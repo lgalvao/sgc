@@ -54,7 +54,6 @@ public class AtividadeFacade {
     private final AccessControlService accessControlService;
     private final UsuarioFacade usuarioService;
     private final MapaFacade mapaFacade;
-    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Constructor com @Lazy para quebrar dependência circular.
@@ -71,7 +70,6 @@ public class AtividadeFacade {
         this.accessControlService = accessControlService;
         this.usuarioService = usuarioService;
         this.mapaFacade = mapaFacade;
-        this.eventPublisher = eventPublisher;
     }
 
     // ===== Consultas =====

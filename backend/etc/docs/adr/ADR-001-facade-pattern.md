@@ -1,9 +1,5 @@
 # ADR-001: Uso do Padrão Facade para Orquestração de Serviços
 
-**Data**: 2026-01-10  
-**Status**: ✅ Aceito e Implementado  
-**Decisores**: Equipe de Arquitetura SGC
-
 ---
 
 ## Contexto e Problema
@@ -34,24 +30,12 @@ Adotar o **Padrão Facade** para encapsular a orquestração de services especia
 
 ---
 
-## Implementação
-
-### Facades Implementadas
-
-| Módulo      | Facade            | Services | Status |
-|-------------|-------------------|----------|--------|
-| Processo    | ProcessoFacade    | 3        | ✅      |
-| Subprocesso | SubprocessoFacade | 11       | ✅      |
-| Mapa        | MapaFacade        | 7        | ✅      |
-| Atividade   | AtividadeFacade   | 2        | ✅      |
-
----
 
 ## Consequências
 
 ### Positivas ✅
 
-- Controllers mais simples (1 dependência)
+- Controllers mais simples
 - Lógica de orquestração centralizada
 - Services mais coesos
 - Melhor testabilidade
@@ -69,8 +53,3 @@ Adotar o **Padrão Facade** para encapsular a orquestração de services especia
 Testes ArchUnit garantem que controllers usam apenas Facades:
 
 - Ver `sgc.arquitetura.ArchConsistencyTest`
-
----
-
-**Revisão próxima**: 2026-07-10  
-**Autor**: GitHub Copilot AI Agent

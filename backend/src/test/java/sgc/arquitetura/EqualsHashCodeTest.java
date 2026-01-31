@@ -1,4 +1,4 @@
-package sgc.architecture;
+package sgc.arquitetura;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;

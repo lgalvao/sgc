@@ -1,9 +1,5 @@
 # ADR-007: Resolução de Dependências Circulares
 
-**Data**: 2026-01-14  
-**Status**: ✅ Implementado  
-**Decisores**: Equipe de Arquitetura SGC
-
 ---
 
 ## Contexto e Problema
@@ -95,9 +91,7 @@ public AtividadeFacade(
 - `subprocessoFacade.obterEntidadePorCodigoMapa()` ✅
 
 **Operações (candidatas a eventos):**
-- `ProcessoInicializador.iniciar()` → cria subprocessos
-  - **Status:** Mantido chamada direta (não é ciclo problemático)
-  - **Razão:** Operação síncrona dentro do mesmo contexto transacional
+- `ProcessoInicializador.iniciar()` → cria subprocessos (operação síncrona dentro do mesmo contexto transacional)
 
 ### Decisões Técnicas
 
@@ -171,8 +165,3 @@ static final ArchRule no_cycles_within_service_packages = slices()
 - ADR-002: Unified Events Pattern
 - [Spring @Lazy Documentation](https://docs.spring.io/spring-framework/reference/core/beans/dependencies/factory-lazy-init.html)
 - [Circular Dependencies in Spring](https://www.baeldung.com/circular-dependencies-in-spring)
-
----
-
-**Autor**: GitHub Copilot AI Agent  
-**Revisão**: 2026-01-14

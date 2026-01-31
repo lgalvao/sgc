@@ -1,9 +1,5 @@
 # ADR-006: Organização por Agregados de Domínio vs Outros Critérios
 
-**Data:** 2026-01-15  
-**Status:** ✅ Aceito  
-**Decisores:** Equipe de Arquitetura SGC  
-**Relacionado:** ADR-001 (Facade Pattern), ADR-005 (Controller Organization)
 
 ---
 
@@ -21,9 +17,9 @@ O sistema SGC está organizado em módulos por conceitos de domínio:
 
 Foi identificado que:
 
-1. O módulo `subprocesso/` é muito grande (76 arquivos, ~6.100 linhas)
-2. O módulo `mapa/` também é substancial (48 arquivos)
-3. Quase tudo no sistema depende de `subprocesso` (59 arquivos importam dele)
+1. O módulo `subprocesso/` é muito grande
+2. O módulo `mapa/` também é substancial
+3. Muitos módulos dependem de `subprocesso`
 4. Há muitas dependências cruzadas entre módulos
 
 ### Questão para Decisão
@@ -60,7 +56,7 @@ Ele conecta:
 - Unidade (quem executa)
 - Atividades (o que é feito)
 - Mapa (competências resultantes)
-- Estados (9 estados de workflow)
+- Estados (workflow complexo)
 
 **Não é um problema arquitetural, é a REALIDADE do domínio.**
 
@@ -79,15 +75,15 @@ sgc/
 
 **Problemas Fatais:**
 
-1. **Duplicação Massiva (>80%)**
+1. **Duplicação Massiva**
     - Subprocesso de mapeamento e revisão compartilham:
         - ✓ Mesmo modelo de dados (Entidade JPA)
         - ✓ Mesma validação hierárquica
         - ✓ Mesmo CRUD de atividades
         - ✓ Mesmos services de transição
     - Diferem apenas em:
-        - ✗ Alguns estados específicos (~10%)
-        - ✗ Algumas validações específicas (~5%)
+        - ✗ Alguns estados específicos
+        - ✗ Algumas validações específicas
 
 2. **Viola DRY (Don't Repeat Yourself)**
     - Mudança em validação = alterar 3 lugares
@@ -144,12 +140,12 @@ sgc/
 **Problemas:**
 
 1. **Navegação Difícil**
-    - Para entender "Subprocesso", visitar 4 pacotes diferentes
+    - Para entender "Subprocesso", visitar múltiplos pacotes diferentes
     - Funcionalidades relacionadas espalhadas
 
 2. **Módulos Grandes Demais**
-    - `domain/` teria 100+ entidades de todos os módulos
-    - `application/` teria 50+ services de todos os módulos
+    - `domain/` teria muitas entidades de todos os módulos
+    - `application/` teria muitos services de todos os módulos
     - Perde coesão
 
 3. **Impede Modularização Futura**
@@ -217,12 +213,10 @@ sgc/
 
 **Problemas Identificados (e soluções):**
 
-| Problema                         | Solução                                |
-|----------------------------------|----------------------------------------|
-| Módulo grande (76 arquivos)      | ✅ Consolidar services (12→6)           |
-| Services públicos desnecessários | ✅ Tornar package-private               |
-| Comunicação síncrona excessiva   | ✅ Implementar eventos de domínio       |
-| Falta de sub-organização         | ✅ Criar sub-pacotes (workflow/, crud/) |
+- Módulo grande → Consolidar services
+- Services públicos desnecessários → Tornar package-private
+- Comunicação síncrona excessiva → Implementar eventos de domínio
+- Falta de sub-organização → Criar sub-pacotes (workflow/, crud/)
 
 **Veredito:** ✅ **ACEITO** - Arquitetura correta, requer refinamento
 
@@ -251,53 +245,6 @@ Organizar código por **funcionalidade de negócio** (agregados), não por **tip
 
 ---
 
-## Melhorias Propostas
-
-### M1. Consolidar Services de Subprocesso
-
-**Antes:** 12 services  
-**Depois:** 6-7 services  
-**Redução:** ~50%
-
-**Consolidações:**
-
-- SubprocessoCadastroWorkflowService + SubprocessoMapaWorkflowService → SubprocessoWorkflowService
-- SubprocessoDetalheService → lógica movida para Facade
-- SubprocessoContextoService → lógica movida para Facade
-
-### M2. Tornar Services Package-Private
-
-```java
-// ANTES
-@Service
-public class SubprocessoCrudService { ... }
-
-// DEPOIS
-@Service
-class SubprocessoCrudService { ... }  // package-private
-```
-
-**Efeito:** Força uso via Facade, garante encapsulamento.
-
-### M3. Implementar Eventos de Domínio
-
-**Atual:** 6 eventos  
-**Meta:** 14-16 eventos  
-**Benefício:** Desacoplamento entre módulos
-
-### M4. Organizar Sub-pacotes
-
-```
-subprocesso/service/
-├── SubprocessoFacade.java (public)
-├── workflow/    (package-private)
-├── crud/        (package-private)
-└── notificacao/ (package-private)
-```
-
-**Benefício:** Navegação mais clara, coesão por responsabilidade.
-
----
 
 ## Consequências
 
@@ -335,65 +282,6 @@ subprocesso/service/
 
 ---
 
-## Análise de Complexidade
-
-### Complexidade Essencial (Inevitável - ~70%)
-
-Do domínio de negócio:
-
-- 9 estados de Subprocesso → workflow complexo de negócio
-- Validação hierárquica em 3 níveis → estrutura organizacional real
-- Síntese manual de competências → decisão humana, não automatizável
-
-### Complexidade Acidental (Evitável - ~30%)
-
-Introduzida pela implementação:
-
-- 12 services quando 6 seriam suficientes
-- Services públicos sem necessidade
-- Comunicação síncrona excessiva
-
-### Estratégia
-
-✅ **Focar em reduzir complexidade acidental**  
-✅ **Aceitar e documentar complexidade essencial**
-
----
-
-## Métricas de Sucesso
-
-| Métrica                 | Antes  | Meta       |
-|-------------------------|--------|------------|
-| Services de Subprocesso | 12     | 6-7        |
-| Services públicos       | 12     | 1 (Facade) |
-| Eventos implementados   | 6      | 14-16      |
-| Linhas em services      | ~2.500 | ~1.800     |
-
----
-
-## Conformidade
-
-### Padrões Mantidos
-
-- ✅ ADR-001: Facade Pattern (mantido)
-- ✅ ADR-002: Unified Events (expandido)
-- ✅ ADR-003: Security Architecture (mantido)
-- ✅ ADR-004: DTO Pattern (mantido)
-- ✅ ADR-005: Controller Organization (mantido)
-
-### Testes Arquiteturais
-
-```java
-@ArchTest
-static final ArchRule modules_are_organized_by_domain_aggregates =
-    classes()
-        .that().resideInAPackage("sgc..")
-        .should().onlyAccessClassesThat()
-        .resideInAnyPackage("sgc..", "java..", "org.springframework..")
-        .because("Modules should be organized by domain aggregates");
-```
-
----
 
 ## Referências
 
@@ -424,20 +312,8 @@ static final ArchRule modules_are_organized_by_domain_aggregates =
 
 ### Documentação Interna
 
-- `/proposta-arquitetura.md` - Análise completa desta decisão
 - `/docs/ARCHITECTURE.md` - Arquitetura geral
-- `/reqs/_intro.md` - Modelo de negócio
+- `/reqs/_intro.md` - Visão conceitual do projeto e situações possiveis
 
 ---
 
-## Histórico de Revisões
-
-| Data       | Versão | Mudanças                                                      |
-|------------|--------|---------------------------------------------------------------|
-| 2026-01-15 | 1.0    | Criação inicial - Decisão de manter organização por agregados |
-
----
-
-**Revisão próxima:** 2026-07-15  
-**Autor:** GitHub Copilot AI Agent  
-**Aprovado por:** Análise Arquitetural (proposta-arquitetura.md)

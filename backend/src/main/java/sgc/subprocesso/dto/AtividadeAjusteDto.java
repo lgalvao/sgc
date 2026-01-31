@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Builder
 public record AtividadeAjusteDto(
-                Long codAtividade,
-                String nome,
-                List<ConhecimentoAjusteDto> conhecimentos) {
+        Long codAtividade,
+        String nome,
+        List<ConhecimentoAjusteDto> conhecimentos) {
 }

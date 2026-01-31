@@ -26,17 +26,16 @@ import java.util.List;
 public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
     /**
      * Busca todas as competências de um mapa, incluindo suas atividades associadas.
-     * 
+     *
      * <p><b>Quando usar:</b> Quando precisar das entidades Atividade completas para manipulação.
-     * 
+     *
      * <p><b>Performance:</b> EntityGraph evita N+1 queries mas pode duplicar dados em memória
      * se múltiplas competências compartilham atividades.
      *
      * @param mapaCodigo Código do mapa
-     * @return Lista de competências do mapa com atividades carregadas
      */
     @EntityGraph(attributePaths = {"atividades"})
-    List<Competencia> findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
+    void findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
 
     /**
      * Busca dados projetados (id, descricao, id_atividade) das competências de um mapa.

@@ -61,8 +61,8 @@ public class UnidadeFacade {
         );
     }
 
-    public List<Long> buscarIdsDescendentes(Long codigoUnidade) {
-        return hierarquiaService.buscarIdsDescendentes(codigoUnidade);
+    public void buscarIdsDescendentes(Long codigoUnidade) {
+        hierarquiaService.buscarIdsDescendentes(codigoUnidade);
     }
 
     public UnidadeDto buscarArvore(Long codigo) {

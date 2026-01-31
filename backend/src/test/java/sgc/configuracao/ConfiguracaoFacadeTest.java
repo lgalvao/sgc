@@ -23,7 +23,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ConfiguracaoFacade")
 class ConfiguracaoFacadeTest {
-
     @InjectMocks
     private ConfiguracaoFacade configuracaoFacade;
 

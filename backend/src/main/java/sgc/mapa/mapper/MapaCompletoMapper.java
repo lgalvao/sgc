@@ -16,8 +16,8 @@ import sgc.mapa.model.Atividade;
 
 @Mapper(componentModel = "spring")
 public interface MapaCompletoMapper {
-    default MapaCompletoDto toDto(Mapa mapa, Long codSubprocesso, List<Competencia> competencias) {
-        return MapaCompletoDto.builder()
+    default void toDto(Mapa mapa, Long codSubprocesso, List<Competencia> competencias) {
+        MapaCompletoDto.builder()
                 .codigo(mapa.getCodigo())
                 .subprocessoCodigo(codSubprocesso)
                 .observacoes(mapa.getObservacoesDisponibilizacao())

@@ -10,12 +10,8 @@ import java.time.LocalDateTime;
 @Builder
 public record AnaliseValidacaoDto(
         Long codigo,
-
         LocalDateTime dataHora,
-
         String observacoes,
-
         String acao,
-
         String unidadeSigla) {
 }

@@ -3,7 +3,6 @@ package sgc.alerta;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -239,12 +238,12 @@ public class AlertaFacade {
     /**
      * Lista alertas destinados a uma unidade específica.
      */
-    public Page<Alerta> listarPorUnidade(Long codigoUnidade, Pageable pageable) {
-        return alertaService.buscarPorUnidadeDestino(codigoUnidade, pageable);
+    public void listarPorUnidade(Long codigoUnidade, Pageable pageable) {
+        alertaService.buscarPorUnidadeDestino(codigoUnidade, pageable);
     }
 
-    public Optional<LocalDateTime> obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
-        return alertaService.obterDataHoraLeitura(codigoAlerta, usuarioTitulo);
+    public void obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
+        alertaService.obterDataHoraLeitura(codigoAlerta, usuarioTitulo);
     }
 
     @Transactional

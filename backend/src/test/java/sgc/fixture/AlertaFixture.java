@@ -23,6 +23,7 @@ public class AlertaFixture {
     public static Alerta alertaParaUsuario(Processo processo, Usuario usuario) {
         Alerta alerta = alertaPadrao(processo);
         alerta.setUsuarioDestino(usuario);
+
         // Define também a unidade de destino para que o alerta apareça na busca por unidade
         alerta.setUnidadeDestino(usuario.getUnidadeLotacao());
         alerta.setDescricao("Alerta para Usuario " + usuario.getNome());

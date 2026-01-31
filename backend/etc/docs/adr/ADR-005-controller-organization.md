@@ -1,25 +1,19 @@
 # ADR-005: Organização de Controllers por Workflow Phase
 
-**Data**: 2026-01-10  
-**Status**: ✅ Aceito e Implementado  
-**Decisores**: Equipe de Arquitetura SGC  
-**Relacionado**: ADR-001 (Facade Pattern)
-
 ---
 
 ## Contexto e Problema
 
-O módulo `subprocesso` possui 4 controllers distintos que gerenciam diferentes aspectos do ciclo de vida de um
-subprocesso:
+O módulo `subprocesso` possui 4 controllers distintos que gerenciam diferentes aspectos do ciclo de vida de um subprocesso:
 
-1. **SubprocessoCrudController** (188 linhas, 12 endpoints)
-2. **SubprocessoCadastroController** (329 linhas, 13 endpoints)
-3. **SubprocessoMapaController** (262 linhas, 14 endpoints)
-4. **SubprocessoValidacaoController** (212 linhas, 11 endpoints)
+1. **SubprocessoCrudController** - CRUD básico, permissões, busca
+2. **SubprocessoCadastroController** - Disponibilizar, devolver, aceitar, homologar
+3. **SubprocessoMapaController** - Edição de mapa, impactos, salvamento
+4. **SubprocessoValidacaoController** - Validação, sugestões, homologação
 
-**Total**: 991 linhas, 50 endpoints, todos usando o mesmo `SubprocessoFacade`.
+Todos usam o mesmo `SubprocessoFacade`.
 
-### Questão Avaliada (Sessão 5 - 2026-01-10)
+### Questão Avaliada
 
 > "Dado que todos os controllers usam a mesma facade e o mesmo base path (`/api/subprocessos/{codigo}/...`), faria
 > sentido consolidá-los em um único `SubprocessoController`?"
@@ -35,17 +29,14 @@ subprocesso:
 ```java
 @RestController
 @RequestMapping("/api/subprocessos")
-public class SubprocessoController {  // ~991 linhas
-    // 12 endpoints CRUD
-    // 13 endpoints workflow cadastro
-    // 14 endpoints workflow mapa  
-    // 11 endpoints workflow validação
+public class SubprocessoController {
+    // Todos endpoints CRUD, cadastro, mapa e validação em um único arquivo
 }
 ```
 
 **Problemas Identificados:**
 
-- ❌ **Arquivo grande** (991 linhas) - difícil navegação
+- ❌ **Arquivo muito grande** - difícil navegação
 - ❌ **Mistura de responsabilidades** - CRUD + 3 workflows diferentes
 - ❌ **Pior documentação** - Swagger misturaria endpoints de contextos diferentes
 - ❌ **Testes menos focados** - Difícil criar testes por workflow
@@ -57,10 +48,10 @@ public class SubprocessoController {  // ~991 linhas
 **Estrutura Atual:**
 
 ```
-SubprocessoCrudController      (12 endpoints) - CRUD básico, permissões, busca
-SubprocessoCadastroController  (13 endpoints) - Disponibilizar, devolver, aceitar, homologar
-SubprocessoMapaController      (14 endpoints) - Edição de mapa, impactos, salvamento
-SubprocessoValidacaoController (11 endpoints) - Validação, sugestões, homologação
+SubprocessoCrudController      - CRUD básico, permissões, busca
+SubprocessoCadastroController  - Disponibilizar, devolver, aceitar, homologar
+SubprocessoMapaController      - Edição de mapa, impactos, salvamento
+SubprocessoValidacaoController - Validação, sugestões, homologação
 ```
 
 **Vantagens:**
@@ -69,7 +60,7 @@ SubprocessoValidacaoController (11 endpoints) - Validação, sugestões, homolog
 - ✅ **Organização** - Separação clara por fase do workflow
 - ✅ **Testabilidade** - Testes focados em workflows específicos
 - ✅ **Documentação** - Swagger organizado por contexto (CRUD, Cadastro, Mapa, Validação)
-- ✅ **Manutenibilidade** - Arquivos de tamanho razoável (~200-300 linhas cada)
+- ✅ **Manutenibilidade** - Arquivos de tamanho razoável
 - ✅ **Coesão** - Cada controller tem responsabilidade bem definida
 - ✅ **Aderência a SRP** - Cada controller muda por uma razão específica
 
@@ -113,7 +104,7 @@ Esta organização:
 
 4. **Manutenibilidade**
     - Mudanças em workflow de cadastro não afetam outros controllers
-    - Arquivos de tamanho gerenciável (~200-300 linhas)
+    - Arquivos de tamanho gerenciável
 
 5. **Aderência ao SRP**
     - Cada controller tem uma razão clara para mudar
@@ -122,7 +113,7 @@ Esta organização:
 ### Negativas ❌
 
 1. **Mais Arquivos**
-    - 4 arquivos em vez de 1
+    - Múltiplos arquivos em vez de um único
     - *Mitigação*: Organização compensa o número de arquivos
 
 2. **Possível Duplicação de Código**
@@ -158,7 +149,7 @@ Controllers podem evoluir independentemente sem afetar os demais.
 
 ## Alternativas Consideradas
 
-### Consolidação Parcial (2 Controllers)
+### Consolidação Parcial
 
 ```
 SubprocessoController        (CRUD básico)
@@ -197,66 +188,12 @@ Controllers seguem padrões:
 - ✅ Localização: `sgc.subprocesso` package
 - ✅ Anotações: `@RestController`, `@RequestMapping`
 
-### Revisão de Código
-
-- Controllers revisados e validados
-- Separação aprovada pela equipe
-- Documentação Swagger organizada
-
----
-
-## Lições Aprendidas
-
-### ✅ Arquitetura deve refletir o domínio
-
-A separação por workflow phase reflete perfeitamente as fases do processo de negócio. Consolidar por questões técnicas (
-todos usam mesma facade) ignoraria essa correspondência.
-
-### ✅ Tamanho de arquivo importa
-
-Arquivos grandes (>500 linhas) são difíceis de navegar e manter. Manter controllers em ~200-300 linhas facilita leitura
-e manutenção.
-
-### ✅ Organização > Número de arquivos
-
-Ter mais arquivos bem organizados é melhor que ter menos arquivos desorganizados.
-
-### ✅ Documentação da API importa
-
-Swagger organizado por contexto (workflow phase) é mais útil para consumidores da API do que endpoints misturados.
-
----
-
-## Métricas de Impacto
-
-| Métrica                 | Controller Único | 4 Controllers | Diferença |
-|-------------------------|------------------|---------------|-----------|
-| **Linhas por arquivo**  | 991              | ~248 (média)  | -75%      |
-| **Navegabilidade**      | Baixa            | Alta          | ⬆️        |
-| **Organização Swagger** | Misturada        | Por Workflow  | ⬆️        |
-| **Testabilidade**       | Média            | Alta          | ⬆️        |
-| **Manutenibilidade**    | Baixa            | Alta          | ⬆️        |
-| **Aderência a SRP**     | Não              | Sim           | ⬆️        |
 
 ---
 
 ## Referências
 
-- [ADR-001: Facade Pattern](/etc/docsdocs/adr/ADR-001-facade-pattern.md)
+- [ADR-001: Facade Pattern](/etc/docs/adr/ADR-001-facade-pattern.md)
 - [ARCHITECTURE.md](/etc/docsdocs/ARCHITECTURE.md)
 - [Backend Patterns](/etc/regras/backend-padroes.md)
 - [Refactoring Plan](/refactoring-plan.md) - Fase 5
-
----
-
-## Histórico de Revisões
-
-| Data       | Versão | Mudanças                   |
-|------------|--------|----------------------------|
-| 2026-01-10 | 1.0    | Criação inicial (Sessão 5) |
-
----
-
-**Revisão próxima**: 2026-07-10  
-**Autor**: GitHub Copilot AI Agent  
-**Aprovado por**: Análise Arquitetural Sessão 5

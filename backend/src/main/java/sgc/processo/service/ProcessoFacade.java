@@ -125,9 +125,9 @@ public class ProcessoFacade {
                 .toList();
     }
 
-    public Page<Processo> listarTodos(
+    public void listarTodos(
             Pageable pageable) {
-        return processoConsultaService.listarTodos(pageable);
+        processoConsultaService.listarTodos(pageable);
     }
 
     public Page<Processo> listarPorParticipantesIgnorandoCriado(

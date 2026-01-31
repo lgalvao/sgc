@@ -10,17 +10,16 @@ import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
+import jakarta.persistence.Entity;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Tag;
-
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
-import static com.tngtech.archunit.core.domain.properties.CanBeAnnotated.Predicates.annotatedWith;
-import jakarta.persistence.Entity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
+
+import static com.tngtech.archunit.core.domain.properties.CanBeAnnotated.Predicates.annotatedWith;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
 @Tag("integration")
 @AnalyzeClasses(packages = "sgc", importOptions = {
@@ -77,8 +76,7 @@ public class ArchConsistencyTest {
                     String itemPackage = item.getPackageName();
                     String itemModule = extractModule(itemPackage);
 
-                    if (itemModule == null)
-                        return;
+                    if (itemModule == null) return;
 
                     for (Dependency dependency : item.getDirectDependenciesFromSelf()) {
                         JavaClass targetClass = dependency.getTargetClass();
@@ -122,8 +120,7 @@ public class ArchConsistencyTest {
                     boolean pacoteNullMarked = javaPackage.isAnnotatedWith(NullMarked.class);
 
                     if (!pacoteNullMarked) {
-                        String mensagem = String.format(
-                                "%s não está em um pacote @NullMarked (pacote: %s)",
+                        String mensagem = String.format("%s não está em um pacote @NullMarked (pacote: %s)",
                                 item.getSimpleName(), javaPackage.getName());
                         events.add(SimpleConditionEvent.violated(item, mensagem));
                     }
@@ -336,4 +333,19 @@ public class ArchConsistencyTest {
             .haveSimpleName("ComumRepo")
             .because("Facades should delegate to Services, not access Repositories directly (ADR-001). " +
                     "See simplification-plan.md section 3 'Facades - Hierarquia Excessiva'");
+
+    /**
+     * Verifica ausência de ciclos internos nos pacotes workflow de cada módulo.
+     *
+     * <p>Garante que pacotes internos de service (workflow, crud, etc.) não criem
+     * dependências circulares entre si dentro do mesmo módulo.
+     *
+     * <p><b>Nota:</b> @Lazy pode ser usado para quebrar ciclos internos quando
+     * houver necessidade legítima de referências mútuas.
+     */
+    @ArchTest
+    static final ArchRule no_cycles_within_service_packages = slices()
+            .matching("sgc.(*).service.(**)")
+            .should()
+            .beFreeOfCycles();
 }

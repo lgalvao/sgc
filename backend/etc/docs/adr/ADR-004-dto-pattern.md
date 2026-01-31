@@ -1,10 +1,5 @@
 # ADR-004: Padrão de DTOs Obrigatórios
 
-**Status:** ✅ Aceito e Implementado  
-**Data:** 2026-01-10  
-**Decisores:** Equipe de Desenvolvimento SGC  
-**Contexto Técnico:** Padrão arquitetural estabelecido desde v1.0
-
 ---
 
 ## Contexto
@@ -554,14 +549,14 @@ Para operações de alto volume, criar DTOs "enxutos":
 
 ```java
 // DTO completo (para detalhes)
-public record SubprocessoDetalheDto(...) {}  // 20+ campos
+public record SubprocessoDetalheDto(...) {}
 
 // DTO enxuto (para listagens)
 public record SubprocessoListagemDto(
     Long codigo,
     String descricao,
     SituacaoSubprocesso situacao
-) {}  // Apenas 3 campos
+) {}
 ```
 
 ## Estrutura de Pacotes
@@ -665,57 +660,6 @@ sgc/
 - **Contras**: Mais código (mitigado por MapStruct)
 - **Motivo da Escolha**: Melhor práticas da indústria
 
-## Implementação
-
-### Status: ✅ 100% IMPLEMENTADO
-
-**Desde v1.0:**
-
-- ✅ 100% dos controllers usam DTOs
-- ✅ 0 entidades JPA expostas
-- ✅ Mappers implementados com MapStruct
-- ✅ Testes arquiteturais (ArchUnit) garantem aderência
-
-**Evidências:**
-
-```bash
-# Verificar que nenhum controller expõe entidades
-grep -r "@Entity" backend/src/main/java/sgc/**/controller/*.java
-# Resultado: 0 ocorrências ✅
-```
-
-### Arquivos Relacionados
-
-**DTOs (150+ arquivos):**
-
-- `sgc.processo.dto.*`
-- `sgc.subprocesso.dto.*`
-- `sgc.mapa.dto.*`
-- `sgc.organizacao.dto.*`
-- ... (outros módulos)
-
-**Mappers (30+ arquivos):**
-
-- `sgc.processo.mapper.*`
-- `sgc.subprocesso.mapper.*`
-- `sgc.mapa.mapper.*`
-- ... (outros módulos)
-
-**Testes Arquiteturais:**
-
-- `ArchConsistencyTest.controllersNaoDevemRetornarEntidades()`
-- `ArchConsistencyTest.dtosNaoDevemSerEntidades()`
-
-## Métricas
-
-| Métrica                      | Valor |
-|------------------------------|-------|
-| DTOs criados                 | 150+  |
-| Mappers MapStruct            | 30+   |
-| Entidades JPA expostas       | 0     |
-| Cobertura de mapeamento      | 100%  |
-| Testes de DTO                | 200+  |
-| Overhead médio de mapeamento | < 1ms |
 
 ## Referências
 
@@ -737,11 +681,4 @@ grep -r "@Entity" backend/src/main/java/sgc/**/controller/*.java
 - Martin Fowler - DTO Pattern: https://martinfowler.com/eaaCatalog/dataTransferObject.html
 - MapStruct Documentation: https://mapstruct.org
 - Jakarta Bean Validation: https://beanvalidation.org
-- OWASP - Mass
-  Assignment: https://owasp.org/API-Security/editions/2023/en/0xa6-unrestricted-access-to-sensitive-business-flows/
-
----
-
-**Aprovado por:** Equipe de Desenvolvimento SGC  
-**Data de Adoção:** 2026 (v1.0)  
-**Status de Produção:** ✅ 100% aderente (verificado por ArchUnit)
+- OWASP - Mass Assignment: https://owasp.org/API-Security/editions/2023/en/0xa6-unrestricted-access-to-sensitive-business-flows/

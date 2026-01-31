@@ -26,11 +26,9 @@ public class ConfiguracaoService {
 
     /**
      * Busca todos os parâmetros de configuração.
-     *
-     * @return lista com todos os parâmetros
      */
-    public List<Parametro> buscarTodos() {
-        return parametroRepo.findAll();
+    public void buscarTodos() {
+        parametroRepo.findAll();
     }
 
     /**

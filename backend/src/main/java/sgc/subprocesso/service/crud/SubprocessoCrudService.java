@@ -73,8 +73,8 @@ public class SubprocessoCrudService {
         this.mapaFacade = mapaFacade;
     }
 
-    public Subprocesso buscarSubprocesso(Long codigo) {
-        return repositorioComum.buscar(Subprocesso.class, codigo);
+    public void buscarSubprocesso(Long codigo) {
+        repositorioComum.buscar(Subprocesso.class, codigo);
     }
 
     /**

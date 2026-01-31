@@ -32,11 +32,11 @@ import static java.util.stream.Collectors.toMap;
 @RequiredArgsConstructor
 public class UsuarioFacade {
     private static final String ENTIDADE_USUARIO = "Usuário";
+
     private final UsuarioConsultaService usuarioConsultaService;
     private final UsuarioPerfilService usuarioPerfilService;
     private final AdministradorService administradorService;
     private final UnidadeConsultaService unidadeConsultaService;
-
 
     @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
@@ -126,11 +126,6 @@ public class UsuarioFacade {
         usuarioPerfilService.carregarAuthorities(usuario);
     }
 
-    private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
-        // Atribuições carregadas diretamente quando necessário via usuarioPerfilRepo
-        // Cache removido conforme simplificação Fase 1
-    }
-
     public Optional<UsuarioDto> buscarUsuarioPorEmail(String email) {
         return usuarioConsultaService.buscarPorEmail(email).map(this::toUsuarioDto);
     }
@@ -138,7 +133,6 @@ public class UsuarioFacade {
     public List<UsuarioDto> buscarUsuariosAtivos() {
         return usuarioConsultaService.buscarTodos().stream().map(this::toUsuarioDto).toList();
     }
-
 
     public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
         List<Usuario> chefes = usuarioConsultaService.buscarChefesPorUnidades(List.of(unidadeCodigo));

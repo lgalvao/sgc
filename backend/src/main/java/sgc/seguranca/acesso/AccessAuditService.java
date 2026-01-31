@@ -17,7 +17,6 @@ import java.time.Instant;
 @Slf4j
 @RequiredArgsConstructor
 public class AccessAuditService {
-
     /**
      * Registra um acesso concedido.
      *
@@ -50,9 +49,6 @@ public class AccessAuditService {
                 motivo,
                 Instant.now()
         );
-
-        // Futura implementação: persistir em tabela de auditoria
-        // auditRepo.save(new AuditRecord(...));
     }
 
     /**
@@ -65,10 +61,7 @@ public class AccessAuditService {
         return switch (recurso) {
             case Subprocesso sp -> "Subprocesso:" + sp.getCodigo();
             case Processo p -> "Processo:" + p.getCodigo();
-            default ->
-
-                // Para outros tipos de recursos
-                    recurso.getClass().getSimpleName();
+            default -> recurso.getClass().getSimpleName();
         };
 
     }

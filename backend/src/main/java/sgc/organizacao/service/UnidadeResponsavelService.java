@@ -157,18 +157,6 @@ public class UnidadeResponsavelService {
                 ));
     }
 
-    // ============ Métodos Privados (Carregamento de Atribuições) ============
-
-    private void carregarAtribuicoesUsuario(Usuario usuario) {
-        // Atribuições carregadas diretamente quando necessário via usuarioPerfilRepo
-        // Cache removido conforme simplificação Fase 1
-    }
-
-    private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
-        // Atribuições carregadas diretamente quando necessário via usuarioPerfilRepo
-        // Cache removido conforme simplificação Fase 1
-    }
-
     private UnidadeResponsavelDto montarResponsavelDto(Long unidadeCodigo, List<Usuario> chefes) {
         Usuario titular = chefes.getFirst();
         Usuario substituto = chefes.size() > 1 ? chefes.get(1) : null;

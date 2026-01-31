@@ -1,14 +1,10 @@
 # ADR-002: Eventos de Domínio Unificados
 
-**Data**: 2026-01-10  
-**Status**: ✅ Aceito e Implementado (Subprocesso)  
-**Decisores**: Equipe de Arquitetura SGC
-
 ---
 
 ## Contexto e Problema
 
-Subprocessos têm múltiplas transições de estado (~15 transições diferentes entre situações).
+Subprocessos têm múltiplas transições de estado diferentes entre situações.
 
 **Abordagem Tradicional:** Um evento por transição
 
@@ -17,11 +13,11 @@ Subprocessos têm múltiplas transições de estado (~15 transições diferentes
 - EventoCadastroAceito
 - EventoCadastroHomologado
 - EventoRevisaoCadastroDisponibilizada
-- ... (15+ eventos)
+- ... (muitos eventos)
 
 **Problemas:**
 
-1. Proliferação de classes (15+ arquivos)
+1. Proliferação de classes (muitos arquivos)
 2. Código duplicado entre eventos
 3. Difícil adicionar novos tipos
 4. Listeners precisam se registrar em múltiplos eventos
@@ -48,7 +44,7 @@ public enum TipoTransicao {
     CADASTRO_ACEITO,
     CADASTRO_HOMOLOGADO,
     REVISAO_CADASTRO_DISPONIBILIZADA,
-    // ... 15 tipos
+    // ... outros tipos
 }
 ```
 
@@ -56,7 +52,7 @@ public enum TipoTransicao {
 
 ## Vantagens ✅
 
-1. **Menos classes**: 1 evento + 1 enum vs 15+ classes
+1. **Menos classes**: 1 evento + 1 enum vs muitas classes separadas
 2. **Consistência**: Mesma estrutura de dados
 3. **Simplicidade**: Fácil adicionar novo tipo (enum entry)
 4. **Listeners flexíveis**: Podem filtrar ou capturar todos
@@ -72,7 +68,7 @@ public enum TipoTransicao {
 
 ✅ **Use evento unificado quando:**
 
-- Múltiplas transições similares (>5)
+- Múltiplas transições similares
 - Mesma estrutura de dados
 - Ações subsequentes similares
 
@@ -88,8 +84,3 @@ public enum TipoTransicao {
 
 **Unificado** (Subprocesso): EventoTransicaoSubprocesso + TipoTransicao  
 **Separado** (Processo): EventoProcessoCriado, EventoProcessoIniciado, EventoProcessoFinalizado
-
----
-
-**Autor**: GitHub Copilot AI Agent  
-**Revisão**: 2026-07-10

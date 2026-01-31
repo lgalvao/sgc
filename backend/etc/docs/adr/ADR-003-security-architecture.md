@@ -1,10 +1,5 @@
 # ADR-003: Arquitetura de Controle de Acesso Centralizada
 
-**Status:** ✅ Aceito e Implementado  
-**Data:** 2026-01-08  
-**Decisores:** Equipe de Desenvolvimento SGC  
-**Contexto Técnico:** Sprint 4 de Segurança (100% testes passando)
-
 ---
 
 ## Contexto
@@ -20,7 +15,7 @@ Historicamente, o SGC implementava controle de acesso de forma **dispersa**:
 
 - Controllers com `@PreAuthorize`
 - Services com verificações programáticas ad-hoc
-- Lógica de permissões espalhada em 22+ arquivos
+- Lógica de permissões espalhada em múltiplos arquivos
 - Padrões inconsistentes entre módulos
 
 Isso resultava em:
@@ -114,7 +109,7 @@ public interface AccessPolicy<T> {
 **Implementações:**
 
 - `ProcessoAccessPolicy` - Regras para processos
-- `SubprocessoAccessPolicy` - Regras para subprocessos (26 ações mapeadas)
+- `SubprocessoAccessPolicy` - Regras para subprocessos
 - `AtividadeAccessPolicy` - Regras para atividades
 - `MapaAccessPolicy` - Regras para mapas
 
@@ -138,7 +133,7 @@ public enum Acao {
     VALIDAR_MAPA, DEVOLVER_MAPA, ACEITAR_MAPA,
     HOMOLOGAR_MAPA, AJUSTAR_MAPA,
     
-    // ... (26+ ações totais)
+    // ... outras ações
 }
 ```
 
@@ -276,6 +271,19 @@ public RespostaDto disponibilizar(Subprocesso sp) {
 }
 ```
 
+## Validação
+
+### Testes ArchUnit
+
+Criado `CyclicDependencyTest.java` com:
+```java
+@ArchTest
+static final ArchRule no_cycles_within_service_packages = slices()
+        .matching("sgc.(*).service.(**)")
+        .should()
+        .beFreeOfCycles();
+```
+
 ## Consequências
 
 ### Vantagens ✅
@@ -313,7 +321,7 @@ public RespostaDto disponibilizar(Subprocesso sp) {
 
 1. **Complexidade Inicial**
     - Curva de aprendizado para novos desenvolvedores
-    - Mais arquivos/classes (5 novos componentes)
+    - Mais arquivos/classes
     - **Mitigação**: Documentação completa + exemplos
 
 2. **Overhead de Abstração**
@@ -377,32 +385,10 @@ public RespostaDto disponibilizar(Subprocesso sp) {
 2. **Auditoria é Crucial**: Logs estruturados facilitam compliance e debugging
 3. **Políticas Declarativas**: Map de regras é mais claro que if/else aninhados
 4. **Testes Arquiteturais**: ArchUnit garante que padrão seja seguido
-5. **Migração Incremental**: Sprints pequenos com validação constante evitam regressões
 
 ## Referências
 
-### Documentos Relacionados
-
-- [ADR-001: Facade Pattern](ADR-001-facade-pattern.md) - Padrão de Facades (relacionado)
-- `/docs/SECURITY-REFACTORING-COMPLETE.md` - Relatório completo da refatoração
-- `/security-refactoring-plan.md` - Plano original (Sprints 1-4)
-- `/AGENTS.md` - Guia de padrões de segurança
-- `/regras/backend-padroes.md` - Seção de Controle de Acesso
-
-### Código de Referência
-
-- `sgc.seguranca.acesso` - Pacote completo de controle de acesso
-- `sgc.seguranca.acesso.SubprocessoAccessPolicy` - Exemplo de policy completa
-- `sgc.subprocesso.service.SubprocessoFacade` - Exemplo de uso
-
-### Padrões Externos
-
-- Spring Security: https://spring.io/projects/spring-security
-- OWASP Access Control: https://owasp.org/www-community/Access_Control
-- Domain-Driven Design: Specification Pattern (base para AccessPolicy)
-
----
-
-**Aprovado por:** Equipe de Desenvolvimento SGC  
-**Data de Implementação:** 2026-01-08 a 2026-01-09  
-**Status de Produção:** ✅ Pronto para merge (1149/1149 testes passando)
+- ADR-001: Facade Pattern
+- ADR-002: Unified Events Pattern
+- [Spring @Lazy Documentation](https://docs.spring.io/spring-framework/reference/core/beans/dependencies/factory-lazy-init.html)
+- [Circular Dependencies in Spring](https://www.baeldung.com/circular-dependencies-in-spring)
