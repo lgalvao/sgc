@@ -9,7 +9,7 @@
 
 ## 📊 Visão Geral
 
-Este documento resume a execução completa do Plano de Melhorias do Sistema de Gestão de Competências (SGC), baseado no `plano-melhorias.md` e rastreado em `tracking-melhorias.md`.
+Este documento resume a execução completa do Plano de Melhorias do Sistema de Gestão de Competências (SGC), baseado no [plano-melhorias.md](docs/historico/plano-melhorias.md) e rastreado em [tracking-melhorias.md](docs/historico/tracking-melhorias.md).
 
 ### Estatísticas Finais
 
