@@ -146,6 +146,11 @@ public class LoginController {
         } else {
             ip = ip.split(",")[0].trim();
         }
+
+        // Sanitização contra Log Injection (CWE-117)
+        if (ip != null) {
+            return ip.replaceAll("[\\n\\r]", "_");
+        }
         return ip;
     }
 }
