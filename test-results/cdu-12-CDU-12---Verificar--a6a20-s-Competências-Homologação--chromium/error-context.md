@@ -1,0 +1,155 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link "Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link "Minha unidade" [ref=e14] [cursor=pointer]:
+                  - /url: /unidade/18
+                  - generic [ref=e15]: 
+                  - text: Minha unidade
+              - listitem [ref=e16]:
+                - link "Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link "Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "CHEFE - SECAO_221" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: CHEFE - SECAO_221
+              - listitem "Sair" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e30]: 
+      - generic [ref=e33]:
+        - button "Voltar" [ref=e34] [cursor=pointer]:
+          - generic [ref=e35]: 
+        - navigation "breadcrumb" [ref=e36]:
+          - list [ref=e37]:
+            - listitem [ref=e38]:
+              - link "Início" [ref=e39] [cursor=pointer]:
+                - /url: /painel
+                - img "Início" [ref=e40]: 
+            - listitem [ref=e41]:
+              - text: ›
+              - link "SECAO_221" [ref=e42] [cursor=pointer]:
+                - /url: /processo/1/SECAO_221
+            - listitem [ref=e43]:
+              - text: ›
+              - generic [ref=e44]: Atividades e conhecimentos
+      - main [ref=e45]:
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - heading "Atividades e conhecimentos" [level=2] [ref=e49]
+              - paragraph [ref=e50]:
+                - generic [ref=e51]:
+                  - button "Voltar" [ref=e52] [cursor=pointer]:
+                    - generic [ref=e53]: 
+                  - generic [ref=e54]: SECAO_221 - Seção 221
+                  - generic [ref=e55]: Cadastro em Andamento
+            - generic [ref=e57]:
+              - button "Mais ações" [ref=e58] [cursor=pointer]
+              - text:   
+          - generic [ref=e59]:
+            - textbox "Nova atividade" [ref=e61]
+            - generic [ref=e62]:
+              - button "Adicionar atividade" [disabled]:
+                - generic: 
+          - generic [ref=e65]:
+            - generic [ref=e67]:
+              - strong [ref=e69]: Atividade Base 1 1769902031417
+              - generic [ref=e70]:
+                - button "Editar" [ref=e71] [cursor=pointer]:
+                  - generic [ref=e72]: 
+                - 'button "Remover atividade: Atividade Base 1 1769902031417" [ref=e73] [cursor=pointer]':
+                  - generic [ref=e74]: 
+            - generic [ref=e75]:
+              - generic [ref=e76]:
+                - strong [ref=e77]: Conhecimentos *
+                - text: (adicione pelo menos um)
+              - generic [ref=e79]:
+                - generic [ref=e80]: Conhecimento Base 1A
+                - generic [ref=e81]:
+                  - button "Editar" [ref=e82] [cursor=pointer]:
+                    - generic [ref=e83]: 
+                  - 'button "Remover conhecimento: Conhecimento Base 1A" [ref=e84] [cursor=pointer]':
+                    - generic [ref=e85]: 
+              - generic [ref=e86]:
+                - textbox "Novo conhecimento" [ref=e88]
+                - button "Adicionar conhecimento" [ref=e90] [cursor=pointer]:
+                  - generic [ref=e91]: 
+          - generic [ref=e94]:
+            - generic [ref=e96]:
+              - strong [ref=e98]: Atividade Base 2 1769902031417
+              - generic [ref=e99]:
+                - button "Editar" [ref=e100] [cursor=pointer]:
+                  - generic [ref=e101]: 
+                - 'button "Remover atividade: Atividade Base 2 1769902031417" [ref=e102] [cursor=pointer]':
+                  - generic [ref=e103]: 
+            - generic [ref=e104]:
+              - generic [ref=e105]:
+                - strong [ref=e106]: Conhecimentos *
+                - text: (adicione pelo menos um)
+              - generic [ref=e108]:
+                - generic [ref=e109]: Conhecimento Base 2A
+                - generic [ref=e110]:
+                  - button "Editar" [ref=e111] [cursor=pointer]:
+                    - generic [ref=e112]: 
+                  - 'button "Remover conhecimento: Conhecimento Base 2A" [ref=e113] [cursor=pointer]':
+                    - generic [ref=e114]: 
+              - generic [ref=e115]:
+                - textbox "Novo conhecimento" [ref=e117]
+                - button "Adicionar conhecimento" [ref=e119] [cursor=pointer]:
+                  - generic [ref=e120]: 
+          - generic [ref=e123]:
+            - generic [ref=e125]:
+              - strong [ref=e127]: Atividade Base 3 1769902031417
+              - generic [ref=e128]:
+                - button "Editar" [ref=e129] [cursor=pointer]:
+                  - generic [ref=e130]: 
+                - 'button "Remover atividade: Atividade Base 3 1769902031417" [ref=e131] [cursor=pointer]':
+                  - generic [ref=e132]: 
+            - generic [ref=e133]:
+              - generic [ref=e134]:
+                - strong [ref=e135]: Conhecimentos *
+                - text: (adicione pelo menos um)
+              - generic [ref=e137]:
+                - generic [ref=e138]: Conhecimento Base 3A
+                - generic [ref=e139]:
+                  - button "Editar" [ref=e140] [cursor=pointer]:
+                    - generic [ref=e141]: 
+                  - 'button "Remover conhecimento: Conhecimento Base 3A" [ref=e142] [cursor=pointer]':
+                    - generic [ref=e143]: 
+              - generic [ref=e144]:
+                - textbox "Novo conhecimento" [ref=e146]
+                - button "Adicionar conhecimento" [active] [ref=e148] [cursor=pointer]:
+                  - generic [ref=e149]: 
+      - contentinfo [ref=e150]:
+        - generic [ref=e151]:
+          - generic [ref=e152]: Versão 1.0.0
+          - generic [ref=e153]: © SESEL/COSIS/TRE-PE
+  - text:   
+```

@@ -1,0 +1,141 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link "Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link "Minha unidade" [ref=e14] [cursor=pointer]:
+                  - /url: /unidade/16
+                  - generic [ref=e15]: 
+                  - text: Minha unidade
+              - listitem [ref=e16]:
+                - link "Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link "Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "CHEFE - SECAO_212" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: CHEFE - SECAO_212
+              - listitem "Sair" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e30]: 
+      - generic [ref=e33]:
+        - button "Voltar" [ref=e34] [cursor=pointer]:
+          - generic [ref=e35]: 
+        - navigation "breadcrumb" [ref=e36]:
+          - list [ref=e37]:
+            - listitem [ref=e38]:
+              - link "Início" [ref=e39] [cursor=pointer]:
+                - /url: /painel
+                - img "Início" [ref=e40]: 
+            - listitem [ref=e41]:
+              - text: ›
+              - link "SECAO_212" [ref=e42] [cursor=pointer]:
+                - /url: /processo/1/SECAO_212
+            - listitem [ref=e43]:
+              - text: ›
+              - generic [ref=e44]: Atividades e conhecimentos
+      - main [ref=e45]:
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - heading "Atividades e conhecimentos" [level=2] [ref=e49]
+              - paragraph [ref=e50]:
+                - generic [ref=e51]:
+                  - button "Voltar" [ref=e52] [cursor=pointer]:
+                    - generic [ref=e53]: 
+                  - generic [ref=e54]: SECAO_212 - Seção 212
+                  - generic [ref=e55]: Cadastro em Andamento
+            - generic [ref=e57]:
+              - button "Mais ações" [ref=e58] [cursor=pointer]
+              - text:   
+          - generic [ref=e59]:
+            - textbox "Nova atividade" [ref=e61]
+            - generic [ref=e62]:
+              - button "Adicionar atividade" [disabled]:
+                - generic: 
+          - generic [ref=e65]:
+            - generic [ref=e67]:
+              - strong [ref=e69]: Atividade Sem Conhecimento 1 1769901869551
+              - generic [ref=e70]:
+                - button "Editar" [ref=e71] [cursor=pointer]:
+                  - generic [ref=e72]: 
+                - 'button "Remover atividade: Atividade Sem Conhecimento 1 1769901869551" [ref=e73] [cursor=pointer]':
+                  - generic [ref=e74]: 
+            - generic [ref=e75]:
+              - generic [ref=e76]:
+                - strong [ref=e77]: Conhecimentos *
+                - text: (adicione pelo menos um)
+              - generic [ref=e78]:
+                - textbox "Novo conhecimento" [ref=e80]
+                - button "Adicionar conhecimento" [ref=e82] [cursor=pointer]:
+                  - generic [ref=e83]: 
+          - generic [ref=e86]:
+            - generic [ref=e88]:
+              - strong [ref=e90]: Atividade Sem Conhecimento 2 1769901870060
+              - generic [ref=e91]:
+                - button "Editar" [ref=e92] [cursor=pointer]:
+                  - generic [ref=e93]: 
+                - 'button "Remover atividade: Atividade Sem Conhecimento 2 1769901870060" [ref=e94] [cursor=pointer]':
+                  - generic [ref=e95]: 
+            - generic [ref=e96]:
+              - generic [ref=e97]:
+                - strong [ref=e98]: Conhecimentos *
+                - text: (adicione pelo menos um)
+              - generic [ref=e99]:
+                - textbox "Novo conhecimento" [ref=e101]
+                - button "Adicionar conhecimento" [ref=e103] [cursor=pointer]:
+                  - generic [ref=e104]: 
+          - generic [ref=e107]:
+            - generic [ref=e109]:
+              - strong [ref=e111]: Atividade Com Conhecimento 1769901870515
+              - generic [ref=e112]:
+                - button "Editar" [ref=e113] [cursor=pointer]:
+                  - generic [ref=e114]: 
+                - 'button "Remover atividade: Atividade Com Conhecimento 1769901870515" [ref=e115] [cursor=pointer]':
+                  - generic [ref=e116]: 
+            - generic [ref=e117]:
+              - generic [ref=e118]:
+                - strong [ref=e119]: Conhecimentos *
+                - text: (adicione pelo menos um)
+              - generic [ref=e121]:
+                - generic [ref=e122]: Java
+                - generic [ref=e123]:
+                  - button "Editar" [ref=e124] [cursor=pointer]:
+                    - generic [ref=e125]: 
+                  - 'button "Remover conhecimento: Java" [ref=e126] [cursor=pointer]':
+                    - generic [ref=e127]: 
+              - generic [ref=e128]:
+                - textbox "Novo conhecimento" [ref=e130]
+                - button "Adicionar conhecimento" [active] [ref=e132] [cursor=pointer]:
+                  - generic [ref=e133]: 
+      - contentinfo [ref=e134]:
+        - generic [ref=e135]:
+          - generic [ref=e136]: Versão 1.0.0
+          - generic [ref=e137]: © SESEL/COSIS/TRE-PE
+  - text:   
+```

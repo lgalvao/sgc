@@ -1,9 +1,33 @@
 [BACKEND] WARN  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão.
 [BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:53 - Validando integridade dos dados organizacionais...
 [BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
-[FRONTEND]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m382[22m[2m[0m ms[22m
+[FRONTEND]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m323[22m[2m[0m ms[22m
 [FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
 [FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 999999999
+[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroAutenticacao:128 - Erro de autenticação: Credenciais inválidas
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 111111
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 111111
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 2 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_211
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_212
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 222222
 [BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
 [BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
 [BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
@@ -11,6 +35,682 @@
 [BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
 [BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
 [BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_211
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 101010
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade ASSESSORIA_12
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_211
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 101010
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 101010 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_212
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 181818
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 181818 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_121
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 171717
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 2 criado.
+[BACKEND] INFO  s.s.s.f.SubprocessoFactory.criarParaRevisao:146 - Subprocesso para revisão criado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de revisao 2 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade ASSESSORIA_12
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 2 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_112
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_111
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 333333
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 333333 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_121
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:263 - Permissão negada: Falha no requisito de hierarquia MESMA_UNIDADE para usuário 191919 na unidade SECAO_121 para ação Editar cadastro de atividades
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar mapa (Permitidas: [MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Devolver cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Aceitar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Aceitar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Devolver mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Homologar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 999999999
+[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroAutenticacao:128 - Erro de autenticação: Credenciais inválidas
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 222222
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 111111
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 2 criado.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 222222
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 3 criado.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 222222
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 222222
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 222222
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 4 criado.
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.atualizar:95 - Processo 4 atualizado.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 5 criado.
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.apagar:109 - Processo 5 removido.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 6 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 6 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade ASSESSORIA_11
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 7 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 7 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade ASSESSORIA_21
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 777777
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 777777
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:50 - E-mail enviado para SECRETARIA_2 - Transição: CADASTRO_DISPONIBILIZADO
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Editar mapa (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Disponibilizar mapa (Permitidas: [MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Aceitar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Devolver mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Homologar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Devolver cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Aceitar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Aceitar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Devolver mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Homologar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Devolver cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Aceitar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Aceitar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Devolver mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Homologar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Devolver cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Aceitar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Aceitar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Devolver mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Homologar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Devolver cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Aceitar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Aceitar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Devolver mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_HOMOLOGADO não permitida para ação Homologar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_CRIADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_CRIADO não permitida para ação Devolver cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_CRIADO não permitida para ação Aceitar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_CRIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_CRIADO não permitida para ação Aceitar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_CRIADO não permitida para ação Devolver mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_CRIADO não permitida para ação Homologar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:50 - E-mail enviado para ASSESSORIA_21 - Transição: MAPA_DISPONIBILIZADO
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 777777
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_DISPONIBILIZADO não permitida para ação Editar mapa (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_DISPONIBILIZADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_DISPONIBILIZADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_DISPONIBILIZADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_DISPONIBILIZADO não permitida para ação Editar mapa (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_DISPONIBILIZADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_DISPONIBILIZADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_DISPONIBILIZADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 777777 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:50 - E-mail enviado para SECRETARIA_2 - Transição: MAPA_VALIDADO
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_VALIDADO não permitida para ação Editar mapa (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_VALIDADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_VALIDADO não permitida para ação Disponibilizar mapa (Permitidas: [MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_VALIDADO não permitida para ação Devolver cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_VALIDADO não permitida para ação Aceitar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_VALIDADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:263 - Permissão negada: Falha no requisito de hierarquia SUPERIOR_IMEDIATA para usuário 191919 na unidade ASSESSORIA_21 para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_VALIDADO não permitida para ação Editar mapa (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_VALIDADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_VALIDADO não permitida para ação Disponibilizar mapa (Permitidas: [MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_VALIDADO não permitida para ação Devolver cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_VALIDADO não permitida para ação Aceitar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_VALIDADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:263 - Permissão negada: Falha no requisito de hierarquia SUPERIOR_IMEDIATA para usuário 191919 na unidade ASSESSORIA_21 para ação Aceitar mapa
+[BACKEND] INFO  s.p.service.ProcessoValidador.validarTodosSubprocessosHomologados:95 - Todos os subprocessos do processo 7 estão homologados
+[BACKEND] INFO  s.p.s.ProcessoFinalizador.tornarMapasVigentes:83 - Mapa vigente definido para o processo 7
+[BACKEND] INFO  s.p.s.ProcessoFinalizador.tornarMapasVigentes:97 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[BACKEND] INFO  s.p.s.ProcessoFinalizador.finalizar:73 - Processo 7 finalizado
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailUnidadeFinal:208 - E-mail de finalização enviado para ASSESSORIA_21
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 8 criado.
+[BACKEND] INFO  s.s.s.f.SubprocessoFactory.criarParaRevisao:146 - Subprocesso para revisão criado para unidade ASSESSORIA_21
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de revisao 8 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade ASSESSORIA_21
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 9 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 9 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade ASSESSORIA_12
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 10 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 10 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_111
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 222222
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 11 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 11 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_121
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 171717
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 171717 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 12 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 12 iniciado para 1 unidade(s).
 [BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade ASSESSORIA_11
 [BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 555555
 [BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 555555 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
@@ -184,3 +884,402 @@
 [BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
 [BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
 [BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 2 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 2 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 141414
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 141414
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 141414
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 141414
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 141414
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Editar mapa (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Disponibilizar mapa (Permitidas: [MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Devolver cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Aceitar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Aceitar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Devolver mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Homologar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Editar mapa (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Disponibilizar mapa (Permitidas: [MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Devolver cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Aceitar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Aceitar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Devolver mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Homologar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 151515
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Editar mapa (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Editar mapa (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação MAPEAMENTO_MAPA_HOMOLOGADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 151515 não tem perfil permitido [ADMIN] para ação Homologar mapa
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 131313
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 141414
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:62 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:106 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:262 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:263 - Permissão negada: Falha no requisito de hierarquia MESMA_UNIDADE para usuário 191919 na unidade SECAO_221 para ação Editar cadastro de atividades
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar mapa (Permitidas: [MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Devolver cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Aceitar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Aceitar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Devolver mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Homologar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:263 - Permissão negada: Falha no requisito de hierarquia MESMA_UNIDADE para usuário 191919 na unidade SECAO_221 para ação Editar cadastro de atividades
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar mapa (Permitidas: [MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Devolver cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Aceitar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_DISPONIBILIZADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:241 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Aceitar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Devolver mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:248 - Permissão negada: Situação NAO_INICIADO não permitida para ação Homologar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:51 - Iniciando reset do banco de dados para E2E...
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:70 - Limpando 24 tabelas no schema SGC
+[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:76 - Executando script de seed: seed.sql
+[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:54 - Reset do banco de dados concluído com sucesso.
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:65 - Usuário autenticado: 191919
