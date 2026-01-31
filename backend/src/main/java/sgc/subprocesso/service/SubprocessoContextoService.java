@@ -14,7 +14,7 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.Acao;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
 import sgc.subprocesso.dto.SubprocessoCadastroDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
@@ -162,7 +162,7 @@ class SubprocessoContextoService {
         UnidadeDto unidadeDto = unidadeFacade.buscarPorSigla(sigla);
 
         MapaCompletoDto mapaDto = mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
-        List<AtividadeVisualizacaoDto> atividades = atividadeService.listarAtividadesSubprocesso(codSubprocesso);
+        List<AtividadeDto> atividades = atividadeService.listarAtividadesSubprocesso(codSubprocesso);
 
         return ContextoEdicaoDto.builder()
                 .unidade(unidadeDto)

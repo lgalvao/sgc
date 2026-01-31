@@ -15,7 +15,7 @@ import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.seguranca.acesso.Acao;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -61,7 +61,7 @@ class AtividadeFacadeTest {
         when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
         when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Cadastro em Andamento"));
         when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
-                new AtividadeVisualizacaoDto(atividadeCodigo, "Desc", null)
+                new AtividadeDto(atividadeCodigo, "Desc", null)
         ));
 
         AtividadeOperacaoResponse result = atividadeFacade.criarAtividade(request);
@@ -162,7 +162,7 @@ class AtividadeFacadeTest {
         when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
         when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Cadastro em Andamento"));
         when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
-                new AtividadeVisualizacaoDto(atividadeCodigo, "Desc", null)
+                new AtividadeDto(atividadeCodigo, "Desc", null)
         ));
 
         ResultadoOperacaoConhecimento result = atividadeFacade.criarConhecimento(atividadeCodigo, request);

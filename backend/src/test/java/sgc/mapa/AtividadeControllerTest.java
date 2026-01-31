@@ -24,7 +24,7 @@ import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.service.AtividadeFacade;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import org.hamcrest.Matchers;
 
@@ -59,7 +59,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve criar atividade")
         void deveCriarAtividade() throws Exception {
-            AtividadeVisualizacaoDto dto = AtividadeVisualizacaoDto.builder()
+            AtividadeDto dto = AtividadeDto.builder()
                     .codigo(10L)
                     .build();
 

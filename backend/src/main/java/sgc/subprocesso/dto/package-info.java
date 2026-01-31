@@ -56,9 +56,9 @@
  *
  * <h3>6. DTOs de Atividades e Competências</h3>
  * <ul>
- *   <li>{@link sgc.subprocesso.dto.AtividadeVisualizacaoDto} - Visualização de atividade</li>
+ *   <li>{@link sgc.mapa.dto.visualizacao.AtividadeDto} - Visualização de atividade (uso consolidado)</li>
  *   <li>{@link sgc.subprocesso.dto.AtividadeOperacaoResponse} - Resposta de operação em atividade</li>
- *   <li>{@link sgc.subprocesso.dto.ConhecimentoVisualizacaoDto} - Visualização de conhecimento</li>
+ *   <li>{@link sgc.mapa.dto.visualizacao.ConhecimentoDto} - Visualização de conhecimento (uso consolidado)</li>
  *   <li>{@link sgc.subprocesso.dto.CompetenciaRequest} - Requisição de competência</li>
  *   <li>{@link sgc.subprocesso.dto.ImportarAtividadesRequest} - Importar atividades</li>
  * </ul>

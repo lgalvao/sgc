@@ -20,7 +20,7 @@ import static sgc.seguranca.acesso.Acao.EDITAR_ATIVIDADE;
 import static sgc.seguranca.acesso.Acao.EXCLUIR_ATIVIDADE;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -235,9 +235,9 @@ public class AtividadeFacade {
         SubprocessoSituacaoDto situacaoDto = subprocessoFacade.obterSituacao(codSubprocesso);
 
         // Buscar todas as atividades do subprocesso
-        List<AtividadeVisualizacaoDto> todasAtividades = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
+        List<AtividadeDto> todasAtividades = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
 
-        AtividadeVisualizacaoDto atividadeVis = null;
+        AtividadeDto atividadeVis = null;
         if (incluirAtividade) {
             atividadeVis = todasAtividades.stream()
                     .filter(a -> a.codigo().equals(codigoAtividade))

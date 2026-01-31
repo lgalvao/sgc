@@ -25,7 +25,7 @@ import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.dto.AtividadeVisualizacaoDto;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.subprocesso.dto.CompetenciaRequest;
 import sgc.subprocesso.dto.ContextoEdicaoDto;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
@@ -120,15 +120,15 @@ public class SubprocessoMapaController {
      * atividades.
      *
      * @param codSubprocesso O código do subprocesso.
-     * @return Uma lista de {@link AtividadeVisualizacaoDto} com as atividades e
+     * @return Uma lista de {@link AtividadeDto} com as atividades e
      *         conhecimentos.
      */
     @GetMapping("/{codSubprocesso}/atividades")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista todas as atividades de um subprocesso")
-    public ResponseEntity<List<AtividadeVisualizacaoDto>> listarAtividades(
+    public ResponseEntity<List<AtividadeDto>> listarAtividades(
             @PathVariable Long codSubprocesso) {
-        List<AtividadeVisualizacaoDto> atividades = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
+        List<AtividadeDto> atividades = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
         return ResponseEntity.ok(atividades);
     }
 
