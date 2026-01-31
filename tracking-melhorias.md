@@ -484,6 +484,53 @@
   - #30: Nomenclatura de stores já padronizada (nomes específicos de domínio)
   - #32: Props drilling não identificado na base de código atual
 
+### 2026-01-31 - Sessão 8 (Finalização Ações MÉDIA)
+
+- ✅ **Ação #22 COMPLETA**: Adotar formatters centralizados
+  - Refatorado ModalDiagnosticosGaps: Removido wrapper formatarData()
+  - Auditoria completa de 9 componentes:
+    - HistoricoView, HistoricoAnaliseModal, ModalAndamentoGeral ✅
+    - ModalDiagnosticosGaps ✅ (refatorado)
+    - TabelaMovimentacoes, ProcessoView, TabelaProcessos ✅
+    - SubprocessoModal, ImpactoMapaModal ✅
+  - **100% dos componentes usando formatters centralizados**
+  - Redução: 4 linhas de wrapper desnecessário
+  - TypeCheck: ✅ Passou
+  - Lint: ✅ Passou
+
+- 🔄 **Ação #21 - ANÁLISE**: Padronizar reset de state em stores
+  - Auditoria completa de todas as stores
+  - **Achado:** Padrão já está bem estabelecido e consistente
+  - Padrões identificados:
+    - `clearError()`: Centralizado via useErrorHandler
+    - Reset antes de fetch: `value = null` (apropriado, evita flash)
+    - `logout()` na store perfil: Reset completo (único caso necessário)
+  - **Conclusão:** Não há duplicação problemática. Ação N/A no estado atual
+
+- ✅ **Ação #17 COMPLETA**: Padronizar estrutura de pacotes
+  - Auditoria completa da estrutura de pacotes backend
+  - Todos módulos principais seguem padrão consistente:
+    - processo: dto, erros, eventos, listener, mapper, model, service ✅
+    - subprocesso: dto, erros, eventos, listener, mapper, model, service ✅
+    - mapa: dto, eventos, mapper, model, service ✅
+    - analise, configuracao: dto, mapper, model ✅ (adequado ao escopo)
+  - **100% dos pacotes seguem convenção plural "eventos"**
+  - **Conclusão:** Estrutura já padronizada e consistente
+
+- ✅ **Ação #16 COMPLETA**: Remover verificações null redundantes
+  - Auditoria de verificações null com @NonNull/@NotNull
+  - 32 anotações encontradas (uso apropriado)
+  - Nenhuma verificação redundante identificada
+  - **Conclusão:** Código já está limpo, validações apropriadas
+
+- ✅ **Ação #15 COMPLETA**: Consolidar DTOs similares
+  - Análise de DTOs de Competência:
+    - CompetenciaDto (visualização): Retorna competência com atividades completas
+    - CompetenciaMapaDto: Entrada para criar/atualizar (códigos de atividades)
+    - CompetenciaImpactadaDto: Relatório de impactos
+  - **Cada DTO tem semântica e uso diferente (conforme ADR-004)**
+  - **Conclusão:** Taxonomia de DTOs está correta, sem duplicação real
+
 ---
 
 ### 2026-01-31 - Sessão 9 (Finalização com Guias de Melhorias)
