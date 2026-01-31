@@ -355,8 +355,8 @@
     - **Impacto:** Padrão unificado, código mais limpo
 
 14. **Ação #22 - Formatters Centralizados:**
-    - HistoricoView refatorado
-    - 13 linhas de código duplicado eliminadas
+    - 3 componentes refatorados (HistoricoView, HistoricoAnaliseModal, ModalAndamentoGeral)
+    - 20 linhas de código duplicado eliminadas
     - **Impacto:** Formatação consistente em toda aplicação
 
 ### 2026-01-31 - Sessão 6 (Ações MÉDIA Backend e Frontend - Histórico)
@@ -425,13 +425,16 @@
   - **Impacto:** Padrão de loading unificado, menos duplicação, código mais limpo
 
 - 🔄 **Ação #22 PARCIAL**: Adotar formatters centralizados
-  - Refatorado HistoricoView para usar formatters centralizados
-  - Substituído `formatarTipo()` local por `formatarTipoProcesso()` de @/utils/formatters
-  - Substituído `formatarData()` local por `formatDateBR()` de @/utils/dateUtils
-  - Removidas 2 funções duplicadas (13 linhas)
+  - Refatorados 3 componentes para usar formatters centralizados:
+    - HistoricoView: Substituído formatarTipo() por formatarTipoProcesso(), formatarData() por formatDateBR()
+    - HistoricoAnaliseModal: Substituído formatarData() por formatDateTimeBR()
+    - ModalAndamentoGeral: Removido wrapper formatarData(), usa formatDateBR() direto
+  - Removidas 3 funções duplicadas (20 linhas)
+  - Reduzidas importações desnecessárias (date-fns, locale ptBR)
   - TypeCheck: ✅ Passou
   - Lint: ✅ Passou
-  - **Pendente:** Buscar e refatorar demais componentes (11 restantes)
+  - **Impacto:** Formatação consistente, menos código duplicado
+  - **Pendente:** Buscar e refatorar demais componentes (~9 restantes)
 
 - ✅ **Ação #23 - N/A**: Adotar normalizeError() em services
   - Análise: Services já seguem padrão correto (View→Store→Service→API)
@@ -463,12 +466,12 @@
 - ✅ Conformidade com ADRs 001, 002, 003, 004, 005 mantida (100%)
 - ✅ Frontend: Padrão de loading unificado com useSingleLoading
 - ✅ Frontend: Formatters centralizados começando a ser adotados
-- ✅ Base de código mais limpa (~5.235+ linhas removidas/refatoradas)
+- ✅ Base de código mais limpa (~5.257+ linhas removidas/refatoradas)
 - ✅ Pattern View→Store→Service→API 100% em conformidade
 
 **Progresso Sessão 7:**
 - ✅ Ação #20: Completa (6 stores refatorados, -42 linhas)
-- 🔄 Ação #22: Parcial (1 componente refatorado, -13 linhas)
+- 🔄 Ação #22: Parcial (3 componentes refatorados, -20 linhas)
 - ✅ Ação #23: N/A (pattern já correto)
 
 **Próximos Passos Recomendados:**
