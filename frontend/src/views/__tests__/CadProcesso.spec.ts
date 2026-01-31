@@ -63,7 +63,7 @@ describe('CadProcesso.vue', () => {
                     BContainer: { template: '<div><slot /></div>' },
                     BAlert: { template: '<div class="alert"><slot /></div>', props: ['modelValue', 'variant'] },
                     BForm: { template: '<form @submit.prevent><slot /></form>' },
-                    BFormGroup: { template: '<div><slot /></div>', props: ['label'] },
+                    BFormGroup: { template: '<div><slot name="label">{{ label }}</slot><slot /></div>', props: ['label'] },
                     BFormInput: {
                         template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
                         props: ['modelValue']
@@ -520,7 +520,7 @@ describe('CadProcesso.vue', () => {
                 BContainer: { template: '<div><slot /></div>' },
                 BAlert: { template: '<div class="alert"><slot /></div>', props: ['modelValue', 'variant'] },
                 BForm: { template: '<form @submit.prevent><slot /></form>' },
-                BFormGroup: { template: '<div><slot /></div>', props: ['label'] },
+                BFormGroup: { template: '<div><slot name="label">{{ label }}</slot><slot /></div>', props: ['label'] },
                 BFormInput: { template: '<input />', props: ['modelValue'] },
                 BFormSelect: { template: '<select></select>', props: ['modelValue'] },
                 BButton: { template: '<button></button>' },
