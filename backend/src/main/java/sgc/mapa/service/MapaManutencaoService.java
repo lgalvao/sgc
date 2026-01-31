@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.*;
-import sgc.mapa.evento.EventoMapaAlterado;
+import sgc.mapa.eventos.EventoMapaAlterado;
 import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.*;

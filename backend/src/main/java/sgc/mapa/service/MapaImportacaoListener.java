@@ -6,7 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.evento.EventoImportacaoAtividades;
+import sgc.mapa.eventos.EventoImportacaoAtividades;
 
 /**
  * Listener responsável por processar eventos de importação de atividades entre mapas.

@@ -1,4 +1,4 @@
-package sgc.mapa.evento;
+package sgc.mapa.eventos;
 
 /**
  * Evento disparado quando ocorrem alterações em atividades ou conhecimentos

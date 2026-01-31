@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.dto.visualizacao.ConhecimentoDto;
-import sgc.mapa.evento.EventoImportacaoAtividades;
+import sgc.mapa.eventos.EventoImportacaoAtividades;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.model.Unidade;
