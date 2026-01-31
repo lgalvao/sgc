@@ -1,19 +1,11 @@
-import {expect, test} from './fixtures/auth-fixtures';
+import {expect, test} from './fixtures/complete-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso, verificarDetalhesProcesso, verificarUnidadeParticipante} from './helpers/helpers-processos';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe('CDU-06 - Detalhar processo', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_12';
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-    test.beforeAll(async ({request}) => await resetDatabase(request));
-
-    test.beforeEach(() => cleanup = useProcessoCleanup());
-
-    test.afterEach(async ({request}) => await cleanup.limpar(request));
-
-    test('Deve exibir detalhes do processo para ADMIN', async ({page, autenticadoComoAdmin}) => {
+    test('Deve exibir detalhes do processo para ADMIN', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 ${timestamp}`;
 
@@ -33,7 +25,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
 
         // Capturar ID do processo para cleanup
         const processoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
-        if (processoId > 0) cleanup.registrar(processoId);
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         // Verificar detalhes do processo (usando caixa alta conforme observado em reviews)
         await verificarDetalhesProcesso(page, {
@@ -53,7 +45,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
     });
 
-    test('Deve exibir detalhes do processo para GESTOR', async ({page}) => {
+    test('Deve exibir detalhes do processo para GESTOR', async ({page, cleanupAutomatico}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 Gestor ${timestamp}`;
         const UNIDADE_PROCESSO = 'SECAO_111';
@@ -81,7 +73,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
 
         // Capturar ID do processo para cleanup
         const processoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
-        if (processoId > 0) cleanup.registrar(processoId);
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await verificarDetalhesProcesso(page, {
             descricao,

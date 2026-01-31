@@ -1,10 +1,9 @@
-import {expect, test} from './fixtures/auth-fixtures';
+import {expect, test} from './fixtures/complete-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -15,8 +14,6 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-19 ${timestamp}`;
-    let processoId: number;
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
 
     // Atividades e competências para os testes
     const atividade1 = `Atividade 1 ${timestamp}`;
@@ -24,20 +21,11 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     const competencia1 = `Competência 1 ${timestamp}`;
     const competencia2 = `Competência 2 ${timestamp}`;
 
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-        cleanup = useProcessoCleanup();
-    });
-
-    test.afterAll(async ({request}) => {
-        await cleanup.limpar(request);
-    });
-
     // ========================================================================
     // PREPARAÇÃO - Criar mapa disponibilizado para CHEFE validar
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, autenticadoComoChefeSecao221, cleanupAutomatico}) => {
         
 
         await criarProcesso(page, {
@@ -51,8 +39,8 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoId > 0) cleanup.registrar(processoId);
+        const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

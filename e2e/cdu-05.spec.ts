@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/auth-fixtures';
+import {expect, test} from './fixtures/complete-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao';
@@ -14,7 +14,6 @@ import {
     navegarParaAtividades,
 } from './helpers/helpers-atividades';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa,} from './helpers/helpers-mapas';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import type {Page} from '@playwright/test';
 
 
@@ -27,20 +26,6 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     const timestamp = Date.now();
     const descProcMapeamento = `Mapeamento Setup ${timestamp}`;
     const descProcRevisao = `Revisão Teste ${timestamp}`;
-    let processoMapeamentoId: number;
-    let processoRevisaoId: number;
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
-
-    // Reset completo do banco antes de todos os testes
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-        cleanup = useProcessoCleanup();
-    });
-
-    // Limpar processos criados após todos os testes
-    test.afterAll(async ({request}) => {
-        await cleanup.limpar(request);
-    });
 
     // ========================================================================
     // PASSOS DE PREPARAÇÃO - PROCESSO DE MAPEAMENTO
@@ -96,13 +81,13 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     // TESTE PRINCIPAL
     // ========================================================================
 
-    test('Fase 1.1: ADMIN cria e inicia processo de Mapeamento', async ({page, autenticadoComoAdmin}) => {
+    test('Fase 1.1: ADMIN cria e inicia processo de Mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
         // Capturar ID do processo para cleanup
         await page.goto('/painel');
         await page.getByText(descProcMapeamento).first().click();
-        processoMapeamentoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
-        if (processoMapeamentoId > 0) cleanup.registrar(processoMapeamentoId);
+        const processoMapeamentoId = parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
+        if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
     });
 
     test('Fase 1.2: CHEFE adiciona atividades e conhecimentos', async ({page}) => {
@@ -168,7 +153,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 2: Iniciar processo de Revisão', async ({page, autenticadoComoAdmin}) => {
+    test('Fase 2: Iniciar processo de Revisão', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         // Login as Admin
         
 
@@ -184,8 +169,8 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Capturar ID do processo para cleanup
         await page.getByText(descProcRevisao).click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
-        processoRevisaoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
-        if (processoRevisaoId > 0) cleanup.registrar(processoRevisaoId);
+        const processoRevisaoId = parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+        if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
 
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcRevisao);
         await page.getByTestId('btn-processo-iniciar').click();

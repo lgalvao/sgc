@@ -1,10 +1,9 @@
-import {expect, test} from './fixtures/auth-fixtures';
+import {expect, test} from './fixtures/complete-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades';
 import {abrirHistoricoAnalise, acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise';
 import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 import {Page} from '@playwright/test';
 
 async function verificarPaginaSubprocesso(page: Page) {
@@ -18,17 +17,8 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
     const timestamp = Date.now();
     const descProcesso = `Proc 9 ${timestamp}`;
-    let processoId: number;
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-        cleanup = useProcessoCleanup();
-    });
-
-    test.afterAll(async ({request}) => await cleanup.limpar(request));
-
-    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         
 
         await criarProcesso(page, {
@@ -48,8 +38,8 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
 
         // Capturar ID do processo para cleanup
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoId > 0) cleanup.registrar(processoId);
+        const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

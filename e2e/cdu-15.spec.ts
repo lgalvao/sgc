@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/auth-fixtures';
+import {expect, test} from './fixtures/complete-fixtures';
 import {login, USUARIOS} from './helpers/helpers-auth';
 import {criarProcesso} from './helpers/helpers-processos';
 import {
@@ -24,7 +24,6 @@ import {
     verificarCompetenciaNoMapa,
     verificarSituacaoSubprocesso
 } from './helpers/helpers-mapas';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza';
 
 test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -37,23 +36,13 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-15 ${timestamp}`;
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
 
     const ATIVIDADE_1 = `Atividade 1 ${timestamp}`;
     const ATIVIDADE_2 = `Atividade 2 ${timestamp}`;
     const CONHECIMENTO_1 = `Conhecimento 1 ${timestamp}`;
     const CONHECIMENTO_2 = `Conhecimento 2 ${timestamp}`;
 
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-        cleanup = useProcessoCleanup();
-    });
-
-    test.afterAll(async ({request}) => {
-        await cleanup.limpar(request);
-    });
-
-    test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221}) => {
+    test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page, autenticadoComoAdmin, autenticadoComoGestorCoord22, autenticadoComoChefeSecao221, cleanupAutomatico}) => {
         // 1. Admin cria e inicia processo
         
 
@@ -71,7 +60,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         const currentUrl = page.url();
         const match = /\/processo\/cadastro\/(\d+)/.exec(currentUrl);
         if (match && match[1]) {
-            cleanup.registrar(parseInt(match[1]));
+            cleanupAutomatico.registrar(parseInt(match[1]));
         }
 
         await page.getByTestId('btn-processo-iniciar').click();

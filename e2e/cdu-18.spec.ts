@@ -1,5 +1,4 @@
-import {expect, test} from './fixtures/auth-fixtures';
-import {resetDatabase} from './hooks/hooks-limpeza';
+import {expect, test} from './fixtures/complete-fixtures';
 
 /**
  * CDU-18: Visualizar mapa de competências
@@ -14,10 +13,6 @@ import {resetDatabase} from './hooks/hooks-limpeza';
  * - Mapa 99 com competência "Competência Técnica Seed 99" vinculada às atividades
  */
 test.describe('CDU-18: Visualizar mapa de competências', () => {
-
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-    });
 
     test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({page, autenticadoComoAdmin}) => {
         await test.step('1. Login como ADMIN', async () => {
