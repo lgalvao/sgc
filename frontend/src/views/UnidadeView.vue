@@ -39,8 +39,22 @@
         <BCardBody>
           <p><strong>Titular:</strong> {{ titularDetalhes?.nome }}</p>
           <p class="ms-3">
-            <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ titularDetalhes?.ramal }}
-            <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ titularDetalhes?.email }}
+            <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>
+            <a
+                class="text-decoration-none text-body"
+                :href="`tel:${titularDetalhes?.ramal}`"
+                :aria-label="`Ligar para ${titularDetalhes?.ramal}`"
+            >
+              {{ titularDetalhes?.ramal }}
+            </a>
+            <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>
+            <a
+                class="text-decoration-none text-body"
+                :href="`mailto:${titularDetalhes?.email}`"
+                :aria-label="`Enviar e-mail para ${titularDetalhes?.email}`"
+            >
+              {{ titularDetalhes?.email }}
+            </a>
           </p>
           <template
               v-if="unidadeComResponsavelDinamico.responsavel &&
@@ -49,8 +63,22 @@
           >
             <p><strong>Responsável:</strong> {{ unidadeComResponsavelDinamico.responsavel.nome }}</p>
             <p class="ms-3">
-              <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ unidadeComResponsavelDinamico.responsavel.ramal }}
-              <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ unidadeComResponsavelDinamico.responsavel.email }}
+              <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>
+              <a
+                  class="text-decoration-none text-body"
+                  :href="`tel:${unidadeComResponsavelDinamico.responsavel.ramal}`"
+                  :aria-label="`Ligar para ${unidadeComResponsavelDinamico.responsavel.ramal}`"
+              >
+                {{ unidadeComResponsavelDinamico.responsavel.ramal }}
+              </a>
+              <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>
+              <a
+                  class="text-decoration-none text-body"
+                  :href="`mailto:${unidadeComResponsavelDinamico.responsavel.email}`"
+                  :aria-label="`Enviar e-mail para ${unidadeComResponsavelDinamico.responsavel.email}`"
+              >
+                {{ unidadeComResponsavelDinamico.responsavel.email }}
+              </a>
             </p>
           </template>
         </BCardBody>
