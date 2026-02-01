@@ -931,4 +931,93 @@ class MapaManutencaoServiceTest {
             verify(eventPublisher, never()).publishEvent(any());
         }
     }
+
+    @Nested
+    @DisplayName("Testes Adicionais de Cobertura - Phase 2")
+    class CoberturaPhaseDoisTests {
+
+        @Test
+        @DisplayName("Deve criar competência com lista vazia de atividades sem chamar findAllById")
+        void deveCriarCompetenciaComListaVaziaDeAtividades() {
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(1L);
+
+            service.criarCompetenciaComAtividades(mapa, "Competência Teste", List.of());
+
+            verify(competenciaRepo).save(any(Competencia.class));
+            // Verifica que findAllById NÃO foi chamado porque a lista estava vazia
+            verify(atividadeRepo, never()).findAllById(anyList());
+            verify(atividadeRepo, never()).saveAll(anyList());
+        }
+
+        @Test
+        @DisplayName("Deve atualizar competência com lista vazia de atividades")
+        void deveAtualizarCompetenciaComListaVazia() {
+            Competencia competencia = Competencia.builder()
+                    .codigo(1L)
+                    .descricao("Competência Original")
+                    .atividades(new HashSet<>())
+                    .build();
+
+            Atividade ativAntiga = new Atividade();
+            ativAntiga.setCodigo(10L);
+            ativAntiga.setCompetencias(new HashSet<>(Set.of(competencia)));
+
+            when(competenciaRepo.findById(1L)).thenReturn(Optional.of(competencia));
+            when(atividadeRepo.listarPorCompetencia(competencia)).thenReturn(List.of(ativAntiga));
+
+            service.atualizarCompetencia(1L, "Nova Descrição", List.of());
+
+            assertThat(competencia.getDescricao()).isEqualTo("Nova Descrição");
+            verify(competenciaRepo).save(competencia);
+            // Verifica que findAllById NÃO foi chamado porque a lista estava vazia
+            verify(atividadeRepo, never()).findAllById(anyList());
+        }
+
+        @Test
+        @DisplayName("Deve atualizar descrições em lote com todas atividades sem mapa")
+        void deveAtualizarDescricoesEmLoteComTodasAtividadesSemMapa() {
+            Atividade atividade1 = new Atividade();
+            atividade1.setCodigo(1L);
+            atividade1.setDescricao("Antiga 1");
+            // Sem mapa - null
+
+            Atividade atividade2 = new Atividade();
+            atividade2.setCodigo(2L);
+            atividade2.setDescricao("Antiga 2");
+            // Sem mapa - null
+
+            Map<Long, String> descricoes = Map.of(
+                    1L, "Nova 1",
+                    2L, "Nova 2"
+            );
+
+            when(atividadeRepo.findAllById(descricoes.keySet())).thenReturn(List.of(atividade1, atividade2));
+
+            service.atualizarDescricoesAtividadeEmLote(descricoes);
+
+            assertThat(atividade1.getDescricao()).isEqualTo("Nova 1");
+            assertThat(atividade2.getDescricao()).isEqualTo("Nova 2");
+
+            verify(atividadeRepo).saveAll(anyList());
+            // Nenhum evento deve ser publicado pois nenhuma atividade tem mapa
+            verify(eventPublisher, never()).publishEvent(any(EventoMapaAlterado.class));
+        }
+
+        @Test
+        @DisplayName("Deve listar conhecimentos por mapa")
+        void deveListarConhecimentosPorMapa() {
+            Long codMapa = 10L;
+            Conhecimento c1 = Conhecimento.builder().codigo(1L).descricao("C1").build();
+            Conhecimento c2 = Conhecimento.builder().codigo(2L).descricao("C2").build();
+
+            when(conhecimentoRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(c1, c2));
+
+            List<Conhecimento> resultado = service.listarConhecimentosPorMapa(codMapa);
+
+            assertThat(resultado).hasSize(2);
+            assertThat(resultado).containsExactly(c1, c2);
+            verify(conhecimentoRepo).findByMapaCodigo(codMapa);
+        }
+    }
 }

@@ -20,12 +20,13 @@ import sgc.seguranca.acesso.Acao;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 class ImpactoMapaServiceTest {
@@ -182,5 +183,96 @@ class ImpactoMapaServiceTest {
 
         assertEquals(1, result.atividadesAlteradas().size());
         assertEquals("Ativ A", result.atividadesAlteradas().getFirst().descricao());
+    }
+
+    @Test
+    void deveDetectarConhecimentosDiferentesComAmbosVazios() {
+        Mapa mapaVigente = Mapa.builder().codigo(100L).build();
+        Mapa mapaAtual = Mapa.builder().codigo(200L).build();
+        Subprocesso subprocesso = criarSubprocesso(1L, mapaAtual);
+
+        Usuario usuario = new Usuario();
+
+        // Atividade vigente com conhecimentos vazios
+        Atividade ativVigente = Atividade.builder()
+                .codigo(1L)
+                .descricao("Ativ A")
+                .conhecimentos(List.of()) // vazio
+                .build();
+
+        // Atividade atual com conhecimentos vazios
+        Atividade ativAtual = Atividade.builder()
+                .codigo(2L)
+                .descricao("Ativ A")
+                .conhecimentos(List.of()) // vazio
+                .build();
+
+        when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaAtual));
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L))
+                .thenReturn(Collections.singletonList(ativVigente));
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L))
+                .thenReturn(Collections.singletonList(ativAtual));
+        when(competenciaRepo.findByMapaCodigo(100L)).thenReturn(Collections.emptyList());
+
+        ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+
+        // Não deve marcar como alterada quando ambos têm conhecimentos vazios
+        assertEquals(0, result.atividadesAlteradas().size());
+    }
+
+    @Test
+    void deveDetectarAtividadesComConhecimentosDiferentes() {
+        Mapa mapaVigente = Mapa.builder().codigo(100L).build();
+        Mapa mapaAtual = Mapa.builder().codigo(200L).build();
+        Subprocesso subprocesso = criarSubprocesso(1L, mapaAtual);
+
+        Usuario usuario = new Usuario();
+
+        Conhecimento c1 = Conhecimento.builder().codigo(1L).descricao("C1").build();
+        Conhecimento c2 = Conhecimento.builder().codigo(2L).descricao("C2").build();
+        Conhecimento c3 = Conhecimento.builder().codigo(3L).descricao("C3").build();
+
+        // Atividade vigente com conhecimento C1
+        Atividade ativVigente = Atividade.builder()
+                .codigo(1L)
+                .descricao("Ativ Teste")
+                .conhecimentos(List.of(c1))
+                .build();
+
+        // Atividade atual com conhecimentos C2 e C3 (diferente da vigente)
+        Atividade ativAtual = Atividade.builder()
+                .codigo(2L)
+                .descricao("Ativ Teste")
+                .conhecimentos(List.of(c2, c3)) // Diferentes
+                .build();
+
+        when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaAtual));
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L))
+                .thenReturn(Collections.singletonList(ativVigente));
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L))
+                .thenReturn(Collections.singletonList(ativAtual));
+        when(competenciaRepo.findByMapaCodigo(100L)).thenReturn(Collections.emptyList());
+
+        ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+
+        // Deve detectar a atividade como alterada porque os conhecimentos são diferentes
+        assertEquals(1, result.atividadesAlteradas().size());
+        assertEquals("Ativ Teste", result.atividadesAlteradas().get(0).descricao());
+        assertNotNull(result);
+    }
+
+    private Subprocesso criarSubprocesso(Long unidadeCodigo, Mapa mapa) {
+        sgc.organizacao.model.Unidade unidade = sgc.organizacao.model.Unidade.builder()
+                .codigo(unidadeCodigo)
+                .sigla("UNID")
+                .nome("Unidade Teste")
+                .build();
+        return Subprocesso.builder()
+                .codigo(1L)
+                .unidade(unidade)
+                .mapa(mapa)
+                .build();
     }
 }
