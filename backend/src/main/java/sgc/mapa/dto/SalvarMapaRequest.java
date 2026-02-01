@@ -5,6 +5,7 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
@@ -13,6 +14,6 @@ import sgc.seguranca.sanitizacao.SanitizarHtml;
  */
 @Builder
 public record SalvarMapaRequest(
-        @Nullable @SanitizarHtml String observacoes,
+        @Nullable @Size(max = 1000, message = "As observações devem ter no máximo 1000 caracteres") @SanitizarHtml String observacoes,
         @Valid List<CompetenciaMapaDto> competencias) {
 }
