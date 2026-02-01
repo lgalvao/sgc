@@ -330,4 +330,34 @@ class E2eControllerTest {
 
         assertCount("sgc.processo WHERE codigo=101", 0);
     }
+
+    @Test
+    @DisplayName("Deve lançar ErroValidacao quando unidade sigla está em branco no fixture")
+    void deveLancarErroValidacaoQuandoSiglaEmBranco() {
+        // Arrange
+        E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
+                "Desc", "", false, null);
+
+        // Act & Assert
+        var exception = Assertions.assertThrows(sgc.comum.erros.ErroValidacao.class,
+                () -> controller.criarProcessoMapeamento(req));
+        Assertions.assertNotNull(exception);
+        Assertions.assertTrue(exception.getMessage().contains("Unidade é obrigatória"));
+    }
+
+    @Test
+    @DisplayName("Deve lançar ErroEntidadeNaoEncontrada quando unidade não existe")
+    void deveLancarErroEntidadeNaoEncontradaQuandoUnidadeNula() {
+        // Arrange
+        E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
+                "Desc", "SIGLA_NAO_EXISTE", false, null);
+
+        when(unidadeFacade.buscarPorSigla("SIGLA_NAO_EXISTE")).thenReturn(null);
+
+        // Act & Assert
+        var exception = Assertions.assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class,
+                () -> controller.criarProcessoRevisao(req));
+        Assertions.assertNotNull(exception);
+        Assertions.assertTrue(exception.getMessage().contains("Unidade"));
+    }
 }

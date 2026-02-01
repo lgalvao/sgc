@@ -1,11 +1,13 @@
 package sgc.subprocesso;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -31,8 +33,13 @@ import sgc.subprocesso.dto.SalvarAjustesRequest;
 import sgc.subprocesso.model.Subprocesso;
 import tools.jackson.databind.ObjectMapper;
 import sgc.mapa.dto.CompetenciaMapaDto;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
+import sgc.subprocesso.dto.ContextoEdicaoDto;
+import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 @WebMvcTest(SubprocessoMapaController.class)
@@ -280,6 +287,97 @@ class SubprocessoMapaControllerTest {
 
                 mockMvc.perform(post("/api/subprocessos/1/competencias/10/remover").with(csrf()))
                                 .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("obterContextoEdicao - sem perfil")
+        @WithMockUser
+        void obterContextoEdicaoSemPerfil() throws Exception {
+                ContextoEdicaoDto dto = ContextoEdicaoDto.builder().build();
+                when(subprocessoFacade.obterContextoEdicao(1L, null)).thenReturn(dto);
+
+                mockMvc.perform(get("/api/subprocessos/1/contexto-edicao"))
+                                .andExpect(status().isOk());
+
+                verify(subprocessoFacade).obterContextoEdicao(1L, null);
+        }
+
+        @Test
+        @DisplayName("obterContextoEdicao - com perfil")
+        @WithMockUser
+        void obterContextoEdicaoComPerfil() throws Exception {
+                ContextoEdicaoDto dto = ContextoEdicaoDto.builder().build();
+                when(subprocessoFacade.obterContextoEdicao(1L, Perfil.ADMIN)).thenReturn(dto);
+
+                mockMvc.perform(get("/api/subprocessos/1/contexto-edicao")
+                                .param("perfil", "ADMIN"))
+                                .andExpect(status().isOk());
+
+                verify(subprocessoFacade).obterContextoEdicao(1L, Perfil.ADMIN);
+        }
+
+        @Test
+        @DisplayName("listarAtividades")
+        @WithMockUser
+        void listarAtividades() throws Exception {
+                List<AtividadeDto> atividades = List.of(
+                                AtividadeDto.builder().codigo(1L).descricao("Atividade 1").build());
+                when(subprocessoFacade.listarAtividadesSubprocesso(1L)).thenReturn(atividades);
+
+                mockMvc.perform(get("/api/subprocessos/1/atividades"))
+                                .andExpect(status().isOk());
+
+                verify(subprocessoFacade).listarAtividadesSubprocesso(1L);
+        }
+
+        @Test
+        @DisplayName("disponibilizarMapaEmBloco - com dataLimite")
+        @WithMockUser(roles = "ADMIN")
+        void disponibilizarMapaEmBlocoComDataLimite() throws Exception {
+                Usuario usuario = new Usuario();
+                ProcessarEmBlocoRequest req = ProcessarEmBlocoRequest.builder()
+                                .acao("DISPONIBILIZAR")
+                                .subprocessos(List.of(1L, 2L, 3L))
+                                .dataLimite(LocalDate.now().plusDays(20))
+                                .build();
+
+                mockMvc.perform(
+                                post("/api/subprocessos/100/disponibilizar-mapa-bloco")
+                                                .with(csrf())
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(objectMapper.writeValueAsString(req)))
+                                .andExpect(status().isOk());
+
+                verify(subprocessoFacade).disponibilizarMapaEmBloco(
+                                eq(List.of(1L, 2L, 3L)),
+                                eq(100L),
+                                any(),
+                                any(Usuario.class));
+        }
+
+        @Test
+        @DisplayName("disponibilizarMapaEmBloco - sem dataLimite (usa padrão +15 dias)")
+        @WithMockUser(roles = "ADMIN")
+        void disponibilizarMapaEmBlocoSemDataLimite() throws Exception {
+                Usuario usuario = new Usuario();
+                ProcessarEmBlocoRequest req = ProcessarEmBlocoRequest.builder()
+                                .acao("DISPONIBILIZAR")
+                                .subprocessos(List.of(1L))
+                                .dataLimite(null)
+                                .build();
+
+                mockMvc.perform(
+                                post("/api/subprocessos/100/disponibilizar-mapa-bloco")
+                                                .with(csrf())
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(objectMapper.writeValueAsString(req)))
+                                .andExpect(status().isOk());
+
+                verify(subprocessoFacade).disponibilizarMapaEmBloco(
+                                eq(List.of(1L)),
+                                eq(100L),
+                                any(),
+                                any(Usuario.class));
         }
 
 }
