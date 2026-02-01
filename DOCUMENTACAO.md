@@ -62,6 +62,9 @@ Este documento serve como índice centralizado de toda a documentação técnica
 
 | Documento                                                                                          | Descrição                                    |
 |----------------------------------------------------------------------------------------------------|----------------------------------------------|
+| **[test-coverage-plan.md](test-coverage-plan.md)** ⭐                                               | Plano completo de restauração de cobertura de testes |
+| **[coverage-tracking.md](coverage-tracking.md)** ⭐                                                 | Rastreamento de progresso de cobertura      |
+| **[GUIA-MELHORIAS-TESTES.md](backend/etc/docs/GUIA-MELHORIAS-TESTES.md)**                         | Guia de melhorias de qualidade de testes     |
 | **[e2e/README.md](e2e/README.md)**                                                                 | Documentação dos testes E2E com Playwright   |
 | **[e2e/FIXTURES-MIGRATION-GUIDE.md](e2e/FIXTURES-MIGRATION-GUIDE.md)**                             | Guia de migração para fixtures reutilizáveis |
 | **[backend/src/test/java/sgc/testutils/README.md](backend/src/test/java/sgc/testutils/README.md)** | Utilitários de teste do backend              |

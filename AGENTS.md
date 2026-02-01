@@ -76,6 +76,11 @@ específicas** do projeto que diferem dos padrões genéricos.
 * **Backend:** `./gradlew :backend:test` (JUnit 5 + Mockito + H2).
 * **Frontend:** `npm run typecheck`, `npm run lint`, `npm run test:unit` (Vitest).
 * **E2E:** Playwright (consulte `/e2e/README.md`).
+* **Cobertura de Testes:**
+    * **Plano de Restauração:** Ver [`test-coverage-plan.md`](/test-coverage-plan.md) - Plano completo para restaurar cobertura >90%
+    * **Rastreamento:** Ver [`coverage-tracking.md`](/coverage-tracking.md) - Progresso e métricas
+    * **Scripts Úteis:** `/backend/etc/scripts/` contém ferramentas de análise de cobertura
+    * **Guia de Qualidade:** Ver [`GUIA-MELHORIAS-TESTES.md`](/backend/etc/docs/GUIA-MELHORIAS-TESTES.md)
 
 ## 5. Padrões Arquiteturais (ADRs)
 
