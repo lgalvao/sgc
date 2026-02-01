@@ -12,9 +12,9 @@
 
 | Métrica       | Meta  | Baseline | Atual | Progresso | Status |
 |---------------|-------|----------|-------|-----------|--------|
-| **BRANCH**    | ≥90%  | 83.30%   | 93.89% | ✅ 100%+  | ✅ **META ATINGIDA!** (+10.59%) |
+| **BRANCH**    | ≥90%  | 83.30%   | 93.98% | ✅ 100%+  | ✅ **META ATINGIDA!** (+10.68%) |
 | **LINE**      | ≥99%  | 92.08%   | 96.63% | 🟢 98%   | 🟢 Muito Bom (+4.55%) |
-| **INSTRUCTION** | ≥99% | 91.30%  | 96.41% | 🟢 97%   | 🟢 Muito Bom (+5.11%) |
+| **INSTRUCTION** | ≥99% | 91.30%  | 96.42% | 🟢 97%   | 🟢 Muito Bom (+5.12%) |
 
 **Testes Totais:** 1379 (1379 passando, 0 falhando)
 
@@ -760,3 +760,98 @@ node backend/etc/scripts/super-cobertura.js --run
 # Verificar metas de cobertura
 ./gradlew :backend:jacocoTestCoverageVerification
 ```
+
+---
+
+## 🎯 Plano Final para Atingir 99% Line Coverage
+
+**Data:** 2026-02-01  
+**Gap Atual:** 2.37% (~106 linhas)  
+**Meta:** 99% Line Coverage
+
+### Top 10 Arquivos por Impacto (Line Coverage <95%, >5 linhas perdidas)
+
+| Rank | Arquivo | Package | Linhas Perdidas | Coverage | Prioridade |
+|------|---------|---------|-----------------|----------|------------|
+| 1 | **SubprocessoContextoService** | sgc.subprocesso.service | 20 | 60.8% | ⭐⭐⭐ CRITICAL |
+| 2 | **SubprocessoFactory** | sgc.subprocesso.service.factory | 20 | 78.7% | ⭐⭐⭐ HIGH |
+| 3 | **AtividadeFacade** | sgc.mapa.service | 12 | 82.4% | ⭐⭐⭐ HIGH |
+| 4 | **SubprocessoAjusteMapaService** | sgc.subprocesso.service | 12 | 81.3% | ⭐⭐⭐ HIGH |
+| 5 | **MapaManutencaoService** | sgc.mapa.service | 8 | 94.5% | ⭐⭐ MEDIUM |
+| 6 | **ImpactoMapaService** | sgc.mapa.service | 7 | 94.7% | ⭐⭐ MEDIUM |
+| 7 | **SubprocessoAtividadeService** | sgc.subprocesso.service | 6 | 88.2% | ⭐⭐ MEDIUM |
+| 8 | **E2eController** | sgc.e2e | 6 | 93.6% | ⭐⭐ MEDIUM |
+| 9 | **SubprocessoCadastroController** | sgc.subprocesso | 5 | 91.8% | ⭐ QUICK WIN |
+| 10 | **SubprocessoMapaController** | sgc.subprocesso | 3 | 90.3% | ⭐ QUICK WIN |
+
+**Total Impacto Estimado:** 99 linhas = ~2.21% de aumento
+
+### Estratégia de Execução
+
+#### Fase A: Services de Alto Impacto (64 linhas = ~1.43%)
+1. **SubprocessoContextoService** (20 linhas)
+   - Métodos: `obterDetalhes`, `obterCadastro`, `obterSugestoes`, `obterContextoEdicao`
+   - Complexidade: MÉDIA
+   - Estimativa: 8-10 testes
+
+2. **SubprocessoFactory** (20 linhas)  
+   - Métodos: Factory methods para diferentes tipos de processo
+   - Complexidade: MÉDIA
+   - Estimativa: 6-8 testes
+
+3. **AtividadeFacade** (12 linhas)
+   - Métodos: CRUD de atividades
+   - Complexidade: BAIXA
+   - Estimativa: 4-6 testes
+
+4. **SubprocessoAjusteMapaService** (12 linhas)
+   - Métodos: Ajustes pós-validação
+   - Complexidade: MÉDIA
+   - Estimativa: 4-6 testes
+
+#### Fase B: Services Próximos ao Alvo (21 linhas = ~0.47%)
+5. **MapaManutencaoService** (8 linhas)
+   - Gaps: Edge cases em métodos complexos
+   - Estimativa: 3-4 testes adicionais
+
+6. **ImpactoMapaService** (7 linhas)
+   - Gaps: Casos especiais de impacto
+   - Estimativa: 3-4 testes adicionais
+
+7. **SubprocessoAtividadeService** (6 linhas)
+   - Gaps: Validações específicas
+   - Estimativa: 2-3 testes adicionais
+
+#### Fase C: Controllers & Finalizadores (14 linhas = ~0.31%)
+8. **E2eController** (6 linhas)
+9. **SubprocessoCadastroController** (5 linhas)
+10. **SubprocessoMapaController** (3 linhas)
+
+### Ganho Estimado por Fase
+
+| Fase | Arquivos | Linhas Cobertas | Ganho % | Coverage Projetado |
+|------|----------|-----------------|---------|-------------------|
+| Inicial | - | - | - | 96.63% |
+| Fase A | 4 | 64 | +1.43% | ~98.06% |
+| Fase B | 3 | 21 | +0.47% | ~98.53% |
+| Fase C | 3 | 14 | +0.31% | ~98.84% |
+| **TOTAL** | **10** | **99** | **+2.21%** | **~98.84%** |
+
+### Próximos Passos
+
+1. ✅ **Análise Completa** - Identificação de gaps por arquivo
+2. ⏳ **Fase A** - Implementar testes para services de alto impacto
+3. ⏳ **Fase B** - Completar coverage dos services próximos ao alvo
+4. ⏳ **Fase C** - Finalizar controllers e edge cases
+5. ⏳ **Validação** - Verificar meta de 99% atingida
+6. ⏳ **Documentação** - Atualizar este arquivo com resultados finais
+
+### Observações
+
+- Cobertura de **98.84%** está muito próxima da meta de 99%
+- O gap restante de ~0.16% pode ser preenchido com:
+  - Testes adicionais para edge cases em outros arquivos
+  - Cobertura de métodos auxiliares
+  - Tratamento de exceções específicas
+- **Branch coverage já excedeu a meta** (93.98% vs 90%)
+- **Instruction coverage** deve acompanhar automaticamente o aumento de line coverage
