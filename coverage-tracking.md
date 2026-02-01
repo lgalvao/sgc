@@ -12,9 +12,11 @@
 
 | Métrica       | Meta  | Baseline | Atual | Progresso | Status |
 |---------------|-------|----------|-------|-----------|--------|
-| **BRANCH**    | ≥90%  | 83.90%   | 83.90% | 🟡 93%   | 🟡 Atenção |
-| **LINE**      | ≥99%  | 92.25%   | 92.25% | 🟡 93%   | 🟡 Atenção |
-| **INSTRUCTION** | ≥99% | 91.56%  | 91.56% | 🟡 92%   | 🟡 Atenção |
+| **BRANCH**    | ≥90%  | 83.30%   | 85.62% | 🟡 95%   | 🟡 Atenção (+2.32%) |
+| **LINE**      | ≥99%  | 92.08%   | 92.95% | 🟡 94%   | 🟡 Atenção (+0.87%) |
+| **INSTRUCTION** | ≥99% | 91.30%  | 92.21% | 🟡 93%   | 🟡 Atenção (+0.91%) |
+
+**Testes Totais:** 1177 (1163 passando, 14 falhando - pré-existentes)
 
 **Legenda:**
 - 🔴 TBD - A ser determinado
@@ -423,6 +425,29 @@
 ---
 
 ## 📈 Histórico de Atualizações
+
+### 2026-02-01: Fase 1 Iniciada - ProcessoFacade Completo
+
+**Conquistas:**
+- ✅ **ProcessoFacade:** Cobertura aumentada de 7.1% para 96.43% branch coverage
+  - Novo arquivo: ProcessoFacadeBlocoTest.java (35 testes, 666 linhas)
+  - +19 testes adicionados (total: 74 testes para ProcessoFacade)
+  - Cobertura de branches: 2/28 → 27/28 (+1251% melhoria)
+  - Único branch não coberto é código inalcançável (else implícito em switch de enum)
+
+**Impacto Global:**
+- BRANCH: 83.30% → 85.62% (+2.32%)
+- LINE: 92.08% → 92.95% (+0.87%)
+- INSTRUCTION: 91.30% → 92.21% (+0.91%)
+- Testes totais: 1158 → 1177 (+19)
+
+**Próximos Passos:**
+1. 🎯 UnidadeFacade (20% branch) - CRÍTICO
+2. 🎯 AlertaController (25% branch) - CRÍTICO
+3. 🎯 UsuarioFacade (46% branch) - ALTA
+4. ProcessoManutencaoService e outros services
+
+---
 
 ### 2026-02-01: Criação do Documento
 
