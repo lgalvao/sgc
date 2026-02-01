@@ -1,0 +1,54 @@
+Calculating task graph as no cached configuration is available for tasks: :backend:test
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava
+> Task :backend:classes
+
+> Task :backend:compileTestJava
+/app/backend/src/test/java/sgc/subprocesso/SubprocessoCadastroControllerTest.java:138: warning: [deprecation] isUnprocessableEntity() in StatusResultMatchers has been deprecated
+                    .andExpect(status().isUnprocessableEntity());
+                                       ^
+/app/backend/src/test/java/sgc/subprocesso/SubprocessoCadastroControllerTest.java:182: warning: [deprecation] isUnprocessableEntity() in StatusResultMatchers has been deprecated
+                    .andExpect(status().isUnprocessableEntity());
+                                       ^
+2 warnings
+
+> Task :backend:testClasses
+> Task :backend:test
+  Results: SUCCESS
+  Total:     1437 tests run
+  ✓ Passed:  1437
+  ✗ Failed:  0
+  ○ Ignored: 0
+  Time:     166.565s
+
+Testes mais lentos (> 1s):
+  - 4613ms: sgc.arquitetura.ArchConsistencyTest > controllers_should_not_access_repositories
+  - 2158ms: sgc.processo.service.ProcessoFacadeBlocoTest$AcaoAceitar > deveAceitarQuandoRevisaoCadastroHomologada()
+  - 1565ms: sgc.e2e.E2eFixtureEndpointTest > devePermitirCriarEIniciarProcessoMapeamentoViaFixture()
+  - 1482ms: sgc.seguranca.login.ClienteAcessoAdTest > autenticar_ValidaOnStatus()
+  - 1314ms: sgc.subprocesso.service.SubprocessoFacadeComplementaryTest$PermissaoDetalheTests > obterPermissoesComAutenticacaoSemNome()
+  - 1297ms: sgc.seguranca.acesso.AccessControlServiceTest > deveRetornarTrueParaPodeExecutarNaImplementacaoInicial()
+  - 1252ms: sgc.alerta.AlertaControllerExtractTituloTest$SwitchExpressionCases > casoDefaultInteger_DeveUsarToString()
+  - 1142ms: sgc.e2e.E2eFixtureEndpointTest > deveGerarDescricaoAutomaticaQuandoNaoFornecida()
+  - 1070ms: sgc.organizacao.UnidadeFacadeElegibilidadePredicateTest$MapaVigenteTestes > comMapaRequerido_UnidadeSemMapa_DeveRejeitar()
+
+> Task :backend:test FAILED
+
+[Incubating] Problems report is available at: file:///app/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> java.nio.file.NoSuchFileException: /app/backend/build/test-results/test/binary/in-progress-results-generic4697501054622439636.bin
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 3m 3s
+5 actionable tasks: 3 executed, 2 up-to-date
+Configuration cache entry stored.

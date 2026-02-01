@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
@@ -11,5 +12,5 @@ import sgc.seguranca.sanitizacao.SanitizarHtml;
  */
 @Builder
 public record ApresentarSugestoesRequest(
-        @NotBlank(message = "As sugestões são obrigatórias") @SanitizarHtml String sugestoes) {
+        @NotBlank(message = "As sugestões são obrigatórias") @Size(max = 1000, message = "As sugestões devem ter no máximo 1000 caracteres") @SanitizarHtml String sugestoes) {
 }

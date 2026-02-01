@@ -2,6 +2,7 @@ package sgc.subprocesso.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
@@ -16,7 +17,7 @@ import java.util.List;
  */
 @Builder
 public record SubmeterMapaAjustadoRequest(
-        @NotBlank(message = "A justificativa é obrigatória") @SanitizarHtml String justificativa,
+        @NotBlank(message = "A justificativa é obrigatória") @Size(max = 500, message = "A justificativa deve ter no máximo 500 caracteres") @SanitizarHtml String justificativa,
 
                 LocalDateTime dataLimiteEtapa2,
 
