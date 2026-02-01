@@ -97,6 +97,22 @@ class ProcessoMapperTest {
             ProcessoDto dto = mapper.toDto(processo);
 
             assertThat(dto).isNotNull();
+            assertThat(dto.getUnidadesParticipantes()).isNullOrEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve lidar com participantes vazios")
+        void deveLidarComParticipantesVazio() {
+            Processo processo = new Processo();
+            processo.setCodigo(1L);
+            processo.setDescricao("Teste");
+            processo.setTipo(TipoProcesso.MAPEAMENTO);
+            processo.setSituacao(SituacaoProcesso.CRIADO);
+            processo.setParticipantes(new HashSet<>());
+
+            ProcessoDto dto = mapper.toDto(processo);
+
+            assertThat(dto).isNotNull();
             assertThat(dto.getUnidadesParticipantes()).isEmpty();
         }
 
