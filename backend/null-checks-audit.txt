@@ -1,0 +1,254 @@
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/alerta/AlertaFacade.java
+  L108 [POTENTIALLY_REDUNDANT]: while (unidadeSuperior != null) {
+  L175 [POTENTIALLY_REDUNDANT]: if (alerta == null) {
+  L186 [POTENTIALLY_REDUNDANT]: if (alertaUsuario != null && alertaUsuario.getDataHoraLeitura() == null) {
+  L231 [POTENTIALLY_REDUNDANT]: .filter(dto -> dto.getDataHoraLeitura() == null)
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/alerta/mapper/AlertaMapper.java
+  L51 [POTENTIALLY_REDUNDANT]: return dataHora == null ? "" : dataHora.format(FORMATTER);
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/analise/AnaliseFacade.java
+  L57 [POTENTIALLY_REDUNDANT]: if (command.siglaUnidade() != null) {
+  L68 [POTENTIALLY_REDUNDANT]: .unidadeCodigo(unidade != null ? unidade.getCodigo() : null)
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/analise/mapper/AnaliseMapper.java
+  L42 [POTENTIALLY_REDUNDANT]: if (codUnidade == null) return null;
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/comum/erros/ErroApi.java
+  L52 [POTENTIALLY_REDUNDANT]: this.subErrors = subErrors != null ? new ArrayList<>(subErrors) : null;
+  L56 [POTENTIALLY_REDUNDANT]: return subErrors != null ? new ArrayList<>(subErrors) : null;
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/comum/erros/RestExceptionHandler.java
+  L63 [POTENTIALLY_REDUNDANT]: if (ex.getDetails() != null && !ex.getDetails().isEmpty()) {
+  L76 [MAYBE_LEGIT]: log.warn("Erro de mensagem HTTP não legível: {}", ex != null ? ex.getMessage() : "sem detalhe");
+  L91 [MAYBE_LEGIT]: var subErrors = ex != null
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/comum/repo/ComumRepo.java
+  L29 [POTENTIALLY_REDUNDANT]: if (entidade == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/comum/util/FormatadorData.java
+  L23 [POTENTIALLY_REDUNDANT]: return data == null ? "-" : data.format(FORMATO_BR);
+  L33 [POTENTIALLY_REDUNDANT]: return data == null ? "-" : data.format(FORMATO_BR_COM_HORA);
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/e2e/E2eController.java
+  L201 [POTENTIALLY_REDUNDANT]: if (unidade == null) {
+  L212 [POTENTIALLY_REDUNDANT]: if (descReq != null && !descReq.isBlank()) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/mapa/service/CopiaMapaService.java
+  L139 [POTENTIALLY_REDUNDANT]: if (novaAtividade != null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/mapa/service/MapaManutencaoService.java
+  L86 [POTENTIALLY_REDUNDANT]: if (existente.getMapa() != null) {
+  L102 [POTENTIALLY_REDUNDANT]: if (novaDescricao != null) {
+  L106 [POTENTIALLY_REDUNDANT]: if (mapa != null) {
+  L126 [POTENTIALLY_REDUNDANT]: if (mapa != null) {
+  L175 [POTENTIALLY_REDUNDANT]: if (ativId != null) {
+  L270 [POTENTIALLY_REDUNDANT]: if (mapa != null) {
+  L287 [POTENTIALLY_REDUNDANT]: if (mapa != null) {
+  L313 [POTENTIALLY_REDUNDANT]: if (mapa != null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/mapa/service/MapaSalvamentoService.java
+  L137 [POTENTIALLY_REDUNDANT]: if (codigo != null) {
+  L139 [POTENTIALLY_REDUNDANT]: if (competencia == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/mapa/service/MapaVisualizacaoService.java
+  L70 [POTENTIALLY_REDUNDANT]: if (ativDto != null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/UsuarioFacade.java
+  L42 [MAYBE_LEGIT]: if (usuario != null) {
+  L76 [POTENTIALLY_REDUNDANT]: if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+  L255 [POTENTIALLY_REDUNDANT]: .substitutoTitulo(substituto != null ? substituto.getTituloEleitoral() : null)
+  L256 [POTENTIALLY_REDUNDANT]: .substitutoNome(substituto != null ? substituto.getNome() : null)
+  L310 [MAYBE_LEGIT]: return principal != null ? principal.toString() : null;
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/mapper/UsuarioMapper.java
+  L28 [POTENTIALLY_REDUNDANT]: @Mapping(target = "tipo", expression = "java(unidade.getTipo() != null ? unidade.getTipo().name() : null)")
+  L46 [POTENTIALLY_REDUNDANT]: if (unidade == null) return null;
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/model/TipoUnidadeConverter.java
+  L11 [POTENTIALLY_REDUNDANT]: if (attribute == null) {
+  L19 [POTENTIALLY_REDUNDANT]: if (dbData == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/model/Usuario.java
+  L68 [POTENTIALLY_REDUNDANT]: if (atribuicoesTemporarias == null) {
+  L91 [POTENTIALLY_REDUNDANT]: if (obj == null || getClass() != obj.getClass()) return false;
+  L103 [POTENTIALLY_REDUNDANT]: return authorities != null ? authorities : Set.of();
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/model/UsuarioPerfil.java
+  L44 [POTENTIALLY_REDUNDANT]: if (obj == null || getClass() != obj.getClass()) return false;
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/service/HierarquiaService.java
+  L25 [POTENTIALLY_REDUNDANT]: while (atual != null) {
+  L56 [POTENTIALLY_REDUNDANT]: if (superiorAlvo == null) return false;
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java
+  L166 [MAYBE_LEGIT]: boolean isElegivel = elegibilidadeChecker != null ? elegibilidadeChecker.apply(u) : true;
+  L190 [POTENTIALLY_REDUNDANT]: if (filhas == null || filhas.isEmpty()) {
+  L205 [POTENTIALLY_REDUNDANT]: if (filhos != null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeResponsavelService.java
+  L67 [POTENTIALLY_REDUNDANT]: LocalDate inicio = request.dataInicio() != null ? request.dataInicio() : LocalDate.now();
+  L77 [POTENTIALLY_REDUNDANT]: .setDataInicio(request.dataInicio() != null ? request.dataInicio().atStartOfDay() : LocalDateTime.now())
+  L165 [POTENTIALLY_REDUNDANT]: .substitutoTitulo(substituto != null ? substituto.getTituloEleitoral() : null)
+  L166 [POTENTIALLY_REDUNDANT]: .substitutoNome(substituto != null ? substituto.getNome() : null)
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/service/ValidadorDadosOrgService.java
+  L92 [POTENTIALLY_REDUNDANT]: .filter(t -> t != null && !t.isBlank())
+  L109 [POTENTIALLY_REDUNDANT]: if (u.getTituloTitular() == null || u.getTituloTitular().isBlank()) {
+  L121 [POTENTIALLY_REDUNDANT]: if (tituloTitular == null || tituloTitular.isBlank()) {
+  L126 [POTENTIALLY_REDUNDANT]: if (titular == null) {
+  L132 [POTENTIALLY_REDUNDANT]: if (titular.getEmail() == null || titular.getEmail().isBlank()) {
+  L144 [POTENTIALLY_REDUNDANT]: .filter(u -> u.getUnidadeSuperior() != null)
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/painel/PainelFacade.java
+  L176 [POTENTIALLY_REDUNDANT]: if (superior == null || !participantesIds.contains(superior.getCodigo())) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/processo/ProcessoController.java
+  L183 [POTENTIALLY_REDUNDANT]: if (processador == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/processo/listener/EventoProcessoListener.java
+  L132 [POTENTIALLY_REDUNDANT]: if (r.titularTitulo() != null)
+  L134 [POTENTIALLY_REDUNDANT]: if (r.substitutoTitulo() != null)
+  L168 [POTENTIALLY_REDUNDANT]: .filter(u -> u.getUnidadeSuperior() != null)
+  L182 [POTENTIALLY_REDUNDANT]: if (responsavel == null || responsavel.titularTitulo() == null)
+  L186 [POTENTIALLY_REDUNDANT]: if (titular == null || titular.email() == null || titular.email().isBlank())
+  L245 [POTENTIALLY_REDUNDANT]: if (responsavel == null || responsavel.titularTitulo() == null)
+  L260 [POTENTIALLY_REDUNDANT]: if (titular != null && titular.email() != null && !titular.email().isBlank()) {
+  L267 [POTENTIALLY_REDUNDANT]: if (responsavel.substitutoTitulo() != null) {
+  L291 [POTENTIALLY_REDUNDANT]: if (substituto != null && !substituto.email().isBlank()) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/processo/mapper/ProcessoMapper.java
+  L31 [POTENTIALLY_REDUNDANT]: if (processo.getParticipantes() != null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/processo/model/Processo.java
+  L57 [POTENTIALLY_REDUNDANT]: if (participantes == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/processo/service/ProcessoAcessoService.java
+  L44 [MAYBE_LEGIT]: if (authentication == null || !authentication.isAuthenticated() || authentication.getName() == null) {
+  L98 [POTENTIALLY_REDUNDANT]: if (unidadeSuperior != null) {
+  L116 [POTENTIALLY_REDUNDANT]: if (filhos != null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/processo/service/ProcessoConsultaService.java
+  L108 [POTENTIALLY_REDUNDANT]: if (authentication == null || authentication.getName() == null) {
+  L133 [POTENTIALLY_REDUNDANT]: if (codUnidadeUsuario == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/processo/service/ProcessoDetalheBuilder.java
+  L73 [POTENTIALLY_REDUNDANT]: if (sp != null) {
+  L77 [POTENTIALLY_REDUNDANT]: if (sp.getMapa() != null) {
+  L93 [POTENTIALLY_REDUNDANT]: if (pai != null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/processo/service/ProcessoInicializador.java
+  L149 [POTENTIALLY_REDUNDANT]: if (unidade == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/processo/service/ProcessoValidador.java
+  L45 [MAYBE_LEGIT]: if (codigosUnidades == null || codigosUnidades.isEmpty()) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/acesso/AbstractAccessPolicy.java
+  L108 [POTENTIALLY_REDUNDANT]: yield tituloTitular != null && tituloTitular.equals(usuario.getTituloEleitoral());
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/acesso/AccessControlService.java
+  L47 [MAYBE_LEGIT]: if (usuario == null) {
+  L82 [MAYBE_LEGIT]: if (usuario == null) return "Usuário não autenticado não pode executar a ação: " + acao.getDescricao();
+  L86 [MAYBE_LEGIT]: if (motivoPolicy != null && !motivoPolicy.isBlank()) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/acesso/AtividadeAccessPolicy.java
+  L52 [POTENTIALLY_REDUNDANT]: if (regras == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/acesso/MapaAccessPolicy.java
+  L44 [POTENTIALLY_REDUNDANT]: if (regras == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/acesso/ProcessoAccessPolicy.java
+  L48 [POTENTIALLY_REDUNDANT]: if (regras == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java
+  L234 [POTENTIALLY_REDUNDANT]: if (regras == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/config/ConfigCorsProperties.java
+  L24 [POTENTIALLY_REDUNDANT]: allowedOrigins = allowedOrigins != null ? allowedOrigins : DEFAULT_ORIGINS;
+  L25 [POTENTIALLY_REDUNDANT]: allowedMethods = allowedMethods != null ? allowedMethods : DEFAULT_METHODS;
+  L26 [POTENTIALLY_REDUNDANT]: allowedHeaders = allowedHeaders != null ? allowedHeaders : DEFAULT_HEADERS;
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/login/FiltroJwt.java
+  L43 [POTENTIALLY_REDUNDANT]: if (authHeader != null && authHeader.startsWith("Bearer ")) {
+  L49 [POTENTIALLY_REDUNDANT]: if (usuario != null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/login/GerenciadorJwt.java
+  L82 [POTENTIALLY_REDUNDANT]: if (tituloEleitoral == null || perfilStr == null || unidadeCodigo == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/login/LimitadorTentativasLogin.java
+  L86 [POTENTIALLY_REDUNDANT]: if (tentativas == null)
+  L92 [POTENTIALLY_REDUNDANT]: while ((tentativaAntiga = tentativas.peekFirst()) != null && tentativaAntiga.isBefore(limite)) {
+  L107 [POTENTIALLY_REDUNDANT]: while ((tentativaAntiga = tentativas.peekFirst()) != null && tentativaAntiga.isBefore(limite)) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/login/LoginController.java
+  L123 [POTENTIALLY_REDUNDANT]: if (request.getCookies() != null) {
+  L132 [POTENTIALLY_REDUNDANT]: if (token == null) {
+  L144 [POTENTIALLY_REDUNDANT]: if (ip == null || ip.isEmpty()) {
+  L151 [POTENTIALLY_REDUNDANT]: if (ip != null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/login/LoginFacade.java
+  L120 [POTENTIALLY_REDUNDANT]: if (usuario == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/sanitizacao/DeserializadorHtmlSanitizado.java
+  L20 [POTENTIALLY_REDUNDANT]: if (value == null || value.isBlank()) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/sanitizacao/UtilSanitizacao.java
+  L26 [POTENTIALLY_REDUNDANT]: if (entrada == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/subprocesso/SubprocessoMapaController.java
+  L234 [POTENTIALLY_REDUNDANT]: .dataLimite(request.dataLimite() != null ? request.dataLimite() : LocalDate.now().plusDays(15))
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/subprocesso/eventos/TipoTransicao.java
+  L148 [POTENTIALLY_REDUNDANT]: return templateAlerta != null;
+  L155 [POTENTIALLY_REDUNDANT]: return templateEmail != null;
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/subprocesso/mapper/SubprocessoDetalheMapper.java
+  L26 [POTENTIALLY_REDUNDANT]: @Mapping(target = "tipoProcesso", expression = "java(sp.getProcesso() != null ? sp.getProcesso().getTipo().name() : null)")
+  L40 [MAYBE_LEGIT]: if (responsavel == null) return null;
+  L57 [MAYBE_LEGIT]: if (titular == null) return null;
+  L69 [MAYBE_LEGIT]: if (movimentacaoRecente.getUnidadeDestino() != null) {
+  L77 [POTENTIALLY_REDUNDANT]: return sp.getDataLimiteEtapa1() != null
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoAjusteMapaService.java
+  L159 [POTENTIALLY_REDUNDANT]: if (competencia != null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/subprocesso/service/crud/SubprocessoCrudService.java
+  L87 [POTENTIALLY_REDUNDANT]: .situacaoLabel(subprocesso.getSituacao() != null ? subprocesso.getSituacao().getDescricao() : null)
+  L119 [POTENTIALLY_REDUNDANT]: Long codAtual = subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null;
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/subprocesso/service/crud/SubprocessoValidacaoService.java
+  L40 [MAYBE_LEGIT]: if (mapa == null || mapa.getCodigo() == null) {
+  L134 [POTENTIALLY_REDUNDANT]: if (subprocesso.getSituacao() == null) {
+  L176 [POTENTIALLY_REDUNDANT]: if (subprocesso == null || subprocesso.getSituacao() == null) {
+  L198 [POTENTIALLY_REDUNDANT]: if (subprocesso == null || subprocesso.getSituacao() == null) {
+  L202 [POTENTIALLY_REDUNDANT]: if (minima == null) {
+  L223 [POTENTIALLY_REDUNDANT]: if (subprocesso == null || subprocesso.getSituacao() == null) {
+  L227 [POTENTIALLY_REDUNDANT]: if (minima == null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/subprocesso/service/notificacao/SubprocessoEmailService.java
+  L71 [POTENTIALLY_REDUNDANT]: if (sp.getDataLimiteEtapa1() != null) {
+  L75 [POTENTIALLY_REDUNDANT]: if (sp.getDataLimiteEtapa2() != null) {
+  L79 [POTENTIALLY_REDUNDANT]: if (evento.getObservacoes() != null) {
+  L122 [POTENTIALLY_REDUNDANT]: while (superior != null) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/subprocesso/service/query/ProcessoSubprocessoQueryService.java
+  L41 [POTENTIALLY_REDUNDANT]: if (unidadeCodigos == null || unidadeCodigos.isEmpty()) {
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoCadastroWorkflowService.java
+  L103 [POTENTIALLY_REDUNDANT]: while (superior != null) {
+  L135 [POTENTIALLY_REDUNDANT]: if (origem == null) {
+  L140 [POTENTIALLY_REDUNDANT]: if (destino == null) {
+  L177 [MAYBE_LEGIT]: if (unidadeAnalise == null) {
+  L208 [MAYBE_LEGIT]: if (unidadeDestino == null) {
+  L257 [MAYBE_LEGIT]: if (unidadeAnalise == null) {
+  L284 [MAYBE_LEGIT]: if (unidadeAnalise == null) {
+  L289 [MAYBE_LEGIT]: Unidade unidadeDestino = (superiorAnalise != null) ? superiorAnalise : unidadeAnalise;
+
+File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoMapaWorkflowService.java
+  L254 [MAYBE_LEGIT]: if (destino == null) {
+  L279 [POTENTIALLY_REDUNDANT]: if (destino == null) {
+  L301 [MAYBE_LEGIT]: if (unidadeSuperior == null) {
+  L329 [POTENTIALLY_REDUNDANT]: Unidade proximaUnidade = unidadeSuperior != null ? unidadeSuperior.getUnidadeSuperior() : null;
+  L332 [POTENTIALLY_REDUNDANT]: if (proximaUnidade == null) {
+  L335 [POTENTIALLY_REDUNDANT]: String siglaUnidade = sup != null ? sup.getSigla() : sp.getUnidade().getSigla();
+
