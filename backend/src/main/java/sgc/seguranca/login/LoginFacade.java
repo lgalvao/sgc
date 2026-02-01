@@ -65,6 +65,10 @@ public class LoginFacade {
             log.info("Usuário autenticado: {}", tituloEleitoral);
             return true;
         }
+        if (clienteAcessoAd == null) {
+            log.warn("Cliente AD não configurado para autenticação em produção.");
+            return false;
+        }
         try {
             return clienteAcessoAd.autenticar(tituloEleitoral, senha);
         } catch (ErroAutenticacao e) {

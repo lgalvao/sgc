@@ -20,6 +20,9 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACA
 import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
 import java.util.ArrayList;
 import java.util.Collection;
+import org.springframework.context.ApplicationEventPublisher;
+import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
+import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SubprocessoRepo;
 
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
@@ -42,6 +45,7 @@ public class SubprocessoFactory {
     private final MapaRepo mapaRepo;
     private final MovimentacaoRepo movimentacaoRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Subprocesso criar(CriarSubprocessoRequest request) {
         Processo processo = Processo.builder()
@@ -112,6 +116,12 @@ public class SubprocessoFactory {
                     .unidadeDestino(sp.getUnidade())
                     .descricao("Processo iniciado")
                     .build());
+
+            eventPublisher.publishEvent(EventoTransicaoSubprocesso.builder()
+                    .subprocesso(sp)
+                    .tipo(TipoTransicao.PROCESSO_INICIADO)
+                    .unidadeDestino(sp.getUnidade())
+                    .build());
         }
         movimentacaoRepo.saveAll(movimentacoes);
     }
@@ -143,6 +153,13 @@ public class SubprocessoFactory {
                 .unidadeDestino(unidade)
                 .descricao("Processo de revisão iniciado")
                 .build());
+
+        eventPublisher.publishEvent(EventoTransicaoSubprocesso.builder()
+                .subprocesso(subprocessoSalvo)
+                .tipo(TipoTransicao.PROCESSO_INICIADO)
+                .unidadeDestino(unidade)
+                .build());
+
         log.info("Subprocesso para revisão criado para unidade {}", unidade.getSigla());
     }
 
@@ -173,6 +190,13 @@ public class SubprocessoFactory {
                 .unidadeDestino(unidade)
                 .descricao("Processo de diagnóstico iniciado")
                 .build());
+
+        eventPublisher.publishEvent(EventoTransicaoSubprocesso.builder()
+                .subprocesso(subprocessoSalvo)
+                .tipo(TipoTransicao.PROCESSO_INICIADO)
+                .unidadeDestino(unidade)
+                .build());
+
         log.info("Subprocesso {} para diagnóstico criado para unidade {}", subprocessoSalvo.getCodigo(), unidade.getSigla());
     }
 }

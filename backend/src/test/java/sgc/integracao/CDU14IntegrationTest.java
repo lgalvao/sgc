@@ -205,7 +205,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                         Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
                         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
                         assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
-                        assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(2);
+                        assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(3);
                         assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
                 }
         }
@@ -233,7 +233,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                         Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
                         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
                         assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
-                        assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(2);
+                        assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(3);
                         assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
                 }
         }

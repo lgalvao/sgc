@@ -164,6 +164,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
         assertThat(alertasCount).isGreaterThan(0);
 
         // 6. Assert: Envio de Notificação por Email
-        verify(notificacaoEmailService, atLeastOnce()).enviarEmailHtml(any(), any(), any());
+        Thread.sleep(1000); // Aguarda processamento assíncrono
+        verify(notificacaoEmailService, atLeastOnce()).enviarEmail(any(), any(), any());
     }
 }

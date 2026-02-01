@@ -129,7 +129,7 @@ class SubprocessoCrudServiceTest {
         SubprocessoSituacaoDto status = service.obterStatus(1L);
         assertThat(status.codigo()).isEqualTo(1L);
         assertThat(status.situacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
-        assertThat(status.situacaoLabel()).isEqualTo("NAO_INICIADO");
+        assertThat(status.situacaoLabel()).isEqualTo("Não Iniciado");
     }
 
     @Test

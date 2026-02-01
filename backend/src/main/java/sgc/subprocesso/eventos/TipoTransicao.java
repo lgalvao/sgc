@@ -138,6 +138,9 @@ public enum TipoTransicao {
      * @return Descrição formatada ou null se não gera alerta
      */
     public String formatarAlerta(String siglaUnidade) {
+        if (templateAlerta == null) {
+            return null;
+        }
         return templateAlerta.formatted(siglaUnidade);
     }
 
