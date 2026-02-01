@@ -296,4 +296,35 @@ describe('UnidadeView.vue', () => {
 
         expect(logger.error).toHaveBeenCalledWith('Erro ao buscar titular:', expect.any(Error));
     });
+
+    it('renders clickable contact links for titular', async () => {
+        // Setup mock user with contact info
+        const mockUserWithContact = {
+            ...mockUsuario,
+            ramal: '1234',
+            email: 'test@example.com'
+        };
+        (buscarUsuarioPorTitulo as any).mockResolvedValue(mockUserWithContact);
+
+        const { wrapper } = createWrapper({
+            unidades: {
+                unidade: mockUnidade
+            }
+        });
+
+        await wrapper.vm.$nextTick();
+        await flushPromises();
+
+        // Check Ramal Link
+        const ramalLink = wrapper.find('a[href="tel:1234"]');
+        expect(ramalLink.exists()).toBe(true);
+        expect(ramalLink.text()).toBe('1234');
+        expect(ramalLink.attributes('aria-label')).toBe('Ligar para 1234');
+
+        // Check Email Link
+        const emailLink = wrapper.find('a[href="mailto:test@example.com"]');
+        expect(emailLink.exists()).toBe(true);
+        expect(emailLink.text()).toBe('test@example.com');
+        expect(emailLink.attributes('aria-label')).toBe('Enviar e-mail para test@example.com');
+    });
 });
