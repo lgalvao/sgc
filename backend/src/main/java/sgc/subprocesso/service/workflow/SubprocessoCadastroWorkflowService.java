@@ -131,10 +131,7 @@ public class SubprocessoCadastroWorkflowService {
         accessControlService.verificarPermissao(usuario, acaoPermissao, sp);
         validarRequisitosNegocioParaDisponibilizacao(codSubprocesso);
 
-        Unidade origem = sp.getUnidade();
-        if (origem == null) {
-            throw new IllegalStateException("Subprocesso sem unidade vinculada: " + codSubprocesso);
-        }
+        Unidade origem = sp.getUnidade(); // Guaranteed non-null by @NonNull return type
 
         Unidade destino = origem.getUnidadeSuperior();
         if (destino == null) {
