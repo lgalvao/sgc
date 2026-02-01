@@ -93,9 +93,9 @@
 
 ### Fase 1: Foundation - Unit Tests
 
-**Status:** 🔴 Não Iniciada  
+**Status:** 🟡 Em Andamento  
 **Estimativa:** 3-5 dias  
-**Início:** -  
+**Início:** 2026-02-01  
 **Conclusão:** -
 
 #### Checklist por Módulo
@@ -103,16 +103,17 @@
 ##### 1.1 Módulo `processo` (CRÍTICO)
 
 **Prioridade:** 🔴 CRÍTICA  
-**Arquivos:** ~35 | **Testes Existentes:** ~25 | **Gap:** ALTO
+**Arquivos:** ~35 | **Testes Existentes:** ~44 (+19) | **Gap:** 🟢 BAIXO
 
-- [ ] **Services**
-  - [ ] `ProcessoService` - Criar/completar testes
+- [x] **Services**
+  - [x] `ProcessoFacade` - ✅ COMPLETO (96.43% branch, 97.5% line)
+    - Criado ProcessoFacadeBlocoTest.java com 35 testes
+    - Cobertura aumentada de 7.1% para 96.43% branch
+    - 19 novos testes adicionados (total: 74 testes)
+  - [ ] `ProcessoManutencaoService` - Criar/completar testes
   - [ ] `ProcessoValidadorService` - Criar/completar testes
   - [ ] `ProcessoNotificadorService` - Criar/completar testes
   - [ ] Outros services especializados
-
-- [ ] **Facades**
-  - [ ] `ProcessoFacade` - Criar/completar testes (orquestração)
 
 - [ ] **Validators**
   - [ ] Validators customizados
@@ -123,10 +124,11 @@
 |----------|-------|--------|-------|
 | LINE     | TBD%  | TBD%   | TBD%  |
 | BRANCH   | TBD%  | TBD%   | TBD%  |
-| Testes + | TBD   | TBD    | TBD   |
+| Testes + | 25    | 44     | +19   |
 
 **Notas:**
-- _Adicionar descobertas e decisões_
+- ✅ ProcessoFacade agora tem excelente cobertura (96.43% branch)
+- 🎯 Próximo foco: ProcessoManutencaoService e outros services do módulo processo
 
 ---
 
