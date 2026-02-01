@@ -107,6 +107,8 @@ class ClienteAcessoAdTest {
         // Valida Predicate
         assertTrue(predicateCaptor.getValue().test(HttpStatusCode.valueOf(400)));
         assertTrue(predicateCaptor.getValue().test(HttpStatusCode.valueOf(500)));
+        // Valida que 2xx retorna false
+        assertTrue(!predicateCaptor.getValue().test(HttpStatusCode.valueOf(200)));
 
         // Valida ErrorHandler
         HttpRequest request = mock(HttpRequest.class);
