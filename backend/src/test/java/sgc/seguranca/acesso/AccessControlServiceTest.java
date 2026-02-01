@@ -181,6 +181,46 @@ class AccessControlServiceTest {
         }
     }
 
+    @Test
+    @DisplayName("Deve retornar false quando usuário é nulo")
+    void deveRetornarFalseQuandoUsuarioEhNulo() {
+        boolean resultado = accessControlService.podeExecutar(null, Acao.VISUALIZAR_PROCESSO, new Processo());
+        assertThat(resultado).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve retornar motivo específico para usuário nulo ao negar acesso")
+    void deveRetornarMotivoParaUsuarioNuloAoNegarAcesso() {
+        try {
+            accessControlService.verificarPermissao(null, Acao.VISUALIZAR_PROCESSO, new Processo());
+        } catch (ErroAcessoNegado e) {
+            assertThat(e.getMessage()).contains("não autenticado");
+            assertThat(e.getMessage()).contains(Acao.VISUALIZAR_PROCESSO.getDescricao());
+        }
+        
+        // Verificar que audit foi chamado com acesso negado
+        verify(auditService).logAccessDenied(eq(null), eq(Acao.VISUALIZAR_PROCESSO), any(Processo.class), anyString());
+    }
+
+    @Test
+    @DisplayName("Deve usar mensagem padrão quando policy retorna motivo em branco")
+    void deveUsarMensagemPadraoQuandoMotivoEmBranco() {
+        Usuario usuario = criarUsuario("123");
+        
+        // Policy retorna false mas com motivo em branco
+        when(processoAccessPolicy.canExecute(any(), any(), any())).thenReturn(false);
+        when(processoAccessPolicy.getMotivoNegacao()).thenReturn("   "); // blank string
+        
+        try {
+            accessControlService.verificarPermissao(usuario, Acao.EDITAR_PROCESSO, new Processo());
+        } catch (ErroAcessoNegado e) {
+            // Deve usar mensagem padrão (fallback) ao invés do motivo em branco
+            assertThat(e.getMessage()).contains("não tem permissão");
+            assertThat(e.getMessage()).contains("123");
+            assertThat(e.getMessage()).contains(Acao.EDITAR_PROCESSO.getDescricao());
+        }
+    }
+
     // Teste de usuário nulo removido - não faz sentido com NullMarked
 
     @Test
