@@ -96,4 +96,33 @@ class LoginFacadeGapTest {
         assertThatThrownBy(() -> loginFacade.entrar(req))
                 .isInstanceOf(ErroAcessoNegado.class);
     }
+
+    @Test
+    @DisplayName("Deve negar acesso se unidade estiver inativa (filtro de situação)")
+    void deveNegarAcessoComUnidadeInativa() {
+        // Request pede ADMIN na unidade 1 que está INATIVA
+        EntrarRequest req = new EntrarRequest("123", "ADMIN", 1L);
+
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
+        
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        unidade.setSituacao(SituacaoUnidade.INATIVA); // Unidade inativa será filtrada
+
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setPerfil(Perfil.ADMIN);
+        up.setUnidade(unidade);
+        up.setUnidadeCodigo(1L);
+        up.setUsuario(usuario);
+
+        when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
+        when(usuarioPerfilService.buscarPorUsuario("123")).thenReturn(List.of(up));
+
+        // Não precisa mockar o mapper porque unidade será filtrada antes do map
+
+        // Deve negar porque unidade está INATIVA (será filtrada linha 132)
+        assertThatThrownBy(() -> loginFacade.entrar(req))
+                .isInstanceOf(ErroAcessoNegado.class);
+    }
 }
