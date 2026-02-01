@@ -199,7 +199,7 @@ public class PainelFacade {
             return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
         } catch (Exception e) {
             log.warn("Erro ao calcular link de destino para o processo {}: {}", processo.getCodigo(), e.getMessage());
-            return "";
+            return null;
         }
     }
 

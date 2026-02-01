@@ -115,7 +115,7 @@ class ProcessoConsultaServiceTest {
         Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).unidade(Unidade.builder().nome("U1").sigla("S1").build()).build();
         s1.setCodigo(1L);
 
-        when(queryService.listarPorProcessoESituacao(1L, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)).thenReturn(List.of(s1));
+        when(queryService.listarPorProcessoESituacoes(eq(1L), anyList())).thenReturn(List.of(s1));
 
         List<SubprocessoElegivelDto> res = processoConsultaService.listarSubprocessosElegiveis(1L);
 
