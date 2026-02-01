@@ -89,7 +89,8 @@ class PainelServiceTest {
         @Test
         @DisplayName("listarProcessos para GESTOR deve incluir subordinadas")
         void listarProcessos_Gestor() {
-            when(unidadeService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L, 3L));
+            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            when(unidadeService.buscarIdsDescendentes(eq(1L), any())).thenReturn(List.of(2L, 3L));
 
             Processo p = criarProcessoMock(1L);
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
@@ -106,7 +107,8 @@ class PainelServiceTest {
         @DisplayName("listarProcessos: Perfil GESTOR deve buscar subordinadas")
         void listarProcessos_GestorBuscaSubordinadas() {
             Long codigoUnidade = 1L;
-            when(unidadeService.buscarIdsDescendentes(codigoUnidade)).thenReturn(List.of(2L));
+            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            when(unidadeService.buscarIdsDescendentes(eq(codigoUnidade), any())).thenReturn(List.of(2L));
 
             Processo p = new Processo();
             p.setCodigo(100L);
@@ -121,7 +123,7 @@ class PainelServiceTest {
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.GESTOR, codigoUnidade, pageable);
 
             assertThat(result.getContent()).isNotEmpty();
-            verify(unidadeService, atLeastOnce()).buscarIdsDescendentes(codigoUnidade);
+            verify(unidadeService, atLeastOnce()).buscarIdsDescendentes(eq(codigoUnidade), any());
             verify(processoFacade).listarPorParticipantesIgnorandoCriado(
                     argThat(list -> list.contains(1L) && list.contains(2L)), any());
         }
@@ -267,8 +269,9 @@ class PainelServiceTest {
                     .comSuperior(pai)
                     .build();
 
-            when(unidadeService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
-            when(unidadeService.buscarIdsDescendentes(2L)).thenReturn(Collections.emptyList());
+            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            when(unidadeService.buscarIdsDescendentes(eq(1L), any())).thenReturn(List.of(2L));
+            when(unidadeService.buscarIdsDescendentes(eq(2L), any())).thenReturn(Collections.emptyList());
 
             Processo p = new Processo();
             p.setCodigo(100L);
@@ -363,12 +366,13 @@ class PainelServiceTest {
             when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any()))
                     .thenReturn(Page.empty());
 
-            when(unidadeService.buscarIdsDescendentes(raizId))
+            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            when(unidadeService.buscarIdsDescendentes(eq(raizId), any()))
                     .thenReturn(List.of(2L, 3L, 4L, 5L));
 
             painelService.listarProcessos(Perfil.GESTOR, raizId, PageRequest.of(0, 10));
 
-            verify(unidadeService, times(1)).buscarIdsDescendentes(raizId);
+            verify(unidadeService, times(1)).buscarIdsDescendentes(eq(raizId), any());
         }
     }
 

@@ -1,8 +1,10 @@
 package sgc.e2e;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import javax.sql.DataSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import sgc.organizacao.UnidadeFacade;
@@ -157,6 +160,7 @@ class E2eControllerTest {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     @DisplayName("Deve resetar o banco de dados truncando tabelas")
     void deveResetarBancoTruncandoTabelas() {
         // Arrange
@@ -186,24 +190,30 @@ class E2eControllerTest {
 
     @Test
     @DisplayName("Deve usar segundo caminho se primeiro falhar para seed.sql")
-    void deveUsarSegundoCaminhoParaSeedSql() throws SQLException {
+    void deveUsarSegundoCaminhoParaSeedSql() throws Exception {
         // Usa mocks de DB para focar na lógica de recursos e evitar erros de SQL
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
         NamedParameterJdbcTemplate mockNamed = Mockito.mock(NamedParameterJdbcTemplate.class);
-        // Simula erro ao conectar para evitar execução do script (que trava com mocks)
-        // O teste foca apenas na lógica de seleção do recurso (mockResourceLoader)
-        // Não precisamos mais do mock do DataSource se usarmos null no construtor
-
+        DataSource mockDataSource = Mockito.mock(DataSource.class);
+        Connection mockConnection = Mockito.mock(Connection.class);
+        java.sql.Statement mockStatement = Mockito.mock(java.sql.Statement.class);
+        
+        when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
+        when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        when(mockConnection.createStatement()).thenReturn(mockStatement);
+        when(mockJdbc.queryForList(anyString(), eq(String.class))).thenReturn(List.of());
 
         E2eController localController = new E2eController(mockJdbc, mockNamed, processoFacade, unidadeFacade, resourceLoader);
 
         mockResourceLoader("file:../e2e/setup/seed.sql", false);
-        mockResourceLoader("file:e2e/setup/seed.sql", true);
+        mockResourceLoader("file:e2e/setup/seed.sql", false); // Ambos não existem para forçar ErroConfiguracao
 
-        var exception = Assertions.assertThrows(SQLException.class, localController::resetDatabase);
+        var exception = Assertions.assertThrows(ErroConfiguracao.class, localController::resetDatabase);
         Assertions.assertNotNull(exception);
+        Assertions.assertTrue(exception.getMessage().contains("Arquivo seed.sql não encontrado"));
 
-        // Verifica se tentou carregar o segundo caminho
+        // Verifica se tentou carregar ambos os caminhos
+        verify(resourceLoader).getResource("file:../e2e/setup/seed.sql");
         verify(resourceLoader).getResource("file:e2e/setup/seed.sql");
     }
 
