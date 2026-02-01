@@ -208,22 +208,26 @@ public class ProcessoFacade {
         List<Long> unidadesHomologarCadastro = new ArrayList<>();
         List<Long> unidadesHomologarValidacao = new ArrayList<>();
 
-        for (Long codUnidade : req.unidadeCodigos()) {
-             SubprocessoDto spDto = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade);
-             
-             if (req.acao() == AcaoProcesso.ACEITAR) {
-                 if (isSituacaoCadastro(spDto.getSituacao())) {
-                     unidadesAceitarCadastro.add(codUnidade);
-                 } else {
-                     unidadesAceitarValidacao.add(codUnidade);
-                 }
-             } else if (req.acao() == AcaoProcesso.HOMOLOGAR) {
-                 if (isSituacaoCadastro(spDto.getSituacao())) {
-                     unidadesHomologarCadastro.add(codUnidade);
-                 } else {
-                     unidadesHomologarValidacao.add(codUnidade);
-                 }
-             }
+        if (!req.unidadeCodigos().isEmpty()) {
+            List<SubprocessoDto> subprocessos = subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
+
+            for (SubprocessoDto spDto : subprocessos) {
+                Long codUnidade = spDto.getCodUnidade();
+
+                if (req.acao() == AcaoProcesso.ACEITAR) {
+                    if (isSituacaoCadastro(spDto.getSituacao())) {
+                        unidadesAceitarCadastro.add(codUnidade);
+                    } else {
+                        unidadesAceitarValidacao.add(codUnidade);
+                    }
+                } else if (req.acao() == AcaoProcesso.HOMOLOGAR) {
+                    if (isSituacaoCadastro(spDto.getSituacao())) {
+                        unidadesHomologarCadastro.add(codUnidade);
+                    } else {
+                        unidadesHomologarValidacao.add(codUnidade);
+                    }
+                }
+            }
         }
 
         executarAcoesBatch(codProcesso, usuario, unidadesAceitarCadastro, unidadesAceitarValidacao, unidadesHomologarCadastro, unidadesHomologarValidacao);

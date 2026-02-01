@@ -368,4 +368,25 @@ class SubprocessoCrudServiceTest {
         assertThat(sp.getMapa()).isNotNull();
         assertThat(sp.getMapa().getCodigo()).isEqualTo(5L);
     }
+
+    @Test
+    @DisplayName("Deve listar subprocessos por processo e unidades")
+    void deveListarPorProcessoEUnidades() {
+        Subprocesso sp = new Subprocesso();
+        when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(1L, List.of(2L)))
+                .thenReturn(List.of(sp));
+        when(subprocessoMapper.toDto(sp)).thenReturn(SubprocessoDto.builder().build());
+
+        List<SubprocessoDto> lista = service.listarPorProcessoEUnidades(1L, List.of(2L));
+        assertThat(lista).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando unidades nulo ou vazio")
+    void deveRetornarVazioQuandoUnidadesNuloOuVazio() {
+        assertThat(service.listarPorProcessoEUnidades(1L, null)).isEmpty();
+        assertThat(service.listarPorProcessoEUnidades(1L, List.of())).isEmpty();
+
+        verify(subprocessoRepo, never()).findByProcessoCodigoAndUnidadeCodigoInWithUnidade(anyLong(), anyList());
+    }
 }

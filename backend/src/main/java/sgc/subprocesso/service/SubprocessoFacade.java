@@ -104,6 +104,11 @@ public class SubprocessoFacade {
         return crudService.obterPorProcessoEUnidade(codProcesso, codUnidade);
     }
 
+    @Transactional(readOnly = true)
+    public List<SubprocessoDto> listarPorProcessoEUnidades(Long codProcesso, List<Long> codUnidades) {
+        return crudService.listarPorProcessoEUnidades(codProcesso, codUnidades);
+    }
+
     @Transactional
     public SubprocessoDto criar(CriarSubprocessoRequest request) {
         return crudService.criar(request);
@@ -275,17 +280,19 @@ public class SubprocessoFacade {
 
     @Transactional
     public void aceitarCadastroEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        for (Long codUnidade : codUnidades) {
-            SubprocessoDto sp = crudService.obterPorProcessoEUnidade(codProcesso, codUnidade);
-            cadastroWorkflowService.aceitarCadastroEmBloco(List.of(sp.getCodigo()), usuario);
+        List<SubprocessoDto> subprocessos = crudService.listarPorProcessoEUnidades(codProcesso, codUnidades);
+        List<Long> ids = subprocessos.stream().map(SubprocessoDto::getCodigo).toList();
+        if (!ids.isEmpty()) {
+            cadastroWorkflowService.aceitarCadastroEmBloco(ids, usuario);
         }
     }
 
     @Transactional
     public void homologarCadastroEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        for (Long codUnidade : codUnidades) {
-            SubprocessoDto sp = crudService.obterPorProcessoEUnidade(codProcesso, codUnidade);
-            cadastroWorkflowService.homologarCadastroEmBloco(List.of(sp.getCodigo()), usuario);
+        List<SubprocessoDto> subprocessos = crudService.listarPorProcessoEUnidades(codProcesso, codUnidades);
+        List<Long> ids = subprocessos.stream().map(SubprocessoDto::getCodigo).toList();
+        if (!ids.isEmpty()) {
+            cadastroWorkflowService.homologarCadastroEmBloco(ids, usuario);
         }
     }
 
@@ -349,25 +356,28 @@ public class SubprocessoFacade {
     @Transactional
     public void disponibilizarMapaEmBloco(List<Long> codUnidades, Long codProcesso, DisponibilizarMapaRequest request,
             Usuario usuario) {
-        for (Long codUnidade : codUnidades) {
-            SubprocessoDto sp = crudService.obterPorProcessoEUnidade(codProcesso, codUnidade);
-            mapaWorkflowService.disponibilizarMapaEmBloco(List.of(sp.getCodigo()), request, usuario);
+        List<SubprocessoDto> subprocessos = crudService.listarPorProcessoEUnidades(codProcesso, codUnidades);
+        List<Long> ids = subprocessos.stream().map(SubprocessoDto::getCodigo).toList();
+        if (!ids.isEmpty()) {
+            mapaWorkflowService.disponibilizarMapaEmBloco(ids, request, usuario);
         }
     }
 
     @Transactional
     public void aceitarValidacaoEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        for (Long codUnidade : codUnidades) {
-            SubprocessoDto sp = crudService.obterPorProcessoEUnidade(codProcesso, codUnidade);
-            mapaWorkflowService.aceitarValidacaoEmBloco(List.of(sp.getCodigo()), usuario);
+        List<SubprocessoDto> subprocessos = crudService.listarPorProcessoEUnidades(codProcesso, codUnidades);
+        List<Long> ids = subprocessos.stream().map(SubprocessoDto::getCodigo).toList();
+        if (!ids.isEmpty()) {
+            mapaWorkflowService.aceitarValidacaoEmBloco(ids, usuario);
         }
     }
 
     @Transactional
     public void homologarValidacaoEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        for (Long codUnidade : codUnidades) {
-            SubprocessoDto sp = crudService.obterPorProcessoEUnidade(codProcesso, codUnidade);
-            mapaWorkflowService.homologarValidacaoEmBloco(List.of(sp.getCodigo()), usuario);
+        List<SubprocessoDto> subprocessos = crudService.listarPorProcessoEUnidades(codProcesso, codUnidades);
+        List<Long> ids = subprocessos.stream().map(SubprocessoDto::getCodigo).toList();
+        if (!ids.isEmpty()) {
+            mapaWorkflowService.homologarValidacaoEmBloco(ids, usuario);
         }
     }
 
