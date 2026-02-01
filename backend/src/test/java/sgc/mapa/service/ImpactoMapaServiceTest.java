@@ -260,7 +260,6 @@ class ImpactoMapaServiceTest {
         // Deve detectar a atividade como alterada porque os conhecimentos são diferentes
         assertEquals(1, result.atividadesAlteradas().size());
         assertEquals("Ativ Teste", result.atividadesAlteradas().get(0).descricao());
-        assertNotNull(result);
     }
 
     private Subprocesso criarSubprocesso(Long unidadeCodigo, Mapa mapa) {
