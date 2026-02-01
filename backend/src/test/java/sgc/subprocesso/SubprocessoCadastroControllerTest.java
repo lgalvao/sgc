@@ -55,11 +55,12 @@ class SubprocessoCadastroControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper();
+        // ObjectMapper is autowired, no manual setup needed
     }
 
     @Nested

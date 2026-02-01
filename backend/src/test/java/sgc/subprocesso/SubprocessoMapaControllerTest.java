@@ -334,7 +334,6 @@ class SubprocessoMapaControllerTest {
         @DisplayName("disponibilizarMapaEmBloco - com dataLimite")
         @WithMockUser(roles = "ADMIN")
         void disponibilizarMapaEmBlocoComDataLimite() throws Exception {
-                Usuario usuario = new Usuario();
                 ProcessarEmBlocoRequest req = ProcessarEmBlocoRequest.builder()
                                 .acao("DISPONIBILIZAR")
                                 .subprocessos(List.of(1L, 2L, 3L))
@@ -359,7 +358,6 @@ class SubprocessoMapaControllerTest {
         @DisplayName("disponibilizarMapaEmBloco - sem dataLimite (usa padrão +15 dias)")
         @WithMockUser(roles = "ADMIN")
         void disponibilizarMapaEmBlocoSemDataLimite() throws Exception {
-                Usuario usuario = new Usuario();
                 ProcessarEmBlocoRequest req = ProcessarEmBlocoRequest.builder()
                                 .acao("DISPONIBILIZAR")
                                 .subprocessos(List.of(1L))
