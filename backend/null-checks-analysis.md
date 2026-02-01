@@ -22,6 +22,7 @@
 | AccessControlService.java | 3 | 0 |
 | ConfigCorsProperties.java | 3 | 3 |
 | LimitadorTentativasLogin.java | 3 | 3 |
+| TipoTransicao.java | 3 | 3 |
 | AnaliseFacade.java | 2 | 2 |
 | ErroApi.java | 2 | 2 |
 | FormatadorData.java | 2 | 2 |
@@ -32,7 +33,7 @@
 | HierarquiaService.java | 2 | 2 |
 | ProcessoConsultaService.java | 2 | 2 |
 | FiltroJwt.java | 2 | 2 |
-| TipoTransicao.java | 2 | 2 |
+| LoginFacade.java | 2 | 2 |
 | SubprocessoCrudService.java | 2 | 2 |
 | AlertaMapper.java | 1 | 1 |
 | AnaliseMapper.java | 1 | 1 |
@@ -52,7 +53,6 @@
 | ProcessoAccessPolicy.java | 1 | 1 |
 | SubprocessoAccessPolicy.java | 1 | 1 |
 | GerenciadorJwt.java | 1 | 1 |
-| LoginFacade.java | 1 | 1 |
 | DeserializadorHtmlSanitizado.java | 1 | 1 |
 | UtilSanitizacao.java | 1 | 1 |
 | SubprocessoMapaController.java | 1 | 1 |

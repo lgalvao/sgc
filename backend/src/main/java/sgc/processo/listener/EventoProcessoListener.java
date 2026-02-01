@@ -129,8 +129,7 @@ public class EventoProcessoListener {
 
         List<String> todosTitulos = new ArrayList<>();
         responsaveis.values().forEach(r -> {
-            if (r.titularTitulo() != null)
-                todosTitulos.add(r.titularTitulo());
+            todosTitulos.add(r.titularTitulo());
             if (r.substitutoTitulo() != null)
                 todosTitulos.add(r.substitutoTitulo());
         });
@@ -179,11 +178,11 @@ public class EventoProcessoListener {
             List<Unidade> todasSubordinadas) {
         try {
             UnidadeResponsavelDto responsavel = responsaveis.get(unidade.getCodigo());
-            if (responsavel == null || responsavel.titularTitulo() == null)
+            if (responsavel == null)
                 return;
 
             UsuarioDto titular = usuarios.get(responsavel.titularTitulo());
-            if (titular == null || titular.email() == null || titular.email().isBlank())
+            if (titular == null || titular.email().isBlank())
                 return;
 
             String emailTitular = titular.email();
@@ -242,7 +241,7 @@ public class EventoProcessoListener {
 
         try {
             UnidadeResponsavelDto responsavel = responsaveis.get(codigoUnidade);
-            if (responsavel == null || responsavel.titularTitulo() == null)
+            if (responsavel == null)
                 return;
 
             String nomeUnidade = unidade.getNome();
@@ -257,7 +256,7 @@ public class EventoProcessoListener {
             };
             String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
 
-            if (titular != null && titular.email() != null && !titular.email().isBlank()) {
+            if (titular != null && !titular.email().isBlank()) {
                 notificacaoEmailService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
                 log.info("E-mail enviado para unidade {}", unidade.getSigla());
             } else {

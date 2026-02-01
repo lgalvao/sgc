@@ -187,7 +187,8 @@ File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/login/LoginC
   L151 [POTENTIALLY_REDUNDANT]: if (ip != null) {
 
 File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/login/LoginFacade.java
-  L120 [POTENTIALLY_REDUNDANT]: if (usuario == null) {
+  L68 [POTENTIALLY_REDUNDANT]: if (clienteAcessoAd == null) {
+  L124 [POTENTIALLY_REDUNDANT]: if (usuario == null) {
 
 File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/sanitizacao/DeserializadorHtmlSanitizado.java
   L20 [POTENTIALLY_REDUNDANT]: if (value == null || value.isBlank()) {
@@ -199,6 +200,7 @@ File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/subprocesso/Subprocess
   L234 [POTENTIALLY_REDUNDANT]: .dataLimite(request.dataLimite() != null ? request.dataLimite() : LocalDate.now().plusDays(15))
 
 File: /home/runner/work/sgc/sgc/backend/src/main/java/sgc/subprocesso/eventos/TipoTransicao.java
+  L141 [POTENTIALLY_REDUNDANT]: return templateAlerta != null ? templateAlerta.formatted(siglaUnidade) : null;
   L148 [POTENTIALLY_REDUNDANT]: return templateAlerta != null;
   L155 [POTENTIALLY_REDUNDANT]: return templateEmail != null;
 

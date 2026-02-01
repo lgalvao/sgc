@@ -133,18 +133,6 @@ class SubprocessoCrudServiceTest {
     }
 
     @Test
-    @DisplayName("Deve obter status com label nulo se situação for nula")
-    void deveObterStatusComLabelNulo() {
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-        sp.setSituacao(null);
-        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
-
-        SubprocessoSituacaoDto status = service.obterStatus(1L);
-        assertThat(status.situacaoLabel()).isNull();
-    }
-
-    @Test
     @DisplayName("Deve obter entidade por código do mapa")
     void deveObterEntidadePorCodigoMapa() {
         Subprocesso sp = new Subprocesso();

@@ -65,10 +65,6 @@ public class Usuario implements UserDetails {
     public Set<UsuarioPerfil> getTodasAtribuicoes(Set<UsuarioPerfil> atribuicoesPermanentes) {
         Set<UsuarioPerfil> todas = new HashSet<>(atribuicoesPermanentes);
 
-        if (atribuicoesTemporarias == null) {
-            return todas;
-        }
-
         LocalDateTime now = LocalDateTime.now();
         for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
             if (!temp.getDataInicio().isAfter(now) && !temp.getDataTermino().isBefore(now)) {

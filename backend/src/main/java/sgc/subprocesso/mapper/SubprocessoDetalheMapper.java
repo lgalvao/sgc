@@ -23,7 +23,7 @@ public interface SubprocessoDetalheMapper {
     @Mapping(target = "situacaoLabel", expression = "java(sp.getSituacao().getDescricao())")
     @Mapping(target = "localizacaoAtual", expression = "java(mapLocalizacaoAtual(movimentacoes))")
     @Mapping(target = "processoDescricao", source = "sp.processo.descricao")
-    @Mapping(target = "tipoProcesso", expression = "java(sp.getProcesso() != null ? sp.getProcesso().getTipo().name() : null)")
+    @Mapping(target = "tipoProcesso", expression = "java(sp.getProcesso().getTipo().name())")
     @Mapping(target = "prazoEtapaAtual", expression = "java(mapPrazoEtapaAtual(sp))")
     @Mapping(target = "isEmAndamento", expression = "java(sp.isEmAndamento())")
     @Mapping(target = "etapaAtual", source = "sp.etapaAtual")
