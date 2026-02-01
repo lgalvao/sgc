@@ -130,7 +130,7 @@ public class EventoProcessoListener {
         List<String> todosTitulos = new ArrayList<>();
         responsaveis.values().forEach(r -> {
             todosTitulos.add(r.titularTitulo());
-            if (r.substitutoTitulo() != null) // substituto is legitimately optional
+            if (r.substitutoTitulo() != null)
                 todosTitulos.add(r.substitutoTitulo());
         });
 
