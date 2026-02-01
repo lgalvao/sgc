@@ -12,9 +12,9 @@
 
 | Métrica       | Meta  | Baseline | Atual | Progresso | Status |
 |---------------|-------|----------|-------|-----------|--------|
-| **BRANCH**    | ≥90%  | TBD      | TBD   | 🔴 0%     | 🔴 TBD |
-| **LINE**      | ≥99%  | TBD      | TBD   | 🔴 0%     | 🔴 TBD |
-| **INSTRUCTION** | ≥99% | TBD     | TBD   | 🔴 0%     | 🔴 TBD |
+| **BRANCH**    | ≥90%  | 83.90%   | 83.90% | 🟡 93%   | 🟡 Atenção |
+| **LINE**      | ≥99%  | 92.25%   | 92.25% | 🟡 93%   | 🟡 Atenção |
+| **INSTRUCTION** | ≥99% | 91.56%  | 91.56% | 🟡 92%   | 🟡 Atenção |
 
 **Legenda:**
 - 🔴 TBD - A ser determinado
@@ -37,17 +37,17 @@
 
 ### Fase 0: Preparação
 
-**Status:** 🔴 Não Iniciada  
+**Status:** 🟡 Em Andamento  
 **Estimativa:** 1-2 dias  
-**Início:** -  
+**Início:** 2026-02-01  
 **Conclusão:** -
 
 #### Checklist
 
-- [ ] **0.1 Auditoria de Null Checks**
-  - [ ] Executar `auditar-verificacoes-null.js`
-  - [ ] Analisar relatórios (`null-checks-audit.txt`, `null-checks-analysis.md`)
-  - [ ] Remover verificações redundantes (estimado: 50-100)
+- [x] **0.1 Auditoria de Null Checks**
+  - [x] Executar `auditar-verificacoes-null.js`
+  - [x] Analisar relatórios (`null-checks-audit.txt`, `null-checks-analysis.md`)
+  - [ ] Remover verificações redundantes (encontrados: 121 potencialmente redundantes)
   - [ ] Validar testes após remoções
   - [ ] Documentar decisões
 
@@ -57,24 +57,32 @@
   - [ ] Atualizar `build.gradle.kts`
   - [ ] Validar build
 
-- [ ] **0.3 Baseline de Cobertura**
-  - [ ] Executar `./gradlew :backend:jacocoTestReport`
-  - [ ] Executar `super-cobertura.js --run`
-  - [ ] Documentar baseline neste arquivo
-  - [ ] Gerar `cobertura_lacunas.json`
+- [x] **0.3 Baseline de Cobertura**
+  - [x] Executar `./gradlew :backend:jacocoTestReport`
+  - [ ] Executar `super-cobertura.js --run` (script precisa ajuste ES modules)
+  - [x] Documentar baseline neste arquivo
+  - [x] Gerar análise de lacunas
 
 #### Métricas Fase 0
 
 | Item                         | Quantidade | Status |
 |------------------------------|------------|--------|
-| Null checks identificados    | TBD        | 🔴 TBD |
-| Null checks removidos        | TBD        | 🔴 TBD |
+| Null checks identificados    | 142        | ✅ Completo |
+| Null checks removidos        | 0          | 🔴 Pendente |
 | Classes excluídas adicionais | TBD        | 🔴 TBD |
-| Cobertura baseline (BRANCH)  | TBD        | 🔴 TBD |
-| Cobertura baseline (LINE)    | TBD        | 🔴 TBD |
+| Cobertura baseline (BRANCH)  | 83.90%     | ✅ Documentado |
+| Cobertura baseline (LINE)    | 92.25%     | ✅ Documentado |
+| Cobertura baseline (INSTRUCTION) | 91.56% | ✅ Documentado |
 
 **Notas:**
-- _Adicionar notas relevantes aqui conforme execução_
+- Baseline estabelecido em 2026-02-01
+- 1158 testes existentes (1144 passando, 14 falhando)
+- Gap para meta: BRANCH +6.1%, LINE +6.75%, INSTRUCTION +7.44%
+- Arquivos críticos identificados: ProcessoFacade (7.1% branch), UnidadeFacade (20% branch)
+- **Auditoria de Null Checks:** 142 verificações encontradas, 121 potencialmente redundantes (85.2%)
+  - Análise manual necessária antes de remoção - muitas verificações podem ser legítimas
+  - Recomendação: Adiar remoção de null checks para evitar quebrar testes
+  - Foco deve ser em adicionar testes, não remover código defensivo
 
 ---
 
@@ -413,13 +421,27 @@
 
 - ✅ Documento criado com estrutura inicial
 - ✅ Fases definidas
-- 🔴 Baseline de cobertura pendente (requer Java 21)
-- 🔴 Início da execução pendente
+- ✅ Baseline de cobertura estabelecido
+- ✅ Top 30 arquivos com menor cobertura identificados
+- 🟡 Início da execução da Fase 0 em andamento
+
+**Baseline Estabelecido:**
+- BRANCH: 83.90% (4715/5620) - Gap: +6.1% para meta
+- LINE: 92.25% (21254/23040) - Gap: +6.75% para meta
+- INSTRUCTION: 91.56% (94320/103015) - Gap: +7.44% para meta
+
+**Top 5 Arquivos Críticos (Branch Coverage):**
+1. ProcessoFacade.java: 7.1% branch (CRÍTICO)
+2. UnidadeFacade.java: 20.0% branch (CRÍTICO)
+3. AlertaController.java: 25.0% branch (CRÍTICO)
+4. UsuarioFacade.java: 46.0% branch (ALTA)
+5. UnidadeHierarquiaService.java: 50.0% branch (ALTA)
 
 **Próximos Passos:**
-1. Garantir ambiente com Java 21
-2. Executar Fase 0.3 para estabelecer baseline
-3. Iniciar Fase 0.1 (auditoria null checks)
+1. ✅ Baseline estabelecido
+2. 🟡 Executar Fase 0.1 (auditoria null checks)
+3. 🔴 Executar Fase 0.2 (atualizar exclusões)
+4. 🔴 Iniciar Fase 1 (Foundation tests)
 
 ---
 
