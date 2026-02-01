@@ -173,8 +173,8 @@ public class SubprocessoValidacaoService {
      * @throws IllegalArgumentException se subprocesso for null, situação for null, ou nenhuma situação permitida for fornecida
      */
     public void validarSituacaoPermitida(@NonNull Subprocesso subprocesso, @NonNull String mensagem, @NonNull SituacaoSubprocesso... permitidas) {
-        if (subprocesso == null || subprocesso.getSituacao() == null) {
-            throw new IllegalArgumentException("Subprocesso e sua situação não podem ser nulos");
+        if (subprocesso.getSituacao() == null) {
+            throw new IllegalArgumentException("Situação do subprocesso não pode ser nula");
         }
         
         if (permitidas.length == 0) {
@@ -195,12 +195,8 @@ public class SubprocessoValidacaoService {
      * @throws IllegalArgumentException se subprocesso for null ou situação for null
      */
     public void validarSituacaoMinima(@NonNull Subprocesso subprocesso, @NonNull SituacaoSubprocesso minima) {
-        if (subprocesso == null || subprocesso.getSituacao() == null) {
-            throw new IllegalArgumentException("Subprocesso e sua situação não podem ser nulos");
-        }
-        
-        if (minima == null) {
-            throw new IllegalArgumentException("Situação mínima não pode ser nula");
+        if (subprocesso.getSituacao() == null) {
+            throw new IllegalArgumentException("Situação do subprocesso não pode ser nula");
         }
         
         if (subprocesso.getSituacao().ordinal() < minima.ordinal()) {
@@ -220,12 +216,8 @@ public class SubprocessoValidacaoService {
      * @throws IllegalArgumentException se subprocesso for null ou situação for null
      */
     public void validarSituacaoMinima(@NonNull Subprocesso subprocesso, @NonNull SituacaoSubprocesso minima, @NonNull String mensagem) {
-        if (subprocesso == null || subprocesso.getSituacao() == null) {
-            throw new IllegalArgumentException("Subprocesso e sua situação não podem ser nulos");
-        }
-        
-        if (minima == null) {
-            throw new IllegalArgumentException("Situação mínima não pode ser nula");
+        if (subprocesso.getSituacao() == null) {
+            throw new IllegalArgumentException("Situação do subprocesso não pode ser nula");
         }
         
         if (subprocesso.getSituacao().ordinal() < minima.ordinal()) {

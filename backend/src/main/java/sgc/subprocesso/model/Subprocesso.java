@@ -50,11 +50,11 @@ public class Subprocesso extends EntidadeBase {
     private SituacaoSubprocesso situacao;
 
     /**
-     * Retorna o mapa de competências.
+     * Retorna o mapa de competências associado a este subprocesso.
      *
-     * @return Mapa sempre não-nulo (criado no construtor ou em criar())
+     * @return Mapa de competências ou null se ainda não foi criado
      */
-    public @NonNull Mapa getMapa() {
+    public Mapa getMapa() {
         return mapa;
     }
 
