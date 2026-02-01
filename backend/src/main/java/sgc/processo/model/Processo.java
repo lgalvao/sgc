@@ -54,9 +54,6 @@ public class Processo extends EntidadeBase {
     private Set<Unidade> participantes = new HashSet<>();
 
     public Set<Unidade> getParticipantes() {
-        if (participantes == null) {
-            participantes = new HashSet<>();
-        }
         return participantes;
     }
 }
