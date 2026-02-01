@@ -166,11 +166,11 @@ public class SubprocessoValidacaoService {
     /**
      * Valida se a situação atual do subprocesso está entre as situações permitidas com mensagem customizada.
      *
-     * @param subprocesso Subprocesso a validar (não pode ser null)
+     * @param subprocesso Subprocesso a validar (garantido não-null por @NonNull)
      * @param mensagem Mensagem customizada de erro
      * @param permitidas Situações permitidas (varargs, pelo menos uma é obrigatória)
      * @throws ErroValidacao se a situação atual não está entre as permitidas
-     * @throws IllegalArgumentException se subprocesso for null, situação for null, ou nenhuma situação permitida for fornecida
+     * @throws IllegalArgumentException se a situação do subprocesso for null, ou nenhuma situação permitida for fornecida
      */
     public void validarSituacaoPermitida(@NonNull Subprocesso subprocesso, @NonNull String mensagem, @NonNull SituacaoSubprocesso... permitidas) {
         if (subprocesso.getSituacao() == null) {
@@ -189,10 +189,10 @@ public class SubprocessoValidacaoService {
     /**
      * Valida se a situação atual do subprocesso é maior ou igual à situação mínima.
      *
-     * @param subprocesso Subprocesso a validar (não pode ser null)
-     * @param minima Situação mínima exigida (não pode ser null)
+     * @param subprocesso Subprocesso a validar (garantido não-null por @NonNull)
+     * @param minima Situação mínima exigida (garantida não-null por @NonNull)
      * @throws ErroValidacao se a situação atual é inferior à mínima
-     * @throws IllegalArgumentException se subprocesso for null ou situação for null
+     * @throws IllegalArgumentException se a situação do subprocesso for null
      */
     public void validarSituacaoMinima(@NonNull Subprocesso subprocesso, @NonNull SituacaoSubprocesso minima) {
         if (subprocesso.getSituacao() == null) {
@@ -209,11 +209,11 @@ public class SubprocessoValidacaoService {
     /**
      * Valida se a situação atual do subprocesso é maior ou igual à situação mínima com mensagem customizada.
      *
-     * @param subprocesso Subprocesso a validar (não pode ser null)
-     * @param minima Situação mínima exigida (não pode ser null)
+     * @param subprocesso Subprocesso a validar (garantido não-null por @NonNull)
+     * @param minima Situação mínima exigida (garantida não-null por @NonNull)
      * @param mensagem Mensagem customizada de erro
      * @throws ErroValidacao se a situação atual é inferior à mínima
-     * @throws IllegalArgumentException se subprocesso for null ou situação for null
+     * @throws IllegalArgumentException se a situação do subprocesso for null
      */
     public void validarSituacaoMinima(@NonNull Subprocesso subprocesso, @NonNull SituacaoSubprocesso minima, @NonNull String mensagem) {
         if (subprocesso.getSituacao() == null) {
