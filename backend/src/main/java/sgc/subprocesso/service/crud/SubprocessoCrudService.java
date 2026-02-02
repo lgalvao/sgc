@@ -158,4 +158,15 @@ public class SubprocessoCrudService {
     public boolean verificarAcessoUnidadeAoProcesso(Long codProcesso, List<Long> codigosUnidadesHierarquia) {
         return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, codigosUnidadesHierarquia);
     }
+
+    @Transactional(readOnly = true)
+    public List<SubprocessoDto> listarPorProcessoEUnidades(Long codProcesso, List<Long> codUnidades) {
+        if (codUnidades == null || codUnidades.isEmpty()) {
+            return List.of();
+        }
+        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(codProcesso, codUnidades)
+                .stream()
+                .map(subprocessoMapper::toDto)
+                .toList();
+    }
 }

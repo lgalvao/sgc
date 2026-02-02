@@ -141,7 +141,7 @@ class ProcessoFacadeBlocoTest {
             processoFacade.executarAcaoEmBloco(100L, req);
 
             // Assert - não deve buscar subprocessos
-            verify(subprocessoFacade, never()).obterPorProcessoEUnidade(anyLong(), anyLong());
+            verify(subprocessoFacade, never()).listarPorProcessoEUnidades(anyLong(), anyList());
         }
     }
 
@@ -156,14 +156,15 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp1 = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                 .build();
             SubprocessoDto sp2 = SubprocessoDto.builder()
+                .codUnidade(2L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp1);
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 2L)).thenReturn(sp2);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L, 2L))).thenReturn(List.of(sp1, sp2));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L, 2L),
@@ -189,14 +190,15 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp1 = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO)
                 .build();
             SubprocessoDto sp2 = SubprocessoDto.builder()
+                .codUnidade(2L)
                 .situacao(SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp1);
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 2L)).thenReturn(sp2);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L, 2L))).thenReturn(List.of(sp1, sp2));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L, 2L),
@@ -222,22 +224,24 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto spCadastro1 = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                 .build();
             SubprocessoDto spCadastro2 = SubprocessoDto.builder()
+                .codUnidade(2L)
                 .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA)
                 .build();
             SubprocessoDto spValidacao1 = SubprocessoDto.builder()
+                .codUnidade(3L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO)
                 .build();
             SubprocessoDto spValidacao2 = SubprocessoDto.builder()
+                .codUnidade(4L)
                 .situacao(SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(spCadastro1);
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 2L)).thenReturn(spCadastro2);
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 3L)).thenReturn(spValidacao1);
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 4L)).thenReturn(spValidacao2);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L, 2L, 3L, 4L)))
+                .thenReturn(List.of(spCadastro1, spCadastro2, spValidacao1, spValidacao2));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L, 2L, 3L, 4L),
@@ -263,10 +267,11 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L))).thenReturn(List.of(sp));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L),
@@ -293,14 +298,15 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp1 = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                 .build();
             SubprocessoDto sp2 = SubprocessoDto.builder()
+                .codUnidade(2L)
                 .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp1);
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 2L)).thenReturn(sp2);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L, 2L))).thenReturn(List.of(sp1, sp2));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L, 2L),
@@ -326,14 +332,15 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp1 = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO)
                 .build();
             SubprocessoDto sp2 = SubprocessoDto.builder()
+                .codUnidade(2L)
                 .situacao(SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp1);
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 2L)).thenReturn(sp2);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L, 2L))).thenReturn(List.of(sp1, sp2));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L, 2L),
@@ -359,22 +366,24 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto spCadastro1 = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                 .build();
             SubprocessoDto spCadastro2 = SubprocessoDto.builder()
+                .codUnidade(2L)
                 .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA)
                 .build();
             SubprocessoDto spValidacao1 = SubprocessoDto.builder()
+                .codUnidade(3L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO)
                 .build();
             SubprocessoDto spValidacao2 = SubprocessoDto.builder()
+                .codUnidade(4L)
                 .situacao(SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(spCadastro1);
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 2L)).thenReturn(spCadastro2);
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 3L)).thenReturn(spValidacao1);
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 4L)).thenReturn(spValidacao2);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L, 2L, 3L, 4L)))
+                .thenReturn(List.of(spCadastro1, spCadastro2, spValidacao1, spValidacao2));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L, 2L, 3L, 4L),
@@ -400,10 +409,11 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L))).thenReturn(List.of(sp));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L),
@@ -430,10 +440,11 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L))).thenReturn(List.of(sp));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L),
@@ -457,10 +468,11 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L))).thenReturn(List.of(sp));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L),
@@ -484,10 +496,11 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L))).thenReturn(List.of(sp));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L),
@@ -511,10 +524,11 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L))).thenReturn(List.of(sp));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L),
@@ -551,7 +565,7 @@ class ProcessoFacadeBlocoTest {
             processoFacade.executarAcaoEmBloco(100L, req);
 
             // Assert - não deve chamar nenhum método de batch
-            verify(subprocessoFacade, never()).obterPorProcessoEUnidade(anyLong(), anyLong());
+            verify(subprocessoFacade, never()).listarPorProcessoEUnidades(anyLong(), anyList());
             verify(subprocessoFacade, never()).aceitarCadastroEmBloco(anyList(), anyLong(), any());
             verify(subprocessoFacade, never()).aceitarValidacaoEmBloco(anyList(), anyLong(), any());
             verify(subprocessoFacade, never()).homologarCadastroEmBloco(anyList(), anyLong(), any());
@@ -566,10 +580,11 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L))).thenReturn(List.of(sp));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L),
@@ -592,10 +607,11 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L))).thenReturn(List.of(sp));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L),
@@ -618,10 +634,11 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L))).thenReturn(List.of(sp));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L),
@@ -644,10 +661,11 @@ class ProcessoFacadeBlocoTest {
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
             SubprocessoDto sp = SubprocessoDto.builder()
+                .codUnidade(1L)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO)
                 .build();
 
-            when(subprocessoFacade.obterPorProcessoEUnidade(100L, 1L)).thenReturn(sp);
+            when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L))).thenReturn(List.of(sp));
 
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                 List.of(1L),
