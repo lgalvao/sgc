@@ -36,10 +36,8 @@
         </template>
       </PageHeader>
 
-      <TreeTable
-          :columns="colunasTabela"
-          :data="dadosFormatados"
-          title="Unidades participantes"
+      <ProcessoSubprocessosTable
+          :participantes-hierarquia="participantesHierarquia"
           @row-click="abrirDetalhesUnidade"
       />
 
@@ -92,229 +90,38 @@
 
 <script lang="ts" setup>
 import {BAlert, BBadge, BButton, BContainer, BSpinner} from "bootstrap-vue-next";
-import {storeToRefs} from "pinia";
-import {computed, onMounted, ref} from "vue";
-import {useRoute, useRouter} from "vue-router";
-import ModalAcaoBloco, {type UnidadeSelecao} from "@/components/ModalAcaoBloco.vue";
+import ModalAcaoBloco from "@/components/ModalAcaoBloco.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ProcessoAcoes from "@/components/ProcessoAcoes.vue";
-import TreeTable from "@/components/TreeTableView.vue";
 import ErrorAlert from "@/components/common/ErrorAlert.vue";
 import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
+import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
 
-import {usePerfilStore} from "@/stores/perfil";
-import {useProcessosStore} from "@/stores/processos";
-import {useFeedbackStore} from "@/stores/feedback";
-import type {Processo, UnidadeParticipante} from "@/types/tipos";
-import {SituacaoSubprocesso} from "@/types/tipos";
-import {flattenTree} from "@/utils/treeUtils";
+import {useProcessoView} from "@/composables/useProcessoView";
 
-interface TreeTableItem {
-  codigo: number | string;
-  nome: string;
-  situacao: string;
-  dataLimite: string;
-  unidadeAtual: string;
-  expanded: boolean;
-  children: TreeTableItem[];
-  clickable?: boolean;
-  [key: string]: any;
-}
-
-const route = useRoute();
-const router = useRouter();
-const processosStore = useProcessosStore();
-const {processoDetalhe} = storeToRefs(processosStore);
-const perfilStore = usePerfilStore();
-const feedbackStore = useFeedbackStore();
-
-const modalBlocoRef = ref<InstanceType<typeof ModalAcaoBloco> | null>(null);
-const mostrarModalFinalizacao = ref(false);
-const acaoBlocoAtual = ref<'aceitar' | 'homologar' | 'disponibilizar' | null>(null);
-
-const codProcesso = computed(() => Number(route.params.codProcesso || route.query.codProcesso));
-
-onMounted(async () => {
-  if (codProcesso.value) {
-    await processosStore.buscarContextoCompleto(codProcesso.value);
-  }
-});
-
-const processo = computed<Processo | undefined>(() => processoDetalhe.value || undefined);
-const participantesHierarquia = computed<UnidadeParticipante[]>(() => processo.value?.unidades || []);
-
-const colunasTabela = [
-  {key: "nome", label: "Unidade", width: "40%"},
-  {key: "situacao", label: "Situação", width: "20%"},
-  {key: "dataLimite", label: "Data limite", width: "20%"},
-  {key: "unidadeAtual", label: "Unidade Atual", width: "20%"},
-];
-
-const dadosFormatados = computed<TreeTableItem[]>(() => formatarDadosParaArvore(participantesHierarquia.value));
-
-function formatarDadosParaArvore(dados: UnidadeParticipante[]): TreeTableItem[] {
-  if (!dados) return [];
-  return dados.map((item) => ({
-    codigo: item.codUnidade,
-    nome: item.sigla,
-    situacao: item.situacaoLabel || item.situacaoSubprocesso || "Não iniciado",
-    dataLimite: item.dataLimiteFormatada || "",
-    unidadeAtual: item.sigla,
-    clickable: true,
-    expanded: true,
-    children: item.filhos ? formatarDadosParaArvore(item.filhos) : [],
-  }));
-}
-
-function abrirDetalhesUnidade(item: any) {
-  if (item && item.clickable) {
-    // Usar isAdmin/isGestor que verificam a lista de perfis, não perfilSelecionado
-    // pois perfilSelecionado pode ser null mesmo quando o usuário tem o perfil
-    if (perfilStore.isAdmin || perfilStore.isGestor) {
-      router.push({
-        name: "Subprocesso",
-        params: {
-          codProcesso: codProcesso.value.toString(),
-          siglaUnidade: String(item.unidadeAtual),
-        },
-      });
-    } else {
-      // Para CHEFE/SERVIDOR, só navega para sua própria unidade
-      const perfilUsuario = perfilStore.perfilSelecionado;
-      if (
-          (perfilUsuario === "CHEFE" || perfilUsuario === "SERVIDOR") &&
-          perfilStore.unidadeSelecionada === item.codigo
-      ) {
-        router.push({
-          name: "Subprocesso",
-          params: {
-            codProcesso: String(codProcesso.value),
-            siglaUnidade: String(item.unidadeAtual),
-          },
-        });
-      }
-    }
-  }
-}
-
-async function finalizarProcesso() {
-  if (processo.value) mostrarModalFinalizacao.value = true;
-}
-
-async function confirmarFinalizacao() {
-  if (!processo.value) return;
-  mostrarModalFinalizacao.value = false;
-  try {
-    await processosStore.finalizarProcesso(processo.value.codigo);
-    feedbackStore.show(
-        "Processo finalizado",
-        "O processo foi finalizado com sucesso.",
-        "success"
-    );
-    await router.push("/painel");
-  } catch (error: any) {
-    feedbackStore.show("Erro ao finalizar", error.message || "Erro desconhecido", "danger");
-  }
-}
-
-// --- Lógica de Ações em Bloco ---
-
-function toSituacao(s: string): SituacaoSubprocesso | string {
-    return s as SituacaoSubprocesso;
-}
-
-const unidadesElegiveis = computed<UnidadeSelecao[]>(() => {
-    const all = flattenTree(participantesHierarquia.value, 'filhos');
-
-    if (acaoBlocoAtual.value === 'aceitar') {
-        return all.filter(u =>
-            toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-            toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
-            toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO // Para CDU-25
-        ).map(u => ({ codigo: u.codUnidade, sigla: u.sigla, nome: u.nome, situacao: u.situacaoSubprocesso, selecionada: true }));
-    } else if (acaoBlocoAtual.value === 'homologar') {
-         return all.filter(u =>
-            toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-            toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO // Para CDU-26
-         ).map(u => ({ codigo: u.codUnidade, sigla: u.sigla, nome: u.nome, situacao: u.situacaoSubprocesso, selecionada: true }));
-    } else if (acaoBlocoAtual.value === 'disponibilizar') {
-        return all.filter(u =>
-            toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO ||
-            toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO
-        ).map(u => ({ codigo: u.codUnidade, sigla: u.sigla, nome: u.nome, situacao: u.situacaoSubprocesso, selecionada: true }));
-    }
-
-    return [];
-});
-
-const idsElegiveis = computed(() => unidadesElegiveis.value.map(u => u.codigo));
-
-const mostrarBotoesBloco = computed(() => {
-    const all = flattenTree(participantesHierarquia.value, 'filhos');
-
-    const temDisponivelAceite = all.some(u =>
-        toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-        toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
-        toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-
-    const temDisponivelHomolog = all.some(u =>
-        toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-        toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-
-    const temDisponivelMapa = all.some(u =>
-        toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO ||
-        toSituacao(u.situacaoSubprocesso) === SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
-
-    return (temDisponivelAceite || temDisponivelHomolog || temDisponivelMapa);
-});
-
-const podeAceitarBloco = computed(() => perfilStore.isAdmin || perfilStore.isGestor);
-const podeHomologarBloco = computed(() => processo.value?.podeHomologarCadastro || false);
-const podeDisponibilizarBloco = computed(() => perfilStore.isAdmin);
-
-const tituloModalBloco = computed(() => {
-    switch(acaoBlocoAtual.value) {
-        case 'aceitar': return 'Aceitar em Bloco';
-        case 'homologar': return 'Homologar em Bloco';
-        case 'disponibilizar': return 'Disponibilizar Mapas em Bloco';
-        default: return '';
-    }
-});
-
-const textoModalBloco = computed(() => {
-     switch(acaoBlocoAtual.value) {
-        case 'aceitar': return 'Selecione as unidades para aceitar:';
-        case 'homologar': return 'Selecione as unidades para homologar:';
-        case 'disponibilizar': return 'Selecione as unidades cujos mapas serão disponibilizados:';
-        default: return '';
-    }
-});
-
-const rotuloBotaoBloco = computed(() => {
-     switch(acaoBlocoAtual.value) {
-        case 'aceitar': return 'Aceitar';
-        case 'homologar': return 'Homologar';
-        case 'disponibilizar': return 'Disponibilizar';
-        default: return 'Confirmar';
-    }
-});
-
-function abrirModalBloco(acao: 'aceitar' | 'homologar' | 'disponibilizar') {
-    acaoBlocoAtual.value = acao;
-    modalBlocoRef.value?.abrir();
-}
-
-async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) {
-    if (!acaoBlocoAtual.value || !processo.value) return;
-
-    try {
-        await processosStore.executarAcaoBloco(acaoBlocoAtual.value, dados.ids, dados.dataLimite);
-        feedbackStore.show('Sucesso', `Ação ${acaoBlocoAtual.value} realizada em bloco.`, 'success');
-        modalBlocoRef.value?.fechar();
-    } catch (e: any) {
-        modalBlocoRef.value?.setErro(e.message || "Erro ao processar em bloco.");
-        modalBlocoRef.value?.setProcessando(false);
-    }
-}
+const {
+  processosStore,
+  perfilStore,
+  feedbackStore,
+  processo,
+  participantesHierarquia,
+  modalBlocoRef,
+  mostrarModalFinalizacao,
+  acaoBlocoAtual,
+  unidadesElegiveis,
+  idsElegiveis,
+  mostrarBotoesBloco,
+  podeAceitarBloco,
+  podeHomologarBloco,
+  podeDisponibilizarBloco,
+  tituloModalBloco,
+  textoModalBloco,
+  rotuloBotaoBloco,
+  abrirDetalhesUnidade,
+  finalizarProcesso,
+  confirmarFinalizacao,
+  abrirModalBloco,
+  executarAcaoBloco
+} = useProcessoView();
 </script>
