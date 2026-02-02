@@ -267,7 +267,7 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
 import {ref} from "vue";
-import {useVisMapaLogic} from "@/composables/useVisMapaLogic";
+import {useVisMapa} from "@/composables/useVisMapa";
 
 const {
   perfilSelecionado,
@@ -301,7 +301,7 @@ const {
   abrirModalDevolucao,
   abrirModalHistorico,
   fecharModalHistorico
-} = useVisMapaLogic();
+} = useVisMapa();
 
 const verHistorico = abrirModalHistorico;
 
