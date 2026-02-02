@@ -3,111 +3,21 @@
     <PageHeader title="Cadastro de processo" />
 
     <BForm class="mt-4 col-md-6 col-sm-8 col-12">
-      <BAlert
-          v-model="alertState.show"
-          :fade="false"
+      <FormErrorAlert
+          v-model:show="alertState.show"
           :variant="alertState.variant"
-          class="mb-3"
-          dismissible
-      >
-        <h4 v-if="alertState.title" class="alert-heading">{{ alertState.title }}</h4>
-        <p class="mb-0">{{ alertState.body }}</p>
-        <ul v-if="alertState.errors && alertState.errors.length > 0" class="mb-0 mt-2">
-          <li v-for="(error, index) in alertState.errors" :key="index">{{ error }}</li>
-        </ul>
-      </BAlert>
+          :title="alertState.title"
+          :body="alertState.body"
+          :errors="alertState.errors"
+      />
 
-      <BFormGroup
-          class="mb-3"
-          label-for="descricao"
-      >
-        <template #label>
-          Descrição <span class="text-danger" aria-hidden="true">*</span>
-        </template>
-        <BFormInput
-            id="descricao"
-            ref="inputDescricaoRef"
-            v-model="descricao"
-            :state="fieldErrors.descricao ? false : null"
-            data-testid="inp-processo-descricao"
-            placeholder="Descreva o processo"
-            type="text"
-            required
-        />
-        <BFormInvalidFeedback :state="fieldErrors.descricao ? false : null">
-          {{ fieldErrors.descricao }}
-        </BFormInvalidFeedback>
-      </BFormGroup>
-
-      <BFormGroup
-          class="mb-3"
-          label-for="tipo"
-      >
-        <template #label>
-          Tipo <span class="text-danger" aria-hidden="true">*</span>
-        </template>
-        <BFormSelect
-            id="tipo"
-            v-model="tipo"
-            :options="tipoOptions"
-            :state="fieldErrors.tipo ? false : null"
-            data-testid="sel-processo-tipo"
-            required
-        >
-          <template #first>
-            <BFormSelectOption :value="null" disabled>-- Selecione o tipo --</BFormSelectOption>
-          </template>
-        </BFormSelect>
-        <BFormInvalidFeedback :state="fieldErrors.tipo ? false : null">
-          {{ fieldErrors.tipo }}
-        </BFormInvalidFeedback>
-      </BFormGroup>
-
-      <BFormGroup
-          class="mb-3"
-      >
-        <template #label>
-          Unidades participantes <span class="text-danger" aria-hidden="true">*</span>
-        </template>
-        <div class="border rounded p-3" :class="{ 'border-danger': fieldErrors.unidades }">
-          <ArvoreUnidades
-              v-if="!unidadesStore.isLoading"
-              v-model="unidadesSelecionadas"
-              :unidades="unidadesStore.unidades"
-          />
-          <div
-              v-else
-              class="text-center py-3"
-          >
-            <span class="spinner-border spinner-border-sm me-2"/>
-            Carregando unidades...
-          </div>
-        </div>
-        <BFormInvalidFeedback :state="fieldErrors.unidades ? false : null" class="d-block">
-          {{ fieldErrors.unidades }}
-        </BFormInvalidFeedback>
-      </BFormGroup>
-
-      <BFormGroup
-          class="mb-3"
-          description="Prazo para conclusão da primeira etapa (Mapeamento/Revisão)."
-          label-for="dataLimite"
-      >
-        <template #label>
-          Data limite <span class="text-danger" aria-hidden="true">*</span>
-        </template>
-        <BFormInput
-            id="dataLimite"
-            v-model="dataLimite"
-            :state="fieldErrors.dataLimite ? false : null"
-            data-testid="inp-processo-data-limite"
-            type="date"
-            required
-        />
-        <BFormInvalidFeedback :state="fieldErrors.dataLimite ? false : null">
-          {{ fieldErrors.dataLimite }}
-        </BFormInvalidFeedback>
-      </BFormGroup>
+      <ProcessoFormFields
+          ref="formFieldsRef"
+          v-model="formData"
+          :field-errors="fieldErrors"
+          :unidades="unidadesStore.unidades"
+          :is-loading-unidades="unidadesStore.isLoading"
+      />
 
       <div class="d-flex justify-content-between">
         <div>
@@ -192,35 +102,24 @@
 
 <script lang="ts" setup>
 import {
-  BAlert,
   BButton,
   BContainer,
   BForm,
-  BFormGroup,
-  BFormInput,
-  BFormInvalidFeedback,
-  BFormSelect,
-  BFormSelectOption,
 } from "bootstrap-vue-next";
-import {nextTick, onMounted, ref, watch} from "vue";
-import {useRoute, useRouter} from "vue-router";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
-import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
-import {logger} from "@/utils";
-import {useProcessoForm} from "@/composables/useProcessoForm";
+import ProcessoFormFields from "@/components/processo/ProcessoFormFields.vue";
+import FormErrorAlert from "@/components/common/FormErrorAlert.vue";
+import { logger } from "@/utils";
+import { useProcessoForm } from "@/composables/useProcessoForm";
 
-import {useProcessosStore} from "@/stores/processos";
-import {useUnidadesStore} from "@/stores/unidades";
-import {useFeedbackStore} from "@/stores/feedback";
-import {Processo as ProcessoModel, TipoProcesso} from "@/types/tipos";
-
-const tipoOptions = [
-  { value: TipoProcesso.MAPEAMENTO, text: 'Mapeamento' },
-  { value: TipoProcesso.REVISAO, text: 'Revisão' },
-  { value: TipoProcesso.DIAGNOSTICO, text: 'Diagnóstico' }
-];
+import { useProcessosStore } from "@/stores/processos";
+import { useUnidadesStore } from "@/stores/unidades";
+import { useFeedbackStore } from "@/stores/feedback";
+import { Processo as ProcessoModel, TipoProcesso } from "@/types/tipos";
 
 const {
   descricao,
@@ -237,7 +136,23 @@ const {
   limpar: limparCampos
 } = useProcessoForm();
 
-const inputDescricaoRef = ref<InstanceType<typeof BFormInput> | null>(null);
+// Computed form data for the extracted component
+const formData = computed({
+  get: () => ({
+    descricao: descricao.value,
+    tipo: tipo.value,
+    unidadesSelecionadas: unidadesSelecionadas.value,
+    dataLimite: dataLimite.value
+  }),
+  set: (value) => {
+    descricao.value = value.descricao;
+    tipo.value = value.tipo;
+    unidadesSelecionadas.value = value.unidadesSelecionadas;
+    dataLimite.value = value.dataLimite;
+  }
+});
+
+const formFieldsRef = ref<InstanceType<typeof ProcessoFormFields> | null>(null);
 
 const isLoading = ref(false);
 const router = useRouter();
@@ -286,8 +201,6 @@ onMounted(async () => {
       if (processo) {
         // Redirect if process is not in CRIADO state (cannot be edited)
         if (processo.situacao !== 'CRIADO') {
-          // Como vamos redirecionar, não adianta mostrar alerta local.
-          // Idealmente usaríamos um store global, mas aqui apenas logamos/redirecionamos
           await router.push(`/processo/${processo.codigo}`);
           return;
         }
@@ -314,7 +227,7 @@ onMounted(async () => {
   // Auto-focus na descrição ao carregar
   if (!processoEditando.value) {
     nextTick(() => {
-      inputDescricaoRef.value?.$el?.focus();
+      formFieldsRef.value?.inputDescricaoRef?.$el?.focus();
     });
   }
 });
