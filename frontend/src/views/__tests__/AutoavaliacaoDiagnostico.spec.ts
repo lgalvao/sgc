@@ -59,7 +59,16 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     BSpinner: { template: '<div data-testid="spinner"></div>' },
     BCard: { template: '<div><slot name="header" /><slot /></div>' },
     BFormSelect: {
-      template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value); $emit(\'change\', $event.target.value)"><option value="N1">N1</option></select>',
+      template: `<select :value="modelValue" @change="$emit('update:modelValue', $event.target.value); $emit('change', $event.target.value)">
+        <option value="">Selecione</option>
+        <option value="NA">NA</option>
+        <option value="N1">N1</option>
+        <option value="N2">N2</option>
+        <option value="N3">N3</option>
+        <option value="N4">N4</option>
+        <option value="N5">N5</option>
+        <option value="N6">N6</option>
+      </select>`,
       props: ['modelValue', 'options']
     },
     BFormTextarea: {
@@ -180,21 +189,17 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     
     expect(ctx.wrapper!.vm.podeConcluir).toBe(false);
     
-    // Access the avaliacoes ref directly and modify it
-    const avaliacoes = ctx.wrapper!.vm.avaliacoes;
-    if (!avaliacoes[2]) throw new Error('Avaliação 2 não foi inicializada');
+    // Simulate user selecting values in the form (competency 2)
+    const selImportancia = ctx.wrapper!.find('[data-testid="sel-importancia-2"]');
+    const selDominio = ctx.wrapper!.find('[data-testid="sel-dominio-2"]');
     
-    // Update ALL required properties to match what the component expects
-    avaliacoes[2] = {
-      importancia: 'N4',
-      dominio: 'N2',
-      observacoes: avaliacoes[2].observacoes,
-      salvo: avaliacoes[2].salvo
-    };
-    
-    // Force a re-render
-    ctx.wrapper!.vm.$forceUpdate();
+    // Set values and trigger events
+    await selImportancia.setValue('N4');
+    await selImportancia.trigger('change');
     await ctx.wrapper!.vm.$nextTick();
+    
+    await selDominio.setValue('N2');
+    await selDominio.trigger('change');
     await ctx.wrapper!.vm.$nextTick();
     
     expect(ctx.wrapper!.vm.podeConcluir).toBe(true);
@@ -208,21 +213,16 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     const {useFeedbackStore} = await import('@/stores/feedback');
     const feedbackStore = useFeedbackStore();
     
-    // Access the avaliacoes ref directly and modify it
-    const avaliacoes = ctx.wrapper!.vm.avaliacoes;
-    if (!avaliacoes[2]) throw new Error('Avaliação 2 não foi inicializada');
+    // Simulate user selecting values in the form (competency 2)
+    const selImportancia = ctx.wrapper!.find('[data-testid="sel-importancia-2"]');
+    const selDominio = ctx.wrapper!.find('[data-testid="sel-dominio-2"]');
     
-    // Update ALL required properties to match what the component expects
-    avaliacoes[2] = {
-      importancia: 'N4',
-      dominio: 'N2',
-      observacoes: avaliacoes[2].observacoes,
-      salvo: avaliacoes[2].salvo
-    };
-    
-    // Force a re-render
-    ctx.wrapper!.vm.$forceUpdate();
+    await selImportancia.setValue('N4');
+    await selImportancia.trigger('change');
     await ctx.wrapper!.vm.$nextTick();
+    
+    await selDominio.setValue('N2');
+    await selDominio.trigger('change');
     await ctx.wrapper!.vm.$nextTick();
     
     const btn = ctx.wrapper!.find('[data-testid="btn-concluir-autoavaliacao"]');
