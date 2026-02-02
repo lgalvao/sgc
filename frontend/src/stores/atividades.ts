@@ -2,7 +2,13 @@ import {defineStore} from "pinia";
 import {ref} from "vue";
 import * as atividadeService from "@/services/atividadeService";
 import * as subprocessoService from "@/services/subprocessoService";
-import type {Atividade, AtividadeOperacaoResponse, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
+import type {
+    Atividade,
+    AtividadeOperacaoResponse,
+    Conhecimento,
+    CriarAtividadeRequest,
+    CriarConhecimentoRequest,
+} from "@/types/tipos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";

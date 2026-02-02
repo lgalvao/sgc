@@ -44,6 +44,7 @@ public class SubprocessoEmailService {
         try {
             Map<String, Object> variaveis = criarVariaveisTemplate(sp, evento);
             String assunto = criarAssunto(tipo, sp);
+            @SuppressWarnings("ConstantConditions")
             String corpo = processarTemplate(tipo.getTemplateEmail(), variaveis);
 
             notificacaoEmailService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);

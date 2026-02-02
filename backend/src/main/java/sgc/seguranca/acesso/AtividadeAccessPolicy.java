@@ -62,6 +62,11 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
 
         // 2. Verifica se é titular da unidade (obrigatório para todas as ações atuais)
         Mapa mapa = atividade.getMapa();
+        if (mapa == null) {
+            definirMotivoNegacao("Atividade não associada a um mapa de competências");
+            return false;
+        }
+
         Subprocesso subprocesso = mapa.getSubprocesso();
         Unidade unidade = subprocesso.getUnidade();
 

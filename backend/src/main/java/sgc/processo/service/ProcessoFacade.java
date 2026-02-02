@@ -110,6 +110,7 @@ public class ProcessoFacade {
     public List<ProcessoDto> listarFinalizados() {
         return processoConsultaService.listarFinalizados().stream()
                 .map(processoMapper::toDto)
+                .filter(java.util.Objects::nonNull)
                 .toList();
     }
 
@@ -117,6 +118,7 @@ public class ProcessoFacade {
     public List<ProcessoDto> listarAtivos() {
         return processoConsultaService.listarAtivos().stream()
                 .map(processoMapper::toDto)
+                .filter(java.util.Objects::nonNull)
                 .toList();
     }
 
@@ -183,6 +185,7 @@ public class ProcessoFacade {
     public List<SubprocessoDto> listarTodosSubprocessos(Long codProcesso) {
         return subprocessoFacade.listarEntidadesPorProcesso(codProcesso).stream()
                 .map(subprocessoMapper::toDto)
+                .filter(java.util.Objects::nonNull)
                 .toList();
     }
 

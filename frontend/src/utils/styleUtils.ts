@@ -1,4 +1,4 @@
-import { CLASSES_BADGE_SITUACAO } from "@/constants/situacoes";
+import {CLASSES_BADGE_SITUACAO} from "@/constants/situacoes";
 
 // ===== CLASSES DE BADGE =====
 export function badgeClass(situacao: string): string {

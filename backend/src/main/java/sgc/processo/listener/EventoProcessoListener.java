@@ -182,7 +182,7 @@ public class EventoProcessoListener {
                 return;
 
             UsuarioDto titular = usuarios.get(responsavel.titularTitulo());
-            if (titular == null || titular.email().isBlank())
+            if (titular == null || titular.email() == null || titular.email().isBlank())
                 return;
 
             String emailTitular = titular.email();
@@ -210,7 +210,7 @@ public class EventoProcessoListener {
     private void enviarEmailUnidadeIntermediaria(Processo processo, Unidade unidade, String email,
             List<Unidade> subordinadas) {
         List<String> siglasSubordinadas = subordinadas.stream()
-                .filter(u -> u.getUnidadeSuperior().getCodigo().equals(unidade.getCodigo()))
+                .filter(u -> u.getUnidadeSuperior() != null && u.getUnidadeSuperior().getCodigo().equals(unidade.getCodigo()))
                 .map(Unidade::getSigla)
                 .sorted()
                 .toList();
@@ -256,7 +256,7 @@ public class EventoProcessoListener {
             };
             String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
 
-            if (titular != null && !titular.email().isBlank()) {
+            if (titular != null && titular.email() != null && !titular.email().isBlank()) {
                 notificacaoEmailService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
                 log.info("E-mail enviado para unidade {}", unidade.getSigla());
             } else {
@@ -287,7 +287,7 @@ public class EventoProcessoListener {
             String corpoHtml, String nomeUnidade) {
         try {
             UsuarioDto substituto = usuarios.get(tituloSubstituto);
-            if (substituto != null && !substituto.email().isBlank()) {
+            if (substituto != null && substituto.email() != null && !substituto.email().isBlank()) {
                 notificacaoEmailService.enviarEmailHtml(substituto.email(), assunto, corpoHtml);
                 log.info("E-mail enviado para o substituto da unidade {}.", nomeUnidade);
             }

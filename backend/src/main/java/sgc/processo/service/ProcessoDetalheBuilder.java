@@ -9,8 +9,8 @@ import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.mapper.ProcessoDetalheMapper;
 import sgc.processo.model.Processo;
-import sgc.seguranca.acesso.AccessControlService;
 import sgc.seguranca.acesso.Acao;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 

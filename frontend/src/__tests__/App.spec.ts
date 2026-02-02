@@ -6,6 +6,8 @@ import {mount} from "@vue/test-utils";
 import App from "../App.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useRoute} from "vue-router";
+import {useToast} from "bootstrap-vue-next";
+import {useFeedbackStore} from "@/stores/feedback";
 
 // Mock de components
 vi.mock("@/components/BarraNavegacao.vue", () => ({default: {template: '<div data-testid="barra-navegacao"></div>'}}));
@@ -18,9 +20,6 @@ vi.mock("bootstrap-vue-next", async () => {
         BOrchestrator: { template: '<div></div>' }
     };
 });
-
-import {useToast} from "bootstrap-vue-next";
-import {useFeedbackStore} from "@/stores/feedback";
 
 // Mock do router
 vi.mock("vue-router", () => ({

@@ -1,14 +1,12 @@
-import { defineStore } from "pinia";
-import type {
-    TipoProcesso,
-} from "@/types/tipos";
-import { SituacaoSubprocesso } from "@/types/tipos";
-import { useErrorHandler } from "@/composables/useErrorHandler";
-import { flattenTree } from "@/utils";
+import {defineStore} from "pinia";
+import type {TipoProcesso,} from "@/types/tipos";
+import {SituacaoSubprocesso} from "@/types/tipos";
+import {useErrorHandler} from "@/composables/useErrorHandler";
+import {flattenTree} from "@/utils";
 import * as processoService from "@/services/processoService";
 import * as subprocessoService from "@/services/subprocessoService";
-import { useProcessosCoreStore } from "./core";
-import { useFeedbackStore } from "@/stores/feedback";
+import {useProcessosCoreStore} from "./core";
+import {useFeedbackStore} from "@/stores/feedback";
 
 export const useProcessosWorkflowStore = defineStore("processos-workflow", () => {
     const { lastError, clearError, withErrorHandling } = useErrorHandler();

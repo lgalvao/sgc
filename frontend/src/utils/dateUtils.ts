@@ -1,13 +1,5 @@
-import {
-    format,
-    parseISO,
-    isValid,
-    isFuture,
-    startOfDay,
-    differenceInDays,
-    parse,
-} from "date-fns";
-import { ptBR } from "date-fns/locale";
+import {differenceInDays, format, isFuture, isValid, parse, parseISO, startOfDay,} from "date-fns";
+import {ptBR} from "date-fns/locale";
 
 export type DateInput = string | number | Date | null | undefined;
 

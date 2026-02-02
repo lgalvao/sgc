@@ -10,15 +10,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.UsuarioPerfilService;
 import sgc.seguranca.login.dto.EntrarRequest;
 
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
-import sgc.organizacao.dto.UnidadeDto;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

@@ -1,18 +1,18 @@
-import { computed, nextTick, onMounted, ref, type ComputedRef, type Ref } from "vue";
-import { useRouter, type Router } from "vue-router";
-import { storeToRefs } from "pinia";
-import { useAtividadeForm } from "@/composables/useAtividadeForm";
-import { useAtividadesStore } from "@/stores/atividades";
-import { useSubprocessosStore } from "@/stores/subprocessos";
-import { useMapasStore } from "@/stores/mapas";
-import { useUnidadesStore } from "@/stores/unidades";
-import { useAnalisesStore } from "@/stores/analises";
-import { useFeedbackStore } from "@/stores/feedback";
-import { usePerfil } from "@/composables/usePerfil";
+import {computed, type ComputedRef, nextTick, onMounted, ref, type Ref} from "vue";
+import {type Router, useRouter} from "vue-router";
+import {storeToRefs} from "pinia";
+import {useAtividadeForm} from "@/composables/useAtividadeForm";
+import {useAtividadesStore} from "@/stores/atividades";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useMapasStore} from "@/stores/mapas";
+import {useUnidadesStore} from "@/stores/unidades";
+import {useAnalisesStore} from "@/stores/analises";
+import {useFeedbackStore} from "@/stores/feedback";
+import {usePerfil} from "@/composables/usePerfil";
 import type {
-    Atividade,
     AnaliseCadastro,
     AnaliseValidacao,
+    Atividade,
     Conhecimento,
     CriarConhecimentoRequest,
     ErroValidacao,
@@ -20,7 +20,7 @@ import type {
     SubprocessoDetalhe,
     SubprocessoPermissoes,
 } from "@/types/tipos";
-import { Perfil, SituacaoSubprocesso, TipoProcesso } from "@/types/tipos";
+import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import logger from "@/utils/logger";
 
 type Analise = AnaliseCadastro | AnaliseValidacao;

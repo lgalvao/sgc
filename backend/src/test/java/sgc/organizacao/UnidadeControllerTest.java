@@ -10,13 +10,19 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
+import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.model.UsuarioRepo;
+import sgc.processo.service.ProcessoFacade;
+import sgc.seguranca.login.GerenciadorJwt;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
@@ -26,12 +32,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import java.util.Optional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.organizacao.model.UsuarioPerfilRepo;
-import sgc.organizacao.model.UsuarioRepo;
-import sgc.processo.service.ProcessoFacade;
-import sgc.seguranca.login.GerenciadorJwt;
 
 @WebMvcTest(UnidadeController.class)
 @Import(RestExceptionHandler.class)

@@ -3,6 +3,7 @@ package sgc.seguranca;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import sgc.seguranca.config.ConfigCors;
@@ -11,7 +12,6 @@ import sgc.seguranca.config.ConfigCorsProperties;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.springframework.mock.web.MockHttpServletRequest;
 
 @Tag("unit")
 @DisplayName("ConfigCors - Testes de Configuração CORS")

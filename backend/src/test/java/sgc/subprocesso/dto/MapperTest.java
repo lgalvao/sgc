@@ -1,14 +1,10 @@
 package sgc.subprocesso.dto;
 
-import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
@@ -17,6 +13,11 @@ import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Testes para mappers de Subprocesso e Movimentação.

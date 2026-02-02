@@ -1,6 +1,6 @@
-import { z } from "zod";
- 
- const emailSchema = z.string().email();
+import {z} from "zod";
+
+const emailSchema = z.string().email();
  
  export function validarEmail(email: string | null | undefined): boolean {
    if (!email) return false;

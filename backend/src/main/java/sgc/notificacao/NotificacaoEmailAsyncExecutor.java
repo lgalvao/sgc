@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import sgc.comum.util.Sleeper;
 
-
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.CompletableFuture;
 

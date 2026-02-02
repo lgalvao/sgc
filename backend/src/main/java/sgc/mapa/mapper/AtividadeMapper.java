@@ -20,7 +20,7 @@ public abstract class AtividadeMapper {
      * Converte uma entidade {@link Atividade} em um {@link AtividadeResponse}.
      */
     @Mapping(source = "mapa.codigo", target = "mapaCodigo")
-    public abstract AtividadeResponse toResponse(@Nullable Atividade atividade);
+    public abstract @Nullable AtividadeResponse toResponse(@Nullable Atividade atividade);
 
     /**
      * Converte um {@link CriarAtividadeRequest} em uma entidade {@link Atividade}.
@@ -29,7 +29,7 @@ public abstract class AtividadeMapper {
     @Mapping(target = "mapa", ignore = true)
     @Mapping(target = "conhecimentos", ignore = true)
     @Mapping(target = "competencias", ignore = true)
-    public abstract Atividade toEntity(@Nullable CriarAtividadeRequest request);
+    public abstract @Nullable Atividade toEntity(@Nullable CriarAtividadeRequest request);
 
     /**
      * Converte um {@link AtualizarAtividadeRequest} em uma entidade {@link Atividade}.
@@ -38,6 +38,6 @@ public abstract class AtividadeMapper {
     @Mapping(target = "mapa", ignore = true)
     @Mapping(target = "conhecimentos", ignore = true)
     @Mapping(target = "competencias", ignore = true)
-    public abstract Atividade toEntity(@Nullable AtualizarAtividadeRequest request);
+    public abstract @Nullable Atividade toEntity(@Nullable AtualizarAtividadeRequest request);
 
 }

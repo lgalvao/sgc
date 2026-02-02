@@ -1,8 +1,10 @@
 package sgc.integracao.mocks;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
@@ -11,7 +13,6 @@ import sgc.organizacao.model.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.security.core.GrantedAuthority;
 
 public class WithMockChefeSecurityContextFactory
         implements WithSecurityContextFactory<WithMockChefe> {
@@ -25,7 +26,7 @@ public class WithMockChefeSecurityContextFactory
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Override
-    public SecurityContext createSecurityContext(@NonNull WithMockChefe annotation) {
+    public @Nullable SecurityContext createSecurityContext(@NonNull WithMockChefe annotation) {
         Usuario usuario = null;
         if (usuarioRepo != null) {
             try {

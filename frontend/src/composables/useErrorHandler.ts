@@ -1,5 +1,5 @@
-import { ref } from 'vue';
-import { normalizeError, type NormalizedError } from '@/utils/apiError';
+import {ref} from 'vue';
+import {type NormalizedError, normalizeError} from '@/utils/apiError';
 
 /**
  * Composable para tratamento centralizado de erros em stores.

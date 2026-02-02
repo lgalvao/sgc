@@ -6,7 +6,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
@@ -16,6 +15,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 
 import java.time.LocalDateTime;
 import java.util.List;

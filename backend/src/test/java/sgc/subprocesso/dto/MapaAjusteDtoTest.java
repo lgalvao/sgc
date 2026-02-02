@@ -1,15 +1,6 @@
 package sgc.subprocesso.dto;
 
-import java.util.List;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.*;
 import sgc.analise.model.Analise;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
@@ -17,6 +8,11 @@ import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
+
+import java.util.List;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("unit")
 @DisplayName("Testes de MapaAjusteDto")

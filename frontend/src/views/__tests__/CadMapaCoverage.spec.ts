@@ -1,9 +1,9 @@
-import { describe, it, expect, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { createTestingPinia } from '@pinia/testing';
+import {describe, expect, it, vi} from 'vitest';
+import {mount} from '@vue/test-utils';
+import {createTestingPinia} from '@pinia/testing';
 import CadMapa from '@/views/CadMapa.vue';
-import { useMapasStore } from '@/stores/mapas';
-import { useSubprocessosStore } from '@/stores/subprocessos';
+import {useMapasStore} from '@/stores/mapas';
+import {useSubprocessosStore} from '@/stores/subprocessos';
 
 // Mock router
 vi.mock("vue-router", () => ({

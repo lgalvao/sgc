@@ -5,11 +5,11 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.Processo;
 
 import java.util.stream.Collectors;
-import sgc.organizacao.model.Unidade;
 
 /**
  * Mapper (usando MapStruct) entre a entidade Processo e seu DTO principal.
@@ -22,10 +22,10 @@ public interface ProcessoMapper {
     @Mapping(target = "situacaoLabel", ignore = true)
     @Mapping(target = "tipoLabel", ignore = true)
     @Mapping(target = "unidadesParticipantes", ignore = true)
-    ProcessoDto toDto(@Nullable Processo processo);
+    @Nullable ProcessoDto toDto(@Nullable Processo processo);
 
     @Mapping(target = "participantes", ignore = true)
-    Processo toEntity(@Nullable ProcessoDto processoDTO);
+    @Nullable Processo toEntity(@Nullable ProcessoDto processoDTO);
 
     @AfterMapping
     default void mapUnidadesParticipantes(Processo processo, @MappingTarget ProcessoDto dto) {

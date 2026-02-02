@@ -12,9 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Request para submeter mapa ajustado (CDU-19 item 5 e CDU-16).
- * Usado pelo RUP para submeter o mapa com ajustes após receber
- * sugestões/devolução.
+ * Request para submeter o mapa com ajustes após receber sugestões/devolução.
  */
 @Builder
 public record SubmeterMapaAjustadoRequest(

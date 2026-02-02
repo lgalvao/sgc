@@ -2,10 +2,10 @@ package sgc.subprocesso.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 import sgc.mapa.dto.ConhecimentoResponse;
 
 import java.util.List;
-import org.jspecify.annotations.Nullable;
 
 /**
  * DTO agregado retornado pelo endpoint GET /api/subprocessos/{codigo}/cadastro Estrutura: {

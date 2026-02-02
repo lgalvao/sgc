@@ -1,8 +1,8 @@
-import { defineStore, storeToRefs } from "pinia";
-import { computed } from "vue";
-import { useProcessosCoreStore } from "./processos/core";
-import { useProcessosWorkflowStore } from "./processos/workflow";
-import { useProcessosContextStore } from "./processos/context";
+import {defineStore, storeToRefs} from "pinia";
+import {computed} from "vue";
+import {useProcessosCoreStore} from "./processos/core";
+import {useProcessosWorkflowStore} from "./processos/workflow";
+import {useProcessosContextStore} from "./processos/context";
 
 // Re-export new stores for direct usage
 export * from "./processos/core";

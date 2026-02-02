@@ -1,35 +1,34 @@
 package sgc.seguranca;
 
-import java.util.Collections;
-import java.util.List;
-
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.mockito.Mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.service.MapaFacade;
+import sgc.organizacao.UsuarioFacade;
 import sgc.subprocesso.SubprocessoMapaController;
 import sgc.subprocesso.service.SubprocessoFacade;
 import tools.jackson.databind.ObjectMapper;
-import org.assertj.core.api.Assertions;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
-import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioFacade;
+
+import java.util.Collections;
+import java.util.List;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(SubprocessoMapaController.class)
 @Import(RestExceptionHandler.class)

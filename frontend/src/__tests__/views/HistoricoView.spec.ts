@@ -1,9 +1,8 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {mount, flushPromises} from "@vue/test-utils";
+import {flushPromises, mount} from "@vue/test-utils";
 import HistoricoView from "@/views/HistoricoView.vue";
 import {createTestingPinia} from "@pinia/testing";
-import {useProcessosStore} from "@/stores/processos";
-import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mock router
 const { mockPush } = vi.hoisted(() => {

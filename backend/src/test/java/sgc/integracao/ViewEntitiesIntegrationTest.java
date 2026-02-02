@@ -1,9 +1,5 @@
 package sgc.integracao;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -12,18 +8,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.organizacao.model.*;
 
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.SituacaoUnidade;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.model.UsuarioPerfilRepo;
-import sgc.organizacao.model.UsuarioRepo;
-import sgc.organizacao.model.VinculacaoUnidade;
-import sgc.organizacao.model.VinculacaoUnidadeId;
-import sgc.organizacao.model.VinculacaoUnidadeRepo;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("integration")
 @SpringBootTest

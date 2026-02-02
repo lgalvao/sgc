@@ -1,4 +1,4 @@
-import { ref, watch, type Ref } from 'vue';
+import {ref, type Ref, watch} from 'vue';
 
 /**
  * Composable para sincronizar ref com localStorage

@@ -21,7 +21,7 @@ describe('Configuracoes Store', () => {
 
     it('carregarConfiguracoes deve preencher parametros em caso de sucesso', async () => {
         const mockData = [
-            { id: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '60' }
+            { codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '60' }
         ];
         vi.mocked(configuracaoService.buscarConfiguracoes).mockResolvedValue(mockData);
 
@@ -45,7 +45,7 @@ describe('Configuracoes Store', () => {
 
     it('salvarConfiguracoes deve atualizar parametros em caso de sucesso', async () => {
         const novosParametros = [
-            { id: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '90' }
+            { codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '90' }
         ];
         vi.mocked(configuracaoService.salvarConfiguracoes).mockResolvedValue(novosParametros);
 
@@ -59,7 +59,7 @@ describe('Configuracoes Store', () => {
 
     it('salvarConfiguracoes deve definir erro em caso de falha', async () => {
         const novosParametros = [
-            { id: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '90' }
+            { codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '90' }
         ];
         vi.mocked(configuracaoService.salvarConfiguracoes).mockRejectedValue(new Error('Erro API'));
 
@@ -71,7 +71,7 @@ describe('Configuracoes Store', () => {
 
     it('getValor deve retornar valor correto ou padrao', () => {
         store.parametros = [
-            { id: 1, chave: 'TESTE_KEY', descricao: 'Desc', valor: 'valor_teste' }
+            { codigo: 1, chave: 'TESTE_KEY', descricao: 'Desc', valor: 'valor_teste' }
         ];
 
         expect(store.getValor('TESTE_KEY')).toBe('valor_teste');
@@ -84,13 +84,13 @@ describe('Configuracoes Store', () => {
 
         // Caso configurado
         store.parametros = [
-            { id: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '45' }
+            { codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '45' }
         ];
         expect(store.getDiasInativacaoProcesso()).toBe(45);
 
         // Caso inválido
         store.parametros = [
-            { id: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: 'abc' }
+            { codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: 'abc' }
         ];
         expect(store.getDiasInativacaoProcesso()).toBe(30);
     });
@@ -101,13 +101,13 @@ describe('Configuracoes Store', () => {
 
         // Caso configurado
         store.parametros = [
-            { id: 1, chave: 'DIAS_ALERTA_NOVO', descricao: 'Desc', valor: '7' }
+            { codigo: 1, chave: 'DIAS_ALERTA_NOVO', descricao: 'Desc', valor: '7' }
         ];
         expect(store.getDiasAlertaNovo()).toBe(7);
 
         // Caso inválido
         store.parametros = [
-             { id: 1, chave: 'DIAS_ALERTA_NOVO', descricao: 'Desc', valor: 'xyz' }
+             { codigo: 1, chave: 'DIAS_ALERTA_NOVO', descricao: 'Desc', valor: 'xyz' }
         ];
         expect(store.getDiasAlertaNovo()).toBe(3);
     });

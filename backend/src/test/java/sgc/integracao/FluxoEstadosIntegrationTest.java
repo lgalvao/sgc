@@ -28,6 +28,7 @@ import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.CriarProcessoRequest;
+import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
@@ -48,7 +49,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
-import sgc.processo.model.SituacaoProcesso;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)

@@ -1,13 +1,9 @@
 package sgc;
 
-import java.util.HashMap;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.comum.erros.ErroNegocio;
@@ -19,6 +15,10 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
+
+import java.util.HashMap;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Cobertura Extra de Erros e Modelos")
 @Tag("unit")

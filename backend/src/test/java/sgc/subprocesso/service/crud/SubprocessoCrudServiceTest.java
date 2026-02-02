@@ -1,22 +1,19 @@
 package sgc.subprocesso.service.crud;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.Mapa;
+import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -24,13 +21,16 @@ import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import java.time.LocalDateTime;
-import sgc.comum.repo.ComumRepo;
-import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.factory.SubprocessoFactory;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)

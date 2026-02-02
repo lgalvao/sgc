@@ -139,14 +139,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BButton,
-  BCard,
-  BCardBody,
-  BContainer,
-  BFormGroup,
-  BFormTextarea,
-} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BContainer, BFormGroup, BFormTextarea,} from "bootstrap-vue-next";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";

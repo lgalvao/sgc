@@ -10,19 +10,18 @@ import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
 import sgc.processo.model.Processo;
+import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
-import java.util.ArrayList;
-import java.util.Collection;
-import sgc.subprocesso.model.SubprocessoRepo;
-
-import sgc.subprocesso.dto.CriarSubprocessoRequest;
 
 /**
  * Factory para criação de entidades Subprocesso.

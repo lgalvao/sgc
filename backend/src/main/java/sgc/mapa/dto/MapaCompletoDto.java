@@ -1,8 +1,8 @@
 package sgc.mapa.dto;
 
-import java.util.List;
-
 import lombok.Builder;
+
+import java.util.List;
 
 /**
  * DTO que representa um mapa completo com todas as suas competências e os vínculos com atividades

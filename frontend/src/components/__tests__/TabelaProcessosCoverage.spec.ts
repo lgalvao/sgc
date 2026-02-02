@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
+import {mount} from '@vue/test-utils';
 import TabelaProcessos from '../TabelaProcessos.vue';
-import { SituacaoProcesso, TipoProcesso } from '@/types/tipos';
-import { createMockProcessoResumo } from '@/test-utils/mockFactories';
+import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
+import {createMockProcessoResumo} from '@/test-utils/mockFactories';
 
 describe('TabelaProcessos Coverage', () => {
     const mockProcessos = [

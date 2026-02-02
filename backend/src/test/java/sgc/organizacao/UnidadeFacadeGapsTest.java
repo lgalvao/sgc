@@ -2,21 +2,16 @@ package sgc.organizacao;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.UnidadeConsultaService;
-import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeMapaService;
-import sgc.organizacao.service.UnidadeResponsavelService;
-import sgc.organizacao.service.UsuarioConsultaService;
+import sgc.organizacao.service.*;
 
 import java.util.HashMap;
 import java.util.List;

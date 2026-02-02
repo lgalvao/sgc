@@ -1,12 +1,12 @@
-import { createPinia, setActivePinia } from 'pinia';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useSubprocessosStore } from '../subprocessos';
-import { useProcessosStore } from '../processos';
-import { usePerfilStore } from '../perfil';
-import { useUnidadesStore } from '../unidades';
-import { useMapasStore } from '../mapas';
-import { useAtividadesStore } from '../atividades';
-import { useFeedbackStore } from '../feedback';
+import {createPinia, setActivePinia} from 'pinia';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {useSubprocessosStore} from '../subprocessos';
+import {useProcessosStore} from '../processos';
+import {usePerfilStore} from '../perfil';
+import {useUnidadesStore} from '../unidades';
+import {useMapasStore} from '../mapas';
+import {useAtividadesStore} from '../atividades';
+import {useFeedbackStore} from '../feedback';
 import {
     buscarContextoEdicao,
     buscarSubprocessoDetalhe,
@@ -22,9 +22,7 @@ import {
     homologarCadastro,
     homologarRevisaoCadastro
 } from '@/services/cadastroService';
-import {
-    alterarDataLimiteSubprocesso
-} from '@/services/processoService';
+import {alterarDataLimiteSubprocesso} from '@/services/processoService';
 
 // Mock Dependencies
 vi.mock('@/services/subprocessoService', () => ({

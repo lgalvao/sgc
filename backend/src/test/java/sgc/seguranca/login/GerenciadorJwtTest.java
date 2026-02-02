@@ -1,5 +1,7 @@
 package sgc.seguranca.login;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -13,14 +15,12 @@ import sgc.comum.erros.ErroConfiguracao;
 import sgc.organizacao.model.Perfil;
 import sgc.seguranca.config.JwtProperties;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import java.nio.charset.StandardCharsets;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

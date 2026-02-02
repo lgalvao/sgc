@@ -15,6 +15,7 @@ import sgc.mapa.service.MapaManutencaoService;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.dto.MapaAjusteDto;
+import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -24,7 +25,6 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 
 /**
  * Service responsável por operações relacionadas a ajustes de mapa em subprocessos.

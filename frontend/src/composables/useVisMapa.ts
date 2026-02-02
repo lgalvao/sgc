@@ -1,15 +1,15 @@
-import { computed, onMounted, ref, type ComputedRef, type Ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { storeToRefs } from "pinia";
-import { useMapasStore } from "@/stores/mapas";
-import { useUnidadesStore } from "@/stores/unidades";
-import { useProcessosStore } from "@/stores/processos";
-import { useAnalisesStore } from "@/stores/analises";
-import { useSubprocessosStore } from "@/stores/subprocessos";
-import { useFeedbackStore } from "@/stores/feedback";
-import { usePerfil } from "@/composables/usePerfil";
-import type { AnaliseCadastro, AnaliseValidacao, MapaVisualizacao, Unidade, SubprocessoPermissoes } from "@/types/tipos";
-import { TipoProcesso } from "@/types/tipos";
+import {computed, type ComputedRef, onMounted, ref, type Ref} from "vue";
+import {useRoute, useRouter} from "vue-router";
+import {storeToRefs} from "pinia";
+import {useMapasStore} from "@/stores/mapas";
+import {useUnidadesStore} from "@/stores/unidades";
+import {useProcessosStore} from "@/stores/processos";
+import {useAnalisesStore} from "@/stores/analises";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useFeedbackStore} from "@/stores/feedback";
+import {usePerfil} from "@/composables/usePerfil";
+import type {AnaliseCadastro, AnaliseValidacao, MapaVisualizacao, SubprocessoPermissoes, Unidade} from "@/types/tipos";
+import {TipoProcesso} from "@/types/tipos";
 import logger from "@/utils/logger";
 
 type Analise = AnaliseCadastro | AnaliseValidacao;

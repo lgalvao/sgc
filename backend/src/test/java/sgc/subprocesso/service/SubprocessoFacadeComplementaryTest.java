@@ -1,51 +1,46 @@
 package sgc.subprocesso.service;
 
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import sgc.analise.AnaliseFacade;
+import sgc.comum.erros.ErroAcessoNegado;
+import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
+import sgc.mapa.service.CopiaMapaService;
+import sgc.mapa.service.MapaFacade;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
-import sgc.subprocesso.dto.CompetenciaAjusteDto;
-import sgc.subprocesso.dto.CriarSubprocessoRequest;
-import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.dto.SubprocessoSituacaoDto;
-import sgc.subprocesso.dto.ValidacaoCadastroDto;
+import sgc.seguranca.acesso.AccessControlService;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.MapaAjusteMapper;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
-import org.junit.jupiter.api.Assertions;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-import sgc.comum.erros.ErroAcessoNegado;
-import sgc.mapa.mapper.ConhecimentoMapper;
-import sgc.mapa.service.CopiaMapaService;
-import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.model.Perfil;
-import sgc.seguranca.acesso.AccessControlService;
-import sgc.subprocesso.model.SubprocessoRepo;
+
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)

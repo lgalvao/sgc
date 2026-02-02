@@ -1,9 +1,13 @@
-import type { Page } from '@playwright/test';
+import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
-import {abrirHistoricoAnalise, acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
+import {
+    abrirHistoricoAnalise,
+    acessarSubprocessoAdmin,
+    acessarSubprocessoChefeDireto
+} from './helpers/helpers-analise.js';
 import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 async function verificarPaginaSubprocesso(page: Page) {

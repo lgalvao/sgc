@@ -253,14 +253,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BButton,
-  BCard,
-  BCardBody,
-  BContainer,
-  BFormTextarea,
-  BModal,
-} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
 import EmptyState from "@/components/EmptyState.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";

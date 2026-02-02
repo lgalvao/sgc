@@ -15,12 +15,12 @@ import sgc.organizacao.service.ValidadorDadosOrgService;
 import sgc.testutils.UnidadeTestBuilder;
 import sgc.testutils.UsuarioTestBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
-import java.util.ArrayList;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

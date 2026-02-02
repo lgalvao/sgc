@@ -1,25 +1,20 @@
 package sgc.integracao.mocks;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
+import sgc.organizacao.model.*;
 
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.security.core.GrantedAuthority;
-import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.model.UsuarioPerfilRepo;
 
 @Component
 public class WithMockGestorSecurityContextFactory
@@ -31,7 +26,7 @@ public class WithMockGestorSecurityContextFactory
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Override
-    public SecurityContext createSecurityContext(@NonNull WithMockGestor customUser) {
+    public @Nullable SecurityContext createSecurityContext(@NonNull WithMockGestor customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         String tituloGestor = customUser.value();
         Usuario principal = null;

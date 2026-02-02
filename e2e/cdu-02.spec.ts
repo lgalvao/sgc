@@ -1,9 +1,9 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
-import {criarProcesso, verificarProcessoNaTabela, extrairProcessoId} from './helpers/helpers-processos.js';
-import type { Page } from '@playwright/test';
-import type { useProcessoCleanup } from './hooks/hooks-limpeza.js';
+import {criarProcesso, extrairProcessoId, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import type {Page} from '@playwright/test';
+import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 test.describe('CDU-02 - Visualizar Painel', () => {
     test.describe('Como ADMIN', () => {

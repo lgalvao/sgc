@@ -12,7 +12,6 @@ import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
-import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.factory.SubprocessoFactory;
@@ -65,18 +64,6 @@ public class SubprocessoCrudService {
     @Transactional(readOnly = true)
     public List<Subprocesso> listarEntidadesPorProcesso(Long codProcesso) {
         return subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Subprocesso> listarPorProcessoESituacao(Long codProcesso, SituacaoSubprocesso situacao) {
-        return subprocessoRepo.findByProcessoCodigoAndSituacaoWithUnidade(codProcesso, situacao);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Subprocesso> listarPorProcessoUnidadeESituacoes(Long codProcesso, Long codUnidade,
-            List<SituacaoSubprocesso> situacoes) {
-        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso,
-                codUnidade, situacoes);
     }
 
     @Transactional(readOnly = true)

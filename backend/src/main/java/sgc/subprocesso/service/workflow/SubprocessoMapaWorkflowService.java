@@ -1,18 +1,12 @@
 package sgc.subprocesso.service.workflow;
 
-import java.time.LocalDateTime;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.TipoAcaoAnalise;
@@ -28,39 +22,23 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
-import static sgc.seguranca.acesso.Acao.ACEITAR_MAPA;
-import static sgc.seguranca.acesso.Acao.AJUSTAR_MAPA;
-import static sgc.seguranca.acesso.Acao.APRESENTAR_SUGESTOES;
-import static sgc.seguranca.acesso.Acao.DEVOLVER_MAPA;
-import static sgc.seguranca.acesso.Acao.DISPONIBILIZAR_MAPA;
-import static sgc.seguranca.acesso.Acao.HOMOLOGAR_MAPA;
-import static sgc.seguranca.acesso.Acao.VALIDAR_MAPA;
 import sgc.seguranca.acesso.AccessControlService;
-import sgc.subprocesso.dto.CompetenciaRequest;
-import sgc.subprocesso.dto.DisponibilizarMapaRequest;
-import sgc.subprocesso.dto.RegistrarTransicaoCommand;
-import sgc.subprocesso.dto.RegistrarWorkflowCommand;
-import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_VALIDADO;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import org.springframework.util.StringUtils;
 
-import sgc.subprocesso.model.SubprocessoRepo;
+import java.time.LocalDateTime;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static sgc.seguranca.acesso.Acao.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service
 @Slf4j

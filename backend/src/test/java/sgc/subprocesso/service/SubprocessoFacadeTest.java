@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UsuarioFacade;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
@@ -17,11 +18,10 @@ import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
 
+import java.time.LocalDate;
 import java.util.Collections;
 
 import static org.mockito.Mockito.verify;
-import java.time.LocalDate;
-import sgc.seguranca.acesso.AccessControlService;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

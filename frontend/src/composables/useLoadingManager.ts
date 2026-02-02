@@ -1,5 +1,5 @@
-import { ref, computed, type Ref } from 'vue';
-import { logger } from '@/utils';
+import {computed, ref, type Ref} from 'vue';
+import {logger} from '@/utils';
 
 /**
  * Gerenciador de múltiplos estados de loading

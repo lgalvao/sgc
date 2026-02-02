@@ -1,7 +1,7 @@
 /**
  * Factory functions for creating mock objects in tests
  */
-import { ProcessoResumo, SituacaoProcesso, TipoProcesso } from '@/types/tipos';
+import {ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
 /**
  * Creates a mock ProcessoResumo object with default values

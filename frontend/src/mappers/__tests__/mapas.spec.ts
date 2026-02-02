@@ -5,7 +5,7 @@ import {
     mapMapaCompletoDtoToModel,
     mapMapaDtoToModel
 } from '../mapas';
-import { TipoImpactoAtividade } from '@/types/tipos';
+import {TipoImpactoAtividade} from '@/types/tipos';
 
 describe('mappers/mapas.ts', () => {
     describe('mapMapaDtoToModel', () => {

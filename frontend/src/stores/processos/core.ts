@@ -1,14 +1,9 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
-import type { Page } from "@/services/painelService";
-import type {
-    AtualizarProcessoRequest,
-    CriarProcessoRequest,
-    Processo,
-    ProcessoResumo,
-} from "@/types/tipos";
-import { useErrorHandler } from "@/composables/useErrorHandler";
+import {defineStore} from "pinia";
+import {ref} from "vue";
+import type {Page} from "@/services/painelService";
 import * as painelService from "@/services/painelService";
+import type {AtualizarProcessoRequest, CriarProcessoRequest, Processo, ProcessoResumo,} from "@/types/tipos";
+import {useErrorHandler} from "@/composables/useErrorHandler";
 import * as processoService from "@/services/processoService";
 
 export const useProcessosCoreStore = defineStore("processos-core", () => {

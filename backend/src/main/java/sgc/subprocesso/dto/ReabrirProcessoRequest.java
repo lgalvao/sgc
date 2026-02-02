@@ -9,5 +9,7 @@ import lombok.Builder;
  */
 @Builder
 public record ReabrirProcessoRequest(
-        @NotBlank(message = "Justificativa é obrigatória") @Size(max = 500, message = "Justificativa deve ter no máximo 500 caracteres") String justificativa) {
+        @NotBlank(message = "Justificativa é obrigatória") 
+        @Size(max = 500, message = "Justificativa deve ter no máximo 500 caracteres") 
+        String justificativa) {
 }

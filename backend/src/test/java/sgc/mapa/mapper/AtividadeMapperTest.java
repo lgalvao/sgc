@@ -1,18 +1,14 @@
 package sgc.mapa.mapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mapstruct.factory.Mappers;
-
 import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.AtualizarAtividadeRequest;
 import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("unit")
 @DisplayName("AtividadeMapper")

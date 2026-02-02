@@ -1,15 +1,11 @@
 package sgc.subprocesso.mapper;
 
-import java.util.HashSet;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import sgc.analise.model.Analise;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
@@ -18,10 +14,10 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.model.Subprocesso;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import org.mapstruct.factory.Mappers;
+
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

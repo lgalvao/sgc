@@ -56,8 +56,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { BButton, BFormInput } from 'bootstrap-vue-next';
+import {ref} from 'vue';
+import {BButton, BFormInput} from 'bootstrap-vue-next';
 
 interface Props {
   modelValue: string;

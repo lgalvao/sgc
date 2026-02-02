@@ -9,14 +9,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import sgc.organizacao.model.UnidadeRepo;
-import sgc.processo.model.ProcessoRepo;
 
 @SpringBootTest
 @Transactional

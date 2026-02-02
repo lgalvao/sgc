@@ -12,7 +12,6 @@ import java.util.List;
 @Getter
 @Builder
 public class SubprocessoDetalheDto {
-
     private final UnidadeDto unidade;
     private final ResponsavelDto titular;
     private final ResponsavelDto responsavel;
@@ -27,6 +26,7 @@ public class SubprocessoDetalheDto {
     private final List<MovimentacaoDto> movimentacoes;
     private final SubprocessoPermissoesDto permissoes;
 
+    // TODO deveria estar em arquivo separado
     @Getter
     @Builder
     public static class UnidadeDto {
@@ -35,6 +35,7 @@ public class SubprocessoDetalheDto {
         private final String nome;
     }
 
+    // TODO deveria estar em arquivo separado
     @Getter
     @Builder
     public static class ResponsavelDto {

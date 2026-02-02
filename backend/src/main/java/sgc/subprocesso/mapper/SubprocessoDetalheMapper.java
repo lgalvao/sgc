@@ -3,6 +3,8 @@ package sgc.subprocesso.mapper;
 import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.util.CollectionUtils;
+import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoPermissoesDto;
@@ -11,9 +13,8 @@ import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.util.CollectionUtils;
-import sgc.organizacao.model.Unidade;
 
+@SuppressWarnings("unused")
 @Mapper(componentModel = "spring", uses = MovimentacaoMapper.class)
 public interface SubprocessoDetalheMapper {
     @Mapping(target = "unidade", source = "sp.unidade")
@@ -29,7 +30,11 @@ public interface SubprocessoDetalheMapper {
     @Mapping(target = "etapaAtual", source = "sp.etapaAtual")
     @Mapping(target = "movimentacoes", source = "movimentacoes")
     @Mapping(target = "permissoes", source = "permissoes")
-    SubprocessoDetalheDto toDto(@Nullable Subprocesso sp, @Nullable Usuario responsavel, @Nullable Usuario titular, @Nullable List<Movimentacao> movimentacoes, @Nullable SubprocessoPermissoesDto permissoes);
+    SubprocessoDetalheDto toDto(@Nullable Subprocesso sp,
+                                @Nullable Usuario responsavel,
+                                @Nullable Usuario titular,
+                                @Nullable List<Movimentacao> movimentacoes,
+                                @Nullable SubprocessoPermissoesDto permissoes);
 
     @Mapping(target = "codigo", source = "codigo")
     @Mapping(target = "sigla", source = "sigla")

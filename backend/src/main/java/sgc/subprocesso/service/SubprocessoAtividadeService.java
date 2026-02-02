@@ -13,11 +13,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;

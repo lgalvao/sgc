@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import { BAlert } from "bootstrap-vue-next";
+import {BAlert} from "bootstrap-vue-next";
 
 type Variant = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
 

@@ -1,17 +1,17 @@
 package sgc.subprocesso.model;
 
-import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
+
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("unit")
 @DisplayName("Entidade: Subprocesso")

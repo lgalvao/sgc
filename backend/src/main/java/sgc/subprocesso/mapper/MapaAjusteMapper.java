@@ -1,5 +1,6 @@
 package sgc.subprocesso.mapper;
 
+import org.jspecify.annotations.Nullable;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,13 +14,8 @@ import sgc.subprocesso.dto.ConhecimentoAjusteDto;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.Set;
-import org.jspecify.annotations.Nullable;
 
 @Mapper(componentModel = "spring")
 public interface MapaAjusteMapper {
@@ -27,9 +23,9 @@ public interface MapaAjusteMapper {
     @Mapping(target = "unidadeNome", source = "sp.unidade.nome")
     @Mapping(target = "competencias", expression = "java(mapCompetencias(competencias, atividades, conhecimentos, associacoes))")
     @Mapping(target = "justificativaDevolucao", source = "analise.observacoes")
-    MapaAjusteDto toDto(@Nullable Subprocesso sp, @Nullable Analise analise, @Nullable List<Competencia> competencias, @Nullable List<Atividade> atividades, @Nullable List<Conhecimento> conhecimentos, @Context @Nullable Map<Long, Set<Long>> associacoes);
+    @Nullable MapaAjusteDto toDto(@Nullable Subprocesso sp, @Nullable Analise analise, @Nullable List<Competencia> competencias, @Nullable List<Atividade> atividades, @Nullable List<Conhecimento> conhecimentos, @Context @Nullable Map<Long, Set<Long>> associacoes);
 
-    default List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, Map<Long, Set<Long>> associacoes) {
+    default @Nullable List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, Map<Long, Set<Long>> associacoes) {
         Map<Long, List<Conhecimento>> conhecimentosPorAtividade = conhecimentos.stream()
                 .collect(Collectors.groupingBy(Conhecimento::getCodigoAtividade));
 

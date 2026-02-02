@@ -6,20 +6,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.dto.ConhecimentoResponse;
 import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.service.MapaFacade;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.Acao;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.subprocesso.dto.ContextoEdicaoDto;
-import sgc.subprocesso.dto.SubprocessoCadastroDto;
-import sgc.subprocesso.dto.SubprocessoDetalheDto;
-import sgc.subprocesso.dto.SubprocessoPermissoesDto;
-import sgc.subprocesso.dto.SugestoesDto;
+import sgc.seguranca.acesso.AccessControlService;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
@@ -29,8 +27,6 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import sgc.mapa.service.MapaFacade;
-import sgc.seguranca.acesso.AccessControlService;
 
 /**
  * Service responsável por preparar contextos de visualização de subprocessos.
@@ -117,6 +113,7 @@ class SubprocessoContextoService {
         List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
         for (Atividade a : atividades) {
             List<ConhecimentoResponse> ksDto = a.getConhecimentos().stream().map(conhecimentoMapper::toResponse)
+                    .filter(java.util.Objects::nonNull)
                     .toList();
             atividadesComConhecimentos.add(SubprocessoCadastroDto.AtividadeCadastroDto.builder()
                     .codigo(a.getCodigo())

@@ -1,17 +1,19 @@
 package sgc.seguranca.login;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import org.springframework.core.env.Environment;
 import sgc.organizacao.model.Perfil;
+import sgc.seguranca.config.JwtProperties;
 
 import java.nio.charset.StandardCharsets;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-import org.springframework.core.env.Environment;
-import sgc.seguranca.config.JwtProperties;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Tag("unit")
 @DisplayName("GerenciadorJwt - Gap Tests for Null Claims")

@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
@@ -17,7 +18,6 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
-import sgc.analise.AnaliseFacade;
 
 @RestController
 @RequestMapping("/api/subprocessos")

@@ -1,10 +1,10 @@
-import { describe, it, expect, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { createTestingPinia } from '@pinia/testing';
+import {describe, expect, it, vi} from 'vitest';
+import {mount} from '@vue/test-utils';
+import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
-import { useSubprocessosStore } from '@/stores/subprocessos';
-import { useFeedbackStore } from '@/stores/feedback';
-import { BSpinner, BAlert } from 'bootstrap-vue-next';
+import {useSubprocessosStore} from '@/stores/subprocessos';
+import {useFeedbackStore} from '@/stores/feedback';
+import {BAlert, BSpinner} from 'bootstrap-vue-next';
 
 // Mock child components to avoid rendering them and their dependencies
 const SubprocessoHeaderStub = { template: '<div />' };

@@ -1,4 +1,4 @@
-import type {PerfilUnidadeDto, UsuarioDto, LoginResponseDto} from "@/types/dtos";
+import type {LoginResponseDto, PerfilUnidadeDto, UsuarioDto} from "@/types/dtos";
 
 export interface AutenticacaoRequest {
     tituloEleitoral: string;

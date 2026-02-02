@@ -7,14 +7,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.service.MapaManutencaoService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;
-import static org.mockito.Mockito.*;
-import sgc.organizacao.UsuarioFacade;
-import sgc.subprocesso.model.SubprocessoRepo;
+
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoFacade Batch Update Test")

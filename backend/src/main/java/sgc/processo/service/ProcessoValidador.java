@@ -5,12 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
+import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 
 import java.util.List;
 import java.util.Optional;

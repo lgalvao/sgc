@@ -12,15 +12,12 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.model.*;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static sgc.organizacao.model.Perfil.CHEFE;

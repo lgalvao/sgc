@@ -1,30 +1,18 @@
 package sgc.mapa;
 
-import java.net.URI;
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import sgc.mapa.dto.AtividadeResponse;
-import sgc.mapa.dto.AtualizarAtividadeRequest;
-import sgc.mapa.dto.AtualizarConhecimentoRequest;
-import sgc.mapa.dto.ConhecimentoResponse;
-import sgc.mapa.dto.CriarAtividadeRequest;
-import sgc.mapa.dto.CriarConhecimentoRequest;
-import sgc.mapa.dto.ResultadoOperacaoConhecimento;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import sgc.mapa.dto.*;
 import sgc.mapa.service.AtividadeFacade;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
+
+import java.net.URI;
+import java.util.List;
 
 /**
  * Controlador REST para gerenciar Atividades e seus Conhecimentos associados.

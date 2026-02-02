@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
@@ -22,7 +23,6 @@ import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
 import java.util.Map;
-import sgc.analise.AnaliseFacade;
 
 @RestController
 @RequestMapping("/api/subprocessos")
@@ -316,6 +316,9 @@ public class SubprocessoCadastroController {
 
     private Usuario obterUsuarioAutenticado(Object principal) {
         String titulo = usuarioService.extrairTituloUsuario(principal);
+        if (titulo == null) {
+            throw new sgc.comum.erros.ErroAutenticacao("Usuário não identificado");
+        }
         return usuarioService.buscarPorLogin(titulo);
     }
 }

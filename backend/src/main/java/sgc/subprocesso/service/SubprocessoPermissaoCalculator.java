@@ -7,10 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
 import sgc.seguranca.acesso.Acao;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
-import sgc.seguranca.acesso.AccessControlService;
 
 /**
  * Service responsável por calcular permissões de acesso a subprocessos.

@@ -1,7 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
-import type { Page } from '@playwright/test';
-import type { useProcessoCleanup } from './hooks/hooks-limpeza.js';
+import type {Page} from '@playwright/test';
+import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 test.describe('CDU-03 - Manter Processo', () => {
 

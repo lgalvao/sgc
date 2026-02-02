@@ -1,15 +1,16 @@
 package sgc.seguranca.acesso;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.organizacao.service.HierarquiaService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.*;
-
-import lombok.extern.slf4j.Slf4j;
-
+import java.util.EnumSet;
+import java.util.Map;
 
 import static sgc.organizacao.model.Perfil.*;
 import static sgc.seguranca.acesso.Acao.*;

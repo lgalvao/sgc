@@ -6,11 +6,11 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
+import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 
 import java.util.*;
 import java.util.stream.Collectors;

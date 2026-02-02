@@ -1,19 +1,22 @@
 package sgc.organizacao;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.UsuarioDto;
-import sgc.organizacao.model.*;
-import sgc.organizacao.service.*;
+import sgc.organizacao.model.Administrador;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.service.AdministradorService;
+import sgc.organizacao.service.UnidadeConsultaService;
+import sgc.organizacao.service.UsuarioConsultaService;
+import sgc.organizacao.service.UsuarioPerfilService;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)

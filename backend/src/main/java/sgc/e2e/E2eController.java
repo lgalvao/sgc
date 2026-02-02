@@ -65,7 +65,7 @@ public class E2eController {
 
             List<String> tables = jdbcTemplate.queryForList(
                     "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE UPPER(TABLE_SCHEMA) = 'SGC'",
-                    String.class);
+                    String.class).stream().filter(Objects::nonNull).toList();
 
             log.info("Limpando {} tabelas no schema SGC", tables.size());
             for (String table : tables) {
@@ -107,7 +107,7 @@ public class E2eController {
     public void limparProcessoComDependentes(@PathVariable Long codigo) {
         String sqlMapas =
                 "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN (SELECT codigo FROM" + SQL_SUBPROCESSO_POR_PROCESSO;
-        List<Long> mapaIds = jdbcTemplate.queryForList(sqlMapas, Long.class, codigo);
+        List<Long> mapaIds = jdbcTemplate.queryForList(sqlMapas, Long.class, codigo).stream().filter(Objects::nonNull).toList();
 
         jdbcTemplate.update(
                 "DELETE FROM sgc.analise WHERE subprocesso_codigo IN (SELECT codigo FROM"
@@ -139,13 +139,10 @@ public class E2eController {
             namedJdbcTemplate.update("DELETE FROM sgc.competencia WHERE mapa_codigo IN (:ids)", params);
             namedJdbcTemplate.update("DELETE FROM sgc.mapa WHERE codigo IN (:ids)", params);
         }
-
         jdbcTemplate.update("DELETE FROM sgc.subprocesso WHERE processo_codigo = ?", codigo);
-
-        jdbcTemplate.update(
-                "DELETE FROM sgc.alerta_usuario WHERE alerta_codigo IN (SELECT codigo FROM"
-                        + " sgc.alerta WHERE processo_codigo = ?)",
-                codigo);
+        jdbcTemplate.update("""
+                DELETE FROM sgc.alerta_usuario
+                WHERE alerta_codigo IN (SELECT codigo FROM sgc.alerta WHERE processo_codigo = ?)""", codigo);
         jdbcTemplate.update("DELETE FROM sgc.alerta WHERE processo_codigo = ?", codigo);
         jdbcTemplate.update("DELETE FROM sgc.unidade_processo WHERE processo_codigo = ?", codigo);
         jdbcTemplate.update("DELETE FROM sgc.processo WHERE codigo = ?", codigo);
@@ -198,6 +195,10 @@ public class E2eController {
 
         // Buscar unidade pela sigla
         UnidadeDto unidade = unidadeFacade.buscarPorSigla(request.unidadeSigla());
+        boolean unidadeNula = unidade == null;
+        if (unidadeNula) {
+            throw new ErroEntidadeNaoEncontrada("Unidade", request.unidadeSigla());
+        }
 
         // Calcular data limite
         int diasLimite = Objects.requireNonNullElse(request.diasLimite(), 30);

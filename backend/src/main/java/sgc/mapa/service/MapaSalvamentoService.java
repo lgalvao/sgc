@@ -47,7 +47,7 @@ public class MapaSalvamentoService {
     private final MapaCompletoMapper mapaCompletoMapper;
 
     /**
-     * Salva o mapa completo com todas as competências e suas associações.
+     * Salva o mapa completo with todas as competências e suas associações.
      *
      * @param codMapa O código do mapa a ser salvo.
      * @param request A requisição contendo as competências e observações.
@@ -84,10 +84,12 @@ public class MapaSalvamentoService {
 
         Set<Long> atividadesDoMapaIds = atividadesAtuais.stream()
                 .map(Atividade::getCodigo)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         Set<Long> codigosNovos = request.competencias().stream()
                 .map(CompetenciaMapaDto::codigo)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         return new ContextoSalvamento(
@@ -152,7 +154,7 @@ public class MapaSalvamentoService {
 
     private void atualizarAssociacoesAtividades(ContextoSalvamento contexto, List<Competencia> competenciasSalvas) {
         Long codMapa = contexto.atividadesAtuais.isEmpty() ? null
-                : contexto.atividadesAtuais.getFirst().getMapa().getCodigo();
+                : (contexto.atividadesAtuais.getFirst().getMapa() != null ? contexto.atividadesAtuais.getFirst().getMapa().getCodigo() : null);
 
         Map<Long, Set<Competencia>> mapAtividadeCompetencias = construirMapaAssociacoes(
                 contexto, competenciasSalvas, codMapa);
@@ -168,7 +170,7 @@ public class MapaSalvamentoService {
 
         Map<Long, Set<Competencia>> mapAtividadeCompetencias = new HashMap<>();
 
-        // Inicializar com conjuntos vazios para todas as atividades
+        // Inicializar with conjuntos vazios para todas as atividades
         for (Long ativId : contexto.atividadesDoMapaIds) {
             mapAtividadeCompetencias.put(ativId, new HashSet<>());
         }
@@ -189,7 +191,7 @@ public class MapaSalvamentoService {
 
     private void validarAtividadePertenceAoMapa(Long ativId, Set<Long> atividadesDoMapaIds, Long codMapa) {
         if (!atividadesDoMapaIds.contains(ativId)) {
-            throw new ErroValidacao("Atividade %d não pertence ao mapa %d".formatted(ativId, codMapa));
+            throw new ErroValidacao("Atividade %d não pertence ao mapa %s".formatted(ativId, Objects.toString(codMapa)));
         }
     }
 

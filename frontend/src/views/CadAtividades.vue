@@ -184,17 +184,8 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BAlert,
-  BButton,
-  BCol,
-  BContainer,
-  BDropdown,
-  BDropdownItem,
-  BForm,
-  BFormInput
-} from "bootstrap-vue-next";
-import {ref, watch, nextTick} from "vue";
+import {BAlert, BButton, BCol, BContainer, BDropdown, BDropdownItem, BForm, BFormInput} from "bootstrap-vue-next";
+import {nextTick, ref, watch} from "vue";
 import {badgeClass} from "@/utils";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";

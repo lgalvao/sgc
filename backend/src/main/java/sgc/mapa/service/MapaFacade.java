@@ -4,18 +4,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 import java.util.Optional;
-import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
-import sgc.organizacao.model.Usuario;
 
 /**
  * Facade para operações com Mapas de Competências.

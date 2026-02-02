@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
-import { useErrorHandler } from '../useErrorHandler';
+import {describe, expect, it, vi} from 'vitest';
+import {useErrorHandler} from '../useErrorHandler';
 
 describe('useErrorHandler', () => {
   it('inicializa com lastError como null', () => {

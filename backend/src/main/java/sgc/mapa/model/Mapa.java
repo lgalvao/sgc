@@ -19,17 +19,17 @@ import java.time.LocalDateTime;
 @SuperBuilder
 public class Mapa extends EntidadeBase {
     @Column(name = "data_hora_disponibilizado")
-    private LocalDateTime dataHoraDisponibilizado;
+    private @Nullable LocalDateTime dataHoraDisponibilizado;
 
     @Column(name = "observacoes_disponibilizacao", length = 1000)
-    private String observacoesDisponibilizacao;
+    private @Nullable String observacoesDisponibilizacao;
 
     @Column(name = "sugestoes", length = 1000)
     @Nullable
     private String sugestoes;
 
     @Column(name = "data_hora_homologado")
-    private LocalDateTime dataHoraHomologado;
+    private @Nullable LocalDateTime dataHoraHomologado;
 
     @OneToOne
     @JoinColumn(name = "subprocesso_codigo", nullable = false)

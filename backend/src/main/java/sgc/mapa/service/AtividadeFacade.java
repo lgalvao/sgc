@@ -1,34 +1,25 @@
 package sgc.mapa.service;
 
-import java.util.List;
-import java.util.Objects;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import sgc.mapa.dto.AtividadeResponse;
-import sgc.mapa.dto.ResultadoOperacaoConhecimento;
+import sgc.mapa.dto.*;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
-import static sgc.seguranca.acesso.Acao.ASSOCIAR_CONHECIMENTOS;
-import static sgc.seguranca.acesso.Acao.CRIAR_ATIVIDADE;
-import static sgc.seguranca.acesso.Acao.EDITAR_ATIVIDADE;
-import static sgc.seguranca.acesso.Acao.EXCLUIR_ATIVIDADE;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
-import sgc.mapa.dto.AtualizarAtividadeRequest;
-import sgc.mapa.dto.AtualizarConhecimentoRequest;
-import sgc.mapa.dto.ConhecimentoResponse;
-import sgc.mapa.dto.CriarAtividadeRequest;
-import sgc.mapa.dto.CriarConhecimentoRequest;
+
+import java.util.List;
+import java.util.Objects;
+
+import static sgc.seguranca.acesso.Acao.*;
 
 /**
  * Facade para orquestrar operações de atividades e conhecimentos,

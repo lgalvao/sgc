@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
+import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.Analise;
@@ -16,6 +17,7 @@ import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoFacade;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,8 +25,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import java.time.LocalDateTime;
-import sgc.analise.AnaliseFacade;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

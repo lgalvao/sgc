@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso, verificarProcessoNaTabela, extrairProcessoId} from './helpers/helpers-processos.js';
+import {criarProcesso, extrairProcessoId, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 
 test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
     test('Deve iniciar um processo com sucesso', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {

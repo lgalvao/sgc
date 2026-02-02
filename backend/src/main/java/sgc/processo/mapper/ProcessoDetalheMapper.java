@@ -25,5 +25,5 @@ public interface ProcessoDetalheMapper {
     @Mapping(target = "dataLimiteFormatada", ignore = true)
     @Mapping(target = "codSubprocesso", ignore = true)
     @Mapping(target = "mapaCodigo", ignore = true)
-    ProcessoDetalheDto.UnidadeParticipanteDto toUnidadeParticipanteDto(@Nullable Unidade unidade);
+    ProcessoDetalheDto.@Nullable UnidadeParticipanteDto toUnidadeParticipanteDto(@Nullable Unidade unidade);
 }

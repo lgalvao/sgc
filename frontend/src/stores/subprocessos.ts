@@ -1,5 +1,5 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import {defineStore} from "pinia";
+import {ref} from "vue";
 import {
     aceitarCadastro,
     aceitarRevisaoCadastro,
@@ -14,22 +14,22 @@ import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
-    validarCadastro as serviceValidarCadastro,
     obterPermissoes as serviceObterPermissoes,
+    validarCadastro as serviceValidarCadastro,
 } from "@/services/subprocessoService";
 import {
+    alterarDataLimiteSubprocesso as serviceAlterarDataLimite,
     reabrirCadastro as serviceReabrirCadastro,
     reabrirRevisaoCadastro as serviceReabrirRevisaoCadastro,
-    alterarDataLimiteSubprocesso as serviceAlterarDataLimite,
 } from "@/services/processoService";
-import { usePerfilStore } from "@/stores/perfil";
-import { useProcessosStore } from "@/stores/processos";
-import { useFeedbackStore } from "@/stores/feedback";
-import { useUnidadesStore } from "@/stores/unidades";
-import { useMapasStore } from "@/stores/mapas";
-import { useAtividadesStore } from "@/stores/atividades";
-import { mapMapaCompletoDtoToModel } from "@/mappers/mapas";
-import { mapAtividadeVisualizacaoToModel } from "@/mappers/atividades";
+import {usePerfilStore} from "@/stores/perfil";
+import {useProcessosStore} from "@/stores/processos";
+import {useFeedbackStore} from "@/stores/feedback";
+import {useUnidadesStore} from "@/stores/unidades";
+import {useMapasStore} from "@/stores/mapas";
+import {useAtividadesStore} from "@/stores/atividades";
+import {mapMapaCompletoDtoToModel} from "@/mappers/mapas";
+import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,
@@ -37,8 +37,8 @@ import type {
     SituacaoSubprocesso,
     SubprocessoDetalhe,
 } from "@/types/tipos";
-import { useErrorHandler } from "@/composables/useErrorHandler";
-import { normalizeError } from "@/utils/apiError";
+import {useErrorHandler} from "@/composables/useErrorHandler";
+import {normalizeError} from "@/utils/apiError";
 
 export const useSubprocessosStore = defineStore("subprocessos", () => {
     const subprocessoDetalhe = ref<SubprocessoDetalhe | null>(null);

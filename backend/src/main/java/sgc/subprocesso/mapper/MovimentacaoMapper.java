@@ -17,5 +17,5 @@ public interface MovimentacaoMapper {
     @Mapping(source = "unidadeDestino.codigo", target = "unidadeDestinoCodigo")
     @Mapping(source = "unidadeDestino.sigla", target = "unidadeDestinoSigla")
     @Mapping(source = "unidadeDestino.nome", target = "unidadeDestinoNome")
-    MovimentacaoDto toDto(@Nullable Movimentacao movimentacao);
+    @Nullable MovimentacaoDto toDto(@Nullable Movimentacao movimentacao);
 }

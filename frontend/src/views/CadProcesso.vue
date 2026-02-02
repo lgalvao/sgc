@@ -101,25 +101,21 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BButton,
-  BContainer,
-  BForm,
-} from "bootstrap-vue-next";
-import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import {BButton, BContainer, BForm,} from "bootstrap-vue-next";
+import {computed, nextTick, onMounted, ref, watch} from "vue";
+import {useRoute, useRouter} from "vue-router";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
 import ProcessoFormFields from "@/components/processo/ProcessoFormFields.vue";
 import FormErrorAlert from "@/components/common/FormErrorAlert.vue";
-import { logger } from "@/utils";
-import { useProcessoForm } from "@/composables/useProcessoForm";
+import {logger} from "@/utils";
+import {useProcessoForm} from "@/composables/useProcessoForm";
 
-import { useProcessosStore } from "@/stores/processos";
-import { useUnidadesStore } from "@/stores/unidades";
-import { useFeedbackStore } from "@/stores/feedback";
-import { Processo as ProcessoModel, TipoProcesso } from "@/types/tipos";
+import {useProcessosStore} from "@/stores/processos";
+import {useUnidadesStore} from "@/stores/unidades";
+import {useFeedbackStore} from "@/stores/feedback";
+import {Processo as ProcessoModel, TipoProcesso} from "@/types/tipos";
 
 const {
   descricao,

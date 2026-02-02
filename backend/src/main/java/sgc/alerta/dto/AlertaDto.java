@@ -2,6 +2,7 @@ package sgc.alerta.dto;
 
 import lombok.Builder;
 import lombok.Value;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +16,7 @@ public class AlertaDto {
     String unidadeDestino;
     String descricao;
     LocalDateTime dataHora;
-    LocalDateTime dataHoraLeitura;
+    @Nullable LocalDateTime dataHoraLeitura;
     String mensagem;
     String dataHoraFormatada;
     String origem;

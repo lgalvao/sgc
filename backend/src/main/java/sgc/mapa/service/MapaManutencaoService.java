@@ -37,7 +37,7 @@ public class MapaManutencaoService {
 
     @Transactional(readOnly = true)
     public List<AtividadeResponse> listarAtividades() {
-        return atividadeRepo.findAll().stream().map(atividadeMapper::toResponse).toList();
+        return atividadeRepo.findAll().stream().map(atividadeMapper::toResponse).filter(Objects::nonNull).toList();
     }
 
     @Transactional(readOnly = true)
@@ -148,6 +148,7 @@ public class MapaManutencaoService {
         return competenciaRepo.findByMapaCodigoSemFetch(codMapa);
     }
 
+    @SuppressWarnings("ConstantConditions")
     public Map<Long, Set<Long>> buscarIdsAssociacoesCompetenciaAtividade(Long codMapa) {
         List<Object[]> rows = competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(codMapa);
         Map<Long, Set<Long>> result = new HashMap<>();
@@ -229,6 +230,7 @@ public class MapaManutencaoService {
         }
         return conhecimentoRepo.findByAtividadeCodigo(codAtividade).stream()
                 .map(conhecimentoMapper::toResponse)
+                .filter(Objects::nonNull)
                 .toList();
     }
 

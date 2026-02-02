@@ -1,7 +1,8 @@
 package sgc.integracao.mocks;
 
-import org.jspecify.annotations.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -25,7 +26,7 @@ public class WithMockCustomUserSecurityContextFactory
     private UsuarioRepo usuarioRepo;
 
     @Override
-    public SecurityContext createSecurityContext(@NonNull WithMockCustomUser customUser) {
+    public @Nullable SecurityContext createSecurityContext(@NonNull WithMockCustomUser customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         Unidade unidade = null;
         boolean dbAvailable = false;

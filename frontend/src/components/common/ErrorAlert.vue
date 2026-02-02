@@ -14,11 +14,11 @@
 </template>
 
 <script lang="ts" setup>
-import { BAlert } from "bootstrap-vue-next";
+import {BAlert} from "bootstrap-vue-next";
 
 interface ErrorObject {
   message: string;
-  details?: string;
+  details?: string | Record<string, any>;
 }
 
 withDefaults(

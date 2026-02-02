@@ -17,23 +17,22 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface MapaCompletoMapper {
-    default MapaCompletoDto toDto(Mapa mapa, Long codSubprocesso, List<Competencia> competencias) {
+    default @Nullable MapaCompletoDto toDto(Mapa mapa, @Nullable Long codSubprocesso, List<Competencia> competencias) {
         return MapaCompletoDto.builder()
                 .codigo(mapa.getCodigo())
                 .subprocessoCodigo(codSubprocesso)
                 .observacoes(mapa.getObservacoesDisponibilizacao())
-                .competencias(competencias.stream().map(this::toDto).toList())
+                .competencias(competencias.stream().map(this::toDto).filter(Objects::nonNull).toList())
                 .build();
     }
 
     @Mapping(target = "codigo", source = "codigo")
     @Mapping(target = "descricao", source = "descricao")
     @Mapping(target = "atividadesCodigos", source = "atividades", qualifiedByName = "mapAtividadesCodigos")
-    CompetenciaMapaDto toDto(@Nullable Competencia competencia);
+    @Nullable CompetenciaMapaDto toDto(@Nullable Competencia competencia);
 
     @Named("mapAtividadesCodigos")
     default List<Long> mapAtividadesCodigos(Set<Atividade> atividades) {
-
         return atividades.stream()
                 .map(Atividade::getCodigo)
                 .filter(Objects::nonNull)

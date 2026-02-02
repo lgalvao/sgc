@@ -17,5 +17,5 @@ public interface SubprocessoMapper {
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidade.codigo", target = "codUnidade")
     @Mapping(source = "mapa.codigo", target = "codMapa")
-    SubprocessoDto toDto(@Nullable Subprocesso subprocesso);
+    @Nullable SubprocessoDto toDto(@Nullable Subprocesso subprocesso);
 }

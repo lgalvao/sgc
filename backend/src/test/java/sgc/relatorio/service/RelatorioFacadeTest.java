@@ -26,10 +26,10 @@ import sgc.subprocesso.service.SubprocessoFacade;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-import java.util.Set;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)

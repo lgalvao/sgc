@@ -1,11 +1,11 @@
 import {defineStore} from "pinia";
-import {ref, computed} from "vue";
+import {computed, ref} from "vue";
 import {logger} from "@/utils";
 import {useSingleLoading} from "@/composables/useLoadingManager";
 import {
     buscarConfiguracoes as serviceBuscarConfiguracoes,
-    salvarConfiguracoes as serviceSalvarConfiguracoes,
     type Parametro,
+    salvarConfiguracoes as serviceSalvarConfiguracoes,
 } from "@/services/configuracaoService";
 
 export type { Parametro };

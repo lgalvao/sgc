@@ -15,8 +15,8 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import sgc.seguranca.login.FiltroJwt;
 import org.springframework.web.cors.CorsConfigurationSource;
+import sgc.seguranca.login.FiltroJwt;
 
 @Configuration
 @EnableWebSecurity

@@ -79,7 +79,9 @@ public class GerenciadorJwt {
             String perfilStr = claims.get("perfil", String.class);
             Long unidadeCodigo = claims.get("unidade", Long.class);
 
-            if (tituloEleitoral == null || perfilStr == null || unidadeCodigo == null) {
+            @SuppressWarnings("ConstantConditions")
+            boolean incompleto = tituloEleitoral == null || perfilStr == null || unidadeCodigo == null;
+            if (incompleto) {
                 log.warn("JWT com claims obrigatórios ausentes");
                 return Optional.empty();
             }

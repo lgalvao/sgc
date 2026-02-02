@@ -1,9 +1,8 @@
 import {describe, expect, it, vi} from "vitest";
+import logger, {getLogLevel} from "@/utils/logger";
 
 // Unmock the logger to test the real implementation
 vi.unmock("@/utils/logger");
-
-import logger, {getLogLevel} from "@/utils/logger";
 
 describe("utils/logger.ts", () => {
     it("deve exportar uma instância do logger", () => {

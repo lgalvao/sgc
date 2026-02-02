@@ -74,17 +74,6 @@ public class ProcessoSubprocessoQueryService {
     }
 
     /**
-     * Lista subprocessos por processo e situação.
-     *
-     * @param processoId código do processo
-     * @param situacao   situação dos subprocessos
-     * @return lista de subprocessos
-     */
-    public List<Subprocesso> listarPorProcessoESituacao(Long processoId, SituacaoSubprocesso situacao) {
-        return subprocessoRepo.findByProcessoCodigoAndSituacaoWithUnidade(processoId, situacao);
-    }
-
-    /**
      * Lista subprocessos por processo e múltiplas situações.
      *
      * @param processoId código do processo
@@ -125,7 +114,7 @@ public class ProcessoSubprocessoQueryService {
      * @param valido   indica se a validação passou
      * @param mensagem mensagem de erro (presente apenas se inválido)
      */
-    public record ValidationResult(boolean valido, String mensagem) {
+    public record ValidationResult(boolean valido, @Nullable String mensagem) {
         public static ValidationResult ofValido() {
             return new ValidationResult(true, null);
         }

@@ -88,17 +88,11 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BFormGroup,
-  BFormInput,
-  BFormInvalidFeedback,
-  BFormSelect,
-  BFormSelectOption
-} from "bootstrap-vue-next";
-import { ref } from "vue";
+import {BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect, BFormSelectOption} from "bootstrap-vue-next";
+import {ref} from "vue";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
-import { TipoProcesso } from "@/types/tipos";
-import type { Unidade } from "@/types/tipos";
+import type {Unidade} from "@/types/tipos";
+import {TipoProcesso} from "@/types/tipos";
 
 interface ProcessoFormData {
   descricao: string;

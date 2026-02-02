@@ -1,5 +1,6 @@
 package sgc.seguranca.sanitizacao;
 
+import org.jspecify.annotations.Nullable;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.deser.std.StdDeserializer;
@@ -15,7 +16,7 @@ public class DeserializadorHtmlSanitizado extends StdDeserializer<String> {
     }
 
     @Override
-    public String deserialize(JsonParser parser, DeserializationContext ctxt) {
+    public @Nullable String deserialize(JsonParser parser, DeserializationContext ctxt) {
         String value = parser.getValueAsString();
         if (value == null || value.isBlank()) {
             return value;

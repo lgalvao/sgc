@@ -1,6 +1,7 @@
 package sgc.seguranca.login;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ import java.util.Set;
 public class LoginFacade {
     private final UsuarioFacade usuarioService;
     private final GerenciadorJwt gerenciadorJwt;
-    private final ClienteAcessoAd clienteAcessoAd;
+    private final @Nullable ClienteAcessoAd clienteAcessoAd;
     private final UnidadeFacade unidadeService;
     private final UsuarioMapper usuarioMapper;
     private final UsuarioPerfilService usuarioPerfilService;
@@ -41,7 +42,7 @@ public class LoginFacade {
 
     public LoginFacade(UsuarioFacade usuarioService,
             GerenciadorJwt gerenciadorJwt,
-            @Autowired(required = false) ClienteAcessoAd clienteAcessoAd,
+            @Autowired(required = false) @Nullable ClienteAcessoAd clienteAcessoAd,
             UnidadeFacade unidadeService,
             UsuarioMapper usuarioMapper,
             UsuarioPerfilService usuarioPerfilService) {

@@ -3,7 +3,7 @@
  * Esses tipos são usados para fornecer type safety aos mappers.
  */
 
-import type { TipoImpactoAtividade } from './tipos';
+import type {TipoImpactoAtividade} from './tipos';
 
 export interface AtividadeDto {
     codigo: number;

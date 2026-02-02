@@ -18,7 +18,7 @@ import sgc.subprocesso.model.Subprocesso;
 public class EventoTransicaoSubprocesso {
     private Subprocesso subprocesso;
     private TipoTransicao tipo;
-    private Usuario usuario;
+    private @Nullable Usuario usuario;
     private Unidade unidadeOrigem;
     private Unidade unidadeDestino;
     @Nullable

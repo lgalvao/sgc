@@ -2,7 +2,7 @@ import {describe, expect, it} from "vitest";
 import {mapVWUsuariosArray, mapVWUsuarioToUsuario,} from "@/mappers/usuarios";
 import {mapUnidade, mapUnidadesArray, mapUnidadeSnapshot,} from "@/mappers/unidades";
 import type {Alerta, Mapa, MapaAjuste} from "@/types/tipos";
-import { TipoImpactoAtividade } from "@/types/tipos";
+import {TipoImpactoAtividade} from "@/types/tipos";
 import {mapAlertaDtoToFrontend} from "../alertas";
 import {
     mapAtividadeToModel,

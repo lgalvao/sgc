@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { createTestingPinia } from '@pinia/testing';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {mount} from '@vue/test-utils';
+import {createTestingPinia} from '@pinia/testing';
 import PainelView from '@/views/PainelView.vue';
-import { useProcessosStore } from '@/stores/processos';
-import { useAlertasStore } from '@/stores/alertas';
-import { useRouter } from 'vue-router';
+import {useProcessosStore} from '@/stores/processos';
+import {useAlertasStore} from '@/stores/alertas';
+import {useRouter} from 'vue-router';
 
 // Mock router
 vi.mock("vue-router", () => ({

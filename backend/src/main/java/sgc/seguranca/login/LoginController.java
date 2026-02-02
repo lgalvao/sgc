@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,14 +18,10 @@ import sgc.comum.erros.ErroAutenticacao;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.login.dto.AutenticarRequest;
-import sgc.seguranca.login.dto.EntrarRequest;
-import sgc.seguranca.login.dto.EntrarResponse;
-import sgc.seguranca.login.dto.PerfilUnidadeDto;
+import sgc.seguranca.login.dto.*;
 
 import java.util.List;
 import java.util.Optional;
-import sgc.seguranca.login.dto.AutorizarRequest;
 
 /**
  * Controller responsável pelo fluxo de login: autenticação, autorização e
@@ -139,7 +136,8 @@ public class LoginController {
         }
     }
 
-    private String extrairIp(HttpServletRequest httpRequest) {
+    @SuppressWarnings("ConstantConditions")
+    private @Nullable String extrairIp(HttpServletRequest httpRequest) {
         String ip = httpRequest.getHeader("X-Forwarded-For");
         if (ip == null || ip.isEmpty()) {
             ip = httpRequest.getRemoteAddr();

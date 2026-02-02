@@ -138,7 +138,7 @@ public enum TipoTransicao {
      * @param siglaUnidade Sigla da unidade para substituir no template
      * @return Descrição formatada ou null se não gera alerta
      */
-    public String formatarAlerta(String siglaUnidade) {
+    public @Nullable String formatarAlerta(String siglaUnidade) {
         return templateAlerta != null ? templateAlerta.formatted(siglaUnidade) : null;
     }
 

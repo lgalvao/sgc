@@ -1,46 +1,42 @@
 package sgc.subprocesso;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import sgc.comum.erros.RestExceptionHandler;
+import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
-import sgc.subprocesso.dto.CompetenciaRequest;
-import sgc.subprocesso.dto.MapaAjusteDto;
-import sgc.subprocesso.dto.SalvarAjustesRequest;
-import sgc.subprocesso.model.Subprocesso;
-import tools.jackson.databind.ObjectMapper;
-import sgc.mapa.dto.CompetenciaMapaDto;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.dto.CompetenciaAjusteDto;
-import sgc.subprocesso.dto.ContextoEdicaoDto;
-import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
+import tools.jackson.databind.ObjectMapper;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(SubprocessoMapaController.class)
 @Import(RestExceptionHandler.class)

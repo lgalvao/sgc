@@ -1,6 +1,7 @@
 package sgc.integracao;
 
 import jakarta.mail.internet.MimeMessage;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -13,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -22,10 +24,14 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.fixture.*;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
 import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.ConhecimentoRepo;
+import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.*;
+import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -41,12 +47,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import jakarta.persistence.EntityManager;
-import sgc.integracao.mocks.TestThymeleafConfig;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.Mapa;
-import sgc.processo.model.Processo;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Tag("integration")
 @SpringBootTest

@@ -24,12 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)

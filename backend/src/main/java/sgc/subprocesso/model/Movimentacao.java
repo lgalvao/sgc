@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.jspecify.annotations.Nullable;
 import sgc.comum.model.EntidadeBase;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -43,5 +44,5 @@ public class Movimentacao extends EntidadeBase {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_titulo")
-    private Usuario usuario;
+    private @Nullable Usuario usuario;
 }

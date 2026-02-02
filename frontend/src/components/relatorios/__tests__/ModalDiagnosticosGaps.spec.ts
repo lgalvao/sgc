@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {mount} from '@vue/test-utils';
 import ModalDiagnosticosGaps from '../ModalDiagnosticosGaps.vue';
-import { BModal } from 'bootstrap-vue-next';
+import {BModal} from 'bootstrap-vue-next';
 import * as csvUtils from '@/utils/csv';
 
 // Mock dependencies

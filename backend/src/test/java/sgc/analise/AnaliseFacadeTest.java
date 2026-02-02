@@ -9,14 +9,14 @@ import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.model.Unidade;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

@@ -1,12 +1,9 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
-import type {
-    ProcessoResumo,
-    SubprocessoElegivel,
-} from "@/types/tipos";
-import { useErrorHandler } from "@/composables/useErrorHandler";
+import {defineStore} from "pinia";
+import {ref} from "vue";
+import type {ProcessoResumo, SubprocessoElegivel,} from "@/types/tipos";
+import {useErrorHandler} from "@/composables/useErrorHandler";
 import * as processoService from "@/services/processoService";
-import { useProcessosCoreStore } from "./core";
+import {useProcessosCoreStore} from "./core";
 
 export const useProcessosContextStore = defineStore("processos-context", () => {
     const subprocessosElegiveis = ref<SubprocessoElegivel[]>([]);

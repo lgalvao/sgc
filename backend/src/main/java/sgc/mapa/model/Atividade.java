@@ -1,5 +1,6 @@
 package sgc.mapa.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import jakarta.annotation.Nullable;
 
 /**
  * Representa uma atividade desempenhada em um determinado contexto, associada a um mapa de

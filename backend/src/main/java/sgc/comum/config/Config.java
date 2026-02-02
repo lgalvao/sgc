@@ -1,9 +1,10 @@
 package sgc.comum.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+
 import java.time.Clock;
-import org.springframework.context.annotation.Bean;
 
 /**
  * Configuração geral do Spring Data para serialização de Pagination.

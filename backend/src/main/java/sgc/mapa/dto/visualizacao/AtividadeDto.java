@@ -1,8 +1,8 @@
 package sgc.mapa.dto.visualizacao;
 
-import java.util.List;
-
 import lombok.Builder;
+
+import java.util.List;
 
 /**
  * DTO para visualização de atividade.

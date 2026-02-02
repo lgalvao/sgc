@@ -16,6 +16,7 @@ import sgc.notificacao.NotificacaoEmailService;
 @Profile({"test", "e2e"})
 @Slf4j
 public class NotificacaoEmailServiceMock extends NotificacaoEmailService {
+    @SuppressWarnings("ConstantConditions")
     public NotificacaoEmailServiceMock() {
         super(null, null);
         log.info("NotificacaoEmailServiceMock ATIVADO - E-mails serão mockados");

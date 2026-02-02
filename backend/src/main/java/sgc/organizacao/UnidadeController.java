@@ -14,6 +14,7 @@ import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.processo.model.TipoProcesso;
+import sgc.processo.service.ProcessoFacade;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,6 @@ import java.util.Set;
 
 import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
 import static sgc.processo.model.TipoProcesso.REVISAO;
-import sgc.processo.service.ProcessoFacade;
 
 /**
  * Controle para operações relacionadas a unidades organizacionais

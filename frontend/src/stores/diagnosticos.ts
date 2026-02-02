@@ -1,13 +1,13 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import {defineStore} from "pinia";
+import {ref} from "vue";
 import {
-    type DiagnosticoDto,
     type AvaliacaoServidorDto,
-    type OcupacaoCriticaDto,
-    diagnosticoService
+    type DiagnosticoDto,
+    diagnosticoService,
+    type OcupacaoCriticaDto
 } from "@/services/diagnosticoService";
-import { useErrorHandler } from "@/composables/useErrorHandler";
-import { useSingleLoading } from "@/composables/useLoadingManager";
+import {useErrorHandler} from "@/composables/useErrorHandler";
+import {useSingleLoading} from "@/composables/useLoadingManager";
 
 export const useDiagnosticosStore = defineStore("diagnosticos", () => {
     const diagnostico = ref<DiagnosticoDto | null>(null);

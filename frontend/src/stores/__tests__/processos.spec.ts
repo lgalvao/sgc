@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it, type Mocked, vi } from "vitest";
-import { setupStoreTest } from "@/test-utils/storeTestHelpers";
-import type { Processo } from "@/types/tipos";
-import { SituacaoProcesso, TipoProcesso } from "@/types/tipos";
-import { useProcessosStore } from "../processos";
-import { normalizeError } from "@/utils/apiError";
+import {beforeEach, describe, expect, it, type Mocked, vi} from "vitest";
+import {setupStoreTest} from "@/test-utils/storeTestHelpers";
+import type {Processo} from "@/types/tipos";
+import {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
+import {useProcessosStore} from "../processos";
+import {normalizeError} from "@/utils/apiError";
 
 // Mocks
 vi.mock("@/services/painelService");

@@ -3,18 +3,15 @@ package sgc.organizacao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.mapa.model.Mapa;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.mapper.UsuarioMapper;
-import sgc.organizacao.model.*;
-import sgc.organizacao.service.UnidadeConsultaService;
-import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeMapaService;
-import sgc.organizacao.service.UnidadeResponsavelService;
-import sgc.organizacao.service.UsuarioConsultaService;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.service.*;
 
 import java.util.*;
-
-import sgc.mapa.model.Mapa;
 
 /**
  * Facade para operações de unidades organizacionais.

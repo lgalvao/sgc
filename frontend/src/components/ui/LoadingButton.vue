@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { BButton, BSpinner } from 'bootstrap-vue-next';
+import {BButton, BSpinner} from 'bootstrap-vue-next';
 
 interface Props {
   loading?: boolean

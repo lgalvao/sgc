@@ -1,6 +1,9 @@
 package sgc.processo;
 
 import org.junit.jupiter.api.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -11,11 +14,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
+import sgc.subprocesso.dto.SubprocessoDto;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
@@ -28,11 +33,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.MockitoAnnotations;
-import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.dto.SubprocessoDto;
 
 @WebMvcTest(ProcessoController.class)
 @Import(RestExceptionHandler.class)

@@ -1,6 +1,6 @@
-import { axe } from "vitest-axe";
+import {axe} from "vitest-axe";
 import "vitest-axe/extend-expect";
-import { expect } from "vitest";
+import {expect} from "vitest";
 
 /**
  * Executes accessibility checks on a rendered component or HTML element.
