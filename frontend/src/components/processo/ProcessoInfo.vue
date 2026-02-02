@@ -37,7 +37,7 @@ withDefaults(
   }
 );
 
-function formatarData(data: string): string {
+function formatarData(data?: string): string {
   if (!data) return '';
   const date = new Date(data);
   return date.toLocaleDateString('pt-BR');

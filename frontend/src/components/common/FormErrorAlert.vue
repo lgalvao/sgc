@@ -5,7 +5,7 @@
       :fade="false"
       class="mb-3"
       dismissible
-      @update:model-value="(val: boolean) => $emit('update:show', val)"
+      @update:model-value="(val) => val === false && $emit('update:show', false)"
   >
     <h4 v-if="title" class="alert-heading">{{ title }}</h4>
     <p class="mb-0">{{ body }}</p>

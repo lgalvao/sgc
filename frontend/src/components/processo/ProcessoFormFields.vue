@@ -13,7 +13,7 @@
           placeholder="Descreva o processo"
           type="text"
           required
-          @update:model-value="updateField('descricao', $event)"
+          @update:model-value="(val) => updateField('descricao', String(val))"
       />
       <BFormInvalidFeedback :state="fieldErrors.descricao ? false : null">
         {{ fieldErrors.descricao }}
@@ -78,7 +78,7 @@
           data-testid="inp-processo-data-limite"
           type="date"
           required
-          @update:model-value="updateField('dataLimite', $event)"
+          @update:model-value="(val) => updateField('dataLimite', String(val))"
       />
       <BFormInvalidFeedback :state="fieldErrors.dataLimite ? false : null">
         {{ fieldErrors.dataLimite }}
@@ -133,7 +133,7 @@ const tipoOptions = [
   { value: TipoProcesso.DIAGNOSTICO, text: 'Diagnóstico' }
 ];
 
-function updateField(field: keyof ProcessoFormData, value: any) {
+function updateField<K extends keyof ProcessoFormData>(field: K, value: ProcessoFormData[K]) {
   emit('update:modelValue', {
     ...props.modelValue,
     [field]: value
