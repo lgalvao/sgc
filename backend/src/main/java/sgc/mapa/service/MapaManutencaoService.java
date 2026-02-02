@@ -40,14 +40,14 @@ public class MapaManutencaoService {
     @Transactional(readOnly = true)
     public List<AtividadeResponse> listarAtividades() {
         return atividadeRepo.findAll().stream()
-                .map(atividadeMapper::toResponse)
-                .filter(Objects::nonNull)
+                .flatMap(a -> java.util.stream.Stream.ofNullable(atividadeMapper.toResponse(a)))
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public AtividadeResponse obterAtividadeResponse(Long codAtividade) {
-        return atividadeMapper.toResponse(obterAtividadePorCodigo(codAtividade));
+        return Optional.ofNullable(atividadeMapper.toResponse(obterAtividadePorCodigo(codAtividade)))
+                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter atividade para resposta."));
     }
 
     @Transactional(readOnly = true)
@@ -64,11 +64,13 @@ public class MapaManutencaoService {
         Mapa mapa = repo.buscar(Mapa.class, request.mapaCodigo());
         notificarAlteracaoMapa(request.mapaCodigo());
 
-        Atividade entidade = atividadeMapper.toEntity(request);
+        Atividade entidade = Optional.ofNullable(atividadeMapper.toEntity(request))
+                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade atividade."));
         entidade.setMapa(mapa);
 
         Atividade salvo = atividadeRepo.save(entidade);
-        return atividadeMapper.toResponse(salvo);
+        return Optional.ofNullable(atividadeMapper.toResponse(salvo))
+                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter atividade salva para resposta."));
     }
 
     public void atualizarAtividade(Long codigo, AtualizarAtividadeRequest request) {
@@ -78,7 +80,8 @@ public class MapaManutencaoService {
             notificarAlteracaoMapa(existente.getMapa().getCodigo());
         }
 
-        var entidadeParaAtualizar = atividadeMapper.toEntity(request);
+        var entidadeParaAtualizar = Optional.ofNullable(atividadeMapper.toEntity(request))
+                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade atividade."));
         existente.setDescricao(entidadeParaAtualizar.getDescricao());
 
         atividadeRepo.save(existente);
@@ -234,8 +237,7 @@ public class MapaManutencaoService {
             throw new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade);
         }
         return conhecimentoRepo.findByAtividadeCodigo(codAtividade).stream()
-                .map(conhecimentoMapper::toResponse)
-                .filter(Objects::nonNull)
+                .flatMap(c -> java.util.stream.Stream.ofNullable(conhecimentoMapper.toResponse(c)))
                 .toList();
     }
 
@@ -257,10 +259,12 @@ public class MapaManutencaoService {
                         notificarAlteracaoMapa(mapa.getCodigo());
                     }
 
-                    var conhecimento = conhecimentoMapper.toEntity(request);
+                    var conhecimento = Optional.ofNullable(conhecimentoMapper.toEntity(request))
+                            .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade conhecimento."));
                     conhecimento.setAtividade(atividade);
                     var salvo = conhecimentoRepo.save(conhecimento);
-                    return conhecimentoMapper.toResponse(salvo);
+                    return Optional.ofNullable(conhecimentoMapper.toResponse(salvo))
+                            .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter conhecimento salvo para resposta."));
                 })
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade));
     }

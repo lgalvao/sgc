@@ -29,7 +29,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 @RestController
@@ -65,7 +64,7 @@ public class E2eController {
 
             List<String> tables = jdbcTemplate.queryForList(
                     "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE UPPER(TABLE_SCHEMA) = 'SGC'",
-                    String.class).stream().filter(Objects::nonNull).toList();
+                    String.class).stream().flatMap(java.util.stream.Stream::ofNullable).toList();
 
             log.info("Limpando {} tabelas no schema SGC", tables.size());
             for (String table : tables) {
@@ -108,7 +107,7 @@ public class E2eController {
         String sqlMapas =
                 "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN (SELECT codigo FROM" + SQL_SUBPROCESSO_POR_PROCESSO;
         List<Long> mapaIds = jdbcTemplate.queryForList(sqlMapas, Long.class, codigo).stream()
-                .filter(Objects::nonNull)
+                .flatMap(java.util.stream.Stream::ofNullable)
                 .toList();
 
         jdbcTemplate.update(

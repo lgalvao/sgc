@@ -13,6 +13,7 @@ import sgc.mapa.service.MapaFacade;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controlador REST para gerenciar Mapas usando DTOs. Evita expor entidades JPA diretamente nas
@@ -36,8 +37,7 @@ public class MapaController {
     @Operation(summary = "Lista todos os mapas")
     public List<MapaDto> listar() {
         return mapaFacade.listar().stream()
-                .map(mapaMapper::toDto)
-                .filter(java.util.Objects::nonNull)
+                .flatMap(m -> java.util.stream.Stream.ofNullable(mapaMapper.toDto(m)))
                 .toList();
     }
 
@@ -66,7 +66,8 @@ public class MapaController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cria um mapa")
     public ResponseEntity<MapaDto> criar(@Valid @RequestBody MapaDto mapaDto) {
-        var entidade = mapaMapper.toEntity(mapaDto);
+        var entidade = Optional.ofNullable(mapaMapper.toEntity(mapaDto))
+                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter DTO para entidade mapa."));
         var salvo = mapaFacade.criar(entidade);
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(mapaMapper.toDto(salvo));
@@ -83,7 +84,8 @@ public class MapaController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza um mapa existente")
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
-        var entidade = mapaMapper.toEntity(mapaDto);
+        var entidade = Optional.ofNullable(mapaMapper.toEntity(mapaDto))
+                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter DTO para entidade mapa."));
         var atualizado = mapaFacade.atualizar(codMapa, entidade);
         return ResponseEntity.ok(mapaMapper.toDto(atualizado));
     }

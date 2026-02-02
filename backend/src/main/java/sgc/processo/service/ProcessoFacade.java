@@ -66,13 +66,15 @@ public class ProcessoFacade {
     @Transactional
     public ProcessoDto criar(CriarProcessoRequest req) {
         Processo processoSalvo = processoManutencaoService.criar(req);
-        return processoMapper.toDto(processoSalvo);
+        return Optional.ofNullable(processoMapper.toDto(processoSalvo))
+                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter processo criado para DTO."));
     }
 
     @Transactional
     public ProcessoDto atualizar(Long codigo, AtualizarProcessoRequest requisicao) {
         Processo processoAtualizado = processoManutencaoService.atualizar(codigo, requisicao);
-        return processoMapper.toDto(processoAtualizado);
+        return Optional.ofNullable(processoMapper.toDto(processoAtualizado))
+                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter processo atualizado para DTO."));
     }
 
     @Transactional
@@ -109,14 +111,14 @@ public class ProcessoFacade {
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarFinalizados() {
         return processoConsultaService.listarFinalizados().stream()
-                .map(processoMapper::toDto)
+                .flatMap(p -> java.util.stream.Stream.ofNullable(processoMapper.toDto(p)))
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarAtivos() {
         return processoConsultaService.listarAtivos().stream()
-                .map(processoMapper::toDto)
+                .flatMap(p -> java.util.stream.Stream.ofNullable(processoMapper.toDto(p)))
                 .toList();
     }
 

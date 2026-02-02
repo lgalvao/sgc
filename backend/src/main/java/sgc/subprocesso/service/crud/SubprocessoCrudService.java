@@ -86,7 +86,8 @@ public class SubprocessoCrudService {
 
     public SubprocessoDto criar(CriarSubprocessoRequest request) {
         Subprocesso salvo = subprocessoFactory.criar(request);
-        return subprocessoMapper.toDto(salvo);
+        return Optional.ofNullable(subprocessoMapper.toDto(salvo))
+                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter subprocesso criado para DTO."));
     }
 
     public SubprocessoDto atualizar(Long codigo, AtualizarSubprocessoRequest request) {
@@ -95,7 +96,8 @@ public class SubprocessoCrudService {
 
         Subprocesso salvo = subprocessoRepo.save(subprocesso);
 
-        return subprocessoMapper.toDto(salvo);
+        return Optional.ofNullable(subprocessoMapper.toDto(salvo))
+                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter subprocesso atualizado para DTO."));
     }
 
     private void processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
@@ -130,8 +132,7 @@ public class SubprocessoCrudService {
     @Transactional(readOnly = true)
     public List<SubprocessoDto> listar() {
         return subprocessoRepo.findAllComFetch().stream()
-                .map(subprocessoMapper::toDto)
-                .filter(Objects::nonNull)
+                .flatMap(s -> java.util.stream.Stream.ofNullable(subprocessoMapper.toDto(s)))
                 .toList();
     }
 
@@ -142,7 +143,8 @@ public class SubprocessoCrudService {
                 .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(
                         "%s para o processo %s e unidade %s".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codProcesso,
                                 codUnidade)));
-        return subprocessoMapper.toDto(sp);
+        return Optional.ofNullable(subprocessoMapper.toDto(sp))
+                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter subprocesso para DTO."));
     }
 
     @Transactional(readOnly = true)
@@ -157,8 +159,7 @@ public class SubprocessoCrudService {
         }
         return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(codProcesso, codUnidades)
                 .stream()
-                .map(subprocessoMapper::toDto)
-                .filter(Objects::nonNull)
+                .flatMap(s -> java.util.stream.Stream.ofNullable(subprocessoMapper.toDto(s)))
                 .toList();
     }
 }

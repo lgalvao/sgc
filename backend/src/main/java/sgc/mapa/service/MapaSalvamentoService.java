@@ -69,7 +69,8 @@ public class MapaSalvamentoService {
 
         validarIntegridadeMapa(codMapa, contexto.atividadesAtuais, competenciasSalvas);
 
-        return mapaCompletoMapper.toDto(mapa, null, competenciasSalvas);
+        return Optional.ofNullable(mapaCompletoMapper.toDto(mapa, null, competenciasSalvas))
+                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter mapa salvo para DTO."));
     }
 
     private void atualizarObservacoes(Mapa mapa, @Nullable String observacoes) {
@@ -89,7 +90,7 @@ public class MapaSalvamentoService {
 
         Set<Long> codigosNovos = request.competencias().stream()
                 .map(CompetenciaMapaDto::codigo)
-                .filter(Objects::nonNull)
+                .flatMap(java.util.stream.Stream::ofNullable)
                 .collect(Collectors.toSet());
 
         return new ContextoSalvamento(

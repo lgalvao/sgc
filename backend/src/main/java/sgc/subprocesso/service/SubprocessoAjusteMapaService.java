@@ -93,7 +93,8 @@ class SubprocessoAjusteMapaService {
         List<Conhecimento> conhecimentos = mapaManutencaoService.listarConhecimentosPorMapa(codMapa);
         Map<Long, Set<Long>> associacoes = mapaManutencaoService.buscarIdsAssociacoesCompetenciaAtividade(codMapa);
         
-        return java.util.Objects.requireNonNull(mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes));
+        return Optional.ofNullable(mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes))
+                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao gerar dados de ajuste do mapa."));
     }
 
     /**
