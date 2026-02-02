@@ -151,7 +151,7 @@ import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import {useVisAtividadesLogic} from "@/composables/useVisAtividadesLogic";
+import {useVisAtividades} from "@/composables/useVisAtividades";
 
 const props = defineProps<{
   codProcesso: number | string;
@@ -187,7 +187,7 @@ const {
   devolverCadastro,
   confirmarValidacao,
   confirmarDevolucao,
-} = useVisAtividadesLogic(props);
+} = useVisAtividades(props);
 
 defineExpose({
   mostrarModalHistoricoAnalise,
