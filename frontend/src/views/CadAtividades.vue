@@ -205,7 +205,7 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
 import EmptyState from "@/components/EmptyState.vue";
 import AtividadeItem from "@/components/AtividadeItem.vue";
-import {useCadAtividadesLogic} from "@/composables/useCadAtividadesLogic";
+import {useCadAtividades} from "@/composables/useCadAtividades";
 
 const props = defineProps<{
   codProcesso: number | string;
@@ -252,7 +252,7 @@ const {
   disponibilizarCadastro,
   confirmarDisponibilizacao,
   fecharModalImpacto
-} = useCadAtividadesLogic(props);
+} = useCadAtividades(props);
 
 const inputNovaAtividadeRef = ref<InstanceType<typeof BFormInput> | null>(null);
 

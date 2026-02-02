@@ -151,6 +151,8 @@ describe("CadAtividades.vue", () => {
         subprocessosStore.buscarContextoEdicao.mockResolvedValue(undefined);
         subprocessosStore.disponibilizarCadastro.mockResolvedValue(true);
         subprocessosStore.disponibilizarRevisaoCadastro.mockResolvedValue(true);
+        // Mock validarCadastro to call through to service mock
+        subprocessosStore.validarCadastro.mockImplementation((cod: number) => subprocessoService.validarCadastro(cod));
 
         atividadesStore = useAtividadesStore(pinia) as any;
         // Actions
