@@ -22,12 +22,19 @@ import {
     homologarCadastro,
     homologarRevisaoCadastro
 } from '@/services/cadastroService';
+import {
+    alterarDataLimiteSubprocesso
+} from '@/services/processoService';
 
 // Mock Dependencies
 vi.mock('@/services/subprocessoService', () => ({
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
+}));
+
+vi.mock('@/services/processoService', () => ({
+    alterarDataLimiteSubprocesso: vi.fn(),
 }));
 
 vi.mock('@/services/cadastroService', () => ({
@@ -70,11 +77,14 @@ vi.mock('../feedback', () => ({
 }));
 
 // Mock API Client
+const mockApiClient = {
+    post: vi.fn().mockResolvedValue({ data: {} }),
+    get: vi.fn().mockResolvedValue({ data: {} })
+};
+
 vi.mock('@/axios-setup', () => ({
-    apiClient: {
-        post: vi.fn().mockResolvedValue({ data: {} }),
-        get: vi.fn().mockResolvedValue({ data: {} })
-    }
+    default: mockApiClient,
+    apiClient: mockApiClient
 }));
 
 describe('Subprocessos Store', () => {
@@ -380,21 +390,18 @@ describe('Subprocessos Store', () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
             mockPerfilStore.unidadeAtual = null;
             (buscarSubprocessoDetalhe as any).mockResolvedValue({});
+            (alterarDataLimiteSubprocesso as any).mockResolvedValue(undefined);
 
-            const { apiClient } = await import('@/axios-setup');
             const dados = { novaData: '2024-12-31' };
 
             await store.alterarDataLimiteSubprocesso(123, dados);
 
-            expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/123/data-limite', {
-                novaDataLimite: dados.novaData
-            });
+            expect(alterarDataLimiteSubprocesso).toHaveBeenCalledWith(123, dados);
             expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(123, 'ADMIN', null);
         });
 
         it('deve lidar com erro na API', async () => {
-            const { apiClient } = await import('@/axios-setup');
-            (apiClient.post as any).mockRejectedValue(new Error("API Fail"));
+            (alterarDataLimiteSubprocesso as any).mockRejectedValue(new Error("API Fail"));
 
             await expect(store.alterarDataLimiteSubprocesso(123, { novaData: '2022' }))
                 .rejects.toThrow("API Fail");

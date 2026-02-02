@@ -5,7 +5,7 @@ import {createPinia, setActivePinia} from "pinia";
 describe("Feedback Store", () => {
     let store: ReturnType<typeof useFeedbackStore>;
     const mockToast = {
-        show: vi.fn(),
+        create: vi.fn(),
     };
 
     beforeEach(() => {
@@ -17,15 +17,15 @@ describe("Feedback Store", () => {
     it("deve enfileirar mensagens se não inicializado", () => {
         store.show("Teste", "Mensagem", "info");
         
-        expect(mockToast.show).not.toHaveBeenCalled();
+        expect(mockToast.create).not.toHaveBeenCalled();
     });
 
     it("deve disparar toast se já inicializado", () => {
         store.init(mockToast);
         store.show("Sucesso", "Operação realizada", "success", 2000);
 
-        expect(mockToast.show).toHaveBeenCalledTimes(1);
-        expect(mockToast.show).toHaveBeenCalledWith({
+        expect(mockToast.create).toHaveBeenCalledTimes(1);
+        expect(mockToast.create).toHaveBeenCalledWith({
             props: {
                 title: "Sucesso",
                 body: "Operação realizada",
@@ -41,22 +41,22 @@ describe("Feedback Store", () => {
         store.show("Fila 1", "Msg 1");
         store.show("Fila 2", "Msg 2");
         
-        expect(mockToast.show).not.toHaveBeenCalled();
+        expect(mockToast.create).not.toHaveBeenCalled();
 
         // Inicializa
         store.init(mockToast);
 
-        expect(mockToast.show).toHaveBeenCalledTimes(2);
+        expect(mockToast.create).toHaveBeenCalledTimes(2);
         
         // Verifica argumentos da primeira chamada
-        expect(mockToast.show).toHaveBeenNthCalledWith(1, expect.objectContaining({
+        expect(mockToast.create).toHaveBeenNthCalledWith(1, expect.objectContaining({
             props: expect.objectContaining({
                 title: "Fila 1"
             })
         }));
 
         // Verifica argumentos da segunda chamada
-        expect(mockToast.show).toHaveBeenNthCalledWith(2, expect.objectContaining({
+        expect(mockToast.create).toHaveBeenNthCalledWith(2, expect.objectContaining({
             props: expect.objectContaining({
                 title: "Fila 2"
             })
@@ -67,7 +67,7 @@ describe("Feedback Store", () => {
         store.init(mockToast);
         store.show("Título", "Mensagem"); // Sem variant e delay
         
-        expect(mockToast.show).toHaveBeenCalledWith(expect.objectContaining({
+        expect(mockToast.create).toHaveBeenCalledWith(expect.objectContaining({
             props: expect.objectContaining({
                 variant: 'info',
                 value: 3000

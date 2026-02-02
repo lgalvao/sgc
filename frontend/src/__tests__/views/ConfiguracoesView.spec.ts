@@ -1,8 +1,9 @@
-import {describe, expect, it, vi} from 'vitest'
+import {describe, expect, it, vi, beforeEach} from 'vitest'
 import {mount} from '@vue/test-utils'
 import {createTestingPinia} from '@pinia/testing'
 import ConfiguracoesView from '@/views/ConfiguracoesView.vue'
 import {useConfiguracoesStore} from '@/stores/configuracoes'
+import {usePerfilStore} from '@/stores/perfil'
 
 // Mock dependencies
 const { mockApiClient } = vi.hoisted(() => {
@@ -28,8 +29,18 @@ vi.mock('@/stores/feedback', () => ({
   }))
 }))
 
+vi.mock('@/services/administradorService', () => ({
+  listarAdministradores: vi.fn().mockResolvedValue([]),
+  adicionarAdministrador: vi.fn().mockResolvedValue({}),
+  removerAdministrador: vi.fn().mockResolvedValue({})
+}))
+
 describe('ConfiguracoesView.vue', () => {
-  it('renders correctly and loads data', async () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('renderiza corretamente e carrega dados', async () => {
     const wrapper = mount(ConfiguracoesView, {
       global: {
         plugins: [createTestingPinia({
@@ -39,6 +50,9 @@ describe('ConfiguracoesView.vue', () => {
               parametros: [],
               loading: false,
               error: null
+            },
+            perfil: {
+              isAdmin: false
             }
           }
         })]
@@ -46,40 +60,40 @@ describe('ConfiguracoesView.vue', () => {
     })
 
     const store = useConfiguracoesStore()
+    await wrapper.vm.$nextTick()
+    
+    // Verifica se a ação foi chamada durante onMounted
     expect(store.carregarConfiguracoes).toHaveBeenCalled()
     expect(wrapper.text()).toContain('Configurações do Sistema')
   })
 
-  it('updates form values from store', async () => {
+  it('atualiza valores do formulário da store', async () => {
     const wrapper = mount(ConfiguracoesView, {
       global: {
         plugins: [createTestingPinia({
           createSpy: vi.fn,
+          stubActions: false, // Permite que os getters funcionem com os dados reais
           initialState: {
             configuracoes: {
               parametros: [
-                  { id: 1, chave: 'DIAS_INATIVACAO_PROCESSO', valor: '45' },
-                  { id: 2, chave: 'DIAS_ALERTA_NOVO', valor: '10' }
+                  { codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Dias', valor: '45' },
+                  { codigo: 2, chave: 'DIAS_ALERTA_NOVO', descricao: 'Dias', valor: '10' }
               ],
               loading: false,
               error: null
+            },
+            perfil: {
+              isAdmin: false
             }
-          },
-          stubActions: false
-        })],
-        stubs: {
-            // Fix: bind $attrs to ensure ID is passed to the input element
-            BFormInput: {
-                template: '<input v-bind="$attrs" :value="modelValue" @input="$emit(\'update:modelValue\', Number($event.target.value))" />',
-                props: ['modelValue']
-            }
-        }
+          }
+        })]
       }
     })
 
-    await new Promise(resolve => setTimeout(resolve, 0));
+    // Aguardar que onMounted processe e atualize o formulário
+    await wrapper.vm.$nextTick()
+    await new Promise(resolve => setTimeout(resolve, 10))
 
-    // Now find by ID should work because $attrs passes the ID to the root element of the stub
     const input1 = wrapper.find('#diasInativacao').element as HTMLInputElement
     const input2 = wrapper.find('#diasAlertaNovo').element as HTMLInputElement
 

@@ -5,8 +5,14 @@ import {createTestingPinia} from '@pinia/testing';
 import CadProcesso from '@/views/CadProcesso.vue';
 import {useProcessosStore} from '@/stores/processos';
 import {useUnidadesStore} from '@/stores/unidades';
-import * as processoService from "@/services/processoService";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+
+// Mock processoService
+vi.mock('@/services/processoService', () => ({
+    criarProcesso: vi.fn(),
+    atualizarProcesso: vi.fn(),
+    excluirProcesso: vi.fn(),
+}));
 
 // Mock router
 const { mockPush, mockRoute } = vi.hoisted(() => {
@@ -44,6 +50,7 @@ describe('CadProcesso.vue', () => {
     const context = setupComponentTest();
     let processosStore: any;
     let unidadesStore: any;
+    let processoService: any;
 
     const createWrapper = (initialState = {}) => {
         context.wrapper = mount(CadProcesso, {
@@ -95,9 +102,12 @@ describe('CadProcesso.vue', () => {
         return { wrapper: context.wrapper, processosStore, unidadesStore };
     };
 
-    beforeEach(() => {
+    beforeEach(async () => {
         vi.clearAllMocks();
         mockRoute.query = {};
+
+        // Importar o mock do service
+        processoService = await import('@/services/processoService');
 
         // Mock window.scrollTo
         window.scrollTo = vi.fn();
@@ -284,15 +294,16 @@ describe('CadProcesso.vue', () => {
     });
 
     it('removes a process', async () => {
-        const { wrapper } = createWrapper();
-        vi.spyOn(processoService, 'excluirProcesso').mockResolvedValue(undefined);
+        const { wrapper, processosStore } = createWrapper();
+        processosStore.removerProcesso.mockResolvedValue(undefined);
 
         wrapper.vm.processoEditando = { codigo: 123 };
         wrapper.vm.mostrarModalRemocao = true;
 
         await wrapper.vm.confirmarRemocao();
+        await flushPromises();
 
-        expect(processoService.excluirProcesso).toHaveBeenCalledWith(123);
+        expect(processosStore.removerProcesso).toHaveBeenCalledWith(123);
         expect(mockPush).toHaveBeenCalledWith('/painel');
     });
 
@@ -342,8 +353,8 @@ describe('CadProcesso.vue', () => {
     });
 
     it('handles error when removing a process', async () => {
-         const { wrapper } = createWrapper();
-         vi.spyOn(processoService, 'excluirProcesso').mockRejectedValue(new Error('Erro Remocao'));
+         const { wrapper, processosStore } = createWrapper();
+         processosStore.removerProcesso.mockRejectedValue(new Error('Erro Remocao'));
 
          wrapper.vm.processoEditando = { codigo: 123 };
          wrapper.vm.mostrarModalRemocao = true;

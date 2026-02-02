@@ -125,7 +125,7 @@ describe("useProcessosStore", () => {
                 await context.store.buscarContextoCompleto(1);
 
                 expect(processoService.buscarContextoCompleto).toHaveBeenCalledWith(1);
-                expect(context.store.processoDetalhe).toEqual(MOCK_PROCESSO_DETALHE);
+                expect(context.store.processoDetalhe).toEqual(mockData);
                 expect(context.store.subprocessosElegiveis).toEqual([{ codigo: 1 }]);
             });
 
