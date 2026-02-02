@@ -140,7 +140,7 @@ describe('SubprocessoView.vue', () => {
         await (processoService.reabrirCadastro as any)(cod, just);
         feedbackStore.show('Cadastro reaberto', 'O cadastro foi reaberto com sucesso', 'success');
         return true;
-      } catch (error) {
+      } catch {
         feedbackStore.show('Erro', 'Não foi possível reabrir o cadastro', 'danger');
         return false;
       }
@@ -150,7 +150,7 @@ describe('SubprocessoView.vue', () => {
         await (processoService.reabrirRevisaoCadastro as any)(cod, just);
         feedbackStore.show('Revisão reaberta', 'A revisão foi reaberta com sucesso', 'success');
         return true;
-      } catch (error) {
+      } catch {
         feedbackStore.show('Erro', 'Não foi possível reabrir a revisão', 'danger');
         return false;
       }
@@ -162,7 +162,7 @@ describe('SubprocessoView.vue', () => {
         await (processoService.enviarLembrete as any)(codProcesso, codUnidade);
         feedbackStore.show('Lembrete enviado', 'O lembrete foi enviado com sucesso', 'success');
         return true;
-      } catch (error) {
+      } catch {
         feedbackStore.show('Erro', 'Não foi possível enviar o lembrete', 'danger');
         return false;
       }

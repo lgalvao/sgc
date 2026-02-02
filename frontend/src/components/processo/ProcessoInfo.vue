@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-const props = withDefaults(
+withDefaults(
   defineProps<{
     tipoLabel?: string;
     situacaoLabel?: string;
@@ -28,6 +28,10 @@ const props = withDefaults(
     showUnidades?: boolean;
   }>(),
   {
+    tipoLabel: '',
+    situacaoLabel: '',
+    dataLimite: '',
+    numUnidades: 0,
     showTipo: true,
     showSituacao: true,
     showDataLimite: true,

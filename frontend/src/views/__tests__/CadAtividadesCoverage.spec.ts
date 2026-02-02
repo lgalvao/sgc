@@ -3,6 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import CadAtividades from "@/views/CadAtividades.vue";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useAtividadesStore} from "@/stores/atividades";
+import {useAnalisesStore} from "@/stores/analises";
 import {useFeedbackStore} from "@/stores/feedback";
 import * as subprocessoService from "@/services/subprocessoService";
 import {createTestingPinia} from "@pinia/testing";
@@ -106,6 +107,9 @@ describe("CadAtividadesCoverage.spec.ts", () => {
 
         const atividadesStore = useAtividadesStore(pinia) as any;
         atividadesStore.removerConhecimento.mockResolvedValue({});
+
+        const analisesStore = useAnalisesStore(pinia) as any;
+        analisesStore.obterAnalisesPorSubprocesso.mockReturnValue([]);
 
         const feedbackStore = useFeedbackStore(pinia) as any;
 
