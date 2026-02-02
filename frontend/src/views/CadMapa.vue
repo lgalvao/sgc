@@ -88,7 +88,6 @@
 
 <script lang="ts" setup>
 import {BButton, BContainer,} from "bootstrap-vue-next";
-import EmptyState from "@/components/EmptyState.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
 import ErrorAlert from "@/components/common/ErrorAlert.vue";
@@ -103,7 +102,6 @@ import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
 import type {Atividade, Competencia} from "@/types/tipos";
-import CompetenciaCard from "@/components/CompetenciaCard.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 
 // Lazy loading de componentes pesados ou modais
