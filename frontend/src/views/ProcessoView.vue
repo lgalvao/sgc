@@ -1,17 +1,9 @@
 <template>
   <BContainer class="mt-4">
-    <BAlert
-        v-if="processosStore.lastError"
-        :model-value="true"
-        variant="danger"
-        dismissible
-        @dismissed="processosStore.clearError()"
-    >
-      {{ processosStore.lastError.message }}
-      <div v-if="processosStore.lastError.details">
-        <small>Detalhes: {{ processosStore.lastError.details }}</small>
-      </div>
-    </BAlert>
+    <ErrorAlert
+        :error="processosStore.lastError"
+        @dismiss="processosStore.clearError()"
+    />
 
     <div v-if="processo">
       <PageHeader :title="processo.descricao" title-test-id="processo-info">
@@ -23,10 +15,11 @@
           >
             Detalhes do processo
           </BBadge>
-          <div class="mb-4 mt-1">
-            <strong>Tipo:</strong> {{ formatarTipoProcesso(processo.tipo) }}<br>
-            <strong>Situação:</strong> {{ formatarSituacaoProcesso(processo.situacao) }}<br>
-          </div>
+          <ProcessoInfo
+              :tipo="processo.tipo"
+              :situacao="processo.situacao"
+              :show-data-limite="false"
+          />
         </template>
         <template #actions>
           <BButton v-if="mostrarBotoesBloco && podeAceitarBloco" variant="success" @click="abrirModalBloco('aceitar')">
@@ -105,9 +98,10 @@ import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ProcessoAcoes from "@/components/ProcessoAcoes.vue";
 import TreeTable from "@/components/TreeTableView.vue";
+import ErrorAlert from "@/components/common/ErrorAlert.vue";
+import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 
 import {usePerfilStore} from "@/stores/perfil";
-import {formatarSituacaoProcesso, formatarTipoProcesso} from "@/utils/formatters";
 import {useProcessosStore} from "@/stores/processos";
 import {useFeedbackStore} from "@/stores/feedback";
 import type {Processo, UnidadeParticipante} from "@/types/tipos";
