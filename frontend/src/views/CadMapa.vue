@@ -36,51 +36,16 @@
         @dismiss="mapasStore.clearError()"
     />
 
-
-    <div v-if="unidade">
-      <div v-if="competencias.length === 0" class="mb-4 mt-3">
-        <EmptyState
-            icon="bi-journal-plus"
-            title="Mapa de competências"
-            description="Nenhuma competência cadastrada para esta unidade."
-        >
-          <BButton
-              v-if="podeEditarMapa"
-              data-testid="btn-abrir-criar-competencia-empty"
-              variant="primary"
-              @click="abrirModalCriarLimpo"
-          >
-            <i aria-hidden="true" class="bi bi-plus-lg me-2"/> Criar primeira competência
-          </BButton>
-        </EmptyState>
-      </div>
-
-      <div v-else class="mb-4 mt-3">
-        <BButton
-            v-if="podeEditarMapa"
-            class="mb-3"
-            data-testid="btn-abrir-criar-competencia"
-            variant="outline-primary"
-            @click="abrirModalCriarLimpo"
-        >
-          <i aria-hidden="true" class="bi bi-plus-lg"/> Criar competência
-        </BButton>
-
-        <CompetenciaCard
-            v-for="comp in competencias"
-            :key="comp.codigo"
-            :atividades="atividades"
-            :competencia="comp"
-            :pode-editar="podeEditarMapa"
-            @editar="iniciarEdicaoCompetencia"
-            @excluir="excluirCompetencia"
-            @remover-atividade="removerAtividadeAssociada"
-        />
-      </div>
-    </div>
-    <div v-else>
-      <p>Unidade não encontrada.</p>
-    </div>
+    <CompetenciasListSection
+        :unidade="unidade"
+        :competencias="competencias"
+        :atividades="atividades"
+        :pode-editar="podeEditarMapa"
+        @criar="abrirModalCriarLimpo"
+        @editar="iniciarEdicaoCompetencia"
+        @excluir="excluirCompetencia"
+        @remover-atividade="removerAtividadeAssociada"
+    />
 
     <CriarCompetenciaModal
         :atividades="atividades"
@@ -127,6 +92,7 @@ import EmptyState from "@/components/EmptyState.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
 import ErrorAlert from "@/components/common/ErrorAlert.vue";
+import CompetenciasListSection from "@/components/mapa/CompetenciasListSection.vue";
 import {storeToRefs} from "pinia";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
