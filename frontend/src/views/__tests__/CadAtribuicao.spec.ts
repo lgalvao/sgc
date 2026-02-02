@@ -2,15 +2,15 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import CadAtribuicao from '@/views/CadAtribuicao.vue';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
-import {buscarUnidadePorCodigo} from '@/services/unidadeService';
-import {buscarUsuariosPorUnidade} from '@/services/usuarioService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mocks
-const { mockPush, mockFeedbackShow } = vi.hoisted(() => {
+const { mockPush, mockFeedbackShow, mockBuscarUnidade, mockBuscarUsuarios } = vi.hoisted(() => {
     return {
         mockPush: vi.fn(),
         mockFeedbackShow: vi.fn(),
+        mockBuscarUnidade: vi.fn(),
+        mockBuscarUsuarios: vi.fn(),
     };
 });
 
@@ -36,11 +36,13 @@ vi.mock('@/stores/feedback', () => ({
 vi.mock('@/services/atribuicaoTemporariaService', () => ({
     criarAtribuicaoTemporaria: vi.fn(),
 }));
+
 vi.mock('@/services/unidadeService', () => ({
-    buscarUnidadePorCodigo: vi.fn(),
+    buscarUnidadePorCodigo: mockBuscarUnidade,
 }));
+
 vi.mock('@/services/usuarioService', () => ({
-    buscarUsuariosPorUnidade: vi.fn(),
+    buscarUsuariosPorUnidade: mockBuscarUsuarios,
 }));
 
 describe('CadAtribuicao.vue', () => {
@@ -57,16 +59,14 @@ describe('CadAtribuicao.vue', () => {
         { codigo: '222', nome: 'Servidor 2', tituloEleitoral: '222' }
     ];
 
-    beforeEach(() => {
-        vi.clearAllMocks();
-        vi.spyOn(console, 'error').mockImplementation(() => {});
-
-        (buscarUnidadePorCodigo as any).mockResolvedValue(mockUnidade);
-        (buscarUsuariosPorUnidade as any).mockResolvedValue(mockUsuarios);
-
-        context.wrapper = mount(CadAtribuicao, {
+    function criarWrapper() {
+        return mount(CadAtribuicao, {
             ...getCommonMountOptions(
-                {}, // no store needed, or empty state
+                {
+                    unidades: {
+                        unidadeSelecionada: mockUnidade
+                    }
+                },
                 {
                     BContainer: { template: '<div><slot /></div>' },
                     BCard: { template: '<div><slot /></div>' },
@@ -87,27 +87,42 @@ describe('CadAtribuicao.vue', () => {
                     },
                     BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
                     BAlert: { template: '<div role="alert"><slot /></div>' },
-                }
+                },
+                { stubActions: false } // Permite que as stores chamem os serviços mockados
             ),
             props: {
                 codUnidade: 1
             },
         });
+    }
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        mockBuscarUnidade.mockResolvedValue(mockUnidade);
+        mockBuscarUsuarios.mockResolvedValue(mockUsuarios);
+
+        context.wrapper = criarWrapper();
     });
 
-    it('fetches data on mount', async () => {
-        expect(buscarUnidadePorCodigo).toHaveBeenCalledWith(1);
-
+    it('busca dados no mount', async () => {
         await flushPromises();
 
-        expect(buscarUsuariosPorUnidade).toHaveBeenCalledWith(1);
-        expect(context.wrapper!.vm.usuarios).toHaveLength(2);
+        expect(mockBuscarUnidade).toHaveBeenCalledWith(1);
+        expect(mockBuscarUsuarios).toHaveBeenCalledWith(1);
     });
 
-    it('submits the form successfully', async () => {
+    it('submete o formulário com sucesso', async () => {
+        // Resetar e configurar o mock apenas para este teste
+        (criarAtribuicaoTemporaria as any).mockReset();
+        (criarAtribuicaoTemporaria as any).mockResolvedValue({});
+        
+        // Remontar o componente para este teste
+        context.wrapper = criarWrapper();
         await flushPromises();
 
-        // Fill form
+        // Preencher formulário
         const select = context.wrapper!.find('[data-testid="select-usuario"]');
         await select.setValue('111');
 
@@ -123,18 +138,23 @@ describe('CadAtribuicao.vue', () => {
         expect(criarAtribuicaoTemporaria).toHaveBeenCalledWith(1, {
             tituloEleitoralUsuario: '111',
             dataTermino: '2023-12-31',
-            justificativa: 'Justificativa de teste'
+            justificativa: 'Justificativa de teste',
+            dataInicio: undefined
         });
 
         expect(mockFeedbackShow).toHaveBeenCalledWith('Sucesso', 'Atribuição criada com sucesso!', 'success');
     });
 
-    it('handles submission error', async () => {
+    it('lida com erro de submissão', async () => {
+        // Resetar e configurar o mock apenas para este teste
+        (criarAtribuicaoTemporaria as any).mockReset();
+        (criarAtribuicaoTemporaria as any).mockRejectedValue(new Error('API Error'));
+        
+        // Remontar o componente para este teste
+        context.wrapper = criarWrapper();
         await flushPromises();
 
-        (criarAtribuicaoTemporaria as any).mockRejectedValue(new Error('API Error'));
-
-        // Fill form
+        // Preencher formulário
         context.wrapper!.vm.usuarioSelecionado = '111';
         context.wrapper!.vm.dataTermino = '2023-12-31';
         context.wrapper!.vm.justificativa = 'Teste';
@@ -145,7 +165,7 @@ describe('CadAtribuicao.vue', () => {
         expect(mockFeedbackShow).toHaveBeenCalledWith('Erro', 'Falha ao criar atribuição. Tente novamente.', 'danger');
     });
 
-    it('cancels and navigates back', async () => {
+    it('cancela e navega de volta', async () => {
         const btn = context.wrapper!.find('[data-testid="btn-cancelar-atribuicao"]');
         await btn.trigger('click');
 

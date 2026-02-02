@@ -98,7 +98,7 @@ describe("VisAtividades.vue Coverage", () => {
                 BContainer: { template: '<div><slot/></div>' },
                 BCard: { template: '<div><slot/></div>' },
                 BCardBody: { template: '<div><slot/></div>' },
-                PageHeader: { template: '<div><slot name="subtitle"/><slot name="actions"/></div>' },
+                PageHeader: { template: '<div><slot/><slot name="subtitle"/><slot name="actions"/></div>' },
                 BButton: { template: '<button @click="$emit(\'click\')"><slot/></button>' },
                 BFormGroup: { template: '<div><slot/></div>' },
                 BFormTextarea: { template: '<textarea></textarea>' }
@@ -122,6 +122,19 @@ describe("VisAtividades.vue Coverage", () => {
                         ]
                     }
                 ]
+            },
+            processos: {
+                processoDetalhe: {
+                    codigo: 1,
+                    tipo: TipoProcesso.REVISAO,
+                    unidades: [
+                        {
+                            sigla: "NESTED",
+                            codSubprocesso: 10,
+                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                        }
+                    ]
+                }
             }
         };
 
