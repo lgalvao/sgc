@@ -31,18 +31,10 @@
       </template>
     </PageHeader>
 
-    <BAlert
-        v-if="mapasStore.lastError"
-        :model-value="true"
-        variant="danger"
-        dismissible
-        @dismissed="mapasStore.clearError()"
-    >
-      {{ mapasStore.lastError.message }}
-      <div v-if="mapasStore.lastError.details">
-        <small>Detalhes: {{ mapasStore.lastError.details }}</small>
-      </div>
-    </BAlert>
+    <ErrorAlert
+        :error="mapasStore.lastError"
+        @dismiss="mapasStore.clearError()"
+    />
 
 
     <div v-if="unidade">
@@ -134,6 +126,7 @@ import {BAlert, BButton, BContainer,} from "bootstrap-vue-next";
 import EmptyState from "@/components/EmptyState.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
+import ErrorAlert from "@/components/common/ErrorAlert.vue";
 import {storeToRefs} from "pinia";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
