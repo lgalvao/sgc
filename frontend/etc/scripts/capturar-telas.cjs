@@ -45,7 +45,7 @@ if (!CATEGORIES.hasOwnProperty(category)) {
 }
 
 const pattern = CATEGORIES[category];
-const screenshotsDir = path.join(__dirname, '../../screenshots');
+const screenshotsDir = path.join(__dirname, '../../../screenshots');
 
 // Limpar screenshots se for 'all' (comportamento do script original capturar-telas.sh)
 if (category === 'all') {
@@ -78,7 +78,7 @@ console.log(`Executando: ${npx} ${cmdArgs.join(' ')}`);
 
 const child = spawn(npx, cmdArgs, {
     stdio: 'inherit',
-    cwd: path.join(__dirname, '../../') // Root of project
+    cwd: path.join(__dirname, '../../../') // Root of project
 });
 
 child.on('close', (code) => {

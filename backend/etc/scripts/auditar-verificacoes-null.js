@@ -6,8 +6,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const SOURCE_DIR = path.join(__dirname, '../../src/main/java/sgc');
-const AUDIT_FILE = path.join(__dirname, '../../null-checks-audit.txt');
-const ANALYSIS_FILE = path.join(__dirname, '../../null-checks-analysis.md');
+const AUDIT_FILE = path.join(__dirname, '../../../null-checks-audit.txt');
+const ANALYSIS_FILE = path.join(__dirname, '../../../null-checks-analysis.md');
 
 function getAllFiles(dirPath, arrayOfFiles) {
     const files = fs.readdirSync(dirPath);

@@ -148,7 +148,17 @@ Para detalhes técnicos e exemplos de código, consulte:
     * `README.md` de cada módulo e diretório para responsabilidades específicas
     * `package-info.java` em cada pacote para documentação detalhada
 
-## 7. Navegação da Documentação
+## 7. Habilidades do Agente (Skills)
+
+Este projeto utiliza um sistema de **Skills** para o agente Jules, permitindo a execução de tarefas complexas de auditoria e manutenção de forma padronizada.
+
+As definições de skills estão em `.jules/skills/`:
+* **[Auditoria de Qualidade Backend](/.jules/skills/audit-qualidade-backend.md)**: Cobertura, complexidade e null-checks.
+* **[Auditoria de Qualidade Frontend](/.jules/skills/audit-qualidade-frontend.md)**: Cobertura, acessibilidade e validações.
+* **[Gestão de Testes](/.jules/skills/gestao-testes.md)**: Análise e priorização de testes unitários.
+* **[Utilitários e Ambiente](/.jules/skills/utilitarios.md)**: Screenshots, manutenção e correções de ambiente.
+
+## 8. Navegação da Documentação
 
 Para um índice completo e organizado de toda a documentação do projeto, consulte:
 

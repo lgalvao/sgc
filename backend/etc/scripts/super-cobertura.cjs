@@ -36,6 +36,7 @@ async function main() {
 
     if (!fs.existsSync(REPORT_PATH)) {
         console.error(`❌ Relatório não encontrado: ${REPORT_PATH}`);
+        console.error("💡 Execute './gradlew :backend:test :backend:jacocoTestReport' primeiro para gerar o relatório.");
         process.exit(1);
     }
 

@@ -2,8 +2,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const SOURCE_DIR = path.join(__dirname, '../../backend/src/main/java/sgc');
-const AUDIT_FILE = path.join(__dirname, '../../view-validations-audit.md');
+const SOURCE_DIR = path.join(__dirname, '../../../backend/src/main/java/sgc');
+const AUDIT_FILE = path.join(__dirname, '../../../view-validations-audit.md');
 
 const GUARANTEED_FIELDS = [
     // Unidade
