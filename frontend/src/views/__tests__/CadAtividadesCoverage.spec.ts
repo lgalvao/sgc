@@ -102,6 +102,7 @@ describe("CadAtividadesCoverage.spec.ts", () => {
 
         const subprocessosStore = useSubprocessosStore(pinia) as any;
         subprocessosStore.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(123);
+        subprocessosStore.validarCadastro.mockImplementation((cod: number) => subprocessoService.validarCadastro(cod));
 
         const atividadesStore = useAtividadesStore(pinia) as any;
         atividadesStore.removerConhecimento.mockResolvedValue({});
