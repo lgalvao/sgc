@@ -5,6 +5,8 @@ import {useMapasStore} from '@/stores/mapas';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useFeedbackStore} from '@/stores/feedback';
 import {diagnosticoService} from '@/services/diagnosticoService';
+import * as mapaService from '@/services/mapaService';
+import * as unidadeService from '@/services/unidadeService';
 import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
 
 // Mocks
@@ -32,6 +34,14 @@ vi.mock('@/services/diagnosticoService', () => ({
   },
 }));
 
+vi.mock('@/services/mapaService', () => ({
+  obterMapaCompleto: vi.fn(),
+}));
+
+vi.mock('@/services/unidadeService', () => ({
+  buscarUnidade: vi.fn(),
+}));
+
 describe('AutoavaliacaoDiagnostico.vue', () => {
   const ctx = setupComponentTest();
   let mapasStore: any;
@@ -44,7 +54,8 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
   ];
 
   const mockAvaliacoes = [
-    { competenciaCodigo: 1, importancia: 'N5', dominio: 'N3', observacoes: 'Obs 1' }
+    { competenciaCodigo: 1, importancia: 'N5', dominio: 'N3', observacoes: 'Obs 1' },
+    { competenciaCodigo: 2, importancia: '', dominio: '', observacoes: '' }
   ];
 
   const stubs = {
@@ -71,48 +82,29 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     (diagnosticoService.buscarMinhasAvaliacoes as any).mockResolvedValue(mockAvaliacoes);
     (diagnosticoService.salvarAvaliacao as any).mockResolvedValue({});
     (diagnosticoService.concluirAutoavaliacao as any).mockResolvedValue({});
+    (mapaService.obterMapaCompleto as any).mockResolvedValue({ competencias: mockCompetencias });
+    (unidadeService.buscarUnidade as any).mockResolvedValue({ nome: 'Unidade Teste' });
 
-    const mountOptions = getCommonMountOptions({
-      mapas: {
-        mapaCompleto: null, // Start with null, will be populated by store action
-      },
-      unidades: {
-        unidade: null, // Start with null
-      },
-      diagnosticos: {
-        avaliacoes: [], // Start empty
-      },
-    }, stubs, { stubActions: false });
+    const mountOptions = getCommonMountOptions({}, stubs, { stubActions: false });
 
     ctx.wrapper = mount(AutoavaliacaoDiagnostico, mountOptions);
 
     mapasStore = useMapasStore();
     unidadesStore = useUnidadesStore();
     feedbackStore = useFeedbackStore();
-
-    // Simulate store actions completing
-    mapasStore.mapaCompleto = { competencias: mockCompetencias };
-    unidadesStore.unidade = { nome: 'Unidade Teste' };
     
     // Wait for all async operations to complete
+    await ctx.wrapper.vm.$nextTick();
     await ctx.wrapper.vm.$nextTick();
   });
 
   it('exibe estado de carregamento inicialmente', async () => {
-    // Component is still loading since onMounted is async
-    // Wait for it to complete
-    await ctx.wrapper!.vm.$nextTick();
-    
-    expect(unidadesStore.buscarUnidade).toHaveBeenCalledWith('TEST');
-    expect(mapasStore.buscarMapaCompleto).toHaveBeenCalledWith(10);
+    expect(unidadeService.buscarUnidade).toHaveBeenCalledWith('TEST');
+    expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(10);
     expect(diagnosticoService.buscarMinhasAvaliacoes).toHaveBeenCalledWith(10, undefined);
   });
   
   it('exibe competências e avaliações existentes', async () => {
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
-
     expect(ctx.wrapper!.text()).toContain('Competencia 1');
     expect(ctx.wrapper!.text()).toContain('Competencia 2');
     
@@ -124,10 +116,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
   });
 
   it('salva avaliação ao alterar', async () => {
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
-
     ctx.wrapper!.vm.avaliacoes[2].importancia = 'N4';
     ctx.wrapper!.vm.avaliacoes[2].dominio = 'N2';
     
@@ -137,10 +125,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
   });
 
   it('salva avaliação ao sair do campo de observação (blur)', async () => {
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
-
     const textarea = ctx.wrapper!.find('[data-testid="txt-obs-1"]');
 
     // Set value triggers input -> v-model update
@@ -154,28 +138,20 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
   });
 
   it('habilita botão de concluir apenas quando todas as competências estão avaliadas', async () => {
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
     
     expect(ctx.wrapper!.vm.podeConcluir).toBe(false);
     
     ctx.wrapper!.vm.avaliacoes[2].importancia = 'N4';
     ctx.wrapper!.vm.avaliacoes[2].dominio = 'N2';
     
-    await ctx.wrapper!.vm.$nextTick();
     expect(ctx.wrapper!.vm.podeConcluir).toBe(true);
   });
 
   it('conclui autoavaliação', async () => {
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
     
     ctx.wrapper!.vm.avaliacoes[2].importancia = 'N4';
     ctx.wrapper!.vm.avaliacoes[2].dominio = 'N2';
     
-    await ctx.wrapper!.vm.$nextTick();
     
     const btn = ctx.wrapper!.find('[data-testid="btn-concluir-autoavaliacao"]');
     await btn.trigger('click');
@@ -198,20 +174,14 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
 
     ctx.wrapper = mount(AutoavaliacaoDiagnostico, emptyMountOptions);
     
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
     
     // Set loading to false manually to see the "empty" state
     ctx.wrapper!.vm.loading = false;
-    await ctx.wrapper!.vm.$nextTick();
 
     expect(ctx.wrapper!.text()).toContain('Nenhuma competência encontrada');
   });
 
   it('não salva quando campos estão vazios', async () => {
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
 
     // Call salvar with empty values - should return early
     await ctx.wrapper!.vm.salvar(1, '', 'N3');
@@ -222,9 +192,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
   });
 
   it('exibe erro ao falhar salvamento de avaliação', async () => {
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
 
     (diagnosticoService.salvarAvaliacao as any).mockRejectedValueOnce({
       response: { data: { message: 'Erro de validação' } }
@@ -236,15 +203,11 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
   });
 
   it('exibe erro ao falhar conclusão de autoavaliação', async () => {
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
 
     ctx.wrapper!.vm.avaliacoes[1].importancia = 'N5';
     ctx.wrapper!.vm.avaliacoes[1].dominio = 'N3';
     ctx.wrapper!.vm.avaliacoes[2].importancia = 'N4';
     ctx.wrapper!.vm.avaliacoes[2].dominio = 'N2';
-    await ctx.wrapper!.vm.$nextTick();
 
     (diagnosticoService.concluirAutoavaliacao as any).mockRejectedValueOnce({
       response: { data: { message: 'Erro ao finalizar' } }
@@ -257,9 +220,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
   });
 
   it('não conclui quando podeConcluir é false', async () => {
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
 
     // Ensure not all ratings are filled
     expect(ctx.wrapper!.vm.podeConcluir).toBe(false);
@@ -270,9 +230,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
   });
 
   it('trata erro genérico ao salvar avaliação', async () => {
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
 
     (diagnosticoService.salvarAvaliacao as any).mockRejectedValueOnce(new Error('Erro de rede'));
 
@@ -283,15 +240,11 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
   });
 
   it('trata erro genérico ao concluir autoavaliação', async () => {
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
 
     ctx.wrapper!.vm.avaliacoes[1].importancia = 'N5';
     ctx.wrapper!.vm.avaliacoes[1].dominio = 'N3';
     ctx.wrapper!.vm.avaliacoes[2].importancia = 'N4';
     ctx.wrapper!.vm.avaliacoes[2].dominio = 'N2';
-    await ctx.wrapper!.vm.$nextTick();
 
     (diagnosticoService.concluirAutoavaliacao as any).mockRejectedValueOnce(new Error('Erro genérico'));
 
