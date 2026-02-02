@@ -105,10 +105,10 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
     /**
      * Valida que toda unidade ativa tem titular com título eleitoral.
      */
-    @SuppressWarnings("ConstantConditions")
     private void validarTitularesUnidades(List<Unidade> unidades, List<String> violacoes) {
         for (Unidade u : unidades) {
-            if (u.getTituloTitular() == null || u.getTituloTitular().isBlank()) {
+            String titulo = u.getTituloTitular();
+            if (titulo == null || titulo.isBlank()) {
                 violacoes.add("Unidade %s (%s) não possui titular cadastrado".formatted(u.getSigla(), u.getTipo()));
             }
         }
@@ -117,24 +117,21 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
     /**
      * Valida que todos os titulares de unidades têm email cadastrado.
      */
-    @SuppressWarnings("ConstantConditions")
     private void validarEmailsTitulares(List<Unidade> unidades, Map<String, Usuario> usuarios, List<String> violacoes) {
         for (Unidade u : unidades) {
             String tituloTitular = u.getTituloTitular();
-            if (tituloTitular == null || tituloTitular.isBlank()) {
-                continue;
-            }
-
-            Usuario titular = usuarios.get(tituloTitular);
-            if (titular == null) {
-                violacoes.add("Titular da unidade %s (título %s) não encontrado na base de usuários"
-                        .formatted(u.getSigla(), tituloTitular));
-                continue;
-            }
-
-            if (titular.getEmail() == null || titular.getEmail().isBlank()) {
-                violacoes.add("Titular %s da unidade %s não possui email cadastrado"
-                        .formatted(titular.getNome(), u.getSigla()));
+            if (tituloTitular != null && !tituloTitular.isBlank()) {
+                Usuario titular = usuarios.get(tituloTitular);
+                if (titular == null) {
+                    violacoes.add("Titular da unidade %s (título %s) não encontrado na base de usuários"
+                            .formatted(u.getSigla(), tituloTitular));
+                } else {
+                    String email = titular.getEmail();
+                    if (email == null || email.isBlank()) {
+                        violacoes.add("Titular %s da unidade %s não possui email cadastrado"
+                                .formatted(titular.getNome(), u.getSigla()));
+                    }
+                }
             }
         }
     }

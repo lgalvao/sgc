@@ -82,7 +82,11 @@ public class MapaFacade {
         Mapa mapa = mapaManutencaoService.buscarMapaPorCodigo(codMapa);
 
         List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapa(codMapa);
-        return mapaCompletoMapper.toDto(mapa, codSubprocesso, competencias);
+        var dto = mapaCompletoMapper.toDto(mapa, codSubprocesso, competencias);
+        if (dto == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter mapa completo para DTO.");
+        }
+        return dto;
     }
 
     // ===================================================================================

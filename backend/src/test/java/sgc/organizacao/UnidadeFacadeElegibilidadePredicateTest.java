@@ -18,8 +18,8 @@ import sgc.organizacao.service.UnidadeMapaService;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
+import java.util.*;
+import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +50,7 @@ class UnidadeFacadeElegibilidadePredicateTest {
     private UnidadeFacade facade;
 
     @Captor
-    private ArgumentCaptor<Function<Unidade, Boolean>> predicateCaptor;
+    private ArgumentCaptor<Predicate<Unidade>> predicateCaptor;
 
     @Nested
     @DisplayName("Condição 1: Tipo de Unidade")
@@ -67,13 +67,13 @@ class UnidadeFacadeElegibilidadePredicateTest {
             
             // Assert
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
-            Function<Unidade, Boolean> predicate = predicateCaptor.getValue();
+            Predicate<Unidade> predicate = predicateCaptor.getValue();
             
             Unidade unidadeFinal = new Unidade();
             unidadeFinal.setCodigo(1L);
             unidadeFinal.setTipo(TipoUnidade.OPERACIONAL);
             
-            assertThat(predicate.apply(unidadeFinal)).isTrue();
+            assertThat(predicate.test(unidadeFinal)).isTrue();
         }
         
         @Test
@@ -87,13 +87,13 @@ class UnidadeFacadeElegibilidadePredicateTest {
             
             // Assert
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
-            Function<Unidade, Boolean> predicate = predicateCaptor.getValue();
+            Predicate<Unidade> predicate = predicateCaptor.getValue();
             
             Unidade unidadeIntermediaria = new Unidade();
             unidadeIntermediaria.setCodigo(1L);
             unidadeIntermediaria.setTipo(TipoUnidade.INTERMEDIARIA);
             
-            assertThat(predicate.apply(unidadeIntermediaria)).isFalse();
+            assertThat(predicate.test(unidadeIntermediaria)).isFalse();
         }
     }
 
@@ -112,13 +112,13 @@ class UnidadeFacadeElegibilidadePredicateTest {
             
             // Assert
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
-            Function<Unidade, Boolean> predicate = predicateCaptor.getValue();
+            Predicate<Unidade> predicate = predicateCaptor.getValue();
             
             Unidade unidadeSemMapa = new Unidade();
             unidadeSemMapa.setCodigo(1L);
             unidadeSemMapa.setTipo(TipoUnidade.OPERACIONAL);
             
-            assertThat(predicate.apply(unidadeSemMapa)).isTrue();
+            assertThat(predicate.test(unidadeSemMapa)).isTrue();
         }
         
         @Test
@@ -133,13 +133,13 @@ class UnidadeFacadeElegibilidadePredicateTest {
             
             // Assert
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
-            Function<Unidade, Boolean> predicate = predicateCaptor.getValue();
+            Predicate<Unidade> predicate = predicateCaptor.getValue();
             
             Unidade unidadeComMapa = new Unidade();
             unidadeComMapa.setCodigo(1L);
             unidadeComMapa.setTipo(TipoUnidade.OPERACIONAL);
             
-            assertThat(predicate.apply(unidadeComMapa)).isTrue();
+            assertThat(predicate.test(unidadeComMapa)).isTrue();
         }
         
         @Test
@@ -154,13 +154,13 @@ class UnidadeFacadeElegibilidadePredicateTest {
             
             // Assert
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
-            Function<Unidade, Boolean> predicate = predicateCaptor.getValue();
+            Predicate<Unidade> predicate = predicateCaptor.getValue();
             
             Unidade unidadeSemMapa = new Unidade();
             unidadeSemMapa.setCodigo(1L);
             unidadeSemMapa.setTipo(TipoUnidade.OPERACIONAL);
             
-            assertThat(predicate.apply(unidadeSemMapa)).isFalse();
+            assertThat(predicate.test(unidadeSemMapa)).isFalse();
         }
     }
 
@@ -183,13 +183,13 @@ class UnidadeFacadeElegibilidadePredicateTest {
             
             // Assert
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
-            Function<Unidade, Boolean> predicate = predicateCaptor.getValue();
+            Predicate<Unidade> predicate = predicateCaptor.getValue();
             
             Unidade unidadeNaoBloqueada = new Unidade();
             unidadeNaoBloqueada.setCodigo(1L);
             unidadeNaoBloqueada.setTipo(TipoUnidade.OPERACIONAL);
             
-            assertThat(predicate.apply(unidadeNaoBloqueada)).isTrue();
+            assertThat(predicate.test(unidadeNaoBloqueada)).isTrue();
         }
         
         @Test
@@ -207,13 +207,13 @@ class UnidadeFacadeElegibilidadePredicateTest {
             
             // Assert
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
-            Function<Unidade, Boolean> predicate = predicateCaptor.getValue();
+            Predicate<Unidade> predicate = predicateCaptor.getValue();
             
             Unidade unidadeBloqueada = new Unidade();
             unidadeBloqueada.setCodigo(1L);
             unidadeBloqueada.setTipo(TipoUnidade.OPERACIONAL);
             
-            assertThat(predicate.apply(unidadeBloqueada)).isFalse();
+            assertThat(predicate.test(unidadeBloqueada)).isFalse();
         }
     }
 
@@ -233,13 +233,13 @@ class UnidadeFacadeElegibilidadePredicateTest {
             
             // Assert
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
-            Function<Unidade, Boolean> predicate = predicateCaptor.getValue();
+            Predicate<Unidade> predicate = predicateCaptor.getValue();
             
             Unidade unidade = new Unidade();
             unidade.setCodigo(1L);
             unidade.setTipo(TipoUnidade.OPERACIONAL);
             
-            assertThat(predicate.apply(unidade)).isTrue();
+            assertThat(predicate.test(unidade)).isTrue();
         }
         
         @Test
@@ -254,13 +254,13 @@ class UnidadeFacadeElegibilidadePredicateTest {
             
             // Assert
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
-            Function<Unidade, Boolean> predicate = predicateCaptor.getValue();
+            Predicate<Unidade> predicate = predicateCaptor.getValue();
             
             Unidade unidade = new Unidade();
             unidade.setCodigo(1L);
             unidade.setTipo(TipoUnidade.OPERACIONAL);
             
-            assertThat(predicate.apply(unidade)).isFalse();
+            assertThat(predicate.test(unidade)).isFalse();
         }
         
         @Test
@@ -277,13 +277,13 @@ class UnidadeFacadeElegibilidadePredicateTest {
             
             // Assert
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
-            Function<Unidade, Boolean> predicate = predicateCaptor.getValue();
+            Predicate<Unidade> predicate = predicateCaptor.getValue();
             
             Unidade unidade = new Unidade();
             unidade.setCodigo(1L);
             unidade.setTipo(TipoUnidade.OPERACIONAL);
             
-            assertThat(predicate.apply(unidade)).isFalse();
+            assertThat(predicate.test(unidade)).isFalse();
         }
         
         @Test
@@ -298,13 +298,13 @@ class UnidadeFacadeElegibilidadePredicateTest {
             
             // Assert
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
-            Function<Unidade, Boolean> predicate = predicateCaptor.getValue();
+            Predicate<Unidade> predicate = predicateCaptor.getValue();
             
             Unidade unidade = new Unidade();
             unidade.setCodigo(1L);
             unidade.setTipo(TipoUnidade.INTERMEDIARIA);
             
-            assertThat(predicate.apply(unidade)).isFalse();
+            assertThat(predicate.test(unidade)).isFalse();
         }
     }
 }

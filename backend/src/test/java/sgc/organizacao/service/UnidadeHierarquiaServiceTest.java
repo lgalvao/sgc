@@ -13,7 +13,7 @@ import sgc.organizacao.model.UnidadeRepo;
 import sgc.testutils.UnidadeTestBuilder;
 
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -144,7 +144,7 @@ class UnidadeHierarquiaServiceTest {
                     unidadeRaiz, unidadeIntermediaria
             ));
 
-            Function<Unidade, Boolean> elegibilidadeChecker = u -> 
+            Predicate<Unidade> elegibilidadeChecker = u -> 
                     u.getCodigo().equals(1L);
 
             when(usuarioMapper.toUnidadeDto(unidadeRaiz, true))
@@ -167,7 +167,7 @@ class UnidadeHierarquiaServiceTest {
                     unidadeRaiz
             ));
 
-            Function<Unidade, Boolean> todasElegiveis = u -> true;
+            Predicate<Unidade> todasElegiveis = u -> true;
 
             when(usuarioMapper.toUnidadeDto(unidadeRaiz, true))
                     .thenReturn(criarDtoComSubunidades(1L, "SEDOC"));
@@ -185,7 +185,7 @@ class UnidadeHierarquiaServiceTest {
             // Arrange
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz));
 
-            Function<Unidade, Boolean> nenhumaElegivel = u -> false;
+            Predicate<Unidade> nenhumaElegivel = u -> false;
 
             when(usuarioMapper.toUnidadeDto(unidadeRaiz, false))
                     .thenReturn(criarDtoComSubunidades(1L, "SEDOC"));
@@ -218,7 +218,7 @@ class UnidadeHierarquiaServiceTest {
         }
 
         @Test
-        @DisplayName("deve retornar lista vazia quando não há descendentes")
+        @DisplayName("deve retornar lista vazia when não há descendentes")
         void deveRetornarVazioQuandoNaoHaDescendentes() {
             // Arrange
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(
@@ -233,7 +233,7 @@ class UnidadeHierarquiaServiceTest {
         }
 
         @Test
-        @DisplayName("deve retornar apenas filhos diretos quando não há netos")
+        @DisplayName("deve retornar apenas filhos diretos when não há netos")
         void deveRetornarApenasFilhosDiretos() {
             // Arrange
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(
@@ -268,7 +268,7 @@ class UnidadeHierarquiaServiceTest {
         }
 
         @Test
-        @DisplayName("deve retornar lista vazia quando código não está no mapa")
+        @DisplayName("deve retornar lista vazia when código não está no mapa")
         void deveRetornarVazioQuandoCodigoNaoEstaNoMapa() {
             // Arrange
             Map<Long, List<Long>> mapa = new HashMap<>();
@@ -316,7 +316,7 @@ class UnidadeHierarquiaServiceTest {
         }
 
         @Test
-        @DisplayName("deve retornar mapa vazio quando não há unidades")
+        @DisplayName("deve retornar mapa vazio when não há unidades")
         void deveRetornarMapaVazioQuandoNaoHaUnidades() {
             // Arrange
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of());
@@ -371,7 +371,7 @@ class UnidadeHierarquiaServiceTest {
         }
 
         @Test
-        @DisplayName("deve lançar exceção quando unidade não é encontrada")
+        @DisplayName("deve lançar exceção when unidade não é encontrada")
         void deveLancarExcecaoQuandoNaoEncontrada() {
             // Arrange
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz));
@@ -442,7 +442,7 @@ class UnidadeHierarquiaServiceTest {
         }
 
         @Test
-        @DisplayName("deve lançar exceção quando sigla não é encontrada")
+        @DisplayName("deve lançar exceção when sigla não é encontrada")
         void deveLancarExcecaoQuandoSiglaNaoEncontrada() {
             // Arrange
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz));
@@ -458,7 +458,7 @@ class UnidadeHierarquiaServiceTest {
         }
 
         @Test
-        @DisplayName("deve retornar apenas a própria sigla quando não há subordinadas")
+        @DisplayName("deve retornar apenas a própria sigla when não há subordinadas")
         void deveRetornarApenasPropriaSiglaQuandoNaoHaSubordinadas() {
             // Arrange
             Unidade unidadeSemFilhos = UnidadeTestBuilder.operacional().build();
@@ -492,12 +492,11 @@ class UnidadeHierarquiaServiceTest {
             Optional<String> resultado = service.buscarSiglaSuperior("ASSESSORIA_11");
 
             // Assert
-            assertThat(resultado).isPresent();
-            assertThat(resultado.get()).isEqualTo("COORD_11");
+            assertThat(resultado).contains("COORD_11");
         }
 
         @Test
-        @DisplayName("deve retornar Optional vazio quando não há unidade superior")
+        @DisplayName("deve retornar Optional vazio when não há unidade superior")
         void deveRetornarVazioQuandoNaoHaSuperior() {
             // Arrange
             when(unidadeRepo.findBySigla("SEDOC"))
@@ -511,7 +510,7 @@ class UnidadeHierarquiaServiceTest {
         }
 
         @Test
-        @DisplayName("deve lançar exceção quando sigla não existe")
+        @DisplayName("deve lançar exceção when sigla não existe")
         void deveLancarExcecaoQuandoSiglaNaoExiste() {
             // Arrange
             when(unidadeRepo.findBySigla("INEXISTENTE"))
@@ -547,7 +546,7 @@ class UnidadeHierarquiaServiceTest {
         }
 
         @Test
-        @DisplayName("deve retornar lista vazia quando não há subordinadas")
+        @DisplayName("deve retornar lista vazia when não há subordinadas")
         void deveRetornarVazioQuandoNaoHaSubordinadas() {
             // Arrange
             when(unidadeRepo.findByUnidadeSuperiorCodigo(3L))
@@ -619,7 +618,7 @@ class UnidadeHierarquiaServiceTest {
         }
 
         @Test
-        @DisplayName("deve retornar DTO sem modificação quando não há filhas")
+        @DisplayName("deve retornar DTO sem modificação when não há filhas")
         void deveRetornarSemModificacaoQuandoNaoHaFilhas() {
             // Arrange
             UnidadeDto dto = criarDtoComSubunidades(1L, "FOLHA");
@@ -633,7 +632,7 @@ class UnidadeHierarquiaServiceTest {
         }
 
         @Test
-        @DisplayName("deve retornar DTO sem modificação quando lista de filhas é vazia")
+        @DisplayName("deve retornar DTO sem modificação when lista de filhas é vazia")
         void deveRetornarSemModificacaoQuandoListaFilhasVazia() {
             // Arrange
             UnidadeDto dto = criarDtoComSubunidades(1L, "FOLHA");

@@ -10,7 +10,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Serviço especializado para gerenciar a hierarquia de unidades organizacionais.
@@ -48,7 +48,7 @@ public class UnidadeHierarquiaService {
      * @param elegibilidadeChecker função para verificar se unidade é elegível
      * @return lista de unidades raiz com suas subunidades populadas
      */
-    public List<UnidadeDto> buscarArvoreComElegibilidade(Function<Unidade, Boolean> elegibilidadeChecker) {
+    public List<UnidadeDto> buscarArvoreComElegibilidade(Predicate<Unidade> elegibilidadeChecker) {
         List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
         return montarHierarquia(todasUnidades, elegibilidadeChecker);
     }
@@ -155,13 +155,13 @@ public class UnidadeHierarquiaService {
         return montarHierarquia(unidades, null);
     }
 
-    private List<UnidadeDto> montarHierarquia(List<Unidade> unidades, @Nullable Function<Unidade, Boolean> elegibilidadeChecker) {
+    private List<UnidadeDto> montarHierarquia(List<Unidade> unidades, @Nullable Predicate<Unidade> elegibilidadeChecker) {
         Map<Long, UnidadeDto> mapaUnidades = new HashMap<>();
         Map<Long, List<UnidadeDto>> mapaFilhas = new HashMap<>();
         List<UnidadeDto> raizes = new ArrayList<>();
 
         for (Unidade u : unidades) {
-            boolean isElegivel = elegibilidadeChecker != null ? elegibilidadeChecker.apply(u) : true;
+            boolean isElegivel = elegibilidadeChecker == null || elegibilidadeChecker.test(u);
             UnidadeDto dto = usuarioMapper.toUnidadeDto(u, isElegivel);
 
             mapaUnidades.put(u.getCodigo(), dto);
