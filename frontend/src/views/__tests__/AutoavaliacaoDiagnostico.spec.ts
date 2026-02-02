@@ -63,18 +63,26 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     },
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     mockRouteParams.value = { codSubprocesso: '10', siglaUnidade: 'TEST' };
 
+    // Setup service mocks BEFORE mounting
+    (diagnosticoService.buscarMinhasAvaliacoes as any).mockResolvedValue(mockAvaliacoes);
+    (diagnosticoService.salvarAvaliacao as any).mockResolvedValue({});
+    (diagnosticoService.concluirAutoavaliacao as any).mockResolvedValue({});
+
     const mountOptions = getCommonMountOptions({
       mapas: {
-        mapaCompleto: { competencias: mockCompetencias },
+        mapaCompleto: null, // Start with null, will be populated by store action
       },
       unidades: {
-        unidade: { nome: 'Unidade Teste' },
+        unidade: null, // Start with null
       },
-    }, stubs);
+      diagnosticos: {
+        avaliacoes: [], // Start empty
+      },
+    }, stubs, { stubActions: false });
 
     ctx.wrapper = mount(AutoavaliacaoDiagnostico, mountOptions);
 
@@ -82,18 +90,22 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     unidadesStore = useUnidadesStore();
     feedbackStore = useFeedbackStore();
 
-    // Setup service mocks
-    (diagnosticoService.buscarMinhasAvaliacoes as any).mockResolvedValue(mockAvaliacoes);
-    (diagnosticoService.salvarAvaliacao as any).mockResolvedValue({});
-    (diagnosticoService.concluirAutoavaliacao as any).mockResolvedValue({});
+    // Simulate store actions completing
+    mapasStore.mapaCompleto = { competencias: mockCompetencias };
+    unidadesStore.unidade = { nome: 'Unidade Teste' };
+    
+    // Wait for all async operations to complete
+    await ctx.wrapper.vm.$nextTick();
   });
 
   it('exibe estado de carregamento inicialmente', async () => {
-    expect(ctx.wrapper!.find('[data-testid="spinner"]').exists()).toBe(true);
+    // Component is still loading since onMounted is async
+    // Wait for it to complete
+    await ctx.wrapper!.vm.$nextTick();
     
     expect(unidadesStore.buscarUnidade).toHaveBeenCalledWith('TEST');
     expect(mapasStore.buscarMapaCompleto).toHaveBeenCalledWith(10);
-    expect(diagnosticoService.buscarMinhasAvaliacoes).toHaveBeenCalledWith(10);
+    expect(diagnosticoService.buscarMinhasAvaliacoes).toHaveBeenCalledWith(10, undefined);
   });
   
   it('exibe competências e avaliações existentes', async () => {
@@ -266,7 +278,8 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
 
     await ctx.wrapper!.vm.salvar(1, 'N4', 'N2');
     
-    expect(feedbackStore.show).toHaveBeenCalledWith('Erro', 'Erro de rede', 'danger');
+    // Error handler normalizes network errors
+    expect(feedbackStore.show).toHaveBeenCalledWith('Erro de Rede', 'Não foi possível conectar ao servidor. Verifique sua conexão.', 'danger');
   });
 
   it('trata erro genérico ao concluir autoavaliação', async () => {

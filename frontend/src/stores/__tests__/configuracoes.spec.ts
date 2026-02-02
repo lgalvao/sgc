@@ -1,46 +1,40 @@
 import {createPinia, setActivePinia} from 'pinia';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useConfiguracoesStore} from '../configuracoes';
+import * as configuracaoService from '@/services/configuracaoService';
 
-// Mock API Client
-vi.mock('@/axios-setup', () => ({
-    apiClient: {
-        get: vi.fn(),
-        post: vi.fn()
-    }
+// Mock configuracaoService
+vi.mock('@/services/configuracaoService', () => ({
+    buscarConfiguracoes: vi.fn(),
+    salvarConfiguracoes: vi.fn()
 }));
 
 describe('Configuracoes Store', () => {
     let store: ReturnType<typeof useConfiguracoesStore>;
-    let apiClient: any;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         setActivePinia(createPinia());
         store = useConfiguracoesStore();
-
-        // Reset mocks and re-import apiClient
         vi.clearAllMocks();
         vi.spyOn(console, 'error').mockImplementation(() => {});
-        const axiosSetup = await import('@/axios-setup');
-        apiClient = axiosSetup.apiClient;
     });
 
     it('carregarConfiguracoes deve preencher parametros em caso de sucesso', async () => {
         const mockData = [
             { id: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '60' }
         ];
-        apiClient.get.mockResolvedValue({ data: mockData });
+        vi.mocked(configuracaoService.buscarConfiguracoes).mockResolvedValue(mockData);
 
         await store.carregarConfiguracoes();
 
-        expect(apiClient.get).toHaveBeenCalledWith('/configuracoes');
+        expect(configuracaoService.buscarConfiguracoes).toHaveBeenCalled();
         expect(store.parametros).toEqual(mockData);
         expect(store.error).toBeNull();
         expect(store.loading).toBe(false);
     });
 
     it('carregarConfiguracoes deve definir erro em caso de falha', async () => {
-        apiClient.get.mockRejectedValue(new Error('Erro API'));
+        vi.mocked(configuracaoService.buscarConfiguracoes).mockRejectedValue(new Error('Erro API'));
 
         await store.carregarConfiguracoes();
 
@@ -53,11 +47,11 @@ describe('Configuracoes Store', () => {
         const novosParametros = [
             { id: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '90' }
         ];
-        apiClient.post.mockResolvedValue({ data: novosParametros });
+        vi.mocked(configuracaoService.salvarConfiguracoes).mockResolvedValue(novosParametros);
 
         const result = await store.salvarConfiguracoes(novosParametros);
 
-        expect(apiClient.post).toHaveBeenCalledWith('/configuracoes', novosParametros);
+        expect(configuracaoService.salvarConfiguracoes).toHaveBeenCalledWith(novosParametros);
         expect(store.parametros).toEqual(novosParametros);
         expect(result).toBe(true);
         expect(store.error).toBeNull();
@@ -67,7 +61,7 @@ describe('Configuracoes Store', () => {
         const novosParametros = [
             { id: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '90' }
         ];
-        apiClient.post.mockRejectedValue(new Error('Erro API'));
+        vi.mocked(configuracaoService.salvarConfiguracoes).mockRejectedValue(new Error('Erro API'));
 
         const result = await store.salvarConfiguracoes(novosParametros);
 

@@ -32,7 +32,7 @@
 
     <div v-else class="row">
       <div v-for="comp in competencias" :key="comp.codigo" class="col-12 mb-4">
-        <BCard class="h-100 shadow-sm">
+        <BCard v-if="avaliacoes[comp.codigo]" class="h-100 shadow-sm">
           <template #header>
             <h5 class="card-title mb-0">{{ comp.descricao }}</h5>
           </template>
