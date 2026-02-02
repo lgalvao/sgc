@@ -100,6 +100,7 @@ public class LoginController {
     public ResponseEntity<EntrarResponse> entrar(
             @Valid @RequestBody EntrarRequest request,
             HttpServletRequest httpRequest) {
+
         verificarTokenPreAuth(httpRequest, request.tituloEleitoral());
         String token = loginFacade.entrar(request);
         Usuario usuario = usuarioService.buscarPorLogin(request.tituloEleitoral());

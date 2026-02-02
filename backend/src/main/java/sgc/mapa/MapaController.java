@@ -35,7 +35,10 @@ public class MapaController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Lista todos os mapas")
     public List<MapaDto> listar() {
-        return mapaFacade.listar().stream().map(mapaMapper::toDto).filter(java.util.Objects::nonNull).toList();
+        return mapaFacade.listar().stream()
+                .map(mapaMapper::toDto)
+                .filter(java.util.Objects::nonNull)
+                .toList();
     }
 
     /**
@@ -49,7 +52,7 @@ public class MapaController {
     @Operation(summary = "Obtém um mapa pelo código")
     public ResponseEntity<MapaDto> obterPorId(@PathVariable Long codigo) {
         var mapa = mapaFacade.obterPorCodigo(codigo);
-        return ResponseEntity.ok(java.util.Objects.requireNonNull(mapaMapper.toDto(mapa)));
+        return ResponseEntity.ok(mapaMapper.toDto(mapa));
     }
 
     /**
@@ -66,7 +69,7 @@ public class MapaController {
         var entidade = mapaMapper.toEntity(mapaDto);
         var salvo = mapaFacade.criar(entidade);
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
-        return ResponseEntity.created(uri).body(java.util.Objects.requireNonNull(mapaMapper.toDto(salvo)));
+        return ResponseEntity.created(uri).body(mapaMapper.toDto(salvo));
     }
 
     /**
@@ -82,7 +85,7 @@ public class MapaController {
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
         var entidade = mapaMapper.toEntity(mapaDto);
         var atualizado = mapaFacade.atualizar(codMapa, entidade);
-        return ResponseEntity.ok(java.util.Objects.requireNonNull(mapaMapper.toDto(atualizado)));
+        return ResponseEntity.ok(mapaMapper.toDto(atualizado));
     }
 
     /**

@@ -166,7 +166,7 @@ public class MapaSalvamentoService {
     private Map<Long, Set<Competencia>> construirMapaAssociacoes(
             ContextoSalvamento contexto,
             List<Competencia> competenciasSalvas,
-            Long codMapa) {
+            @Nullable Long codMapa) {
 
         Map<Long, Set<Competencia>> mapAtividadeCompetencias = new HashMap<>();
 

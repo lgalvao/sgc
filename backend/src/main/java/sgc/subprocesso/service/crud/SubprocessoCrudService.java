@@ -129,7 +129,10 @@ public class SubprocessoCrudService {
 
     @Transactional(readOnly = true)
     public List<SubprocessoDto> listar() {
-        return subprocessoRepo.findAllComFetch().stream().map(subprocessoMapper::toDto).toList();
+        return subprocessoRepo.findAllComFetch().stream()
+                .map(subprocessoMapper::toDto)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -155,6 +158,7 @@ public class SubprocessoCrudService {
         return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(codProcesso, codUnidades)
                 .stream()
                 .map(subprocessoMapper::toDto)
+                .filter(Objects::nonNull)
                 .toList();
     }
 }

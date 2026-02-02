@@ -110,7 +110,6 @@ public class ProcessoFacade {
     public List<ProcessoDto> listarFinalizados() {
         return processoConsultaService.listarFinalizados().stream()
                 .map(processoMapper::toDto)
-                .filter(java.util.Objects::nonNull)
                 .toList();
     }
 
@@ -118,7 +117,6 @@ public class ProcessoFacade {
     public List<ProcessoDto> listarAtivos() {
         return processoConsultaService.listarAtivos().stream()
                 .map(processoMapper::toDto)
-                .filter(java.util.Objects::nonNull)
                 .toList();
     }
 
@@ -160,7 +158,9 @@ public class ProcessoFacade {
             throw new ErroProcesso("Unidade não participa deste processo.");
         }
 
-        String dataLimite = processo.getDataLimite().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String dataLimite = processo.getDataLimite() != null 
+                ? processo.getDataLimite().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                : "N/A";
         String descricao = "Lembrete: Prazo do processo %s encerra em %s"
                 .formatted(processo.getDescricao(), dataLimite);
 
@@ -185,7 +185,6 @@ public class ProcessoFacade {
     public List<SubprocessoDto> listarTodosSubprocessos(Long codProcesso) {
         return subprocessoFacade.listarEntidadesPorProcesso(codProcesso).stream()
                 .map(subprocessoMapper::toDto)
-                .filter(java.util.Objects::nonNull)
                 .toList();
     }
 

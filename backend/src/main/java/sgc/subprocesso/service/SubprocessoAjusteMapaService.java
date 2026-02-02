@@ -93,7 +93,7 @@ class SubprocessoAjusteMapaService {
         List<Conhecimento> conhecimentos = mapaManutencaoService.listarConhecimentosPorMapa(codMapa);
         Map<Long, Set<Long>> associacoes = mapaManutencaoService.buscarIdsAssociacoesCompetenciaAtividade(codMapa);
         
-        return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes);
+        return java.util.Objects.requireNonNull(mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes));
     }
 
     /**

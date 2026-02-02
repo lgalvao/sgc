@@ -1,6 +1,7 @@
 package sgc.mapa.dto;
 
 import lombok.Builder;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
 @Builder
 public record MapaCompletoDto(
         Long codigo,
-        Long subprocessoCodigo,
-        String observacoes,
+        @Nullable Long subprocessoCodigo,
+        @Nullable String observacoes,
         List<CompetenciaMapaDto> competencias) {
 }

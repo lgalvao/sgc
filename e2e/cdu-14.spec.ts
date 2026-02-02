@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {USUARIOS} from './helpers/helpers-auth.js';
+import {USUARIOS, login} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {
     adicionarAtividade,

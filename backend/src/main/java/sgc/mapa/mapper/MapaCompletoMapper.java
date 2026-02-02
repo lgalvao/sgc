@@ -22,7 +22,10 @@ public interface MapaCompletoMapper {
                 .codigo(mapa.getCodigo())
                 .subprocessoCodigo(codSubprocesso)
                 .observacoes(mapa.getObservacoesDisponibilizacao())
-                .competencias(competencias.stream().map(this::toDto).filter(Objects::nonNull).toList())
+                .competencias(competencias.stream()
+                        .map(this::toDto)
+                        .filter(Objects::nonNull)
+                        .toList())
                 .build();
     }
 

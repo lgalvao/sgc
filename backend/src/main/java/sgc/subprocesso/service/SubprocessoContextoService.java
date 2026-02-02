@@ -112,7 +112,8 @@ class SubprocessoContextoService {
         List<SubprocessoCadastroDto.AtividadeCadastroDto> atividadesComConhecimentos = new ArrayList<>();
         List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
         for (Atividade a : atividades) {
-            List<ConhecimentoResponse> ksDto = a.getConhecimentos().stream().map(conhecimentoMapper::toResponse)
+            List<ConhecimentoResponse> ksDto = a.getConhecimentos().stream()
+                    .map(conhecimentoMapper::toResponse)
                     .filter(java.util.Objects::nonNull)
                     .toList();
             atividadesComConhecimentos.add(SubprocessoCadastroDto.AtividadeCadastroDto.builder()

@@ -17,9 +17,6 @@ import java.util.stream.Collectors;
 
 /**
  * Service especializado para visualização de mapas de competências.
- *
- * <p><b>IMPORTANTE:</b> Este serviço deve ser acessado APENAS via {@link MapaFacade}.
- * Controllers não devem injetar este serviço diretamente.
  */
 @Service
 @Transactional(readOnly = true)
@@ -45,11 +42,7 @@ public class MapaVisualizacaoService {
         Map<Long, AtividadeDto> atividadeDtoMap = atividadesComConhecimentos.stream()
                 .collect(Collectors.toMap(Atividade::getCodigo, this::mapAtividadeToDto));
 
-        // ⚡ Bolt: Usando projeção otimizada para evitar hidratar entidades Atividade redundantes
-        // via JOIN FETCH. Recuperamos apenas (CompID, CompDesc, AtivID)
         List<Object[]> tuples = competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(mapa.getCodigo());
-
-        // Agrupa as competências e suas atividades
         Map<Long, CompetenciaDto> compMap = new LinkedHashMap<>();
         Set<Long> atividadesComCompetenciaIds = new HashSet<>();
 
@@ -66,6 +59,7 @@ public class MapaVisualizacaoService {
 
             atividadesComCompetenciaIds.add(ativId);
             AtividadeDto ativDto = atividadeDtoMap.get(ativId);
+
             // Só adiciona se a atividade existir no mapa de atividades do subprocesso
             if (ativDto != null) {
                 compMap.get(compId).getAtividades().add(ativDto);
@@ -98,6 +92,7 @@ public class MapaVisualizacaoService {
                         .descricao(c.getDescricao())
                         .build())
                 .toList();
+
         return AtividadeDto.builder()
                 .codigo(atividade.getCodigo())
                 .descricao(atividade.getDescricao())

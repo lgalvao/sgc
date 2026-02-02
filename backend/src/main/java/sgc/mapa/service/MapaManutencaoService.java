@@ -26,6 +26,8 @@ import java.util.*;
 @Transactional
 @RequiredArgsConstructor
 public class MapaManutencaoService {
+    private static final String ENTIDADE_COMPETENCIA = "Competência";
+    private static final String ENTIDADE_ATIVIDADE = "Atividade";
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo competenciaRepo;
     private final ConhecimentoRepo conhecimentoRepo;
@@ -37,7 +39,10 @@ public class MapaManutencaoService {
 
     @Transactional(readOnly = true)
     public List<AtividadeResponse> listarAtividades() {
-        return atividadeRepo.findAll().stream().map(atividadeMapper::toResponse).filter(Objects::nonNull).toList();
+        return atividadeRepo.findAll().stream()
+                .map(atividadeMapper::toResponse)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -137,7 +142,7 @@ public class MapaManutencaoService {
 
     public Competencia buscarCompetenciaPorCodigo(Long codCompetencia) {
         return competenciaRepo.findById(codCompetencia)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência", codCompetencia));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_COMPETENCIA, codCompetencia));
     }
 
     public List<Competencia> buscarCompetenciasPorCodMapa(Long codMapa) {
@@ -188,7 +193,7 @@ public class MapaManutencaoService {
 
     public void atualizarCompetencia(Long codCompetencia, String descricao, List<Long> atividadesIds) {
         Competencia competencia = competenciaRepo.findById(codCompetencia)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência", codCompetencia));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_COMPETENCIA, codCompetencia));
 
         competencia.setDescricao(descricao);
 
@@ -205,7 +210,7 @@ public class MapaManutencaoService {
 
     public void removerCompetencia(Long codCompetencia) {
         Competencia competencia = competenciaRepo.findById(codCompetencia)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência", codCompetencia));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_COMPETENCIA, codCompetencia));
 
         List<Atividade> atividadesAssociadas = atividadeRepo.listarPorCompetencia(competencia);
         atividadesAssociadas.forEach(atividade -> atividade.getCompetencias().remove(competencia));
@@ -226,7 +231,7 @@ public class MapaManutencaoService {
     @Transactional(readOnly = true)
     public List<ConhecimentoResponse> listarConhecimentosPorAtividade(Long codAtividade) {
         if (!atividadeRepo.existsById(codAtividade)) {
-            throw new ErroEntidadeNaoEncontrada("Atividade", codAtividade);
+            throw new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade);
         }
         return conhecimentoRepo.findByAtividadeCodigo(codAtividade).stream()
                 .map(conhecimentoMapper::toResponse)
@@ -257,7 +262,7 @@ public class MapaManutencaoService {
                     var salvo = conhecimentoRepo.save(conhecimento);
                     return conhecimentoMapper.toResponse(salvo);
                 })
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade", codAtividade));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade));
     }
 
     public void atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
