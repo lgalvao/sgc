@@ -20,7 +20,7 @@
         </div>
       </template>
       <template #cell(dataHora)="data">
-        {{ formatDateTimeBR(data.item.dataHora) }}
+        {{ data.item.dataHoraFormatada || formatDateTimeBR(data.item.dataHora) }}
       </template>
       <template #cell(unidadeOrigem)="data">
         {{ data.item.unidadeOrigem?.sigla || '-' }}

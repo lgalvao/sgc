@@ -196,6 +196,9 @@ public class E2eController {
 
         // Buscar unidade pela sigla
         UnidadeDto unidade = unidadeFacade.buscarPorSigla(request.unidadeSigla());
+        if (unidade == null) {
+            throw new ErroEntidadeNaoEncontrada("Unidade não encontrada: " + request.unidadeSigla());
+        }
 
         // Calcular data limite
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;

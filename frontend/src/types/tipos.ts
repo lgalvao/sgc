@@ -200,6 +200,7 @@ export interface Movimentacao {
     codigo: number;
     subprocesso: Subprocesso;
     dataHora: string;
+    dataHoraFormatada?: string;
     unidadeOrigem: Unidade;
     unidadeDestino: Unidade;
     descricao: string;
@@ -209,6 +210,7 @@ export interface Movimentacao {
 export interface AnaliseValidacao {
     codigo: number;
     dataHora: string;
+    dataHoraFormatada?: string;
     analista: string;
     unidade: string;
     acao: string;
@@ -220,6 +222,7 @@ export interface AnaliseValidacao {
 export interface AnaliseCadastro {
     codigo: number;
     dataHora: string;
+    dataHoraFormatada?: string;
     analista: string;
     unidadeSigla: string;
     acao: string;

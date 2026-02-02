@@ -133,7 +133,7 @@ public class PainelFacade {
                 .codigo(processo.getCodigo())
                 .descricao(processo.getDescricao())
                 .situacao(processo.getSituacao())
-                .situacaoLabel(processo.getSituacao().getLabel())
+                .situacaoLabel(processo.getSituacao() != null ? processo.getSituacao().getLabel() : null)
                 .tipo(processo.getTipo().name())
                 .tipoLabel(processo.getTipo().getLabel())
                 .dataLimite(processo.getDataLimite())
@@ -204,7 +204,7 @@ public class PainelFacade {
             return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
         } catch (Exception e) {
             log.warn("Erro ao calcular link de destino para o processo {}: {}", processo.getCodigo(), e.getMessage());
-            return "";
+            return null;
         }
     }
 

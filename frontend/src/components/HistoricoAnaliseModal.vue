@@ -33,7 +33,7 @@
           >
             <template #cell(dataHora)="{ item, index }">
               <span :data-testid="`cell-dataHora-${index}`">
-                {{ formatDateTimeBR((item as Analise).dataHora) }}
+                {{ (item as Analise).dataHoraFormatada || formatDateTimeBR((item as Analise).dataHora) }}
               </span>
             </template>
             <template #cell(unidade)="{ item, index }">
