@@ -12,9 +12,9 @@ import java.util.List;
 @Getter
 @Builder
 public class SubprocessoDetalheDto {
-    private final UnidadeDto unidade;
-    private final ResponsavelDto titular;
-    private final ResponsavelDto responsavel;
+    private final UnidadeDetalheDto unidade;
+    private final ResponsavelDetalheDto titular;
+    private final ResponsavelDetalheDto responsavel;
     private final String situacao;
     private final String situacaoLabel;
     private final String localizacaoAtual;
@@ -26,23 +26,4 @@ public class SubprocessoDetalheDto {
     private final List<MovimentacaoDto> movimentacoes;
     private final SubprocessoPermissoesDto permissoes;
 
-    // TODO deveria estar em arquivo separado
-    @Getter
-    @Builder
-    public static class UnidadeDto {
-        private final Long codigo;
-        private final String sigla;
-        private final String nome;
-    }
-
-    // TODO deveria estar em arquivo separado
-    @Getter
-    @Builder
-    public static class ResponsavelDto {
-        private final Long codigo;
-        private final String nome;
-        private final String tipoResponsabilidade;
-        private final String ramal;
-        private final String email;
-    }
 }

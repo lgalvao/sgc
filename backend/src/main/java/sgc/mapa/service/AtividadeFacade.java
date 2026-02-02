@@ -1,6 +1,5 @@
 package sgc.mapa.service;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,8 +53,7 @@ public class AtividadeFacade {
             @Lazy SubprocessoFacade subprocessoFacade,
             AccessControlService accessControlService,
             UsuarioFacade usuarioService,
-            MapaFacade mapaFacade,
-            ApplicationEventPublisher eventPublisher) {
+            MapaFacade mapaFacade) {
         this.mapaManutencaoService = mapaManutencaoService;
         this.subprocessoFacade = subprocessoFacade;
         this.accessControlService = accessControlService;

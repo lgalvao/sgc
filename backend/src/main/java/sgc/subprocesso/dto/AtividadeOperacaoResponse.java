@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Builder
 public record AtividadeOperacaoResponse(
-        AtividadeDto atividade,
+        @org.jspecify.annotations.Nullable AtividadeDto atividade,
         SubprocessoSituacaoDto subprocesso,
         List<AtividadeDto> atividadesAtualizadas) {
 }

@@ -13,7 +13,7 @@ import sgc.mapa.service.MapaFacade;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * Controlador REST para gerenciar Mapas usando DTOs. Evita expor entidades JPA diretamente nas
@@ -37,7 +37,8 @@ public class MapaController {
     @Operation(summary = "Lista todos os mapas")
     public List<MapaDto> listar() {
         return mapaFacade.listar().stream()
-                .flatMap(m -> java.util.stream.Stream.ofNullable(mapaMapper.toDto(m)))
+                .map(mapaMapper::toDto)
+                .filter(Objects::nonNull)
                 .toList();
     }
 
@@ -52,7 +53,11 @@ public class MapaController {
     @Operation(summary = "Obtém um mapa pelo código")
     public ResponseEntity<MapaDto> obterPorId(@PathVariable Long codigo) {
         var mapa = mapaFacade.obterPorCodigo(codigo);
-        return ResponseEntity.ok(mapaMapper.toDto(mapa));
+        var dto = mapaMapper.toDto(mapa);
+        if (dto == null) {
+             throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter mapa para DTO.");
+        }
+        return ResponseEntity.ok(dto);
     }
 
     /**
@@ -66,11 +71,17 @@ public class MapaController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cria um mapa")
     public ResponseEntity<MapaDto> criar(@Valid @RequestBody MapaDto mapaDto) {
-        var entidade = Optional.ofNullable(mapaMapper.toEntity(mapaDto))
-                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter DTO para entidade mapa."));
+        var entidade = mapaMapper.toEntity(mapaDto);
+        if (entidade == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter DTO para entidade mapa.");
+        }
         var salvo = mapaFacade.criar(entidade);
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
-        return ResponseEntity.created(uri).body(mapaMapper.toDto(salvo));
+        var salvoDto = mapaMapper.toDto(salvo);
+        if (salvoDto == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter mapa salvo para DTO.");
+        }
+        return ResponseEntity.created(uri).body(salvoDto);
     }
 
     /**
@@ -84,10 +95,16 @@ public class MapaController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza um mapa existente")
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
-        var entidade = Optional.ofNullable(mapaMapper.toEntity(mapaDto))
-                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter DTO para entidade mapa."));
+        var entidade = mapaMapper.toEntity(mapaDto);
+        if (entidade == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter DTO para entidade mapa.");
+        }
         var atualizado = mapaFacade.atualizar(codMapa, entidade);
-        return ResponseEntity.ok(mapaMapper.toDto(atualizado));
+        var atualizadoDto = mapaMapper.toDto(atualizado);
+        if (atualizadoDto == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter mapa atualizado para DTO.");
+        }
+        return ResponseEntity.ok(atualizadoDto);
     }
 
     /**

@@ -7,6 +7,8 @@ import org.springframework.util.CollectionUtils;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
+import sgc.subprocesso.dto.UnidadeDetalheDto;
+import sgc.subprocesso.dto.ResponsavelDetalheDto;
 import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
@@ -39,9 +41,9 @@ public interface SubprocessoDetalheMapper {
     @Mapping(target = "codigo", source = "codigo")
     @Mapping(target = "sigla", source = "sigla")
     @Mapping(target = "nome", source = "nome")
-    SubprocessoDetalheDto.UnidadeDto toUnidadeDto(@Nullable Unidade unidade);
+    UnidadeDetalheDto toUnidadeDto(@Nullable Unidade unidade);
 
-    default SubprocessoDetalheDto.@Nullable ResponsavelDto mapResponsavel(Subprocesso sp, @Nullable Usuario responsavel) {
+    default @Nullable ResponsavelDetalheDto mapResponsavel(Subprocesso sp, @Nullable Usuario responsavel) {
         if (responsavel == null) return null;
 
         String tituloTitular = sp.getUnidade().getTituloTitular();
@@ -50,7 +52,7 @@ public interface SubprocessoDetalheMapper {
             tipo = "Titular";
         }
 
-        return SubprocessoDetalheDto.ResponsavelDto.builder()
+        return ResponsavelDetalheDto.builder()
                 .nome(responsavel.getNome())
                 .ramal(responsavel.getRamal())
                 .email(responsavel.getEmail())
@@ -58,9 +60,9 @@ public interface SubprocessoDetalheMapper {
                 .build();
     }
 
-    default SubprocessoDetalheDto.@Nullable ResponsavelDto mapTitular(Subprocesso sp, @Nullable Usuario titular, @Nullable Usuario responsavel) {
+    default @Nullable ResponsavelDetalheDto mapTitular(Subprocesso sp, @Nullable Usuario titular, @Nullable Usuario responsavel) {
         if (titular == null) return null;
-        return SubprocessoDetalheDto.ResponsavelDto.builder()
+        return ResponsavelDetalheDto.builder()
                 .nome(titular.getNome())
                 .tipoResponsabilidade("Titular")
                 .ramal(titular.getRamal())

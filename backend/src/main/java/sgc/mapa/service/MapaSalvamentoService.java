@@ -69,8 +69,11 @@ public class MapaSalvamentoService {
 
         validarIntegridadeMapa(codMapa, contexto.atividadesAtuais, competenciasSalvas);
 
-        return Optional.ofNullable(mapaCompletoMapper.toDto(mapa, null, competenciasSalvas))
-                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter mapa salvo para DTO."));
+        var response = mapaCompletoMapper.toDto(mapa, null, competenciasSalvas);
+        if (response == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter mapa salvo para DTO.");
+        }
+        return response;
     }
 
     private void atualizarObservacoes(Mapa mapa, @Nullable String observacoes) {
@@ -154,8 +157,13 @@ public class MapaSalvamentoService {
     }
 
     private void atualizarAssociacoesAtividades(ContextoSalvamento contexto, List<Competencia> competenciasSalvas) {
-        Long codMapa = contexto.atividadesAtuais.isEmpty() ? null
-                : (contexto.atividadesAtuais.getFirst().getMapa() != null ? contexto.atividadesAtuais.getFirst().getMapa().getCodigo() : null);
+        Long codMapa = null;
+        if (!contexto.atividadesAtuais.isEmpty()) {
+            Atividade primeiraAtividade = contexto.atividadesAtuais.getFirst();
+            if (primeiraAtividade.getMapa() != null) {
+                codMapa = primeiraAtividade.getMapa().getCodigo();
+            }
+        }
 
         Map<Long, Set<Competencia>> mapAtividadeCompetencias = construirMapaAssociacoes(
                 contexto, competenciasSalvas, codMapa);
@@ -190,7 +198,7 @@ public class MapaSalvamentoService {
         return mapAtividadeCompetencias;
     }
 
-    private void validarAtividadePertenceAoMapa(Long ativId, Set<Long> atividadesDoMapaIds, Long codMapa) {
+    private void validarAtividadePertenceAoMapa(Long ativId, Set<Long> atividadesDoMapaIds, @Nullable Long codMapa) {
         if (!atividadesDoMapaIds.contains(ativId)) {
             throw new ErroValidacao("Atividade %d não pertence ao mapa %s".formatted(ativId, Objects.toString(codMapa)));
         }

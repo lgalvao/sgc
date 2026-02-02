@@ -86,8 +86,11 @@ public class SubprocessoCrudService {
 
     public SubprocessoDto criar(CriarSubprocessoRequest request) {
         Subprocesso salvo = subprocessoFactory.criar(request);
-        return Optional.ofNullable(subprocessoMapper.toDto(salvo))
-                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter subprocesso criado para DTO."));
+        var dto = subprocessoMapper.toDto(salvo);
+        if (dto == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter subprocesso criado para DTO.");
+        }
+        return dto;
     }
 
     public SubprocessoDto atualizar(Long codigo, AtualizarSubprocessoRequest request) {
@@ -96,8 +99,11 @@ public class SubprocessoCrudService {
 
         Subprocesso salvo = subprocessoRepo.save(subprocesso);
 
-        return Optional.ofNullable(subprocessoMapper.toDto(salvo))
-                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter subprocesso atualizado para DTO."));
+        var dto = subprocessoMapper.toDto(salvo);
+        if (dto == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter subprocesso atualizado para DTO.");
+        }
+        return dto;
     }
 
     private void processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
@@ -143,8 +149,11 @@ public class SubprocessoCrudService {
                 .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(
                         "%s para o processo %s e unidade %s".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codProcesso,
                                 codUnidade)));
-        return Optional.ofNullable(subprocessoMapper.toDto(sp))
-                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter subprocesso para DTO."));
+        var dto = subprocessoMapper.toDto(sp);
+        if (dto == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter subprocesso para DTO.");
+        }
+        return dto;
     }
 
     @Transactional(readOnly = true)

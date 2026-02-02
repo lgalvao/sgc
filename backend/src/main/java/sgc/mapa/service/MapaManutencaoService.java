@@ -46,8 +46,11 @@ public class MapaManutencaoService {
 
     @Transactional(readOnly = true)
     public AtividadeResponse obterAtividadeResponse(Long codAtividade) {
-        return Optional.ofNullable(atividadeMapper.toResponse(obterAtividadePorCodigo(codAtividade)))
-                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter atividade para resposta."));
+        var response = atividadeMapper.toResponse(obterAtividadePorCodigo(codAtividade));
+        if (response == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter atividade para resposta.");
+        }
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -64,13 +67,18 @@ public class MapaManutencaoService {
         Mapa mapa = repo.buscar(Mapa.class, request.mapaCodigo());
         notificarAlteracaoMapa(request.mapaCodigo());
 
-        Atividade entidade = Optional.ofNullable(atividadeMapper.toEntity(request))
-                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade atividade."));
+        Atividade entidade = atividadeMapper.toEntity(request);
+        if (entidade == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade atividade.");
+        }
         entidade.setMapa(mapa);
 
         Atividade salvo = atividadeRepo.save(entidade);
-        return Optional.ofNullable(atividadeMapper.toResponse(salvo))
-                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter atividade salva para resposta."));
+        var response = atividadeMapper.toResponse(salvo);
+        if (response == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter atividade salva para resposta.");
+        }
+        return response;
     }
 
     public void atualizarAtividade(Long codigo, AtualizarAtividadeRequest request) {
@@ -80,8 +88,10 @@ public class MapaManutencaoService {
             notificarAlteracaoMapa(existente.getMapa().getCodigo());
         }
 
-        var entidadeParaAtualizar = Optional.ofNullable(atividadeMapper.toEntity(request))
-                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade atividade."));
+        var entidadeParaAtualizar = atividadeMapper.toEntity(request);
+        if (entidadeParaAtualizar == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade atividade.");
+        }
         existente.setDescricao(entidadeParaAtualizar.getDescricao());
 
         atividadeRepo.save(existente);
@@ -259,12 +269,17 @@ public class MapaManutencaoService {
                         notificarAlteracaoMapa(mapa.getCodigo());
                     }
 
-                    var conhecimento = Optional.ofNullable(conhecimentoMapper.toEntity(request))
-                            .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade conhecimento."));
+                    var conhecimento = conhecimentoMapper.toEntity(request);
+                    if (conhecimento == null) {
+                        throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade conhecimento.");
+                    }
                     conhecimento.setAtividade(atividade);
                     var salvo = conhecimentoRepo.save(conhecimento);
-                    return Optional.ofNullable(conhecimentoMapper.toResponse(salvo))
-                            .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter conhecimento salvo para resposta."));
+                    var response = conhecimentoMapper.toResponse(salvo);
+                    if (response == null) {
+                        throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter conhecimento salvo para resposta.");
+                    }
+                    return response;
                 })
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade));
     }

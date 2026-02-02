@@ -366,7 +366,7 @@ class SubprocessoContextoServiceTest {
             subprocesso.setMapa(mapa);
             subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             
-            SubprocessoDetalheDto.UnidadeDto unidadeDtoInterno = SubprocessoDetalheDto.UnidadeDto.builder()
+            UnidadeDetalheDto unidadeDtoInterno = UnidadeDetalheDto.builder()
                     .codigo(1L)
                     .sigla("SIGLA")
                     .nome("Nome")

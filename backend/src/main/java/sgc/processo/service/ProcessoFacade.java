@@ -66,15 +66,21 @@ public class ProcessoFacade {
     @Transactional
     public ProcessoDto criar(CriarProcessoRequest req) {
         Processo processoSalvo = processoManutencaoService.criar(req);
-        return Optional.ofNullable(processoMapper.toDto(processoSalvo))
-                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter processo criado para DTO."));
+        var dto = processoMapper.toDto(processoSalvo);
+        if (dto == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter processo criado para DTO.");
+        }
+        return dto;
     }
 
     @Transactional
     public ProcessoDto atualizar(Long codigo, AtualizarProcessoRequest requisicao) {
         Processo processoAtualizado = processoManutencaoService.atualizar(codigo, requisicao);
-        return Optional.ofNullable(processoMapper.toDto(processoAtualizado))
-                .orElseThrow(() -> new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter processo atualizado para DTO."));
+        var dto = processoMapper.toDto(processoAtualizado);
+        if (dto == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter processo atualizado para DTO.");
+        }
+        return dto;
     }
 
     @Transactional
@@ -212,29 +218,38 @@ public class ProcessoFacade {
         List<Long> unidadesHomologarCadastro = new ArrayList<>();
         List<Long> unidadesHomologarValidacao = new ArrayList<>();
 
-        if (!req.unidadeCodigos().isEmpty()) {
-            List<SubprocessoDto> subprocessos = subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
+        if (req.unidadeCodigos().isEmpty()) {
+            return;
+        }
 
-            for (SubprocessoDto spDto : subprocessos) {
-                Long codUnidade = spDto.getCodUnidade();
+        List<SubprocessoDto> subprocessos = subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
 
-                if (req.acao() == ACEITAR) {
-                    if (isSituacaoCadastro(spDto.getSituacao())) {
-                        unidadesAceitarCadastro.add(codUnidade);
-                    } else {
-                        unidadesAceitarValidacao.add(codUnidade);
-                    }
-                } else if (req.acao() == HOMOLOGAR) {
-                    if (isSituacaoCadastro(spDto.getSituacao())) {
-                        unidadesHomologarCadastro.add(codUnidade);
-                    } else {
-                        unidadesHomologarValidacao.add(codUnidade);
-                    }
-                }
-            }
+        for (SubprocessoDto spDto : subprocessos) {
+            categorizarUnidadePorAcao(req, spDto, unidadesAceitarCadastro, unidadesAceitarValidacao, unidadesHomologarCadastro, unidadesHomologarValidacao);
         }
 
         executarAcoesBatch(codProcesso, usuario, unidadesAceitarCadastro, unidadesAceitarValidacao, unidadesHomologarCadastro, unidadesHomologarValidacao);
+    }
+
+    private void categorizarUnidadePorAcao(AcaoEmBlocoRequest req, SubprocessoDto spDto,
+                                           List<Long> unitsAceitarCad, List<Long> unitsAceitarVal,
+                                           List<Long> unitsHomolCad, List<Long> unitsHomolVal) {
+        Long codUnidade = spDto.getCodUnidade();
+        boolean isCadastro = isSituacaoCadastro(spDto.getSituacao());
+
+        if (req.acao() == ACEITAR) {
+            if (isCadastro) {
+                unitsAceitarCad.add(codUnidade);
+            } else {
+                unitsAceitarVal.add(codUnidade);
+            }
+        } else if (req.acao() == HOMOLOGAR) {
+            if (isCadastro) {
+                unitsHomolCad.add(codUnidade);
+            } else {
+                unitsHomolVal.add(codUnidade);
+            }
+        }
     }
 
     private void executarAcoesBatch(Long codProcesso,
