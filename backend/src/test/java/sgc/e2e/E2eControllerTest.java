@@ -1,18 +1,8 @@
 package sgc.e2e;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
-import javax.sql.DataSource;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,18 +14,23 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
+import sgc.comum.erros.ErroConfiguracao;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.service.ProcessoFacade;
+
+import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import org.junit.jupiter.api.Assertions;
-import org.mockito.Mockito;
-import sgc.comum.erros.ErroConfiguracao;
+import java.sql.Connection;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 @Tag("integration")
 @SpringBootTest
@@ -61,12 +56,21 @@ class E2eControllerTest {
 
     private E2eController controller;
 
+    private AutoCloseable closeable;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
         // Default behavior for resource loader (file found in first path)
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
         controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        if (closeable != null) {
+            closeable.close();
+        }
     }
 
     private void mockResourceLoader(String path, boolean exists) {

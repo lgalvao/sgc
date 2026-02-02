@@ -17,10 +17,10 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.SubprocessoElegivelDto;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
-import sgc.processo.model.TipoProcesso;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,8 +28,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

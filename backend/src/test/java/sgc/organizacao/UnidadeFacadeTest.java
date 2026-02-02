@@ -1,13 +1,5 @@
 package sgc.organizacao;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -15,26 +7,27 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
-import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.mapper.UsuarioMapper;
-import sgc.organizacao.model.*;
-import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeMapaService;
-import sgc.organizacao.service.UnidadeResponsavelService;
-import sgc.organizacao.service.UnidadeConsultaService;
-import sgc.organizacao.service.UsuarioConsultaService;
+import sgc.organizacao.model.SituacaoUnidade;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.service.*;
+
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -47,8 +40,6 @@ class UnidadeFacadeTest {
     private UsuarioConsultaService usuarioConsultaService;
     @Mock
     private UsuarioMapper usuarioMapper;
-
-    // Novos mocks para serviços especializados
     @Mock
     private UnidadeHierarquiaService hierarquiaService;
     @Mock

@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
@@ -96,9 +95,7 @@ public class UsuarioFacade {
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String sigla) {
         Unidade unidade = unidadeConsultaService.buscarPorSigla(sigla);
-
         Usuario usuarioSimples = usuarioConsultaService.buscarChefePorUnidade(unidade.getCodigo(), sigla);
-
         Usuario usuarioCompleto = usuarioConsultaService.buscarPorIdComAtribuicoes(usuarioSimples.getTituloEleitoral());
 
         carregarAtribuicoes(usuarioCompleto);

@@ -1,5 +1,6 @@
 package sgc.subprocesso.mapper;
 
+import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import sgc.subprocesso.dto.MovimentacaoDto;
@@ -16,5 +17,5 @@ public interface MovimentacaoMapper {
     @Mapping(source = "unidadeDestino.codigo", target = "unidadeDestinoCodigo")
     @Mapping(source = "unidadeDestino.sigla", target = "unidadeDestinoSigla")
     @Mapping(source = "unidadeDestino.nome", target = "unidadeDestinoNome")
-    MovimentacaoDto toDto(Movimentacao movimentacao);
+    MovimentacaoDto toDto(@Nullable Movimentacao movimentacao);
 }

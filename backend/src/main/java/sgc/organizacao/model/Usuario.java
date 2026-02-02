@@ -26,7 +26,7 @@ import java.util.Set;
 @SuperBuilder
 public class Usuario implements UserDetails {
     @Transient
-    private Set<GrantedAuthority> authorities;
+    private @Nullable Set<GrantedAuthority> authorities;
 
     @Id
     @Column(name = "titulo", length = 12, nullable = false)

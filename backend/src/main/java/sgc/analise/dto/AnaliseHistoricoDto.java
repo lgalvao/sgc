@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 
 @Builder
 public record AnaliseHistoricoDto(
-                LocalDateTime dataHora,
-                String observacoes,
-                TipoAcaoAnalise acao,
-                String unidadeSigla,
-                String analistaUsuarioTitulo,
-                String motivo,
-                TipoAnalise tipo) {
+        LocalDateTime dataHora,
+        String observacoes,
+        TipoAcaoAnalise acao,
+        String unidadeSigla,
+        String analistaUsuarioTitulo,
+        String motivo,
+        TipoAnalise tipo) {
 }

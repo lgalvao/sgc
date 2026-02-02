@@ -7,16 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.acesso.AccessControlService;
 import sgc.seguranca.acesso.Acao;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.Collections;
@@ -259,7 +254,7 @@ class ImpactoMapaServiceTest {
 
         // Deve detectar a atividade como alterada porque os conhecimentos são diferentes
         assertEquals(1, result.atividadesAlteradas().size());
-        assertEquals("Ativ Teste", result.atividadesAlteradas().get(0).descricao());
+        assertEquals("Ativ Teste", result.atividadesAlteradas().getFirst().descricao());
     }
 
     private Subprocesso criarSubprocesso(Long unidadeCodigo, Mapa mapa) {

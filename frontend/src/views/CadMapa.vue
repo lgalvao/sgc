@@ -122,7 +122,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BContainer,} from "bootstrap-vue-next";
+import {BButton, BContainer,} from "bootstrap-vue-next";
 import EmptyState from "@/components/EmptyState.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";

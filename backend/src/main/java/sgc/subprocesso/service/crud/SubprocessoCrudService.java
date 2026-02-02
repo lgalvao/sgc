@@ -1,6 +1,7 @@
 package sgc.subprocesso.service.crud;
 
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -160,7 +161,7 @@ public class SubprocessoCrudService {
     }
 
     @Transactional(readOnly = true)
-    public List<SubprocessoDto> listarPorProcessoEUnidades(Long codProcesso, List<Long> codUnidades) {
+    public List<SubprocessoDto> listarPorProcessoEUnidades(Long codProcesso, @Nullable List<Long> codUnidades) {
         if (codUnidades == null || codUnidades.isEmpty()) {
             return List.of();
         }

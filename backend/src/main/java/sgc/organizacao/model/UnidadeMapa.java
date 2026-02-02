@@ -15,7 +15,7 @@ import sgc.mapa.model.Mapa;
 @SuperBuilder
 public class UnidadeMapa {
     @Id
-    @Column(name = "unidade_codigo")
+    @Column(name = "unidade_codigo", nullable = false)
     private Long unidadeCodigo;
 
     @ManyToOne

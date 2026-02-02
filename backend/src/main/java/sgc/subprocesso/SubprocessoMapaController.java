@@ -59,7 +59,7 @@ public class SubprocessoMapaController {
     public ContextoEdicaoDto obterContextoEdicao(
             @PathVariable Long codigo,
             @RequestParam(required = false) Perfil perfil) {
-        return subprocessoFacade.obterContextoEdicao(codigo, perfil);
+        return subprocessoFacade.obterContextoEdicao(codigo);
     }
 
     /**

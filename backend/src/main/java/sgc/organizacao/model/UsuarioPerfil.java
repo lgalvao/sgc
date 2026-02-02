@@ -18,16 +18,16 @@ import java.util.Objects;
 @IdClass(UsuarioPerfilId.class)
 public class UsuarioPerfil implements Serializable {
     @Id
-    @Column(name = "usuario_titulo", length = 12)
+    @Column(name = "usuario_titulo", length = 12, nullable = false)
     private String usuarioTitulo;
 
     @Id
-    @Column(name = "unidade_codigo")
+    @Column(name = "unidade_codigo", nullable = false)
     private Long unidadeCodigo;
 
     @Id
     @Enumerated(EnumType.STRING)
-    @Column(name = "perfil")
+    @Column(name = "perfil", nullable = false)
     private Perfil perfil;
 
     @ManyToOne(fetch = FetchType.LAZY)

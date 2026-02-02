@@ -2,6 +2,7 @@ package sgc.subprocesso.eventos;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Define os tipos de transição de subprocesso e seus metadados para comunicação.
@@ -128,8 +129,8 @@ public enum TipoTransicao {
     );
 
     private final String descricaoMovimentacao;
-    private final String templateAlerta;  // null = não gera alerta
-    private final String templateEmail;   // null = não envia e-mail
+    private final @Nullable String templateAlerta;  // null = não gera alerta
+    private final @Nullable String templateEmail;   // null = não envia e-mail
 
     /**
      * Formata a descrição do alerta substituindo %s pela sigla da unidade.

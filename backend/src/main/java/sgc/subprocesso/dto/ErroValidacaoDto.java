@@ -7,7 +7,7 @@ import lombok.Builder;
  */
 @Builder
 public record ErroValidacaoDto(
-        String tipo, // "ATIVIDADE_SEM_CONHECIMENTO", "SEM_ATIVIDADES", etc.
+        String tipo,
         Long atividadeCodigo,
         String descricaoAtividade,
         String mensagem

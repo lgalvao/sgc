@@ -3,6 +3,7 @@ package sgc.integracao.mocks;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,7 +31,7 @@ public class WithMockGestorSecurityContextFactory
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Override
-    public SecurityContext createSecurityContext(WithMockGestor customUser) {
+    public SecurityContext createSecurityContext(@NonNull WithMockGestor customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         String tituloGestor = customUser.value();
         Usuario principal = null;

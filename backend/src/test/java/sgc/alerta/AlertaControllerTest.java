@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.organizacao.model.Usuario;
 
 import java.util.List;
 

@@ -1,9 +1,9 @@
 import {defineStore} from "pinia";
-import {ref, computed} from "vue";
+import {computed, ref} from "vue";
 import {
     buscarTodosUsuarios,
-    buscarUsuariosPorUnidade as serviceBuscarUsuariosPorUnidade,
     buscarUsuarioPorTitulo as serviceBuscarUsuarioPorTitulo,
+    buscarUsuariosPorUnidade as serviceBuscarUsuariosPorUnidade,
 } from "@/services/usuarioService";
 import type {Usuario} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
@@ -56,8 +56,7 @@ export const useUsuariosStore = defineStore("usuarios", () => {
         error.value = null;
         return loading.withLoading(async () => {
             return withErrorHandling(async () => {
-                const response = await serviceBuscarUsuariosPorUnidade(codigoUnidade);
-                return response;
+                return await serviceBuscarUsuariosPorUnidade(codigoUnidade);
             }, () => {
                 error.value = lastError.value?.message || "Erro ao buscar usuários da unidade";
             }) as Promise<Usuario[]>;

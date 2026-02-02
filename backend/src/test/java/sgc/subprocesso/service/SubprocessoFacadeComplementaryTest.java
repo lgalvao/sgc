@@ -314,7 +314,7 @@ class SubprocessoFacadeComplementaryTest {
 
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
 
-            subprocessoFacade.obterDetalhes(codigo, Perfil.ADMIN);
+            subprocessoFacade.obterDetalhes(codigo);
 
             verify(contextoService).obterDetalhes(codigo, usuario);
         }
@@ -325,7 +325,7 @@ class SubprocessoFacadeComplementaryTest {
         void deveObterContextoEdicao() {
             Long codigo = 1L;
 
-            subprocessoFacade.obterContextoEdicao(codigo, Perfil.ADMIN);
+            subprocessoFacade.obterContextoEdicao(codigo);
 
             verify(contextoService).obterContextoEdicao(codigo);
         }

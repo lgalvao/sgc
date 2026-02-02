@@ -27,7 +27,7 @@ public interface MapaAjusteMapper {
     @Mapping(target = "unidadeNome", source = "sp.unidade.nome")
     @Mapping(target = "competencias", expression = "java(mapCompetencias(competencias, atividades, conhecimentos, associacoes))")
     @Mapping(target = "justificativaDevolucao", source = "analise.observacoes")
-    MapaAjusteDto toDto(Subprocesso sp, @Nullable Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, @Context Map<Long, Set<Long>> associacoes);
+    MapaAjusteDto toDto(@Nullable Subprocesso sp, @Nullable Analise analise, @Nullable List<Competencia> competencias, @Nullable List<Atividade> atividades, @Nullable List<Conhecimento> conhecimentos, @Context @Nullable Map<Long, Set<Long>> associacoes);
 
     default List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, Map<Long, Set<Long>> associacoes) {
         Map<Long, List<Conhecimento>> conhecimentosPorAtividade = conhecimentos.stream()

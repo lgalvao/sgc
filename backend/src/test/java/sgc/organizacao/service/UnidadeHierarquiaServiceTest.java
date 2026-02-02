@@ -1,10 +1,6 @@
 package sgc.organizacao.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -19,13 +15,15 @@ import sgc.testutils.UnidadeTestBuilder;
 import java.util.*;
 import java.util.function.Function;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 
 /**
  * Testes unitários para {@link UnidadeHierarquiaService}.
- * 
+ * <p>
  * Foco em cobertura de branches (28 branches, alvo: 90%+).
  */
 @ExtendWith(MockitoExtension.class)
@@ -88,9 +86,9 @@ class UnidadeHierarquiaServiceTest {
 
             // Assert
             assertThat(resultado).hasSize(1);
-            assertThat(resultado.get(0).getCodigo()).isEqualTo(1L);
-            assertThat(resultado.get(0).getSubunidades()).hasSize(1);
-            assertThat(resultado.get(0).getSubunidades().get(0).getCodigo()).isEqualTo(2L);
+            assertThat(resultado.getFirst().getCodigo()).isEqualTo(1L);
+            assertThat(resultado.getFirst().getSubunidades()).hasSize(1);
+            assertThat(resultado.getFirst().getSubunidades().getFirst().getCodigo()).isEqualTo(2L);
         }
 
         @Test
@@ -545,7 +543,7 @@ class UnidadeHierarquiaServiceTest {
 
             // Assert
             assertThat(resultado).hasSize(1);
-            assertThat(resultado.get(0).getCodigo()).isEqualTo(2L);
+            assertThat(resultado.getFirst().getCodigo()).isEqualTo(2L);
         }
 
         @Test
@@ -617,7 +615,7 @@ class UnidadeHierarquiaServiceTest {
 
             // Assert
             assertThat(resultado.getSubunidades()).hasSize(1);
-            assertThat(resultado.getSubunidades().get(0).getSubunidades()).hasSize(1);
+            assertThat(resultado.getSubunidades().getFirst().getSubunidades()).hasSize(1);
         }
 
         @Test

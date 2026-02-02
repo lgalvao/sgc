@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Predicate;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -108,7 +109,7 @@ class ClienteAcessoAdTest {
         assertTrue(predicateCaptor.getValue().test(HttpStatusCode.valueOf(400)));
         assertTrue(predicateCaptor.getValue().test(HttpStatusCode.valueOf(500)));
         // Valida que 2xx retorna false
-        assertTrue(!predicateCaptor.getValue().test(HttpStatusCode.valueOf(200)));
+        assertFalse(predicateCaptor.getValue().test(HttpStatusCode.valueOf(200)));
 
         // Valida ErrorHandler
         HttpRequest request = mock(HttpRequest.class);

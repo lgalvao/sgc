@@ -10,7 +10,10 @@ import sgc.comum.validacao.TituloEleitoral;
  */
 @Builder
 public record AutenticarRequest(
-                @TituloEleitoral String tituloEleitoral,
+        @TituloEleitoral
+        String tituloEleitoral,
 
-                @NotNull(message = "A senha é obrigatória.") @Size(max = 64, message = "A senha deve ter no máximo 64 caracteres.") String senha) {
+        @NotNull(message = "A senha é obrigatória.")
+        @Size(max = 64, message = "A senha deve ter no máximo 64 caracteres.")
+        String senha) {
 }

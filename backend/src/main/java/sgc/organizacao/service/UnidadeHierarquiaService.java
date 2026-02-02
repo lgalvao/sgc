@@ -151,8 +151,6 @@ public class UnidadeHierarquiaService {
                 .toList();
     }
 
-    // ============ Métodos Privados (Algoritmos Recursivos) ============
-
     private List<UnidadeDto> montarHierarquia(List<Unidade> unidades) {
         return montarHierarquia(unidades, null);
     }

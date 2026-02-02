@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.mapa.dto.visualizacao.ConhecimentoDto;
 import sgc.mapa.eventos.EventoImportacaoAtividades;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
@@ -22,11 +21,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.ArrayList;
@@ -35,8 +30,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 /**
@@ -284,18 +277,18 @@ class SubprocessoAtividadeServiceTest {
             // Assert
             assertThat(resultado).hasSize(2);
 
-            AtividadeDto dto1 = resultado.get(0);
+            AtividadeDto dto1 = resultado.getFirst();
             assertThat(dto1.codigo()).isEqualTo(1L);
             assertThat(dto1.descricao()).isEqualTo("Atividade 1");
             assertThat(dto1.conhecimentos()).hasSize(1);
-            assertThat(dto1.conhecimentos().get(0).codigo()).isEqualTo(100L);
-            assertThat(dto1.conhecimentos().get(0).descricao()).isEqualTo("Conhecimento 1");
+            assertThat(dto1.conhecimentos().getFirst().codigo()).isEqualTo(100L);
+            assertThat(dto1.conhecimentos().getFirst().descricao()).isEqualTo("Conhecimento 1");
 
             AtividadeDto dto2 = resultado.get(1);
             assertThat(dto2.codigo()).isEqualTo(2L);
             assertThat(dto2.descricao()).isEqualTo("Atividade 2");
             assertThat(dto2.conhecimentos()).hasSize(1);
-            assertThat(dto2.conhecimentos().get(0).codigo()).isEqualTo(101L);
+            assertThat(dto2.conhecimentos().getFirst().codigo()).isEqualTo(101L);
 
             verify(crudService).buscarSubprocesso(codSubprocesso);
             verify(mapaManutencaoService).buscarAtividadesPorMapaCodigoComConhecimentos(codMapa);

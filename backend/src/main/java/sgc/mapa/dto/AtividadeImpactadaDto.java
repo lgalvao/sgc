@@ -15,12 +15,8 @@ import java.util.List;
 @Builder
 public record AtividadeImpactadaDto(
         Long codigo,
-
-                String descricao,
-
-                TipoImpactoAtividade tipoImpacto,
-
-                String descricaoAnterior,
-
-                List<String> competenciasVinculadas) {
+        String descricao,
+        TipoImpactoAtividade tipoImpacto,
+        String descricaoAnterior,
+        List<String> competenciasVinculadas) {
 }

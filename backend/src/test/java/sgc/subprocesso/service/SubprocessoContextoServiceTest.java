@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.dto.ConhecimentoResponse;
 import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
@@ -23,12 +24,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.Acao;
 import sgc.seguranca.acesso.AccessControlService;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.subprocesso.dto.ContextoEdicaoDto;
-import sgc.subprocesso.dto.SubprocessoCadastroDto;
-import sgc.subprocesso.dto.SubprocessoDetalheDto;
-import sgc.subprocesso.dto.SubprocessoPermissoesDto;
-import sgc.subprocesso.dto.SugestoesDto;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.mapper.SubprocessoDetalheMapper;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
@@ -36,14 +32,11 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -312,7 +305,7 @@ class SubprocessoContextoServiceTest {
             assertThat(result).isNotNull();
             assertThat(result.getAtividades()).hasSize(2);
             
-            SubprocessoCadastroDto.AtividadeCadastroDto atividadeDto1 = result.getAtividades().get(0);
+            SubprocessoCadastroDto.AtividadeCadastroDto atividadeDto1 = result.getAtividades().getFirst();
             assertThat(atividadeDto1.getCodigo()).isEqualTo(1L);
             assertThat(atividadeDto1.getDescricao()).isEqualTo("Atividade 1");
             assertThat(atividadeDto1.getConhecimentos()).hasSize(2);

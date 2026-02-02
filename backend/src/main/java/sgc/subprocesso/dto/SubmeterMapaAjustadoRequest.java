@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
+import org.jspecify.annotations.Nullable;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 import java.time.LocalDateTime;
@@ -17,16 +18,21 @@ import java.util.List;
  */
 @Builder
 public record SubmeterMapaAjustadoRequest(
-        @NotBlank(message = "A justificativa é obrigatória") @Size(max = 500, message = "A justificativa deve ter no máximo 500 caracteres") @SanitizarHtml String justificativa,
+        @NotBlank(message = "A justificativa é obrigatória")
+        @Size(max = 500, message = "A justificativa deve ter no máximo 500 caracteres")
+        @SanitizarHtml
+        String justificativa,
 
-                LocalDateTime dataLimiteEtapa2,
+        @Nullable
+        LocalDateTime dataLimiteEtapa2,
 
-                @Valid List<CompetenciaAjusteDto> competencias) {
+        @Valid
+        List<CompetenciaAjusteDto> competencias) {
 
-        /**
-         * Construtor para compatibilidade com testes legados.
-         */
-        public SubmeterMapaAjustadoRequest(String justificativa, LocalDateTime dataLimiteEtapa2) {
-                this(justificativa, dataLimiteEtapa2, Collections.emptyList());
-        }
+    /**
+     * Construtor para compatibilidade com testes legados.
+     */
+    public SubmeterMapaAjustadoRequest(String justificativa, LocalDateTime dataLimiteEtapa2) {
+        this(justificativa, dataLimiteEtapa2, Collections.emptyList());
+    }
 }

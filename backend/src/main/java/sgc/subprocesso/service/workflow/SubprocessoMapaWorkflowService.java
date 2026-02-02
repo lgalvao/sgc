@@ -393,6 +393,11 @@ public class SubprocessoMapaWorkflowService {
 
         sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));
         sp.setDataFimEtapa1(LocalDateTime.now());
+
+        if (request.dataLimiteEtapa2() != null) {
+            sp.setDataLimiteEtapa2(request.dataLimiteEtapa2());
+        }
+
         subprocessoRepo.save(sp);
 
         transicaoService.registrar(RegistrarTransicaoCommand.builder()
@@ -401,6 +406,7 @@ public class SubprocessoMapaWorkflowService {
                 .origem(sp.getUnidade())
                 .destino(sp.getUnidade())
                 .usuario(usuario)
+                .observacoes(request.justificativa())
                 .build());
     }
 

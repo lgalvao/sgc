@@ -3,6 +3,7 @@ package sgc.seguranca;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import sgc.mapa.dto.CompetenciaMapaDto;
@@ -17,12 +18,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class InputValidationSecurityTest {
 
+    private static ValidatorFactory factory;
     private static Validator validator;
 
     @BeforeAll
     static void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+    }
+
+    @AfterAll
+    static void tearDown() {
+        if (factory != null) {
+            factory.close();
+        }
     }
 
     @Test

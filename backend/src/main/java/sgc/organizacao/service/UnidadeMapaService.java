@@ -3,11 +3,11 @@ package sgc.organizacao.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.UnidadeMapa;
 import sgc.organizacao.model.UnidadeMapaRepo;
 
 import java.util.List;
-import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.UnidadeMapa;
 
 /**
  * Serviço especializado para gerenciar mapas vigentes de unidades.
@@ -55,10 +55,10 @@ public class UnidadeMapaService {
      */
     @Transactional
     public void definirMapaVigente(Long codigoUnidade, Mapa mapa) {
-        UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(codigoUnidade)
-                .orElse(new UnidadeMapa());
+        UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(codigoUnidade).orElse(new UnidadeMapa());
         unidadeMapa.setUnidadeCodigo(codigoUnidade);
         unidadeMapa.setMapaVigente(mapa);
+
         unidadeMapaRepo.save(unidadeMapa);
     }
 }

@@ -17,11 +17,11 @@ import org.hibernate.annotations.Immutable;
 @IdClass(VinculacaoUnidadeId.class)
 public class VinculacaoUnidade {
     @Id
-    @Column(name = "unidade_atual_codigo")
+    @Column(name = "unidade_atual_codigo", nullable = false)
     private Long unidadeAtualCodigo;
 
     @Id
-    @Column(name = "unidade_anterior_codigo")
+    @Column(name = "unidade_anterior_codigo", nullable = false)
     private Long unidadeAnteriorCodigo;
 
     @Column(name = "demais_unidades_historicas")

@@ -1,5 +1,6 @@
 package sgc.mapa.mapper;
 
+import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -28,7 +29,7 @@ public interface MapaCompletoMapper {
     @Mapping(target = "codigo", source = "codigo")
     @Mapping(target = "descricao", source = "descricao")
     @Mapping(target = "atividadesCodigos", source = "atividades", qualifiedByName = "mapAtividadesCodigos")
-    CompetenciaMapaDto toDto(Competencia competencia);
+    CompetenciaMapaDto toDto(@Nullable Competencia competencia);
 
     @Named("mapAtividadesCodigos")
     default List<Long> mapAtividadesCodigos(Set<Atividade> atividades) {

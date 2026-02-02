@@ -1,48 +1,31 @@
 package sgc.subprocesso.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeMapa;
 import sgc.organizacao.model.Usuario;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
-import sgc.subprocesso.dto.CompetenciaAjusteDto;
-import sgc.subprocesso.dto.CompetenciaRequest;
-import sgc.subprocesso.dto.ContextoEdicaoDto;
-import sgc.subprocesso.dto.CriarSubprocessoRequest;
-import sgc.subprocesso.dto.DisponibilizarMapaRequest;
-import sgc.subprocesso.dto.MapaAjusteDto;
-import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
-import sgc.subprocesso.dto.SubprocessoCadastroDto;
-import sgc.subprocesso.dto.SubprocessoDetalheDto;
-import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.dto.SubprocessoPermissoesDto;
-import sgc.subprocesso.dto.SubprocessoSituacaoDto;
-import sgc.subprocesso.dto.SugestoesDto;
-import sgc.subprocesso.dto.ValidacaoCadastroDto;
-import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.processo.model.Processo;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
+import sgc.subprocesso.service.factory.SubprocessoFactory;
 import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
+
 import java.time.LocalDate;
 import java.util.Collection;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapa;
-import sgc.processo.model.Processo;
-import sgc.subprocesso.service.factory.SubprocessoFactory;
+import java.util.List;
 
 /**
  * Facade para orquestrar operações de Subprocesso.
@@ -66,8 +49,6 @@ import sgc.subprocesso.service.factory.SubprocessoFactory;
 @RequiredArgsConstructor
 @Slf4j
 public class SubprocessoFacade {
-
-    // Services decomposed (package-private)
     private final SubprocessoCrudService crudService;
     private final SubprocessoValidacaoService validacaoService;
     private final SubprocessoCadastroWorkflowService cadastroWorkflowService;
@@ -78,11 +59,7 @@ public class SubprocessoFacade {
     private final SubprocessoContextoService contextoService;
     private final SubprocessoPermissaoCalculator permissaoCalculator;
     private final SubprocessoFactory subprocessoFactory;
-
-    // Utility services
     private final UsuarioFacade usuarioService;
-
-    // ===== Operações CRUD =====
 
     @Transactional(readOnly = true)
     public Subprocesso buscarSubprocesso(Long codigo) {
@@ -127,7 +104,7 @@ public class SubprocessoFacade {
     // ===== Consultas e Detalhes =====
 
     @Transactional(readOnly = true)
-    public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil) {
+    public SubprocessoDetalheDto obterDetalhes(Long codigo) {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
         return contextoService.obterDetalhes(codigo, usuario);
     }
@@ -153,7 +130,7 @@ public class SubprocessoFacade {
     }
 
     @Transactional(readOnly = true)
-    public ContextoEdicaoDto obterContextoEdicao(Long codigo, Perfil perfil) {
+    public ContextoEdicaoDto obterContextoEdicao(Long codigo) {
         return contextoService.obterContextoEdicao(codigo);
     }
 
@@ -170,17 +147,6 @@ public class SubprocessoFacade {
     @Transactional(readOnly = true)
     public List<Subprocesso> listarEntidadesPorProcesso(Long codProcesso) {
         return crudService.listarEntidadesPorProcesso(codProcesso);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Subprocesso> listarPorProcessoESituacao(Long codProcesso, SituacaoSubprocesso situacao) {
-        return crudService.listarPorProcessoESituacao(codProcesso, situacao);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Subprocesso> listarPorProcessoUnidadeESituacoes(Long codProcesso, Long codUnidade,
-            List<SituacaoSubprocesso> situacoes) {
-        return crudService.listarPorProcessoUnidadeESituacoes(codProcesso, codUnidade, situacoes);
     }
 
     @Transactional(readOnly = true)
@@ -228,15 +194,6 @@ public class SubprocessoFacade {
     public SubprocessoCadastroDto obterCadastro(Long codigo) {
         return contextoService.obterCadastro(codigo);
     }
-
-    // ===== Permissões =====
-
-    @Transactional(readOnly = true)
-    public void calcularPermissoes(Subprocesso subprocesso, Usuario usuario) {
-        permissaoCalculator.calcularPermissoes(subprocesso, usuario);
-    }
-
-    // ===== Workflow de Cadastro =====
 
     @Transactional
     public void disponibilizarCadastro(Long codigo, Usuario usuario) {
@@ -295,8 +252,6 @@ public class SubprocessoFacade {
             cadastroWorkflowService.homologarCadastroEmBloco(ids, usuario);
         }
     }
-
-    // ===== Workflow de Mapa =====
 
     @Transactional
     public MapaCompletoDto salvarMapaSubprocesso(Long codigo, SalvarMapaRequest request) {

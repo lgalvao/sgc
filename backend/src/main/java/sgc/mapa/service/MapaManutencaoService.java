@@ -26,22 +26,14 @@ import java.util.*;
 @Transactional
 @RequiredArgsConstructor
 public class MapaManutencaoService {
-
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo competenciaRepo;
     private final ConhecimentoRepo conhecimentoRepo;
     private final MapaRepo mapaRepo;
-    
     private final ComumRepo repo;
-    
     private final AtividadeMapper atividadeMapper;
     private final ConhecimentoMapper conhecimentoMapper;
-    
     private final ApplicationEventPublisher eventPublisher;
-
-    // ============================================================================================
-    // SEÇÃO: ATIVIDADE
-    // ============================================================================================
 
     @Transactional(readOnly = true)
     public List<AtividadeResponse> listarAtividades() {
@@ -63,14 +55,8 @@ public class MapaManutencaoService {
         return atividadeRepo.findAllById(codigos);
     }
 
-    @Transactional(readOnly = true)
-    public int contarAtividadesPorMapa(Long codMapa) {
-        return (int) atividadeRepo.countByMapaCodigo(codMapa);
-    }
-
     public AtividadeResponse criarAtividade(CriarAtividadeRequest request) {
         Mapa mapa = repo.buscar(Mapa.class, request.mapaCodigo());
-
         notificarAlteracaoMapa(request.mapaCodigo());
 
         Atividade entidade = atividadeMapper.toEntity(request);
@@ -149,10 +135,6 @@ public class MapaManutencaoService {
         return atividadeRepo.findWithConhecimentosByMapaCodigo(mapaCodigo);
     }
 
-    // ============================================================================================
-    // SEÇÃO: COMPETÊNCIA
-    // ============================================================================================
-
     public Competencia buscarCompetenciaPorCodigo(Long codCompetencia) {
         return competenciaRepo.findById(codCompetencia)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência", codCompetencia));
@@ -196,6 +178,7 @@ public class MapaManutencaoService {
                 .descricao(descricao)
                 .mapa(mapa)
                 .build();
+
         prepararCompetenciasAtividades(codigosAtividades, competencia);
         competenciaRepo.save(competencia);
 
@@ -239,10 +222,6 @@ public class MapaManutencaoService {
         atividades.forEach(atividade -> atividade.getCompetencias().add(competencia));
     }
 
-    // ============================================================================================
-    // SEÇÃO: CONHECIMENTO
-    // ============================================================================================
-
     @Transactional(readOnly = true)
     public List<ConhecimentoResponse> listarConhecimentosPorAtividade(Long codAtividade) {
         if (!atividadeRepo.existsById(codAtividade)) {
@@ -270,6 +249,7 @@ public class MapaManutencaoService {
                     if (mapa != null) {
                         notificarAlteracaoMapa(mapa.getCodigo());
                     }
+
                     var conhecimento = conhecimentoMapper.toEntity(request);
                     conhecimento.setAtividade(atividade);
                     var salvo = conhecimentoRepo.save(conhecimento);
@@ -306,8 +286,6 @@ public class MapaManutencaoService {
                         });
     }
     
-    // Auxiliares
-
     private void executarExclusaoConhecimento(Conhecimento conhecimento) {
         var mapa = conhecimento.getAtividade().getMapa();
         if (mapa != null) {
@@ -319,10 +297,6 @@ public class MapaManutencaoService {
     private void notificarAlteracaoMapa(Long mapaCodigo) {
         eventPublisher.publishEvent(new EventoMapaAlterado(mapaCodigo));
     }
-
-    // ============================================================================================
-    // SEÇÃO: MAPA - Operações básicas consolidadas
-    // ============================================================================================
 
     @Transactional(readOnly = true)
     public List<Mapa> listarTodosMapas() {

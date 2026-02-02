@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+import {spawn} from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -69,7 +69,7 @@ function cleanLog(output) {
         const trimmed = line.trim();
         if (filters.some(f => f.test(trimmed))) return false;
         // Filtro específico para os pontos do vitest/jest
-        return !/^[\.·]+$/.test(trimmed);
+        return !/^[.·]+$/.test(trimmed);
 
     });
 

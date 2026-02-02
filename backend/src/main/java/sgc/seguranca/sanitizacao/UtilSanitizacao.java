@@ -1,5 +1,6 @@
 package sgc.seguranca.sanitizacao;
 
+import org.jspecify.annotations.Nullable;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 
@@ -22,7 +23,7 @@ public final class UtilSanitizacao {
      * @param entrada O texto a ser sanitizado.
      * @return O texto sem tags HTML, ou nulo se a entrada for nula.
      */
-    public static String sanitizar(String entrada) {
+    public static @Nullable String sanitizar(@Nullable String entrada) {
         if (entrada == null) {
             return null;
         }

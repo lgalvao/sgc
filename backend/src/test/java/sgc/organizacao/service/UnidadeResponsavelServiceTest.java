@@ -12,11 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.ComumRepo;
-import sgc.organizacao.dto.AtribuicaoTemporariaDto;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
-import sgc.organizacao.dto.UnidadeResponsavelDto;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.dto.UsuarioDto;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
 
@@ -24,9 +20,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -488,8 +483,8 @@ class UnidadeResponsavelServiceTest {
             // Given
             List<Long> unidadesCodigos = List.of(1L, 2L);
 
-            Usuario titular1 = criarUsuarioComAtribuicoes("111111111111", "João Silva", 1L);
-            Usuario titular2 = criarUsuarioComAtribuicoes("222222222222", "Maria Santos", 2L);
+            Usuario titular1 = criarUsuarioComAtribuicoes("111111111111", "João Silva");
+            Usuario titular2 = criarUsuarioComAtribuicoes("222222222222", "Maria Santos");
 
             List<Usuario> todosChefes = List.of(titular1, titular2);
             List<Usuario> chefesCompletos = List.of(titular1, titular2);
@@ -531,8 +526,8 @@ class UnidadeResponsavelServiceTest {
             // Given
             List<Long> unidadesCodigos = List.of(1L);
 
-            Usuario titular = criarUsuarioComAtribuicoes("111111111111", "João Silva", 1L);
-            Usuario substituto = criarUsuarioComAtribuicoes("222222222222", "Maria Santos", 1L);
+            Usuario titular = criarUsuarioComAtribuicoes("111111111111", "João Silva");
+            Usuario substituto = criarUsuarioComAtribuicoes("222222222222", "Maria Santos");
 
             List<Usuario> todosChefes = List.of(titular, substituto);
             List<Usuario> chefesCompletos = List.of(titular, substituto);
@@ -567,8 +562,8 @@ class UnidadeResponsavelServiceTest {
             List<Long> unidadesCodigos = List.of(1L, 2L);
 
             // Usuário com perfil de chefe em múltiplas unidades, mas só queremos 1L e 2L
-            Usuario usuario1 = criarUsuarioComAtribuicoes("111111111111", "João Silva", 1L);
-            Usuario usuario2 = criarUsuarioComAtribuicoes("222222222222", "Maria Santos", 2L);
+            Usuario usuario1 = criarUsuarioComAtribuicoes("111111111111", "João Silva");
+            Usuario usuario2 = criarUsuarioComAtribuicoes("222222222222", "Maria Santos");
 
             List<Usuario> todosChefes = List.of(usuario1, usuario2);
 
@@ -602,7 +597,7 @@ class UnidadeResponsavelServiceTest {
             // Given
             List<Long> unidadesCodigos = List.of(1L);
 
-            Usuario usuario1 = criarUsuarioComAtribuicoes("111111111111", "João Silva", 1L);
+            Usuario usuario1 = criarUsuarioComAtribuicoes("111111111111", "João Silva");
 
             List<Usuario> todosChefes = List.of(usuario1);
 
@@ -632,7 +627,7 @@ class UnidadeResponsavelServiceTest {
 
     // Métodos auxiliares para criar objetos de teste
     
-    private Usuario criarUsuarioComAtribuicoes(String titulo, String nome, Long unidadeCodigo) {
+    private Usuario criarUsuarioComAtribuicoes(String titulo, String nome) {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(titulo);
         usuario.setNome(nome);

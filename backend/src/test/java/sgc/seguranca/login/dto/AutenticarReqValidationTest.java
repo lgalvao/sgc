@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -19,12 +20,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Testes de Validação: AutenticarRequest")
 class AutenticarReqValidationTest {
 
+    private ValidatorFactory factory;
     private Validator validator;
 
     @BeforeEach
     void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (factory != null) {
+            factory.close();
+        }
     }
 
     @Test

@@ -3,6 +3,7 @@ package sgc.integracao.mocks;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,7 +33,7 @@ public class WithMockAdminSecurityContextFactory
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Override
-    public SecurityContext createSecurityContext(WithMockAdmin customUser) {
+    public SecurityContext createSecurityContext(@NonNull WithMockAdmin customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         String tituloAdmin = "111111111111";
 

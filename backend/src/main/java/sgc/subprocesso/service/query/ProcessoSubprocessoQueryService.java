@@ -1,6 +1,7 @@
 package sgc.subprocesso.service.query;
 
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -37,7 +38,7 @@ public class ProcessoSubprocessoQueryService {
      * @param unidadeCodigos códigos das unidades a verificar
      * @return true se pelo menos uma unidade participa do processo
      */
-    public boolean verificarAcessoUnidadeAoProcesso(Long processoId, List<Long> unidadeCodigos) {
+    public boolean verificarAcessoUnidadeAoProcesso(Long processoId, @Nullable List<Long> unidadeCodigos) {
         if (unidadeCodigos == null || unidadeCodigos.isEmpty()) {
             return false;
         }

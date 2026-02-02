@@ -1,6 +1,5 @@
-import type { Page } from '@playwright/test';
-import { expect, test } from './fixtures/base.js';
-import { login, USUARIOS } from './helpers/helpers-auth.js';
+import {expect, test} from './fixtures/base.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
 
 test.describe('UI Consistency & Accessibility', () => {
 

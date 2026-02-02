@@ -79,7 +79,7 @@ public class SubprocessoCrudController {
             @RequestParam(required = false) Perfil perfil,
             @RequestParam(required = false) Long unidadeUsuario) {
 
-        return subprocessoFacade.obterDetalhes(codigo, perfil);
+        return subprocessoFacade.obterDetalhes(codigo);
     }
 
     /**

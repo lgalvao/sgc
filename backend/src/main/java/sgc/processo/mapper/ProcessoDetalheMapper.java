@@ -1,5 +1,6 @@
 package sgc.processo.mapper;
 
+import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import sgc.organizacao.model.Unidade;
@@ -24,5 +25,5 @@ public interface ProcessoDetalheMapper {
     @Mapping(target = "dataLimiteFormatada", ignore = true)
     @Mapping(target = "codSubprocesso", ignore = true)
     @Mapping(target = "mapaCodigo", ignore = true)
-    ProcessoDetalheDto.UnidadeParticipanteDto toUnidadeParticipanteDto(Unidade unidade);
+    ProcessoDetalheDto.UnidadeParticipanteDto toUnidadeParticipanteDto(@Nullable Unidade unidade);
 }

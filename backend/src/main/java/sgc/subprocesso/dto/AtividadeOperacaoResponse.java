@@ -18,8 +18,6 @@ import java.util.List;
 @Builder
 public record AtividadeOperacaoResponse(
         @Nullable AtividadeDto atividade,
-
-                SubprocessoSituacaoDto subprocesso,
-
-                List<AtividadeDto> atividadesAtualizadas) {
+        SubprocessoSituacaoDto subprocesso,
+        List<AtividadeDto> atividadesAtualizadas) {
 }

@@ -234,7 +234,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve falhar ao buscar subprocesso inexistente")
     void falhaSubprocessoInexistente() {
         Assertions
-                .assertThatThrownBy(() -> subprocessoFacade.obterDetalhes(99999L, Perfil.ADMIN))
+                .assertThatThrownBy(() -> subprocessoFacade.obterDetalhes(99999L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

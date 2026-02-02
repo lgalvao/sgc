@@ -1,3 +1,3 @@
-## 2026-01-30 - Unwired Props in Modals
-**Learning:** Found a `loading` prop in `AceitarMapaModal` that was defined but completely unused in the template. This indicates a pattern where the interface was prepared for feedback but the implementation was missed.
-**Action:** When seeing "dead" props in component definitions, check if they were meant for important UX states like loading/disabled and wire them up.
+## 2025-02-18 - [Standardizing Required Field Indicators]
+**Learning:** `BFormGroup` in `bootstrap-vue-next` (and Vue generally) requires using the `#label` slot to inject HTML content like `<span class="text-danger">*</span>`, as the `label` prop only accepts strings. This pattern must be consistent across forms for accessibility and UX.
+**Action:** When adding required field indicators, always use `<template #label>Label <span class="text-danger" aria-hidden="true">*</span></template>` and ensure the `required` attribute is present on the input itself for browser validation.

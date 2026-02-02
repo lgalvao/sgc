@@ -3,6 +3,7 @@ package sgc.configuracao.model;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -17,12 +18,20 @@ import jakarta.validation.ValidatorFactory;
 @DisplayName("Parametro Validation")
 class ParametroValidationTest {
 
+    private static ValidatorFactory factory;
     private static Validator validator;
 
     @BeforeAll
     static void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+    }
+
+    @AfterAll
+    static void tearDown() {
+        if (factory != null) {
+            factory.close();
+        }
     }
 
     @Test

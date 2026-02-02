@@ -8,5 +8,5 @@ import sgc.comum.validacao.TituloEleitoral;
  */
 @Builder
 public record AutorizarRequest(
-                @TituloEleitoral String tituloEleitoral) {
+        @TituloEleitoral String tituloEleitoral) {
 }

@@ -21,7 +21,7 @@ public class NotificacaoModelosServiceMock extends NotificacaoModelosService {
     }
 
     @Override
-    public String criarEmailProcessoIniciado(
+    public @NonNull String criarEmailProcessoIniciado(
             @NonNull String nomeUnidade,
             @NonNull String nomeProcesso,
             @NonNull String tipoProcesso,
@@ -54,12 +54,12 @@ public class NotificacaoModelosServiceMock extends NotificacaoModelosService {
     }
 
     @Override
-    public String criarEmailProcessoFinalizadoPorUnidade(@NonNull String siglaUnidade, @NonNull String nomeProcesso) {
+    public @NonNull String criarEmailProcessoFinalizadoPorUnidade(@NonNull String siglaUnidade, @NonNull String nomeProcesso) {
         return "<html><body>Mock Email de Processo Finalizado Por Unidade</body></html>";
     }
 
     @Override
-    public String criarEmailProcessoFinalizadoUnidadesSubordinadas(
+    public @NonNull String criarEmailProcessoFinalizadoUnidadesSubordinadas(
             @NonNull String siglaUnidade, @NonNull String nomeProcesso, @NonNull List<String> siglasUnidadesSubordinadas) {
         return "<html><body>Mock Email de Processo Finalizado Unidades Subordinadas</body></html>";
     }

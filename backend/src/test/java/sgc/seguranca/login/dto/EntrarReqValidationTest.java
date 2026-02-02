@@ -14,12 +14,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Testes de Validação: EntrarRequest")
 class EntrarReqValidationTest {
 
+    private ValidatorFactory factory;
     private Validator validator;
 
     @BeforeEach
     void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (factory != null) {
+            factory.close();
+        }
     }
 
     @Nested

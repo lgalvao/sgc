@@ -1,6 +1,5 @@
 package sgc.subprocesso;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,6 @@ import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.comum.erros.ErroValidacao;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.model.Atividade;
 import sgc.organizacao.UsuarioFacade;
@@ -32,8 +30,10 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(SubprocessoCadastroController.class)
 @Import(RestExceptionHandler.class)
@@ -57,11 +57,6 @@ class SubprocessoCadastroControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @BeforeEach
-    void setUp() {
-        // ObjectMapper is autowired, no manual setup needed
-    }
 
     @Nested
     @DisplayName("obterHistoricoCadastro")
@@ -135,7 +130,7 @@ class SubprocessoCadastroControllerTest {
             // Act & Assert
             mockMvc.perform(post("/api/subprocessos/1/cadastro/disponibilizar")
                             .with(csrf()))
-                    .andExpect(status().isUnprocessableEntity());
+                    .andExpect(status().is(422));
         }
     }
 
@@ -179,7 +174,7 @@ class SubprocessoCadastroControllerTest {
             // Act & Assert
             mockMvc.perform(post("/api/subprocessos/1/disponibilizar-revisao")
                             .with(csrf()))
-                    .andExpect(status().isUnprocessableEntity());
+                    .andExpect(status().is(422));
         }
     }
 

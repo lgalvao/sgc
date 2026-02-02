@@ -1,5 +1,6 @@
 package sgc.subprocesso.mapper;
 
+import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -16,5 +17,5 @@ public interface SubprocessoMapper {
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidade.codigo", target = "codUnidade")
     @Mapping(source = "mapa.codigo", target = "codMapa")
-    SubprocessoDto toDto(Subprocesso subprocesso);
+    SubprocessoDto toDto(@Nullable Subprocesso subprocesso);
 }

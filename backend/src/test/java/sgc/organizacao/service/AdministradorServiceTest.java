@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.model.Administrador;
 import sgc.organizacao.model.AdministradorRepo;
 
 import static org.assertj.core.api.Assertions.assertThat;

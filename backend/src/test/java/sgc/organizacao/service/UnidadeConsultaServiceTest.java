@@ -17,12 +17,13 @@ import sgc.testutils.UnidadeTestBuilder;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 /**
  * Testes unitários para {@link UnidadeConsultaService}.
- * 
+ * <p>
  * Foco em cobertura das 2 branches não cobertas.
  */
 @ExtendWith(MockitoExtension.class)

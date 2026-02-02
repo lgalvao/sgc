@@ -5,7 +5,7 @@ import sgc.organizacao.model.Usuario;
 
 /**
  * Builder para criação de objetos Usuario em testes.
- * 
+ * <p>
  * Implementa apenas os setters realmente presentes no modelo `Usuario`.
  */
 public class UsuarioTestBuilder {

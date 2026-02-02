@@ -49,15 +49,6 @@ public class Subprocesso extends EntidadeBase {
     @Column(name = "situacao", length = 50)
     private SituacaoSubprocesso situacao;
 
-    /**
-     * Retorna o mapa de competências associado a este subprocesso.
-     *
-     * @return Mapa de competências ou null se ainda não foi criado
-     */
-    public Mapa getMapa() {
-        return mapa;
-    }
-
     public @NonNull Processo getProcesso() {
         return processo;
     }

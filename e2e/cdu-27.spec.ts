@@ -1,6 +1,5 @@
-import type { Page } from '@playwright/test';
 import {expect, test} from './fixtures/auth-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';

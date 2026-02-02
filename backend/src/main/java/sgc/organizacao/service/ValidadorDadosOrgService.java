@@ -86,6 +86,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
                 .toList();
     }
 
+    @SuppressWarnings("ConstantConditions")
     private Map<String, Usuario> carregarUsuariosTitulares(List<Unidade> unidades) {
         List<String> titulos = unidades.stream()
                 .map(Unidade::getTituloTitular)
@@ -104,6 +105,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
     /**
      * Valida que toda unidade ativa tem titular com título eleitoral.
      */
+    @SuppressWarnings("ConstantConditions")
     private void validarTitularesUnidades(List<Unidade> unidades, List<String> violacoes) {
         for (Unidade u : unidades) {
             if (u.getTituloTitular() == null || u.getTituloTitular().isBlank()) {
@@ -115,6 +117,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
     /**
      * Valida que todos os titulares de unidades têm email cadastrado.
      */
+    @SuppressWarnings("ConstantConditions")
     private void validarEmailsTitulares(List<Unidade> unidades, Map<String, Usuario> usuarios, List<String> violacoes) {
         for (Unidade u : unidades) {
             String tituloTitular = u.getTituloTitular();

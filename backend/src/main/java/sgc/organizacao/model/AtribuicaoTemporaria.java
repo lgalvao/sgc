@@ -21,29 +21,28 @@ import java.time.LocalDateTime;
 @SuperBuilder
 public class AtribuicaoTemporaria extends EntidadeBase {
     @ManyToOne
-    @JoinColumn(name = "unidade_codigo")
+    @JoinColumn(name = "unidade_codigo", nullable = false)
     private Unidade unidade;
 
-    @Column(name = "usuario_titulo", length = 12)
+    @Column(name = "usuario_titulo", length = 12, nullable = false)
     private String usuarioTitulo;
 
-    @Column(name = "usuario_matricula", length = 8)
+    @Column(name = "usuario_matricula", length = 8, nullable = false)
     private String usuarioMatricula;
 
-    @Column(name = "data_inicio")
+    @Column(name = "data_inicio", nullable = false)
     private LocalDateTime dataInicio;
 
-    @Column(name = "data_termino")
+    @Column(name = "data_termino", nullable = false)
     private LocalDateTime dataTermino;
 
     @Column(name = "justificativa", length = 500)
     private String justificativa;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_titulo", insertable = false, updatable = false)
+    @JoinColumn(name = "usuario_titulo", insertable = false, updatable = false, nullable = false)
     private Usuario usuario;
 
     @Transient
     private Perfil perfil;
-
 }

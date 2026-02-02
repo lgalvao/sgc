@@ -10,5 +10,6 @@ import java.time.LocalDate;
  */
 @Builder
 public record AlterarDataLimiteRequest(
-                @NotNull(message = "A nova data limite é obrigatória") LocalDate novaDataLimite) {
+        @NotNull(message = "A nova data limite é obrigatória")
+        LocalDate novaDataLimite) {
 }

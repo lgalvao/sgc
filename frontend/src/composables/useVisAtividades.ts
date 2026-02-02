@@ -1,17 +1,14 @@
-import { computed, onMounted, ref, type ComputedRef, type Ref } from "vue";
-import { useRouter, type Router } from "vue-router";
-import { storeToRefs } from "pinia";
-import { useAtividadesStore } from "@/stores/atividades";
-import { useUnidadesStore } from "@/stores/unidades";
-import { useProcessosStore } from "@/stores/processos";
-import { usePerfilStore } from "@/stores/perfil";
-import { useAnalisesStore } from "@/stores/analises";
-import { useMapasStore } from "@/stores/mapas";
-import { useSubprocessosStore } from "@/stores/subprocessos";
+import {computed, type ComputedRef, onMounted, ref, type Ref} from "vue";
+import {useRouter} from "vue-router";
+import {storeToRefs} from "pinia";
+import {useAtividadesStore} from "@/stores/atividades";
+import {useUnidadesStore} from "@/stores/unidades";
+import {useProcessosStore} from "@/stores/processos";
+import {usePerfilStore} from "@/stores/perfil";
+import {useAnalisesStore} from "@/stores/analises";
+import {useMapasStore} from "@/stores/mapas";
+import {useSubprocessosStore} from "@/stores/subprocessos";
 import {
-    Perfil,
-    SituacaoSubprocesso,
-    TipoProcesso,
     type AceitarCadastroRequest,
     type AnaliseCadastro,
     type AnaliseValidacao,
@@ -19,6 +16,9 @@ import {
     type DevolverCadastroRequest,
     type HomologarCadastroRequest,
     type ImpactoMapa,
+    Perfil,
+    SituacaoSubprocesso,
+    TipoProcesso,
     type Unidade,
 } from "@/types/tipos";
 

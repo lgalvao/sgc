@@ -15,7 +15,6 @@ import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.mapper.ProcessoMapper;
-import sgc.processo.model.AcaoProcesso;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -28,6 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import static sgc.processo.model.AcaoProcesso.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**
  * Orquestra operações de Processo.
@@ -118,13 +120,11 @@ public class ProcessoFacade {
                 .toList();
     }
 
-    public Page<Processo> listarTodos(
-            Pageable pageable) {
+    public Page<Processo> listarTodos(Pageable pageable) {
         return processoConsultaService.listarTodos(pageable);
     }
 
-    public Page<Processo> listarPorParticipantesIgnorandoCriado(
-            List<Long> unidadeIds, Pageable pageable) {
+    public Page<Processo> listarPorParticipantesIgnorandoCriado(List<Long> unidadeIds, Pageable pageable) {
         return processoConsultaService.listarPorParticipantesIgnorandoCriado(unidadeIds, pageable);
     }
 
@@ -190,10 +190,10 @@ public class ProcessoFacade {
     public void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoRequest req) {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
 
-        if (req.acao() == AcaoProcesso.DISPONIBILIZAR) {
-             DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(
-                req.dataLimite(), 
-                "Disponibilização em bloco"
+        if (req.acao() == DISPONIBILIZAR) {
+            DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(
+                    req.dataLimite(),
+                    "Disponibilização em bloco"
             );
             subprocessoFacade.disponibilizarMapaEmBloco(req.unidadeCodigos(), codProcesso, dispReq, usuario);
             return;
@@ -214,13 +214,13 @@ public class ProcessoFacade {
             for (SubprocessoDto spDto : subprocessos) {
                 Long codUnidade = spDto.getCodUnidade();
 
-                if (req.acao() == AcaoProcesso.ACEITAR) {
+                if (req.acao() == ACEITAR) {
                     if (isSituacaoCadastro(spDto.getSituacao())) {
                         unidadesAceitarCadastro.add(codUnidade);
                     } else {
                         unidadesAceitarValidacao.add(codUnidade);
                     }
-                } else if (req.acao() == AcaoProcesso.HOMOLOGAR) {
+                } else if (req.acao() == HOMOLOGAR) {
                     if (isSituacaoCadastro(spDto.getSituacao())) {
                         unidadesHomologarCadastro.add(codUnidade);
                     } else {
@@ -233,12 +233,12 @@ public class ProcessoFacade {
         executarAcoesBatch(codProcesso, usuario, unidadesAceitarCadastro, unidadesAceitarValidacao, unidadesHomologarCadastro, unidadesHomologarValidacao);
     }
 
-    private void executarAcoesBatch(Long codProcesso, 
-        Usuario usuario, 
-        List<Long> unidadesAceitarCadastro, 
-        List<Long> unidadesAceitarValidacao, 
-        List<Long> unidadesHomologarCadastro, 
-        List<Long> unidadesHomologarValidacao) {
+    private void executarAcoesBatch(Long codProcesso,
+                                    Usuario usuario,
+                                    List<Long> unidadesAceitarCadastro,
+                                    List<Long> unidadesAceitarValidacao,
+                                    List<Long> unidadesHomologarCadastro,
+                                    List<Long> unidadesHomologarValidacao) {
 
         if (!unidadesAceitarCadastro.isEmpty()) {
             subprocessoFacade.aceitarCadastroEmBloco(unidadesAceitarCadastro, codProcesso, usuario);
@@ -255,8 +255,8 @@ public class ProcessoFacade {
     }
 
     private boolean isSituacaoCadastro(SituacaoSubprocesso situacao) {
-        return situacao == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO || 
-               situacao == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
-               situacao == SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA; 
+        return situacao == MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+                situacao == REVISAO_CADASTRO_DISPONIBILIZADA ||
+                situacao == REVISAO_CADASTRO_HOMOLOGADA;
     }
 }

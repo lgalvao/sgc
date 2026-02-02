@@ -5,6 +5,7 @@ import java.util.List;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
+import org.jspecify.annotations.Nullable;
 import java.time.LocalDate;
 
 /**
@@ -16,5 +17,5 @@ public record ProcessarEmBlocoRequest(
 
                 @NotEmpty(message = "Pelo menos um subprocesso deve ser selecionado") List<Long> subprocessos,
                 
-                LocalDate dataLimite) {
+                @Nullable LocalDate dataLimite) {
 }

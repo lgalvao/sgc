@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class TestSecurityController {
+    @SuppressWarnings("EmptyMethod")
     @PostMapping("/test/validacao")
     void teste(@Valid @RequestBody TestDto dto) {
     }

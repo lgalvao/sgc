@@ -53,7 +53,4 @@ public class Processo extends EntidadeBase {
     @Builder.Default
     private Set<Unidade> participantes = new HashSet<>();
 
-    public Set<Unidade> getParticipantes() {
-        return participantes;
-    }
 }

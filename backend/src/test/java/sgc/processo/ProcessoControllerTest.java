@@ -62,10 +62,19 @@ class ProcessoControllerTest {
     @Captor
     private ArgumentCaptor<AtualizarProcessoRequest> atualizarCaptor;
 
+    private AutoCloseable closeable;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
         objectMapper = new ObjectMapper();
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        if (closeable != null) {
+            closeable.close();
+        }
     }
 
     @Nested

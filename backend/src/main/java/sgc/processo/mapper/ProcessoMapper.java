@@ -1,5 +1,6 @@
 package sgc.processo.mapper;
 
+import org.jspecify.annotations.Nullable;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,10 +22,10 @@ public interface ProcessoMapper {
     @Mapping(target = "situacaoLabel", ignore = true)
     @Mapping(target = "tipoLabel", ignore = true)
     @Mapping(target = "unidadesParticipantes", ignore = true)
-    ProcessoDto toDto(Processo processo);
+    ProcessoDto toDto(@Nullable Processo processo);
 
     @Mapping(target = "participantes", ignore = true)
-    Processo toEntity(ProcessoDto processoDTO);
+    Processo toEntity(@Nullable ProcessoDto processoDTO);
 
     @AfterMapping
     default void mapUnidadesParticipantes(Processo processo, @MappingTarget ProcessoDto dto) {

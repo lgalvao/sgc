@@ -29,12 +29,12 @@ public interface SubprocessoDetalheMapper {
     @Mapping(target = "etapaAtual", source = "sp.etapaAtual")
     @Mapping(target = "movimentacoes", source = "movimentacoes")
     @Mapping(target = "permissoes", source = "permissoes")
-    SubprocessoDetalheDto toDto(Subprocesso sp, @Nullable Usuario responsavel, @Nullable Usuario titular, List<Movimentacao> movimentacoes, @Nullable SubprocessoPermissoesDto permissoes);
+    SubprocessoDetalheDto toDto(@Nullable Subprocesso sp, @Nullable Usuario responsavel, @Nullable Usuario titular, @Nullable List<Movimentacao> movimentacoes, @Nullable SubprocessoPermissoesDto permissoes);
 
     @Mapping(target = "codigo", source = "codigo")
     @Mapping(target = "sigla", source = "sigla")
     @Mapping(target = "nome", source = "nome")
-    SubprocessoDetalheDto.UnidadeDto toUnidadeDto(Unidade unidade);
+    SubprocessoDetalheDto.UnidadeDto toUnidadeDto(@Nullable Unidade unidade);
 
     default SubprocessoDetalheDto.@Nullable ResponsavelDto mapResponsavel(Subprocesso sp, @Nullable Usuario responsavel) {
         if (responsavel == null) return null;

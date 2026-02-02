@@ -12,10 +12,10 @@ import sgc.comum.model.EntidadeBase;
 import sgc.processo.model.Processo;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Immutable
@@ -25,7 +25,7 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 public class Unidade extends EntidadeBase {
-    @Column(name = "nome")
+    @Column(name = "nome", nullable = false)
     private String nome;
 
     @Column(name = "sigla", length = 20, nullable = false)

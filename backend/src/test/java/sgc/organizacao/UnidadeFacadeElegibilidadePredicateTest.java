@@ -10,15 +10,10 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.service.UnidadeConsultaService;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeMapaService;
-import sgc.organizacao.service.UnidadeResponsavelService;
-import sgc.organizacao.service.UsuarioConsultaService;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -45,24 +40,11 @@ import static org.mockito.Mockito.when;
 @Tag("unit")
 @DisplayName("UnidadeFacade - Predicado de Elegibilidade")
 class UnidadeFacadeElegibilidadePredicateTest {
-
-    @Mock
-    private UnidadeConsultaService unidadeConsultaService;
-    
-    @Mock
-    private UsuarioConsultaService usuarioConsultaService;
-    
-    @Mock
-    private UsuarioMapper usuarioMapper;
-    
     @Mock
     private UnidadeHierarquiaService hierarquiaService;
     
     @Mock
     private UnidadeMapaService mapaService;
-    
-    @Mock
-    private UnidadeResponsavelService responsavelService;
 
     @InjectMocks
     private UnidadeFacade facade;

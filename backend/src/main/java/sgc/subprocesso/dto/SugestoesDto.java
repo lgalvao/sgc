@@ -10,6 +10,5 @@ import java.time.LocalDateTime;
 @Builder
 public record SugestoesDto(
         String sugestoes,
-
         LocalDateTime dataHora) {
 }

@@ -10,7 +10,7 @@ import lombok.Builder;
  */
 @Builder
 public record ConhecimentoAjusteDto(
-                Long conhecimentoCodigo,
-                String nome,
-                boolean incluido) {
+        Long conhecimentoCodigo,
+        String nome,
+        boolean incluido) {
 }

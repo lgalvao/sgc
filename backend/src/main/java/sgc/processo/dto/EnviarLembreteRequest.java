@@ -8,5 +8,5 @@ import lombok.Builder;
  */
 @Builder
 public record EnviarLembreteRequest(
-                @NotNull(message = "O código da unidade é obrigatório") Long unidadeCodigo) {
+        @NotNull(message = "O código da unidade é obrigatório") Long unidadeCodigo) {
 }

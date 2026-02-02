@@ -1,7 +1,7 @@
 package sgc.seguranca.acesso;
 
 import lombok.RequiredArgsConstructor;
-import sgc.organizacao.model.Perfil;
+import org.jspecify.annotations.Nullable;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
@@ -104,7 +104,7 @@ public abstract class AbstractAccessPolicy<T> implements AccessPolicy<T> {
                     .anyMatch(a -> hierarquiaService.isSuperiorImediata(unidade, a.getUnidade()));
 
             case TITULAR_UNIDADE -> {
-                String tituloTitular = unidade.getTituloTitular();
+                @Nullable String tituloTitular = unidade.getTituloTitular();
                 yield tituloTitular != null && tituloTitular.equals(usuario.getTituloEleitoral());
             }
         };

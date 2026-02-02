@@ -1,5 +1,6 @@
 package sgc.mapa.mapper;
 
+import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -17,13 +18,13 @@ import sgc.mapa.model.Conhecimento;
 @Mapper(componentModel = "spring")
 public interface ConhecimentoMapper {
     @Mapping(source = "atividade.codigo", target = "atividadeCodigo")
-    ConhecimentoResponse toResponse(Conhecimento conhecimento);
+    ConhecimentoResponse toResponse(@Nullable Conhecimento conhecimento);
 
     @Mapping(target = "codigo", ignore = true)
     @Mapping(target = "atividade", ignore = true)
-    Conhecimento toEntity(CriarConhecimentoRequest request);
+    Conhecimento toEntity(@Nullable CriarConhecimentoRequest request);
 
     @Mapping(target = "codigo", ignore = true)
     @Mapping(target = "atividade", ignore = true)
-    Conhecimento toEntity(AtualizarConhecimentoRequest request);
+    Conhecimento toEntity(@Nullable AtualizarConhecimentoRequest request);
 }

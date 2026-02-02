@@ -17,6 +17,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class Administrador {
     @Id
-    @Column(name = "usuario_titulo", length = 12)
+    @Column(name = "usuario_titulo", length = 12, nullable = false)
     private String usuarioTitulo;
 }

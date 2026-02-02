@@ -8,9 +8,9 @@ import sgc.organizacao.model.Perfil;
  */
 @Builder
 public record EntrarResponse(
-                String tituloEleitoral,
-                String nome,
-                Perfil perfil,
-                Long unidadeCodigo,
-                String token) {
+        String tituloEleitoral,
+        String nome,
+        Perfil perfil,
+        Long unidadeCodigo,
+        String token) {
 }

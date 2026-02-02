@@ -115,7 +115,6 @@ public ProcessoDetalheDto buscarDetalhes(Integer codigo) {
  * @param codigo código do processo a finalizar
  * @throws ErroNegocio se o processo não for encontrado
  * @throws ErroNegocio se o processo não puder ser finalizado (mapas pendentes)
- * @see NotificacaoService#notificarFinalizacao(Integer)
  */
 @Transactional
 public void finalizarProcesso(Integer codigo) {
@@ -161,38 +160,28 @@ public Subprocesso buscar(Integer codigo) {
 
 ```java
 // ❌ ERRADO: Descrição muito genérica
-/**
- * @throws ErroNegocio se houver erro
- */
+
 ```
 
 **Correto:**
 
 ```java
 // ✅ CORRETO: Descreve condições específicas
-/**
- * @throws ErroNegocio se o processo não for encontrado
- * @throws ErroNegocio se o processo não estiver em situação INICIADO
- */
+
 ```
 
 ### ❌ Erro 3: Documentar Exception Genérica
 
 ```java
 // ❌ ERRADO: Exception é muito genérica
-/**
- * @throws Exception se algo der errado
- */
+
 ```
 
 **Correto:**
 
 ```java
 // ✅ CORRETO: Tipos específicos de exceção
-/**
- * @throws ErroNegocio se a validação falhar
- * @throws AcessoNegadoException se o usuário não tiver permissão
- */
+
 ```
 
 ---

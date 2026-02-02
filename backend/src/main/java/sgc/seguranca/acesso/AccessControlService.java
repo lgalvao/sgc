@@ -91,6 +91,7 @@ public class AccessControlService {
                 usuario.getTituloEleitoral(), acao.getDescricao());
     }
 
+    @SuppressWarnings("unused")
     private <T> @Nullable String getMotivoPolicy(T recurso) {
         String motivoPolicy = null;
         switch (recurso) {

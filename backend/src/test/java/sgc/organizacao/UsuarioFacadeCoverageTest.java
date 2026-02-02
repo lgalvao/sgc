@@ -14,7 +14,6 @@ import sgc.organizacao.service.UnidadeConsultaService;
 import sgc.organizacao.service.UsuarioConsultaService;
 import sgc.organizacao.service.UsuarioPerfilService;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

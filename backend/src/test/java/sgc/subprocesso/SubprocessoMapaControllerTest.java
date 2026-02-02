@@ -294,12 +294,12 @@ class SubprocessoMapaControllerTest {
         @WithMockUser
         void obterContextoEdicaoSemPerfil() throws Exception {
                 ContextoEdicaoDto dto = ContextoEdicaoDto.builder().build();
-                when(subprocessoFacade.obterContextoEdicao(1L, null)).thenReturn(dto);
+                when(subprocessoFacade.obterContextoEdicao(1L)).thenReturn(dto);
 
                 mockMvc.perform(get("/api/subprocessos/1/contexto-edicao"))
                                 .andExpect(status().isOk());
 
-                verify(subprocessoFacade).obterContextoEdicao(1L, null);
+                verify(subprocessoFacade).obterContextoEdicao(1L);
         }
 
         @Test
@@ -307,13 +307,13 @@ class SubprocessoMapaControllerTest {
         @WithMockUser
         void obterContextoEdicaoComPerfil() throws Exception {
                 ContextoEdicaoDto dto = ContextoEdicaoDto.builder().build();
-                when(subprocessoFacade.obterContextoEdicao(1L, Perfil.ADMIN)).thenReturn(dto);
+                when(subprocessoFacade.obterContextoEdicao(1L)).thenReturn(dto);
 
                 mockMvc.perform(get("/api/subprocessos/1/contexto-edicao")
                                 .param("perfil", "ADMIN"))
                                 .andExpect(status().isOk());
 
-                verify(subprocessoFacade).obterContextoEdicao(1L, Perfil.ADMIN);
+                verify(subprocessoFacade).obterContextoEdicao(1L);
         }
 
         @Test
