@@ -5,6 +5,7 @@ import SubprocessoView from '@/views/SubprocessoView.vue';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useMapasStore} from '@/stores/mapas';
 import {useFeedbackStore} from '@/stores/feedback';
+import {useProcessosStore} from '@/stores/processos';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
@@ -122,6 +123,7 @@ describe('SubprocessoView.vue', () => {
     const store = useSubprocessosStore(pinia);
     const mapaStore = useMapasStore(pinia);
     const feedbackStore = useFeedbackStore(pinia);
+    const processosStore = useProcessosStore(pinia);
 
     // Mock implementations
     (store.buscarSubprocessoPorProcessoEUnidade as any).mockImplementation(async () => 10);
@@ -131,6 +133,40 @@ describe('SubprocessoView.vue', () => {
     });
     (mapaStore.buscarMapaCompleto as any).mockResolvedValue({});
     (store.alterarDataLimiteSubprocesso as any).mockResolvedValue({});
+    
+    // Mock store actions that call services
+    (store.reabrirCadastro as any).mockImplementation(async (cod: number, just: string) => {
+      try {
+        await (processoService.reabrirCadastro as any)(cod, just);
+        feedbackStore.show('Cadastro reaberto', 'O cadastro foi reaberto com sucesso', 'success');
+        return true;
+      } catch (error) {
+        feedbackStore.show('Erro', 'Não foi possível reabrir o cadastro', 'danger');
+        return false;
+      }
+    });
+    (store.reabrirRevisaoCadastro as any).mockImplementation(async (cod: number, just: string) => {
+      try {
+        await (processoService.reabrirRevisaoCadastro as any)(cod, just);
+        feedbackStore.show('Revisão reaberta', 'A revisão foi reaberta com sucesso', 'success');
+        return true;
+      } catch (error) {
+        feedbackStore.show('Erro', 'Não foi possível reabrir a revisão', 'danger');
+        return false;
+      }
+    });
+    
+    // Mock processos store action that calls service  
+    (processosStore.enviarLembrete as any).mockImplementation(async (codProcesso: number, codUnidade: number) => {
+      try {
+        await (processoService.enviarLembrete as any)(codProcesso, codUnidade);
+        feedbackStore.show('Lembrete enviado', 'O lembrete foi enviado com sucesso', 'success');
+        return true;
+      } catch (error) {
+        feedbackStore.show('Erro', 'Não foi possível enviar o lembrete', 'danger');
+        return false;
+      }
+    });
 
     const wrapper = mount(SubprocessoView, {
       global: {
@@ -147,7 +183,7 @@ describe('SubprocessoView.vue', () => {
       }
     });
 
-    return { wrapper, store, mapaStore, feedbackStore };
+    return { wrapper, store, mapaStore, feedbackStore, processosStore };
   };
 
   it('fetches data on mount', async () => {

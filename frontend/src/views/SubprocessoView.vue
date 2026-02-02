@@ -203,11 +203,6 @@ async function confirmarReabertura() {
       fecharModalReabrir();
       await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value!);
     }
-
-    if (sucesso) {
-      fecharModalReabrir();
-      await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value!);
-    }
   });
 }
 

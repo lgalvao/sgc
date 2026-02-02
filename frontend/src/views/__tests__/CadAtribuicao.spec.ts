@@ -35,6 +35,7 @@ vi.mock('@/stores/feedback', () => ({
 
 vi.mock('@/services/atribuicaoTemporariaService', () => ({
     criarAtribuicaoTemporaria: vi.fn(),
+    buscarTodasAtribuicoes: vi.fn().mockResolvedValue([]),
 }));
 
 vi.mock('@/services/unidadeService', () => ({

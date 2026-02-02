@@ -1,8 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {mount} from '@vue/test-utils';
+import {flushPromises, mount} from '@vue/test-utils';
 import ConclusaoDiagnostico from '@/views/ConclusaoDiagnostico.vue';
 import {useFeedbackStore} from '@/stores/feedback';
-import {diagnosticoService} from '@/services/diagnosticoService';
 import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
 
 // Mocks
@@ -32,6 +31,7 @@ vi.mock('@/services/diagnosticoService', () => ({
 describe('ConclusaoDiagnostico.vue', () => {
   const ctx = setupComponentTest();
   let feedbackStore: any;
+  let diagnosticoService: any;
 
   const mockDiagnosticoPronto = {
     podeSerConcluido: true,
@@ -64,41 +64,41 @@ describe('ConclusaoDiagnostico.vue', () => {
     },
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     mockRouteParams.value = { codSubprocesso: '10' };
 
-    const mountOptions = getCommonMountOptions({}, stubs);
-    ctx.wrapper = mount(ConclusaoDiagnostico, mountOptions);
+    // Import service after mocks are cleared
+    const diagMod = await import('@/services/diagnosticoService');
+    diagnosticoService = diagMod.diagnosticoService;
 
-    feedbackStore = useFeedbackStore();
-    
     // Resposta válida padrão
     (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoPronto);
+    (diagnosticoService.concluirDiagnostico as any).mockResolvedValue({});
   });
 
+  const mountComponent = async () => {
+    const mountOptions = getCommonMountOptions({}, stubs, { stubActions: false });
+    ctx.wrapper = mount(ConclusaoDiagnostico, mountOptions);
+    feedbackStore = useFeedbackStore();
+    await flushPromises();
+    await ctx.wrapper.vm.$nextTick();
+  };
+
   it('exibe estado de carregamento inicialmente', async () => {
+    await mountComponent();
     expect(diagnosticoService.buscarDiagnostico).toHaveBeenCalledWith(10);
   });
 
   it('exibe estado pronto corretamente', async () => {
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
-
+    await mountComponent();
     expect(ctx.wrapper!.text()).toContain('O diagnóstico está completo');
     expect(ctx.wrapper!.find('[data-testid="btn-confirmar-conclusao"]').attributes('disabled')).toBeUndefined();
   });
 
   it('exibe estado pendente e requer justificativa', async () => {
     (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoPendente);
-    
-    const mountOptions = getCommonMountOptions({}, stubs);
-    ctx.wrapper = mount(ConclusaoDiagnostico, mountOptions);
-
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
+    await mountComponent();
 
     expect(ctx.wrapper!.text()).toContain('Pendências existem');
     
@@ -117,26 +117,18 @@ describe('ConclusaoDiagnostico.vue', () => {
 
   it('redireciona se já concluído', async () => {
     (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoConcluido);
-    
-    const mountOptions = getCommonMountOptions({}, stubs);
-    ctx.wrapper = mount(ConclusaoDiagnostico, mountOptions);
-
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    
-    feedbackStore = useFeedbackStore();
+    await mountComponent();
     
     expect(feedbackStore.show).toHaveBeenCalledWith('Aviso', expect.any(String), 'warning');
     expect(mockPush).toHaveBeenCalledWith('/painel');
   });
 
   it('conclui diagnóstico', async () => {
-    await ctx.wrapper!.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    await ctx.wrapper!.vm.$nextTick();
+    await mountComponent();
 
     const btn = ctx.wrapper!.find('[data-testid="btn-confirmar-conclusao"]');
     await btn.trigger('click');
+    await flushPromises();
 
     expect(diagnosticoService.concluirDiagnostico).toHaveBeenCalledWith(10, '');
     expect(mockPush).toHaveBeenCalledWith('/painel');
@@ -145,13 +137,7 @@ describe('ConclusaoDiagnostico.vue', () => {
 
   it('conclui diagnóstico com justificativa', async () => {
       (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoPendente);
-      
-      const mountOptions = getCommonMountOptions({}, stubs);
-      ctx.wrapper = mount(ConclusaoDiagnostico, mountOptions);
-      
-      await ctx.wrapper!.vm.$nextTick();
-      await new Promise(resolve => setTimeout(resolve, 10));
-      await ctx.wrapper!.vm.$nextTick();
+      await mountComponent();
       
       const textarea = ctx.wrapper!.find('textarea');
       await textarea.setValue('Justificativa válida para teste');
@@ -159,6 +145,7 @@ describe('ConclusaoDiagnostico.vue', () => {
       await ctx.wrapper!.vm.$nextTick();
       
       await ctx.wrapper!.find('[data-testid="btn-confirmar-conclusao"]').trigger('click');
+      await flushPromises();
       
       expect(diagnosticoService.concluirDiagnostico).toHaveBeenCalledWith(10, 'Justificativa válida para teste');
   });

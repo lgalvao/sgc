@@ -18,7 +18,7 @@ vi.mock('@/services/mapaService', () => ({
 }));
 
 vi.mock('@/services/unidadeService', () => ({
-  buscarUnidade: vi.fn(),
+  buscarUnidadePorSigla: vi.fn(),
 }));
 
 // Mocks do router
@@ -59,7 +59,16 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     BSpinner: { template: '<div data-testid="spinner"></div>' },
     BCard: { template: '<div><slot name="header" /><slot /></div>' },
     BFormSelect: {
-      template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value); $emit(\'change\', $event.target.value)"><option value="N1">N1</option></select>',
+      template: `<select :value="modelValue" @change="$emit('update:modelValue', $event.target.value); $emit('change', $event.target.value)">
+        <option value="">Selecione</option>
+        <option value="NA">NA</option>
+        <option value="N1">N1</option>
+        <option value="N2">N2</option>
+        <option value="N3">N3</option>
+        <option value="N4">N4</option>
+        <option value="N5">N5</option>
+        <option value="N6">N6</option>
+      </select>`,
       props: ['modelValue', 'options']
     },
     BFormTextarea: {
@@ -85,15 +94,23 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     diagnosticoService = diagMod.diagnosticoService;
     mapaService = mapaMod;
     unidadeService = unidMod;
+    
+    // Configurar mocks padrão ANTES de qualquer montagem
+    (diagnosticoService.buscarMinhasAvaliacoes as any).mockResolvedValue(mockAvaliacoes);
+    (diagnosticoService.salvarAvaliacao as any).mockResolvedValue({});
+    (diagnosticoService.concluirAutoavaliacao as any).mockResolvedValue({});
+    (mapaService.obterMapaCompleto as any).mockResolvedValue({ competencias: mockCompetencias });
+    (unidadeService.buscarUnidadePorSigla as any).mockResolvedValue({ nome: 'Unidade Teste', sigla: 'TEST' });
   });
 
   const mountComponent = async (competencias = mockCompetencias, avaliacoes = mockAvaliacoes) => {
-    // Configurar os mocks ANTES de montar
-    (diagnosticoService.buscarMinhasAvaliacoes as any).mockResolvedValue(avaliacoes);
-    (diagnosticoService.salvarAvaliacao as any).mockResolvedValue({});
-    (diagnosticoService.concluirAutoavaliacao as any).mockResolvedValue({});
-    (mapaService.obterMapaCompleto as any).mockResolvedValue({ competencias });
-    (unidadeService.buscarUnidade as any).mockResolvedValue({ nome: 'Unidade Teste' });
+    // Atualizar mocks se valores customizados forem passados
+    if (competencias !== mockCompetencias) {
+      (mapaService.obterMapaCompleto as any).mockResolvedValue({ competencias });
+    }
+    if (avaliacoes !== mockAvaliacoes) {
+      (diagnosticoService.buscarMinhasAvaliacoes as any).mockResolvedValue(avaliacoes);
+    }
 
     ctx.wrapper = mount(AutoavaliacaoDiagnostico, {
       global: {
@@ -101,17 +118,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
           createTestingPinia({
             createSpy: vi.fn,
             stubActions: false,
-            initialState: {
-              mapas: {
-                mapaCompleto: { competencias },
-              },
-              unidades: {
-                unidade: { nome: 'Unidade Teste', sigla: 'TEST' },
-              },
-              diagnosticos: {
-                avaliacoes,
-              },
-            },
           }),
         ],
         stubs,
@@ -125,13 +131,18 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
   it('exibe estado de carregamento inicialmente', async () => {
     await mountComponent();
     
-    expect(unidadeService.buscarUnidade).toHaveBeenCalledWith('TEST');
+    expect(unidadeService.buscarUnidadePorSigla).toHaveBeenCalledWith('TEST');
     expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(10);
     expect(diagnosticoService.buscarMinhasAvaliacoes).toHaveBeenCalledWith(10, undefined);
   });
   
   it('exibe competências e avaliações existentes', async () => {
     await mountComponent();
+    
+    // Esperar que as competências sejam renderizadas
+    await flushPromises();
+    await ctx.wrapper!.vm.$nextTick();
+    
     const html = ctx.wrapper!.html();
     expect(html).toContain('Competencia 1');
     expect(html).toContain('Competencia 2');
@@ -145,6 +156,8 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
 
   it('salva avaliação ao alterar', async () => {
     await mountComponent();
+    await flushPromises();
+    await ctx.wrapper!.vm.$nextTick();
     
     const av2 = ctx.wrapper!.vm.avaliacoes[2];
     if (!av2) throw new Error('Avaliação 2 não foi inicializada');
@@ -171,13 +184,22 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
 
   it('habilita botão de concluir apenas quando todas as competências estão avaliadas', async () => {
     await mountComponent();
+    await flushPromises();
+    await ctx.wrapper!.vm.$nextTick();
+    
     expect(ctx.wrapper!.vm.podeConcluir).toBe(false);
     
-    const av2 = ctx.wrapper!.vm.avaliacoes[2];
-    if (!av2) throw new Error('Avaliação 2 não foi inicializada');
+    // Simulate user selecting values in the form (competency 2)
+    const selImportancia = ctx.wrapper!.find('[data-testid="sel-importancia-2"]');
+    const selDominio = ctx.wrapper!.find('[data-testid="sel-dominio-2"]');
     
-    av2.importancia = 'N4';
-    av2.dominio = 'N2';
+    // Set values and trigger events
+    await selImportancia.setValue('N4');
+    await selImportancia.trigger('change');
+    await ctx.wrapper!.vm.$nextTick();
+    
+    await selDominio.setValue('N2');
+    await selDominio.trigger('change');
     await ctx.wrapper!.vm.$nextTick();
     
     expect(ctx.wrapper!.vm.podeConcluir).toBe(true);
@@ -185,14 +207,22 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
 
   it('conclui autoavaliação', async () => {
     await mountComponent();
+    await flushPromises();
+    await ctx.wrapper!.vm.$nextTick();
+    
     const {useFeedbackStore} = await import('@/stores/feedback');
     const feedbackStore = useFeedbackStore();
     
-    const av2 = ctx.wrapper!.vm.avaliacoes[2];
-    if (!av2) throw new Error('Avaliação 2 não foi inicializada');
+    // Simulate user selecting values in the form (competency 2)
+    const selImportancia = ctx.wrapper!.find('[data-testid="sel-importancia-2"]');
+    const selDominio = ctx.wrapper!.find('[data-testid="sel-dominio-2"]');
     
-    av2.importancia = 'N4';
-    av2.dominio = 'N2';
+    await selImportancia.setValue('N4');
+    await selImportancia.trigger('change');
+    await ctx.wrapper!.vm.$nextTick();
+    
+    await selDominio.setValue('N2');
+    await selDominio.trigger('change');
     await ctx.wrapper!.vm.$nextTick();
     
     const btn = ctx.wrapper!.find('[data-testid="btn-concluir-autoavaliacao"]');
@@ -224,17 +254,19 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
 
   it('exibe erro ao falhar salvamento de avaliação', async () => {
     await mountComponent();
+    await flushPromises();
+    await ctx.wrapper!.vm.$nextTick();
+    
+    // Verificar que avaliações foram inicializadas
+    const avaliacoes = ctx.wrapper!.vm.avaliacoes;
+    expect(avaliacoes[1]).toBeDefined();
+    expect(avaliacoes[2]).toBeDefined();
+    
+    // Limpar mocks e configurar erro DEPOIS de obter feedback store
     const {useFeedbackStore} = await import('@/stores/feedback');
     const feedbackStore = useFeedbackStore();
-    
-    // Debug: ver o estado das avaliações
-    console.log('avaliacoes:', ctx.wrapper!.vm.avaliacoes);
-    console.log('avaliacoes keys:', Object.keys(ctx.wrapper!.vm.avaliacoes || {}));
-    
-    // Garantir que a avaliação foi inicializada
-    expect(ctx.wrapper!.vm.avaliacoes[1]).toBeDefined();
-    
     vi.clearAllMocks();
+    
     (diagnosticoService.salvarAvaliacao as any).mockRejectedValueOnce({
       response: { data: { message: 'Erro de validação' } }
     });
@@ -248,8 +280,8 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
 
   it('exibe erro ao falhar conclusão de autoavaliação', async () => {
     await mountComponent();
-    const {useFeedbackStore} = await import('@/stores/feedback');
-    const feedbackStore = useFeedbackStore();
+    await flushPromises();
+    await ctx.wrapper!.vm.$nextTick();
     
     const av1 = ctx.wrapper!.vm.avaliacoes[1];
     const av2 = ctx.wrapper!.vm.avaliacoes[2];
@@ -264,7 +296,11 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     }
     await ctx.wrapper!.vm.$nextTick();
 
+    // Obter feedback store e limpar mocks na ordem correta
+    const {useFeedbackStore} = await import('@/stores/feedback');
+    const feedbackStore = useFeedbackStore();
     vi.clearAllMocks();
+    
     (diagnosticoService.concluirAutoavaliacao as any).mockRejectedValueOnce({
       response: { data: { message: 'Erro ao finalizar' } }
     });
@@ -309,8 +345,8 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
 
   it('trata erro genérico ao concluir autoavaliação', async () => {
     await mountComponent();
-    const {useFeedbackStore} = await import('@/stores/feedback');
-    const feedbackStore = useFeedbackStore();
+    await flushPromises();
+    await ctx.wrapper!.vm.$nextTick();
     
     const av1 = ctx.wrapper!.vm.avaliacoes[1];
     const av2 = ctx.wrapper!.vm.avaliacoes[2];
@@ -325,7 +361,11 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     }
     await ctx.wrapper!.vm.$nextTick();
 
+    // Obter feedback store e limpar mocks na ordem correta
+    const {useFeedbackStore} = await import('@/stores/feedback');
+    const feedbackStore = useFeedbackStore();
     vi.clearAllMocks();
+    
     (diagnosticoService.concluirAutoavaliacao as any).mockRejectedValueOnce(new Error('Erro genérico'));
 
     await ctx.wrapper!.vm.concluirAutoavaliacao();
