@@ -36,7 +36,7 @@
           <td>{{ processo.descricao }}</td>
           <td>{{ processo.tipo }}</td>
           <td>{{ processo.situacao }}</td>
-          <td>{{ formatDateBR(new Date(processo.dataLimite)) }}</td>
+          <td>{{ processo.dataLimiteFormatada }}</td>
           <td>{{ processo.unidadeNome }}</td>
           <td>{{ calcularPercentualConcluido() }}%</td>
         </tr>
@@ -50,7 +50,6 @@
 import {BButton, BModal} from "bootstrap-vue-next";
 import {computed} from "vue";
 import {downloadCSV, gerarCSV} from "@/utils/csv";
-import {formatDateBR} from "@/utils";
 import type {ProcessoResumo} from "@/types/tipos";
 
 const props = defineProps<{
@@ -78,7 +77,7 @@ function exportar() {
     Descricao: processo.descricao,
     Tipo: processo.tipo,
     Situacao: processo.situacao,
-    "Data Limite": formatDateBR(new Date(processo.dataLimite)),
+    "Data Limite": processo.dataLimiteFormatada,
     Unidade: processo.unidadeNome,
     "% Concluido": calcularPercentualConcluido(),
   }));
