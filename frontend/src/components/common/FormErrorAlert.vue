@@ -8,7 +8,7 @@
       @update:model-value="(val) => val === false && $emit('update:show', false)"
   >
     <h4 v-if="title" class="alert-heading">{{ title }}</h4>
-    <p class="mb-0">{{ body }}</p>
+    <p v-if="body" class="mb-0">{{ body }}</p>
     <ul v-if="errors && errors.length > 0" class="mb-0 mt-2">
       <li v-for="(error, index) in errors" :key="index">{{ error }}</li>
     </ul>
@@ -24,7 +24,7 @@ defineProps<{
   show: boolean;
   variant: Variant;
   title?: string;
-  body: string;
+  body?: string;
   errors?: string[];
 }>();
 

@@ -4,7 +4,7 @@
       :model-value="true"
       :variant="variant"
       dismissible
-      @dismissed="handleDismiss"
+      @dismissed="$emit('dismiss')"
   >
     {{ error.message }}
     <div v-if="error.details">
@@ -21,7 +21,7 @@ interface ErrorObject {
   details?: string;
 }
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     error: ErrorObject | null;
     variant?: 'danger' | 'warning' | 'info';
@@ -31,11 +31,7 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits<{
+defineEmits<{
   dismiss: [];
 }>();
-
-function handleDismiss() {
-  emit('dismiss');
-}
 </script>
