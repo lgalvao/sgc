@@ -19,7 +19,7 @@
               :class="badgeClass(subprocesso.situacao)"
               class="badge fs-6"
               data-testid="cad-atividades__txt-badge-situacao"
-          >{{ subprocesso.situacaoLabel || situacaoLabel(subprocesso.situacao) }}</span>
+          >{{ subprocesso.situacaoLabel }}</span>
         </div>
       </template>
       <template #actions>
@@ -195,7 +195,7 @@ import {
   BFormInput
 } from "bootstrap-vue-next";
 import {ref, watch, nextTick} from "vue";
-import {badgeClass, situacaoLabel} from "@/utils";
+import {badgeClass} from "@/utils";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";

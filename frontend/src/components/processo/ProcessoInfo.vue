@@ -1,10 +1,10 @@
 <template>
   <div class="process-info mb-4">
-    <div v-if="showTipo" class="mb-2">
-      <strong>Tipo:</strong> {{ tipoFormatado }}
+    <div v-if="showTipo && tipoLabel" class="mb-2">
+      <strong>Tipo:</strong> {{ tipoLabel }}
     </div>
-    <div v-if="showSituacao" class="mb-2">
-      <strong>Situação:</strong> {{ situacaoFormatada }}
+    <div v-if="showSituacao && situacaoLabel" class="mb-2">
+      <strong>Situação:</strong> {{ situacaoLabel }}
     </div>
     <div v-if="showDataLimite && dataLimite" class="mb-2">
       <strong>Data Limite:</strong> {{ formatarData(dataLimite) }}
@@ -16,14 +16,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
-import { formatarTipoProcesso, formatarSituacaoProcesso } from "@/utils/formatters";
-
 const props = withDefaults(
   defineProps<{
-    tipo?: string;
     tipoLabel?: string;
-    situacao?: string;
     situacaoLabel?: string;
     dataLimite?: string;
     numUnidades?: number;
@@ -39,10 +34,6 @@ const props = withDefaults(
     showUnidades: false
   }
 );
-
-// Use label from backend if available, otherwise format the enum value
-const tipoFormatado = computed(() => props.tipoLabel || (props.tipo ? formatarTipoProcesso(props.tipo) : ''));
-const situacaoFormatada = computed(() => props.situacaoLabel || (props.situacao ? formatarSituacaoProcesso(props.situacao) : ''));
 
 function formatarData(data?: string): string {
   if (!data) return '';

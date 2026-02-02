@@ -204,13 +204,17 @@ describe("TabelaProcessos.vue", () => {
                 ...mockProcessos[0],
                 codigo: 3,
                 situacao: SituacaoProcesso.CRIADO,
-                tipo: TipoProcesso.DIAGNOSTICO
+                situacaoLabel: "Criado",
+                tipo: TipoProcesso.DIAGNOSTICO,
+                tipoLabel: "Diagnóstico"
             },
             {
                 ...mockProcessos[0],
                 codigo: 4,
                 situacao: "DESCONHECIDO" as any,
-                tipo: "OUTRO" as any
+                situacaoLabel: "DESCONHECIDO",
+                tipo: "OUTRO" as any,
+                tipoLabel: "OUTRO"
             }
         ];
 

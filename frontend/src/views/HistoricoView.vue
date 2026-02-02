@@ -38,10 +38,10 @@
               </td>
               <td>
                 <span :class="['badge', getBadgeClass(proc.tipo)]">
-                  {{ formatarTipoProcesso(proc.tipo) }}
+                  {{ proc.tipoLabel }}
                 </span>
               </td>
-              <td>{{ formatDateBR(proc.dataFinalizacao) }}</td>
+              <td>{{ proc.dataFinalizacaoFormatada || formatDateBR(proc.dataFinalizacao) }}</td>
               <td>
                 <BButton
                   size="sm"
@@ -67,7 +67,6 @@ import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import {useProcessosStore} from '@/stores/processos';
 import {logger} from '@/utils';
-import {formatarTipoProcesso} from '@/utils/formatters';
 import {formatDateBR} from '@/utils/dateUtils';
 
 const router = useRouter();

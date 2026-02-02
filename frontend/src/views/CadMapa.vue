@@ -5,7 +5,7 @@
         <div class="fs-5">
           {{ unidade?.sigla }} - {{ unidade?.nome }}
           <span class="ms-3" data-testid="txt-badge-situacao">{{
-              subprocessosStore.subprocessoDetalhe?.situacaoLabel || situacaoLabel(subprocessosStore.subprocessoDetalhe?.situacao)
+              subprocessosStore.subprocessoDetalhe?.situacaoLabel
             }}</span>
         </div>
       </template>
@@ -132,7 +132,6 @@ import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {useFormErrors} from '@/composables/useFormErrors';
-import {situacaoLabel} from "@/utils";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";

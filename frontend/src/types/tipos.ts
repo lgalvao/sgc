@@ -127,7 +127,9 @@ export interface Processo {
     codigo: number;
     descricao: string;
     tipo: TipoProcesso;
+    tipoLabel: string;
     situacao: SituacaoProcesso;
+    situacaoLabel: string;
     dataLimite: string;
     dataCriacao: string;
     dataFinalizacao?: string;
