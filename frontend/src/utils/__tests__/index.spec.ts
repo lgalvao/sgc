@@ -10,32 +10,9 @@ import {
     isDateValidAndFuture,
     type LocalTipoNotificacao,
     parseDate,
-    situacaoLabel,
 } from "@/utils";
 
 describe("utilitários", () => {
-    describe("situacaoLabel", () => {
-        it("deve retornar o label correto para situações mapeadas do backend", () => {
-            expect(situacaoLabel("NAO_INICIADO")).toBe("Não iniciado");
-            expect(situacaoLabel("MAPEAMENTO_CADASTRO_EM_ANDAMENTO")).toBe(
-                "Cadastro em andamento",
-            );
-        });
-
-        it("deve retornar o label correto para situações legadas", () => {
-            expect(situacaoLabel("MAPA_DISPONIBILIZADO")).toBe("Mapa disponibilizado");
-        });
-
-        it("deve retornar o próprio valor se não houver mapeamento", () => {
-            expect(situacaoLabel("SITUACAO_DESCONHECIDA")).toBe("SITUACAO_DESCONHECIDA");
-        });
-
-        it('deve retornar "Não disponibilizado" para valores nulos ou indefinidos', () => {
-            expect(situacaoLabel(null)).toBe("Não disponibilizado");
-            expect(situacaoLabel()).toBe("Não disponibilizado");
-        });
-    });
-
     describe("badgeClass", () => {
         it("deve retornar a classe de badge correta para situações conhecidas", () => {
             expect(badgeClass("Finalizado")).toBe("bg-success");

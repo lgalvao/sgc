@@ -13,11 +13,14 @@ const mockProcessos: ProcessoResumo[] = [
         codigo: 1,
         descricao: "Processo Alpha",
         tipo: TipoProcesso.MAPEAMENTO,
+        tipoLabel: "Mapeamento",
         unidadeCodigo: 1,
         unidadeNome: "UNID1, UNID2",
         unidadesParticipantes: "UNID1, UNID2",
         situacao: SituacaoProcesso.EM_ANDAMENTO,
+        situacaoLabel: "Em andamento",
         dataLimite: new Date().toISOString(),
+        dataLimiteFormatada: "15/10/2023",
         dataCriacao: new Date().toISOString(),
         dataFinalizacao: null,
     },
@@ -25,11 +28,14 @@ const mockProcessos: ProcessoResumo[] = [
         codigo: 2,
         descricao: "Processo Beta",
         tipo: TipoProcesso.REVISAO,
+        tipoLabel: "Revisão",
         unidadeCodigo: 3,
         unidadeNome: "UNID3",
         unidadesParticipantes: "UNID3",
         situacao: SituacaoProcesso.FINALIZADO,
+        situacaoLabel: "Finalizado",
         dataLimite: new Date().toISOString(),
+        dataLimiteFormatada: "20/11/2023",
         dataCriacao: new Date().toISOString(),
         dataFinalizacao: new Date("2024-08-26").toISOString(),
         dataFinalizacaoFormatada: "26/08/2024",
@@ -198,13 +204,17 @@ describe("TabelaProcessos.vue", () => {
                 ...mockProcessos[0],
                 codigo: 3,
                 situacao: SituacaoProcesso.CRIADO,
-                tipo: TipoProcesso.DIAGNOSTICO
+                situacaoLabel: "Criado",
+                tipo: TipoProcesso.DIAGNOSTICO,
+                tipoLabel: "Diagnóstico"
             },
             {
                 ...mockProcessos[0],
                 codigo: 4,
                 situacao: "DESCONHECIDO" as any,
-                tipo: "OUTRO" as any
+                situacaoLabel: "DESCONHECIDO",
+                tipo: "OUTRO" as any,
+                tipoLabel: "OUTRO"
             }
         ];
 

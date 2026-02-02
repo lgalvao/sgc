@@ -3,7 +3,6 @@ import {BTable} from "bootstrap-vue-next";
 import {computed} from "vue";
 import EmptyState from "@/components/EmptyState.vue";
 import type {ProcessoResumo} from "@/types/tipos";
-import {formatarSituacaoProcesso, formatarTipoProcesso} from "@/utils/formatters";
 
 const props = defineProps<{
   processos: ProcessoResumo[];
@@ -120,11 +119,11 @@ const rowAttr = (item: ProcessoResumo | null, type: string) => {
       </template>
 
       <template #cell(situacao)="data">
-        {{ formatarSituacaoProcesso(data.value as string) }}
+        {{ data.item.situacaoLabel }}
       </template>
 
       <template #cell(tipo)="data">
-        {{ formatarTipoProcesso(data.value as string) }}
+        {{ data.item.tipoLabel }}
       </template>
     </BTable>
   </div>

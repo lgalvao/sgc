@@ -17,7 +17,9 @@
           </BBadge>
           <ProcessoInfo
               :tipo="processo.tipo"
+              :tipo-label="processo.tipoLabel"
               :situacao="processo.situacao"
+              :situacao-label="processo.situacaoLabel"
               :show-data-limite="false"
           />
         </template>

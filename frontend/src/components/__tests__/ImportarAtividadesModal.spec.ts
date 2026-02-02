@@ -2,25 +2,29 @@ import {flushPromises, mount, type VueWrapper} from "@vue/test-utils";
 import {BFormSelect} from "bootstrap-vue-next";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
-import {type Atividade, type ProcessoResumo, SituacaoProcesso, TipoProcesso} from "@/types/tipos";
+import {type Atividade, SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 import ImportarAtividadesModal from "../ImportarAtividadesModal.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import {createMockProcessoResumo} from "@/test-utils/mockFactories";
 import {useAtividadesStore} from "@/stores/atividades";
 
 // Helper type for the component instance
 type ImportarAtividadesModalVM = InstanceType<typeof ImportarAtividadesModal>;
 
-const mockProcessos: ProcessoResumo[] = [
-    {
+const mockProcessos = [
+    createMockProcessoResumo({
         codigo: 1,
         descricao: "Processo 1",
         tipo: TipoProcesso.MAPEAMENTO,
+        tipoLabel: "Mapeamento",
         situacao: SituacaoProcesso.FINALIZADO,
+        situacaoLabel: "Finalizado",
         dataCriacao: "2021-01-01",
         dataLimite: "2021-01-01",
+        dataLimiteFormatada: "01/01/2021",
         unidadeCodigo: 1,
         unidadeNome: "test",
-    },
+    }),
 ];
 const mockProcessoDetalhe = {
     unidades: [{codUnidade: 10, sigla: "U1", codSubprocesso: 100}],

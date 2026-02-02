@@ -1,10 +1,10 @@
 <template>
   <div class="process-info mb-4">
-    <div v-if="showTipo" class="mb-2">
-      <strong>Tipo:</strong> {{ formatarTipoProcesso(tipo) }}
+    <div v-if="showTipo && tipoLabel" class="mb-2">
+      <strong>Tipo:</strong> {{ tipoLabel }}
     </div>
-    <div v-if="showSituacao" class="mb-2">
-      <strong>Situação:</strong> {{ formatarSituacaoProcesso(situacao) }}
+    <div v-if="showSituacao && situacaoLabel" class="mb-2">
+      <strong>Situação:</strong> {{ situacaoLabel }}
     </div>
     <div v-if="showDataLimite && dataLimite" class="mb-2">
       <strong>Data Limite:</strong> {{ formatarData(dataLimite) }}
@@ -16,12 +16,10 @@
 </template>
 
 <script lang="ts" setup>
-import { formatarTipoProcesso, formatarSituacaoProcesso } from "@/utils/formatters";
-
-withDefaults(
+const props = withDefaults(
   defineProps<{
-    tipo?: string;
-    situacao?: string;
+    tipoLabel?: string;
+    situacaoLabel?: string;
     dataLimite?: string;
     numUnidades?: number;
     showTipo?: boolean;
