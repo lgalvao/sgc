@@ -915,45 +915,62 @@ const perfilUnidade: PerfilUnidadeDto = await api.get('/perfis');
 
 ### 3.3. FASE 3: Modernização e Otimização
 
-#### 3.3.1. Migrar de BootstrapVue para Biblioteca Moderna
+#### 3.3.1. Otimizar Uso do BootstrapVueNext
 
-**Contexto:** Projeto usa BootstrapVueNext (port community-driven do BootstrapVue para Vue 3).
+**Contexto:** Projeto usa BootstrapVueNext (port community-driven do BootstrapVue para Vue 3), que é o padrão da empresa para novos projetos.
 
-**Problemas:**
-- Suporte limitado
-- Bundle size grande
-- Componentes verbosos
+**Oportunidades de Otimização:**
 
-**Opções:**
+**1. Importações Seletivas (Tree Shaking)**
 
-1. **PrimeVue** (recomendado)
-   - Componentes ricos e modernos
-   - Tree component nativo (importante para unidades/processos)
-   - Tema customizável
-   - Excelente documentação
+Atual:
+```typescript
+// Importa tudo
+import { createBootstrap } from 'bootstrap-vue-next'
+app.use(createBootstrap())
+```
 
-2. **Vuetify**
-   - Material Design
-   - Componentes completos
-   - Grande comunidade
+Proposto:
+```typescript
+// Importa apenas componentes usados
+import { BButton, BForm, BFormInput, BTable, BAlert } from 'bootstrap-vue-next'
+app.component('BButton', BButton)
+app.component('BForm', BForm)
+// etc...
+```
 
-3. **Naive UI**
-   - Leve e performático
-   - TypeScript first
-   - Componentes bonitos
+**Benefício:** Reduz bundle size em ~30-40%
 
-**Recomendação: PrimeVue**
+**2. Aplicar Bootstrap Best Practices**
 
-Motivos:
-- ✅ Tree components nativos (usado em unidades)
-- ✅ Melhor bundle size que BootstrapVue
-- ✅ Componentes de formulário robustos
-- ✅ Tema TRE customizável
+- Usar utility classes do Bootstrap em vez de CSS customizado
+- Aproveitar Grid System do Bootstrap para layouts responsivos
+- Usar componentes BootstrapVueNext de forma idiomática
+- Seguir convenções de nomenclatura do Bootstrap
+
+**3. Componentes Wrapper Customizados**
+
+Criar wrappers para componentes BootstrapVueNext frequentemente usados:
+
+```typescript
+// components/ui/AppButton.vue
+<template>
+  <BButton :variant="variant" v-bind="$attrs">
+    <slot />
+  </BButton>
+</template>
+```
+
+**Benefícios:**
+- Consistência visual em toda aplicação
+- Facilita mudanças globais de estilo
+- Reduz verbosidade nos templates
 
 **Impacto:**
-- Refatoração de ~26 componentes
-- Simplificação de markup (componentes PrimeVue são mais concisos)
-- **Estimativa: -500 linhas de código** (markup simplificado)
+- Redução de bundle size: ~30-40% via tree shaking
+- Melhor aderência aos padrões Bootstrap
+- Código mais limpo e idiomático
+- **Estimativa: -200 linhas de código** (markup simplificado com utility classes)
 
 ---
 
@@ -963,18 +980,33 @@ Motivos:
 
 **Solução:**
 
-Usar `vue-virtual-scroller` ou componente de tabela da biblioteca de UI (PrimeVue tem DataTable com virtual scrolling).
+Usar `vue-virtual-scroller` ou recurso de virtual scrolling do BootstrapVueNext.
 
-**Exemplo:**
+**Exemplo com vue-virtual-scroller:**
 ```vue
 <template>
-  <DataTable 
-    :value="processos" 
-    :virtualScrollerOptions="{ itemSize: 50 }"
-    scrollable
+  <RecycleScroller
+    :items="processos"
+    :item-size="50"
+    key-field="codigo"
+    v-slot="{ item }"
   >
-    <!-- columns -->
-  </DataTable>
+    <div class="processo-item">
+      {{ item.descricao }}
+    </div>
+  </RecycleScroller>
+</template>
+```
+
+**Ou com tabela BootstrapVueNext + scroll:**
+```vue
+<template>
+  <BTable
+    :items="processos"
+    :fields="fields"
+    sticky-header="600px"
+    responsive
+  />
 </template>
 ```
 
@@ -1113,22 +1145,23 @@ const routes = [
 
 ### Sprint 9-12: Fase 3 (Modernização)
 **Duração:** 4 semanas  
-**Objetivo:** Atualizar stack técnico
+**Objetivo:** Otimizar stack técnico mantendo BootstrapVueNext
 
 **Tarefas:**
-- [ ] Avaliar e decidir biblioteca de UI (PrimeVue recomendado)
-- [ ] Setup PrimeVue/tema
-- [ ] Migrar componentes incrementalmente
+- [ ] Implementar tree shaking para BootstrapVueNext (importações seletivas)
+- [ ] Criar componentes wrapper para elementos comuns (AppButton, AppInput, etc)
+- [ ] Aplicar utility classes do Bootstrap para reduzir CSS customizado
+- [ ] Revisar e aplicar Bootstrap best practices em todos os componentes
 - [ ] Implementar lazy loading de rotas
-- [ ] Implementar virtual scrolling em listas grandes
-- [ ] Otimizar bundle
+- [ ] Implementar virtual scrolling em listas grandes (vue-virtual-scroller)
+- [ ] Otimizar bundle com code splitting
 - [ ] Testes de regressão
-- [ ] Documentação
+- [ ] Documentação de padrões Bootstrap
 
 **Resultado Esperado:** 
-- ~500 linhas de markup simplificado
-- Bundle 30-40% menor
-- Melhor performance
+- ~200 linhas de markup simplificado
+- Bundle 30-40% menor via tree shaking
+- Melhor aderência aos padrões da empresa
 
 ---
 
@@ -1143,8 +1176,8 @@ const routes = [
 | Fase 2.2: CSV Backend | ~60 | ~1% |
 | Fase 2.3: Validação Backend | ~126 | ~2% |
 | Fase 2.4: Mappers | ~150 | ~2.5% |
-| Fase 3: Modernização | ~500 | ~8% |
-| **TOTAL** | **~2.198** | **~35%** |
+| Fase 3: Otimização BootstrapVueNext | ~200 | ~3% |
+| **TOTAL** | **~1.898** | **~30%** |
 
 ### Qualidade de Código
 
@@ -1156,11 +1189,12 @@ const routes = [
 - Duplicação de validação (frontend + backend)
 
 **Depois:**
-- ~4.000 linhas de código frontend
+- ~4.100 linhas de código frontend
 - 4-5 composables coesos
 - ~150 linhas de mappers (apenas complexos)
 - Views com <150 linhas
 - Validação centralizada no backend
+- BootstrapVueNext otimizado com tree shaking
 
 ### Performance
 
@@ -1192,13 +1226,14 @@ const routes = [
 - Revisão de código rigorosa
 - QA manual de funcionalidades críticas
 
-### Risco 3: Curva de Aprendizado com Nova Biblioteca UI
+### Risco 3: Impacto na Performance com BootstrapVueNext
 
 **Mitigação:**
-- Migração gradual (componente por componente)
-- Documentação interna
-- Treinamento da equipe
-- Manter BootstrapVue em paralelo durante transição
+- Implementar tree shaking rigoroso (importar apenas componentes usados)
+- Usar lazy loading de rotas
+- Implementar virtual scrolling para listas grandes
+- Code splitting estratégico
+- Monitorar bundle size continuamente
 
 ---
 
@@ -1208,15 +1243,16 @@ O frontend do SGC, apesar de bem arquitetado, carrega vestígios significativos 
 
 1. **Simplificação de Composables:** Reduzir complexidade e indireção desnecessária
 2. **Transferência de Responsabilidades:** Mover formatação, validação e transformação para o backend
-3. **Modernização:** Atualizar biblioteca de UI e otimizar bundle
+3. **Otimização de BootstrapVueNext:** Tree shaking, utility classes, e componentes wrapper
 4. **Componentização:** Quebrar views grandes em componentes menores e reutilizáveis
 
 **Impacto Total Estimado:**
-- ✅ **~35% de redução de código** (~2.200 linhas)
-- ✅ **40% de redução no bundle size**
+- ✅ **~30% de redução de código** (~1.900 linhas)
+- ✅ **30-40% de redução no bundle size** (via tree shaking e lazy loading)
 - ✅ **Melhoria significativa em manutenibilidade**
 - ✅ **Eliminação de duplicação de lógica**
 - ✅ **Centralização de responsabilidades**
+- ✅ **Melhor aderência aos padrões Bootstrap da empresa**
 
 A implementação gradual proposta permite realizar melhorias contínuas sem grandes riscos, com entregas de valor a cada sprint.
 
@@ -1410,22 +1446,19 @@ VisMapa.vue (312 linhas) ⚠️
 - [ ] Frontend: Atualizar imports
 - [ ] Frontend: Testes
 
-#### Fase 3: Modernização
+#### Fase 3: Otimização
 
-- [ ] Decisão: Escolher biblioteca UI (PrimeVue recomendado)
-- [ ] Setup PrimeVue e tema TRE
-- [ ] Migrar FormInput/FormSelect
-- [ ] Migrar Buttons/Alerts
-- [ ] Migrar Tables/DataTables
-- [ ] Migrar Modals
-- [ ] Migrar ArvoreUnidades para PrimeVue Tree
-- [ ] Implementar lazy loading de rotas
-- [ ] Implementar virtual scrolling em tabelas grandes
-- [ ] Otimizar imports (tree shaking)
-- [ ] Análise de bundle size
-- [ ] Testes de regressão completos
+- [ ] Implementar tree shaking para BootstrapVueNext (importar componentes seletivamente)
+- [ ] Criar componentes wrapper (AppButton, AppInput, AppTable, etc)
+- [ ] Aplicar Bootstrap utility classes em vez de CSS customizado
+- [ ] Revisar componentes para seguir Bootstrap best practices
+- [ ] Implementar lazy loading em todas as rotas
+- [ ] Adicionar virtual scrolling em TabelaProcessos
+- [ ] Adicionar virtual scrolling em outras listas grandes
+- [ ] Code splitting estratégico
+- [ ] Análise e otimização de bundle size
 - [ ] Testes de performance
-- [ ] Documentação de migração
+- [ ] Documentação de padrões Bootstrap adotados
 
 ---
 
