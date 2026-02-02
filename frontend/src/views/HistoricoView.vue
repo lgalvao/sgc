@@ -41,7 +41,7 @@
                   {{ proc.tipoLabel }}
                 </span>
               </td>
-              <td>{{ proc.dataFinalizacaoFormatada || formatDateBR(proc.dataFinalizacao) }}</td>
+              <td>{{ proc.dataFinalizacaoFormatada }}</td>
               <td>
                 <BButton
                   size="sm"
@@ -67,7 +67,6 @@ import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import {useProcessosStore} from '@/stores/processos';
 import {logger} from '@/utils';
-import {formatDateBR} from '@/utils/dateUtils';
 
 const router = useRouter();
 const processosStore = useProcessosStore();

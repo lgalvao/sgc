@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public record AnaliseValidacaoDto(
         Long codigo,
         LocalDateTime dataHora,
+        String dataHoraFormatada,
         String observacoes,
         String acao,
         String unidadeSigla) {
