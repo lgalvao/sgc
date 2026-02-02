@@ -262,44 +262,42 @@ public class MapaManutencaoService {
     }
 
     public ConhecimentoResponse criarConhecimento(Long codAtividade, CriarConhecimentoRequest request) {
-        return atividadeRepo.findById(codAtividade)
-                .map(atividade -> {
-                    var mapa = atividade.getMapa();
-                    if (mapa != null) {
-                        notificarAlteracaoMapa(mapa.getCodigo());
-                    }
-
-                    var conhecimento = conhecimentoMapper.toEntity(request);
-                    if (conhecimento == null) {
-                        throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade conhecimento.");
-                    }
-                    conhecimento.setAtividade(atividade);
-                    var salvo = conhecimentoRepo.save(conhecimento);
-                    var response = conhecimentoMapper.toResponse(salvo);
-                    if (response == null) {
-                        throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter conhecimento salvo para resposta.");
-                    }
-                    return response;
-                })
+        var atividade = atividadeRepo.findById(codAtividade)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade));
+
+        var mapa = atividade.getMapa();
+        if (mapa != null) {
+            notificarAlteracaoMapa(mapa.getCodigo());
+        }
+
+        var conhecimento = conhecimentoMapper.toEntity(request);
+        if (conhecimento == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade conhecimento.");
+        }
+        conhecimento.setAtividade(atividade);
+        var salvo = conhecimentoRepo.save(conhecimento);
+        var response = conhecimentoMapper.toResponse(salvo);
+        if (response == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter conhecimento salvo para resposta.");
+        }
+        return response;
     }
 
     public void atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
-        conhecimentoRepo.findById(codConhecimento)
-                .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
-                .ifPresentOrElse(
-                        existente -> {
-                            var mapa = existente.getAtividade().getMapa();
-                            if (mapa != null) {
-                                notificarAlteracaoMapa(mapa.getCodigo());
-                            }
-                            var paraAtualizar = conhecimentoMapper.toEntity(request);
-                            existente.setDescricao(paraAtualizar.getDescricao());
-                            conhecimentoRepo.save(existente);
-                        },
-                        () -> {
-                            throw new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento);
-                        });
+        var existente = conhecimentoRepo.findById(codConhecimento)
+                .filter(c -> c.getCodigoAtividade().equals(codAtividade))
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento));
+
+        var mapa = existente.getAtividade().getMapa();
+        if (mapa != null) {
+            notificarAlteracaoMapa(mapa.getCodigo());
+        }
+        var paraAtualizar = conhecimentoMapper.toEntity(request);
+        if (paraAtualizar == null) {
+            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade conhecimento.");
+        }
+        existente.setDescricao(paraAtualizar.getDescricao());
+        conhecimentoRepo.save(existente);
     }
 
     public void excluirConhecimento(Long codAtividade, Long codConhecimento) {
