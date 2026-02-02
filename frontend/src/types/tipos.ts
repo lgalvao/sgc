@@ -148,15 +148,18 @@ export interface ProcessoResumo {
     codigo: number;
     descricao: string;
     situacao: SituacaoProcesso;
+    situacaoLabel: string;
     tipo: TipoProcesso;
+    tipoLabel: string;
     dataLimite: string;
+    dataLimiteFormatada: string;
     dataCriacao: string;
-    unidadeCodigo: number;
-    unidadeNome: string;
-    unidadesParticipantes?: string;
     dataFinalizacao?: string;
     dataFinalizacaoFormatada?: string;
     linkDestino?: string;
+    unidadeCodigo: number;
+    unidadeNome: string;
+    unidadesParticipantes?: string;
 }
 
 export interface Subprocesso {

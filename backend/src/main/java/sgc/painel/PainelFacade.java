@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
+import sgc.comum.util.FormatadorData;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
@@ -132,9 +133,13 @@ public class PainelFacade {
                 .codigo(processo.getCodigo())
                 .descricao(processo.getDescricao())
                 .situacao(processo.getSituacao())
+                .situacaoLabel(processo.getSituacao().getLabel())
                 .tipo(processo.getTipo().name())
+                .tipoLabel(processo.getTipo().getLabel())
                 .dataLimite(processo.getDataLimite())
+                .dataLimiteFormatada(FormatadorData.formatarData(processo.getDataLimite()))
                 .dataCriacao(processo.getDataCriacao())
+                .dataFinalizacaoFormatada(FormatadorData.formatarData(processo.getDataFinalizacao()))
                 .unidadeCodigo(codUnidMapeado)
                 .unidadeNome(nomeUnidMapeado)
                 .unidadesParticipantes(unidadesParticipantes)

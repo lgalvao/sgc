@@ -2,19 +2,23 @@ import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import TabelaProcessos from '../TabelaProcessos.vue';
 import { SituacaoProcesso, TipoProcesso } from '@/types/tipos';
+import { createMockProcessoResumo } from '@/test-utils/mockFactories';
 
 describe('TabelaProcessos Coverage', () => {
     const mockProcessos = [
-        {
+        createMockProcessoResumo({
             codigo: 1,
             descricao: "Processo Teste",
             tipo: TipoProcesso.MAPEAMENTO,
+            tipoLabel: "Mapeamento",
             unidadeCodigo: 1,
             unidadeNome: "U1",
             situacao: SituacaoProcesso.EM_ANDAMENTO,
+            situacaoLabel: "Em andamento",
             dataLimite: new Date().toISOString(),
+            dataLimiteFormatada: "31/12/2023",
             dataCriacao: new Date().toISOString()
-        }
+        })
     ];
 
     it('handles Space key on row to select process', async () => {
