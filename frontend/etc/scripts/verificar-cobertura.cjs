@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Caminho do relatório de cobertura do Frontend (Vitest/Istanbul)
-const COVERAGE_PATH = path.join(__dirname, '../../frontend/coverage/coverage-final.json');
+const COVERAGE_PATH = path.join(__dirname, '../../coverage/coverage-final.json');
 
 console.log(`Lendo relatório de cobertura de: ${COVERAGE_PATH}`);
 

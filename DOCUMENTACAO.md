@@ -81,6 +81,17 @@ Este documento serve como índice centralizado de toda a documentação técnica
 
 ---
 
+### 🤖 Agente e Skills (Jules)
+
+| Documento                                                               | Descrição                                        |
+|-------------------------------------------------------------------------|--------------------------------------------------|
+| **[audit-qualidade-backend.md](.jules/skills/audit-qualidade-backend.md)**   | Skill para auditoria de qualidade no backend     |
+| **[audit-qualidade-frontend.md](.jules/skills/audit-qualidade-frontend.md)** | Skill para auditoria de qualidade no frontend    |
+| **[gestao-testes.md](.jules/skills/gestao-testes.md)**                       | Skill para análise e priorização de testes       |
+| **[utilitarios.md](.jules/skills/utilitarios.md)**                           | Skill para ferramentas de ambiente e utilitários |
+
+---
+
 ### 📦 Documentação de Módulos
 
 #### Backend
