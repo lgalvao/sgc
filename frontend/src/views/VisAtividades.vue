@@ -43,34 +43,11 @@
     </PageHeader>
 
     <!-- Lista de atividades -->
-    <BCard
+    <VisAtividadeItem
         v-for="(atividade) in atividades"
         :key="atividade.codigo"
-        class="mb-3 atividade-card"
-        no-body
-    >
-      <BCardBody class="py-2">
-        <div
-            class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
-        >
-          <strong
-              class="atividade-descricao"
-              data-testid="txt-atividade-descricao"
-          >{{ atividade.descricao }}</strong>
-        </div>
-
-        <!-- Conhecimentos da atividade -->
-        <div class="mt-3 ms-3">
-          <div
-              v-for="(conhecimento) in atividade.conhecimentos"
-              :key="conhecimento.codigo"
-              class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
-          >
-            <span data-testid="txt-conhecimento-descricao">{{ conhecimento.descricao }}</span>
-          </div>
-        </div>
-      </BCardBody>
-    </BCard>
+        :atividade="atividade"
+    />
 
     <!-- Modal de Impacto no Mapa -->
     <ImpactoMapaModal
@@ -139,11 +116,12 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BContainer, BFormGroup, BFormTextarea,} from "bootstrap-vue-next";
+import {BButton, BContainer, BFormGroup, BFormTextarea,} from "bootstrap-vue-next";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import VisAtividadeItem from "@/components/atividades/VisAtividadeItem.vue";
 import {useVisAtividades} from "@/composables/useVisAtividades";
 
 const props = defineProps<{
@@ -194,31 +172,6 @@ defineExpose({
   color: var(--bs-body-color);
   opacity: 0.85;
   padding-right: 1rem;
-}
-
-.atividade-card {
-  transition: box-shadow 0.2s;
-}
-
-.atividade-descricao {
-  word-break: break-word;
-  max-width: 100%;
-  display: inline-block;
-}
-
-.atividade-titulo-card {
-  background: var(--bs-light);
-  border-bottom: 1px solid var(--bs-border-color);
-  padding: 0.5rem 0.75rem;
-  margin-left: -0.75rem;
-  margin-right: -0.75rem;
-  margin-top: -0.5rem;
-  border-top-left-radius: 0.375rem;
-  border-top-right-radius: 0.375rem;
-}
-
-.atividade-titulo-card .atividade-descricao {
-  font-size: 1.1rem;
 }
 
 .unidade-cabecalho {

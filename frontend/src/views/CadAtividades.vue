@@ -77,36 +77,13 @@
       {{ erroGlobal }}
     </BAlert>
 
-    <BForm
-        class="row g-2 align-items-center mb-4"
-        data-testid="form-nova-atividade"
-        @submit.prevent="handleAdicionarAtividade"
-    >
-      <BCol>
-        <BFormInput
-            ref="inputNovaAtividadeRef"
-            v-model="novaAtividade"
-            aria-label="Nova atividade"
-            data-testid="inp-nova-atividade"
-            :disabled="loadingAdicionar"
-            placeholder="Nova atividade"
-            type="text"
-            required
-        />
-      </BCol>
-      <BCol cols="auto">
-        <LoadingButton
-            aria-label="Adicionar atividade"
-            :disabled="!codSubprocesso || !permissoes?.podeEditarMapa || !novaAtividade.trim()"
-            :loading="loadingAdicionar"
-            data-testid="btn-adicionar-atividade"
-            size="sm"
-            type="submit"
-            variant="outline-primary"
-            icon="plus-lg"
-        />
-      </BCol>
-    </BForm>
+    <CadAtividadeForm
+        ref="atividadeFormRef"
+        v-model="novaAtividade"
+        :disabled="!codSubprocesso || !permissoes?.podeEditarMapa"
+        :loading="loadingAdicionar"
+        @submit="handleAdicionarAtividade"
+    />
 
     <!-- Empty State -->
     <EmptyState
@@ -184,7 +161,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCol, BContainer, BDropdown, BDropdownItem, BForm, BFormInput} from "bootstrap-vue-next";
+import {BAlert, BButton, BContainer, BDropdown, BDropdownItem} from "bootstrap-vue-next";
 import {nextTick, ref, watch} from "vue";
 import {badgeClass} from "@/utils";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
@@ -196,6 +173,7 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
 import EmptyState from "@/components/EmptyState.vue";
 import AtividadeItem from "@/components/AtividadeItem.vue";
+import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
 import {useCadAtividades} from "@/composables/useCadAtividades";
 
 const props = defineProps<{
@@ -245,20 +223,20 @@ const {
   fecharModalImpacto
 } = useCadAtividades(props);
 
-const inputNovaAtividadeRef = ref<InstanceType<typeof BFormInput> | null>(null);
+const atividadeFormRef = ref<InstanceType<typeof CadAtividadeForm> | null>(null);
 
 async function handleAdicionarAtividade() {
   const sucesso = await adicionarAtividade();
   if (sucesso) {
     await nextTick();
-    inputNovaAtividadeRef.value?.$el?.focus();
+    atividadeFormRef.value?.inputRef?.$el?.focus();
   }
 }
 
 // Auto-focus if empty on load
 watch(() => atividades.value?.length, (newLen, oldLen) => {
   if (newLen === 0 && oldLen === undefined) {
-    nextTick(() => inputNovaAtividadeRef.value?.$el?.focus());
+    nextTick(() => atividadeFormRef.value?.inputRef?.$el?.focus());
   }
 }, { immediate: true });
 

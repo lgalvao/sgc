@@ -88,50 +88,11 @@
             title="Nenhuma competência cadastrada"
             description="Este mapa ainda não possui competências registradas."
         />
-        <BCard
+        <CompetenciaViewCard
             v-for="comp in mapa?.competencias"
             :key="comp.codigo"
-            class="mb-3 competencia-card"
-            data-testid="vis-mapa__card-competencia"
-            no-body
-        >
-          <BCardBody class="py-2">
-            <div
-                class="card-title fs-5 d-flex align-items-center position-relative competencia-titulo-card"
-            >
-              <strong
-                  class="competencia-descricao"
-                  data-testid="vis-mapa__txt-competencia-descricao"
-              > {{ comp.descricao }}</strong>
-            </div>
-            <div class="d-flex flex-wrap gap-2 mt-2 ps-3">
-              <div
-                  v-for="atv in comp.atividades"
-                  :key="atv.codigo"
-              >
-                <BCard
-                    class="atividade-associada-card-item d-flex flex-column group-atividade-associada"
-                    data-testid="card-atividade-associada"
-                    no-body
-                >
-                  <BCardBody class="d-flex align-items-center py-1 px-2">
-                    <span class="atividade-associada-descricao me-2">{{ atv.descricao }}</span>
-                  </BCardBody>
-                  <div class="conhecimentos-atividade px-2 pb-2 ps-3">
-                    <span
-                        v-for="conhecimento in atv.conhecimentos"
-                        :key="conhecimento.descricao"
-                        class="me-3 mb-1"
-                        data-testid="txt-conhecimento-item"
-                    >
-                      {{ conhecimento.descricao }}
-                    </span>
-                  </div>
-                </BCard>
-              </div>
-            </div>
-          </BCardBody>
-        </BCard>
+            :competencia="comp"
+        />
       </div>
     </div>
     <div v-else>
@@ -253,12 +214,13 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
+import {BButton, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
 import EmptyState from "@/components/EmptyState.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import AceitarMapaModal from "@/components/AceitarMapaModal.vue";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
+import CompetenciaViewCard from "@/components/mapa/CompetenciaViewCard.vue";
 import {ref} from "vue";
 import {useVisMapa} from "@/composables/useVisMapa";
 

@@ -35,54 +35,10 @@
         </template>
       </PageHeader>
 
-      <BCard class="mb-4">
-        <BCardBody>
-          <p><strong>Titular:</strong> {{ titularDetalhes?.nome }}</p>
-          <p class="ms-3">
-            <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>
-            <a
-                class="text-decoration-none text-body"
-                :href="`tel:${titularDetalhes?.ramal}`"
-                :aria-label="`Ligar para ${titularDetalhes?.ramal}`"
-            >
-              {{ titularDetalhes?.ramal }}
-            </a>
-            <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>
-            <a
-                class="text-decoration-none text-body"
-                :href="`mailto:${titularDetalhes?.email}`"
-                :aria-label="`Enviar e-mail para ${titularDetalhes?.email}`"
-            >
-              {{ titularDetalhes?.email }}
-            </a>
-          </p>
-          <template
-              v-if="unidadeComResponsavelDinamico.responsavel &&
-              unidadeComResponsavelDinamico.responsavel.codigo &&
-              unidadeComResponsavelDinamico.responsavel.codigo !== unidadeComResponsavelDinamico.usuarioCodigo"
-          >
-            <p><strong>Responsável:</strong> {{ unidadeComResponsavelDinamico.responsavel.nome }}</p>
-            <p class="ms-3">
-              <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>
-              <a
-                  class="text-decoration-none text-body"
-                  :href="`tel:${unidadeComResponsavelDinamico.responsavel.ramal}`"
-                  :aria-label="`Ligar para ${unidadeComResponsavelDinamico.responsavel.ramal}`"
-              >
-                {{ unidadeComResponsavelDinamico.responsavel.ramal }}
-              </a>
-              <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>
-              <a
-                  class="text-decoration-none text-body"
-                  :href="`mailto:${unidadeComResponsavelDinamico.responsavel.email}`"
-                  :aria-label="`Enviar e-mail para ${unidadeComResponsavelDinamico.responsavel.email}`"
-              >
-                {{ unidadeComResponsavelDinamico.responsavel.email }}
-              </a>
-            </p>
-          </template>
-        </BCardBody>
-      </BCard>
+      <UnidadeInfoCard
+          :unidade="unidadeComResponsavelDinamico"
+          :titular-detalhes="titularDetalhes"
+      />
     </div>
     <div v-else>
       <p>Unidade não encontrada.</p>
@@ -104,102 +60,28 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody, BContainer} from "bootstrap-vue-next";
-import {computed, onMounted, ref} from "vue";
-import {useRouter} from "vue-router";
-import {logger} from "@/utils";
-import {useAtribuicaoTemporariaStore} from "@/stores/atribuicoes";
-import {useMapasStore} from "@/stores/mapas";
-import {usePerfilStore} from "@/stores/perfil";
-import {useUnidadesStore} from "@/stores/unidades";
-import {useUsuariosStore} from "@/stores/usuarios";
-import type {MapaCompleto, Responsavel, Unidade, Usuario,} from "@/types/tipos";
+import {BAlert, BButton, BContainer} from "bootstrap-vue-next";
+import {computed} from "vue";
+import type {Unidade} from "@/types/tipos";
 import TreeTable from "../components/TreeTableView.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import UnidadeInfoCard from "@/components/unidade/UnidadeInfoCard.vue";
+import {useUnidadeView} from "@/composables/useUnidadeView";
 
 const props = defineProps<{ codUnidade: number }>();
 
-const router = useRouter();
-const codigo = computed(() => props.codUnidade);
-const unidadesStore = useUnidadesStore();
-const perfilStore = usePerfilStore();
-const mapasStore = useMapasStore();
-const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
-const usuariosStore = useUsuariosStore();
+const {
+  unidadesStore,
+  perfilStore,
+  unidadeComResponsavelDinamico,
+  titularDetalhes,
+  mapaVigente,
+  irParaCriarAtribuicao,
+  navegarParaUnidadeSubordinada,
+  visualizarMapa
+} = useUnidadeView(props.codUnidade);
 
-const titular = ref<Usuario | null>(null);
-
-onMounted(async () => {
-  await Promise.all([
-    unidadesStore.buscarArvoreUnidade(codigo.value),
-    atribuicaoTemporariaStore.buscarAtribuicoes(),
-  ]);
-
-  if (unidadesStore.unidade?.tituloTitular) {
-    try {
-      titular.value = await usuariosStore.buscarUsuarioPorTitulo(unidadesStore.unidade.tituloTitular) || null;
-    } catch (e) {
-      logger.error("Erro ao buscar titular:", e);
-    }
-  }
-});
-
-const unidadeOriginal = computed<Unidade | null>(
-    () => unidadesStore.unidade,
-);
-
-const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
-  const unidade = unidadeOriginal.value;
-  if (!unidade) return null;
-
-  const atribuicoes = atribuicaoTemporariaStore.obterAtribuicoesPorUnidade(
-      unidade.sigla,
-  );
-  const hoje = new Date();
-
-  // Encontrar a atribuição temporária vigente
-  const atribuicaoVigente = atribuicoes.find((atrb) => {
-    const dataInicio = new Date(atrb.dataInicio);
-    const dataTermino = new Date(atrb.dataTermino);
-    return hoje >= dataInicio && hoje <= dataTermino;
-  });
-
-  if (atribuicaoVigente) {
-    const responsavel: Responsavel = {
-      codigo: atribuicaoVigente.usuario.codigo,
-      nome: atribuicaoVigente.usuario.nome,
-      tituloEleitoral: atribuicaoVigente.usuario.tituloEleitoral,
-      unidade: atribuicaoVigente.usuario.unidade,
-      email: atribuicaoVigente.usuario.email,
-      ramal: atribuicaoVigente.usuario.ramal,
-      usuarioTitulo: atribuicaoVigente.usuario.nome,
-      unidadeCodigo: atribuicaoVigente.unidade.codigo,
-      usuarioCodigo: atribuicaoVigente.usuario.codigo,
-      tipo: "TEMPORARIO",
-      dataInicio: atribuicaoVigente.dataInicio,
-      dataFim: atribuicaoVigente.dataFim,
-    };
-    // Retorna uma nova unidade com o responsável da atribuição temporária
-    return {
-      ...unidade,
-      responsavel,
-    };
-  }
-
-  // Se não houver atribuição temporária vigente, retorna a unidade original
-  return unidade;
-});
-const titularDetalhes = computed<Usuario | null>(() => {
-  return titular.value;
-});
-
-const mapaVigente = computed<MapaCompleto | null>(() => {
-  return mapasStore.mapaCompleto;
-});
-
-function irParaCriarAtribuicao() {
-  router.push({path: `/unidade/${codigo.value}/atribuicao`});
-}
+const colunasTabela = [{key: "nome", label: "Unidade"}];
 
 const dadosFormatadosSubordinadas = computed(() => {
   if (
@@ -210,8 +92,6 @@ const dadosFormatadosSubordinadas = computed(() => {
     return [];
   return formatarDadosParaArvore(unidadeComResponsavelDinamico.value.filhas);
 });
-
-const colunasTabela = [{key: "nome", label: "Unidade"}];
 
 interface UnidadeFormatada {
   codigo: number;
@@ -232,22 +112,5 @@ function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
       ...(children.length > 0 && {children}),
     };
   });
-}
-
-function navegarParaUnidadeSubordinada(item: { codigo: any }) {
-  if (item && typeof item.codigo === "number")
-    router.push({path: `/unidade/${item.codigo}`});
-}
-
-function visualizarMapa() {
-  if (mapaVigente.value && unidadeOriginal.value) {
-    router.push({
-      name: "SubprocessoVisMapa",
-      params: {
-        codProcesso: mapaVigente.value.subprocessoCodigo,
-        siglaUnidade: unidadeOriginal.value.sigla,
-      },
-    });
-  }
 }
 </script>

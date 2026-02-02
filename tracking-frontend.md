@@ -8,7 +8,7 @@ Este documento acompanha o progresso da refatoração do frontend conforme o pla
 
 | Fase | Status | Progresso | Linhas Reduzidas | Meta |
 |------|--------|-----------|------------------|------|
-| Fase 1: Simplificação | 🟢 Concluído (1.1, 1.2, 1.3 parcial) | 95% | ~1.646* | ~1.200 |
+| Fase 1: Simplificação | 🟢 Concluído | 100% | ~2.500* | ~1.200 |
 | Fase 2.1: Formatação Backend | 🟢 Concluído | 100% | ~15 | ~162 |
 | Fase 2.2: CSV Backend | 🔴 Não Iniciado | 0% | 0 | ~60 |
 | Fase 2.3: Validação Backend | 🔴 Não Iniciado | 0% | 0 | ~126 |
@@ -139,17 +139,18 @@ Este documento acompanha o progresso da refatoração do frontend conforme o pla
 
 ---
 
-#### Outras Views (ConfiguracoesView, ProcessoView, VisMapa, RelatoriosView, UnidadeView, VisAtividades)
+#### Outras Views (ConfiguracoesView, ProcessoView, VisMapa, RelatoriosView, UnidadeView, VisAtividades, CadAtividades)
 
-- [ ] ConfiguracoesView.vue (346 → ~150) - Planejar
-- [ ] ProcessoView.vue (324 → ~150) - Planejar
-- [ ] VisMapa.vue (312 → ~150) - Planejar
-- [ ] RelatoriosView.vue (296 → ~150) - Planejar
-- [ ] UnidadeView.vue (253 → ~150) - Planejar
-- [ ] VisAtividades.vue (246 → ~150) - Planejar
+- [x] ConfiguracoesView.vue (346 → ~25) - ✅ Concluído
+- [x] ProcessoView.vue (320 → ~75) - ✅ Concluído
+- [x] VisMapa.vue (305 → ~180) - ✅ Concluído
+- [x] RelatoriosView.vue (296 → ~50) - ✅ Concluído
+- [x] UnidadeView.vue (253 → ~85) - ✅ Concluído
+- [x] VisAtividades.vue (246 → ~135) - ✅ Concluído
+- [x] CadAtividades.vue (273 → ~215) - ✅ Concluído
 
-**Progresso:** 0/6 tarefas  
-**Linhas Economizadas:** 0 / ~600
+**Progresso:** 7/7 tarefas ✅
+**Linhas Economizadas:** ~1.200 / ~600
 
 ---
 
@@ -441,6 +442,7 @@ Nenhum bloqueador identificado no momento.
 - ✅ Estrutura inicial definida
 - ✅ Todas as fases mapeadas com tarefas detalhadas
 - ✅ Revisão de issues do Backend via SARIF e atualização do `correction-plan.md`
+- ✅ Refatoração de ProcessoView, VisMapa, RelatoriosView, UnidadeView, VisAtividades e CadAtividades concluída (Fase 1.3)
 
 ---
 
