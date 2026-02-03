@@ -69,27 +69,8 @@ public enum Acao {
     EXCLUIR_MAPA("Excluir mapa"),
 
     // ========== AÇÕES EM BLOCO ==========
-    ACEITAR_CADASTRO_EM_BLOCO("Aceitar cadastros em bloco"),
     HOMOLOGAR_CADASTRO_EM_BLOCO("Homologar cadastros em bloco"),
-    ACEITAR_MAPA_EM_BLOCO("Aceitar mapas em bloco"),
     HOMOLOGAR_MAPA_EM_BLOCO("Homologar mapas em bloco"),
-
-    // ========== RELATÓRIOS ==========
-    GERAR_RELATORIO_ANDAMENTO("Gerar relatório de andamento"),
-    GERAR_RELATORIO_MAPAS("Gerar relatório de mapas"),
-
-    // ========== CONFIGURAÇÕES ==========
-    VISUALIZAR_CONFIGURACOES("Visualizar configurações"),
-    EDITAR_CONFIGURACOES("Editar configurações"),
-
-    // ========== ADMINISTRAÇÃO DE USUÁRIOS ==========
-    LISTAR_ADMINISTRADORES("Listar administradores"),
-    ADICIONAR_ADMINISTRADOR("Adicionar administrador"),
-    REMOVER_ADMINISTRADOR("Remover administrador"),
-
-    // ========== PAINEL ==========
-    VISUALIZAR_PAINEL_PROCESSOS("Visualizar painel de processos"),
-    VISUALIZAR_PAINEL_ALERTAS("Visualizar painel de alertas"),
 
     // ========== DIAGNÓSTICO ==========
     VISUALIZAR_DIAGNOSTICO("Visualizar diagnóstico"),

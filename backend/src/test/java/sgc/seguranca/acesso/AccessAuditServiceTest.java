@@ -61,7 +61,7 @@ class AccessAuditServiceTest {
     @DisplayName("Deve registrar acesso com objeto genérico")
     void deveRegistrarAcessoComObjetoGenerico() {
         Usuario usuario = criarUsuario("123456789012");
-        Acao acao = Acao.EDITAR_CONFIGURACOES;
+        Acao acao = Acao.VISUALIZAR_PROCESSO;
         String recurso = "ConfiguracaoGenerica";
 
         assertDoesNotThrow(() ->
