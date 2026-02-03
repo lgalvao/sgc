@@ -15,5 +15,5 @@
 
 ## Fase 3: Homologação e Cobertura
 - [x] Task: Executar o Quality Gate completo (`quality-check.sh`) para garantir 99% de cobertura. [53a2e69]
-- [ ] Task: Verificar integração entre backend e frontend nos fluxos críticos.
-- [ ] Task: Conductor - User Manual Verification 'Homologação e Cobertura' (Protocol in workflow.md)
+- [x] Task: Verificar integração entre backend e frontend nos fluxos críticos. [a8a0669]
+- [~] Task: Conductor - User Manual Verification 'Homologação e Cobertura' (Protocol in workflow.md)
