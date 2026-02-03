@@ -9,7 +9,7 @@
 - [x] Task: Conductor - User Manual Verification 'Auditoria e Alinhamento do Backend' (Protocol in workflow.md)
 
 ## Fase 2: Sincronização e Validação do Frontend
-- [x] Task: Revisar os mappers e tipos TypeScript para refletir as situações corretas. [3162359]
+- [x] Task: Revisar os mappers e tipos TypeScript para refletir as situações corretas. [a30e352]
 - [~] Task: Validar se as ações de interface (botões de envio, devolução, validação) respeitam o estado atual.
 - [ ] Task: Conductor - User Manual Verification 'Sincronização e Validação do Frontend' (Protocol in workflow.md)
 
