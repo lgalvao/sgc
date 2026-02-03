@@ -25,7 +25,7 @@
       <form v-else @submit.prevent="salvar">
         <div class="mb-3">
           <label for="diasInativacao" class="form-label">
-            Dias para inativação de processos (DIAS_INATIVACAO_PROCESSO)
+            Dias para inativação de processos (DIAS_INATIVACAO_PROCESSO) <span class="text-danger" aria-hidden="true">*</span>
           </label>
           <input
             id="diasInativacao"
@@ -43,7 +43,7 @@
 
         <div class="mb-3">
           <label for="diasAlertaNovo" class="form-label">
-            Dias para indicação de alerta como novo (DIAS_ALERTA_NOVO)
+            Dias para indicação de alerta como novo (DIAS_ALERTA_NOVO) <span class="text-danger" aria-hidden="true">*</span>
           </label>
           <input
             id="diasAlertaNovo"
