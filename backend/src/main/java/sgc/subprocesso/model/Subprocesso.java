@@ -10,6 +10,7 @@ import sgc.comum.model.EntidadeBase;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
+import sgc.subprocesso.erros.ErroTransicaoInvalida;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -46,15 +47,24 @@ public class Subprocesso extends EntidadeBase {
     private LocalDateTime dataFimEtapa2;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "situacao", length = 50)
-    private SituacaoSubprocesso situacao;
+    @Column(name = "situacao", length = 50, nullable = false)
+    @lombok.Builder.Default
+    private SituacaoSubprocesso situacao = SituacaoSubprocesso.NAO_INICIADO;
 
     public void setSituacao(SituacaoSubprocesso novaSituacao) {
-        if (this.situacao != null && novaSituacao != null && !this.situacao.podeTransicionarPara(novaSituacao)) {
-            throw new sgc.subprocesso.erros.ErroTransicaoInvalida(
-                    String.format("Transição de situação inválida: %s -> %s", this.situacao.getDescricao(), novaSituacao.getDescricao())
+        if (processo != null && situacao != null && situacao != novaSituacao && !situacao.podeTransicionarPara(novaSituacao, processo.getTipo())) {
+            throw new ErroTransicaoInvalida("Transição de situação inválida: %s -> %s".formatted(
+                    situacao.getDescricao(), novaSituacao.getDescricao())
             );
         }
+        situacao = novaSituacao;
+    }
+
+    /**
+     * Define a situação ignorando as regras de transição.
+     * USO EXCLUSIVO PARA TESTES E SETUP DE DADOS.
+     */
+    public void setSituacaoForcada(SituacaoSubprocesso novaSituacao) {
         this.situacao = novaSituacao;
     }
 

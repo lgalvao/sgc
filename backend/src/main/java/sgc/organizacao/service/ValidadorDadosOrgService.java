@@ -86,7 +86,6 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
                 .toList();
     }
 
-    @SuppressWarnings("ConstantConditions")
     private Map<String, Usuario> carregarUsuariosTitulares(List<Unidade> unidades) {
         List<String> titulos = unidades.stream()
                 .map(Unidade::getTituloTitular)
@@ -108,7 +107,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
     private void validarTitularesUnidades(List<Unidade> unidades, List<String> violacoes) {
         for (Unidade u : unidades) {
             String titulo = u.getTituloTitular();
-            if (titulo == null || titulo.isBlank()) {
+            if (titulo.isBlank()) {
                 violacoes.add("Unidade %s (%s) não possui titular cadastrado".formatted(u.getSigla(), u.getTipo()));
             }
         }
@@ -120,7 +119,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
     private void validarEmailsTitulares(List<Unidade> unidades, Map<String, Usuario> usuarios, List<String> violacoes) {
         for (Unidade u : unidades) {
             String tituloTitular = u.getTituloTitular();
-            if (tituloTitular != null && !tituloTitular.isBlank()) {
+            if (!tituloTitular.isBlank()) {
                 Usuario titular = usuarios.get(tituloTitular);
                 if (titular == null) {
                     violacoes.add("Titular da unidade %s (título %s) não encontrado na base de usuários"

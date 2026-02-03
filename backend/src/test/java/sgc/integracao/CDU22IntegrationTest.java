@@ -86,13 +86,13 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         // Create subprocesses for both units
         subprocesso1 = SubprocessoFixture.subprocessoPadrao(processo, unidade1);
         subprocesso1.setCodigo(null);
-        subprocesso1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocesso1.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocesso1.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso1 = subprocessoRepo.save(subprocesso1);
 
         subprocesso2 = SubprocessoFixture.subprocessoPadrao(processo, unidade2);
         subprocesso2.setCodigo(null);
-        subprocesso2.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocesso2.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocesso2.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso2 = subprocessoRepo.save(subprocesso2);
 

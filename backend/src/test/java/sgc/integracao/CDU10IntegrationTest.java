@@ -129,7 +129,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
 
         subprocessoRevisao = SubprocessoFixture.subprocessoPadrao(processoRevisao, unidadeChefe);
         subprocessoRevisao.setCodigo(null);
-        subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocessoRevisao.setDataLimiteEtapa1(processoRevisao.getDataLimite());
         subprocessoRevisao = subprocessoRepo.save(subprocessoRevisao);
 
@@ -234,7 +234,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
 
         // 4. Simular devolução
         Subprocesso sp = subprocessoRepo.findById(subprocessoId).get();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         sp.setDataFimEtapa1(null);
         subprocessoRepo.saveAndFlush(sp);
 

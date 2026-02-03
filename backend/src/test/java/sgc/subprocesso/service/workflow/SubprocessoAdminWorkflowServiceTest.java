@@ -41,7 +41,7 @@ class SubprocessoAdminWorkflowServiceTest {
         Long codigo = 1L;
         LocalDate novaData = LocalDate.of(2023, 10, 1);
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setUnidade(new Unidade());
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
@@ -59,7 +59,7 @@ class SubprocessoAdminWorkflowServiceTest {
         Long codigo = 1L;
         LocalDate novaData = LocalDate.of(2023, 10, 1);
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         sp.setUnidade(new Unidade());
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
@@ -76,7 +76,7 @@ class SubprocessoAdminWorkflowServiceTest {
     void atualizarSituacaoParaEmAndamento_Mapeamento() {
         Long codMapa = 100L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         Processo p = new Processo();
         p.setTipo(TipoProcesso.MAPEAMENTO);
         sp.setProcesso(p);
@@ -94,7 +94,7 @@ class SubprocessoAdminWorkflowServiceTest {
     void atualizarSituacaoParaEmAndamento_OutroTipo() {
         Long codMapa = 100L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         Processo p = new Processo();
         p.setTipo(TipoProcesso.DIAGNOSTICO); // Caso não tratado nos ifs
         sp.setProcesso(p);
@@ -114,7 +114,7 @@ class SubprocessoAdminWorkflowServiceTest {
     void atualizarSituacaoParaEmAndamento_Revisao() {
         Long codMapa = 100L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         Processo p = new Processo();
         p.setTipo(TipoProcesso.REVISAO);
         sp.setProcesso(p);
@@ -140,7 +140,7 @@ class SubprocessoAdminWorkflowServiceTest {
         Long codigo = 1L;
         LocalDate novaData = LocalDate.of(2023, 10, 1);
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setUnidade(new Unidade());
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);

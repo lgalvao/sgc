@@ -134,7 +134,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         sp = SubprocessoFixture.subprocessoPadrao(processo, unidadeChefe);
         sp.setCodigo(null);
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp = subprocessoRepo.save(sp);
 
         Mapa mapa = new Mapa();

@@ -94,7 +94,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         // Create subprocess in MAPEAMENTO_MAPA_VALIDADO state for unit 9
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         subprocesso = subprocessoRepo.save(subprocesso);
         subprocessoRepo.flush();
     }
@@ -225,7 +225,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void testHomologarValidacao_Sucesso() throws Exception {
         // Cenário: Subprocesso já validado e pronto para homologação
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         subprocessoRepo.save(subprocesso);
         subprocessoRepo.flush();
 

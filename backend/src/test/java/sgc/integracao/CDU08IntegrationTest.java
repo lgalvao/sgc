@@ -214,7 +214,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve importar e atualizar status se NAO_INICIADO")
         void deveImportarEAtualizarStatus() throws Exception {
-            subprocessoDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            subprocessoDestino.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
             subprocessoRepo.save(subprocessoDestino);
 
             ImportarAtividadesRequest request =
@@ -238,7 +238,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve falhar ao importar para subprocesso em estado inválido")
         void deveFalharAoImportarParaSubprocessoEmEstadoInvalido() throws Exception {
-            subprocessoDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            subprocessoDestino.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             subprocessoRepo.save(subprocessoDestino);
 
             ImportarAtividadesRequest request =

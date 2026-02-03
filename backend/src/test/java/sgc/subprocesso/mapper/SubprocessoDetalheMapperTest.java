@@ -42,7 +42,7 @@ class SubprocessoDetalheMapperTest {
     void toDto() {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         Processo p = new Processo();
         p.setTipo(TipoProcesso.MAPEAMENTO);
         sp.setProcesso(p);
@@ -59,7 +59,7 @@ class SubprocessoDetalheMapperTest {
     @Test
     void deveMapearResponsavelTitular() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         Unidade unidade = new Unidade();
         unidade.setTituloTitular("123");
         sp.setUnidade(unidade);
@@ -80,7 +80,7 @@ class SubprocessoDetalheMapperTest {
     @Test
     void deveMapearResponsavelSubstituto() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         Unidade unidade = new Unidade();
         unidade.setTituloTitular("123");
         sp.setUnidade(unidade);
@@ -101,7 +101,7 @@ class SubprocessoDetalheMapperTest {
     @Test
     void deveMapearLocalizacaoAtual() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         Processo processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         sp.setProcesso(processo);
@@ -119,7 +119,7 @@ class SubprocessoDetalheMapperTest {
     @Test
     void deveMapearLocalizacaoAtualVaziaSeSemDestino() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         Processo processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         sp.setProcesso(processo);

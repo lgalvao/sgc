@@ -123,7 +123,7 @@ class SubprocessoCrudServiceTest {
     void deveObterStatus() {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         SubprocessoSituacaoDto status = service.obterStatus(1L);
@@ -238,7 +238,7 @@ class SubprocessoCrudServiceTest {
     @DisplayName("Deve atualizar subprocesso detectando alterações em campos diversos")
     void deveAtualizarDetectandoAlteracoes() {
         Subprocesso sp = criarSubprocessoCompleto();
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
                 .dataLimiteEtapa1(LocalDateTime.now())
                 .dataFimEtapa1(LocalDateTime.now())
@@ -259,7 +259,7 @@ class SubprocessoCrudServiceTest {
     @DisplayName("Deve atualizar quando nada mudar")
     void deveAtualizarSemMudancas() {
         Subprocesso sp = criarSubprocessoCompleto();
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().build();
         SubprocessoDto responseDto = SubprocessoDto.builder().build();
 

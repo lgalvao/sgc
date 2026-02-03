@@ -68,7 +68,7 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setMapa(mapa);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocesso = subprocessoRepo.save(subprocesso);
 
         Atividade atividade1 = atividadeRepo.save(Atividade.builder().mapa(mapa).descricao("Atividade 1").build());

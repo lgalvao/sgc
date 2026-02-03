@@ -211,7 +211,7 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoPermitida: com Set - sucesso quando situação está no conjunto")
     void validarSituacaoPermitidaSetSucesso() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         
         service.validarSituacaoPermitida(sp, Set.of(
             MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
@@ -223,7 +223,7 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoPermitida: com Set - erro quando situação não está no conjunto")
     void validarSituacaoPermitidaSetErro() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(NAO_INICIADO);
+        sp.setSituacaoForcada(NAO_INICIADO);
         
         assertThatThrownBy(() -> service.validarSituacaoPermitida(sp, Set.of(
             MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
@@ -237,7 +237,7 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoPermitida: varargs - sucesso quando situação está entre as permitidas")
     void validarSituacaoPermitidaVarargsSucesso() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_HOMOLOGADO);
         
         service.validarSituacaoPermitida(sp,
             MAPEAMENTO_CADASTRO_HOMOLOGADO,
@@ -249,7 +249,7 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoPermitida: varargs - erro quando situação não está entre as permitidas")
     void validarSituacaoPermitidaVarargsErro() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(NAO_INICIADO);
+        sp.setSituacaoForcada(NAO_INICIADO);
         
         assertThatThrownBy(() -> service.validarSituacaoPermitida(sp,
             MAPEAMENTO_CADASTRO_HOMOLOGADO,
@@ -263,7 +263,7 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoPermitida: com mensagem customizada - sucesso")
     void validarSituacaoPermitidaMensagemSucesso() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_HOMOLOGADO);
         
         service.validarSituacaoPermitida(sp, "Mensagem customizada",
             MAPEAMENTO_CADASTRO_HOMOLOGADO
@@ -274,7 +274,7 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoPermitida: com mensagem customizada - erro")
     void validarSituacaoPermitidaMensagemErro() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(NAO_INICIADO);
+        sp.setSituacaoForcada(NAO_INICIADO);
         
         assertThatThrownBy(() -> service.validarSituacaoPermitida(sp, "Mensagem customizada de teste",
             MAPEAMENTO_CADASTRO_HOMOLOGADO
@@ -287,7 +287,7 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoMinima: sucesso quando situação é igual à mínima")
     void validarSituacaoMinimaSucessoIgual() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_HOMOLOGADO);
         
         service.validarSituacaoMinima(sp, MAPEAMENTO_CADASTRO_HOMOLOGADO);
     }
@@ -296,7 +296,7 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoMinima: sucesso quando situação é maior que a mínima")
     void validarSituacaoMinimaSucessoMaior() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
+        sp.setSituacaoForcada(MAPEAMENTO_MAPA_CRIADO);
         
         service.validarSituacaoMinima(sp, MAPEAMENTO_CADASTRO_HOMOLOGADO);
     }
@@ -305,7 +305,7 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoMinima: erro quando situação é menor que a mínima")
     void validarSituacaoMinimaErro() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         
         assertThatThrownBy(() -> service.validarSituacaoMinima(sp, MAPEAMENTO_CADASTRO_HOMOLOGADO))
             .isInstanceOf(ErroValidacao.class)
@@ -316,7 +316,7 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoMinima: com mensagem customizada - sucesso")
     void validarSituacaoMinimaMensagemSucesso() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
+        sp.setSituacaoForcada(REVISAO_CADASTRO_HOMOLOGADA);
         
         service.validarSituacaoMinima(sp, REVISAO_CADASTRO_HOMOLOGADA, "Mensagem customizada");
     }
@@ -325,7 +325,7 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoMinima: com mensagem customizada - erro")
     void validarSituacaoMinimaMensagemErro() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacaoForcada(REVISAO_CADASTRO_EM_ANDAMENTO);
         
         assertThatThrownBy(() -> service.validarSituacaoMinima(sp,
             REVISAO_CADASTRO_HOMOLOGADA,

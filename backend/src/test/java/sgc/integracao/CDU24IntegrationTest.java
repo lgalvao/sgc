@@ -97,7 +97,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
         // Criar Subprocesso in correct state for disponibilizar mapa
         Subprocesso sub = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         sub.setCodigo(null);
-        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO); // Changed from MAPEAMENTO_MAPA_CRIADO
+        sub.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO); // Changed from MAPEAMENTO_MAPA_CRIADO
         sub = subprocessoRepo.save(sub);
 
         // Criar Mapa

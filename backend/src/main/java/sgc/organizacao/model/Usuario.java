@@ -38,12 +38,10 @@ public class Usuario implements UserDetails {
     @Column(name = "nome", nullable = false)
     private String nome;
 
-    @Column(name = "email")
-    @Nullable
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "ramal", length = 20)
-    @Nullable
+    @Column(name = "ramal", length = 20, nullable = false)
     private String ramal;
 
     @ManyToOne

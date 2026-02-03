@@ -126,7 +126,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                 Subprocesso sp = subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream()
                                 .findFirst()
                                 .orElseThrow();
-                sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+                sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
                 subprocessoRepo.save(sp);
                 return sp.getCodigo();
         }

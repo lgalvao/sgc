@@ -32,7 +32,7 @@ class SubprocessoValidacaoServiceCoverageTest {
     @DisplayName("validarSituacaoPermitida(Set): deve lançar IllegalArgumentException se situacao for null")
     void validarSituacaoPermitidaSet_DeveLancarErroSeSituacaoNull() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(null);
+        sp.setSituacaoForcada(null);
         Set<SituacaoSubprocesso> permitidas = Set.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         assertThatThrownBy(() -> service.validarSituacaoPermitida(sp, permitidas))
@@ -44,7 +44,7 @@ class SubprocessoValidacaoServiceCoverageTest {
     @DisplayName("validarSituacaoPermitida(Set): deve lançar IllegalArgumentException se conjunto permitidas for vazio")
     void validarSituacaoPermitidaSet_DeveLancarErroSePermitidasVazio() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         Set<SituacaoSubprocesso> permitidas = Collections.emptySet();
 
         assertThatThrownBy(() -> service.validarSituacaoPermitida(sp, permitidas))
@@ -66,7 +66,7 @@ class SubprocessoValidacaoServiceCoverageTest {
     @DisplayName("validarSituacaoPermitida(Msg, Varargs): deve lançar IllegalArgumentException se situacao for null")
     void validarSituacaoPermitidaMsg_DeveLancarErroSeSituacaoNull() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(null);
+        sp.setSituacaoForcada(null);
 
         assertThatThrownBy(() -> service.validarSituacaoPermitida(sp, "Erro", MAPEAMENTO_CADASTRO_EM_ANDAMENTO))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -77,7 +77,7 @@ class SubprocessoValidacaoServiceCoverageTest {
     @DisplayName("validarSituacaoPermitida(Msg, Varargs): deve lançar IllegalArgumentException se permitidas for vazio")
     void validarSituacaoPermitidaMsg_DeveLancarErroSePermitidasVazio() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         assertThatThrownBy(() -> service.validarSituacaoPermitida(sp, "Erro"))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -88,7 +88,7 @@ class SubprocessoValidacaoServiceCoverageTest {
     @DisplayName("validarSituacaoMinima: deve lançar IllegalArgumentException se situacao for null")
     void validarSituacaoMinima_DeveLancarErroSeSituacaoNull() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(null);
+        sp.setSituacaoForcada(null);
 
         assertThatThrownBy(() -> service.validarSituacaoMinima(sp, MAPEAMENTO_CADASTRO_EM_ANDAMENTO))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -99,7 +99,7 @@ class SubprocessoValidacaoServiceCoverageTest {
     @DisplayName("validarSituacaoMinima(Msg): deve lançar IllegalArgumentException se situacao for null")
     void validarSituacaoMinimaMsg_DeveLancarErroSeSituacaoNull() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(null);
+        sp.setSituacaoForcada(null);
 
         assertThatThrownBy(() -> service.validarSituacaoMinima(sp, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Erro"))
                 .isInstanceOf(IllegalArgumentException.class)

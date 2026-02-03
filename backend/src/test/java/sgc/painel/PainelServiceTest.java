@@ -191,7 +191,7 @@ class PainelServiceTest {
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, 2L, PageRequest.of(0, 10));
 
-            assertThat(result.getContent().getFirst().linkDestino()).isNull();
+            assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("");
         }
 
         @Test
@@ -214,7 +214,7 @@ class PainelServiceTest {
             Page<ProcessoResumoDto> res = painelService.listarProcessos(Perfil.SERVIDOR, 1L, PageRequest.of(0, 10));
 
             assertThat(res.getContent()).hasSize(1);
-            assertThat(res.getContent().getFirst().linkDestino()).isNull();
+            assertThat(res.getContent().getFirst().linkDestino()).isEqualTo("");
         }
     }
 

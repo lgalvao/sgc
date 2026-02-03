@@ -126,7 +126,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         Subprocesso sp1 = SubprocessoFixture.subprocessoPadrao(processo, unidadeOperacional1);
         sp1.setCodigo(null);
         sp1.setMapa(mapa1);
-        sp1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        sp1.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         subprocessoRepo.save(sp1);
 
         Mapa mapa2 = MapaFixture.mapaPadrao(null);
@@ -136,7 +136,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         Subprocesso sp2 = SubprocessoFixture.subprocessoPadrao(processo, unidadeOperacional2);
         sp2.setCodigo(null);
         sp2.setMapa(mapa2);
-        sp2.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        sp2.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         subprocessoRepo.save(sp2);
 
         // Configurar mocks do UnidadeFacade com dados dinâmicos
@@ -224,7 +224,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
                                                 .equals(unidadeOperacional1.getCodigo()))
                         .findFirst()
                         .orElseThrow();
-        spPendente.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        spPendente.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.save(spPendente);
 
         mockMvc.perform(post("/api/processos/{id}/finalizar", processo.getCodigo()).with(csrf()))

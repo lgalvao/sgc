@@ -122,7 +122,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         subprocessoRevisao = SubprocessoFixture.subprocessoPadrao(processoRevisao, unidade);
         subprocessoRevisao.setCodigo(null);
         subprocessoRevisao.setMapa(null); // Initially null, set later
-        subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocessoRevisao.setDataLimiteEtapa1(processoRevisao.getDataLimite());
         subprocessoRevisao = subprocessoRepo.save(subprocessoRevisao);
 
@@ -273,7 +273,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @DisplayName("CHEFE pode acessar se subprocesso está em 'Revisão do cadastro em andamento'")
         void chefePodeAcessar_EmRevisaoCadastro() throws Exception {
             setupChefeForUnidade(CHEFE_TITULO, unidade);
-            subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             subprocessoRepo.save(subprocessoRevisao);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
@@ -286,7 +286,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         void gestorPodeAcessar_EmRevisaoDisponibilizada() throws Exception {
             // Gestor usually has global access or needs setup too.
             // Assuming MockGestor works globally or we need to link.
-            subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+            subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             subprocessoRepo.save(subprocessoRevisao);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
@@ -297,7 +297,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockAdmin
         @DisplayName("ADMIN pode acessar se subprocesso está em 'Revisão do cadastro homologada'")
         void adminPodeAcessar_EmRevisaoHomologada() throws Exception {
-            subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+            subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
             subprocessoRepo.save(subprocessoRevisao);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
@@ -308,7 +308,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockAdmin
         @DisplayName("ADMIN pode acessar se subprocesso está em 'Mapa Ajustado'")
         void adminPodeAcessar_EmMapaAjustado() throws Exception {
-            subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
             subprocessoRepo.save(subprocessoRevisao);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
@@ -320,7 +320,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @DisplayName("CHEFE NÃO pode acessar se subprocesso está em situação diferente de 'Revisão do cadastro em andamento'")
         void chefeNaoPodeAcessar_EmSituacaoIncorreta() throws Exception {
             setupChefeForUnidade(CHEFE_TITULO, unidade);
-            subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+            subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             subprocessoRepo.save(subprocessoRevisao);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))

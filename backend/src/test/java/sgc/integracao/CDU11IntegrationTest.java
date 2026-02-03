@@ -99,7 +99,7 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setMapa(mapa);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocesso.setDataLimiteEtapa1(processo.getDataLimite());
         subprocesso = subprocessoRepo.save(subprocesso);
 

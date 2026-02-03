@@ -364,7 +364,7 @@ class SubprocessoContextoServiceTest {
             subprocesso.setCodigo(codSubprocesso);
             subprocesso.setUnidade(unidade);
             subprocesso.setMapa(mapa);
-            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             
             UnidadeDetalheDto unidadeDtoInterno = UnidadeDetalheDto.builder()
                     .codigo(1L)

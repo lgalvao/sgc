@@ -53,7 +53,7 @@ class MapperTest {
         entity.setDataFimEtapa1(LocalDateTime.now());
         entity.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
         entity.setDataFimEtapa2(LocalDateTime.now().plusHours(1));
-        entity.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        entity.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         SubprocessoDto dto = subprocessoMapper.toDto(entity);
 

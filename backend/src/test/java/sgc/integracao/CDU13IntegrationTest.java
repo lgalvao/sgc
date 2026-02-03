@@ -119,7 +119,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         // Criar Subprocesso via Fixture
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso = subprocessoRepo.save(subprocesso);
 
@@ -274,7 +274,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk());
 
         subprocesso = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocessoRepo.saveAndFlush(subprocesso);
 
         String obsAceite = "Agora sim, completo.";

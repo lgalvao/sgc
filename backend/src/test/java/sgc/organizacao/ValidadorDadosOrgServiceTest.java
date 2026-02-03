@@ -245,11 +245,11 @@ class ValidadorDadosOrgServiceTest {
         }
 
         @Test
-        @DisplayName("Deve falhar com título nulo (branch coverage)")
+        @DisplayName("Deve falhar com título vazio")
         void deveFalharComTituloNulo() {
             // Arrange
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
-            u.setTituloTitular(null);
+            u.setTituloTitular("");
 
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
 

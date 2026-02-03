@@ -99,7 +99,7 @@ class FluxoCompletoProcessoIntegrationTest extends BaseIntegrationTest {
                 .orElseThrow(() -> new RuntimeException("Subprocesso não encontrado"));
 
         // Alterar situação para MAPA_HOMOLOGADO (pré-requisito para finalizar)
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         subprocessoRepo.saveAndFlush(subprocesso);
 
         // Verificar situação antes de finalizar via service

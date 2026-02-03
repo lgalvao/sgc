@@ -43,7 +43,7 @@ class AuditoriaFluxoMapeamentoTest {
     }
 
     private SituacaoSubprocesso transicionar(SituacaoSubprocesso atual, SituacaoSubprocesso nova) {
-        assertThat(atual.podeTransicionarPara(nova))
+        assertThat(atual.podeTransicionarPara(nova, sgc.processo.model.TipoProcesso.MAPEAMENTO))
                 .withFailMessage("Transição inválida: " + atual + " -> " + nova)
                 .isTrue();
         return nova;

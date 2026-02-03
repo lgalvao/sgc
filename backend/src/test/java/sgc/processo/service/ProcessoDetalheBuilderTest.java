@@ -93,7 +93,7 @@ class ProcessoDetalheBuilderTest {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
         sp.setUnidade(u1);
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         sp.setDataLimiteEtapa1(processo.getDataLimite());
         sp.setMapa(new Mapa());
 
@@ -212,13 +212,13 @@ class ProcessoDetalheBuilderTest {
 
         Subprocesso spPai = new Subprocesso();
         spPai.setUnidade(pai);
-        spPai.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        spPai.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         spPai.setMapa(new Mapa());
         spPai.getMapa().setCodigo(100L);
 
         Subprocesso spFilho = new Subprocesso();
         spFilho.setUnidade(filho);
-        spFilho.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        spFilho.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         spFilho.setMapa(new Mapa());
         spFilho.getMapa().setCodigo(101L);
 
@@ -323,7 +323,7 @@ class ProcessoDetalheBuilderTest {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
         sp.setUnidade(u1);
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         sp.setDataLimiteEtapa1(processo.getDataLimite());
         sp.setMapa(null); // Mapa nulo
 
@@ -354,7 +354,7 @@ class ProcessoDetalheBuilderTest {
         Unidade u1 = new Unidade();
         u1.setCodigo(10L);
         sp.setUnidade(u1);
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
 
         // Subprocesso existe mas unidade não está em participantes
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));

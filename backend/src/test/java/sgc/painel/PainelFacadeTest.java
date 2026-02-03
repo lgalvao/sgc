@@ -86,8 +86,8 @@ class PainelFacadeTest {
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.CHEFE, 100L, PageRequest.of(0, 10));
 
-        // Link deve ser null em caso de exceção
-        assertThat(result.getContent().getFirst().linkDestino()).isNull();
+        // Link deve ser vazio em caso de exceção
+        assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("");
     }
 
     @Test

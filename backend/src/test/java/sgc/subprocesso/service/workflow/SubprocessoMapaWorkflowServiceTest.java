@@ -300,9 +300,10 @@ class SubprocessoMapaWorkflowServiceTest {
         }
 
         @Test
-        @DisplayName("Não deve mudar status ao remover competência se ficou vazio mas situação é REVISAO_MAPA_AJUSTADO")
-        void naoDeveMudarStatusRemoverCompetenciaSeRevisao() {
+        @DisplayName("Deve mudar status ao remover competência se ficou vazio e situação é REVISAO_MAPA_AJUSTADO")
+        void deveMudarStatusRemoverCompetenciaSeRevisao() {
             Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            sp.getProcesso().setTipo(TipoProcesso.REVISAO);
             Mapa mapa = mock(Mapa.class);
             when(mapa.getCodigo()).thenReturn(10L);
             when(sp.getMapa()).thenReturn(mapa);
@@ -312,7 +313,8 @@ class SubprocessoMapaWorkflowServiceTest {
 
             service.removerCompetencia(1L, 5L);
 
-            verify(subprocessoRepo, never()).save(sp);
+            verify(subprocessoRepo).save(sp);
+            verify(sp).setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         }
 
         @Test

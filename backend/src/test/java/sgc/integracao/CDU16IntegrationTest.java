@@ -74,7 +74,7 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setMapa(null); // Importante: limpar mapa da fixture para evitar dependência circular errada
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         subprocesso = subprocessoRepo.save(subprocesso);
 
         // Criar Mapa via Fixture (Ligado ao Subprocesso)
@@ -175,7 +175,7 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve retornar 409 se tentar ajustar mapa em situação inválida")
         void deveRetornarErroParaSituacaoInvalida() throws Exception {
-            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+            subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
             subprocessoRepo.save(subprocesso);
 
             var request = new SalvarAjustesRequest(

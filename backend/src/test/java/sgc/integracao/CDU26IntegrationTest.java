@@ -93,12 +93,12 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
         // O status "MAPEAMENTO_MAPA_VALIDADO" é um bom candidato se não houver um "VALIDACAO_ACEITA" intermediário.
         subprocesso1 = SubprocessoFixture.subprocessoPadrao(processo, unidade1);
         subprocesso1.setCodigo(null);
-        subprocesso1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        subprocesso1.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         subprocesso1 = subprocessoRepo.save(subprocesso1);
 
         subprocesso2 = SubprocessoFixture.subprocessoPadrao(processo, unidade2);
         subprocesso2.setCodigo(null);
-        subprocesso2.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        subprocesso2.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         subprocesso2 = subprocessoRepo.save(subprocesso2);
 
         entityManager.flush();

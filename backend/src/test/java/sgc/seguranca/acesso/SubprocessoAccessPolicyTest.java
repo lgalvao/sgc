@@ -260,7 +260,7 @@ class SubprocessoAccessPolicyTest {
         // ACEITAR_CADASTRO requer SUPERIOR_IMEDIATA
         Usuario uGestor = criarUsuario(Perfil.GESTOR, 2L);
         // Atualiza status para permitir chegar na verificação de hierarquia
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         // Garante que não é superior
         when(hierarquiaService.isSuperiorImediata(any(), any())).thenReturn(false);
         assertFalse(policy.canExecute(uGestor, Acao.ACEITAR_CADASTRO, sp));
@@ -297,7 +297,7 @@ class SubprocessoAccessPolicyTest {
 
     private Subprocesso criarSubprocesso(SituacaoSubprocesso situacao, Long codUnidade) {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(situacao);
+        sp.setSituacaoForcada(situacao);
         Unidade un = new Unidade();
         un.setCodigo(codUnidade);
         sp.setUnidade(un);

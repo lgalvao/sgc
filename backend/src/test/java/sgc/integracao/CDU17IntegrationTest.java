@@ -107,7 +107,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setMapa(mapa);
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         subprocesso.setDataLimiteEtapa2(null);
         subprocesso.setDataFimEtapa2(null);
         subprocesso = subprocessoRepo.save(subprocesso);
@@ -214,7 +214,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se subprocesso não está no estado correto")
         @WithMockAdmin
         void disponibilizarMapa_comEstadoInvalido_retornaConflict() throws Exception {
-            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             subprocessoRepo.save(subprocesso);
 
             DisponibilizarMapaRequest request =

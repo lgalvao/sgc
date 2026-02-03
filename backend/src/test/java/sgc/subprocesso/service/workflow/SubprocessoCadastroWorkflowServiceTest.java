@@ -245,7 +245,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void homologarCadastro() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         Usuario user = new Usuario();
         Unidade sedoc = new Unidade();
 
@@ -268,7 +268,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void homologarCadastroSituacaoInvalida() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         Usuario user = new Usuario();
 
         when(crudService.buscarSubprocesso(id)).thenReturn(sp);
@@ -284,7 +284,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void devolverRevisaoCadastro() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         Unidade u = new Unidade();
         u.setCodigo(10L);
         u.setSigla("U1");
@@ -318,7 +318,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void aceitarRevisaoCadastro() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
         Unidade u = new Unidade();
         u.setCodigo(10L);
@@ -352,7 +352,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void homologarRevisaoCadastroComImpactos() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         Usuario user = new Usuario();
 
         ImpactoMapaDto impactoDto = ImpactoMapaDto.builder().temImpactos(true).build();
@@ -377,7 +377,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void homologarRevisaoCadastroSemImpactos() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         Usuario user = new Usuario();
 
         when(crudService.buscarSubprocesso(id)).thenReturn(sp);
@@ -394,7 +394,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void homologarRevisaoCadastroEstadoInvalido() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         Usuario user = new Usuario();
 
         when(crudService.buscarSubprocesso(id)).thenReturn(sp);
@@ -487,7 +487,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void reabrirCadastro_Sucesso() {
         Long codigo = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         sp.setUnidade(new Unidade());
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
@@ -508,7 +508,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void reabrirRevisaoCadastro_Sucesso() {
         Long codigo = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         sp.setUnidade(new Unidade());
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
@@ -527,7 +527,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void reabrirCadastro_comHierarquiaMultiNivel() {
         Long codigo = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         
         // Criar hierarquia de 3 níveis
         Unidade unidadeNivel3 = new Unidade();
@@ -561,7 +561,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void reabrirCadastro_comUnidadeSemSuperior() {
         Long codigo = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         
         Unidade unidadeSemSuperior = new Unidade();
         unidadeSemSuperior.setSigla("UNIDADE");
@@ -585,7 +585,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void reabrirRevisaoCadastro_comHierarquiaMultiNivel() {
         Long codigo = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         
         // Criar hierarquia de 3 níveis
         Unidade unidadeNivel3 = new Unidade();
@@ -619,7 +619,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void reabrirRevisaoCadastro_comUnidadeSemSuperior() {
         Long codigo = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         
         Unidade unidadeSemSuperior = new Unidade();
         unidadeSemSuperior.setSigla("UNIDADE");
@@ -761,7 +761,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void devolverRevisaoCadastro_comUnidadeSemSuperior() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         
         Unidade u = new Unidade();
         u.setCodigo(10L);
@@ -790,7 +790,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void aceitarRevisaoCadastro_comUnidadeSemSuperior() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
         Unidade u = new Unidade();
         u.setCodigo(10L);
@@ -818,7 +818,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     void aceitarRevisaoCadastro_comSuperiorTendoSuperior() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
         // Hierarquia: u -> sup -> supDoSup
         Unidade supDoSup = new Unidade();

@@ -74,7 +74,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setMapa(mapa);
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocesso = subprocessoRepo.save(subprocesso);
 
         atividade1 = Atividade.builder().mapa(mapa).descricao("Atividade 1").build();
@@ -185,7 +185,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve retornar 400 se tentar salvar mapa para subprocesso em situação inválida")
     void deveRetornarErroParaSituacaoInvalida() throws Exception {
         // Given
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.save(subprocesso);
 
         var request = new SalvarMapaRequest(
@@ -328,7 +328,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         @WithMockAdmin
         @DisplayName("Deve retornar 409 se tentar editar mapa para subprocesso em situação inválida")
         void deveRetornarErroParaSituacaoInvalidaCrud() throws Exception {
-            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             subprocessoRepo.save(subprocesso);
 
             var request = new CompetenciaRequest(

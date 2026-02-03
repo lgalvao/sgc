@@ -100,7 +100,7 @@ class SubprocessoServiceActionsTest {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setProcesso(processo);
         subprocesso.setUnidade(unidade);
-        subprocesso.setSituacao(situacao);
+        subprocesso.setSituacaoForcada(situacao);
         subprocesso.setMapa(mapa);
         subprocessoRepo.save(subprocesso);
         return subprocesso;

@@ -35,39 +35,92 @@ public enum SituacaoSubprocesso {
 
     private final String descricao;
 
-    public boolean podeTransicionarPara(SituacaoSubprocesso nova) {
+    public boolean podeTransicionarPara(SituacaoSubprocesso nova, sgc.processo.model.TipoProcesso tipo) {
         if (this == nova) return true;
 
+        // Garantir que não misturamos situações de tipos diferentes
+        if (this != NAO_INICIADO && nova != NAO_INICIADO) {
+            if (this.name().startsWith("MAPEAMENTO") && !nova.name().startsWith("MAPEAMENTO")) return false;
+            if (this.name().startsWith("REVISAO") && !nova.name().startsWith("REVISAO")) return false;
+            if (this.name().startsWith("DIAGNOSTICO") && !nova.name().startsWith("DIAGNOSTICO")) return false;
+        }
+
         return switch (this) {
-            case NAO_INICIADO -> nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO || nova == REVISAO_CADASTRO_EM_ANDAMENTO;
+            case NAO_INICIADO ->
+                    (tipo == sgc.processo.model.TipoProcesso.MAPEAMENTO && nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO) ||
+                    (tipo == sgc.processo.model.TipoProcesso.REVISAO && nova == REVISAO_CADASTRO_EM_ANDAMENTO) ||
+                    (tipo == sgc.processo.model.TipoProcesso.DIAGNOSTICO && nova == DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
 
-            // Mapeamento - Cadastro
-            case MAPEAMENTO_CADASTRO_EM_ANDAMENTO -> nova == MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
+            // --- MAPEAMENTO ---
+            case MAPEAMENTO_CADASTRO_EM_ANDAMENTO ->
+                    nova == MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
+
             case MAPEAMENTO_CADASTRO_DISPONIBILIZADO ->
-                    nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO || nova == MAPEAMENTO_CADASTRO_HOMOLOGADO || nova == MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
-            case MAPEAMENTO_CADASTRO_HOMOLOGADO -> nova == MAPEAMENTO_MAPA_CRIADO || nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+                    nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO ||
+                    nova == MAPEAMENTO_CADASTRO_HOMOLOGADO;
 
-            // Mapeamento - Mapa
-            case MAPEAMENTO_MAPA_CRIADO -> nova == MAPEAMENTO_MAPA_DISPONIBILIZADO;
-            case MAPEAMENTO_MAPA_DISPONIBILIZADO -> nova == MAPEAMENTO_MAPA_COM_SUGESTOES || nova == MAPEAMENTO_MAPA_VALIDADO;
-            case MAPEAMENTO_MAPA_COM_SUGESTOES -> nova == MAPEAMENTO_MAPA_DISPONIBILIZADO || nova == MAPEAMENTO_MAPA_CRIADO || nova == MAPEAMENTO_MAPA_COM_SUGESTOES;
-            case MAPEAMENTO_MAPA_VALIDADO -> nova == MAPEAMENTO_MAPA_HOMOLOGADO || nova == MAPEAMENTO_MAPA_DISPONIBILIZADO || nova == MAPEAMENTO_MAPA_VALIDADO;
-            case MAPEAMENTO_MAPA_HOMOLOGADO -> false;
+            case MAPEAMENTO_CADASTRO_HOMOLOGADO ->
+                    nova == MAPEAMENTO_MAPA_CRIADO ||
+                    nova == MAPEAMENTO_MAPA_DISPONIBILIZADO ||
+                    nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
 
-            // Revisão - Cadastro
-            case REVISAO_CADASTRO_EM_ANDAMENTO -> nova == REVISAO_CADASTRO_DISPONIBILIZADA;
+            case MAPEAMENTO_MAPA_CRIADO ->
+                    nova == MAPEAMENTO_MAPA_DISPONIBILIZADO ||
+                    nova == MAPEAMENTO_CADASTRO_HOMOLOGADO;
+
+            case MAPEAMENTO_MAPA_DISPONIBILIZADO ->
+                    nova == MAPEAMENTO_MAPA_COM_SUGESTOES ||
+                    nova == MAPEAMENTO_MAPA_VALIDADO ||
+                    nova == MAPEAMENTO_MAPA_CRIADO;
+
+            case MAPEAMENTO_MAPA_COM_SUGESTOES ->
+                    nova == MAPEAMENTO_MAPA_DISPONIBILIZADO ||
+                    nova == MAPEAMENTO_MAPA_CRIADO;
+
+            case MAPEAMENTO_MAPA_VALIDADO ->
+                    nova == MAPEAMENTO_MAPA_HOMOLOGADO ||
+                    nova == MAPEAMENTO_MAPA_DISPONIBILIZADO;
+
+            case MAPEAMENTO_MAPA_HOMOLOGADO, REVISAO_MAPA_HOMOLOGADO, DIAGNOSTICO_CONCLUIDO -> false;
+
+            // --- REVISÃO ---
+            case REVISAO_CADASTRO_EM_ANDAMENTO ->
+                    nova == REVISAO_CADASTRO_DISPONIBILIZADA;
+
             case REVISAO_CADASTRO_DISPONIBILIZADA ->
-                    nova == REVISAO_CADASTRO_EM_ANDAMENTO || nova == REVISAO_CADASTRO_HOMOLOGADA || nova == REVISAO_CADASTRO_DISPONIBILIZADA || nova == REVISAO_MAPA_HOMOLOGADO;
-            case REVISAO_CADASTRO_HOMOLOGADA -> nova == REVISAO_MAPA_AJUSTADO || nova == REVISAO_CADASTRO_EM_ANDAMENTO;
+                    nova == REVISAO_CADASTRO_EM_ANDAMENTO ||
+                    nova == REVISAO_CADASTRO_HOMOLOGADA ||
+                    nova == REVISAO_MAPA_HOMOLOGADO;
 
-            // Revisão - Mapa
-            case REVISAO_MAPA_AJUSTADO -> nova == REVISAO_MAPA_DISPONIBILIZADO;
-            case REVISAO_MAPA_DISPONIBILIZADO -> nova == REVISAO_MAPA_COM_SUGESTOES || nova == REVISAO_MAPA_VALIDADO || nova == REVISAO_MAPA_AJUSTADO;
-            case REVISAO_MAPA_COM_SUGESTOES -> nova == REVISAO_MAPA_DISPONIBILIZADO || nova == REVISAO_MAPA_AJUSTADO || nova == REVISAO_MAPA_COM_SUGESTOES;
-            case REVISAO_MAPA_VALIDADO -> nova == REVISAO_MAPA_HOMOLOGADO || nova == REVISAO_MAPA_DISPONIBILIZADO || nova == REVISAO_MAPA_VALIDADO;
-            case REVISAO_MAPA_HOMOLOGADO -> false;
+            case REVISAO_CADASTRO_HOMOLOGADA ->
+                    nova == REVISAO_MAPA_AJUSTADO ||
+                    nova == REVISAO_MAPA_DISPONIBILIZADO ||
+                    nova == REVISAO_CADASTRO_EM_ANDAMENTO;
 
-            default -> true; // Diagnóstico e outros simplificados por enquanto
+            case REVISAO_MAPA_AJUSTADO ->
+                    nova == REVISAO_MAPA_DISPONIBILIZADO ||
+                    nova == REVISAO_CADASTRO_HOMOLOGADA;
+
+            case REVISAO_MAPA_DISPONIBILIZADO ->
+                    nova == REVISAO_MAPA_COM_SUGESTOES ||
+                    nova == REVISAO_MAPA_VALIDADO ||
+                    nova == REVISAO_MAPA_AJUSTADO;
+
+            case REVISAO_MAPA_COM_SUGESTOES ->
+                    nova == REVISAO_MAPA_DISPONIBILIZADO ||
+                    nova == REVISAO_MAPA_AJUSTADO;
+
+            case REVISAO_MAPA_VALIDADO ->
+                    nova == REVISAO_MAPA_HOMOLOGADO ||
+                    nova == REVISAO_MAPA_DISPONIBILIZADO;
+
+            // --- DIAGNÓSTICO ---
+            case DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO ->
+                    nova == DIAGNOSTICO_MONITORAMENTO;
+
+            case DIAGNOSTICO_MONITORAMENTO ->
+                    nova == DIAGNOSTICO_CONCLUIDO;
+
         };
     }
 }

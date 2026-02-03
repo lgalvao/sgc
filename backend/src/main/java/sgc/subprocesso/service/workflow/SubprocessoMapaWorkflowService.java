@@ -80,9 +80,14 @@ public class SubprocessoMapaWorkflowService {
         boolean temNovasCompetencias = !request.competencias().isEmpty();
 
         MapaCompletoDto mapaDto = mapaFacade.salvarMapaCompleto(codMapa, request);
-        if (eraVazio && temNovasCompetencias && subprocesso.getSituacao() == MAPEAMENTO_CADASTRO_HOMOLOGADO) {
-            subprocesso.setSituacao(MAPEAMENTO_MAPA_CRIADO);
-            subprocessoRepo.save(subprocesso);
+        if (eraVazio && temNovasCompetencias) {
+            if (subprocesso.getSituacao() == MAPEAMENTO_CADASTRO_HOMOLOGADO) {
+                subprocesso.setSituacao(MAPEAMENTO_MAPA_CRIADO);
+                subprocessoRepo.save(subprocesso);
+            } else if (subprocesso.getSituacao() == REVISAO_CADASTRO_HOMOLOGADA) {
+                subprocesso.setSituacao(REVISAO_MAPA_AJUSTADO);
+                subprocessoRepo.save(subprocesso);
+            }
         }
 
         return mapaDto;
@@ -98,10 +103,15 @@ public class SubprocessoMapaWorkflowService {
         mapaManutencaoService.criarCompetenciaComAtividades(
                 mapa, request.descricao(), request.atividadesIds());
 
-        // Alterar situação para MAPA_CRIADO se era vazio e passou a ter competências
-        if (eraVazio && subprocesso.getSituacao() == MAPEAMENTO_CADASTRO_HOMOLOGADO) {
-            subprocesso.setSituacao(MAPEAMENTO_MAPA_CRIADO);
-            subprocessoRepo.save(subprocesso);
+        // Alterar situação para MAPA_CRIADO/AJUSTADO se era vazio e passou a ter competências
+        if (eraVazio) {
+            if (subprocesso.getSituacao() == MAPEAMENTO_CADASTRO_HOMOLOGADO) {
+                subprocesso.setSituacao(MAPEAMENTO_MAPA_CRIADO);
+                subprocessoRepo.save(subprocesso);
+            } else if (subprocesso.getSituacao() == REVISAO_CADASTRO_HOMOLOGADA) {
+                subprocesso.setSituacao(REVISAO_MAPA_AJUSTADO);
+                subprocessoRepo.save(subprocesso);
+            }
         }
 
         return mapaFacade.obterMapaCompleto(mapa.getCodigo(), codSubprocesso);
@@ -125,12 +135,18 @@ public class SubprocessoMapaWorkflowService {
         Long codMapa = subprocesso.getMapa().getCodigo();
         mapaManutencaoService.removerCompetencia(codCompetencia);
 
-        // Se o mapa ficou vazio e estava em MAPA_CRIADO, voltar para CADASTRO_HOMOLOGADO
+        // Se o mapa ficou vazio, voltar para situação anterior
         boolean ficouVazio = mapaManutencaoService.buscarCompetenciasPorCodMapa(codMapa).isEmpty();
-        if (ficouVazio && subprocesso.getSituacao() == MAPEAMENTO_MAPA_CRIADO) {
-            subprocesso.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
-            subprocessoRepo.save(subprocesso);
-            log.info("Situação do subprocesso {} alterada para CADASTRO_HOMOLOGADO (mapa ficou vazio)", codSubprocesso);
+        if (ficouVazio) {
+            if (subprocesso.getSituacao() == MAPEAMENTO_MAPA_CRIADO) {
+                subprocesso.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
+                subprocessoRepo.save(subprocesso);
+                log.info("Situação do subprocesso {} alterada para CADASTRO_HOMOLOGADO (mapa ficou vazio)", codSubprocesso);
+            } else if (subprocesso.getSituacao() == REVISAO_MAPA_AJUSTADO) {
+                subprocesso.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
+                subprocessoRepo.save(subprocesso);
+                log.info("Situação do subprocesso {} alterada para REVISAO_CADASTRO_HOMOLOGADA (mapa ficou vazio)", codSubprocesso);
+            }
         }
 
         return mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
