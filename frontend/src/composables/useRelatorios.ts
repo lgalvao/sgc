@@ -1,12 +1,14 @@
 import { computed, ref, onMounted } from "vue";
 import { useProcessosStore } from "@/stores/processos";
 import { useMapasStore } from "@/stores/mapas";
+import { usePerfilStore } from "@/stores/perfil";
 import { isWithinInterval, parseISO, startOfDay, endOfDay } from "date-fns";
 import { TipoProcesso } from "@/types/tipos";
 
 export function useRelatorios() {
   const processosStore = useProcessosStore();
   const mapasStore = useMapasStore();
+  const perfilStore = usePerfilStore();
 
   const filtroTipo = ref("");
   const filtroDataInicio = ref("");
@@ -83,7 +85,14 @@ export function useRelatorios() {
 
   onMounted(async () => {
     if (!processosStore.processosPainel || processosStore.processosPainel.length === 0) {
-        await processosStore.buscarProcessosPainel();
+        if (perfilStore.perfilSelecionado && perfilStore.unidadeSelecionada) {
+            await processosStore.buscarProcessosPainel(
+                perfilStore.perfilSelecionado,
+                perfilStore.unidadeSelecionada,
+                0,
+                10
+            );
+        }
     }
   });
 

@@ -1,5 +1,6 @@
 import {describe, expect, it} from "vitest";
 import {mapUnidade, mapUnidadesArray, mapUnidadeSnapshot} from "../unidades";
+import type {Responsavel} from "@/types/tipos";
 
 describe("mappers/unidades", () => {
     describe("mapUnidadeSnapshot", () => {
@@ -87,13 +88,13 @@ describe("mappers/unidades", () => {
             expect(u.responsavel?.codigo).toBe(1);
             expect(u.responsavel?.nome).toBe("");
             expect(u.responsavel?.tituloEleitoral).toBe("");
-            expect(u.responsavel?.usuarioTitulo).toBe("123");
-            expect(u.responsavel?.unidadeCodigo).toBe(5);
-            expect(u.responsavel?.usuarioCodigo).toBe(6);
-            expect(u.responsavel?.tipo).toBe("");
-            expect(u.responsavel?.dataInicio).toBe("2023-01-01");
-            expect(u.responsavel?.dataFim).toBeNull();
-            expect(u.responsavel?.unidade).toEqual({});
+            expect((u.responsavel as Responsavel)?.usuarioTitulo).toBe("123");
+            expect((u.responsavel as Responsavel)?.unidadeCodigo).toBe(5);
+            expect((u.responsavel as Responsavel)?.usuarioCodigo).toBe(6);
+            expect((u.responsavel as Responsavel)?.tipo).toBe("");
+            expect((u.responsavel as Responsavel)?.dataInicio).toBe("2023-01-01");
+            expect((u.responsavel as Responsavel)?.dataFim).toBeNull();
+            expect((u.responsavel as Responsavel)?.unidade).toEqual({});
         });
 
         it("maps responsavel using alternative fields", () => {
@@ -102,7 +103,7 @@ describe("mappers/unidades", () => {
                     idServidorResponsavel: 55
                 }
             });
-            expect(u.responsavel?.usuarioCodigo).toBe(55);
+            expect((u.responsavel as Responsavel)?.usuarioCodigo).toBe(55);
         });
     });
 

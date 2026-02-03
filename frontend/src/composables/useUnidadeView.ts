@@ -23,7 +23,7 @@ export function useUnidadeView(codUnidade: number) {
     const unidadeComResponsavelDinamico = computed(() => {
         if (!unidade.value) return null;
 
-        const atribuicoes = atribuicaoStore.obterAtribuicoesPorUnidade(unidade.value.codigo);
+        const atribuicoes = atribuicaoStore.obterAtribuicoesPorUnidade(unidade.value.sigla);
         const agora = new Date();
         const atribuicaoAtiva = atribuicoes.find(a => {
             const inicio = new Date(a.dataInicio);

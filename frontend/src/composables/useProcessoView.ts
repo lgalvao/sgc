@@ -65,7 +65,7 @@ export function useProcessoView() {
             codigo: u.codUnidade,
             sigla: u.sigla,
             nome: u.nome,
-            situacaoLabel: u.situacaoLabel || u.situacaoSubprocesso
+            situacao: u.situacaoLabel || u.situacaoSubprocesso
         }));
     });
 

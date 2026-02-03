@@ -41,7 +41,7 @@ export interface Unidade {
     usuarioCodigo?: number;
     tituloTitular?: string;
     isElegivel?: boolean;
-    responsavel?: Responsavel | null;
+    responsavel?: Responsavel | Usuario | null;
 }
 
 export interface Responsavel {
@@ -381,6 +381,7 @@ export interface MapaCompleto {
     observacoes: string;
     competencias: CompetenciaCompleta[];
     situacao: string;
+    unidade?: Unidade;
 }
 
 export interface MapaAjuste {

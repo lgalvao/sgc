@@ -20,7 +20,7 @@
             data-testid="filtro-data-inicio"
             type="date"
             aria-label="Data Início"
-            @update:model-value="$emit('update:dataInicio', $event)"
+            @update:model-value="$emit('update:dataInicio', String($event))"
         />
       </BFormGroup>
     </BCol>
@@ -32,7 +32,7 @@
             data-testid="filtro-data-fim"
             type="date"
             aria-label="Data Fim"
-            @update:model-value="$emit('update:dataFim', $event)"
+            @update:model-value="$emit('update:dataFim', String($event))"
         />
       </BFormGroup>
     </BCol>
