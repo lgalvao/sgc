@@ -89,7 +89,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
     private Map<String, Usuario> carregarUsuariosTitulares(List<Unidade> unidades) {
         List<String> titulos = unidades.stream()
                 .map(Unidade::getTituloTitular)
-                .filter(t -> t != null && !t.isBlank())
+                .filter(t -> !t.isBlank())
                 .distinct()
                 .toList();
 
@@ -126,7 +126,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
                             .formatted(u.getSigla(), tituloTitular));
                 } else {
                     String email = titular.getEmail();
-                    if (email == null || email.isBlank()) {
+                    if (email.isBlank()) {
                         violacoes.add("Titular %s da unidade %s não possui email cadastrado"
                                 .formatted(titular.getNome(), u.getSigla()));
                     }
