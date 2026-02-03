@@ -209,8 +209,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
 
-        // Verificar situação inicial - deve ser "Não Iniciado" (antes de qualquer alteração)
-        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Não Iniciado/i);
+        // Verificar situação inicial - deve ser "Não iniciado" (antes de qualquer alteração)
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Não iniciado/i);
 
         await navegarParaAtividades(page);
 

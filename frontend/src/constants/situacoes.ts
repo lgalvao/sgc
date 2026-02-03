@@ -25,7 +25,7 @@ export const SITUACOES_SUBPROCESSO = {
     CADASTRO_HOMOLOGADO: "Cadastro homologado",
     CADASTRO_ACEITO: "Cadastro aceito",
     REVISAO_CADASTRO_ACEITA: "Revisão do cadastro aceita",
-    MAPA_AJUSTADO: "Mapa Ajustado",
+    MAPA_AJUSTADO: "Mapa ajustado",
     MAPA_CRIADO: "Mapa criado",
     NAO_INICIADO: "Não iniciado",
 } as const;

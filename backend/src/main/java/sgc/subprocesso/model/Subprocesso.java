@@ -49,6 +49,15 @@ public class Subprocesso extends EntidadeBase {
     @Column(name = "situacao", length = 50)
     private SituacaoSubprocesso situacao;
 
+    public void setSituacao(SituacaoSubprocesso novaSituacao) {
+        if (this.situacao != null && novaSituacao != null && !this.situacao.podeTransicionarPara(novaSituacao)) {
+            throw new sgc.subprocesso.erros.ErroTransicaoInvalida(
+                    String.format("Transição de situação inválida: %s -> %s", this.situacao.getDescricao(), novaSituacao.getDescricao())
+            );
+        }
+        this.situacao = novaSituacao;
+    }
+
     public @NonNull Processo getProcesso() {
         return processo;
     }

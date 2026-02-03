@@ -17,7 +17,7 @@
 - **Linguagem:** TypeScript 5.9.3
 - **Build Tool:** Vite 7.3.1
 - **Gerenciamento de Estado:** Pinia 3.0.4
-- **UI Components:** BootstrapVueNext (Bootstrap 5.3.8)
+- **UI Components:** BootstrapVueNext e Bootstrap 5.3.8
 - **Validação:** Zod 4.3.6
 
 ## Banco de Dados
@@ -28,7 +28,7 @@
 - **Backend:** 
   - JUnit 6
   - Mockito
-  - AssertJ 3.27.7
+  - AssertJ 3
   - ArchUnit (Regras de Arquitetura)
   - Jacoco (Cobertura de Código)
   - Pitest (Testes de Mutação)

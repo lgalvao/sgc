@@ -52,7 +52,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         // Seção Dados da Unidade
         await verificarDetalhesSubprocesso(page, {
             sigla: 'SECAO_121',
-            situacao: 'Não Iniciado', // Ajustado conforme o UI
+            situacao: 'Não iniciado', // Ajustado conforme o UI
             prazo: '/'
         });
 
