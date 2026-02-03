@@ -8,7 +8,7 @@ Este documento acompanha o progresso da refatoração do frontend conforme o pla
 
 | Fase | Status | Progresso | Linhas Reduzidas | Meta |
 |------|--------|-----------|------------------|------|
-| Fase 1: Simplificação | 🟢 Concluído | 100% | ~2.500* | ~1.200 |
+| Fase 1: Simplificação | 🟢 Concluído | 100% | ~3.100* | ~1.200 |
 | Fase 2.1: Formatação Backend | 🟢 Concluído | 100% | ~15 | ~162 |
 | Fase 2.2: CSV Backend | 🔴 Não Iniciado | 0% | 0 | ~60 |
 | Fase 2.3: Validação Backend | 🔴 Não Iniciado | 0% | 0 | ~126 |
@@ -128,14 +128,14 @@ Este documento acompanha o progresso da refatoração do frontend conforme o pla
 #### CadMapa.vue (382 linhas → ~340 linhas)
 
 - [x] Extrair `CompetenciasListSection.vue` (~67 linhas)
-- [ ] Extrair lógica de modais em composable (opcional)
+- [x] Extrair lógica de modais em composable (restaurado)
 - [x] Refatorar view principal
 - [x] Atualizar testes
 - [x] Validar funcionamento
 
-**Progresso:** 4/5 tarefas ✅  
+**Progresso:** 5/5 tarefas ✅
 **Linhas Economizadas:** ~34 linhas (374 → 340)
-**Status:** 🟢 Parcialmente Concluído
+**Status:** ✅ Concluído
 
 ---
 
@@ -150,7 +150,7 @@ Este documento acompanha o progresso da refatoração do frontend conforme o pla
 - [x] CadAtividades.vue (273 → ~215) - ✅ Concluído
 
 **Progresso:** 7/7 tarefas ✅
-**Linhas Economizadas:** ~1.200 / ~600
+**Linhas Economizadas:** ~1.800 / ~600
 
 ---
 

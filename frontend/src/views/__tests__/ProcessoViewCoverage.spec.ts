@@ -140,7 +140,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
         await flushPromises();
 
-        const item = { clickable: true, unidadeAtual: "U1", codigo: 10 };
+        const item = { clickable: true, sigla: "U1", codigo: 10 };
         (wrapper.vm as any).abrirDetalhesUnidade(item);
 
         expect(mocks.push).toHaveBeenCalledWith(expect.objectContaining({
@@ -176,7 +176,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         await flushPromises();
 
         // Abre unidade 10
-        (wrapper.vm as any).abrirDetalhesUnidade({ clickable: true, codigo: 10, unidadeAtual: "U1" });
+        (wrapper.vm as any).abrirDetalhesUnidade({ clickable: true, codigo: 10, sigla: "U1" });
 
         expect(mocks.push).toHaveBeenCalledWith(expect.objectContaining({
             params: { codProcesso: "1", siglaUnidade: "U1" }

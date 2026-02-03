@@ -85,6 +85,11 @@ const TreeTableStub = {
 
 describe('UnidadeView.vue', () => {
     const context = setupComponentTest();
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
     let unidadesStore: any;
     let atribuicaoStore: any;
     let perfilStore: any;
