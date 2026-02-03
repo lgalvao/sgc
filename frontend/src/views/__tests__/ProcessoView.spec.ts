@@ -431,7 +431,8 @@ describe("ProcessoView.vue", () => {
 
         const rowItem = {
             codigo: 101,
-            unidadeAtual: "UNI1",
+            unidadeAtual: "UNI1 - Unidade 1",
+            sigla: "UNI1",
             clickable: true
         };
 
