@@ -6,7 +6,7 @@
 - [x] Task: Refatorar as transições de situação no backend. [e06a100]
     - [x] Escrever testes unitários (JUnit 6) cobrindo todas as transições válidas e inválidas.
     - [x] Implementar as correções na lógica de transição.
-- [ ] Task: Conductor - User Manual Verification 'Auditoria e Alinhamento do Backend' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Auditoria e Alinhamento do Backend' (Protocol in workflow.md)
 
 ## Fase 2: Sincronização e Validação do Frontend
 - [ ] Task: Revisar os mappers e tipos TypeScript para refletir as situações corretas.
