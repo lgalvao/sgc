@@ -12,10 +12,80 @@ import sgc.processo.model.Processo;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import sgc.subprocesso.erros.ErroTransicaoInvalida;
+import sgc.processo.model.TipoProcesso;
 
 @Tag("unit")
 @DisplayName("Entidade: Subprocesso")
 class SubprocessoTest {
+
+    @Test
+    @DisplayName("Deve lançar erro ao tentar transição inválida")
+    void deveLancarErroTransicaoInvalida() {
+        Processo p = Processo.builder().tipo(TipoProcesso.MAPEAMENTO).build();
+        Subprocesso sp = Subprocesso.builder()
+                .processo(p)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                .build();
+
+        assertThatThrownBy(() -> sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO))
+                .isInstanceOf(ErroTransicaoInvalida.class)
+                .hasMessageContaining("Transição de situação inválida");
+    }
+
+    @Test
+    @DisplayName("Deve permitir transição válida")
+    void devePermitirTransicaoValida() {
+        Processo p = Processo.builder().tipo(TipoProcesso.MAPEAMENTO).build();
+        Subprocesso sp = Subprocesso.builder()
+                .processo(p)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                .build();
+
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+    }
+
+    @Test
+    @DisplayName("Deve permitir mudar situação se processo for nulo")
+    void devePermitirMudarSituacaoSeProcessoNulo() {
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(null);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+    }
+
+    @Test
+    @DisplayName("Deve permitir mudar situação se situação atual for nula")
+    void devePermitirMudarSituacaoSeSituacaoAtualNula() {
+        Processo p = Processo.builder().tipo(TipoProcesso.MAPEAMENTO).build();
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(p);
+        sp.setSituacaoForcada(null);
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+    }
+
+    @Test
+    @DisplayName("Deve permitir mudar situação se for a mesma")
+    void devePermitirMudarSituacaoSeForAMesma() {
+        Processo p = Processo.builder().tipo(TipoProcesso.MAPEAMENTO).build();
+        Subprocesso sp = Subprocesso.builder()
+                .processo(p)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                .build();
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+    }
+
+    @Test
+    @DisplayName("Deve permitir forçar situação para testes")
+    void devePermitirForcarSituacao() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+    }
 
     @ParameterizedTest
     @EnumSource(value = SituacaoSubprocesso.class, names = {
