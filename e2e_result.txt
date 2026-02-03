@@ -1,0 +1,82 @@
+[1A[2K[2m[WebServer] [22mWARN  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ⚠️ ALERTA DE SEGURANÇA: A aplicação está rodando com o segredo JWT padrão.
+
+[1A[2K[2m[WebServer] [22mINFO  s.o.s.ValidadorDadosOrgService.run:53 - Validando integridade dos dados organizacionais...
+
+[1A[2K[2m[WebServer] [22mINFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
+
+[1A[2K[2m[WebServer] [22m  [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m353[22m[2m[0m ms[22m
+
+[1A[2K[2m[WebServer] [22m  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+
+[1A[2K[2m[WebServer] [22m[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+
+[1A[2K[2m[WebServer] [22m>>> Frontend e Backend no ar!
+
+
+Running 1 test using 1 worker
+
+[1A[2K[1/1] [chromium] › e2e/verificacao-situacoes.spec.ts:7:5 › Verificação de Situações e Labels › Deve exibir label "Não iniciado" corretamente no subprocesso
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:50 - Iniciando reset do banco de dados para E2E...
+
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.executeDatabaseReset:69 - Limpando 24 tabelas no schema SGC
+
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.executeDatabaseReset:75 - Executando script de seed: seed.sql
+
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:53 - Reset do banco de dados concluído com sucesso.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:66 - Usuário autenticado: 191919
+
+[1A[2K[chromium] › e2e/verificacao-situacoes.spec.ts:7:5 › Verificação de Situações e Labels › Deve exibir label "Não iniciado" corretamente no subprocesso
+[BROWSER UNCAUGHT ERROR] Error [TypeError]: Cannot read properties of null (reading 'active')
+    at resolveActiveStatus (http://localhost:5173/node_modules/[4m.vite[24m/deps/bootstrap-vue-next.js?v=91ca4660:8548:76)
+    at mounted (http://localhost:5173/node_modules/[4m.vite[24m/deps/bootstrap-vue-next.js?v=91ca4660:9141:24)
+    at callWithErrorHandling (http://localhost:5173/node_modules/[4m.vite[24m/deps/chunk-DUJS4OLK.js?v=91ca4660:2342:19)
+    at callWithAsyncErrorHandling (http://localhost:5173/node_modules/[4m.vite[24m/deps/chunk-DUJS4OLK.js?v=91ca4660:2349:17)
+    at invokeDirectiveHook (http://localhost:5173/node_modules/[4m.vite[24m/deps/chunk-DUJS4OLK.js?v=91ca4660:2910:7)
+    at http://localhost:5173/node_modules/[4m.vite[24m/deps/chunk-DUJS4OLK.js?v=91ca4660:7781:17
+    at flushPostFlushCbs (http://localhost:5173/node_modules/[4m.vite[24m/deps/chunk-DUJS4OLK.js?v=91ca4660:2527:28)
+    at flushJobs (http://localhost:5173/node_modules/[4m.vite[24m/deps/chunk-DUJS4OLK.js?v=91ca4660:2569:5)
+
+[1A[2K[BROWSER WARNING] [Vue warn]: Unhandled error during execution of directive hook 
+  at <ConditionalWrapper skip=false class="form-check unidade-checkbox" > 
+  at <BFormCheckbox id="chk-SECRETARIA_1" data-testid="chk-arvore-unidade-SECRETARIA_1" disabled=false  ... > 
+  at <UnidadeTreeNode key="SECRETARIA_1" get-estado-selecao=fn<getEstadoSelecao> is-checked=fn<isChecked>  ... > 
+  at <ArvoreUnidades key=0 model-value= [] unidades= [{"codigo":1,"sigla":"SEDOC","tipo":"INTEROPERACIONAL","nome":"Seção de Desenvolvimento e Capacitação","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[{"codigo":2,"sigla":"SECRETARIA_1","tipo":"INTEROPERACIONAL","nome":"Secretaria 1","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[{"codigo":3,"sigla":"ASSESSORIA_11","tipo":"OPERACIONAL","nome":"Assessoria 11","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[]},{"codigo":4,"sigla":"ASSESSORIA_12","tipo":"OPERACIONAL","nome":"Assessoria 12","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[]},{"codigo":5,"sigla":"COORD_11","tipo":"INTERMEDIARIA","nome":"Coordenadoria 11","isElegivel":false,"usuarioCodigo":0,"responsavel":null,"filhas":[{"codigo":6,"sigla":"SECAO_111","tipo":"OPERACIONAL","nome":"Seção 111","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[]},{"codigo":7,"sigla":"SECAO_112","tipo":"OPERACIONAL","nome":"Seção 112","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[]},{"codigo":8,"sigla":"SECAO_113","tipo":"OPERACIONAL","nome":"Seção 113","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[]}]},{"codigo":9,"sigla":"COORD_12","tipo":"INTERMEDIARIA","nome":"Coordenadoria 12","isElegivel":false,"usuarioCodigo":0,"responsavel":null,"filhas":[{"codigo":10,"sigla":"SECAO_121","tipo":"OPERACIONAL","nome":"Seção 121","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[]}]}]},{"codigo":11,"sigla":"SECRETARIA_2","tipo":"INTEROPERACIONAL","nome":"Secretaria 2","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[{"codigo":12,"sigla":"ASSESSORIA_21","tipo":"OPERACIONAL","nome":"Assessoria 21","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[]},{"codigo":13,"sigla":"ASSESSORIA_22","tipo":"OPERACIONAL","nome":"Assessoria 22","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[]},{"codigo":14,"sigla":"COORD_21","tipo":"INTERMEDIARIA","nome":"Coordenadoria 21","isElegivel":false,"usuarioCodigo":0,"responsavel":null,"filhas":[{"codigo":15,"sigla":"SECAO_211","tipo":"OPERACIONAL","nome":"Seção 211","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[]},{"codigo":16,"sigla":"SECAO_212","tipo":"OPERACIONAL","nome":"Seção 212","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[]}]},{"codigo":17,"sigla":"COORD_22","tipo":"INTERMEDIARIA","nome":"Coordenadoria 22","isElegivel":false,"usuarioCodigo":0,"responsavel":null,"filhas":[{"codigo":18,"sigla":"SECAO_221","tipo":"OPERACIONAL","nome":"Seção 221","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[]}]},{"codigo":99,"sigla":"UNIT_TEST_DIAG","tipo":"OPERACIONAL","nome":"Unit Test Diag","isElegivel":true,"usuarioCodigo":0,"responsavel":null,"filhas":[]}]}]}]  ... > 
+  at <BFormGroup class="mb-3" > 
+  at <ProcessoFormFields ref="formFieldsRef" modelValue= {"descricao":"Processo Verificacao Labels 1770127054173","tipo":"MAPEAMENTO","unidadesSelecionadas":[],"dataLimite":"2026-03-05"} onUpdate:modelValue=fn  ... > 
+  at <BForm class="mt-4 col-md-6 col-sm-8 col-12" > 
+  at <BContainer class="mt-4" > 
+  at <CadProcesso onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< {} > > 
+  at <RouterView> 
+  at <App>
+
+[1A[2K  1) [chromium] › e2e/verificacao-situacoes.spec.ts:7:5 › Verificação de Situações e Labels › Deve exibir label "Não iniciado" corretamente no subprocesso 
+
+    [31mTest timeout of 15000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('btn-arvore-expand-COORD_12')[22m
+
+
+       at helpers/helpers-processos.ts:33
+
+      31 |     if (options.expandir) {
+      32 |         for (const sigla of options.expandir) {
+    > 33 |             await page.getByTestId(`btn-arvore-expand-${sigla}`).click();
+         |                                                                  ^
+      34 |         }
+      35 |     }
+      36 |
+        at criarProcesso (/Users/leonardo/sgc/e2e/helpers/helpers-processos.ts:33:66)
+        at /Users/leonardo/sgc/e2e/verificacao-situacoes.spec.ts:12:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/verificacao-situacoes-Veri-8934a-corretamente-no-subprocesso-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/verificacao-situacoes-Veri-8934a-corretamente-no-subprocesso-chromium/error-context.md
+
+
+[1A[2K  1 failed
+    [chromium] › e2e/verificacao-situacoes.spec.ts:7:5 › Verificação de Situações e Labels › Deve exibir label "Não iniciado" corretamente no subprocesso 
