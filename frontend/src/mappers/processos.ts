@@ -8,7 +8,7 @@ export function mapUnidadeParticipanteDtoToFrontend(
         ...dto,
         codUnidade: dto.codigo,
         codSubprocesso: dto.codSubprocesso || 0,
-        situacaoSubprocesso: (dto.situacaoSubprocesso as any) || 'CRIADO',
+        situacaoSubprocesso: (dto.situacaoSubprocesso as any) || 'NAO_INICIADO',
         dataLimite: dto.dataLimite || '',
         filhos: dto.filhos
             ? dto.filhos.map(mapUnidadeParticipanteDtoToFrontend)
