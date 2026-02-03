@@ -3,7 +3,7 @@
 ## Fase 1: Auditoria e Alinhamento do Backend
 - [x] Task: Analisar classes de domínio e serviços relacionados às situações de mapeamento. [b905dd4]
 - [x] Task: Mapear divergências entre o código atual e a máquina de estados do `_intro.md`. [9e1a6c3]
-- [x] Task: Refatorar as transições de situação no backend. [d860a1f]
+- [x] Task: Refatorar as transições de situação no backend. [e06a100]
     - [x] Escrever testes unitários (JUnit 6) cobrindo todas as transições válidas e inválidas.
     - [x] Implementar as correções na lógica de transição.
 - [ ] Task: Conductor - User Manual Verification 'Auditoria e Alinhamento do Backend' (Protocol in workflow.md)
