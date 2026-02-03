@@ -81,6 +81,18 @@ Este documento serve como índice centralizado de toda a documentação técnica
 
 ---
 
+### 📈 Projetos e Melhorias
+
+| Documento                                                           | Descrição                                        |
+|---------------------------------------------------------------------|--------------------------------------------------|
+| **[FRONTEND-IMPROVEMENTS-SUMMARY.md](FRONTEND-IMPROVEMENTS-SUMMARY.md)** ⭐ | Resumo completo do projeto de melhorias do frontend |
+| **[melhorias-frontend.md](melhorias-frontend.md)**                  | Análise detalhada e plano de melhorias do frontend |
+| **[tracking-frontend.md](tracking-frontend.md)**                    | Tracking de progresso das melhorias do frontend   |
+| **[test-coverage-plan.md](test-coverage-plan.md)**                  | Plano de restauração de cobertura de testes      |
+| **[coverage-tracking.md](coverage-tracking.md)**                    | Rastreamento de progresso de cobertura           |
+
+---
+
 ### 🤖 Agente e Skills (Jules)
 
 | Documento                                                               | Descrição                                        |
@@ -155,6 +167,12 @@ Cada módulo possui um README.md detalhando suas responsabilidades:
 
 1. [diagramas-arquitetura.md](backend/etc/docs/diagramas-arquitetura.md)
 2. Todos os [ADRs](backend/etc/docs/adr/)
+
+### "Preciso entender o histórico de melhorias do frontend"
+
+1. ⭐ **[FRONTEND-IMPROVEMENTS-SUMMARY.md](FRONTEND-IMPROVEMENTS-SUMMARY.md)** - Resumo executivo completo
+2. [tracking-frontend.md](tracking-frontend.md) - Status detalhado por fase
+3. [melhorias-frontend.md](melhorias-frontend.md) - Análise e plano original
 
 ---
 
