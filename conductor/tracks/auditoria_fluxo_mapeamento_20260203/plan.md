@@ -13,7 +13,7 @@
 - [x] Task: Validar se as ações de interface (botões de envio, devolução, validação) respeitam o estado atual. [03fee28]
 - [x] Task: Conductor - User Manual Verification 'Sincronização e Validação do Frontend' (Protocol in workflow.md)
 
-## Fase 3: Homologação e Cobertura
+## Fase 3: Homologação e Cobertura [checkpoint: b4fd502]
 - [x] Task: Executar o Quality Gate completo (`quality-check.sh`) para garantir 99% de cobertura. [53a2e69]
 - [x] Task: Verificar integração entre backend e frontend nos fluxos críticos. [a8a0669]
-- [~] Task: Conductor - User Manual Verification 'Homologação e Cobertura' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Homologação e Cobertura' (Protocol in workflow.md) [b4fd502]
