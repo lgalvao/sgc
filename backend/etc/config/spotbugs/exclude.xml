@@ -33,6 +33,7 @@
     <Match>
         <Or>
             <Class name="sgc.mapa.service.MapaFacade"/>
+            <Class name="sgc.mapa.service.AtividadeFacade"/>
             <Class name="sgc.subprocesso.service.crud.SubprocessoCrudService"/>
             <Class name="sgc.subprocesso.service.workflow.SubprocessoWorkflowService"/>
             <Class name="sgc.processo.service.ProcessoConsultaService"/>
@@ -95,5 +96,13 @@
             <Class name="~sgc\..*Test"/>
         </Or>
         <Bug pattern="UC_USELESS_OBJECT,RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+    </Match>
+
+    <!--
+        Mocks não precisam ser fechados.
+    -->
+    <Match>
+        <Class name="~sgc\..*Test"/>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
     </Match>
 </FindBugsFilter>

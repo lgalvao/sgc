@@ -88,13 +88,9 @@ class UnidadeControllerTest {
                         post("/api/unidades/1/atribuicoes-temporarias")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("""
-                                        {
-                                            "tituloEleitoralUsuario":"123",
-                                            "dataTermino":"2025-12-31",
-                                            "justificativa":"%s"
-                                        }
-                                        """.formatted("a".repeat(501))))
+                                .content(
+                                        "{ \"tituloEleitoralUsuario\":\"123\", \"dataTermino\":\"2025-12-31\", \"justificativa\":\"%s\" }"
+                                                .formatted("a".repeat(501))))
                 .andExpect(status().isBadRequest());
     }
 
