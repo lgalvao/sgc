@@ -1,6 +1,6 @@
 # Plano de Implementação: Auditoria e Refatoração do Fluxo de Mapeamento
 
-## Fase 1: Auditoria e Alinhamento do Backend
+## Fase 1: Auditoria e Alinhamento do Backend [checkpoint: 01fba03]
 - [x] Task: Analisar classes de domínio e serviços relacionados às situações de mapeamento. [b905dd4]
 - [x] Task: Mapear divergências entre o código atual e a máquina de estados do `_intro.md`. [9e1a6c3]
 - [x] Task: Refatorar as transições de situação no backend. [e06a100]
