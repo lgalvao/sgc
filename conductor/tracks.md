@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Auditoria e Refatoração do Fluxo de Situações do Mapeamento**
+- [x] **Track: Auditoria e Refatoração do Fluxo de Situações do Mapeamento**
   *Link: [./tracks/auditoria_fluxo_mapeamento_20260203/](./tracks/auditoria_fluxo_mapeamento_20260203/)*
