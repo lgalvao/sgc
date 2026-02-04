@@ -48,7 +48,6 @@ graph TD
     - **Exceções de Negócio:**
         - `ErroEntidadeNaoEncontrada`: HTTP 404.
         - `ErroValidacao`: HTTP 400.
-        - `ErroSituacaoInvalida`: HTTP 409 (Conflito de estado).
         - `ErroAcessoNegado`: HTTP 403.
 
 ### 2. `model`

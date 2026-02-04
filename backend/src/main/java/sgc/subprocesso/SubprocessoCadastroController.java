@@ -24,6 +24,7 @@ import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/subprocessos")
@@ -156,7 +157,8 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         
         Usuario usuario = obterUsuarioAutenticado(principal);
-        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
+        String sanitizedObservacoes = Optional.ofNullable(UtilSanitizacao.sanitizar(request.observacoes()))
+                .orElse("");
 
         subprocessoFacade.devolverCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -179,7 +181,8 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody AceitarCadastroRequest request,
             @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
+        String sanitizedObservacoes = Optional.ofNullable(UtilSanitizacao.sanitizar(request.observacoes()))
+                .orElse("");
 
         subprocessoFacade.aceitarCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -201,7 +204,8 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody HomologarCadastroRequest request,
             @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
+        String sanitizedObservacoes = Optional.ofNullable(UtilSanitizacao.sanitizar(request.observacoes()))
+                .orElse("");
 
         subprocessoFacade.homologarCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -222,7 +226,8 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody DevolverCadastroRequest request,
             @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
+        String sanitizedObservacoes = Optional.ofNullable(UtilSanitizacao.sanitizar(request.observacoes()))
+                .orElse("");
 
         subprocessoFacade.devolverRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -241,7 +246,8 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody AceitarCadastroRequest request,
             @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
+        String sanitizedObservacoes = Optional.ofNullable(UtilSanitizacao.sanitizar(request.observacoes()))
+                .orElse("");
 
         subprocessoFacade.aceitarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }
@@ -263,7 +269,8 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody HomologarCadastroRequest request,
             @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
+        String sanitizedObservacoes = Optional.ofNullable(UtilSanitizacao.sanitizar(request.observacoes()))
+                .orElse("");
 
         subprocessoFacade.homologarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
     }

@@ -33,10 +33,6 @@ public class ConfiguracaoService {
 
     /**
      * Busca um parâmetro por código.
-     *
-     * @param codigo código do parâmetro
-     * @return parâmetro encontrado
-     * @throws ErroConfiguracao se o parâmetro não for encontrado
      */
     public Parametro buscarPorId(Long codigo) {
         return parametroRepo.findById(codigo)
@@ -46,10 +42,6 @@ public class ConfiguracaoService {
 
     /**
      * Busca um parâmetro por chave.
-     *
-     * @param chave chave do parâmetro
-     * @return parâmetro encontrado
-     * @throws ErroConfiguracao se o parâmetro não for encontrado
      */
     public Parametro buscarPorChave(String chave) {
         return parametroRepo.findByChave(chave)
@@ -59,9 +51,6 @@ public class ConfiguracaoService {
 
     /**
      * Salva uma lista de parâmetros.
-     *
-     * @param parametros lista de parâmetros a salvar
-     * @return lista de parâmetros salvos
      */
     @Transactional
     public List<Parametro> salvar(List<Parametro> parametros) {
@@ -70,11 +59,6 @@ public class ConfiguracaoService {
 
     /**
      * Atualiza o valor de um parâmetro existente.
-     *
-     * @param chave chave do parâmetro
-     * @param novoValor novo valor do parâmetro
-     * @return parâmetro atualizado
-     * @throws ErroConfiguracao se o parâmetro não for encontrado
      */
     @Transactional
     public Parametro atualizar(String chave, String novoValor) {

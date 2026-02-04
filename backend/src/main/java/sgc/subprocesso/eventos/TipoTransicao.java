@@ -17,9 +17,6 @@ import org.jspecify.annotations.Nullable;
 @Getter
 @RequiredArgsConstructor
 public enum TipoTransicao {
-
-    // ===== CADASTRO (Mapeamento) =====
-
     CADASTRO_DISPONIBILIZADO(
             "Disponibilização do cadastro de atividades",
             "Cadastro de atividades/conhecimentos da unidade %s disponibilizado para análise",
@@ -50,8 +47,6 @@ public enum TipoTransicao {
             "cadastro-reaberto"
     ),
 
-    // ===== REVISÃO DO CADASTRO (Revisão) =====
-
     REVISAO_CADASTRO_DISPONIBILIZADA(
             "Disponibilização da revisão do cadastro de atividades",
             "Revisão do cadastro da unidade %s disponibilizada para análise",
@@ -81,8 +76,6 @@ public enum TipoTransicao {
             "Revisão do cadastro da unidade %s reaberta para ajustes",
             "revisao-cadastro-reaberta"
     ),
-
-    // ===== MAPA =====
 
     MAPA_DISPONIBILIZADO(
             "Disponibilização do mapa de competências para validação",
@@ -119,8 +112,6 @@ public enum TipoTransicao {
             null,
             null
     ),
-
-    // ===== PROCESSO (início) =====
 
     PROCESSO_INICIADO(
             "Processo iniciado",

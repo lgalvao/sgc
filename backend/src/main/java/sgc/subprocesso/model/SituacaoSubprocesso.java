@@ -35,92 +35,90 @@ public enum SituacaoSubprocesso {
 
     private final String descricao;
 
+    private static final String PREFIXO_MAPEAMENTO = "MAPEAMENTO";
+    private static final String PREFIXO_REVISAO = "REVISAO";
+    private static final String PREFIXO_DIAGNOSTICO = "DIAGNOSTICO";
+
     public boolean podeTransicionarPara(SituacaoSubprocesso nova, sgc.processo.model.TipoProcesso tipo) {
         if (this == nova) return true;
 
-        // Garantir que não misturamos situações de tipos diferentes
-        if (this != NAO_INICIADO && nova != NAO_INICIADO) {
-            if (this.name().startsWith("MAPEAMENTO") && !nova.name().startsWith("MAPEAMENTO")) return false;
-            if (this.name().startsWith("REVISAO") && !nova.name().startsWith("REVISAO")) return false;
-            if (this.name().startsWith("DIAGNOSTICO") && !nova.name().startsWith("DIAGNOSTICO")) return false;
+        if (this == NAO_INICIADO) {
+            return podeIniciar(nova, tipo);
         }
 
-        return switch (this) {
-            case NAO_INICIADO ->
-                    (tipo == sgc.processo.model.TipoProcesso.MAPEAMENTO && nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO) ||
-                    (tipo == sgc.processo.model.TipoProcesso.REVISAO && nova == REVISAO_CADASTRO_EM_ANDAMENTO) ||
-                    (tipo == sgc.processo.model.TipoProcesso.DIAGNOSTICO && nova == DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+        if (!isSituacaoCompativel(nova)) return false;
 
-            // --- MAPEAMENTO ---
+        if (this.name().startsWith(PREFIXO_MAPEAMENTO)) {
+            return transicaoMapeamento(nova);
+        } else if (this.name().startsWith(PREFIXO_REVISAO)) {
+            return transicaoRevisao(nova);
+        } else if (this.name().startsWith(PREFIXO_DIAGNOSTICO)) {
+            return transicaoDiagnostico(nova);
+        }
+
+        return false;
+    }
+
+    private boolean isSituacaoCompativel(SituacaoSubprocesso nova) {
+        if (nova == NAO_INICIADO) return true;
+        if (this.name().startsWith(PREFIXO_MAPEAMENTO) && !nova.name().startsWith(PREFIXO_MAPEAMENTO)) return false;
+        if (this.name().startsWith(PREFIXO_REVISAO) && !nova.name().startsWith(PREFIXO_REVISAO)) return false;
+        return !this.name().startsWith(PREFIXO_DIAGNOSTICO) || nova.name().startsWith(PREFIXO_DIAGNOSTICO);
+    }
+
+    private boolean podeIniciar(SituacaoSubprocesso nova, sgc.processo.model.TipoProcesso tipo) {
+        return (tipo == sgc.processo.model.TipoProcesso.MAPEAMENTO && nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO) ||
+               (tipo == sgc.processo.model.TipoProcesso.REVISAO && nova == REVISAO_CADASTRO_EM_ANDAMENTO) ||
+               (tipo == sgc.processo.model.TipoProcesso.DIAGNOSTICO && nova == DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+    }
+
+    private boolean transicaoMapeamento(SituacaoSubprocesso nova) {
+        return switch (this) {
             case MAPEAMENTO_CADASTRO_EM_ANDAMENTO ->
                     nova == MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
-
             case MAPEAMENTO_CADASTRO_DISPONIBILIZADO ->
-                    nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO ||
-                    nova == MAPEAMENTO_CADASTRO_HOMOLOGADO;
-
+                    nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO || nova == MAPEAMENTO_CADASTRO_HOMOLOGADO;
             case MAPEAMENTO_CADASTRO_HOMOLOGADO ->
-                    nova == MAPEAMENTO_MAPA_CRIADO ||
-                    nova == MAPEAMENTO_MAPA_DISPONIBILIZADO ||
-                    nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
-
+                    nova == MAPEAMENTO_MAPA_CRIADO || nova == MAPEAMENTO_MAPA_DISPONIBILIZADO || nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
             case MAPEAMENTO_MAPA_CRIADO ->
-                    nova == MAPEAMENTO_MAPA_DISPONIBILIZADO ||
-                    nova == MAPEAMENTO_CADASTRO_HOMOLOGADO;
-
+                    nova == MAPEAMENTO_MAPA_DISPONIBILIZADO || nova == MAPEAMENTO_CADASTRO_HOMOLOGADO;
             case MAPEAMENTO_MAPA_DISPONIBILIZADO ->
-                    nova == MAPEAMENTO_MAPA_COM_SUGESTOES ||
-                    nova == MAPEAMENTO_MAPA_VALIDADO ||
-                    nova == MAPEAMENTO_MAPA_CRIADO;
-
+                    nova == MAPEAMENTO_MAPA_COM_SUGESTOES || nova == MAPEAMENTO_MAPA_VALIDADO || nova == MAPEAMENTO_MAPA_CRIADO;
             case MAPEAMENTO_MAPA_COM_SUGESTOES ->
-                    nova == MAPEAMENTO_MAPA_DISPONIBILIZADO ||
-                    nova == MAPEAMENTO_MAPA_CRIADO;
-
+                    nova == MAPEAMENTO_MAPA_DISPONIBILIZADO || nova == MAPEAMENTO_MAPA_CRIADO;
             case MAPEAMENTO_MAPA_VALIDADO ->
-                    nova == MAPEAMENTO_MAPA_HOMOLOGADO ||
-                    nova == MAPEAMENTO_MAPA_DISPONIBILIZADO;
+                    nova == MAPEAMENTO_MAPA_HOMOLOGADO || nova == MAPEAMENTO_MAPA_DISPONIBILIZADO;
+            default -> false;
+        };
+    }
 
-            case MAPEAMENTO_MAPA_HOMOLOGADO, REVISAO_MAPA_HOMOLOGADO, DIAGNOSTICO_CONCLUIDO -> false;
-
-            // --- REVISÃO ---
+    private boolean transicaoRevisao(SituacaoSubprocesso nova) {
+        return switch (this) {
             case REVISAO_CADASTRO_EM_ANDAMENTO ->
                     nova == REVISAO_CADASTRO_DISPONIBILIZADA;
-
             case REVISAO_CADASTRO_DISPONIBILIZADA ->
-                    nova == REVISAO_CADASTRO_EM_ANDAMENTO ||
-                    nova == REVISAO_CADASTRO_HOMOLOGADA ||
-                    nova == REVISAO_MAPA_HOMOLOGADO;
-
+                    nova == REVISAO_CADASTRO_EM_ANDAMENTO || nova == REVISAO_CADASTRO_HOMOLOGADA || nova == REVISAO_MAPA_HOMOLOGADO;
             case REVISAO_CADASTRO_HOMOLOGADA ->
-                    nova == REVISAO_MAPA_AJUSTADO ||
-                    nova == REVISAO_MAPA_DISPONIBILIZADO ||
-                    nova == REVISAO_CADASTRO_EM_ANDAMENTO;
-
+                    nova == REVISAO_MAPA_AJUSTADO || nova == REVISAO_MAPA_DISPONIBILIZADO || nova == REVISAO_CADASTRO_EM_ANDAMENTO;
             case REVISAO_MAPA_AJUSTADO ->
-                    nova == REVISAO_MAPA_DISPONIBILIZADO ||
-                    nova == REVISAO_CADASTRO_HOMOLOGADA;
-
+                    nova == REVISAO_MAPA_DISPONIBILIZADO || nova == REVISAO_CADASTRO_HOMOLOGADA;
             case REVISAO_MAPA_DISPONIBILIZADO ->
-                    nova == REVISAO_MAPA_COM_SUGESTOES ||
-                    nova == REVISAO_MAPA_VALIDADO ||
-                    nova == REVISAO_MAPA_AJUSTADO;
-
+                    nova == REVISAO_MAPA_COM_SUGESTOES || nova == REVISAO_MAPA_VALIDADO || nova == REVISAO_MAPA_AJUSTADO;
             case REVISAO_MAPA_COM_SUGESTOES ->
-                    nova == REVISAO_MAPA_DISPONIBILIZADO ||
-                    nova == REVISAO_MAPA_AJUSTADO;
-
+                    nova == REVISAO_MAPA_DISPONIBILIZADO || nova == REVISAO_MAPA_AJUSTADO;
             case REVISAO_MAPA_VALIDADO ->
-                    nova == REVISAO_MAPA_HOMOLOGADO ||
-                    nova == REVISAO_MAPA_DISPONIBILIZADO;
+                    nova == REVISAO_MAPA_HOMOLOGADO || nova == REVISAO_MAPA_DISPONIBILIZADO;
+            default -> false;
+        };
+    }
 
-            // --- DIAGNÓSTICO ---
+    private boolean transicaoDiagnostico(SituacaoSubprocesso nova) {
+        return switch (this) {
             case DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO ->
                     nova == DIAGNOSTICO_MONITORAMENTO;
-
             case DIAGNOSTICO_MONITORAMENTO ->
                     nova == DIAGNOSTICO_CONCLUIDO;
-
+            default -> false;
         };
     }
 }

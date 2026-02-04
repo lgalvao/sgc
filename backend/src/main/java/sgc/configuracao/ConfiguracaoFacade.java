@@ -20,14 +20,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ConfiguracaoFacade {
-
     private final ConfiguracaoService configuracaoService;
     private final ParametroMapper parametroMapper;
 
     /**
      * Busca todos os parâmetros de configuração.
-     *
-     * @return lista com todos os parâmetros
      */
     public List<ParametroResponse> buscarTodos() {
         return configuracaoService.buscarTodos().stream()
@@ -37,9 +34,6 @@ public class ConfiguracaoFacade {
 
     /**
      * Busca um parâmetro por chave.
-     *
-     * @param chave chave do parâmetro
-     * @return parâmetro encontrado
      */
     public Parametro buscarPorChave(String chave) {
         return configuracaoService.buscarPorChave(chave);
@@ -47,9 +41,6 @@ public class ConfiguracaoFacade {
 
     /**
      * Salva uma lista de parâmetros.
-     *
-     * @param requests lista de DTOs de parâmetros a salvar
-     * @return lista de DTOs de parâmetros salvos
      */
     public List<ParametroResponse> salvar(List<ParametroRequest> requests) {
         // Buscar parâmetros existentes e atualizar com dados das requests
@@ -70,10 +61,6 @@ public class ConfiguracaoFacade {
 
     /**
      * Atualiza o valor de um parâmetro existente.
-     *
-     * @param chave chave do parâmetro
-     * @param novoValor novo valor do parâmetro
-     * @return parâmetro atualizado
      */
     public Parametro atualizar(String chave, String novoValor) {
         return configuracaoService.atualizar(chave, novoValor);

@@ -31,16 +31,7 @@ public class SubprocessoValidacaoController {
 
     /**
      * Disponibiliza o mapa de competências de um subprocesso para as unidades
-     * envolvidas iniciarem
-     * a etapa de validação.
-     *
-     * <p>
-     * Ação restrita a usuários com perfil 'ADMIN'.
-     *
-     * @param codigo  O código do subprocesso.
-     * @param request O DTO contendo observações e a data limite para a etapa.
-     * @param usuario O usuário autenticado (administrador) que realiza a ação.
-     * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
+     * envolvidas iniciarem a etapa de validação.
      */
     @PostMapping("/{codigo}/disponibilizar-mapa")
     @PreAuthorize("hasRole('ADMIN')")
@@ -60,15 +51,7 @@ public class SubprocessoValidacaoController {
     }
 
     /**
-     * Permite que um usuário apresente sugestões de melhoria para um mapa de
-     * competências.
-     *
-     * <p>
-     * Ação restrita a usuários com perfil 'CHEFE' (CDU-09).
-     *
-     * @param codigo  O código do subprocesso.
-     * @param request O DTO contendo o texto das sugestões.
-     * @param usuario O usuário autenticado que está enviando as sugestões.
+     * Permite que um usuário apresente sugestões de melhoria para um mapa de competências.
      */
     @PostMapping("/{codigo}/apresentar-sugestoes")
     @PreAuthorize("hasRole('CHEFE')")
@@ -83,12 +66,6 @@ public class SubprocessoValidacaoController {
 
     /**
      * Registra a validação de um mapa de competências pelo responsável da unidade.
-     *
-     * <p>
-     * Ação restrita a usuários com perfil 'CHEFE' (CDU-10).
-     *
-     * @param codigo  O código do subprocesso.
-     * @param usuario O usuário autenticado (chefe da unidade) que está validando.
      */
     @PostMapping("/{codigo}/validar-mapa")
     @PreAuthorize("hasRole('CHEFE')")
@@ -100,9 +77,6 @@ public class SubprocessoValidacaoController {
     /**
      * Obtém as sugestões de melhoria que foram apresentadas para o mapa de um
      * subprocesso.
-     *
-     * @param codigo O código do subprocesso.
-     * @return Um {@link SugestoesDto} contendo as sugestões.
      */
     @GetMapping("/{codigo}/sugestoes")
     @PreAuthorize("isAuthenticated()")
@@ -112,10 +86,6 @@ public class SubprocessoValidacaoController {
 
     /**
      * Obtém o histórico de análises da fase de validação de um subprocesso.
-     *
-     * @param codigo O código do subprocesso.
-     * @return Uma {@link List} de {@link AnaliseValidacaoHistoricoDto} com o
-     *         histórico.
      */
     @GetMapping("/{codigo}/historico-validacao")
     @PreAuthorize("isAuthenticated()")
@@ -127,15 +97,7 @@ public class SubprocessoValidacaoController {
 
     /**
      * Devolve a validação de um mapa para a unidade de negócio responsável para que
-     * sejam feitos
-     * ajustes.
-     *
-     * <p>
-     * Ação restrita a usuários com perfil 'ADMIN' ou 'GESTOR' (CDU-20).
-     *
-     * @param codigo  O código do subprocesso.
-     * @param request O DTO contendo a justificativa da devolução.
-     * @param usuario O usuário autenticado que está realizando a devolução.
+     * sejam feitos ajustes.
      */
     @PostMapping("/{codigo}/devolver-validacao")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
@@ -149,14 +111,7 @@ public class SubprocessoValidacaoController {
 
     /**
      * Aceita a validação de um mapa, movendo o subprocesso para a próxima etapa de
-     * análise
-     * hierárquica.
-     *
-     * <p>
-     * Ação restrita a usuários com perfil 'ADMIN' ou 'GESTOR' (CDU-20).
-     *
-     * @param codigo  O código do subprocesso.
-     * @param usuario O usuário autenticado que está aceitando a validação.
+     * análise hierárquica.
      */
     @PostMapping("/{codigo}/aceitar-validacao")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
@@ -167,13 +122,6 @@ public class SubprocessoValidacaoController {
 
     /**
      * Homologa a validação de um mapa, finalizando o fluxo de aprovações.
-     *
-     * <p>
-     * Ação restrita a usuários com perfil 'ADMIN'.
-     *
-     * @param codigo  O código do subprocesso.
-     * @param usuario O usuário autenticado (administrador) que realiza a
-     *                homologação.
      */
     @PostMapping("/{codigo}/homologar-validacao")
     @PreAuthorize("hasRole('ADMIN')")
@@ -184,13 +132,6 @@ public class SubprocessoValidacaoController {
 
     /**
      * Submete a versão ajustada de um mapa para uma nova rodada de validação.
-     *
-     * <p>
-     * Ação restrita a usuários com perfil 'ADMIN' (CDU-17).
-     *
-     * @param codigo  O código do subprocesso.
-     * @param request O DTO contendo as observações e a nova data limite da etapa.
-     * @param usuario O usuário autenticado que está submetendo os ajustes.
      */
     @PostMapping("/{codigo}/submeter-mapa-ajustado")
     @PreAuthorize("hasRole('ADMIN')")
@@ -202,7 +143,6 @@ public class SubprocessoValidacaoController {
 
     /**
      * Aceita a validação de mapa de competências de múltiplas unidades em bloco.
-     * (CDU-25)
      */
     @PostMapping("/{codigo}/aceitar-validacao-bloco")
     @PreAuthorize("hasRole('GESTOR')")
@@ -210,12 +150,12 @@ public class SubprocessoValidacaoController {
     public void aceitarValidacaoEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal Usuario usuario) {
+                
         subprocessoFacade.aceitarValidacaoEmBloco(request.subprocessos(), codigo, usuario);
     }
 
     /**
      * Homologa a validação de mapa de competências de múltiplas unidades em bloco.
-     * (CDU-26)
      */
     @PostMapping("/{codigo}/homologar-validacao-bloco")
     @PreAuthorize("hasRole('ADMIN')")
@@ -223,6 +163,7 @@ public class SubprocessoValidacaoController {
     public void homologarValidacaoEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal Usuario usuario) {
+
         subprocessoFacade.homologarValidacaoEmBloco(request.subprocessos(), codigo, usuario);
     }
 }
