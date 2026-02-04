@@ -173,6 +173,38 @@ class ProcessoSubprocessoQueryServiceTest {
     }
 
     @Nested
+    @DisplayName("Listagem de Subprocessos")
+    class ListagemSubprocessos {
+
+        @Test
+        @DisplayName("deve listar por processo e situações")
+        void deveListarPorProcessoESituacoes() {
+            Long processoId = 1L;
+            List<SituacaoSubprocesso> situacoes = List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            queryService.listarPorProcessoESituacoes(processoId, situacoes);
+            verify(subprocessoRepo).findByProcessoCodigoAndSituacaoInWithUnidade(processoId, situacoes);
+        }
+
+        @Test
+        @DisplayName("deve listar entidades por processo")
+        void deveListarEntidadesPorProcesso() {
+            Long processoId = 1L;
+            queryService.listarEntidadesPorProcesso(processoId);
+            verify(subprocessoRepo).findByProcessoCodigoWithUnidade(processoId);
+        }
+
+        @Test
+        @DisplayName("deve listar por processo, unidade e situações")
+        void deveListarPorProcessoUnidadeESituacoes() {
+            Long processoId = 1L;
+            Long unidadeId = 2L;
+            List<SituacaoSubprocesso> situacoes = List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            queryService.listarPorProcessoUnidadeESituacoes(processoId, unidadeId, situacoes);
+            verify(subprocessoRepo).findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(processoId, unidadeId, situacoes);
+        }
+    }
+
+    @Nested
     @DisplayName("ValidationResult")
     class ValidationResultTest {
 

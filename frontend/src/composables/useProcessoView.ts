@@ -150,7 +150,6 @@ export function useProcessoView() {
 
     function abrirModalBloco(acao: "aceitar" | "homologar" | "disponibilizar") {
         acaoBlocoAtual.value = acao;
-        console.log('modalBlocoRef.value:', modalBlocoRef.value);
         modalBlocoRef.value?.abrir();
     }
 

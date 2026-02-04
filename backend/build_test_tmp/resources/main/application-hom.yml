@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: oracle.jdbc.OracleDriver
+  jpa:
+    open-in-view: false
+    hibernate.ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: sgc
+        jdbc.fetch_size: 50
+    show-sql: false
+    defer-datasource-initialization: false
+  sql:
+    init:
+      mode: never
+      platform: oracle
+
+aplicacao:
+  ambiente-testes: false
+  acesso-ad:
+    base-url: ${AD_BASE_URL:https://sedesenvdev01.tre-pe.gov.br/acessoAD}
+    codigo-sistema: SGC
+
+logging:
+  level:
+    sgc: INFO
+    org.hibernate: WARN
+    org.springframework: WARN

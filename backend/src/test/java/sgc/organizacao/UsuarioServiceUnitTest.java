@@ -14,7 +14,6 @@ import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.AdministradorService;
-import sgc.organizacao.service.UnidadeConsultaService;
 import sgc.organizacao.service.UnidadeResponsavelService;
 import sgc.organizacao.service.UsuarioConsultaService;
 import sgc.organizacao.service.UsuarioPerfilService;
@@ -44,8 +43,6 @@ class UsuarioServiceUnitTest {
     @Mock
     private AdministradorService administradorService;
     
-    @Mock
-    private UnidadeConsultaService unidadeConsultaService;
 
     @Mock
     private UnidadeResponsavelService unidadeResponsavelService;
@@ -56,7 +53,6 @@ class UsuarioServiceUnitTest {
             usuarioConsultaService,
             usuarioPerfilService,
             administradorService,
-            unidadeConsultaService,
             unidadeResponsavelService
         );
     }

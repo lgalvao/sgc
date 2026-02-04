@@ -112,8 +112,7 @@ public class UnidadeResponsavelService {
         Responsabilidade responsabilidade = repo.buscar(Responsabilidade.class, unidadeCodigo);
         Usuario responsavel = repo.buscar(Usuario.class, responsabilidade.getUsuarioTitulo());
 
-        Usuario titularOficial = responsabilidade.getUnidade() != null ?
-                repo.buscar(Usuario.class, responsabilidade.getUnidade().getTituloTitular()) : null;
+        Usuario titularOficial = repo.buscar(Usuario.class, responsabilidade.getUnidade().getTituloTitular());
 
         return montarResponsavelDto(unidadeCodigo, responsavel, titularOficial);
     }
@@ -135,9 +134,7 @@ public class UnidadeResponsavelService {
         Set<String> todosTitulos = new HashSet<>();
         responsabilidades.forEach(r -> {
             todosTitulos.add(r.getUsuarioTitulo());
-            if (r.getUnidade() != null) {
-                todosTitulos.add(r.getUnidade().getTituloTitular());
-            }
+            todosTitulos.add(r.getUnidade().getTituloTitular());
         });
 
         Map<String, Usuario> usuariosPorTitulo = usuarioRepo.findByIdInWithAtribuicoes(new ArrayList<>(todosTitulos)).stream()
@@ -151,16 +148,15 @@ public class UnidadeResponsavelService {
                         Responsabilidade::getUnidadeCodigo,
                         r -> {
                             Usuario responsavel = usuariosPorTitulo.get(r.getUsuarioTitulo());
-                            Usuario titularOficial = r.getUnidade() != null ? 
-                                    usuariosPorTitulo.get(r.getUnidade().getTituloTitular()) : null;
+                            Usuario titularOficial = usuariosPorTitulo.get(r.getUnidade().getTituloTitular());
                             return montarResponsavelDto(r.getUnidadeCodigo(), responsavel, titularOficial);
                         }
                 ));
     }
 
     private UnidadeResponsavelDto montarResponsavelDto(Long unidadeCodigo, Usuario responsavel, Usuario titularOficial) {
-        // Se não temos titular oficial ou o responsável é o próprio titular
-        if (titularOficial == null || responsavel.getTituloEleitoral().equals(titularOficial.getTituloEleitoral())) {
+        // Se o responsável é o próprio titular
+        if (responsavel.getTituloEleitoral().equals(titularOficial.getTituloEleitoral())) {
             return UnidadeResponsavelDto.builder()
                     .unidadeCodigo(unidadeCodigo)
                     .titularTitulo(responsavel.getTituloEleitoral())
@@ -180,16 +176,6 @@ public class UnidadeResponsavelService {
                 .build();
     }
 
-    private UnidadeResponsavelDto montarResponsavelDto(Long unidadeCodigo, Usuario responsavel) {
-        // Fallback mantendo compatibilidade, sem info do titular oficial
-        return UnidadeResponsavelDto.builder()
-                .unidadeCodigo(unidadeCodigo)
-                .titularTitulo(responsavel.getTituloEleitoral())
-                .titularNome(responsavel.getNome())
-                .substitutoTitulo(null)
-                .substitutoNome(null)
-                .build();
-    }
 
     /**
      * Busca os códigos das unidades onde o usuário é o responsável atual.

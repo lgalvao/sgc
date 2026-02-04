@@ -7,21 +7,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.organizacao.dto.PerfilDto;
-import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.AdministradorService;
-import sgc.organizacao.service.UnidadeConsultaService;
 import sgc.organizacao.service.UnidadeResponsavelService;
 import sgc.organizacao.service.UsuarioConsultaService;
 import sgc.organizacao.service.UsuarioPerfilService;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,9 +31,6 @@ class UsuarioFacadeCoverageTest {
 
     @Mock
     private AdministradorService administradorService;
-
-    @Mock
-    private UnidadeConsultaService unidadeConsultaService;
 
     @Mock
     private UnidadeResponsavelService unidadeResponsavelService;

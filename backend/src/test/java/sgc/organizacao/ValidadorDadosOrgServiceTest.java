@@ -16,7 +16,6 @@ import sgc.testutils.UnidadeTestBuilder;
 import sgc.testutils.UsuarioTestBuilder;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatCode;

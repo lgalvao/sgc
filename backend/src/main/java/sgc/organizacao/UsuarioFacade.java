@@ -9,7 +9,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAcessoNegado;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.PerfilDto;
@@ -19,7 +18,6 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -30,7 +28,6 @@ public class UsuarioFacade {
     private final UsuarioConsultaService usuarioConsultaService;
     private final UsuarioPerfilService usuarioPerfilService;
     private final AdministradorService administradorService;
-    private final UnidadeConsultaService unidadeConsultaService;
     private final UnidadeResponsavelService unidadeResponsavelService;
 
     @Transactional(readOnly = true)

@@ -62,4 +62,11 @@ class UnidadeMapaServiceTest {
 
         verify(unidadeMapaRepo).save(unidadeMapaExistente);
     }
+
+    @Test
+    @DisplayName("Deve buscar todos os códigos de unidades que possuem mapa vigente")
+    void deveBuscarTodosCodigosUnidades() {
+        unidadeMapaService.buscarTodosCodigosUnidades();
+        verify(unidadeMapaRepo).findAllUnidadeCodigos();
+    }
 }

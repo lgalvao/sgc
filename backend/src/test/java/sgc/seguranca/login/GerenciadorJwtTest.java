@@ -169,4 +169,36 @@ class GerenciadorJwtTest {
 
         assertThat(result).isEmpty();
     }
+
+    @Test
+    @DisplayName("Deve gerar e validar token de pré-autenticação")
+    void preAuthSuccess() {
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
+
+        String token = gerenciador.gerarTokenPreAuth("123");
+        Optional<String> result = gerenciador.validarTokenPreAuth(token);
+
+        assertThat(result).isPresent().contains("123");
+    }
+
+    @Test
+    @DisplayName("Deve retornar empty para token pré-auth com tipo errado")
+    void preAuthWrongType() {
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
+        when(jwtProperties.expiracaoMinutos()).thenReturn(60);
+
+        // Token normal usado como pré-auth
+        String token = gerenciador.gerarToken("123", Perfil.ADMIN, 1L);
+        Optional<String> result = gerenciador.validarTokenPreAuth(token);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve retornar empty para token pré-auth inválido")
+    void preAuthInvalid() {
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
+        Optional<String> result = gerenciador.validarTokenPreAuth("invalid.token");
+        assertThat(result).isEmpty();
+    }
 }

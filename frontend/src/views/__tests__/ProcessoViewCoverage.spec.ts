@@ -3,6 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {markRaw} from "vue";
 import ProcessoView from "@/views/ProcessoView.vue";
 import {useProcessosStore} from "@/stores/processos";
+import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
 import {createTestingPinia} from "@pinia/testing";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
@@ -31,17 +32,43 @@ vi.mock("vue-router", () => ({
 
 vi.mock("@/services/processoService");
 
-const modalSpies = {
-    abrir: vi.fn(),
-    fechar: vi.fn(),
-    setErro: vi.fn(),
-    setProcessando: vi.fn()
+const ModalAcaoBlocoStub = {
+    name: 'ModalAcaoBloco',
+    template: '<div>ModalAcaoBloco</div>',
+    expose: ['abrir', 'fechar', 'setErro', 'setProcessando'],
+    setup(props: any, { expose }: any) {
+        expose({
+            abrir: vi.fn(),
+            fechar: vi.fn(),
+            setErro: vi.fn(),
+            setProcessando: vi.fn()
+        });
+        return {};
+    }
+};
+
+const commonStubs = {
+    PageHeader: { template: '<div><slot/><slot name="actions"/></div>' },
+    ProcessoAcoes: { name: 'ProcessoAcoes', template: '<div><button data-testid="btn-finalizar" @click="$emit(\'finalizar\')">Finalizar</button></div>', emits: ['finalizar'] },
+    TreeTable: { template: '<div>TreeTable</div>' },
+    ModalAcaoBloco: ModalAcaoBlocoStub,
+    ModalConfirmacao: {
+        template: '<div v-if="modelValue"><button @click="$emit(\'confirmar\')">Confirmar</button></div>',
+        props: ['modelValue'],
+        emits: ['confirmar', 'update:modelValue']
+    },
+    BAlert: { template: '<div v-if="modelValue"><slot /></div>', props: ['modelValue'] },
+    BBadge: { template: '<span><slot /></span>' },
+    BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
+    BContainer: { template: '<div><slot /></div>' },
+    BSpinner: { template: '<span>Loading</span>' }
 };
 
 describe("ProcessoViewCoverage.spec.ts", () => {
     let processosStore: any;
+    let modalSpies: any;
 
-    const createWrapper = (initialState: any = {}) => {
+    const createWrapper = (initialState: any = {}, shallow = false) => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {
@@ -58,12 +85,21 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                 perfil: {
                     perfilSelecionado: "GESTOR",
                     unidadeSelecionada: 100,
-                    perfisUnidades: [{ perfil: "GESTOR", unidade: { codigo: 100 } }]
-                },
-                ...initialState
+                    perfisUnidades: [{ perfil: "GESTOR", unidade: { codigo: 100 } }],
+                    perfis: ["GESTOR"]
+                }
             },
             stubActions: true
         });
+
+        if (initialState.processos) {
+            const store = useProcessosStore(pinia);
+            store.$patch(initialState.processos);
+        }
+        if (initialState.perfil) {
+            const store = usePerfilStore(pinia);
+            store.$patch(initialState.perfil);
+        }
 
         processosStore = useProcessosStore(pinia);
         // Ensure action returns promise
@@ -71,44 +107,29 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         processosStore.finalizarProcesso.mockResolvedValue({});
         processosStore.executarAcaoBloco.mockResolvedValue({});
 
-        return mount(ProcessoView, {
+        const options: any = {
             global: {
                 plugins: [pinia],
-                stubs: {
-                    PageHeader: { template: '<div><slot/><slot name="actions"/></div>' },
-                    ProcessoAcoes: { name: 'ProcessoAcoes', template: '<div><button data-testid="btn-finalizar" @click="$emit(\'finalizar\')">Finalizar</button></div>', emits: ['finalizar'] },
-                    TreeTable: { template: '<div>TreeTable</div>' },
-                    ModalAcaoBloco: {
-                        name: 'ModalAcaoBloco',
-                        template: '<div>ModalAcaoBloco</div>',
-                        expose: ['abrir', 'fechar', 'setErro', 'setProcessando'],
-                        setup(props, { expose }) {
-                           const rawSpies = markRaw(modalSpies);
-                           expose(rawSpies);
-                           return rawSpies;
-                        }
-                    },
-                    ModalConfirmacao: {
-                        template: '<div v-if="modelValue"><button @click="$emit(\'confirmar\')">Confirmar</button></div>',
-                        props: ['modelValue'],
-                        emits: ['confirmar', 'update:modelValue']
-                    },
-                    BAlert: { template: '<div v-if="modelValue"><slot /></div>', props: ['modelValue'] },
-                    BBadge: { template: '<span><slot /></span>' },
-                    BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
-                    BContainer: { template: '<div><slot /></div>' },
-                    BSpinner: { template: '<span>Loading</span>' }
-                }
+                stubs: commonStubs
             }
-        });
+        };
+        
+        if (shallow) {
+            options.shallow = true;
+        }
+
+        return mount(ProcessoView, options);
     };
 
     beforeEach(() => {
         vi.clearAllMocks();
-        modalSpies.abrir.mockClear();
-        modalSpies.fechar.mockClear();
-        modalSpies.setErro.mockClear();
-        modalSpies.setProcessando.mockClear();
+        modalSpies = {
+            abrir: vi.fn(),
+            fechar: vi.fn(),
+            setErro: vi.fn(),
+            setProcessando: vi.fn()
+        };
+        (globalThis as any).modalSpies = modalSpies;
     });
 
     it("deve lidar com erro ao finalizar processo", async () => {
@@ -120,35 +141,25 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
         await flushPromises();
 
-        // Trigger finalizar via stubbed component emit
-        // Find by name "ProcessoAcoes" works because we defined the stub with that name in `createWrapper`.
-        // Or we can find by ref if it had one, or by component definition if imported.
-        // But here we rely on the stub name.
         const acoes = wrapper.findComponent({ name: "ProcessoAcoes" });
         await acoes.vm.$emit("finalizar");
         await flushPromises();
 
-        // Confirm
         const modal = wrapper.findComponent({ name: "ModalConfirmacao" });
         if (modal.exists()) {
             await modal.vm.$emit("confirmar");
         }
         await flushPromises();
-
-        // Expect show to be called. If not called, then ProcessoAcoes or Modal didn't exist
-        // Note: wrapper.findComponent finds by name if stubbed with name
     });
 
     it("deve abrir detalhes da unidade (navegação) para ADMIN", async () => {
         const wrapper = createWrapper({
             perfil: {
                 perfilSelecionado: "ADMIN",
-                unidadeSelecionada: 999
+                unidadeSelecionada: 999,
+                perfis: ["ADMIN"]
             }
         });
-
-        // Force isAdmin getter to true in store manually if mock
-        (wrapper.vm as any).perfilStore.isAdmin = true;
 
         await flushPromises();
 
@@ -171,7 +182,11 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
     it("não deve navegar para unidade de terceiros se CHEFE", async () => {
         const wrapper = createWrapper({
-            perfil: { perfilSelecionado: "CHEFE", unidadeSelecionada: 200 } // Unidade logada 200
+            perfil: {
+                perfilSelecionado: "CHEFE",
+                unidadeSelecionada: 200,
+                perfis: ["CHEFE"]
+            }
         });
         await flushPromises();
 
@@ -183,7 +198,11 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
     it("deve navegar para própria unidade se CHEFE", async () => {
         const wrapper = createWrapper({
-            perfil: { perfilSelecionado: "CHEFE", unidadeSelecionada: 10 } // Unidade logada 10
+            perfil: {
+                perfilSelecionado: "CHEFE",
+                unidadeSelecionada: 10,
+                perfis: ["CHEFE"]
+            }
         });
         await flushPromises();
 
@@ -197,7 +216,15 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
 
     it("deve lidar com erro na ação em bloco", async () => {
-        const wrapper = createWrapper();
+        const wrapper = createWrapper({
+            processos: {
+                processoDetalhe: {
+                    unidades: [
+                        { codUnidade: 1, sigla: "A", situacaoSubprocesso: "QUALQUER" }
+                    ]
+                }
+            }
+        });
         const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
@@ -207,7 +234,8 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         (wrapper.vm as any).acaoBlocoAtual = 'aceitar';
         processosStore.executarAcaoBloco.mockRejectedValue(new Error("Erro bloco"));
 
-        await (wrapper.vm as any).executarAcaoBloco({ ids: [1] });
+        await modal.vm.$emit("confirmar", { ids: [1] });
+        await flushPromises();
 
         if (modal.exists()) {
              expect(modalSpies.setErro).toHaveBeenCalledWith("Erro bloco");

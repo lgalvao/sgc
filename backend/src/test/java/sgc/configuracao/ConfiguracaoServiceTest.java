@@ -89,4 +89,23 @@ class ConfiguracaoServiceTest {
         assertEquals(novoValor, resultado.getValor());
         verify(parametroRepo).save(parametro);
     }
+
+    @Test
+    @DisplayName("Deve buscar parâmetro por ID existente")
+    void deveBuscarPorIdExistente() {
+        Long id = 1L;
+        Parametro p = new Parametro();
+        when(parametroRepo.findById(id)).thenReturn(Optional.of(p));
+
+        assertEquals(p, configuracaoService.buscarPorId(id));
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro ao buscar por ID inexistente")
+    void deveLancarErroAoBuscarPorIdInexistente() {
+        Long id = 1L;
+        when(parametroRepo.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(ErroConfiguracao.class, () -> configuracaoService.buscarPorId(id));
+    }
 }

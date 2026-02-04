@@ -119,4 +119,13 @@ class AtividadeAccessPolicyTest {
         atribuicoes.add(atribuicao);
         return atribuicoes;
     }
+
+    @Test
+    @DisplayName("Deve negar se atividade não possuir mapa")
+    void deveNegarAtividadeSemMapa() {
+        atividade.setMapa(null);
+        boolean resultado = policy.canExecute(usuarioChefe, CRIAR_ATIVIDADE, atividade);
+        assertThat(resultado).isFalse();
+        assertThat(policy.getMotivoNegacao()).contains("não associada a um mapa");
+    }
 }

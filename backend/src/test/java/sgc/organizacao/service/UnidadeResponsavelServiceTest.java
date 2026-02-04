@@ -91,8 +91,7 @@ class UnidadeResponsavelServiceTest {
             List<AtribuicaoTemporariaDto> resultado = service.buscarTodasAtribuicoes();
 
             // Then
-            assertThat(resultado).hasSize(2);
-            assertThat(resultado).containsExactly(dto1, dto2);
+            assertThat(resultado).hasSize(2).containsExactly(dto1, dto2);
             verify(atribuicaoTemporariaRepo).findAll();
             verify(usuarioMapper, times(2)).toAtribuicaoTemporariaDto(any());
         }
@@ -470,16 +469,5 @@ class UnidadeResponsavelServiceTest {
         return usuario;
     }
 
-    private List<UsuarioPerfil> criarPerfisChefeUnidade(Usuario usuario, Long unidadeCodigo) {
-        UsuarioPerfil perfil = criarUsuarioPerfil(usuario, unidadeCodigo, Perfil.CHEFE);
-        return List.of(perfil);
-    }
 
-    private UsuarioPerfil criarUsuarioPerfil(Usuario usuario, Long unidadeCodigo, Perfil perfil) {
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setUsuario(usuario);
-        up.setUnidadeCodigo(unidadeCodigo);
-        up.setPerfil(perfil);
-        return up;
-    }
 }
