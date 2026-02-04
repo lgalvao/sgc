@@ -5,7 +5,7 @@ This plan outlines the steps to enrich the project's seed data to support compre
 ## Phase 1: Multi-Unit Processes and State Variety
 This phase focuses on adding new processes that involve multiple units in different stages of the workflow.
 
-- [~] Task: Create a large `MAPEAMENTO` process (ID 300) involving the entire `SECRETARIA_1` hierarchy.
+- [x] Task: Create a large `MAPEAMENTO` process (ID 300) involving the entire `SECRETARIA_1` hierarchy. [05ff46e]
     - [ ] Add `UnidadeProcesso` entries for Units 2, 3, 4, 5, 6, 7, 8.
     - [ ] Create Subprocess for `ASSESSORIA_11` (Unit 3) in `MAPEAMENTO_CADASTRO_EM_ANDAMENTO`.
     - [ ] Create Subprocess for `SECAO_111` (Unit 6) in `MAPEAMENTO_MAPA_DISPONIBILIZADO`.
