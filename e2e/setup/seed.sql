@@ -455,3 +455,11 @@ VALUES (406, 400, 6, 'DIAGNOSTICO_MONITORAMENTO', CURRENT_TIMESTAMP);
 -- Subprocesso Unit 7 (SECAO_112): DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO
 INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
 VALUES (407, 400, 7, 'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO', CURRENT_TIMESTAMP);
+
+-- Subprocesso Unit 8 (SECAO_113): NAO_INICIADO
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (408, 400, 8, 'NAO_INICIADO', CURRENT_TIMESTAMP);
+
+-- Subprocesso Unit 10 (SECAO_121): NAO_INICIADO
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (410, 400, 10, 'NAO_INICIADO', CURRENT_TIMESTAMP);
