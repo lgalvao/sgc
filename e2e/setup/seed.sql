@@ -463,3 +463,50 @@ VALUES (408, 400, 8, 'NAO_INICIADO', CURRENT_TIMESTAMP);
 -- Subprocesso Unit 10 (SECAO_121): NAO_INICIADO
 INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
 VALUES (410, 400, 10, 'NAO_INICIADO', CURRENT_TIMESTAMP);
+
+-- Phase 2: Complex Map for Unit 6 (Process 300)
+
+-- Technical Competences
+INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo) VALUES (30601, 'Análise de Processos Complexos', 306);
+INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo) VALUES (30602, 'Gestão de Stakeholders', 306);
+INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo) VALUES (30603, 'Liderança e Mentoria', 306);
+INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo) VALUES (30604, 'Domínio de Normativas Internas', 306);
+
+-- Activity 1
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo) VALUES (3061, 'Mapear fluxos de trabalho da unidade', 306);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30611, 'BPMN 2.0', 3061);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30612, 'Ferramentas de modelagem', 3061);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (3061, 30601);
+
+-- Activity 2
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo) VALUES (3062, 'Elaborar relatórios gerenciais trimestrais', 306);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30621, 'Análise de dados (Excel/PowerBI)', 3062);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30622, 'Redação oficial', 3062);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (3062, 30601);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (3062, 30604);
+
+-- Activity 3
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo) VALUES (3063, 'Orientar novos servidores em processos operacionais', 306);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30631, 'Técnicas de treinamento', 3063);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30632, 'Procedimentos operacionais padrão', 3063);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (3063, 30603);
+
+-- Activity 4
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo) VALUES (3064, 'Gerenciar conflitos entre equipes', 306);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30641, 'Comunicação não-violenta', 3064);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30642, 'Mediação de conflitos', 3064);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (3064, 30602);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (3064, 30603);
+
+-- Activity 5
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo) VALUES (3065, 'Revisar conformidade legal de atos administrativos', 306);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30651, 'Direito Administrativo', 3065);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30652, 'Regimento Interno', 3065);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (3065, 30604);
+
+-- Activity 6
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo) VALUES (3066, 'Participar de comissões de melhoria contínua', 306);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30661, 'Metodologias ágeis', 3066);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30662, 'Gestão da qualidade', 3066);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (3066, 30601);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (3066, 30602);
