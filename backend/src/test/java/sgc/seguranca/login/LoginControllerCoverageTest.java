@@ -9,22 +9,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Usuario;
 import sgc.seguranca.login.dto.AutenticarRequest;
-import sgc.seguranca.login.dto.AutorizarRequest;
 import sgc.seguranca.login.dto.EntrarRequest;
-import sgc.seguranca.login.dto.EntrarResponse;
-
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,7 +47,7 @@ class LoginControllerCoverageTest {
 
         controller.autenticar(req, httpReq, httpRes);
 
-        verify(httpRes).addCookie(argThat(cookie -> cookie.getSecure()));
+        verify(httpRes).addCookie(argThat(Cookie::getSecure));
     }
 
     @Test

@@ -99,7 +99,34 @@ class EventoProcessoListenerCoverageTest {
     }
 
     @Test
-    @DisplayName("aoIniciarProcesso deve enviar email para titular e substituto")
+    @DisplayName("aoIniciarProcesso quando responsavel da unidade nao encontrado deve retornar early")
+    void aoIniciarProcesso_ResponsavelNaoEncontrado() {
+        Long codProcesso = 1L;
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder()
+                .codProcesso(codProcesso)
+                .build();
+
+        Processo processo = new Processo();
+        processo.setDescricao("Processo");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+
+        Subprocesso subprocesso = new Subprocesso();
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(99L);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setSigla("U99");
+        subprocesso.setUnidade(unidade);
+
+        when(processoFacade.buscarEntidadePorId(codProcesso)).thenReturn(processo);
+        when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
+        // Return empty map for responsaveis
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of());
+
+        listener.aoIniciarProcesso(evento);
+
+        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+    }
     void aoIniciarProcesso_SubstitutoSuccess() {
         Long codProcesso = 1L;
         EventoProcessoIniciado evento = EventoProcessoIniciado.builder()

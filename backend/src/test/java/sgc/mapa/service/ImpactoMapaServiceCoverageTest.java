@@ -48,11 +48,12 @@ class ImpactoMapaServiceCoverageTest {
         Unidade u = new Unidade();
         u.setCodigo(100L);
         sp.setUnidade(u);
+        Usuario usuario = new Usuario();
 
         when(mapaRepo.findMapaVigenteByUnidade(100L)).thenReturn(Optional.of(new Mapa()));
         when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.verificarImpactos(sp, new Usuario()))
+        assertThatThrownBy(() -> service.verificarImpactos(sp, usuario))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 

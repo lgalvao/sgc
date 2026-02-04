@@ -65,7 +65,7 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Disponibiliza o cadastro de atividades para análise")
     public ResponseEntity<MensagemResponse> disponibilizarCadastro(
             @PathVariable("codigo") Long codSubprocesso,
-            @AuthenticationPrincipal Object principal) {
+            @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         List<Atividade> faltando = subprocessoFacade.obterAtividadesSemConhecimento(codSubprocesso);
         if (!faltando.isEmpty()) {
@@ -106,7 +106,7 @@ public class SubprocessoCadastroController {
     @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
     public ResponseEntity<MensagemResponse> disponibilizarRevisao(
-            @PathVariable Long codigo, @AuthenticationPrincipal Object principal) {
+            @PathVariable Long codigo, @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         List<Atividade> faltando = subprocessoFacade.obterAtividadesSemConhecimento(codigo);
         if (!faltando.isEmpty()) {
@@ -153,7 +153,7 @@ public class SubprocessoCadastroController {
     public void devolverCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody DevolverCadastroRequest request,
-            @AuthenticationPrincipal Object principal) {
+            @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         
         Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
@@ -177,7 +177,7 @@ public class SubprocessoCadastroController {
     public void aceitarCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody AceitarCadastroRequest request,
-            @AuthenticationPrincipal Object principal) {
+            @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
 
@@ -199,7 +199,7 @@ public class SubprocessoCadastroController {
     public void homologarCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody HomologarCadastroRequest request,
-            @AuthenticationPrincipal Object principal) {
+            @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
 
@@ -220,7 +220,7 @@ public class SubprocessoCadastroController {
     public void devolverRevisaoCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody DevolverCadastroRequest request,
-            @AuthenticationPrincipal Object principal) {
+            @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
 
@@ -239,7 +239,7 @@ public class SubprocessoCadastroController {
     public void aceitarRevisaoCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody AceitarCadastroRequest request,
-            @AuthenticationPrincipal Object principal) {
+            @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
 
@@ -261,7 +261,7 @@ public class SubprocessoCadastroController {
     public void homologarRevisaoCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody HomologarCadastroRequest request,
-            @AuthenticationPrincipal Object principal) {
+            @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
 
@@ -297,7 +297,7 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Aceita cadastros em bloco")
     public void aceitarCadastroEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
-            @AuthenticationPrincipal Object principal) {
+            @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         subprocessoFacade.aceitarCadastroEmBloco(request.subprocessos(), codigo, usuario);
     }
@@ -311,12 +311,12 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Homologa cadastros em bloco")
     public void homologarCadastroEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
-            @AuthenticationPrincipal Object principal) {
+            @AuthenticationPrincipal @org.jspecify.annotations.Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
         subprocessoFacade.homologarCadastroEmBloco(request.subprocessos(), codigo, usuario);
     }
 
-    private Usuario obterUsuarioAutenticado(Object principal) {
+    private Usuario obterUsuarioAutenticado(@org.jspecify.annotations.Nullable Object principal) {
         String titulo = usuarioService.extrairTituloUsuario(principal);
         if (titulo == null) {
             throw new ErroAutenticacao("Usuário não identificado");
