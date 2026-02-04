@@ -137,10 +137,11 @@ describe('BarraNavegacao.vue', () => {
         expect(items[3].text()).toBe('Mapa de competências');
     });
 
-    it('deve mostrar breadcrumbs para rotas de Unidade', () => {
+    it('deve mostrar breadcrumbs para rotas de Unidade (não-ADMIN vê Minha unidade)', () => {
         mockRoute.name = 'Unidade';
         mockRoute.params = { codUnidade: '10' };
         const wrapper = mountComponent({
+             perfil: { perfilSelecionado: Perfil.GESTOR },
              unidades: { unidade: { codigo: 10, sigla: 'MINHA_UNIDADE' } }
         });
         const items = wrapper.findAllComponents(BBreadcrumbItemStub);
@@ -150,10 +151,25 @@ describe('BarraNavegacao.vue', () => {
         expect(items[2].text()).toBe('Minha unidade');
     });
 
+    it('deve mostrar breadcrumbs para rotas de Unidade (ADMIN vê Unidades)', () => {
+        mockRoute.name = 'Unidade';
+        mockRoute.params = { codUnidade: '1' };
+        const wrapper = mountComponent({
+             perfil: { perfilSelecionado: Perfil.ADMIN },
+             unidades: { unidade: { codigo: 1, sigla: 'SEDOC' } }
+        });
+        const items = wrapper.findAllComponents(BBreadcrumbItemStub);
+        // Home -> SEDOC -> Unidades
+        expect(items.length).toBe(3);
+        expect(items[1].text()).toBe('SEDOC');
+        expect(items[2].text()).toBe('Unidades');
+    });
+
     it('deve usar ID da unidade se sigla não estiver na store', () => {
         mockRoute.name = 'Unidade';
         mockRoute.params = { codUnidade: '99' };
         const wrapper = mountComponent({
+             perfil: { perfilSelecionado: Perfil.GESTOR },
              unidades: { unidade: null }
         });
         const items = wrapper.findAllComponents(BBreadcrumbItemStub);

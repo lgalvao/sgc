@@ -44,7 +44,7 @@ describe("MainNavbar.vue", () => {
         } as any);
     });
 
-    it("deve navegar para a rota correta ao clicar nos links do menu", async () => {
+    it("deve navegar para a rota correta ao clicar nos links do menu (ADMIN)", async () => {
         const options = getCommonMountOptions({
             perfil: {
                 perfilSelecionado: "ADMIN",
@@ -63,9 +63,31 @@ describe("MainNavbar.vue", () => {
         };
 
         checkLink("Painel", "/painel");
-        checkLink("Minha unidade", "/unidade/456");
+        // ADMIN vê "Unidades" apontando para unidade raiz (código 1)
+        checkLink("Unidades", "/unidade/1");
         checkLink("Relatórios", "/relatorios");
         checkLink("Histórico", "/historico");
+    });
+
+    it("deve navegar para a unidade do usuário ao clicar em 'Minha unidade' (não-ADMIN)", async () => {
+        const options = getCommonMountOptions({
+            perfil: {
+                perfilSelecionado: "GESTOR",
+                unidadeSelecionada: 456
+            }
+        });
+
+        ctx.wrapper = mount(NavBar, options);
+
+        const checkLink = (text: string, to: string) => {
+             const links = ctx.wrapper!.findAllComponents(RouterLinkStub);
+             const link = links.find(w => w.text().includes(text));
+             expect(link?.exists()).toBe(true);
+             expect(link?.props().to).toBe(to);
+        };
+
+        // GESTOR vê "Minha unidade" apontando para sua unidade
+        checkLink("Minha unidade", "/unidade/456");
     });
 
     it("deve exibir o perfil e a unidade do usuário", async () => {

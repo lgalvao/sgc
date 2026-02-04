@@ -22,11 +22,11 @@ const app = createApp(App);
 const pinia = createPinia();
 app.use(pinia);
 
-window.pinia = pinia;
+globalThis.pinia = pinia;
 
 app.use(router);
 app.use(createBootstrap());
 app.directive('b-tooltip', vBTooltip);
 app.mount("#app");
 
-window.__pinia__ = pinia;
+globalThis.__pinia__ = pinia;

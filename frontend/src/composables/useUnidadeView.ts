@@ -23,11 +23,16 @@ export function useUnidadeView(codUnidade: number) {
     const unidadeComResponsavelDinamico = computed(() => {
         if (!unidade.value) return null;
 
-        const atribuicoes = atribuicaoStore.obterAtribuicoesPorUnidade(unidade.value.codigo);
+        const atribuicoes = atribuicaoStore.obterAtribuicoesPorUnidade(unidade.value.sigla);
         const agora = new Date();
         const atribuicaoAtiva = atribuicoes.find(a => {
             const inicio = new Date(a.dataInicio);
-            const fim = a.dataTermino ? new Date(a.dataTermino) : (a.dataFim ? new Date(a.dataFim) : null);
+            let fim = null;
+            if (a.dataTermino) {
+                fim = new Date(a.dataTermino);
+            } else if (a.dataFim) {
+                fim = new Date(a.dataFim);
+            }
             return inicio <= agora && (!fim || fim >= agora);
         });
 

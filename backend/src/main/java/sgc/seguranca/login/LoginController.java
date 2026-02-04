@@ -37,6 +37,8 @@ public class LoginController {
     private final UsuarioFacade usuarioService;
     private final LimitadorTentativasLogin limitadorTentativasLogin;
     private final GerenciadorJwt gerenciadorJwt;
+    @org.springframework.beans.factory.annotation.Value("${aplicacao.ambiente-testes:false}")
+    private boolean ambienteTestes;
 
     /**
      * Autentica um usuário com base no título de eleitor e senha.
@@ -61,7 +63,7 @@ public class LoginController {
             String token = gerenciadorJwt.gerarTokenPreAuth(request.tituloEleitoral());
             Cookie cookie = new Cookie("SGC_PRE_AUTH", token);
             cookie.setHttpOnly(true);
-            cookie.setSecure(true);
+            cookie.setSecure(!ambienteTestes);
             cookie.setPath("/");
             cookie.setMaxAge(300); // 5 minutes
             httpResponse.addCookie(cookie);

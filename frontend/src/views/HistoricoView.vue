@@ -16,9 +16,7 @@
           <tbody>
             <tr v-if="loading">
               <td colspan="4" class="text-center py-4">
-                <div class="spinner-border text-primary" role="status">
-                  <span class="visually-hidden">Carregando...</span>
-                </div>
+                <BSpinner label="Carregando..." variant="primary" />
               </td>
             </tr>
             <tr v-else-if="processos.length === 0">
@@ -34,7 +32,6 @@
             <tr v-for="proc in processos" v-else :key="proc.codigo">
               <td>
                 <div class="fw-bold">{{ proc.descricao }}</div>
-                <!-- <small class="text-muted">{{ formatarParticipantes(proc) }}</small> -->
               </td>
               <td>
                 <span :class="['badge', getBadgeClass(proc.tipo)]">
@@ -62,7 +59,7 @@
 <script setup lang="ts">
 import {computed, onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
-import {BButton, BCard, BContainer} from 'bootstrap-vue-next';
+import {BButton, BCard, BContainer, BSpinner} from 'bootstrap-vue-next';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import {useProcessosStore} from '@/stores/processos';
@@ -85,7 +82,7 @@ async function carregarHistorico() {
 }
 
 function verDetalhes(codigo: number) {
-  router.push(`/processos/${codigo}`);
+  router.push(`/processo/${codigo}`);
 }
 
 function getBadgeClass(tipo: string): string {

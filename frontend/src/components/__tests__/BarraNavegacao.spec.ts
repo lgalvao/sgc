@@ -126,7 +126,7 @@ describe("BarraNavegacao.vue", () => {
             expect(items[2].text()).toBe("ASSESSORIA_12");
         });
 
-        it("deve renderizar breadcrumbs para rotas de unidade", () => {
+        it("deve renderizar breadcrumbs para rotas de unidade (ADMIN vê 'Unidades')", () => {
             vi.mocked(useRoute).mockReturnValue(
                 createMockRoute("/unidade/1", mockMatchedUnidade, "Unidade", {codUnidade: "1"}),
             );
@@ -135,10 +135,27 @@ describe("BarraNavegacao.vue", () => {
             }, {BButton}));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(3); // Home + sigla/codigo + "Minha unidade"
+            expect(items).toHaveLength(3); // Home + sigla/codigo + "Unidades"
             expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
             // Sem unidade carregada no store, mostra "Unidade X"
             expect(items[1].text()).toBe("Unidade 1");
+            // ADMIN vê "Unidades" em vez de "Minha unidade"
+            expect(items[2].text()).toBe("Unidades");
+        });
+
+        it("deve renderizar breadcrumbs para rotas de unidade (não-ADMIN vê 'Minha unidade')", () => {
+            vi.mocked(useRoute).mockReturnValue(
+                createMockRoute("/unidade/456", mockMatchedUnidade, "Unidade", {codUnidade: "456"}),
+            );
+            const wrapper = mount(BarraNavegacao, getCommonMountOptions({
+                perfil: {perfilSelecionado: Perfil.GESTOR}
+            }, {BButton}));
+
+            const items = wrapper.findAllComponents(BBreadcrumbItem);
+            expect(items).toHaveLength(3); // Home + sigla/codigo + "Minha unidade"
+            expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
+            expect(items[1].text()).toBe("Unidade 456");
+            // Não-ADMIN vê "Minha unidade"
             expect(items[2].text()).toBe("Minha unidade");
         });
     });

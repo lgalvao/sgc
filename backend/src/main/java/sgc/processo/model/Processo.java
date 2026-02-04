@@ -29,7 +29,7 @@ public class Processo extends EntidadeBase {
     @Column(name = "data_finalizacao")
     private LocalDateTime dataFinalizacao;
 
-    @Column(name = "data_limite")
+    @Column(name = "data_limite", nullable = false)
     private LocalDateTime dataLimite;
 
     @Column(name = "descricao")

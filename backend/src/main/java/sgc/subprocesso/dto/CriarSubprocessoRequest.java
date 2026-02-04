@@ -20,6 +20,7 @@ public record CriarSubprocessoRequest(
 
                 Long codMapa,
 
+                @NotNull(message = "A data limite da etapa 1 é obrigatória")
                 LocalDateTime dataLimiteEtapa1,
                 LocalDateTime dataLimiteEtapa2) {
 }

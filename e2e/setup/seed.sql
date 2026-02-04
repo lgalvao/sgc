@@ -185,16 +185,16 @@ VALUES ('303030', 'CHEFE', 8);
 
 -- Inserir Mapa vigente para Assessoria 12 (Unit 4) para testes de Revisão
 -- Processo 99
-INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, descricao, situacao, tipo)
-VALUES (99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo Seed 99', 'FINALIZADO', 'MAPEAMENTO');
+INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, descricao, situacao, tipo)
+VALUES (99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo Seed 99', 'FINALIZADO', 'MAPEAMENTO');
 
 -- UnidadeProcesso (Unit 4)
 INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao)
 VALUES (99, 4, 'CONCLUIDA');
 
 -- Subprocesso 99
-INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao)
-VALUES (99, 99, 4, 'MAPEAMENTO_MAPA_HOMOLOGADO');
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (99, 99, 4, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
 
 -- Mapa (agora vinculado ao Subprocesso e sem sugestoes_apresentadas)
 INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
@@ -348,16 +348,16 @@ VALUES (2, 'DIAS_ALERTA_NOVO', 'Dias para indicação de alerta como novo', '3')
 
 -- Dados para teste de Importação (CDU-08)
 -- Processo 200
-INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, descricao, situacao, tipo)
-VALUES (200, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo Seed 200', 'FINALIZADO', 'MAPEAMENTO');
+INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, descricao, situacao, tipo)
+VALUES (200, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo Seed 200', 'FINALIZADO', 'MAPEAMENTO');
 
 -- UnidadeProcesso (Unit 2)
 INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao)
 VALUES (200, 2, 'CONCLUIDA');
 
 -- Subprocesso 200
-INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao)
-VALUES (200, 200, 2, 'MAPEAMENTO_MAPA_HOMOLOGADO');
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (200, 200, 2, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
 
 -- Mapa para SECRETARIA_1 (Unidade 2)
 INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)

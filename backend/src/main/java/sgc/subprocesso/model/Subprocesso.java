@@ -34,7 +34,7 @@ public class Subprocesso extends EntidadeBase {
     @OneToOne(mappedBy = "subprocesso")
     private Mapa mapa;
 
-    @Column(name = "data_limite_etapa1")
+    @Column(name = "data_limite_etapa1", nullable = false)
     private LocalDateTime dataLimiteEtapa1;
 
     @Column(name = "data_fim_etapa1")

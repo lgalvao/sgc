@@ -130,6 +130,6 @@ describe("HistoricoView.vue", () => {
         expect(buttons.length).toBeGreaterThan(0);
         await buttons[0].trigger('click');
 
-        expect(mockPush).toHaveBeenCalledWith('/processos/1');
+        expect(mockPush).toHaveBeenCalledWith('/processo/1');
     });
 });

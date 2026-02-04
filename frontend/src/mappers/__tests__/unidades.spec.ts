@@ -87,12 +87,12 @@ describe("mappers/unidades", () => {
             expect(u.responsavel?.codigo).toBe(1);
             expect(u.responsavel?.nome).toBe("");
             expect(u.responsavel?.tituloEleitoral).toBe("");
-            expect(u.responsavel?.usuarioTitulo).toBe("123");
-            expect(u.responsavel?.unidadeCodigo).toBe(5);
-            expect(u.responsavel?.usuarioCodigo).toBe(6);
-            expect(u.responsavel?.tipo).toBe("");
-            expect(u.responsavel?.dataInicio).toBe("2023-01-01");
-            expect(u.responsavel?.dataFim).toBeNull();
+            expect((u.responsavel as any)?.usuarioTitulo).toBe("123");
+            expect((u.responsavel as any)?.unidadeCodigo).toBe(5);
+            expect((u.responsavel as any)?.usuarioCodigo).toBe(6);
+            expect((u.responsavel as any)?.tipo).toBe("");
+            expect((u.responsavel as any)?.dataInicio).toBe("2023-01-01");
+            expect((u.responsavel as any)?.dataFim).toBeNull();
             expect(u.responsavel?.unidade).toEqual({});
         });
 
@@ -102,13 +102,13 @@ describe("mappers/unidades", () => {
                     idServidorResponsavel: 55
                 }
             });
-            expect(u.responsavel?.usuarioCodigo).toBe(55);
+            expect((u.responsavel as any)?.usuarioCodigo).toBe(55);
         });
     });
 
     describe("mapUnidadesArray", () => {
         it("handles undefined input", () => {
-            const arr = mapUnidadesArray(undefined);
+            const arr = mapUnidadesArray();
             expect(arr).toEqual([]);
         });
     });

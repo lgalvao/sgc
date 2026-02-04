@@ -11,59 +11,41 @@ export interface Breadcrumb {
 }
 
 export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
-  const crumbs = computed((): Breadcrumb[] => {
-    const breadcrumbs: Breadcrumb[] = [];
-    const perfil = usePerfilStore();
-    const unidadesStore = useUnidadesStore();
-    const perfilUsuario = perfil.perfilSelecionado;
+  const perfil = usePerfilStore();
+  const unidadesStore = useUnidadesStore();
 
-    // Add home breadcrumb
-    breadcrumbs.push({ label: "Painel", to: { name: "Painel" }, isHome: true });
-
-    const routeName = route.name as string;
-    const codProcesso = route.params.codProcesso as string;
-    const siglaUnidade = route.params.siglaUnidade as string;
-    const codUnidade = route.params.codUnidade as string;
-
-    // Verifica se é uma rota de processo ou subprocesso
-    const isProcessoRoute = routeName === "Processo";
-    const isSubprocessoRoute = [
-      "Subprocesso",
-      "SubprocessoMapa",
-      "SubprocessoVisMapa",
-      "SubprocessoCadastro",
-      "SubprocessoVisCadastro",
-    ].includes(routeName);
-
-    // Verifica se é uma rota de unidade
-    const isUnidadeRoute = [
-      "Unidade",
-      "Mapa",
-      "AtribuicaoTemporariaForm",
-    ].includes(routeName);
-
-    // Para CHEFE e SERVIDOR, não mostra "Detalhes do processo"
-    const shouldShowProcessoCrumb =
-        perfilUsuario !== Perfil.CHEFE && perfilUsuario !== Perfil.SERVIDOR;
-
-    // Adiciona breadcrumb de "Detalhes do processo" se aplicável
+  const getProcessoBreadcrumbs = (
+    codProcesso: string,
+    isProcessoRoute: boolean,
+    isSubprocessoRoute: boolean,
+    perfilUsuario: Perfil | null
+  ): Breadcrumb[] => {
+    const crumbs: Breadcrumb[] = [];
     if (codProcesso && (isProcessoRoute || isSubprocessoRoute)) {
+      const shouldShowProcessoCrumb = perfilUsuario !== Perfil.CHEFE && perfilUsuario !== Perfil.SERVIDOR;
       if (shouldShowProcessoCrumb) {
-        breadcrumbs.push({
+        crumbs.push({
           label: "Detalhes do processo",
           to: isProcessoRoute ? undefined : { name: "Processo", params: { codProcesso } },
         });
       }
     }
+    return crumbs;
+  };
 
-    // Adiciona breadcrumb do subprocesso (sigla da unidade)
+  const getSubprocessoBreadcrumbs = (
+    codProcesso: string,
+    siglaUnidade: string,
+    isSubprocessoRoute: boolean,
+    routeName: string
+  ): Breadcrumb[] => {
+    const crumbs: Breadcrumb[] = [];
     if (siglaUnidade && isSubprocessoRoute) {
-      breadcrumbs.push({
+      crumbs.push({
         label: siglaUnidade,
         to: routeName === "Subprocesso" ? undefined : { name: "Subprocesso", params: { codProcesso, siglaUnidade } },
       });
 
-      // Adiciona breadcrumb final para páginas específicas do subprocesso
       const pageTitles: Record<string, string> = {
         SubprocessoMapa: "Mapa de competências",
         SubprocessoVisMapa: "Visualizar mapa",
@@ -73,66 +55,79 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
 
       const pageTitle = pageTitles[routeName];
       if (pageTitle) {
-        breadcrumbs.push({
-          label: pageTitle,
-        });
+        crumbs.push({ label: pageTitle });
       }
     }
+    return crumbs;
+  };
 
-    // Adiciona breadcrumbs para rotas de unidade
+  const getUnidadeBreadcrumbs = (
+    codUnidade: string,
+    isUnidadeRoute: boolean,
+    routeName: string,
+    perfilUsuario: Perfil | null
+  ): Breadcrumb[] => {
+    const crumbs: Breadcrumb[] = [];
     if (codUnidade && isUnidadeRoute) {
-      // Obtém a sigla da unidade do store (se carregada)
       const siglaUnidadeStore = unidadesStore.unidade?.sigla;
-
-      breadcrumbs.push({
+      crumbs.push({
         label: siglaUnidadeStore || `Unidade ${codUnidade}`,
         to: routeName === "Unidade" ? undefined : { name: "Unidade", params: { codUnidade } },
       });
 
-      // Adiciona breadcrumb final para páginas específicas de unidade
+      const unidadeLabel = perfilUsuario === Perfil.ADMIN ? "Unidades" : "Minha unidade";
       const unidadePageTitles: Record<string, string> = {
-        Unidade: "Minha unidade",
+        Unidade: unidadeLabel,
         Mapa: "Mapa de competências",
         AtribuicaoTemporariaForm: "Atribuição temporária",
       };
 
       const unidadePageTitle = unidadePageTitles[routeName];
       if (unidadePageTitle) {
-        breadcrumbs.push({
-          label: unidadePageTitle,
-        });
+        crumbs.push({ label: unidadePageTitle });
       }
     }
+    return crumbs;
+  };
 
-    // Para outras rotas, usa a lógica padrão baseada em meta.breadcrumb
-    if (!isProcessoRoute && !isSubprocessoRoute && !isUnidadeRoute) {
-      route.matched.forEach((routeRecord) => {
-        const { meta, name } = routeRecord;
-
-        if (meta.breadcrumb) {
-          const label =
-              typeof meta.breadcrumb === "function"
-                  ? meta.breadcrumb(route)
-                  : (meta.breadcrumb as string);
-
-          if (label) {
-            if (
-                breadcrumbs.length === 0 ||
-                breadcrumbs[breadcrumbs.length - 1].label !== label
-            ) {
-              breadcrumbs.push({
-                label,
-                to: { name: name as string, params: route.params },
-              });
-            }
-          }
+  const addFallbackBreadcrumbs = (breadcrumbs: Breadcrumb[]) => {
+    route.matched.forEach((routeRecord) => {
+      const { meta, name } = routeRecord;
+      if (meta.breadcrumb) {
+        const label = typeof meta.breadcrumb === "function" ? meta.breadcrumb(route) : (meta.breadcrumb as string);
+        if (label && (breadcrumbs.length === 0 || breadcrumbs.at(-1)?.label !== label)) {
+          breadcrumbs.push({
+            label,
+            to: { name: name as string, params: route.params },
+          });
         }
-      });
-
-      // Remove link from the last breadcrumb
-      if (breadcrumbs.length > 0) {
-        breadcrumbs[breadcrumbs.length - 1].to = undefined;
       }
+    });
+
+    if (breadcrumbs.length > 0) {
+      const last = breadcrumbs.at(-1);
+      if (last) last.to = undefined;
+    }
+  };
+
+  const crumbs = computed((): Breadcrumb[] => {
+    const breadcrumbs: Breadcrumb[] = [{ label: "Painel", to: { name: "Painel" }, isHome: true }];
+    const perfilUsuario = perfil.perfilSelecionado;
+    const routeName = route.name as string;
+    const codProcesso = route.params.codProcesso as string;
+    const siglaUnidade = route.params.siglaUnidade as string;
+    const codUnidade = route.params.codUnidade as string;
+
+    const isProcessoRoute = routeName === "Processo";
+    const isSubprocessoRoute = ["Subprocesso", "SubprocessoMapa", "SubprocessoVisMapa", "SubprocessoCadastro", "SubprocessoVisCadastro"].includes(routeName);
+    const isUnidadeRoute = ["Unidade", "Mapa", "AtribuicaoTemporariaForm"].includes(routeName);
+
+    breadcrumbs.push(...getProcessoBreadcrumbs(codProcesso, isProcessoRoute, isSubprocessoRoute, perfilUsuario));
+    breadcrumbs.push(...getSubprocessoBreadcrumbs(codProcesso, siglaUnidade, isSubprocessoRoute, routeName));
+    breadcrumbs.push(...getUnidadeBreadcrumbs(codUnidade, isUnidadeRoute, routeName, perfilUsuario));
+
+    if (!isProcessoRoute && !isSubprocessoRoute && !isUnidadeRoute) {
+      addFallbackBreadcrumbs(breadcrumbs);
     }
 
     return breadcrumbs;

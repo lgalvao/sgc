@@ -103,7 +103,6 @@ import {useProcessoView} from "@/composables/useProcessoView";
 const {
   processosStore,
   perfilStore,
-  feedbackStore,
   processo,
   participantesHierarquia,
   modalBlocoRef,

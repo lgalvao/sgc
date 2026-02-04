@@ -94,7 +94,7 @@ export function useVisAtividades(props: { codProcesso: number | string; sigla: s
         function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | undefined {
             for (const u of unidades) {
                 if (u.sigla === sigla) return u;
-                if (u.filhas && u.filhas.length) {
+                if (u.filhas?.length) {
                     const encontrada = buscarUnidade(u.filhas, sigla);
                     if (encontrada) return encontrada;
                 }

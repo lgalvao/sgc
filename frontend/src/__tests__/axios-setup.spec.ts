@@ -24,6 +24,9 @@ const {mockInstance} = vi.hoisted(() => {
 vi.mock("@/router", () => ({
     default: {
         push: vi.fn().mockResolvedValue(undefined),
+        currentRoute: {
+            value: { path: '/' }
+        }
     },
 }));
 

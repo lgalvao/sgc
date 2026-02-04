@@ -20,8 +20,7 @@
       <template #empty>
         <EmptyState
             icon="bi-bell-slash"
-            title="Tudo limpo!"
-            description="Você não tem novos alertas no momento."
+            title="Nenhum alerta"
             data-testid="empty-state-alertas"
             class="border-0 bg-transparent mb-0"
         />

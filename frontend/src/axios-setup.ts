@@ -20,12 +20,14 @@ const handleResponseError = (error: any) => {
 
     // Caso especial: 401 - redirecionar para login
     if (normalized.kind === 'unauthorized') {
-        feedbackStore.show(
-            'Não Autorizado',
-            'Sua sessão expirou ou você não está autenticado. Faça login novamente.',
-            'danger'
-        );
-        router.push('/login').catch(e => logger.error("Erro ao redirecionar:", e));
+        if (router.currentRoute?.value?.path !== '/login') {
+            feedbackStore.show(
+                'Não Autorizado',
+                'Sua sessão expirou ou você não está autenticado. Faça login novamente.',
+                'danger'
+            );
+            router.push('/login').catch(e => logger.error("Erro ao redirecionar:", e));
+        }
         return Promise.reject(error);
     }
 

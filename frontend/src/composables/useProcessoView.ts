@@ -5,6 +5,17 @@ import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
 import {Perfil, SituacaoSubprocesso} from "@/types/tipos";
 
+function flattenUnidades(unidades: any[]): any[] {
+    let result: any[] = [];
+    for (const u of unidades) {
+        result.push(u);
+        if (u.filhos && u.filhos.length > 0) {
+            result = result.concat(flattenUnidades(u.filhos));
+        }
+    }
+    return result;
+}
+
 export function useProcessoView() {
     const route = useRoute();
     const router = useRouter();
@@ -65,7 +76,7 @@ export function useProcessoView() {
             codigo: u.codUnidade,
             sigla: u.sigla,
             nome: u.nome,
-            situacaoLabel: u.situacaoLabel || u.situacaoSubprocesso
+            situacao: u.situacaoLabel || u.situacaoSubprocesso
         }));
     });
 
@@ -98,16 +109,7 @@ export function useProcessoView() {
         }
     });
 
-    function flattenUnidades(unidades: any[]): any[] {
-        let result: any[] = [];
-        for (const u of unidades) {
-            result.push(u);
-            if (u.filhos && u.filhos.length > 0) {
-                result = result.concat(flattenUnidades(u.filhos));
-            }
-        }
-        return result;
-    }
+
 
     async function abrirDetalhesUnidade(row: any) {
         if (!row.clickable) return;

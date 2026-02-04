@@ -6,7 +6,6 @@ export function useProcessoForm(initialData?: Processo) {
   const descricao = ref(initialData?.descricao ?? '');
   const tipo = ref<TipoProcesso | null>(initialData?.tipo ?? null);
 
-  // Handling date format for input type="date"
   const initialDate = initialData?.dataLimite ? initialData.dataLimite.split('T')[0] : '';
   const dataLimite = ref(initialDate);
 
@@ -45,7 +44,7 @@ export function useProcessoForm(initialData?: Processo) {
   function construirCriarRequest(): CriarProcessoRequest {
     return {
       descricao: descricao.value,
-      tipo: tipo.value as TipoProcesso,
+      tipo: tipo.value,
       dataLimiteEtapa1: dataLimite.value ? `${dataLimite.value}T00:00:00` : null,
       unidades: unidadesSelecionadas.value,
     };
@@ -55,7 +54,7 @@ export function useProcessoForm(initialData?: Processo) {
     return {
       codigo,
       descricao: descricao.value,
-      tipo: tipo.value as TipoProcesso,
+      tipo: tipo.value,
       dataLimiteEtapa1: dataLimite.value ? `${dataLimite.value}T00:00:00` : null,
       unidades: unidadesSelecionadas.value,
     };
