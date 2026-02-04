@@ -17,7 +17,7 @@
 2. O sistema mostra a tela Detalhes do processo.
 
 3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para aceitação em bloco do cadastro
-   de atividades (de acordo com as pré-condições do caso de uso) e exibe, na seção Unidades Participantes, abaixo da
+   de atividades (de acordo com as pré-condições do caso de uso) e exibe, na seção Unidades participantes, abaixo da
    árvore de unidades, o botão `Aceitar cadastro em bloco`.
 
 4. O usuário clica no botão `Aceitar cadastro em bloco`.

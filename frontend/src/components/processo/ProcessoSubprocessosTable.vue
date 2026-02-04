@@ -2,7 +2,7 @@
   <TreeTable
       :columns="colunas"
       :data="mapeamentoHierarquia"
-      title="Unidades Participantes"
+      title="Unidades participantes"
       @row-click="$emit('row-click', $event)"
   />
 </template>

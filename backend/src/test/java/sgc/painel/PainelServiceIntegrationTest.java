@@ -126,9 +126,9 @@ class PainelServiceIntegrationTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar links corretos quando existem processos finalizados e em andamento")
         void deveRetornarLinksCorretosComMixDeProcessos() {
-            // Arrange: Simular o Processo Seed 99 (Finalizado)
+            // Arrange: Simular o Processo 99 (Finalizado)
             CriarProcessoRequest reqSeedLike = new CriarProcessoRequest(
-                    "Processo Seed Like",
+                    "Processo Like",
                     TipoProcesso.MAPEAMENTO,
                     LocalDateTime.now().plusDays(30),
                     List.of(10L)

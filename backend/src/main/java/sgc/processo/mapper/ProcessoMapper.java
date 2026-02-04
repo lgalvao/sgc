@@ -9,6 +9,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.Processo;
 
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
 /**
@@ -28,13 +29,32 @@ public interface ProcessoMapper {
     @Nullable Processo toEntity(@Nullable ProcessoDto processoDTO);
 
     @AfterMapping
-    default void mapUnidadesParticipantes(Processo processo, @MappingTarget ProcessoDto dto) {
+    default void mapAfterMapping(Processo processo, @MappingTarget ProcessoDto dto) {
         if (processo.getParticipantes() != null) {
             String siglas = processo.getParticipantes().stream()
                     .map(Unidade::getSigla)
                     .sorted()
                     .collect(Collectors.joining(", "));
             dto.setUnidadesParticipantes(siglas);
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        if (processo.getDataCriacao() != null) {
+            dto.setDataCriacaoFormatada(processo.getDataCriacao().format(formatter));
+        }
+        if (processo.getDataFinalizacao() != null) {
+            dto.setDataFinalizacaoFormatada(processo.getDataFinalizacao().format(formatter));
+        }
+        if (processo.getDataLimite() != null) {
+            dto.setDataLimiteFormatada(processo.getDataLimite().format(formatter));
+        }
+
+        if (processo.getSituacao() != null) {
+            dto.setSituacaoLabel(processo.getSituacao().getLabel());
+        }
+
+        if (processo.getTipo() != null) {
+            dto.setTipoLabel(processo.getTipo().getLabel());
         }
     }
 }

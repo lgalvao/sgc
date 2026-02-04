@@ -17,7 +17,7 @@
 2. O sistema mostra a tela Detalhes do processo.
 
 3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para homologação em bloco do
-   cadastro de atividades (de acordo com as pré-condições) e exibe, na seção `Unidades Participantes`, abaixo da árvore
+   cadastro de atividades (de acordo com as pré-condições) e exibe, na seção `Unidades participantes`, abaixo da árvore
    de unidades, o botão `Homologar cadastro em bloco`.
 
 4. O usuário clica no botão `Homologar cadastro em bloco`.

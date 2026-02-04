@@ -2,54 +2,53 @@
   <BContainer class="mt-4">
     <ErrorAlert
         :error="processosStore.lastError"
-        @dismiss="processosStore.clearError()"
-    />
+        @dismiss="processosStore.clearError()"/>
 
     <div v-if="processo">
       <PageHeader :title="processo.descricao" title-test-id="processo-info">
         <template #default>
-          <BBadge
-              class="mb-2"
-              style="border-radius: 0"
-              variant="secondary"
-          >
+          <BBadge class="mb-2" style="border-radius: 0" variant="secondary">
             Detalhes do processo
           </BBadge>
+
           <ProcessoInfo
               :tipo="processo.tipo"
               :tipo-label="processo.tipoLabel"
               :situacao="processo.situacao"
               :situacao-label="processo.situacaoLabel"
-              :show-data-limite="false"
-          />
+              :show-data-limite="false"/>
         </template>
+
         <template #actions>
           <BButton v-if="mostrarBotoesBloco && podeAceitarBloco" variant="success" @click="abrirModalBloco('aceitar')">
-            Aceitar em Bloco
+            Aceitar em bloco
           </BButton>
-          <BButton v-if="mostrarBotoesBloco && podeHomologarBloco" variant="warning" class="text-white" @click="abrirModalBloco('homologar')">
-            Homologar em Bloco
+
+          <BButton v-if="mostrarBotoesBloco && podeHomologarBloco" variant="warning" class="text-white"
+                   @click="abrirModalBloco('homologar')">
+            Homologar em bloco
           </BButton>
-          <BButton v-if="mostrarBotoesBloco && podeDisponibilizarBloco" variant="info" class="text-white" @click="abrirModalBloco('disponibilizar')">
-            Disponibilizar Mapas em Bloco
+
+          <BButton v-if="mostrarBotoesBloco && podeDisponibilizarBloco" variant="info" class="text-white"
+                   @click="abrirModalBloco('disponibilizar')">
+            Disponibilizar mapas em bloco
           </BButton>
         </template>
       </PageHeader>
 
       <ProcessoSubprocessosTable
           :participantes-hierarquia="participantesHierarquia"
-          @row-click="abrirDetalhesUnidade"
-      />
+          @row-click="abrirDetalhesUnidade"/>
 
       <ProcessoAcoes
           :mostrar-botoes-bloco="false"
           :perfil="perfilStore.perfilSelecionado"
           :situacao-processo="processo.situacao"
-          @finalizar="finalizarProcesso"
-      />
+          @finalizar="finalizarProcesso"/>
     </div>
+
     <div v-else class="text-center py-5">
-      <BSpinner label="Carregando detalhes do processo..." variant="primary" />
+      <BSpinner label="Carregando detalhes do processo..." variant="primary"/>
       <p class="mt-2 text-muted">Carregando detalhes do processo...</p>
     </div>
 
@@ -63,8 +62,7 @@
         :unidades="unidadesElegiveis"
         :unidades-pre-selecionadas="idsElegiveis"
         :mostrar-data-limite="acaoBlocoAtual === 'disponibilizar'"
-        @confirmar="executarAcaoBloco"
-    />
+        @confirmar="executarAcaoBloco"/>
 
     <ModalConfirmacao
         v-model="mostrarModalFinalizacao"
@@ -72,13 +70,13 @@
         test-id-confirmar="btn-finalizar-processo-confirmar"
         titulo="Finalização de processo"
         variant="success"
-        @confirmar="confirmarFinalizacao"
-    >
+        @confirmar="confirmarFinalizacao">
+
       <BAlert
           :fade="false"
           :model-value="true"
-          variant="info"
-      >
+          variant="info">
+
         <i aria-hidden="true" class="bi bi-info-circle"/>
         Confirma a finalização do processo <strong>{{ processo?.descricao || '' }}</strong>?<br>
         Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades
@@ -105,7 +103,6 @@ const {
   perfilStore,
   processo,
   participantesHierarquia,
-  modalBlocoRef,
   mostrarModalFinalizacao,
   acaoBlocoAtual,
   unidadesElegiveis,

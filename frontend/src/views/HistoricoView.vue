@@ -1,35 +1,40 @@
 <template>
   <BContainer class="mt-4">
-    <PageHeader title="Histórico de Processos" subtitle="Lista de processos finalizados." />
+    <PageHeader title="Histórico de processos" subtitle="Lista de processos finalizados." />
 
     <BCard no-body class="shadow-sm">
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
           <thead class="table-light">
             <tr>
-              <th scope="col" style="width: 40%">Processo</th>
+              <th scope="col" style="width: 60%">Processo</th>
               <th scope="col" style="width: 20%">Tipo</th>
               <th scope="col" style="width: 20%">Finalizado em</th>
-              <th scope="col" style="width: 20%">Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="loading">
-              <td colspan="4" class="text-center py-4">
+              <td colspan="3" class="text-center py-4">
                 <BSpinner label="Carregando..." variant="primary" />
               </td>
             </tr>
             <tr v-else-if="processos.length === 0">
-              <td colspan="4">
+              <td colspan="3">
                 <EmptyState
                     icon="bi-folder2-open"
-                    title="Nenhum processo finalizado encontrado"
+                    title="Nenhum processo finalizado"
                     description="Os processos finalizados aparecerão aqui."
                     class="border-0 bg-transparent mb-0"
                 />
               </td>
             </tr>
-            <tr v-for="proc in processos" v-else :key="proc.codigo">
+            <tr
+              v-for="proc in processos"
+              v-else
+              :key="proc.codigo"
+              style="cursor: pointer;"
+              @click="verDetalhes(proc.codigo)"
+            >
               <td>
                 <div class="fw-bold">{{ proc.descricao }}</div>
               </td>
@@ -39,15 +44,6 @@
                 </span>
               </td>
               <td>{{ proc.dataFinalizacaoFormatada }}</td>
-              <td>
-                <BButton
-                  size="sm"
-                  variant="outline-primary"
-                  @click="verDetalhes(proc.codigo)"
-                >
-                  <i aria-hidden="true" class="bi bi-eye"></i> Detalhes
-                </BButton>
-              </td>
             </tr>
           </tbody>
         </table>
@@ -59,7 +55,7 @@
 <script setup lang="ts">
 import {computed, onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
-import {BButton, BCard, BContainer, BSpinner} from 'bootstrap-vue-next';
+import {BCard, BContainer, BSpinner} from 'bootstrap-vue-next';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import {useProcessosStore} from '@/stores/processos';
