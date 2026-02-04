@@ -145,11 +145,6 @@ onMounted(async () => {
   }
 });
 
-function getProgressoServidor(s: ServidorDiagnosticoDto) {
-  if (s.totalCompetencias === 0) return 0;
-  return Math.round((s.competenciasAvaliadas / s.totalCompetencias) * 100);
-}
-
 function getProgressBarVariant(s: ServidorDiagnosticoDto) {
   if (s.situacao === 'AUTOAVALIACAO_CONCLUIDA') return 'success';
   if (s.competenciasAvaliadas > 0) return 'primary';

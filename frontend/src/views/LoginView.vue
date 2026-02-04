@@ -72,7 +72,7 @@
                     id="senha"
                     v-model="senha"
                     name="senha"
-                    autocomplete="current-password"
+                    :autocomplete="showPassword ? 'off' : 'current-password'"
                     data-testid="inp-login-senha"
                     :disabled="loginStep > 1"
                     placeholder="Digite sua senha"
