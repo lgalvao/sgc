@@ -147,7 +147,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
                             .formatted(u.getSigla(), tituloTitular));
                 } else {
                     String email = titular.getEmail();
-                    if (email.isBlank()) {
+                    if (email == null || email.isBlank()) {
                         violacoes.add("Titular %s da unidade %s não possui email cadastrado"
                                 .formatted(titular.getNome(), u.getSigla()));
                     }

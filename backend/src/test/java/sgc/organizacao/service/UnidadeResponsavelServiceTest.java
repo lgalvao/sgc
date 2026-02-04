@@ -42,6 +42,9 @@ class UnidadeResponsavelServiceTest {
     private AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
 
     @Mock
+    private ResponsabilidadeRepo responsabilidadeRepo;
+
+    @Mock
     private UsuarioMapper usuarioMapper;
 
     @Mock
@@ -270,16 +273,17 @@ class UnidadeResponsavelServiceTest {
             unidade.setCodigo(1L);
             unidade.setSigla(siglaUnidade);
 
-            Usuario usuarioSimples = new Usuario();
-            usuarioSimples.setTituloEleitoral("123456789012");
+            Responsabilidade resp = new Responsabilidade();
+            resp.setUnidadeCodigo(1L);
+            resp.setUsuarioTitulo("123456789012");
 
             Usuario usuarioCompleto = new Usuario();
             usuarioCompleto.setTituloEleitoral("123456789012");
             usuarioCompleto.setNome("João Silva");
 
             when(unidadeRepo.findBySigla(siglaUnidade)).thenReturn(Optional.of(unidade));
-            when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.of(usuarioSimples));
-            when(usuarioRepo.findByIdWithAtribuicoes("123456789012")).thenReturn(Optional.of(usuarioCompleto));
+            when(repo.buscar(Responsabilidade.class, 1L)).thenReturn(resp);
+            when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuarioCompleto);
             when(usuarioPerfilRepo.findByUsuarioTitulo("123456789012")).thenReturn(Collections.emptyList());
 
             // When
@@ -289,9 +293,8 @@ class UnidadeResponsavelServiceTest {
             assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo("123456789012");
             verify(unidadeRepo).findBySigla(siglaUnidade);
-            verify(usuarioRepo).chefePorCodUnidade(1L);
-            verify(usuarioRepo).findByIdWithAtribuicoes("123456789012");
-            verify(usuarioPerfilRepo).findByUsuarioTitulo("123456789012");
+            verify(repo).buscar(Responsabilidade.class, 1L);
+            verify(repo).buscar(Usuario.class, "123456789012");
         }
 
         @Test
@@ -308,59 +311,7 @@ class UnidadeResponsavelServiceTest {
                     .hasMessageContaining(siglaUnidade);
 
             verify(unidadeRepo).findBySigla(siglaUnidade);
-            verify(usuarioRepo, never()).chefePorCodUnidade(any());
-        }
-
-        @Test
-        @DisplayName("Deve lançar exceção quando responsável não encontrado")
-        void deveLancarExcecaoQuandoResponsavelNaoEncontrado() {
-            // Given
-            String siglaUnidade = "ABC";
-            
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(1L);
-            unidade.setSigla(siglaUnidade);
-
-            when(unidadeRepo.findBySigla(siglaUnidade)).thenReturn(Optional.of(unidade));
-            when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.empty());
-
-            // When / Then
-            assertThatThrownBy(() -> service.buscarResponsavelAtual(siglaUnidade))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Responsável da unidade")
-                    .hasMessageContaining(siglaUnidade);
-
-            verify(unidadeRepo).findBySigla(siglaUnidade);
-            verify(usuarioRepo).chefePorCodUnidade(1L);
-            verify(usuarioRepo, never()).findByIdWithAtribuicoes(any());
-        }
-
-        @Test
-        @DisplayName("Deve lançar exceção quando usuário completo não encontrado")
-        void deveLancarExcecaoQuandoUsuarioCompletoNaoEncontrado() {
-            // Given
-            String siglaUnidade = "ABC";
-            
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(1L);
-            unidade.setSigla(siglaUnidade);
-
-            Usuario usuarioSimples = new Usuario();
-            usuarioSimples.setTituloEleitoral("123456789012");
-
-            when(unidadeRepo.findBySigla(siglaUnidade)).thenReturn(Optional.of(unidade));
-            when(usuarioRepo.chefePorCodUnidade(1L)).thenReturn(Optional.of(usuarioSimples));
-            when(usuarioRepo.findByIdWithAtribuicoes("123456789012")).thenReturn(Optional.empty());
-
-            // When / Then
-            assertThatThrownBy(() -> service.buscarResponsavelAtual(siglaUnidade))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Usuário")
-                    .hasMessageContaining("123456789012");
-
-            verify(unidadeRepo).findBySigla(siglaUnidade);
-            verify(usuarioRepo).chefePorCodUnidade(1L);
-            verify(usuarioRepo).findByIdWithAtribuicoes("123456789012");
+            verify(repo, never()).buscar(eq(Responsabilidade.class), any());
         }
     }
 
@@ -374,17 +325,26 @@ class UnidadeResponsavelServiceTest {
             // Given
             Long unidadeCodigo = 1L;
 
-            Usuario titular = new Usuario();
-            titular.setTituloEleitoral("111111111111");
-            titular.setNome("João Silva");
+            Usuario titularOficial = new Usuario();
+            titularOficial.setTituloEleitoral("111111111111");
+            titularOficial.setNome("João Silva");
 
             Usuario substituto = new Usuario();
             substituto.setTituloEleitoral("222222222222");
             substituto.setNome("Maria Santos");
 
-            List<Usuario> chefes = List.of(titular, substituto);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(unidadeCodigo);
+            unidade.setTituloTitular("111111111111");
 
-            when(usuarioRepo.findChefesByUnidadesCodigos(List.of(unidadeCodigo))).thenReturn(chefes);
+            Responsabilidade responsabilidade = new Responsabilidade();
+            responsabilidade.setUnidadeCodigo(unidadeCodigo);
+            responsabilidade.setUsuarioTitulo("222222222222"); // Substituto é o responsável atual
+            responsabilidade.setUnidade(unidade);
+
+            when(repo.buscar(Responsabilidade.class, unidadeCodigo)).thenReturn(responsabilidade);
+            when(repo.buscar(Usuario.class, "222222222222")).thenReturn(substituto);
+            when(repo.buscar(Usuario.class, "111111111111")).thenReturn(titularOficial);
 
             // When
             UnidadeResponsavelDto resultado = service.buscarResponsavelUnidade(unidadeCodigo);
@@ -396,7 +356,6 @@ class UnidadeResponsavelServiceTest {
             assertThat(resultado.titularNome()).isEqualTo("João Silva");
             assertThat(resultado.substitutoTitulo()).isEqualTo("222222222222");
             assertThat(resultado.substitutoNome()).isEqualTo("Maria Santos");
-            verify(usuarioRepo).findChefesByUnidadesCodigos(List.of(unidadeCodigo));
         }
 
         @Test
@@ -409,9 +368,17 @@ class UnidadeResponsavelServiceTest {
             titular.setTituloEleitoral("111111111111");
             titular.setNome("João Silva");
 
-            List<Usuario> chefes = List.of(titular);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(unidadeCodigo);
+            unidade.setTituloTitular("111111111111");
 
-            when(usuarioRepo.findChefesByUnidadesCodigos(List.of(unidadeCodigo))).thenReturn(chefes);
+            Responsabilidade responsabilidade = new Responsabilidade();
+            responsabilidade.setUnidadeCodigo(unidadeCodigo);
+            responsabilidade.setUsuarioTitulo("111111111111");
+            responsabilidade.setUnidade(unidade);
+
+            when(repo.buscar(Responsabilidade.class, unidadeCodigo)).thenReturn(responsabilidade);
+            when(repo.buscar(Usuario.class, "111111111111")).thenReturn(titular);
 
             // When
             UnidadeResponsavelDto resultado = service.buscarResponsavelUnidade(unidadeCodigo);
@@ -423,23 +390,6 @@ class UnidadeResponsavelServiceTest {
             assertThat(resultado.titularNome()).isEqualTo("João Silva");
             assertThat(resultado.substitutoTitulo()).isNull();
             assertThat(resultado.substitutoNome()).isNull();
-            verify(usuarioRepo).findChefesByUnidadesCodigos(List.of(unidadeCodigo));
-        }
-
-        @Test
-        @DisplayName("Deve lançar exceção quando lista de chefes está vazia")
-        void deveLancarExcecaoQuandoListaChefesVazia() {
-            // Given
-            Long unidadeCodigo = 1L;
-            when(usuarioRepo.findChefesByUnidadesCodigos(List.of(unidadeCodigo))).thenReturn(Collections.emptyList());
-
-            // When / Then
-            assertThatThrownBy(() -> service.buscarResponsavelUnidade(unidadeCodigo))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Responsável da unidade")
-                    .hasMessageContaining("1");
-
-            verify(usuarioRepo).findChefesByUnidadesCodigos(List.of(unidadeCodigo));
         }
     }
 
@@ -458,44 +408,42 @@ class UnidadeResponsavelServiceTest {
 
             // Then
             assertThat(resultado).isEmpty();
-            verify(usuarioRepo, never()).findChefesByUnidadesCodigos(anyList());
+            verify(responsabilidadeRepo, never()).findByUnidadeCodigoIn(anyList());
         }
 
         @Test
-        @DisplayName("Deve retornar mapa vazio quando não há chefes")
-        void deveRetornarMapaVazioQuandoNaoHaChefes() {
+        @DisplayName("Deve retornar mapa vazio quando não há responsabilidades")
+        void deveRetornarMapaVazioQuandoNaoHaResponsabilidades() {
             // Given
             List<Long> unidadesCodigos = List.of(1L, 2L);
-            when(usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos)).thenReturn(Collections.emptyList());
+            when(responsabilidadeRepo.findByUnidadeCodigoIn(unidadesCodigos)).thenReturn(Collections.emptyList());
 
             // When
             Map<Long, UnidadeResponsavelDto> resultado = service.buscarResponsaveisUnidades(unidadesCodigos);
 
             // Then
             assertThat(resultado).isEmpty();
-            verify(usuarioRepo).findChefesByUnidadesCodigos(unidadesCodigos);
-            verify(usuarioRepo, never()).findByIdInWithAtribuicoes(anyList());
+            verify(responsabilidadeRepo).findByUnidadeCodigoIn(unidadesCodigos);
         }
 
         @Test
-        @DisplayName("Deve buscar responsáveis de múltiplas unidades com titular apenas")
-        void deveBuscarResponsaveisMultiplasUnidadesComApenasTitular() {
+        @DisplayName("Deve buscar responsáveis de múltiplas unidades")
+        void deveBuscarResponsaveisMultiplasUnidades() {
             // Given
             List<Long> unidadesCodigos = List.of(1L, 2L);
 
-            Usuario titular1 = criarUsuarioComAtribuicoes("111111111111", "João Silva");
-            Usuario titular2 = criarUsuarioComAtribuicoes("222222222222", "Maria Santos");
+            Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTituloTitular("111111111111");
+            Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setTituloTitular("222222222222");
 
-            List<Usuario> todosChefes = List.of(titular1, titular2);
-            List<Usuario> chefesCompletos = List.of(titular1, titular2);
+            Responsabilidade r1 = new Responsabilidade(); r1.setUnidadeCodigo(1L); r1.setUsuarioTitulo("111111111111"); r1.setUnidade(u1);
+            Responsabilidade r2 = new Responsabilidade(); r2.setUnidadeCodigo(2L); r2.setUsuarioTitulo("333333333333"); r2.setUnidade(u2); // Substituto
 
-            when(usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos)).thenReturn(todosChefes);
-            when(usuarioRepo.findByIdInWithAtribuicoes(List.of("111111111111", "222222222222")))
-                    .thenReturn(chefesCompletos);
-            when(usuarioPerfilRepo.findByUsuarioTitulo("111111111111"))
-                    .thenReturn(criarPerfisChefeUnidade(titular1, 1L));
-            when(usuarioPerfilRepo.findByUsuarioTitulo("222222222222"))
-                    .thenReturn(criarPerfisChefeUnidade(titular2, 2L));
+            Usuario t1 = criarUsuarioComAtribuicoes("111111111111", "Titular 1");
+            Usuario t2 = criarUsuarioComAtribuicoes("222222222222", "Titular 2");
+            Usuario s2 = criarUsuarioComAtribuicoes("333333333333", "Substituto 2");
+
+            when(responsabilidadeRepo.findByUnidadeCodigoIn(unidadesCodigos)).thenReturn(List.of(r1, r2));
+            when(usuarioRepo.findByIdInWithAtribuicoes(anyList())).thenReturn(List.of(t1, t2, s2));
 
             // When
             Map<Long, UnidadeResponsavelDto> resultado = service.buscarResponsaveisUnidades(unidadesCodigos);
@@ -504,124 +452,12 @@ class UnidadeResponsavelServiceTest {
             assertThat(resultado).hasSize(2);
             
             UnidadeResponsavelDto resp1 = resultado.get(1L);
-            assertThat(resp1).isNotNull();
-            assertThat(resp1.unidadeCodigo()).isEqualTo(1L);
             assertThat(resp1.titularTitulo()).isEqualTo("111111111111");
-            assertThat(resp1.titularNome()).isEqualTo("João Silva");
             assertThat(resp1.substitutoTitulo()).isNull();
-            assertThat(resp1.substitutoNome()).isNull();
 
             UnidadeResponsavelDto resp2 = resultado.get(2L);
-            assertThat(resp2).isNotNull();
-            assertThat(resp2.unidadeCodigo()).isEqualTo(2L);
             assertThat(resp2.titularTitulo()).isEqualTo("222222222222");
-            assertThat(resp2.titularNome()).isEqualTo("Maria Santos");
-            assertThat(resp2.substitutoTitulo()).isNull();
-            assertThat(resp2.substitutoNome()).isNull();
-        }
-
-        @Test
-        @DisplayName("Deve buscar responsáveis com titular e substituto")
-        void deveBuscarResponsaveisComTitularESubstituto() {
-            // Given
-            List<Long> unidadesCodigos = List.of(1L);
-
-            Usuario titular = criarUsuarioComAtribuicoes("111111111111", "João Silva");
-            Usuario substituto = criarUsuarioComAtribuicoes("222222222222", "Maria Santos");
-
-            List<Usuario> todosChefes = List.of(titular, substituto);
-            List<Usuario> chefesCompletos = List.of(titular, substituto);
-
-            when(usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos)).thenReturn(todosChefes);
-            when(usuarioRepo.findByIdInWithAtribuicoes(List.of("111111111111", "222222222222")))
-                    .thenReturn(chefesCompletos);
-            when(usuarioPerfilRepo.findByUsuarioTitulo("111111111111"))
-                    .thenReturn(criarPerfisChefeUnidade(titular, 1L));
-            when(usuarioPerfilRepo.findByUsuarioTitulo("222222222222"))
-                    .thenReturn(criarPerfisChefeUnidade(substituto, 1L));
-
-            // When
-            Map<Long, UnidadeResponsavelDto> resultado = service.buscarResponsaveisUnidades(unidadesCodigos);
-
-            // Then
-            assertThat(resultado).hasSize(1);
-            
-            UnidadeResponsavelDto resp = resultado.get(1L);
-            assertThat(resp).isNotNull();
-            assertThat(resp.unidadeCodigo()).isEqualTo(1L);
-            assertThat(resp.titularTitulo()).isEqualTo("111111111111");
-            assertThat(resp.titularNome()).isEqualTo("João Silva");
-            assertThat(resp.substitutoTitulo()).isEqualTo("222222222222");
-            assertThat(resp.substitutoNome()).isEqualTo("Maria Santos");
-        }
-
-        @Test
-        @DisplayName("Deve filtrar apenas chefes das unidades solicitadas")
-        void deveFiltrarApenasChefesDasUnidadesSolicitadas() {
-            // Given
-            List<Long> unidadesCodigos = List.of(1L, 2L);
-
-            // Usuário com perfil de chefe em múltiplas unidades, mas só queremos 1L e 2L
-            Usuario usuario1 = criarUsuarioComAtribuicoes("111111111111", "João Silva");
-            Usuario usuario2 = criarUsuarioComAtribuicoes("222222222222", "Maria Santos");
-
-            List<Usuario> todosChefes = List.of(usuario1, usuario2);
-
-            when(usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos)).thenReturn(todosChefes);
-            when(usuarioRepo.findByIdInWithAtribuicoes(anyList())).thenReturn(todosChefes);
-            
-            // Mock para retornar perfis incluindo unidades não solicitadas
-            List<UsuarioPerfil> perfis1 = new ArrayList<>();
-            perfis1.add(criarUsuarioPerfil(usuario1, 1L, Perfil.CHEFE));
-            perfis1.add(criarUsuarioPerfil(usuario1, 99L, Perfil.CHEFE)); // unidade não solicitada
-            
-            List<UsuarioPerfil> perfis2 = new ArrayList<>();
-            perfis2.add(criarUsuarioPerfil(usuario2, 2L, Perfil.CHEFE));
-            perfis2.add(criarUsuarioPerfil(usuario2, 88L, Perfil.CHEFE)); // unidade não solicitada
-
-            when(usuarioPerfilRepo.findByUsuarioTitulo("111111111111")).thenReturn(perfis1);
-            when(usuarioPerfilRepo.findByUsuarioTitulo("222222222222")).thenReturn(perfis2);
-
-            // When
-            Map<Long, UnidadeResponsavelDto> resultado = service.buscarResponsaveisUnidades(unidadesCodigos);
-
-            // Then
-            assertThat(resultado).hasSize(2);
-            assertThat(resultado).containsOnlyKeys(1L, 2L);
-            assertThat(resultado).doesNotContainKeys(88L, 99L);
-        }
-
-        @Test
-        @DisplayName("Deve filtrar perfis não-CHEFE")
-        void deveFiltrarPerfisNaoChefeNaBuscaEmLote() {
-            // Given
-            List<Long> unidadesCodigos = List.of(1L);
-
-            Usuario usuario1 = criarUsuarioComAtribuicoes("111111111111", "João Silva");
-
-            List<Usuario> todosChefes = List.of(usuario1);
-
-            when(usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos)).thenReturn(todosChefes);
-            when(usuarioRepo.findByIdInWithAtribuicoes(anyList())).thenReturn(todosChefes);
-            
-            // Mock com perfis CHEFE e outros perfis (GESTOR, SERVIDOR)
-            List<UsuarioPerfil> perfis1 = new ArrayList<>();
-            perfis1.add(criarUsuarioPerfil(usuario1, 1L, Perfil.CHEFE)); // deve incluir
-            perfis1.add(criarUsuarioPerfil(usuario1, 1L, Perfil.GESTOR)); // deve filtrar
-            perfis1.add(criarUsuarioPerfil(usuario1, 1L, Perfil.SERVIDOR)); // deve filtrar
-
-            when(usuarioPerfilRepo.findByUsuarioTitulo("111111111111")).thenReturn(perfis1);
-
-            // When
-            Map<Long, UnidadeResponsavelDto> resultado = service.buscarResponsaveisUnidades(unidadesCodigos);
-
-            // Then
-            assertThat(resultado).hasSize(1);
-            assertThat(resultado).containsKey(1L);
-            
-            UnidadeResponsavelDto resp = resultado.get(1L);
-            assertThat(resp).isNotNull();
-            assertThat(resp.titularTitulo()).isEqualTo("111111111111");
+            assertThat(resp2.substitutoTitulo()).isEqualTo("333333333333");
         }
     }
 

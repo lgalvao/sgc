@@ -15,6 +15,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.AdministradorService;
 import sgc.organizacao.service.UnidadeConsultaService;
+import sgc.organizacao.service.UnidadeResponsavelService;
 import sgc.organizacao.service.UsuarioConsultaService;
 import sgc.organizacao.service.UsuarioPerfilService;
 
@@ -46,13 +47,17 @@ class UsuarioServiceUnitTest {
     @Mock
     private UnidadeConsultaService unidadeConsultaService;
 
+    @Mock
+    private UnidadeResponsavelService unidadeResponsavelService;
+
     @BeforeEach
     void setUp() {
         service = new UsuarioFacade(
             usuarioConsultaService,
             usuarioPerfilService,
             administradorService,
-            unidadeConsultaService
+            unidadeConsultaService,
+            unidadeResponsavelService
         );
     }
 
@@ -183,7 +188,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar lista vazia se usuário não encontrado ao buscar unidades onde é responsável")
         void deveRetornarListaVaziaSeUsuarioNaoEncontradoAoBuscarUnidadesOndeEhResponsavel() {
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional("user")).thenReturn(Optional.empty());
+            when(unidadeResponsavelService.buscarUnidadesOndeEhResponsavel("user")).thenReturn(Collections.emptyList());
 
             assertThat(service.buscarUnidadesOndeEhResponsavel("user")).isEmpty();
         }

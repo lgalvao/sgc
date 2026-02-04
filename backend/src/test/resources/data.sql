@@ -56,7 +56,7 @@ FROM SGC.PARAMETRO;
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular)
 VALUES ('1', 'Tribunal Regional Eleitoral', 'TRE', 'INTEROPERACIONAL', 'ATIVA', NULL, NULL);
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular)
-VALUES ('2', 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', 'ATIVA', NULL, '6');
+VALUES ('2', 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', 'ATIVA', NULL, '777');
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular)
 VALUES ('100', 'ADMIN-UNIT', 'ADMIN-UNIT', 'INTEROPERACIONAL', 'ATIVA', NULL, '7');
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular)
@@ -266,7 +266,7 @@ VALUES ('999999999999', 'GESTOR', 2);
 -- VW_RESPONSABILIDADE - simulada como tabela no H2
 -- -------------------------------------------------------------------------------------------------
 INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio)
-VALUES (2, '6', 'TITULAR', CURRENT_TIMESTAMP);
+VALUES (2, '777', 'TITULAR', CURRENT_TIMESTAMP);
 INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio)
 VALUES (100, '7', 'TITULAR', CURRENT_TIMESTAMP);
 INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio)

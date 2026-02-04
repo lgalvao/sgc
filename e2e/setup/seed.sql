@@ -545,3 +545,45 @@ INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VAL
 -- Subprocess Unit 12: REVISAO_CADASTRO_EM_ANDAMENTO
 INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
 VALUES (50012, 500, 12, 'REVISAO_CADASTRO_EM_ANDAMENTO', CURRENT_TIMESTAMP);
+
+-- -------------------------------------------------------------------------------------------------
+-- VW_RESPONSABILIDADE (Inserido ao final para garantir integridade referencial)
+-- -------------------------------------------------------------------------------------------------
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (1, '111111', '00111111', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (2, '202020', '00202020', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (3, '555555', '00555555', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (4, '151515', '00151515', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (5, '222222', '00222222', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (6, '333333', '00333333', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (7, '444444', '00444444', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (8, '303030', '00303030', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (9, '222223', '00222223', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (10, '171717', '00171717', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (11, '212121', '00212121', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (12, '777777', '00777777', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (13, '888888', '00888888', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (14, '999999', '00999999', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (15, '101010', '00101010', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (16, '181818', '00181818', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (17, '131313', '00131313', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (18, '141414', '00141414', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (99, '123456789012', '56789012', 'TITULAR', CURRENT_TIMESTAMP);

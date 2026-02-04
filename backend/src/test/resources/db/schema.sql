@@ -174,6 +174,39 @@ create table if not exists sgc.vw_vinculacao_unidade
 )
     );
 
+create table if not exists sgc.vw_responsabilidade
+(
+    unidade_codigo
+    bigint
+    not
+    null,
+    usuario_matricula
+    varchar
+(
+    8
+),
+    usuario_titulo varchar
+(
+    12
+) not null,
+    tipo varchar
+(
+    30
+),
+    data_inicio timestamp
+(
+    6
+),
+    data_fim timestamp
+(
+    6
+),
+    primary key
+(
+    unidade_codigo
+)
+    );
+
 create table if not exists sgc.processo
 (
     codigo
@@ -742,6 +775,10 @@ alter table if exists sgc.vw_usuario_perfil_unidade
     add constraint fk_usuario_perfil_usuario foreign key (usuario_titulo) references sgc.vw_usuario;
 alter table if exists sgc.vw_usuario_perfil_unidade
     add constraint fk_usuario_perfil_unidade foreign key (unidade_codigo) references sgc.vw_unidade;
+alter table if exists sgc.vw_responsabilidade
+    add constraint fk_responsabilidade_unidade foreign key (unidade_codigo) references sgc.vw_unidade;
+alter table if exists sgc.vw_responsabilidade
+    add constraint fk_responsabilidade_usuario foreign key (usuario_titulo) references sgc.vw_usuario;
 alter table if exists sgc.vw_vinculacao_unidade
     add constraint fk_vinculacao_unidade_anterior foreign key (unidade_anterior_codigo) references sgc.vw_unidade;
 alter table if exists sgc.vw_vinculacao_unidade

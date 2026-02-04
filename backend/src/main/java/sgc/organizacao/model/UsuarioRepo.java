@@ -15,22 +15,6 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
     List<Usuario> findByUnidadeLotacaoCodigo(Long codigoUnidade);
 
     @Query("""
-            SELECT DISTINCT u FROM Usuario u
-            JOIN UsuarioPerfil up ON up.usuarioTitulo = u.tituloEleitoral
-            LEFT JOIN FETCH u.atribuicoesTemporarias
-            WHERE up.unidadeCodigo = :codigoUnidade AND up.perfil IN ('CHEFE', 'GESTOR')
-            """)
-    Optional<Usuario> findResponsavelByUnidadeCodigo(@Param("codigoUnidade") Long codigoUnidade);
-
-    @Query("""
-            SELECT DISTINCT u FROM Usuario u
-            JOIN UsuarioPerfil up ON up.usuarioTitulo = u.tituloEleitoral
-            LEFT JOIN FETCH u.atribuicoesTemporarias
-            WHERE up.unidadeCodigo IN :codigosUnidades AND up.perfil = 'CHEFE'
-            """)
-    List<Usuario> findChefesByUnidadesCodigos(@Param("codigosUnidades") List<Long> codigosUnidades);
-
-    @Query("""
             SELECT u FROM Usuario u LEFT JOIN FETCH u.atribuicoesTemporarias WHERE u.tituloEleitoral = :titulo
             """)
     Optional<Usuario> findByIdWithAtribuicoes(@Param("titulo") String titulo);

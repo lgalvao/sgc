@@ -23,6 +23,7 @@ import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.AdministradorService;
 import sgc.organizacao.service.UnidadeConsultaService;
+import sgc.organizacao.service.UnidadeResponsavelService;
 import sgc.organizacao.service.UsuarioConsultaService;
 import sgc.organizacao.service.UsuarioPerfilService;
 
@@ -48,6 +49,9 @@ class UsuarioFacadeTest {
     
     @Mock
     private UnidadeConsultaService unidadeConsultaService;
+    
+    @Mock
+    private UnidadeResponsavelService unidadeResponsavelService;
     
     @InjectMocks
     private UsuarioFacade facade;
@@ -190,7 +194,7 @@ class UsuarioFacadeTest {
 
             // Assert
             assertThat(resultado).isEmpty();
-            verify(usuarioConsultaService, never()).buscarChefesPorUnidades(anyList());
+            verify(unidadeResponsavelService, never()).buscarResponsaveisUnidades(anyList());
         }
 
         @Test
@@ -198,8 +202,8 @@ class UsuarioFacadeTest {
         void deveRetornarMapaVazioQuandoNaoHouverChefes() {
             // Arrange
             List<Long> codigos = List.of(1L, 2L);
-            when(usuarioConsultaService.buscarChefesPorUnidades(codigos))
-                    .thenReturn(Collections.emptyList());
+            when(unidadeResponsavelService.buscarResponsaveisUnidades(codigos))
+                    .thenReturn(Collections.emptyMap());
 
             // Act
             Map<Long, UnidadeResponsavelDto> resultado = facade.buscarResponsaveisUnidades(codigos);
@@ -214,17 +218,16 @@ class UsuarioFacadeTest {
             // Arrange
             Long codigoUnidade = 1L;
             String titulo = "123456";
-            Usuario chefe = criarUsuario(titulo);
-            Unidade unidade = criarUnidade(codigoUnidade, "UNID1");
-            UsuarioPerfil atribuicao = criarAtribuicao(chefe, unidade, Perfil.CHEFE);
-            Set<UsuarioPerfil> atribuicoes = Set.of(atribuicao);
+            UnidadeResponsavelDto dto = UnidadeResponsavelDto.builder()
+                    .unidadeCodigo(codigoUnidade)
+                    .titularTitulo(titulo)
+                    .titularNome("Nome")
+                    .substitutoTitulo(null)
+                    .substitutoNome(null)
+                    .build();
 
-            when(usuarioConsultaService.buscarChefesPorUnidades(List.of(codigoUnidade)))
-                    .thenReturn(List.of(chefe));
-            when(usuarioConsultaService.buscarPorIdsComAtribuicoes(List.of(titulo)))
-                    .thenReturn(List.of(chefe));
-            when(usuarioPerfilService.buscarAtribuicoesParaCache(titulo))
-                    .thenReturn(atribuicoes);
+            when(unidadeResponsavelService.buscarResponsaveisUnidades(List.of(codigoUnidade)))
+                    .thenReturn(Map.of(codigoUnidade, dto));
 
             // Act
             Map<Long, UnidadeResponsavelDto> resultado = facade.buscarResponsaveisUnidades(List.of(codigoUnidade));
@@ -241,10 +244,14 @@ class UsuarioFacadeTest {
             // Arrange
             Long codigoUnidade = 1L;
             String titulo = "123456";
-            Usuario chefe = criarUsuario(titulo);
+            UnidadeResponsavelDto dto = UnidadeResponsavelDto.builder()
+                    .unidadeCodigo(codigoUnidade)
+                    .titularTitulo(titulo)
+                    .titularNome("Nome")
+                    .build();
 
-            when(usuarioConsultaService.buscarChefesPorUnidades(List.of(codigoUnidade)))
-                    .thenReturn(List.of(chefe));
+            when(unidadeResponsavelService.buscarResponsavelUnidade(codigoUnidade))
+                    .thenReturn(dto);
 
             // Act
             UnidadeResponsavelDto resultado = facade.buscarResponsavelUnidade(codigoUnidade);
@@ -259,8 +266,8 @@ class UsuarioFacadeTest {
         void deveLancarExcecaoQuandoNaoEncontrarResponsavel() {
             // Arrange
             Long codigoUnidade = 999L;
-            when(usuarioConsultaService.buscarChefesPorUnidades(List.of(codigoUnidade)))
-                    .thenReturn(Collections.emptyList());
+            when(unidadeResponsavelService.buscarResponsavelUnidade(codigoUnidade))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Responsável da unidade", codigoUnidade));
 
             // Act & Assert
             assertThatThrownBy(() -> facade.buscarResponsavelUnidade(codigoUnidade))
@@ -455,14 +462,9 @@ class UsuarioFacadeTest {
         void deveBuscarUnidadesOndeEhResponsavel() {
             // Arrange
             String titulo = "123456";
-            Usuario usuario = criarUsuario(titulo);
-            Unidade unidade = criarUnidade(1L, "UNID1");
-            UsuarioPerfil atribuicao = criarAtribuicao(usuario, unidade, Perfil.CHEFE);
-
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
-                    .thenReturn(Optional.of(usuario));
-            when(usuarioPerfilService.buscarPorUsuario(titulo))
-                    .thenReturn(List.of(atribuicao));
+            
+            when(unidadeResponsavelService.buscarUnidadesOndeEhResponsavel(titulo))
+                    .thenReturn(List.of(1L));
 
             // Act
             List<Long> resultado = facade.buscarUnidadesOndeEhResponsavel(titulo);
@@ -664,22 +666,16 @@ class UsuarioFacadeTest {
         void deveBuscarResponsavelAtual() {
             // Arrange
             String sigla = "UNID1";
-            Long codigoUnidade = 1L;
-            String titulo = "123456";
-            Unidade unidade = criarUnidade(codigoUnidade, sigla);
-            Usuario chefe = criarUsuario(titulo);
+            Usuario chefe = criarUsuario("123456");
 
-            when(unidadeConsultaService.buscarPorSigla(sigla)).thenReturn(unidade);
-            when(usuarioConsultaService.buscarChefePorUnidade(codigoUnidade, sigla)).thenReturn(chefe);
-            when(usuarioConsultaService.buscarPorIdComAtribuicoes(titulo)).thenReturn(chefe);
+            when(unidadeResponsavelService.buscarResponsavelAtual(sigla)).thenReturn(chefe);
 
             // Act
             Usuario resultado = facade.buscarResponsavelAtual(sigla);
 
             // Assert
             assertThat(resultado).isNotNull();
-            assertThat(resultado.getTituloEleitoral()).isEqualTo(titulo);
-            verify(usuarioPerfilService).carregarAuthorities(chefe);
+            assertThat(resultado.getTituloEleitoral()).isEqualTo("123456");
         }
     }
 

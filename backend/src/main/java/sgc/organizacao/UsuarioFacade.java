@@ -92,12 +92,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String sigla) {
-        Unidade unidade = unidadeConsultaService.buscarPorSigla(sigla);
-        Usuario usuarioSimples = usuarioConsultaService.buscarChefePorUnidade(unidade.getCodigo(), sigla);
-        Usuario usuarioCompleto = usuarioConsultaService.buscarPorIdComAtribuicoes(usuarioSimples.getTituloEleitoral());
-
-        carregarAtribuicoes(usuarioCompleto);
-        return usuarioCompleto;
+        return unidadeResponsavelService.buscarResponsavelAtual(sigla);
     }
 
     @Transactional(readOnly = true)
@@ -133,6 +128,9 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public Map<Long, UnidadeResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
+        if (unidadesCodigos.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return unidadeResponsavelService.buscarResponsaveisUnidades(unidadesCodigos);
     }
 
