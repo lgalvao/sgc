@@ -30,6 +30,12 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import java.util.Collections;
+import java.util.Set;
+import org.junit.jupiter.api.Assertions;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroEstadoImpossivel;
+import sgc.processo.eventos.EventoProcessoFinalizado;
 
 @ExtendWith(MockitoExtension.class)
 class EventoProcessoListenerCoverageTest {
@@ -133,7 +139,7 @@ class EventoProcessoListenerCoverageTest {
     @DisplayName("aoFinalizarProcesso deve enviar e-mails para unidades operacionais e intermediárias")
     void aoFinalizarProcesso_SucessoTotal() {
         Long codProcesso = 1L;
-        sgc.processo.eventos.EventoProcessoFinalizado evento = sgc.processo.eventos.EventoProcessoFinalizado.builder()
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder()
                 .codProcesso(codProcesso)
                 .build();
 
@@ -158,7 +164,7 @@ class EventoProcessoListenerCoverageTest {
         uOutra.setSigla("UX");
         uOutra.setUnidadeSuperior(null);
 
-        processo.setParticipantes(java.util.Set.of(uInter, uOp, uOutra));
+        processo.setParticipantes(Set.of(uInter, uOp, uOutra));
 
         UnidadeResponsavelDto rInter = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(1L).titularTitulo("T1").build();
@@ -188,7 +194,7 @@ class EventoProcessoListenerCoverageTest {
     @DisplayName("aoFinalizarProcesso deve tratar unidades sem superiores ou superiores diferentes")
     void aoFinalizarProcesso_FiltragemSubordinadas() {
         Long codProcesso = 1L;
-        sgc.processo.eventos.EventoProcessoFinalizado evento = sgc.processo.eventos.EventoProcessoFinalizado.builder()
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder()
                 .codProcesso(codProcesso)
                 .build();
 
@@ -208,7 +214,7 @@ class EventoProcessoListenerCoverageTest {
         uSubordinadaInvalida.setCodigo(2L);
         uSubordinadaInvalida.setUnidadeSuperior(uSuperiorDiferente);
 
-        processo.setParticipantes(java.util.Set.of(uInter, uSubordinadaInvalida));
+        processo.setParticipantes(Set.of(uInter, uSubordinadaInvalida));
 
         UnidadeResponsavelDto rInter = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(1L).titularTitulo("T1").build();
@@ -228,13 +234,13 @@ class EventoProcessoListenerCoverageTest {
     @DisplayName("aoFinalizarProcesso deve capturar exceção genérica no loop de envio")
     void aoFinalizarProcesso_ErroNoLoop() {
         Long codProcesso = 1L;
-        sgc.processo.eventos.EventoProcessoFinalizado evento = sgc.processo.eventos.EventoProcessoFinalizado.builder()
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder()
                 .codProcesso(codProcesso)
                 .build();
 
         when(processoFacade.buscarEntidadePorId(codProcesso)).thenThrow(new RuntimeException("Erro inesperado"));
 
-        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> listener.aoFinalizarProcesso(evento));
+        Assertions.assertDoesNotThrow(() -> listener.aoFinalizarProcesso(evento));
     }
 
     @Test
@@ -242,15 +248,15 @@ class EventoProcessoListenerCoverageTest {
     void aoIniciarProcesso_ErroGenerico() {
         EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
         when(processoFacade.buscarEntidadePorId(any())).thenThrow(new RuntimeException("Erro"));
-        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> listener.aoIniciarProcesso(evento));
+        Assertions.assertDoesNotThrow(() -> listener.aoIniciarProcesso(evento));
     }
 
     @Test
     @DisplayName("aoIniciarProcesso deve capturar ErroEntidadeNaoEncontrada")
     void aoIniciarProcesso_ErroEntidade() {
         EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
-        when(processoFacade.buscarEntidadePorId(any())).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Erro"));
-        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> listener.aoIniciarProcesso(evento));
+        when(processoFacade.buscarEntidadePorId(any())).thenThrow(new ErroEntidadeNaoEncontrada("Erro"));
+        Assertions.assertDoesNotThrow(() -> listener.aoIniciarProcesso(evento));
     }
 
     @Test
@@ -292,10 +298,10 @@ class EventoProcessoListenerCoverageTest {
     @DisplayName("aoFinalizarProcesso quando não há unidades participantes deve retornar early")
     void aoFinalizarProcesso_SemParticipantes() {
         Long cod = 1L;
-        sgc.processo.eventos.EventoProcessoFinalizado evento = sgc.processo.eventos.EventoProcessoFinalizado.builder().codProcesso(cod).build();
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(cod).build();
         Processo p = new Processo();
         p.setCodigo(cod);
-        p.setParticipantes(java.util.Collections.emptySet());
+        p.setParticipantes(Collections.emptySet());
         when(processoFacade.buscarEntidadePorId(cod)).thenReturn(p);
         listener.aoFinalizarProcesso(evento);
         verify(unidadeService, never()).buscarResponsaveisUnidades(any());
@@ -326,7 +332,7 @@ class EventoProcessoListenerCoverageTest {
     @Test
     @DisplayName("criarCorpoEmailPorTipo deve disparar ErroEstadoImpossivel para tipo RAIZ")
     void criarCorpoEmailPorTipo_Erro() {
-        org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroEstadoImpossivel.class, () -> 
+        Assertions.assertThrows(ErroEstadoImpossivel.class, () -> 
             listener.criarCorpoEmailPorTipo(TipoUnidade.RAIZ, new Processo(), new Subprocesso())
         );
     }
@@ -368,13 +374,13 @@ class EventoProcessoListenerCoverageTest {
     @DisplayName("aoFinalizarProcesso deve cobrir tipo INTEROPERACIONAL e titular null")
     void aoFinalizarProcesso_InteroperacionalAndTitularNull() {
         Long cod = 1L;
-        sgc.processo.eventos.EventoProcessoFinalizado evento = sgc.processo.eventos.EventoProcessoFinalizado.builder().codProcesso(cod).build();
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(cod).build();
         Processo p = new Processo();
         p.setCodigo(cod);
         Unidade u = new Unidade();
         u.setCodigo(10L);
         u.setTipo(TipoUnidade.INTEROPERACIONAL);
-        p.setParticipantes(java.util.Set.of(u));
+        p.setParticipantes(Set.of(u));
         UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").build();
 
         when(processoFacade.buscarEntidadePorId(cod)).thenReturn(p);
@@ -389,12 +395,12 @@ class EventoProcessoListenerCoverageTest {
     @DisplayName("aoFinalizarProcesso deve cobrir titular com email em branco")
     void aoFinalizarProcesso_TitularEmailBlank() {
         Long cod = 1L;
-        sgc.processo.eventos.EventoProcessoFinalizado evento = sgc.processo.eventos.EventoProcessoFinalizado.builder().codProcesso(cod).build();
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(cod).build();
         Processo p = new Processo();
         p.setCodigo(cod);
         Unidade u = new Unidade();
         u.setCodigo(10L);
-        p.setParticipantes(java.util.Set.of(u));
+        p.setParticipantes(Set.of(u));
         UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").build();
         UsuarioDto ut = UsuarioDto.builder().tituloEleitoral("T").email(" ").build();
 
@@ -436,10 +442,10 @@ class EventoProcessoListenerCoverageTest {
     @DisplayName("aoFinalizarProcesso deve ignorar tipo RAIZ")
     void aoFinalizarProcesso_Raiz() {
         Long cod = 1L;
-        sgc.processo.eventos.EventoProcessoFinalizado evento = sgc.processo.eventos.EventoProcessoFinalizado.builder().codProcesso(cod).build();
+        EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(cod).build();
         Processo p = new Processo(); p.setCodigo(cod);
         Unidade u = new Unidade(); u.setCodigo(10L); u.setTipo(TipoUnidade.RAIZ);
-        p.setParticipantes(java.util.Set.of(u));
+        p.setParticipantes(Set.of(u));
         UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").build();
         UsuarioDto ut = UsuarioDto.builder().tituloEleitoral("T").email("t@t.com").build();
 

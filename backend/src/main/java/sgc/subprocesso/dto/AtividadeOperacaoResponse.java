@@ -4,6 +4,7 @@ import lombok.Builder;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * DTO de resposta para operações CRUD em atividades.
@@ -16,7 +17,7 @@ import java.util.List;
  */
 @Builder
 public record AtividadeOperacaoResponse(
-        @org.jspecify.annotations.Nullable AtividadeDto atividade,
+        @Nullable AtividadeDto atividade,
         SubprocessoSituacaoDto subprocesso,
         List<AtividadeDto> atividadesAtualizadas) {
 }

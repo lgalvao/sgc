@@ -25,6 +25,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import java.io.ByteArrayInputStream;
+import javax.sql.DataSource;
+import org.springframework.core.io.Resource;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Cobertura Extra: E2eController")
@@ -57,7 +60,7 @@ class E2eControllerCoverageTest {
         doThrow(new SQLException("Erro H2")).when(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
 
         // Mockar DataSource e Connection para resetDatabase
-        javax.sql.DataSource ds = mock(javax.sql.DataSource.class);
+        DataSource ds = mock(DataSource.class);
         when(jdbcTemplate.getDataSource()).thenAnswer(i -> ds);
         when(ds.getConnection()).thenReturn(conn);
         when(conn.createStatement()).thenReturn(stmt);
@@ -66,11 +69,11 @@ class E2eControllerCoverageTest {
         when(jdbcTemplate.queryForList(anyString(), eq(String.class))).thenReturn(List.of("TABELA_TESTE"));
         
         // Mockar resourceLoader para seed
-        org.springframework.core.io.Resource resource = mock(org.springframework.core.io.Resource.class);
+        Resource resource = mock(Resource.class);
         when(resourceLoader.getResource(anyString())).thenReturn(resource);
         when(resource.exists()).thenReturn(true);
         // when(resource.isReadable()).thenReturn(true); // Unnecessary
-        when(resource.getInputStream()).thenReturn(new java.io.ByteArrayInputStream("SELECT 1;".getBytes()));
+        when(resource.getInputStream()).thenReturn(new ByteArrayInputStream("SELECT 1;".getBytes()));
 
         controller.resetDatabase();
 

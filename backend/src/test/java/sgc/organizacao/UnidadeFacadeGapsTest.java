@@ -21,6 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Testes para cobrir gaps de cobertura no UnidadeFacade.
@@ -136,7 +138,7 @@ class UnidadeFacadeGapsTest {
             when(hierarquiaService.buscarArvoreComElegibilidade(any()))
                 .thenReturn(List.of(dto1, dto2));
             
-            java.util.Set<Long> unidadesBloqueadas = new java.util.HashSet<>();
+            Set<Long> unidadesBloqueadas = new HashSet<>();
             unidadesBloqueadas.add(2L);
 
             // Act
@@ -157,7 +159,7 @@ class UnidadeFacadeGapsTest {
                 .thenReturn(List.of(dto));
 
             // Act
-            List<UnidadeDto> resultado = facade.buscarArvoreComElegibilidade(true, new java.util.HashSet<>());
+            List<UnidadeDto> resultado = facade.buscarArvoreComElegibilidade(true, new HashSet<>());
 
             // Assert
             assertThat(resultado).isNotEmpty();
@@ -174,7 +176,7 @@ class UnidadeFacadeGapsTest {
                 .thenReturn(List.of(dto));
 
             // Act
-            facade.buscarArvoreComElegibilidade(false, new java.util.HashSet<>());
+            facade.buscarArvoreComElegibilidade(false, new HashSet<>());
 
             // Assert
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());

@@ -29,6 +29,8 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import sgc.alerta.AlertaFacade;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 @ExtendWith(MockitoExtension.class)
 class ProcessoFacadeCoverageTest {
@@ -52,7 +54,7 @@ class ProcessoFacadeCoverageTest {
     private UnidadeFacade unidadeService;
 
     @Mock
-    private sgc.alerta.AlertaFacade alertaService;
+    private AlertaFacade alertaService;
 
     @Mock
     private SubprocessoFacade subprocessoFacade;
@@ -138,7 +140,7 @@ class ProcessoFacadeCoverageTest {
         
         SubprocessoDto subDto = new SubprocessoDto();
         subDto.setCodUnidade(10L);
-        subDto.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subDto.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         when(subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
             .thenReturn(List.of(subDto));

@@ -2,6 +2,7 @@ package sgc.subprocesso.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import sgc.processo.model.TipoProcesso;
 
 @Getter
 @RequiredArgsConstructor
@@ -39,7 +40,7 @@ public enum SituacaoSubprocesso {
     private static final String PREFIXO_REVISAO = "REVISAO";
     private static final String PREFIXO_DIAGNOSTICO = "DIAGNOSTICO";
 
-    public boolean podeTransicionarPara(SituacaoSubprocesso nova, sgc.processo.model.TipoProcesso tipo) {
+    public boolean podeTransicionarPara(SituacaoSubprocesso nova, TipoProcesso tipo) {
         if (this == nova) return true;
 
         if (this == NAO_INICIADO) {
@@ -64,10 +65,10 @@ public enum SituacaoSubprocesso {
         return !this.name().startsWith(PREFIXO_DIAGNOSTICO) || nova.name().startsWith(PREFIXO_DIAGNOSTICO);
     }
 
-    private boolean podeIniciar(SituacaoSubprocesso nova, sgc.processo.model.TipoProcesso tipo) {
-        return (tipo == sgc.processo.model.TipoProcesso.MAPEAMENTO && nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO) ||
-               (tipo == sgc.processo.model.TipoProcesso.REVISAO && nova == REVISAO_CADASTRO_EM_ANDAMENTO) ||
-               (tipo == sgc.processo.model.TipoProcesso.DIAGNOSTICO && nova == DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+    private boolean podeIniciar(SituacaoSubprocesso nova, TipoProcesso tipo) {
+        return (tipo == TipoProcesso.MAPEAMENTO && nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO) ||
+               (tipo == TipoProcesso.REVISAO && nova == REVISAO_CADASTRO_EM_ANDAMENTO) ||
+               (tipo == TipoProcesso.DIAGNOSTICO && nova == DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
     }
 
     private boolean transicaoMapeamento(SituacaoSubprocesso nova) {

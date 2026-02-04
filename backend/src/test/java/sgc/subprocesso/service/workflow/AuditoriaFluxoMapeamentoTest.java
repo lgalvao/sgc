@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import sgc.processo.model.TipoProcesso;
 
 @DisplayName("Auditoria do Fluxo de Mapeamento")
 class AuditoriaFluxoMapeamentoTest {
@@ -43,7 +44,7 @@ class AuditoriaFluxoMapeamentoTest {
     }
 
     private SituacaoSubprocesso transicionar(SituacaoSubprocesso atual, SituacaoSubprocesso nova) {
-        assertThat(atual.podeTransicionarPara(nova, sgc.processo.model.TipoProcesso.MAPEAMENTO))
+        assertThat(atual.podeTransicionarPara(nova, TipoProcesso.MAPEAMENTO))
                 .withFailMessage("Transição inválida: " + atual + " -> " + nova)
                 .isTrue();
         return nova;

@@ -258,7 +258,7 @@ class ImpactoMapaServiceTest {
     }
 
     private Subprocesso criarSubprocesso(Long unidadeCodigo, Mapa mapa) {
-        sgc.organizacao.model.Unidade unidade = sgc.organizacao.model.Unidade.builder()
+        Unidade unidade = Unidade.builder()
                 .codigo(unidadeCodigo)
                 .sigla("UNID")
                 .nome("Unidade Teste")

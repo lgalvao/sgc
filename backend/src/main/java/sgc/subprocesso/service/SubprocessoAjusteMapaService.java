@@ -25,6 +25,7 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import sgc.comum.erros.ErroEstadoImpossivel;
 
 /**
  * Service responsável por operações relacionadas a ajustes de mapa em subprocessos.
@@ -95,7 +96,7 @@ class SubprocessoAjusteMapaService {
         
         var dto = mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes);
         if (dto == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao gerar dados de ajuste do mapa.");
+            throw new ErroEstadoImpossivel("Falha ao gerar dados de ajuste do mapa.");
         }
         return dto;
     }

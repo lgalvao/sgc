@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import sgc.seguranca.acesso.Acao;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -125,7 +126,7 @@ class ProcessoDetalheBuilderTest {
         processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.setParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
-        when(accessControlService.podeExecutar(eq(usuario), eq(sgc.seguranca.acesso.Acao.FINALIZAR_PROCESSO), eq(processo)))
+        when(accessControlService.podeExecutar(eq(usuario), eq(Acao.FINALIZAR_PROCESSO), eq(processo)))
                 .thenReturn(true);
 
         // Act
@@ -146,7 +147,7 @@ class ProcessoDetalheBuilderTest {
         processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.setParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
-        when(accessControlService.podeExecutar(eq(usuario), eq(sgc.seguranca.acesso.Acao.FINALIZAR_PROCESSO), eq(processo)))
+        when(accessControlService.podeExecutar(eq(usuario), eq(Acao.FINALIZAR_PROCESSO), eq(processo)))
                 .thenReturn(false);
 
         // Act

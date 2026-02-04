@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import sgc.processo.erros.ErroProcesso;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -100,7 +101,7 @@ class ProcessoFinalizadorTest {
         when(queryService.listarEntidadesPorProcesso(codigo)).thenReturn(List.of(s));
 
         assertThatThrownBy(() -> finalizador.finalizar(codigo))
-                .isInstanceOf(sgc.processo.erros.ErroProcesso.class)
+                .isInstanceOf(ErroProcesso.class)
                 .hasMessageContaining("sem unidade associada");
     }
 
@@ -120,7 +121,7 @@ class ProcessoFinalizadorTest {
         when(queryService.listarEntidadesPorProcesso(codigo)).thenReturn(List.of(s));
 
         assertThatThrownBy(() -> finalizador.finalizar(codigo))
-                .isInstanceOf(sgc.processo.erros.ErroProcesso.class)
+                .isInstanceOf(ErroProcesso.class)
                 .hasMessageContaining("sem mapa associado");
     }
 }

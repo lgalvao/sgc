@@ -32,6 +32,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import sgc.comum.erros.ErroEstadoImpossivel;
 
 /**
  * Testes unitários para SubprocessoAjusteMapaService.
@@ -294,7 +295,7 @@ class SubprocessoAjusteMapaServiceTest {
             
             // Act & Assert
             assertThatThrownBy(() -> service.obterMapaParaAjuste(codSubprocesso))
-                    .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
+                    .isInstanceOf(ErroEstadoImpossivel.class);
         }
     }
 

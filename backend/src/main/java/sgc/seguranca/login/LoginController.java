@@ -22,6 +22,7 @@ import sgc.seguranca.login.dto.*;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Controller responsável pelo fluxo de login: autenticação, autorização e
@@ -37,7 +38,7 @@ public class LoginController {
     private final UsuarioFacade usuarioService;
     private final LimitadorTentativasLogin limitadorTentativasLogin;
     private final GerenciadorJwt gerenciadorJwt;
-    @org.springframework.beans.factory.annotation.Value("${aplicacao.ambiente-testes:false}")
+    @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
 
     /**

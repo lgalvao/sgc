@@ -14,6 +14,7 @@ import sgc.mapa.service.MapaFacade;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
+import sgc.comum.erros.ErroEstadoImpossivel;
 
 /**
  * Controlador REST para gerenciar Mapas usando DTOs. Evita expor entidades JPA diretamente nas
@@ -55,7 +56,7 @@ public class MapaController {
         var mapa = mapaFacade.obterPorCodigo(codigo);
         var dto = mapaMapper.toDto(mapa);
         if (dto == null) {
-             throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter mapa para DTO.");
+             throw new ErroEstadoImpossivel("Falha ao converter mapa para DTO.");
         }
         return ResponseEntity.ok(dto);
     }
@@ -73,13 +74,13 @@ public class MapaController {
     public ResponseEntity<MapaDto> criar(@Valid @RequestBody MapaDto mapaDto) {
         var entidade = mapaMapper.toEntity(mapaDto);
         if (entidade == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter DTO para entidade mapa.");
+            throw new ErroEstadoImpossivel("Falha ao converter DTO para entidade mapa.");
         }
         var salvo = mapaFacade.criar(entidade);
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
         var salvoDto = mapaMapper.toDto(salvo);
         if (salvoDto == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter mapa salvo para DTO.");
+            throw new ErroEstadoImpossivel("Falha ao converter mapa salvo para DTO.");
         }
         return ResponseEntity.created(uri).body(salvoDto);
     }
@@ -97,12 +98,12 @@ public class MapaController {
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
         var entidade = mapaMapper.toEntity(mapaDto);
         if (entidade == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter DTO para entidade mapa.");
+            throw new ErroEstadoImpossivel("Falha ao converter DTO para entidade mapa.");
         }
         var atualizado = mapaFacade.atualizar(codMapa, entidade);
         var atualizadoDto = mapaMapper.toDto(atualizado);
         if (atualizadoDto == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter mapa atualizado para DTO.");
+            throw new ErroEstadoImpossivel("Falha ao converter mapa atualizado para DTO.");
         }
         return ResponseEntity.ok(atualizadoDto);
     }

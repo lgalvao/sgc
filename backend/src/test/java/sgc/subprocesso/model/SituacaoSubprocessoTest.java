@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import sgc.processo.model.TipoProcesso;
 
 @DisplayName("SituacaoSubprocesso - Teste de Transições")
 class SituacaoSubprocessoTest {
@@ -67,14 +68,14 @@ class SituacaoSubprocessoTest {
         "MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_MAPA_CRIADO, false, MAPEAMENTO",
         "MAPEAMENTO_MAPA_HOMOLOGADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, false, MAPEAMENTO"
     })
-    void testTransicoes(SituacaoSubprocesso de, SituacaoSubprocesso para, boolean esperado, sgc.processo.model.TipoProcesso tipo) {
+    void testTransicoes(SituacaoSubprocesso de, SituacaoSubprocesso para, boolean esperado, TipoProcesso tipo) {
         assertThat(de.podeTransicionarPara(para, tipo)).isEqualTo(esperado);
     }
 
     @Test
     @DisplayName("Deve permitir transição para si mesmo")
     void testMesmaSituacao() {
-        assertThat(NAO_INICIADO.podeTransicionarPara(NAO_INICIADO, sgc.processo.model.TipoProcesso.MAPEAMENTO)).isTrue();
+        assertThat(NAO_INICIADO.podeTransicionarPara(NAO_INICIADO, TipoProcesso.MAPEAMENTO)).isTrue();
     }
 
     @Test
@@ -82,23 +83,23 @@ class SituacaoSubprocessoTest {
     void testRamosPrefixoMapeamento() {
         // this != NAO_INICIADO && nova != NAO_INICIADO
         // this.name().startsWith("MAPEAMENTO") && !nova.name().startsWith("MAPEAMENTO") -> false
-        assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(REVISAO_CADASTRO_EM_ANDAMENTO, sgc.processo.model.TipoProcesso.MAPEAMENTO)).isFalse();
+        assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.MAPEAMENTO)).isFalse();
         
         // this.name().startsWith("MAPEAMENTO") && nova.name().startsWith("MAPEAMENTO") -> prossegue para switch
-        assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_DISPONIBILIZADO, sgc.processo.model.TipoProcesso.MAPEAMENTO)).isTrue();
+        assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoProcesso.MAPEAMENTO)).isTrue();
     }
 
     @Test
     @DisplayName("Deve testar ramos da verificação de prefixo (REVISAO)")
     void testRamosPrefixoRevisao() {
-        assertThat(REVISAO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, sgc.processo.model.TipoProcesso.REVISAO)).isFalse();
-        assertThat(REVISAO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(REVISAO_CADASTRO_DISPONIBILIZADA, sgc.processo.model.TipoProcesso.REVISAO)).isTrue();
+        assertThat(REVISAO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.REVISAO)).isFalse();
+        assertThat(REVISAO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(REVISAO_CADASTRO_DISPONIBILIZADA, TipoProcesso.REVISAO)).isTrue();
     }
 
     @Test
     @DisplayName("Deve testar ramos da verificação de prefixo (DIAGNOSTICO)")
     void testRamosPrefixoDiagnostico() {
-        assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, sgc.processo.model.TipoProcesso.DIAGNOSTICO)).isFalse();
-        assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(DIAGNOSTICO_MONITORAMENTO, sgc.processo.model.TipoProcesso.DIAGNOSTICO)).isTrue();
+        assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
+        assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(DIAGNOSTICO_MONITORAMENTO, TipoProcesso.DIAGNOSTICO)).isTrue();
     }
 }

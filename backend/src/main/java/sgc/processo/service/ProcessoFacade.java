@@ -30,6 +30,8 @@ import java.util.Set;
 
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import java.util.stream.Stream;
+import sgc.comum.erros.ErroEstadoImpossivel;
 
 /**
  * Orquestra operações de Processo.
@@ -68,7 +70,7 @@ public class ProcessoFacade {
         Processo processoSalvo = processoManutencaoService.criar(req);
         var dto = processoMapper.toDto(processoSalvo);
         if (dto == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter processo criado para DTO.");
+            throw new ErroEstadoImpossivel("Falha ao converter processo criado para DTO.");
         }
         return dto;
     }
@@ -78,7 +80,7 @@ public class ProcessoFacade {
         Processo processoAtualizado = processoManutencaoService.atualizar(codigo, requisicao);
         var dto = processoMapper.toDto(processoAtualizado);
         if (dto == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter processo atualizado para DTO.");
+            throw new ErroEstadoImpossivel("Falha ao converter processo atualizado para DTO.");
         }
         return dto;
     }
@@ -117,14 +119,14 @@ public class ProcessoFacade {
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarFinalizados() {
         return processoConsultaService.listarFinalizados().stream()
-                .flatMap(p -> java.util.stream.Stream.ofNullable(processoMapper.toDto(p)))
+                .flatMap(p -> Stream.ofNullable(processoMapper.toDto(p)))
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarAtivos() {
         return processoConsultaService.listarAtivos().stream()
-                .flatMap(p -> java.util.stream.Stream.ofNullable(processoMapper.toDto(p)))
+                .flatMap(p -> Stream.ofNullable(processoMapper.toDto(p)))
                 .toList();
     }
 

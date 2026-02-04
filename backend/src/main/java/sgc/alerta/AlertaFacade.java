@@ -19,6 +19,7 @@ import sgc.processo.model.Processo;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import org.springframework.data.domain.Page;
 
 /**
  * Facade para gerenciamento de alertas do sistema.
@@ -235,7 +236,7 @@ public class AlertaFacade {
     /**
      * Lista alertas destinados a uma unidade específica.
      */
-    public org.springframework.data.domain.Page<Alerta> listarPorUnidade(Long codigoUnidade, Pageable pageable) {
+    public Page<Alerta> listarPorUnidade(Long codigoUnidade, Pageable pageable) {
         return alertaService.buscarPorUnidadeDestino(codigoUnidade, pageable);
     }
 

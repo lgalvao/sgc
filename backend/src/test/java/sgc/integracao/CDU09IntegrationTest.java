@@ -47,6 +47,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 
 @Tag("integration")
 @SpringBootTest
@@ -69,7 +71,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     private AlertaRepo alertaRepo;
 
     @Autowired
-    private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
+    private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -150,7 +152,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
     private void setupUsuarioPerfil(Usuario usuario, Unidade unidade, Perfil perfil) {
         try {
-            var up = sgc.organizacao.model.UsuarioPerfil.builder()
+            var up = UsuarioPerfil.builder()
                     .usuarioTitulo(usuario.getTituloEleitoral())
                     .unidadeCodigo(unidade.getCodigo())
                     .perfil(perfil)

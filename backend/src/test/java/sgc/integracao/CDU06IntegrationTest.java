@@ -44,6 +44,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import jakarta.persistence.EntityManager;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -64,10 +68,10 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     private UsuarioRepo usuarioRepo;
 
     @Autowired
-    private sgc.organizacao.model.UsuarioPerfilRepo usuarioPerfilRepo;
+    private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @PersistenceContext
-    private jakarta.persistence.EntityManager entityManager;
+    private EntityManager entityManager;
 
     private Processo processo;
     private Unidade unidade;
@@ -101,11 +105,11 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         principal.setTituloEleitoral(TEST_USER_ID);
         principal.setUnidadeLotacao(unidade);
         usuarioRepo.save(principal);
-        principal.setAuthorities(Set.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + perfil.name())));
+        principal.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_" + perfil.name())));
 
         // Insert into VW_USUARIO_PERFIL_UNIDADE to support ProcessoDetalheBuilder query
         try {
-            var up = sgc.organizacao.model.UsuarioPerfil.builder()
+            var up = UsuarioPerfil.builder()
                     .usuarioTitulo(TEST_USER_ID)
                     .unidadeCodigo(unidade.getCodigo())
                     .perfil(perfil)

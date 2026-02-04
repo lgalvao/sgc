@@ -17,6 +17,8 @@ import sgc.seguranca.sanitizacao.UtilSanitizacao;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import sgc.comum.erros.ErroEstadoImpossivel;
 
 /**
  * Serviço especializado para salvar o mapa completo de competências.
@@ -71,7 +73,7 @@ public class MapaSalvamentoService {
 
         var response = mapaCompletoMapper.toDto(mapa, null, competenciasSalvas);
         if (response == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter mapa salvo para DTO.");
+            throw new ErroEstadoImpossivel("Falha ao converter mapa salvo para DTO.");
         }
         return response;
     }
@@ -93,7 +95,7 @@ public class MapaSalvamentoService {
 
         Set<Long> codigosNovos = request.competencias().stream()
                 .map(CompetenciaMapaDto::codigo)
-                .flatMap(java.util.stream.Stream::ofNullable)
+                .flatMap(Stream::ofNullable)
                 .collect(Collectors.toSet());
 
         return new ContextoSalvamento(

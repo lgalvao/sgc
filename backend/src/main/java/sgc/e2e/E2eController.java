@@ -30,6 +30,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/e2e")
@@ -58,13 +61,13 @@ public class E2eController {
     }
 
     private void executeDatabaseReset(Connection conn) throws Exception {
-        try (java.sql.Statement stmt = conn.createStatement()) {
+        try (Statement stmt = conn.createStatement()) {
             log.debug("Desabilitando integridade referencial");
             stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
 
             List<String> tables = jdbcTemplate.queryForList(
                     "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE UPPER(TABLE_SCHEMA) = 'SGC'",
-                    String.class).stream().flatMap(java.util.stream.Stream::ofNullable).toList();
+                    String.class).stream().flatMap(Stream::ofNullable).toList();
 
             log.info("Limpando {} tabelas no schema SGC", tables.size());
             for (String table : tables) {
@@ -80,7 +83,7 @@ public class E2eController {
         }
     }
 
-    private void limparTabela(java.sql.Statement stmt, String table) throws java.sql.SQLException {
+    private void limparTabela(Statement stmt, String table) throws SQLException {
         log.debug("Limpando tabela: sgc.{}", table);
         try {
             stmt.execute("TRUNCATE TABLE sgc." + table + " RESTART IDENTITY");
@@ -107,7 +110,7 @@ public class E2eController {
         String sqlMapas =
                 "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN (SELECT codigo FROM" + SQL_SUBPROCESSO_POR_PROCESSO;
         List<Long> mapaIds = jdbcTemplate.queryForList(sqlMapas, Long.class, codigo).stream()
-                .flatMap(java.util.stream.Stream::ofNullable)
+                .flatMap(Stream::ofNullable)
                 .toList();
 
         jdbcTemplate.update(

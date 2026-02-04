@@ -27,6 +27,7 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Service responsável por preparar contextos de visualização de subprocessos.
@@ -114,7 +115,7 @@ class SubprocessoContextoService {
         for (Atividade a : atividades) {
             List<ConhecimentoResponse> ksDto = a.getConhecimentos().stream()
                     .map(conhecimentoMapper::toResponse)
-                    .filter(java.util.Objects::nonNull)
+                    .filter(Objects::nonNull)
                     .toList();
             atividadesComConhecimentos.add(SubprocessoCadastroDto.AtividadeCadastroDto.builder()
                     .codigo(a.getCodigo())

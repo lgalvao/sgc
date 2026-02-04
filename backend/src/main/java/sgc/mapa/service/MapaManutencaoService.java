@@ -14,6 +14,8 @@ import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.*;
 
 import java.util.*;
+import java.util.stream.Stream;
+import sgc.comum.erros.ErroEstadoImpossivel;
 
 /**
  * Serviço unificado responsável pela manutenção da estrutura do Mapa de Competências.
@@ -40,7 +42,7 @@ public class MapaManutencaoService {
     @Transactional(readOnly = true)
     public List<AtividadeResponse> listarAtividades() {
         return atividadeRepo.findAll().stream()
-                .flatMap(a -> java.util.stream.Stream.ofNullable(atividadeMapper.toResponse(a)))
+                .flatMap(a -> Stream.ofNullable(atividadeMapper.toResponse(a)))
                 .toList();
     }
 
@@ -48,7 +50,7 @@ public class MapaManutencaoService {
     public AtividadeResponse obterAtividadeResponse(Long codAtividade) {
         var response = atividadeMapper.toResponse(obterAtividadePorCodigo(codAtividade));
         if (response == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter atividade para resposta.");
+            throw new ErroEstadoImpossivel("Falha ao converter atividade para resposta.");
         }
         return response;
     }
@@ -69,14 +71,14 @@ public class MapaManutencaoService {
 
         Atividade entidade = atividadeMapper.toEntity(request);
         if (entidade == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade atividade.");
+            throw new ErroEstadoImpossivel("Falha ao converter requisição para entidade atividade.");
         }
         entidade.setMapa(mapa);
 
         Atividade salvo = atividadeRepo.save(entidade);
         var response = atividadeMapper.toResponse(salvo);
         if (response == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter atividade salva para resposta.");
+            throw new ErroEstadoImpossivel("Falha ao converter atividade salva para resposta.");
         }
         return response;
     }
@@ -90,7 +92,7 @@ public class MapaManutencaoService {
 
         var entidadeParaAtualizar = atividadeMapper.toEntity(request);
         if (entidadeParaAtualizar == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade atividade.");
+            throw new ErroEstadoImpossivel("Falha ao converter requisição para entidade atividade.");
         }
         existente.setDescricao(entidadeParaAtualizar.getDescricao());
 
@@ -247,7 +249,7 @@ public class MapaManutencaoService {
             throw new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade);
         }
         return conhecimentoRepo.findByAtividadeCodigo(codAtividade).stream()
-                .flatMap(c -> java.util.stream.Stream.ofNullable(conhecimentoMapper.toResponse(c)))
+                .flatMap(c -> Stream.ofNullable(conhecimentoMapper.toResponse(c)))
                 .toList();
     }
 
@@ -272,13 +274,13 @@ public class MapaManutencaoService {
 
         var conhecimento = conhecimentoMapper.toEntity(request);
         if (conhecimento == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade conhecimento.");
+            throw new ErroEstadoImpossivel("Falha ao converter requisição para entidade conhecimento.");
         }
         conhecimento.setAtividade(atividade);
         var salvo = conhecimentoRepo.save(conhecimento);
         var response = conhecimentoMapper.toResponse(salvo);
         if (response == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter conhecimento salvo para resposta.");
+            throw new ErroEstadoImpossivel("Falha ao converter conhecimento salvo para resposta.");
         }
         return response;
     }
@@ -294,7 +296,7 @@ public class MapaManutencaoService {
         }
         var paraAtualizar = conhecimentoMapper.toEntity(request);
         if (paraAtualizar == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter requisição para entidade conhecimento.");
+            throw new ErroEstadoImpossivel("Falha ao converter requisição para entidade conhecimento.");
         }
         existente.setDescricao(paraAtualizar.getDescricao());
         conhecimentoRepo.save(existente);

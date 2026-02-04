@@ -31,6 +31,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import java.sql.Statement;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
 
 @Tag("integration")
 @SpringBootTest
@@ -200,7 +203,7 @@ class E2eControllerTest {
         NamedParameterJdbcTemplate mockNamed = Mockito.mock(NamedParameterJdbcTemplate.class);
         DataSource mockDataSource = Mockito.mock(DataSource.class);
         Connection mockConnection = Mockito.mock(Connection.class);
-        java.sql.Statement mockStatement = Mockito.mock(java.sql.Statement.class);
+        Statement mockStatement = Mockito.mock(Statement.class);
         
         when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
@@ -343,7 +346,7 @@ class E2eControllerTest {
                 "Desc", "", false, null);
 
         // Act & Assert
-        var exception = Assertions.assertThrows(sgc.comum.erros.ErroValidacao.class,
+        var exception = Assertions.assertThrows(ErroValidacao.class,
                 () -> controller.criarProcessoMapeamento(req));
         Assertions.assertNotNull(exception);
         Assertions.assertTrue(exception.getMessage().contains("Unidade é obrigatória"));
@@ -359,7 +362,7 @@ class E2eControllerTest {
         when(unidadeFacade.buscarPorSigla("SIGLA_NAO_EXISTE")).thenReturn(null);
 
         // Act & Assert
-        var exception = Assertions.assertThrows(sgc.comum.erros.ErroEntidadeNaoEncontrada.class,
+        var exception = Assertions.assertThrows(ErroEntidadeNaoEncontrada.class,
                 () -> controller.criarProcessoRevisao(req));
         Assertions.assertNotNull(exception);
         Assertions.assertTrue(exception.getMessage().contains("Unidade"));

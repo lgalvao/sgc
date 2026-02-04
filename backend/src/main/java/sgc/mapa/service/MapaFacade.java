@@ -16,6 +16,7 @@ import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 import java.util.Optional;
+import sgc.comum.erros.ErroEstadoImpossivel;
 
 /**
  * Facade para operações com Mapas de Competências.
@@ -84,7 +85,7 @@ public class MapaFacade {
         List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapa(codMapa);
         var dto = mapaCompletoMapper.toDto(mapa, codSubprocesso, competencias);
         if (dto == null) {
-            throw new sgc.comum.erros.ErroEstadoImpossivel("Falha ao converter mapa completo para DTO.");
+            throw new ErroEstadoImpossivel("Falha ao converter mapa completo para DTO.");
         }
         return dto;
     }
