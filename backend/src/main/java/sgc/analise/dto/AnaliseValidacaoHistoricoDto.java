@@ -17,6 +17,7 @@ public record AnaliseValidacaoHistoricoDto(
 
                 @TituloEleitoral
                 String analistaUsuarioTitulo,
+                
                 String motivo,
                 TipoAnalise tipo) {
 }
