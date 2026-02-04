@@ -139,7 +139,7 @@ class MapaManutencaoServiceCoverageTest {
     @Test
     @DisplayName("criarConhecimento: Erro quando mapper.toEntity retorna null")
     void criarConhecimento_ToEntityNull() {
-        CriarConhecimentoRequest req = new CriarConhecimentoRequest("Desc");
+        CriarConhecimentoRequest req = new CriarConhecimentoRequest(1L, "Desc");
         Atividade atividade = new Atividade();
         when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
         when(conhecimentoMapper.toEntity(req)).thenReturn(null); // NULL
@@ -151,7 +151,7 @@ class MapaManutencaoServiceCoverageTest {
     @Test
     @DisplayName("criarConhecimento: Erro quando mapper.toResponse retorna null")
     void criarConhecimento_ToResponseNull() {
-        CriarConhecimentoRequest req = new CriarConhecimentoRequest("Desc");
+        CriarConhecimentoRequest req = new CriarConhecimentoRequest(1L, "Desc");
         Atividade atividade = new Atividade();
         Conhecimento conhecimento = new Conhecimento();
         
@@ -171,7 +171,6 @@ class MapaManutencaoServiceCoverageTest {
         Atividade atividade = new Atividade();
         atividade.setCodigo(1L);
         Conhecimento conhecimento = new Conhecimento();
-        conhecimento.setCodigoAtividade(1L);
         conhecimento.setAtividade(atividade);
 
         when(conhecimentoRepo.findById(10L)).thenReturn(Optional.of(conhecimento));
