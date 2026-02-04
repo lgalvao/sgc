@@ -186,7 +186,7 @@ VALUES ('303030', 'CHEFE', 8);
 -- Inserir Mapa vigente para Assessoria 12 (Unit 4) para testes de Revisão
 -- Processo 99
 INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, descricao, situacao, tipo)
-VALUES (99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo Seed 99', 'FINALIZADO', 'MAPEAMENTO');
+VALUES (99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo 99', 'FINALIZADO', 'MAPEAMENTO');
 
 -- UnidadeProcesso (Unit 4)
 INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao)
@@ -400,3 +400,40 @@ SET titulo_titular           = '123456789012',
     matricula_titular        = '56789012',
     data_inicio_titularidade = CURRENT_TIMESTAMP
 WHERE codigo = 99;
+
+-- Phase 1: Enhanced Seed Data
+
+-- Processo 300: Mapeamento em andamento na hierarquia SECRETARIA_1
+INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, descricao, situacao, tipo)
+VALUES (300, CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP, 'Mapeamento Geral 2026 - Secretaria 1', 'EM_ANDAMENTO', 'MAPEAMENTO');
+
+-- UnidadeProcesso entries (Units 2, 3, 4, 5, 6, 7, 8)
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (300, 2, 'EM_ANDAMENTO'); -- SECRETARIA_1
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (300, 3, 'EM_ANDAMENTO'); -- ASSESSORIA_11
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (300, 4, 'AGUARDANDO');   -- ASSESSORIA_12
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (300, 5, 'EM_ANDAMENTO'); -- COORD_11
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (300, 6, 'EM_ANDAMENTO'); -- SECAO_111
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (300, 7, 'EM_ANDAMENTO'); -- SECAO_112
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (300, 8, 'AGUARDANDO');   -- SECAO_113
+
+-- Subprocesso Unit 3 (ASSESSORIA_11): MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (303, 300, 3, 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO', CURRENT_TIMESTAMP);
+
+-- Subprocesso Unit 6 (SECAO_111): MAPEAMENTO_MAPA_DISPONIBILIZADO
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (306, 300, 6, 'MAPEAMENTO_MAPA_DISPONIBILIZADO', CURRENT_TIMESTAMP);
+-- Map for Unit 6
+INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
+VALUES (306, 306, CURRENT_TIMESTAMP, NULL, NULL);
+
+-- Subprocesso Unit 7 (SECAO_112): MAPEAMENTO_MAPA_COM_SUGESTOES
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (307, 300, 7, 'MAPEAMENTO_MAPA_COM_SUGESTOES', CURRENT_TIMESTAMP);
+-- Map for Unit 7 with suggestions
+INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
+VALUES (307, 307, CURRENT_TIMESTAMP, NULL, 'Revisar a descrição das atividades 1 e 2. Estão genéricas demais.');
+
+-- Subprocesso Unit 5 (COORD_11): MAPEAMENTO_CADASTRO_HOMOLOGADO
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (305, 300, 5, 'MAPEAMENTO_CADASTRO_HOMOLOGADO', CURRENT_TIMESTAMP);
