@@ -11,7 +11,7 @@ This phase focuses on adding new processes that involve multiple units in differ
     - [ ] Create Subprocess for `SECAO_111` (Unit 6) in `MAPEAMENTO_MAPA_DISPONIBILIZADO`.
     - [ ] Create Subprocess for `SECAO_112` (Unit 7) in `MAPEAMENTO_MAPA_COM_SUGESTOES` (with mock feedback).
     - [ ] Create Subprocess for `COORD_11` (Unit 5) in `MAPEAMENTO_CADASTRO_HOMOLOGADO`.
-- [ ] Task: Create a `DIAGNOSTICO` process (ID 400) involving multiple operational units (Units 6, 7, 8, 10).
+- [x] Task: Create a `DIAGNOSTICO` process (ID 400) involving multiple operational units (Units 6, 7, 8, 10). [bb3f413]
     - [ ] Set Subprocess for `SECAO_111` (Unit 6) to `DIAGNOSTICO_MONITORAMENTO`.
     - [ ] Set Subprocess for `SECAO_112` (Unit 7) to `DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Multi-Unit Processes and State Variety' (Protocol in workflow.md)
