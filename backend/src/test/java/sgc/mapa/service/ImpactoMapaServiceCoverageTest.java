@@ -20,14 +20,12 @@ import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -95,8 +93,8 @@ class ImpactoMapaServiceCoverageTest {
         // Deve ter processado sem erro (handler de colisão keep-first)
         // Se tinha 2, removeu 1 (porque mapa atual vazio).
         // Na verdade, mapaVigentes map vai ter apenas 1 entrada ("Mesma" -> a1).
-        // removidas vai ter 1 entrada.
-        assertThat(dto.atividadesRemovidas()).hasSize(1);
+        // Mas detectarRemovidas itera sobre a LISTA de vigentes, entao remove as duas.
+        assertThat(dto.atividadesRemovidas()).hasSize(2);
     }
 
     @Test

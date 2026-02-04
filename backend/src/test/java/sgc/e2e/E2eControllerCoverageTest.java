@@ -14,7 +14,7 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.ProcessoDto;
-import sgc.processo.model.TipoProcesso;
+
 import sgc.processo.service.ProcessoFacade;
 
 import java.sql.Connection;

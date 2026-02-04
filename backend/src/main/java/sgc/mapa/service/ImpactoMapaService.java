@@ -263,7 +263,10 @@ public class ImpactoMapaService {
 
         // Indexar IDs das atividades vigentes por descrição para lookup rápido
         Map<String, Long> descricaoToVigenteId = atividadesVigentes.stream()
-                .collect(Collectors.toMap(Atividade::getDescricao, Atividade::getCodigo));
+                .collect(Collectors.toMap(
+                        Atividade::getDescricao, 
+                        Atividade::getCodigo,
+                        (existing, replacement) -> existing));
 
         // Processar Atividades Removidas
         processarRemovidas(removidas, atividadeIdToCompetencias, mapaImpactos);
