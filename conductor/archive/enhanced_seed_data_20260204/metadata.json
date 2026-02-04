@@ -1,0 +1,8 @@
+{
+  "track_id": "enhanced_seed_data_20260204",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-02-04T15:45:00Z",
+  "updated_at": "2026-02-04T15:45:00Z",
+  "description": "I'm validating the UI/UX but the seed data (in seed.sql) is quite restricted. I need more data so that I can validate."
+}
