@@ -228,11 +228,18 @@ public class E2eController {
         if (Boolean.TRUE.equals(request.iniciar())) {
             List<Long> unidades = List.of(unidade.getCodigo());
             Long processoCodigo = processo.getCodigo();
+            List<String> erros;
 
             if (tipo == TipoProcesso.MAPEAMENTO) {
-                processoFacade.iniciarProcessoMapeamento(processoCodigo, unidades);
+                erros = processoFacade.iniciarProcessoMapeamento(processoCodigo, unidades);
             } else if (tipo == TipoProcesso.REVISAO) {
-                processoFacade.iniciarProcessoRevisao(processoCodigo, unidades);
+                erros = processoFacade.iniciarProcessoRevisao(processoCodigo, unidades);
+            } else {
+                erros = List.of();
+            }
+
+            if (erros != null && !erros.isEmpty()) {
+                throw new ErroValidacao("Falha ao iniciar processo fixture: " + String.join("; ", erros));
             }
 
             // Recarregar processo após iniciar

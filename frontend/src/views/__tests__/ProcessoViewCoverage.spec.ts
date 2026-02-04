@@ -2,6 +2,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
 import ProcessoView from "@/views/ProcessoView.vue";
 import {useProcessosStore} from "@/stores/processos";
+import {useFeedbackStore} from "@/stores/feedback";
 import {createTestingPinia} from "@pinia/testing";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
@@ -101,7 +102,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
     it("deve lidar com erro ao finalizar processo", async () => {
         const wrapper = createWrapper();
-        const feedbackStore = (wrapper.vm as any).feedbackStore;
+        const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
         processosStore.finalizarProcesso.mockRejectedValue(new Error("Erro ao finalizar"));
@@ -186,13 +187,13 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
     it("deve lidar com erro na ação em bloco", async () => {
         const wrapper = createWrapper();
-        const feedbackStore = (wrapper.vm as any).feedbackStore;
+        const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
         const modal = wrapper.findComponent({ name: 'ModalAcaoBloco' });
         if (modal.exists()) {
-             modal.vm.setErro = vi.fn();
-             modal.vm.setProcessando = vi.fn();
+             vi.spyOn(modal.vm, 'setErro');
+             vi.spyOn(modal.vm, 'setProcessando');
         }
 
         // Trigger action

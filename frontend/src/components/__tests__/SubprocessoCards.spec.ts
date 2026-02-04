@@ -36,7 +36,7 @@ describe('SubprocessoCards.vue', () => {
             props: defaultProps,
             global: {
                 stubs: {
-                    BCard: { template: '<div class="card" @click="$emit(\'click\')" @keydown.enter.prevent="$emit(\'keydown.enter.prevent\')" @keydown.space.prevent="$emit(\'keydown.space.prevent\')"><slot /></div>' },
+                    BCard: { template: '<div class="card"><slot /></div>' },
                     BCardTitle: { template: '<div><slot /></div>' },
                     BCardText: { template: '<div><slot /></div>' },
                     BRow: { template: '<div><slot /></div>' },
@@ -57,7 +57,7 @@ describe('SubprocessoCards.vue', () => {
 
         // Keydown Enter action
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown.enter');
+        await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown', { key: 'Enter' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoCadastro',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
@@ -82,7 +82,7 @@ describe('SubprocessoCards.vue', () => {
 
         // Enter
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown.enter');
+        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown', { key: 'Enter' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoMapa',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
@@ -105,7 +105,7 @@ describe('SubprocessoCards.vue', () => {
             },
             global: {
                 stubs: {
-                    BCard: { template: '<div class="card" @click="$emit(\'click\')" @keydown.enter.prevent="$emit(\'keydown.enter.prevent\')" @keydown.space.prevent="$emit(\'keydown.space.prevent\')"><slot /></div>' },
+                    BCard: { template: '<div class="card"><slot /></div>' },
                     BCardTitle: { template: '<div><slot /></div>' },
                     BCardText: { template: '<div><slot /></div>' },
                     BRow: { template: '<div><slot /></div>' },
@@ -124,7 +124,7 @@ describe('SubprocessoCards.vue', () => {
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('keydown.enter');
+        await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('keydown', { key: 'Enter' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoVisCadastro',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
@@ -146,7 +146,7 @@ describe('SubprocessoCards.vue', () => {
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown.enter');
+        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown', { key: 'Enter' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoVisMapa',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
@@ -169,7 +169,7 @@ describe('SubprocessoCards.vue', () => {
             },
             global: {
                 stubs: {
-                    BCard: { template: '<div class="card" @click="$emit(\'click\')" @keydown.enter.prevent="$emit(\'keydown.enter.prevent\')" @keydown.space.prevent="$emit(\'keydown.space.prevent\')"><slot /></div>' },
+                    BCard: { template: '<div class="card"><slot /></div>' },
                     BCardTitle: { template: '<div><slot /></div>' },
                     BCardText: { template: '<div><slot /></div>' },
                     BRow: { template: '<div><slot /></div>' },
@@ -186,7 +186,7 @@ describe('SubprocessoCards.vue', () => {
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-diagnostico"]').trigger('keydown.enter');
+        await wrapper.find('[data-testid="card-subprocesso-diagnostico"]').trigger('keydown', { key: 'Enter' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'AutoavaliacaoDiagnostico',
             params: { codSubprocesso: 100, siglaUnidade: 'TESTE' }
@@ -208,7 +208,7 @@ describe('SubprocessoCards.vue', () => {
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').trigger('keydown.enter');
+        await wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').trigger('keydown', { key: 'Enter' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'OcupacoesCriticasDiagnostico',
             params: { codSubprocesso: 100, siglaUnidade: 'TESTE' }
@@ -230,7 +230,7 @@ describe('SubprocessoCards.vue', () => {
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-monitoramento"]').trigger('keydown.enter');
+        await wrapper.find('[data-testid="card-subprocesso-monitoramento"]').trigger('keydown', { key: 'Enter' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'MonitoramentoDiagnostico',
             params: { codSubprocesso: 100, siglaUnidade: 'TESTE' }
@@ -253,7 +253,7 @@ describe('SubprocessoCards.vue', () => {
             global: {
                 stubs: {
                     BCard: {
-                        template: '<div class="card" @click="$emit(\'click\')" @keydown.enter.prevent="$emit(\'keydown.enter.prevent\')" @keydown.space.prevent="$emit(\'keydown.space.prevent\')"><slot /></div>'
+                        template: '<div class="card"><slot /></div>'
                     },
                     BCardTitle: { template: '<div><slot /></div>' },
                     BCardText: { template: '<div><slot /></div>' },
@@ -290,7 +290,7 @@ describe('SubprocessoCards.vue', () => {
             global: {
                 stubs: {
                     BCard: {
-                        template: '<div class="card" @click="$emit(\'click\')" @keydown.enter.prevent="$emit(\'keydown.enter.prevent\')"><slot /></div>'
+                        template: '<div class="card"><slot /></div>'
                     },
                     BCardTitle: { template: '<div><slot /></div>' },
                     BCardText: { template: '<div><slot /></div>' },

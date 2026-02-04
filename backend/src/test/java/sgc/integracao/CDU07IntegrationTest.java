@@ -170,6 +170,14 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
                 .build();
         usuarioPerfilRepo.save(perfilOutroChefe);
 
+        // Popular VW_RESPONSABILIDADE (simulada como tabela no H2)
+        jdbcTemplate.update(
+                "INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio) VALUES (?, ?, ?, ?)",
+                unidade.getCodigo(), chefe.getTituloEleitoral(), "TITULAR", LocalDateTime.now());
+        jdbcTemplate.update(
+                "INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio) VALUES (?, ?, ?, ?)",
+                outraUnidade.getCodigo(), outroChefe.getTituloEleitoral(), "TITULAR", LocalDateTime.now());
+
         Movimentacao movimentacao = Movimentacao.builder()
                 .subprocesso(subprocesso)
                 .unidadeOrigem(null)

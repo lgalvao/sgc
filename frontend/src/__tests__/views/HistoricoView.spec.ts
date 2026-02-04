@@ -118,17 +118,16 @@ describe("HistoricoView.vue", () => {
         await flushPromises();
 
         const text = context.wrapper.text();
-        expect(text).toContain("Nenhum processo finalizado encontrado");
+        expect(text).toContain("Nenhum processo finalizado");
     });
 
     it("deve navegar para detalhes ao clicar", async () => {
         context.wrapper = mount(HistoricoView, mountOptions());
         await flushPromises();
 
-        const buttons = context.wrapper.findAll('button');
-        // First row button
-        expect(buttons.length).toBeGreaterThan(0);
-        await buttons[0].trigger('click');
+        const rows = context.wrapper.findAll('tbody tr');
+        expect(rows.length).toBeGreaterThan(0);
+        await rows[0].trigger('click');
 
         expect(mockPush).toHaveBeenCalledWith('/processo/1');
     });

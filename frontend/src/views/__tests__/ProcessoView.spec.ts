@@ -224,7 +224,7 @@ describe("ProcessoView.vue", () => {
         // Check if buttons exist directly as the container class might have changed
         const btnAceitar = wrapper.find("button.btn-success");
         expect(btnAceitar.exists()).toBe(true);
-        expect(btnAceitar.text()).toContain("Aceitar em Bloco");
+        expect(btnAceitar.text()).toContain("Aceitar em bloco");
 
         // Homologar
         const btnHomologar = wrapper.find("button.btn-warning");
@@ -251,7 +251,8 @@ describe("ProcessoView.vue", () => {
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         expect(modal.exists()).toBe(true);
-        expect(ModalAcaoBlocoStub.methods.abrir).toHaveBeenCalled();
+        vi.spyOn(modal.vm, 'abrir');
+        expect(modal.vm.abrir).toHaveBeenCalled();
         expect(modal.props("titulo")).toBe("Aceitar em Bloco");
     });
 
@@ -270,6 +271,7 @@ describe("ProcessoView.vue", () => {
         await flushPromises();
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
+        vi.spyOn(modal.vm, 'fechar');
         await wrapper.find("button.btn-success").trigger("click"); // Abrir modal 'aceitar'
 
         // Simular confirmação do modal com ID 101 (Mapeamento Cadastro Disponibilizado)
@@ -278,7 +280,7 @@ describe("ProcessoView.vue", () => {
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('aceitar', [101], undefined);
         expect(feedbackStore.show).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("realizada"), "success");
-        expect(ModalAcaoBlocoStub.methods.fechar).toHaveBeenCalled();
+        expect(modal.vm.fechar).toHaveBeenCalled();
     });
 
     it("deve executar ação em bloco com sucesso (Aceitar Validação)", async () => {
@@ -380,13 +382,15 @@ describe("ProcessoView.vue", () => {
         processosStore.executarAcaoBloco.mockRejectedValue(new Error(errorMsg));
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
+        vi.spyOn(modal.vm, 'setErro');
+        vi.spyOn(modal.vm, 'setProcessando');
         await wrapper.find("button.btn-success").trigger("click"); // Abrir modal
 
         await modal.vm.$emit("confirmar", { ids: [101] });
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalled();
-        expect(ModalAcaoBlocoStub.methods.setErro).toHaveBeenCalledWith(errorMsg);
-        expect(ModalAcaoBlocoStub.methods.setProcessando).toHaveBeenCalledWith(false);
+        expect(modal.vm.setErro).toHaveBeenCalledWith(errorMsg);
+        expect(modal.vm.setProcessando).toHaveBeenCalledWith(false);
     });
 
     it("deve mostrar erro se unidade não for encontrada para ação em bloco", async () => {
@@ -405,12 +409,13 @@ describe("ProcessoView.vue", () => {
         processosStore.executarAcaoBloco.mockRejectedValue(new Error(errorMsg));
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
+        vi.spyOn(modal.vm, 'setErro');
         await wrapper.find("button.btn-success").trigger("click");
 
         // ID inexistente
         await modal.vm.$emit("confirmar", { ids: [9999] });
 
-        expect(ModalAcaoBlocoStub.methods.setErro).toHaveBeenCalledWith(errorMsg);
+        expect(modal.vm.setErro).toHaveBeenCalledWith(errorMsg);
     });
 
     it("deve redirecionar para detalhes da unidade ao clicar na tabela (Gestor)", async () => {

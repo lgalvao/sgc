@@ -77,7 +77,7 @@
 
 <script lang="ts" setup>
 import {BButton} from "bootstrap-vue-next";
-import {computed, nextTick, ref, watch} from "vue";
+import {computed, nextTick, ref, toRaw, watch} from "vue";
 import TreeRowItem from "./TreeRowItem.vue";
 import EmptyState from "@/components/EmptyState.vue";
 
@@ -136,7 +136,7 @@ watch(
   () => props.data,
   (newData) => {
     internalData.value = initializeExpanded(
-      structuredClone(newData),
+      structuredClone(toRaw(newData)),
     );
   },
   { immediate: true, deep: true },
