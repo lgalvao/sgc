@@ -21,9 +21,6 @@ public abstract class AnaliseMapper {
 
     /**
      * Converte uma entidade {@link Analise} em um DTO {@link AnaliseHistoricoDto}.
-     *
-     * @param analise A entidade a ser convertida.
-     * @return O DTO correspondente.
      */
     @Mapping(target = "unidadeSigla", expression = "java(getUnidadeSigla(analise.getUnidadeCodigo()))")
     @Mapping(target = "analistaUsuarioTitulo", source = "usuarioTitulo")
@@ -32,9 +29,6 @@ public abstract class AnaliseMapper {
 
     /**
      * Converte uma entidade {@link Analise} em um DTO {@link AnaliseValidacaoHistoricoDto}.
-     *
-     * @param analise A entidade a ser convertida.
-     * @return O DTO correspondente.
      */
     @Mapping(target = "unidadeSigla", expression = "java(getUnidadeSigla(analise.getUnidadeCodigo()))")
     @Mapping(target = "analistaUsuarioTitulo", source = "usuarioTitulo")

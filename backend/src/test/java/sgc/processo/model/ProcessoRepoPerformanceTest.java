@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @ActiveProfiles("test")
 class ProcessoRepoPerformanceTest {
-
     @Autowired
     private ProcessoRepo processoRepo;
 

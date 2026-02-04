@@ -1,6 +1,6 @@
 {
-  "globalLineCoverage": "99.63%",
-  "totalFilesWithGaps": 21,
+  "globalLineCoverage": "99.67%",
+  "totalFilesWithGaps": 20,
   "gaps": [
     {
       "class": "sgc.processo.listener.EventoProcessoListener",
@@ -16,17 +16,17 @@
       "score": 3.5
     },
     {
-      "class": "sgc.processo.ProcessoController",
-      "coverage": "93.18%",
+      "class": "sgc.subprocesso.model.SituacaoSubprocesso",
+      "coverage": "98.31%",
       "missed": [
-        184,
-        286,
-        287
+        59
       ],
       "partial": [
-        "183(1/2)"
+        "55(1/2)",
+        "63(1/2)",
+        "70(2/12)"
       ],
-      "score": 3.5
+      "score": 2.5
     },
     {
       "class": "sgc.e2e.E2eController",
@@ -77,17 +77,6 @@
       "score": 1.5
     },
     {
-      "class": "sgc.subprocesso.SubprocessoCadastroController",
-      "coverage": "98.41%",
-      "missed": [
-        322
-      ],
-      "partial": [
-        "321(1/2)"
-      ],
-      "score": 1.5
-    },
-    {
       "class": "sgc.organizacao.UsuarioFacade",
       "coverage": "100.00%",
       "missed": [],
@@ -117,6 +106,17 @@
       ],
       "partial": [
         "86(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.processo.ProcessoController",
+      "coverage": "97.73%",
+      "missed": [
+        184
+      ],
+      "partial": [
+        "183(1/2)"
       ],
       "score": 1.5
     },
@@ -152,16 +152,6 @@
         "122(1/5)"
       ],
       "score": 1.5
-    },
-    {
-      "class": "sgc.subprocesso.model.SituacaoSubprocesso",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "42(1/4)",
-        "50(2/12)"
-      ],
-      "score": 1
     },
     {
       "class": "sgc.mapa.service.CopiaMapaService",

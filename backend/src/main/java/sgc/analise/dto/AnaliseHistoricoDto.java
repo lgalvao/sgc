@@ -6,6 +6,8 @@ import sgc.analise.model.TipoAnalise;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.validator.constraints.br.TituloEleitoral;
+
 @Builder
 public record AnaliseHistoricoDto(
         LocalDateTime dataHora,
@@ -13,7 +15,11 @@ public record AnaliseHistoricoDto(
         String observacoes,
         TipoAcaoAnalise acao,
         String unidadeSigla,
+        String unidadeNome,
+
+        @TituloEleitoral
         String analistaUsuarioTitulo,
+
         String motivo,
         TipoAnalise tipo) {
 }
