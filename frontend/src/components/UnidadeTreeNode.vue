@@ -29,6 +29,7 @@
           @update:model-value="(val) => onToggle(unidade, val as boolean)"
       >
         <span
+            v-b-tooltip.hover="!isHabilitado(unidade) ? 'Esta unidade não está disponível para seleção' : ''"
             :class="{ 'text-muted': !isHabilitado(unidade) }"
             class="unidade-label"
             :style="!isHabilitado(unidade) ? { cursor: 'help' } : {}"
