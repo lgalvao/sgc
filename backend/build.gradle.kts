@@ -146,7 +146,7 @@ tasks.withType<Test> {
                 println(output)
 
                 if (slowTests.isNotEmpty()) {
-                    println("\nTestes mais lentos (> 1s):")
+                    println("\nTestes mais lentos (>2s):")
                     slowTests.sortedByDescending { it.second }
                         .take(10)
                         .forEach { (name, time) ->
@@ -159,7 +159,7 @@ tasks.withType<Test> {
         override fun beforeTest(testDescriptor: TestDescriptor) {}
         override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
             val duration = result.endTime - result.startTime
-            if (duration > 1000) {
+            if (duration > 2000) {
                 slowTests.add("${testDescriptor.className} > ${testDescriptor.name}" to duration)
             }
         }
