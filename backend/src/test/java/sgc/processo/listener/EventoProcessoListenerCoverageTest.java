@@ -156,16 +156,21 @@ class EventoProcessoListenerCoverageTest {
 
         when(processoFacade.buscarEntidadePorId(cod)).thenReturn(p);
         when(subprocessoFacade.listarEntidadesPorProcesso(cod)).thenReturn(List.of(s));
-        when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, r));
-        when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("T", ut, "S", us));
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r));
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", ut, "S", us));
         when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("html");
         
-        doThrow(new RuntimeException("SIMULADO")).when(notificacaoEmailService)
-            .enviarEmailHtml(eq("s@s.com"), anyString(), anyString());
+        doAnswer(invocation -> {
+            String email = invocation.getArgument(0);
+            if ("s@s.com".equals(email)) {
+                throw new RuntimeException("SIMULADO");
+            }
+            return null;
+        }).when(notificacaoEmailService).enviarEmailHtml(any(), any(), any());
 
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> listener.aoIniciarProcesso(evento));
 
-        verify(notificacaoEmailService, times(2)).enviarEmailHtml(anyString(), anyString(), anyString());
+        verify(notificacaoEmailService, times(2)).enviarEmailHtml(any(), any(), any());
     }
 
     @Test

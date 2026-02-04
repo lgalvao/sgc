@@ -151,7 +151,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve criar uma análise de cadastro e retornar 201 Created")
         @WithMockUser(roles = "GESTOR")
         void deveCriarAnaliseCadastro() throws Exception {
-            var request = new CriarAnaliseRequest(NOVA_ANALISE_DE_CADASTRO, "SIGLA", "TITULO", "MOTIVO");
+            var request = new CriarAnaliseRequest("123456789012", NOVA_ANALISE_DE_CADASTRO, "SIGLA", "MOTIVO");
             var analise = new Analise();
             var dto = AnaliseHistoricoDto.builder().observacoes(NOVA_ANALISE_DE_CADASTRO).build();
 
@@ -172,7 +172,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve criar uma análise de cadastro com observações vazias e retornar 201 Created")
         @WithMockUser(roles = "GESTOR")
         void deveCriarAnaliseCadastroComObservacoesVazias() throws Exception {
-            var request = new CriarAnaliseRequest("", "SIGLA", "TITULO", "MOTIVO");
+            var request = new CriarAnaliseRequest("123456789012", "", "SIGLA", "MOTIVO");
             var analise = new Analise();
             var dto = AnaliseHistoricoDto.builder().observacoes("").build();
 
@@ -204,7 +204,7 @@ class AnaliseControllerTest {
                             post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content("{}"))
+                                    .content("{\"tituloUsuario\": \"123456789012\"}"))
                     .andExpect(status().isCreated());
         }
 
@@ -212,7 +212,7 @@ class AnaliseControllerTest {
         @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
         @WithMockUser(roles = "ADMIN")
         void deveRetornarNotFoundParaSubprocessoInexistenteNaCriacao() throws Exception {
-            var request = new CriarAnaliseRequest(ANALISE_DE_CADASTRO, "S", "T", "M");
+            var request = new CriarAnaliseRequest("123456789012", ANALISE_DE_CADASTRO, "S", "M");
 
             when(subprocessoFacade.buscarSubprocesso(99L))
                     .thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
@@ -229,7 +229,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar 400 Bad Request para parâmetro inválido")
         @WithMockUser(roles = "GESTOR")
         void deveRetornarBadRequestParaParametroInvalido() throws Exception {
-            var request = new CriarAnaliseRequest(ANALISE_INVALIDA, "S", "T", "M");
+            var request = new CriarAnaliseRequest("123456789012", ANALISE_INVALIDA, "S", "M");
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any()))
@@ -247,7 +247,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar 500 Internal Server Error para erro inesperado na criação")
         @WithMockUser(roles = "ADMIN")
         void deveRetornarInternalServerErrorParaErroInesperadoNaCriacao() throws Exception {
-            var request = new CriarAnaliseRequest(ANALISE_DE_CADASTRO, "S", "T", "M");
+            var request = new CriarAnaliseRequest("123456789012", ANALISE_DE_CADASTRO, "S", "M");
 
             when(subprocessoFacade.buscarSubprocesso(99L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any()))
@@ -316,7 +316,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve criar uma análise de validação e retornar 201 Created")
         @WithMockUser(roles = "ADMIN")
         void deveCriarAnaliseValidacao() throws Exception {
-            var request = new CriarAnaliseRequest(NOVA_ANALISE_DE_VALIDACAO, "S", "T", "M");
+            var request = new CriarAnaliseRequest("123456789012", NOVA_ANALISE_DE_VALIDACAO, "S", "M");
             var analise = new Analise();
             var dto = AnaliseHistoricoDto.builder().observacoes(NOVA_ANALISE_DE_VALIDACAO).build();
 
