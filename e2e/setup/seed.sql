@@ -437,3 +437,21 @@ VALUES (307, 307, CURRENT_TIMESTAMP, NULL, 'Revisar a descrição das atividades
 -- Subprocesso Unit 5 (COORD_11): MAPEAMENTO_CADASTRO_HOMOLOGADO
 INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
 VALUES (305, 300, 5, 'MAPEAMENTO_CADASTRO_HOMOLOGADO', CURRENT_TIMESTAMP);
+
+-- Processo 400: Diagnóstico de Competências 2026
+INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, descricao, situacao, tipo)
+VALUES (400, CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP, 'Diagnóstico de Competências 2026', 'EM_ANDAMENTO', 'DIAGNOSTICO');
+
+-- UnidadeProcesso (Units 6, 7, 8, 10)
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (400, 6, 'EM_ANDAMENTO'); -- SECAO_111
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (400, 7, 'EM_ANDAMENTO'); -- SECAO_112
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (400, 8, 'AGUARDANDO');   -- SECAO_113
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (400, 10, 'AGUARDANDO');  -- SECAO_121
+
+-- Subprocesso Unit 6 (SECAO_111): DIAGNOSTICO_MONITORAMENTO
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (406, 400, 6, 'DIAGNOSTICO_MONITORAMENTO', CURRENT_TIMESTAMP);
+
+-- Subprocesso Unit 7 (SECAO_112): DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (407, 400, 7, 'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO', CURRENT_TIMESTAMP);
