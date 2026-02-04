@@ -46,7 +46,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" :disabled="processando">Cancelar</button>
           <button type="button" class="btn btn-primary" :disabled="processando || selecionadosLocal.length === 0" @click="confirmar">
-            <span v-if="processando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <output v-if="processando" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></output>
             {{ rotuloBotao }}
           </button>
         </div>
@@ -78,7 +78,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'confirmar', dados: { ids: number[], dataLimite?: string }): void;
+  'confirmar': [dados: { ids: number[], dataLimite?: string }];
 }>();
 
 const modalElement = ref<HTMLElement | null>(null);

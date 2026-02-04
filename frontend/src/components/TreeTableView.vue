@@ -118,14 +118,16 @@ const props = withDefaults(defineProps<TreeTableProps>(), {
   emptyIcon: "bi-folder2-open",
 });
 
-const emit = defineEmits<(e: "row-click", item: TreeItem) => void>();
+const emit = defineEmits<{
+  'row-click': [item: TreeItem];
+}>();
 
 const internalData = ref<TreeItem[]>([]);
 
 const initializeExpanded = (items: TreeItem[]): TreeItem[] => {
   return items.map((item) => ({
     ...item,
-    expanded: item.expanded !== undefined ? item.expanded : false,
+    expanded: item.expanded ?? false,
     children: item.children ? initializeExpanded(item.children) : [],
   }));
 };
@@ -134,7 +136,7 @@ watch(
   () => props.data,
   (newData) => {
     internalData.value = initializeExpanded(
-      JSON.parse(JSON.stringify(newData)),
+      structuredClone(newData),
     );
   },
   { immediate: true, deep: true },

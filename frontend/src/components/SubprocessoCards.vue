@@ -12,8 +12,7 @@
             role="button"
             tabindex="0"
             @click="navegarPara('SubprocessoCadastro')"
-            @keydown.enter.prevent="navegarPara('SubprocessoCadastro')"
-            @keydown.space.prevent="navegarPara('SubprocessoCadastro')"
+            @keydown="handleKeyDown($event, 'SubprocessoCadastro')"
         >
           <div class="card-click-area">
             <BCardTitle>
@@ -31,8 +30,7 @@
             role="button"
             tabindex="0"
             @click="navegarPara('SubprocessoVisCadastro')"
-            @keydown.enter.prevent="navegarPara('SubprocessoVisCadastro')"
-            @keydown.space.prevent="navegarPara('SubprocessoVisCadastro')"
+            @keydown="handleKeyDown($event, 'SubprocessoVisCadastro')"
         >
           <div class="card-click-area">
             <BCardTitle>
@@ -58,8 +56,7 @@
             role="button"
             :tabindex="!mapa ? -1 : 0"
             @click="!mapa ? null : navegarPara('SubprocessoMapa')"
-            @keydown.enter.prevent="!mapa ? null : navegarPara('SubprocessoMapa')"
-            @keydown.space.prevent="!mapa ? null : navegarPara('SubprocessoMapa')"
+            @keydown="handleKeyDown($event, 'SubprocessoMapa')"
         >
           <div class="card-click-area">
             <BCardTitle>
@@ -79,8 +76,7 @@
             role="button"
             :tabindex="!mapa ? -1 : 0"
             @click="!mapa ? null : navegarPara('SubprocessoVisMapa')"
-            @keydown.enter.prevent="!mapa ? null : navegarPara('SubprocessoVisMapa')"
-            @keydown.space.prevent="!mapa ? null : navegarPara('SubprocessoVisMapa')"
+            @keydown="handleKeyDown($event, 'SubprocessoVisMapa')"
         >
           <div class="card-click-area">
             <BCardTitle>
@@ -106,8 +102,7 @@
             role="button"
             tabindex="0"
             @click="navegarParaDiag('AutoavaliacaoDiagnostico')"
-            @keydown.enter.prevent="navegarParaDiag('AutoavaliacaoDiagnostico')"
-            @keydown.space.prevent="navegarParaDiag('AutoavaliacaoDiagnostico')"
+            @keydown="handleKeyDown($event, 'AutoavaliacaoDiagnostico', true)"
         >
           <div class="card-click-area">
             <BCardTitle>
@@ -130,8 +125,7 @@
             role="button"
             tabindex="0"
             @click="navegarParaDiag('OcupacoesCriticasDiagnostico')"
-            @keydown.enter.prevent="navegarParaDiag('OcupacoesCriticasDiagnostico')"
-            @keydown.space.prevent="navegarParaDiag('OcupacoesCriticasDiagnostico')"
+            @keydown="handleKeyDown($event, 'OcupacoesCriticasDiagnostico', true)"
         >
           <div class="card-click-area">
             <BCardTitle>
@@ -153,8 +147,7 @@
             role="button"
             tabindex="0"
             @click="navegarParaDiag('MonitoramentoDiagnostico')"
-            @keydown.enter.prevent="navegarParaDiag('MonitoramentoDiagnostico')"
-            @keydown.space.prevent="navegarParaDiag('MonitoramentoDiagnostico')"
+            @keydown="handleKeyDown($event, 'MonitoramentoDiagnostico', true)"
         >
           <div class="card-click-area">
             <BCardTitle>
@@ -207,6 +200,19 @@ const navegarParaDiag = (routeName: string) => {
       siglaUnidade: props.siglaUnidade
     }
   });
+};
+
+const handleKeyDown = (event: KeyboardEvent, routeName: string, diag = false) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    if (diag) {
+      navegarParaDiag(routeName);
+    } else if (routeName === 'SubprocessoMapa' || routeName === 'SubprocessoVisMapa') {
+        if (props.mapa) navegarPara(routeName);
+    } else {
+        navegarPara(routeName);
+    }
+  }
 };
 </script>
 

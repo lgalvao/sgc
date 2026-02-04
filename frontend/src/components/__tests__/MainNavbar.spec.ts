@@ -44,6 +44,13 @@ describe("MainNavbar.vue", () => {
         } as any);
     });
 
+    const checkLink = (text: string, to: string) => {
+         const links = ctx.wrapper.findAllComponents(RouterLinkStub);
+         const link = links.find(w => w.text().includes(text));
+         expect(link?.exists()).toBe(true);
+         expect(link?.props().to).toBe(to);
+    };
+
     it("deve navegar para a rota correta ao clicar nos links do menu (ADMIN)", async () => {
         const options = getCommonMountOptions({
             perfil: {
@@ -53,14 +60,6 @@ describe("MainNavbar.vue", () => {
         });
 
         ctx.wrapper = mount(NavBar, options);
-
-        // Helper to check link
-        const checkLink = (text: string, to: string) => {
-             const links = ctx.wrapper!.findAllComponents(RouterLinkStub);
-             const link = links.find(w => w.text().includes(text));
-             expect(link?.exists()).toBe(true);
-             expect(link?.props().to).toBe(to);
-        };
 
         checkLink("Painel", "/painel");
         // ADMIN vê "Unidades" apontando para unidade raiz (código 1)
@@ -79,12 +78,6 @@ describe("MainNavbar.vue", () => {
 
         ctx.wrapper = mount(NavBar, options);
 
-        const checkLink = (text: string, to: string) => {
-             const links = ctx.wrapper!.findAllComponents(RouterLinkStub);
-             const link = links.find(w => w.text().includes(text));
-             expect(link?.exists()).toBe(true);
-             expect(link?.props().to).toBe(to);
-        };
 
         // GESTOR vê "Minha unidade" apontando para sua unidade
         checkLink("Minha unidade", "/unidade/456");

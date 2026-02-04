@@ -296,7 +296,7 @@ export function useCadAtividades(props: { codProcesso: number | string; sigla: s
             erroGlobal.value = null;
             try {
                 const resultado = await subprocessosStore.validarCadastro(codSubprocesso.value);
-                if (resultado && resultado.valido) {
+                if (resultado?.valido) {
                     mostrarModalConfirmacao.value = true;
                 } else if (resultado) {
                     errosValidacao.value = resultado.erros;

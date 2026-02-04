@@ -38,10 +38,9 @@
           variant="primary"
           @click="$emit('confirmarAlteracao', novaDataLimite)"
       >
-        <span
+        <output
             v-if="loading"
             class="spinner-border spinner-border-sm me-1"
-            role="status"
             aria-hidden="true"
         />
         <i v-else class="bi bi-check-circle me-1" aria-hidden="true"/>

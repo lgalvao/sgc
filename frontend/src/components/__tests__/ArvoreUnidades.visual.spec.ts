@@ -137,8 +137,8 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm as any;
-            const coord11 = criarUnidades()[0].filhas![2];
+            const vm = wrapper.vm;
+            const coord11 = criarUnidades()[0].filhas[2];
 
             expect(vm.getEstadoSelecao(coord11)).toBe(false);
         });
@@ -151,8 +151,8 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm as any;
-            const coord11 = criarUnidades()[0].filhas![2];
+            const vm = wrapper.vm;
+            const coord11 = criarUnidades()[0].filhas[2];
 
             expect(vm.getEstadoSelecao(coord11)).toBe(true);
         });
@@ -165,8 +165,8 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm as any;
-            const coord11 = criarUnidades()[0].filhas![2];
+            const vm = wrapper.vm;
+            const coord11 = criarUnidades()[0].filhas[2];
 
             expect(vm.getEstadoSelecao(coord11)).toBe('indeterminate');
         });
@@ -202,9 +202,9 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm as any;
+            const vm = wrapper.vm;
             const secretaria = criarUnidades()[0];
-            const coord12 = criarUnidades()[0].filhas![3];
+            const coord12 = criarUnidades()[0].filhas[3];
 
             // Antes de desmarcar
             expect(vm.getEstadoSelecao(coord12)).toBe(false);
@@ -226,8 +226,8 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm as any;
-            const coord11 = criarUnidades()[0].filhas![2];
+            const vm = wrapper.vm;
+            const coord11 = criarUnidades()[0].filhas[2];
 
             // COORD_11 não é elegível (INTERMEDIARIA)
             expect(coord11.isElegivel).toBe(false);
@@ -268,7 +268,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm as any;
+            const vm = wrapper.vm;
             const coord = unidadesComCoordSemFilhas[0];
 
             expect(vm.isHabilitado(coord)).toBe(false);
@@ -283,7 +283,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
             });
 
             const vm = wrapper.vm as any;
-            const assessoria = criarUnidades()[0].filhas![0];
+            const assessoria = criarUnidades()[0].filhas[0];
 
             expect(assessoria.isElegivel).toBe(true);
             expect(vm.isHabilitado(assessoria)).toBe(true);
@@ -318,8 +318,8 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                 }
             });
 
-            const vm = wrapper.vm as any;
-            const coord11 = criarUnidades()[0].filhas![2];
+            const vm = wrapper.vm;
+            const coord11 = criarUnidades()[0].filhas[2];
 
             // Selecionar COORD_11
             vm.toggle(coord11, true);

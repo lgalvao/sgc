@@ -44,7 +44,7 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'submit'): void;
+  'submit': [];
 }>();
 
 const inputRef = ref<InstanceType<typeof BFormInput> | null>(null);

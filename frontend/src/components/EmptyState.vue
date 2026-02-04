@@ -1,8 +1,7 @@
 <template>
-  <div
+  <section
       class="text-center py-4 border rounded bg-light mb-3 text-muted empty-state"
       data-testid="empty-state"
-      role="region"
       aria-label="Estado vazio"
   >
     <i
@@ -27,7 +26,7 @@
 
     <!-- Slot para botões de ação -->
     <slot />
-  </div>
+  </section>
 </template>
 
 <script lang="ts" setup>

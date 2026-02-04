@@ -10,9 +10,9 @@
   >
     <div data-testid="modal-historico-body">
       <div v-if="loading" class="text-center py-4">
-        <div class="spinner-border text-primary" role="status">
+        <output class="spinner-border text-primary" aria-label="Carregando dados">
           <span class="visually-hidden">Carregando...</span>
-        </div>
+        </output>
       </div>
       <template v-else>
         <BAlert

@@ -12,12 +12,11 @@
         :key="column.key"
         :style="index === 0 ? { paddingLeft: (level * 1.25) + 'rem' } : {}"
     >
-      <span
+      <button
           v-if="index === 0 && item.children && item.children.length > 0"
+          type="button"
+          class="btn btn-link p-0 toggle-icon text-decoration-none border-0"
           :data-testid="`btn-toggle-expand-${item.codigo}`"
-          class="toggle-icon"
-          tabindex="0"
-          role="button"
           :aria-expanded="item.expanded"
           :aria-label="item.expanded ? 'Recolher' : 'Expandir'"
           @click.stop="toggleExpand(item.codigo)"
@@ -25,7 +24,7 @@
           @keydown.space.stop="toggleExpand(item.codigo)"
       >
         <i aria-hidden="true" :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']"/>
-      </span>
+      </button>
       {{ item[column.key] }}
     </td>
   </tr>

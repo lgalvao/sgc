@@ -7,7 +7,7 @@
           aria-label="Selecionar todas as unidades elegíveis"
           @click="selecionarTodas"
       >
-        <i class="bi bi-check-all me-1" aria-hidden="true"/> Selecionar todas
+        <i class="bi bi-check-all me-1" aria-hidden="true"/> Selecionar todas as unidades elegíveis
       </button>
       <button
           type="button"
@@ -15,7 +15,7 @@
           aria-label="Desmarcar todas as unidades"
           @click="deselecionarTodas"
       >
-        <i class="bi bi-x-lg me-1" aria-hidden="true"/> Limpar seleção
+        <i class="bi bi-x-lg me-1" aria-hidden="true"/> Desmarcar todas as unidades
       </button>
     </div>
 
@@ -183,10 +183,8 @@ function updateAncestors(node: Unidade, selectionSet: Set<number>) {
       if (parent.isElegivel) {
         selectionSet.add(parent.codigo);
       }
-    } else {
-      if (parent.tipo !== 'INTEROPERACIONAL') {
-        selectionSet.delete(parent.codigo);
-      }
+    } else if (parent.tipo !== 'INTEROPERACIONAL') {
+      selectionSet.delete(parent.codigo);
     }
     current = parent;
   }
@@ -258,6 +256,17 @@ watch(
     },
     {deep: true}
 );
+
+defineExpose({
+    getEstadoSelecao,
+    isChecked,
+    isExpanded,
+    isHabilitado,
+    toggle,
+    toggleExpand,
+    selecionarTodas,
+    deselecionarTodas
+});
 </script>
 
 <style scoped>

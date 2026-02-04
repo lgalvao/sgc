@@ -71,14 +71,14 @@
               </td>
               <td>
                 <div class="d-flex align-items-center">
-                  <div class="progress flex-grow-1 me-2" style="height: 10px;">
-                    <div
-                        :class="getProgressBarClass(servidor)"
-                        :style="`width: ${getProgressoServidor(servidor)}%`"
-                        class="progress-bar"
-                        role="progressbar"
-                    ></div>
-                  </div>
+                  <BProgress
+                      :max="servidor.totalCompetencias"
+                      :value="servidor.competenciasAvaliadas"
+                      :variant="getProgressBarVariant(servidor)"
+                      aria-label="Progresso das competências avaliadas"
+                      class="flex-grow-1 me-2"
+                      height="10px"
+                  />
                   <span>{{ servidor.competenciasAvaliadas }}/{{ servidor.totalCompetencias }}</span>
                 </div>
               </td>
@@ -103,7 +103,7 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
-import {BButton, BCard, BContainer, BSpinner} from 'bootstrap-vue-next';
+import {BButton, BCard, BContainer, BProgress, BSpinner} from 'bootstrap-vue-next';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import {useFeedbackStore} from '@/stores/feedback';
 import {useDiagnosticosStore} from '@/stores/diagnosticos';
@@ -150,10 +150,10 @@ function getProgressoServidor(s: ServidorDiagnosticoDto) {
   return Math.round((s.competenciasAvaliadas / s.totalCompetencias) * 100);
 }
 
-function getProgressBarClass(s: ServidorDiagnosticoDto) {
-  if (s.situacao === 'AUTOAVALIACAO_CONCLUIDA') return 'bg-success';
-  if (s.competenciasAvaliadas > 0) return 'bg-primary';
-  return 'bg-secondary';
+function getProgressBarVariant(s: ServidorDiagnosticoDto) {
+  if (s.situacao === 'AUTOAVALIACAO_CONCLUIDA') return 'success';
+  if (s.competenciasAvaliadas > 0) return 'primary';
+  return 'secondary';
 }
 
 function getStatusBadgeClass(situacao: string) {

@@ -39,7 +39,7 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "ordenar", criterio: "data" | "processo"): void;
+  'ordenar': [criterio: "data" | "processo"];
 }>();
 
 const fields = [
@@ -50,7 +50,7 @@ const fields = [
 ];
 
 const rowClass = (item: Alerta) => {
-  return !item.dataHoraLeitura ? "fw-bold" : "";
+  return item.dataHoraLeitura ? "" : "fw-bold";
 };
 
 const handleSortChange = (ctx: any) => {

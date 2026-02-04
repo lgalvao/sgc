@@ -17,7 +17,7 @@ const props = defineProps<{
 }>();
 
 defineEmits<{
-  (e: 'row-click', item: any): void;
+  'row-click': [item: any];
 }>();
 
 const colunas = [

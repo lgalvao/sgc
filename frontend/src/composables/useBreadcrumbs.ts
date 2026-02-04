@@ -122,9 +122,11 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
     const isSubprocessoRoute = ["Subprocesso", "SubprocessoMapa", "SubprocessoVisMapa", "SubprocessoCadastro", "SubprocessoVisCadastro"].includes(routeName);
     const isUnidadeRoute = ["Unidade", "Mapa", "AtribuicaoTemporariaForm"].includes(routeName);
 
-    breadcrumbs.push(...getProcessoBreadcrumbs(codProcesso, isProcessoRoute, isSubprocessoRoute, perfilUsuario));
-    breadcrumbs.push(...getSubprocessoBreadcrumbs(codProcesso, siglaUnidade, isSubprocessoRoute, routeName));
-    breadcrumbs.push(...getUnidadeBreadcrumbs(codUnidade, isUnidadeRoute, routeName, perfilUsuario));
+    breadcrumbs.push(
+      ...getProcessoBreadcrumbs(codProcesso, isProcessoRoute, isSubprocessoRoute, perfilUsuario),
+      ...getSubprocessoBreadcrumbs(codProcesso, siglaUnidade, isSubprocessoRoute, routeName),
+      ...getUnidadeBreadcrumbs(codUnidade, isUnidadeRoute, routeName, perfilUsuario)
+    );
 
     if (!isProcessoRoute && !isSubprocessoRoute && !isUnidadeRoute) {
       addFallbackBreadcrumbs(breadcrumbs);

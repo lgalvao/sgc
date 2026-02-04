@@ -43,6 +43,7 @@
               <BFormInput
                   id="titulo"
                   v-model="titulo"
+                  name="titulo"
                   autocomplete="username"
                   data-testid="inp-login-usuario"
                   :disabled="loginStep > 1"
@@ -70,6 +71,7 @@
                 <BFormInput
                     id="senha"
                     v-model="senha"
+                    name="senha"
                     autocomplete="current-password"
                     data-testid="inp-login-senha"
                     :disabled="loginStep > 1"
@@ -214,6 +216,13 @@ const verificarCapsLock = (event: KeyboardEvent) => {
 
 const handleLogin = async () => {
   if (loginStep.value === 1) {
+    await performInitialLogin();
+  } else if (loginStep.value === 2) {
+    await performProfileSelection();
+  }
+};
+
+const performInitialLogin = async () => {
     if (!titulo.value || !senha.value) {
       feedbackStore.show("Dados incompletos", "Por favor, preencha título e senha.", "danger");
       return;
@@ -224,16 +233,7 @@ const handleLogin = async () => {
       const sucessoAutenticacao = await perfilStore.loginCompleto(titulo.value, senha.value);
 
       if (sucessoAutenticacao) {
-        if (perfilStore.perfisUnidades.length > 1) {
-          loginStep.value = 2;
-          // Não retornar aqui para garantir que o finally execute corretamente (embora o try/finally garanta, é bom ser explícito no fluxo)
-          // Na verdade, o return dentro do try executa o finally antes de retornar.
-          // O problema pode ser outro.
-        } else if (perfilStore.perfisUnidades.length === 1) {
-          await router.push("/painel");
-        } else {
-          feedbackStore.show("Perfis indisponíveis", "Nenhum perfil/unidade disponível para este usuário.", "danger");
-        }
+          await handlePostAuth();
       } else {
         feedbackStore.show("Erro no login", "Título ou senha inválidos.", "danger");
       }
@@ -247,8 +247,19 @@ const handleLogin = async () => {
     } finally {
       isLoading.value = false;
     }
-  } else if (loginStep.value === 2) {
-    // Step 2: Profile Selection
+};
+
+const handlePostAuth = async () => {
+    if (perfilStore.perfisUnidades.length > 1) {
+        loginStep.value = 2;
+    } else if (perfilStore.perfisUnidades.length === 1) {
+        await router.push("/painel");
+    } else {
+        feedbackStore.show("Perfis indisponíveis", "Nenhum perfil/unidade disponível para este usuário.", "danger");
+    }
+};
+
+const performProfileSelection = async () => {
     if (parSelecionado.value) {
       isLoading.value = true;
       try {
@@ -266,6 +277,5 @@ const handleLogin = async () => {
     } else {
       feedbackStore.show("Seleção necessária", "Por favor, selecione um perfil.", "danger");
     }
-  }
 };
 </script>
