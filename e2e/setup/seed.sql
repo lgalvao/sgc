@@ -510,3 +510,38 @@ INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30661
 INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30662, 'Gestão da qualidade', 3066);
 INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (3066, 30601);
 INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (3066, 30602);
+
+-- Phase 2: Revision Flow Scenario (Process 500)
+
+-- Historical process for Unit 12 (ASSESSORIA_21) to have a base map
+INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, descricao, situacao, tipo)
+VALUES (499, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo Histórico Unit 12', 'FINALIZADO', 'MAPEAMENTO');
+
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (499, 12, 'CONCLUIDA');
+
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (49912, 499, 12, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
+
+INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
+VALUES (49912, 49912, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
+
+INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo)
+VALUES (12, 49912);
+
+-- Base map content
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo) VALUES (499121, 'Atividade Histórica 1', 49912);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (4991211, 'Conhecimento Histórico 1.1', 499121);
+
+-- New REVISAO process (ID 500)
+INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, descricao, situacao, tipo)
+VALUES (500, CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP, 'Revisão Bienal 2026 - Secretaria 2', 'EM_ANDAMENTO', 'REVISAO');
+
+-- UnidadeProcesso (Units 11, 12, 13, 14)
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (500, 11, 'EM_ANDAMENTO');
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (500, 12, 'EM_ANDAMENTO');
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (500, 13, 'AGUARDANDO');
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao) VALUES (500, 14, 'AGUARDANDO');
+
+-- Subprocess Unit 12: REVISAO_CADASTRO_EM_ANDAMENTO
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (50012, 500, 12, 'REVISAO_CADASTRO_EM_ANDAMENTO', CURRENT_TIMESTAMP);
