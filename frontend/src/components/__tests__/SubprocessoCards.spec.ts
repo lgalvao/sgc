@@ -36,11 +36,6 @@ describe('SubprocessoCards.vue', () => {
             props: defaultProps,
             global: {
                 stubs: {
-                    BCard: { template: '<div class="card"><slot /></div>' },
-                    BCardTitle: { template: '<div><slot /></div>' },
-                    BCardText: { template: '<div><slot /></div>' },
-                    BRow: { template: '<div><slot /></div>' },
-                    BCol: { template: '<div><slot /></div>' }
                 }
             }
         });
@@ -65,7 +60,7 @@ describe('SubprocessoCards.vue', () => {
 
         // Keydown Space action
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown.space');
+        await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown', { key: ' ' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoCadastro',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
@@ -90,7 +85,7 @@ describe('SubprocessoCards.vue', () => {
 
         // Space
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown.space');
+        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown', { key: ' ' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoMapa',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
@@ -105,11 +100,6 @@ describe('SubprocessoCards.vue', () => {
             },
             global: {
                 stubs: {
-                    BCard: { template: '<div class="card"><slot /></div>' },
-                    BCardTitle: { template: '<div><slot /></div>' },
-                    BCardText: { template: '<div><slot /></div>' },
-                    BRow: { template: '<div><slot /></div>' },
-                    BCol: { template: '<div><slot /></div>' }
                 }
             }
         });
@@ -131,7 +121,7 @@ describe('SubprocessoCards.vue', () => {
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('keydown.space');
+        await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('keydown', { key: ' ' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoVisCadastro',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
@@ -153,7 +143,7 @@ describe('SubprocessoCards.vue', () => {
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown.space');
+        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown', { key: ' ' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoVisMapa',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
@@ -169,11 +159,6 @@ describe('SubprocessoCards.vue', () => {
             },
             global: {
                 stubs: {
-                    BCard: { template: '<div class="card"><slot /></div>' },
-                    BCardTitle: { template: '<div><slot /></div>' },
-                    BCardText: { template: '<div><slot /></div>' },
-                    BRow: { template: '<div><slot /></div>' },
-                    BCol: { template: '<div><slot /></div>' }
                 }
             }
         });
@@ -193,7 +178,7 @@ describe('SubprocessoCards.vue', () => {
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-diagnostico"]').trigger('keydown.space');
+        await wrapper.find('[data-testid="card-subprocesso-diagnostico"]').trigger('keydown', { key: ' ' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'AutoavaliacaoDiagnostico',
             params: { codSubprocesso: 100, siglaUnidade: 'TESTE' }
@@ -215,7 +200,7 @@ describe('SubprocessoCards.vue', () => {
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').trigger('keydown.space');
+        await wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').trigger('keydown', { key: ' ' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'OcupacoesCriticasDiagnostico',
             params: { codSubprocesso: 100, siglaUnidade: 'TESTE' }
@@ -237,7 +222,7 @@ describe('SubprocessoCards.vue', () => {
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-monitoramento"]').trigger('keydown.space');
+        await wrapper.find('[data-testid="card-subprocesso-monitoramento"]').trigger('keydown', { key: ' ' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'MonitoramentoDiagnostico',
             params: { codSubprocesso: 100, siglaUnidade: 'TESTE' }
@@ -252,13 +237,6 @@ describe('SubprocessoCards.vue', () => {
             },
             global: {
                 stubs: {
-                    BCard: {
-                        template: '<div class="card"><slot /></div>'
-                    },
-                    BCardTitle: { template: '<div><slot /></div>' },
-                    BCardText: { template: '<div><slot /></div>' },
-                    BRow: { template: '<div><slot /></div>' },
-                    BCol: { template: '<div><slot /></div>' }
                 }
             }
         });
@@ -273,10 +251,10 @@ describe('SubprocessoCards.vue', () => {
         await card.trigger('click');
         expect(pushMock).not.toHaveBeenCalled();
 
-        await card.trigger('keydown.enter');
+        await card.trigger('keydown', { key: 'Enter' });
         expect(pushMock).not.toHaveBeenCalled();
 
-        await card.trigger('keydown.space');
+        await card.trigger('keydown', { key: ' ' });
         expect(pushMock).not.toHaveBeenCalled();
     });
 
@@ -289,13 +267,6 @@ describe('SubprocessoCards.vue', () => {
             },
             global: {
                 stubs: {
-                    BCard: {
-                        template: '<div class="card"><slot /></div>'
-                    },
-                    BCardTitle: { template: '<div><slot /></div>' },
-                    BCardText: { template: '<div><slot /></div>' },
-                    BRow: { template: '<div><slot /></div>' },
-                    BCol: { template: '<div><slot /></div>' }
                 }
             }
         });
@@ -307,7 +278,7 @@ describe('SubprocessoCards.vue', () => {
         await card.trigger('click');
         expect(pushMock).not.toHaveBeenCalled();
 
-        await card.trigger('keydown.enter');
+        await card.trigger('keydown', { key: 'Enter' });
         expect(pushMock).not.toHaveBeenCalled();
     });
 
@@ -316,11 +287,6 @@ describe('SubprocessoCards.vue', () => {
             props: defaultProps,
             global: {
                 stubs: {
-                    BCard: { template: '<div class="card"><slot /></div>' },
-                    BCardTitle: { template: '<div><slot /></div>' },
-                    BCardText: { template: '<div><slot /></div>' },
-                    BRow: { template: '<div><slot /></div>' },
-                    BCol: { template: '<div><slot /></div>' }
                 }
             }
         });

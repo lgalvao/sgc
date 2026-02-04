@@ -1,5 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
+import {markRaw} from "vue";
 import ProcessoView from "@/views/ProcessoView.vue";
 import {useProcessosStore} from "@/stores/processos";
 import {useFeedbackStore} from "@/stores/feedback";
@@ -29,6 +30,13 @@ vi.mock("vue-router", () => ({
 }));
 
 vi.mock("@/services/processoService");
+
+const modalSpies = {
+    abrir: vi.fn(),
+    fechar: vi.fn(),
+    setErro: vi.fn(),
+    setProcessando: vi.fn()
+};
 
 describe("ProcessoViewCoverage.spec.ts", () => {
     let processosStore: any;
@@ -74,11 +82,10 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         name: 'ModalAcaoBloco',
                         template: '<div>ModalAcaoBloco</div>',
                         expose: ['abrir', 'fechar', 'setErro', 'setProcessando'],
-                        methods: {
-                            abrir: vi.fn(),
-                            fechar: vi.fn(),
-                            setErro: vi.fn(),
-                            setProcessando: vi.fn()
+                        setup(props, { expose }) {
+                           const rawSpies = markRaw(modalSpies);
+                           expose(rawSpies);
+                           return rawSpies;
                         }
                     },
                     ModalConfirmacao: {
@@ -98,6 +105,10 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        modalSpies.abrir.mockClear();
+        modalSpies.fechar.mockClear();
+        modalSpies.setErro.mockClear();
+        modalSpies.setProcessando.mockClear();
     });
 
     it("deve lidar com erro ao finalizar processo", async () => {
@@ -191,10 +202,6 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         vi.spyOn(feedbackStore, "show");
 
         const modal = wrapper.findComponent({ name: 'ModalAcaoBloco' });
-        if (modal.exists()) {
-             vi.spyOn(modal.vm, 'setErro');
-             vi.spyOn(modal.vm, 'setProcessando');
-        }
 
         // Trigger action
         (wrapper.vm as any).acaoBlocoAtual = 'aceitar';
@@ -203,7 +210,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         await (wrapper.vm as any).executarAcaoBloco({ ids: [1] });
 
         if (modal.exists()) {
-             expect(modal.vm.setErro).toHaveBeenCalledWith("Erro bloco");
+             expect(modalSpies.setErro).toHaveBeenCalledWith("Erro bloco");
         }
     });
 

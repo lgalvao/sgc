@@ -58,6 +58,8 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
     private UsuarioPerfilRepo usuarioPerfilRepo;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private jakarta.persistence.EntityManager entityManager;
 
     private Subprocesso subprocesso;
     private Unidade unidade;
@@ -169,6 +171,9 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
                 .perfil(Perfil.CHEFE)
                 .build();
         usuarioPerfilRepo.save(perfilOutroChefe);
+
+        // Sincronizar JPA com banco antes de usar JDBC direto
+        entityManager.flush();
 
         // Popular VW_RESPONSABILIDADE (simulada como tabela no H2)
         jdbcTemplate.update(

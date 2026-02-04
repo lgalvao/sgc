@@ -24,12 +24,14 @@
             Aceitar em bloco
           </BButton>
 
-          <BButton v-if="mostrarBotoesBloco && podeHomologarBloco" variant="warning" class="text-white"
+          <BButton
+v-if="mostrarBotoesBloco && podeHomologarBloco" variant="warning" class="text-white"
                    @click="abrirModalBloco('homologar')">
             Homologar em bloco
           </BButton>
 
-          <BButton v-if="mostrarBotoesBloco && podeDisponibilizarBloco" variant="info" class="text-white"
+          <BButton
+v-if="mostrarBotoesBloco && podeDisponibilizarBloco" variant="info" class="text-white"
                    @click="abrirModalBloco('disponibilizar')">
             Disponibilizar mapas em bloco
           </BButton>
@@ -103,6 +105,7 @@ const {
   perfilStore,
   processo,
   participantesHierarquia,
+  modalBlocoRef,
   mostrarModalFinalizacao,
   acaoBlocoAtual,
   unidadesElegiveis,
@@ -120,4 +123,12 @@ const {
   abrirModalBloco,
   executarAcaoBloco
 } = useProcessoView();
+
+defineExpose({
+  abrirDetalhesUnidade,
+  executarAcaoBloco,
+  acaoBlocoAtual,
+  unidadesElegiveis,
+  perfilStore,
+});
 </script>

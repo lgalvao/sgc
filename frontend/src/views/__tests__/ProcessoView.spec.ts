@@ -52,15 +52,20 @@ const ProcessoAcoesStub = {
     emits: ["finalizar"],
 };
 
+const modalSpies = {
+    abrir: vi.fn(),
+    fechar: vi.fn(),
+    setErro: vi.fn(),
+    setProcessando: vi.fn(),
+};
+
 const ModalAcaoBlocoStub = {
     name: "ModalAcaoBloco",
     template: '<div data-testid="modal-acao-bloco"></div>',
     props: ["id", "titulo", "texto", "rotuloBotao", "unidades", "mostrar", "tipo", "unidadesPreSelecionadas", "mostrarDataLimite"],
-    methods: {
-        abrir: vi.fn(),
-        fechar: vi.fn(),
-        setErro: vi.fn(),
-        setProcessando: vi.fn(),
+    setup(props: any, { expose }: any) {
+        expose(modalSpies);
+        return modalSpies;
     },
     emits: ["confirmar"],
 };
@@ -163,10 +168,10 @@ describe("ProcessoView.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Clear stub mocks history
-        (ModalAcaoBlocoStub.methods.abrir as any).mockClear();
-        (ModalAcaoBlocoStub.methods.fechar as any).mockClear();
-        (ModalAcaoBlocoStub.methods.setErro as any).mockClear();
-        (ModalAcaoBlocoStub.methods.setProcessando as any).mockClear();
+        modalSpies.abrir.mockClear();
+        modalSpies.fechar.mockClear();
+        modalSpies.setErro.mockClear();
+        modalSpies.setProcessando.mockClear();
         // Reset router mock push spy
         mocks.push.mockClear();
         router = { push: mocks.push };
@@ -251,8 +256,7 @@ describe("ProcessoView.vue", () => {
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         expect(modal.exists()).toBe(true);
-        vi.spyOn(modal.vm, 'abrir');
-        expect(modal.vm.abrir).toHaveBeenCalled();
+        expect(modalSpies.abrir).toHaveBeenCalled();
         expect(modal.props("titulo")).toBe("Aceitar em Bloco");
     });
 
@@ -271,7 +275,6 @@ describe("ProcessoView.vue", () => {
         await flushPromises();
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
-        vi.spyOn(modal.vm, 'fechar');
         await wrapper.find("button.btn-success").trigger("click"); // Abrir modal 'aceitar'
 
         // Simular confirmação do modal com ID 101 (Mapeamento Cadastro Disponibilizado)
@@ -280,7 +283,7 @@ describe("ProcessoView.vue", () => {
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('aceitar', [101], undefined);
         expect(feedbackStore.show).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("realizada"), "success");
-        expect(modal.vm.fechar).toHaveBeenCalled();
+        expect(modalSpies.fechar).toHaveBeenCalled();
     });
 
     it("deve executar ação em bloco com sucesso (Aceitar Validação)", async () => {
@@ -382,15 +385,13 @@ describe("ProcessoView.vue", () => {
         processosStore.executarAcaoBloco.mockRejectedValue(new Error(errorMsg));
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
-        vi.spyOn(modal.vm, 'setErro');
-        vi.spyOn(modal.vm, 'setProcessando');
         await wrapper.find("button.btn-success").trigger("click"); // Abrir modal
 
         await modal.vm.$emit("confirmar", { ids: [101] });
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalled();
-        expect(modal.vm.setErro).toHaveBeenCalledWith(errorMsg);
-        expect(modal.vm.setProcessando).toHaveBeenCalledWith(false);
+        expect(modalSpies.setErro).toHaveBeenCalledWith(errorMsg);
+        expect(modalSpies.setProcessando).toHaveBeenCalledWith(false);
     });
 
     it("deve mostrar erro se unidade não for encontrada para ação em bloco", async () => {
@@ -409,13 +410,12 @@ describe("ProcessoView.vue", () => {
         processosStore.executarAcaoBloco.mockRejectedValue(new Error(errorMsg));
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
-        vi.spyOn(modal.vm, 'setErro');
         await wrapper.find("button.btn-success").trigger("click");
 
         // ID inexistente
         await modal.vm.$emit("confirmar", { ids: [9999] });
 
-        expect(modal.vm.setErro).toHaveBeenCalledWith(errorMsg);
+        expect(modalSpies.setErro).toHaveBeenCalledWith(errorMsg);
     });
 
     it("deve redirecionar para detalhes da unidade ao clicar na tabela (Gestor)", async () => {
