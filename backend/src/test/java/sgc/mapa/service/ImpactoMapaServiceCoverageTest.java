@@ -14,6 +14,7 @@ import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.TipoImpactoCompetencia;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
