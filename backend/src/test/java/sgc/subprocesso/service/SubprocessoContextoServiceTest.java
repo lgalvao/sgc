@@ -41,7 +41,6 @@ import static org.mockito.Mockito.*;
 
 /**
  * Testes unitários para SubprocessoContextoService.
- * Foca em cobrir branches e cenários de erro não cobertos.
  */
 @Tag("unit")
 @DisplayName("SubprocessoContextoService")

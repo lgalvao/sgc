@@ -280,5 +280,52 @@ class SubprocessoAjusteMapaServiceTest {
             assertThat(result).isNotNull();
             verify(mapaAjusteMapper).toDto(eq(sp), isNull(), anyList(), anyList(), anyList(), anyMap());
         }
+
+        @Test
+        @DisplayName("deve lancar ErroEstadoImpossivel quando mapper retorna null")
+        void deveLancarErroQuandoMapperRetornaNull() {
+            // Arrange
+            Long codSubprocesso = 1L;
+            Mapa mapa = Mapa.builder().codigo(100L).build();
+            Subprocesso sp = Subprocesso.builder().mapa(mapa).build();
+            
+            when(crudService.buscarSubprocessoComMapa(codSubprocesso)).thenReturn(sp);
+            when(mapaAjusteMapper.toDto(any(), any(), any(), any(), any(), any())).thenReturn(null);
+            
+            // Act & Assert
+            assertThatThrownBy(() -> service.obterMapaParaAjuste(codSubprocesso))
+                    .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("atualizarCompetenciasEAssociacoes internal scenarios")
+    class AtualizarCompetenciasInterno {
+        @Test
+        @DisplayName("deve ignorar competencia nao encontrada no mapa")
+        void deveIgnorarCompetenciaNaoEncontrada() {
+            // Arrange
+            Long codSubprocesso = 1L;
+            Subprocesso sp = Subprocesso.builder()
+                    .codigo(codSubprocesso)
+                    .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
+                    .build();
+            
+            CompetenciaAjusteDto compDto = CompetenciaAjusteDto.builder()
+                    .codCompetencia(100L)
+                    .atividades(Collections.emptyList())
+                    .build();
+            
+            when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+            // Return empty list for competencies to trigger (competencia == null)
+            when(mapaManutencaoService.buscarCompetenciasPorCodigos(anyList())).thenReturn(Collections.emptyList());
+            when(mapaManutencaoService.buscarAtividadesPorCodigos(anyList())).thenReturn(Collections.emptyList());
+            
+            // Act
+            service.salvarAjustesMapa(codSubprocesso, List.of(compDto));
+            
+            // Assert
+            verify(mapaManutencaoService).salvarTodasCompetencias(argThat(List::isEmpty));
+        }
     }
 }

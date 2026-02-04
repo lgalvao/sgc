@@ -52,11 +52,9 @@ public enum SituacaoSubprocesso {
             return transicaoMapeamento(nova);
         } else if (this.name().startsWith(PREFIXO_REVISAO)) {
             return transicaoRevisao(nova);
-        } else if (this.name().startsWith(PREFIXO_DIAGNOSTICO)) {
+        } else {
             return transicaoDiagnostico(nova);
         }
-
-        return false;
     }
 
     private boolean isSituacaoCompativel(SituacaoSubprocesso nova) {

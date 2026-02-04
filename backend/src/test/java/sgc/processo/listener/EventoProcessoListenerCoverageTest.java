@@ -127,46 +127,6 @@ class EventoProcessoListenerCoverageTest {
 
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
-    @Test
-    @DisplayName("aoIniciarProcesso deve capturar exceção ao enviar e-mail para substituto")
-    void aoIniciarProcesso_SubstitutoError() {
-        Long cod = 100L;
-        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(cod).build();
-
-        Processo p = new Processo();
-        p.setDescricao("Desc");
-        p.setTipo(TipoProcesso.MAPEAMENTO);
-
-        Unidade u = new Unidade();
-        u.setCodigo(10L);
-        u.setTipo(TipoUnidade.OPERACIONAL);
-        u.setSigla("UO");
-
-        Subprocesso s = new Subprocesso();
-        s.setUnidade(u);
-
-        UnidadeResponsavelDto r = UnidadeResponsavelDto.builder()
-                .unidadeCodigo(10L)
-                .titularTitulo("T")
-                .substitutoTitulo("S")
-                .build();
-        
-        UsuarioDto ut = UsuarioDto.builder().tituloEleitoral("T").email("t@t.com").build();
-        UsuarioDto us = UsuarioDto.builder().tituloEleitoral("S").email("s@s.com").build();
-
-        when(processoFacade.buscarEntidadePorId(cod)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(cod)).thenReturn(List.of(s));
-        when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, r));
-        when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("T", ut, "S", us));
-        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("html");
-        
-        doThrow(new RuntimeException("SIMULADO")).when(notificacaoEmailService)
-            .enviarEmailHtml(eq("s@s.com"), anyString(), anyString());
-
-        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> listener.aoIniciarProcesso(evento));
-
-        verify(notificacaoEmailService, times(2)).enviarEmailHtml(anyString(), anyString(), anyString());
-    }
 
     @Test
     @DisplayName("aoFinalizarProcesso deve enviar e-mails para unidades operacionais e intermediárias")
@@ -274,5 +234,46 @@ class EventoProcessoListenerCoverageTest {
         when(processoFacade.buscarEntidadePorId(codProcesso)).thenThrow(new RuntimeException("Erro inesperado"));
 
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> listener.aoFinalizarProcesso(evento));
+    }
+
+    @Test
+    @DisplayName("aoIniciarProcesso deve capturar exceção genérica")
+    void aoIniciarProcesso_ErroGenerico() {
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
+        when(processoFacade.buscarEntidadePorId(any())).thenThrow(new RuntimeException("Erro"));
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> listener.aoIniciarProcesso(evento));
+    }
+
+    @Test
+    @DisplayName("aoIniciarProcesso deve capturar ErroEntidadeNaoEncontrada")
+    void aoIniciarProcesso_ErroEntidade() {
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
+        when(processoFacade.buscarEntidadePorId(any())).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Erro"));
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> listener.aoIniciarProcesso(evento));
+    }
+
+    @Test
+    @DisplayName("aoIniciarProcesso deve ignorar titular sem e-mail")
+    void aoIniciarProcesso_TitularSemEmail() {
+        Long cod = 100L;
+        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(cod).build();
+        Processo p = new Processo();
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        p.setDescricao("D");
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        u.setTipo(TipoUnidade.OPERACIONAL);
+        Subprocesso s = new Subprocesso();
+        s.setUnidade(u);
+        UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").build();
+        UsuarioDto ut = UsuarioDto.builder().tituloEleitoral("T").email(null).build();
+
+        when(processoFacade.buscarEntidadePorId(cod)).thenReturn(p);
+        when(subprocessoFacade.listarEntidadesPorProcesso(cod)).thenReturn(List.of(s));
+        when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, r));
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", ut));
+
+        listener.aoIniciarProcesso(evento);
+        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
 }

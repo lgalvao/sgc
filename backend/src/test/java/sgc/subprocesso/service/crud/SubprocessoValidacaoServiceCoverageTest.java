@@ -19,9 +19,9 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_A
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes de Cobertura - SubprocessoValidacaoService")
 class SubprocessoValidacaoServiceCoverageTest {
-
     @Mock
     private MapaManutencaoService mapaManutencaoService;
+
     @Mock
     private SubprocessoCrudService crudService;
 

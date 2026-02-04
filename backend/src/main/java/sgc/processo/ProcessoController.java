@@ -57,8 +57,7 @@ public class ProcessoController {
 
     /**
      * Retorna códigos de unidades que já participam de processos ativos do tipo
-     * especificado ou de
-     * um processo específico, útil para desabilitar checkboxes no frontend.
+     * especificado ou de um processo específico.
      *
      * @param tipo        Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
      * @param codProcesso Código opcional do processo a ser considerado

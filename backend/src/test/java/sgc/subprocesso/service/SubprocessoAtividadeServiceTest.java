@@ -40,7 +40,6 @@ import static org.mockito.Mockito.*;
 @DisplayName("SubprocessoAtividadeService")
 @ExtendWith(MockitoExtension.class)
 class SubprocessoAtividadeServiceTest {
-
     @Mock
     private SubprocessoRepo subprocessoRepo;
 

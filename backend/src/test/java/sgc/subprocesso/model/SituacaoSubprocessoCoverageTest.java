@@ -107,7 +107,16 @@ class SituacaoSubprocessoCoverageTest {
             "DIAGNOSTICO_MONITORAMENTO, DIAGNOSTICO_CONCLUIDO, DIAGNOSTICO, true",
             "DIAGNOSTICO_MONITORAMENTO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO, false",
             
-            "DIAGNOSTICO_CONCLUIDO, DIAGNOSTICO_MONITORAMENTO, DIAGNOSTICO, false"
+            "DIAGNOSTICO_CONCLUIDO, DIAGNOSTICO_MONITORAMENTO, DIAGNOSTICO, false",
+            
+            // Transição para NAO_INICIADO (isSituacaoCompativel permite, mas transicaoMapeamento/Revisao negam atualmente)
+            "MAPEAMENTO_CADASTRO_EM_ANDAMENTO, NAO_INICIADO, MAPEAMENTO, false",
+            "REVISAO_CADASTRO_EM_ANDAMENTO, NAO_INICIADO, REVISAO, false",
+            
+            // Casos para podeIniciar (line 70) - cobrir todas as combinações de falha
+            "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO, false",
+            "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO, false",
+            "NAO_INICIADO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, MAPEAMENTO, false"
     })
     @DisplayName("Transições")
     void transicoes(SituacaoSubprocesso origem, SituacaoSubprocesso destino, TipoProcesso tipo, boolean esperado) {

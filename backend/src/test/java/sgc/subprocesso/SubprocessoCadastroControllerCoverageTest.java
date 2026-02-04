@@ -17,7 +17,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoCadastroControllerCoverageTest {
-
     @InjectMocks
     private SubprocessoCadastroController controller;
 
@@ -32,7 +31,6 @@ class SubprocessoCadastroControllerCoverageTest {
         Object principal = null;
         Long codigo = 1L;
 
-        // When facade returns null for extracted title
         when(usuarioService.extrairTituloUsuario(principal)).thenReturn(null);
 
         assertThrows(ErroAutenticacao.class, 

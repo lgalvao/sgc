@@ -17,7 +17,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoComunicacaoListenerTest {
-
     @Mock private AlertaFacade alertaFacade;
     @Mock private SubprocessoEmailService emailService;
 
@@ -37,7 +36,6 @@ class SubprocessoComunicacaoListenerTest {
         Unidade origem = new Unidade();
         Unidade destino = new Unidade();
         
-        // CADASTRO_DISPONIBILIZADO has both alert and email
         EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
                 .subprocesso(subprocesso)
                 .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
@@ -47,10 +45,7 @@ class SubprocessoComunicacaoListenerTest {
 
         listener.handle(evento);
 
-        // Verify Alerta
         verify(alertaFacade).criarAlertaTransicao(eq(processo), anyString(), eq(origem), eq(destino));
-        
-        // Verify Email
         verify(emailService).enviarEmailTransicao(evento);
     }
 
@@ -62,7 +57,6 @@ class SubprocessoComunicacaoListenerTest {
         unidade.setSigla("SIGLA");
         subprocesso.setUnidade(unidade);
         
-        // CADASTRO_HOMOLOGADO has neither
         EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
                 .subprocesso(subprocesso)
                 .tipo(TipoTransicao.CADASTRO_HOMOLOGADO)

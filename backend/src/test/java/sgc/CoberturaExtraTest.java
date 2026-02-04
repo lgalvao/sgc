@@ -37,7 +37,6 @@ class CoberturaExtraTest {
         assertThat(erro.getCode()).isEqualTo("CODO");
         assertThat(erro.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
 
-        // Cobertura para o método default da interface ErroNegocio
         ErroNegocio erroInterface = new ErroNegocio() {
             @Override
             public String getCode() {

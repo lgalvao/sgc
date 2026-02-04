@@ -16,19 +16,12 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-/**
- * Testes unitários para {@link SubprocessoPermissaoCalculator}.
- * <p>
- * Foco em cobrir as 8 branches (atualmente 50% = 4/8 cobertas).
- */
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("SubprocessoPermissaoCalculator")
 class SubprocessoPermissaoCalculatorTest {
-
     @Mock
     private AccessControlService accessControlService;
 
@@ -122,15 +115,15 @@ class SubprocessoPermissaoCalculatorTest {
             processo.setTipo(TipoProcesso.MAPEAMENTO);
 
             // Configurar mock genérico primeiro (retorna false)
-            when(accessControlService.podeExecutar(eq(usuario), any(), eq(subprocesso)))
+            when(accessControlService.podeExecutar(usuario, any(), subprocesso))
                     .thenReturn(false);
             
             // Depois configurar os casos específicos (retornam true) - sobrescrevem o genérico
-            when(accessControlService.podeExecutar(eq(usuario), eq(Acao.DISPONIBILIZAR_CADASTRO), eq(subprocesso)))
+            when(accessControlService.podeExecutar(usuario, Acao.DISPONIBILIZAR_CADASTRO, subprocesso))
                     .thenReturn(true);
-            when(accessControlService.podeExecutar(eq(usuario), eq(Acao.DEVOLVER_CADASTRO), eq(subprocesso)))
+            when(accessControlService.podeExecutar(usuario, Acao.DEVOLVER_CADASTRO, subprocesso))
                     .thenReturn(true);
-            when(accessControlService.podeExecutar(eq(usuario), eq(Acao.ACEITAR_CADASTRO), eq(subprocesso)))
+            when(accessControlService.podeExecutar(usuario, Acao.ACEITAR_CADASTRO, subprocesso))
                     .thenReturn(true);
 
             // Act
@@ -150,15 +143,15 @@ class SubprocessoPermissaoCalculatorTest {
             processo.setTipo(TipoProcesso.REVISAO);
 
             // Configurar mock genérico primeiro (retorna false)
-            when(accessControlService.podeExecutar(eq(usuario), any(), eq(subprocesso)))
+            when(accessControlService.podeExecutar(usuario, any(), subprocesso))
                     .thenReturn(false);
             
             // Depois configurar os casos específicos (retornam true) - sobrescrevem o genérico
-            when(accessControlService.podeExecutar(eq(usuario), eq(Acao.DISPONIBILIZAR_REVISAO_CADASTRO), eq(subprocesso)))
+            when(accessControlService.podeExecutar(usuario, Acao.DISPONIBILIZAR_REVISAO_CADASTRO, subprocesso))
                     .thenReturn(true);
-            when(accessControlService.podeExecutar(eq(usuario), eq(Acao.DEVOLVER_REVISAO_CADASTRO), eq(subprocesso)))
+            when(accessControlService.podeExecutar(usuario, Acao.DEVOLVER_REVISAO_CADASTRO, subprocesso))
                     .thenReturn(true);
-            when(accessControlService.podeExecutar(eq(usuario), eq(Acao.ACEITAR_REVISAO_CADASTRO), eq(subprocesso)))
+            when(accessControlService.podeExecutar(usuario, Acao.ACEITAR_REVISAO_CADASTRO, subprocesso))
                     .thenReturn(true);
 
             // Act

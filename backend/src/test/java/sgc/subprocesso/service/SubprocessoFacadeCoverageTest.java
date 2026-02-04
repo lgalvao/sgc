@@ -25,7 +25,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoFacadeCoverageTest {
-
     @InjectMocks
     private SubprocessoFacade subprocessoFacade;
 

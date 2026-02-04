@@ -15,23 +15,8 @@ import java.util.List;
 @Getter
 @Builder
 public class EventoProcessoIniciado {
-    /**
-     * O código do processo que foi iniciado.
-     */
     private final Long codProcesso;
-
-    /**
-     * O tipo do processo (ex: "MAPEAMENTO", "REVISAO").
-     */
     private final String tipo;
-
-    /**
-     * A data e hora exatas do início.
-     */
     private final LocalDateTime dataHoraInicio;
-
-    /**
-     * A lista de IDs das unidades que participam do processo.
-     */
     private final List<Long> codUnidades;
 }
