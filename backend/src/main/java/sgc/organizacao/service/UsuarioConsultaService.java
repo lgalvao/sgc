@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
+import sgc.comum.repo.ComumRepo;
+import sgc.organizacao.model.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +15,8 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class UsuarioConsultaService {
     private final UsuarioRepo usuarioRepo;
+    private final ResponsabilidadeRepo responsabilidadeRepo;
+    private final ComumRepo repo;
     private static final String ENTIDADE_USUARIO = "Usuário";
 
     public Usuario buscarPorId(String titulo) {
@@ -48,13 +50,13 @@ public class UsuarioConsultaService {
     }
 
     public Usuario buscarChefePorUnidade(Long codigoUnidade, String siglaUnidade) {
-        return usuarioRepo
-                .chefePorCodUnidade(codigoUnidade)
-                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada("Responsável da unidade", siglaUnidade));
+        return repo.buscar(Responsabilidade.class, codigoUnidade).getUsuario();
     }
 
     public List<Usuario> buscarChefesPorUnidades(List<Long> codigosUnidades) {
-        return usuarioRepo.findChefesByUnidadesCodigos(codigosUnidades);
+        return responsabilidadeRepo.findByUnidadeCodigoIn(codigosUnidades).stream()
+                .map(Responsabilidade::getUsuario)
+                .toList();
     }
 
     public List<Usuario> buscarPorIdsComAtribuicoes(List<String> titulos) {

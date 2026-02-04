@@ -16,10 +16,7 @@ import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.AdministradorService;
-import sgc.organizacao.service.UnidadeConsultaService;
-import sgc.organizacao.service.UsuarioConsultaService;
-import sgc.organizacao.service.UsuarioPerfilService;
+import sgc.organizacao.service.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,6 +31,7 @@ public class UsuarioFacade {
     private final UsuarioPerfilService usuarioPerfilService;
     private final AdministradorService administradorService;
     private final UnidadeConsultaService unidadeConsultaService;
+    private final UnidadeResponsavelService unidadeResponsavelService;
 
     @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
@@ -130,42 +128,12 @@ public class UsuarioFacade {
     }
 
     public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
-        List<Usuario> chefes = usuarioConsultaService.buscarChefesPorUnidades(List.of(unidadeCodigo));
-        if (chefes.isEmpty()) {
-            throw new ErroEntidadeNaoEncontrada("Responsável da unidade", unidadeCodigo);
-        }
-        return montarResponsavelDto(unidadeCodigo, chefes);
+        return unidadeResponsavelService.buscarResponsavelUnidade(unidadeCodigo);
     }
 
     @Transactional(readOnly = true)
     public Map<Long, UnidadeResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
-        if (unidadesCodigos.isEmpty()) return Collections.emptyMap();
-
-        List<Usuario> todosChefes = usuarioConsultaService.buscarChefesPorUnidades(unidadesCodigos);
-        if (todosChefes.isEmpty()) return Collections.emptyMap();
-
-        List<String> titulos = todosChefes.stream().map(Usuario::getTituloEleitoral).toList();
-        List<Usuario> chefesCompletos = usuarioConsultaService.buscarPorIdsComAtribuicoes(titulos);
-        
-        // Carregar atribuições para cada usuário
-        Map<String, Set<UsuarioPerfil>> atribuicoesPorUsuario = new HashMap<>();
-        for (Usuario usuario : chefesCompletos) {
-            Set<UsuarioPerfil> atribuicoes = usuarioPerfilService.buscarAtribuicoesParaCache(usuario.getTituloEleitoral());
-            atribuicoesPorUsuario.put(usuario.getTituloEleitoral(), atribuicoes);
-        }
-
-        Map<Long, List<Usuario>> chefesPorUnidade = chefesCompletos.stream()
-                .flatMap(u -> u.getTodasAtribuicoes(atribuicoesPorUsuario.get(u.getTituloEleitoral())).stream()
-                        .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
-                        .filter(a -> a.getPerfil() == Perfil.CHEFE && unidadesCodigos.contains(a.getUnidadeCodigo()))
-                        .map(a -> new AbstractMap.SimpleEntry<>(a.getUnidadeCodigo(), u)))
-                .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
-
-        return chefesPorUnidade.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> montarResponsavelDto(e.getKey(), e.getValue())
-                ));
+        return unidadeResponsavelService.buscarResponsaveisUnidades(unidadesCodigos);
     }
 
     public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
@@ -175,18 +143,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
-        return usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo)
-                .map(u -> {
-                    Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                        usuarioPerfilService.buscarPorUsuario(u.getTituloEleitoral())
-                    );
-                    return u.getTodasAtribuicoes(atribuicoes).stream()
-                            .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
-                            .filter(a -> a.getPerfil() == Perfil.CHEFE)
-                            .map(UsuarioPerfil::getUnidadeCodigo)
-                            .toList();
-                })
-                .orElse(Collections.emptyList());
+        return unidadeResponsavelService.buscarUnidadesOndeEhResponsavel(titulo);
     }
 
     @Transactional(readOnly = true)
@@ -238,19 +195,6 @@ public class UsuarioFacade {
                 .unidadeCodigo(atribuicao.getUnidade().getCodigo())
                 .unidadeNome(atribuicao.getUnidade().getNome())
                 .perfil(atribuicao.getPerfil().name())
-                .build();
-    }
-
-    private UnidadeResponsavelDto montarResponsavelDto(Long unidadeCodigo, List<Usuario> chefes) {
-        Usuario titular = chefes.getFirst();
-        Usuario substituto = chefes.size() > 1 ? chefes.get(1) : null;
-
-        return UnidadeResponsavelDto.builder()
-                .unidadeCodigo(unidadeCodigo)
-                .titularTitulo(titular.getTituloEleitoral())
-                .titularNome(titular.getNome())
-                .substitutoTitulo(substituto != null ? substituto.getTituloEleitoral() : null)
-                .substitutoNome(substituto != null ? substituto.getNome() : null)
                 .build();
     }
 

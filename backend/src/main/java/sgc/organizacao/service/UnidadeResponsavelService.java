@@ -37,6 +37,7 @@ public class UnidadeResponsavelService {
     private final UsuarioRepo usuarioRepo;
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
+    private final ResponsabilidadeRepo responsabilidadeRepo;
     private final UsuarioMapper usuarioMapper;
     private final ComumRepo repo;
 
@@ -93,12 +94,8 @@ public class UnidadeResponsavelService {
         Unidade unidade = unidadeRepo.findBySigla(siglaUnidade)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", siglaUnidade));
 
-        Usuario usuarioSimples = usuarioRepo
-                .chefePorCodUnidade(unidade.getCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Responsável da unidade", siglaUnidade));
-
-        Usuario usuarioCompleto = usuarioRepo.findByIdWithAtribuicoes(usuarioSimples.getTituloEleitoral())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", usuarioSimples.getTituloEleitoral()));
+        Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigo());
+        Usuario usuarioCompleto = repo.buscar(Usuario.class, resp.getUsuarioTitulo());
 
         carregarAtribuicoesUsuario(usuarioCompleto);
         return usuarioCompleto;
@@ -112,11 +109,13 @@ public class UnidadeResponsavelService {
      * @throws ErroEntidadeNaoEncontrada se não houver responsável
      */
     public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
-        List<Usuario> chefes = usuarioRepo.findChefesByUnidadesCodigos(List.of(unidadeCodigo));
-        if (chefes.isEmpty()) {
-            throw new ErroEntidadeNaoEncontrada("Responsável da unidade", unidadeCodigo);
-        }
-        return montarResponsavelDto(unidadeCodigo, chefes);
+        Responsabilidade responsabilidade = repo.buscar(Responsabilidade.class, unidadeCodigo);
+        Usuario responsavel = repo.buscar(Usuario.class, responsabilidade.getUsuarioTitulo());
+
+        Usuario titularOficial = responsabilidade.getUnidade() != null ?
+                repo.buscar(Usuario.class, responsabilidade.getUnidade().getTituloTitular()) : null;
+
+        return montarResponsavelDto(unidadeCodigo, responsavel, titularOficial);
     }
 
     /**
@@ -129,42 +128,80 @@ public class UnidadeResponsavelService {
     public Map<Long, UnidadeResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         if (unidadesCodigos.isEmpty()) return Collections.emptyMap();
 
-        List<Usuario> todosChefes = usuarioRepo.findChefesByUnidadesCodigos(unidadesCodigos);
-        if (todosChefes.isEmpty()) return Collections.emptyMap();
+        List<Responsabilidade> responsabilidades = responsabilidadeRepo.findByUnidadeCodigoIn(unidadesCodigos);
+        if (responsabilidades.isEmpty()) return Collections.emptyMap();
 
-        List<String> titulos = todosChefes.stream().map(Usuario::getTituloEleitoral).toList();
-        List<Usuario> chefesCompletos = usuarioRepo.findByIdInWithAtribuicoes(titulos);
-        carregarAtribuicoesEmLote(chefesCompletos);
+        // Coletar todos os títulos (responsáveis atuais e titulares oficiais) para busca em lote
+        Set<String> todosTitulos = new HashSet<>();
+        responsabilidades.forEach(r -> {
+            todosTitulos.add(r.getUsuarioTitulo());
+            if (r.getUnidade() != null) {
+                todosTitulos.add(r.getUnidade().getTituloTitular());
+            }
+        });
 
-        Map<Long, List<Usuario>> chefesPorUnidade = chefesCompletos.stream()
-                .flatMap(u -> {
-                    Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                            usuarioPerfilRepo.findByUsuarioTitulo(u.getTituloEleitoral())
-                    );
-                    return u.getTodasAtribuicoes(atribuicoes).stream()
-                            .filter(a -> a.getPerfil() == Perfil.CHEFE && unidadesCodigos.contains(a.getUnidadeCodigo()))
-                            .map(a -> new AbstractMap.SimpleEntry<>(a.getUnidadeCodigo(), u));
-                })
-                .collect(groupingBy(Map.Entry::getKey, mapping(Map.Entry::getValue, toList())));
+        Map<String, Usuario> usuariosPorTitulo = usuarioRepo.findByIdInWithAtribuicoes(new ArrayList<>(todosTitulos)).stream()
+                .collect(toMap(Usuario::getTituloEleitoral, u -> u));
 
-        return chefesPorUnidade.entrySet().stream()
+        carregarAtribuicoesEmLote(new ArrayList<>(usuariosPorTitulo.values()));
+
+        return responsabilidades.stream()
+                .filter(r -> usuariosPorTitulo.containsKey(r.getUsuarioTitulo()))
                 .collect(toMap(
-                        Map.Entry::getKey,
-                        e -> montarResponsavelDto(e.getKey(), e.getValue())
+                        Responsabilidade::getUnidadeCodigo,
+                        r -> {
+                            Usuario responsavel = usuariosPorTitulo.get(r.getUsuarioTitulo());
+                            Usuario titularOficial = r.getUnidade() != null ? 
+                                    usuariosPorTitulo.get(r.getUnidade().getTituloTitular()) : null;
+                            return montarResponsavelDto(r.getUnidadeCodigo(), responsavel, titularOficial);
+                        }
                 ));
     }
 
-    private UnidadeResponsavelDto montarResponsavelDto(Long unidadeCodigo, List<Usuario> chefes) {
-        Usuario titular = chefes.getFirst();
-        Usuario substituto = chefes.size() > 1 ? chefes.get(1) : null;
+    private UnidadeResponsavelDto montarResponsavelDto(Long unidadeCodigo, Usuario responsavel, Usuario titularOficial) {
+        // Se não temos titular oficial ou o responsável é o próprio titular
+        if (titularOficial == null || responsavel.getTituloEleitoral().equals(titularOficial.getTituloEleitoral())) {
+            return UnidadeResponsavelDto.builder()
+                    .unidadeCodigo(unidadeCodigo)
+                    .titularTitulo(responsavel.getTituloEleitoral())
+                    .titularNome(responsavel.getNome())
+                    .substitutoTitulo(null)
+                    .substitutoNome(null)
+                    .build();
+        }
 
+        // Caso o responsável seja um substituto ou atribuição temporária
         return UnidadeResponsavelDto.builder()
                 .unidadeCodigo(unidadeCodigo)
-                .titularTitulo(titular.getTituloEleitoral())
-                .titularNome(titular.getNome())
-                .substitutoTitulo(substituto != null ? substituto.getTituloEleitoral() : null)
-                .substitutoNome(substituto != null ? substituto.getNome() : null)
+                .titularTitulo(titularOficial.getTituloEleitoral())
+                .titularNome(titularOficial.getNome())
+                .substitutoTitulo(responsavel.getTituloEleitoral())
+                .substitutoNome(responsavel.getNome())
                 .build();
+    }
+
+    private UnidadeResponsavelDto montarResponsavelDto(Long unidadeCodigo, Usuario responsavel) {
+        // Fallback mantendo compatibilidade, sem info do titular oficial
+        return UnidadeResponsavelDto.builder()
+                .unidadeCodigo(unidadeCodigo)
+                .titularTitulo(responsavel.getTituloEleitoral())
+                .titularNome(responsavel.getNome())
+                .substitutoTitulo(null)
+                .substitutoNome(null)
+                .build();
+    }
+
+    /**
+     * Busca os códigos das unidades onde o usuário é o responsável atual.
+     *
+     * @param titulo título do usuário
+     * @return lista de códigos de unidades
+     */
+    @Transactional(readOnly = true)
+    public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
+        return responsabilidadeRepo.findByUsuarioTitulo(titulo).stream()
+                .map(Responsabilidade::getUnidadeCodigo)
+                .toList();
     }
 
     private void carregarAtribuicoesUsuario(Usuario usuario) {

@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.organizacao.model.*;
+import sgc.organizacao.model.Responsabilidade;
+import sgc.organizacao.model.ResponsabilidadeRepo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +48,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
 
     private final UnidadeRepo unidadeRepo;
     private final UsuarioRepo usuarioRepo;
+    private final ResponsabilidadeRepo responsabilidadeRepo;
 
     @Override
     @Transactional(readOnly = true)
@@ -59,6 +62,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
         validarTitularesUnidades(unidadesAtivas, violacoes);
         validarEmailsTitulares(unidadesAtivas, usuarios, violacoes);
         validarUnidadesIntermediarias(unidadesAtivas, violacoes);
+        validarResponsaveisAtuais(unidadesAtivas, violacoes);
 
         if (!violacoes.isEmpty()) {
             violacoes.forEach(v -> log.error("INVARIANTE VIOLADA: {}", v));
@@ -77,6 +81,23 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
         }
 
         log.info("Dados organizacionais validados com sucesso. {} unidades verificadas.", unidadesAtivas.size());
+    }
+
+    /**
+     * Valida que todas as unidades participantes possuem um responsável atual definido.
+     */
+    private void validarResponsaveisAtuais(List<Unidade> unidades, List<String> violacoes) {
+        List<Long> ids = unidades.stream().map(Unidade::getCodigo).toList();
+        Map<Long, Responsabilidade> responsabilidades = responsabilidadeRepo.findByUnidadeCodigoIn(ids).stream()
+                .collect(Collectors.toMap(Responsabilidade::getUnidadeCodigo, r -> r));
+
+        for (Unidade u : unidades) {
+            Responsabilidade r = responsabilidades.get(u.getCodigo());
+            if (r == null || r.getUsuarioTitulo() == null || r.getUsuarioTitulo().isBlank()) {
+                violacoes.add("Unidade %s (%s) não possui responsável atual definido (Titular, Substituto ou Atribuição)"
+                        .formatted(u.getSigla(), u.getTipo()));
+            }
+        }
     }
 
     private List<Unidade> carregarUnidadesAtivas() {

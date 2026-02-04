@@ -18,9 +18,9 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
             SELECT DISTINCT u FROM Usuario u
             JOIN UsuarioPerfil up ON up.usuarioTitulo = u.tituloEleitoral
             LEFT JOIN FETCH u.atribuicoesTemporarias
-            WHERE up.unidadeCodigo = :codigoUnidade AND up.perfil = 'CHEFE'
+            WHERE up.unidadeCodigo = :codigoUnidade AND up.perfil IN ('CHEFE', 'GESTOR')
             """)
-    Optional<Usuario> chefePorCodUnidade(@Param("codigoUnidade") Long codigoUnidade);
+    Optional<Usuario> findResponsavelByUnidadeCodigo(@Param("codigoUnidade") Long codigoUnidade);
 
     @Query("""
             SELECT DISTINCT u FROM Usuario u

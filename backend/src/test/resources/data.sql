@@ -38,6 +38,9 @@ DELETE
 FROM SGC.VW_VINCULACAO_UNIDADE;
 
 DELETE
+FROM SGC.VW_RESPONSABILIDADE;
+
+DELETE
 FROM SGC.UNIDADE_MAPA;
 DELETE
 FROM SGC.VW_USUARIO;
@@ -258,6 +261,30 @@ INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codig
 VALUES ('999999999999', 'ADMIN', 2);
 INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
 VALUES ('999999999999', 'GESTOR', 2);
+
+-- -------------------------------------------------------------------------------------------------
+-- VW_RESPONSABILIDADE - simulada como tabela no H2
+-- -------------------------------------------------------------------------------------------------
+INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio)
+VALUES (2, '6', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio)
+VALUES (100, '7', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio)
+VALUES (200, '2', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio)
+VALUES (5, '5', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio)
+VALUES (8, '3', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio)
+VALUES (9, '333333333333', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio)
+VALUES (10, '1', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio)
+VALUES (11, '12', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio)
+VALUES (6, '666666666666', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, tipo, data_inicio)
+VALUES (101, '222222222222', 'TITULAR', CURRENT_TIMESTAMP);
 
 -- -------------------------------------------------------------------------------------------------
 -- ADMINISTRADORES (perfis ADMIN gerenciados pelo SGC)
