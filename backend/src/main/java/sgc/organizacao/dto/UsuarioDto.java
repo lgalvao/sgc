@@ -1,16 +1,16 @@
 package sgc.organizacao.dto;
 
 import lombok.Builder;
-import org.jspecify.annotations.Nullable;
+import sgc.comum.validacao.TituloEleitoral;
 
 /**
  * DTO para representação de usuário.
  */
 @Builder
 public record UsuarioDto(
-        String tituloEleitoral,
+        @TituloEleitoral String tituloEleitoral,
         String nome,
-        @Nullable String email,
-        @Nullable String matricula,
-        @Nullable Long unidadeCodigo) {
+        String email,
+        String matricula,
+        Long unidadeCodigo) {
 }

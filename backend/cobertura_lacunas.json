@@ -1,0 +1,260 @@
+{
+  "globalLineCoverage": "99.45%",
+  "totalFilesWithGaps": 22,
+  "gaps": [
+    {
+      "class": "sgc.processo.listener.EventoProcessoListener",
+      "coverage": "96.97%",
+      "missed": [
+        245,
+        294,
+        295,
+        296
+      ],
+      "partial": [
+        "213(2/4)",
+        "244(1/2)"
+      ],
+      "score": 5
+    },
+    {
+      "class": "sgc.subprocesso.service.crud.SubprocessoCrudService",
+      "coverage": "95.08%",
+      "missed": [
+        91,
+        104,
+        154
+      ],
+      "partial": [
+        "90(1/2)",
+        "103(1/2)",
+        "153(1/2)"
+      ],
+      "score": 4.5
+    },
+    {
+      "class": "sgc.mapa.service.MapaSalvamentoService",
+      "coverage": "97.06%",
+      "missed": [
+        74,
+        227,
+        228
+      ],
+      "partial": [
+        "73(1/2)",
+        "163(1/2)",
+        "226(1/2)"
+      ],
+      "score": 4.5
+    },
+    {
+      "class": "sgc.seguranca.login.LoginController",
+      "coverage": "97.83%",
+      "missed": [
+        155
+      ],
+      "partial": [
+        "62(1/2)",
+        "66(1/2)",
+        "124(1/2)",
+        "125(1/2)",
+        "152(1/2)"
+      ],
+      "score": 3.5
+    },
+    {
+      "class": "sgc.processo.ProcessoController",
+      "coverage": "93.18%",
+      "missed": [
+        184,
+        286,
+        287
+      ],
+      "partial": [
+        "183(1/2)"
+      ],
+      "score": 3.5
+    },
+    {
+      "class": "sgc.e2e.E2eController",
+      "coverage": "99.00%",
+      "missed": [
+        238
+      ],
+      "partial": [
+        "210(1/4)",
+        "235(1/2)",
+        "241(1/4)"
+      ],
+      "score": 2.5
+    },
+    {
+      "class": "sgc.seguranca.login.LoginFacade",
+      "coverage": "95.45%",
+      "missed": [
+        74,
+        126
+      ],
+      "partial": [
+        "125(1/2)"
+      ],
+      "score": 2.5
+    },
+    {
+      "class": "sgc.subprocesso.service.SubprocessoAjusteMapaService",
+      "coverage": "98.51%",
+      "missed": [
+        98
+      ],
+      "partial": [
+        "97(1/2)",
+        "163(1/2)"
+      ],
+      "score": 2
+    },
+    {
+      "class": "sgc.organizacao.service.UnidadeHierarquiaService",
+      "coverage": "98.82%",
+      "missed": [
+        231
+      ],
+      "partial": [
+        "230(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.subprocesso.SubprocessoCadastroController",
+      "coverage": "98.41%",
+      "missed": [
+        320
+      ],
+      "partial": [
+        "319(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.organizacao.UsuarioFacade",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "70(1/6)",
+        "152(1/2)",
+        "167(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.processo.mapper.ProcessoMapper",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "42(1/2)",
+        "52(1/2)",
+        "56(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.mapa.service.MapaFacade",
+      "coverage": "96.88%",
+      "missed": [
+        87
+      ],
+      "partial": [
+        "86(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService",
+      "coverage": "96.55%",
+      "missed": [
+        42
+      ],
+      "partial": [
+        "38(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.subprocesso.service.SubprocessoAtividadeService",
+      "coverage": "98.04%",
+      "missed": [
+        93
+      ],
+      "partial": [
+        "89(1/3)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.seguranca.acesso.AbstractAccessPolicy",
+      "coverage": "98.11%",
+      "missed": [
+        123
+      ],
+      "partial": [
+        "122(1/5)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.subprocesso.model.SituacaoSubprocesso",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "42(1/4)",
+        "50(2/12)"
+      ],
+      "score": 1
+    },
+    {
+      "class": "sgc.mapa.service.CopiaMapaService",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "115(1/2)",
+        "139(1/2)"
+      ],
+      "score": 1
+    },
+    {
+      "class": "sgc.processo.service.ProcessoConsultaService",
+      "coverage": "97.50%",
+      "missed": [
+        65
+      ],
+      "partial": [],
+      "score": 1
+    },
+    {
+      "class": "sgc.organizacao.service.ValidadorDadosOrgService",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "96(2/6)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.organizacao.UnidadeController",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "88(2/4)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "145(1/2)"
+      ],
+      "score": 0.5
+    }
+  ]
+}

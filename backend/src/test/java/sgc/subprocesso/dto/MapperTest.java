@@ -21,10 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Testes para mappers de Subprocesso e Movimentação.
- * 
- * <p><b>Nota:</b> Após simplificação (Fase 1), os mappers foram purificados
- * e não possuem mais dependências de repositories. Os mappers agora são
- * funções puras que apenas extraem dados das entidades.
  */
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

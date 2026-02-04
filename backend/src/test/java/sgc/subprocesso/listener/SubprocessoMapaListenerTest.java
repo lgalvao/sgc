@@ -1,6 +1,7 @@
 package sgc.subprocesso.listener;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,8 +13,8 @@ import sgc.subprocesso.service.SubprocessoFacade;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("unit")
 class SubprocessoMapaListenerTest {
-
     @Mock
     private SubprocessoFacade subprocessoFacade;
 

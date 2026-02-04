@@ -31,7 +31,7 @@ public class Unidade extends EntidadeBase {
     @Column(name = "sigla", length = 20, nullable = false)
     private String sigla;
 
-    @Column(name = "matricula_titular", length = 8)
+    @Column(name = "matricula_titular", length = 8, nullable = false)
     private String matriculaTitular;
 
     @Column(name = "titulo_titular", length = 12, nullable = false)

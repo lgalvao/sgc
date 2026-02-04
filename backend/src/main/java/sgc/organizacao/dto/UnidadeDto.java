@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * DTO para dados de unidade do SGRH. Suporta estrutura hierárquica com subunidades.
  *
- * <p>Mantido como class por necessitar de mutabilidade para construção de árvore hierárquica
+ * <p>Mantido como classe por necessitar de mutabilidade para construção de árvore hierárquica
  * no {@link sgc.organizacao.service.UnidadeHierarquiaService}.
  */
 @Getter
@@ -18,12 +18,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UnidadeDto {
-
     private Long codigo;
     private String nome;
     private String sigla;
     private Long codigoPai;
     private String tipo;
+
     @Builder.Default
     private List<UnidadeDto> subunidades = new ArrayList<>();
 

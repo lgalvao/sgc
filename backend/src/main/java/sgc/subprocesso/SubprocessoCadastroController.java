@@ -13,6 +13,7 @@ import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
+import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
 import sgc.organizacao.UsuarioFacade;
@@ -153,6 +154,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody DevolverCadastroRequest request,
             @AuthenticationPrincipal Object principal) {
+        
         Usuario usuario = obterUsuarioAutenticado(principal);
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(request.observacoes());
 
@@ -317,7 +319,7 @@ public class SubprocessoCadastroController {
     private Usuario obterUsuarioAutenticado(Object principal) {
         String titulo = usuarioService.extrairTituloUsuario(principal);
         if (titulo == null) {
-            throw new sgc.comum.erros.ErroAutenticacao("Usuário não identificado");
+            throw new ErroAutenticacao("Usuário não identificado");
         }
         return usuarioService.buscarPorLogin(titulo);
     }
