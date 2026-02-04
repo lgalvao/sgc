@@ -1,6 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
-import {markRaw} from "vue";
 import ProcessoView from "@/views/ProcessoView.vue";
 import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
@@ -35,8 +34,7 @@ vi.mock("@/services/processoService");
 const ModalAcaoBlocoStub = {
     name: 'ModalAcaoBloco',
     template: '<div>ModalAcaoBloco</div>',
-    expose: ['abrir', 'fechar', 'setErro', 'setProcessando'],
-    setup(props: any, { expose }: any) {
+    setup(_props: unknown, { expose }: { expose: (exposed: Record<string, any>) => void }) {
         expose({
             abrir: vi.fn(),
             fechar: vi.fn(),
@@ -65,8 +63,7 @@ const commonStubs = {
 };
 
 describe("ProcessoViewCoverage.spec.ts", () => {
-    let processosStore: any;
-    let modalSpies: any;
+    let processosStore: ReturnType<typeof useProcessosStore>;
 
     const createWrapper = (initialState: any = {}, shallow = false) => {
         const pinia = createTestingPinia({
@@ -101,11 +98,11 @@ describe("ProcessoViewCoverage.spec.ts", () => {
             store.$patch(initialState.perfil);
         }
 
-        processosStore = useProcessosStore(pinia);
+        processosStore = useProcessosStore(pinia) as any;
         // Ensure action returns promise
-        processosStore.buscarContextoCompleto.mockResolvedValue({});
-        processosStore.finalizarProcesso.mockResolvedValue({});
-        processosStore.executarAcaoBloco.mockResolvedValue({});
+        (processosStore.buscarContextoCompleto as any).mockResolvedValue({});
+        (processosStore.finalizarProcesso as any).mockResolvedValue({});
+        (processosStore.executarAcaoBloco as any).mockResolvedValue({});
 
         const options: any = {
             global: {
@@ -123,13 +120,6 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        modalSpies = {
-            abrir: vi.fn(),
-            fechar: vi.fn(),
-            setErro: vi.fn(),
-            setProcessando: vi.fn()
-        };
-        (globalThis as any).modalSpies = modalSpies;
     });
 
     it("deve lidar com erro ao finalizar processo", async () => {
@@ -232,13 +222,13 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
         // Trigger action
         (wrapper.vm as any).acaoBlocoAtual = 'aceitar';
-        processosStore.executarAcaoBloco.mockRejectedValue(new Error("Erro bloco"));
+        (processosStore.executarAcaoBloco as any).mockRejectedValue(new Error("Erro bloco"));
 
         await modal.vm.$emit("confirmar", { ids: [1] });
         await flushPromises();
 
         if (modal.exists()) {
-             expect(modalSpies.setErro).toHaveBeenCalledWith("Erro bloco");
+             expect(modal.vm.setErro).toHaveBeenCalledWith("Erro bloco");
         }
     });
 
