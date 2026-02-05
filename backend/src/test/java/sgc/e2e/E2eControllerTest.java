@@ -19,6 +19,7 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
+import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
 import javax.sql.DataSource;
@@ -366,5 +367,64 @@ class E2eControllerTest {
                 () -> controller.criarProcessoRevisao(req));
         Assertions.assertNotNull(exception);
         Assertions.assertTrue(exception.getMessage().contains("Unidade"));
+    }
+
+    @Test
+    @DisplayName("Deve cobrir else em criarProcessoFixture")
+    void deveCobrirElseEmCriarProcessoFixture() throws Exception {
+        // Arrange
+        E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
+                "Desc", "SIGLA", true, 10);
+
+        UnidadeDto un = new UnidadeDto();
+        un.setCodigo(1L);
+        when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+
+        ProcessoDto proc = new ProcessoDto();
+        proc.setCodigo(100L);
+        when(processoFacade.criar(any())).thenReturn(proc);
+        when(processoFacade.obterPorId(100L)).thenReturn(Optional.of(proc));
+
+        // Use reflection to call private method
+        var method = E2eController.class.getDeclaredMethod("criarProcessoFixture",
+                E2eController.ProcessoFixtureRequest.class, TipoProcesso.class);
+        method.setAccessible(true);
+
+        // Act
+        method.invoke(controller, req, TipoProcesso.DIAGNOSTICO);
+
+        // Assert
+        verify(processoFacade, never()).iniciarProcessoMapeamento(anyLong(), anyList());
+        verify(processoFacade, never()).iniciarProcessoRevisao(anyLong(), anyList());
+    }
+
+    @Test
+    @DisplayName("Deve cobrir branches de erros em iniciar no fixture")
+    void deveCobrirBranchesErrosIniciar() throws Exception {
+        // Arrange
+        E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
+                "   ", "SIGLA", true, 10); // Blank description
+
+        UnidadeDto un = new UnidadeDto();
+        un.setCodigo(1L);
+        when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+
+        ProcessoDto proc = new ProcessoDto();
+        proc.setCodigo(100L);
+        when(processoFacade.criar(any())).thenReturn(proc);
+        when(processoFacade.obterPorId(100L)).thenReturn(Optional.of(proc));
+
+        // Simular retorno de erros nulo
+        when(processoFacade.iniciarProcessoMapeamento(anyLong(), anyList())).thenReturn(null);
+
+        var method = E2eController.class.getDeclaredMethod("criarProcessoFixture",
+                E2eController.ProcessoFixtureRequest.class, TipoProcesso.class);
+        method.setAccessible(true);
+
+        // Act
+        method.invoke(controller, req, TipoProcesso.MAPEAMENTO);
+
+        // Assert
+        verify(processoFacade).iniciarProcessoMapeamento(eq(100L), anyList());
     }
 }

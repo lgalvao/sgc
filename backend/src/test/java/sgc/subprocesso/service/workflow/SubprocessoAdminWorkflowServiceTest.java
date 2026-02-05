@@ -54,6 +54,24 @@ class SubprocessoAdminWorkflowServiceTest {
     }
 
     @Test
+    @DisplayName("alterarDataLimite - Situação Genérica (Else)")
+    void alterarDataLimite_SituacaoGenerica() {
+        Long codigo = 1L;
+        LocalDate novaData = LocalDate.of(2023, 10, 1);
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
+        sp.setUnidade(new Unidade());
+
+        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+
+        service.alterarDataLimite(codigo, novaData);
+
+        verify(subprocessoRepo).save(sp);
+        assertEquals(novaData.atStartOfDay(), sp.getDataLimiteEtapa1());
+        verify(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), any(), eq(1));
+    }
+
+    @Test
     @DisplayName("alterarDataLimite - Etapa 2")
     void alterarDataLimite_Etapa2() {
         Long codigo = 1L;

@@ -183,4 +183,11 @@ class ProcessoConsultaServiceTest {
         List<SubprocessoElegivelDto> res = processoConsultaService.listarSubprocessosElegiveis(1L);
         assertThat(res).isEmpty();
     }
+
+    @Test
+    @DisplayName("Deve listar processos ativos")
+    void deveListarAtivos() {
+        processoConsultaService.listarAtivos();
+        verify(processoRepo).findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
+    }
 }

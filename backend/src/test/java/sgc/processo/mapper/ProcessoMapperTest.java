@@ -147,6 +147,27 @@ class ProcessoMapperTest {
 
             assertThat(dto.getUnidadesParticipantes()).isEqualTo("ALFA, MEGA, ZEBRA");
         }
+
+        @Test
+        @DisplayName("Deve lidar com datas, situação e tipo null")
+        void deveLidarComCamposNull() {
+            Processo processo = new Processo();
+            processo.setCodigo(1L);
+            processo.setDataCriacao(null);
+            processo.setDataFinalizacao(null);
+            processo.setDataLimite(null);
+            processo.setSituacao(null);
+            processo.setTipo(null);
+
+            ProcessoDto dto = mapper.toDto(processo);
+
+            assertThat(dto).isNotNull();
+            assertThat(dto.getDataCriacaoFormatada()).isNull();
+            assertThat(dto.getDataFinalizacaoFormatada()).isNull();
+            assertThat(dto.getDataLimiteFormatada()).isNull();
+            assertThat(dto.getSituacaoLabel()).isNull();
+            assertThat(dto.getTipoLabel()).isNull();
+        }
     }
 
     @Nested

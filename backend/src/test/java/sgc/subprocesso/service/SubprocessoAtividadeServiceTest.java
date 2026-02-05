@@ -220,6 +220,34 @@ class SubprocessoAtividadeServiceTest {
         }
 
         @Test
+        @DisplayName("deve cair no default quando tipo de processo é DIAGNOSTICO")
+        void deveCairNoDefaultQuandoTipoDiagnostico() {
+            // Arrange
+            Long codDestino = 1L;
+            Long codOrigem = 2L;
+
+            Mapa mapaOrigem = criarMapa(10L);
+            Mapa mapaDestino = criarMapa(20L);
+
+            Processo processoDiagnostico = criarProcesso(TipoProcesso.DIAGNOSTICO);
+            Subprocesso spDestino = criarSubprocessoComMapaEProcesso(codDestino, SituacaoSubprocesso.NAO_INICIADO, mapaDestino, processoDiagnostico);
+            Subprocesso spOrigem = criarSubprocessoComMapa(codOrigem, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, mapaOrigem);
+
+            when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+            when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+            when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(spDestino);
+            when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
+
+            // Act
+            service.importarAtividades(codDestino, codOrigem);
+
+            // Assert
+            verify(subprocessoRepo).save(spDestino);
+            assertThat(spDestino.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO); // Não muda no default
+            verify(eventPublisher).publishEvent(any(EventoImportacaoAtividades.class));
+        }
+
+        @Test
         @DisplayName("deve importar sem atualizar situação quando destino em REVISAO_CADASTRO_EM_ANDAMENTO")
         void deveImportarSemAtualizarQuandoDestinoEmRevisaoCadastro() {
             // Arrange

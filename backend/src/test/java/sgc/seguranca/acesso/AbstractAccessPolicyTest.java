@@ -55,6 +55,10 @@ class AbstractAccessPolicyTest {
         public String testFormatarPerfis(EnumSet<Perfil> perfis) {
             return formatarPerfis(perfis);
         }
+
+        public String testObterMotivoNegacaoHierarquia(Usuario usuario, Unidade unidade, AbstractAccessPolicy.RequisitoHierarquia requisito) {
+            return obterMotivoNegacaoHierarquia(usuario, unidade, requisito);
+        }
     }
 
     private TestAccessPolicy policy;
@@ -145,5 +149,17 @@ class AbstractAccessPolicyTest {
         String custom = "Erro customizado";
         policy.testDefinirMotivoNegacao(custom);
         assertEquals(custom, policy.getMotivoNegacao());
+    }
+
+    @Test
+    @DisplayName("Deve retornar motivo genérico para requisito de hierarquia NENHUM")
+    void deveRetornarMotivoGenericoParaHierarquiaNenhum() {
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("12345");
+        Unidade unidade = new Unidade();
+        unidade.setSigla("UNITESTE");
+
+        String result = policy.testObterMotivoNegacaoHierarquia(usuario, unidade, AbstractAccessPolicy.RequisitoHierarquia.NENHUM);
+        assertEquals("Erro inesperado na verificação de hierarquia", result);
     }
 }

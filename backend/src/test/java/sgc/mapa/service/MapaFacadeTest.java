@@ -190,6 +190,18 @@ class MapaFacadeTest {
             assertThat(resultado).isNotNull();
             verify(mapaManutencaoService).buscarCompetenciasPorCodMapa(1L);
         }
+
+        @Test
+        @DisplayName("Deve lançar erro se falhar converter mapa para DTO")
+        void deveLancarErroSeFalharConverter() {
+            when(mapaManutencaoService.buscarMapaPorCodigo(1L)).thenReturn(new Mapa());
+            when(mapaManutencaoService.buscarCompetenciasPorCodMapa(1L)).thenReturn(List.of());
+            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(null);
+
+            assertThatThrownBy(() -> facade.obterMapaCompleto(1L, 10L))
+                    .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class)
+                    .hasMessageContaining("Falha ao converter mapa completo para DTO");
+        }
     }
 
     @Nested

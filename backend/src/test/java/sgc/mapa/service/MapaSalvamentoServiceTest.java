@@ -150,4 +150,33 @@ class MapaSalvamentoServiceTest {
         // Verifica que passou sem erro e salvou
         verify(mapaRepo).save(mapa);
     }
+
+    @Test
+    @DisplayName("Deve lidar com primeira atividade sem mapa (branch coverage)")
+    void deveLidarComPrimeiraAtividadeSemMapa() {
+        // Arrange
+        Long codMapa = 100L;
+        SalvarMapaRequest request = new SalvarMapaRequest("Obs", List.of());
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(codMapa);
+
+        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
+
+        // Atividade presente mas sem mapa
+        Atividade ativ = new Atividade();
+        ativ.setCodigo(1L);
+        ativ.setMapa(null);
+        when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(ativ));
+
+        when(competenciaRepo.saveAll(anyList())).thenReturn(List.of());
+        when(atividadeRepo.saveAll(anyList())).thenReturn(List.of());
+        when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(MapaCompletoDto.builder().build());
+
+        // Act
+        mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
+
+        // Assert
+        verify(mapaRepo).save(mapa);
+    }
 }

@@ -114,4 +114,52 @@ class CopiaMapaServiceTest {
         verify(atividadeRepo, never()).saveAll(anyList());
         verify(competenciaRepo, never()).saveAll(anyList());
     }
+
+    @Test
+    @DisplayName("Deve lidar com atividade que tem lista de conhecimentos vazia")
+    void deveLidarComConhecimentosVazio() {
+        Long origemId = 1L;
+        Mapa mapaOrigem = new Mapa();
+        mapaOrigem.setCodigo(origemId);
+
+        Atividade atividadeOrigem = new Atividade();
+        atividadeOrigem.setCodigo(10L);
+        atividadeOrigem.setConhecimentos(List.of()); // Empty list
+
+        when(mapaRepo.findById(origemId)).thenReturn(Optional.of(mapaOrigem));
+        when(mapaRepo.save(any(Mapa.class))).thenReturn(new Mapa());
+        when(atividadeRepo.findWithConhecimentosByMapaCodigo(origemId)).thenReturn(List.of(atividadeOrigem));
+        when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(List.of());
+
+        service.copiarMapaParaUnidade(origemId);
+
+        verify(atividadeRepo).saveAll(anyList());
+    }
+
+    @Test
+    @DisplayName("Deve lidar com competencia que referencia atividade inexistente no mapa")
+    void deveLidarComAtividadeInexistenteNaCompetencia() {
+        Long origemId = 1L;
+        Mapa mapaOrigem = new Mapa();
+        mapaOrigem.setCodigo(origemId);
+
+        Atividade atividadeOrigem = new Atividade();
+        atividadeOrigem.setCodigo(10L);
+        atividadeOrigem.setConhecimentos(List.of());
+
+        Competencia competenciaOrigem = new Competencia();
+        competenciaOrigem.setDescricao("Comp");
+        Atividade atividadeOutra = new Atividade();
+        atividadeOutra.setCodigo(999L); // ID not in the map
+        competenciaOrigem.setAtividades(Set.of(atividadeOutra));
+
+        when(mapaRepo.findById(origemId)).thenReturn(Optional.of(mapaOrigem));
+        when(mapaRepo.save(any(Mapa.class))).thenReturn(new Mapa());
+        when(atividadeRepo.findWithConhecimentosByMapaCodigo(origemId)).thenReturn(List.of(atividadeOrigem));
+        when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(List.of(competenciaOrigem));
+
+        service.copiarMapaParaUnidade(origemId);
+
+        verify(competenciaRepo).saveAll(anyList());
+    }
 }

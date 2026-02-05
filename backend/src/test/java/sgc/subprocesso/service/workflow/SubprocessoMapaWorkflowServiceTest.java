@@ -135,6 +135,21 @@ class SubprocessoMapaWorkflowServiceTest {
         }
 
         @Test
+        @DisplayName("Não deve mudar status ao remover competência se ficou vazio mas situação era CADASTRO_HOMOLOGADO")
+        void naoDeveMudarStatusRemoverCompetenciaSeJaEraCadastroHomologado() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+
+            when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
+
+            service.removerCompetencia(1L, 5L);
+
+            verify(subprocessoRepo, never()).save(sp);
+        }
+
+        @Test
         @DisplayName("Não deve alterar situação ao salvar mapa se já estava criado")
         void naoDeveAlterarSituacaoSalvarMapaSeJaCriado() {
             Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
