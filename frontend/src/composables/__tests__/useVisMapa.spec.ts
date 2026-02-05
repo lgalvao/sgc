@@ -98,6 +98,30 @@ describe("useVisMapa", () => {
         expect(mapasStore.buscarMapaVisualizacao).toHaveBeenCalledWith(10);
     });
 
+    it("inicializa dados no onMounted sem subprocesso", async () => {
+        setup({
+            processos: {
+                processoDetalhe: { unidades: [] }
+            }
+        });
+        const mapasStore = useMapasStore();
+
+        await flushPromises();
+        expect(mapasStore.buscarMapaVisualizacao).not.toHaveBeenCalled();
+    });
+
+    it("abrirModalHistorico sem codSubprocesso", async () => {
+        setup({
+            processos: {
+                processoDetalhe: { unidades: [] }
+            }
+        });
+        const analisesStore = useAnalisesStore();
+
+        await wrapper.vm.abrirModalHistorico();
+        expect(analisesStore.buscarAnalisesCadastro).not.toHaveBeenCalled();
+    });
+
     it("confirmarSugestoes com sucesso", async () => {
         setup();
         processosStore.apresentarSugestoes.mockResolvedValue({});
@@ -235,6 +259,26 @@ describe("useVisMapa", () => {
         await nextTick();
         expect(wrapper.vm.permissoes).toEqual(permissoes);
         expect(wrapper.vm.podeValidar).toBe(true);
+    });
+
+    it("podeAnalisar computa corretamente baseada em permissoes", async () => {
+        setup();
+
+        subprocessosStore.subprocessoDetalhe = { permissoes: { podeAceitarMapa: true } } as any;
+        await nextTick();
+        expect(wrapper.vm.podeAnalisar).toBe(true);
+
+        subprocessosStore.subprocessoDetalhe = { permissoes: { podeDevolverMapa: true } } as any;
+        await nextTick();
+        expect(wrapper.vm.podeAnalisar).toBe(true);
+
+        subprocessosStore.subprocessoDetalhe = { permissoes: { podeHomologarMapa: true } } as any;
+        await nextTick();
+        expect(wrapper.vm.podeAnalisar).toBe(true);
+
+        subprocessosStore.subprocessoDetalhe = { permissoes: { } } as any;
+        await nextTick();
+        expect(wrapper.vm.podeAnalisar).toBe(false);
     });
 
     it("lidar com erro em confirmarSugestoes", async () => {

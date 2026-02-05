@@ -2,6 +2,9 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import RelatoriosView from '@/views/RelatoriosView.vue';
 import {TipoProcesso} from '@/types/tipos';
+import {useProcessosStore} from '@/stores/processos';
+import {usePerfilStore} from '@/stores/perfil';
+import {createTestingPinia} from '@pinia/testing';
 import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
@@ -210,5 +213,26 @@ describe('RelatoriosView.vue', () => {
 
     const wrapper = mount(RelatoriosView, mountOptions);
     expect((wrapper.vm as any).mapasVigentes).toHaveLength(0);
+  });
+
+  it('busca processos no mount se a lista estiver vazia', async () => {
+    const pinia = createTestingPinia({ stubActions: false });
+    const processosStore = useProcessosStore(pinia);
+    const perfilStore = usePerfilStore(pinia);
+
+    perfilStore.perfilSelecionado = 'ADMIN';
+    perfilStore.unidadeSelecionada = 1;
+    processosStore.processosPainel = [];
+
+    const spy = vi.spyOn(processosStore, 'buscarProcessosPainel').mockResolvedValue([] as any);
+
+    mount(RelatoriosView, {
+      global: {
+        plugins: [pinia],
+        stubs: stubs
+      }
+    });
+
+    expect(spy).toHaveBeenCalled();
   });
 });

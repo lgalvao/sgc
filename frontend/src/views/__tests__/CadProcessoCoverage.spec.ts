@@ -3,6 +3,7 @@ import {flushPromises, mount} from '@vue/test-utils';
 import {nextTick} from 'vue';
 import CadProcesso from '@/views/CadProcesso.vue';
 import {useProcessosStore} from '@/stores/processos';
+import {useUnidadesStore} from '@/stores/unidades';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mock router
@@ -87,7 +88,8 @@ describe('CadProcesso.vue Coverage', () => {
         });
 
         processosStore = useProcessosStore();
-        return { wrapper: context.wrapper, processosStore };
+        const unidadesStore = useUnidadesStore();
+        return { wrapper: context.wrapper, processosStore, unidadesStore };
     };
 
     beforeEach(() => {
@@ -179,5 +181,99 @@ describe('CadProcesso.vue Coverage', () => {
         expect(wrapper.vm.alertState.show).toBe(true);
         expect(wrapper.vm.alertState.body).toContain('Failed to start');
         expect(wrapper.vm.isLoading).toBe(false);
+    });
+
+    it('opens and confirms removal modal', async () => {
+        const { wrapper, processosStore } = createWrapper();
+
+        // Setup process being edited
+        (wrapper.vm as any).processoEditando = { codigo: 123, descricao: 'Processo Teste' };
+        await nextTick();
+
+        // Open modal
+        await (wrapper.vm as any).abrirModalRemocao();
+        expect((wrapper.vm as any).mostrarModalRemocao).toBe(true);
+
+        // Confirm removal
+        processosStore.removerProcesso.mockResolvedValue(undefined);
+
+        await (wrapper.vm as any).confirmarRemocao();
+        await flushPromises();
+
+        expect(processosStore.removerProcesso).toHaveBeenCalledWith(123);
+        expect(mockPush).toHaveBeenCalledWith('/painel');
+        expect((wrapper.vm as any).mostrarModalRemocao).toBe(false);
+    });
+
+    it('handles error during removal', async () => {
+        const { wrapper, processosStore } = createWrapper();
+
+        (wrapper.vm as any).processoEditando = { codigo: 123, descricao: 'Processo Teste' };
+        await nextTick();
+
+        processosStore.removerProcesso.mockRejectedValue(new Error('Delete Error'));
+        processosStore.lastError = { message: 'Failed to delete' };
+
+        await (wrapper.vm as any).confirmarRemocao();
+        await flushPromises();
+
+        expect((wrapper.vm as any).mostrarModalRemocao).toBe(false);
+        expect((wrapper.vm as any).alertState.show).toBe(true);
+        expect((wrapper.vm as any).alertState.body).toContain('Failed to delete');
+    });
+
+    it('fecharModalRemocao closes the modal', async () => {
+        const { wrapper } = createWrapper();
+        (wrapper.vm as any).mostrarModalRemocao = true;
+
+        (wrapper.vm as any).fecharModalRemocao();
+
+        expect((wrapper.vm as any).mostrarModalRemocao).toBe(false);
+    });
+
+    it('confirmarRemocao does nothing if no process editing', async () => {
+        const { wrapper, processosStore } = createWrapper();
+        (wrapper.vm as any).processoEditando = null;
+
+        await (wrapper.vm as any).confirmarRemocao();
+
+        expect(processosStore.removerProcesso).not.toHaveBeenCalled();
+    });
+
+    it('triggers search for units if type changes', async () => {
+        const { wrapper } = createWrapper();
+        const unidadesStore = (wrapper.vm as any).unidadesStore;
+        vi.spyOn(unidadesStore, 'buscarUnidadesParaProcesso').mockResolvedValue(undefined);
+
+        (wrapper.vm as any).tipo = 'MAPEAMENTO';
+        await nextTick();
+
+        expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('MAPEAMENTO', undefined);
+    });
+
+    it('populates fields when loading an existing process', async () => {
+        mockRoute.query = { codProcesso: '123' };
+        const mockProcesso = {
+            codigo: 123,
+            descricao: 'Processo Existente',
+            tipo: 'MAPEAMENTO',
+            dataLimite: '2023-12-31T00:00:00',
+            situacao: 'CRIADO',
+            unidades: [{ codUnidade: 1 }, { codUnidade: 2 }]
+        };
+
+        const { wrapper, processosStore, unidadesStore } = createWrapper({
+            processos: {
+                processoDetalhe: mockProcesso
+            }
+        });
+
+        await flushPromises();
+
+        expect((wrapper.vm as any).descricao).toBe('Processo Existente');
+        expect((wrapper.vm as any).tipo).toBe('MAPEAMENTO');
+        expect((wrapper.vm as any).dataLimite).toBe('2023-12-31');
+        expect((wrapper.vm as any).unidadesSelecionadas).toEqual([1, 2]);
+        expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('MAPEAMENTO', 123);
     });
 });

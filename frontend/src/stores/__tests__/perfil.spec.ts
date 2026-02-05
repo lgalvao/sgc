@@ -207,5 +207,49 @@ describe("usePerfilStore", () => {
             context.store.clearError();
             expect(context.store.lastError).toBeNull();
         });
+
+        it("loginCompleto deve retornar false para erros 401 ou 404", async () => {
+            const mockUsuarioService = vi.mocked(usuarioService);
+            mockUsuarioService.autenticar.mockRejectedValue({ response: { status: 401 } });
+
+            const result = await context.store.loginCompleto("123", "pass");
+            expect(result).toBe(false);
+
+            mockUsuarioService.autenticar.mockRejectedValue({ response: { status: 404 } });
+            const result2 = await context.store.loginCompleto("123", "pass");
+            expect(result2).toBe(false);
+
+            mockUsuarioService.autenticar.mockRejectedValue(new Error("Other error"));
+            await expect(context.store.loginCompleto("123", "pass")).rejects.toThrow("Other error");
+        });
+    });
+
+    describe("getters", () => {
+        it("unidadeAtual deve retornar unidadeSelecionada se definida", () => {
+            context.store.perfilSelecionado = Perfil.ADMIN;
+            context.store.unidadeSelecionada = 50;
+            expect(context.store.unidadeAtual).toBe(50);
+        });
+
+        it("unidadeAtual deve retornar unidade do perfil se unidadeSelecionada for null", () => {
+            context.store.perfilSelecionado = Perfil.CHEFE;
+            context.store.unidadeSelecionada = null;
+            context.store.perfisUnidades = [
+                { perfil: Perfil.CHEFE, unidade: { codigo: 60 } } as any
+            ];
+            expect(context.store.unidadeAtual).toBe(60);
+        });
+
+        it("unidadeAtual deve retornar null se nenhum perfil selecionado", () => {
+            context.store.perfilSelecionado = null;
+            expect(context.store.unidadeAtual).toBeNull();
+        });
+
+        it("unidadeAtual deve retornar null se perfil não encontrado no mapa", () => {
+            context.store.perfilSelecionado = Perfil.GESTOR;
+            context.store.unidadeSelecionada = null;
+            context.store.perfisUnidades = [];
+            expect(context.store.unidadeAtual).toBeNull();
+        });
     });
 });
