@@ -44,18 +44,53 @@ const CATEGORIES = {
     }
 };
 
-// Arquivos que podem ser ignorados (configuração, DTOs simples, etc)
+// Arquivos que podem ser ignorados - match build.gradle.kts jacocoTestReport exclusions
 const IGNORE_PATTERNS = [
+    // Gerados automaticamente
+    /MapperImpl/,
+    
+    // Bootstrap e configuração
+    /Sgc\.java$/,
     /Config.*\.java$/,
     /Properties\.java$/,
-    /Command\.java$/,
+    
+    // DTOs e Request/Response (apenas dados)
+    /Dto\.java$/,
     /Request\.java$/,
     /Response\.java$/,
-    /Dto\.java$/,
+    
+    // Exceções (maioria simples)
+    /Erro.*\.java$/,
+    /Exception\.java$/,
+    
+    // Mocks de teste
     /Mock\.java$/,
     /Test\.java$/,
-    /Erro.*\.java$/,
-    /Exception\.java$/
+    
+    // Repositórios (interfaces JPA)
+    /Repo\.java$/,
+    
+    // Entidades JPA simples (sem lógica de negócio)
+    /model\/Perfil\.java$/,
+    /model\/Usuario\.java$/,
+    /model\/Unidade.*\.java$/,
+    /model\/Administrador\.java$/,
+    /model\/Vinculacao.*\.java$/,
+    /model\/Atribuicao.*\.java$/,
+    /model\/Parametro\.java$/,
+    /model\/Movimentacao\.java$/,
+    /model\/Analise\.java$/,
+    /model\/Alerta.*\.java$/,
+    /model\/Conhecimento\.java$/,
+    /model\/Mapa\.java$/,
+    /model\/Atividade\.java$/,
+    /model\/Competencia.*\.java$/,
+    /model\/Notificacao\.java$/,
+    /model\/Processo\.java$/,
+    
+    // Enums simples sem lógica de negócio
+    /Status.*\.java$/,
+    /Tipo.*\.java$/
 ];
 
 async function parseXml(filePath) {

@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const { createInterface } = require('readline');
+const fs = require('node:fs');
+const path = require('node:path');
+const { createInterface } = require('node:readline');
 
 // Configuração
 const CSV_PATH = path.join(__dirname, '../../backend/build/reports/jacoco/test/jacocoTestReport.csv');
@@ -11,16 +11,16 @@ class ClassMetrics {
     constructor(data) {
         this.package = data.PACKAGE;
         this.name = data.CLASS;
-        this.instructionsCovered = parseInt(data.INSTRUCTION_COVERED || 0, 10);
-        this.instructionsMissed = parseInt(data.INSTRUCTION_MISSED || 0, 10);
-        this.branchesCovered = parseInt(data.BRANCH_COVERED || 0, 10);
-        this.branchesMissed = parseInt(data.BRANCH_MISSED || 0, 10);
-        this.linesCovered = parseInt(data.LINE_COVERED || 0, 10);
-        this.linesMissed = parseInt(data.LINE_MISSED || 0, 10);
-        this.complexityCovered = parseInt(data.COMPLEXITY_COVERED || 0, 10);
-        this.complexityMissed = parseInt(data.COMPLEXITY_MISSED || 0, 10);
-        this.methodsCovered = parseInt(data.METHOD_COVERED || 0, 10);
-        this.methodsMissed = parseInt(data.METHOD_MISSED || 0, 10);
+        this.instructionsCovered = Number.parseInt(data.INSTRUCTION_COVERED || 0, 10);
+        this.instructionsMissed = Number.parseInt(data.INSTRUCTION_MISSED || 0, 10);
+        this.branchesCovered = Number.parseInt(data.BRANCH_COVERED || 0, 10);
+        this.branchesMissed = Number.parseInt(data.BRANCH_MISSED || 0, 10);
+        this.linesCovered = Number.parseInt(data.LINE_COVERED || 0, 10);
+        this.linesMissed = Number.parseInt(data.LINE_MISSED || 0, 10);
+        this.complexityCovered = Number.parseInt(data.COMPLEXITY_COVERED || 0, 10);
+        this.complexityMissed = Number.parseInt(data.COMPLEXITY_MISSED || 0, 10);
+        this.methodsCovered = Number.parseInt(data.METHOD_COVERED || 0, 10);
+        this.methodsMissed = Number.parseInt(data.METHOD_MISSED || 0, 10);
     }
 
     get totalBranches() { return this.branchesCovered + this.branchesMissed; }
@@ -29,11 +29,11 @@ class ClassMetrics {
     get totalMethods() { return this.methodsCovered + this.methodsMissed; }
     
     get avgComplexityPerMethod() {
-        return this.totalMethods === 0 ? 0.0 : this.totalComplexity / this.totalMethods;
+        return this.totalMethods === 0 ? 0 : this.totalComplexity / this.totalMethods;
     }
 
     get branchCoveragePercentage() {
-        if (this.totalBranches === 0) return 100.0;
+        if (this.totalBranches === 0) return 100;
         return (this.branchesCovered / this.totalBranches) * 100;
     }
 
@@ -44,10 +44,10 @@ class ClassMetrics {
         const normAvgComplexity = this.avgComplexityPerMethod * 5;
 
         return (
-            normComplexity * 0.40 +
-            normBranches * 0.30 +
-            normLines * 0.20 +
-            normAvgComplexity * 0.10
+            normComplexity * 0.4 +
+            normBranches * 0.3 +
+            normLines * 0.2 +
+            normAvgComplexity * 0.1
         );
     }
 

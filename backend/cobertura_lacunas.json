@@ -1,6 +1,6 @@
 {
-  "globalLineCoverage": "3.39%",
-  "totalFilesWithGaps": 120,
+  "globalLineCoverage": "3.44%",
+  "totalFilesWithGaps": 118,
   "gaps": [
     {
       "class": "sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService",
@@ -2785,69 +2785,6 @@
       "score": 55
     },
     {
-      "class": "sgc.processo.service.ProcessoDetalheBuilder",
-      "coverage": "0.00%",
-      "missed": [
-        29,
-        30,
-        31,
-        32,
-        33,
-        34,
-        35,
-        36,
-        37,
-        38,
-        39,
-        40,
-        41,
-        42,
-        43,
-        44,
-        45,
-        46,
-        48,
-        49,
-        51,
-        58,
-        59,
-        62,
-        63,
-        64,
-        67,
-        68,
-        69,
-        72,
-        73,
-        74,
-        75,
-        76,
-        77,
-        78,
-        80,
-        81,
-        82,
-        85,
-        86,
-        89,
-        90,
-        91,
-        93,
-        95,
-        98,
-        100,
-        103,
-        104,
-        106,
-        108,
-        109,
-        110,
-        111
-      ],
-      "partial": [],
-      "score": 55
-    },
-    {
       "class": "sgc.subprocesso.service.notificacao.SubprocessoEmailService",
       "coverage": "0.00%",
       "missed": [
@@ -5179,19 +5116,6 @@
         17,
         18,
         19
-      ],
-      "partial": [],
-      "score": 5
-    },
-    {
-      "class": "sgc.comum.repo.ComumRepo",
-      "coverage": "0.00%",
-      "missed": [
-        13,
-        28,
-        29,
-        30,
-        32
       ],
       "partial": [],
       "score": 5

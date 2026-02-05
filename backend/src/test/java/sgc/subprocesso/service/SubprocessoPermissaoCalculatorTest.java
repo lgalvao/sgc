@@ -115,7 +115,7 @@ class SubprocessoPermissaoCalculatorTest {
             processo.setTipo(TipoProcesso.MAPEAMENTO);
 
             // Configurar mock genérico primeiro (retorna false)
-            when(accessControlService.podeExecutar(usuario, any(), subprocesso))
+            when(accessControlService.podeExecutar(any(), any(), any()))
                     .thenReturn(false);
             
             // Depois configurar os casos específicos (retornam true) - sobrescrevem o genérico
@@ -143,7 +143,7 @@ class SubprocessoPermissaoCalculatorTest {
             processo.setTipo(TipoProcesso.REVISAO);
 
             // Configurar mock genérico primeiro (retorna false)
-            when(accessControlService.podeExecutar(usuario, any(), subprocesso))
+            when(accessControlService.podeExecutar(any(), any(), any()))
                     .thenReturn(false);
             
             // Depois configurar os casos específicos (retornam true) - sobrescrevem o genérico

@@ -47,6 +47,31 @@ async function main() {
     let totalLines = 0;
     let coveredLines = 0;
 
+    // Exclusions matching build.gradle.kts jacocoTestReport configuration
+    const EXCLUSION_PATTERNS = [
+        /MapperImpl/,
+        /\.Sgc$/,
+        /Config$/,
+        /Properties$/,
+        /Dto$/,
+        /Request$/,
+        /Response$/,
+        /\.Erro/,
+        /Repo$/,
+        // Simple entities without business logic - match class names ending with these
+        /\.model\.(Usuario|Unidade|Administrador|Vinculacao|Atribuicao|Parametro|Movimentacao|Analise|Alerta|Conhecimento|Mapa|Atividade|Competencia|Notificacao|Processo|Perfil)$/,
+        // Also match if they have Builder suffix (Lombok generated)
+        /Builder$/,
+        /BuilderImpl$/,
+        // Simple enums - match Status or Tipo anywhere in name
+        /\.Status/,
+        /\.Tipo/
+    ];
+
+    function shouldExclude(className) {
+        return EXCLUSION_PATTERNS.some(pattern => pattern.test(className));
+    }
+
     packages.forEach(pkg => {
         const packageName = pkg.$.name.replace(/\//g, '.');
         const sourceFiles = pkg.sourcefile || [];
@@ -54,6 +79,11 @@ async function main() {
         sourceFiles.forEach(sf => {
             const fileName = sf.$.name;
             const className = `${packageName}.${fileName.replace('.java', '')}`;
+
+            // Skip excluded classes
+            if (shouldExclude(className)) {
+                return;
+            }
 
             let linesTotal = 0;
             let linesCovered = 0;
