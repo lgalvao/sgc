@@ -2,8 +2,9 @@
 
 Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/backend/etc/sql`), modelos JPA e DTOs (Backend e Frontend) para verificar o alinhamento em termos de nomes, tipos, nullability e validações.
 
-**Status da Análise:** ✅ Completo  
+**Status da Análise:** ✅ Completo e Verificado  
 **Data da Análise:** 2026-02-05  
+**Última Verificação:** 2026-02-05 (Revisão contra código-fonte atual)  
 **Arquivos Analisados:**
 - `/backend/etc/sql/ddl_tabelas.sql` (449 linhas)
 - `/backend/etc/sql/ddl_views.sql` (288 linhas)
@@ -11,6 +12,15 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
 - DTOs Backend em `/backend/src/main/java/sgc/*/dto/`
 - DTOs Frontend em `/frontend/src/types/dtos.ts`
 - Mappers Frontend em `/frontend/src/mappers/processos.ts`
+- Requisitos em `/etc/reqs/`
+
+---
+
+## Notas Importantes sobre Oracle DATE
+
+> ⚠️ **Esclarecimento técnico:** Diferentemente do MySQL/PostgreSQL, o tipo `DATE` do Oracle **inclui componente de hora** (ano, mês, dia, hora, minuto, segundo). Portanto, as discrepâncias de tipo DATE vs LocalDateTime documentadas abaixo **NÃO causam perda de dados no Oracle**. Contudo, para clareza semântica e compatibilidade cross-database, recomenda-se alinhar os tipos.
+
+---
 
 ## 1. SQL Schema vs JPA Entities
 
@@ -20,12 +30,13 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
 - **JPA:** `@Column(name = "data_limite", nullable = false)` (linha 32, Processo.java)
 - **Impacto:** Validação Java é mais restritiva que o banco. O banco permite NULL, mas a aplicação rejeita.
 - **Severidade:** ⚠️ MÉDIA - Pode causar inconsistência se dados forem inseridos diretamente no banco.
+- **Recomendação:** SQL deve ser alterado para `NOT NULL` para alinhar com regra de negócio.
 
 #### Achado 2: Discrepância de Tipo - `data_limite`
-- **SQL:** `data_limite DATE NULL` (DATE sem componente de hora)
+- **SQL:** `data_limite DATE NULL`
 - **JPA:** `private LocalDateTime dataLimite;` (linha 33, Processo.java)
-- **Impacto:** JPA armazena timestamp completo mas SQL define apenas DATE. Oracle converterá para DATE truncando a hora.
-- **Severidade:** 🔴 ALTA - Perda silenciosa de dados (componente de hora)
+- **Impacto:** ~~JPA armazena timestamp completo mas SQL define apenas DATE~~ **Oracle DATE inclui hora**, portanto não há perda de dados.
+- **Severidade:** 🟡 BAIXA - Apenas inconsistência semântica (DATE vs TIMESTAMP no DDL)
 - **Evidência:**
   ```sql
   -- SQL (ddl_tabelas.sql:35)
@@ -36,13 +47,15 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
   @Column(name = "data_limite", nullable = false)
   private LocalDateTime dataLimite;
   ```
+- **Recomendação:** Para clareza, considerar mudar SQL para `TIMESTAMP` ou JPA para `LocalDate`.
 
 ### 1.2 Table `UNIDADE_PROCESSO`
 #### Achado: Colunas de Snapshot Ignoradas pelo JPA
 - **SQL:** Tabela define colunas de snapshot: `nome`, `sigla`, `matricula_titular`, `titulo_titular`, `data_inicio_titularidade`, `tipo`, `situacao`, `unidade_superior_codigo` (linhas 59-71, ddl_tabelas.sql)
 - **JPA:** Mapeada apenas como `@JoinTable` para relacionamento `@ManyToMany` com `Unidade` (linhas 46-54, Processo.java)
 - **Impacto:** As colunas de snapshot NUNCA são populadas ou gerenciadas pelo Hibernate. A funcionalidade de snapshot está completamente não implementada no backend.
-- **Severidade:** 🔴 CRÍTICA - Funcionalidade planejada (snapshot de unidades no momento do processo) não funciona
+- **Severidade:** ⚠️ ADIADA - Funcionalidade planejada mas não requerida nos requisitos atuais
+- **Verificação de Requisitos:** Não há menção a "snapshot" nos documentos de requisitos em `/etc/reqs/`.
 - **Evidência:**
   ```sql
   -- SQL define 10 colunas, sendo 8 de snapshot (ddl_tabelas.sql:59-71)
@@ -72,7 +85,7 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
   @Builder.Default
   private Set<Unidade> participantes = new HashSet<>();
   ```
-- **Recomendação:** Criar entidade `UnidadeProcesso` ou usar `@ElementCollection` com `@Embedded` para persistir snapshots.
+- **Recomendação:** Decidir: (1) Criar entidade `UnidadeProcesso` para implementar snapshots, ou (2) Remover colunas de snapshot do SQL se não forem necessárias.
 
 ### 1.3 Table `SUBPROCESSO`
 #### Achado 1: Discrepância de Nullability - `unidade_codigo`
@@ -80,12 +93,14 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
 - **JPA:** `@JoinColumn(name = "unidade_codigo", nullable = false)` (linha 31, Subprocesso.java)
 - **Impacto:** Validação Java é mais restritiva. Inserções diretas no banco podem criar registros sem unidade que causarão exceções no JPA.
 - **Severidade:** ⚠️ MÉDIA
+- **Recomendação:** SQL deve ser `NOT NULL` - subprocesso sem unidade é inválido por definição.
 
 #### Achado 2: Discrepância de Nullability - `situacao`
 - **SQL:** `situacao VARCHAR2(50) NULL` (linha 107, ddl_tabelas.sql)
 - **JPA:** `@Column(name = "situacao", length = 50, nullable = false)` com `@Builder.Default` (linhas 50-52, Subprocesso.java)
 - **Impacto:** JPA força valor não-nulo (default = `NAO_INICIADO`), mas banco permite NULL.
 - **Severidade:** 🟡 BAIXA - Default do Builder previne maioria dos casos
+- **Recomendação:** SQL deve ser `NOT NULL` para consistência.
 
 #### Achado 3: Discrepância de Tipo - Datas Limite
 - **SQL:** 
@@ -94,8 +109,8 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
 - **JPA:** 
   - `private LocalDateTime dataLimiteEtapa1;` (linha 37, Subprocesso.java)
   - `private LocalDateTime dataLimiteEtapa2;` (linha 44, Subprocesso.java)
-- **Impacto:** Mesmo problema do Processo - perda do componente de hora ao persistir
-- **Severidade:** 🔴 ALTA - Perda silenciosa de dados (componente de hora)
+- **Impacto:** ~~Perda do componente de hora~~ **Oracle DATE inclui hora**, sem perda de dados.
+- **Severidade:** 🟡 BAIXA - Apenas inconsistência semântica
 - **Evidência:**
   ```sql
   -- SQL (ddl_tabelas.sql:103-107)
@@ -111,10 +126,10 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
   private Unidade unidade;
   
   @Column(name = "data_limite_etapa1", nullable = false)
-  private LocalDateTime dataLimiteEtapa1;  // ❌ Deveria ser LocalDate
+  private LocalDateTime dataLimiteEtapa1;
   
   @Column(name = "data_limite_etapa2")
-  private LocalDateTime dataLimiteEtapa2;  // ❌ Deveria ser LocalDate
+  private LocalDateTime dataLimiteEtapa2;
   
   @Enumerated(EnumType.STRING)
   @Column(name = "situacao", length = 50, nullable = false)
@@ -123,17 +138,17 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
   ```
 
 ### 1.4 Table `ANALISE`
-#### Achado 1: Discrepância de Nullability - `subprocesso_codigo`
+#### ~~Achado 1: Discrepância de Nullability - `subprocesso_codigo`~~ ✅ CORRIGIDO
 - **SQL:** `subprocesso_codigo NUMBER NOT NULL` (linha 222, ddl_tabelas.sql)
-- **JPA:** `@JoinColumn(name = "subprocesso_codigo")` sem `nullable = false` (linha 27, Analise.java)
-- **Impacto:** JPA permite NULL mas banco rejeita. Tentativa de salvar análise sem subprocesso causará erro SQL.
-- **Severidade:** 🔴 ALTA - Erro em runtime se código tentar persistir análise sem subprocesso
+- **JPA:** `@JoinColumn(name = "subprocesso_codigo", nullable = false)` (linha 27, Analise.java)
+- **Status:** ✅ **ALINHADO** - JPA agora tem `nullable = false` conforme verificado no código atual.
 
 #### Achado 2: Discrepância de Tamanho - `acao`
 - **SQL:** `acao VARCHAR2(100) NULL` (linha 225, ddl_tabelas.sql)
 - **JPA:** `@Column(name = "acao", length = 20)` (linha 37, Analise.java)
 - **Impacto:** JPA aceita até 20 caracteres mas banco permite 100. Divergência de validação.
-- **Severidade:** 🟡 BAIXA - Valores enum são curtos, mas inconsistente
+- **Severidade:** 🟡 BAIXA - Valores enum são curtos (ex: `ACEITE`, `DEVOLUCAO`), sem risco prático.
+- **Recomendação:** Opcional - alinhar ambos para 50 caracteres para consistência.
 
 #### Achado 3: Discrepância CRÍTICA de Tamanho - `motivo`
 - **SQL:** `motivo VARCHAR2(200) NULL` (linha 228, ddl_tabelas.sql)
@@ -145,61 +160,40 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
   -- SQL (ddl_tabelas.sql:220-229)
   CREATE TABLE ANALISE (
       codigo             NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-      subprocesso_codigo NUMBER NOT NULL,                    -- ⚠️ NOT NULL
+      subprocesso_codigo NUMBER NOT NULL,
       data_hora          TIMESTAMP NULL,
       tipo               VARCHAR2(20)  NULL,
-      acao               VARCHAR2(100) NULL,                  -- ⚠️ 100 chars
+      acao               VARCHAR2(100) NULL,
       usuario_titulo     VARCHAR2(12)  NULL,
       unidade_codigo     NUMBER NULL,
-      motivo             VARCHAR2(200) NULL,                  -- 🔴 200 chars
+      motivo             VARCHAR2(200) NULL,       -- 🔴 200 chars < JPA 500
       observacoes        VARCHAR2(500) NULL,
       -- ...
   );
   ```
   ```java
-  // JPA (Analise.java:26-48)
-  @ManyToOne
-  @JoinColumn(name = "subprocesso_codigo")  // ❌ Falta nullable = false
-  private Subprocesso subprocesso;
-  
-  @Enumerated(EnumType.STRING)
-  @Column(name = "acao", length = 20)       // ⚠️ 20 < 100 do SQL
-  private TipoAcaoAnalise acao;
-  
+  // JPA (Analise.java:46-47)
   @Column(name = "motivo", length = 500)    // 🔴 500 > 200 do SQL
   private String motivo;
   ```
+- **Recomendação:** Alterar SQL para `VARCHAR2(500)` para alinhar com JPA.
 
 ### 1.5 Table `MOVIMENTACAO`
-#### Achado 1: Coluna AUSENTE no SQL - `observacoes`
-- **SQL:** Tabela `MOVIMENTACAO` NÃO possui coluna `observacoes` (linhas 354-366, ddl_tabelas.sql)
-- **JPA:** `@Column(name = "observacoes", length = 500)` (linha 41, Movimentacao.java)
-- **Impacto:** Qualquer tentativa de salvar `Movimentacao` com `observacoes` preenchido causará erro SQL "coluna inválida". Funcionalidade completamente quebrada.
-- **Severidade:** 🔴 CRÍTICA - Impossível usar campo observacoes
-- **Evidência:**
-  ```sql
-  -- SQL (ddl_tabelas.sql:354-366) - NÃO tem observacoes
-  CREATE TABLE MOVIMENTACAO (
-      codigo                 NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-      subprocesso_codigo     NUMBER NOT NULL,
-      data_hora              TIMESTAMP NULL,
-      unidade_origem_codigo  NUMBER NULL,
-      unidade_destino_codigo NUMBER NULL,
-      usuario_titulo         VARCHAR2(12)  NULL,
-      descricao              VARCHAR2(255) NULL,  -- ✅ Tem descricao
-      -- 🔴 FALTA observacoes
-      CONSTRAINT pk_movimentacao PRIMARY KEY (codigo),
-      -- ...
-  );
-  ```
+#### ~~Achado 1: Coluna AUSENTE no SQL - `observacoes`~~ ❌ ERRO NO RELATÓRIO ORIGINAL
+- **Status:** ❌ **RELATÓRIO INCORRETO** - A entidade JPA `Movimentacao.java` **NÃO possui** campo `observacoes`.
+- **Verificação:** Analisando o código atual em `backend/src/main/java/sgc/subprocesso/model/Movimentacao.java`:
   ```java
-  // JPA (Movimentacao.java:38-42)
-  @Column(name = "descricao")
+  // Campos atuais da entidade Movimentacao (verificado 2026-02-05):
+  private Subprocesso subprocesso;
+  private LocalDateTime dataHora;
+  private Unidade unidadeOrigem;
+  private Unidade unidadeDestino;
   private String descricao;
-  
-  @Column(name = "observacoes", length = 500)  // 🔴 Coluna não existe!
-  private String observacoes;
+  private Usuario usuario;
+  // NÃO há campo observacoes!
   ```
+- **Requisitos:** Os casos de uso em `/etc/reqs/` (cdu-07, cdu-09, cdu-13, etc.) especificam apenas `descrição` para movimentações, não `observacoes`.
+- **Conclusão:** Este achado era baseado em informação desatualizada ou incorreta. **Nenhuma ação necessária.**
 
 #### Achado 2: Múltiplas Discrepâncias de Nullability
 - **SQL:** Campos NULL (linhas 358-361):
@@ -207,9 +201,11 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
   - `unidade_origem_codigo NUMBER NULL`
   - `unidade_destino_codigo NUMBER NULL`
   - `usuario_titulo VARCHAR2(12) NULL`
-- **JPA:** Todos marcados como `nullable = false` (linhas 27-28, 31-32, 35-36, 45-46, Movimentacao.java)
+- **JPA:** Todos marcados como `nullable = false` (linhas 27-28, 31-32, 35-36, 42-43, Movimentacao.java)
 - **Impacto:** Validação Java é mais restritiva. Inserções diretas podem causar exceções.
 - **Severidade:** ⚠️ MÉDIA
+- **Verificação de Requisitos:** Os casos de uso (cdu-09.md, cdu-13.md, etc.) sempre especificam valores para todos estes campos ao criar movimentações.
+- **Recomendação:** SQL deve ter todos estes campos como `NOT NULL` para alinhar com regras de negócio.
 
 ### 1.6 View `VW_VINCULACAO_UNIDADE`
 #### Achado: ID com Valores NULL - `unidade_anterior_codigo`
@@ -245,9 +241,24 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
       @Column(name = "unidade_anterior_codigo", nullable = false)  // 🔴 Mas pode ser NULL!
       private Long unidadeAnteriorCodigo;
   ```
-- **Recomendação:** Usar ID surrogate ou chave composta que suporte opcionalidade (composite key com `@Embeddable`).
+- **Recomendação:** 
+  1. **Opção A:** Modificar a view para usar valor sentinela (ex: 0) em vez de NULL
+  2. **Opção B:** Usar surrogate ID único na entidade JPA
+  3. **Opção C:** Usar `@EmbeddedId` com tratamento de Optional
 
 ### 1.7 Table `ATRIBUICAO_TEMPORARIA`
+#### Achado: Múltiplas Discrepâncias de Nullability
+- **SQL:** Campos NULL (linhas 257-262, ddl_tabelas.sql):
+  - `unidade_codigo NUMBER NULL`
+  - `usuario_matricula VARCHAR2(8) NULL`
+  - `usuario_titulo VARCHAR2(12) NULL`
+  - `data_inicio DATE NULL`
+  - `data_termino DATE NULL`
+- **JPA:** Todos marcados como `nullable = false` (linhas 24-36, AtribuicaoTemporaria.java)
+- **Impacto:** Validação Java é mais restritiva.
+- **Severidade:** ⚠️ MÉDIA
+- **Recomendação:** SQL deve ter todos estes campos como `NOT NULL` - atribuição temporária sem estes valores é inválida.
+
 #### Achado: Discrepância de Tipo - Datas
 - **SQL:** 
   - `data_inicio DATE NULL` (linha 260, ddl_tabelas.sql)
@@ -255,19 +266,8 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
 - **JPA:** 
   - `private LocalDateTime dataInicio;` (AtribuicaoTemporaria.java)
   - `private LocalDateTime dataTermino;` (AtribuicaoTemporaria.java)
-- **Impacto:** Mesmo problema - componente de hora é truncado ao persistir em campo DATE
-- **Severidade:** 🔴 ALTA - Perda silenciosa de dados (componente de hora)
-- **Evidência:**
-  ```sql
-  -- SQL (ddl_tabelas.sql:260-261)
-  data_inicio       DATE NULL,
-  data_termino      DATE NULL,
-  ```
-  ```java
-  // JPA deveria usar LocalDate, não LocalDateTime
-  private LocalDateTime dataInicio;    // ❌ Deveria ser LocalDate
-  private LocalDateTime dataTermino;   // ❌ Deveria ser LocalDate
-  ```
+- **Impacto:** ~~Perda do componente de hora~~ **Oracle DATE inclui hora**, sem perda de dados.
+- **Severidade:** 🟡 BAIXA - Apenas inconsistência semântica
 
 ---
 
@@ -318,116 +318,85 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
   }
   ```
 - **Correção:** Alinhar o nome do campo:
-  - **Opção 1:** Renomear frontend `codigo` → `codUnidade`
-  - **Opção 2:** Renomear backend `codUnidade` → `codigo`
-  - **Recomendado:** Opção 1 (menos impacto, apenas frontend)
+  - **Opção 1 (Recomendada):** Renomear frontend `codigo` → `codUnidade` em dtos.ts e ajustar mapper
+  - **Opção 2:** Renomear backend `codUnidade` → `codigo` em ProcessoDetalheDto.java
 
 ### 2.2 `Analise` DTOs
 - **Observation:** `Analise` related DTOs in the frontend often use `any` in mappers, which bypasses type checking and obscures mismatches between backend `LocalDateTime` (string in JSON) and frontend expected formats.
 
 ---
 
-## 3. Resumo dos Achados Críticos
+## 3. Resumo dos Achados Verificados
 
 ### Classificação por Severidade
 
-#### 🔴 CRÍTICA (6 achados - Quebra funcionalidade ou perda de dados)
-| # | Entidade/DTO | Campo | Tipo de Problema | Descrição |
-|---|:-------------|:------|:-----------------|:----------|
-| 1 | `UNIDADE_PROCESSO` | Todas colunas snapshot | Lógica/Mapeamento | 8 colunas de snapshot definidas em SQL são completamente ignoradas pelo JPA @ManyToMany |
-| 2 | `Analise` | `motivo` | Validação/Tamanho | JPA length=500 > SQL VARCHAR2(200). Truncamento silencioso ou exceção |
-| 3 | `Movimentacao` | `observacoes` | Esquema/Coluna Ausente | Campo existe no JPA mas FALTA no SQL. Qualquer uso gera erro SQL |
-| 4 | `VinculacaoUnidade` | `unidadeAnteriorCodigo` | JPA/ID | Marcado @Id mas pode ser NULL em unidades raiz. JPA não suporta PK NULL |
-| 5 | `UnidadeParticipanteDto` | `codigo` vs `codUnidade` | Naming/Contrato | Backend envia `codUnidade`, frontend espera `codigo`. Resulta em undefined |
-| 6 | `Analise` | `subprocesso_codigo` | Nullability/FK | SQL NOT NULL mas JPA permite NULL. Erro SQL em runtime |
+#### 🔴 CRÍTICA (3 achados - Quebra funcionalidade ou perda de dados)
+| # | Entidade/DTO | Campo | Tipo de Problema | Descrição | Status |
+|---|:-------------|:------|:-----------------|:----------|:-------|
+| 1 | `Analise` | `motivo` | Validação/Tamanho | JPA length=500 > SQL VARCHAR2(200). Truncamento ou exceção | ⏳ Pendente |
+| 2 | `VinculacaoUnidade` | `unidadeAnteriorCodigo` | JPA/ID | Marcado @Id mas pode ser NULL em unidades raiz | ⏳ Pendente |
+| 3 | `UnidadeParticipanteDto` | `codigo` vs `codUnidade` | Naming/Contrato | Backend envia `codUnidade`, frontend espera `codigo` | ⏳ Pendente |
 
-#### 🔴 ALTA (4 achados - Perda silenciosa de dados)
-| # | Entidade | Campos | Tipo de Problema | Descrição |
-|---|:---------|:-------|:-----------------|:----------|
-| 7 | `Processo` | `dataLimite` | Tipo de Dado | SQL DATE vs JPA LocalDateTime - perde componente de hora |
-| 8 | `Subprocesso` | `dataLimiteEtapa1`, `dataLimiteEtapa2` | Tipo de Dado | SQL DATE vs JPA LocalDateTime - perde componente de hora |
-| 9 | `AtribuicaoTemporaria` | `dataInicio`, `dataTermino` | Tipo de Dado | SQL DATE vs JPA LocalDateTime - perde componente de hora |
-| 10 | `Analise` | `acao` | Tamanho | JPA length=20 < SQL VARCHAR2(100). Divergência de validação |
+#### ⚠️ MÉDIA (5 achados - Inconsistência entre camadas, SQL mais permissivo que JPA)
+| # | Entidade | Campo | Tipo de Problema | Descrição | Status |
+|---|:---------|:------|:-----------------|:----------|:-------|
+| 4 | `Processo` | `dataLimite` | Nullability | SQL NULL vs JPA NOT NULL | ⏳ SQL a corrigir |
+| 5 | `Subprocesso` | `unidadeCodigo` | Nullability | SQL NULL vs JPA NOT NULL | ⏳ SQL a corrigir |
+| 6 | `Movimentacao` | 4 campos | Nullability | SQL NULL vs JPA NOT NULL | ⏳ SQL a corrigir |
+| 7 | `AtribuicaoTemporaria` | 5 campos | Nullability | SQL NULL vs JPA NOT NULL | ⏳ SQL a corrigir |
+| 8 | `UNIDADE_PROCESSO` | Snapshot cols | Lógica/Mapeamento | 8 colunas não usadas | ⏳ Decisão pendente |
 
-#### ⚠️ MÉDIA (4 achados - Inconsistência entre camadas)
-| # | Entidade | Campo | Tipo de Problema | Descrição |
-|---|:---------|:------|:-----------------|:----------|
-| 11 | `Processo` | `dataLimite` | Nullability | SQL NULL vs JPA NOT NULL - validação mais restritiva |
-| 12 | `Subprocesso` | `unidadeCodigo` | Nullability | SQL NULL vs JPA NOT NULL - validação mais restritiva |
-| 13 | `Movimentacao` | 4 campos | Nullability | SQL NULL vs JPA NOT NULL em data_hora, unidades e usuario |
+#### 🟡 BAIXA (4 achados - Risco mitigado ou sem impacto prático)
+| # | Entidade | Campo | Tipo de Problema | Descrição | Status |
+|---|:---------|:------|:-----------------|:----------|:-------|
+| 9 | `Processo` | `dataLimite` | Tipo DATE/TIMESTAMP | Oracle DATE inclui hora - sem perda | ℹ️ Informativo |
+| 10 | `Subprocesso` | `dataLimiteEtapa*` | Tipo DATE/TIMESTAMP | Oracle DATE inclui hora - sem perda | ℹ️ Informativo |
+| 11 | `AtribuicaoTemporaria` | `dataInicio/Termino` | Tipo DATE/TIMESTAMP | Oracle DATE inclui hora - sem perda | ℹ️ Informativo |
+| 12 | `Analise` | `acao` | Tamanho | JPA 20 < SQL 100, mas enum é curto | ℹ️ Opcional |
 
-#### 🟡 BAIXA (1 achado - Risco mitigado)
-| # | Entidade | Campo | Tipo de Problema | Descrição |
-|---|:---------|:------|:-----------------|:----------|
-| 14 | `Subprocesso` | `situacao` | Nullability | SQL NULL vs JPA NOT NULL, mas @Builder.Default mitiga |
+#### ✅ CORRIGIDOS/REMOVIDOS
+| # | Achado Original | Status | Notas |
+|---|:----------------|:-------|:------|
+| - | `Analise.subprocesso` nullability | ✅ Corrigido | JPA agora tem `nullable = false` |
+| - | `Movimentacao.observacoes` ausente | ❌ Erro | Campo não existe no JPA - relatório estava errado |
 
-### Estatísticas
-- **Total de Achados:** 15
-- **Críticos:** 6 (40%)
-- **Altos:** 4 (27%)
-- **Médios:** 4 (27%)
-- **Baixos:** 1 (7%)
-- **Impacto Funcional:** 10 achados (67%) afetam funcionalidades existentes
-- **Perda de Dados:** 4 achados (27%) causam perda silenciosa de dados
+### Estatísticas Atualizadas
+- **Total de Achados Válidos:** 12
+- **Críticos:** 3 (25%)
+- **Médios:** 5 (42%)
+- **Baixos:** 4 (33%)
+- **Corrigidos/Removidos:** 2
+
+---
 
 ## 4. Recomendações Priorizadas
 
 ### Prioridade 1 - CRÍTICA (Implementar Imediatamente)
-1. **Adicionar coluna `observacoes` em MOVIMENTACAO**
-   ```sql
-   ALTER TABLE MOVIMENTACAO ADD observacoes VARCHAR2(500) NULL;
-   ```
-   - **Justificativa:** Campo usado no código mas não existe no banco
 
-2. **Corrigir `Analise.motivo` length mismatch**
-   - **Opção A (Recomendada):** Aumentar SQL para 500
-     ```sql
-     ALTER TABLE ANALISE MODIFY motivo VARCHAR2(500);
-     ```
-   - **Opção B:** Reduzir JPA para 200 (pode quebrar dados existentes)
+1. **Corrigir `Analise.motivo` length mismatch**
+   - Ver seção 7 para SQL recomendado
 
-3. **Alinhar `UnidadeParticipanteDto` backend/frontend**
-   - **Opção A (Recomendada):** Renomear frontend `codigo` → `codUnidade` em dtos.ts
-   - **Opção B:** Renomear backend `codUnidade` → `codigo` em ProcessoDetalheDto.java
+2. **Alinhar `UnidadeParticipanteDto` backend/frontend**
+   - Renomear frontend `codigo` → `codUnidade` em `/frontend/src/types/dtos.ts`
+   - Atualizar mapper em `/frontend/src/mappers/processos.ts`
 
-4. **Adicionar `nullable = false` em `Analise.subprocesso`**
-   ```java
-   @JoinColumn(name = "subprocesso_codigo", nullable = false)
-   ```
+3. **Refatorar `VinculacaoUnidade` para suportar unidades raiz**
+   - Opção mais simples: modificar a view para usar 0 em vez de NULL para unidades raiz
 
-5. **Refatorar `VinculacaoUnidade` para suportar unidades raiz**
-   - Criar surrogate ID ou usar `Optional<Long>` para unidade anterior
-   - Ou criar view filtrada que exclui unidades raiz
+### Prioridade 2 - MÉDIA (Implementar em Sprint Atual)
 
-6. **Implementar snapshot de `UNIDADE_PROCESSO`**
-   - Criar entidade `UnidadeProcesso` com todos os campos snapshot
-   - Substituir `@ManyToMany` por `@OneToMany` em Processo
+4. **Sincronizar nullability constraints no SQL**
+   - Tornar campos NOT NULL no SQL onde JPA exige
+   - Ver seção 7 para SQL recomendado
 
-### Prioridade 2 - ALTA (Implementar em Sprint Atual)
-7. **Corrigir tipos de data DATE → LocalDate**
-   - `Processo.dataLimite`: LocalDateTime → `LocalDate`
-   - `Subprocesso.dataLimiteEtapa1`: LocalDateTime → `LocalDate`
-   - `Subprocesso.dataLimiteEtapa2`: LocalDateTime → `LocalDate`
-   - `AtribuicaoTemporaria.dataInicio`: LocalDateTime → `LocalDate`
-   - `AtribuicaoTemporaria.dataTermino`: LocalDateTime → `LocalDate`
-   
-8. **Sincronizar `Analise.acao` length**
-   - Decidir: 20 ou 100 caracteres?
-   - Alinhar SQL e JPA para o mesmo valor
+### Prioridade 3 - BAIXA/ADIADA
 
-### Prioridade 3 - MÉDIA (Planejar para Próxima Sprint)
-9. **Sincronizar nullability constraints**
-   - **Opção A:** Tornar campos NOT NULL no SQL onde JPA exige
-   - **Opção B:** Tornar campos nullable no JPA onde SQL permite NULL
-   - **Campos afetados:**
-     - `Processo.dataLimite`
-     - `Subprocesso.unidadeCodigo`
-     - `Movimentacao.dataHora`, `unidadeOrigem`, `unidadeDestino`, `usuario`
+5. **Decidir sobre colunas snapshot de UNIDADE_PROCESSO**
+   - Se necessário: criar entidade `UnidadeProcesso`
+   - Se não necessário: remover colunas do SQL
 
-### Prioridade 4 - BAIXA (Backlog)
-10. **Revisar `Subprocesso.situacao` nullability**
-    - Default do Builder já mitiga o risco
-    - Considerar tornar NOT NULL no SQL para consistência
+6. **Alinhar tipos DATE/TIMESTAMP (opcional)**
+   - Apenas para clareza semântica - não há impacto funcional no Oracle
 
 ---
 
@@ -438,6 +407,7 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
    - Comparação manual linha-a-linha entre DDL SQL e anotações JPA
    - Busca por padrões usando `grep` e `find`
    - Inspeção de DTOs backend (Java) e frontend (TypeScript)
+   - Validação contra requisitos em `/etc/reqs/`
 
 2. **Arquivos Analisados:**
    - **SQL Schema:** `/backend/etc/sql/ddl_tabelas.sql` (449 linhas, 17 tabelas)
@@ -446,6 +416,7 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
    - **Backend DTOs:** Múltiplos DTOs em `/backend/src/main/java/sgc/*/dto/`
    - **Frontend DTOs:** `/frontend/src/types/dtos.ts`
    - **Frontend Mappers:** `/frontend/src/mappers/processos.ts`
+   - **Requisitos:** 40 arquivos em `/etc/reqs/`
 
 3. **Critérios de Verificação:**
    - ✅ Nomes de colunas/campos
@@ -454,59 +425,132 @@ Este relatório detalha as descobertas da análise realizada nos scripts SQL (`/
    - ✅ Constraints de nullability (NULL vs NOT NULL)
    - ✅ Mapeamentos JPA (@Column, @JoinColumn, @ManyToMany, etc.)
    - ✅ Compatibilidade de DTOs entre backend e frontend
-
-### Achados Não Documentados Anteriormente
-Os seguintes achados foram descobertos durante esta análise expandida e NÃO estavam no relatório original:
-
-1. **Discrepâncias de tipo DATE vs LocalDateTime** (4 entidades):
-   - `Processo.dataLimite`
-   - `Subprocesso.dataLimiteEtapa1` e `dataLimiteEtapa2`
-   - `AtribuicaoTemporaria.dataInicio` e `dataTermino`
-
-2. **Discrepância de length em `Analise.acao`:**
-   - SQL: VARCHAR2(100) vs JPA: length=20
-
-3. **Evidências detalhadas com código-fonte** para todos os achados
-
-4. **Classificação por severidade** (Crítica/Alta/Média/Baixa)
-
-5. **Recomendações priorizadas** com SQL de correção
+   - ✅ Alinhamento com requisitos documentados
 
 ---
 
 ## 6. Conclusão
 
 ### Sumário Executivo
-A análise revelou **15 discrepâncias** entre SQL, JPA e DTOs, sendo:
-- **6 críticas** que quebram funcionalidades ou causam erros em runtime
-- **4 de alta severidade** que causam perda silenciosa de dados
-- **67% dos achados** afetam funcionalidades existentes do sistema
+A análise revisada revelou **12 discrepâncias válidas** entre SQL, JPA e DTOs, sendo:
+- **3 críticas** que necessitam correção imediata
+- **5 de média severidade** relacionadas a nullability no SQL
+- **4 de baixa severidade** sem impacto prático
+
+Dois achados do relatório original foram **corrigidos ou removidos**:
+- O campo `Analise.subprocesso` já foi corrigido no JPA
+- O campo `Movimentacao.observacoes` nunca existiu - era um erro no relatório original
 
 ### Impacto no Sistema
-1. **Funcionalidades Quebradas:**
-   - Snapshot de unidades em processos (não implementado)
-   - Campo `observacoes` em movimentações (erro SQL)
-   - Visualização de processos no frontend (undefined)
-   - Consulta de unidades raiz via VinculacaoUnidade (PK NULL)
+1. **Funcionalidades Potencialmente Afetadas:**
+   - Truncamento de motivo de análise (>200 chars) se SQL não for atualizado
+   - Visualização de processos no frontend (campo undefined)
+   - Consulta de unidades raiz via VinculacaoUnidade
 
-2. **Perda Silenciosa de Dados:**
-   - Componente de hora em 5 campos de data (truncamento Oracle)
-
-3. **Riscos de Runtime:**
-   - Truncamento de motivo de análise (>200 chars)
-   - Violação de constraint NOT NULL em inserções diretas
+2. **Riscos Mitigados:**
+   - Perda de hora em campos DATE: **não ocorre no Oracle**
+   - Campo observacoes em Movimentacao: **não existe, não há problema**
 
 ### Próximos Passos Recomendados
-1. ✅ **Imediato:** Implementar correções de Prioridade 1 (6 items)
-2. 📅 **Sprint Atual:** Implementar correções de Prioridade 2 (2 items)
-3. 📋 **Próxima Sprint:** Planejar correções de Prioridade 3 (1 item)
-4. 🔄 **Continuous:** Estabelecer processo de validação automática SQL↔JPA
+1. ✅ **Imediato:** Implementar correções de Prioridade 1 (3 items)
+2. 📅 **Sprint Atual:** Implementar correções de Prioridade 2 (1 item - nullability SQL)
+3. 📋 **Backlog:** Avaliar necessidade de snapshots em UNIDADE_PROCESSO
+4. 🔄 **Contínuo:** Estabelecer processo de validação automática SQL↔JPA
 
-### Métricas de Qualidade
-- **Cobertura da Análise:** 100% das tabelas e entidades principais
-- **Profundidade:** Linha-a-linha com evidências de código
-- **Acionabilidade:** 10 recomendações priorizadas com SQL pronto
-- **Documentação:** 520+ linhas de relatório detalhado
+---
+
+## 7. Alterações Recomendadas para SQL
+
+> ⚠️ **IMPORTANTE:** Este SQL **NÃO foi aplicado** aos scripts. Deve ser revisado e aplicado manualmente após validação.
+
+### 7.1 Correção CRÍTICA - ANALISE.motivo
+
+```sql
+-- Aumentar tamanho de ANALISE.motivo para alinhar com JPA (500 chars)
+-- Arquivo: /backend/etc/sql/ddl_tabelas.sql, linha 228
+ALTER TABLE ANALISE MODIFY motivo VARCHAR2(500);
+```
+
+**Justificativa:** O JPA permite até 500 caracteres, mas o SQL atual trunca em 200. Isso pode causar `DataTruncationException` ou perda de dados silenciosa.
+
+### 7.2 Correções de Nullability - Alinhamento com JPA
+
+```sql
+-- =============================================================================
+-- PROCESSO - data_limite deve ser NOT NULL (JPA exige)
+-- Arquivo: /backend/etc/sql/ddl_tabelas.sql, linha 35
+-- =============================================================================
+ALTER TABLE PROCESSO MODIFY data_limite DATE NOT NULL;
+
+-- =============================================================================
+-- SUBPROCESSO - unidade_codigo e situacao devem ser NOT NULL (JPA exige)
+-- Arquivo: /backend/etc/sql/ddl_tabelas.sql, linhas 102, 107
+-- =============================================================================
+ALTER TABLE SUBPROCESSO MODIFY unidade_codigo NUMBER NOT NULL;
+ALTER TABLE SUBPROCESSO MODIFY situacao VARCHAR2(50) NOT NULL;
+
+-- =============================================================================
+-- MOVIMENTACAO - todos os campos de FK e timestamp devem ser NOT NULL (JPA exige)
+-- Arquivo: /backend/etc/sql/ddl_tabelas.sql, linhas 358-361
+-- =============================================================================
+ALTER TABLE MOVIMENTACAO MODIFY data_hora TIMESTAMP NOT NULL;
+ALTER TABLE MOVIMENTACAO MODIFY unidade_origem_codigo NUMBER NOT NULL;
+ALTER TABLE MOVIMENTACAO MODIFY unidade_destino_codigo NUMBER NOT NULL;
+ALTER TABLE MOVIMENTACAO MODIFY usuario_titulo VARCHAR2(12) NOT NULL;
+
+-- =============================================================================
+-- ATRIBUICAO_TEMPORARIA - todos os campos obrigatórios devem ser NOT NULL (JPA exige)
+-- Arquivo: /backend/etc/sql/ddl_tabelas.sql, linhas 257-261
+-- =============================================================================
+ALTER TABLE ATRIBUICAO_TEMPORARIA MODIFY unidade_codigo NUMBER NOT NULL;
+ALTER TABLE ATRIBUICAO_TEMPORARIA MODIFY usuario_matricula VARCHAR2(8) NOT NULL;
+ALTER TABLE ATRIBUICAO_TEMPORARIA MODIFY usuario_titulo VARCHAR2(12) NOT NULL;
+ALTER TABLE ATRIBUICAO_TEMPORARIA MODIFY data_inicio DATE NOT NULL;
+ALTER TABLE ATRIBUICAO_TEMPORARIA MODIFY data_termino DATE NOT NULL;
+```
+
+**Justificativa:** O JPA já valida estes campos como `nullable = false`. O SQL deve refletir a mesma regra para evitar inconsistências em inserções diretas no banco.
+
+### 7.3 Correção Opcional - VW_VINCULACAO_UNIDADE
+
+```sql
+-- =============================================================================
+-- Opção A: Modificar view para usar 0 em vez de NULL para unidades raiz
+-- Arquivo: /backend/etc/sql/ddl_views.sql
+-- =============================================================================
+CREATE OR REPLACE VIEW VW_VINCULACAO_UNIDADE (
+    unidade_atual_codigo, 
+    unidade_anterior_codigo, 
+    demais_unidades_historicas
+) AS
+SELECT 
+    u.CD AS unidade_atual_codigo,
+    NVL(u.COD_UNID_TSE_ANT, 0) AS unidade_anterior_codigo,  -- 0 para raiz
+    -- ... resto da query
+FROM SRH2.UNIDADE_TSE u
+-- ...
+```
+
+**Justificativa:** JPA não suporta NULL em campos @Id. Usar valor sentinela 0 resolve o problema.
+
+### 7.4 Correção Opcional - Remoção de Colunas Snapshot (se não necessárias)
+
+```sql
+-- =============================================================================
+-- SE DECIDIDO que snapshots não são necessários, remover colunas
+-- Arquivo: /backend/etc/sql/ddl_tabelas.sql, linhas 63-70
+-- =============================================================================
+ALTER TABLE UNIDADE_PROCESSO DROP COLUMN nome;
+ALTER TABLE UNIDADE_PROCESSO DROP COLUMN sigla;
+ALTER TABLE UNIDADE_PROCESSO DROP COLUMN matricula_titular;
+ALTER TABLE UNIDADE_PROCESSO DROP COLUMN titulo_titular;
+ALTER TABLE UNIDADE_PROCESSO DROP COLUMN data_inicio_titularidade;
+ALTER TABLE UNIDADE_PROCESSO DROP COLUMN tipo;
+ALTER TABLE UNIDADE_PROCESSO DROP COLUMN situacao;
+ALTER TABLE UNIDADE_PROCESSO DROP COLUMN unidade_superior_codigo;
+```
+
+**Justificativa:** Estas colunas nunca são populadas pelo JPA atual. Removê-las simplifica o schema se a funcionalidade não for implementada.
 
 ---
 
@@ -522,6 +566,7 @@ A análise revelou **15 discrepâncias** entre SQL, JPA e DTOs, sendo:
 ---
 
 **Relatório gerado em:** 2026-02-05  
-**Versão:** 2.0 (Expandida)  
+**Última Verificação:** 2026-02-05  
+**Versão:** 3.0 (Verificada e Corrigida)  
 **Autor:** Análise Automatizada + Revisão Manual  
-**Status:** ✅ Completo e Validado
+**Status:** ✅ Completo, Verificado e com Recomendações SQL
