@@ -10,7 +10,9 @@ import {useFeedbackStore} from '../feedback';
 import {
     buscarContextoEdicao,
     buscarSubprocessoDetalhe,
-    buscarSubprocessoPorProcessoEUnidade
+    buscarSubprocessoPorProcessoEUnidade,
+    obterPermissoes,
+    validarCadastro,
 } from '@/services/subprocessoService';
 import {
     aceitarCadastro,
@@ -20,19 +22,27 @@ import {
     disponibilizarCadastro,
     disponibilizarRevisaoCadastro,
     homologarCadastro,
-    homologarRevisaoCadastro
+    homologarRevisaoCadastro,
 } from '@/services/cadastroService';
-import {alterarDataLimiteSubprocesso} from '@/services/processoService';
+import {
+    alterarDataLimiteSubprocesso,
+    reabrirCadastro,
+    reabrirRevisaoCadastro,
+} from '@/services/processoService';
 
 // Mock Dependencies
 vi.mock('@/services/subprocessoService', () => ({
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
+    obterPermissoes: vi.fn(),
+    validarCadastro: vi.fn(),
 }));
 
 vi.mock('@/services/processoService', () => ({
     alterarDataLimiteSubprocesso: vi.fn(),
+    reabrirCadastro: vi.fn(),
+    reabrirRevisaoCadastro: vi.fn(),
 }));
 
 vi.mock('@/services/cadastroService', () => ({
@@ -404,6 +414,72 @@ describe('Subprocessos Store', () => {
             await expect(store.alterarDataLimiteSubprocesso(123, { novaData: '2022' }))
                 .rejects.toThrow("API Fail");
             expect(store.lastError).toBeTruthy();
+        });
+    });
+
+    describe('atualizarStatusLocal', () => {
+        it('deve atualizar o status se houver detalhe carregado', () => {
+            store.subprocessoDetalhe = { situacao: 'CRIADO', situacaoLabel: 'Criado' } as any;
+            store.atualizarStatusLocal({ codigo: 1, situacao: 'EM_ANDAMENTO', situacaoLabel: 'Em andamento' });
+            expect(store.subprocessoDetalhe?.situacao).toBe('EM_ANDAMENTO');
+            expect(store.subprocessoDetalhe?.situacaoLabel).toBe('Em andamento');
+        });
+
+        it('não deve fazer nada se não houver detalhe carregado', () => {
+            store.subprocessoDetalhe = null;
+            store.atualizarStatusLocal({ codigo: 1, situacao: 'EM_ANDAMENTO', situacaoLabel: 'Em andamento' });
+            expect(store.subprocessoDetalhe).toBeNull();
+        });
+    });
+
+    describe('validarCadastro', () => {
+        it('deve chamar serviceValidarCadastro', async () => {
+            (validarCadastro as any).mockResolvedValue({ valido: true });
+            const res = await store.validarCadastro(1);
+            expect(validarCadastro).toHaveBeenCalledWith(1);
+            expect(res).toEqual({ valido: true });
+        });
+    });
+
+    describe('reabrirCadastro', () => {
+        it('deve chamar reabrirCadastro service e mostrar feedback', async () => {
+            (reabrirCadastro as any).mockResolvedValue({});
+            const res = await store.reabrirCadastro(1, 'Justificativa');
+            expect(reabrirCadastro).toHaveBeenCalledWith(1, 'Justificativa');
+            expect(res).toBe(true);
+            expect(mockFeedbackStore.show).toHaveBeenCalledWith('Cadastro reaberto', expect.any(String), 'success');
+        });
+    });
+
+    describe('reabrirRevisaoCadastro', () => {
+        it('deve chamar reabrirRevisaoCadastro service', async () => {
+            (reabrirRevisaoCadastro as any).mockResolvedValue({});
+            const res = await store.reabrirRevisaoCadastro(1, 'Justificativa');
+            expect(reabrirRevisaoCadastro).toHaveBeenCalledWith(1, 'Justificativa');
+            expect(res).toBe(true);
+            expect(mockFeedbackStore.show).toHaveBeenCalledWith('Revisão de cadastro reaberta', expect.any(String), 'success');
+        });
+    });
+
+    describe('buscarPermissoes', () => {
+        it('deve buscar e atualizar permissões se o ID coincidir', async () => {
+            store.subprocessoDetalhe = { unidade: { codigo: 10 }, permissoes: null } as any;
+            (obterPermissoes as any).mockResolvedValue({ podeEditar: true });
+
+            await store.buscarPermissoes(10);
+
+            expect(obterPermissoes).toHaveBeenCalledWith(10);
+            expect(store.subprocessoDetalhe?.permissoes).toEqual({ podeEditar: true });
+        });
+
+        it('deve buscar mas NÃO atualizar permissões se o ID não coincidir', async () => {
+            store.subprocessoDetalhe = { unidade: { codigo: 10 }, permissoes: null } as any;
+            (obterPermissoes as any).mockResolvedValue({ podeEditar: true });
+
+            await store.buscarPermissoes(20);
+
+            expect(obterPermissoes).toHaveBeenCalledWith(20);
+            expect(store.subprocessoDetalhe?.permissoes).toBeNull();
         });
     });
 });

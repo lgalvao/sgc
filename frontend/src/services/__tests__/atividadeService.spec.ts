@@ -21,7 +21,63 @@ describe("atividadeService", () => {
     beforeEach(() => {
         setActivePinia(createPinia());
     });
-// ... (rest of the file until listarConhecimentos test)
+
+    it("listarAtividades deve buscar e mapear atividades", async () => {
+        const dtoList = [{codigo: 1, descricao: "Atividade DTO"}];
+        mockApi.get.mockResolvedValue({data: dtoList});
+
+        const result = await service.listarAtividades();
+
+        expect(mockApi.get).toHaveBeenCalledWith("/atividades");
+        expect(mappers.mapAtividadeToModel).toHaveBeenCalled();
+        expect(result[0]).toHaveProperty("mapped", true);
+    });
+
+    it("obterAtividadePorCodigo deve buscar e mapear uma atividade", async () => {
+        const dto = {codigo: 1, descricao: "Atividade DTO"};
+        mockApi.get.mockResolvedValue({data: dto});
+
+        const result = await service.obterAtividadePorCodigo(1);
+
+        expect(mockApi.get).toHaveBeenCalledWith("/atividades/1");
+        expect(mappers.mapAtividadeToModel).toHaveBeenCalledWith(dto);
+        expect(result).toHaveProperty("mapped", true);
+    });
+
+    it("criarAtividade deve mapear requisição e enviar POST", async () => {
+        const request = {descricao: "Nova"};
+        const responseDto = {atividade: {codigo: 1}};
+        mockApi.post.mockResolvedValue({data: responseDto});
+
+        const result = await service.criarAtividade(request, 100);
+
+        expect(mappers.mapCriarAtividadeRequestToDto).toHaveBeenCalledWith(request, 100);
+        expect(mockApi.post).toHaveBeenCalledWith("/atividades", expect.any(Object));
+        expect(result).toEqual(responseDto);
+    });
+
+    it("atualizarAtividade deve mapear e enviar POST", async () => {
+        const request = {codigo: 1, descricao: "Editada"} as any;
+        const responseDto = {atividade: request};
+        mockApi.post.mockResolvedValue({data: responseDto});
+
+        const result = await service.atualizarAtividade(1, request);
+
+        expect(mappers.mapAtualizarAtividadeToDto).toHaveBeenCalledWith(request);
+        expect(mockApi.post).toHaveBeenCalledWith("/atividades/1/atualizar", expect.any(Object));
+        expect(result).toEqual(responseDto);
+    });
+
+    it("excluirAtividade deve enviar POST", async () => {
+        const responseDto = {sucesso: true};
+        mockApi.post.mockResolvedValue({data: responseDto});
+
+        const result = await service.excluirAtividade(1);
+
+        expect(mockApi.post).toHaveBeenCalledWith("/atividades/1/excluir");
+        expect(result).toEqual(responseDto);
+    });
+
     it("listarConhecimentos deve buscar e mapear conhecimentos", async () => {
         const dtoList = [{codigo: 1, descricao: "Conhecimento DTO"}];
         mockApi.get.mockResolvedValue({data: dtoList});

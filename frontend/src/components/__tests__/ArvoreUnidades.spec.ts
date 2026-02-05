@@ -311,4 +311,106 @@ describe("ArvoreUnidades.vue", () => {
         const wrapper = createWrapper();
         await checkA11y(wrapper.element as HTMLElement);
     });
+
+    it("deve exibir a raiz quando ocultarRaiz é false", () => {
+        const wrapper = createWrapper({ ocultarRaiz: false });
+        expect((wrapper.vm as any).unidadesExibidas[0].codigo).toBe(1);
+    });
+
+    it("deve filtrar unidades", () => {
+        const wrapper = createWrapper({
+            filtrarPor: (u: Unidade) => u.sigla === "ROOT",
+            ocultarRaiz: false
+        });
+        expect((wrapper.vm as any).unidadesExibidas).toHaveLength(1);
+        expect((wrapper.vm as any).unidadesExibidas[0].sigla).toBe("ROOT");
+    });
+
+    it("não deve permitir seleção se modoSelecao é false", async () => {
+        const wrapper = createWrapper({ modoSelecao: false });
+        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+
+        expect(root.props("isChecked")(10)).toBe(false);
+        expect(root.props("isHabilitado")(mockUnidades[0].filhas![0])).toBe(false);
+        expect(root.props("getEstadoSelecao")(mockUnidades[0].filhas![0])).toBe(false);
+
+        // toggle should do nothing
+        await root.props("onToggle")(mockUnidades[0].filhas![0], true);
+        expect(wrapper.emitted("update:modelValue")).toBeFalsy();
+    });
+
+    it("deve atualizar unidadesSelecionadasLocal quando modelValue muda", async () => {
+        const wrapper = createWrapper({ modelValue: [10] });
+        await wrapper.setProps({ modelValue: [20] });
+        expect((wrapper.vm as any).unidadesSelecionadasLocal).toContain(20);
+    });
+
+    it("deve atualizar expandedUnits quando unidades muda", async () => {
+        const wrapper = createWrapper();
+        const novasUnidades = [{ codigo: 999, sigla: 'N', nome: 'N' }];
+        await wrapper.setProps({ unidades: novasUnidades });
+        expect((wrapper.vm as any).isExpanded(novasUnidades[0])).toBe(true);
+    });
+
+    it("deve calcular estado de seleção para INTEROPERACIONAL", () => {
+        const unidadesTeste: Unidade[] = [
+            {
+                codigo: 500,
+                sigla: "INTER",
+                nome: "Inter",
+                isElegivel: true,
+                tipo: "INTEROPERACIONAL",
+                filhas: [
+                    { codigo: 501, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL" },
+                    { codigo: 502, sigla: "F2", nome: "F2", isElegivel: true, filhas: [], tipo: "OPERACIONAL" }
+                ]
+            }
+        ];
+
+        // INTEROPERACIONAL self selected but no children selected -> should return true
+        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [500] });
+        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        expect(root.props("getEstadoSelecao")(unidadesTeste[0])).toBe(true);
+
+        // INTEROPERACIONAL not selected but some children selected -> indeterminate
+        const wrapper2 = createWrapper({ unidades: unidadesTeste, modelValue: [501] });
+        const root2 = wrapper2.findComponent({ name: "UnidadeTreeNode" });
+        expect(root2.props("getEstadoSelecao")(unidadesTeste[0])).toBe("indeterminate");
+    });
+
+    it("deve deselecionar pai não INTEROPERACIONAL se um filho for desmarcado", async () => {
+        const unidadesTeste: Unidade[] = [
+            {
+                codigo: 600,
+                sigla: "NORMAL",
+                nome: "Normal",
+                isElegivel: true,
+                tipo: "OPERACIONAL",
+                filhas: [
+                    { codigo: 601, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL" }
+                ]
+            }
+        ];
+
+        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [600, 601] });
+        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+
+        await root.props("onToggle")(unidadesTeste[0].filhas![0], false);
+        const emitted = wrapper.emitted("update:modelValue");
+        expect(emitted![emitted!.length - 1][0]).not.toContain(600);
+    });
+
+    it("deve cobrir watcher de modelValue quando não há mudança real", async () => {
+        const wrapper = createWrapper({ modelValue: [10] });
+        await wrapper.setProps({ modelValue: [10] });
+        expect((wrapper.vm as any).unidadesSelecionadasLocal).toEqual([10]);
+    });
+
+    it("deve lidar com unidades sem propriedade filhas", async () => {
+        const unidadesSemFilhas: Unidade[] = [
+            { codigo: 700, sigla: "SOLO", nome: "Solo", isElegivel: true } as any
+        ];
+        const wrapper = createWrapper({ unidades: unidadesSemFilhas, modelValue: [700] });
+        expect((wrapper.vm as any).isHabilitado(unidadesSemFilhas[0])).toBe(true);
+    });
 });

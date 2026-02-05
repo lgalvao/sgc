@@ -25,6 +25,8 @@ const mockUsuarios: Usuario[] = [
 
 vi.mock("@/services/usuarioService", () => ({
     buscarTodosUsuarios: vi.fn(() => Promise.resolve(mockUsuarios)),
+    buscarUsuariosPorUnidade: vi.fn(),
+    buscarUsuarioPorTitulo: vi.fn(),
 }));
 
 describe("useUsuariosStore", () => {
@@ -54,6 +56,47 @@ describe("useUsuariosStore", () => {
             );
             await expect(context.store.buscarUsuarios()).rejects.toThrow("Failed");
             expect(context.store.error).toContain("Failed");
+        });
+
+        it("buscarUsuariosPorUnidade deve buscar usuários da unidade", async () => {
+            const mockUnidadeUsers = [mockUsuarios[0]];
+            vi.mocked(usuarioService.buscarUsuariosPorUnidade).mockResolvedValue(mockUnidadeUsers);
+
+            const result = await context.store.buscarUsuariosPorUnidade(10);
+
+            expect(usuarioService.buscarUsuariosPorUnidade).toHaveBeenCalledWith(10);
+            expect(result).toEqual(mockUnidadeUsers);
+        });
+
+        it("buscarUsuariosPorUnidade deve lidar com erros", async () => {
+            vi.mocked(usuarioService.buscarUsuariosPorUnidade).mockRejectedValue(new Error("Unit fail"));
+            await expect(context.store.buscarUsuariosPorUnidade(10)).rejects.toThrow("Unit fail");
+            expect(context.store.error).toBe("Unit fail");
+        });
+
+        it("buscarUsuarioPorTitulo deve buscar usuário pelo título", async () => {
+            vi.mocked(usuarioService.buscarUsuarioPorTitulo).mockResolvedValue(mockUsuarios[0]);
+
+            const result = await context.store.buscarUsuarioPorTitulo("123456789");
+
+            expect(usuarioService.buscarUsuarioPorTitulo).toHaveBeenCalledWith("123456789");
+            expect(result).toEqual(mockUsuarios[0]);
+        });
+
+        it("buscarUsuarioPorTitulo deve lidar com erros", async () => {
+            vi.mocked(usuarioService.buscarUsuarioPorTitulo).mockRejectedValue(new Error("Title fail"));
+            await expect(context.store.buscarUsuarioPorTitulo("123")).rejects.toThrow("Title fail");
+            expect(context.store.error).toBe("Title fail");
+        });
+
+        it("clearError deve limpar erros normalizados e a string de erro", () => {
+            context.store.error = "Algum erro";
+            context.store.lastError = { message: "Erro normalizado" } as any;
+
+            context.store.clearError();
+
+            expect(context.store.error).toBeNull();
+            expect(context.store.lastError).toBeNull();
         });
     });
 

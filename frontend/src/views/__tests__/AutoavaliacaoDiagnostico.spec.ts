@@ -194,12 +194,13 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     
     expect(ctx.wrapper!.vm.podeConcluir).toBe(false);
     
-    // Update internal state to simulate user filling the form
-    ctx.wrapper!.vm.avaliacoes[2].importancia = 'N4';
-    ctx.wrapper!.vm.avaliacoes[2].dominio = 'N2';
+    // Use UI to change values to cover template lines
+    const selects = ctx.wrapper!.findAll('select');
+    // selects[0] and [1] are for comp 1 (already filled in mock)
+    // selects[2] and [3] are for comp 2
+    await selects[2].setValue('N4');
+    await selects[3].setValue('N2');
     
-    // Trigger the salvar method which the component would normally call on change
-    await ctx.wrapper!.vm.salvar(2, 'N4', 'N2');
     await flushPromises();
     await ctx.wrapper!.vm.$nextTick();
     
@@ -373,5 +374,40 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     expect(feedbackStore.show).toHaveBeenCalled();
     const calls = (feedbackStore.show as any).mock.calls;
     expect(calls[0]).toEqual(['Erro', 'Erro ao concluir.', 'danger']);
+  });
+
+  it('trata erro com resposta ao concluir autoavaliação', async () => {
+    await mountComponent();
+    ctx.wrapper!.vm.avaliacoes[2].importancia = 'N4';
+    ctx.wrapper!.vm.avaliacoes[2].dominio = 'N2';
+    await ctx.wrapper!.vm.$nextTick();
+
+    const {useFeedbackStore} = await import('@/stores/feedback');
+    const feedbackStore = useFeedbackStore();
+    vi.clearAllMocks();
+
+    (diagnosticoService.concluirAutoavaliacao as any).mockRejectedValueOnce({
+      response: { data: { message: 'Erro da API' } }
+    });
+
+    await ctx.wrapper!.vm.concluirAutoavaliacao();
+    await flushPromises();
+
+    expect(feedbackStore.show).toHaveBeenCalledWith('Erro', 'Erro da API', 'danger');
+  });
+
+  it('trata erro no onMounted', async () => {
+    // Import store to clear mocks later if needed
+    const {useFeedbackStore} = await import('@/stores/feedback');
+
+    // SETUP MOCK BEFORE MOUNT
+    const unidMod = await import('@/services/unidadeService');
+    (unidMod.buscarUnidadePorSigla as any).mockRejectedValueOnce(new Error('Fatal error'));
+
+    await mountComponent();
+    await flushPromises();
+
+    const feedbackStore = useFeedbackStore();
+    expect(feedbackStore.show).toHaveBeenCalledWith('Erro', 'Erro ao carregar dados do diagnóstico.', 'danger');
   });
 });
