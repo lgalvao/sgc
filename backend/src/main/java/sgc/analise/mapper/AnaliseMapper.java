@@ -23,6 +23,7 @@ public abstract class AnaliseMapper {
      * Converte uma entidade {@link Analise} em um DTO {@link AnaliseHistoricoDto}.
      */
     @Mapping(target = "unidadeSigla", expression = "java(getUnidadeSigla(analise.getUnidadeCodigo()))")
+    @Mapping(target = "unidadeNome", expression = "java(getUnidadeNome(analise.getUnidadeCodigo()))")
     @Mapping(target = "analistaUsuarioTitulo", source = "usuarioTitulo")
     @Mapping(target = "dataHoraFormatada", expression = "java(FormatadorData.formatarDataHora(analise.getDataHora()))")
     public abstract AnaliseHistoricoDto toAnaliseHistoricoDto(Analise analise);
@@ -38,6 +39,13 @@ public abstract class AnaliseMapper {
         if (codUnidade == null) return null;
         return unidadeRepo.findById(codUnidade)
                 .map(Unidade::getSigla)
+                .orElse(null);
+    }
+
+    protected String getUnidadeNome(Long codUnidade) {
+        if (codUnidade == null) return null;
+        return unidadeRepo.findById(codUnidade)
+                .map(Unidade::getNome)
                 .orElse(null);
     }
 }
