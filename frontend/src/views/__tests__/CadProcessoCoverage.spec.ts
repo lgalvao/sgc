@@ -262,7 +262,7 @@ describe('CadProcesso.vue Coverage', () => {
             unidades: [{ codUnidade: 1 }, { codUnidade: 2 }]
         };
 
-        const { wrapper, processosStore, unidadesStore } = createWrapper({
+        const { wrapper, unidadesStore } = createWrapper({
             processos: {
                 processoDetalhe: mockProcesso
             }
