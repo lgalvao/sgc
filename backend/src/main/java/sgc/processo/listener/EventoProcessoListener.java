@@ -162,20 +162,15 @@ public class EventoProcessoListener {
                 .distinct()
                 .toList());
 
-        // Filtrar subordinadas uma vez para uso nas intermediárias
-        List<Unidade> todasSubordinadas = unidadesParticipantes.stream()
-                .filter(u -> u.getUnidadeSuperior() != null)
-                .toList();
-
         for (Unidade unidade : unidadesParticipantes) {
-            enviarNotificacaoFinalizacao(processo, unidade, responsaveis, usuarios, todasSubordinadas);
+            enviarNotificacaoFinalizacao(processo, unidade, responsaveis, usuarios, unidadesParticipantes);
         }
     }
 
     private void enviarNotificacaoFinalizacao(Processo processo, Unidade unidade,
             Map<Long, UnidadeResponsavelDto> responsaveis,
             Map<String, UsuarioDto> usuarios,
-            List<Unidade> todasSubordinadas) {
+            List<Unidade> subordinadas) {
         try {
             UnidadeResponsavelDto responsavel = responsaveis.get(unidade.getCodigo());
             if (responsavel == null)
@@ -191,7 +186,7 @@ public class EventoProcessoListener {
             if (tipoUnidade == OPERACIONAL || tipoUnidade == INTEROPERACIONAL) {
                 enviarEmailUnidadeFinal(processo, unidade, emailTitular);
             } else if (tipoUnidade == INTERMEDIARIA) {
-                enviarEmailUnidadeIntermediaria(processo, unidade, emailTitular, todasSubordinadas);
+                enviarEmailUnidadeIntermediaria(processo, unidade, emailTitular, subordinadas);
             }
         } catch (Exception e) {
             log.error("Falha ao preparar notificação para unidade {} no processo {}: {}",

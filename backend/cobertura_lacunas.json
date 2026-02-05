@@ -1,6 +1,6 @@
 {
   "globalLineCoverage": "100.00%",
-  "totalFilesWithGaps": 2,
+  "totalFilesWithGaps": 1,
   "gaps": [
     {
       "class": "sgc.processo.listener.EventoProcessoListener",
@@ -8,15 +8,6 @@
       "missed": [],
       "partial": [
         "213(1/4)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.subprocesso.model.SituacaoSubprocesso",
-      "coverage": "100.00%",
-      "missed": [],
-      "partial": [
-        "69(1/12)"
       ],
       "score": 0.5
     }
