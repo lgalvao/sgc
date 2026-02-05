@@ -10,11 +10,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroConfiguracao;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
@@ -27,20 +29,17 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import java.sql.Statement;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroValidacao;
 
 @Tag("integration")
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @DisplayName("Testes do E2eController (Backend Support)")
 class E2eControllerTest {
     @Autowired
@@ -169,6 +168,7 @@ class E2eControllerTest {
 
     @Test
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @DisplayName("Deve resetar o banco de dados truncando tabelas")
     void deveResetarBancoTruncandoTabelas() {
         // Arrange

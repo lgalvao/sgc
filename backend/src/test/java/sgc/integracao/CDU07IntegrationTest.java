@@ -1,5 +1,6 @@
 package sgc.integracao;
 
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
@@ -36,14 +36,12 @@ import java.time.LocalDateTime;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import jakarta.persistence.EntityManager;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
 @Transactional
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @DisplayName("CDU-07: Detalhar Subprocesso")
 class CDU07IntegrationTest extends BaseIntegrationTest {
     private static final String UNIDADE_SIGLA = "SESEL_TEST";

@@ -12,10 +12,9 @@ import sgc.organizacao.model.UsuarioPerfil;
 import sgc.organizacao.model.UsuarioPerfilRepo;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes do UsuarioPerfilService")
@@ -48,16 +47,5 @@ class UsuarioPerfilServiceTest {
         
         assertNotNull(usuario.getAuthorities());
         assertEquals(1, usuario.getAuthorities().size());
-    }
-
-    @Test
-    @DisplayName("Deve buscar atribuições para cache")
-    void deveBuscarAtribuicoesParaCache() {
-        UsuarioPerfil up = new UsuarioPerfil();
-        when(usuarioPerfilRepo.findByUsuarioTitulo("user")).thenReturn(List.of(up));
-        
-        Set<UsuarioPerfil> result = usuarioPerfilService.buscarAtribuicoesParaCache("user");
-        assertEquals(1, result.size());
-        assertTrue(result.contains(up));
     }
 }

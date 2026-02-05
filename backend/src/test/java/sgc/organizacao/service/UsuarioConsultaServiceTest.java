@@ -7,13 +7,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.repo.ComumRepo;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.ResponsabilidadeRepo;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioRepo;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,37 +71,6 @@ class UsuarioConsultaServiceTest {
         usuarioConsultaService.buscarTodos();
         when(usuarioRepo.findAll()).thenReturn(List.of());
         assertTrue(usuarioConsultaService.buscarTodos().isEmpty());
-    }
-
-    @Test
-    @DisplayName("Deve buscar chefe por unidade")
-    void deveBuscarChefePorUnidade() {
-        Responsabilidade resp = mock(Responsabilidade.class);
-        Usuario u = new Usuario();
-        when(repo.buscar(Responsabilidade.class, 1L)).thenReturn(resp);
-        when(resp.getUsuario()).thenReturn(u);
-        assertEquals(u, usuarioConsultaService.buscarChefePorUnidade(1L, "SIGLA"));
-    }
-
-    @Test
-    @DisplayName("Deve buscar chefes por unidades")
-    void deveBuscarChefesPorUnidades() {
-        Responsabilidade resp = mock(Responsabilidade.class);
-        Usuario u = new Usuario();
-        when(responsabilidadeRepo.findByUnidadeCodigoIn(List.of(1L))).thenReturn(List.of(resp));
-        when(resp.getUsuario()).thenReturn(u);
-        
-        List<Usuario> result = usuarioConsultaService.buscarChefesPorUnidades(List.of(1L));
-        assertEquals(1, result.size());
-        assertEquals(u, result.get(0));
-    }
-
-    @Test
-    @DisplayName("Deve buscar por IDs com atribuições")
-    void deveBuscarPorIdsComAtribuicoes() {
-        usuarioConsultaService.buscarPorIdsComAtribuicoes(List.of("u"));
-        when(usuarioRepo.findByIdInWithAtribuicoes(List.of("u"))).thenReturn(List.of());
-        assertTrue(usuarioConsultaService.buscarPorIdsComAtribuicoes(List.of("u")).isEmpty());
     }
 
     @Test

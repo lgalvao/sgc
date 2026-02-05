@@ -18,7 +18,10 @@ import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.service.*;
+import sgc.organizacao.service.AdministradorService;
+import sgc.organizacao.service.UnidadeResponsavelService;
+import sgc.organizacao.service.UsuarioConsultaService;
+import sgc.organizacao.service.UsuarioPerfilService;
 
 import java.util.*;
 
@@ -31,7 +34,6 @@ public class UsuarioFacade {
     private final UsuarioConsultaService usuarioConsultaService;
     private final UsuarioPerfilService usuarioPerfilService;
     private final AdministradorService administradorService;
-    private final UnidadeConsultaService unidadeConsultaService;
     private final UnidadeResponsavelService unidadeResponsavelService;
 
     @Transactional(readOnly = true)

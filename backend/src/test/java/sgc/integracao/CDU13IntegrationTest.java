@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,9 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-13: Analisar cadastro de atividades e conhecimentos")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CDU13IntegrationTest extends BaseIntegrationTest {
-
     @Autowired
     private UsuarioRepo usuarioRepo;
 

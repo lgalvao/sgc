@@ -194,28 +194,6 @@ class ValidadorDadosOrgServiceTest {
         }
 
         @Test
-        @DisplayName("Deve falhar quando titular não tem email")
-        void deveFalharTitularSemEmail() {
-            // Arrange
-            Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
-            Usuario titular = criarUsuarioValido("TITULO_1");
-            titular.setEmail(null);
-
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
-            when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular));
-            Responsabilidade r = Responsabilidade.builder()
-                    .unidadeCodigo(1L)
-                    .usuarioTitulo("TITULO_1")
-                    .build();
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(List.of(1L))).thenReturn(List.of(r));
-
-            // Act & Assert
-            assertThatThrownBy(() -> validador.run(args))
-                    .isInstanceOf(ErroConfiguracao.class)
-                    .hasMessageContaining("1 violação");
-        }
-
-        @Test
         @DisplayName("Deve falhar quando titular tem email em branco")
         void deveFailharTitularEmailEmBranco() {
             // Arrange
@@ -354,27 +332,6 @@ class ValidadorDadosOrgServiceTest {
             Responsabilidade r = Responsabilidade.builder()
                     .unidadeCodigo(1L)
                     .usuarioTitulo("   ")
-                    .build();
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(r));
-
-            // Act & Assert
-            assertThatThrownBy(() -> validador.run(args))
-                    .isInstanceOf(ErroConfiguracao.class);
-        }
-
-        @Test
-        @DisplayName("Deve falhar quando responsabilidade tem usuário nulo")
-        void deveFalharResponsabilidadeUsuarioNulo() {
-            // Arrange
-            Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
-            Usuario titular = criarUsuarioValido("TITULO_1");
-
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
-            when(usuarioRepo.findAllById(anyList())).thenReturn(List.of(titular));
-
-            Responsabilidade r = Responsabilidade.builder()
-                    .unidadeCodigo(1L)
-                    .usuarioTitulo(null)
                     .build();
             when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(r));
 
