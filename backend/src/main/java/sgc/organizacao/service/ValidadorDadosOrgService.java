@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.organizacao.model.*;
-import sgc.organizacao.model.Responsabilidade;
-import sgc.organizacao.model.ResponsabilidadeRepo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,7 +91,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
 
         for (Unidade u : unidades) {
             Responsabilidade r = responsabilidades.get(u.getCodigo());
-            if (r == null || r.getUsuarioTitulo() == null || r.getUsuarioTitulo().isBlank()) {
+            if (r == null || r.getUsuarioTitulo().isBlank()) {
                 violacoes.add("Unidade %s (%s) não possui responsável atual definido (Titular, Substituto ou Atribuição)"
                         .formatted(u.getSigla(), u.getTipo()));
             }
@@ -147,7 +145,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
                             .formatted(u.getSigla(), tituloTitular));
                 } else {
                     String email = titular.getEmail();
-                    if (email == null || email.isBlank()) {
+                    if (email.isBlank()) {
                         violacoes.add("Titular %s da unidade %s não possui email cadastrado"
                                 .formatted(titular.getNome(), u.getSigla()));
                     }

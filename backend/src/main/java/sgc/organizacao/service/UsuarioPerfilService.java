@@ -31,12 +31,4 @@ public class UsuarioPerfilService {
 
         usuario.setAuthorities(authorities);
     }
-
-    /**
-     * Helper para carregar atribuições de uma lista de usuários de forma otimizada
-     * (embora a implementação atual ainda faça N queries, centraliza a lógica)
-     */
-    public Set<UsuarioPerfil> buscarAtribuicoesParaCache(String usuarioTitulo) {
-        return new HashSet<>(usuarioPerfilRepo.findByUsuarioTitulo(usuarioTitulo));
-    }
 }

@@ -1,6 +1,7 @@
-import os
 import argparse
+import os
 from datetime import datetime
+
 
 def analyze_tests(backend_dir='backend'):
     JAVA_EXT = '.java'
@@ -10,7 +11,7 @@ def analyze_tests(backend_dir='backend'):
 
     if not os.path.exists(backend_src):
         print(f"Erro: Diretório de origem não encontrado: {backend_src}")
-        return
+        return None
 
     source_files = []
     test_files = set()
@@ -71,13 +72,11 @@ def analyze_tests(backend_dir='backend'):
             report[category]["untested"].append(src_rel)
 
     # Output Markdown
-    output = []
-    output.append("# Relatório de Cobertura de Testes Unitários (Backend)\n")
-    output.append(f"**Data:** {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
-    output.append(f"**Total de Classes:** {stats['total']}")
-    output.append(f"**Com Testes Unitários:** {stats['tested']}")
-    output.append(f"**Sem Testes Unitários:** {stats['total'] - stats['tested']}")
-    
+    output = ["# Relatório de Cobertura de Testes Unitários (Backend)\n",
+              f"**Data:** {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}", f"**Total de Classes:** {stats['total']}",
+              f"**Com Testes Unitários:** {stats['tested']}",
+              f"**Sem Testes Unitários:** {stats['total'] - stats['tested']}"]
+
     if stats['total'] > 0:
         coverage = stats['tested'] / stats['total'] * 100
         output.append(f"**Cobertura (Arquivos):** {coverage:.2f}%\n")

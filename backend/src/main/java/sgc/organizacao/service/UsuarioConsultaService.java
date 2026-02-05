@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.ResponsabilidadeRepo;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,20 +49,6 @@ public class UsuarioConsultaService {
 
     public List<Usuario> buscarTodos() {
         return usuarioRepo.findAll();
-    }
-
-    public Usuario buscarChefePorUnidade(Long codigoUnidade, String siglaUnidade) {
-        return repo.buscar(Responsabilidade.class, codigoUnidade).getUsuario();
-    }
-
-    public List<Usuario> buscarChefesPorUnidades(List<Long> codigosUnidades) {
-        return responsabilidadeRepo.findByUnidadeCodigoIn(codigosUnidades).stream()
-                .map(Responsabilidade::getUsuario)
-                .toList();
-    }
-
-    public List<Usuario> buscarPorIdsComAtribuicoes(List<String> titulos) {
-        return usuarioRepo.findByIdInWithAtribuicoes(titulos);
     }
 
     public List<Usuario> buscarTodosPorIds(List<String> titulos) {
