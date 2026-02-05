@@ -22,13 +22,13 @@ public interface SubprocessoDetalheMapper {
     @Mapping(target = "unidade", source = "sp.unidade")
     @Mapping(target = "titular", expression = "java(mapTitular(sp, titular, responsavel))")
     @Mapping(target = "responsavel", expression = "java(mapResponsavel(sp, responsavel))")
-    @Mapping(target = "situacao", expression = "java(sp.getSituacao().name())")
-    @Mapping(target = "situacaoLabel", expression = "java(sp.getSituacao().getDescricao())")
+    @Mapping(target = "situacao", expression = "java(sp != null ? sp.getSituacao().name() : null)")
+    @Mapping(target = "situacaoLabel", expression = "java(sp != null ? sp.getSituacao().getDescricao() : null)")
     @Mapping(target = "localizacaoAtual", expression = "java(mapLocalizacaoAtual(movimentacoes))")
     @Mapping(target = "processoDescricao", source = "sp.processo.descricao")
-    @Mapping(target = "tipoProcesso", expression = "java(sp.getProcesso().getTipo().name())")
+    @Mapping(target = "tipoProcesso", expression = "java(sp != null && sp.getProcesso() != null ? sp.getProcesso().getTipo().name() : null)")
     @Mapping(target = "prazoEtapaAtual", expression = "java(mapPrazoEtapaAtual(sp))")
-    @Mapping(target = "isEmAndamento", expression = "java(sp.isEmAndamento())")
+    @Mapping(target = "isEmAndamento", expression = "java(sp != null && sp.isEmAndamento())")
     @Mapping(target = "etapaAtual", source = "sp.etapaAtual")
     @Mapping(target = "movimentacoes", source = "movimentacoes")
     @Mapping(target = "permissoes", source = "permissoes")
@@ -43,12 +43,12 @@ public interface SubprocessoDetalheMapper {
     @Mapping(target = "nome", source = "nome")
     UnidadeDetalheDto toUnidadeDto(@Nullable Unidade unidade);
 
-    default @Nullable ResponsavelDetalheDto mapResponsavel(Subprocesso sp, @Nullable Usuario responsavel) {
-        if (responsavel == null) return null;
+    default @Nullable ResponsavelDetalheDto mapResponsavel(@Nullable Subprocesso sp, @Nullable Usuario responsavel) {
+        if (responsavel == null || sp == null || sp.getUnidade() == null) return null;
 
         String tituloTitular = sp.getUnidade().getTituloTitular();
         String tipo = "Substituição";
-        if (responsavel.getTituloEleitoral().equals(tituloTitular)) {
+        if (responsavel.getTituloEleitoral() != null && responsavel.getTituloEleitoral().equals(tituloTitular)) {
             tipo = "Titular";
         }
 
@@ -60,7 +60,7 @@ public interface SubprocessoDetalheMapper {
                 .build();
     }
 
-    default @Nullable ResponsavelDetalheDto mapTitular(Subprocesso sp, @Nullable Usuario titular, @Nullable Usuario responsavel) {
+    default @Nullable ResponsavelDetalheDto mapTitular(@Nullable Subprocesso sp, @Nullable Usuario titular, @Nullable Usuario responsavel) {
         if (titular == null) return null;
         return ResponsavelDetalheDto.builder()
                 .nome(titular.getNome())
@@ -80,7 +80,8 @@ public interface SubprocessoDetalheMapper {
         return "";
     }
 
-    default LocalDateTime mapPrazoEtapaAtual(Subprocesso sp) {
+    default @Nullable LocalDateTime mapPrazoEtapaAtual(@Nullable Subprocesso sp) {
+        if (sp == null) return null;
         return sp.getDataLimiteEtapa1() != null
                 ? sp.getDataLimiteEtapa1()
                 : sp.getDataLimiteEtapa2();

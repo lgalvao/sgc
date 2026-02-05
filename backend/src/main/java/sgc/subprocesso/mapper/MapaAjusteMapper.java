@@ -25,7 +25,11 @@ public interface MapaAjusteMapper {
     @Mapping(target = "justificativaDevolucao", source = "analise.observacoes")
     @Nullable MapaAjusteDto toDto(@Nullable Subprocesso sp, @Nullable Analise analise, @Nullable List<Competencia> competencias, @Nullable List<Atividade> atividades, @Nullable List<Conhecimento> conhecimentos, @Context @Nullable Map<Long, Set<Long>> associacoes);
 
-    default @Nullable List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, Map<Long, Set<Long>> associacoes) {
+    default @Nullable List<CompetenciaAjusteDto> mapCompetencias(@Nullable List<Competencia> competencias, @Nullable List<Atividade> atividades, @Nullable List<Conhecimento> conhecimentos, @Nullable Map<Long, Set<Long>> associacoes) {
+        if (competencias == null || atividades == null || conhecimentos == null || associacoes == null) {
+            return Collections.emptyList();
+        }
+
         Map<Long, List<Conhecimento>> conhecimentosPorAtividade = conhecimentos.stream()
                 .collect(Collectors.groupingBy(Conhecimento::getCodigoAtividade));
 

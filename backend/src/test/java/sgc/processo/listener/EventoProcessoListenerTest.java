@@ -592,26 +592,39 @@ class EventoProcessoListenerTest {
 
         Unidade intermediaria = criarUnidade(1L, TipoUnidade.INTERMEDIARIA);
         intermediaria.setSigla("INT");
+
+        // Unidade 'outra' sem superior (u.getUnidadeSuperior() == null)
         Unidade outra = criarUnidade(2L, TipoUnidade.OPERACIONAL);
         outra.setSigla("OUTRA");
 
-        processo.setParticipantes(Set.of(intermediaria, outra));
+        // Unidade 'comOutroSuperior' com superior diferente (u.getUnidadeSuperior() != null && !equals)
+        Unidade outraIntermediaria = criarUnidade(3L, TipoUnidade.INTERMEDIARIA);
+        Unidade comOutroSuperior = criarUnidade(4L, TipoUnidade.OPERACIONAL);
+        comOutroSuperior.setUnidadeSuperior(outraIntermediaria);
+        comOutroSuperior.setSigla("OUTRO_SUP");
+
+        processo.setParticipantes(Set.of(intermediaria, outra, comOutroSuperior));
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
                 1L, UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
-                2L, UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build()
+                2L, UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build(),
+                4L, UnidadeResponsavelDto.builder().unidadeCodigo(4L).titularTitulo("T4").build()
         ));
 
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
                 "T1", UsuarioDto.builder().email("int@mail.com").build(),
-                "T2", UsuarioDto.builder().email("out@mail.com").build()
+                "T2", UsuarioDto.builder().email("out@mail.com").build(),
+                "T4", UsuarioDto.builder().email("outro_sup@mail.com").build()
         ));
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(10L).build());
 
-        // Deve enviar para operacional
+        // Deve enviar para operacionais
         verify(notificacaoEmailService).enviarEmailHtml(eq("out@mail.com"), anyString(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("outro_sup@mail.com"), anyString(), any());
+
         // Não deve enviar para intermediária pois não há subordinada que tenha ela como superior imediata
+        // Isso cobre u.getUnidadeSuperior() == null E u.getUnidadeSuperior().getCodigo() != unidade.getCodigo()
         verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
     }
 }
