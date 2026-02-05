@@ -1,6 +1,8 @@
 package sgc.seguranca.login;
 
 import org.junit.jupiter.api.DisplayName;
+import org.springframework.test.util.ReflectionTestUtils;
+import sgc.comum.erros.ErroAutenticacao;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,7 @@ import sgc.seguranca.login.dto.EntrarRequest;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
@@ -125,5 +128,51 @@ class LoginFacadeGapTest {
         // Deve negar porque unidade está INATIVA (será filtrada linha 132)
         assertThatThrownBy(() -> loginFacade.entrar(req))
                 .isInstanceOf(ErroAcessoNegado.class);
+    }
+
+    @Test
+    @DisplayName("Deve lançar ErroAutenticacao quando usuário não é encontrado")
+    void deveLancarErroQuandoUsuarioNaoEncontrado() {
+        when(usuarioService.carregarUsuarioParaAutenticacao("999")).thenReturn(null);
+        
+        assertThatThrownBy(() -> loginFacade.autorizar("999"))
+                .isInstanceOf(ErroAutenticacao.class)
+                .hasMessageContaining("Credenciais inválidas");
+    }
+
+    @Test
+    @DisplayName("Deve delegar para ClienteAcessoAd quando não estiver em ambiente de testes")
+    void deveDelegarParaLdapEmProducao() {
+        // Simular ambiente de produção
+        ReflectionTestUtils.setField(loginFacade, "ambienteTestes", false);
+        
+        when(clienteAcessoAd.autenticar("789", "senha")).thenReturn(true);
+        
+        boolean resultado = loginFacade.autenticar("789", "senha");
+        
+        assertThat(resultado).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve retornar false quando falha autenticação no AD")
+    void deveRetornarFalseQuandoFalhaAd() {
+        ReflectionTestUtils.setField(loginFacade, "ambienteTestes", false);
+        
+        when(clienteAcessoAd.autenticar("789", "senha")).thenThrow(new ErroAutenticacao("Erro AD"));
+        
+        boolean resultado = loginFacade.autenticar("789", "senha");
+        
+        assertThat(resultado).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve retornar false quando ClienteAcessoAd é nulo em produção")
+    void deveRetornarFalseQuandoClienteAdNulo() {
+        LoginFacade localFacade = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper, usuarioPerfilService);
+        ReflectionTestUtils.setField(localFacade, "ambienteTestes", false);
+        
+        boolean resultado = localFacade.autenticar("123", "senha");
+        
+        assertThat(resultado).isFalse();
     }
 }

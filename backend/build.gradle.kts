@@ -212,15 +212,19 @@ tasks.register<Test>("integrationTest") {
     }
 }
 
+jacoco {
+    toolVersion = "0.8.13"
+}
+
 tasks.jacocoTestReport {
     dependsOn(tasks.named("test"))
     // Relatório consome dados de qualquer tarefa de teste que rodou
-    executionData.setFrom(fileTree(layout.buildDirectory.get().asFile).include("/jacoco/*.exec"))
+    executionData.setFrom(fileTree(layout.buildDirectory).include("jacoco/*.exec"))
 
     reports {
         xml.required.set(true)
         csv.required.set(true)
-        html.required.set(false)
+        html.required.set(true)
     }
 
     classDirectories.setFrom(

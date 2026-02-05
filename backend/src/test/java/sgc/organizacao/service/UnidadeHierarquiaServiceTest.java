@@ -475,6 +475,31 @@ class UnidadeHierarquiaServiceTest {
             // Assert
             assertThat(resultado).containsExactly("ASSESSORIA_11");
         }
+
+        @Test
+        @DisplayName("deve encontrar sigla em profundidade na hierarquia")
+        void deveEncontrarSiglaEmProfundidade() {
+            // Arrange
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(
+                    unidadeRaiz, unidadeIntermediaria, unidadeOperacional
+            ));
+
+            UnidadeDto dtoOper = criarDtoComSubunidades(3L, "ASSESSORIA_11");
+            UnidadeDto dtoInter = criarDtoComSubunidades(2L, "COORD_11");
+            dtoInter.setSubunidades(List.of(dtoOper));
+            UnidadeDto dtoRaiz = criarDtoComSubunidades(1L, "SEDOC");
+            dtoRaiz.setSubunidades(List.of(dtoInter));
+
+            when(usuarioMapper.toUnidadeDto(unidadeRaiz, true)).thenReturn(dtoRaiz);
+            when(usuarioMapper.toUnidadeDto(unidadeIntermediaria, true)).thenReturn(dtoInter);
+            when(usuarioMapper.toUnidadeDto(unidadeOperacional, true)).thenReturn(dtoOper);
+
+            // Act - buscar sigla da unidade intermediária (não raiz)
+            List<String> resultado = service.buscarSiglasSubordinadas("COORD_11");
+
+            // Assert
+            assertThat(resultado).containsExactly("COORD_11", "ASSESSORIA_11");
+        }
     }
 
     @Nested
