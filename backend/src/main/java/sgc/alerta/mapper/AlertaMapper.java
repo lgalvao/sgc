@@ -31,6 +31,7 @@ public abstract class AlertaMapper {
      */
     public AlertaDto toDto(Alerta alerta, LocalDateTime dataHoraLeitura) {
         AlertaDto dto = toDto(alerta);
+        if (dto == null) return null;
         return AlertaDto.builder()
                 .codigo(dto.getCodigo())
                 .codProcesso(dto.getCodProcesso())

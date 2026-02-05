@@ -232,7 +232,7 @@ tasks.jacocoTestReport {
             fileTree(it) {
                 exclude(
                     // Gerados automaticamente
-                    "**/*MapperImpl*",
+                    // "**/*MapperImpl*",
                     
                     // Bootstrap e configuração
                     "sgc/Sgc.class",
@@ -240,9 +240,9 @@ tasks.jacocoTestReport {
                     "sgc/**/*Properties.class",
                     
                     // DTOs e Request/Response (apenas dados)
-                    "sgc/**/*Dto.class",
-                    "sgc/**/*Request.class",
-                    "sgc/**/*Response.class",
+                    // "sgc/**/*Dto.class",
+                    // "sgc/**/*Request.class",
+                    // "sgc/**/*Response.class",
                     
                     // Exceções (maioria simples)
                     "sgc/**/Erro*.class",
