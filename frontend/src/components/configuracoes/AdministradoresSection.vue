@@ -70,7 +70,7 @@
         @shown="() => inputTituloRef?.focus()"
     >
       <div class="mb-3">
-        <label for="usuarioTitulo" class="form-label">Título</label>
+        <label for="usuarioTitulo" class="form-label">Título <span class="text-danger" aria-hidden="true">*</span></label>
         <input
             id="usuarioTitulo"
             ref="inputTituloRef"
