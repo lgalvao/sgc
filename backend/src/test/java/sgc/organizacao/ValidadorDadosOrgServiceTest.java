@@ -339,5 +339,66 @@ class ValidadorDadosOrgServiceTest {
                     .hasMessageContaining("violações encontradas")
                     .hasMessageContaining("+");
         }
+
+        @Test
+        @DisplayName("Deve falhar quando responsabilidade tem usuário em branco")
+        void deveFalharResponsabilidadeUsuarioEmBranco() {
+            // Arrange
+            Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
+            Usuario titular = criarUsuarioValido("TITULO_1");
+
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
+            when(usuarioRepo.findAllById(anyList())).thenReturn(List.of(titular));
+
+            // Responsabilidade presente mas com título em branco
+            Responsabilidade r = Responsabilidade.builder()
+                    .unidadeCodigo(1L)
+                    .usuarioTitulo("   ")
+                    .build();
+            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(r));
+
+            // Act & Assert
+            assertThatThrownBy(() -> validador.run(args))
+                    .isInstanceOf(ErroConfiguracao.class);
+        }
+
+        @Test
+        @DisplayName("Deve falhar quando responsabilidade tem usuário nulo")
+        void deveFalharResponsabilidadeUsuarioNulo() {
+            // Arrange
+            Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
+            Usuario titular = criarUsuarioValido("TITULO_1");
+
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
+            when(usuarioRepo.findAllById(anyList())).thenReturn(List.of(titular));
+
+            Responsabilidade r = Responsabilidade.builder()
+                    .unidadeCodigo(1L)
+                    .usuarioTitulo(null)
+                    .build();
+            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(r));
+
+            // Act & Assert
+            assertThatThrownBy(() -> validador.run(args))
+                    .isInstanceOf(ErroConfiguracao.class);
+        }
+
+        @Test
+        @DisplayName("Deve falhar quando responsabilidade é nula")
+        void deveFalharResponsabilidadeNula() {
+            // Arrange
+            Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
+            Usuario titular = criarUsuarioValido("TITULO_1");
+
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
+            when(usuarioRepo.findAllById(anyList())).thenReturn(List.of(titular));
+
+            // Responsabilidades vazio -> r será nulo no loop
+            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of());
+
+            // Act & Assert
+            assertThatThrownBy(() -> validador.run(args))
+                    .isInstanceOf(ErroConfiguracao.class);
+        }
     }
 }

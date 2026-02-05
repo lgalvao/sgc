@@ -583,4 +583,35 @@ class EventoProcessoListenerTest {
         // Não deve enviar email pois exceção foi capturada
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
+
+    @Test
+    @DisplayName("Deve cobrir intermediária sem subordinadas diretas filtradas")
+    void deveCobrirIntermediariaSemSubordinadasFiltradas() {
+        Processo processo = criarProcesso(10L);
+        when(processoFacade.buscarEntidadePorId(10L)).thenReturn(processo);
+
+        Unidade intermediaria = criarUnidade(1L, TipoUnidade.INTERMEDIARIA);
+        intermediaria.setSigla("INT");
+        Unidade outra = criarUnidade(2L, TipoUnidade.OPERACIONAL);
+        outra.setSigla("OUTRA");
+
+        processo.setParticipantes(Set.of(intermediaria, outra));
+
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
+                1L, UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
+                2L, UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build()
+        ));
+
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
+                "T1", UsuarioDto.builder().email("int@mail.com").build(),
+                "T2", UsuarioDto.builder().email("out@mail.com").build()
+        ));
+
+        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(10L).build());
+
+        // Deve enviar para operacional
+        verify(notificacaoEmailService).enviarEmailHtml(eq("out@mail.com"), anyString(), any());
+        // Não deve enviar para intermediária pois não há subordinada que tenha ela como superior imediata
+        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
+    }
 }

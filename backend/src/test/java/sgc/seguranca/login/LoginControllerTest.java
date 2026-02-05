@@ -58,6 +58,20 @@ class LoginControllerTest {
     }
 
     @Test
+    @DisplayName("POST /api/usuarios/autorizar - Deve falhar com cookies presentes mas sem pre-auth")
+    @WithMockUser
+    void autorizar_CookiesSemPreAuth_DeveFalhar() throws Exception {
+        AutorizarRequest req = AutorizarRequest.builder().tituloEleitoral("123").build();
+
+        mockMvc.perform(post("/api/usuarios/autorizar")
+                        .with(csrf())
+                        .cookie(new Cookie("OUTRO_COOKIE", "valor"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     @DisplayName("POST /api/usuarios/autenticar - Deve autenticar com sucesso")
     @WithMockUser
     void autenticar_Sucesso() throws Exception {

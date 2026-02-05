@@ -80,6 +80,30 @@ class UsuarioFacadeTest {
         }
 
         @Test
+        @DisplayName("Deve filtrar atribuições em unidades inativas")
+        void deveFiltrarUnidadesInativas() {
+            // Arrange
+            String titulo = "123456";
+            Usuario usuario = criarUsuario(titulo);
+            Unidade unidadeInativa = criarUnidade(1L, "INATIVA");
+            unidadeInativa.setSituacao(SituacaoUnidade.INATIVA);
+            UsuarioPerfil atribuicao = criarAtribuicao(usuario, unidadeInativa, Perfil.CHEFE);
+
+            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
+                    .thenReturn(Optional.of(usuario));
+            when(usuarioPerfilService.buscarPorUsuario(titulo))
+                    .thenReturn(List.of(atribuicao));
+
+            // Act
+            boolean resultado = facade.usuarioTemPerfil(titulo, "CHEFE", 1L);
+            List<Long> unidades = facade.buscarUnidadesPorPerfil(titulo, "CHEFE");
+
+            // Assert
+            assertThat(resultado).isFalse();
+            assertThat(unidades).isEmpty();
+        }
+
+        @Test
         @DisplayName("Deve lançar exceção quando não houver usuário autenticado")
         void deveLancarExcecaoQuandoNaoHouverUsuarioAutenticado() {
             // Arrange
@@ -112,6 +136,40 @@ class UsuarioFacadeTest {
             AnonymousAuthenticationToken authToken = mock(AnonymousAuthenticationToken.class);
             when(authToken.isAuthenticated()).thenReturn(true);
             when(context.getAuthentication()).thenReturn(authToken);
+            SecurityContextHolder.setContext(context);
+
+            // Act
+            Usuario resultado = facade.obterUsuarioAutenticadoOuNull();
+
+            // Assert
+            assertThat(resultado).isNull();
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        @DisplayName("Deve retornar null quando não houver autenticação (Contexto vazio)")
+        void deveRetornarNullQuandoContextoVazio() {
+            // Arrange
+            SecurityContext context = mock(SecurityContext.class);
+            when(context.getAuthentication()).thenReturn(null);
+            SecurityContextHolder.setContext(context);
+
+            // Act
+            Usuario resultado = facade.obterUsuarioAutenticadoOuNull();
+
+            // Assert
+            assertThat(resultado).isNull();
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        @DisplayName("Deve retornar null quando autenticação não estiver autenticada")
+        void deveRetornarNullQuandoNaoAutenticado() {
+            // Arrange
+            SecurityContext context = mock(SecurityContext.class);
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(false);
+            when(context.getAuthentication()).thenReturn(auth);
             SecurityContextHolder.setContext(context);
 
             // Act

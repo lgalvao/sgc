@@ -122,6 +122,38 @@ class UnidadeControllerTest {
     }
 
     @Test
+    @DisplayName("Deve retornar árvore de elegibilidade para REVISAO")
+    @WithMockUser
+    void deveRetornarArvoreDeElegibilidadeRevisao() throws Exception {
+        // Arrange
+        when(processoFacade.buscarIdsUnidadesEmProcessosAtivos(any()))
+                .thenReturn(Collections.emptySet());
+        when(unidadeService.buscarArvoreComElegibilidade(eq(true), any()))
+                .thenReturn(Collections.emptyList());
+
+        // Act & Assert
+        mockMvc.perform(get("/api/unidades/arvore-com-elegibilidade")
+                        .param("tipoProcesso", "REVISAO"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Deve retornar árvore de elegibilidade para DIAGNOSTICO")
+    @WithMockUser
+    void deveRetornarArvoreDeElegibilidadeDiagnostico() throws Exception {
+        // Arrange
+        when(processoFacade.buscarIdsUnidadesEmProcessosAtivos(any()))
+                .thenReturn(Collections.emptySet());
+        when(unidadeService.buscarArvoreComElegibilidade(eq(true), any()))
+                .thenReturn(Collections.emptyList());
+
+        // Act & Assert
+        mockMvc.perform(get("/api/unidades/arvore-com-elegibilidade")
+                        .param("tipoProcesso", "DIAGNOSTICO"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     @DisplayName("Deve verificar mapa vigente e retornar boolean")
     @WithMockUser
     void deveVerificarMapaVigente() throws Exception {
