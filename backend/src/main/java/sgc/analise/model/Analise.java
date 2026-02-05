@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Analise extends EntidadeBase {
     @ManyToOne
-    @JoinColumn(name = "subprocesso_codigo")
+    @JoinColumn(name = "subprocesso_codigo", nullable = false)
     private Subprocesso subprocesso;
 
     @Column(name = "data_hora")

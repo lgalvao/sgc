@@ -38,9 +38,6 @@ public class Movimentacao extends EntidadeBase {
     @Column(name = "descricao")
     private String descricao;
 
-    @Column(name = "observacoes", length = 500)
-    private String observacoes;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_titulo", nullable = false)
     private Usuario usuario;

@@ -15,7 +15,7 @@ import sgc.comum.model.EntidadeBase;
 @SuperBuilder
 public class Conhecimento extends EntidadeBase {
     @ManyToOne
-    @JoinColumn(name = "atividade_codigo")
+    @JoinColumn(name = "atividade_codigo", nullable = false)
     private Atividade atividade;
 
     @Column(name = "descricao")

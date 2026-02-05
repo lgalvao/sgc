@@ -49,7 +49,6 @@ public class SubprocessoTransicaoService {
                 .unidadeOrigem(cmd.origem())
                 .unidadeDestino(cmd.destino())
                 .descricao(cmd.tipo().getDescricaoMovimentacao())
-                .observacoes(cmd.observacoes())
                 .usuario(cmd.usuario())
                 .build();
         movimentacaoRepo.save(movimentacao);

@@ -26,8 +26,7 @@ import java.util.Set;
 @SuperBuilder
 public class Atividade extends EntidadeBase {
     @ManyToOne
-    @JoinColumn(name = "mapa_codigo")
-    @Nullable
+    @JoinColumn(name = "mapa_codigo", nullable = false)
     private Mapa mapa;
 
     @Column(name = "descricao")

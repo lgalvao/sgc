@@ -19,7 +19,7 @@ import java.util.Set;
 @SuperBuilder
 public class Competencia extends EntidadeBase {
     @ManyToOne
-    @JoinColumn(name = "mapa_codigo")
+    @JoinColumn(name = "mapa_codigo", nullable = false)
     private Mapa mapa;
 
     @Column(name = "descricao")

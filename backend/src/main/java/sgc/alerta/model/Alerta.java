@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Alerta extends EntidadeBase {
     @ManyToOne
-    @JoinColumn(name = "processo_codigo")
+    @JoinColumn(name = "processo_codigo", nullable = false)
     private Processo processo;
 
     @Column(name = "data_hora")

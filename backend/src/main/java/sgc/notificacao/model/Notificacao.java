@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @SuperBuilder
 public class Notificacao extends EntidadeBase {
     @ManyToOne
-    @JoinColumn(name = "subprocesso_codigo")
+    @JoinColumn(name = "subprocesso_codigo", nullable = false)
     private Subprocesso subprocesso;
 
     @Column(name = "data_hora")
