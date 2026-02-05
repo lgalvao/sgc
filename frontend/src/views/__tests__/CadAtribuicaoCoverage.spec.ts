@@ -60,7 +60,7 @@ describe('CadAtribuicao Coverage', () => {
         const wrapper = criarWrapper();
         await flushPromises();
 
-        expect(wrapper.vm.erroUsuario).toBe("Falha ao carregar dados da unidade ou usuários.");
+        expect((wrapper.vm as any).erroUsuario).toBe("Falha ao carregar dados da unidade ou usuários.");
     });
 
     it('deve retornar precocemente em criarAtribuicao se unidade ou usuario selecionado estiverem faltando', async () => {
@@ -68,19 +68,19 @@ describe('CadAtribuicao Coverage', () => {
         await flushPromises();
 
         // Forçar estado onde unidade ou usuarioSelecionado é nulo
-        wrapper.vm.unidade = null;
-        wrapper.vm.usuarioSelecionado = null;
+        (wrapper.vm as any).unidade = null;
+        (wrapper.vm as any).usuarioSelecionado = null;
 
-        await wrapper.vm.criarAtribuicao();
+        await (wrapper.vm as any).criarAtribuicao();
 
-        expect(wrapper.vm.isLoading).toBe(false);
+        expect((wrapper.vm as any).isLoading).toBe(false);
     });
 
     it('deve atualizar dataInicio via v-model', async () => {
         const wrapper = criarWrapper();
         await flushPromises();
 
-        wrapper.vm.dataInicio = '2023-10-10';
-        expect(wrapper.vm.dataInicio).toBe('2023-10-10');
+        (wrapper.vm as any).dataInicio = '2023-10-10';
+        expect((wrapper.vm as any).dataInicio).toBe('2023-10-10');
     });
 });

@@ -40,7 +40,16 @@ describe('useVisAtividades', () => {
     const props = { codProcesso: 1, sigla: 'TEST' };
 
     const TestComponent = defineComponent({
-        props: ['codProcesso', 'sigla'],
+        props: {
+            codProcesso: {
+                type: Number,
+                default: 0
+            },
+            sigla: {
+                type: String,
+                default: ''
+            }
+        },
         setup(props) {
             return { ...useVisAtividades(props as any) };
         },

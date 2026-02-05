@@ -1,7 +1,7 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import RelatoriosView from '@/views/RelatoriosView.vue';
-import {TipoProcesso} from '@/types/tipos';
+import {Perfil, TipoProcesso} from '@/types/tipos';
 import {useProcessosStore} from '@/stores/processos';
 import {usePerfilStore} from '@/stores/perfil';
 import {createTestingPinia} from '@pinia/testing';
@@ -220,7 +220,7 @@ describe('RelatoriosView.vue', () => {
     const processosStore = useProcessosStore(pinia);
     const perfilStore = usePerfilStore(pinia);
 
-    perfilStore.perfilSelecionado = 'ADMIN';
+    perfilStore.perfilSelecionado = Perfil.ADMIN;
     perfilStore.unidadeSelecionada = 1;
     processosStore.processosPainel = [];
 
