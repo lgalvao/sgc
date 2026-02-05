@@ -32,8 +32,11 @@
               v-for="proc in processos"
               v-else
               :key="proc.codigo"
-              style="cursor: pointer;"
+              class="cursor-pointer"
+              tabindex="0"
               @click="verDetalhes(proc.codigo)"
+              @keydown.enter.prevent="verDetalhes(proc.codigo)"
+              @keydown.space.prevent="verDetalhes(proc.codigo)"
             >
               <td>
                 <div class="fw-bold">{{ proc.descricao }}</div>
@@ -94,3 +97,12 @@ onMounted(() => {
   carregarHistorico();
 });
 </script>
+
+<style scoped>
+tbody tr:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  background-color: var(--bs-table-hover-bg);
+  z-index: 1; /* Ensure outline sits on top of adjacent borders */
+  position: relative;
+}
+</style>
