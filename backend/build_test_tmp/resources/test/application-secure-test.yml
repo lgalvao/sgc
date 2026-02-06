@@ -1,6 +1,0 @@
-# Perfil para testes de segurança com autenticação ativa
-# Herda do perfil test, adicionando segurança completa
-
-sgc:
-  validacao:
-    startup: false

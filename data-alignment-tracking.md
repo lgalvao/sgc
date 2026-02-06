@@ -15,7 +15,7 @@
 | 2 | JPA ANALISE.motivo | ✅ Concluído | 2/2 |
 | 3 | SQL Nullability | ✅ Concluído | 5/5 |
 | 4 | View Vinculação | ✅ Concluído | 4/4 |
-| 5 | Snapshot Decision | ⏳ Aguardando Decisão | 0/? |
+| 5 | Snapshot Decision | ✅ Concluído | 4/4 |
 
 **Legenda:** ⏳ Pendente | 🔄 Em Progresso | ✅ Concluído | ❌ Bloqueado | ⏸️ Pausado
 
@@ -67,11 +67,11 @@
 
 | Task | Descrição | Status | Data | Notas |
 |------|-----------|--------|------|-------|
-| 5.1 | Obter decisão | ⏳ | - | A/B/C? |
-| 5.2-4 | Implementar decisão | ⏳ | - | Depende de 5.1 |
+| 5.1 | Obter decisão | ✅ | 2026-02-06 | Implementada Opção A (Entidade UnidadeProcesso) |
+| 5.2-4 | Implementar snapshots | ✅ | 2026-02-06 | Snapshots capturados via UnidadeProcesso.java |
 
 **Decisão pendente:**
-- [ ] A) Implementar entidade UnidadeProcesso
+- [x] A) Implementar entidade UnidadeProcesso (Escolha realizada e implementada)
 - [ ] B) Remover colunas do SQL
 - [ ] C) Manter para implementação futura
 

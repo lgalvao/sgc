@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="EntryPointsManager">
+    <list size="2">
+      <item index="0" class="java.lang.String" itemvalue="com.tngtech.archunit.junit.ArchTest" />
+      <item index="1" class="java.lang.String" itemvalue="lombok.Setter" />
+    </list>
+    <pattern value="sgc.seguranca.acesso.AccessPolicy" method="canExecute" />
+    <pattern value="sgc.seguranca.acesso.AccessPolicy" method="getMotivoNegacao" />
+    <pattern value="sgc.organizacao.model.AdministradorRepo" />
+    <pattern value="sgc.alerta.model.AlertaRepo" method="findByProcessoCodigo" />
+    <pattern value="sgc.mapa.model.AtividadeRepo" method="countByMapaCodigo" />
+    <pattern value="sgc.subprocesso.dto.MovimentacaoDto" method="MovimentacaoDto" />
+    <pattern value="sgc.alerta.model.AlertaUsuarioRepo" />
+    <pattern value="sgc.analise.model.AnaliseRepo" />
+    <pattern value="sgc.subprocesso.dto.AnaliseValidacaoDto" />
+    <pattern value="sgc.analise.model.AnaliseRepo" method="findBySubprocessoCodigo" />
+    <pattern value="sgc.analise.model.AnaliseRepo" method="findBySubprocessoCodigoOrderByDataHoraDesc" />
+    <pattern value="sgc.alerta.model.AlertaUsuarioRepo" method="findByUsuarioAndAlertas" />
+    <pattern value="sgc.organizacao.model.UnidadeMapaRepo" method="findAllUnidadeCodigos" />
+    <pattern value="sgc.processo.dto.AcaoEmBlocoRequest" method="AcaoEmBlocoRequest" />
+    <pattern value="sgc.organizacao.dto.AdministradorDto" method="AdministradorDto" />
+    <pattern value="sgc.subprocesso.dto.AlterarDataLimiteRequest" method="AlterarDataLimiteRequest" />
+    <pattern value="sgc.analise.dto.AnaliseHistoricoDto" method="AnaliseHistoricoDto" />
+    <pattern value="sgc.subprocesso.dto.AnaliseValidacaoDto" method="AnaliseValidacaoDto" />
+    <pattern value="sgc.mapa.dto.AtividadeImpactadaDto" />
+    <pattern value="sgc.mapa.dto.AtividadeImpactadaDto" method="AtividadeImpactadaDto" />
+    <pattern value="sgc.subprocesso.dto.AtividadeOperacaoResponse" />
+    <pattern value="sgc.subprocesso.dto.AtividadeOperacaoResponse" method="AtividadeOperacaoResponse" />
+    <pattern value="sgc.mapa.model.AtividadeRepo" />
+    <pattern value="sgc.organizacao.dto.AtribuicaoTemporariaDto" />
+    <pattern value="sgc.organizacao.dto.AtribuicaoTemporariaDto" method="AtribuicaoTemporariaDto" />
+    <pattern value="sgc.subprocesso.dto.AtualizarSubprocessoRequest" />
+    <pattern value="sgc.subprocesso.dto.AtualizarSubprocessoRequest" method="AtualizarSubprocessoRequest" />
+    <pattern value="sgc.seguranca.login.dto.AutenticarRequest" />
+    <pattern value="sgc.seguranca.login.dto.AutenticarRequest" method="AutenticarRequest" />
+    <pattern value="sgc.seguranca.login.dto.AutorizarRequest" />
+    <pattern value="sgc.seguranca.login.dto.AutorizarRequest" method="AutorizarRequest" />
+    <pattern value="sgc.subprocesso.dto.ConhecimentoAjusteDto" />
+    <pattern value="sgc.subprocesso.dto.ConhecimentoAjusteDto" method="ConhecimentoAjusteDto" />
+    <pattern value="sgc.mapa.dto.visualizacao.ConhecimentoDto" />
+    <pattern value="sgc.mapa.dto.visualizacao.ConhecimentoDto" method="ConhecimentoDto" />
+    <pattern value="sgc.subprocesso.dto.ContextoEdicaoDto" />
+    <pattern value="sgc.subprocesso.dto.ContextoEdicaoDto" method="ContextoEdicaoDto" />
+    <pattern value="sgc.analise.dto.CriarAnaliseCommand" />
+    <pattern value="sgc.analise.dto.CriarAnaliseCommand" method="CriarAnaliseCommand" />
+    <pattern value="sgc.seguranca.login.dto.EntrarResponse" />
+    <pattern value="sgc.seguranca.login.dto.EntrarResponse" method="EntrarResponse" />
+    <pattern value="sgc.processo.dto.EnviarLembreteRequest" />
+    <pattern value="sgc.processo.dto.EnviarLembreteRequest" method="EnviarLembreteRequest" />
+    <pattern value="sgc.comum.erros.ErroApi" />
+    <pattern value="sgc.comum.erros.ErroNegocio" />
+    <pattern value="sgc.subprocesso.dto.ErroValidacaoDto" />
+    <pattern value="sgc.subprocesso.dto.ErroValidacaoDto" method="ErroValidacaoDto" />
+    <pattern value="sgc.mapa.model.AtividadeRepo" method="findBySubprocessoCodigo" />
+    <pattern value="sgc.organizacao.dto.PerfilDto" method="from" />
+    <pattern value="sgc.comum.erros.ErroNegocio" method="getMessage" />
+    <pattern value="sgc.comum.erros.ErroApi" method="getSubErrors" />
+    <pattern value="sgc.mapa.dto.MapaDto" />
+    <pattern value="sgc.mapa.dto.MapaDto" method="MapaDto" />
+    <pattern value="sgc.mapa.dto.visualizacao.MapaVisualizacaoDto" />
+    <pattern value="sgc.mapa.dto.visualizacao.MapaVisualizacaoDto" method="MapaVisualizacaoDto" />
+    <pattern value="sgc.organizacao.dto.PerfilDto" />
+    <pattern value="sgc.subprocesso.dto.ProcessarEmBlocoRequest" />
+    <pattern value="sgc.subprocesso.dto.ProcessarEmBlocoRequest" method="ProcessarEmBlocoRequest" />
+    <pattern value="sgc.processo.dto.ProcessoResumoDto" />
+    <pattern value="sgc.processo.dto.ProcessoResumoDto" method="ProcessoResumoDto" />
+    <pattern value="sgc.subprocesso.dto.RegistrarTransicaoCommand" />
+    <pattern value="sgc.subprocesso.dto.RegistrarTransicaoCommand" method="RegistrarTransicaoCommand" />
+    <pattern value="sgc.subprocesso.dto.RegistrarWorkflowCommand" />
+    <pattern value="sgc.subprocesso.dto.RegistrarWorkflowCommand" method="RegistrarWorkflowCommand" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoDetalheDto.ResponsavelDto" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoDetalheDto" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoPermissoesDto" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoPermissoesDto" method="SubprocessoPermissoesDto" />
+    <pattern value="sgc.subprocesso.dto.SugestoesDto" />
+    <pattern value="sgc.subprocesso.dto.SugestoesDto" method="SugestoesDto" />
+    <pattern value="sgc.mapa.dto.visualizacao.MapaVisualizacaoDto.UnidadeDto" />
+    <pattern value="sgc.mapa.dto.visualizacao.MapaVisualizacaoDto.UnidadeDto" method="UnidadeDto" />
+    <pattern value="sgc.organizacao.dto.UsuarioDto" />
+    <pattern value="sgc.organizacao.dto.UsuarioDto" method="UsuarioDto" />
+    <pattern value="sgc.subprocesso.dto.ValidacaoCadastroDto" />
+    <pattern value="sgc.subprocesso.dto.ValidacaoCadastroDto" method="ValidacaoCadastroDto" />
+    <pattern value="sgc.mapa.service.MapaFacade" method="listar" />
+    <pattern value="sgc.mapa.service.MapaFacade" />
+  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="corretto-21" project-jdk-type="JavaSDK" />
+</project>

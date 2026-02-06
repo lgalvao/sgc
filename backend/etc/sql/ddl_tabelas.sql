@@ -353,9 +353,9 @@ CREATE TABLE MOVIMENTACAO
     codigo                 NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     subprocesso_codigo     NUMBER NOT NULL,
     data_hora              TIMESTAMP NOT NULL,
-    unidade_origem_codigo  NUMBER NULL,
+    unidade_origem_codigo  NUMBER NOT NULL,
     unidade_destino_codigo NUMBER NOT NULL,
-    usuario_titulo         VARCHAR2(12) NULL,
+    usuario_titulo         VARCHAR2(12) NOT NULL,
     descricao              VARCHAR2(255) NULL,
     CONSTRAINT pk_movimentacao PRIMARY KEY (codigo),
     CONSTRAINT fk_mov_subprocesso FOREIGN KEY (subprocesso_codigo) REFERENCES SUBPROCESSO (codigo)
