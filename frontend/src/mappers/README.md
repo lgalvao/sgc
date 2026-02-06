@@ -1,28 +1,19 @@
 # Diretório de Mappers
 
-Este diretório contém funções responsáveis por transformar dados entre diferentes formatos, geralmente entre a API (
-Backend) e a View (Frontend).
+Responsáveis pela transformação de dados entre a camada de API (DTOs) e a camada de Visualização (Modelos do Frontend).
+
+## Mappers Disponíveis
+
+* **`processos.ts`**: Conversão de cronogramas e dados de processo.
+* **`atividades.ts`**: Formatação de itens de atividade e taxonomias.
+* **`mapas.ts`**: Transformação de competências e revisões de mapa.
+* **`unidades.ts`**: Mapeamento da árvore e detalhes de unidades.
+* **`usuarios.ts`**: Dados de perfil e permissões de usuário.
+* **`alertas.ts`**: Transformação de notificações e alertas.
+* **`sgrh.ts`**: Integração de dados provenientes do sistema de RH.
 
 ## Por que usar Mappers?
 
-- **Desacoplamento:** Evita que a estrutura do banco de dados/API "vaze" diretamente para os componentes visuais. Se o
-  backend mudar o nome de um campo, você altera apenas o mapper, não 50 componentes.
-- **Formatação:** Prepara dados para exibição (ex: formatar datas, converter códigos de status em labels legíveis,
-  calcular campos derivados).
-
-## Exemplo
-
-```typescript
-// ProcessoMapper.ts
-import type { ProcessoDto, ProcessoVisualizacao } from '@/types';
-import { formatarDataBrasileira } from '@/utils/formatters';
-
-export function paraVisualizacao(dto: ProcessoDto): ProcessoVisualizacao {
-  return {
-    id: dto.codigo,
-    tituloFormatado: dto.titulo.toUpperCase(),
-    inicio: formatarDataBrasileira(dto.dataInicio),
-    statusLabel: obterLabelSituacao(dto.situacao)
-  };
-}
-```
+1. **Desacoplamento**: Protege o frontend contra mudanças na estrutura do JSON da API.
+2. **Sanitização**: Garante que campos opcionais tenham valores padrão seguros.
+3. **Formatação**: Centraliza lógica de exibição (ex: converter `STATUS_CONCLUIDO` para "Concluído").

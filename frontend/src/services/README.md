@@ -1,41 +1,38 @@
 # Diretório de Serviços (Services)
 
-Este diretório contém a camada de abstração de API. Os arquivos aqui são responsáveis por realizar as chamadas HTTP para
-o backend.
+Este diretório contém a camada de abstração de rede. Os serviços são responsáveis por realizar as comunicações HTTP com o backend.
 
 ## Padrão de Implementação
 
-Os serviços exportam objetos ou funções que utilizam a instância configurada do Axios (`@/axios-setup`).
+Os serviços utilizam a instância centralizada do Axios configurada em `@/axios-setup`.
 
 ```typescript
 import api from '@/axios-setup';
-import type { Processo } from '@/types';
 
-export default {
-  async listar(): Promise<Processo[]> {
-    const { data } = await api.get('/processos');
-    return data;
-  },
-
-  async criar(payload: CriarProcessoDto): Promise<Processo> {
-    const { data } = await api.post('/processos', payload);
-    return data;
-  }
+export const exemploService = {
+  listar: () => api.get('/exemplo').then(r => r.data),
 };
 ```
 
+## Serviços Disponíveis
+
+* **`usuarioService`**: Login, perfis e dados de usuários.
+* **`processoService`**: Gestão de processos e cronogramas.
+* **`subprocessoService`**: Operações de fluxo de unidades.
+* **`atividadeService`**: Cadastro e listagem de atividades.
+* **`mapaService`**: Gestão de competências e revisões de mapa.
+* **`diagnosticoService`**: Autoavaliação e monitoramento.
+* **`unidadeService`**: Busca e hierarquia de unidades.
+* **`alertaService`**: Recuperação de alertas do sistema.
+* **`analiseService`**: Logs e histórico de auditoria.
+* **`atribuicaoTemporariaService`**: Gestão de substitutos.
+* **`configuracaoService`**: Parâmetros do sistema.
+* **`administradorService`**: Gestão de administradores do sistema.
+* **`painelService`**: Dados agregados para o dashboard.
+* **`cadastroService`**: Operações auxiliares de cadastro.
+
 ## Configuração do Axios (`axios-setup.ts`)
 
-O cliente HTTP centralizado configura:
-
-1. **Base URL**: Aponta para a API (ex: `/api` via proxy ou `http://localhost:10000`).
-2. **Request Interceptor**: Injeta o cabeçalho `Authorization: Bearer <token>` se o usuário estiver logado.
-3. **Response Interceptor**: Trata erros globais, como `401 Unauthorized` (redirecionando para login) ou
-   `403 Forbidden`.
-
-## Serviços Principais
-
-* **`authService`**: Login e troca de perfil.
-* **`processoService`**: Operações de Processo.
-* **`subprocessoService`**: Operações de Subprocesso e Workflow.
-* **`mapaService`**: Operações específicas do Mapa (atividades, competências).
+O arquivo central de configuração trata:
+1. **Base URL**: Definida via variáveis de ambiente.
+2. **Interceptors**: Injeção de token Bearer e tratamento global de erros (401, 403, 500).
