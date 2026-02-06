@@ -312,7 +312,14 @@ spotbugs {
 
 configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
     junit5PluginVersion.set("1.2.3")
-    targetClasses.set(setOf("sgc.*"))
+
+    // Permite filtrar via projeto: ./gradlew pitest -PpitestTarget=sgc.pacote.*
+    val target = project.findProperty("pitestTarget")?.toString() ?: "sgc.*"
+    targetClasses.set(setOf(target))
+
+    val targetTestsProp = project.findProperty("pitestTargetTests")?.toString() ?: "sgc.*"
+    targetTests.set(setOf(targetTestsProp))
+
     excludedClasses.set(
         setOf(
             "sgc.Sgc",
@@ -326,8 +333,9 @@ configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
             "sgc.**.*Impl"
         )
     )
-    threads.set(8)
-    outputFormats.set(setOf("XML"))
+    threads.set(4) // Reduzido para maior estabilidade no ambiente de sandbox
+    outputFormats.set(setOf("HTML", "XML"))
+    timestampedReports.set(false)
 }
 
 tasks.register("qualityCheck") {

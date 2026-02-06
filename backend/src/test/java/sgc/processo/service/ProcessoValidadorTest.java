@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -59,6 +59,32 @@ class ProcessoValidadorTest {
     }
 
     @Test
+    @DisplayName("getMensagemErroUnidadesSemMapa deve retornar vazio se todas unidades possuem mapa")
+    void getMensagemErroUnidadesSemMapaSucesso() {
+        Unidade u = new Unidade();
+        u.setCodigo(1L);
+        when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
+        when(unidadeService.verificarMapaVigente(1L)).thenReturn(true);
+
+        Optional<String> msg = validador.getMensagemErroUnidadesSemMapa(List.of(1L));
+        assertThat(msg).isEmpty();
+    }
+
+    @Test
+    @DisplayName("validarFinalizacaoProcesso sucesso")
+    void validarFinalizacaoProcessoSucesso() {
+        Processo p = new Processo();
+        p.setCodigo(1L);
+        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+        when(queryService.validarSubprocessosParaFinalizacao(1L))
+                .thenReturn(ProcessoSubprocessoQueryService.ValidationResult.ofValido());
+
+        Assertions.assertDoesNotThrow(() -> validador.validarFinalizacaoProcesso(p));
+        verify(queryService).validarSubprocessosParaFinalizacao(1L);
+    }
+
+    @Test
     @DisplayName("validarFinalizacaoProcesso falha se situação inválida")
     void validarFinalizacaoProcessoSituacaoInvalida() {
         Processo p = new Processo();
@@ -80,5 +106,19 @@ class ProcessoValidadorTest {
 
         // Should not throw exception
         Assertions.assertDoesNotThrow(() -> validador.validarTodosSubprocessosHomologados(p));
+    }
+
+    @Test
+    @DisplayName("validarTodosSubprocessosHomologados deve lançar erro se algum não homologado")
+    void validarTodosSubprocessosHomologadosErro() {
+        Processo p = new Processo();
+        p.setCodigo(1L);
+
+        when(queryService.validarSubprocessosParaFinalizacao(1L))
+                .thenReturn(ProcessoSubprocessoQueryService.ValidationResult.ofInvalido("Erro de validação"));
+
+        assertThatThrownBy(() -> validador.validarTodosSubprocessosHomologados(p))
+                .isInstanceOf(ErroProcesso.class)
+                .hasMessage("Erro de validação");
     }
 }
