@@ -27,14 +27,14 @@ public class Analise extends EntidadeBase {
     @JoinColumn(name = "subprocesso_codigo", nullable = false)
     private Subprocesso subprocesso;
 
-    @Column(name = "data_hora")
+    @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
 
     @Column(name = "observacoes", length = 500)
     private String observacoes;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "acao", length = 20)
+    @Column(name = "acao", length = 20, nullable = false)
     private TipoAcaoAnalise acao;
 
     @Column(name = "unidade_codigo")
@@ -43,7 +43,7 @@ public class Analise extends EntidadeBase {
     @Column(name = "usuario_titulo", length = 12)
     private String usuarioTitulo;
 
-    @Column(name = "motivo", length = 500)
+    @Column(name = "motivo", length = 200)
     private String motivo;
 
     @Enumerated(EnumType.STRING)

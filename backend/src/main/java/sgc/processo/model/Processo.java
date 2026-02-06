@@ -23,7 +23,7 @@ import java.util.Set;
 @AttributeOverride(name = "codigo", column = @Column(name = "codigo"))
 public class Processo extends EntidadeBase {
     @Builder.Default
-    @Column(name = "data_criacao")
+    @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao = LocalDateTime.now();
 
     @Column(name = "data_finalizacao")
@@ -32,15 +32,15 @@ public class Processo extends EntidadeBase {
     @Column(name = "data_limite", nullable = false)
     private LocalDateTime dataLimite;
 
-    @Column(name = "descricao")
+    @Column(name = "descricao", nullable = false)
     private String descricao;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "situacao", length = 20)
+    @Column(name = "situacao", length = 20, nullable = false)
     private SituacaoProcesso situacao;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo", length = 20)
+    @Column(name = "tipo", length = 20, nullable = false)
     private TipoProcesso tipo;
 
     @ManyToMany

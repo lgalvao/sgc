@@ -30,12 +30,12 @@ WITH 1 INCREMENT BY 1
 CREATE TABLE PROCESSO
 (
     codigo           NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    data_criacao     TIMESTAMP NULL,
+    data_criacao     TIMESTAMP NOT NULL,
     data_finalizacao TIMESTAMP NULL,
-    data_limite      DATE NULL,
-    descricao        VARCHAR2(255) NULL,
-    situacao         VARCHAR2(20)  NULL,
-    tipo             VARCHAR2(20)  NULL,
+    data_limite      DATE NOT NULL,
+    descricao        VARCHAR2(255) NOT NULL,
+    situacao         VARCHAR2(20)  NOT NULL,
+    tipo             VARCHAR2(20)  NOT NULL,
     CONSTRAINT pk_processo PRIMARY KEY (codigo)
 );
 
@@ -99,12 +99,12 @@ CREATE TABLE SUBPROCESSO
 (
     codigo             NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     processo_codigo    NUMBER NOT NULL,
-    unidade_codigo     NUMBER NULL,
-    data_limite_etapa1 DATE NULL,
+    unidade_codigo     NUMBER NOT NULL,
+    data_limite_etapa1 DATE NOT NULL,
     data_fim_etapa1    TIMESTAMP NULL,
     data_limite_etapa2 DATE NULL,
     data_fim_etapa2    TIMESTAMP NULL,
-    situacao           VARCHAR2(50) NULL,
+    situacao           VARCHAR2(50) NOT NULL,
     CONSTRAINT pk_subprocesso PRIMARY KEY (codigo),
     CONSTRAINT fk_subprocesso_up FOREIGN KEY (processo_codigo, unidade_codigo) REFERENCES UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
 );
@@ -171,11 +171,11 @@ CREATE TABLE ALERTA
 (
     codigo                 NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     processo_codigo        NUMBER NOT NULL,
-    data_hora              TIMESTAMP NULL,
-    unidade_origem_codigo  NUMBER NULL,
+    data_hora              TIMESTAMP NOT NULL,
+    unidade_origem_codigo  NUMBER NOT NULL,
     unidade_destino_codigo NUMBER NULL,
     usuario_destino_titulo VARCHAR2(12)  NULL,
-    descricao              VARCHAR2(255) NULL,
+    descricao              VARCHAR2(255) NOT NULL,
     CONSTRAINT pk_alerta PRIMARY KEY (codigo),
     CONSTRAINT fk_alerta_processo FOREIGN KEY (processo_codigo) REFERENCES PROCESSO (codigo)
 );
@@ -201,7 +201,7 @@ CREATE TABLE ALERTA_USUARIO
 (
     alerta_codigo     NUMBER NOT NULL,
     usuario_titulo    VARCHAR2(12) NOT NULL,
-    data_hora_leitura TIMESTAMP NULL,
+    data_hora_leitura TIMESTAMP NOT NULL,
     CONSTRAINT pk_alerta_usuario PRIMARY KEY (alerta_codigo, usuario_titulo),
     CONSTRAINT fk_alerta_usuario_alerta FOREIGN KEY (alerta_codigo) REFERENCES ALERTA (codigo)
     -- FK implícita para VW_USUARIO.titulo
@@ -220,9 +220,9 @@ CREATE TABLE ANALISE
 (
     codigo             NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     subprocesso_codigo NUMBER NOT NULL,
-    data_hora          TIMESTAMP NULL,
-    tipo               VARCHAR2(20)  NULL,
-    acao               VARCHAR2(100) NULL,
+    data_hora          TIMESTAMP NOT NULL,
+    tipo               VARCHAR2(20)  NOT NULL,
+    acao               VARCHAR2(100) NOT NULL,
     usuario_titulo     VARCHAR2(12)  NULL,
     unidade_codigo     NUMBER NULL,
     motivo             VARCHAR2(200) NULL,
@@ -254,11 +254,11 @@ ON COLUMN ANALISE.observacoes IS 'Observações da análise.';
 CREATE TABLE ATRIBUICAO_TEMPORARIA
 (
     codigo            NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    unidade_codigo    NUMBER NULL,
-    usuario_matricula VARCHAR2(8)   NULL,
-    usuario_titulo    VARCHAR2(12)  NULL,
-    data_inicio       DATE NULL,
-    data_termino      DATE NULL,
+    unidade_codigo    NUMBER NOT NULL,
+    usuario_matricula VARCHAR2(8)   NOT NULL,
+    usuario_titulo    VARCHAR2(12)  NOT NULL,
+    data_inicio       DATE NOT NULL,
+    data_termino      DATE NOT NULL,
     justificativa     VARCHAR2(500) NULL,
     CONSTRAINT pk_atrib_temp PRIMARY KEY (codigo)
     -- FKs implícitas para VW_UNIDADE.codigo e VW_USUARIO.titulo
@@ -285,7 +285,7 @@ CREATE TABLE ATIVIDADE
 (
     codigo      NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     mapa_codigo NUMBER NOT NULL,
-    descricao   VARCHAR2(255) NULL,
+    descricao   VARCHAR2(255) NOT NULL,
     CONSTRAINT pk_atividade PRIMARY KEY (codigo),
     CONSTRAINT fk_atividade_mapa FOREIGN KEY (mapa_codigo) REFERENCES MAPA (codigo)
 );
@@ -303,7 +303,7 @@ CREATE TABLE COMPETENCIA
 (
     codigo      NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     mapa_codigo NUMBER NOT NULL,
-    descricao   VARCHAR2(255) NULL,
+    descricao   VARCHAR2(255) NOT NULL,
     CONSTRAINT pk_competencia PRIMARY KEY (codigo),
     CONSTRAINT fk_competencia_mapa FOREIGN KEY (mapa_codigo) REFERENCES MAPA (codigo)
 );
@@ -337,7 +337,7 @@ CREATE TABLE CONHECIMENTO
 (
     codigo           NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     atividade_codigo NUMBER NOT NULL,
-    descricao        VARCHAR2(255) NULL,
+    descricao        VARCHAR2(255) NOT NULL,
     CONSTRAINT pk_conhecimento PRIMARY KEY (codigo),
     CONSTRAINT fk_conhecimento_atividade FOREIGN KEY (atividade_codigo) REFERENCES ATIVIDADE (codigo)
 );
@@ -355,10 +355,10 @@ CREATE TABLE MOVIMENTACAO
 (
     codigo                 NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     subprocesso_codigo     NUMBER NOT NULL,
-    data_hora              TIMESTAMP NULL,
+    data_hora              TIMESTAMP NOT NULL,
     unidade_origem_codigo  NUMBER NULL,
-    unidade_destino_codigo NUMBER NULL,
-    usuario_titulo         VARCHAR2(12)  NULL,
+    unidade_destino_codigo NUMBER NOT NULL,
+    usuario_titulo         VARCHAR2(12) NULL,
     descricao              VARCHAR2(255) NULL,
     CONSTRAINT pk_movimentacao PRIMARY KEY (codigo),
     CONSTRAINT fk_mov_subprocesso FOREIGN KEY (subprocesso_codigo) REFERENCES SUBPROCESSO (codigo)
@@ -386,10 +386,10 @@ CREATE TABLE NOTIFICACAO
 (
     codigo                 NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
     subprocesso_codigo     NUMBER NOT NULL,
-    data_hora              TIMESTAMP NULL,
-    unidade_origem_codigo  NUMBER NULL,
-    unidade_destino_codigo NUMBER NULL,
-    conteudo               VARCHAR2(500) NULL,
+    data_hora              TIMESTAMP NOT NULL,
+    unidade_origem_codigo  NUMBER NOT NULL,
+    unidade_destino_codigo NUMBER NOT NULL,
+    conteudo               VARCHAR2(500) NOT NULL,
     CONSTRAINT pk_notificacao PRIMARY KEY (codigo),
     CONSTRAINT fk_notif_subprocesso FOREIGN KEY (subprocesso_codigo) REFERENCES SUBPROCESSO (codigo)
     -- FKs implícitas para VW_UNIDADE.codigo
@@ -413,9 +413,9 @@ ON COLUMN NOTIFICACAO.conteudo IS 'Conteúdo da notificação.';
 CREATE TABLE PARAMETRO
 (
     codigo    NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    chave     VARCHAR2(50)  NULL,
+    chave     VARCHAR2(50)  NOT NULL,
     descricao VARCHAR2(255) NULL,
-    valor     VARCHAR2(255) NULL,
+    valor     VARCHAR2(255) NOT NULL,
     CONSTRAINT pk_parametro PRIMARY KEY (codigo)
 );
 

@@ -22,7 +22,7 @@ public class Competencia extends EntidadeBase {
     @JoinColumn(name = "mapa_codigo", nullable = false)
     private Mapa mapa;
 
-    @Column(name = "descricao")
+    @Column(name = "descricao", nullable = false)
     private String descricao;
 
     @ManyToMany(mappedBy = "competencias")

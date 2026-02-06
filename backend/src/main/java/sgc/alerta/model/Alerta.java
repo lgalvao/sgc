@@ -29,11 +29,11 @@ public class Alerta extends EntidadeBase {
     @JoinColumn(name = "processo_codigo", nullable = false)
     private Processo processo;
 
-    @Column(name = "data_hora")
+    @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
 
     @ManyToOne
-    @JoinColumn(name = "unidade_origem_codigo")
+    @JoinColumn(name = "unidade_origem_codigo", nullable = false)
     private Unidade unidadeOrigem;
 
     @ManyToOne
@@ -44,6 +44,6 @@ public class Alerta extends EntidadeBase {
     @JoinColumn(name = "usuario_destino_titulo")
     private Usuario usuarioDestino;
 
-    @Column(name = "descricao")
+    @Column(name = "descricao", nullable = false)
     private String descricao;
 }

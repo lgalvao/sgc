@@ -41,7 +41,7 @@ public class AlertaUsuario implements Serializable {
             updatable = false)
     private Usuario usuario;
 
-    @Column(name = "data_hora_leitura")
+    @Column(name = "data_hora_leitura", nullable = false)
     private LocalDateTime dataHoraLeitura;
 
     /**

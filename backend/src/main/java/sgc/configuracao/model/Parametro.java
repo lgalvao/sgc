@@ -18,7 +18,7 @@ import sgc.comum.model.EntidadeBase;
 @NoArgsConstructor
 @SuperBuilder
 public class Parametro extends EntidadeBase {
-    @Column(name = "chave", length = 50)
+    @Column(name = "chave", length = 50, nullable = false)
     @NotBlank(message = "A chave não pode estar vazia")
     @Size(max = 50, message = "A chave deve ter no máximo 50 caracteres")
     private String chave;
@@ -26,7 +26,7 @@ public class Parametro extends EntidadeBase {
     @Column(name = "descricao")
     private String descricao;
 
-    @Column(name = "valor")
+    @Column(name = "valor", nullable = false)
     @NotBlank(message = "O valor não pode estar vazio")
     private String valor;
 }

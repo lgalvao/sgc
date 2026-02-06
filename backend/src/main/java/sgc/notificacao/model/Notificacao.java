@@ -22,17 +22,17 @@ public class Notificacao extends EntidadeBase {
     @JoinColumn(name = "subprocesso_codigo", nullable = false)
     private Subprocesso subprocesso;
 
-    @Column(name = "data_hora")
+    @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
 
     @ManyToOne
-    @JoinColumn(name = "unidade_origem_codigo")
+    @JoinColumn(name = "unidade_origem_codigo", nullable = false)
     private Unidade unidadeOrigem;
 
     @ManyToOne
-    @JoinColumn(name = "unidade_destino_codigo")
+    @JoinColumn(name = "unidade_destino_codigo", nullable = false)
     private Unidade unidadeDestino;
 
-    @Column(name = "conteudo", length = 500)
+    @Column(name = "conteudo", length = 500, nullable = false)
     private String conteudo;
 }

@@ -28,7 +28,7 @@ public class Movimentacao extends EntidadeBase {
     private LocalDateTime dataHora = LocalDateTime.now();
 
     @ManyToOne
-    @JoinColumn(name = "unidade_origem_codigo", nullable = false)
+    @JoinColumn(name = "unidade_origem_codigo")
     private Unidade unidadeOrigem;
 
     @ManyToOne
@@ -39,6 +39,6 @@ public class Movimentacao extends EntidadeBase {
     private String descricao;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_titulo", nullable = false)
+    @JoinColumn(name = "usuario_titulo")
     private Usuario usuario;
 }

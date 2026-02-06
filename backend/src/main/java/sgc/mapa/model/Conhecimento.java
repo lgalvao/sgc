@@ -18,7 +18,7 @@ public class Conhecimento extends EntidadeBase {
     @JoinColumn(name = "atividade_codigo", nullable = false)
     private Atividade atividade;
 
-    @Column(name = "descricao")
+    @Column(name = "descricao", nullable = false)
     private String descricao;
 
     public Long getCodigoAtividade() {

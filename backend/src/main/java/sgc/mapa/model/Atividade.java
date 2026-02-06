@@ -29,7 +29,7 @@ public class Atividade extends EntidadeBase {
     @JoinColumn(name = "mapa_codigo", nullable = false)
     private Mapa mapa;
 
-    @Column(name = "descricao")
+    @Column(name = "descricao", nullable = false)
     private String descricao;
 
     @OneToMany(mappedBy = "atividade", cascade = CascadeType.ALL, orphanRemoval = true)
