@@ -185,9 +185,6 @@ public class PainelFacade {
                 return atual.getUnidadeCodigo();
             }
             atual = participantesPorCodigo.get(superiorCodigo);
-            if (atual == null) {
-                return unidade.getUnidadeCodigo();
-            }
         }
     }
 

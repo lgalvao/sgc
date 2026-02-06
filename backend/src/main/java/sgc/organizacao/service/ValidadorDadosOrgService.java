@@ -51,8 +51,6 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
     @Override
     @Transactional(readOnly = true)
     public void run(ApplicationArguments args) {
-        log.info("Validando integridade dos dados organizacionais...");
-
         List<String> violacoes = new ArrayList<>();
         List<Unidade> unidadesAtivas = carregarUnidadesAtivas();
         Map<String, Usuario> usuarios = carregarUsuariosTitulares(unidadesAtivas);

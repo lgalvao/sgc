@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
@@ -19,8 +20,7 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -35,6 +35,9 @@ class SubprocessoTransicaoServiceTest {
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    private UsuarioFacade usuarioFacade;
 
     @InjectMocks
     private SubprocessoTransicaoService service;
@@ -84,6 +87,43 @@ class SubprocessoTransicaoServiceTest {
         // Assert
         verify(movimentacaoRepo).save(any(Movimentacao.class));
         verify(eventPublisher).publishEvent(any(EventoTransicaoSubprocesso.class));
+    }
+
+    @Test
+    @DisplayName("Deve buscar usuário da facade quando não fornecido no comando")
+    void deveBuscarUsuarioDaFacadeQuandoNaoFornecido() {
+        // Arrange
+        Subprocesso subprocesso = mock(Subprocesso.class);
+        Usuario usuarioAutenticado = new Usuario();
+        when(usuarioFacade.obterUsuarioAutenticado()).thenReturn(usuarioAutenticado);
+
+        // Act
+        service.registrar(RegistrarTransicaoCommand.builder()
+                .sp(subprocesso)
+                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
+                .build());
+
+        // Assert
+        verify(usuarioFacade).obterUsuarioAutenticado();
+        verify(movimentacaoRepo).save(any(Movimentacao.class));
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando usuário não for fornecido e não houver usuário autenticado")
+    void deveLancarErroQuandoUsuarioNaoAutenticado() {
+        // Arrange
+        Subprocesso subprocesso = mock(Subprocesso.class);
+        when(usuarioFacade.obterUsuarioAutenticado()).thenReturn(null);
+
+        RegistrarTransicaoCommand cmd = RegistrarTransicaoCommand.builder()
+                .sp(subprocesso)
+                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
+                .build();
+
+        // Act & Assert
+        org.junit.jupiter.api.Assertions.assertThrows(sgc.processo.erros.ErroProcessoEmSituacaoInvalida.class, () -> {
+            service.registrar(cmd);
+        });
     }
 
     @Test

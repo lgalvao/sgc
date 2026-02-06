@@ -1,8 +1,0 @@
-{
-  "track_id": "auditoria_fluxo_mapeamento_20260203",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-02-03T10:00:00Z",
-  "updated_at": "2026-02-03T10:00:00Z",
-  "description": "Auditoria e Refatoração do Fluxo de Situações do Mapeamento para garantir conformidade com a máquina de estados oficial."
-}
