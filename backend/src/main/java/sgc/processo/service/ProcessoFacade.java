@@ -140,17 +140,22 @@ public class ProcessoFacade {
 
     @Transactional
     public List<String> iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
-        return processoInicializador.iniciar(codigo, codsUnidades);
+        return iniciarProcesso(codigo, codsUnidades);
     }
 
     @Transactional
     public List<String> iniciarProcessoRevisao(Long codigo, List<Long> codigosUnidades) {
-        return processoInicializador.iniciar(codigo, codigosUnidades);
+        return iniciarProcesso(codigo, codigosUnidades);
     }
 
     @Transactional
     public List<String> iniciarProcessoDiagnostico(Long codigo, List<Long> codsUnidades) {
-        return processoInicializador.iniciar(codigo, codsUnidades);
+        return iniciarProcesso(codigo, codsUnidades);
+    }
+
+    private List<String> iniciarProcesso(Long codigo, List<Long> codsUnidades) {
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        return processoInicializador.iniciar(codigo, codsUnidades, usuario);
     }
 
     @Transactional

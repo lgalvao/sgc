@@ -87,12 +87,14 @@ class ProcessoFacadeCoverageTest {
     void iniciarProcessoDiagnostico_DeveDelegar() {
         Long codigo = 1L;
         List<Long> unidades = List.of(2L, 3L);
-        when(processoInicializador.iniciar(codigo, unidades)).thenReturn(List.of("OK"));
+        Usuario usuario = new Usuario();
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+        when(processoInicializador.iniciar(codigo, unidades, usuario)).thenReturn(List.of("OK"));
 
         var result = processoFacade.iniciarProcessoDiagnostico(codigo, unidades);
         
         assertEquals(1, result.size());
-        verify(processoInicializador).iniciar(codigo, unidades);
+        verify(processoInicializador).iniciar(codigo, unidades, usuario);
     }
 
     @Test

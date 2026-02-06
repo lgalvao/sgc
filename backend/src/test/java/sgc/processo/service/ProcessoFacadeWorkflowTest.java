@@ -10,6 +10,7 @@ import sgc.fixture.UnidadeFixture;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
@@ -79,19 +80,27 @@ class ProcessoFacadeWorkflowTest {
         @DisplayName("Deve iniciar mapeamento com sucesso delegando para ProcessoInicializador")
         void deveIniciarMapeamentoComSucesso() {
             Long id = 100L;
-            when(processoInicializador.iniciar(id, List.of(1L))).thenReturn(List.of());
+            Usuario usuario = new Usuario();
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(processoInicializador.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
+
             List<String> erros = processoFacade.iniciarProcessoMapeamento(id, List.of(1L));
+
             assertThat(erros).isEmpty();
-            verify(processoInicializador).iniciar(id, List.of(1L));
+            verify(processoInicializador).iniciar(id, List.of(1L), usuario);
         }
 
         @Test
         @DisplayName("Deve retornar erro ao iniciar mapeamento se unidade já em uso")
         void deveRetornarErroAoIniciarMapeamentoSeUnidadeEmUso() {
             Long id = 100L;
+            Usuario usuario = new Usuario();
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             String mensagemErro = "As seguintes unidades já participam de outro processo ativo: U1";
-            when(processoInicializador.iniciar(id, List.of(1L))).thenReturn(List.of(mensagemErro));
+            when(processoInicializador.iniciar(id, List.of(1L), usuario)).thenReturn(List.of(mensagemErro));
+
             List<String> erros = processoFacade.iniciarProcessoMapeamento(id, List.of(1L));
+
             assertThat(erros).contains(mensagemErro);
         }
 
@@ -99,10 +108,14 @@ class ProcessoFacadeWorkflowTest {
         @DisplayName("Deve iniciar revisão com sucesso delegando para ProcessoInicializador")
         void deveIniciarRevisaoComSucesso() {
             Long id = 100L;
-            when(processoInicializador.iniciar(id, List.of(1L))).thenReturn(List.of());
+            Usuario usuario = new Usuario();
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(processoInicializador.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
+
             List<String> erros = processoFacade.iniciarProcessoRevisao(id, List.of(1L));
+
             assertThat(erros).isEmpty();
-            verify(processoInicializador).iniciar(id, List.of(1L));
+            verify(processoInicializador).iniciar(id, List.of(1L), usuario);
         }
 
         @Test

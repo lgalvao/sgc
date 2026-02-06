@@ -55,9 +55,11 @@ class SubprocessoFacadeCoverageTest {
         Processo processo = new Processo();
         Unidade unidade = new Unidade();
         UnidadeMapa unidadeMapa = new UnidadeMapa();
+        Unidade unidadeOrigem = new Unidade();
+        Usuario usuario = new Usuario();
         
-        subprocessoFacade.criarParaDiagnostico(processo, unidade, unidadeMapa);
-        verify(subprocessoFactory).criarParaDiagnostico(processo, unidade, unidadeMapa);
+        subprocessoFacade.criarParaDiagnostico(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
+        verify(subprocessoFactory).criarParaDiagnostico(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
     }
 
     @Test

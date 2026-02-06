@@ -14,12 +14,12 @@ import sgc.mapa.service.CopiaMapaService;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.model.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -100,10 +100,10 @@ class SubprocessoFactoryTest {
             unidade.setTipo(TipoUnidade.OPERACIONAL);
             unidade.setSigla("U1");
 
-            when(subprocessoRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
-            when(mapaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
+            Unidade unidadeOrigem = new Unidade();
+            Usuario usuario = new Usuario();
 
-            factory.criarParaMapeamento(processo, List.of(unidade));
+            factory.criarParaMapeamento(processo, List.of(unidade), unidadeOrigem, usuario);
 
             verify(subprocessoRepo, times(1)).saveAll(anyList());
             verify(mapaRepo).saveAll(anyList());
@@ -119,10 +119,10 @@ class SubprocessoFactoryTest {
             unidade.setTipo(TipoUnidade.INTEROPERACIONAL);
             unidade.setSigla("U2");
 
-            when(subprocessoRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
-            when(mapaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
+            Unidade unidadeOrigem = new Unidade();
+            Usuario usuario = new Usuario();
 
-            factory.criarParaMapeamento(processo, List.of(unidade));
+            factory.criarParaMapeamento(processo, List.of(unidade), unidadeOrigem, usuario);
 
             verify(subprocessoRepo).saveAll(anyList());
             verify(mapaRepo).saveAll(anyList());
@@ -136,7 +136,10 @@ class SubprocessoFactoryTest {
             Unidade unidade = new Unidade();
             unidade.setTipo(TipoUnidade.INTERMEDIARIA);
 
-            factory.criarParaMapeamento(processo, List.of(unidade));
+            Unidade unidadeOrigem = new Unidade();
+            Usuario usuario = new Usuario();
+
+            factory.criarParaMapeamento(processo, List.of(unidade), unidadeOrigem, usuario);
 
             verifyNoInteractions(subprocessoRepo);
         }
@@ -146,7 +149,10 @@ class SubprocessoFactoryTest {
         void deveProcessarListaVaziaDeUnidades() {
             Processo processo = new Processo();
 
-            factory.criarParaMapeamento(processo, Collections.emptyList());
+            Unidade unidadeOrigem = new Unidade();
+            Usuario usuario = new Usuario();
+
+            factory.criarParaMapeamento(processo, Collections.emptyList(), unidadeOrigem, usuario);
 
             verifyNoInteractions(subprocessoRepo);
         }
@@ -169,15 +175,10 @@ class SubprocessoFactoryTest {
             unidade3.setTipo(TipoUnidade.INTERMEDIARIA);
             unidade3.setSigla("U3");
 
-            List<Subprocesso> subprocessosSalvos = new ArrayList<>();
-            when(subprocessoRepo.saveAll(anyList())).thenAnswer(invocation -> {
-                List<Subprocesso> subs = invocation.getArgument(0);
-                subprocessosSalvos.addAll(subs);
-                return subprocessosSalvos;
-            });
-            when(mapaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
+            Unidade unidadeOrigem = new Unidade();
+            Usuario usuario = new Usuario();
 
-            factory.criarParaMapeamento(processo, List.of(unidade1, unidade2, unidade3));
+            factory.criarParaMapeamento(processo, List.of(unidade1, unidade2, unidade3), unidadeOrigem, usuario);
 
             verify(subprocessoRepo).saveAll(argThat(list -> ((List<?>)list).size() == 2)); // Apenas 2 elegiveis
             verify(mapaRepo).saveAll(anyList());
@@ -210,7 +211,10 @@ class SubprocessoFactoryTest {
             when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L)).thenReturn(mapaCopiado);
             when(mapaRepo.save(any(Mapa.class))).thenAnswer(i -> i.getArgument(0));
 
-            factory.criarParaRevisao(processo, unidade, unidadeMapa);
+            Unidade unidadeOrigemMock = new Unidade();
+            Usuario usuario = new Usuario();
+
+            factory.criarParaRevisao(processo, unidade, unidadeMapa, unidadeOrigemMock, usuario);
 
             verify(subprocessoRepo, times(1)).save(any(Subprocesso.class));
             verify(mapaRepo).save(any(Mapa.class));
@@ -244,7 +248,10 @@ class SubprocessoFactoryTest {
             when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L)).thenReturn(mapaCopiado);
             when(mapaRepo.save(any(Mapa.class))).thenAnswer(i -> i.getArgument(0));
 
-            factory.criarParaDiagnostico(processo, unidade, unidadeMapa);
+            Unidade unidadeOrigemMock = new Unidade();
+            Usuario usuario = new Usuario();
+
+            factory.criarParaDiagnostico(processo, unidade, unidadeMapa, unidadeOrigemMock, usuario);
 
             // Verifica situacao inicial
             verify(subprocessoRepo, atLeastOnce()).save(argThat(s -> s.getSituacao() == SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO));

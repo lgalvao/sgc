@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
+import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UnidadeMapaRepo;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
@@ -45,9 +46,10 @@ public class ProcessoInicializador {
      *
      * @param codigo            Código do processo
      * @param codsUnidadesParam Lista de códigos de unidades (usada apenas para REVISAO)
+     * @param usuario           Usuário que está iniciando o processo
      * @return Lista de erros (vazia se sucesso)
      */
-    public List<String> iniciar(Long codigo, List<Long> codsUnidadesParam) {
+    public List<String> iniciar(Long codigo, List<Long> codsUnidadesParam, Usuario usuario) {
         Processo processo = processoRepo.findById(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
@@ -88,8 +90,12 @@ public class ProcessoInicializador {
             unidadesMapas = unidadeMapaRepo.findAllById(codigosUnidades);
         }
 
+        // Buscar SEDOC como unidade de origem para as movimentações iniciais
+        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", "SEDOC"));
+
         // Criar subprocessos
-        criarSubprocessos(processo, tipo, codigosUnidades, unidadesParaProcessar, unidadesMapas);
+        criarSubprocessos(processo, tipo, codigosUnidades, unidadesParaProcessar, unidadesMapas, sedoc, usuario);
 
         // Atualizar situação e salvar
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -132,13 +138,13 @@ public class ProcessoInicializador {
 
     private void criarSubprocessos(Processo processo, TipoProcesso tipo,
                                    List<Long> codigosUnidades, Set<Unidade> unidadesParaProcessar,
-                                   List<UnidadeMapa> unidadesMapas) {
+                                   List<UnidadeMapa> unidadesMapas, Unidade sedoc, Usuario usuario) {
 
         Map<Long, UnidadeMapa> mapaUnidadeMapa = unidadesMapas.stream()
                 .collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigo, m -> m));
 
         if (tipo == TipoProcesso.MAPEAMENTO) {
-            subprocessoFacade.criarParaMapeamento(processo, unidadesParaProcessar);
+            subprocessoFacade.criarParaMapeamento(processo, unidadesParaProcessar, sedoc, usuario);
         } else if (tipo == TipoProcesso.REVISAO) {
             // Batch fetch units to avoid N+1 queries
             List<Unidade> unidades = unidadeRepo.findAllById(codigosUnidades);
@@ -151,13 +157,13 @@ public class ProcessoInicializador {
                     throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
                 }
                 UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
-                subprocessoFacade.criarParaRevisao(processo, unidade, um);
+                subprocessoFacade.criarParaRevisao(processo, unidade, um, sedoc, usuario);
             }
         } else {
             // Caso DIAGNOSTICO
             for (Unidade unidade : unidadesParaProcessar) {
                 UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
-                subprocessoFacade.criarParaDiagnostico(processo, unidade, um);
+                subprocessoFacade.criarParaDiagnostico(processo, unidade, um, sedoc, usuario);
             }
         }
     }

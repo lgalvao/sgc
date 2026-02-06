@@ -15,6 +15,8 @@ import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.Usuario;
 
 import java.util.List;
 
@@ -39,6 +41,7 @@ class SubprocessoAtividadeService {
     private final MapaManutencaoService mapaManutencaoService;
     private final ApplicationEventPublisher eventPublisher;
     private final MovimentacaoRepo movimentacaoRepo;
+    private final UsuarioFacade usuarioService;
 
     /**
      * Importa atividades de um subprocesso de origem para um subprocesso de destino.
@@ -101,11 +104,14 @@ class SubprocessoAtividadeService {
                 spOrigem.getCodigo(),
                 unidadeOrigem.getSigla());
 
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+
         movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(spDestino)
                 .unidadeOrigem(unidadeOrigem)
                 .unidadeDestino(spDestino.getUnidade())
                 .descricao(descMovimentacao)
+                .usuario(usuario)
                 .build());
 
         log.info("Evento de importação de atividades publicado: subprocesso {} -> {}", 

@@ -373,8 +373,8 @@ public class SubprocessoFacade {
      * @param unidades as {@link sgc.organizacao.model.Unidade}s para as quais criar subprocessos
      */
     @Transactional
-    public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades) {
-        subprocessoFactory.criarParaMapeamento(processo, unidades);
+    public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
+        subprocessoFactory.criarParaMapeamento(processo, unidades, unidadeOrigem, usuario);
     }
 
     /**
@@ -388,8 +388,8 @@ public class SubprocessoFacade {
      * @param unidadeMapa o {@link sgc.organizacao.model.UnidadeMapa} vigente da unidade
      */
     @Transactional
-    public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa) {
-        subprocessoFactory.criarParaRevisao(processo, unidade, unidadeMapa);
+    public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
+        subprocessoFactory.criarParaRevisao(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
     }
 
     /**
@@ -403,7 +403,7 @@ public class SubprocessoFacade {
      * @param unidadeMapa o {@link sgc.organizacao.model.UnidadeMapa} vigente da unidade
      */
     @Transactional
-    public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa) {
-        subprocessoFactory.criarParaDiagnostico(processo, unidade, unidadeMapa);
+    public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
+        subprocessoFactory.criarParaDiagnostico(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
     }
 }
