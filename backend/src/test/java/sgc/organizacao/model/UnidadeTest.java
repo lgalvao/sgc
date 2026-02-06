@@ -26,4 +26,12 @@ class UnidadeTest {
         assertThat(unidade.getTituloTitular()).isEqualTo("123456789012");
         assertThat(unidade.getMatriculaTitular()).isEqualTo("12345678");
     }
+
+    @Test
+    @DisplayName("Deve instanciar via builder")
+    void deveInstanciarViaBuilder() {
+        Unidade u = Unidade.builder().nome("Nome").sigla("SIGLA").build();
+        assertThat(u.getNome()).isEqualTo("Nome");
+        assertThat(u.getSigla()).isEqualTo("SIGLA");
+    }
 }

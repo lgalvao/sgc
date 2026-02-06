@@ -19,6 +19,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Mapper(componentModel = "spring", uses = MovimentacaoMapper.class)
 public interface SubprocessoDetalheMapper {
+    @Mapping(target = "codigo", source = "sp.codigo")
     @Mapping(target = "unidade", source = "sp.unidade")
     @Mapping(target = "titular", expression = "java(mapTitular(sp, titular, responsavel))")
     @Mapping(target = "responsavel", expression = "java(mapResponsavel(sp, responsavel))")

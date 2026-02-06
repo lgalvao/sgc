@@ -167,6 +167,18 @@ class ProcessoMapperTest {
             assertThat(dto.getSituacaoLabel()).isNull();
             assertThat(dto.getTipoLabel()).isNull();
         }
+
+        @Test
+        @DisplayName("Deve cobrir branches de tipo nulo no toDto")
+        void deveCobrirTipoNuloNoToDto() {
+            Processo entity = new Processo();
+            entity.setCodigo(1L);
+            entity.setTipo(null);
+
+            ProcessoDto dto = mapper.toDto(entity);
+            assertThat(dto).isNotNull();
+            assertThat(dto.getTipo()).isNull();
+        }
     }
 
     @Nested
@@ -189,6 +201,19 @@ class ProcessoMapperTest {
             assertThat(processo.getDescricao()).isEqualTo("Mapeamento 2026");
             assertThat(processo.getTipo()).isEqualTo(TipoProcesso.MAPEAMENTO);
             assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.CRIADO);
+        }
+
+        @Test
+        @DisplayName("Deve cobrir branches de tipo nulo no toEntity")
+        void deveCobrirTipoNuloNoToEntity() {
+            ProcessoDto dto = ProcessoDto.builder()
+                    .codigo(1L)
+                    .tipo(null)
+                    .build();
+
+            Processo entity = mapper.toEntity(dto);
+            assertThat(entity).isNotNull();
+            assertThat(entity.getTipo()).isNull();
         }
 
         @Test

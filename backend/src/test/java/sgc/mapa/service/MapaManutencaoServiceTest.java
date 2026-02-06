@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.*;
 import sgc.mapa.eventos.EventoMapaAlterado;
@@ -1016,6 +1017,153 @@ class MapaManutencaoServiceTest {
             assertThat(resultado).hasSize(2);
             assertThat(resultado).containsExactly(c1, c2);
             verify(conhecimentoRepo).findByMapaCodigo(codMapa);
+        }
+    }
+
+    @Nested
+    @DisplayName("Operações de Mapa")
+    class Mapas {
+
+        @Test
+        @DisplayName("Deve listar todos os mapas")
+        void listarTodosMapas() {
+            service.listarTodosMapas();
+            verify(mapaRepo).findAll();
+        }
+
+        @Test
+        @DisplayName("Deve buscar mapa vigente por unidade")
+        void buscarMapaVigentePorUnidade() {
+            service.buscarMapaVigentePorUnidade(1L);
+            verify(mapaRepo).findMapaVigenteByUnidade(1L);
+        }
+
+        @Test
+        @DisplayName("Deve buscar mapa por código de subprocesso")
+        void buscarMapaPorSubprocessoCodigo() {
+            service.buscarMapaPorSubprocessoCodigo(1L);
+            verify(mapaRepo).findBySubprocessoCodigo(1L);
+        }
+
+        @Test
+        @DisplayName("Deve salvar mapa")
+        void salvarMapa() {
+            Mapa mapa = new Mapa();
+            service.salvarMapa(mapa);
+            verify(mapaRepo).save(mapa);
+        }
+
+        @Test
+        @DisplayName("Deve verificar se mapa existe")
+        void mapaExiste() {
+            service.mapaExiste(1L);
+            verify(mapaRepo).existsById(1L);
+        }
+
+        @Test
+        @DisplayName("Deve excluir mapa")
+        void excluirMapa() {
+            service.excluirMapa(1L);
+            verify(mapaRepo).deleteById(1L);
+        }
+    }
+
+    @Nested
+    @DisplayName("Cobertura de Mapper (Casos de Borda)")
+    class MapperCoverage {
+
+        @Test
+        @DisplayName("obterAtividadeResponse: Deve lançar erro quando mapper retorna null")
+        void obterAtividadeResponse_MapperNull() {
+            Atividade atividade = new Atividade();
+            when(repo.buscar(Atividade.class, 1L)).thenReturn(atividade);
+            when(atividadeMapper.toResponse(atividade)).thenReturn(null);
+
+            assertThatThrownBy(() -> service.obterAtividadeResponse(1L))
+                    .isInstanceOf(ErroEstadoImpossivel.class);
+        }
+
+        @Test
+        @DisplayName("criarAtividade: Deve lançar erro quando mapper.toEntity retorna null")
+        void criarAtividade_ToEntityNull() {
+            CriarAtividadeRequest req = new CriarAtividadeRequest(1L, "Desc");
+            Mapa mapa = new Mapa();
+            when(repo.buscar(Mapa.class, 1L)).thenReturn(mapa);
+            when(atividadeMapper.toEntity(req)).thenReturn(null);
+
+            assertThatThrownBy(() -> service.criarAtividade(req))
+                    .isInstanceOf(ErroEstadoImpossivel.class);
+        }
+
+        @Test
+        @DisplayName("criarAtividade: Deve lançar erro quando mapper.toResponse retorna null")
+        void criarAtividade_ToResponseNull() {
+            CriarAtividadeRequest req = new CriarAtividadeRequest(1L, "Desc");
+            Mapa mapa = new Mapa();
+            Atividade atividade = new Atividade();
+            when(repo.buscar(Mapa.class, 1L)).thenReturn(mapa);
+            when(atividadeMapper.toEntity(req)).thenReturn(atividade);
+            when(atividadeRepo.save(atividade)).thenReturn(atividade);
+            when(atividadeMapper.toResponse(atividade)).thenReturn(null);
+
+            assertThatThrownBy(() -> service.criarAtividade(req))
+                    .isInstanceOf(ErroEstadoImpossivel.class);
+        }
+
+        @Test
+        @DisplayName("atualizarAtividade: Deve lançar erro quando mapper.toEntity retorna null")
+        void atualizarAtividade_ToEntityNull() {
+            AtualizarAtividadeRequest req = new AtualizarAtividadeRequest("Desc");
+            Atividade atividade = new Atividade();
+            when(repo.buscar(Atividade.class, 1L)).thenReturn(atividade);
+            when(atividadeMapper.toEntity(req)).thenReturn(null);
+
+            assertThatThrownBy(() -> service.atualizarAtividade(1L, req))
+                    .isInstanceOf(ErroEstadoImpossivel.class);
+        }
+
+        @Test
+        @DisplayName("criarConhecimento: Deve lançar erro quando mapper.toEntity retorna null")
+        void criarConhecimento_ToEntityNull() {
+            CriarConhecimentoRequest req = new CriarConhecimentoRequest(1L, "Desc");
+            Atividade atividade = new Atividade();
+            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
+            when(conhecimentoMapper.toEntity(req)).thenReturn(null);
+
+            assertThatThrownBy(() -> service.criarConhecimento(1L, req))
+                    .isInstanceOf(ErroEstadoImpossivel.class);
+        }
+
+        @Test
+        @DisplayName("criarConhecimento: Deve lançar erro quando mapper.toResponse retorna null")
+        void criarConhecimento_ToResponseNull() {
+            CriarConhecimentoRequest req = new CriarConhecimentoRequest(1L, "Desc");
+            Atividade atividade = new Atividade();
+            Conhecimento conhecimento = new Conhecimento();
+            
+            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
+            when(conhecimentoMapper.toEntity(req)).thenReturn(conhecimento);
+            when(conhecimentoRepo.save(conhecimento)).thenReturn(conhecimento);
+            when(conhecimentoMapper.toResponse(conhecimento)).thenReturn(null);
+
+            assertThatThrownBy(() -> service.criarConhecimento(1L, req))
+                    .isInstanceOf(ErroEstadoImpossivel.class);
+        }
+
+        @Test
+        @DisplayName("atualizarConhecimento: Deve lançar erro quando mapper.toEntity retorna null")
+        void atualizarConhecimento_ToEntityNull() {
+            AtualizarConhecimentoRequest req = new AtualizarConhecimentoRequest("Desc");
+            Atividade atividade = new Atividade();
+            atividade.setCodigo(1L);
+            Conhecimento conhecimento = new Conhecimento();
+            conhecimento.setAtividade(atividade);
+
+            when(conhecimentoRepo.findById(10L)).thenReturn(Optional.of(conhecimento));
+            when(conhecimentoMapper.toEntity(req)).thenReturn(null);
+
+            assertThatThrownBy(() -> service.atualizarConhecimento(1L, 10L, req))
+                    .isInstanceOf(ErroEstadoImpossivel.class);
         }
     }
 }

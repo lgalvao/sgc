@@ -186,8 +186,11 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     async function buscarPermissoes(id: number) {
         return withErrorHandling(async () => {
             const permissoes = await serviceObterPermissoes(id);
-            if (subprocessoDetalhe.value && subprocessoDetalhe.value.unidade.codigo === id) {
-                subprocessoDetalhe.value.permissoes = permissoes;
+            if (subprocessoDetalhe.value && subprocessoDetalhe.value.codigo === id) {
+                subprocessoDetalhe.value = {
+                    ...subprocessoDetalhe.value,
+                    permissoes: permissoes
+                };
             }
         });
     }

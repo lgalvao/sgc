@@ -23,8 +23,6 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
     const descProcesso = `Proc 9 ${timestamp}`;
 
     test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        
-
         await criarProcesso(page, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
@@ -37,13 +35,10 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         const linhaProcesso = page.locator('tr').filter({has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        // Wait for data to load to avoid race condition where fields are empty
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcesso);
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
 
-        // Capturar ID do processo para cleanup
-        const processoId = await extrairProcessoId(page);
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
+        await extrairProcessoId(page);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
@@ -93,10 +88,6 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         // Garantir que temos dados validos
         const atividadeDesc = `Atividade Validada ${timestamp}`;
 
-        // Como o teste é serial, podemos assumir que o Cenario 1 limpou ou estamos em um estado conhecido.
-        // Mas para garantir determinismo, vamos adicionar a atividade sempre.
-        // Se ela já existisse, o teste falharia, então assumimos que o estado é limpo ou controlado.
-        // O Cenario 1 adicionou "Atividade Incompleta...", esta é nova.
         await adicionarAtividade(page, atividadeDesc);
         await adicionarConhecimento(page, atividadeDesc, 'Conhecimento Valido');
 
@@ -105,7 +96,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Validar sucesso
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
 
         // Verificar status no subprocesso
@@ -113,11 +104,10 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
     });
 
-    test('Cenario 3: Devolucao e Historico de Analise', async ({page}) => {
+    test('Cenario 3: Devolucao e Historico de Analise', async ({page, autenticadoComoAdmin}) => {
         // 1. Admin devolve o cadastro
-        
-
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
+
         // Entrar no cadastro de atividades (visualização)
         await page.getByTestId('card-subprocesso-atividades-vis').click();
 
@@ -158,6 +148,6 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Validar sucesso
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
     });
 });

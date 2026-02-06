@@ -87,7 +87,7 @@ export async function verificarDetalhesProcesso(page: Page, dados: {
 }
 
 export async function verificarUnidadeParticipante(page: Page, unidade: UnidadeParticipante) {
-    const row = page.getByRole('row', {name: new RegExp(unidade.sigla, 'i')});
+    const row = page.locator('tr').filter({hasText: new RegExp(String.raw`^\s*${unidade.sigla}\b`, 'i')}).first();
     await expect(row).toBeVisible();
     await expect(row).toContainText(unidade.situacao);
 
@@ -130,9 +130,9 @@ export async function extrairProcessoId(page: Page): Promise<number> {
     ];
     
     for (const pattern of patterns) {
-        const match = RegExp(pattern).exec(url);
+        const match = new RegExp(pattern).exec(url);
         if (match?.[1]) {
-            return parseInt(match[1]);
+            return Number.parseInt(match[1]);
         }
     }
     

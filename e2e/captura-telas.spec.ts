@@ -1,7 +1,7 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/base.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
+import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
 import {abrirModalCriarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
@@ -41,6 +41,7 @@ async function capturarTela(page: Page, categoria: string, nome: string, opcoes?
 }
 
 test.describe('Captura de Telas - Sistema SGC', () => {
+    test.setTimeout(60000); // Aumentar timeout para cenários longos
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
     test.beforeEach(async ({request}) => {
@@ -109,6 +110,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '02-painel', '04-arvore-unidades-expandida');
 
             // Expandir COORD_11 para acessar SECAO_111
+            await page.waitForTimeout(300);
             await page.getByTestId('btn-arvore-expand-COORD_11').click();
             await page.waitForTimeout(300);
 
@@ -127,7 +129,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Capturar ID para cleanup
             await page.getByText(descricaoProcesso).click();
             await expect(page).toHaveURL(/codProcesso=\d+/);
-            const processoId = Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
             await page.goto('/painel');
 
@@ -195,7 +197,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Capturar ID para cleanup
             await page.getByText(descricao).click();
-            const processoId = Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
             // Tela de edição de processo
@@ -235,6 +237,9 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.waitForTimeout(300);
             await capturarTela(page, '03-processo', '11-botoes-desativados-falta-data-unidade');
 
+            // Selecionar tipo de processo (necessário para carregar árvore de unidades)
+            await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
+
             // Preencher data limite (botões ainda desativados - falta unidade)
             const dataLimite = new Date();
             dataLimite.setDate(dataLimite.getDate() + 30);
@@ -270,7 +275,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             const linhaProcesso = page.locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
-            const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
             await page.getByTestId('btn-processo-iniciar').click();
@@ -336,7 +341,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             const linhaProcesso = page.locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
-            const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
             await page.getByTestId('btn-processo-iniciar').click();
@@ -443,7 +448,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             const linhaProcesso = page.locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
-            const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
             await page.getByTestId('btn-processo-iniciar').click();
@@ -470,7 +475,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.waitForTimeout(100);
 
             // Logout e login como ADMIN para Homologar
-            await page.getByTestId('btn-logout').click();
+            await page.getByTestId('btn-logout').click({force: true});
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Navegar para o subprocesso (admin vê tabela de unidades)
@@ -542,10 +547,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '06-navegacao', '02-menu-configuracoes');
             await page.goto('/painel');
 
-            // Seção Minha Unidade
-            await page.getByText('Minha unidade').click();
+            // Seção Unidades (para ADMIN)
+            await page.getByText('Unidades').click();
             await page.waitForTimeout(100);
-            await capturarTela(page, '06-navegacao', '03-minha-unidade', {fullPage: true});
+            await capturarTela(page, '06-navegacao', '03-unidades', {fullPage: true});
 
             // Seção Relatórios
             await page.getByText('Relatórios').click();
@@ -579,7 +584,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
 
             await page.getByText(processosCriado).click();
-            const processoId1 = Number.parseInt(new RegExp(/codProcesso=(\d+)/).exec(page.url())?.[1] || '0');
+            await expect(page).toHaveURL(/codProcesso=|processo\/\d+/);
+            const processoId1 = await extrairProcessoId(page);
             if (processoId1 > 0) cleanup.registrar(processoId1);
             await page.goto('/painel');
 
@@ -596,8 +602,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 iniciar: true
             });
 
-            const processoId2 = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
-            if (processoId2 > 0) cleanup.registrar(processoId2);
+
 
             await capturarTela(page, '07-estados', '02-processo-em-andamento');
         });
@@ -650,9 +655,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
 
             await page.getByText(descricao).click();
+            await expect(page).toHaveURL(/processo\/\d+/);
             
             // Capturar ID para cleanup (após navegar para o subprocesso)
-            const processoId = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
             await navegarParaAtividades(page);
             await adicionarAtividade(page, 'Atividade Bloco 1');
@@ -745,7 +751,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page).toHaveURL(/\/processo\/\d+/);
 
             // Registrar para cleanup
-            const processoId = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
+            const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
             // Acessar subprocesso

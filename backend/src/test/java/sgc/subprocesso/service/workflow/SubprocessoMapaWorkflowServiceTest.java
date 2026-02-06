@@ -323,6 +323,88 @@ class SubprocessoMapaWorkflowServiceTest {
             verify(subprocessoRepo).save(sp);
             verify(sp).setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         }
+
+        @Test
+        @DisplayName("Deve mudar para REVISAO_MAPA_AJUSTADO se era vazio e situação REVISAO_CADASTRO_HOMOLOGADA")
+        void deveMudarSituacaoParaAjustadoEmRevisaoSeEraVazio() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+            sp.getProcesso().setTipo(TipoProcesso.REVISAO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+
+            when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
+
+            SalvarMapaRequest req = SalvarMapaRequest.builder()
+                    .competencias(List.of(CompetenciaMapaDto.builder().build()))
+                    .build();
+
+            service.salvarMapaSubprocesso(1L, req);
+
+            verify(sp).setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            verify(subprocessoRepo).save(sp);
+        }
+
+        @Test
+        @DisplayName("Deve mudar para MAPEAMENTO_MAPA_CRIADO ao adicionar comp se era vazio e situação MAPEAMENTO_CADASTRO_HOMOLOGADO")
+        void deveMudarParaMapaCriadoAoAdicionarCompSeEraVazio() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+
+            when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
+
+            CompetenciaRequest req = CompetenciaRequest.builder()
+                    .descricao("Nova")
+                    .atividadesIds(List.of(1L))
+                    .build();
+
+            service.adicionarCompetencia(1L, req);
+
+            verify(sp).setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            verify(subprocessoRepo).save(sp);
+        }
+
+        @Test
+        @DisplayName("Deve mudar para REVISAO_MAPA_AJUSTADO ao adicionar comp se era vazio e situação REVISAO_CADASTRO_HOMOLOGADA")
+        void deveMudarParaMapaAjustadoAoAdicionarCompSeEraVazio() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+            sp.getProcesso().setTipo(TipoProcesso.REVISAO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+
+            when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
+
+            CompetenciaRequest req = CompetenciaRequest.builder()
+                    .descricao("Nova")
+                    .atividadesIds(List.of(1L))
+                    .build();
+
+            service.adicionarCompetencia(1L, req);
+
+            verify(sp).setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            verify(subprocessoRepo).save(sp);
+        }
+
+        @Test
+        @DisplayName("Deve voltar para MAPEAMENTO_CADASTRO_HOMOLOGADO ao remover comp se ficou vazio")
+        void deveVoltarParaCadastroHomologadoAoRemoverCompSeFicouVazio() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+
+            when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
+
+            service.removerCompetencia(1L, 55L);
+
+            verify(sp).setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            verify(subprocessoRepo).save(sp);
+        }
     }
 
     @Nested
@@ -554,6 +636,85 @@ class SubprocessoMapaWorkflowServiceTest {
             service.aceitarValidacao(1L, new Usuario());
 
             verify(transicaoService).registrarAnaliseETransicao(argThat(req -> req.novaSituacao() == SituacaoSubprocesso.REVISAO_MAPA_VALIDADO));
+        }
+
+        @Test
+        @DisplayName("Apresentar sugestões: Sem unidade superior, destino é a própria unidade")
+        void apresentarSugestoes_SemUnidadeSuperior() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+            sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+            when(sp.getMapa()).thenReturn(mock(Mapa.class));
+
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(100L);
+            when(sp.getUnidade()).thenReturn(unidade);
+            // unidade.getUnidadeSuperior() retorna null por padrão
+
+            service.apresentarSugestoes(1L, "Sugestoes", new Usuario());
+
+            verify(transicaoService).registrar(argThat(cmd ->
+                    cmd.destino().equals(unidade) &&
+                    cmd.tipo() == TipoTransicao.MAPA_SUGESTOES_APRESENTADAS
+            ));
+        }
+
+        @Test
+        @DisplayName("Validar mapa: Sem unidade superior, destino é a própria unidade")
+        void validarMapa_SemUnidadeSuperior() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+            sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(100L);
+            when(sp.getUnidade()).thenReturn(unidade);
+
+            service.validarMapa(1L, new Usuario());
+
+            verify(transicaoService).registrar(argThat(cmd ->
+                    cmd.destino().equals(unidade) &&
+                    cmd.tipo() == TipoTransicao.MAPA_VALIDADO
+            ));
+        }
+
+        @Test
+        @DisplayName("Devolver validação: Sem unidade superior, usa própria unidade")
+        void devolverValidacao_SemUnidadeSuperior() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+            sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(100L);
+            when(sp.getUnidade()).thenReturn(unidade);
+
+            service.devolverValidacao(1L, "Justificativa", new Usuario());
+
+            verify(transicaoService).registrarAnaliseETransicao(argThat(cmd ->
+                    cmd.unidadeAnalise().equals(unidade) &&
+                    cmd.unidadeOrigemTransicao().equals(unidade) &&
+                    cmd.tipoTransicao() == TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA
+            ));
+        }
+
+        @Test
+        @DisplayName("Aceitar validação: Unidade superior null (topo imediato), deve homologar")
+        void aceitarValidacao_UnidadeSuperiorNull_Homologa() {
+            Subprocesso sp = mockSubprocesso(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+            sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+
+            Unidade unidade = mock(Unidade.class);
+            when(sp.getUnidade()).thenReturn(unidade);
+            when(unidade.getUnidadeSuperior()).thenReturn(null);
+            when(unidade.getSigla()).thenReturn("UNI");
+
+            service.aceitarValidacao(1L, new Usuario());
+
+            verify(analiseFacade).criarAnalise(eq(sp), argThat(cmd ->
+                    cmd.acao() == TipoAcaoAnalise.ACEITE_MAPEAMENTO &&
+                    "UNI".equals(cmd.siglaUnidade())
+            ));
+
+            verify(sp).setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+            verify(subprocessoRepo).save(sp);
         }
     }
 

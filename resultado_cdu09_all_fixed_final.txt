@@ -1,0 +1,291 @@
+[1A[2K[WebServer] INFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+
+[1A[2K[WebServer] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
+
+[1A[2K[WebServer]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m233[22m[2m[0m ms[22m
+
+[1A[2K[WebServer]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[WebServer] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+
+
+Running 4 tests using 1 worker
+
+[1A[2K[WebServer] >>> Frontend e Backend no ar!
+
+[1A[2K[1/4] [chromium] › e2e/cdu-09.spec.ts:25:5 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Preparacao: Admin cria e inicia processo
+[1A[2K[WebServer] INFO  sgc.e2e.E2eController.resetDatabase:54 - Iniciando reset do banco de dados para E2E...
+
+[1A[2K[WebServer] INFO  sgc.e2e.E2eController.executeDatabaseReset:73 - Limpando 25 tabelas no schema SGC
+
+[1A[2K[WebServer] INFO  sgc.e2e.E2eController.executeDatabaseReset:79 - Executando script de seed: seed.sql
+
+[1A[2K[WebServer] INFO  sgc.e2e.E2eController.resetDatabase:57 - Reset do banco de dados concluído com sucesso.
+
+[1A[2K[WebServer] INFO  s.seguranca.login.LoginFacade.autenticar:66 - Usuário autenticado: 191919
+
+[1A[2K[WebServer] INFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 1 criado.
+
+[1A[2K[WebServer] INFO  s.p.s.ProcessoInicializador.iniciar:113 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+
+[1A[2K[2/4] [chromium] › e2e/cdu-09.spec.ts:48:5 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Cenario 1: Validacao - Atividade sem conhecimento
+[1A[2K[WebServer] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:258 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[WebServer] INFO  s.seguranca.login.LoginFacade.autenticar:66 - Usuário autenticado: 191919
+
+[1A[2K[WebServer] INFO  s.seguranca.login.LoginFacade.autenticar:66 - Usuário autenticado: 141414
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação NAO_INICIADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação NAO_INICIADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação NAO_INICIADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação NAO_INICIADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+
+[1A[2K[WebServer] INFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 1 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+
+[1A[2K[3/4] [chromium] › e2e/cdu-09.spec.ts:83:5 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Cenario 2: Caminho feliz - Disponibilizar Cadastro
+[1A[2K[WebServer] INFO  s.seguranca.login.LoginFacade.autenticar:66 - Usuário autenticado: 141414
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+
+[1A[2K[WebServer] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Editar mapa (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Disponibilizar cadastro (Permitidas: [MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+
+[1A[2K[4/4] [chromium] › e2e/cdu-09.spec.ts:107:5 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Cenario 3: Devolucao e Historico de Analise
+[1A[2K[WebServer] INFO  s.seguranca.login.LoginFacade.autenticar:66 - Usuário autenticado: 191919
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Editar mapa (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Editar cadastro de atividades (Permitidas: [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Disponibilizar mapa (Permitidas: [MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Disponibilizar cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Apresentar sugestões ao mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 191919 não tem perfil permitido [CHEFE] para ação Validar mapa
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Aceitar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Devolver mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_DISPONIBILIZADO não permitida para ação Homologar mapa (Permitidas: [MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO])
+
+[1A[2K[WebServer] INFO  s.s.s.w.SubprocessoTransicaoService.registrarAnaliseETransicao:113 - Workflow executado: Subprocesso 1 -> MAPEAMENTO_CADASTRO_EM_ANDAMENTO, Transição CADASTRO_DEVOLVIDO
+[WebServer] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para SECAO_221 - Transição: CADASTRO_DEVOLVIDO
+
+[1A[2K[WebServer] INFO  s.seguranca.login.LoginFacade.autenticar:66 - Usuário autenticado: 141414
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Disponibilizar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Alterar data limite
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Realizar autoavaliação (Permitidas: [DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir cadastro
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Reabrir revisão
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Apresentar sugestões ao mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:249 - Permissão negada: Situação MAPEAMENTO_CADASTRO_EM_ANDAMENTO não permitida para ação Validar mapa (Permitidas: [MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO])
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Aceitar mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN, GESTOR] para ação Devolver mapa
+
+[1A[2K[WebServer] DEBUG s.s.a.SubprocessoAccessPolicy.canExecute:242 - Permissão negada: Usuário 141414 não tem perfil permitido [ADMIN] para ação Homologar mapa
+
+[1A[2K[WebServer] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:51 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K  4 passed (18.0s)

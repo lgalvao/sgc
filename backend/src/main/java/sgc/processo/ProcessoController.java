@@ -178,6 +178,10 @@ public class ProcessoController {
     public ResponseEntity<Object> iniciar(
             @PathVariable Long codigo, @Valid @RequestBody IniciarProcessoRequest req) {
 
+        if (req.tipo() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
         var processador = getProcessadoresInicio().get(req.tipo());
         if (processador == null) {
             return ResponseEntity.badRequest().build();

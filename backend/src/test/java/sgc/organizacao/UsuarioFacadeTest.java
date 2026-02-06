@@ -589,6 +589,29 @@ class UsuarioFacadeTest {
             assertThat(resultado).hasSize(1);
             assertThat(resultado).contains(1L);
         }
+
+        @Test
+        @DisplayName("Deve filtrar unidades inativas ao buscar perfis")
+        void deveFiltrarUnidadesInativasEmBuscaPerfis() {
+            // Arrange
+            String titulo = "123456";
+            Usuario usuario = criarUsuario(titulo);
+            Unidade unidadeInativa = criarUnidade(1L, "UNID1");
+            unidadeInativa.setSituacao(SituacaoUnidade.INATIVA);
+
+            UsuarioPerfil atribuicao = criarAtribuicao(usuario, unidadeInativa, Perfil.CHEFE);
+
+            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
+                    .thenReturn(Optional.of(usuario));
+            when(usuarioPerfilService.buscarPorUsuario(titulo))
+                    .thenReturn(List.of(atribuicao));
+
+            // Act
+            List<PerfilDto> resultado = facade.buscarPerfisUsuario(titulo);
+
+            // Assert
+            assertThat(resultado).isEmpty();
+        }
     }
 
     @Nested

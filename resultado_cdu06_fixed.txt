@@ -1,0 +1,42 @@
+[1A[2K[WebServer] INFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+
+[1A[2K[WebServer] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
+
+[1A[2K[WebServer]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m913[22m[2m[0m ms[22m
+
+[1A[2K[WebServer]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[WebServer] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+
+[1A[2K[WebServer] >>> Frontend e Backend no ar!
+
+
+Running 2 tests using 1 worker
+
+[1A[2K[1/2] [chromium] › e2e/cdu-06.spec.ts:8:5 › CDU-06 - Detalhar processo › Deve exibir detalhes do processo para ADMIN
+[1A[2K[WebServer] INFO  sgc.e2e.E2eController.resetDatabase:54 - Iniciando reset do banco de dados para E2E...
+
+[1A[2K[WebServer] INFO  sgc.e2e.E2eController.executeDatabaseReset:73 - Limpando 25 tabelas no schema SGC
+
+[1A[2K[WebServer] INFO  sgc.e2e.E2eController.executeDatabaseReset:79 - Executando script de seed: seed.sql
+
+[1A[2K[WebServer] INFO  sgc.e2e.E2eController.resetDatabase:57 - Reset do banco de dados concluído com sucesso.
+
+[1A[2K[WebServer] INFO  s.seguranca.login.LoginFacade.autenticar:66 - Usuário autenticado: 191919
+
+[1A[2K[WebServer] INFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 1 criado.
+[WebServer] INFO  s.p.s.ProcessoInicializador.iniciar:113 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+
+[1A[2K[WebServer] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:258 - E-mail enviado para unidade ASSESSORIA_12
+
+[1A[2K[2/2] [chromium] › e2e/cdu-06.spec.ts:48:5 › CDU-06 - Detalhar processo › Deve exibir detalhes do processo para GESTOR
+[1A[2K[WebServer] INFO  s.seguranca.login.LoginFacade.autenticar:66 - Usuário autenticado: 191919
+
+[1A[2K[WebServer] INFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 2 criado.
+
+[1A[2K[WebServer] INFO  s.p.s.ProcessoInicializador.iniciar:113 - Processo de mapeamento 2 iniciado para 1 unidade(s).
+
+[1A[2K[WebServer] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:258 - E-mail enviado para unidade SECAO_111
+
+[1A[2K[WebServer] INFO  s.seguranca.login.LoginFacade.autenticar:66 - Usuário autenticado: 222222
+
+[1A[2K  2 passed (22.2s)

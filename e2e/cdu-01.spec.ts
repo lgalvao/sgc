@@ -38,7 +38,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         // Verifica Barra de Navegação
         await expect(page.getByRole('link', {name: 'SGC'})).toBeVisible();
         await expect(page.getByText('Painel')).toBeVisible();
-        await expect(page.getByText('Minha unidade')).toBeVisible();
+        await expect(page.getByRole('link', {name: 'Unidades'})).toBeVisible();
         await expect(page.getByText('Relatórios')).toBeVisible();
         await expect(page.getByText('Histórico')).toBeVisible();
     });

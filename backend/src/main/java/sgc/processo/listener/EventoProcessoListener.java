@@ -280,7 +280,7 @@ public class EventoProcessoListener {
         };
     }
 
-    private void enviarEmailParaSubstituto(String tituloSubstituto, Map<String, UsuarioDto> usuarios, String assunto,
+    void enviarEmailParaSubstituto(String tituloSubstituto, Map<String, UsuarioDto> usuarios, String assunto,
             String corpoHtml, String nomeUnidade) {
         try {
             UsuarioDto substituto = usuarios.get(tituloSubstituto);

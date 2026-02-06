@@ -32,6 +32,7 @@ public class SubprocessoMapaListener {
      */
     @EventListener
     public void handleMapaAlterado(EventoMapaAlterado evento) {
+        log.debug("Evento EventoMapaAlterado recebido para mapa {}", evento.mapaCodigo());
         subprocessoFacade.atualizarSituacaoParaEmAndamento(evento.mapaCodigo());
     }
 }

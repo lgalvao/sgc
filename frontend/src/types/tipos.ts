@@ -310,6 +310,7 @@ export interface SubprocessoPermissoes {
 }
 
 export interface SubprocessoDetalhe {
+    codigo: number;
     unidade: Unidade;
     titular: Usuario;
     responsavel: Usuario;

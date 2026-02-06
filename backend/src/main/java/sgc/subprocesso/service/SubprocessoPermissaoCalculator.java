@@ -83,7 +83,7 @@ class SubprocessoPermissaoCalculator {
                 ? Acao.ACEITAR_REVISAO_CADASTRO
                 : Acao.ACEITAR_CADASTRO;
 
-        return SubprocessoPermissoesDto.builder()
+        var permissoes = SubprocessoPermissoesDto.builder()
                 .podeVerPagina(podeExecutar(usuario, Acao.VISUALIZAR_SUBPROCESSO, subprocesso))
                 .podeEditarMapa(podeExecutar(usuario, Acao.EDITAR_MAPA, subprocesso))
                 .podeEditarCadastro(podeExecutar(usuario, Acao.EDITAR_CADASTRO, subprocesso))
@@ -105,5 +105,7 @@ class SubprocessoPermissaoCalculator {
                 .podeDevolverMapa(podeExecutar(usuario, Acao.DEVOLVER_MAPA, subprocesso))
                 .podeHomologarMapa(podeExecutar(usuario, Acao.HOMOLOGAR_MAPA, subprocesso))
                 .build();
+
+        return permissoes;
     }
 }
