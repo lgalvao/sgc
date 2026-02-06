@@ -240,7 +240,7 @@ describe("useVisMapa", () => {
     });
 
     it("computa historicoAnalise corretamente", async () => {
-        const mockAnalises = [{ codigo: 1, descricao: "Analise 1" }];
+        const mockAnalises = [{ codigo: 1, descricao: "Analise 1" }] as any;
         setup();
         const analisesStore = useAnalisesStore();
         vi.mocked(analisesStore.obterAnalisesPorSubprocesso).mockReturnValue(mockAnalises);

@@ -70,7 +70,7 @@ describe('AdministradoresSection.vue Coverage', () => {
     });
 
     it('trata erro ao remover administrador', async () => {
-        const mockAdmin = { tituloEleitoral: '1', nome: 'Admin', matricula: 'A1', unidadeSigla: 'U' };
+        const mockAdmin = { tituloEleitoral: '1', nome: 'Admin', matricula: 'A1', unidadeSigla: 'U' } as any;
         vi.mocked(adminService.listarAdministradores).mockResolvedValue([mockAdmin]);
         const pinia = createTestingPinia();
 

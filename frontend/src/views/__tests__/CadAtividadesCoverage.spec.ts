@@ -200,7 +200,7 @@ describe('CadAtividades.vue Coverage', () => {
         const analisesStore = useAnalisesStore(pinia);
         (wrapper.vm as any).codSubprocesso = 123;
 
-        const spy = vi.spyOn(analisesStore, 'buscarAnalisesCadastro').mockResolvedValue([]);
+        const spy = vi.spyOn(analisesStore, 'buscarAnalisesCadastro').mockResolvedValue([] as any);
 
         await (wrapper.vm as any).abrirModalHistorico();
 
@@ -227,7 +227,7 @@ describe('CadAtividades.vue Coverage', () => {
         const feedbackStore = useFeedbackStore(pinia);
         (wrapper.vm as any).codSubprocesso = 123;
 
-        const spy = vi.spyOn(atividadesStore, 'buscarAtividadesParaSubprocesso').mockResolvedValue([]);
+        const spy = vi.spyOn(atividadesStore, 'buscarAtividadesParaSubprocesso').mockResolvedValue([] as any);
         const fbSpy = vi.spyOn(feedbackStore, 'show');
 
         await (wrapper.vm as any).handleImportAtividades();
@@ -266,7 +266,7 @@ describe('CadAtividades.vue Coverage', () => {
         const erros = [
             { atividadeCodigo: 1, mensagem: 'Erro na atividade' },
             { atividadeCodigo: null, mensagem: 'Erro global' }
-        ];
+        ] as any;
         vi.spyOn(subprocessosStore, 'validarCadastro').mockResolvedValue({ valido: false, erros });
 
         await (wrapper.vm as any).disponibilizarCadastro();

@@ -127,7 +127,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         const feedbackStore = useFeedbackStore();
         vi.spyOn(feedbackStore, "show");
 
-        processosStore.finalizarProcesso.mockRejectedValue(new Error("Erro ao finalizar"));
+        (processosStore.finalizarProcesso as any).mockRejectedValue(new Error("Erro ao finalizar"));
 
         await flushPromises();
 

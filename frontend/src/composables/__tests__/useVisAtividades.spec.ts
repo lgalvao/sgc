@@ -37,10 +37,10 @@ vi.mock('@/services/subprocessoService', () => ({
 }));
 
 describe('useVisAtividades', () => {
-    const props = { codProcesso: 1, sigla: 'TEST' };
+    const props = { codProcesso: "1", sigla: 'TEST' };
 
     const TestComponent = defineComponent({
-        props: ['codProcesso', 'sigla'],
+        props: { codProcesso: String, sigla: String },
         setup(props) {
             return { ...useVisAtividades(props as any) };
         },

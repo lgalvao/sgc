@@ -420,14 +420,14 @@ describe('Subprocessos Store', () => {
     describe('atualizarStatusLocal', () => {
         it('deve atualizar o status se houver detalhe carregado', () => {
             store.subprocessoDetalhe = { situacao: 'CRIADO', situacaoLabel: 'Criado' } as any;
-            store.atualizarStatusLocal({ codigo: 1, situacao: 'EM_ANDAMENTO', situacaoLabel: 'Em andamento' });
+            store.atualizarStatusLocal({ codigo: 1, situacao: 'EM_ANDAMENTO' as any, situacaoLabel: 'Em andamento' });
             expect(store.subprocessoDetalhe?.situacao).toBe('EM_ANDAMENTO');
             expect(store.subprocessoDetalhe?.situacaoLabel).toBe('Em andamento');
         });
 
         it('não deve fazer nada se não houver detalhe carregado', () => {
             store.subprocessoDetalhe = null;
-            store.atualizarStatusLocal({ codigo: 1, situacao: 'EM_ANDAMENTO', situacaoLabel: 'Em andamento' });
+            store.atualizarStatusLocal({ codigo: 1, situacao: 'EM_ANDAMENTO' as any, situacaoLabel: 'Em andamento' });
             expect(store.subprocessoDetalhe).toBeNull();
         });
     });
