@@ -22,13 +22,25 @@ public interface UsuarioMapper {
     // ========== Mapeamentos de Unidade ==========
 
     /**
-     * Converte Unidade para UnidadeDto com flag de elegibilidade customizada.
+     * Mapeamento base de Unidade para UnidadeDto.
+     * Flag isElegivel é ignorada para ser tratada nos métodos default.
      */
-    @Mapping(target = "codigoPai", source = "unidade.unidadeSuperior.codigo")
+    @Mapping(target = "codigoPai", source = "unidadeSuperior.codigo")
     @Mapping(target = "tipo", expression = "java(unidade.getTipo() != null ? unidade.getTipo().name() : null)")
     @Mapping(target = "subunidades", expression = "java(new java.util.ArrayList<>())")
-    @Mapping(target = "isElegivel", source = "isElegivel")
-    UnidadeDto toUnidadeDto(Unidade unidade, boolean isElegivel);
+    @Mapping(target = "isElegivel", ignore = true)
+    UnidadeDto toUnidadeDtoBase(Unidade unidade);
+
+    /**
+     * Converte Unidade para UnidadeDto com flag de elegibilidade customizada.
+     */
+    default UnidadeDto toUnidadeDto(Unidade unidade, boolean isElegivel) {
+        UnidadeDto dto = toUnidadeDtoBase(unidade);
+        if (dto != null) {
+            dto.setElegivel(isElegivel);
+        }
+        return dto;
+    }
 
     /**
      * Converte Unidade para UnidadeDto (elegível por padrão).

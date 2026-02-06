@@ -67,4 +67,27 @@ class MapaAjusteMapperCoverageTest {
         assertThat(dto.getCompetencias().get(0).getAtividades().get(0).conhecimentos()).hasSize(1);
         assertThat(dto.getCompetencias().get(0).getAtividades().get(0).conhecimentos().get(0).incluido()).isTrue();
     }
+
+    @Test
+    @DisplayName("Deve cobrir todas as combinações de null no toDto para atingir 100% de branches")
+    void deveCobrirCombinacoesNull() {
+        // sp != null (já coberto, mas vamos reforçar)
+        assertThat(mapper.toDto(new Subprocesso(), null, null, null, null, null)).isNotNull();
+
+        // sp == null, analise != null
+        Analise analise = new Analise();
+        analise.setObservacoes("Obs");
+        MapaAjusteDto dtoAnalise = mapper.toDto(null, analise, null, null, null, null);
+        assertThat(dtoAnalise).isNotNull();
+        assertThat(dtoAnalise.getJustificativaDevolucao()).isEqualTo("Obs");
+
+        // sp, analise == null, competencias != null
+        assertThat(mapper.toDto(null, null, List.of(new Competencia()), null, null, null)).isNotNull();
+
+        // sp, analise, competencias == null, atividades != null
+        assertThat(mapper.toDto(null, null, null, List.of(new Atividade()), null, null)).isNotNull();
+
+        // sp, analise, competencias, atividades == null, conhecimentos != null
+        assertThat(mapper.toDto(null, null, null, null, List.of(new Conhecimento()), null)).isNotNull();
+    }
 }
