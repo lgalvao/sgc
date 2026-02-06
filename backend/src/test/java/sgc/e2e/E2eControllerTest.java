@@ -22,8 +22,6 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoFacade;
-
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -49,7 +47,7 @@ class E2eControllerTest {
     private NamedParameterJdbcTemplate namedJdbcTemplate;
 
     @Mock
-    private ProcessoFacade processoFacade;
+    private sgc.processo.service.ProcessoFacade processoFacade;
 
     @Mock
     private UnidadeFacade unidadeFacade;
@@ -64,7 +62,6 @@ class E2eControllerTest {
     @BeforeEach
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
-        // Default behavior for resource loader (file found in first path)
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
         controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
     }
@@ -145,7 +142,6 @@ class E2eControllerTest {
         assertCount("sgc.alerta", 1);
         assertCount("sgc.alerta_usuario", 1);
         assertCount("sgc.unidade_processo", 1);
-
         assertCount("sgc.vw_unidade", 1);
         assertCount("sgc.vw_usuario", 1);
 

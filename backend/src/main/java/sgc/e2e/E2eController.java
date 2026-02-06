@@ -21,7 +21,6 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
-
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
@@ -177,7 +176,7 @@ public class E2eController {
      */
     private <T> T executeAsAdmin(Supplier<T> operation) {
         var auth = new UsernamePasswordAuthenticationToken(
-                "e2e-admin",
+                "111111",
                 null,
                 List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
 

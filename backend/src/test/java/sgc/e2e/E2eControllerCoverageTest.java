@@ -21,8 +21,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 import java.io.ByteArrayInputStream;
@@ -45,39 +43,26 @@ class E2eControllerCoverageTest {
     @Test
     @DisplayName("limparTabela: Deve tentar DELETE se TRUNCATE falhar")
     void limparTabela_TruncateFalha_TentaDelete() throws Exception {
+        // ... (rest of the method remains same, but easier to just replace header section up to InjectMocks)
         Connection conn = mock(Connection.class);
         Statement stmt = mock(Statement.class);
         
-        // Configurar comportamento padrao para chamadas execute
-        // Lenient porque sera chamado varias vezes com strings diferentes
         lenient().when(stmt.execute(anyString())).thenReturn(true);
-        
-        // Simular falha especificamente no TRUNCATE
-        // Como o stub acima cobre qualquer string, precisamos garantir que ESE stub especifico ganhe
-        // Mockito avalia em ordem reversa de declaracao? Nao, 'when' ... overrides.
-        // Mas para doThrow/thenThrow com matcher, eh melhor usar doAnswer ou garantir a ordem.
-        // Se usarmos doThrow(...).when(stmt).execute(contains("TRUNCATE")) DEPOIS do anyString, deve funcionar.
         doThrow(new SQLException("Erro H2")).when(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
 
-        // Mockar DataSource e Connection para resetDatabase
         DataSource ds = mock(DataSource.class);
         when(jdbcTemplate.getDataSource()).thenAnswer(i -> ds);
         when(ds.getConnection()).thenReturn(conn);
         when(conn.createStatement()).thenReturn(stmt);
-        
-        // Mockar lista de tabelas
         when(jdbcTemplate.queryForList(anyString(), eq(String.class))).thenReturn(List.of("TABELA_TESTE"));
         
-        // Mockar resourceLoader para seed
         Resource resource = mock(Resource.class);
         when(resourceLoader.getResource(anyString())).thenReturn(resource);
         when(resource.exists()).thenReturn(true);
-        // when(resource.isReadable()).thenReturn(true); // Unnecessary
         when(resource.getInputStream()).thenReturn(new ByteArrayInputStream("SELECT 1;".getBytes()));
 
         controller.resetDatabase();
 
-        // Verificar se chamou TRUNCATE (que falhou) e depois DELETE
         verify(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
         verify(stmt).execute(contains("DELETE FROM sgc.TABELA_TESTE"));
     }
@@ -125,16 +110,11 @@ class E2eControllerCoverageTest {
         when(processoFacade.iniciarProcessoMapeamento(100L, List.of(10L)))
             .thenReturn(List.of()); // Sucesso
             
-        when(processoFacade.obterPorId(100L)).thenReturn(Optional.empty()); // Falha ao recarregar
+        when(processoFacade.obterPorId(100L)).thenReturn(java.util.Optional.empty()); // Falha ao recarregar
 
         assertThatThrownBy(() -> controller.criarProcessoMapeamento(req))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
     
-    // Para testar o ramo "else" do tipo de processo (linha 237), seria necessário passar um tipo diferente de MAPEAMENTO/REVISAO para criarProcessoFixture.
-    // Mas os métodos públicos (criarProcessoMapeamento, criarProcessoRevisao) fixam o tipo.
-    // O método privado aceita TipoProcesso.
-    // Podemos testar criando um método público "fake" via reflexão ou apenas aceitar que essa branch é inalcançável via API pública (o que é bom).
-    // Mas para cobertura 100%, precisaríamos invocar o privado.
-    // No entanto, vou pular esse detalhe por enquanto.
+    // ... rest of comments
 }
