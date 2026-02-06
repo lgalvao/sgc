@@ -1,73 +1,58 @@
 # Componentes do Frontend
 
-Este diretório contém os componentes Vue.js reutilizáveis utilizados na aplicação frontend.
+Este diretório contém os componentes Vue.js reutilizáveis, organizados por funcionalidade (feature-based).
 
 ## Princípios dos Componentes
 
-- **Reutilizáveis e Agnósticos:** Componentes devem ser projetados para serem reutilizáveis em diferentes partes da
-  aplicação.
-- **Controlados por Props e Eventos:** A comunicação deve ser feita via `props` e `emits`.
-- **Uso de BootstrapVueNext:** A maioria dos componentes utiliza componentes base da biblioteca `bootstrap-vue-next` (
-  ex: `BModal`, `BButton`).
+- **Reutilização:** Componentes devem ser agnósticos ao contexto quando possível.
+- **Props/Emits:** Comunicação estrita via propriedades e eventos.
+- **BootstrapVueNext:** Baseado no Bootstrap 5 através da biblioteca `bootstrap-vue-next`.
+- **Acessibilidade:** Devem seguir as diretrizes de acessibilidade (WAI-ARIA).
 
-## Componentes de Navegação
+## Organização por Pastas
 
-### MainNavbar
+### `atividades/`
+Componentes específicos para gestão de atividades (ex: `CadAtividadeForm.vue`).
 
-**Responsabilidade:** Menu principal do sistema (topo da aplicação)
+### `common/`
+Componentes utilitários de uso geral (ex: `ErrorAlert.vue`, `InlineEditor.vue`).
 
-- Links para páginas principais (Home, Alertas, Movimentações)
-- Links contextuais baseados em perfil do usuário
-- Responsivo com toggle para mobile
-- Posição: Fixa no topo
+### `configuracoes/`
+Componentes para as telas de configurações do sistema.
 
-### BarraNavegacao
+### `layout/`
+Componentes de estrutura da página (ex: `PageHeader.vue`).
 
-**Responsabilidade:** Breadcrumbs contextuais e navegação hierárquica
+### `mapa/`
+Componentes relacionados ao mapa de competências (ex: `CompetenciasListSection.vue`).
 
-- Mostra caminho atual na hierarquia (Processo → Subprocesso → Seção)
-- Botão de voltar
-- Breadcrumbs dinâmicos baseados na rota atual
-- Posição: Abaixo do MainNavbar, dentro do conteúdo
+### `processo/`
+Componentes para exibição e gestão de processos (ex: `ProcessoInfo.vue`).
 
----
+### `relatorios/`
+Modais e cards específicos para a central de relatórios.
 
-## Lista de Componentes
+### `ui/`
+Componentes de interface atômicos (ex: `LoadingButton.vue`).
 
-### Modais
+### `unidade/`
+Componentes para visualização de dados de unidades.
 
-- **AceitarMapaModal.vue**: Diálogo para aceitar (Gestor) ou homologar (Admin) um mapa.
-- **ConfirmacaoDisponibilizacaoModal.vue**: Confirmação para envio de cadastro para validação.
-- **CriarCompetenciaModal.vue**: Criação ou edição de competências e associação com atividades.
-- **DisponibilizarMapaModal.vue**: Definição de prazo e disponibilização de mapa.
-- **HistoricoAnaliseModal.vue**: Exibe histórico de auditoria/análises de um subprocesso.
-- **ImpactoMapaModal.vue**: Comparativo de mudanças (adições/remoções) em revisões de mapa.
-- **ImportarAtividadesModal.vue**: Importação de atividades de outros processos.
-- **ModalAcaoBloco.vue**: Ações em massa para unidades (aceite/homologação).
-- **ModalConfirmacao.vue**: Modal genérico de confirmação.
-- **SubprocessoModal.vue**: Alteração de data limite de subprocesso.
+## Componentes Globais (Raiz)
 
-### Tabelas e Listas
+### Navegação
+- **MainNavbar.vue**: Menu superior principal.
+- **BarraNavegacao.vue**: Breadcrumbs e navegação de nível secundário.
 
-- **TabelaAlertas.vue**: Listagem de alertas do usuário.
-- **TabelaMovimentacoes.vue**: Histórico de movimentações recentes.
-- **TabelaProcessos.vue**: Listagem principal de processos.
-- **TreeTableView.vue**: Tabela hierárquica genérica.
-- **TreeRowItem.vue**: Linha recursiva para `TreeTableView`.
+### Modais e Diálogos
+- **ModalConfirmacao.vue**: Diálogo genérico para ações destrutivas ou importantes.
+- **HistoricoAnaliseModal.vue**: Exibe o log de auditoria de um subprocesso.
+- **ImportarAtividadesModal.vue**: Facilita a cópia de atividades entre processos.
 
-### Árvore de Unidades
+### Tabelas e Árvores
+- **TabelaProcessos.vue**: Listagem principal com filtros e paginação.
+- **ArvoreUnidades.vue**: Hierarquia organizacional com seleção.
+- **TreeTableView.vue**: Componente base para visualização de dados hierárquicos.
 
-- **ArvoreUnidades.vue**: Componente principal de árvore com seleção tri-state.
-- **UnidadeTreeNode.vue**: Nó recursivo da árvore.
-
-### Subprocesso e Mapa
-
-- **AtividadeItem.vue**: Exibição e edição de itens de atividade.
-- **CompetenciaCard.vue**: Card visual para competências no mapa.
-- **SubprocessoCards.vue**: Navegação por cards para seções do subprocesso.
-- **SubprocessoHeader.vue**: Cabeçalho com detalhes do subprocesso e status.
-
-### Utilitários
-
-- **EmptyState.vue**: Feedback visual para listas ou estados vazios.
-- **ProcessoAcoes.vue**: Botões de ação para detalhes do processo.
+### Feedback
+- **EmptyState.vue**: Exibido quando não há dados para mostrar.

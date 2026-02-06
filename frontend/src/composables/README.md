@@ -1,24 +1,31 @@
 # Composables (Vue Composition API)
 
-Este diretório contém **Composables** do Vue.js. Composables são funções que encapsulam lógica de estado com a Composition API para ser reutilizada entre componentes. Por convenção, o nome dessas funções começa com `use` (ex: `usePerfil`).
+Este diretório contém funções que encapsulam lógica de estado e UI reutilizável.
 
 ## Composables Disponíveis
 
-### `useApi.ts`
+### Lógica de UI e Estado
+* **`useApi.ts`**: Wrapper para chamadas de API com estados de `loading` e `error` integrados.
+* **`useErrorHandler.ts`**: Tratamento padronizado de erros de API e exibição de feedbacks.
+* **`useLoadingManager.ts`**: Controle centralizado de indicadores de carregamento.
+* **`useModalManager.ts`**: Abstração para abertura e fechamento de modais programaticamente.
+* **`useLocalStorage.ts`**: Persistência reativa de dados no navegador.
+* **`useFormErrors.ts`**: Gestão e exibição de erros de validação em formulários.
 
-- **Objetivo:** Fornecer um wrapper reativo em torno das chamadas de API, gerenciando estados comuns como `loading` (
-  carregamento), `error` (erro) e `data` (dados).
-- **Uso:** Simplifica o código nos componentes, evitando a repetição de blocos `try/catch` e variáveis de estado para
-  controle de feedback visual.
+### Domínio e Negócio
+* **`usePerfil.ts`**: Lógica para cálculo de permissões e contexto do usuário logado.
+* **`useBreadcrumbs.ts`**: Geração dinâmica da trilha de navegação (breadcrumbs).
+* **`useRelatorios.ts`**: Lógica de busca e filtros para a central de relatórios.
 
-### `usePerfil.ts`
+### Fluxos Específicos (Views)
+* **`useProcessoView.ts` / `useProcessoForm.ts`**: Lógica para telas de detalhes e cadastro de processos.
+* **`useUnidadeView.ts`**: Lógica para a tela de detalhes da unidade.
+* **`useCadAtividades.ts` / `useAtividadeForm.ts`**: Suporte ao fluxo de cadastro de atividades.
+* **`useVisAtividades.ts`**: Lógica para visualização de atividades.
+* **`useVisMapa.ts`**: Lógica para exibição do mapa de competências.
 
-- **Objetivo:** Centraliza a lógica complexa de cálculo de perfis de acesso do usuário.
-- **Funcionalidades:**
-    - **Cálculo de Perfis:** Determina dinamicamente quais perfis (`ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`) um usuário
-      possui com base em sua lotação, titularidade de unidades e atribuições temporárias.
-    - **Estado do Usuário:** Fornece propriedades computadas reativas para o `servidorLogado`, `perfilSelecionado` e
-      `unidadeSelecionada`.
-    - **Integração com Stores:** Orquestra dados das stores `useUsuariosStore`, `useUnidadesStore` e
-      `useAtribuicaoTemporariaStore`.
+## Boas Práticas
 
+1. **Nomenclatura**: Sempre começar com o prefixo `use` (ex: `useAuth`).
+2. **Ciclo de Vida**: Podem utilizar `onMounted`, `watch`, etc., para gerenciar efeitos colaterais.
+3. **Puro/Impuro**: Prefira composables que retornam apenas estado reativo (`Ref`, `ComputedRef`) e funções.

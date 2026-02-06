@@ -20,12 +20,13 @@ O frontend utiliza uma arquitetura baseada em componentes com **Vue.js 3** e **T
 
 * **Framework:** Vue.js 3 (Composition API, `<script setup>`)
 * **Linguagem:** TypeScript
-* **Estado:** Pinia
-* **Roteamento:** Vue Router
+* **Estado:** Pinia (Setup Stores)
+* **Roteamento:** Vue Router (Modularizado)
 * **UI:** BootstrapVueNext + Bootstrap 5
 * **Build:** Vite
 * **HTTP:** Axios (com interceptors para JWT)
 * **Testes:** Vitest (Unitários) + Playwright (E2E)
+* **Qualidade:** ESLint + TypeScript (typecheck)
 
 ### Fluxo de Dados
 
@@ -34,44 +35,55 @@ O frontend utiliza uma arquitetura baseada em componentes com **Vue.js 3** e **T
 3. **Services (`src/services`)**: Camada de abstração da API. Fazem requisições HTTP.
 4. **Backend**: API REST Spring Boot.
 
-## 📂 Estrutura de Pastas
+## 📂 Estrutura de Pastas Principais
 
-* **`src/stores/`**: Módulos Pinia (ex: `useProcessoStore`). Fonte única da verdade.
-* **`src/services/`**: Encapsulamento de chamadas HTTP (ex: `processoService.ts`).
+* **`src/components/`**: Componentes reutilizáveis, organizados por funcionalidade.
+* **`src/composables/`**: Lógica de estado reutilizável (Composition API).
+* **`src/mappers/`**: Transformação de dados entre API e View.
+* **`src/services/`**: Encapsulamento de chamadas HTTP.
+* **`src/stores/`**: Gerenciamento de estado global (Pinia).
 * **`src/views/`**: Telas principais da aplicação.
-* **`src/components/`**: Componentes reutilizáveis (botões, modais, cards).
-* **`src/router/`**: Configuração de rotas e guardas de navegação (auth guards).
-* **`src/types/`**: Interfaces e Tipos TypeScript compartilhados.
+* **`src/utils/`**: Funções utilitárias e auxiliares.
+* **`src/types/`**: Definições de tipos e DTOs.
+* **`etc/`**: Scripts de automação e documentação adicional.
 
-## 🧪 Testes
+## 🧪 Testes e Qualidade
 
 ### Unitários (Vitest)
 
-Testam componentes, stores e lógica de negócio isolada.
-
 ```bash
-cd frontend
-npm run test:unit
+npm test
 ```
 
 ### Type Check
 
-Verificação estática de tipos.
+```bash
+npm run typecheck
+```
+
+### Linting
 
 ```bash
-cd frontend
-npm run typecheck
+npm run lint
+```
+
+### E2E (Playwright)
+
+```bash
+npm run test:e2e
 ```
 
 ## 🔒 Autenticação
 
-A autenticação é feita via **JWT**.
+A autenticação é feita via **JWT**. O token é armazenado no `localStorage` e injetado automaticamente pelo `axios-setup.ts`.
 
-* O token é armazenado no `localStorage`.
-* O arquivo `axios-setup.ts` injeta o token automaticamente em todas as requisições (`Authorization: Bearer ...`).
-* Se a API retornar `401 Unauthorized`, o usuário é redirecionado para o login.
+## 📖 Documentação Adicional
 
-## 🤝 Padrões de Código
+Consulte a pasta `etc/docs/` para guias detalhados sobre:
+- [Estratégia de Erros](etc/docs/ESTRATEGIA-ERROS.md)
+- [Guia de Composables](etc/docs/GUIA-COMPOSABLES.md)
+- [Diretrizes de Design](etc/docs/design-guidelines.md)
+- [Padrões do Frontend](etc/docs/frontend-padroes.md)
+- [Testes no Frontend](etc/docs/frontend-testes.md)
 
-Consulte o arquivo **[AGENTS.md](../AGENTS.md)** na raiz para detalhes sobre convenções de nomenclatura e padrões
-Vue/TypeScript.
+Para convenções de código, veja o arquivo **[AGENTS.md](../AGENTS.md)** na raiz do projeto.

@@ -1,31 +1,16 @@
 # Diretório de Roteamento
 
-Este diretório contém a configuração do Vue Router.
+Configuração centralizada do Vue Router.
 
-## Estrutura
+## Estrutura de Arquivos
 
-- **`index.ts`**: Ponto de entrada que cria a instância do router e define os guards globais (autenticação).
-- **`*.routes.ts`**: Definições de rotas modulares. Cada domínio funcional deve ter seu próprio arquivo de rotas para
-  evitar um `index.ts` gigante.
-
-## Modularização
-
-Exemplo de importação no `index.ts`:
-
-```typescript
-import processoRoutes from './processo.routes';
-import adminRoutes from './admin.routes';
-
-const routes = [
-  ...processoRoutes,
-  ...adminRoutes,
-  { path: '/login', component: Login }
-];
-```
+* **`index.ts`**: Ponto de entrada. Cria a instância do router e configura os Navigation Guards (proteção de rotas).
+* **`main.routes.ts`**: Rotas principais de nível superior (Login, Dashboard, Erro).
+* **`processo.routes.ts`**: Rotas relacionadas ao fluxo de processos e subprocessos.
+* **`unidade.routes.ts`**: Rotas para gestão e visualização de unidades.
 
 ## Navigation Guards
 
-O `index.ts` implementa o `beforeEach` para verificar:
-
-1. Se a rota requer autenticação (`meta: { requiresAuth: true }`).
-2. Se o usuário tem o perfil necessário (`meta: { roles: ['ADMIN'] }`).
+O sistema utiliza o guard `beforeEach` para validar:
+1. **Autenticação**: Verifica se o usuário possui um token válido para rotas marcadas com `requiresAuth`.
+2. **Autorização**: Valida se o perfil selecionado do usuário permite o acesso à rota (`roles`).
