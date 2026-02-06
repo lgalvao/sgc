@@ -222,7 +222,7 @@ CREATE TABLE ANALISE
     subprocesso_codigo NUMBER NOT NULL,
     data_hora          TIMESTAMP NOT NULL,
     tipo               VARCHAR2(20)  NOT NULL,
-    acao               VARCHAR2(100) NOT NULL,
+    acao               VARCHAR2(20) NOT NULL,
     usuario_titulo     VARCHAR2(12)  NULL,
     unidade_codigo     NUMBER NULL,
     motivo             VARCHAR2(200) NULL,

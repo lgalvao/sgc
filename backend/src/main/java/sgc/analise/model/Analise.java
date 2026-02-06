@@ -47,6 +47,6 @@ public class Analise extends EntidadeBase {
     private String motivo;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo", length = 20)
+    @Column(name = "tipo", length = 20, nullable = false)
     private TipoAnalise tipo;
 }
