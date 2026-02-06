@@ -87,9 +87,7 @@ class GeneralMappersCoverageTest {
         userSemTitulo.setTituloEleitoral(null);
         assertThat(subprocessoDetalheMapper.toDto(sp, userSemTitulo, null, null, null)).isNotNull();
 
-        Subprocesso spSemUnidade = new Subprocesso();
-        spSemUnidade.setUnidade(null);
-        assertThat(subprocessoDetalheMapper.toDto(spSemUnidade, new Usuario(), null, null, null)).isNotNull();
+
 
         Subprocesso spSemProcesso = new Subprocesso();
         spSemProcesso.setProcesso(null);

@@ -86,7 +86,7 @@ class E2eControllerCoverageTest {
     @DisplayName("criarProcessoFixture: Unidade não encontrada")
     void criarProcessoFixture_UnidadeNaoEncontrada() {
         var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", false, 30);
-        when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(null);
+        when(unidadeFacade.buscarPorSigla("SIGLA")).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA"));
 
         assertThatThrownBy(() -> controller.criarProcessoMapeamento(req))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);

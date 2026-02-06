@@ -12,6 +12,7 @@ public record CriarAnaliseRequest(
         @Size(max = 500, message = "Observações devem ter no máximo 500 caracteres")
         String observacoes,
 
+        @jakarta.validation.constraints.NotNull(message = "A sigla da unidade é obrigatória")
         @Size(max = 20, message = "Sigla da unidade deve ter no máximo 20 caracteres")
         String siglaUnidade,
 

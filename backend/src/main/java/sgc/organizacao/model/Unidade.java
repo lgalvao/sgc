@@ -45,7 +45,7 @@ public class Unidade extends EntidadeBase {
     private SituacaoUnidade situacao;
 
     @ManyToOne
-    @JoinColumn(name = "unidade_superior_codigo")
+    @JoinColumn(name = "unidade_superior_codigo", nullable = true)
     @Nullable
     private Unidade unidadeSuperior;
 

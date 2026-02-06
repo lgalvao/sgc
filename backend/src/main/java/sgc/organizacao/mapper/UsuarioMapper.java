@@ -55,7 +55,7 @@ public interface UsuarioMapper {
      */
     @Named("toUnidadeDtoComElegibilidadeCalculada")
     default UnidadeDto toUnidadeDtoComElegibilidadeCalculada(Unidade unidade) {
-        if (unidade == null) return null;
+
         boolean elegivel = unidade.getTipo() != TipoUnidade.INTERMEDIARIA;
         return toUnidadeDto(unidade, elegivel);
     }

@@ -68,7 +68,7 @@ class E2eFixtureEndpointTest {
         E2eController.ProcessoFixtureRequest request =
                 new E2eController.ProcessoFixtureRequest(
                         "Processo Fixture Teste Mapeamento Iniciado",
-                        "SECAO_211", // Unidade 15 (Operacional e livre)
+                        "SEPRO", // Unidade 13 (Operacional e livre)
                         true, // iniciar = true
                         30);
 

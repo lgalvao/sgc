@@ -37,7 +37,7 @@ public class Analise extends EntidadeBase {
     @Column(name = "acao", length = 20, nullable = false)
     private TipoAcaoAnalise acao;
 
-    @Column(name = "unidade_codigo")
+    @Column(name = "unidade_codigo", nullable = false)
     private Long unidadeCodigo;
 
     @Column(name = "usuario_titulo", length = 12)

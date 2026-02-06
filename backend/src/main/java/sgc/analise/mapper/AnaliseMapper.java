@@ -36,14 +36,12 @@ public abstract class AnaliseMapper {
     public abstract AnaliseValidacaoHistoricoDto toAnaliseValidacaoHistoricoDto(Analise analise);
 
     protected String getUnidadeSigla(Long codUnidade) {
-        if (codUnidade == null) return null;
         return unidadeRepo.findById(codUnidade)
                 .map(Unidade::getSigla)
                 .orElse(null);
     }
 
     protected String getUnidadeNome(Long codUnidade) {
-        if (codUnidade == null) return null;
         return unidadeRepo.findById(codUnidade)
                 .map(Unidade::getNome)
                 .orElse(null);

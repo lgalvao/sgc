@@ -68,8 +68,7 @@ class UsuarioMapperTest {
     @Test
     @DisplayName("Deve mapear Unidade com elegibilidade calculada (Default Method)")
     void deveMapearComElegibilidadeCalculada() {
-        // 1. Cenário: Unidade Nula
-        assertThat(mapper.toUnidadeDtoComElegibilidadeCalculada(null)).isNull();
+
 
         // 2. Cenário: Unidade Operacional (Elegível)
         Unidade uOp = new Unidade();

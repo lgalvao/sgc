@@ -21,6 +21,7 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
+
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
@@ -47,6 +48,7 @@ public class E2eController {
     private final ProcessoFacade processoFacade;
     private final UnidadeFacade unidadeFacade;
     private final ResourceLoader resourceLoader;
+
 
     @PostMapping("/reset-database")
     public void resetDatabase() {
@@ -199,9 +201,6 @@ public class E2eController {
 
         // Buscar unidade pela sigla
         UnidadeDto unidade = unidadeFacade.buscarPorSigla(request.unidadeSigla());
-        if (unidade == null) {
-            throw new ErroEntidadeNaoEncontrada("Unidade", request.unidadeSigla());
-        }
 
         // Calcular data limite
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
@@ -246,13 +245,8 @@ public class E2eController {
             }
 
             // Recarregar processo após iniciar
-            processo =
-                    processoFacade
-                            .obterPorId(processoCodigo)
-                            .orElseThrow(
-                                    () ->
-                                            new ErroEntidadeNaoEncontrada(
-                                                    "Processo", processoCodigo));
+            processo = processoFacade.obterPorId(processoCodigo)
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", processoCodigo));
         }
 
         return processo;

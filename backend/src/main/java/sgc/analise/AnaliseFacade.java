@@ -52,10 +52,17 @@ public class AnaliseFacade {
      */
     @Transactional
     public Analise criarAnalise(Subprocesso subprocesso, CriarAnaliseCommand command) {
-        Unidade unidade = null;
+        Unidade unidade;
         if (command.siglaUnidade() != null) {
             var unidadeDto = unidadeService.buscarPorSigla(command.siglaUnidade());
             unidade = unidadeService.buscarEntidadePorId(unidadeDto.getCodigo());
+        } else {
+            // Se não veio sigla, tentamos pegar a unidade do subprocesso se fizer sentido,
+            // ou lançamos erro.
+            // Pela regra "Unidade is not null anywhere", vamos exigir.
+            // Mas o command pode ter vindo de um contexto onde a unidade é implicita?
+            // O controller pega do request body.
+            throw new IllegalArgumentException("Sigla da unidade é obrigatória para criar análise.");
         }
 
         Analise analise = Analise.builder()
@@ -64,7 +71,7 @@ public class AnaliseFacade {
                 .observacoes(command.observacoes())
                 .tipo(command.tipo())
                 .acao(command.acao())
-                .unidadeCodigo(unidade != null ? unidade.getCodigo() : null)
+                .unidadeCodigo(unidade.getCodigo())
                 .usuarioTitulo(command.tituloUsuario())
                 .motivo(command.motivo())
                 .build();

@@ -26,7 +26,7 @@ class UsuarioMapperCoverageTest {
     @Test
     @DisplayName("Deve cobrir toUnidadeDtoComElegibilidadeCalculada")
     void deveCobrirElegibilidade() {
-        assertThat(mapper.toUnidadeDtoComElegibilidadeCalculada(null)).isNull();
+
 
         Unidade u1 = Unidade.builder().codigo(1L).tipo(TipoUnidade.INTERMEDIARIA).build();
         UnidadeDto d1 = mapper.toUnidadeDtoComElegibilidadeCalculada(u1);

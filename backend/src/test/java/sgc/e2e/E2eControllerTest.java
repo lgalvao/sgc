@@ -360,7 +360,8 @@ class E2eControllerTest {
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "Desc", "SIGLA_NAO_EXISTE", false, null);
 
-        when(unidadeFacade.buscarPorSigla("SIGLA_NAO_EXISTE")).thenReturn(null);
+        when(unidadeFacade.buscarPorSigla("SIGLA_NAO_EXISTE"))
+                .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA_NAO_EXISTE"));
 
         // Act & Assert
         var exception = Assertions.assertThrows(ErroEntidadeNaoEncontrada.class,
