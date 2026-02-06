@@ -164,7 +164,7 @@ public class ProcessoFacade {
         Unidade unidade = unidadeService.buscarEntidadePorId(unidadeCodigo);
 
         // Verifica se unidade participa do processo
-        if (processo.getParticipantes().stream().noneMatch(u -> u.getCodigo().equals(unidadeCodigo))) {
+        if (processo.getParticipantes().stream().noneMatch(u -> u.getUnidadeCodigo().equals(unidadeCodigo))) {
             throw new ErroProcesso("Unidade não participa deste processo.");
         }
 

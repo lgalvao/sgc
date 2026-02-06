@@ -102,19 +102,19 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         processoRaiz = ProcessoFixture.processoEmAndamento();
         processoRaiz.setCodigo(null);
         processoRaiz.setDescricao("Processo Raiz");
-        processoRaiz.getParticipantes().add(unidadeRaiz);
+        processoRaiz.adicionarParticipantes(Set.of(unidadeRaiz));
         processoRaiz = processoRepo.save(processoRaiz);
 
         processoFilha1 = ProcessoFixture.processoEmAndamento();
         processoFilha1.setCodigo(null);
         processoFilha1.setDescricao("Processo Filha 1");
-        processoFilha1.getParticipantes().add(unidadeFilha1);
+        processoFilha1.adicionarParticipantes(Set.of(unidadeFilha1));
         processoFilha1 = processoRepo.save(processoFilha1);
 
         Processo processoCriado = ProcessoFixture.processoPadrao(); // Status CRIADO
         processoCriado.setCodigo(null);
         processoCriado.setDescricao("Processo Criado Teste");
-        processoCriado.getParticipantes().add(unidadeRaiz);
+        processoCriado.adicionarParticipantes(Set.of(unidadeRaiz));
         processoRepo.save(processoCriado);
 
         // Flush para garantir persistência antes dos testes
@@ -218,7 +218,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             Processo processoCriadoFilha = ProcessoFixture.processoPadrao();
             processoCriadoFilha.setCodigo(null);
             processoCriadoFilha.setDescricao("Processo Criado Filha");
-            processoCriadoFilha.getParticipantes().add(unidadeFilha1);
+            processoCriadoFilha.adicionarParticipantes(Set.of(unidadeFilha1));
             processoRepo.saveAndFlush(processoCriadoFilha);
 
             mockMvc.perform(

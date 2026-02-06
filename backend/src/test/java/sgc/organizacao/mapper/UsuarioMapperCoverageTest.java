@@ -2,10 +2,8 @@ package sgc.organizacao.mapper;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
-import sgc.organizacao.model.AtribuicaoTemporaria;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;

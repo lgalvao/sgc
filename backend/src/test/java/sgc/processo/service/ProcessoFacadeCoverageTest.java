@@ -114,7 +114,7 @@ class ProcessoFacadeCoverageTest {
         processo.setDataLimite(null);
         Unidade unidade = new Unidade();
         unidade.setCodigo(codUnidade);
-        processo.setParticipantes(Set.of(unidade));
+        processo.adicionarParticipantes(Set.of(unidade));
 
         when(processoConsultaService.buscarPorId(codProcesso)).thenReturn(processo);
         when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(unidade);

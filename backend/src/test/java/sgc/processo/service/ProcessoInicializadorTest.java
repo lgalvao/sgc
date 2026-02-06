@@ -84,7 +84,7 @@ class ProcessoInicializadorTest {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
-        p.setParticipantes(Collections.emptySet());
+        p.setParticipantes(new java.util.ArrayList<>());
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
         assertThatThrownBy(() -> inicializador.iniciar(1L, null))
@@ -99,7 +99,7 @@ class ProcessoInicializadorTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        p.setParticipantes(Set.of(u));
+        p.adicionarParticipantes(Set.of(u));
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of());
@@ -137,7 +137,7 @@ class ProcessoInicializadorTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        p.setParticipantes(Set.of(u));
+        p.adicionarParticipantes(Set.of(u));
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of(1L));
@@ -181,7 +181,7 @@ class ProcessoInicializadorTest {
         p.setTipo(TipoProcesso.DIAGNOSTICO);
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        p.setParticipantes(Set.of(u));
+        p.adicionarParticipantes(Set.of(u));
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
@@ -189,6 +189,7 @@ class ProcessoInicializadorTest {
         UnidadeMapa um = new UnidadeMapa();
         um.setUnidadeCodigo(1L);
         when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of(um));
+        when(unidadeRepo.findAllById(anyList())).thenReturn(List.of(u));
 
         List<String> erros = inicializador.iniciar(1L, null);
 

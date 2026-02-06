@@ -15,7 +15,7 @@ public record CriarAnaliseRequest(
         @Size(max = 20, message = "Sigla da unidade deve ter no máximo 20 caracteres")
         String siglaUnidade,
 
-        @Size(max = 500, message = "Motivo deve ter no máximo 500 caracteres")
+        @Size(max = 200, message = "Motivo deve ter no máximo 200 caracteres")
         String motivo
 ) {
 }

@@ -55,7 +55,7 @@ class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))
                 .build();
-        processoEmAndamento.setParticipantes(Set.of(unidade));
+        processoEmAndamento.adicionarParticipantes(Set.of(unidade));
         processoEmAndamento = processoRepo.saveAndFlush(processoEmAndamento);
 
         var mapaEmAndamento = mapaRepo.save(new Mapa());
@@ -75,7 +75,7 @@ class ProcessoDetalhesIntegrationTest extends BaseIntegrationTest {
                 .situacao(SituacaoProcesso.FINALIZADO)
                 .dataLimite(LocalDateTime.now().plusDays(30))
                 .build();
-        processoFinalizado.setParticipantes(Set.of(unidade));
+        processoFinalizado.adicionarParticipantes(Set.of(unidade));
         processoFinalizado.setDataFinalizacao(LocalDateTime.now());
         processoFinalizado = processoRepo.saveAndFlush(processoFinalizado);
 

@@ -156,7 +156,7 @@ describe("mappers/processos", () => {
     it("mapProcessoDetalheDtoToFrontend deve mapear estruturas aninhadas", () => {
         const dto = {
             codigo: 1,
-            unidades: [{codigo: 10, filhos: [{codigo: 11}]}],
+            unidades: [{codUnidade: 10, filhos: [{codUnidade: 11}]}],
         };
         const model = mapProcessoDetalheDtoToFrontend(dto);
         expect(model.unidades[0].filhos[0].codUnidade).toBe(11);

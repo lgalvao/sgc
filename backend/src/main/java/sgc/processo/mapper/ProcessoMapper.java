@@ -5,12 +5,10 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.Processo;
 
 import java.time.format.DateTimeFormatter;
-import java.util.stream.Collectors;
 
 /**
  * Mapper (usando MapStruct) entre a entidade Processo e seu DTO principal.
@@ -31,11 +29,7 @@ public interface ProcessoMapper {
     @AfterMapping
     default void mapAfterMapping(Processo processo, @MappingTarget ProcessoDto dto) {
         if (processo.getParticipantes() != null) {
-            String siglas = processo.getParticipantes().stream()
-                    .map(Unidade::getSigla)
-                    .sorted()
-                    .collect(Collectors.joining(", "));
-            dto.setUnidadesParticipantes(siglas);
+            dto.setUnidadesParticipantes(processo.getSiglasParticipantes());
         }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -58,4 +52,3 @@ public interface ProcessoMapper {
         }
     }
 }
-

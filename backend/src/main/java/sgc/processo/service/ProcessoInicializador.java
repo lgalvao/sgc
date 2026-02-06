@@ -66,13 +66,14 @@ public class ProcessoInicializador {
             codigosUnidades = codsUnidadesParam;
             unidadesParaProcessar = Set.of(); // Será buscado individualmente via Repo se necessário
         } else {
-            // Mapeamento e Diagnóstico usam participantes do processo
-            Set<Unidade> participantes = processo.getParticipantes();
-            if (participantes.isEmpty()) {
+            // Mapeamento e Diagnóstico usam participantes do processo (snapshots)
+            List<Long> codsParticipantes = processo.getCodigosParticipantes();
+            if (codsParticipantes.isEmpty()) {
                 throw new ErroUnidadesNaoDefinidas("Não há unidades participantes definidas para este processo.");
             }
-            codigosUnidades = participantes.stream().map(Unidade::getCodigo).toList();
-            unidadesParaProcessar = participantes;
+            codigosUnidades = codsParticipantes;
+            // Buscar as entidades Unidade do repositório para criar subprocessos
+            unidadesParaProcessar = new HashSet<>(unidadeRepo.findAllById(codigosUnidades));
         }
 
         // Validar unidades (Batch)

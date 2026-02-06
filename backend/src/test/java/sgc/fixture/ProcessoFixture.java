@@ -4,8 +4,10 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.processo.model.UnidadeProcesso;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public class ProcessoFixture {
 
@@ -28,7 +30,15 @@ public class ProcessoFixture {
 
     public static Processo processoComUnidade(Unidade unidade) {
         Processo processo = processoPadrao();
-        processo.getParticipantes().add(unidade);
+        processo.adicionarParticipantes(Set.of(unidade));
         return processo;
+    }
+
+    /**
+     * Cria um snapshot de UnidadeProcesso a partir de uma Unidade para uso em testes.
+     * Este método permite criar snapshots sem ter um Processo persistido.
+     */
+    public static UnidadeProcesso criarSnapshotParaTeste(Processo processo, Unidade unidade) {
+        return UnidadeProcesso.criarSnapshot(processo, unidade);
     }
 }

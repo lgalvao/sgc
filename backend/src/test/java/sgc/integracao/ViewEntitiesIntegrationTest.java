@@ -96,12 +96,35 @@ class ViewEntitiesIntegrationTest extends BaseIntegrationTest {
                 "INSERT INTO SGC.VW_VINCULACAO_UNIDADE (unidade_atual_codigo, unidade_anterior_codigo, demais_unidades_historicas) VALUES (?, ?, ?)",
                 unidadeAtualId, unidadeAntId, "UANT -> UANT2 -> UANT3");
 
-        // Act & Assert
-        VinculacaoUnidadeId id = new VinculacaoUnidadeId(unidadeAtualId, unidadeAntId);
-        Optional<VinculacaoUnidade> found = vinculacaoUnidadeRepo.findById(id);
+        // Act & Assert - busca por ID simples (Long)
+        Optional<VinculacaoUnidade> found = vinculacaoUnidadeRepo.findById(unidadeAtualId);
 
         assertThat(found).isPresent();
+        assertThat(found.get().getUnidadeAnteriorCodigo()).isEqualTo(unidadeAntId);
         assertThat(found.get().getDemaisUnidadesHistoricas()).isEqualTo("UANT -> UANT2 -> UANT3");
+        assertThat(found.get().isUnidadeRaiz()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve lidar com unidade raiz (unidade_anterior_codigo NULL)")
+    void testVinculacaoUnidadeRaiz() {
+        // Arrange - unidade raiz sem antecessor
+        Long unidadeRaizId = 9906L;
+        jdbcTemplate.update(
+                "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO) VALUES (?, ?, ?, ?, ?)",
+                unidadeRaizId, "Unidade Raiz", "RAIZ", TipoUnidade.OPERACIONAL.name(),
+                SituacaoUnidade.ATIVA.name());
+
+        jdbcTemplate.update(
+                "INSERT INTO SGC.VW_VINCULACAO_UNIDADE (unidade_atual_codigo, unidade_anterior_codigo) VALUES (?, ?)",
+                unidadeRaizId, null);
+
+        // Act & Assert
+        Optional<VinculacaoUnidade> found = vinculacaoUnidadeRepo.findById(unidadeRaizId);
+
+        assertThat(found).isPresent();
+        assertThat(found.get().getUnidadeAnteriorCodigo()).isNull();
+        assertThat(found.get().isUnidadeRaiz()).isTrue();
     }
 
     @Test

@@ -9,13 +9,9 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Immutable;
 import org.jspecify.annotations.Nullable;
 import sgc.comum.model.EntidadeBase;
-import sgc.processo.model.Processo;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Immutable
@@ -57,7 +53,4 @@ public class Unidade extends EntidadeBase {
     @Builder.Default
     private List<Unidade> subunidades = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "participantes")
-    @Builder.Default
-    private Set<Processo> processos = new HashSet<>();
 }

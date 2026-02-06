@@ -123,7 +123,7 @@ class ProcessoFacadeWorkflowTest {
             Processo p = ProcessoFixture.processoEmAndamento();
             p.setCodigo(1L);
             Unidade u = UnidadeFixture.unidadeComId(10L);
-            p.setParticipantes(Set.of(u));
+            p.adicionarParticipantes(Set.of(u));
 
             when(processoConsultaService.buscarPorId(1L)).thenReturn(p);
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
@@ -139,7 +139,7 @@ class ProcessoFacadeWorkflowTest {
             p.setCodigo(1L);
             Unidade u = UnidadeFixture.unidadeComId(10L);
             Unidade outra = UnidadeFixture.unidadeComId(20L);
-            p.setParticipantes(Set.of(outra));
+            p.adicionarParticipantes(Set.of(outra));
 
             when(processoConsultaService.buscarPorId(1L)).thenReturn(p);
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);

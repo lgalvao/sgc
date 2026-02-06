@@ -5,7 +5,7 @@ import type {Processo, UnidadeParticipante} from "@/types/tipos";
 describe("mappers/processos", () => {
     it("mapUnidadeParticipanteDtoToFrontend handles missing children (filhos)", () => {
         const dto = {
-            codigo: 1,
+            codUnidade: 1,
             // filhos is undefined
         };
         const model: UnidadeParticipante = mapUnidadeParticipanteDtoToFrontend(dto);

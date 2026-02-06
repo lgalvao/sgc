@@ -15,6 +15,7 @@ import sgc.processo.mapper.ProcessoDetalheMapper;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.processo.model.UnidadeProcesso;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -27,7 +28,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import sgc.seguranca.acesso.Acao;
 
@@ -59,13 +59,13 @@ class ProcessoDetalheBuilderTest {
      * Chamado apenas nos testes que usam participantes.
      */
     private void configurarMockDoMapper() {
-        when(processoDetalheMapper.toUnidadeParticipanteDto(any(Unidade.class))).thenAnswer(invocation -> {
-            Unidade u = invocation.getArgument(0);
+        when(processoDetalheMapper.fromSnapshot(any(UnidadeProcesso.class))).thenAnswer(invocation -> {
+            UnidadeProcesso u = invocation.getArgument(0);
             ProcessoDetalheDto.UnidadeParticipanteDto dto = new ProcessoDetalheDto.UnidadeParticipanteDto();
-            dto.setCodUnidade(u.getCodigo());
+            dto.setCodUnidade(u.getUnidadeCodigo());
             dto.setNome(u.getNome());
             dto.setSigla(u.getSigla());
-            dto.setCodUnidadeSuperior(u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null);
+            dto.setCodUnidadeSuperior(u.getUnidadeSuperiorCodigo()); // UnidadeProcesso usa getUnidadeSuperiorCodigo
             return dto;
         });
     }
@@ -89,7 +89,7 @@ class ProcessoDetalheBuilderTest {
         u1.setSigla("U1");
         u1.setNome("Unidade 1");
 
-        processo.setParticipantes(Set.of(u1));
+        processo.adicionarParticipantes(Set.of(u1));
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
@@ -124,10 +124,9 @@ class ProcessoDetalheBuilderTest {
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.CRIADO);
-        processo.setParticipantes(Set.of());
+        processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
-        when(accessControlService.podeExecutar(eq(usuario), eq(Acao.FINALIZAR_PROCESSO), eq(processo)))
-                .thenReturn(true);
+        when(accessControlService.podeExecutar(usuario, Acao.FINALIZAR_PROCESSO, processo)).thenReturn(true);
 
         // Act
         ProcessoDetalheDto dto = builder.build(processo, usuario);
@@ -145,10 +144,9 @@ class ProcessoDetalheBuilderTest {
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.CRIADO);
-        processo.setParticipantes(Set.of());
+        processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
-        when(accessControlService.podeExecutar(eq(usuario), eq(Acao.FINALIZAR_PROCESSO), eq(processo)))
-                .thenReturn(false);
+        when(accessControlService.podeExecutar(usuario, Acao.FINALIZAR_PROCESSO, processo)).thenReturn(false);
 
         // Act
         ProcessoDetalheDto dto = builder.build(processo, usuario);
@@ -177,7 +175,7 @@ class ProcessoDetalheBuilderTest {
         u2.setSigla("A");
         u2.setNome("Unidade A");
 
-        processo.setParticipantes(Set.of(u1, u2));
+        processo.adicionarParticipantes(Set.of(u1, u2));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
         // Act
@@ -203,13 +201,15 @@ class ProcessoDetalheBuilderTest {
         Unidade pai = new Unidade();
         pai.setCodigo(1L);
         pai.setSigla("PAI");
+        pai.setNome("PAI");
 
         Unidade filho = new Unidade();
         filho.setCodigo(2L);
         filho.setSigla("FILHO");
+        filho.setNome("FILHO");
         filho.setUnidadeSuperior(pai);
 
-        processo.setParticipantes(Set.of(pai, filho));
+        processo.adicionarParticipantes(Set.of(pai, filho));
 
         Subprocesso spPai = new Subprocesso();
         spPai.setUnidade(pai);
@@ -244,7 +244,7 @@ class ProcessoDetalheBuilderTest {
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setParticipantes(Set.of());
+        processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
         when(accessControlService.podeExecutar(any(Usuario.class), any(), any(Processo.class)))
                 .thenReturn(false);
@@ -264,7 +264,7 @@ class ProcessoDetalheBuilderTest {
         configurarMockDoMapper();
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
-        processo.setParticipantes(Set.of(u1));
+        processo.adicionarParticipantes(Set.of(u1));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
         when(accessControlService.podeExecutar(any(Usuario.class), any(), any(Processo.class)))
                 .thenReturn(false);
@@ -288,11 +288,12 @@ class ProcessoDetalheBuilderTest {
         Unidade filho = new Unidade();
         filho.setCodigo(2L);
         filho.setSigla("FILHO");
+        filho.setNome("FILHO");
         filho.setUnidadeSuperior(pai);
 
         // Apenas filho participa
         configurarMockDoMapper();
-        processo.setParticipantes(Set.of(filho));
+        processo.adicionarParticipantes(Set.of(filho));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
@@ -318,8 +319,9 @@ class ProcessoDetalheBuilderTest {
         Unidade u1 = new Unidade();
         u1.setCodigo(10L);
         u1.setSigla("U1");
+        u1.setNome("Unidade 1");
 
-        processo.setParticipantes(Set.of(u1));
+        processo.adicionarParticipantes(Set.of(u1));
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
@@ -348,7 +350,7 @@ class ProcessoDetalheBuilderTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
 
-        processo.setParticipantes(Set.of()); // Sem participantes
+        processo.adicionarParticipantes(Set.of()); // Sem participantes
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
@@ -375,7 +377,7 @@ class ProcessoDetalheBuilderTest {
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setParticipantes(Set.of());
+        processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
         when(accessControlService.podeExecutar(any(Usuario.class), any(), any(Processo.class)))
                 .thenReturn(false);

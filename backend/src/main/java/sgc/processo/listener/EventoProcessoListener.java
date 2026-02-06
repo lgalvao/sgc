@@ -145,13 +145,15 @@ public class EventoProcessoListener {
     private void processarFinalizacaoProcesso(EventoProcessoFinalizado evento) {
         Processo processo = processoFacade.buscarEntidadePorId(evento.getCodProcesso());
 
-        List<Unidade> unidadesParticipantes = new ArrayList<>(processo.getParticipantes());
+        List<Long> codigosParticipantes = processo.getCodigosParticipantes();
 
-        if (unidadesParticipantes.isEmpty()) {
+        if (codigosParticipantes.isEmpty()) {
             log.warn("Nenhuma unidade participante encontrada para notificar ao finalizar processo {}",
                     processo.getCodigo());
             return;
         }
+
+        List<Unidade> unidadesParticipantes = unidadeService.buscarEntidadesPorIds(codigosParticipantes);
 
         List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
         Map<Long, UnidadeResponsavelDto> responsaveis = unidadeService.buscarResponsaveisUnidades(todosCodigosUnidades);

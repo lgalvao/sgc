@@ -193,7 +193,7 @@ class PainelFacadeTest {
         u.setCodigo(10L);
         u.setNome("Unit");
         u.setSigla("U");
-        p.setParticipantes(new HashSet<>(Set.of(u)));
+        p.adicionarParticipantes(Set.of(u));
         return p;
     }
 }

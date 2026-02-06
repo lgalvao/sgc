@@ -80,7 +80,7 @@ class EventoProcessoListenerTest {
         p.setCodigo(codigo);
         p.setDescricao("Processo " + codigo);
         p.setTipo(TipoProcesso.MAPEAMENTO);
-        p.setParticipantes(Collections.emptySet());
+        p.setParticipantes(new java.util.ArrayList<>());
         return p;
     }
 
@@ -206,7 +206,7 @@ class EventoProcessoListenerTest {
         Unidade intermediaria = criarUnidade(2L, TipoUnidade.INTERMEDIARIA);
         intermediaria.setSigla("INT");
 
-        processo.setParticipantes(Set.of(operacional, intermediaria));
+        processo.adicionarParticipantes(Set.of(operacional, intermediaria));
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
                 1L, UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
@@ -218,6 +218,8 @@ class EventoProcessoListenerTest {
                 "T2", UsuarioDto.builder().email("int@mail.com").build()
         ));
 
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(operacional, intermediaria));
+        
         // 1. Intermediária sem subordinadas (log.warn)
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(2L).build());
         verify(notificacaoEmailService, times(1)).enviarEmailHtml(eq("op@mail.com"), anyString(), any());
@@ -227,7 +229,7 @@ class EventoProcessoListenerTest {
         Unidade sub = criarUnidade(21L, TipoUnidade.OPERACIONAL);
         sub.setUnidadeSuperior(intermediaria);
         sub.setSigla("SUB");
-        processo.setParticipantes(Set.of(operacional, intermediaria, sub));
+        processo.adicionarParticipantes(Set.of(operacional, intermediaria, sub));
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
                 1L, UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
@@ -239,6 +241,8 @@ class EventoProcessoListenerTest {
                 "T2", UsuarioDto.builder().email("int@mail.com").build(),
                 "TS", UsuarioDto.builder().email("sub@mail.com").build()
         ));
+
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(operacional, intermediaria, sub));
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(2L).build());
         verify(notificacaoEmailService).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
@@ -273,7 +277,7 @@ class EventoProcessoListenerTest {
 
         Unidade raiz = criarUnidade(1L, TipoUnidade.RAIZ);
 
-        processo.setParticipantes(Set.of(raiz));
+        processo.adicionarParticipantes(Set.of(raiz));
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
                 1L, UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build()
@@ -282,6 +286,7 @@ class EventoProcessoListenerTest {
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
                 "T1", UsuarioDto.builder().email("op@mail.com").build()
         ));
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(raiz));
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(2L).build());
 
@@ -303,7 +308,7 @@ class EventoProcessoListenerTest {
     @DisplayName("Deve ignorar se participantes for vazio ao finalizar")
     void deveLogarWarningSeParticipantesVazio() {
         Processo p = criarProcesso(1L);
-        p.setParticipantes(Collections.emptySet());
+        p.setParticipantes(new java.util.ArrayList<>());
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build());
@@ -343,13 +348,14 @@ class EventoProcessoListenerTest {
         Unidade u1 = criarUnidade(1L, TipoUnidade.OPERACIONAL);
         Unidade u2 = criarUnidade(2L, TipoUnidade.OPERACIONAL);
 
-        processo.setParticipantes(Set.of(u1, u2));
+        processo.adicionarParticipantes(Set.of(u1, u2));
 
         // u1 sem responsável no mapa
         // u2 com responsável mas sem titularTitulo
         UnidadeResponsavelDto r2 = UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo(null).build();
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(2L, r2));
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(u1, u2));
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(3L).build());
 
@@ -365,7 +371,7 @@ class EventoProcessoListenerTest {
         Unidade u1 = criarUnidade(1L, TipoUnidade.OPERACIONAL);
         Unidade u2 = criarUnidade(2L, TipoUnidade.OPERACIONAL);
 
-        processo.setParticipantes(Set.of(u1, u2));
+        processo.adicionarParticipantes(Set.of(u1, u2));
 
         UnidadeResponsavelDto r1 = UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
         UnidadeResponsavelDto r2 = UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build();
@@ -378,6 +384,7 @@ class EventoProcessoListenerTest {
         UsuarioDto user2 = UsuarioDto.builder().tituloEleitoral("T2").email("   ").build();
 
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", user1, "T2", user2));
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(u1, u2));
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(4L).build());
 
@@ -446,7 +453,7 @@ class EventoProcessoListenerTest {
 
         Unidade interoperacional = criarUnidade(1L, TipoUnidade.INTEROPERACIONAL);
         interoperacional.setSigla("INTER");
-        processo.setParticipantes(Set.of(interoperacional));
+        processo.adicionarParticipantes(Set.of(interoperacional));
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
                 1L, UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build()
@@ -455,6 +462,7 @@ class EventoProcessoListenerTest {
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
                 "T1", UsuarioDto.builder().email("inter@mail.com").build()
         ));
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(interoperacional));
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(5L).build());
 
@@ -473,7 +481,7 @@ class EventoProcessoListenerTest {
         sub.setUnidadeSuperior(intermediaria);
         sub.setSigla("SUB");
 
-        processo.setParticipantes(Set.of(intermediaria, sub));
+        processo.adicionarParticipantes(Set.of(intermediaria, sub));
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
                 1L, UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
@@ -488,6 +496,7 @@ class EventoProcessoListenerTest {
         // Simular exceção ao criar email para unidade intermediária
         when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any()))
                 .thenThrow(new RuntimeException("Erro ao criar template"));
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(intermediaria, sub));
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(6L).build());
 
@@ -538,7 +547,7 @@ class EventoProcessoListenerTest {
         Unidade u1 = criarUnidade(1L, TipoUnidade.OPERACIONAL);
         Unidade u2 = criarUnidade(2L, TipoUnidade.OPERACIONAL);
 
-        processo.setParticipantes(Set.of(u1, u2));
+        processo.adicionarParticipantes(Set.of(u1, u2));
 
         // Responsáveis com titularTitulo null - stream resultará vazio
         UnidadeResponsavelDto r1 = UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo(null).build();
@@ -603,7 +612,7 @@ class EventoProcessoListenerTest {
         comOutroSuperior.setUnidadeSuperior(outraIntermediaria);
         comOutroSuperior.setSigla("OUTRO_SUP");
 
-        processo.setParticipantes(Set.of(intermediaria, outra, comOutroSuperior));
+        processo.adicionarParticipantes(Set.of(intermediaria, outra, comOutroSuperior));
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
                 1L, UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
@@ -616,6 +625,7 @@ class EventoProcessoListenerTest {
                 "T2", UsuarioDto.builder().email("out@mail.com").build(),
                 "T4", UsuarioDto.builder().email("outro_sup@mail.com").build()
         ));
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(intermediaria, outra, comOutroSuperior));
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(10L).build());
 

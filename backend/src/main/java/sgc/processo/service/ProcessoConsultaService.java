@@ -71,7 +71,7 @@ public class ProcessoConsultaService {
 
     public Page<Processo> listarPorParticipantesIgnorandoCriado(
             List<Long> unidadeIds, Pageable pageable) {
-        return processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
+        return processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 unidadeIds, SituacaoProcesso.CRIADO, pageable);
     }
 

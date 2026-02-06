@@ -54,9 +54,12 @@ public class ProcessoManutencaoService {
                 .setTipo(tipoProcesso)
                 .setDataLimite(req.dataLimiteEtapa1())
                 .setSituacao(CRIADO)
-                .setDataCriacao(LocalDateTime.now())
-                .setParticipantes(participantes);
+                .setDataCriacao(LocalDateTime.now());
 
+        // Adiciona participantes com snapshot
+        processo.adicionarParticipantes(participantes);
+
+        // Salva uma única vez com todos os participantes
         Processo processoSalvo = processoRepo.saveAndFlush(processo);
 
         log.info("Processo {} criado.", processoSalvo.getCodigo());
@@ -88,8 +91,8 @@ public class ProcessoManutencaoService {
             participantes.add(unidadeService.buscarEntidadePorId(codigoUnidade));
         }
 
-        // Atualiza participantes
-        processo.setParticipantes(participantes);
+        // Atualiza participantes com sincronização inteligente para evitar DuplicateKeyException
+        processo.sincronizarParticipantes(participantes);
 
         Processo processoAtualizado = processoRepo.saveAndFlush(processo);
         log.info("Processo {} atualizado.", codigo);

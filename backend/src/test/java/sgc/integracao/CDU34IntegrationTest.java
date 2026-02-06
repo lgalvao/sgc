@@ -28,7 +28,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDateTime;
-
+import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -61,7 +61,7 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setDescricao("Processo CDU-34");
-        processo.getParticipantes().add(unidade); // Adicionar unidade como participante
+        processo.adicionarParticipantes(Set.of(unidade)); // Adicionar unidade como participante
         processo = processoRepo.save(processo);
 
         // Criar Subprocesso com prazo próximo

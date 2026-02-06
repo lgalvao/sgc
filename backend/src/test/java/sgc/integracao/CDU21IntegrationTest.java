@@ -30,7 +30,6 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -113,9 +112,8 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         processo.setDescricao("Processo de Teste para Finalizar");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setParticipantes(
-                new HashSet<>(
-                        Set.of(unidadeIntermediaria, unidadeOperacional1, unidadeOperacional2)));
+        processo.adicionarParticipantes(
+                        Set.of(unidadeIntermediaria, unidadeOperacional1, unidadeOperacional2));
         processo = processoRepo.save(processo);
 
         // Criar Mapas e Subprocessos via Fixture

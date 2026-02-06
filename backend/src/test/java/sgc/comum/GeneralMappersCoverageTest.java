@@ -100,11 +100,12 @@ class GeneralMappersCoverageTest {
     @Test
     @DisplayName("ProcessoDetalheMapper - Cobertura de branches nulos")
     void processoDetalheMapperNulls() {
-        assertThat(processoDetalheMapper.toUnidadeParticipanteDto(null)).isNull();
+        assertThat(processoDetalheMapper.fromUnidade(null)).isNull();
+        assertThat(processoDetalheMapper.fromSnapshot(null)).isNull();
 
         Unidade u = new Unidade();
         u.setUnidadeSuperior(null);
-        assertThat(processoDetalheMapper.toUnidadeParticipanteDto(u).getCodUnidadeSuperior()).isNull();
+        assertThat(processoDetalheMapper.fromUnidade(u).getCodUnidadeSuperior()).isNull();
     }
 
     @Test

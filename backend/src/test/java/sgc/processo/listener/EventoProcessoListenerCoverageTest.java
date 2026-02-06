@@ -30,7 +30,6 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import java.util.Collections;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -164,7 +163,7 @@ class EventoProcessoListenerCoverageTest {
         uOutra.setSigla("UX");
         uOutra.setUnidadeSuperior(null);
 
-        processo.setParticipantes(Set.of(uInter, uOp, uOutra));
+        processo.adicionarParticipantes(Set.of(uInter, uOp, uOutra));
 
         UnidadeResponsavelDto rInter = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(1L).titularTitulo("T1").build();
@@ -183,6 +182,7 @@ class EventoProcessoListenerCoverageTest {
         
         when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("html op");
         when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), anyList())).thenReturn("html inter");
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(uInter, uOp, uOutra));
 
         listener.aoFinalizarProcesso(evento);
 
@@ -214,7 +214,7 @@ class EventoProcessoListenerCoverageTest {
         uSubordinadaInvalida.setCodigo(2L);
         uSubordinadaInvalida.setUnidadeSuperior(uSuperiorDiferente);
 
-        processo.setParticipantes(Set.of(uInter, uSubordinadaInvalida));
+        processo.adicionarParticipantes(Set.of(uInter, uSubordinadaInvalida));
 
         UnidadeResponsavelDto rInter = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(1L).titularTitulo("T1").build();
@@ -223,6 +223,7 @@ class EventoProcessoListenerCoverageTest {
         when(processoFacade.buscarEntidadePorId(codProcesso)).thenReturn(processo);
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, rInter));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1));
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(uInter, uSubordinadaInvalida));
 
         listener.aoFinalizarProcesso(evento);
 
@@ -301,7 +302,7 @@ class EventoProcessoListenerCoverageTest {
         EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(cod).build();
         Processo p = new Processo();
         p.setCodigo(cod);
-        p.setParticipantes(Collections.emptySet());
+        p.setParticipantes(new java.util.ArrayList<>());
         when(processoFacade.buscarEntidadePorId(cod)).thenReturn(p);
         listener.aoFinalizarProcesso(evento);
         verify(unidadeService, never()).buscarResponsaveisUnidades(any());
@@ -380,12 +381,13 @@ class EventoProcessoListenerCoverageTest {
         Unidade u = new Unidade();
         u.setCodigo(10L);
         u.setTipo(TipoUnidade.INTEROPERACIONAL);
-        p.setParticipantes(Set.of(u));
+        p.adicionarParticipantes(Set.of(u));
         UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").build();
 
         when(processoFacade.buscarEntidadePorId(cod)).thenReturn(p);
         when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, r));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of());
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(u));
 
         listener.aoFinalizarProcesso(evento);
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
@@ -400,7 +402,7 @@ class EventoProcessoListenerCoverageTest {
         p.setCodigo(cod);
         Unidade u = new Unidade();
         u.setCodigo(10L);
-        p.setParticipantes(Set.of(u));
+        p.adicionarParticipantes(Set.of(u));
         UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").build();
         UsuarioDto ut = UsuarioDto.builder().tituloEleitoral("T").email(" ").build();
 
@@ -408,6 +410,7 @@ class EventoProcessoListenerCoverageTest {
         when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, r));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", ut));
 
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(u));
         listener.aoFinalizarProcesso(evento);
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
@@ -445,13 +448,14 @@ class EventoProcessoListenerCoverageTest {
         EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder().codProcesso(cod).build();
         Processo p = new Processo(); p.setCodigo(cod);
         Unidade u = new Unidade(); u.setCodigo(10L); u.setTipo(TipoUnidade.RAIZ);
-        p.setParticipantes(Set.of(u));
+        p.adicionarParticipantes(Set.of(u));
         UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").build();
         UsuarioDto ut = UsuarioDto.builder().tituloEleitoral("T").email("t@t.com").build();
 
         when(processoFacade.buscarEntidadePorId(cod)).thenReturn(p);
         when(unidadeService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, r));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", ut));
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(u));
 
         listener.aoFinalizarProcesso(evento);
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());

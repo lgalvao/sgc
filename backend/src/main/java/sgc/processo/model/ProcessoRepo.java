@@ -29,19 +29,19 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
             """)
     List<Processo> listarPorSituacaoComParticipantes(@Param("situacao") SituacaoProcesso situacao);
 
-    Page<Processo> findDistinctByParticipantes_CodigoInAndSituacaoNot(
+    Page<Processo> findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
             List<Long> codigos, SituacaoProcesso situacao, Pageable pageable);
 
     @Query("""
-            SELECT distinct u.codigo FROM Processo p JOIN p.participantes u
-            WHERE p.situacao = :situacao AND u.codigo IN :codigos
+            SELECT distinct u.id.unidadeCodigo FROM Processo p JOIN p.participantes u
+            WHERE p.situacao = :situacao AND u.id.unidadeCodigo IN :codigos
             """)
     List<Long> findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(
             @Param("situacao") SituacaoProcesso situacao,
             @Param("codigos") List<Long> codigos);
 
     @Query("""
-            SELECT distinct u.codigo FROM Processo p JOIN p.participantes u
+            SELECT distinct u.id.unidadeCodigo FROM Processo p JOIN p.participantes u
             WHERE p.situacao = :situacao AND p.tipo = :tipo
             """)
     List<Long> findUnidadeCodigosBySituacaoAndTipo(
@@ -49,7 +49,7 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
             @Param("tipo") TipoProcesso tipo);
 
     @Query("""
-            SELECT distinct u.codigo FROM Processo p JOIN p.participantes u
+            SELECT distinct u.id.unidadeCodigo FROM Processo p JOIN p.participantes u
             WHERE p.situacao IN :situacoes AND (:idIgnorado IS NULL OR p.codigo <> :idIgnorado)
             """)
     List<Long> findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(

@@ -159,9 +159,7 @@ create table if not exists sgc.vw_vinculacao_unidade
     not
     null,
     unidade_anterior_codigo
-    bigint
-    not
-    null,
+    bigint,
     demais_unidades_historicas
     varchar
 (
@@ -169,8 +167,7 @@ create table if not exists sgc.vw_vinculacao_unidade
 ),
     primary key
 (
-    unidade_atual_codigo,
-    unidade_anterior_codigo
+    unidade_atual_codigo
 )
     );
 
@@ -227,7 +224,7 @@ create table if not exists sgc.processo
     data_limite timestamp
 (
     6
-),
+) not null,
     situacao varchar
 (
     20
@@ -321,7 +318,7 @@ create table if not exists sgc.subprocesso
     6
 ),
     processo_codigo bigint,
-    unidade_codigo bigint,
+    unidade_codigo bigint not null,
     situacao varchar
 (
     50
@@ -350,7 +347,7 @@ create table if not exists sgc.subprocesso
     'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO',
     'DIAGNOSTICO_MONITORAMENTO',
     'DIAGNOSTICO_CONCLUIDO'
-)),
+)) not null,
     primary key
 (
     codigo
@@ -454,7 +451,7 @@ create table if not exists sgc.analise
 ),
     motivo varchar
 (
-    500
+    200
 ),
     observacoes varchar
 (
@@ -499,20 +496,20 @@ create table if not exists sgc.atribuicao_temporaria
     timestamp
 (
     6
-),
+) not null,
     data_termino timestamp
 (
     6
-),
-    unidade_codigo bigint,
+) not null,
+    unidade_codigo bigint not null,
     usuario_titulo varchar
 (
     12
-),
+) not null,
     usuario_matricula varchar
 (
     8
-),
+) not null,
     justificativa varchar
 (
     500
@@ -595,14 +592,14 @@ create table if not exists sgc.movimentacao
     timestamp
 (
     6
-),
+) not null,
     subprocesso_codigo bigint,
-    unidade_destino_codigo bigint,
-    unidade_origem_codigo bigint,
+    unidade_destino_codigo bigint not null,
+    unidade_origem_codigo bigint not null,
     usuario_titulo varchar
 (
     12
-),
+) not null,
     descricao varchar
 (
     255
@@ -785,8 +782,7 @@ alter table if exists sgc.vw_responsabilidade
     add constraint fk_responsabilidade_unidade foreign key (unidade_codigo) references sgc.vw_unidade;
 alter table if exists sgc.vw_responsabilidade
     add constraint fk_responsabilidade_usuario foreign key (usuario_titulo) references sgc.vw_usuario;
-alter table if exists sgc.vw_vinculacao_unidade
-    add constraint fk_vinculacao_unidade_anterior foreign key (unidade_anterior_codigo) references sgc.vw_unidade;
+-- FK de unidade_anterior_codigo removida: campo pode ser NULL para unidades raiz
 alter table if exists sgc.vw_vinculacao_unidade
     add constraint fk_vinculacao_unidade_atual foreign key (unidade_atual_codigo) references sgc.vw_unidade;
 
