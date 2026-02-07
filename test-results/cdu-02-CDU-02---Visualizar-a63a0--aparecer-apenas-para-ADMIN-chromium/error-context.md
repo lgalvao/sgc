@@ -1,0 +1,96 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e4]:
+    - navigation [ref=e5]:
+      - generic [ref=e6]:
+        - link "SGC" [ref=e7] [cursor=pointer]:
+          - /url: /painel
+        - generic [ref=e8]:
+          - list [ref=e9]:
+            - listitem [ref=e10]:
+              - link "Painel" [ref=e11] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e12]: 
+                - text: Painel
+            - listitem [ref=e13]:
+              - link "Unidades" [ref=e14] [cursor=pointer]:
+                - /url: /unidade/1
+                - generic [ref=e15]: 
+                - text: Unidades
+            - listitem [ref=e16]:
+              - link "Relatórios" [ref=e17] [cursor=pointer]:
+                - /url: /relatorios
+                - generic [ref=e18]: 
+                - text: Relatórios
+            - listitem [ref=e19]:
+              - link "Histórico" [ref=e20] [cursor=pointer]:
+                - /url: /historico
+                - generic [ref=e21]: 
+                - text: Histórico
+          - list [ref=e22]:
+            - listitem [ref=e23]:
+              - link "ADMIN - SEDOC" [ref=e24]:
+                - /url: "#"
+                - generic [ref=e25]:
+                  - generic [ref=e26]: 
+                  - generic [ref=e27]: ADMIN - SEDOC
+            - listitem "Configurações do sistema" [ref=e28]:
+              - link [ref=e29] [cursor=pointer]:
+                - /url: /configuracoes
+                - generic [ref=e30]: 
+            - listitem "Sair" [ref=e31]:
+              - link [ref=e32] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e33]: 
+    - main [ref=e34]:
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - heading "Processos" [level=2] [ref=e39]
+            - button "Criar processo" [ref=e41] [cursor=pointer]:
+              - generic [ref=e42]: 
+              - text: Criar processo
+          - generic "Lista de processos cadastrados" [ref=e44]:
+            - table [ref=e45]:
+              - rowgroup [ref=e46]:
+                - row "Descrição Tipo Unidades Situação" [ref=e47]:
+                  - columnheader "Descrição" [ref=e48] [cursor=pointer]
+                  - columnheader "Tipo" [ref=e49] [cursor=pointer]
+                  - columnheader "Unidades" [ref=e50]
+                  - columnheader "Situação" [ref=e51] [cursor=pointer]
+              - rowgroup [ref=e52]:
+                - row "Processo 99 Mapeamento ASSESSORIA_12 Finalizado" [ref=e53] [cursor=pointer]:
+                  - cell "Processo 99" [ref=e54]
+                  - cell "Mapeamento" [ref=e55]
+                  - cell "ASSESSORIA_12" [ref=e56]
+                  - cell "Finalizado" [ref=e57]
+                - row "Processo Seed 200 Mapeamento SECRETARIA_1 Finalizado" [ref=e58] [cursor=pointer]:
+                  - cell "Processo Seed 200" [ref=e59]
+                  - cell "Mapeamento" [ref=e60]
+                  - cell "SECRETARIA_1" [ref=e61]
+                  - cell "Finalizado" [ref=e62]
+        - generic [ref=e63]:
+          - heading "Alertas" [level=2] [ref=e66]
+          - table [ref=e69]:
+            - rowgroup [ref=e70]:
+              - row "Data/Hora Descrição Processo Origem" [ref=e71]:
+                - columnheader "Data/Hora" [ref=e72] [cursor=pointer]
+                - columnheader "Descrição" [ref=e73]
+                - columnheader "Processo" [ref=e74] [cursor=pointer]
+                - columnheader "Origem" [ref=e75]
+            - rowgroup [ref=e76]:
+              - row [ref=e77] [cursor=pointer]:
+                - cell [ref=e78]:
+                  - alert [ref=e79]:
+                    - region "Estado vazio" [ref=e81]:
+                      - generic [ref=e82]: 
+                      - paragraph [ref=e83]: Nenhum alerta
+    - contentinfo [ref=e84]:
+      - generic [ref=e85]:
+        - generic [ref=e86]: Versão 1.0.0
+        - generic [ref=e87]: © SESEL/COSIS/TRE-PE
+```

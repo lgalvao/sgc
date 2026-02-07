@@ -1,0 +1,5 @@
+
+> sgc-e2e@1.0.0 test:e2e
+> playwright test
+
+sh: 1: playwright: not found
