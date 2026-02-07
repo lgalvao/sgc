@@ -45,7 +45,7 @@ describe("MainNavbar.vue", () => {
     });
 
     const checkLink = (text: string, to: string) => {
-         const links = ctx.wrapper.findAllComponents(RouterLinkStub);
+         const links = ctx.wrapper!.findAllComponents(RouterLinkStub);
          const link = links.find(w => w.text().includes(text));
          expect(link?.exists()).toBe(true);
          expect(link?.props().to).toBe(to);

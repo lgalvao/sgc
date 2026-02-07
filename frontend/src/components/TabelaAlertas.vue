@@ -49,7 +49,8 @@ const fields = [
   {key: "origem", label: "Origem"},
 ];
 
-const rowClass = (item: Alerta) => {
+const rowClass = (item: Alerta | null) => {
+  if (!item) return "";
   return item.dataHoraLeitura ? "" : "fw-bold";
 };
 

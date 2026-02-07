@@ -27,7 +27,7 @@ export async function importarAtividades(
 
 export async function listarAtividades(codSubprocesso: number): Promise<Atividade[]> {
     const response = await apiClient.get<any[]>(`/subprocessos/${codSubprocesso}/atividades`);
-    return response.data.map(mapAtividadeVisualizacaoToModel);
+    return response.data.map(mapAtividadeVisualizacaoToModel).filter((a): a is Atividade => a !== null);
 }
 
 export async function obterPermissoes(codSubprocesso: number): Promise<SubprocessoPermissoes> {

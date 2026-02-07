@@ -33,7 +33,7 @@ describe("mappers/alertas", () => {
             dataHora: "2025-10-18T10:00:00",
             unidadeOrigem: "UO",
             unidadeDestino: "UD",
-            dataHoraLeitura: null,
+            dataHoraLeitura: undefined,
             linkDestino: "/test",
             mensagem: "Test Message",
             dataHoraFormatada: "18/10/2025 10:00",
@@ -64,17 +64,17 @@ describe("mappers/atividades", () => {
             conhecimentos: [{codigo: 101, descricao: "Conhecimento Teste"}],
         };
         const model = mapAtividadeToModel(dto);
-        expect(model.codigo).toBe(1);
-        expect(model.descricao).toBe("Atividade Teste");
-        expect(model.conhecimentos).toHaveLength(1);
-        expect(model.conhecimentos[0].codigo).toBe(101);
+        expect(model!.codigo).toBe(1);
+        expect(model!.descricao).toBe("Atividade Teste");
+        expect(model!.conhecimentos).toHaveLength(1);
+        expect(model!.conhecimentos[0].codigo).toBe(101);
     });
 
     it("mapConhecimentoToModel deve mapear corretamente", () => {
         const dto = {codigo: 101, descricao: "Conhecimento Teste"};
         const model = mapConhecimentoToModel(dto);
-        expect(model.codigo).toBe(101);
-        expect(model.descricao).toBe("Conhecimento Teste");
+        expect(model!.codigo).toBe(101);
+        expect(model!.descricao).toBe("Conhecimento Teste");
     });
 
     it("mapCriarAtividadeRequestToDto deve adicionar codSubrocesso", () => {
@@ -117,7 +117,7 @@ describe("mappers/mapas", () => {
             ],
         };
         const model = mapMapaCompletoDtoToModel(dto);
-        expect(model.competencias[0].atividades[0].conhecimentos[0].codigo).toBe(
+        expect(model.competencias[0].atividades[0].conhecimentos![0].codigo).toBe(
             1000,
         );
     });
@@ -159,7 +159,7 @@ describe("mappers/processos", () => {
             unidades: [{codUnidade: 10, filhos: [{codUnidade: 11}]}],
         };
         const model = mapProcessoDetalheDtoToFrontend(dto);
-        expect(model.unidades[0].filhos[0].codUnidade).toBe(11);
+        expect(model.unidades[0].filhos![0].codUnidade).toBe(11);
     });
 });
 
@@ -299,7 +299,7 @@ describe("mappers/unidades", () => {
         expect(mapped.responsavel).not.toBeNull();
         expect((mapped.responsavel as any)!.usuarioCodigo).toBe(100);
         expect(Array.isArray(mapped.filhas)).toBe(true);
-        expect(mapped.filhas[0].codigo).toBe(11);
+        expect(mapped.filhas![0].codigo).toBe(11);
     });
 
     it("mapUnidadeSnapshot mapeia estrutura simples de snapshot recursivamente", () => {
@@ -310,8 +310,8 @@ describe("mappers/unidades", () => {
         };
         const snap = mapUnidadeSnapshot(s);
         expect(snap.sigla).toBe("ROOT");
-        expect(snap.filhas.length).toBe(1);
-        expect(snap.filhas[0].sigla).toBe("C1");
+        expect(snap.filhas!.length).toBe(1);
+        expect(snap.filhas![0].sigla).toBe("C1");
     });
 
     it("mapUnidadesArray mapeia arrays", () => {

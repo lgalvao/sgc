@@ -299,7 +299,7 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
   if (competencia) {
     const competenciaAtualizada = {
       ...competencia,
-      atividadesAssociadas: competencia.atividadesAssociadas.filter(
+      atividadesAssociadas: (competencia.atividadesAssociadas || []).filter(
           (id) => id !== atividadeId,
       ),
     };

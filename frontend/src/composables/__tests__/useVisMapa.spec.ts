@@ -43,7 +43,7 @@ describe("useVisMapa", () => {
     let feedbackStore: any;
     let router: any;
 
-    const setup = (initialState = {}, routeParams = { siglaUnidade: "TEST", codProcesso: "1" }, perfil = "GESTOR") => {
+    const setup = (initialState: any = {}, routeParams = { siglaUnidade: "TEST", codProcesso: "1" }, perfil = "GESTOR") => {
         vi.mocked(useRoute).mockReturnValue({
             params: reactive(routeParams)
         } as any);

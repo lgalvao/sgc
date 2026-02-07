@@ -9,7 +9,7 @@ export function mapAlertaDtoToFrontend(dto: AlertaDto): Alerta {
         dataHora: dto.dataHora,
         unidadeOrigem: dto.unidadeOrigem,
         unidadeDestino: dto.unidadeDestino,
-        dataHoraLeitura: dto.dataHoraLeitura,
+        dataHoraLeitura: dto.dataHoraLeitura ?? null,
         mensagem: dto.mensagem,
         dataHoraFormatada: dto.dataHoraFormatada,
         origem: dto.origem,

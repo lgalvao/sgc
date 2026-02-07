@@ -11,7 +11,7 @@ describe('ParametrosSection', () => {
     let configuracoesStore: any;
     let notificacoesStore: any;
 
-    const setupWrapper = (initialState = {}, storeParams = null) => {
+    const setupWrapper = (initialState: any = {}, storeParams: any[] | null = null) => {
         const pinia = createTestingPinia({
             stubActions: false,
             initialState

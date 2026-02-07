@@ -11,12 +11,14 @@ import apiClient from "@/axios-setup";
 
 export async function listarAtividades(): Promise<Atividade[]> {
     const response = await apiClient.get<any[]>("/atividades");
-    return response.data.map(mapAtividadeToModel);
+    return response.data.map(mapAtividadeToModel).filter((a): a is Atividade => a !== null);
 }
 
 export async function obterAtividadePorCodigo(codAtividade: number): Promise<Atividade> {
     const response = await apiClient.get<any>(`/atividades/${codAtividade}`);
-    return mapAtividadeToModel(response.data);
+    const model = mapAtividadeToModel(response.data);
+    if (!model) throw new Error("Atividade não encontrada");
+    return model;
 }
 
 export async function criarAtividade(
@@ -51,7 +53,7 @@ export async function listarConhecimentos(
     const response = await apiClient.get<any[]>(
         `/atividades/${codAtividade}/conhecimentos`,
     );
-    return response.data.map(mapConhecimentoToModel);
+    return response.data.map(mapConhecimentoToModel).filter((c): c is Conhecimento => c !== null);
 }
 
 export async function criarConhecimento(

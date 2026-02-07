@@ -2,7 +2,7 @@ import {describe, expect, it, vi} from "vitest";
 import {mount, VueWrapper} from "@vue/test-utils";
 import TabelaMovimentacoes from "../TabelaMovimentacoes.vue";
 import type {Movimentacao, Unidade} from "@/types/tipos";
-import {BTable} from "bootstrap-vue-next";
+import {BTable as _BTable} from "bootstrap-vue-next";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mock do utils para formatDateTimeBR
@@ -58,7 +58,7 @@ describe("TabelaMovimentacoes.vue", () => {
             global: {stubs: {BTable: true}}
         });
 
-        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
+        const bTable = wrapper.findComponent(_BTable as any) as unknown as VueWrapper<any>;
         expect(bTable.exists()).toBe(true);
         expect(bTable.props("items")).toEqual(mockMovimentacoes);
     });
@@ -94,7 +94,7 @@ describe("TabelaMovimentacoes.vue", () => {
             global: {stubs: {BTable: true}}
         });
 
-        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
+        const bTable = wrapper.findComponent(_BTable as any) as unknown as VueWrapper<any>;
         const rowAttrFn = bTable.props("tbodyTrAttr") || bTable.vm.$attrs["tbody-tr-attr"];
 
         expect(typeof rowAttrFn).toBe("function");

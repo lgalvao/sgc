@@ -32,7 +32,9 @@ export const useAtividadesStore = defineStore("atividades", () => {
     async function atualizarDadosLocais(codSubprocesso: number, response: AtividadeOperacaoResponse) {
         // Atualizar lista de atividades no cache local
         if (response.atividadesAtualizadas) {
-            const atividades = response.atividadesAtualizadas.map(mapAtividadeVisualizacaoToModel);
+            const atividades = response.atividadesAtualizadas
+                .map(mapAtividadeVisualizacaoToModel)
+                .filter((a): a is Atividade => a !== null);
             atividadesPorSubprocesso.value.set(codSubprocesso, atividades);
         }
         

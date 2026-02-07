@@ -1,5 +1,5 @@
-import {mount, type VueWrapper} from "@vue/test-utils";
-import {BTable} from "bootstrap-vue-next";
+import {mount} from "@vue/test-utils";
+import {BTable as _BTable} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import {type ProcessoResumo, SituacaoProcesso, TipoProcesso,} from "@/types/tipos";
 import TabelaProcessos from "../TabelaProcessos.vue";
@@ -22,7 +22,7 @@ const mockProcessos: ProcessoResumo[] = [
         dataLimite: new Date().toISOString(),
         dataLimiteFormatada: "15/10/2023",
         dataCriacao: new Date().toISOString(),
-        dataFinalizacao: null,
+        dataFinalizacao: undefined,
     },
     {
         codigo: 2,
@@ -56,7 +56,7 @@ describe("TabelaProcessos.vue", () => {
             },
         });
 
-        const table = context.wrapper.findComponent(BTable);
+        const table = context.wrapper.findComponent(_BTable as any) as any;
         expect(table.exists()).toBe(true);
 
         await context.wrapper.vm.$nextTick();
@@ -114,7 +114,7 @@ describe("TabelaProcessos.vue", () => {
         });
 
         await (
-            context.wrapper.findComponent(BTable) as unknown as VueWrapper<any>
+            context.wrapper.findComponent(_BTable as any) as any
         ).vm.$emit("sort-changed", {sortBy: "tipo"});
 
         expect(context.wrapper.emitted("ordenar")).toBeTruthy();
@@ -299,7 +299,7 @@ describe("TabelaProcessos.vue", () => {
                 },
             });
 
-            const table = context.wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
+            const table = context.wrapper.findComponent(_BTable as any) as any;
             const fields = (table.props("fields") as any[]);
             const desc = fields.find(f => f.key === "descricao");
             expect(desc.sortable).toBe(true);
@@ -322,7 +322,7 @@ describe("TabelaProcessos.vue", () => {
             });
 
             await (
-                context.wrapper.findComponent(BTable) as unknown as VueWrapper<any>
+                context.wrapper.findComponent(_BTable as any) as any
             ).vm.$emit("sort-changed", {sortBy: "tipo"});
 
             expect(context.wrapper.emitted("ordenar")).toBeTruthy();

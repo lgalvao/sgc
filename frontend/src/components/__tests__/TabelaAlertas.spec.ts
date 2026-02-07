@@ -3,7 +3,7 @@ import {mount, VueWrapper} from "@vue/test-utils";
 import TabelaAlertas from "../TabelaAlertas.vue";
 import EmptyState from "../EmptyState.vue";
 import type {Alerta} from "@/types/tipos";
-import {BTable} from "bootstrap-vue-next";
+import {BTable as _BTable} from "bootstrap-vue-next";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
@@ -48,7 +48,7 @@ describe("TabelaAlertas.vue", () => {
             }
         });
 
-        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
+        const bTable = wrapper.findComponent(_BTable as any) as unknown as VueWrapper<any>;
         expect(bTable.exists()).toBe(true);
         expect(bTable.props("items")).toEqual(mockAlertas);
     });
@@ -78,7 +78,7 @@ describe("TabelaAlertas.vue", () => {
             global: {stubs: {BTable: true}}
         });
 
-        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
+        const bTable = wrapper.findComponent(_BTable as any) as unknown as VueWrapper<any>;
         const rowClassFn = bTable.props("tbodyTrClass");
 
         expect(rowClassFn(mockAlertas[0], "row")).toBe("fw-bold"); // Não lido
@@ -91,7 +91,7 @@ describe("TabelaAlertas.vue", () => {
             global: {stubs: {BTable: true}}
         });
 
-        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
+        const bTable = wrapper.findComponent(_BTable as any) as unknown as VueWrapper<any>;
         const fn = bTable.props("tbodyTrAttr") || bTable.vm.$attrs["tbody-tr-attr"];
 
         expect(typeof fn).toBe("function");
@@ -105,7 +105,7 @@ describe("TabelaAlertas.vue", () => {
             global: {stubs: {BTable: true}}
         });
 
-        const bTable = wrapper.findComponent(BTable) as unknown as VueWrapper<any>;
+        const bTable = wrapper.findComponent(_BTable as any) as unknown as VueWrapper<any>;
 
         await bTable.vm.$emit("sort-changed", {sortBy: "dataHoraFormatada"});
         expect(wrapper.emitted("ordenar")?.[0]).toEqual(["data"]);

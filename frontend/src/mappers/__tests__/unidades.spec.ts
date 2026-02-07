@@ -20,7 +20,7 @@ describe("mappers/unidades", () => {
             expect(snap.nome).toBe("Name");
             expect(snap.sigla).toBe("SIG");
             expect(snap.filhas).toHaveLength(1);
-            expect(snap.filhas[0].sigla).toBe("SUB");
+            expect(snap.filhas![0].sigla).toBe("SUB");
         });
 
         it("maps another alternative for sigla", () => {

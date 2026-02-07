@@ -77,7 +77,7 @@ const BFormInputStub = {
     template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
     props: ['modelValue'],
     emits: ['update:modelValue'],
-    setup(props, { expose }) {
+    setup(_props: any, { expose }: any) {
         const focus = vi.fn();
         expose({ focus, $el: { focus } });
         return { focus };
