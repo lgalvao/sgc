@@ -248,10 +248,10 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
     if (fieldErrors.value.dataLimiteEtapa1) fieldErrors.value.dataLimite = fieldErrors.value.dataLimiteEtapa1;
 
     const hasFieldErrors = hasErrors();
-    const genericErrors = lastError.subErrors?.filter(e => !e.field).map(e => e.message) || [];
+    const genericErrors = lastError.subErrors?.filter(e => !e.field).map(e => e.message || '') || [];
 
     if (!hasFieldErrors || genericErrors.length > 0) {
-      mostrarAlerta('danger', title, lastError.message || defaultMsg, genericErrors);
+      mostrarAlerta('danger', title, lastError.message || defaultMsg, genericErrors as string[]);
     } else if (hasFieldErrors) {
       // Focus on first invalid field
       nextTick(() => {

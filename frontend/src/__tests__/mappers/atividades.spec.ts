@@ -17,16 +17,16 @@ describe("mappers/atividades.ts", () => {
                 conhecimentos: [{codigo: 10, descricao: "Conh 1"}]
             };
             const result = mapAtividadeVisualizacaoToModel(dto);
-            expect(result.codigo).toBe(1);
-            expect(result.descricao).toBe("Ativ 1");
-            expect(result.conhecimentos).toHaveLength(1);
-            expect(result.conhecimentos[0].codigo).toBe(10);
+            expect(result!.codigo).toBe(1);
+            expect(result!.descricao).toBe("Ativ 1");
+            expect(result!.conhecimentos).toHaveLength(1);
+            expect(result!.conhecimentos[0].codigo).toBe(10);
         });
 
         it("deve lidar com conhecimentos vazios", () => {
             const dto = {codigo: 1, descricao: "Ativ 1"};
             const result = mapAtividadeVisualizacaoToModel(dto);
-            expect(result.conhecimentos).toEqual([]);
+            expect(result!.conhecimentos).toEqual([]);
         });
 
         it("deve retornar null se entrada for null", () => {
@@ -39,8 +39,8 @@ describe("mappers/atividades.ts", () => {
         it("deve mapear corretamente", () => {
             const dto = {codigo: 10, descricao: "Conh 1"};
             const result = mapConhecimentoVisualizacaoToModel(dto);
-            expect(result.codigo).toBe(10);
-            expect(result.descricao).toBe("Conh 1");
+            expect(result!.codigo).toBe(10);
+            expect(result!.descricao).toBe("Conh 1");
         });
 
         it("deve retornar null se input null", () => {
@@ -56,14 +56,14 @@ describe("mappers/atividades.ts", () => {
                 conhecimentos: [{codigo: 2, descricao: "C"}]
             };
             const result = mapAtividadeToModel(dto);
-            expect(result.codigo).toBe(1);
-            expect(result.conhecimentos[0].codigo).toBe(2);
+            expect(result!.codigo).toBe(1);
+            expect(result!.conhecimentos[0].codigo).toBe(2);
         });
 
         it("deve lidar com conhecimentos null", () => {
-            const dto = {codigo: 1, descricao: "A", conhecimentos: null};
+            const dto = {codigo: 1, descricao: "A", conhecimentos: null as any};
             const result = mapAtividadeToModel(dto);
-            expect(result.conhecimentos).toEqual([]);
+            expect(result!.conhecimentos).toEqual([]);
         });
 
         it("deve retornar null se input null", () => {
@@ -74,12 +74,12 @@ describe("mappers/atividades.ts", () => {
     describe("mapConhecimentoToModel", () => {
         it("deve mapear usando id", () => {
             const dto = {codigo: 5, descricao: "D"};
-            expect(mapConhecimentoToModel(dto).codigo).toBe(5);
+            expect(mapConhecimentoToModel(dto)!.codigo).toBe(5);
         });
 
         it("deve mapear usando codigo (fallback)", () => {
             const dto = {codigo: 6, descricao: "E"};
-            expect(mapConhecimentoToModel(dto).codigo).toBe(6);
+            expect(mapConhecimentoToModel(dto)!.codigo).toBe(6);
         });
 
         it("deve retornar null se input null", () => {

@@ -16,12 +16,11 @@ describe('Propriedades de Validação (validators.ts)', () => {
             );
         });
 
-        it.skip('deve aceitar emails válidos gerados', () => {
+        it('deve aceitar emails válidos gerados', () => {
              fc.assert(
                 fc.property(
-                    fc.emailAddress(),
+                    fc.stringMatching(/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,4}$/),
                     (email) => {
-                         // fast-check gera emails válidos, então nossa função deve retornar true
                          return validarEmail(email) === true;
                     }
                 )

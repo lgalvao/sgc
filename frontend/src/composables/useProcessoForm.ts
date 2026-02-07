@@ -44,7 +44,7 @@ export function useProcessoForm(initialData?: Processo) {
   function construirCriarRequest(): CriarProcessoRequest {
     return {
       descricao: descricao.value,
-      tipo: tipo.value,
+      tipo: tipo.value as TipoProcesso,
       dataLimiteEtapa1: dataLimite.value ? `${dataLimite.value}T00:00:00` : null,
       unidades: unidadesSelecionadas.value,
     };
@@ -54,7 +54,7 @@ export function useProcessoForm(initialData?: Processo) {
     return {
       codigo,
       descricao: descricao.value,
-      tipo: tipo.value,
+      tipo: tipo.value as TipoProcesso,
       dataLimiteEtapa1: dataLimite.value ? `${dataLimite.value}T00:00:00` : null,
       unidades: unidadesSelecionadas.value,
     };

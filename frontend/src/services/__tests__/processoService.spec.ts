@@ -64,7 +64,7 @@ describe('processoService', () => {
     it('atualizarProcesso deve fazer requisição POST', async () => {
         const codProcesso = 1;
         const request: AtualizarProcessoRequest = { codigo: 1, descricao: 'Atualizado', tipo: TipoProcesso.MAPEAMENTO, dataLimiteEtapa1: '2024-01-01', unidades: [] };
-        const responseData = { codigo: 1, ...request };
+        const responseData = { ...request };
         vi.mocked(apiClient.post).mockResolvedValue({ data: responseData });
 
         const result = await processoService.atualizarProcesso(codProcesso, request);

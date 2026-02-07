@@ -105,10 +105,10 @@ describe('Subprocessos Store', () => {
         processoDetalhe: { codigo: 999 },
     };
     const mockPerfilStore = {
-        perfilSelecionado: null,
-        unidadeSelecionada: null,
-        perfisUnidades: [],
-        unidadeAtual: null,
+        perfilSelecionado: null as string | null,
+        unidadeSelecionada: null as number | null,
+        perfisUnidades: [] as any[],
+        unidadeAtual: null as number | null,
     };
     const mockUnidadesStore = {
         unidade: null,

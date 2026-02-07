@@ -190,7 +190,7 @@ describe('ArvoreUnidades.vue', () => {
         expect(isHabilitado(mockUnidades[0])).toBe(true);
 
         // CHILD1 é elegível -> Habilitado
-        expect(isHabilitado(mockUnidades[0].filhas[0])).toBe(true);
+        expect(isHabilitado(mockUnidades[0].filhas![0])).toBe(true);
     });
 
     it('deve calcular estado de seleção indeterminado (getEstadoSelecao)', () => {
@@ -232,7 +232,7 @@ describe('ArvoreUnidades.vue', () => {
         const toggle = rootNode.props('onToggle');
 
         // Selecionar CHILD1
-        await toggle(mockUnidades[0].filhas[0], true);
+        await toggle(mockUnidades[0].filhas![0], true);
 
         // Deve emitir update:modelValue com [2]
         expect(wrapper.emitted('update:modelValue')).toBeTruthy();
@@ -257,7 +257,7 @@ describe('ArvoreUnidades.vue', () => {
         const toggle = rootNode.props('onToggle');
 
         // Deselecionar CHILD1
-        await toggle(mockUnidades[0].filhas[0], false);
+        await toggle(mockUnidades[0].filhas![0], false);
 
         expect(wrapper.emitted('update:modelValue')).toBeTruthy();
         expect(wrapper.emitted('update:modelValue')![0]).toEqual([[]]);
