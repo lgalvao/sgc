@@ -1,7 +1,7 @@
 # Status de Implementação - SGC
 
 **Última Atualização:** 2026-02-08  
-**Versão:** 1.0.1
+**Versão:** 1.1.0
 
 ---
 
@@ -265,6 +265,7 @@ Todos os módulos possuem README.md documentando suas responsabilidades e estrut
 
 | Data       | Versão | Mudanças                                           | Autor          |
 |------------|--------|----------------------------------------------------|----------------|
+| 2026-02-08 | 1.1.0  | Adicionado guia de atualização do documento        | Jules (Agent)  |
 | 2026-02-08 | 1.0.1  | Correção de métricas (195 arquivos de teste)       | Jules (Agent)  |
 | 2026-02-08 | 1.0.0  | Criação inicial do documento STATUS.md             | Jules (Agent)  |
 
@@ -283,3 +284,64 @@ Todos os módulos possuem README.md documentando suas responsabilidades e estrut
 ---
 
 **Nota:** Este documento deve ser atualizado regularmente conforme o projeto evolui. Ao completar tarefas ou iniciar novos trabalhos, atualize as seções relevantes e incremente a versão no histórico.
+
+---
+
+## 📝 Como Atualizar Este Documento
+
+Este documento STATUS.md é uma ferramenta viva que deve ser atualizada frequentemente. Siga estas diretrizes:
+
+### Quando Atualizar
+
+- ✅ Ao completar uma tarefa ou marco importante
+- ✅ Ao iniciar um novo trabalho significativo (mova de ⬜ para 🔄)
+- ✅ Ao implementar ou aceitar um novo ADR
+- ✅ Ao mudar o status de um módulo ou área
+- ✅ Ao alcançar novas métricas de cobertura ou qualidade
+- ✅ Semanalmente, como parte de revisões regulares
+
+### Como Atualizar
+
+1. **Atualize a data e versão no topo:**
+   ```markdown
+   **Última Atualização:** YYYY-MM-DD  
+   **Versão:** X.Y.Z
+   ```
+
+2. **Incremente a versão seguindo semver:**
+   - **Patch (x.y.Z):** Pequenas correções, atualizações de métricas
+   - **Minor (x.Y.z):** Novas seções, mudanças de status de tarefas
+   - **Major (X.y.z):** Grandes mudanças estruturais no projeto
+
+3. **Atualize as seções relevantes:**
+   - Mude status de tarefas (⬜ → 🔄 → ✅)
+   - Atualize métricas e KPIs
+   - Adicione novos itens em "Próximas Ações"
+   - Documente decisões arquiteturais
+
+4. **Adicione entrada no Histórico de Atualizações:**
+   ```markdown
+   | YYYY-MM-DD | X.Y.Z  | Descrição clara da mudança | Autor |
+   ```
+
+5. **Commit com mensagem descritiva:**
+   ```bash
+   git add STATUS.md
+   git commit -m "Update STATUS.md: [descrição da mudança] (vX.Y.Z)"
+   ```
+
+### Exemplo de Fluxo de Atualização
+
+```markdown
+# Antes de começar uma tarefa
+- [ ] Implementar cache distribuído com Redis
+
+# Ao iniciar
+- [x] Criar STATUS.md (este documento)
+- [🔄] Implementar cache distribuído com Redis  ← mudou para "em progresso"
+
+# Ao completar
+- [x] Implementar cache distribuído com Redis  ← mudou para "completo"
+```
+
+Mantenha este documento como a fonte única de verdade sobre o status do projeto!
