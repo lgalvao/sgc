@@ -1,7 +1,7 @@
 # Status de Implementação - SGC
 
 **Última Atualização:** 2026-02-08  
-**Versão:** 1.1.0
+**Versão:** 1.2.0
 
 ---
 
@@ -75,7 +75,7 @@ Este documento rastreia o status geral de implementação, refinamento e melhori
 | 11     | Padronização de Estilo      | ✅ Concluído  | -              | -               | 100%      |
 
 **Métricas Atuais:**
-- **Total de Arquivos:** 195 (reduzido de 248)
+- **Total de Arquivos:** 220 arquivos de teste Java
 - **Cobertura de Linhas:** 100%
 - **Cobertura de Branches:** 100%
 - **Padrão:** AssertJ (100% convertido)
@@ -85,32 +85,37 @@ Este documento rastreia o status geral de implementação, refinamento e melhori
 
 ### Frontend (Vue / Vitest)
 
-| Área                  | Status         | Observações                          |
-|-----------------------|----------------|--------------------------------------|
-| **Stores (Pinia)**    | 🔄 Em Progresso | Testes básicos implementados         |
-| **Services**          | 🔄 Em Progresso | Testes de API mock em desenvolvimento|
-| **Components**        | 🔄 Em Progresso | Testes de componentes core           |
-| **Composables**       | 🔄 Em Progresso | Testes de lógica reutilizável        |
-| **Utils**             | ✅ Completo     | Funções utilitárias testadas         |
+| Área                  | Status         | Arquivos | Observações                          |
+|-----------------------|----------------|----------|--------------------------------------|
+| **Stores (Pinia)**    | ✅ Completo     | 13       | Testes de stores implementados       |
+| **Services**          | 🔄 Em Progresso | ~30      | Testes de API mock em desenvolvimento|
+| **Components**        | 🔄 Em Progresso | ~60      | Testes de componentes core           |
+| **Composables**       | 🔄 Em Progresso | ~10      | Testes de lógica reutilizável        |
+| **Utils**             | ✅ Completo     | 17       | Funções utilitárias testadas         |
+| **Total**             | 🔄 Em Progresso | 130      | Suite de testes unitários            |
 
 ### E2E (Playwright)
 
-| Caso de Uso           | Status      | Flaky | Observações                    |
-|-----------------------|-------------|-------|--------------------------------|
-| CDU01 - Mapeamento    | ✅ Estável   | Não   | Fluxo completo testado         |
-| CDU02 - Revisão       | ✅ Estável   | Não   | Aprovação e ajustes            |
-| CDU03 - Diagnóstico   | ✅ Estável   | Não   | Avaliação de proficiência      |
-| CDU04 - Consultas     | ✅ Estável   | Não   | Filtros e busca                |
-| CDU05 - Alertas       | ✅ Estável   | Não   | Sistema de notificações        |
-| CDU06 - Dashboard     | ✅ Estável   | Não   | Métricas e painéis             |
-| CDU07 - Admin         | ✅ Estável   | Não   | Gestão de usuários             |
-| CDU08 - Competências  | ✅ Estável   | Não   | CRUD de competências           |
-| CDU09 - Workflows     | ✅ Estável   | Não   | Transições de estado           |
+**Status Geral:** ✅ Suite completa com 39 testes implementados e estáveis
+
+| Categoria               | Testes | Status      | Observações                          |
+|-------------------------|--------|-------------|--------------------------------------|
+| **Casos de Uso (CDU)**  | 36     | ✅ Estável   | CDU-01 a CDU-36 implementados        |
+| **Testes Auxiliares**   | 3      | ✅ Estável   | UI Consistency, Situações, Capturas  |
+| **Total E2E**           | 39     | ✅ Estável   | Suite completa e sem flaky tests     |
+
+**Destaques dos Casos de Uso:**
+- **CDU-01 a CDU-09:** Mapeamento de competências e processos
+- **CDU-10 a CDU-18:** Revisão, validação e aprovação
+- **CDU-19 a CDU-27:** Diagnóstico e avaliação de proficiência
+- **CDU-28 a CDU-36:** Consultas, relatórios e administração
 
 **Observações:**
-- Suite completa de E2E implementada e estável
-- Fixtures reutilizáveis implementadas
-- Ver [e2e/README.md](e2e/README.md) para documentação
+- Suite completa de E2E com 39 testes implementados (36 CDUs + 3 auxiliares)
+- Todos os testes estáveis, sem flaky tests detectados
+- Fixtures reutilizáveis implementadas para autenticação
+- Helpers organizados por domínio (auth, processos, mapas)
+- Ver [e2e/README.md](e2e/README.md) para documentação completa
 
 ---
 
@@ -215,9 +220,9 @@ Todos os módulos possuem README.md documentando suas responsabilidades e estrut
 ### Curto Prazo (1-2 semanas)
 
 1. ✅ Criar STATUS.md (este documento)
-2. ⬜ Atualizar métricas de cobertura frontend
-3. ⬜ Revisar e atualizar screenshots de E2E
-4. ⬜ Documentar casos de uso não cobertos por E2E (se houver)
+2. ✅ Atualizar STATUS.md com métricas corretas (220 testes backend, 39 E2E, 130 frontend)
+3. ⬜ Expandir cobertura de testes unitários frontend
+4. ⬜ Documentar casos de uso específicos não cobertos por E2E (se houver)
 
 ### Médio Prazo (1-2 meses)
 
@@ -265,6 +270,7 @@ Todos os módulos possuem README.md documentando suas responsabilidades e estrut
 
 | Data       | Versão | Mudanças                                           | Autor          |
 |------------|--------|----------------------------------------------------|----------------|
+| 2026-02-08 | 1.2.0  | Atualizado métricas corretas (220 testes backend, 39 E2E, 130 frontend) | Jules (Agent)  |
 | 2026-02-08 | 1.1.0  | Adicionado guia de atualização do documento        | Jules (Agent)  |
 | 2026-02-08 | 1.0.1  | Correção de métricas (195 arquivos de teste)       | Jules (Agent)  |
 | 2026-02-08 | 1.0.0  | Criação inicial do documento STATUS.md             | Jules (Agent)  |
