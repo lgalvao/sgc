@@ -113,15 +113,15 @@ describe("useUsuariosStore", () => {
             expect(usuario).toBeUndefined();
         });
 
-        it("obterUsuarioPorId deve retornar o usuário correto pelo id", () => {
-            const usuario = context.store.obterUsuarioPorId(1);
+        it("obterUsuarioPorCodigo deve retornar o usuário correto pelo codigo", () => {
+            const usuario = context.store.obterUsuarioPorCodigo(1);
             expect(usuario).toBeDefined();
             expect(usuario?.codigo).toBe(1);
             expect(usuario?.nome).toBe("Ana Paula Souza");
         });
 
-        it("obterUsuarioPorId deve retornar undefined se nenhum usuário correspondente for encontrado", () => {
-            const usuario = context.store.obterUsuarioPorId(999);
+        it("obterUsuarioPorCodigo deve retornar undefined se nenhum usuário correspondente for encontrado", () => {
+            const usuario = context.store.obterUsuarioPorCodigo(999);
             expect(usuario).toBeUndefined();
         });
     });

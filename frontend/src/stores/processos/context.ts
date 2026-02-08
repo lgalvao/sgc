@@ -10,26 +10,26 @@ export const useProcessosContextStore = defineStore("processos-context", () => {
     const { lastError, clearError, withErrorHandling } = useErrorHandler();
     const coreStore = useProcessosCoreStore();
 
-    function obterUnidadesDoProcesso(idProcesso: number): ProcessoResumo[] {
-        if (coreStore.processoDetalhe && coreStore.processoDetalhe.codigo === idProcesso) {
+    function obterUnidadesDoProcesso(codigoProcesso: number): ProcessoResumo[] {
+        if (coreStore.processoDetalhe && coreStore.processoDetalhe.codigo === codigoProcesso) {
             return coreStore.processoDetalhe.resumoSubprocessos;
         }
         return [];
     }
 
-    async function buscarContextoCompleto(idProcesso: number) {
+    async function buscarContextoCompleto(codigoProcesso: number) {
         return withErrorHandling(async () => {
             coreStore.setProcessoDetalhe(null); // Limpa estado anterior
-            const data = await processoService.buscarContextoCompleto(idProcesso);
+            const data = await processoService.buscarContextoCompleto(codigoProcesso);
             coreStore.setProcessoDetalhe(data);
             subprocessosElegiveis.value = data.elegiveis;
         });
     }
 
-    async function buscarSubprocessosElegiveis(idProcesso: number) {
+    async function buscarSubprocessosElegiveis(codigoProcesso: number) {
         return withErrorHandling(async () => {
             subprocessosElegiveis.value =
-                await processoService.buscarSubprocessosElegiveis(idProcesso);
+                await processoService.buscarSubprocessosElegiveis(codigoProcesso);
         });
     }
 

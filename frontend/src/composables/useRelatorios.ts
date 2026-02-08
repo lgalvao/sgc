@@ -19,10 +19,10 @@ export function useRelatorios() {
   const mostrarModalAndamentoGeral = ref(false);
 
   const diagnosticosGaps = ref([
-    { id: 1, processo: "Processo A", unidade: "Unidade 1", gaps: 5, importanciaMedia: 4.5, dominioMedio: 2.1, competenciasCriticas: ["Java", "SQL"], data: new Date("2024-08-15"), status: "Finalizado" },
-    { id: 2, processo: "Processo B", unidade: "Unidade 2", gaps: 3, importanciaMedia: 4, dominioMedio: 3.5, competenciasCriticas: ["Vue"], data: new Date("2024-08-20"), status: "Em análise" },
-    { id: 3, processo: "Processo C", unidade: "Unidade 3", gaps: 8, importanciaMedia: 4.8, dominioMedio: 1.5, competenciasCriticas: ["Spring"], data: new Date("2024-09-05"), status: "Pendente" },
-    { id: 4, processo: "Processo D", unidade: "Unidade 4", gaps: 0, importanciaMedia: 3, dominioMedio: 4.5, competenciasCriticas: [], data: new Date("2024-09-10"), status: "Finalizado" },
+    { codigo: 1, processo: "Processo A", unidade: "Unidade 1", gaps: 5, importanciaMedia: 4.5, dominioMedio: 2.1, competenciasCriticas: ["Java", "SQL"], data: new Date("2024-08-15"), status: "Finalizado" },
+    { codigo: 2, processo: "Processo B", unidade: "Unidade 2", gaps: 3, importanciaMedia: 4, dominioMedio: 3.5, competenciasCriticas: ["Vue"], data: new Date("2024-08-20"), status: "Em análise" },
+    { codigo: 3, processo: "Processo C", unidade: "Unidade 3", gaps: 8, importanciaMedia: 4.8, dominioMedio: 1.5, competenciasCriticas: ["Spring"], data: new Date("2024-09-05"), status: "Pendente" },
+    { codigo: 4, processo: "Processo D", unidade: "Unidade 4", gaps: 0, importanciaMedia: 3, dominioMedio: 4.5, competenciasCriticas: [], data: new Date("2024-09-10"), status: "Finalizado" },
   ]);
 
   const processosFiltrados = computed(() => {
@@ -48,7 +48,7 @@ export function useRelatorios() {
     const mapa = mapasStore.mapaCompleto as any;
     if (mapa?.unidade) {
         return [{
-            id: mapa.codigo || 1,
+            codigo: mapa.codigo || 1,
             unidade: mapa.unidade.sigla,
             competencias: mapa.competencias || []
         }];

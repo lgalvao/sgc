@@ -193,8 +193,8 @@ describe('RelatoriosView.vue', () => {
     await ctx.wrapper!.vm.$nextTick();
 
     expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados).toHaveLength(2);
-    expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados.map((d: any) => d.id)).toContain(1);
-    expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados.map((d: any) => d.id)).toContain(2);
+    expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados.map((d: any) => d.codigo)).toContain(1);
+    expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados.map((d: any) => d.codigo)).toContain(2);
   });
 
   it('mapasVigentes retorna vazio se dados incompletos', async () => {

@@ -12,9 +12,9 @@ vi.mock('@/utils/csv', () => ({
 
 describe('ModalMapasVigentes.vue', () => {
   const mockMapas = [
-    { id: 1, unidade: 'Unidade A', competencias: [1, 2, 3] },
-    { id: 2, unidade: 'Unidade B', competencias: [] },
-    { id: 3, unidade: 'Unidade C' }, // undefined competencias
+    { codigo: 1, unidade: 'Unidade A', competencias: [1, 2, 3] },
+    { codigo: 2, unidade: 'Unidade B', competencias: [] },
+    { codigo: 3, unidade: 'Unidade C' }, // undefined competencias
   ];
 
   const mountOptions = {

@@ -31,7 +31,7 @@ export function mapUnidade(obj: any): Unidade {
         nome: obj.nome ?? obj.nome_unidade ?? "",
         isElegivel: obj.isElegivel,
         usuarioCodigo:
-            obj.usuarioCodigo ?? obj.idServidorTitular ?? obj.id_servidor_titular ?? obj.titular_id ?? 0,
+            obj.usuarioCodigo ?? obj.idServidorTitular ?? 0,
         responsavel: obj.responsavel
             ? {
                 codigo: obj.responsavel.codigo ?? 0,
