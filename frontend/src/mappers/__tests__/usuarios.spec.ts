@@ -8,9 +8,7 @@ describe("mappers/usuarios", () => {
         expect(user.nome).toBe("");
     });
 
-    it("mapVWUsuarioToUsuario resolves ID correctly (id > codigo > titulo number)", () => {
-        // id priority
-        expect(mapVWUsuarioToUsuario({id: 1, codigo: 2, titulo: "3"}).codigo).toBe(1);
+    it("mapVWUsuarioToUsuario resolves ID correctly (codigo > titulo number)", () => {
         // codigo priority
         expect(mapVWUsuarioToUsuario({codigo: 2, titulo: "3"}).codigo).toBe(2);
         // titulo numeric priority

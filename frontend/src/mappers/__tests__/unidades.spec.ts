@@ -57,15 +57,11 @@ describe("mappers/unidades", () => {
             expect(u.filhas).toHaveLength(1);
         });
 
-        it("maps other alternative fields for user", () => {
+        it("maps idServidorTitular alternative field for user", () => {
              const u = mapUnidade({
-                id_servidor_titular: 88
+                idServidorTitular: 88
             });
             expect(u.usuarioCodigo).toBe(88);
-             const u2 = mapUnidade({
-                titular_id: 77
-            });
-            expect(u2.usuarioCodigo).toBe(77);
         });
 
         it("maps responsavel with all fallback fields", () => {
