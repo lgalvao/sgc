@@ -1,7 +1,7 @@
 # Status de Implementação - SGC
 
 **Última Atualização:** 2026-02-08  
-**Versão:** 1.0.0
+**Versão:** 1.0.1
 
 ---
 
@@ -75,7 +75,7 @@ Este documento rastreia o status geral de implementação, refinamento e melhori
 | 11     | Padronização de Estilo      | ✅ Concluído  | -              | -               | 100%      |
 
 **Métricas Atuais:**
-- **Total de Arquivos:** ~210 (reduzido de 248)
+- **Total de Arquivos:** 195 (reduzido de 248)
 - **Cobertura de Linhas:** 100%
 - **Cobertura de Branches:** 100%
 - **Padrão:** AssertJ (100% convertido)
@@ -263,9 +263,10 @@ Todos os módulos possuem README.md documentando suas responsabilidades e estrut
 
 ## 🔄 Histórico de Atualizações
 
-| Data       | Versão | Mudanças                                      | Autor          |
-|------------|--------|-----------------------------------------------|----------------|
-| 2026-02-08 | 1.0.0  | Criação inicial do documento STATUS.md        | Jules (Agent)  |
+| Data       | Versão | Mudanças                                           | Autor          |
+|------------|--------|----------------------------------------------------|----------------|
+| 2026-02-08 | 1.0.1  | Correção de métricas (195 arquivos de teste)       | Jules (Agent)  |
+| 2026-02-08 | 1.0.0  | Criação inicial do documento STATUS.md             | Jules (Agent)  |
 
 ---
 
