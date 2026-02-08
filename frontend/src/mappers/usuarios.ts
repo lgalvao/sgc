@@ -17,7 +17,6 @@ import type {Usuario} from "@/types/tipos";
 
 export function mapVWUsuarioToUsuario(vw: any): Usuario {
     const candidateId =
-        vw?.id ??
         vw?.codigo ??
         (typeof vw?.titulo === "string" && /^\d+$/.test(vw.titulo)
             ? Number(vw.titulo)

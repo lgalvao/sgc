@@ -13,16 +13,16 @@ export const useProcessosWorkflowStore = defineStore("processos-workflow", () =>
     const coreStore = useProcessosCoreStore();
     const feedbackStore = useFeedbackStore();
 
-    async function iniciarProcesso(idProcesso: number, tipo: TipoProcesso, unidadesIds: number[]) {
+    async function iniciarProcesso(codigoProcesso: number, tipo: TipoProcesso, unidadesIds: number[]) {
         return withErrorHandling(async () => {
-            await processoService.iniciarProcesso(idProcesso, tipo, unidadesIds);
+            await processoService.iniciarProcesso(codigoProcesso, tipo, unidadesIds);
         });
     }
 
-    async function finalizarProcesso(idProcesso: number) {
+    async function finalizarProcesso(codigoProcesso: number) {
         return withErrorHandling(async () => {
-            await processoService.finalizarProcesso(idProcesso);
-            await coreStore.buscarProcessoDetalhe(idProcesso);
+            await processoService.finalizarProcesso(codigoProcesso);
+            await coreStore.buscarProcessoDetalhe(codigoProcesso);
         });
     }
 
@@ -39,41 +39,41 @@ export const useProcessosWorkflowStore = defineStore("processos-workflow", () =>
         });
     }
 
-    async function alterarDataLimiteSubprocesso(id: number, dados: { novaData: string }) {
+    async function alterarDataLimiteSubprocesso(codigo: number, dados: { novaData: string }) {
         return withErrorHandling(async () => {
-            await processoService.alterarDataLimiteSubprocesso(id, dados);
+            await processoService.alterarDataLimiteSubprocesso(codigo, dados);
             if (coreStore.processoDetalhe) {
                 await coreStore.buscarProcessoDetalhe(coreStore.processoDetalhe.codigo);
             }
         });
     }
 
-    async function apresentarSugestoes(id: number, dados: { sugestoes: string }) {
+    async function apresentarSugestoes(codigo: number, dados: { sugestoes: string }) {
         return withErrorHandling(async () => {
-            await processoService.apresentarSugestoes(id, dados);
+            await processoService.apresentarSugestoes(codigo, dados);
             if (coreStore.processoDetalhe) {
                 await coreStore.buscarProcessoDetalhe(coreStore.processoDetalhe.codigo);
             }
         });
     }
 
-    async function validarMapa(id: number) {
+    async function validarMapa(codigo: number) {
         return withErrorHandling(async () => {
-            await processoService.validarMapa(id);
+            await processoService.validarMapa(codigo);
             if (coreStore.processoDetalhe) await coreStore.buscarProcessoDetalhe(coreStore.processoDetalhe.codigo);
         });
     }
 
-    async function homologarValidacao(id: number) {
+    async function homologarValidacao(codigo: number) {
         return withErrorHandling(async () => {
-            await processoService.homologarValidacao(id);
+            await processoService.homologarValidacao(codigo);
             if (coreStore.processoDetalhe) await coreStore.buscarProcessoDetalhe(coreStore.processoDetalhe.codigo);
         });
     }
 
-    async function aceitarValidacao(id: number, dados?: { observacoes?: string }) {
+    async function aceitarValidacao(codigo: number, dados?: { observacoes?: string }) {
         return withErrorHandling(async () => {
-            await processoService.aceitarValidacao(id, dados);
+            await processoService.aceitarValidacao(codigo, dados);
             if (coreStore.processoDetalhe) await coreStore.buscarProcessoDetalhe(coreStore.processoDetalhe.codigo);
         });
     }

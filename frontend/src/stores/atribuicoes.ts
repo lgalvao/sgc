@@ -45,7 +45,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
                     
                     if (Array.isArray(data)) {
                         atribuicoes.value = data.map((a: any) => ({
-                            codigo: a.id,
+                            codigo: a.codigo,
                             dataInicio: new Date(a.dataInicio).toISOString(),
                             dataFim: new Date(a.dataTermino).toISOString(),
                             dataTermino: new Date(a.dataTermino).toISOString(),

@@ -42,10 +42,10 @@ export const useProcessosCoreStore = defineStore("processos-core", () => {
         });
     }
 
-    async function buscarProcessoDetalhe(idProcesso: number) {
+    async function buscarProcessoDetalhe(codigoProcesso: number) {
         return withErrorHandling(async () => {
             processoDetalhe.value = null; // Limpa estado anterior
-            processoDetalhe.value = await processoService.obterDetalhesProcesso(idProcesso);
+            processoDetalhe.value = await processoService.obterDetalhesProcesso(codigoProcesso);
         }, () => {
             processoDetalhe.value = null;
         });
@@ -57,15 +57,15 @@ export const useProcessosCoreStore = defineStore("processos-core", () => {
         });
     }
 
-    async function atualizarProcesso(idProcesso: number, payload: AtualizarProcessoRequest) {
+    async function atualizarProcesso(codigoProcesso: number, payload: AtualizarProcessoRequest) {
         return withErrorHandling(async () => {
-            await processoService.atualizarProcesso(idProcesso, payload);
+            await processoService.atualizarProcesso(codigoProcesso, payload);
         });
     }
 
-    async function removerProcesso(idProcesso: number) {
+    async function removerProcesso(codigoProcesso: number) {
         return withErrorHandling(async () => {
-            await processoService.excluirProcesso(idProcesso);
+            await processoService.excluirProcesso(codigoProcesso);
         });
     }
     

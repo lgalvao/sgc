@@ -33,8 +33,8 @@ export const useUsuariosStore = defineStore("usuarios", () => {
         return usuariosPorTituloMap.value.get(titulo);
     }
 
-    function obterUsuarioPorId(id: number): Usuario | undefined {
-        return usuariosPorCodigoMap.value.get(id);
+    function obterUsuarioPorCodigo(codigo: number): Usuario | undefined {
+        return usuariosPorCodigoMap.value.get(codigo);
     }
 
     async function buscarUsuarios() {
@@ -81,7 +81,7 @@ export const useUsuariosStore = defineStore("usuarios", () => {
         lastError,
         clearError,
         obterUsuarioPorTitulo,
-        obterUsuarioPorId,
+        obterUsuarioPorCodigo,
         buscarUsuarios,
         buscarUsuariosPorUnidade,
         buscarUsuarioPorTitulo,
