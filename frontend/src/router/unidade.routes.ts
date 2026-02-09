@@ -2,9 +2,9 @@ import type {RouteLocationNormalized, RouteRecordRaw} from "vue-router";
 
 const unidadeRoutes: RouteRecordRaw[] = [
     {
-        path: "/unidade",
+        path: "/unidades",
         name: "Unidades",
-        component: () => import("@/views/UnidadesView.vue"),
+        component: () => import("@/views/Unidades.vue"),
         meta: {
             title: "Unidades",
             breadcrumb: "Unidades",
@@ -13,7 +13,7 @@ const unidadeRoutes: RouteRecordRaw[] = [
     {
         path: "/unidade/:codUnidade",
         name: "Unidade",
-        component: () => import("@/views/UnidadeView.vue"),
+        component: () => import("@/views/Unidade.vue"),
         props: (route: RouteLocationNormalized) => ({
             codUnidade: Number(route.params.codUnidade),
         }),

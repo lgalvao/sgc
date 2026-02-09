@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
-import ProcessoView from "@/views/ProcessoView.vue";
+import Processo from "@/views/Processo.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useProcessosStore} from "@/stores/processos";
 import {useProcessosCoreStore} from "@/stores/processos/core";
@@ -91,7 +91,7 @@ const BAlertStub = {
     emits: ['dismissed']
 };
 
-describe("ProcessoView.vue", () => {
+describe("Processo.vue", () => {
     let wrapper: any;
     let processosStore: any;
     let feedbackStore: any;
@@ -152,7 +152,7 @@ describe("ProcessoView.vue", () => {
     };
 
     const createWrapper = () => {
-        return mount(ProcessoView, {
+        return mount(Processo, {
             global: {
                 plugins: [
                     createTestingPinia({

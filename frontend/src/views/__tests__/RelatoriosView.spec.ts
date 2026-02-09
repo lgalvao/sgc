@@ -1,6 +1,6 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
-import RelatoriosView from '@/views/RelatoriosView.vue';
+import Relatorios from '@/views/Relatorios.vue';
 import {Perfil, TipoProcesso} from '@/types/tipos';
 import {useProcessosStore} from '@/stores/processos';
 import {usePerfilStore} from '@/stores/perfil';
@@ -11,7 +11,7 @@ import {checkA11y} from "@/test-utils/a11yTestHelpers";
 // Mock URL.createObjectURL
 global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
 
-describe('RelatoriosView.vue', () => {
+describe('Relatorios.vue', () => {
   const ctx = setupComponentTest();
 
   const mockProcessos = [
@@ -68,7 +68,7 @@ describe('RelatoriosView.vue', () => {
       },
     }, stubs);
 
-    ctx.wrapper = mount(RelatoriosView, mountOptions);
+    ctx.wrapper = mount(Relatorios, mountOptions);
   });
   
   afterEach(() => {
@@ -211,7 +211,7 @@ describe('RelatoriosView.vue', () => {
       },
     }, stubsLocal);
 
-    const wrapper = mount(RelatoriosView, mountOptions);
+    const wrapper = mount(Relatorios, mountOptions);
     expect((wrapper.vm as any).mapasVigentes).toHaveLength(0);
   });
 
@@ -226,7 +226,7 @@ describe('RelatoriosView.vue', () => {
 
     const spy = vi.spyOn(processosStore, 'buscarProcessosPainel').mockResolvedValue([] as any);
 
-    mount(RelatoriosView, {
+    mount(Relatorios, {
       global: {
         plugins: [pinia],
         stubs: stubs

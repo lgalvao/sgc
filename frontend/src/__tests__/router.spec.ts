@@ -13,10 +13,10 @@ vi.mock("../views/PainelView.vue", () => ({
 vi.mock("../views/CadProcesso.vue", () => ({
     default: {template: "<div>CadProcesso</div>"},
 }));
-vi.mock("../views/ProcessoView.vue", () => ({
+vi.mock("../views/Processo.vue", () => ({
     default: {template: "<div>Processo</div>"},
 }));
-vi.mock("../views/SubprocessoView.vue", () => ({
+vi.mock("../views/Subprocesso.vue", () => ({
     default: {template: "<div>Subprocesso</div>"},
 }));
 vi.mock("../views/CadMapa.vue", () => ({
@@ -43,7 +43,7 @@ vi.mock("../views/AutoavaliacaoDiagnostico.vue", () => ({
 vi.mock("../views/OcupacoesCriticasDiagnostico.vue", () => ({
     default: {template: "<div>OcupacoesCriticasDiagnostico</div>"},
 }));
-vi.mock("../views/UnidadeView.vue", () => ({
+vi.mock("../views/Unidade.vue", () => ({
     default: {template: "<div>Unidade</div>"},
 }));
 vi.mock("../views/CadAtribuicao.vue", () => ({
@@ -52,10 +52,10 @@ vi.mock("../views/CadAtribuicao.vue", () => ({
 vi.mock("../views/HistoricoView.vue", () => ({
     default: {template: "<div>Historico</div>"},
 }));
-vi.mock("../views/RelatoriosView.vue", () => ({
+vi.mock("../views/Relatorios.vue", () => ({
     default: {template: "<div>Relatorios</div>"},
 }));
-vi.mock("../views/ConfiguracoesView.vue", () => ({
+vi.mock("../views/Configuracoes.vue", () => ({
     default: {template: "<div>Configuracoes</div>"},
 }));
 

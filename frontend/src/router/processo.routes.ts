@@ -10,7 +10,7 @@ const processoRoutes: RouteRecordRaw[] = [
     {
         path: "/processo/:codProcesso",
         name: "Processo",
-        component: () => import("@/views/ProcessoView.vue"),
+        component: () => import("@/views/Processo.vue"),
         props: true,
         meta: {
             title: "Unidades do Processo",
@@ -20,7 +20,7 @@ const processoRoutes: RouteRecordRaw[] = [
     {
         path: "/processo/:codProcesso/:siglaUnidade",
         name: "Subprocesso",
-        component: () => import("@/views/SubprocessoView.vue"),
+        component: () => import("@/views/Subprocesso.vue"),
         props: (route: RouteLocationNormalized) => ({
             codProcesso: Number(route.params.codProcesso),
             siglaUnidade: route.params.siglaUnidade,

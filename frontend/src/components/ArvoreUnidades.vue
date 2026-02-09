@@ -26,6 +26,7 @@
         :is-checked="isChecked"
         :is-expanded="isExpanded"
         :is-habilitado="isHabilitado"
+        :modo-selecao="modoSelecao"
         :on-toggle="toggle"
         :on-toggle-expand="toggleExpand"
         :unidade="unidade"

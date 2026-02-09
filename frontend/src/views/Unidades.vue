@@ -1,8 +1,8 @@
 <template>
   <BContainer class="mt-4">
-    <PageHeader title="Unidades do Tribunal">
+    <PageHeader title="Unidades do TRE-PE">
       <template #description>
-        Explore a hierarquia organizacional completa do Tribunal.
+        Clique em unidade para ver detalhes.
       </template>
     </PageHeader>
 
@@ -40,24 +40,19 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, computed } from "vue";
-import { BContainer, BAlert, BSpinner } from "bootstrap-vue-next";
+import {computed, onMounted} from "vue";
+import {BAlert, BContainer, BSpinner} from "bootstrap-vue-next";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
-import { useUnidadesStore } from "@/stores/unidades";
-import { useRouter } from "vue-router";
+import {useUnidadesStore} from "@/stores/unidades";
 
 const unidadesStore = useUnidadesStore();
-const router = useRouter();
-
 const unidades = computed(() => unidadesStore.unidades);
 
 onMounted(async () => {
   await unidadesStore.buscarTodasAsUnidades();
 });
 
-// ArvoreUnidades triggers navigation when a node is clicked?
-// Let's check UnidadeTreeNode.vue or ArvoreUnidades.vue to see how it handles clicks in non-selection mode.
 </script>
 
 <style scoped>

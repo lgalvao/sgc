@@ -48,7 +48,7 @@ Este documento fornece diretrizes para extrair lógica complexa de views Vue par
 ### Exemplo: View com Lógica Complexa
 
 ```vue
-<!-- ❌ ANTI-PADRÃO: ProcessoView.vue -->
+<!-- ❌ ANTI-PADRÃO: Processo.vue -->
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
@@ -179,7 +179,7 @@ export function useProcessoAcoesBloco(
 ### Passo 2: Usar Composable na View
 
 ```vue
-<!-- ✅ PADRÃO CORRETO: ProcessoView.vue -->
+<!-- ✅ PADRÃO CORRETO: Processo.vue -->
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';

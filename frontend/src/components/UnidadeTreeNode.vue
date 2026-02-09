@@ -148,6 +148,20 @@ const {isChecked, getEstadoSelecao, isExpanded, isHabilitado, onToggle, onToggle
   user-select: none;
 }
 
+.unidade-link {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 500;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.unidade-link:hover {
+  background-color: #f8f9fa;
+  color: #0d6efd;
+}
+
 .unidade-children {
   margin-left: 1.5rem;
 }

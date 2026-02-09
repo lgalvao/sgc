@@ -1,7 +1,7 @@
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import ConfiguracoesView from '../ConfiguracoesView.vue';
+import Configuracoes from '../Configuracoes.vue';
 import {usePerfilStore} from '@/stores/perfil';
 import * as administradorService from '@/services/administradorService';
 
@@ -12,7 +12,7 @@ vi.mock('@/services/administradorService', () => ({
     removerAdministrador: vi.fn(),
 }));
 
-describe('ConfiguracoesView', () => {
+describe('Configuracoes', () => {
     let wrapper: any;
     let perfilStore: any;
 
@@ -38,7 +38,7 @@ describe('ConfiguracoesView', () => {
 
         (administradorService.listarAdministradores as any).mockResolvedValue([]);
 
-        wrapper = mount(ConfiguracoesView, {
+        wrapper = mount(Configuracoes, {
             global: {
                 plugins: [pinia],
                 stubs: {

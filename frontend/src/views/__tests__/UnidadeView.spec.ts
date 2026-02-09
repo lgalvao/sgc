@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
-import UnidadeView from '@/views/UnidadeView.vue';
+import Unidade from '@/views/Unidade.vue';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes';
 import {usePerfilStore} from '@/stores/perfil';
@@ -83,7 +83,7 @@ const TreeTableStub = {
     emits: ['row-click']
 };
 
-describe('UnidadeView.vue', () => {
+describe('Unidade.vue', () => {
     const context = setupComponentTest();
 
     beforeEach(() => {
@@ -100,7 +100,7 @@ describe('UnidadeView.vue', () => {
 
 
     const createWrapper = (initialStateOverride = {}) => {
-        context.wrapper = mount(UnidadeView, {
+        context.wrapper = mount(Unidade, {
             ...getCommonMountOptions(
                 {
                     unidades: {
