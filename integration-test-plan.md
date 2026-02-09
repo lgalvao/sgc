@@ -8,6 +8,12 @@ Criar uma nova suíte de testes de integração baseada nos requisitos definidos
 
 Os testes de integração existentes em `backend/src/test/java/sgc/integracao/` divergiram dos requisitos originais ao longo do tempo. Este plano estabelece uma nova suíte de testes que serve como fonte de verdade alinhada aos requisitos.
 
+## Documentação Relacionada
+
+- **[Rastreamento de Progresso](integration-test-tracking.md)**: Status de implementação e próximos passos
+- **[Aprendizados](integration-test-learnings.md)**: Lições aprendidas, desafios e soluções durante a implementação
+- **[README dos Testes V2](backend/src/test/java/sgc/integracao/v2/README.md)**: Guia prático para escrever testes
+
 ## Princípios dos Novos Testes
 
 ### 1. Fidelidade aos Requisitos

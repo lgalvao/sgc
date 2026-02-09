@@ -2,6 +2,12 @@
 
 **Última atualização**: 2026-02-09
 
+## Documentação Relacionada
+
+- **[Plano de Testes](integration-test-plan.md)**: Estratégia completa e princípios dos testes
+- **[Aprendizados](integration-test-learnings.md)**: Lições aprendidas, desafios e soluções
+- **[README dos Testes V2](backend/src/test/java/sgc/integracao/v2/README.md)**: Guia prático para escrever testes
+
 ## Status Geral
 
 | Categoria | Total | Implementados | Em Progresso | Pendente |
