@@ -58,30 +58,12 @@ Este documento rastreia o status geral de implementação, refinamento e melhori
 
 ### Backend (Java / JUnit)
 
-**Reorganização de Testes:** ✅ Concluída em 2026-02-06
-
-| Sprint | Módulo                      | Status       | Arquivos Antes | Arquivos Depois | Cobertura |
-|--------|-----------------------------|--------------|----------------|-----------------|-----------|
-| 1      | `subprocesso.model`         | ✅ Concluído  | 3              | 1               | 100%      |
-| 2      | `subprocesso.service` (Facade) | ✅ Concluído | 4              | 1               | 100%      |
-| 3      | `subprocesso.service.workflow` | ✅ Concluído | 2              | 1               | 100%      |
-| 4      | `subprocesso.service.crud`  | ✅ Concluído  | 2              | 2               | 100%      |
-| 5      | `processo.service`          | ✅ Concluído  | 6              | 1               | 100%      |
-| 6      | `mapa.service`              | ✅ Concluído  | 4              | -               | 100%      |
-| 7      | `organizacao`               | ✅ Concluído  | 5              | -               | 100%      |
-| 8      | `seguranca`                 | ✅ Concluído  | 3              | -               | 100%      |
-| 9      | Módulos Menores             | ✅ Concluído  | 12             | -               | 100%      |
-| 10     | `CoberturaExtraTest`        | ✅ Concluído  | 1              | 4               | 100%      |
-| 11     | Padronização de Estilo      | ✅ Concluído  | -              | -               | 100%      |
-
 **Métricas Atuais:**
 - **Total de Arquivos:** 220 arquivos de teste Java
 - **Cobertura de Linhas:** 100%
 - **Cobertura de Branches:** 100%
 - **Padrão:** AssertJ (100% convertido)
 - **Organização:** Testes consolidados com `@Nested` classes
-
-**Rastreamento Detalhado:** Ver [test-organization-tracking.md](test-organization-tracking.md)
 
 ### Frontend (Vue / Vitest)
 
@@ -177,18 +159,6 @@ Nenhuma melhoria prioritária identificada no momento. O sistema está estável 
 
 **Status:** ✅ Sem dívida técnica significativa identificada
 
-O projeto passou por uma reorganização arquitetural completa em fevereiro de 2026, incluindo:
-- Consolidação de testes (248 → ~210 arquivos)
-- Implementação de todos os ADRs
-- Refatoração de segurança completa
-- Padronização de DTOs
-- Organização de controllers
-
-**Itens para Monitoramento:**
-- Performance de queries em produção
-- Crescimento de módulos grandes (Subprocesso, Mapa)
-- Necessidade de cache distribuído em escala
-
 ---
 
 ## 📚 Documentação
@@ -212,31 +182,6 @@ O projeto passou por uma reorganização arquitetural completa em fevereiro de 2
 Todos os módulos possuem README.md documentando suas responsabilidades e estrutura:
 - ✅ Backend: 13 módulos documentados
 - ✅ Frontend: 11 áreas documentadas
-
----
-
-## 🎯 Próximas Ações
-
-### Curto Prazo (1-2 semanas)
-
-1. ✅ Criar STATUS.md (este documento)
-2. ✅ Atualizar STATUS.md com métricas corretas (220 testes backend, 39 E2E, 130 frontend)
-3. ⬜ Expandir cobertura de testes unitários frontend
-4. ⬜ Documentar casos de uso específicos não cobertos por E2E (se houver)
-
-### Médio Prazo (1-2 meses)
-
-1. ⬜ Expandir testes unitários frontend para 80%+ cobertura
-2. ⬜ Implementar testes de acessibilidade (a11y)
-3. ⬜ Revisar performance em ambientes de produção
-4. ⬜ Adicionar monitoring e alerting proativo
-
-### Longo Prazo (3-6 meses)
-
-1. ⬜ Avaliar necessidade de cache distribuído (Redis)
-2. ⬜ Considerar migração para arquitetura de microsserviços (se justificado)
-3. ⬜ Implementar CI/CD pipeline completo
-4. ⬜ Adicionar testes de carga e stress
 
 ---
 

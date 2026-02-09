@@ -18,8 +18,9 @@
       </button>
       <span v-else class="expansor-placeholder"></span>
 
-      <!-- Checkbox com label -->
+      <!-- Checkbox com label (Modo Seleção) -->
       <BFormCheckbox
+          v-if="modoSelecao"
           :id="`chk-${unidade.sigla}`"
           :data-testid="`chk-arvore-unidade-${unidade.sigla}`"
           :disabled="!isHabilitado(unidade)"
@@ -37,6 +38,17 @@
           {{ unidade.sigla }}
         </span>
       </BFormCheckbox>
+
+      <!-- Link para Unidade (Modo Navegação) -->
+      <router-link
+          v-else
+          :to="`/unidade/${unidade.codigo}`"
+          class="unidade-link"
+          :data-testid="`link-arvore-unidade-${unidade.sigla}`"
+      >
+        <span class="sigla">{{ unidade.sigla }}</span>
+        <span class="nome ms-2 text-muted small">- {{ unidade.nome }}</span>
+      </router-link>
     </div>
 
     <!-- Filhas (recursivo) -->
@@ -52,6 +64,7 @@
           :is-checked="isChecked"
           :is-expanded="isExpanded"
           :is-habilitado="isHabilitado"
+          :modo-selecao="modoSelecao"
           :on-toggle="onToggle"
           :on-toggle-expand="onToggleExpand"
           :unidade="filha"
@@ -73,14 +86,16 @@ interface Props {
   isHabilitado: (unidade: Unidade) => boolean;
   onToggle: (unidade: Unidade, checked: boolean) => void;
   onToggleExpand: (unidade: Unidade) => void;
+  modoSelecao?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   depth: 0,
+  modoSelecao: true
 });
 
 // Desestruturar para uso no template
-const {isChecked, getEstadoSelecao, isExpanded, isHabilitado, onToggle, onToggleExpand} = props;
+const {isChecked, getEstadoSelecao, isExpanded, isHabilitado, onToggle, onToggleExpand, modoSelecao} = props;
 </script>
 
 <style scoped>
