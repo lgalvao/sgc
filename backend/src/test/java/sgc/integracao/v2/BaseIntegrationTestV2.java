@@ -1,5 +1,6 @@
 package sgc.integracao.v2;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import sgc.Sgc;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestConfig;
+import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.ConhecimentoRepo;
@@ -54,7 +56,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
 @Transactional
-@Import(TestConfig.class)
+@Import({TestConfig.class, TestSecurityConfig.class})
 public abstract class BaseIntegrationTestV2 {
     
     protected MockMvc mockMvc;
@@ -112,6 +114,12 @@ public abstract class BaseIntegrationTestV2 {
         } catch (DataAccessException e) {
             // Ignora se o DB não suportar
         }
+    }
+    
+    @AfterEach
+    void cleanupSecurityContext() {
+        // Garante que o contexto de segurança seja limpo após cada teste
+        SecurityContextHolder.clearContext();
     }
     
     /**

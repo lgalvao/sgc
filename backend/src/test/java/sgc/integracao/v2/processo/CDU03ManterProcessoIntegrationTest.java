@@ -11,6 +11,8 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -33,6 +35,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
     
     private static final String API_PROCESSOS = "/api/processos";
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    
+    /**
+     * Gera uma data limite futura formatada corretamente para o DTO.
+     */
+    private String getDataLimiteFutura() {
+        return LocalDateTime.now().plusDays(10).format(DATE_FORMAT);
+    }
     
     @Nested
     @DisplayName("Criação de Processos")
@@ -49,10 +59,13 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
             String requestBody = String.format("""
                 {
                     "descricao": "Processo de Mapeamento Teste",
-                    "tipoProcesso": "MAPEAMENTO",
-                    "codigosUnidades": [%d, %d]
+                    "tipo": "MAPEAMENTO",
+                    "dataLimiteEtapa1": "%s",
+                    "unidades": [%d, %d]
                 }
-                """, unidade1.getCodigo(), unidade2.getCodigo());
+                """, 
+                getDataLimiteFutura(),
+                unidade1.getCodigo(), unidade2.getCodigo());
             
             // ACT & ASSERT
             mockMvc.perform(post(API_PROCESSOS)
@@ -61,7 +74,7 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.codigo").exists())
                     .andExpect(jsonPath("$.descricao").value("Processo de Mapeamento Teste"))
-                    .andExpect(jsonPath("$.tipoProcesso").value("MAPEAMENTO"))
+                    .andExpect(jsonPath("$.tipo").value("MAPEAMENTO"))
                     .andExpect(jsonPath("$.situacao").value("CRIADO"));
         }
         
@@ -79,17 +92,20 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
             String requestBody = String.format("""
                 {
                     "descricao": "Processo de Revisão Teste",
-                    "tipoProcesso": "REVISAO",
-                    "codigosUnidades": [%d]
+                    "tipo": "REVISAO",
+                    "dataLimiteEtapa1": "%s",
+                    "unidades": [%d]
                 }
-                """, unidade.getCodigo());
+                """, 
+                getDataLimiteFutura(),
+                unidade.getCodigo());
             
             // ACT & ASSERT
             mockMvc.perform(post(API_PROCESSOS)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody))
                     .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.tipoProcesso").value("REVISAO"));
+                    .andExpect(jsonPath("$.tipo").value("REVISAO"));
         }
         
         @Test
@@ -102,17 +118,20 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
             String requestBody = String.format("""
                 {
                     "descricao": "Processo de Diagnóstico Teste",
-                    "tipoProcesso": "DIAGNOSTICO",
-                    "codigosUnidades": [%d]
+                    "tipo": "DIAGNOSTICO",
+                    "dataLimiteEtapa1": "%s",
+                    "unidades": [%d]
                 }
-                """, unidade.getCodigo());
+                """, 
+                getDataLimiteFutura(),
+                unidade.getCodigo());
             
             // ACT & ASSERT
             mockMvc.perform(post(API_PROCESSOS)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody))
                     .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.tipoProcesso").value("DIAGNOSTICO"));
+                    .andExpect(jsonPath("$.tipo").value("DIAGNOSTICO"));
         }
     }
     
@@ -129,10 +148,13 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
             
             String requestBody = String.format("""
                 {
-                    "tipoProcesso": "MAPEAMENTO",
-                    "codigosUnidades": [%d]
+                    "tipo": "MAPEAMENTO",
+                    "dataLimiteEtapa1": "%s",
+                    "unidades": [%d]
                 }
-                """, unidade.getCodigo());
+                """, 
+                getDataLimiteFutura(),
+                unidade.getCodigo());
             
             // ACT & ASSERT
             mockMvc.perform(post(API_PROCESSOS)
@@ -146,13 +168,15 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
         @DisplayName("Deve rejeitar criação sem unidades")
         void testRejeitarCriacaoSemUnidades() throws Exception {
             // ARRANGE
-            String requestBody = """
+            String requestBody = String.format("""
                 {
                     "descricao": "Processo Sem Unidades",
-                    "tipoProcesso": "MAPEAMENTO",
-                    "codigosUnidades": []
+                    "tipo": "MAPEAMENTO",
+                    "dataLimiteEtapa1": "%s",
+                    "unidades": []
                 }
-                """;
+                """,
+                getDataLimiteFutura());
             
             // ACT & ASSERT
             mockMvc.perform(post(API_PROCESSOS)
@@ -168,14 +192,17 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
             // ARRANGE
             Unidade unidade = criarUnidadeOperacional("Unidade com Processo Ativo");
             
+            String dataLimite = getDataLimiteFutura();
+            
             // Cria primeiro processo de mapeamento
             String requestBody1 = String.format("""
                 {
                     "descricao": "Primeiro Processo",
-                    "tipoProcesso": "MAPEAMENTO",
-                    "codigosUnidades": [%d]
+                    "tipo": "MAPEAMENTO",
+                    "dataLimiteEtapa1": "%s",
+                    "unidades": [%d]
                 }
-                """, unidade.getCodigo());
+                """, dataLimite, unidade.getCodigo());
             
             mockMvc.perform(post(API_PROCESSOS)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -186,10 +213,11 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
             String requestBody2 = String.format("""
                 {
                     "descricao": "Segundo Processo",
-                    "tipoProcesso": "MAPEAMENTO",
-                    "codigosUnidades": [%d]
+                    "tipo": "MAPEAMENTO",
+                    "dataLimiteEtapa1": "%s",
+                    "unidades": [%d]
                 }
-                """, unidade.getCodigo());
+                """, dataLimite, unidade.getCodigo());
             
             // ACT & ASSERT
             mockMvc.perform(post(API_PROCESSOS)
@@ -210,14 +238,17 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
             // ARRANGE
             Unidade unidade = criarUnidadeOperacional("Unidade Original");
             
+            String dataLimite = getDataLimiteFutura();
+            
             // Cria processo
             String requestCriacao = String.format("""
                 {
                     "descricao": "Descrição Original",
-                    "tipoProcesso": "MAPEAMENTO",
-                    "codigosUnidades": [%d]
+                    "tipo": "MAPEAMENTO",
+                    "dataLimiteEtapa1": "%s",
+                    "unidades": [%d]
                 }
-                """, unidade.getCodigo());
+                """, dataLimite, unidade.getCodigo());
             
             String responseCriacao = mockMvc.perform(post(API_PROCESSOS)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -233,13 +264,14 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
             String requestEdicao = String.format("""
                 {
                     "descricao": "Descrição Editada",
-                    "tipoProcesso": "MAPEAMENTO",
-                    "codigosUnidades": [%d]
+                    "tipo": "MAPEAMENTO",
+                    "dataLimiteEtapa1": "%s",
+                    "unidades": [%d]
                 }
-                """, unidade.getCodigo());
+                """, dataLimite, unidade.getCodigo());
             
             // ACT & ASSERT
-            mockMvc.perform(put(API_PROCESSOS + "/{codigo}", codigoProcesso)
+            mockMvc.perform(post(API_PROCESSOS + "/{codigo}/atualizar", codigoProcesso)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestEdicao))
                     .andExpect(status().isOk())
@@ -258,13 +290,16 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
             // ARRANGE
             Unidade unidade = criarUnidadeOperacional("Unidade para Exclusão");
             
+            String dataLimite = getDataLimiteFutura();
+            
             String requestCriacao = String.format("""
                 {
                     "descricao": "Processo a Excluir",
-                    "tipoProcesso": "MAPEAMENTO",
-                    "codigosUnidades": [%d]
+                    "tipo": "MAPEAMENTO",
+                    "dataLimiteEtapa1": "%s",
+                    "unidades": [%d]
                 }
-                """, unidade.getCodigo());
+                """, dataLimite, unidade.getCodigo());
             
             String responseCriacao = mockMvc.perform(post(API_PROCESSOS)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -277,7 +312,7 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
             Integer codigoProcesso = objectMapper.readTree(responseCriacao).get("codigo").asInt();
             
             // ACT & ASSERT - Exclusão
-            mockMvc.perform(delete(API_PROCESSOS + "/{codigo}/excluir", codigoProcesso))
+            mockMvc.perform(post(API_PROCESSOS + "/{codigo}/excluir", codigoProcesso))
                     .andExpect(status().isNoContent());
             
             // Verifica que processo foi excluído
@@ -302,10 +337,13 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
             String requestBody = String.format("""
                 {
                     "descricao": "Processo Criado por Chefe",
-                    "tipoProcesso": "MAPEAMENTO",
-                    "codigosUnidades": [%d]
+                    "tipo": "MAPEAMENTO",
+                    "dataLimiteEtapa1": "%s",
+                    "unidades": [%d]
                 }
-                """, unidade.getCodigo());
+                """, 
+                getDataLimiteFutura(),
+                unidade.getCodigo());
             
             // ACT & ASSERT
             mockMvc.perform(post(API_PROCESSOS)
@@ -326,10 +364,13 @@ class CDU03ManterProcessoIntegrationTest extends BaseIntegrationTestV2 {
             String requestBody = String.format("""
                 {
                     "descricao": "Processo Criado por Gestor",
-                    "tipoProcesso": "MAPEAMENTO",
-                    "codigosUnidades": [%d]
+                    "tipo": "MAPEAMENTO",
+                    "dataLimiteEtapa1": "%s",
+                    "unidades": [%d]
                 }
-                """, unidade.getCodigo());
+                """, 
+                getDataLimiteFutura(),
+                unidade.getCodigo());
             
             // ACT & ASSERT
             mockMvc.perform(post(API_PROCESSOS)
