@@ -288,7 +288,7 @@ class CDU02VisualizarPainelIntegrationTest extends BaseIntegrationTestV2 {
             // ACT & ASSERT - Ordenação decrescente por tipo
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                     .param("perfil", "ADMIN")
-                    .param("sort", "tipoProcesso,desc"))
+                    .param("sort", "tipo,desc"))
                     .andExpect(status().isOk());
         }
         

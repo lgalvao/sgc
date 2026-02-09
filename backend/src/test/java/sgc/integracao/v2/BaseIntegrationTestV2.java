@@ -24,11 +24,13 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.ConhecimentoRepo;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import tools.jackson.databind.ObjectMapper;
 
@@ -88,6 +90,9 @@ public abstract class BaseIntegrationTestV2 {
     
     @Autowired
     protected MapaRepo mapaRepo;
+    
+    @Autowired
+    protected UnidadeMapaRepo unidadeMapaRepo;
     
     @Autowired
     protected JdbcTemplate jdbcTemplate;
@@ -171,8 +176,46 @@ public abstract class BaseIntegrationTestV2 {
         Processo processo = new Processo();
         processo.setDescricao(descricao);
         processo.setTipo(tipo);
+        processo.setSituacao(sgc.processo.model.SituacaoProcesso.FINALIZADO);
+        processo.setDataCriacao(java.time.LocalDateTime.now().minusDays(30));
+        processo.setDataLimite(java.time.LocalDateTime.now().minusDays(10));
+        processo.setDataFinalizacao(java.time.LocalDateTime.now().minusDays(5));
         processo.adicionarParticipantes(new HashSet<>(unidades));
         return processoRepo.saveAndFlush(processo);
+    }
+    
+    /**
+     * Cria um mapa vigente para uma unidade.
+     * Útil para testes de processos de REVISÃO e DIAGNÓSTICO que requerem mapas existentes.
+     * 
+     * @param unidade Unidade que terá o mapa vigente
+     * @return O mapa criado
+     */
+    protected Mapa criarMapaVigenteParaUnidade(Unidade unidade) {
+        // Cria um processo finalizado para servir como base
+        Processo processoBase = criarProcesso("Processo Base para Mapa", TipoProcesso.MAPEAMENTO, List.of(unidade));
+        
+        // Cria um subprocesso vinculado ao processo
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setProcesso(processoBase);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        subprocesso.setDataLimiteEtapa1(java.time.LocalDateTime.now().minusDays(15));
+        subprocesso = subprocessoRepo.saveAndFlush(subprocesso);
+        
+        // Cria um mapa homologado para o subprocesso
+        Mapa mapa = new Mapa();
+        mapa.setSubprocesso(subprocesso);
+        mapa.setDataHoraHomologado(java.time.LocalDateTime.now().minusDays(5));
+        mapa = mapaRepo.saveAndFlush(mapa);
+        
+        // Cria o registro de UnidadeMapa para marcar como vigente
+        UnidadeMapa unidadeMapa = new UnidadeMapa();
+        unidadeMapa.setUnidadeCodigo(unidade.getCodigo());
+        unidadeMapa.setMapaVigente(mapa);
+        unidadeMapaRepo.saveAndFlush(unidadeMapa);
+        
+        return mapa;
     }
     
     /**
