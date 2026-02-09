@@ -98,6 +98,11 @@ VALUES (18, 'Seção 221', 'SECAO_221', 'OPERACIONAL', 'ATIVA', 17, '141414', '0
 -- ================================================================================
 
 -- Administradores
+-- Admin principal para testes V2 (usado por @WithMockAdmin)
+INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('111111111111', '11111111', 'Admin Teste V2', 'admin.teste.v2@tre-pe.jus.br', '9999', 1, 1);
+
+-- Outros administradores
 INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
 VALUES ('111111', '00111111', 'ADMIN_SEDOC_E_CHEFE_SEDOC', 'admin_sedoc_e_chefe_sedoc@tre-pe.jus.br', '2001', 1, 1);
 
@@ -191,6 +196,11 @@ VALUES ('292929', '00292929', 'Flea', 'flea@tre-pe.jus.br', '2029', 18, 18);
 -- ================================================================================
 
 -- Perfis ADMIN
+-- Perfil para Admin Teste V2 (usado por @WithMockAdmin)
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('111111111111', 'ADMIN', 1);
+
+-- Outros perfis ADMIN
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('111111', 'ADMIN', 1);
 
