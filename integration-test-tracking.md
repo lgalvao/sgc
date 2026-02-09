@@ -7,25 +7,48 @@
 | Categoria | Total | Implementados | Em Progresso | Pendente |
 |-----------|-------|---------------|--------------|----------|
 | **Autenticação** | 1 | 0 | 0 | 1 |
-| **Processo** | 6 | 0 | 0 | 6 |
+| **Processo** | 6 | 1 | 0 | 5 |
 | **Cadastro** | 6 | 0 | 0 | 6 |
 | **Mapa** | 9 | 0 | 0 | 9 |
 | **Operações em Bloco** | 5 | 0 | 0 | 5 |
 | **Administração** | 7 | 0 | 0 | 7 |
-| **Painel** | 2 | 0 | 0 | 2 |
+| **Painel** | 2 | 1 | 0 | 1 |
 | **Relatórios** | 3 | 0 | 0 | 3 |
 | **Fluxos Completos** | 3 | 0 | 0 | 3 |
-| **TOTAL** | **42** | **0** | **0** | **42** |
+| **TOTAL** | **42** | **2** | **0** | **40** |
 
-**Progresso**: 0% (0/42)
+**Progresso**: 4.8% (2/42)
 
 ---
 
 ## Detalhamento por CDU
 
-### ✅ Implementados (0)
+### ✅ Implementados (2)
 
-_Nenhum teste implementado ainda._
+#### Processo (1)
+
+- [x] **CDU-03**: Manter Processo
+  - ✅ Criação de processos (mapeamento, revisão, diagnóstico)
+  - ✅ Validações (descrição, unidades, conflitos)
+  - ✅ Edição de processos em status Criado
+  - ✅ Exclusão de processos em status Criado
+  - ✅ Controle de acesso (ADMIN somente)
+  - Arquivo: `backend/src/test/java/sgc/integracao/v2/processo/CDU03ManterProcessoIntegrationTest.java`
+  - Cenários: 9 de 9 ✅
+  - Data: 2026-02-09
+
+#### Painel (1)
+
+- [x] **CDU-02**: Visualizar Painel
+  - ✅ Visibilidade de processos por perfil (ADMIN, GESTOR, CHEFE)
+  - ✅ Processos 'Criado' visíveis apenas para ADMIN
+  - ✅ Visibilidade baseada em hierarquia
+  - ✅ Alertas pessoais e da unidade
+  - ✅ Marcação de alertas como visualizados
+  - ✅ Ordenação de processos e alertas
+  - Arquivo: `backend/src/test/java/sgc/integracao/v2/painel/CDU02VisualizarPainelIntegrationTest.java`
+  - Cenários: 6 de 6 ✅
+  - Data: 2026-02-09
 
 ---
 
@@ -44,12 +67,7 @@ _Nenhum teste em desenvolvimento._
   - Prioridade: 🔴 Alta
   - Dependências: Nenhuma
 
-#### Processo (6)
-
-- [ ] **CDU-03**: Manter Processo
-  - Cenários: 9
-  - Prioridade: 🔴 Alta
-  - Dependências: CDU-01
+#### Processo (5)
 
 - [ ] **CDU-04**: Iniciar Processo de Mapeamento
   - Cenários: 7
@@ -63,11 +81,6 @@ _Nenhum teste em desenvolvimento._
 
 - [ ] **CDU-06**: Detalhar Processo
   - Cenários: 6
-  - Prioridade: 🟡 Média
-  - Dependências: CDU-04
-
-- [ ] **CDU-07**: Detalhar Subprocesso
-  - Cenários: 5
   - Prioridade: 🟡 Média
   - Dependências: CDU-04
 
@@ -209,12 +222,12 @@ _Nenhum teste em desenvolvimento._
   - Prioridade: 🟢 Baixa
   - Dependências: CDU-04
 
-#### Painel (2)
+#### Painel (1)
 
-- [ ] **CDU-02**: Visualizar Painel
-  - Cenários: 6
-  - Prioridade: 🔴 Alta
-  - Dependências: CDU-01, CDU-04
+- [ ] **CDU-07**: Detalhar Subprocesso
+  - Cenários: 5
+  - Prioridade: 🟡 Média
+  - Dependências: CDU-04
 
 #### Relatórios (3)
 
@@ -368,4 +381,5 @@ _Documentar questões que precisam de clarificação._
 
 | Data | Versão | Autor | Mudanças |
 |------|--------|-------|----------|
+| 2026-02-09 | 0.2.0 | Sistema | Implementação de CDU-02 e CDU-03 (2/42 testes) |
 | 2026-02-09 | 0.1.0 | Sistema | Criação inicial do documento de rastreamento |
