@@ -162,7 +162,7 @@ public abstract class BaseIntegrationTestV2 {
     protected Processo criarProcesso(String descricao, TipoProcesso tipo, List<Unidade> unidades) {
         Processo processo = new Processo();
         processo.setDescricao(descricao);
-        processo.setTipoProcesso(tipo);
+        processo.setTipo(tipo);
         processo.adicionarParticipantes(new HashSet<>(unidades));
         return processoRepo.saveAndFlush(processo);
     }
