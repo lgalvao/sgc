@@ -1,5 +1,5 @@
 import { describe, it } from 'vitest';
-import { render } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { page } from '@vitest/browser/context';
 import App from '../App.vue';
 import { createPinia, setActivePinia } from 'pinia';
@@ -10,7 +10,7 @@ describe('Visual Capture', () => {
     setActivePinia(createPinia());
     
     // We mount the component
-    const wrapper = render(App, {
+    mount(App, {
       global: {
         plugins: [router]
       }
