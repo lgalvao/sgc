@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {mount} from "@vue/test-utils";
+import {mount, RouterLinkStub} from "@vue/test-utils";
 import ArvoreUnidades from "../ArvoreUnidades.vue";
 import type {Unidade} from "@/types/tipos";
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
@@ -58,7 +58,8 @@ describe("ArvoreUnidades.vue", () => {
                     // Actually, let's keep it real or use a smart stub.
                     // For coverage of ArvoreUnidades, we need to trigger its methods.
                     // Let's rely on the props passed to children.
-                    UnidadeTreeNode: true
+                    UnidadeTreeNode: true,
+                    RouterLink: RouterLinkStub
                 }
             }
         });

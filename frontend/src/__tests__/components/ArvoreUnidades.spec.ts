@@ -1,4 +1,4 @@
-import {mount} from '@vue/test-utils';
+import {mount, RouterLinkStub} from '@vue/test-utils';
 import {describe, expect, it} from 'vitest';
 import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
 import {Unidade} from '@/types/tipos';
@@ -56,7 +56,8 @@ describe('ArvoreUnidades.vue', () => {
             },
             global: {
                 stubs: {
-                    UnidadeTreeNode: UnidadeTreeNodeStub
+                    UnidadeTreeNode: UnidadeTreeNodeStub,
+                    RouterLink: RouterLinkStub
                 }
             }
         });
@@ -73,7 +74,8 @@ describe('ArvoreUnidades.vue', () => {
             },
             global: {
                 stubs: {
-                    UnidadeTreeNode: UnidadeTreeNodeStub
+                    UnidadeTreeNode: UnidadeTreeNodeStub,
+                    RouterLink: RouterLinkStub
                 }
             }
         });
@@ -93,7 +95,8 @@ describe('ArvoreUnidades.vue', () => {
             },
             global: {
                 stubs: {
-                    UnidadeTreeNode: UnidadeTreeNodeStub
+                    UnidadeTreeNode: UnidadeTreeNodeStub,
+                    RouterLink: RouterLinkStub
                 }
             }
         });
@@ -112,7 +115,8 @@ describe('ArvoreUnidades.vue', () => {
             },
             global: {
                 stubs: {
-                    UnidadeTreeNode: UnidadeTreeNodeStub
+                    UnidadeTreeNode: UnidadeTreeNodeStub,
+                    RouterLink: RouterLinkStub
                 }
             }
         });
@@ -131,7 +135,8 @@ describe('ArvoreUnidades.vue', () => {
             },
             global: {
                 stubs: {
-                    UnidadeTreeNode: UnidadeTreeNodeStub
+                    UnidadeTreeNode: UnidadeTreeNodeStub,
+                    RouterLink: RouterLinkStub
                 }
             }
         });
@@ -157,7 +162,8 @@ describe('ArvoreUnidades.vue', () => {
             },
             global: {
                 stubs: {
-                    UnidadeTreeNode: UnidadeTreeNodeStub
+                    UnidadeTreeNode: UnidadeTreeNodeStub,
+                    RouterLink: RouterLinkStub
                 }
             }
         });
@@ -178,7 +184,8 @@ describe('ArvoreUnidades.vue', () => {
             },
             global: {
                 stubs: {
-                    UnidadeTreeNode: UnidadeTreeNodeStub
+                    UnidadeTreeNode: UnidadeTreeNodeStub,
+                    RouterLink: RouterLinkStub
                 }
             }
         });
@@ -202,7 +209,8 @@ describe('ArvoreUnidades.vue', () => {
             },
             global: {
                 stubs: {
-                    UnidadeTreeNode: UnidadeTreeNodeStub
+                    UnidadeTreeNode: UnidadeTreeNodeStub,
+                    RouterLink: RouterLinkStub
                 }
             }
         });
@@ -223,7 +231,8 @@ describe('ArvoreUnidades.vue', () => {
             },
             global: {
                 stubs: {
-                    UnidadeTreeNode: UnidadeTreeNodeStub
+                    UnidadeTreeNode: UnidadeTreeNodeStub,
+                    RouterLink: RouterLinkStub
                 }
             }
         });
@@ -248,7 +257,8 @@ describe('ArvoreUnidades.vue', () => {
             },
             global: {
                 stubs: {
-                    UnidadeTreeNode: UnidadeTreeNodeStub
+                    UnidadeTreeNode: UnidadeTreeNodeStub,
+                    RouterLink: RouterLinkStub
                 }
             }
         });
@@ -272,7 +282,8 @@ describe('ArvoreUnidades.vue', () => {
             },
             global: {
                 stubs: {
-                    UnidadeTreeNode: UnidadeTreeNodeStub
+                    UnidadeTreeNode: UnidadeTreeNodeStub,
+                    RouterLink: RouterLinkStub
                 }
             }
         });

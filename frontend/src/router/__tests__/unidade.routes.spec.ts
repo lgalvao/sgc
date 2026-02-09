@@ -5,7 +5,20 @@ import type {RouteLocationNormalized} from "vue-router";
 describe("unidade.routes", () => {
     it("deve exportar um array de rotas", () => {
         expect(Array.isArray(unidadeRoutes)).toBe(true);
-        expect(unidadeRoutes).toHaveLength(3);
+        expect(unidadeRoutes).toHaveLength(4);
+    });
+
+    it("deve conter a rota Unidades", async () => {
+        const route = unidadeRoutes.find((r) => r.name === "Unidades");
+        expect(route).toBeDefined();
+        expect(route?.path).toBe("/unidades");
+        expect(route?.meta?.title).toBe("Unidades");
+        expect(route?.meta?.breadcrumb).toBe("Unidades");
+
+        if (typeof route?.component === "function") {
+            const component = await (route.component as () => Promise<any>)();
+            expect(component.default).toBeDefined();
+        }
     });
 
     it("deve conter a rota Unidade e mapear props/meta corretamente", async () => {

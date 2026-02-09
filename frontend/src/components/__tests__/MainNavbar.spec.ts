@@ -62,8 +62,8 @@ describe("MainNavbar.vue", () => {
         ctx.wrapper = mount(NavBar, options);
 
         checkLink("Painel", "/painel");
-        // ADMIN vê "Unidades" apontando para unidade raiz (código 1)
-        checkLink("Unidades", "/unidade/1");
+        // ADMIN vê "Unidades" apontando para a lista/árvore de unidades
+        checkLink("Unidades", "/unidades");
         checkLink("Relatórios", "/relatorios");
         checkLink("Histórico", "/historico");
     });

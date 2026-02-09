@@ -1,4 +1,4 @@
-import {mount} from "@vue/test-utils";
+import {mount, RouterLinkStub} from "@vue/test-utils";
 import {describe, expect, it, vi} from "vitest";
 import UnidadeTreeNode from "@/components/UnidadeTreeNode.vue";
 import type {Unidade} from "@/types/tipos";
@@ -42,7 +42,8 @@ describe("UnidadeTreeNode.vue", () => {
     const mountOptions = {
         global: {
             stubs: {
-                BFormCheckbox: BFormCheckboxStub
+                BFormCheckbox: BFormCheckboxStub,
+                RouterLink: RouterLinkStub
             }
         }
     };
