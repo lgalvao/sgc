@@ -335,12 +335,46 @@ Baseado no rastreamento, os próximos CDUs a implementar são:
 
 ---
 
-## 11. Changelog
+## 11. Problemas Conhecidos e Investigações em Andamento
+
+### 11.1. Isolamento de Testes
+
+**Problema**: Quando todos os testes V2 são executados juntos (`./gradlew :backend:test --tests "sgc.integracao.v2.*"`), apenas 11/20 testes passam. Porém, quando executados individualmente por CDU:
+- CDU-02: 32/33 passam
+- CDU-03: 25/33 passam
+
+**Hipóteses**:
+1. Possível problema com compartilhamento de estado entre testes
+2. `@Transactional` pode não estar isolando corretamente todos os casos
+3. Ordem de execução pode estar afetando alguns testes
+4. Configuração de segurança pode estar sendo compartilhada entre testes
+
+**Próximos Passos**:
+- Investigar logs de execução para identificar padrões
+- Verificar se `@DirtiesContext` resolve o problema
+- Analisar uso de fixtures e dados compartilhados
+
+### 11.2. Arquivo de Seed para Testes
+
+**Status**: ✅ Resolvido
+
+**Solução**:
+- Criado `integration-test-seed.sql` com estrutura limpa contendo apenas dados não mantidos pelo sistema
+- `data.sql` existente já possui dados corretos para testes
+- Adicionado usuário admin com titulo "111111111111" para compatibilidade com `@WithMockAdmin`
+
+**Estrutura**:
+- `data.sql`: Usado automaticamente por `application.yml` test profile
+- `integration-test-seed.sql`: Referência para criação de novos dados base (se necessário no futuro)
+
+## 12. Changelog
 
 | Data | Autor | Mudanças |
 |------|-------|----------|
 | 2026-02-09 | Sistema | Criação do documento com aprendizados iniciais |
 | 2026-02-09 | Sistema | Documentação de CDU-02 e CDU-03 |
+| 2026-02-09 | Sistema | Investigação de problemas de isolamento entre testes |
+| 2026-02-09 | Sistema | Documentação sobre arquivos de seed e estrutura de dados |
 
 ---
 

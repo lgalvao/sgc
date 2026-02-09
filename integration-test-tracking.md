@@ -25,6 +25,11 @@
 
 **Progresso**: 4.8% (2/42)
 
+**Nota**: Os testes implementados apresentam problema de isolamento quando executados em conjunto.
+- Executados individualmente: CDU-02 (32/33 passam), CDU-03 (25/33 passam)
+- Executados juntos (sgc.integracao.v2.*): 11/20 passam
+- **Ação necessária**: Resolver isolamento antes de implementar novos CDUs
+
 ---
 
 ## Detalhamento por CDU
@@ -363,23 +368,79 @@ _Nenhum teste em desenvolvimento._
 
 ## Issues e Bloqueios
 
-_Nenhum bloqueio identificado ainda._
+### 🔴 Bloqueio Crítico: Isolamento de Testes
+
+**Problema**: Testes V2 existentes falham quando executados em conjunto, mas passam quando executados individualmente.
+
+**Detalhes**:
+- CDU-02: 32/33 testes passam quando rodados isoladamente
+- CDU-03: 25/33 testes passam quando rodados isoladamente  
+- Ao executar todos V2 juntos: apenas 11/20 passam
+
+**Impacto**: Não é seguro implementar novos testes enquanto os existentes não forem estáveis.
+
+**Próximos Passos**:
+1. Investigar causa raiz (compartilhamento de estado, transações, segurança)
+2. Testar soluções (`@DirtiesContext`, isolamento de dados, etc.)
+3. Garantir 100% de sucesso nos testes existentes antes de prosseguir
+
+**Referência**: Ver seção 11.1 em [integration-test-learnings.md](integration-test-learnings.md)
 
 ---
 
 ## Notas e Descobertas
 
+### Estrutura de Dados de Teste
+
+**Arquivos**:
+- `backend/src/test/resources/data.sql`: Arquivo principal carregado automaticamente pelos testes
+- `backend/src/test/resources/integration-test-seed.sql`: Arquivo de referência com estrutura limpa
+
+**Dados no data.sql**:
+- ✅ Unidades (VW_UNIDADE) com hierarquia completa
+- ✅ Usuários (VW_USUARIO) incluindo admin para `@WithMockAdmin` (titulo: 111111111111)
+- ✅ Perfis (VW_USUARIO_PERFIL_UNIDADE)
+- ✅ Responsabilidades (VW_RESPONSABILIDADE)
+- ✅ Parâmetros do sistema
+- ⚠️ Alguns dados mantidos pelo sistema (para compatibilidade com testes antigos)
+
+**Dados no integration-test-seed.sql**:
+- ✅ Versão limpa contendo APENAS dados não mantidos pelo sistema
+- ✅ Baseado no e2e/setup/seed.sql com melhorias
+- ✅ Inclui admin para testes V2 (titulo: 111111111111)
+- 📝 Pode ser usado como referência para futuras migrações
+
+### Configuração de Segurança em Testes
+
+**Anotações Disponíveis**:
+- `@WithMockAdmin`: Cria usuário admin (titulo: 111111111111)
+- `@WithMockChefe`: Cria usuário chefe
+- `@WithMockGestor`: Cria usuário gestor
+- `@WithMockCustomUser`: Permite customização
+
+**Factories de Contexto**: Localizado em `backend/src/test/java/sgc/integracao/mocks/`
+
+### Compilação e Configuração
+
+**Java Version**: Projeto requer Java 21
+- Múltiplas versões disponíveis em `/usr/lib/jvm/`
+- Usar: `export JAVA_HOME=/usr/lib/jvm/temurin-21-jdk-amd64`
+
 ### Divergências entre Requisitos e Implementação
 
-_Documentar aqui quaisquer divergências encontradas entre os requisitos em `/etc/reqs` e a implementação atual._
+_Nenhuma divergência documentada ainda. A ser atualizado conforme novos testes forem criados._
 
 ### Melhorias Identificadas
 
-_Documentar sugestões de melhoria no código ou nos requisitos._
+1. **Isolamento de Testes**: Resolver problema de compartilhamento de estado (crítico)
+2. **Consolidação de Seeds**: Eventualmente migrar para uso exclusivo de integration-test-seed.sql
+3. **Documentação**: Criar guia sobre como executar testes individuais vs. em conjunto
 
 ### Perguntas Pendentes
 
-_Documentar questões que precisam de clarificação._
+1. Qual a causa raiz do problema de isolamento entre testes?
+2. Devemos usar `@DirtiesContext` em todos os testes V2?
+3. Quando migrar completamente para integration-test-seed.sql?
 
 ---
 
@@ -387,5 +448,6 @@ _Documentar questões que precisam de clarificação._
 
 | Data | Versão | Autor | Mudanças |
 |------|--------|-------|----------|
+| 2026-02-09 | 0.3.0 | Sistema | Investigação e documentação de bloqueio de isolamento de testes |
 | 2026-02-09 | 0.2.0 | Sistema | Implementação de CDU-02 e CDU-03 (2/42 testes) |
 | 2026-02-09 | 0.1.0 | Sistema | Criação inicial do documento de rastreamento |
