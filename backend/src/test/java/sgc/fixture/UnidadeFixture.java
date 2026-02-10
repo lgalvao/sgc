@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 
 public class UnidadeFixture {
 
+    public static final String DEFAULT_TITULO_TITULAR = "777";
+    public static final String DEFAULT_MATRICULA_TITULAR = "00000777";
+
     public static Unidade unidadePadrao() {
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -15,8 +18,8 @@ public class UnidadeFixture {
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
         // Campos obrigatórios para VW_UNIDADE (simula view de sistema externo)
-        unidade.setTituloTitular("777");
-        unidade.setMatriculaTitular("00000777");
+        unidade.setTituloTitular(DEFAULT_TITULO_TITULAR);
+        unidade.setMatriculaTitular(DEFAULT_MATRICULA_TITULAR);
         unidade.setDataInicioTitularidade(LocalDateTime.now().minusYears(1));
         return unidade;
     }

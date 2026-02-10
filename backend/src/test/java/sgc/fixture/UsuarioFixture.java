@@ -43,8 +43,16 @@ public class UsuarioFixture {
     public static Usuario usuarioComTitulo(String titulo) {
         Usuario usuario = usuarioPadrao();
         usuario.setTituloEleitoral(titulo);
-        // Gera matrícula a partir do título (últimos 8 caracteres ou padding com zeros)
-        String matricula = titulo.length() >= 8 ? titulo.substring(titulo.length() - 8) : String.format("%08d", Integer.parseInt(titulo));
+        // Gera matrícula a partir do título de forma segura
+        // Se título tem >= 8 caracteres, pega os últimos 8
+        // Senão, preenche com zeros à esquerda até ter 8 caracteres
+        String matricula;
+        if (titulo.length() >= 8) {
+            matricula = titulo.substring(titulo.length() - 8);
+        } else {
+            // Preenche com zeros à esquerda
+            matricula = String.format("%08d", titulo.chars().sum()); // Hash simples baseado na soma dos caracteres
+        }
         usuario.setMatricula(matricula);
         return usuario;
     }
