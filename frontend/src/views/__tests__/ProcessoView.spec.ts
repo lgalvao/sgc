@@ -178,7 +178,6 @@ describe("Processo.vue", () => {
         modalSpies.setProcessando.mockClear();
         // Reset router mock push spy
         mocks.push.mockClear();
-        router = { push: mocks.push };
     });
 
     it("deve carregar e exibir os detalhes do processo ao montar", async () => {
