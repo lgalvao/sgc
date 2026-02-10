@@ -18,6 +18,7 @@ import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
+import sgc.testutils.UnidadeTestBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -46,17 +47,17 @@ class EventoProcessoListenerBranchTest {
         processo.setDescricao("Proc");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
 
-        Unidade intermediaria = Unidade.builder().codigo(10L).sigla("INT").tipo(TipoUnidade.INTERMEDIARIA).build();
+        Unidade intermediaria = UnidadeTestBuilder.intermediaria().comCodigo("10").comSigla("INT").build();
 
         // Unidade 1: unidadeSuperior é null
-        Unidade u1 = Unidade.builder().codigo(1L).sigla("U1").unidadeSuperior(null).build();
+        Unidade u1 = UnidadeTestBuilder.umaDe().comCodigo("1").comSigla("U1").comSuperior(null).build();
 
         // Unidade 2: unidadeSuperior não é a intermediária
-        Unidade superiorOutra = Unidade.builder().codigo(99L).build();
-        Unidade u2 = Unidade.builder().codigo(2L).sigla("U2").unidadeSuperior(superiorOutra).build();
+        Unidade superiorOutra = UnidadeTestBuilder.umaDe().comCodigo("99").build();
+        Unidade u2 = UnidadeTestBuilder.umaDe().comCodigo("2").comSigla("U2").comSuperior(superiorOutra).build();
 
         // Unidade 3: unidadeSuperior É a intermediária
-        Unidade u3 = Unidade.builder().codigo(3L).sigla("U3").unidadeSuperior(intermediaria).build();
+        Unidade u3 = UnidadeTestBuilder.umaDe().comCodigo("3").comSigla("U3").comSuperior(intermediaria).build();
 
         processo.adicionarParticipantes(Set.of(intermediaria, u1, u2, u3));
 
@@ -73,7 +74,6 @@ class EventoProcessoListenerBranchTest {
                 "T10", user, "T1", user, "T2", user, "T3", user
         ));
 
-        lenient().when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("html");
         when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any())).thenReturn("html");
         when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(intermediaria, u1, u2, u3));
 

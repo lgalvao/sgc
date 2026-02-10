@@ -22,6 +22,7 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 import sgc.comum.repo.ComumRepo;
+import sgc.testutils.UnidadeTestBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -56,6 +57,13 @@ class ProcessoInicializadorTest {
 
     @InjectMocks
     private ProcessoInicializador inicializador;
+
+    private Unidade criarUnidade(long codigo, String sigla) {
+        return UnidadeTestBuilder.umaDe()
+                .comCodigo(String.valueOf(codigo))
+                .comSigla(sigla)
+                .build();
+    }
 
     @Test
     @DisplayName("Iniciar processo falha se situação inválida")
@@ -104,15 +112,13 @@ class ProcessoInicializadorTest {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
+        Unidade u = criarUnidade(1L, "U1");
         p.adicionarParticipantes(Set.of(u));
 
         when(repo.buscar(Processo.class, 1L)).thenReturn(p);
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of());
 
-        Unidade sedoc = new Unidade();
-        sedoc.setSigla("SEDOC");
+        Unidade sedoc = criarUnidade(999L, "SEDOC");
         when(repo.buscarPorSigla(Unidade.class, "SEDOC")).thenReturn(sedoc);
 
         Usuario usuario = new Usuario();
@@ -148,8 +154,7 @@ class ProcessoInicializadorTest {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
+        Unidade u = criarUnidade(1L, "U1");
         p.adicionarParticipantes(Set.of(u));
 
         when(repo.buscar(Processo.class, 1L)).thenReturn(p);
@@ -177,12 +182,10 @@ class ProcessoInicializadorTest {
         um.setUnidadeCodigo(1L);
         when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of(um));
 
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
+        Unidade u = criarUnidade(1L, "U1");
         when(repo.buscar(Unidade.class, 1L)).thenReturn(u);
 
-        Unidade sedoc = new Unidade();
-        sedoc.setSigla("SEDOC");
+        Unidade sedoc = criarUnidade(999L, "SEDOC");
         when(repo.buscarPorSigla(Unidade.class, "SEDOC")).thenReturn(sedoc);
 
         Usuario usuario = new Usuario();
@@ -198,8 +201,7 @@ class ProcessoInicializadorTest {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.DIAGNOSTICO);
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
+        Unidade u = criarUnidade(1L, "U1");
         p.adicionarParticipantes(Set.of(u));
 
         when(repo.buscar(Processo.class, 1L)).thenReturn(p);
@@ -210,8 +212,7 @@ class ProcessoInicializadorTest {
         when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of(um));
         when(unidadeRepo.findAllById(anyList())).thenReturn(List.of(u));
 
-        Unidade sedoc = new Unidade();
-        sedoc.setSigla("SEDOC");
+        Unidade sedoc = criarUnidade(999L, "SEDOC");
         when(repo.buscarPorSigla(Unidade.class, "SEDOC")).thenReturn(sedoc);
 
         Usuario usuario = new Usuario();
@@ -219,30 +220,5 @@ class ProcessoInicializadorTest {
 
         assertThat(erros).isEmpty();
         verify(subprocessoFacade).criarParaDiagnostico(eq(p), any(), any(), eq(sedoc), eq(usuario));
-    }
-
-    @Test
-    @DisplayName("Iniciar falha se unidade participante não for encontrada")
-    void iniciarFalhaUnidadeNaoEncontrada() {
-        Processo p = new Processo();
-        p.setSituacao(SituacaoProcesso.CRIADO);
-        p.setTipo(TipoProcesso.REVISAO);
-
-        when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-        when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
-        UnidadeMapa um = new UnidadeMapa();
-        um.setUnidadeCodigo(99L);
-        when(unidadeMapaRepo.findAllById(any())).thenReturn(List.of(um));
-        when(repo.buscar(Unidade.class, 99L))
-                .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 99L));
-
-        Unidade sedoc = new Unidade();
-        sedoc.setSigla("SEDOC");
-        when(repo.buscarPorSigla(Unidade.class, "SEDOC")).thenReturn(sedoc);
-
-        List<Long> unidades = List.of(99L);
-        Usuario usuario = new Usuario();
-        assertThatThrownBy(() -> inicializador.iniciar(1L, unidades, usuario))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

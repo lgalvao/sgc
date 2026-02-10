@@ -22,7 +22,7 @@ import sgc.organizacao.model.Unidade;
  * ```
  */
 public class UnidadeTestBuilder {
-    private String codigo = "UNIDADE_TEST"; // may be non-numeric sigla-like code
+    private String codigo = "1"; 
     private String sigla = "UNIDADE_TEST";
     private String nome = "Unidade de Teste";
     private TipoUnidade tipo = TipoUnidade.OPERACIONAL;
@@ -45,7 +45,7 @@ public class UnidadeTestBuilder {
      */
     public static UnidadeTestBuilder operacional() {
         return new UnidadeTestBuilder()
-            .comCodigo("ASSESSORIA_11")
+            .comCodigo("11")
             .comSigla("ASSESSORIA_11")
             .comNome("Assessoria 11")
             .comTipo(TipoUnidade.OPERACIONAL)
@@ -57,7 +57,7 @@ public class UnidadeTestBuilder {
      */
     public static UnidadeTestBuilder intermediaria() {
         return new UnidadeTestBuilder()
-            .comCodigo("COORD_11")
+            .comCodigo("12")
             .comSigla("COORD_11")
             .comNome("Coordenadoria 11")
             .comTipo(TipoUnidade.INTERMEDIARIA)
@@ -69,7 +69,7 @@ public class UnidadeTestBuilder {
      */
     public static UnidadeTestBuilder raiz() {
         return new UnidadeTestBuilder()
-            .comCodigo("SEDOC")
+            .comCodigo("13")
             .comSigla("SEDOC")
             .comNome("SEDOC")
             .comTipo(TipoUnidade.RAIZ)

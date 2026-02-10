@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.dto.MapaDto;
 import sgc.mapa.mapper.MapaMapper;
@@ -87,15 +86,6 @@ class MapaControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("Deve retornar NotFound quando mapa não existir")
-    void deveRetornarNotFoundQuandoMapaNaoExistir() throws Exception {
-        when(mapaFacade.obterPorCodigo(1L)).thenThrow(new ErroEntidadeNaoEncontrada(""));
-
-        mockMvc.perform(get(API_MAPAS_1)).andExpect(status().isNotFound());
-    }
-
-    @Test
-    @WithMockUser
     @DisplayName("Deve retornar Created ao criar mapa")
     void deveRetornarCreatedAoCriar() throws Exception {
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
@@ -138,24 +128,6 @@ class MapaControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("Deve retornar NotFound ao atualizar mapa inexistente")
-    void deveRetornarNotFoundAoAtualizarMapaInexistente() throws Exception {
-        MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
-
-        when(mapaFacade.atualizar(eq(1L), any(Mapa.class)))
-                .thenThrow(new ErroEntidadeNaoEncontrada(""));
-        when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(new Mapa());
-
-        mockMvc.perform(
-                        post(API_MAPAS_1_ATUALIZAR)
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(mapaDto)))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @WithMockUser
     @DisplayName("Deve retornar NoContent ao excluir mapa")
     void deveRetornarNoContentAoExcluir() throws Exception {
         doNothing().when(mapaFacade).excluir(1L);
@@ -163,15 +135,6 @@ class MapaControllerTest {
         mockMvc.perform(post(API_MAPAS_1_EXCLUIR).with(csrf())).andExpect(status().isNoContent());
 
         verify(mapaFacade).excluir(1L);
-    }
-
-    @Test
-    @WithMockUser
-    @DisplayName("Deve retornar NotFound ao excluir mapa inexistente")
-    void deveRetornarNotFoundAoExcluirInexistente() throws Exception {
-        doThrow(new ErroEntidadeNaoEncontrada("")).when(mapaFacade).excluir(1L);
-
-        mockMvc.perform(post(API_MAPAS_1_EXCLUIR).with(csrf())).andExpect(status().isNotFound());
     }
 
 

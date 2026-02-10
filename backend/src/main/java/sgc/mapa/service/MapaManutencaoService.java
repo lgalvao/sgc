@@ -237,10 +237,7 @@ public class MapaManutencaoService {
     }
 
     public void atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
-        var existente = repo.buscar(Conhecimento.class, codConhecimento);
-        if (!existente.getCodigoAtividade().equals(codAtividade)) {
-            throw new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento);
-        }
+        var existente = repo.buscar(Conhecimento.class, Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade));
 
         var mapa = existente.getAtividade().getMapa();
         notificarAlteracaoMapa(mapa.getCodigo());
@@ -251,10 +248,7 @@ public class MapaManutencaoService {
     }
 
     public void excluirConhecimento(Long codAtividade, Long codConhecimento) {
-        var conhecimento = repo.buscar(Conhecimento.class, codConhecimento);
-        if (!conhecimento.getCodigoAtividade().equals(codAtividade)) {
-            throw new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento);
-        }
+        var conhecimento = repo.buscar(Conhecimento.class, Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade));
         executarExclusaoConhecimento(conhecimento);
     }
 

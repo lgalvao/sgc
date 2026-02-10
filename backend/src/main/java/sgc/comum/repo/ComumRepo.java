@@ -44,11 +44,33 @@ public class ComumRepo {
      */
     public <T> T buscar(Class<T> classe, String campo, Object valor) {
         try {
-            return em.createQuery("SELECT e FROM " + classe.getSimpleName() + " e WHERE e." + campo + " = :valor", classe)
+            return em.createQuery("SELECT e FROM %s e WHERE e.%s = :valor".formatted(classe.getSimpleName(), campo), classe)
                     .setParameter("valor", valor)
                     .getSingleResult();
         } catch (Exception e) {
             throw new ErroEntidadeNaoEncontrada(classe.getSimpleName(), valor);
+        }
+    }
+
+    /**
+     * Busca uma única entidade por múltiplos campos.
+     *
+     * @param <T>     Tipo da entidade
+     * @param classe  Classe da entidade
+     * @param filtros Mapa de campo -> valor
+     * @return A entidade encontrada
+     * @throws ErroEntidadeNaoEncontrada se a entidade não existir ou não atender aos critérios
+     */
+    public <T> T buscar(Class<T> classe, java.util.Map<String, Object> filtros) {
+        StringBuilder jpql = new StringBuilder("SELECT e FROM " + classe.getSimpleName() + " e WHERE 1=1");
+        filtros.keySet().forEach(campo -> jpql.append(" AND e.").append(campo).append(" = :").append(campo.replace(".", "_")));
+        
+        try {
+            var query = em.createQuery(jpql.toString(), classe);
+            filtros.forEach((campo, valor) -> query.setParameter(campo.replace(".", "_"), valor));
+            return query.getSingleResult();
+        } catch (Exception e) {
+            throw new ErroEntidadeNaoEncontrada(classe.getSimpleName(), filtros.values().toString());
         }
     }
 

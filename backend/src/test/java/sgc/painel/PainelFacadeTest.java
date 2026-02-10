@@ -19,6 +19,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
+import sgc.testutils.UnidadeTestBuilder;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -256,10 +257,11 @@ class PainelFacadeTest {
         p.setSituacao(situacao);
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setDataCriacao(LocalDateTime.now());
-        Unidade u = new Unidade();
-        u.setCodigo(10L);
-        u.setNome("Unit");
-        u.setSigla("U");
+        Unidade u = UnidadeTestBuilder.umaDe()
+                .comCodigo("10")
+                .comSigla("U")
+                .comNome("Unit")
+                .build();
         p.adicionarParticipantes(Set.of(u));
         return p;
     }

@@ -14,7 +14,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
@@ -243,10 +242,9 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @WithMockAdmin
-    @DisplayName("Deve falhar ao buscar subprocesso inexistente")
-    void falhaSubprocessoInexistente() {
-        Assertions
-                .assertThatThrownBy(() -> subprocessoFacade.obterDetalhes(99999L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    @DisplayName("Deve retornar 404 ao buscar subprocesso inexistente")
+    void falhaSubprocessoInexistente() throws Exception {
+        mockMvc.perform(get("/api/subprocessos/99999"))
+                .andExpect(status().isNotFound());
     }
 }

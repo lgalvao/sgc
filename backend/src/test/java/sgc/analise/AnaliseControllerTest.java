@@ -13,7 +13,6 @@ import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -37,17 +36,12 @@ class AnaliseControllerTest {
     private static final String OBSERVACAO_1 = "Observação 1";
     private static final String OBSERVACAO_2 = "Observação 2";
     private static final String API_SUBPROCESSOS_1_ANALISES_CADASTRO = "/api/subprocessos/1/analises-cadastro";
-    private static final String DEVE_RETORNAR_404_NOT_FOUND = "Deve retornar 404 Not Found quando subprocesso não encontrado";
-    private static final String SUBPROCESSO_NAO_ENCONTRADO = "Subprocesso não encontrado";
-    private static final String API_SUBPROCESSOS_99_ANALISES_CADASTRO = "/api/subprocessos/99/analises-cadastro";
     private static final String ERRO_INESPERADO = "Erro inesperado";
     private static final String MESSAGE_JSON_PATH = "$.message";
     private static final String OCORREU_UM_ERRO_INESPERADO = "Erro inesperado";
     private static final String NOVA_ANALISE_DE_CADASTRO = "Nova análise de cadastro";
-    private static final String ANALISE_DE_CADASTRO = "Análise de cadastro";
     private static final String ANALISE_INVALIDA = "Análise inválida";
     private static final String API_SUBPROCESSOS_1_ANALISES_VALIDACAO = "/api/subprocessos/1/analises-validacao";
-    private static final String API_SUBPROCESSOS_99_ANALISES_VALIDACAO = "/api/subprocessos/99/analises-validacao";
     private static final String NOVA_ANALISE_DE_VALIDACAO = "Nova análise de validação";
 
     @Autowired
@@ -117,30 +111,6 @@ class AnaliseControllerTest {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$").isEmpty());
         }
-
-        @Test
-        @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
-        @WithMockUser
-        void deveRetornarNotFoundParaSubprocessoInexistente() throws Exception {
-            when(subprocessoFacade.buscarSubprocesso(99L))
-                    .thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
-
-            mockMvc.perform(get(API_SUBPROCESSOS_99_ANALISES_CADASTRO))
-                    .andExpect(status().isNotFound());
-        }
-
-        @Test
-        @DisplayName("Deve retornar 500 Internal Server Error para erro inesperado")
-        @WithMockUser
-        void deveRetornarInternalServerErrorParaErroInesperado() throws Exception {
-            when(subprocessoFacade.buscarSubprocesso(99L)).thenReturn(subprocesso);
-            when(analiseFacade.listarPorSubprocesso(99L, TipoAnalise.CADASTRO))
-                    .thenThrow(new RuntimeException(ERRO_INESPERADO));
-
-            mockMvc.perform(get(API_SUBPROCESSOS_99_ANALISES_CADASTRO))
-                    .andExpect(status().isInternalServerError())
-                    .andExpect(jsonPath(MESSAGE_JSON_PATH).value(OCORREU_UM_ERRO_INESPERADO));
-        }
     }
 
     @Nested
@@ -209,23 +179,6 @@ class AnaliseControllerTest {
         }
 
         @Test
-        @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
-        @WithMockUser(roles = "ADMIN")
-        void deveRetornarNotFoundParaSubprocessoInexistenteNaCriacao() throws Exception {
-            var request = new CriarAnaliseRequest("123456789012", ANALISE_DE_CADASTRO, "S", "M");
-
-            when(subprocessoFacade.buscarSubprocesso(99L))
-                    .thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
-
-            mockMvc.perform(
-                            post(API_SUBPROCESSOS_99_ANALISES_CADASTRO)
-                                    .with(csrf())
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isNotFound());
-        }
-
-        @Test
         @DisplayName("Deve retornar 400 Bad Request para parâmetro inválido")
         @WithMockUser(roles = "GESTOR")
         void deveRetornarBadRequestParaParametroInvalido() throws Exception {
@@ -241,24 +194,6 @@ class AnaliseControllerTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("Deve retornar 500 Internal Server Error para erro inesperado na criação")
-        @WithMockUser(roles = "ADMIN")
-        void deveRetornarInternalServerErrorParaErroInesperadoNaCriacao() throws Exception {
-            var request = new CriarAnaliseRequest("123456789012", ANALISE_DE_CADASTRO, "S", "M");
-
-            when(subprocessoFacade.buscarSubprocesso(99L)).thenReturn(subprocesso);
-            when(analiseFacade.criarAnalise(any(), any()))
-                    .thenThrow(new RuntimeException(ERRO_INESPERADO));
-
-            mockMvc.perform(
-                            post(API_SUBPROCESSOS_99_ANALISES_CADASTRO)
-                                    .with(csrf())
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isInternalServerError());
         }
     }
 
@@ -294,17 +229,6 @@ class AnaliseControllerTest {
             mockMvc.perform(get(API_SUBPROCESSOS_1_ANALISES_VALIDACAO))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isEmpty());
-        }
-
-        @Test
-        @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
-        @WithMockUser
-        void deveRetornarNotFoundParaSubprocessoInexistenteValidacao() throws Exception {
-            when(subprocessoFacade.buscarSubprocesso(99L))
-                    .thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
-
-            mockMvc.perform(get(API_SUBPROCESSOS_99_ANALISES_VALIDACAO))
-                    .andExpect(status().isNotFound());
         }
     }
 

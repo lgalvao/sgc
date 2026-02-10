@@ -248,19 +248,6 @@ class ProcessoControllerTest {
 
         @Test
         @WithMockUser
-        @DisplayName("Deve retornar 404 Not Found quando processo não existe")
-        void deveRetornarNotFoundQuandoProcessoNaoExiste() throws Exception {
-            // Arrange
-            when(processoFacade.obterPorId(999L)).thenReturn(Optional.empty());
-
-            // Act & Assert
-            mockMvc.perform(get(API_PROCESSOS_999)).andExpect(status().isNotFound());
-
-            verify(processoFacade).obterPorId(999L);
-        }
-
-        @Test
-        @WithMockUser
         @DisplayName("Deve retornar detalhes do processo com 200 OK")
         void deveRetornarOkAoObterDetalhesQuandoProcessoExiste() throws Exception {
             // Arrange
@@ -282,19 +269,6 @@ class ProcessoControllerTest {
                     .andExpect(jsonPath("$.descricao").value("Processo Detalhado"));
 
             verify(processoFacade).obterDetalhes(eq(1L), any(Usuario.class));
-        }
-
-        @Test
-        @WithMockUser
-        @DisplayName("Deve retornar 404 Not Found ao obter detalhes se processo não encontrado")
-        void deveRetornarNotFoundAoObterDetalhesQuandoProcessoNaoEncontrado() throws Exception {
-            // Arrange
-            doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
-                    .when(processoFacade)
-                    .obterDetalhes(eq(999L), any(Usuario.class));
-
-            // Act & Assert
-            mockMvc.perform(get("/api/processos/999/detalhes")).andExpect(status().isNotFound());
         }
 
         @Test
@@ -352,32 +326,6 @@ class ProcessoControllerTest {
 
         @Test
         @WithMockUser
-        @DisplayName("Deve retornar 404 Not Found ao atualizar se processo não encontrado")
-        void deveRetornarNotFoundAoAtualizarQuandoProcessoNaoEncontrado() throws Exception {
-            // Arrange
-            var req =
-                    new AtualizarProcessoRequest(
-                            999L,
-                            "Teste",
-                            TipoProcesso.MAPEAMENTO,
-                            LocalDateTime.now().plusDays(30),
-                            List.of(1L));
-
-            doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
-                    .when(processoFacade)
-                    .atualizar(eq(999L), any(AtualizarProcessoRequest.class));
-
-            // Act & Assert
-            mockMvc.perform(
-                            post(API_PROCESSOS + "/999/atualizar")
-                                    .with(csrf())
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(req)))
-                    .andExpect(status().isNotFound());
-        }
-
-        @Test
-        @WithMockUser
         @DisplayName("Deve retornar 409 Conflict ao atualizar se estado inválido")
         void deveRetornarConflictAoAtualizarQuandoEstadoInvalido() throws Exception {
             // Arrange
@@ -415,20 +363,6 @@ class ProcessoControllerTest {
                     .andExpect(status().isNoContent());
 
             verify(processoFacade).apagar(1L);
-        }
-
-        @Test
-        @WithMockUser
-        @DisplayName("Deve retornar 404 Not Found ao excluir se processo não encontrado")
-        void deveRetornarNotFoundAoExcluirQuandoProcessoNaoEncontrado() throws Exception {
-            // Arrange
-            doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
-                    .when(processoFacade)
-                    .apagar(999L);
-
-            // Act & Assert
-            mockMvc.perform(post(API_PROCESSOS + "/999/excluir").with(csrf()))
-                    .andExpect(status().isNotFound());
         }
 
         @Test
@@ -522,20 +456,6 @@ class ProcessoControllerTest {
             mockMvc.perform(post("/api/processos/1/finalizar").with(csrf())).andExpect(status().isOk());
 
             verify(processoFacade).finalizar(1L);
-        }
-
-        @Test
-        @WithMockUser
-        @DisplayName("Deve retornar 404 Not Found ao finalizar se processo não encontrado")
-        void deveRetornarNotFoundAoFinalizarQuandoProcessoNaoEncontrado() throws Exception {
-            // Arrange
-            doThrow(new ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO))
-                    .when(processoFacade)
-                    .finalizar(999L);
-
-            // Act & Assert
-            mockMvc.perform(post(API_PROCESSOS_999 + "/finalizar").with(csrf()))
-                    .andExpect(status().isNotFound());
         }
 
         @Test

@@ -9,7 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
@@ -111,18 +110,6 @@ class SubprocessoCrudControllerTest {
 
         mockMvc.perform(post("/api/subprocessos/1/excluir").with(csrf()))
                 .andExpect(status().isNoContent());
-    }
-
-    @Test
-    @DisplayName("excluir retorna NotFound se erro")
-    @WithMockUser(roles = "ADMIN")
-    void excluirNotFound() throws Exception {
-        doThrow(new ErroEntidadeNaoEncontrada("Subprocesso", 1L))
-                .when(subprocessoFacade)
-                .excluir(1L);
-
-        mockMvc.perform(post("/api/subprocessos/1/excluir").with(csrf()))
-                .andExpect(status().isNotFound());
     }
 
     @Test

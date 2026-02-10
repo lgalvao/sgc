@@ -7,6 +7,7 @@ import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.testutils.UnidadeTestBuilder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -56,15 +57,17 @@ class ProcessoMapperTest {
             processo.setTipo(TipoProcesso.MAPEAMENTO);
             processo.setSituacao(SituacaoProcesso.CRIADO);
 
-            Unidade unidade1 = new Unidade();
-            unidade1.setCodigo(1L);
-            unidade1.setSigla("SEDIA");
-            unidade1.setNome("Unidade 1");
+            Unidade unidade1 = UnidadeTestBuilder.umaDe()
+                    .comCodigo("1")
+                    .comSigla("SEDIA")
+                    .comNome("Unidade 1")
+                    .build();
 
-            Unidade unidade2 = new Unidade();
-            unidade2.setCodigo(2L);
-            unidade2.setSigla("COSIS");
-            unidade2.setNome("Unidade 2");
+            Unidade unidade2 = UnidadeTestBuilder.umaDe()
+                    .comCodigo("2")
+                    .comSigla("COSIS")
+                    .comNome("Unidade 2")
+                    .build();
 
             // Usando adicionarParticipantes criará os snapshots UnidadeProcesso
             processo.adicionarParticipantes(Set.of(unidade1, unidade2));
@@ -117,20 +120,23 @@ class ProcessoMapperTest {
             processo.setTipo(TipoProcesso.MAPEAMENTO);
             processo.setSituacao(SituacaoProcesso.CRIADO);
 
-            Unidade unidadeZ = new Unidade();
-            unidadeZ.setCodigo(1L);
-            unidadeZ.setSigla("ZEBRA");
-            unidadeZ.setNome("Unidade Zebra");
+            Unidade unidadeZ = UnidadeTestBuilder.umaDe()
+                    .comCodigo("1")
+                    .comSigla("ZEBRA")
+                    .comNome("Unidade Zebra")
+                    .build();
 
-            Unidade unidadeA = new Unidade();
-            unidadeA.setCodigo(2L);
-            unidadeA.setSigla("ALFA");
-            unidadeA.setNome("Unidade Alfa");
+            Unidade unidadeA = UnidadeTestBuilder.umaDe()
+                    .comCodigo("2")
+                    .comSigla("ALFA")
+                    .comNome("Unidade Alfa")
+                    .build();
 
-            Unidade unidadeM = new Unidade();
-            unidadeM.setCodigo(3L);
-            unidadeM.setSigla("MEGA");
-            unidadeM.setNome("Unidade Mega");
+            Unidade unidadeM = UnidadeTestBuilder.umaDe()
+                    .comCodigo("3")
+                    .comSigla("MEGA")
+                    .comNome("Unidade Mega")
+                    .build();
 
             processo.adicionarParticipantes(Set.of(unidadeZ, unidadeA, unidadeM));
 

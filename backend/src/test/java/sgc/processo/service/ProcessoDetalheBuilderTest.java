@@ -20,6 +20,7 @@ import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.testutils.UnidadeTestBuilder;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -47,6 +48,14 @@ class ProcessoDetalheBuilderTest {
 
     @InjectMocks
     private ProcessoDetalheBuilder builder;
+
+    private Unidade criarUnidade(Long codigo, String sigla, String nome) {
+        return UnidadeTestBuilder.umaDe()
+                .comCodigo(String.valueOf(codigo))
+                .comSigla(sigla)
+                .comNome(nome)
+                .build();
+    }
 
     private Usuario criarUsuarioMock() {
         Usuario usuario = new Usuario();
@@ -84,10 +93,7 @@ class ProcessoDetalheBuilderTest {
         processo.setDataCriacao(LocalDateTime.now());
         processo.setDataLimite(LocalDateTime.now().plusDays(10));
 
-        Unidade u1 = new Unidade();
-        u1.setCodigo(10L);
-        u1.setSigla("U1");
-        u1.setNome("Unidade 1");
+        Unidade u1 = criarUnidade(10L, "U1", "Unidade 1");
 
         processo.adicionarParticipantes(Set.of(u1));
 
@@ -166,14 +172,8 @@ class ProcessoDetalheBuilderTest {
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.CRIADO);
 
-        Unidade u1 = new Unidade();
-        u1.setCodigo(1L);
-        u1.setSigla("B");
-        u1.setNome("Unidade B");
-        Unidade u2 = new Unidade();
-        u2.setCodigo(2L);
-        u2.setSigla("A");
-        u2.setNome("Unidade A");
+        Unidade u1 = criarUnidade(1L, "B", "Unidade B");
+        Unidade u2 = criarUnidade(2L, "A", "Unidade A");
 
         processo.adicionarParticipantes(Set.of(u1, u2));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
@@ -198,15 +198,8 @@ class ProcessoDetalheBuilderTest {
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-        Unidade pai = new Unidade();
-        pai.setCodigo(1L);
-        pai.setSigla("PAI");
-        pai.setNome("PAI");
-
-        Unidade filho = new Unidade();
-        filho.setCodigo(2L);
-        filho.setSigla("FILHO");
-        filho.setNome("FILHO");
+        Unidade pai = criarUnidade(1L, "PAI", "PAI");
+        Unidade filho = criarUnidade(2L, "FILHO", "FILHO");
         filho.setUnidadeSuperior(pai);
 
         processo.adicionarParticipantes(Set.of(pai, filho));
@@ -262,8 +255,7 @@ class ProcessoDetalheBuilderTest {
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         configurarMockDoMapper();
-        Unidade u1 = new Unidade();
-        u1.setCodigo(1L);
+        Unidade u1 = criarUnidade(1L, "U1", "U1");
         processo.adicionarParticipantes(Set.of(u1));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
         when(accessControlService.podeExecutar(any(Usuario.class), any(), any(Processo.class)))
@@ -282,13 +274,8 @@ class ProcessoDetalheBuilderTest {
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-        Unidade pai = new Unidade();
-        pai.setCodigo(1L);
-        pai.setSigla("PAI");
-        Unidade filho = new Unidade();
-        filho.setCodigo(2L);
-        filho.setSigla("FILHO");
-        filho.setNome("FILHO");
+        Unidade pai = criarUnidade(1L, "PAI", "PAI");
+        Unidade filho = criarUnidade(2L, "FILHO", "FILHO");
         filho.setUnidadeSuperior(pai);
 
         // Apenas filho participa
@@ -316,10 +303,7 @@ class ProcessoDetalheBuilderTest {
         processo.setDataCriacao(LocalDateTime.now());
         processo.setDataLimite(LocalDateTime.now().plusDays(10));
 
-        Unidade u1 = new Unidade();
-        u1.setCodigo(10L);
-        u1.setSigla("U1");
-        u1.setNome("Unidade 1");
+        Unidade u1 = criarUnidade(10L, "U1", "Unidade 1");
 
         processo.adicionarParticipantes(Set.of(u1));
 

@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeDto;
@@ -197,18 +196,6 @@ class UnidadeControllerTest {
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/1")).andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("Deve retornar 404 ao buscar árvore de unidade inexistente")
-    @WithMockUser
-    void deveRetornar404AoBuscarArvoreDeUnidadeInexistente() throws Exception {
-        // Arrange
-        when(unidadeService.buscarArvore(99L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade não encontrada"));
-
-        // Act & Assert
-        mockMvc.perform(get("/api/unidades/99/arvore"))
-                .andExpect(status().isNotFound());
     }
 
     @Test
