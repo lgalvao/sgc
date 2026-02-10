@@ -49,19 +49,27 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
     /**
      * Cria uma unidade com o titular definido para funcionar com @WithMockChefe.
      * O titular padrão "111111111111" corresponde ao usuário criado por @WithMockChefe.
+     * Também cria a atribuição de perfil CHEFE para essa unidade.
      */
     private Unidade criarUnidadeComTitular(String nome) {
+        // Cria a unidade usando criarUnidadeOperacional
         Unidade unidade = criarUnidadeOperacional(nome);
-        // Define o titular como "111111111111" para funcionar com @WithMockChefe
+        
+        // Define o titular diretamente no objeto antes de salvar
+        unidade.setTituloTitular(TITULO_TITULAR_TESTE);
+        unidade.setMatriculaTitular("11111111");
+        unidade.setDataInicioTitularidade(java.time.LocalDateTime.now());
+        unidade = unidadeRepo.saveAndFlush(unidade);
+        
         try {
+            // Cria atribuição de perfil CHEFE para o titular na unidade
             jdbcTemplate.update(
-                "UPDATE SGC.VW_UNIDADE SET TITULO_TITULAR = ? WHERE CODIGO = ?",
-                TITULO_TITULAR_TESTE, unidade.getCodigo());
-            // Recarrega a unidade para ter os dados atualizados
-            unidade = unidadeRepo.findById(unidade.getCodigo()).orElse(unidade);
+                "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (TITULO_USUARIO, PERFIL, CODIGO_UNIDADE) VALUES (?, ?, ?)",
+                TITULO_TITULAR_TESTE, "CHEFE", unidade.getCodigo());
         } catch (Exception e) {
-            // Se não conseguir atualizar, continua mesmo assim
+            // Se já existir, ignora
         }
+        
         return unidade;
     }
     
@@ -71,19 +79,6 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
      * Retorna o código do mapa criado.
      */
     private Long criarSubprocessoERetornarMapaCodigo(Unidade unidade) {
-        // Garante que a unidade tem o titular definido (compatível com @WithMockChefe)
-        if (unidade.getTituloTitular() == null || unidade.getTituloTitular().isEmpty()) {
-            try {
-                jdbcTemplate.update(
-                    "UPDATE SGC.VW_UNIDADE SET TITULO_TITULAR = ? WHERE CODIGO = ?",
-                    TITULO_TITULAR_TESTE, unidade.getCodigo());
-                // Recarrega para obter o valor atualizado
-                unidade = unidadeRepo.findById(unidade.getCodigo()).orElse(unidade);
-            } catch (Exception e) {
-                // Se não conseguir atualizar, continua mesmo assim
-            }
-        }
-        
         // Cria processo iniciado
         Processo processo = new Processo();
         processo.setDescricao("Processo de Mapeamento Teste");
@@ -134,6 +129,7 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
             mockMvc.perform(post(API_ATIVIDADES)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody))
+                    .andDo(print())
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.atividade.codigo").exists())
                     .andExpect(jsonPath("$.atividade.descricao").value("Realizar análise de documentos"));
