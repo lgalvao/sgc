@@ -48,7 +48,7 @@ vi.mock("@/services/subprocessoService", () => ({
 const ProcessoAcoesStub = {
     name: "ProcessoAcoes",
     template: '<div data-testid="processo-acoes"></div>',
-    props: ["mostrarBotoesBloco", "perfil", "situacaoProcesso"],
+    props: ["podeAceitarBloco", "podeHomologarBloco", "podeFinalizar"],
     emits: ["finalizar"],
 };
 
@@ -115,6 +115,7 @@ describe("Processo.vue", () => {
         tipo: "REVISAO",
         situacao: "EM_ANDAMENTO",
         podeHomologarCadastro: true,
+        podeFinalizar: true,
         unidades: [
             {
                 codUnidade: 101,
@@ -452,18 +453,18 @@ describe("Processo.vue", () => {
         });
     });
 
-     it("não deve redirecionar para detalhes da unidade se não tiver permissão (Servidor de outra unidade)", async () => {
+     it("deve redirecionar para detalhes da unidade mesmo como Servidor (controle é no backend)", async () => {
         mocks.push.mockClear(); // Limpa chamadas anteriores
         
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        // Servidor não tem isAdmin nem isGestor - precisa definir perfis vazios
+        // Servidor - o controle de acesso agora é no backend, não no frontend
         perfilStore.$patch({ 
             perfilSelecionado: Perfil.SERVIDOR, 
             unidadeSelecionada: 999,
-            perfis: [Perfil.SERVIDOR] // Lista de perfis do usuário
+            perfis: [Perfil.SERVIDOR]
         });
         processosStore.$patch({ processoDetalhe: mockProcesso });
 
@@ -472,9 +473,15 @@ describe("Processo.vue", () => {
 
         const treeTable = wrapper.findComponent(TreeTableStub);
 
-        await treeTable.vm.$emit("row-click", { codigo: 101, unidadeAtual: "UNI1", clickable: true });
+        await treeTable.vm.$emit("row-click", { codigo: 101, unidadeAtual: "UNI1", sigla: "UNI1", clickable: true });
 
-        expect(mocks.push).not.toHaveBeenCalled();
+        expect(mocks.push).toHaveBeenCalledWith({
+            name: "Subprocesso",
+            params: {
+                codProcesso: "1",
+                siglaUnidade: "UNI1"
+            }
+        });
     });
 
     // --- Finalização ---

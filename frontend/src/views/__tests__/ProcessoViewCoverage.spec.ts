@@ -170,7 +170,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         expect(mocks.push).not.toHaveBeenCalled();
     });
 
-    it("não deve navegar para unidade de terceiros se CHEFE", async () => {
+    it("deve navegar para unidade de terceiros se CHEFE (controle é no backend)", async () => {
         const wrapper = createWrapper({
             perfil: {
                 perfilSelecionado: "CHEFE",
@@ -180,10 +180,12 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         });
         await flushPromises();
 
-        // Tenta abrir unidade 10
-        (wrapper.vm as any).abrirDetalhesUnidade({ clickable: true, codigo: 10, unidadeAtual: "U1" });
+        // Tenta abrir unidade 10 — agora permitido, backend controla acesso
+        (wrapper.vm as any).abrirDetalhesUnidade({ clickable: true, codigo: 10, sigla: "U1", unidadeAtual: "U1" });
 
-        expect(mocks.push).not.toHaveBeenCalled();
+        expect(mocks.push).toHaveBeenCalledWith(expect.objectContaining({
+            params: { codProcesso: "1", siglaUnidade: "U1" }
+        }));
     });
 
     it("deve navegar para própria unidade se CHEFE", async () => {
