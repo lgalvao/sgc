@@ -26,7 +26,7 @@ import sgc.subprocesso.service.factory.SubprocessoFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -200,7 +200,7 @@ class SubprocessoCrudServiceTest {
     @DisplayName("Deve obter subprocesso por processo e unidade")
     void deveObterPorProcessoEUnidade() {
         Subprocesso sp = new Subprocesso();
-        when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(1L, 2L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(eq(Subprocesso.class), anyMap())).thenReturn(sp);
         when(subprocessoMapper.toDto(sp)).thenReturn(SubprocessoDto.builder().build());
 
         assertThat(service.obterPorProcessoEUnidade(1L, 2L)).isNotNull();

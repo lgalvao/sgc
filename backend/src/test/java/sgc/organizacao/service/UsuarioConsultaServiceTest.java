@@ -85,7 +85,7 @@ class UsuarioConsultaServiceTest {
     @DisplayName("Deve buscar por ID com atribuições")
     void deveBuscarPorIdComAtribuicoes() {
         Usuario u = new Usuario();
-        when(usuarioRepo.findByIdWithAtribuicoes("u")).thenReturn(Optional.of(u));
+        when(repo.buscar(Usuario.class, "u")).thenReturn(u);
         assertEquals(u, usuarioConsultaService.buscarPorIdComAtribuicoes("u"));
     }
 

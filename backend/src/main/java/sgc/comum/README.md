@@ -79,16 +79,6 @@ graph TD
 - **Reutilização**: Classes como `EntidadeBase` e anotações como `@SanitizeHtml` reduzem código boilerplate nos módulos
   de negócio.
 
-**Exemplo de uso:**
-
-```java
-// Em um serviço de domínio
-public Recurso buscar(Long codigo) {
-    return repository.findById(codigo)
-        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Recurso", codigo));
-}
-```
-
 ## Como Testar
 
 Para executar apenas os testes deste módulo (a partir do diretório `backend`):

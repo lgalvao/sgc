@@ -327,8 +327,7 @@ public class SubprocessoFacade {
         Usuario usuario = usuarioService.buscarPorTituloEleitoral(auth.getName());
         
         // 1. Busca entidade
-        Subprocesso entity = repo.findById(codigo)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codigo));
+        Subprocesso entity = repo.findById(codigo);
         
         // 2. Verifica permissão (usa entidade)
         accessControl.verificarPermissao(usuario, VISUALIZAR_SUBPROCESSO, entity);

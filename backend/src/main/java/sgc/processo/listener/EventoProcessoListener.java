@@ -241,8 +241,13 @@ public class EventoProcessoListener {
             };
 
             String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
-            notificacaoEmailService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
-            log.info("E-mail enviado para unidade {}", unidade.getSigla());
+            
+            if (titular != null && titular.email() != null && !titular.email().isBlank()) {
+                notificacaoEmailService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
+                log.info("E-mail enviado para unidade {}", unidade.getSigla());
+            } else {
+                log.warn("E-mail não enviado para unidade {}: titular ou e-mail inválido", unidade.getSigla());
+            }
 
             if (responsavel.substitutoTitulo() != null) {
                 enviarEmailParaSubstituto(responsavel.substitutoTitulo(), usuarios, assunto, corpoHtml, nomeUnidade);

@@ -250,8 +250,6 @@ throw new ErroConfiguracao("...");          // ou
 
 // Se for erro de negócio:
 throw new ErroValidacao("...");                    // ou
-throw new ErroProcessoEmSituacaoInvalida("...");   // ou
-throw new ErroEntidadeNaoEncontrada("...");        // ou
 // outra exceção apropriada de negócio
 ```
 
