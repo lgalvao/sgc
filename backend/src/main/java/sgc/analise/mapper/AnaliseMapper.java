@@ -1,5 +1,7 @@
 package sgc.analise.mapper;
 
+import sgc.comum.config.CentralMapperConfig;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,7 @@ import sgc.organizacao.model.UnidadeRepo;
  * Mapper para converter a entidade {@link Analise} em DTOs.
  */
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
-@Mapper(componentModel = "spring", imports = FormatadorData.class)
+@Mapper(componentModel = "spring", config = CentralMapperConfig.class, imports = FormatadorData.class)
 public abstract class AnaliseMapper {
     @Autowired
     protected UnidadeRepo unidadeRepo;

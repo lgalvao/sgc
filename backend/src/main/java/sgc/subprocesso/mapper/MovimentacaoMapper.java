@@ -1,5 +1,7 @@
 package sgc.subprocesso.mapper;
 
+import sgc.comum.config.CentralMapperConfig;
+
 import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -10,7 +12,7 @@ import sgc.subprocesso.model.Movimentacao;
 /**
  * Mapper (usando MapStruct) entre a entidade Movimentacao e seu DTO.
  */
-@Mapper(componentModel = "spring", imports = FormatadorData.class)
+@Mapper(componentModel = "spring", config = CentralMapperConfig.class, imports = FormatadorData.class)
 public interface MovimentacaoMapper {
     @Mapping(source = "unidadeOrigem.codigo", target = "unidadeOrigemCodigo")
     @Mapping(source = "unidadeOrigem.sigla", target = "unidadeOrigemSigla")

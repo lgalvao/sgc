@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -24,6 +24,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 public class SubprocessoAdminWorkflowService {
 
     private final SubprocessoRepo subprocessoRepo;
+    private final ComumRepo repo;
     private final SubprocessoCrudService crudService;
     private final AlertaFacade alertaService;
 
@@ -54,8 +55,7 @@ public class SubprocessoAdminWorkflowService {
 
     @Transactional
     public void atualizarSituacaoParaEmAndamento(Long mapaCodigo) {
-        var subprocesso = subprocessoRepo.findByMapaCodigo(mapaCodigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso do mapa", mapaCodigo));
+        var subprocesso = repo.buscar(Subprocesso.class, "mapa.codigo", mapaCodigo);
 
         if (subprocesso.getSituacao() == NAO_INICIADO) {
             var tipoProcesso = subprocesso.getProcesso().getTipo();

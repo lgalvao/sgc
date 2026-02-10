@@ -1,6 +1,7 @@
 package sgc.processo.mapper;
 
-import org.jspecify.annotations.Nullable;
+import sgc.comum.config.CentralMapperConfig;
+
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Mapper (usando MapStruct) entre a entidade Processo e seu DTO principal.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", config = CentralMapperConfig.class)
 public interface ProcessoMapper {
     @Mapping(target = "dataCriacaoFormatada", ignore = true)
     @Mapping(target = "dataFinalizacaoFormatada", ignore = true)
@@ -21,10 +22,10 @@ public interface ProcessoMapper {
     @Mapping(target = "situacaoLabel", ignore = true)
     @Mapping(target = "tipoLabel", ignore = true)
     @Mapping(target = "unidadesParticipantes", ignore = true)
-    @Nullable ProcessoDto toDto(@Nullable Processo processo);
+    ProcessoDto toDto(Processo processo);
 
     @Mapping(target = "participantes", ignore = true)
-    @Nullable Processo toEntity(@Nullable ProcessoDto processoDTO);
+    Processo toEntity(ProcessoDto processoDTO);
 
     @AfterMapping
     default void mapAfterMapping(Processo processo, @MappingTarget ProcessoDto dto) {
@@ -42,11 +43,9 @@ public interface ProcessoMapper {
         if (processo.getDataLimite() != null) {
             dto.setDataLimiteFormatada(processo.getDataLimite().format(formatter));
         }
-
         if (processo.getSituacao() != null) {
             dto.setSituacaoLabel(processo.getSituacao().getLabel());
         }
-
         if (processo.getTipo() != null) {
             dto.setTipoLabel(processo.getTipo().getLabel());
         }

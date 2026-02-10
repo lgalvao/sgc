@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 @Transactional
 @RequiredArgsConstructor
 public class MapaManutencaoService {
-    private static final String ENTIDADE_COMPETENCIA = "Competência";
     private static final String ENTIDADE_ATIVIDADE = "Atividade";
 
     private final AtividadeRepo atividadeRepo;
@@ -192,8 +191,7 @@ public class MapaManutencaoService {
     }
 
     public void removerCompetencia(Long codCompetencia) {
-        Competencia competencia = competenciaRepo.findById(codCompetencia)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_COMPETENCIA, codCompetencia));
+        Competencia competencia = repo.buscar(Competencia.class, codCompetencia);
 
         List<Atividade> atividadesAssociadas = atividadeRepo.listarPorCompetencia(competencia);
         atividadesAssociadas.forEach(atividade -> atividade.getCompetencias().remove(competencia));
@@ -245,9 +243,10 @@ public class MapaManutencaoService {
     }
 
     public void atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
-        var existente = conhecimentoRepo.findById(codConhecimento)
-                .filter(c -> c.getCodigoAtividade().equals(codAtividade))
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento));
+        var existente = repo.buscar(Conhecimento.class, codConhecimento);
+        if (!existente.getCodigoAtividade().equals(codAtividade)) {
+            throw new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento);
+        }
 
         var mapa = existente.getAtividade().getMapa();
         notificarAlteracaoMapa(mapa.getCodigo());
@@ -258,13 +257,11 @@ public class MapaManutencaoService {
     }
 
     public void excluirConhecimento(Long codAtividade, Long codConhecimento) {
-        conhecimentoRepo.findById(codConhecimento)
-                .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(codAtividade))
-                .ifPresentOrElse(
-                        this::executarExclusaoConhecimento,
-                        () -> {
-                            throw new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento);
-                        });
+        var conhecimento = repo.buscar(Conhecimento.class, codConhecimento);
+        if (!conhecimento.getCodigoAtividade().equals(codAtividade)) {
+            throw new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento);
+        }
+        executarExclusaoConhecimento(conhecimento);
     }
     
     private void executarExclusaoConhecimento(Conhecimento conhecimento) {

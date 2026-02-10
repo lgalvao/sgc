@@ -19,7 +19,6 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class ProcessoDetalheBuilder {
-
     private final SubprocessoRepo subprocessoRepo;
     private final ProcessoDetalheMapper processoDetalheMapper;
     private final AccessControlService accessControlService;
@@ -63,8 +62,7 @@ public class ProcessoDetalheBuilder {
 
         // Loop 1 consolidado: Mapear participantes (snapshots) E preencher dados dos subprocessos
         for (UnidadeProcesso participante : processo.getParticipantes()) {
-            ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto =
-                    processoDetalheMapper.fromSnapshot(participante);
+            ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto = processoDetalheMapper.fromSnapshot(participante);
             
             // Preencher dados do subprocesso se existir
             Subprocesso sp = mapaSubprocessos.get(participante.getUnidadeCodigo());

@@ -31,8 +31,6 @@ import java.util.Set;
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 import java.util.stream.Stream;
-import sgc.comum.erros.ErroEstadoImpossivel;
-
 /**
  * Orquestra operações de Processo.
  */
@@ -68,21 +66,13 @@ public class ProcessoFacade {
     @Transactional
     public ProcessoDto criar(CriarProcessoRequest req) {
         Processo processoSalvo = processoManutencaoService.criar(req);
-        var dto = processoMapper.toDto(processoSalvo);
-        if (dto == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter processo criado para DTO.");
-        }
-        return dto;
+        return processoMapper.toDto(processoSalvo);
     }
 
     @Transactional
     public ProcessoDto atualizar(Long codigo, AtualizarProcessoRequest requisicao) {
         Processo processoAtualizado = processoManutencaoService.atualizar(codigo, requisicao);
-        var dto = processoMapper.toDto(processoAtualizado);
-        if (dto == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter processo atualizado para DTO.");
-        }
-        return dto;
+        return processoMapper.toDto(processoAtualizado);
     }
 
     @Transactional

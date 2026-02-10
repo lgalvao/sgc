@@ -1,7 +1,6 @@
 package sgc.subprocesso.service.crud;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -137,7 +136,7 @@ class SubprocessoCrudServiceTest {
     @DisplayName("Deve obter entidade por código do mapa")
     void deveObterEntidadePorCodigoMapa() {
         Subprocesso sp = new Subprocesso();
-        when(subprocessoRepo.findByMapaCodigo(10L)).thenReturn(Optional.of(sp));
+        when(subprocessoRepo.findByMapaCodigoWithMapa(10L)).thenReturn(Optional.of(sp));
 
         assertThat(service.obterEntidadePorCodigoMapa(10L)).isEqualTo(sp);
     }
@@ -370,41 +369,5 @@ class SubprocessoCrudServiceTest {
         assertThat(service.listarPorProcessoEUnidades(1L, List.of())).isEmpty();
 
         verify(subprocessoRepo, never()).findByProcessoCodigoAndUnidadeCodigoInWithUnidade(anyLong(), anyList());
-    }
-
-    @Nested
-    @DisplayName("Cenários de Erro de Estado Impossível")
-    class ErroEstadoImpossivelTests {
-        @Test
-        @DisplayName("criar deve lançar ErroEstadoImpossivel se DTO for nulo")
-        void criar_DeveLancarErroSeDtoNulo() {
-            CriarSubprocessoRequest req = CriarSubprocessoRequest.builder().codProcesso(1L).codUnidade(10L).build();
-            when(subprocessoFactory.criar(req)).thenReturn(new Subprocesso());
-            when(subprocessoMapper.toDto(any())).thenReturn(null);
-
-            assertThatThrownBy(() -> service.criar(req)).isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
-        }
-
-        @Test
-        @DisplayName("atualizar deve lançar ErroEstadoImpossivel se DTO for nulo")
-        void atualizar_DeveLancarErroSeDtoNulo() {
-            Long codigo = 1L;
-            AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder().build();
-            Subprocesso sp = new Subprocesso();
-            when(repositorioComum.buscar(Subprocesso.class, codigo)).thenReturn(sp);
-            when(subprocessoRepo.save(sp)).thenReturn(sp);
-            when(subprocessoMapper.toDto(any())).thenReturn(null);
-
-            assertThatThrownBy(() -> service.atualizar(codigo, req)).isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
-        }
-
-        @Test
-        @DisplayName("obterPorProcessoEUnidade deve lançar ErroEstadoImpossivel se DTO for nulo")
-        void obterPorProcessoEUnidade_DeveLancarErroSeDtoNulo() {
-            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(1L, 2L)).thenReturn(Optional.of(new Subprocesso()));
-            when(subprocessoMapper.toDto(any())).thenReturn(null);
-
-            assertThatThrownBy(() -> service.obterPorProcessoEUnidade(1L, 2L)).isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
-        }
     }
 }

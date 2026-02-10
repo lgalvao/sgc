@@ -89,12 +89,5 @@ class AtividadeMapperTest {
             assertThat(atividade).isNotNull();
             assertThat(atividade.getDescricao()).isEqualTo("Atividade Atualizada");
         }
-
-        @Test
-        @DisplayName("Deve retornar null quando request é null")
-        void deveRetornarNullQuandoRequestNull() {
-            assertThat(mapper.toEntity((CriarAtividadeRequest) null)).isNull();
-            assertThat(mapper.toEntity((AtualizarAtividadeRequest) null)).isNull();
-        }
     }
 }

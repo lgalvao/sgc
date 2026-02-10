@@ -77,23 +77,4 @@ class ConhecimentoMapperTest {
             assertThat(conhecimento.getDescricao()).isEqualTo("Descricao Atualizada");
         }
     }
-    @Nested
-    @DisplayName("Cobertura de Nulos")
-    class CoberturaNulos {
-        @Test
-        @DisplayName("Deve retornar null quando parâmetros são nulos")
-        void deveRetornarNullQuandoNulos() {
-            assertThat(mapper.toResponse(null)).isNull();
-            assertThat(mapper.toEntity((sgc.mapa.dto.CriarConhecimentoRequest) null)).isNull();
-            assertThat(mapper.toEntity((sgc.mapa.dto.AtualizarConhecimentoRequest) null)).isNull();
-        }
-
-        @Test
-        @DisplayName("Deve retornar atividadeCodigo nulo quando atividade é nula")
-        void deveRetornarAtividadeCodigoNulo() {
-            Conhecimento c = new Conhecimento();
-            c.setAtividade(null);
-            assertThat(mapper.toResponse(c).atividadeCodigo()).isNull();
-        }
-    }
 }

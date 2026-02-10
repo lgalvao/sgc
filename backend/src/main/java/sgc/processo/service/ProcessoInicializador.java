@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
 import sgc.organizacao.model.Usuario;
@@ -35,6 +35,7 @@ import static sgc.processo.model.SituacaoProcesso.CRIADO;
 public class ProcessoInicializador {
 
     private final ProcessoRepo processoRepo;
+    private final ComumRepo repo;
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
     private final ApplicationEventPublisher publicadorEventos;
@@ -50,8 +51,7 @@ public class ProcessoInicializador {
      * @return Lista de erros (vazia se sucesso)
      */
     public List<String> iniciar(Long codigo, List<Long> codsUnidadesParam, Usuario usuario) {
-        Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+        Processo processo = repo.buscar(Processo.class, codigo);
 
         validarSituacaoProcesso(processo);
 
@@ -91,8 +91,7 @@ public class ProcessoInicializador {
         }
 
         // Buscar SEDOC como unidade de origem para as movimentações iniciais
-        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", "SEDOC"));
+        Unidade sedoc = repo.buscarPorSigla(Unidade.class, "SEDOC");
 
         // Criar subprocessos
         criarSubprocessos(processo, tipo, codigosUnidades, unidadesParaProcessar, unidadesMapas, sedoc, usuario);
@@ -143,33 +142,28 @@ public class ProcessoInicializador {
         Map<Long, UnidadeMapa> mapaUnidadeMapa = unidadesMapas.stream()
                 .collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigo, m -> m));
 
-        if (tipo == TipoProcesso.MAPEAMENTO) {
-            subprocessoFacade.criarParaMapeamento(processo, unidadesParaProcessar, sedoc, usuario);
-        } else if (tipo == TipoProcesso.REVISAO) {
-            // Batch fetch units to avoid N+1 queries
-            List<Unidade> unidades = unidadeRepo.findAllById(codigosUnidades);
-            Map<Long, Unidade> mapaUnidades = unidades.stream()
-                    .collect(Collectors.toMap(Unidade::getCodigo, u -> u));
-
-            for (Long codUnidade : codigosUnidades) {
-                Unidade unidade = mapaUnidades.get(codUnidade);
-                if (unidade == null) {
-                    throw new ErroEntidadeNaoEncontrada("Unidade", codUnidade);
-                }
-                UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
-                subprocessoFacade.criarParaRevisao(processo, unidade, um, sedoc, usuario);
-            }
-        } else {
-            // Caso DIAGNOSTICO
-            for (Unidade unidade : unidadesParaProcessar) {
-                UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
-                subprocessoFacade.criarParaDiagnostico(processo, unidade, um, sedoc, usuario);
-            }
+        switch (tipo) {
+          case TipoProcesso.MAPEAMENTO -> {
+              subprocessoFacade.criarParaMapeamento(processo, unidadesParaProcessar, sedoc, usuario);
+          }
+          case TipoProcesso.REVISAO -> {
+              for (Long codUnidade : codigosUnidades) {
+                  Unidade unidade = repo.buscar(Unidade.class, codUnidade);
+                  UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
+                  subprocessoFacade.criarParaRevisao(processo, unidade, um, sedoc, usuario);
+              }
+          }
+          default -> {
+              // Caso DIAGNOSTICO
+              for (Unidade unidade : unidadesParaProcessar) {
+                  UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
+                  subprocessoFacade.criarParaDiagnostico(processo, unidade, um, sedoc, usuario);
+              }
+          }
         }
     }
 
     private Optional<String> getMensagemErroUnidadesEmProcessosAtivos(List<Long> codsUnidades) {
-        // Validation done upstream ensures list is not empty
         List<Long> unidadesBloqueadas = processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(
                 SituacaoProcesso.EM_ANDAMENTO, codsUnidades);
 

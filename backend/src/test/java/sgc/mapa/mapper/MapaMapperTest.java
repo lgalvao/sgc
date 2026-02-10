@@ -45,11 +45,4 @@ class MapaMapperTest {
         assertThat(mapa).isNotNull();
         assertThat(mapa.getCodigo()).isEqualTo(1L);
     }
-
-    @Test
-    @DisplayName("Deve retornar null quando input é null")
-    void deveRetornarNullQuandoNull() {
-        assertThat(mapper.toDto(null)).isNull();
-        assertThat(mapper.toEntity(null)).isNull();
-    }
 }

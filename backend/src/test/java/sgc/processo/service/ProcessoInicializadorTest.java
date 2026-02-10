@@ -21,6 +21,7 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.comum.repo.ComumRepo;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +44,8 @@ class ProcessoInicializadorTest {
     @Mock
     private UnidadeRepo unidadeRepo;
     @Mock
+    private ComumRepo repo;
+    @Mock
     private UnidadeMapaRepo unidadeMapaRepo;
     @Mock
     private ApplicationEventPublisher publicadorEventos;
@@ -59,7 +62,7 @@ class ProcessoInicializadorTest {
     void iniciarProcessoFalhaSituacaoInvalida() {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(repo.buscar(Processo.class, 1L)).thenReturn(p);
 
         List<Long> unidades = List.of();
         Usuario usuario = new Usuario();
@@ -73,7 +76,7 @@ class ProcessoInicializadorTest {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.REVISAO);
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(repo.buscar(Processo.class, 1L)).thenReturn(p);
 
         List<Long> unidades = Collections.emptyList();
         Usuario usuario = new Usuario();
@@ -88,7 +91,7 @@ class ProcessoInicializadorTest {
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setParticipantes(new java.util.ArrayList<>());
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(repo.buscar(Processo.class, 1L)).thenReturn(p);
 
         Usuario usuario = new Usuario();
         assertThatThrownBy(() -> inicializador.iniciar(1L, null, usuario))
@@ -105,12 +108,12 @@ class ProcessoInicializadorTest {
         u.setCodigo(1L);
         p.adicionarParticipantes(Set.of(u));
 
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(repo.buscar(Processo.class, 1L)).thenReturn(p);
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of());
 
         Unidade sedoc = new Unidade();
         sedoc.setSigla("SEDOC");
-        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+        when(repo.buscarPorSigla(Unidade.class, "SEDOC")).thenReturn(sedoc);
 
         Usuario usuario = new Usuario();
         List<String> erros = inicializador.iniciar(1L, null, usuario);
@@ -128,7 +131,7 @@ class ProcessoInicializadorTest {
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.REVISAO);
 
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(repo.buscar(Processo.class, 1L)).thenReturn(p);
         when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.of("As seguintes unidades não possuem mapa vigente: U1"));
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of());
 
@@ -149,7 +152,7 @@ class ProcessoInicializadorTest {
         u.setCodigo(1L);
         p.adicionarParticipantes(Set.of(u));
 
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(repo.buscar(Processo.class, 1L)).thenReturn(p);
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of(1L));
         when(unidadeRepo.findSiglasByCodigos(any())).thenReturn(List.of("U1"));
 
@@ -167,7 +170,7 @@ class ProcessoInicializadorTest {
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.REVISAO);
 
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(repo.buscar(Processo.class, 1L)).thenReturn(p);
         when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
 
         UnidadeMapa um = new UnidadeMapa();
@@ -176,11 +179,11 @@ class ProcessoInicializadorTest {
 
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        when(unidadeRepo.findAllById(anyList())).thenReturn(List.of(u));
+        when(repo.buscar(Unidade.class, 1L)).thenReturn(u);
 
         Unidade sedoc = new Unidade();
         sedoc.setSigla("SEDOC");
-        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+        when(repo.buscarPorSigla(Unidade.class, "SEDOC")).thenReturn(sedoc);
 
         Usuario usuario = new Usuario();
         List<String> erros = inicializador.iniciar(1L, List.of(1L), usuario);
@@ -199,7 +202,7 @@ class ProcessoInicializadorTest {
         u.setCodigo(1L);
         p.adicionarParticipantes(Set.of(u));
 
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(repo.buscar(Processo.class, 1L)).thenReturn(p);
         when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
 
         UnidadeMapa um = new UnidadeMapa();
@@ -209,7 +212,7 @@ class ProcessoInicializadorTest {
 
         Unidade sedoc = new Unidade();
         sedoc.setSigla("SEDOC");
-        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+        when(repo.buscarPorSigla(Unidade.class, "SEDOC")).thenReturn(sedoc);
 
         Usuario usuario = new Usuario();
         List<String> erros = inicializador.iniciar(1L, null, usuario);
@@ -225,16 +228,17 @@ class ProcessoInicializadorTest {
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.REVISAO);
 
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(repo.buscar(Processo.class, 1L)).thenReturn(p);
         when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
         UnidadeMapa um = new UnidadeMapa();
         um.setUnidadeCodigo(99L);
         when(unidadeMapaRepo.findAllById(any())).thenReturn(List.of(um));
-        when(unidadeRepo.findAllById(any())).thenReturn(List.of()); // Retorna vazio
+        when(repo.buscar(Unidade.class, 99L))
+                .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 99L));
 
         Unidade sedoc = new Unidade();
         sedoc.setSigla("SEDOC");
-        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+        when(repo.buscarPorSigla(Unidade.class, "SEDOC")).thenReturn(sedoc);
 
         List<Long> unidades = List.of(99L);
         Usuario usuario = new Usuario();

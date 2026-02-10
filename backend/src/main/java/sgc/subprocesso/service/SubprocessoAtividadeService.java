@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.dto.visualizacao.ConhecimentoDto;
 import sgc.mapa.eventos.EventoImportacaoAtividades;
@@ -37,6 +37,7 @@ import java.util.List;
 class SubprocessoAtividadeService {
 
     private final SubprocessoRepo subprocessoRepo;
+    private final ComumRepo repo;
     private final SubprocessoCrudService crudService;
     private final MapaManutencaoService mapaManutencaoService;
     private final ApplicationEventPublisher eventPublisher;
@@ -61,10 +62,7 @@ class SubprocessoAtividadeService {
      */
     @Transactional
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
-        final Subprocesso spDestino = subprocessoRepo
-                .findById(codSubprocessoDestino)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Subprocesso de destino não encontrado: %d".formatted(codSubprocessoDestino)));
+        final Subprocesso spDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
 
         if (spDestino.getSituacao() != SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
                 && spDestino.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
@@ -75,9 +73,7 @@ class SubprocessoAtividadeService {
                     com cadastro em elaboração ou não iniciado.""");
         }
 
-        Subprocesso spOrigem = subprocessoRepo.findById(codSubprocessoOrigem)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
+        Subprocesso spOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);
 
         // Publica evento para importação assíncrona (desacoplamento do módulo mapa)
         eventPublisher.publishEvent(EventoImportacaoAtividades.builder()

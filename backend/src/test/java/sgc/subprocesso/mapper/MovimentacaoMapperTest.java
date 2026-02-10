@@ -58,12 +58,6 @@ class MovimentacaoMapperTest {
     }
 
     @Test
-    @DisplayName("Deve retornar null quando entrada é null")
-    void deveRetornarNullQuandoNull() {
-        assertThat(mapper.toDto(null)).isNull();
-    }
-
-    @Test
     @DisplayName("Deve lidar com unidades null")
     void deveLidarComUnidadesNull() {
         Movimentacao mov = new Movimentacao();

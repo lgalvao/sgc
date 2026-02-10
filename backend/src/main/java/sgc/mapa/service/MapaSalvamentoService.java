@@ -142,8 +142,11 @@ public class MapaSalvamentoService {
     private void atualizarAssociacoesAtividades(ContextoSalvamento contexto, List<Competencia> competenciasSalvas) {
         Long codMapa = null;
         if (!contexto.atividadesAtuais.isEmpty()) {
-            Atividade primeiraAtividade = contexto.atividadesAtuais.getFirst();
-            codMapa = primeiraAtividade.getMapa().getCodigo();
+            var primeiraAtividade = contexto.atividadesAtuais.getFirst();
+            var mapa = primeiraAtividade.getMapa();
+            if (mapa != null) {
+                codMapa = mapa.getCodigo();
+            }
         }
 
         Map<Long, Set<Competencia>> mapAtividadeCompetencias = construirMapaAssociacoes(

@@ -14,9 +14,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.erros.ErroConfiguracao;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.erros.ErroConfiguracao;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
@@ -47,7 +47,6 @@ public class E2eController {
     private final ProcessoFacade processoFacade;
     private final UnidadeFacade unidadeFacade;
     private final ResourceLoader resourceLoader;
-    private final ComumRepo repo;
 
     @PostMapping("/reset-database")
     public void resetDatabase() {
@@ -248,7 +247,8 @@ public class E2eController {
             }
 
             // Recarregar processo após iniciar
-            processo = repo.buscar(ProcessoDto.class, processoCodigo);
+            processo = processoFacade.obterPorId(processoCodigo)
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", processoCodigo));
         }
 
         return processo;

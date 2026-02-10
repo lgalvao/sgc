@@ -280,7 +280,7 @@ class UnidadeResponsavelServiceTest {
             usuarioCompleto.setTituloEleitoral("123456789012");
             usuarioCompleto.setNome("João Silva");
 
-            when(unidadeRepo.findBySigla(siglaUnidade)).thenReturn(Optional.of(unidade));
+            when(repo.buscarPorSigla(Unidade.class, siglaUnidade)).thenReturn(unidade);
             when(repo.buscar(Responsabilidade.class, 1L)).thenReturn(resp);
             when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuarioCompleto);
             when(usuarioPerfilRepo.findByUsuarioTitulo("123456789012")).thenReturn(Collections.emptyList());
@@ -291,7 +291,7 @@ class UnidadeResponsavelServiceTest {
             // Then
             assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo("123456789012");
-            verify(unidadeRepo).findBySigla(siglaUnidade);
+            verify(repo).buscarPorSigla(Unidade.class, siglaUnidade);
             verify(repo).buscar(Responsabilidade.class, 1L);
             verify(repo).buscar(Usuario.class, "123456789012");
         }
@@ -301,7 +301,8 @@ class UnidadeResponsavelServiceTest {
         void deveLancarExcecaoQuandoUnidadeNaoEncontrada() {
             // Given
             String siglaUnidade = "INEXISTENTE";
-            when(unidadeRepo.findBySigla(siglaUnidade)).thenReturn(Optional.empty());
+            when(repo.buscarPorSigla(Unidade.class, siglaUnidade))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", siglaUnidade));
 
             // When / Then
             assertThatThrownBy(() -> service.buscarResponsavelAtual(siglaUnidade))
@@ -309,7 +310,7 @@ class UnidadeResponsavelServiceTest {
                     .hasMessageContaining("Unidade")
                     .hasMessageContaining(siglaUnidade);
 
-            verify(unidadeRepo).findBySigla(siglaUnidade);
+            verify(repo).buscarPorSigla(Unidade.class, siglaUnidade);
             verify(repo, never()).buscar(eq(Responsabilidade.class), any());
         }
     }

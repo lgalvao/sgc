@@ -170,42 +170,5 @@ class SubprocessoDetalheMapperTest {
             SubprocessoDetalheDto dto2 = mapper.toDto(sp, null, null, null, null);
             assertThat(dto2.getPrazoEtapaAtual()).isEqualTo(d2);
         }
-
-        @Test
-        @DisplayName("Deve retornar null quando todos os parâmetros principais são nulos")
-        void deveRetornarNullQuandoTodosNulos() {
-            assertThat(mapper.toDto(null, null, null, null, null)).isNull();
-        }
-
-        @Test
-        @DisplayName("Deve retornar null para unidade nula")
-        void deveRetornarNullParaUnidadeNula() {
-            assertThat(mapper.toUnidadeDto(null)).isNull();
-        }
-        
-        @Test
-        @DisplayName("Deve lidar com combinações de nulos")
-        void deveLidarComCombinacoesNulos() {
-            Subprocesso sp = new Subprocesso();
-            sp.setProcesso(Processo.builder().tipo(TipoProcesso.MAPEAMENTO).build());
-            sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
-            sp.setUnidade(new Unidade());
-
-            assertThat(mapper.toDto(sp, null, null, null, null)).isNotNull();
-            assertThat(mapper.toDto(null, new Usuario(), null, null, null)).isNotNull();
-            assertThat(mapper.toDto(null, null, new Usuario(), null, null)).isNotNull();
-            assertThat(mapper.toDto(null, null, null, Collections.emptyList(), null)).isNotNull();
-            assertThat(mapper.toDto(null, null, null, null, SubprocessoPermissoesDto.builder().build())).isNotNull();
-
-            // Branches adicionais no mapper interface
-            Usuario userSemTitulo = new Usuario();
-            userSemTitulo.setTituloEleitoral(null);
-            assertThat(mapper.toDto(sp, userSemTitulo, null, null, null)).isNotNull();
-
-            Subprocesso spSemProcesso = new Subprocesso();
-            spSemProcesso.setProcesso(null);
-            spSemProcesso.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
-            assertThat(mapper.toDto(spSemProcesso, null, null, null, null)).isNotNull();
-        }
     }
 }

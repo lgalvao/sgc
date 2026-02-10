@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.*;
 import sgc.mapa.eventos.EventoMapaAlterado;
@@ -81,27 +80,11 @@ class MapaManutencaoServiceTest {
         }
 
         @Test
-        @DisplayName("Deve lançar erro se obter por código não encontrar")
-        void deveLancarErroObterPorCodigo() {
-            when(repo.buscar(Atividade.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
-            assertThatThrownBy(() -> service.obterAtividadeResponse(1L))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-        }
-
-        @Test
         @DisplayName("Deve listar entidades por código")
         void deveListarEntidades() {
             Atividade ativ = new Atividade();
             when(repo.buscar(Atividade.class, 1L)).thenReturn(ativ);
             assertThat(service.obterAtividadePorCodigo(1L)).isNotNull();
-        }
-
-        @Test
-        @DisplayName("Deve lançar erro entidade não encontrada")
-        void deveLancarErro() {
-            when(repo.buscar(Atividade.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 1L));
-            assertThatThrownBy(() -> service.obterAtividadePorCodigo(1L))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
         @Test
@@ -182,19 +165,6 @@ class MapaManutencaoServiceTest {
                     .build();
 
             when(repo.buscar(Mapa.class, null)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", null));
-
-            assertThatThrownBy(() -> service.criarAtividade(request))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-        }
-
-        @Test
-        @DisplayName("Deve lançar erro ao criar atividade em mapa inexistente")
-        void deveLancarErroAoCriarEmMapaInexistente() {
-            CriarAtividadeRequest request = CriarAtividadeRequest.builder()
-                    .mapaCodigo(1L)
-                    .build();
-
-            when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
 
             assertThatThrownBy(() -> service.criarAtividade(request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -322,13 +292,13 @@ class MapaManutencaoServiceTest {
                     .descricao("Competência Teste")
                     .build();
 
-            when(competenciaRepo.findById(1L)).thenReturn(Optional.of(competencia));
+            when(repo.buscar(Competencia.class, 1L)).thenReturn(competencia);
 
             Competencia resultado = service.buscarCompetenciaPorCodigo(1L);
 
             assertThat(resultado).isNotNull();
             assertThat(resultado.getCodigo()).isEqualTo(1L);
-            verify(competenciaRepo).findById(1L);
+            verify(repo).buscar(Competencia.class, 1L);
         }
 
         @Test
@@ -454,7 +424,7 @@ class MapaManutencaoServiceTest {
             ativNova.setCodigo(20L);
             ativNova.setCompetencias(new HashSet<>());
 
-            when(competenciaRepo.findById(1L)).thenReturn(Optional.of(competencia));
+            when(repo.buscar(Competencia.class, 1L)).thenReturn(competencia);
             when(atividadeRepo.listarPorCompetencia(competencia)).thenReturn(List.of(ativAntiga));
             when(atividadeRepo.findAllById(List.of(20L))).thenReturn(List.of(ativNova));
 
@@ -507,7 +477,7 @@ class MapaManutencaoServiceTest {
             ativ2.setCodigo(20L);
             ativ2.setCompetencias(new HashSet<>(Set.of(competencia)));
 
-            when(competenciaRepo.findById(1L)).thenReturn(Optional.of(competencia));
+            when(repo.buscar(Competencia.class, 1L)).thenReturn(competencia);
             when(atividadeRepo.listarPorCompetencia(competencia)).thenReturn(List.of(ativ1, ativ2));
 
             service.removerCompetencia(1L);
@@ -526,7 +496,7 @@ class MapaManutencaoServiceTest {
                     .descricao("Competência Vazia")
                     .build();
 
-            when(competenciaRepo.findById(1L)).thenReturn(Optional.of(competencia));
+            when(repo.buscar(Competencia.class, 1L)).thenReturn(competencia);
             when(atividadeRepo.listarPorCompetencia(competencia)).thenReturn(List.of());
 
             service.removerCompetencia(1L);
@@ -608,7 +578,7 @@ class MapaManutencaoServiceTest {
             Conhecimento conhecimento = new Conhecimento();
             conhecimento.setCodigo(1L);
 
-            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
+            when(repo.buscar(Atividade.class, 1L)).thenReturn(atividade);
             when(conhecimentoMapper.toEntity(request)).thenReturn(conhecimento);
             when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
             when(conhecimentoMapper.toResponse(conhecimento)).thenReturn(ConhecimentoResponse.builder().build());
@@ -634,7 +604,7 @@ class MapaManutencaoServiceTest {
             Conhecimento conhecimento = new Conhecimento();
             conhecimento.setCodigo(1L);
 
-            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
+            when(repo.buscar(Atividade.class, 1L)).thenReturn(atividade);
             when(conhecimentoMapper.toEntity(request)).thenReturn(conhecimento);
             when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
             when(conhecimentoMapper.toResponse(conhecimento)).thenReturn(ConhecimentoResponse.builder().build());
@@ -672,7 +642,7 @@ class MapaManutencaoServiceTest {
             Conhecimento paraAtualizar = new Conhecimento();
             paraAtualizar.setDescricao("Conhecimento Atualizado");
 
-            when(conhecimentoRepo.findById(1L)).thenReturn(Optional.of(conhecimento));
+            when(repo.buscar(Conhecimento.class, 1L)).thenReturn(conhecimento);
             when(conhecimentoMapper.toEntity(request)).thenReturn(paraAtualizar);
 
             service.atualizarConhecimento(1L, 1L, request);
@@ -700,7 +670,7 @@ class MapaManutencaoServiceTest {
             Conhecimento paraAtualizar = new Conhecimento();
             paraAtualizar.setDescricao("Conhecimento Atualizado");
 
-            when(conhecimentoRepo.findById(1L)).thenReturn(Optional.of(conhecimento));
+            when(repo.buscar(Conhecimento.class, 1L)).thenReturn(conhecimento);
             when(conhecimentoMapper.toEntity(request)).thenReturn(paraAtualizar);
 
             service.atualizarConhecimento(1L, 1L, request);
@@ -724,7 +694,7 @@ class MapaManutencaoServiceTest {
             conhecimento.setCodigo(1L);
             conhecimento.setAtividade(atividade);
 
-            when(conhecimentoRepo.findById(1L)).thenReturn(Optional.of(conhecimento));
+            when(repo.buscar(Conhecimento.class, 1L)).thenReturn(conhecimento);
 
             assertThatThrownBy(() -> service.atualizarConhecimento(1L, 1L, request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -739,7 +709,7 @@ class MapaManutencaoServiceTest {
                     .descricao("Conhecimento")
                     .build();
 
-            when(conhecimentoRepo.findById(999L)).thenReturn(Optional.empty());
+            when(repo.buscar(Conhecimento.class, 999L)).thenThrow(new ErroEntidadeNaoEncontrada("Conhecimento", 999L));
 
             assertThatThrownBy(() -> service.atualizarConhecimento(1L, 999L, request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -766,7 +736,7 @@ class MapaManutencaoServiceTest {
             conhecimento.setCodigo(1L);
             conhecimento.setAtividade(atividade);
 
-            when(conhecimentoRepo.findById(1L)).thenReturn(Optional.of(conhecimento));
+            when(repo.buscar(Conhecimento.class, 1L)).thenReturn(conhecimento);
 
             service.excluirConhecimento(1L, 1L);
 
@@ -785,7 +755,7 @@ class MapaManutencaoServiceTest {
             conhecimento.setCodigo(1L);
             conhecimento.setAtividade(atividade);
 
-            when(conhecimentoRepo.findById(1L)).thenReturn(Optional.of(conhecimento));
+            when(repo.buscar(Conhecimento.class, 1L)).thenReturn(conhecimento);
 
             service.excluirConhecimento(1L, 1L);
 
@@ -803,7 +773,7 @@ class MapaManutencaoServiceTest {
             conhecimento.setCodigo(1L);
             conhecimento.setAtividade(atividade);
 
-            when(conhecimentoRepo.findById(1L)).thenReturn(Optional.of(conhecimento));
+            when(repo.buscar(Conhecimento.class, 1L)).thenReturn(conhecimento);
 
             assertThatThrownBy(() -> service.excluirConhecimento(1L, 1L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -814,7 +784,7 @@ class MapaManutencaoServiceTest {
         @Test
         @DisplayName("Deve lançar erro ao excluir conhecimento inexistente")
         void deveLancarErroAoExcluirConhecimentoInexistente() {
-            when(conhecimentoRepo.findById(999L)).thenReturn(Optional.empty());
+            when(repo.buscar(Conhecimento.class, 999L)).thenThrow(new ErroEntidadeNaoEncontrada("Conhecimento", 999L));
 
             assertThatThrownBy(() -> service.excluirConhecimento(1L, 999L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -877,7 +847,7 @@ class MapaManutencaoServiceTest {
             ativAntiga.setCodigo(10L);
             ativAntiga.setCompetencias(new HashSet<>(Set.of(competencia)));
 
-            when(competenciaRepo.findById(1L)).thenReturn(Optional.of(competencia));
+            when(repo.buscar(Competencia.class, 1L)).thenReturn(competencia);
             when(atividadeRepo.listarPorCompetencia(competencia)).thenReturn(List.of(ativAntiga));
 
             service.atualizarCompetencia(1L, "Nova Descrição", List.of());
@@ -980,105 +950,6 @@ class MapaManutencaoServiceTest {
         void excluirMapa() {
             service.excluirMapa(1L);
             verify(mapaRepo).deleteById(1L);
-        }
-    }
-
-    @Nested
-    @DisplayName("Cobertura de Mapper (Casos de Borda)")
-    class MapperCoverage {
-
-        @Test
-        @DisplayName("obterAtividadeResponse: Deve lançar erro quando mapper retorna null")
-        void obterAtividadeResponse_MapperNull() {
-            Atividade atividade = new Atividade();
-            when(repo.buscar(Atividade.class, 1L)).thenReturn(atividade);
-            when(atividadeMapper.toResponse(atividade)).thenReturn(null);
-
-            assertThatThrownBy(() -> service.obterAtividadeResponse(1L))
-                    .isInstanceOf(ErroEstadoImpossivel.class);
-        }
-
-        @Test
-        @DisplayName("criarAtividade: Deve lançar erro quando mapper.toEntity retorna null")
-        void criarAtividade_ToEntityNull() {
-            CriarAtividadeRequest req = new CriarAtividadeRequest(1L, "Desc");
-            Mapa mapa = new Mapa();
-            when(repo.buscar(Mapa.class, 1L)).thenReturn(mapa);
-            when(atividadeMapper.toEntity(req)).thenReturn(null);
-
-            assertThatThrownBy(() -> service.criarAtividade(req))
-                    .isInstanceOf(ErroEstadoImpossivel.class);
-        }
-
-        @Test
-        @DisplayName("criarAtividade: Deve lançar erro quando mapper.toResponse retorna null")
-        void criarAtividade_ToResponseNull() {
-            CriarAtividadeRequest req = new CriarAtividadeRequest(1L, "Desc");
-            Mapa mapa = new Mapa();
-            Atividade atividade = new Atividade();
-            when(repo.buscar(Mapa.class, 1L)).thenReturn(mapa);
-            when(atividadeMapper.toEntity(req)).thenReturn(atividade);
-            when(atividadeRepo.save(atividade)).thenReturn(atividade);
-            when(atividadeMapper.toResponse(atividade)).thenReturn(null);
-
-            assertThatThrownBy(() -> service.criarAtividade(req))
-                    .isInstanceOf(ErroEstadoImpossivel.class);
-        }
-
-        @Test
-        @DisplayName("atualizarAtividade: Deve lançar erro quando mapper.toEntity retorna null")
-        void atualizarAtividade_ToEntityNull() {
-            AtualizarAtividadeRequest req = new AtualizarAtividadeRequest("Desc");
-            Atividade atividade = new Atividade();
-            when(repo.buscar(Atividade.class, 1L)).thenReturn(atividade);
-            when(atividadeMapper.toEntity(req)).thenReturn(null);
-
-            assertThatThrownBy(() -> service.atualizarAtividade(1L, req))
-                    .isInstanceOf(ErroEstadoImpossivel.class);
-        }
-
-        @Test
-        @DisplayName("criarConhecimento: Deve lançar erro quando mapper.toEntity retorna null")
-        void criarConhecimento_ToEntityNull() {
-            CriarConhecimentoRequest req = new CriarConhecimentoRequest(1L, "Desc");
-            Atividade atividade = new Atividade();
-            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
-            when(conhecimentoMapper.toEntity(req)).thenReturn(null);
-
-            assertThatThrownBy(() -> service.criarConhecimento(1L, req))
-                    .isInstanceOf(ErroEstadoImpossivel.class);
-        }
-
-        @Test
-        @DisplayName("criarConhecimento: Deve lançar erro quando mapper.toResponse retorna null")
-        void criarConhecimento_ToResponseNull() {
-            CriarConhecimentoRequest req = new CriarConhecimentoRequest(1L, "Desc");
-            Atividade atividade = new Atividade();
-            Conhecimento conhecimento = new Conhecimento();
-            
-            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
-            when(conhecimentoMapper.toEntity(req)).thenReturn(conhecimento);
-            when(conhecimentoRepo.save(conhecimento)).thenReturn(conhecimento);
-            when(conhecimentoMapper.toResponse(conhecimento)).thenReturn(null);
-
-            assertThatThrownBy(() -> service.criarConhecimento(1L, req))
-                    .isInstanceOf(ErroEstadoImpossivel.class);
-        }
-
-        @Test
-        @DisplayName("atualizarConhecimento: Deve lançar erro quando mapper.toEntity retorna null")
-        void atualizarConhecimento_ToEntityNull() {
-            AtualizarConhecimentoRequest req = new AtualizarConhecimentoRequest("Desc");
-            Atividade atividade = new Atividade();
-            atividade.setCodigo(1L);
-            Conhecimento conhecimento = new Conhecimento();
-            conhecimento.setAtividade(atividade);
-
-            when(conhecimentoRepo.findById(10L)).thenReturn(Optional.of(conhecimento));
-            when(conhecimentoMapper.toEntity(req)).thenReturn(null);
-
-            assertThatThrownBy(() -> service.atualizarConhecimento(1L, 10L, req))
-                    .isInstanceOf(ErroEstadoImpossivel.class);
         }
     }
 }

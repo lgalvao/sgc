@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.Unidade;
@@ -27,9 +28,8 @@ import java.util.function.Predicate;
 @Service
 @RequiredArgsConstructor
 public class UnidadeHierarquiaService {
-    private static final String MSG_NAO_ENCONTRADA = " não encontrada";
-
     private final UnidadeRepo unidadeRepo;
+    private final ComumRepo repo;
     private final UsuarioMapper usuarioMapper;
 
     /**
@@ -132,9 +132,7 @@ public class UnidadeHierarquiaService {
      * @throws ErroEntidadeNaoEncontrada se a unidade não for encontrada
      */
     public Optional<String> buscarSiglaSuperior(String sigla) {
-        Unidade unidade = unidadeRepo
-                .findBySigla(sigla)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla %s%s".formatted(sigla, MSG_NAO_ENCONTRADA)));
+        Unidade unidade = repo.buscarPorSigla(Unidade.class, sigla);
 
         return Optional.ofNullable(unidade.getUnidadeSuperior()).map(Unidade::getSigla);
     }

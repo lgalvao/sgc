@@ -57,8 +57,6 @@ public class AtividadeFacade {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
         Mapa mapa = mapaFacade.obterPorCodigo(mapaCodigo);
 
-
-        // TODO essa criação temporaria me parece um hack
         // Cria atividade temporária para verificação de acesso
         Atividade atividadeTemp = Atividade.builder().mapa(mapa).build();
         accessControlService.verificarPermissao(usuario, CRIAR_ATIVIDADE, atividadeTemp);

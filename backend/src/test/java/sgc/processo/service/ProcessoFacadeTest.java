@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import sgc.alerta.AlertaFacade;
-import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
@@ -95,26 +94,6 @@ class ProcessoFacadeTest {
     @Nested
     @DisplayName("Cobertura e Casos de Borda")
     class CoverageTests {
-        @Test
-        @DisplayName("criar deve lançar ErroEstadoImpossivel quando mapper retornar null")
-        void criar_DeveLancarException_QuandoMapperNull() {
-            CriarProcessoRequest req = new CriarProcessoRequest("Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(10), List.of(1L));
-            when(processoManutencaoService.criar(req)).thenReturn(new Processo());
-            when(processoMapper.toDto(any())).thenReturn(null);
-
-            assertThrows(ErroEstadoImpossivel.class, () -> processoFacade.criar(req));
-        }
-
-        @Test
-        @DisplayName("atualizar deve lançar ErroEstadoImpossivel quando mapper retornar null")
-        void atualizar_DeveLancarException_QuandoMapperNull() {
-            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(10), List.of(1L));
-            when(processoManutencaoService.atualizar(eq(1L), any())).thenReturn(new Processo());
-            when(processoMapper.toDto(any())).thenReturn(null);
-
-            assertThrows(ErroEstadoImpossivel.class, () -> processoFacade.atualizar(1L, req));
-        }
-
         @Test
         @DisplayName("iniciarProcessoDiagnostico deve delegar para inicializador")
         void iniciarProcessoDiagnostico_DeveDelegar() {

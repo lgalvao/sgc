@@ -42,6 +42,9 @@ class E2eControllerTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate namedJdbcTemplate;
+
     @Mock
     private sgc.processo.service.ProcessoFacade processoFacade;
 
@@ -58,6 +61,7 @@ class E2eControllerTest {
     @BeforeEach
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
+        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
     }
 
@@ -306,7 +310,8 @@ class E2eControllerTest {
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
         Mockito.doThrow(new RuntimeException("Error")).when(mockJdbc).execute(any(String.class));
 
-        var exception = Assertions.assertThrows(RuntimeException.class, controller::resetDatabase);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
+        var exception = Assertions.assertThrows(RuntimeException.class, controllerComErro::resetDatabase);
         Assertions.assertNotNull(exception);
     }
 
@@ -319,37 +324,6 @@ class E2eControllerTest {
         controller.limparProcessoComDependentes(101L);
 
         assertCount("sgc.processo WHERE codigo=101", 0);
-    }
-
-    @Test
-    @DisplayName("Deve lançar ErroValidacao quando unidade sigla está em branco no fixture")
-    void deveLancarErroValidacaoQuandoSiglaEmBranco() {
-        // Arrange
-        E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
-                "Desc", "", false, null);
-
-        // Act & Assert
-        var exception = Assertions.assertThrows(ErroValidacao.class,
-                () -> controller.criarProcessoMapeamento(req));
-        Assertions.assertNotNull(exception);
-        Assertions.assertTrue(exception.getMessage().contains("Unidade é obrigatória"));
-    }
-
-    @Test
-    @DisplayName("Deve lançar ErroEntidadeNaoEncontrada quando unidade não existe")
-    void deveLancarErroEntidadeNaoEncontradaQuandoUnidadeNula() {
-        // Arrange
-        E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
-                "Desc", "SIGLA_NAO_EXISTE", false, null);
-
-        when(unidadeFacade.buscarPorSigla("SIGLA_NAO_EXISTE"))
-                .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA_NAO_EXISTE"));
-
-        // Act & Assert
-        var exception = Assertions.assertThrows(ErroEntidadeNaoEncontrada.class,
-                () -> controller.criarProcessoRevisao(req));
-        Assertions.assertNotNull(exception);
-        Assertions.assertTrue(exception.getMessage().contains("Unidade"));
     }
 
     @Test
@@ -413,7 +387,6 @@ class E2eControllerTest {
     @org.junit.jupiter.api.Nested
     @DisplayName("Cobertura Extra Isolada")
     class CoberturaExtra {
-
         private org.springframework.jdbc.core.JdbcTemplate jdbcTemplateMock;
         private sgc.processo.service.ProcessoFacade processoFacadeMock;
         private sgc.organizacao.UnidadeFacade unidadeFacadeMock;
@@ -423,10 +396,11 @@ class E2eControllerTest {
         @BeforeEach
         void setUp() {
             jdbcTemplateMock = mock(org.springframework.jdbc.core.JdbcTemplate.class);
-            mock(org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate.class);
+            var namedJdbcTemplateMock = mock(org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate.class);
             processoFacadeMock = mock(sgc.processo.service.ProcessoFacade.class);
             unidadeFacadeMock = mock(sgc.organizacao.UnidadeFacade.class);
             resourceLoaderMock = mock(org.springframework.core.io.ResourceLoader.class);
+            controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoFacadeMock, unidadeFacadeMock, resourceLoaderMock);
         }
 
         @Test

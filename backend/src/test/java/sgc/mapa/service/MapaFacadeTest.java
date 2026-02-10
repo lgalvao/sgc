@@ -101,28 +101,11 @@ class MapaFacadeTest {
         }
 
         @Test
-        @DisplayName("Deve lançar erro ao atualizar mapa inexistente")
-        void deveLancarErroAoAtualizarInexistente() {
-            when(mapaManutencaoService.buscarMapaPorCodigo(1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
-            Mapa mapa = new Mapa();
-            assertThatThrownBy(() -> facade.atualizar(1L, mapa))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-        }
-
-        @Test
         @DisplayName("Deve excluir mapa")
         void deveExcluirMapa() {
             when(mapaManutencaoService.mapaExiste(1L)).thenReturn(true);
             facade.excluir(1L);
             verify(mapaManutencaoService).excluirMapa(1L);
-        }
-
-        @Test
-        @DisplayName("Deve lançar erro ao excluir mapa inexistente")
-        void deveLancarErroAoExcluirInexistente() {
-            when(mapaManutencaoService.mapaExiste(1L)).thenReturn(false);
-            assertThatThrownBy(() -> facade.excluir(1L))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
 

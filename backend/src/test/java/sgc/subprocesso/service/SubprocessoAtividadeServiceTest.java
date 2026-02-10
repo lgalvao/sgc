@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
@@ -28,7 +29,6 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -60,6 +60,9 @@ class SubprocessoAtividadeServiceTest {
     @Mock
     private UsuarioFacade usuarioService;
 
+    @Mock
+    private ComumRepo repo;
+
     @InjectMocks
     private SubprocessoAtividadeService service;
 
@@ -73,14 +76,16 @@ class SubprocessoAtividadeServiceTest {
             // Arrange
             Long codDestino = 1L;
             Long codOrigem = 2L;
-            when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.empty());
+            when(repo.buscar(Subprocesso.class, codDestino))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", codDestino));
 
             // Act & Assert
             assertThatThrownBy(() -> service.importarAtividades(codDestino, codOrigem))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Subprocesso de destino não encontrado");
+                    .hasMessageContaining("Subprocesso")
+                    .hasMessageContaining("1");
 
-            verify(subprocessoRepo).findById(codDestino);
+            verify(repo).buscar(Subprocesso.class, codDestino);
             verifyNoInteractions(eventPublisher);
         }
 
@@ -92,14 +97,14 @@ class SubprocessoAtividadeServiceTest {
             Long codOrigem = 2L;
 
             Subprocesso spDestino = criarSubprocesso(codDestino, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-            when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
+            when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
 
             // Act & Assert
             assertThatThrownBy(() -> service.importarAtividades(codDestino, codOrigem))
                     .isInstanceOf(ErroAtividadesEmSituacaoInvalida.class)
                     .hasMessageContaining("cadastro em elaboração ou não iniciado");
 
-            verify(subprocessoRepo).findById(codDestino);
+            verify(repo).buscar(Subprocesso.class, codDestino);
             verify(subprocessoRepo, never()).findById(codOrigem);
             verifyNoInteractions(eventPublisher);
         }
@@ -112,16 +117,18 @@ class SubprocessoAtividadeServiceTest {
             Long codOrigem = 2L;
 
             Subprocesso spDestino = criarSubprocesso(codDestino, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
-            when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.empty());
+            when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
+            when(repo.buscar(Subprocesso.class, codOrigem))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", codOrigem));
 
             // Act & Assert
             assertThatThrownBy(() -> service.importarAtividades(codDestino, codOrigem))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Subprocesso de origem não encontrado");
+                    .hasMessageContaining("Subprocesso")
+                    .hasMessageContaining("2");
 
-            verify(subprocessoRepo).findById(codDestino);
-            verify(subprocessoRepo).findById(codOrigem);
+            verify(repo).buscar(Subprocesso.class, codDestino);
+            verify(repo).buscar(Subprocesso.class, codOrigem);
             verifyNoInteractions(eventPublisher);
         }
 
@@ -138,8 +145,8 @@ class SubprocessoAtividadeServiceTest {
             Subprocesso spDestino = criarSubprocessoComMapa(codDestino, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, mapaDestino);
             Subprocesso spOrigem = criarSubprocessoComMapa(codOrigem, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, mapaOrigem);
 
-            when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
-            when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+            when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
+            when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
 
@@ -173,8 +180,8 @@ class SubprocessoAtividadeServiceTest {
             Subprocesso spDestino = criarSubprocessoComMapaEProcesso(codDestino, SituacaoSubprocesso.NAO_INICIADO, mapaDestino, processoMapeamento);
             Subprocesso spOrigem = criarSubprocessoComMapa(codOrigem, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, mapaOrigem);
 
-            when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
-            when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+            when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
+            when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
             when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(spDestino);
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
@@ -208,8 +215,8 @@ class SubprocessoAtividadeServiceTest {
             Subprocesso spDestino = criarSubprocessoComMapaEProcesso(codDestino, SituacaoSubprocesso.NAO_INICIADO, mapaDestino, processoRevisao);
             Subprocesso spOrigem = criarSubprocessoComMapa(codOrigem, SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO, mapaOrigem);
 
-            when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
-            when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+            when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
+            when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
             when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(spDestino);
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
@@ -243,8 +250,8 @@ class SubprocessoAtividadeServiceTest {
             Subprocesso spDestino = criarSubprocessoComMapaEProcesso(codDestino, SituacaoSubprocesso.NAO_INICIADO, mapaDestino, processoDiagnostico);
             Subprocesso spOrigem = criarSubprocessoComMapa(codOrigem, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO, mapaOrigem);
 
-            when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
-            when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+            when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
+            when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
             when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(spDestino);
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
@@ -271,8 +278,8 @@ class SubprocessoAtividadeServiceTest {
             Subprocesso spDestino = criarSubprocessoComMapa(codDestino, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, mapaDestino);
             Subprocesso spOrigem = criarSubprocessoComMapa(codOrigem, SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO, mapaOrigem);
 
-            when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
-            when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+            when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
+            when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
 
@@ -306,7 +313,7 @@ class SubprocessoAtividadeServiceTest {
             Atividade atividade1 = criarAtividadeComConhecimentos(1L, "Atividade 1", List.of(conhecimento1));
             Atividade atividade2 = criarAtividadeComConhecimentos(2L, "Atividade 2", List.of(conhecimento2));
 
-            when(crudService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+            when(crudService.buscarSubprocessoComMapa(codSubprocesso)).thenReturn(subprocesso);
             when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(codMapa))
                     .thenReturn(List.of(atividade1, atividade2));
 
@@ -329,7 +336,7 @@ class SubprocessoAtividadeServiceTest {
             assertThat(dto2.conhecimentos()).hasSize(1);
             assertThat(dto2.conhecimentos().getFirst().codigo()).isEqualTo(101L);
 
-            verify(crudService).buscarSubprocesso(codSubprocesso);
+            verify(crudService).buscarSubprocessoComMapa(codSubprocesso);
             verify(mapaManutencaoService).buscarAtividadesPorMapaCodigoComConhecimentos(codMapa);
         }
 
@@ -343,7 +350,7 @@ class SubprocessoAtividadeServiceTest {
             Mapa mapa = criarMapa(codMapa);
             Subprocesso subprocesso = criarSubprocessoComMapa(codSubprocesso, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, mapa);
 
-            when(crudService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+            when(crudService.buscarSubprocessoComMapa(codSubprocesso)).thenReturn(subprocesso);
             when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(codMapa))
                     .thenReturn(List.of());
 
@@ -352,7 +359,7 @@ class SubprocessoAtividadeServiceTest {
 
             // Assert
             assertThat(resultado).isEmpty();
-            verify(crudService).buscarSubprocesso(codSubprocesso);
+            verify(crudService).buscarSubprocessoComMapa(codSubprocesso);
             verify(mapaManutencaoService).buscarAtividadesPorMapaCodigoComConhecimentos(codMapa);
         }
     }

@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
@@ -25,7 +25,6 @@ import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import sgc.comum.erros.ErroEstadoImpossivel;
 
 /**
  * Service responsável por operações relacionadas a ajustes de mapa em subprocessos.
@@ -46,6 +45,7 @@ import sgc.comum.erros.ErroEstadoImpossivel;
 class SubprocessoAjusteMapaService {
 
     private final SubprocessoRepo subprocessoRepo;
+    private final ComumRepo repo;
     private final SubprocessoCrudService crudService;
     private final MapaManutencaoService mapaManutencaoService;
     private final AnaliseFacade analiseFacade;
@@ -61,9 +61,7 @@ class SubprocessoAjusteMapaService {
      */
     @Transactional
     public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
-        Subprocesso sp = subprocessoRepo.findById(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Subprocesso não encontrado: %d".formatted(codSubprocesso)));
+        Subprocesso sp = repo.buscar(Subprocesso.class, codSubprocesso);
 
         validarSituacaoParaAjuste(sp);
         atualizarDescricoesAtividades(competencias);
@@ -94,11 +92,7 @@ class SubprocessoAjusteMapaService {
         List<Conhecimento> conhecimentos = mapaManutencaoService.listarConhecimentosPorMapa(codMapa);
         Map<Long, Set<Long>> associacoes = mapaManutencaoService.buscarIdsAssociacoesCompetenciaAtividade(codMapa);
         
-        var dto = mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes);
-        if (dto == null) {
-            throw new ErroEstadoImpossivel("Falha ao gerar dados de ajuste do mapa.");
-        }
-        return dto;
+        return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes);
     }
 
     /**

@@ -11,20 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("ProcessoDetalheMapper Tests")
 class ProcessoDetalheMapperTest {
-
     private final ProcessoDetalheMapper mapper = new ProcessoDetalheMapperImpl();
-
-    @Test
-    @DisplayName("Deve retornar null quando unidade é nula (fromUnidade)")
-    void deveRetornarNullQuandoUnidadeNula() {
-        assertThat(mapper.fromUnidade(null)).isNull();
-    }
-
-    @Test
-    @DisplayName("Deve retornar null quando snapshot é nulo (fromSnapshot)")
-    void deveRetornarNullQuandoSnapshotNulo() {
-        assertThat(mapper.fromSnapshot(null)).isNull();
-    }
 
     @Test
     @DisplayName("Deve cobrir unidade com unidade superior")

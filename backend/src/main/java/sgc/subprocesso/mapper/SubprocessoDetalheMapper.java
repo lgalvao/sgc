@@ -1,5 +1,7 @@
 package sgc.subprocesso.mapper;
 
+import sgc.comum.config.CentralMapperConfig;
+
 import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @SuppressWarnings("unused")
-@Mapper(componentModel = "spring", uses = MovimentacaoMapper.class)
+@Mapper(componentModel = "spring", config = CentralMapperConfig.class, uses = MovimentacaoMapper.class)
 public interface SubprocessoDetalheMapper {
     @Mapping(target = "codigo", source = "sp.codigo")
     @Mapping(target = "unidade", source = "sp.unidade")

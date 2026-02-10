@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
@@ -39,6 +39,7 @@ import java.util.Optional;
 class ProcessoFinalizador {
 
     private final ProcessoRepo processoRepo;
+    private final ComumRepo repo;
     private final UnidadeFacade unidadeService;
     private final ProcessoSubprocessoQueryService queryService;
     private final ProcessoValidador processoValidador;
@@ -54,8 +55,7 @@ class ProcessoFinalizador {
      */
     @Transactional
     public void finalizar(Long codigo) {
-        Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+        Processo processo = repo.buscar(Processo.class, codigo);
 
         processoValidador.validarFinalizacaoProcesso(processo);
         tornarMapasVigentes(processo);

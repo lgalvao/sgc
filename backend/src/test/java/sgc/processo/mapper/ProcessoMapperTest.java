@@ -209,14 +209,6 @@ class ProcessoMapperTest {
         }
 
         @Test
-        @DisplayName("Deve retornar null quando DTO é null")
-        void deveRetornarNullQuandoDtoNull() {
-            Processo processo = mapper.toEntity(null);
-
-            assertThat(processo).isNull();
-        }
-
-        @Test
         @DisplayName("Deve ignorar participantes no mapeamento de DTO para entidade")
         void deveIgnorarParticipantes() {
             ProcessoDto dto = ProcessoDto.builder()

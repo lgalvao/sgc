@@ -1,5 +1,7 @@
 package sgc.alerta.mapper;
 
+import sgc.comum.config.CentralMapperConfig;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -12,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Mapper para conversão entre Alerta (entidade) e AlertaDto.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", config = CentralMapperConfig.class)
 public abstract class AlertaMapper {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 

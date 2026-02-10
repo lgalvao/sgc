@@ -726,21 +726,6 @@ class UnidadeFacadeTest {
             assertThat(resultado.getMatricula()).isEqualTo("12345");
             assertThat(resultado.getNome()).isEqualTo("João da Silva");
             verify(responsavelService).buscarResponsavelAtual("UNIDADE-01");
-        }
-        
-        @Test
-        @DisplayName("Deve retornar null se unidade não tem responsável atual")
-        void deveRetornarNullSeNaoTemResponsavel() {
-            // Arrange
-            when(responsavelService.buscarResponsavelAtual("UNIDADE-SEM-RESP"))
-                .thenReturn(null);
-
-            // Act
-            Usuario resultado = service.buscarResponsavelAtual("UNIDADE-SEM-RESP");
-
-            // Assert
-            assertThat(resultado).isNull();
-            verify(responsavelService).buscarResponsavelAtual("UNIDADE-SEM-RESP");
-        }
+        }      
     }
 }

@@ -12,6 +12,7 @@ import sgc.analise.AnaliseFacade;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
@@ -32,7 +33,6 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-import sgc.comum.erros.ErroEstadoImpossivel;
 
 /**
  * Testes unitários para SubprocessoAjusteMapaService.
@@ -57,6 +57,9 @@ class SubprocessoAjusteMapaServiceTest {
     
     @Mock
     private MapaAjusteMapper mapaAjusteMapper;
+
+    @Mock
+    private ComumRepo repo;
 
     @InjectMocks
     private SubprocessoAjusteMapaService service;
@@ -95,7 +98,7 @@ class SubprocessoAjusteMapaServiceTest {
                     .descricao("Atividade 1")
                     .build();
             
-            when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+            when(repo.buscar(Subprocesso.class, codSubprocesso)).thenReturn(sp);
             when(mapaManutencaoService.buscarCompetenciasPorCodigos(anyList()))
                     .thenReturn(List.of(competenciaEntity));
             when(mapaManutencaoService.buscarAtividadesPorCodigos(anyList()))
@@ -106,7 +109,7 @@ class SubprocessoAjusteMapaServiceTest {
             service.salvarAjustesMapa(codSubprocesso, competencias);
             
             // Assert
-            verify(subprocessoRepo).findById(codSubprocesso);
+            verify(repo).buscar(Subprocesso.class, codSubprocesso);
             verify(mapaManutencaoService).atualizarDescricoesAtividadeEmLote(anyMap());
             verify(mapaManutencaoService).salvarTodasCompetencias(anyList());
             verify(subprocessoRepo).save(argThat(s -> s.getSituacao() == SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO));
@@ -133,7 +136,7 @@ class SubprocessoAjusteMapaServiceTest {
             Competencia competenciaEntity = Competencia.builder().codigo(100L).build();
             Atividade atividadeEntity = Atividade.builder().codigo(1L).build();
             
-            when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+            when(repo.buscar(Subprocesso.class, codSubprocesso)).thenReturn(sp);
             when(mapaManutencaoService.buscarCompetenciasPorCodigos(anyList())).thenReturn(List.of(competenciaEntity));
             when(mapaManutencaoService.buscarAtividadesPorCodigos(anyList())).thenReturn(List.of(atividadeEntity));
             
@@ -149,12 +152,15 @@ class SubprocessoAjusteMapaServiceTest {
         void deveLancarErroQuandoSubprocessoNaoEncontrado() {
             // Arrange
             Long codSubprocesso = 999L;
-            when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.empty());
+            when(repo.buscar(Subprocesso.class, codSubprocesso))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
             
             // Act & Assert
-            assertThatThrownBy(() -> service.salvarAjustesMapa(codSubprocesso, Collections.emptyList()))
+            List<CompetenciaAjusteDto> ajustes = Collections.emptyList();
+            assertThatThrownBy(() -> service.salvarAjustesMapa(codSubprocesso, ajustes))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Subprocesso não encontrado: 999");
+                    .hasMessageContaining("Subprocesso")
+                    .hasMessageContaining("999");
         }
 
         @Test
@@ -168,10 +174,11 @@ class SubprocessoAjusteMapaServiceTest {
                     .situacao(SituacaoSubprocesso.NAO_INICIADO)
                     .build();
             
-            when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+            when(repo.buscar(Subprocesso.class, codSubprocesso)).thenReturn(sp);
             
             // Act & Assert
-            assertThatThrownBy(() -> service.salvarAjustesMapa(codSubprocesso, Collections.emptyList()))
+            List<CompetenciaAjusteDto> ajustes = Collections.emptyList();
+            assertThatThrownBy(() -> service.salvarAjustesMapa(codSubprocesso, ajustes))
                     .isInstanceOf(ErroMapaEmSituacaoInvalida.class)
                     .hasMessageContaining("Ajustes no mapa só podem ser feitos em estados específicos");
         }
@@ -187,7 +194,7 @@ class SubprocessoAjusteMapaServiceTest {
                     .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
                     .build();
             
-            when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+            when(repo.buscar(Subprocesso.class, codSubprocesso)).thenReturn(sp);
             
             // Act
             service.salvarAjustesMapa(codSubprocesso, Collections.emptyList());
@@ -281,22 +288,6 @@ class SubprocessoAjusteMapaServiceTest {
             assertThat(result).isNotNull();
             verify(mapaAjusteMapper).toDto(eq(sp), isNull(), anyList(), anyList(), anyList(), anyMap());
         }
-
-        @Test
-        @DisplayName("deve lancar ErroEstadoImpossivel quando mapper retorna null")
-        void deveLancarErroQuandoMapperRetornaNull() {
-            // Arrange
-            Long codSubprocesso = 1L;
-            Mapa mapa = Mapa.builder().codigo(100L).build();
-            Subprocesso sp = Subprocesso.builder().mapa(mapa).build();
-            
-            when(crudService.buscarSubprocessoComMapa(codSubprocesso)).thenReturn(sp);
-            when(mapaAjusteMapper.toDto(any(), any(), any(), any(), any(), any())).thenReturn(null);
-            
-            // Act & Assert
-            assertThatThrownBy(() -> service.obterMapaParaAjuste(codSubprocesso))
-                    .isInstanceOf(ErroEstadoImpossivel.class);
-        }
     }
 
     @Nested
@@ -317,7 +308,7 @@ class SubprocessoAjusteMapaServiceTest {
                     .atividades(Collections.emptyList())
                     .build();
             
-            when(subprocessoRepo.findById(codSubprocesso)).thenReturn(Optional.of(sp));
+            when(repo.buscar(Subprocesso.class, codSubprocesso)).thenReturn(sp);
             // Return empty list for competencies to trigger (competencia == null)
             when(mapaManutencaoService.buscarCompetenciasPorCodigos(anyList())).thenReturn(Collections.emptyList());
             when(mapaManutencaoService.buscarAtividadesPorCodigos(anyList())).thenReturn(Collections.emptyList());

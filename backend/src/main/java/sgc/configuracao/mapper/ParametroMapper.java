@@ -1,5 +1,7 @@
 package sgc.configuracao.mapper;
 
+import sgc.comum.config.CentralMapperConfig;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -7,7 +9,7 @@ import sgc.configuracao.dto.ParametroRequest;
 import sgc.configuracao.dto.ParametroResponse;
 import sgc.configuracao.model.Parametro;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", config = CentralMapperConfig.class)
 public interface ParametroMapper {
     ParametroResponse toResponse(Parametro parametro);
     

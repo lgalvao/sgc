@@ -89,15 +89,6 @@ class UsuarioMapperTest {
         assertThat(dtoInt.isElegivel()).isFalse();
     }
 
-
-    @Test
-    @DisplayName("Deve retornar null quando parâmetros são nulos")
-    void deveRetornarNullQuandoNulos() {
-        assertThat(mapper.toUnidadeDto(null, true)).isNull();
-        assertThat(mapper.toUsuarioDto(null)).isNull();
-        assertThat(mapper.toAtribuicaoTemporariaDto(null)).isNull();
-    }
-
     @Test
     @DisplayName("Deve cobrir toUnidadeDtoComElegibilidadeCalculada para cobertura extra")
     void deveCobrirElegibilidadeExtra() {

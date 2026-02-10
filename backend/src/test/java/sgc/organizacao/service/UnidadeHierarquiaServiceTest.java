@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.Unidade;
@@ -36,6 +37,9 @@ class UnidadeHierarquiaServiceTest {
 
     @Mock
     private UsuarioMapper usuarioMapper;
+
+    @Mock
+    private ComumRepo repo;
 
     @InjectMocks
     private UnidadeHierarquiaService service;
@@ -510,8 +514,8 @@ class UnidadeHierarquiaServiceTest {
         @DisplayName("deve retornar sigla da unidade superior")
         void deveRetornarSiglaUnidadeSuperior() {
             // Arrange
-            when(unidadeRepo.findBySigla("ASSESSORIA_11"))
-                    .thenReturn(Optional.of(unidadeOperacional));
+            when(repo.buscarPorSigla(Unidade.class, "ASSESSORIA_11"))
+                    .thenReturn(unidadeOperacional);
 
             // Act
             Optional<String> resultado = service.buscarSiglaSuperior("ASSESSORIA_11");
@@ -524,8 +528,8 @@ class UnidadeHierarquiaServiceTest {
         @DisplayName("deve retornar Optional vazio when não há unidade superior")
         void deveRetornarVazioQuandoNaoHaSuperior() {
             // Arrange
-            when(unidadeRepo.findBySigla("SEDOC"))
-                    .thenReturn(Optional.of(unidadeRaiz));
+            when(repo.buscarPorSigla(Unidade.class, "SEDOC"))
+                    .thenReturn(unidadeRaiz);
 
             // Act
             Optional<String> resultado = service.buscarSiglaSuperior("SEDOC");
@@ -538,13 +542,15 @@ class UnidadeHierarquiaServiceTest {
         @DisplayName("deve lançar exceção when sigla não existe")
         void deveLancarExcecaoQuandoSiglaNaoExiste() {
             // Arrange
-            when(unidadeRepo.findBySigla("INEXISTENTE"))
-                    .thenReturn(Optional.empty());
+            String sigla = "INEXISTENTE";
+            when(repo.buscarPorSigla(Unidade.class, sigla))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", sigla));
 
             // Act & Assert
-            assertThatThrownBy(() -> service.buscarSiglaSuperior("INEXISTENTE"))
+            assertThatThrownBy(() -> service.buscarSiglaSuperior(sigla))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Unidade com sigla INEXISTENTE");
+                    .hasMessageContaining("Unidade")
+                    .hasMessageContaining(sigla);
         }
     }
 

@@ -19,10 +19,9 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
+import sgc.comum.repo.ComumRepo;
 
 import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
@@ -40,6 +39,8 @@ class ProcessoFinalizadorTest {
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
+    private ComumRepo repo;
+    @Mock
     private UnidadeFacade unidadeService;
     @Mock
     private ProcessoSubprocessoQueryService queryService;
@@ -55,7 +56,7 @@ class ProcessoFinalizadorTest {
         Processo p = new Processo();
         p.setCodigo(codigo);
         p.setDescricao("Processo 1");
-        when(processoRepo.findById(codigo)).thenReturn(Optional.of(p));
+        when(repo.buscar(Processo.class, codigo)).thenReturn(p);
 
         Subprocesso s = new Subprocesso();
         s.setCodigo(10L);
@@ -81,7 +82,8 @@ class ProcessoFinalizadorTest {
     @Test
     @DisplayName("Deve falhar se processo não encontrado")
     void deveFailharSeNaoEncontrado() {
-        when(processoRepo.findById(1L)).thenReturn(Optional.empty());
+        when(repo.buscar(Processo.class, 1L))
+                .thenThrow(new ErroEntidadeNaoEncontrada("Processo", 1L));
         assertThatThrownBy(() -> finalizador.finalizar(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
@@ -92,7 +94,7 @@ class ProcessoFinalizadorTest {
         Long codigo = 1L;
         Processo p = new Processo();
         p.setCodigo(codigo);
-        when(processoRepo.findById(codigo)).thenReturn(Optional.of(p));
+        when(repo.buscar(Processo.class, codigo)).thenReturn(p);
 
         Subprocesso s = new Subprocesso();
         s.setCodigo(10L);
@@ -111,7 +113,7 @@ class ProcessoFinalizadorTest {
         Long codigo = 1L;
         Processo p = new Processo();
         p.setCodigo(codigo);
-        when(processoRepo.findById(codigo)).thenReturn(Optional.of(p));
+        when(repo.buscar(Processo.class, codigo)).thenReturn(p);
 
         Subprocesso s = new Subprocesso();
         s.setCodigo(10L);

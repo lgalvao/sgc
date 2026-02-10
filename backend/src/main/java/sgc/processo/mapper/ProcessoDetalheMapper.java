@@ -1,5 +1,7 @@
 package sgc.processo.mapper;
 
+import sgc.comum.config.CentralMapperConfig;
+
 import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -10,7 +12,7 @@ import sgc.processo.model.UnidadeProcesso;
 /**
  * Mapper MapStruct para conversão de entidades relacionadas a ProcessoDetalhe.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", config = CentralMapperConfig.class)
 public interface ProcessoDetalheMapper {
 
     /**

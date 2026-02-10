@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.CompetenciaMapaDto;
@@ -146,25 +145,6 @@ class MapaSalvamentoServiceTest {
     @Nested
     @DisplayName("Cobertura Extra")
     class Coverage {
-
-        @Test
-        @DisplayName("Deve lançar ErroEstadoImpossivel quando mapper retorna null")
-        void salvarMapaCompleto_MapperNull() {
-            Long codMapa = 1L;
-            SalvarMapaRequest request = SalvarMapaRequest.builder()
-                .competencias(Collections.emptyList())
-                .build();
-            
-            Mapa mapa = new Mapa();
-            when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-            when(mapaRepo.save(mapa)).thenReturn(mapa);
-            when(competenciaRepo.saveAll(anyList())).thenReturn(Collections.emptyList());
-            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(null);
-
-            assertThatThrownBy(() -> mapaSalvamentoService.salvarMapaCompleto(codMapa, request))
-                    .isInstanceOf(ErroEstadoImpossivel.class);
-        }
-
         @Test
         @DisplayName("Deve logar aviso quando competencia sem atividade e atividade sem competencia")
         void validarIntegridadeMapa_LogWarning() {

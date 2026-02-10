@@ -24,14 +24,6 @@ class AlertaMapperTest {
         LocalDateTime now = LocalDateTime.of(2026, 2, 5, 10, 30, 0);
         assertThat(mapper.formatDataHora(now)).isEqualTo("05/02/2026 10:30:00");
     }
-
-    @Test
-    @DisplayName("Deve retornar null quando Alerta é nulo")
-    void deveRetornarNullQuandoAlertaNulo() {
-        assertThat(mapper.toDto(null)).isNull();
-        assertThat(mapper.toDto(null, LocalDateTime.now())).isNull();
-    }
-
     @Test
     @DisplayName("Deve cobrir toDto com todos os campos preenchidos")
     void deveCobrirToDtoCompleto() {

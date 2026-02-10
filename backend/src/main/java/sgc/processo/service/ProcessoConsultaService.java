@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.processo.dto.SubprocessoElegivelDto;
@@ -33,14 +33,13 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ProcessoConsultaService {
     private final ProcessoRepo processoRepo;
+    private final ComumRepo repo;
     private final ProcessoSubprocessoQueryService queryService;
     private final UsuarioFacade usuarioService;
-    private static final String ENTIDADE_PROCESSO = "Processo";
 
 
     public Processo buscarPorId(Long id) {
-        return processoRepo.findById(id)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_PROCESSO, id));
+        return repo.buscar(Processo.class, id);
     }
 
     public Optional<Processo> buscarPorIdOpcional(Long id) {

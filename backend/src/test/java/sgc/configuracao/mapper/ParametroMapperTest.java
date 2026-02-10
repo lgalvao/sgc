@@ -11,14 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("unit")
 @DisplayName("ParametroMapper Tests")
 class ParametroMapperTest {
-
     private final ParametroMapper mapper = Mappers.getMapper(ParametroMapper.class);
-
-    @Test
-    @DisplayName("Deve retornar null no toResponse")
-    void deveRetornarNull() {
-        assertThat(mapper.toResponse(null)).isNull();
-    }
 
     @Test
     @DisplayName("Deve lidar com null no atualizarEntidade")

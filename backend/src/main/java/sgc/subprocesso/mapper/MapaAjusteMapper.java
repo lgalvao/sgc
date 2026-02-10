@@ -1,6 +1,7 @@
 package sgc.subprocesso.mapper;
 
-import org.jspecify.annotations.Nullable;
+import sgc.comum.config.CentralMapperConfig;
+
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,19 +18,15 @@ import sgc.subprocesso.model.Subprocesso;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", config = CentralMapperConfig.class)
 public interface MapaAjusteMapper {
     @Mapping(target = "codMapa", source = "sp.mapa.codigo")
     @Mapping(target = "unidadeNome", source = "sp.unidade.nome")
     @Mapping(target = "competencias", expression = "java(mapCompetencias(competencias, atividades, conhecimentos, associacoes))")
     @Mapping(target = "justificativaDevolucao", source = "analise.observacoes")
-    @Nullable MapaAjusteDto toDto(@Nullable Subprocesso sp, @Nullable Analise analise, @Nullable List<Competencia> competencias, @Nullable List<Atividade> atividades, @Nullable List<Conhecimento> conhecimentos, @Context @Nullable Map<Long, Set<Long>> associacoes);
+    MapaAjusteDto toDto(Subprocesso sp, Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, @Context Map<Long, Set<Long>> associacoes);
 
-    default @Nullable List<CompetenciaAjusteDto> mapCompetencias(@Nullable List<Competencia> competencias, @Nullable List<Atividade> atividades, @Nullable List<Conhecimento> conhecimentos, @Nullable Map<Long, Set<Long>> associacoes) {
-        if (competencias == null || atividades == null || conhecimentos == null || associacoes == null) {
-            return Collections.emptyList();
-        }
-
+    default List<CompetenciaAjusteDto> mapCompetencias(List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, Map<Long, Set<Long>> associacoes) {
         Map<Long, List<Conhecimento>> conhecimentosPorAtividade = conhecimentos.stream()
                 .collect(Collectors.groupingBy(Conhecimento::getCodigoAtividade));
 

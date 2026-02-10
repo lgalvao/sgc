@@ -203,7 +203,6 @@ class UsuarioFacadeTest {
     @Nested
     @DisplayName("Carregamento de Usuário para Autenticação")
     class CarregamentoAutenticacao {
-
         @Test
         @DisplayName("Deve carregar usuário para autenticação quando encontrado")
         void deveCarregarUsuarioQuandoEncontrado() {
@@ -528,8 +527,7 @@ class UsuarioFacadeTest {
             List<Long> resultado = facade.buscarUnidadesOndeEhResponsavel(titulo);
 
             // Assert
-            assertThat(resultado).hasSize(1);
-            assertThat(resultado).contains(1L);
+            assertThat(resultado).hasSize(1).contains(1L);
         }
 
         @Test
@@ -586,8 +584,7 @@ class UsuarioFacadeTest {
             List<Long> resultado = facade.buscarUnidadesPorPerfil(titulo, "SERVIDOR");
 
             // Assert
-            assertThat(resultado).hasSize(1);
-            assertThat(resultado).contains(1L);
+            assertThat(resultado).hasSize(1).contains(1L);
         }
 
         @Test
@@ -703,8 +700,7 @@ class UsuarioFacadeTest {
             Map<String, UsuarioDto> resultado = facade.buscarUsuariosPorTitulos(titulos);
 
             // Assert
-            assertThat(resultado).hasSize(2);
-            assertThat(resultado).containsKeys("111111", "222222");
+            assertThat(resultado).hasSize(2).containsKeys("111111", "222222");
         }
 
         @Test

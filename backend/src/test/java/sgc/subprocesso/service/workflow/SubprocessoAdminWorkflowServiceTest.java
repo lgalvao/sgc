@@ -14,9 +14,8 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
-
+import sgc.comum.repo.ComumRepo;
 import java.time.LocalDate;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
@@ -34,6 +33,8 @@ class SubprocessoAdminWorkflowServiceTest {
     private SubprocessoCrudService crudService;
     @Mock
     private AlertaFacade alertaService;
+    @Mock
+    private ComumRepo repo;
 
     @Test
     @DisplayName("alterarDataLimite - Etapa 1")
@@ -99,7 +100,7 @@ class SubprocessoAdminWorkflowServiceTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         sp.setProcesso(p);
 
-        when(subprocessoRepo.findByMapaCodigo(codMapa)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, "mapa.codigo", codMapa)).thenReturn(sp);
 
         service.atualizarSituacaoParaEmAndamento(codMapa);
 
@@ -117,7 +118,7 @@ class SubprocessoAdminWorkflowServiceTest {
         p.setTipo(TipoProcesso.DIAGNOSTICO); // Caso não tratado nos ifs
         sp.setProcesso(p);
 
-        when(subprocessoRepo.findByMapaCodigo(codMapa)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, "mapa.codigo", codMapa)).thenReturn(sp);
 
         service.atualizarSituacaoParaEmAndamento(codMapa);
 
@@ -137,7 +138,7 @@ class SubprocessoAdminWorkflowServiceTest {
         p.setTipo(TipoProcesso.REVISAO);
         sp.setProcesso(p);
 
-        when(subprocessoRepo.findByMapaCodigo(codMapa)).thenReturn(Optional.of(sp));
+        when(repo.buscar(Subprocesso.class, "mapa.codigo", codMapa)).thenReturn(sp);
 
         service.atualizarSituacaoParaEmAndamento(codMapa);
 

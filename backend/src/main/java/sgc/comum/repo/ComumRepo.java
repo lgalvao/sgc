@@ -31,4 +31,37 @@ public class ComumRepo {
         }
         return entidade;
     }
+
+    /**
+     * Busca uma única entidade por um campo específico.
+     *
+     * @param <T>    Tipo da entidade
+     * @param classe Classe da entidade
+     * @param campo  Nome do campo
+     * @param valor  Valor do campo
+     * @return A entidade encontrada
+     * @throws ErroEntidadeNaoEncontrada se a entidade não existir
+     */
+    public <T> T buscar(Class<T> classe, String campo, Object valor) {
+        try {
+            return em.createQuery("SELECT e FROM " + classe.getSimpleName() + " e WHERE e." + campo + " = :valor", classe)
+                    .setParameter("valor", valor)
+                    .getSingleResult();
+        } catch (Exception e) {
+            throw new ErroEntidadeNaoEncontrada(classe.getSimpleName(), valor);
+        }
+    }
+
+    /**
+     * Busca uma entidade pela sua sigla.
+     *
+     * @param <T>    Tipo da entidade
+     * @param classe Classe da entidade
+     * @param sigla  Sigla da entidade
+     * @return A entidade encontrada
+     * @throws ErroEntidadeNaoEncontrada se a entidade não existir
+     */
+    public <T> T buscarPorSigla(Class<T> classe, String sigla) {
+        return buscar(classe, "sigla", sigla);
+    }
 }

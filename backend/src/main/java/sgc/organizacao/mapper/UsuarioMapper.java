@@ -1,5 +1,7 @@
 package sgc.organizacao.mapper;
 
+import sgc.comum.config.CentralMapperConfig;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -16,7 +18,7 @@ import sgc.organizacao.model.Usuario;
  *
  * <p>Centraliza todos os mapeamentos de Unidade, Usuario e AtribuicaoTemporaria.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", config = CentralMapperConfig.class)
 public interface UsuarioMapper {
 
     // ========== Mapeamentos de Unidade ==========
