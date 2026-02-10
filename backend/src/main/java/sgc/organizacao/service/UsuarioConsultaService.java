@@ -3,7 +3,6 @@ package sgc.organizacao.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
 
@@ -15,11 +14,11 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class UsuarioConsultaService {
     private final UsuarioRepo usuarioRepo;
+    private final sgc.comum.repo.ComumRepo repo;
     private static final String ENTIDADE_USUARIO = "Usuário";
 
     public Usuario buscarPorId(String titulo) {
-        return usuarioRepo.findById(titulo)
-                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(ENTIDADE_USUARIO, titulo));
+        return repo.buscar(Usuario.class, titulo);
     }
 
     public Optional<Usuario> buscarPorIdOpcional(String titulo) {
@@ -28,7 +27,7 @@ public class UsuarioConsultaService {
 
     public Usuario buscarPorIdComAtribuicoes(String titulo) {
         return usuarioRepo.findByIdWithAtribuicoes(titulo)
-                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(ENTIDADE_USUARIO, titulo));
+                .orElseThrow(sgc.comum.erros.ErroEntidadeNaoEncontrada.naoEncontrada(ENTIDADE_USUARIO, titulo));
     }
 
     public Optional<Usuario> buscarPorIdComAtribuicoesOpcional(String titulo) {

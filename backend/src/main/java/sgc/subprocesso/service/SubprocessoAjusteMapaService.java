@@ -56,7 +56,6 @@ class SubprocessoAjusteMapaService {
      * 
      * @param codSubprocesso código do subprocesso
      * @param competencias lista de competências ajustadas
-     * @throws ErroEntidadeNaoEncontrada se subprocesso não existe
      * @throws sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida se situação não permite ajuste
      */
     @Transactional

@@ -3,6 +3,7 @@ package sgc.comum.erros;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
@@ -15,7 +16,7 @@ public abstract class ErroNegocioBase extends RuntimeException implements ErroNe
         super(message);
         this.code = code;
         this.status = status;
-        this.details = null;
+        this.details = new HashMap<>();
     }
 
     protected ErroNegocioBase(String message, String code, HttpStatus status, Map<String, ?> details) {
@@ -29,6 +30,6 @@ public abstract class ErroNegocioBase extends RuntimeException implements ErroNe
         super(message, cause);
         this.code = code;
         this.status = status;
-        this.details = null;
+        this.details = new HashMap<>();
     }
 }

@@ -5,11 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import sgc.comum.repo.ComumRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapa;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UnidadeMapaRepo;
-import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.*;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.erros.ErroUnidadesNaoDefinidas;
 import sgc.processo.eventos.EventoProcessoIniciado;
@@ -143,9 +139,7 @@ public class ProcessoInicializador {
                 .collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigo, m -> m));
 
         switch (tipo) {
-          case TipoProcesso.MAPEAMENTO -> {
-              subprocessoFacade.criarParaMapeamento(processo, unidadesParaProcessar, sedoc, usuario);
-          }
+          case TipoProcesso.MAPEAMENTO -> subprocessoFacade.criarParaMapeamento(processo, unidadesParaProcessar, sedoc, usuario);
           case TipoProcesso.REVISAO -> {
               for (Long codUnidade : codigosUnidades) {
                   Unidade unidade = repo.buscar(Unidade.class, codUnidade);

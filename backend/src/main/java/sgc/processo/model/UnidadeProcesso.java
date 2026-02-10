@@ -34,13 +34,6 @@ public class UnidadeProcesso {
     private Processo processo;
     
     /**
-     * Getter de compatibilidade que retorna o código do processo.
-     */
-    public Long getProcessoCodigo() {
-        return id != null ? id.getProcessoCodigo() : null;
-    }
-
-    /**
      * Getter de conveniência para unidadeCodigo.
      */
     public Long getUnidadeCodigo() {
@@ -59,7 +52,7 @@ public class UnidadeProcesso {
     
     // ========== Colunas de Snapshot ==========
     
-    @Column(name = "nome", length = 255)
+    @Column(name = "nome")
     private String nome;
     
     @Column(name = "sigla", length = 20)
@@ -99,7 +92,7 @@ public class UnidadeProcesso {
         snapshot.setTituloTitular(unidade.getTituloTitular());
         snapshot.setDataInicioTitularidade(unidade.getDataInicioTitularidade());
         snapshot.setTipo(unidade.getTipo());
-        snapshot.setSituacao(unidade.getSituacao() != null ? unidade.getSituacao().name() : null);
+        snapshot.setSituacao(unidade.getSituacao().name());
         snapshot.setUnidadeSuperiorCodigo(
             unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null
         );

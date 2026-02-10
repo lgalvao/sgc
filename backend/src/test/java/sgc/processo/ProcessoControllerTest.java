@@ -455,7 +455,7 @@ class ProcessoControllerTest {
             var req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
             var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Teste").build();
 
-            when(processoFacade.obterPorId(1L)).thenReturn(Optional.of(processo));
+            when(processoFacade.obterDtoPorId(1L)).thenReturn(processo);
             when(processoFacade.iniciarProcessoMapeamento(eq(1L), anyList())).thenReturn(List.of());
 
             // Act & Assert
@@ -479,7 +479,7 @@ class ProcessoControllerTest {
             var req = new IniciarProcessoRequest(TipoProcesso.REVISAO, List.of(1L));
             var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Teste").build();
 
-            when(processoFacade.obterPorId(1L)).thenReturn(Optional.of(processo));
+            when(processoFacade.obterDtoPorId(1L)).thenReturn(processo);
             when(processoFacade.iniciarProcessoRevisao(eq(1L), anyList())).thenReturn(List.of());
 
             // Act & Assert
@@ -684,7 +684,7 @@ class ProcessoControllerTest {
             var req = new IniciarProcessoRequest(TipoProcesso.DIAGNOSTICO, List.of(1L));
             var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Diagnóstico").build();
 
-            when(processoFacade.obterPorId(1L)).thenReturn(Optional.of(processo));
+            when(processoFacade.obterDtoPorId(1L)).thenReturn(processo);
             when(processoFacade.iniciarProcessoDiagnostico(eq(1L), anyList())).thenReturn(List.of());
 
             // Act & Assert
@@ -751,31 +751,7 @@ class ProcessoControllerTest {
         }
 
         @Test
-        @DisplayName("Deve retornar bad request quando processador for nulo no início")
-        void deveRetornarBadRequestQuandoProcessadorNulo() {
-            IniciarProcessoRequest req = new IniciarProcessoRequest(null, List.of());
-            
-                        org.springframework.http.ResponseEntity<Object> response = controller.iniciar(1L, req);
-                        assertEquals(org.springframework.http.HttpStatus.BAD_REQUEST, response.getStatusCode());
-                    }
-            
-                    @Test
-                    @DisplayName("Deve retornar bad request quando tipo de processo é desconhecido")
-                    void deveRetornarBadRequestQuandoTipoDesconhecido() {
-                       
-                       // Vamos usar Spy no controller para mockar o Map retornado por getProcessadoresInicio
-                        ProcessoController spyController = spy(controller);
-                        doReturn(Collections.emptyMap()).when(spyController).getProcessadoresInicio();
-                        
-                        IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of());
-                        org.springframework.http.ResponseEntity<Object> response = spyController.iniciar(1L, req);
-                        
-                        assertEquals(org.springframework.http.HttpStatus.BAD_REQUEST, response.getStatusCode());
-                    }
-            
-                    @Test
-                    @DisplayName("Deve retornar bad request quando iniciar processo retorna lista de erros")
-            
+        @DisplayName("Deve retornar bad request quando iniciar processo retorna lista de erros")
         void deveRetornarBadRequestQuandoIniciarProcessoRetornaErros() {
             IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
             when(processoFacadeMock.iniciarProcessoMapeamento(anyLong(), anyList()))

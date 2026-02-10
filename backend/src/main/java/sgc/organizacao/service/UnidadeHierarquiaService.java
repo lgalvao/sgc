@@ -102,8 +102,12 @@ public class UnidadeHierarquiaService {
      */
     public UnidadeDto buscarArvore(Long codigo) {
         List<UnidadeDto> todas = buscarArvoreHierarquica();
-        return buscarNaHierarquia(todas, codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigo));
+        Optional<UnidadeDto> found = buscarNaHierarquia(todas, codigo);
+        if (found.isPresent()) {
+            return found.get();
+        }
+        repo.buscar(Unidade.class, codigo);
+        return null; // Unreachable - repo.buscar throws exception
     }
 
     /**
@@ -115,13 +119,16 @@ public class UnidadeHierarquiaService {
      */
     public List<String> buscarSiglasSubordinadas(String sigla) {
         List<UnidadeDto> todas = buscarArvoreHierarquica();
-        return buscarNaHierarquiaPorSigla(todas, sigla)
-                .map(raiz -> {
-                    List<String> resultado = new ArrayList<>();
-                    coletarSiglas(raiz, resultado);
-                    return resultado;
-                })
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", sigla));
+        Optional<UnidadeDto> found = buscarNaHierarquiaPorSigla(todas, sigla);
+        
+        if (found.isEmpty()) {
+            repo.buscarPorSigla(Unidade.class, sigla);
+            return List.of(); // Unreachable
+        }
+
+        List<String> resultado = new ArrayList<>();
+        coletarSiglas(found.get(), resultado);
+        return resultado;
     }
 
     /**

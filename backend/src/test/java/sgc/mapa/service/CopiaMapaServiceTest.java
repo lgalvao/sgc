@@ -26,6 +26,8 @@ import static org.mockito.Mockito.*;
 class CopiaMapaServiceTest {
 
     @Mock
+    private sgc.comum.repo.ComumRepo repo;
+    @Mock
     private MapaRepo mapaRepo;
     @Mock
     private AtividadeRepo atividadeRepo;
@@ -59,7 +61,7 @@ class CopiaMapaServiceTest {
         competenciaOrigem.setDescricao("Competencia 1");
         competenciaOrigem.setAtividades(Set.of(atividadeOrigem));
 
-        when(mapaRepo.findById(origemId)).thenReturn(Optional.of(mapaOrigem));
+        when(repo.buscar(Mapa.class, origemId)).thenReturn(mapaOrigem);
         when(mapaRepo.save(any(Mapa.class))).thenReturn(mapaSalvo);
         when(atividadeRepo.findWithConhecimentosByMapaCodigo(origemId)).thenReturn(List.of(atividadeOrigem));
 
@@ -91,7 +93,7 @@ class CopiaMapaServiceTest {
     @Test
     @DisplayName("Deve lançar erro se mapa origem não existir")
     void deveLancarErroSeMapaOrigemNaoExistir() {
-        when(mapaRepo.findById(1L)).thenReturn(Optional.empty());
+        when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
         assertThatThrownBy(() -> service.copiarMapaParaUnidade(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
@@ -103,7 +105,7 @@ class CopiaMapaServiceTest {
         Mapa mapaOrigem = new Mapa();
         mapaOrigem.setCodigo(origemId);
 
-        when(mapaRepo.findById(origemId)).thenReturn(Optional.of(mapaOrigem));
+        when(repo.buscar(Mapa.class, origemId)).thenReturn(mapaOrigem);
         when(mapaRepo.save(any(Mapa.class))).thenReturn(new Mapa());
         when(atividadeRepo.findWithConhecimentosByMapaCodigo(origemId)).thenReturn(List.of()); // Empty list
         when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(List.of()); // Empty list
@@ -126,7 +128,7 @@ class CopiaMapaServiceTest {
         atividadeOrigem.setCodigo(10L);
         atividadeOrigem.setConhecimentos(List.of()); // Empty list
 
-        when(mapaRepo.findById(origemId)).thenReturn(Optional.of(mapaOrigem));
+        when(repo.buscar(Mapa.class, origemId)).thenReturn(mapaOrigem);
         when(mapaRepo.save(any(Mapa.class))).thenReturn(new Mapa());
         when(atividadeRepo.findWithConhecimentosByMapaCodigo(origemId)).thenReturn(List.of(atividadeOrigem));
         when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(List.of());

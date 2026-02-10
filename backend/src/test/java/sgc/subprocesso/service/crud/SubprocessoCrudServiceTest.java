@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
@@ -102,7 +101,7 @@ class SubprocessoCrudServiceTest {
     void deveBuscarSubprocessoComMapa() {
         Subprocesso sp = new Subprocesso();
         sp.setMapa(new Mapa());
-        when(subprocessoRepo.findByIdWithMapa(1L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
 
         Subprocesso resultado = service.buscarSubprocessoComMapa(1L);
         assertThat(resultado).isNotNull();
@@ -137,7 +136,7 @@ class SubprocessoCrudServiceTest {
     @DisplayName("Deve obter entidade por código do mapa")
     void deveObterEntidadePorCodigoMapa() {
         Subprocesso sp = new Subprocesso();
-        when(subprocessoRepo.findByMapaCodigoWithMapa(10L)).thenReturn(Optional.of(sp));
+        when(repositorioComum.buscar(Subprocesso.class, "mapa.codigo", 10L)).thenReturn(sp);
 
         assertThat(service.obterEntidadePorCodigoMapa(10L)).isEqualTo(sp);
     }

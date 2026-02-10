@@ -118,7 +118,7 @@ public class PainelFacade {
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade, Map<Long, List<Long>> mapaPaiFilhos) {
         var participantes = processo.getParticipantes();
-        var participante = participantes.iterator().next();
+        var participante = participantes.getFirst();
 
         Long codUnidMapeado = participante.getUnidadeCodigo();
         String nomeUnidMapeado = participante.getNome();

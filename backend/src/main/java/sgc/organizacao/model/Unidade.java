@@ -9,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Immutable;
 import org.jspecify.annotations.Nullable;
 import sgc.comum.model.EntidadeBase;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +46,7 @@ public class Unidade extends EntidadeBase {
     private SituacaoUnidade situacao;
 
     @ManyToOne
-    @JoinColumn(name = "unidade_superior_codigo", nullable = true)
+    @JoinColumn(name = "unidade_superior_codigo")
     @Nullable
     private Unidade unidadeSuperior;
 

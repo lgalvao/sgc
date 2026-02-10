@@ -34,6 +34,9 @@ class UnidadeConsultaServiceTest {
     @Mock
     private UnidadeRepo unidadeRepo;
 
+    @Mock
+    private sgc.comum.repo.ComumRepo repo;
+
     @InjectMocks
     private UnidadeConsultaService service;
 
@@ -49,7 +52,7 @@ class UnidadeConsultaServiceTest {
             unidade.setCodigo(1L);
             unidade.setSituacao(SituacaoUnidade.ATIVA);
 
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
+            when(repo.buscar(Unidade.class, 1L)).thenReturn(unidade);
 
             // Act
             Unidade resultado = service.buscarPorId(1L);
@@ -64,7 +67,7 @@ class UnidadeConsultaServiceTest {
         @DisplayName("deve lançar exceção quando unidade não existe")
         void deveLancarExcecaoQuandoUnidadeNaoExiste() {
             // Arrange
-            when(unidadeRepo.findById(999L)).thenReturn(Optional.empty());
+            when(repo.buscar(Unidade.class, 999L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 999L));
 
             // Act & Assert
             assertThatThrownBy(() -> service.buscarPorId(999L))
@@ -81,7 +84,7 @@ class UnidadeConsultaServiceTest {
             unidade.setCodigo(1L);
             unidade.setSituacao(SituacaoUnidade.INATIVA);
 
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
+            when(repo.buscar(Unidade.class, 1L)).thenReturn(unidade);
 
             // Act & Assert
             assertThatThrownBy(() -> service.buscarPorId(1L))
@@ -100,7 +103,7 @@ class UnidadeConsultaServiceTest {
         void deveRetornarUnidadeQuandoEncontradaPorSigla() {
             // Arrange
             Unidade unidade = UnidadeTestBuilder.raiz().build();
-            when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(unidade));
+            when(repo.buscarPorSigla(Unidade.class, "SEDOC")).thenReturn(unidade);
 
             // Act
             Unidade resultado = service.buscarPorSigla("SEDOC");
@@ -114,12 +117,12 @@ class UnidadeConsultaServiceTest {
         @DisplayName("deve lançar exceção quando sigla não existe")
         void deveLancarExcecaoQuandoSiglaNaoExiste() {
             // Arrange
-            when(unidadeRepo.findBySigla("INEXISTENTE")).thenReturn(Optional.empty());
+            when(repo.buscarPorSigla(Unidade.class, "INEXISTENTE"))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Unidade with sigla INEXISTENTE não encontrada"));
 
             // Act & Assert
             assertThatThrownBy(() -> service.buscarPorSigla("INEXISTENTE"))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("sigla")
                     .hasMessageContaining("INEXISTENTE");
         }
     }

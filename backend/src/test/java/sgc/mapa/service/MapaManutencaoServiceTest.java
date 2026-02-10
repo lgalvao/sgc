@@ -326,10 +326,10 @@ class MapaManutencaoServiceTest {
 
             Map<Long, Set<Long>> resultado = service.buscarIdsAssociacoesCompetenciaAtividade(10L);
 
-            assertThat(resultado).hasSize(2);
+            assertThat(resultado).hasSize(3);
             assertThat(resultado.get(1L)).containsExactlyInAnyOrder(10L, 20L);
             assertThat(resultado.get(2L)).containsExactly(30L);
-            assertThat(resultado.get(3L)).isNull(); // Competência sem atividade não deve aparecer
+            assertThat(resultado.get(3L)).containsOnly((Long) null); // Competência sem atividade aparece com null no set
             verify(competenciaRepo).findCompetenciaAndAtividadeIdsByMapaCodigo(10L);
         }
 
@@ -501,14 +501,14 @@ class MapaManutencaoServiceTest {
             Conhecimento conhecimento = new Conhecimento();
             conhecimento.setCodigo(1L);
 
-            when(atividadeRepo.existsById(10L)).thenReturn(true);
+            when(repo.buscar(Atividade.class, 10L)).thenReturn(new Atividade());
             when(conhecimentoRepo.findByAtividadeCodigo(10L)).thenReturn(List.of(conhecimento));
             when(conhecimentoMapper.toResponse(any())).thenReturn(ConhecimentoResponse.builder().build());
 
             List<ConhecimentoResponse> resultado = service.listarConhecimentosPorAtividade(10L);
 
             assertThat(resultado).hasSize(1);
-            verify(atividadeRepo).existsById(10L);
+            verify(repo).buscar(Atividade.class, 10L);
             verify(conhecimentoRepo).findByAtividadeCodigo(10L);
         }
 

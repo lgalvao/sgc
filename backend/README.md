@@ -289,7 +289,7 @@ private Long codigo;
 @PathVariable Long codigo
 
 // ❌ RUIM
-private Long id;
+private final Long id;
 @PathVariable Long id
 ```
 

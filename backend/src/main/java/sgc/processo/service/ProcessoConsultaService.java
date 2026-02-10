@@ -24,7 +24,7 @@ import java.util.*;
 
 /**
  * Serviço responsável por consultas relacionadas a Processos.
- *
+ * <p>
  * Centraliza operações de leitura e consultas complexas, incluindo
  * listagens filtradas, verificações de elegibilidade e queries específicas.
  */

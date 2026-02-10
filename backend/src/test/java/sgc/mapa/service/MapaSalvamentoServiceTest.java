@@ -40,6 +40,65 @@ class MapaSalvamentoServiceTest {
     private MapaSalvamentoService mapaSalvamentoService;
 
     @Test
+    @DisplayName("Deve salvar mapa com competência existente")
+    void deveSalvarComCompetenciaExistente() {
+        Long codMapa = 1L;
+        Long codComp = 50L;
+        
+        CompetenciaMapaDto compDto = CompetenciaMapaDto.builder()
+                .codigo(codComp)
+                .descricao("Nova Desc")
+                .atividadesCodigos(List.of())
+                .build();
+        SalvarMapaRequest request = SalvarMapaRequest.builder()
+                .competencias(List.of(compDto))
+                .build();
+
+        Mapa mapa = new Mapa();
+        Competencia compExistente = new Competencia();
+        compExistente.setCodigo(codComp);
+        compExistente.setDescricao("Velha Desc");
+
+        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(compExistente));
+        when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
+        when(competenciaRepo.saveAll(any())).thenAnswer(i -> i.getArgument(0));
+        when(mapaCompletoMapper.toDto(any(), any(), any())).thenReturn(MapaCompletoDto.builder().build());
+
+        mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
+
+        assertThat(compExistente.getDescricao()).isEqualTo("Nova Desc");
+    }
+
+    @Test
+    @DisplayName("Deve falhar quando competência não pertence ao mapa")
+    void deveFalharQuandoCompetenciaNaoPertenceAoMapa() {
+        Long codMapa = 1L;
+        Long codComp = 999L;
+        
+        CompetenciaMapaDto compDto = CompetenciaMapaDto.builder()
+                .codigo(codComp)
+                .descricao("Desc")
+                .atividadesCodigos(List.of())
+                .build();
+        SalvarMapaRequest request = SalvarMapaRequest.builder()
+                .competencias(List.of(compDto))
+                .build();
+
+        Mapa mapa = new Mapa();
+
+        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
+        when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
+        
+        // Mock repo.buscar throwing ErroEntidadeNaoEncontrada
+        when(repo.buscar(Competencia.class, codComp)).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Competência", codComp));
+
+        assertThatThrownBy(() -> mapaSalvamentoService.salvarMapaCompleto(codMapa, request))
+                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
     @DisplayName("Deve falhar ao associar atividade que não pertence ao mapa")
     void deveFalharAtividadeNaoPertenceAoMapa() {
         Long codMapa = 1L;
@@ -117,30 +176,6 @@ class MapaSalvamentoServiceTest {
         verify(mapaRepo).save(mapa);
     }
 
-    @Test
-    @DisplayName("Deve lidar com primeira atividade sem mapa")
-    void deveLidarComPrimeiraAtividadeSemMapa() {
-        Long codMapa = 100L;
-        SalvarMapaRequest request = new SalvarMapaRequest("Obs", List.of());
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(codMapa);
-
-        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
-
-        Atividade ativ = new Atividade();
-        ativ.setCodigo(1L);
-        ativ.setMapa(null);
-        when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(ativ));
-
-        when(competenciaRepo.saveAll(anyList())).thenReturn(List.of());
-        when(atividadeRepo.saveAll(anyList())).thenReturn(List.of());
-        when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(MapaCompletoDto.builder().build());
-
-        mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
-
-        verify(mapaRepo).save(mapa);
-    }
 
     @Nested
     @DisplayName("Cobertura Extra")
@@ -162,6 +197,7 @@ class MapaSalvamentoServiceTest {
             Mapa mapa = new Mapa();
             Atividade ativExistente = new Atividade();
             ativExistente.setCodigo(1L);
+            ativExistente.setMapa(mapa);
             ativExistente.setCompetencias(new HashSet<>());
 
             when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);

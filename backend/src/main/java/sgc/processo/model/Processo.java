@@ -90,13 +90,6 @@ public class Processo extends EntidadeBase {
     }
 
     /**
-     * Remove todas as unidades participantes.
-     */
-    public void limparParticipantes() {
-        participantes.clear();
-    }
-
-    /**
      * Retorna os códigos das unidades participantes.
      */
     public List<Long> getCodigosParticipantes() {

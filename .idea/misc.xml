@@ -83,6 +83,7 @@
     <pattern value="sgc.subprocesso.dto.ValidacaoCadastroDto" method="ValidacaoCadastroDto" />
     <pattern value="sgc.mapa.service.MapaFacade" method="listar" />
     <pattern value="sgc.mapa.service.MapaFacade" />
+    <pattern value="sgc.subprocesso.model.SubprocessoRepo" method="findByMapaCodigo" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">

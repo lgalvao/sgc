@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
-import sgc.comum.erros.ErroEstadoImpossivel;
 
 /**
  * Serviço especializado para operações CRUD básicas de Subprocesso.
@@ -57,9 +56,7 @@ public class SubprocessoCrudService {
      * Busca subprocesso e seu mapa associado.
      */
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
-        return subprocessoRepo
-                .findByIdWithMapa(codigo)
-                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(MSG_SUBPROCESSO_NAO_ENCONTRADO));
+        return repositorioComum.buscar(Subprocesso.class, codigo);
     }
 
     @Transactional(readOnly = true)
@@ -79,10 +76,7 @@ public class SubprocessoCrudService {
 
     @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
-        return subprocessoRepo
-                .findByMapaCodigoWithMapa(codMapa)
-                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(
-                        "%s para o mapa com código %d".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codMapa)));
+        return repositorioComum.buscar(Subprocesso.class, "mapa.codigo", codMapa);
     }
 
     public SubprocessoDto criar(CriarSubprocessoRequest request) {

@@ -9,6 +9,7 @@ import sgc.mapa.dto.AtualizarAtividadeRequest;
 import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.model.Atividade;
 
+@SuppressWarnings("NullableProblems")
 @Component
 @Mapper(config = CentralMapperConfig.class)
 public abstract class AtividadeMapper {

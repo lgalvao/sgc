@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +26,6 @@ import sgc.subprocesso.service.SubprocessoFacade;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.jspecify.annotations.Nullable;
 
 @RestController
 @RequestMapping("/api/subprocessos")
@@ -158,7 +158,7 @@ public class SubprocessoCadastroController {
             @AuthenticationPrincipal @Nullable Object principal) {
         
         Usuario usuario = obterUsuarioAutenticado(principal);
-        String sanitizedObservacoes = Optional.ofNullable(UtilSanitizacao.sanitizar(request.observacoes()))
+        String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.observacoes()))
                 .orElse("");
 
         subprocessoFacade.devolverCadastro(codigo, sanitizedObservacoes, usuario);
@@ -182,7 +182,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody AceitarCadastroRequest request,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        String sanitizedObservacoes = Optional.ofNullable(UtilSanitizacao.sanitizar(request.observacoes()))
+        String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.observacoes()))
                 .orElse("");
 
         subprocessoFacade.aceitarCadastro(codigo, sanitizedObservacoes, usuario);
@@ -205,7 +205,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody HomologarCadastroRequest request,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        String sanitizedObservacoes = Optional.ofNullable(UtilSanitizacao.sanitizar(request.observacoes()))
+        String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.observacoes()))
                 .orElse("");
 
         subprocessoFacade.homologarCadastro(codigo, sanitizedObservacoes, usuario);
@@ -227,7 +227,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody DevolverCadastroRequest request,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        String sanitizedObservacoes = Optional.ofNullable(UtilSanitizacao.sanitizar(request.observacoes()))
+        String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.observacoes()))
                 .orElse("");
 
         subprocessoFacade.devolverRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
@@ -247,7 +247,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody AceitarCadastroRequest request,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        String sanitizedObservacoes = Optional.ofNullable(UtilSanitizacao.sanitizar(request.observacoes()))
+        String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.observacoes()))
                 .orElse("");
 
         subprocessoFacade.aceitarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
@@ -270,7 +270,7 @@ public class SubprocessoCadastroController {
             @Valid @RequestBody HomologarCadastroRequest request,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        String sanitizedObservacoes = Optional.ofNullable(UtilSanitizacao.sanitizar(request.observacoes()))
+        String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.observacoes()))
                 .orElse("");
 
         subprocessoFacade.homologarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);

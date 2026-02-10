@@ -41,10 +41,21 @@ class ProcessoConsultaServiceTest {
     private ProcessoRepo processoRepo;
 
     @Mock
+    private sgc.comum.repo.ComumRepo repo;
+
+    @Mock
     private ProcessoSubprocessoQueryService queryService;
 
     @Mock
     private UsuarioFacade usuarioService;
+
+    @Test
+    @DisplayName("Deve buscar processo por ID")
+    void deveBuscarPorId() {
+        sgc.processo.model.Processo p = new sgc.processo.model.Processo();
+        when(repo.buscar(sgc.processo.model.Processo.class, 1L)).thenReturn(p);
+        assertThat(processoConsultaService.buscarPorId(1L)).isEqualTo(p);
+    }
 
     @Test
     @DisplayName("Deve buscar IDs de unidades em processos ativos")

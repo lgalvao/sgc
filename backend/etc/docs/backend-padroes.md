@@ -214,10 +214,10 @@ public class EventoProcessoListener {
     @EventListener
     @Transactional
     public void onProcessoIniciado(EventoProcessoIniciado evento) {
-        alertaService.criar(...);
-        notificacaoEmailService.enviar(...);
+        alertaService.criar(...)
+        notificacaoEmailService.enviar(...)
     }
-}
+
 ```
 
 **Benefícios:**
@@ -580,7 +580,7 @@ public class Processo extends EntidadeBase {
 ```java
 // Lado One (Processo)
 @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL)
-private List<Subprocesso> subprocessos = new ArrayList<>();
+private final List<Subprocesso> subprocessos = new ArrayList<>();
 
 // Lado Many (Subprocesso)
 @ManyToOne
@@ -598,7 +598,7 @@ private Processo processo;
     joinColumns = @JoinColumn(name = "processo_codigo"),
     inverseJoinColumns = @JoinColumn(name = "unidade_codigo")
 )
-private Set<Unidade> unidades = new HashSet<>();
+private final Set<Unidade> unidades = new HashSet<>();
 ```
 
 **Boas Práticas:**

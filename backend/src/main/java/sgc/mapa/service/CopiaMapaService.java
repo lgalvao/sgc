@@ -3,7 +3,6 @@ package sgc.mapa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.*;
 
@@ -28,9 +27,7 @@ public class CopiaMapaService {
 
     @Transactional
     public Mapa copiarMapaParaUnidade(Long codMapaOrigem) {
-        Mapa fonte = mapaRepo
-                .findById(codMapaOrigem)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codMapaOrigem));
+        Mapa fonte = repo.buscar(Mapa.class, codMapaOrigem);
 
         Mapa novoMapa = criarNovoMapa(fonte);
         Mapa mapaSalvo = mapaRepo.save(novoMapa);

@@ -49,10 +49,10 @@ public class ErroApi {
 
     public ErroApi(HttpStatusCode status, String message, List<ErroSubApi> subErrors) {
         this(status, message);
-        this.subErrors = subErrors != null ? new ArrayList<>(subErrors) : null;
+        this.subErrors = new ArrayList<>(subErrors);
     }
 
     public List<ErroSubApi> getSubErrors() {
-        return subErrors != null ? new ArrayList<>(subErrors) : null;
+        return new ArrayList<>(subErrors);
     }
 }

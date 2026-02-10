@@ -30,6 +30,7 @@ class ImpactoMapaServiceTest {
     @Mock private CompetenciaRepo competenciaRepo;
     @Mock private MapaManutencaoService mapaManutencaoService;
     @Mock private AccessControlService accessControlService;
+    @Mock private sgc.comum.repo.ComumRepo repo;
 
     @InjectMocks
     private ImpactoMapaService impactoMapaService;
@@ -71,7 +72,7 @@ class ImpactoMapaServiceTest {
         mapaSub.setCodigo(200L);
 
         when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepo.findBySubprocessoCodigo(10L)).thenReturn(Optional.of(mapaSub));
+        when(repo.buscar(Mapa.class, "subprocesso.codigo", 10L)).thenReturn(mapaSub);
 
         // Vigente: vazio
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L)).thenReturn(Collections.emptyList());
@@ -107,7 +108,7 @@ class ImpactoMapaServiceTest {
         mapaSub.setCodigo(200L);
 
         when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepo.findBySubprocessoCodigo(10L)).thenReturn(Optional.of(mapaSub));
+        when(repo.buscar(Mapa.class, "subprocesso.codigo", 10L)).thenReturn(mapaSub);
 
         // Vigente: 1 atividade "Antiga"
         Atividade antiga = new Atividade();
@@ -151,7 +152,7 @@ class ImpactoMapaServiceTest {
         mapaSub.setCodigo(200L);
 
         when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepo.findBySubprocessoCodigo(10L)).thenReturn(Optional.of(mapaSub));
+        when(repo.buscar(Mapa.class, "subprocesso.codigo", 10L)).thenReturn(mapaSub);
 
         // Vigente: Ativ A com Conhecimento C1
         Atividade ativVigente = new Atividade();
@@ -204,7 +205,7 @@ class ImpactoMapaServiceTest {
                 .build();
 
         when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaAtual));
+        when(repo.buscar(Mapa.class, "subprocesso.codigo", 1L)).thenReturn(mapaAtual);
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L))
                 .thenReturn(Collections.singletonList(ativVigente));
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L))
@@ -244,7 +245,7 @@ class ImpactoMapaServiceTest {
                 .build();
 
         when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaAtual));
+        when(repo.buscar(Mapa.class, "subprocesso.codigo", 1L)).thenReturn(mapaAtual);
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L))
                 .thenReturn(Collections.singletonList(ativVigente));
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L))
@@ -286,7 +287,7 @@ class ImpactoMapaServiceTest {
             Usuario usuario = new Usuario();
 
             when(mapaRepo.findMapaVigenteByUnidade(100L)).thenReturn(Optional.of(new Mapa()));
-            when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.empty());
+            when(repo.buscar(Mapa.class, "subprocesso.codigo", 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
 
             assertThrows(ErroEntidadeNaoEncontrada.class, () -> impactoMapaService.verificarImpactos(sp, usuario));
         }
@@ -307,7 +308,7 @@ class ImpactoMapaServiceTest {
             mapaSub.setCodigo(21L);
 
             when(mapaRepo.findMapaVigenteByUnidade(100L)).thenReturn(Optional.of(mapaVigente));
-            when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSub));
+            when(repo.buscar(Mapa.class, "subprocesso.codigo", 1L)).thenReturn(mapaSub);
 
             // Duplicatas na lista de atividades do mapa vigente
             Atividade a1 = new Atividade();
@@ -351,7 +352,7 @@ class ImpactoMapaServiceTest {
             mapaSub.setCodigo(21L);
 
             when(mapaRepo.findMapaVigenteByUnidade(100L)).thenReturn(Optional.of(mapaVigente));
-            when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSub));
+            when(repo.buscar(Mapa.class, "subprocesso.codigo", 1L)).thenReturn(mapaSub);
 
             // Atividade vigente
             Atividade aVigente = new Atividade();

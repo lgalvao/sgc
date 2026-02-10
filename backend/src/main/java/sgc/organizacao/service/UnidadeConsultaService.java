@@ -3,33 +3,26 @@ package sgc.organizacao.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UnidadeConsultaService {
     private final UnidadeRepo unidadeRepo;
-    private static final String ENTIDADE_UNIDADE = "Unidade";
+    private final sgc.comum.repo.ComumRepo repo;
 
     public Unidade buscarPorId(Long codigo) {
-        Unidade unidade = unidadeRepo.findById(codigo)
-                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(ENTIDADE_UNIDADE, codigo));
-        if (unidade.getSituacao() != SituacaoUnidade.ATIVA) {
-            throw new ErroEntidadeNaoEncontrada(ENTIDADE_UNIDADE, codigo);
-        }
-        return unidade;
+        return repo.buscar(Unidade.class, Map.of("codigo", codigo, "situacao", SituacaoUnidade.ATIVA));
     }
 
     public Unidade buscarPorSigla(String sigla) {
-        return unidadeRepo
-                .findBySigla(sigla)
-                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada("Unidade com sigla " + sigla + " não encontrada"));
+        return repo.buscarPorSigla(Unidade.class, sigla);
     }
 
     public List<Unidade> buscarEntidadesPorIds(List<Long> codigos) {

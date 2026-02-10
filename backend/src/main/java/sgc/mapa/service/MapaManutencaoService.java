@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.*;
 import sgc.mapa.eventos.EventoMapaAlterado;
@@ -21,8 +21,6 @@ import java.util.stream.Stream;
 @Transactional
 @RequiredArgsConstructor
 public class MapaManutencaoService {
-    private static final String ENTIDADE_ATIVIDADE = "Atividade";
-
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo competenciaRepo;
     private final ConhecimentoRepo conhecimentoRepo;
@@ -103,11 +101,11 @@ public class MapaManutencaoService {
     private void excluirAtividadeEConhecimentos(Atividade atividade) {
         var mapa = atividade.getMapa();
         notificarAlteracaoMapa(mapa.getCodigo());
-       
+
         // Remove conhecimentos associados
         List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
         conhecimentoRepo.deleteAll(conhecimentos);
-        
+
         atividadeRepo.delete(atividade);
     }
 
@@ -144,9 +142,7 @@ public class MapaManutencaoService {
         for (Object[] row : rows) {
             Long compId = (Long) row[0];
             Long ativId = (Long) row[2];
-            if (ativId != null) {
-                result.computeIfAbsent(compId, k -> new HashSet<>()).add(ativId);
-            }
+            result.computeIfAbsent(compId, k -> new HashSet<>()).add(ativId);
         }
         return result;
     }
@@ -211,9 +207,7 @@ public class MapaManutencaoService {
 
     @Transactional(readOnly = true)
     public List<ConhecimentoResponse> listarConhecimentosPorAtividade(Long codAtividade) {
-        if (!atividadeRepo.existsById(codAtividade)) {
-            throw new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade);
-        }
+        repo.buscar(Atividade.class, codAtividade);
 
         return conhecimentoRepo.findByAtividadeCodigo(codAtividade).stream()
                 .flatMap(c -> Stream.ofNullable(conhecimentoMapper.toResponse(c)))
@@ -263,7 +257,7 @@ public class MapaManutencaoService {
         }
         executarExclusaoConhecimento(conhecimento);
     }
-    
+
     private void executarExclusaoConhecimento(Conhecimento conhecimento) {
         var mapa = conhecimento.getAtividade().getMapa();
         notificarAlteracaoMapa(mapa.getCodigo());

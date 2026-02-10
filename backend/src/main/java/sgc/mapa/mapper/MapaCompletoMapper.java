@@ -14,6 +14,7 @@ import sgc.mapa.model.Mapa;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings("NullableProblems")
 @Mapper(config = CentralMapperConfig.class, unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface MapaCompletoMapper {
     default MapaCompletoDto toDto(Mapa mapa, @Nullable Long codSubprocesso, List<Competencia> competencias) {

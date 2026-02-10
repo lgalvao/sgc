@@ -13,7 +13,6 @@ import sgc.mapa.service.MapaFacade;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Controlador REST para gerenciar Mapas usando DTOs. Evita expor entidades JPA diretamente nas
@@ -38,7 +37,6 @@ public class MapaController {
     public List<MapaDto> listar() {
         return mapaFacade.listar().stream()
                 .map(mapaMapper::toDto)
-                .filter(Objects::nonNull)
                 .toList();
     }
 

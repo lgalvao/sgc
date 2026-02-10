@@ -1,6 +1,9 @@
 package sgc.organizacao.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,13 +34,4 @@ public class VinculacaoUnidade {
 
     @Column(name = "demais_unidades_historicas")
     private @Nullable String demaisUnidadesHistoricas;
-
-    /**
-     * Verifica se esta unidade é uma unidade raiz (sem antecessor).
-     * 
-     * @return true se a unidade não possui unidade anterior (é raiz)
-     */
-    public boolean isUnidadeRaiz() {
-        return unidadeAnteriorCodigo == null;
-    }
 }

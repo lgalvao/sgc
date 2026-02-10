@@ -405,7 +405,7 @@ void setUp() {
     filha.setCodigo(null);
     filha.setNome("Unidade Filha");
     filha.setUnidadeSuperior(raiz);
-    filha = unidadeRepo.save(filha);
+    unidadeRepo.save(filha);
 }
 ```
 

@@ -2,6 +2,7 @@ package sgc.comum.erros;
 
 import org.springframework.http.HttpStatus;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -16,7 +17,7 @@ public interface ErroNegocio {
 
     @SuppressWarnings("SameReturnValue")
     default Map<String, ?> getDetails() {
-        return null;
+        return new HashMap<>();
     }
 
     String getMessage();

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import sgc.seguranca.sanitizacao.UtilSanitizacao;
+
 import java.util.UUID;
 
 /**
@@ -71,7 +72,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request) {
 
-        log.warn("Erro de mensagem HTTP não legível: {}", ex != null ? ex.getMessage() : "sem detalhe");
+        log.warn("Erro de mensagem HTTP não legível: {}", ex.getMessage());
         String error = "Requisição JSON malformada";
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, error));
     }

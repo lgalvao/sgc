@@ -14,9 +14,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroValidacao;
 import sgc.comum.erros.ErroConfiguracao;
+import sgc.comum.erros.ErroValidacao;
+import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
@@ -25,13 +25,13 @@ import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.stream.Stream;
 
 @RestController
@@ -47,6 +47,7 @@ public class E2eController {
     private final ProcessoFacade processoFacade;
     private final UnidadeFacade unidadeFacade;
     private final ResourceLoader resourceLoader;
+    private final ComumRepo repo;
 
     @PostMapping("/reset-database")
     public void resetDatabase() {
@@ -231,24 +232,17 @@ public class E2eController {
             List<String> erros;
 
             switch (tipo) {
-              case TipoProcesso.MAPEAMENTO -> {
-                  erros = processoFacade.iniciarProcessoMapeamento(processoCodigo, unidades);
-              }
-              case TipoProcesso.REVISAO -> {
-                  erros = processoFacade.iniciarProcessoRevisao(processoCodigo, unidades);
-              }
-              default -> {
-                  erros = List.of();
-              }
+              case TipoProcesso.MAPEAMENTO -> erros = processoFacade.iniciarProcessoMapeamento(processoCodigo, unidades);
+              case TipoProcesso.REVISAO -> erros = processoFacade.iniciarProcessoRevisao(processoCodigo, unidades);
+              default -> erros = List.of();
             }
 
-            if (erros != null && !erros.isEmpty()) {
+            if (!erros.isEmpty()) {
                 throw new ErroValidacao("Falha ao iniciar processo fixture: " + String.join("; ", erros));
             }
 
             // Recarregar processo após iniciar
-            processo = processoFacade.obterPorId(processoCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", processoCodigo));
+            processo = processoFacade.obterDtoPorId(processoCodigo);
         }
 
         return processo;

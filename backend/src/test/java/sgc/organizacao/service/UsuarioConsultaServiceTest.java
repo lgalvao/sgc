@@ -37,7 +37,7 @@ class UsuarioConsultaServiceTest {
     @DisplayName("Deve buscar usuário por ID")
     void deveBuscarPorId() {
         Usuario usuario = new Usuario();
-        when(usuarioRepo.findById("user")).thenReturn(Optional.of(usuario));
+        when(repo.buscar(Usuario.class, "user")).thenReturn(usuario);
         assertEquals(usuario, usuarioConsultaService.buscarPorId("user"));
     }
 

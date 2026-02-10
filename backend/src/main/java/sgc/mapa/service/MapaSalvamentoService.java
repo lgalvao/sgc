@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.CompetenciaMapaDto;
@@ -126,7 +125,7 @@ public class MapaSalvamentoService {
         if (codigo != null) {
             competencia = mapaCompetenciasExistentes.get(codigo);
             if (competencia == null) {
-                throw new ErroEntidadeNaoEncontrada("Competência", codigo);
+                competencia = repo.buscar(Competencia.class, codigo);
             }
         } else {
             competencia = Competencia.builder()
@@ -144,9 +143,7 @@ public class MapaSalvamentoService {
         if (!contexto.atividadesAtuais.isEmpty()) {
             var primeiraAtividade = contexto.atividadesAtuais.getFirst();
             var mapa = primeiraAtividade.getMapa();
-            if (mapa != null) {
-                codMapa = mapa.getCodigo();
-            }
+            codMapa = mapa.getCodigo();
         }
 
         Map<Long, Set<Competencia>> mapAtividadeCompetencias = construirMapaAssociacoes(

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
@@ -42,6 +43,7 @@ public class ImpactoMapaService {
     private final CompetenciaRepo competenciaRepo;
     private final MapaManutencaoService mapaManutencaoService;
     private final AccessControlService accessControlService;
+    private final ComumRepo repo;
 
     /**
      * Realiza a verificação de impactos no mapa de competências, comparando o mapa
@@ -83,8 +85,8 @@ public class ImpactoMapaService {
         }
 
         Mapa mapaVigente = mapaVigenteOpt.get();
-        Mapa mapaSubprocesso = mapaRepo.findBySubprocessoCodigo(subprocesso.getCodigo()).orElseThrow(
-                () -> new ErroEntidadeNaoEncontrada("Mapa não encontrado para subprocesso", subprocesso.getCodigo()));
+
+        Mapa mapaSubprocesso = repo.buscar(Mapa.class, "subprocesso.codigo", subprocesso.getCodigo());
 
         List<Atividade> atividadesAtuais = obterAtividadesDoMapa(mapaSubprocesso);
         List<Atividade> atividadesVigentes = obterAtividadesDoMapa(mapaVigente);
@@ -93,8 +95,6 @@ public class ImpactoMapaService {
 
         Map<Long, List<Competencia>> atividadeIdToCompetencias = construirMapaAtividadeCompetencias(competenciasMapa);
 
-        // Otimização: Construir mapas auxiliares uma única vez para evitar
-        // re-construção dentro de cada método do detector
         Map<String, Atividade> mapaVigentes = atividadesPorDescricao(atividadesVigentes);
         Map<String, Atividade> mapaAtuais = atividadesPorDescricao(atividadesAtuais);
 

@@ -383,6 +383,8 @@ class UnidadeHierarquiaServiceTest {
             UnidadeDto dto = criarDtoComSubunidades(1L, "SEDOC");
             when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(dto);
 
+            when(repo.buscar(Unidade.class, 999L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 999L));
+
             // Act & Assert
             assertThatThrownBy(() -> service.buscarArvore(999L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -453,6 +455,9 @@ class UnidadeHierarquiaServiceTest {
 
             when(usuarioMapper.toUnidadeDto(unidadeRaiz, true))
                     .thenReturn(criarDtoComSubunidades(1L, "SEDOC"));
+
+            when(repo.buscarPorSigla(Unidade.class, "INEXISTENTE"))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "INEXISTENTE"));
 
             // Act & Assert
             assertThatThrownBy(() -> service.buscarSiglasSubordinadas("INEXISTENTE"))

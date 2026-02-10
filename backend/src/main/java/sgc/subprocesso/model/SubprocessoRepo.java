@@ -57,20 +57,6 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
 
     List<Subprocesso> findByProcessoCodigo(Long processoCodigo);
 
-    @Query("""
-            select s from Subprocesso s
-              join fetch s.unidade u
-              join fetch s.mapa m
-            where m.codigo = :mapaCodigo""")
-    Optional<Subprocesso> findByMapaCodigoWithMapa(@Param("mapaCodigo") Long mapaCodigo);
-
-    @Query("""
-            select s from Subprocesso s
-              join fetch s.unidade u
-              join fetch s.mapa m
-            where s.codigo = :codigo""")
-    Optional<Subprocesso> findByIdWithMapa(@Param("codigo") Long codigo);
-
     Optional<Subprocesso> findByMapaCodigo(Long mapaCodigo);
 
     Optional<Subprocesso> findByProcessoCodigoAndUnidadeCodigo(Long processoCodigo, Long unidadeCodigo);

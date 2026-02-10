@@ -7,15 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.CriarAnaliseCommand;
+import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
 import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 
 /**
  * Serviço consolidado para gerenciar transições e workflows de subprocessos.
@@ -48,9 +47,6 @@ public class SubprocessoTransicaoService {
     @Transactional
     public void registrar(RegistrarTransicaoCommand cmd) {
         Usuario usuario = cmd.usuario() != null ? cmd.usuario() : usuarioFacade.obterUsuarioAutenticado();
-        if (usuario == null) {
-            throw new ErroProcessoEmSituacaoInvalida("Usuário não autenticado");
-        }
 
         // 1. Salvar movimentação (trilha de auditoria completa)
         Movimentacao movimentacao = Movimentacao.builder()

@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
 import sgc.processo.model.TipoProcesso;
@@ -178,23 +177,14 @@ public class ProcessoController {
     public ResponseEntity<Object> iniciar(
             @PathVariable Long codigo, @Valid @RequestBody IniciarProcessoRequest req) {
 
-        if (req.tipo() == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
         var processador = getProcessadoresInicio().get(req.tipo());
-        if (processador == null) {
-            return ResponseEntity.badRequest().build();
-        }
 
         List<String> erros = processador.apply(codigo, req.unidades());
         if (!erros.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("erros", erros));
         }
 
-        ProcessoDto processoAtualizado = processoFacade
-                .obterPorId(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+        ProcessoDto processoAtualizado = processoFacade.obterDtoPorId(codigo);
         return ResponseEntity.ok(processoAtualizado);
     }
 

@@ -77,7 +77,7 @@ def determine_replacement(match, current_package, existing_imports, new_imports_
     fqn = f"{pkg}.{cls}"
     
     # Logic to decide if we should replace
-    False
+    var = False
     
     if should_ignore_fqn(pkg):
          should_replace = True

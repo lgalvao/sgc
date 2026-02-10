@@ -11,12 +11,12 @@ import sgc.mapa.dto.visualizacao.ConhecimentoDto;
 import sgc.mapa.eventos.EventoImportacaoAtividades;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.service.MapaManutencaoService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
-import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Usuario;
 
 import java.util.List;
 
@@ -57,7 +57,6 @@ class SubprocessoAtividadeService {
      * 
      * @param codSubprocessoDestino código do subprocesso de destino
      * @param codSubprocessoOrigem código do subprocesso de origem
-     * @throws ErroEntidadeNaoEncontrada se algum subprocesso não existe
      * @throws ErroAtividadesEmSituacaoInvalida se destino está em situação inválida
      */
     @Transactional

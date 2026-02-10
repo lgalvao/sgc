@@ -1,17 +1,16 @@
 package sgc.subprocesso.mapper;
 
-import sgc.comum.config.CentralMapperConfig;
-
 import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.util.CollectionUtils;
+import sgc.comum.config.CentralMapperConfig;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.dto.SubprocessoDetalheDto;
-import sgc.subprocesso.dto.UnidadeDetalheDto;
 import sgc.subprocesso.dto.ResponsavelDetalheDto;
+import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoPermissoesDto;
+import sgc.subprocesso.dto.UnidadeDetalheDto;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -51,7 +50,7 @@ public interface SubprocessoDetalheMapper {
 
         String tituloTitular = sp.getUnidade().getTituloTitular();
         String tipo = "Substituição";
-        if (responsavel.getTituloEleitoral() != null && responsavel.getTituloEleitoral().equals(tituloTitular)) {
+        if (responsavel.getTituloEleitoral().equals(tituloTitular)) {
             tipo = "Titular";
         }
 

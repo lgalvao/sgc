@@ -50,7 +50,6 @@ class ProcessoFinalizador {
      * Finaliza um processo, validando e tornando os mapas vigentes.
      *
      * @param codigo código do processo a finalizar
-     * @throws ErroEntidadeNaoEncontrada se o processo não for encontrado
      * @throws ErroProcesso              se o processo não puder ser finalizado
      */
     @Transactional
@@ -84,7 +83,7 @@ class ProcessoFinalizador {
         List<Subprocesso> subprocessos = queryService.listarEntidadesPorProcesso(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
-            Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
+            Unidade unidade = Optional.of(subprocesso.getUnidade())
                     .orElseThrow(() -> new ErroProcesso(
                             "Subprocesso %d sem unidade associada.".formatted(subprocesso.getCodigo())));
 

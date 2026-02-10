@@ -86,6 +86,11 @@ public class ProcessoFacade {
     }
 
     @Transactional(readOnly = true)
+    public ProcessoDto obterDtoPorId(Long codigo) {
+        return processoMapper.toDto(buscarPorId(codigo));
+    }
+
+    @Transactional(readOnly = true)
     public Processo buscarEntidadePorId(Long codigo) {
         return buscarPorId(codigo);
     }
