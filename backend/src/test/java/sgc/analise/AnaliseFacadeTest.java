@@ -108,6 +108,14 @@ class AnaliseFacadeTest {
         @Test
         @DisplayName("Deve criar uma análise de cadastro")
         void deveCriarAnaliseCadastro() {
+            String sigla = "UNIDADE";
+            UnidadeDto unidadeDto = new UnidadeDto();
+            unidadeDto.setCodigo(1L);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(1L);
+
+            when(unidadeService.buscarPorSigla(sigla)).thenReturn(unidadeDto);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidade);
             when(analiseService.salvar(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
             Analise resultado = facade.criarAnalise(
@@ -116,7 +124,7 @@ class AnaliseFacadeTest {
                             .tipo(TipoAnalise.CADASTRO)
                             .acao(null)
                             .observacoes(OBS)
-                            .siglaUnidade(null)
+                            .siglaUnidade(sigla)
                             .tituloUsuario(null)
                             .motivo(null)
                             .build());
@@ -125,12 +133,21 @@ class AnaliseFacadeTest {
             assertThat(resultado.getSubprocesso()).isEqualTo(subprocesso);
             assertThat(resultado.getObservacoes()).isEqualTo(OBS);
             assertThat(resultado.getTipo()).isEqualTo(TipoAnalise.CADASTRO);
+            assertThat(resultado.getUnidadeCodigo()).isEqualTo(1L);
             verify(analiseService).salvar(any(Analise.class));
         }
 
         @Test
         @DisplayName("Deve criar uma análise de validação")
         void deveCriarAnaliseValidacao() {
+            String sigla = "UNIDADE";
+            UnidadeDto unidadeDto = new UnidadeDto();
+            unidadeDto.setCodigo(1L);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(1L);
+
+            when(unidadeService.buscarPorSigla(sigla)).thenReturn(unidadeDto);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidade);
             when(analiseService.salvar(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
             Analise resultado = facade.criarAnalise(
@@ -139,7 +156,7 @@ class AnaliseFacadeTest {
                             .tipo(TipoAnalise.VALIDACAO)
                             .acao(null)
                             .observacoes(OBS)
-                            .siglaUnidade(null)
+                            .siglaUnidade(sigla)
                             .tituloUsuario(null)
                             .motivo(null)
                             .build());
@@ -148,6 +165,7 @@ class AnaliseFacadeTest {
             assertThat(resultado.getSubprocesso()).isEqualTo(subprocesso);
             assertThat(resultado.getObservacoes()).isEqualTo(OBS);
             assertThat(resultado.getTipo()).isEqualTo(TipoAnalise.VALIDACAO);
+            assertThat(resultado.getUnidadeCodigo()).isEqualTo(1L);
             verify(analiseService).salvar(any(Analise.class));
         }
 
@@ -174,6 +192,19 @@ class AnaliseFacadeTest {
             assertThat(resultado.getUnidadeCodigo()).isEqualTo(10L);
             verify(unidadeService).buscarPorSigla(sigla);
             verify(unidadeService).buscarEntidadePorId(10L);
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção quando sigla da unidade não for fornecida")
+        void deveLancarExcecaoQuandoSiglaUnidadeNula() {
+            CriarAnaliseCommand command = CriarAnaliseCommand.builder()
+                    .tipo(TipoAnalise.VALIDACAO)
+                    .siglaUnidade(null)
+                    .build();
+
+            org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                facade.criarAnalise(subprocesso, command);
+            });
         }
     }
 

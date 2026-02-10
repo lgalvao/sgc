@@ -43,4 +43,8 @@ class MapaCompletoMapperTest {
         assertThat(dto.competencias().getFirst().codigo()).isEqualTo(2L);
         assertThat(dto.competencias().getFirst().atividadesCodigos()).containsExactly(10L);
     }
+    @Test
+    void toDto_Null() {
+        assertThat(mapper.toDto(null)).isNull();
+    }
 }

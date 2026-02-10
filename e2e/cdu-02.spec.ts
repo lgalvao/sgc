@@ -155,7 +155,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             // Como não há alertas, a tabela deve estar vazia e exibir a mensagem
             const linhasAlertas = await tabelaAlertas.getByRole('row').count();
             expect(linhasAlertas).toBeLessThanOrEqual(2);
-            await expect(tabelaAlertas).toContainText('Você não tem novos alertas no momento.');
+            await expect(tabelaAlertas).toContainText('Nenhum alerta');
         });
     });
 });

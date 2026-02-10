@@ -20,10 +20,8 @@ import java.util.List;
 /**
  * Configuração de segurança específica para testes E2E.
  *
- * <p>
  * Similar à configuração padrão, mas permite acesso aos endpoints /e2e/** sem
- * autenticação.
- * Os métodos de fixture usam SecurityContext interno para chamar métodos
+ * autenticação. Os métodos de fixture usam SecurityContext interno para chamar métodos
  * com @PreAuthorize.
  */
 @Configuration

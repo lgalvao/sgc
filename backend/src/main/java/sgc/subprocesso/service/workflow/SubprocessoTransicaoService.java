@@ -13,6 +13,9 @@ import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.Usuario;
+import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 
 /**
  * Serviço consolidado para gerenciar transições e workflows de subprocessos.
@@ -35,6 +38,7 @@ public class SubprocessoTransicaoService {
     private final MovimentacaoRepo movimentacaoRepo;
     private final ApplicationEventPublisher eventPublisher;
     private final AnaliseFacade analiseFacade;
+    private final UsuarioFacade usuarioFacade;
 
     /**
      * Registra uma transição de subprocesso (auditoria e eventos).
@@ -43,13 +47,18 @@ public class SubprocessoTransicaoService {
      */
     @Transactional
     public void registrar(RegistrarTransicaoCommand cmd) {
+        Usuario usuario = cmd.usuario() != null ? cmd.usuario() : usuarioFacade.obterUsuarioAutenticado();
+        if (usuario == null) {
+            throw new ErroProcessoEmSituacaoInvalida("Usuário não autenticado");
+        }
+
         // 1. Salvar movimentação (trilha de auditoria completa)
         Movimentacao movimentacao = Movimentacao.builder()
                 .subprocesso(cmd.sp())
                 .unidadeOrigem(cmd.origem())
                 .unidadeDestino(cmd.destino())
                 .descricao(cmd.tipo().getDescricaoMovimentacao())
-                .usuario(cmd.usuario())
+                .usuario(usuario)
                 .build();
         movimentacaoRepo.save(movimentacao);
 
@@ -57,7 +66,7 @@ public class SubprocessoTransicaoService {
         EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
                 .subprocesso(cmd.sp())
                 .tipo(cmd.tipo())
-                .usuario(cmd.usuario())
+                .usuario(usuario)
                 .unidadeOrigem(cmd.origem())
                 .unidadeDestino(cmd.destino())
                 .observacoes(cmd.observacoes())

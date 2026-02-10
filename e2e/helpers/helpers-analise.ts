@@ -54,7 +54,7 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
     // Se não redirecionou direto para o subprocesso (a URL não termina com a sigla da unidade)
     if (siglaUnidade && !page.url().endsWith(siglaUnidade)) {
         // Clicar na linha da unidade para acessar o subprocesso
-        await page.getByRole('row', {name: new RegExp(siglaUnidade, 'i')}).click();
+        await page.locator('tr').filter({hasText: new RegExp(`^${siglaUnidade}\\b`, 'i')}).first().click();
     }
     
     // Agora deve estar na página do subprocesso
@@ -69,11 +69,17 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
  * Acessa subprocesso como ADMIN (via lista de unidades)
  */
 export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: string, siglaUnidade: string) {
+    await expect(page.getByText(descricaoProcesso)).toBeVisible();
     await page.getByText(descricaoProcesso).click();
 
     // ADMIN sempre vê lista de unidades participantes
     await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-    await page.getByRole('row', {name: new RegExp(siglaUnidade, 'i')}).click();
+    
+    // Clicar na linha da unidade. Usamos locator + filter para maior robustez.
+    // O texto da célula começa com a Sigla, mas pode ter traço e nome.
+    // Exemplo: "SECAO_121 - Seção 121"
+    // Regex: Começa com a sigla, seguida de espaço/traço ou fim de string.
+    await page.locator('tr').filter({hasText: new RegExp(`^\\s*${siglaUnidade}(?:\\s+-\\s+|\\b)`, 'i')}).first().click();
 
     // Aguardar navegação para a página do subprocesso
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/\w+$`));

@@ -129,7 +129,7 @@ describe("useAtividadesStore", () => {
             expect(atividadeService.criarConhecimento).toHaveBeenCalledWith(1, {
                 descricao: "Novo Conhecimento",
             });
-            expect(context.store.atividadesPorSubprocesso.get(1)[0].conhecimentos).toEqual([
+            expect(context.store.atividadesPorSubprocesso.get(1)![0].conhecimentos).toEqual([
                 novoConhecimento,
             ]);
         });
@@ -171,7 +171,7 @@ describe("useAtividadesStore", () => {
             await context.store.removerConhecimento(1, 1, 1);
 
             expect(atividadeService.excluirConhecimento).toHaveBeenCalledWith(1, 1);
-            expect(context.store.atividadesPorSubprocesso.get(1)[0].conhecimentos).toEqual(
+            expect(context.store.atividadesPorSubprocesso.get(1)![0].conhecimentos).toEqual(
                 [],
             );
         });
@@ -287,7 +287,7 @@ describe("useAtividadesStore", () => {
                 1,
                 conhecimentoAtualizado,
             );
-            expect(context.store.atividadesPorSubprocesso.get(1)[0].conhecimentos).toEqual([
+            expect(context.store.atividadesPorSubprocesso.get(1)![0].conhecimentos).toEqual([
                 conhecimentoAtualizado,
             ]);
         });

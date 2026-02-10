@@ -25,7 +25,6 @@ import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -102,19 +101,19 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         processoRaiz = ProcessoFixture.processoEmAndamento();
         processoRaiz.setCodigo(null);
         processoRaiz.setDescricao("Processo Raiz");
-        processoRaiz.getParticipantes().add(unidadeRaiz);
+        processoRaiz.adicionarParticipantes(Set.of(unidadeRaiz));
         processoRaiz = processoRepo.save(processoRaiz);
 
         processoFilha1 = ProcessoFixture.processoEmAndamento();
         processoFilha1.setCodigo(null);
         processoFilha1.setDescricao("Processo Filha 1");
-        processoFilha1.getParticipantes().add(unidadeFilha1);
+        processoFilha1.adicionarParticipantes(Set.of(unidadeFilha1));
         processoFilha1 = processoRepo.save(processoFilha1);
 
         Processo processoCriado = ProcessoFixture.processoPadrao(); // Status CRIADO
         processoCriado.setCodigo(null);
         processoCriado.setDescricao("Processo Criado Teste");
-        processoCriado.getParticipantes().add(unidadeRaiz);
+        processoCriado.adicionarParticipantes(Set.of(unidadeRaiz));
         processoRepo.save(processoCriado);
 
         // Flush para garantir persistência antes dos testes
@@ -140,15 +139,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             }
             return newUser;
         });
-
-        Set<UsuarioPerfil> perfisSet = new HashSet<>();
-        for (String perfilStr : perfis) {
-            perfisSet.add(UsuarioPerfil.builder()
-                    .usuario(usuario)
-                    .unidade(unidade)
-                    .perfil(Perfil.valueOf(perfilStr))
-                    .build());
-        }
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario, null,
                 usuario.getAuthorities());
@@ -218,7 +208,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             Processo processoCriadoFilha = ProcessoFixture.processoPadrao();
             processoCriadoFilha.setCodigo(null);
             processoCriadoFilha.setDescricao("Processo Criado Filha");
-            processoCriadoFilha.getParticipantes().add(unidadeFilha1);
+            processoCriadoFilha.adicionarParticipantes(Set.of(unidadeFilha1));
             processoRepo.saveAndFlush(processoCriadoFilha);
 
             mockMvc.perform(

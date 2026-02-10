@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,7 +43,7 @@ class AlertaServiceTest {
 
         Alerta resultado = alertaService.salvar(alerta);
 
-        assertNotNull(resultado);
+        assertThat(resultado).isNotNull();
         verify(alertaRepo).save(alerta);
     }
 
@@ -56,8 +56,8 @@ class AlertaServiceTest {
 
         List<Alerta> resultado = alertaService.buscarPorUnidadeDestino(codigoUnidade);
 
-        assertFalse(resultado.isEmpty());
-        assertEquals(1, resultado.size());
+        assertThat(resultado).isNotEmpty();
+        assertThat(resultado).hasSize(1);
         verify(alertaRepo).findByUnidadeDestino_Codigo(codigoUnidade);
     }
 
@@ -71,8 +71,8 @@ class AlertaServiceTest {
 
         Page<Alerta> resultado = alertaService.buscarPorUnidadeDestino(codigoUnidade, pageable);
 
-        assertNotNull(resultado);
-        assertEquals(1, resultado.getContent().size());
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.getContent()).hasSize(1);
         verify(alertaRepo).findByUnidadeDestino_Codigo(codigoUnidade, pageable);
     }
 
@@ -85,7 +85,7 @@ class AlertaServiceTest {
 
         Optional<Alerta> resultado = alertaService.buscarPorCodigo(codigo);
 
-        assertTrue(resultado.isPresent());
+        assertThat(resultado).isPresent();
         verify(alertaRepo).findById(codigo);
     }
 
@@ -98,7 +98,7 @@ class AlertaServiceTest {
 
         Optional<AlertaUsuario> resultado = alertaService.buscarAlertaUsuario(chave);
 
-        assertTrue(resultado.isPresent());
+        assertThat(resultado).isPresent();
         verify(alertaUsuarioRepo).findById(chave);
     }
 
@@ -110,7 +110,7 @@ class AlertaServiceTest {
 
         AlertaUsuario resultado = alertaService.salvarAlertaUsuario(alertaUsuario);
 
-        assertNotNull(resultado);
+        assertThat(resultado).isNotNull();
         verify(alertaUsuarioRepo).save(alertaUsuario);
     }
 
@@ -124,7 +124,7 @@ class AlertaServiceTest {
 
         List<AlertaUsuario> resultado = alertaService.buscarPorUsuarioEAlertas(usuario, codigos);
 
-        assertFalse(resultado.isEmpty());
+        assertThat(resultado).isNotEmpty();
         verify(alertaUsuarioRepo).findByUsuarioAndAlertas(usuario, codigos);
     }
 
@@ -141,7 +141,7 @@ class AlertaServiceTest {
 
         Optional<LocalDateTime> resultado = alertaService.obterDataHoraLeitura(codigoAlerta, usuario);
 
-        assertTrue(resultado.isPresent());
-        assertEquals(now, resultado.get());
+        assertThat(resultado).isPresent();
+        assertThat(resultado.get()).isEqualTo(now);
     }
 }

@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.util.FormatadorData;
-import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.mapper.ProcessoDetalheMapper;
 import sgc.processo.model.Processo;
+import sgc.processo.model.UnidadeProcesso;
 import sgc.seguranca.acesso.Acao;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
@@ -51,8 +51,6 @@ public class ProcessoDetalheBuilder {
         return dto;
     }
 
-
-
     private void montarHierarquiaUnidades(
             ProcessoDetalheDto dto, Processo processo, List<Subprocesso> subprocessos) {
         Map<Long, ProcessoDetalheDto.UnidadeParticipanteDto> mapaUnidades = new HashMap<>();
@@ -63,13 +61,13 @@ public class ProcessoDetalheBuilder {
             mapaSubprocessos.put(sp.getUnidade().getCodigo(), sp);
         }
 
-        // Loop 1 consolidado: Mapear participantes E preencher dados dos subprocessos
-        for (Unidade participante : processo.getParticipantes()) {
+        // Loop 1 consolidado: Mapear participantes (snapshots) E preencher dados dos subprocessos
+        for (UnidadeProcesso participante : processo.getParticipantes()) {
             ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto =
-                    processoDetalheMapper.toUnidadeParticipanteDto(participante);
+                    processoDetalheMapper.fromSnapshot(participante);
             
             // Preencher dados do subprocesso se existir
-            Subprocesso sp = mapaSubprocessos.get(participante.getCodigo());
+            Subprocesso sp = mapaSubprocessos.get(participante.getUnidadeCodigo());
             if (sp != null) {
                 unidadeDto.setSituacaoSubprocesso(sp.getSituacao());
                 unidadeDto.setDataLimite(sp.getDataLimiteEtapa1());
@@ -82,7 +80,7 @@ public class ProcessoDetalheBuilder {
                 unidadeDto.setSituacaoLabel(sp.getSituacao().getDescricao());
             }
             
-            mapaUnidades.put(participante.getCodigo(), unidadeDto);
+            mapaUnidades.put(participante.getUnidadeCodigo(), unidadeDto);
         }
 
         // Loop 2 consolidado: Montar hierarquia E adicionar raízes

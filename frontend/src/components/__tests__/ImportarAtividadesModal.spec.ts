@@ -69,8 +69,8 @@ describe("ImportarAtividadesModal", () => {
 
         // Mock getter that was converted from computed property
         const atividadesStore = useAtividadesStore();
-        atividadesStore.obterAtividadesPorSubprocesso = vi.fn((id: number) => {
-            return mapAtividades.get(id) || [];
+        atividadesStore.obterAtividadesPorSubprocesso = vi.fn((codigo: number) => {
+            return mapAtividades.get(codigo) || [];
         });
     });
 

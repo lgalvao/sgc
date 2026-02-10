@@ -19,6 +19,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Mapper(componentModel = "spring", uses = MovimentacaoMapper.class)
 public interface SubprocessoDetalheMapper {
+    @Mapping(target = "codigo", source = "sp.codigo")
     @Mapping(target = "unidade", source = "sp.unidade")
     @Mapping(target = "titular", expression = "java(mapTitular(sp, titular, responsavel))")
     @Mapping(target = "responsavel", expression = "java(mapResponsavel(sp, responsavel))")
@@ -44,7 +45,7 @@ public interface SubprocessoDetalheMapper {
     UnidadeDetalheDto toUnidadeDto(@Nullable Unidade unidade);
 
     default @Nullable ResponsavelDetalheDto mapResponsavel(@Nullable Subprocesso sp, @Nullable Usuario responsavel) {
-        if (responsavel == null || sp == null || sp.getUnidade() == null) return null;
+        if (responsavel == null || sp == null) return null;
 
         String tituloTitular = sp.getUnidade().getTituloTitular();
         String tipo = "Substituição";

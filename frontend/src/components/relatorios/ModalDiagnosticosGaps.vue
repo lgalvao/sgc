@@ -33,7 +33,7 @@
         <tbody>
         <tr
             v-for="diagnostico in diagnosticos"
-            :key="diagnostico.id"
+            :key="diagnostico.codigo"
         >
           <td>{{ diagnostico.processo }}</td>
           <td>{{ diagnostico.unidade }}</td>
@@ -65,7 +65,7 @@ import {downloadCSV, gerarCSV} from "@/utils/csv";
 import {formatDateBR} from "@/utils";
 
 interface Diagnostico {
-  id: number;
+  codigo: number;
   processo: string;
   unidade: string;
   gaps: number;

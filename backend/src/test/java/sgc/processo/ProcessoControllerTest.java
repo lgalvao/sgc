@@ -19,11 +19,13 @@ import sgc.processo.dto.*;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.processo.model.AcaoProcesso;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.dto.SubprocessoDto;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -734,5 +736,66 @@ class ProcessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.codigo").value(1L));
         }
+    @org.junit.jupiter.api.Nested
+    @DisplayName("Cobertura Extra")
+    class CoberturaExtra {
+        
+        // Usar mocks manuais para testes isolados
+        private ProcessoController controller;
+        private ProcessoFacade processoFacadeMock;
+
+        @BeforeEach
+        void setUp() {
+            processoFacadeMock = mock(ProcessoFacade.class);
+            controller = new ProcessoController(processoFacadeMock);
+        }
+
+        @Test
+        @DisplayName("Deve retornar bad request quando processador for nulo no início")
+        void deveRetornarBadRequestQuandoProcessadorNulo() {
+            IniciarProcessoRequest req = new IniciarProcessoRequest(null, List.of());
+            
+                        org.springframework.http.ResponseEntity<Object> response = controller.iniciar(1L, req);
+                        assertEquals(org.springframework.http.HttpStatus.BAD_REQUEST, response.getStatusCode());
+                    }
+            
+                    @Test
+                    @DisplayName("Deve retornar bad request quando tipo de processo é desconhecido")
+                    void deveRetornarBadRequestQuandoTipoDesconhecido() {
+                       
+                       // Vamos usar Spy no controller para mockar o Map retornado por getProcessadoresInicio
+                        ProcessoController spyController = spy(controller);
+                        doReturn(Collections.emptyMap()).when(spyController).getProcessadoresInicio();
+                        
+                        IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of());
+                        org.springframework.http.ResponseEntity<Object> response = spyController.iniciar(1L, req);
+                        
+                        assertEquals(org.springframework.http.HttpStatus.BAD_REQUEST, response.getStatusCode());
+                    }
+            
+                    @Test
+                    @DisplayName("Deve retornar bad request quando iniciar processo retorna lista de erros")
+            
+        void deveRetornarBadRequestQuandoIniciarProcessoRetornaErros() {
+            IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
+            when(processoFacadeMock.iniciarProcessoMapeamento(anyLong(), anyList()))
+                .thenReturn(List.of("erro"));
+
+            org.springframework.http.ResponseEntity<Object> response = controller.iniciar(1L, req);
+            assertEquals(org.springframework.http.HttpStatus.BAD_REQUEST, response.getStatusCode());
+        }
+
+        @Test
+        @DisplayName("executarAcaoEmBloco chama facade e retorna 200")
+        void executarAcaoEmBloco_Sucesso() {
+            Long codigo = 1L;
+            AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(10L), AcaoProcesso.ACEITAR, java.time.LocalDate.now());
+
+            org.springframework.http.ResponseEntity<Void> response = controller.executarAcaoEmBloco(codigo, req);
+
+            verify(processoFacadeMock).executarAcaoEmBloco(codigo, req);
+            assertEquals(200, response.getStatusCode().value());
+        }
     }
+}
 }

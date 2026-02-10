@@ -140,17 +140,22 @@ public class ProcessoFacade {
 
     @Transactional
     public List<String> iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
-        return processoInicializador.iniciar(codigo, codsUnidades);
+        return iniciarProcesso(codigo, codsUnidades);
     }
 
     @Transactional
     public List<String> iniciarProcessoRevisao(Long codigo, List<Long> codigosUnidades) {
-        return processoInicializador.iniciar(codigo, codigosUnidades);
+        return iniciarProcesso(codigo, codigosUnidades);
     }
 
     @Transactional
     public List<String> iniciarProcessoDiagnostico(Long codigo, List<Long> codsUnidades) {
-        return processoInicializador.iniciar(codigo, codsUnidades);
+        return iniciarProcesso(codigo, codsUnidades);
+    }
+
+    private List<String> iniciarProcesso(Long codigo, List<Long> codsUnidades) {
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        return processoInicializador.iniciar(codigo, codsUnidades, usuario);
     }
 
     @Transactional
@@ -164,7 +169,7 @@ public class ProcessoFacade {
         Unidade unidade = unidadeService.buscarEntidadePorId(unidadeCodigo);
 
         // Verifica se unidade participa do processo
-        if (processo.getParticipantes().stream().noneMatch(u -> u.getCodigo().equals(unidadeCodigo))) {
+        if (processo.getParticipantes().stream().noneMatch(u -> u.getUnidadeCodigo().equals(unidadeCodigo))) {
             throw new ErroProcesso("Unidade não participa deste processo.");
         }
 

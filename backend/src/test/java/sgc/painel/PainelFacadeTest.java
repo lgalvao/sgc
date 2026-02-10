@@ -183,6 +183,73 @@ class PainelFacadeTest {
         verify(processoFacade).listarTodos(Pageable.unpaged());
     }
 
+    @Test
+    @DisplayName("Deve cobrir merge function do toMap com participantes duplicados")
+    void deveCobrirMergeFunctionComParticipantesDuplicados() {
+        // Arrange
+        Processo p = mock(Processo.class);
+        when(p.getCodigo()).thenReturn(1L);
+        when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
+        when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+        
+        sgc.processo.model.UnidadeProcesso up1 = mock(sgc.processo.model.UnidadeProcesso.class);
+        when(up1.getUnidadeCodigo()).thenReturn(10L);
+        when(up1.getSigla()).thenReturn("U1");
+        
+        sgc.processo.model.UnidadeProcesso up2 = mock(sgc.processo.model.UnidadeProcesso.class);
+        when(up2.getUnidadeCodigo()).thenReturn(10L); // Mesmo código
+
+        // Retorna lista com duplicados
+        when(p.getParticipantes()).thenReturn(List.of(up1, up2));
+
+        when(unidadeFacade.buscarMapaHierarquia()).thenReturn(new HashMap<>());
+        when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+
+        // Act
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
+
+        // Assert
+        assertThat(result.getContent().get(0).unidadesParticipantes()).contains("U1");
+    }
+
+    @Test
+    @DisplayName("Deve cobrir lógica de hierarquia visível profunda")
+    void deveCobrirLogicaHierarquiaVisivelProfunda() {
+        // Arrange
+        Processo p = mock(Processo.class);
+        when(p.getCodigo()).thenReturn(1L);
+        when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
+        when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+
+        // U1 (Pai) -> U2 (Filho)
+        sgc.processo.model.UnidadeProcesso up1 = mock(sgc.processo.model.UnidadeProcesso.class);
+        when(up1.getUnidadeCodigo()).thenReturn(1L);
+        when(up1.getSigla()).thenReturn("U1");
+        when(up1.getUnidadeSuperiorCodigo()).thenReturn(null);
+
+        sgc.processo.model.UnidadeProcesso up2 = mock(sgc.processo.model.UnidadeProcesso.class);
+        when(up2.getUnidadeCodigo()).thenReturn(2L);
+        when(up2.getUnidadeSuperiorCodigo()).thenReturn(1L);
+
+        when(p.getParticipantes()).thenReturn(List.of(up1, up2));
+
+        Map<Long, List<Long>> hierarquia = new HashMap<>();
+        hierarquia.put(1L, List.of(2L)); // U1 tem U2 como filho
+        hierarquia.put(2L, new ArrayList<>());
+
+        when(unidadeFacade.buscarMapaHierarquia()).thenReturn(hierarquia);
+        when(unidadeFacade.buscarIdsDescendentes(eq(1L), anyMap())).thenReturn(List.of(2L));
+        when(unidadeFacade.buscarIdsDescendentes(eq(2L), anyMap())).thenReturn(new ArrayList<>());
+        when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+
+        // Act
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
+
+        // Assert
+        // Se U2 participa e U1 participa, e U2 é única subordinada de U1, deve mostrar apenas U1
+        assertThat(result.getContent().get(0).unidadesParticipantes()).isEqualTo("U1");
+    }
+
     private Processo criarProcesso(Long codigo, SituacaoProcesso situacao) {
         Processo p = new Processo();
         p.setCodigo(codigo);
@@ -193,7 +260,7 @@ class PainelFacadeTest {
         u.setCodigo(10L);
         u.setNome("Unit");
         u.setSigla("U");
-        p.setParticipantes(new HashSet<>(Set.of(u)));
+        p.adicionarParticipantes(Set.of(u));
         return p;
     }
 }

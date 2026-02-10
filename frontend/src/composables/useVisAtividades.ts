@@ -20,6 +20,7 @@ import {
     SituacaoSubprocesso,
     TipoProcesso,
     type Unidade,
+    type UnidadeParticipante,
 } from "@/types/tipos";
 
 type Analise = AnaliseCadastro | AnaliseValidacao;
@@ -109,7 +110,19 @@ export function useVisAtividades(props: { codProcesso: number | string; sigla: s
 
     const subprocesso = computed(() => {
         if (!processosStore.processoDetalhe) return null;
-        return processosStore.processoDetalhe.unidades.find((u) => u.sigla === unidadeId.value);
+        
+        function encontrarUnidade(unidades: UnidadeParticipante[]): UnidadeParticipante | undefined {
+            for (const u of unidades) {
+                if (u.sigla === unidadeId.value) return u;
+                if (u.filhos && u.filhos.length > 0) {
+                    const encontrada = encontrarUnidade(u.filhos);
+                    if (encontrada) return encontrada;
+                }
+            }
+            return undefined;
+        }
+
+        return encontrarUnidade(processosStore.processoDetalhe.unidades);
     });
 
     const isHomologacao = computed(() => {

@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
+import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UnidadeMapaRepo;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
@@ -61,7 +62,8 @@ class ProcessoInicializadorTest {
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
         List<Long> unidades = List.of();
-        assertThatThrownBy(() -> inicializador.iniciar(1L, unidades))
+        Usuario usuario = new Usuario();
+        assertThatThrownBy(() -> inicializador.iniciar(1L, unidades, usuario))
                 .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
     }
 
@@ -74,7 +76,8 @@ class ProcessoInicializadorTest {
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
         List<Long> unidades = Collections.emptyList();
-        assertThatThrownBy(() -> inicializador.iniciar(1L, unidades))
+        Usuario usuario = new Usuario();
+        assertThatThrownBy(() -> inicializador.iniciar(1L, unidades, usuario))
                 .isInstanceOf(ErroUnidadesNaoDefinidas.class);
     }
 
@@ -84,10 +87,11 @@ class ProcessoInicializadorTest {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
-        p.setParticipantes(Collections.emptySet());
+        p.setParticipantes(new java.util.ArrayList<>());
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
 
-        assertThatThrownBy(() -> inicializador.iniciar(1L, null))
+        Usuario usuario = new Usuario();
+        assertThatThrownBy(() -> inicializador.iniciar(1L, null, usuario))
                 .isInstanceOf(ErroUnidadesNaoDefinidas.class);
     }
 
@@ -99,15 +103,20 @@ class ProcessoInicializadorTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        p.setParticipantes(Set.of(u));
+        p.adicionarParticipantes(Set.of(u));
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of());
 
-        List<String> erros = inicializador.iniciar(1L, null);
+        Unidade sedoc = new Unidade();
+        sedoc.setSigla("SEDOC");
+        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+
+        Usuario usuario = new Usuario();
+        List<String> erros = inicializador.iniciar(1L, null, usuario);
 
         assertThat(erros).isEmpty();
-        verify(subprocessoFacade).criarParaMapeamento(eq(p), any());
+        verify(subprocessoFacade).criarParaMapeamento(eq(p), any(), eq(sedoc), eq(usuario));
         verify(publicadorEventos).publishEvent(any(Object.class));
         assertThat(p.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
     }
@@ -123,7 +132,8 @@ class ProcessoInicializadorTest {
         when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.of("As seguintes unidades não possuem mapa vigente: U1"));
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of());
 
-        List<String> erros = inicializador.iniciar(1L, List.of(1L));
+        Usuario usuario = new Usuario();
+        List<String> erros = inicializador.iniciar(1L, List.of(1L), usuario);
 
         assertThat(erros).isNotEmpty();
         assertThat(erros.getFirst()).contains("não possuem mapa vigente");
@@ -137,13 +147,14 @@ class ProcessoInicializadorTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        p.setParticipantes(Set.of(u));
+        p.adicionarParticipantes(Set.of(u));
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of(1L));
         when(unidadeRepo.findSiglasByCodigos(any())).thenReturn(List.of("U1"));
 
-        List<String> erros = inicializador.iniciar(1L, null);
+        Usuario usuario = new Usuario();
+        List<String> erros = inicializador.iniciar(1L, null, usuario);
 
         assertThat(erros).isNotEmpty();
         assertThat(erros.getFirst()).contains("já participam de outro processo");
@@ -167,10 +178,15 @@ class ProcessoInicializadorTest {
         u.setCodigo(1L);
         when(unidadeRepo.findAllById(anyList())).thenReturn(List.of(u));
 
-        List<String> erros = inicializador.iniciar(1L, List.of(1L));
+        Unidade sedoc = new Unidade();
+        sedoc.setSigla("SEDOC");
+        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+
+        Usuario usuario = new Usuario();
+        List<String> erros = inicializador.iniciar(1L, List.of(1L), usuario);
 
         assertThat(erros).isEmpty();
-        verify(subprocessoFacade).criarParaRevisao(eq(p), any(), any());
+        verify(subprocessoFacade).criarParaRevisao(eq(p), any(), any(), eq(sedoc), eq(usuario));
     }
 
     @Test
@@ -181,7 +197,7 @@ class ProcessoInicializadorTest {
         p.setTipo(TipoProcesso.DIAGNOSTICO);
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        p.setParticipantes(Set.of(u));
+        p.adicionarParticipantes(Set.of(u));
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
@@ -189,11 +205,17 @@ class ProcessoInicializadorTest {
         UnidadeMapa um = new UnidadeMapa();
         um.setUnidadeCodigo(1L);
         when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of(um));
+        when(unidadeRepo.findAllById(anyList())).thenReturn(List.of(u));
 
-        List<String> erros = inicializador.iniciar(1L, null);
+        Unidade sedoc = new Unidade();
+        sedoc.setSigla("SEDOC");
+        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+
+        Usuario usuario = new Usuario();
+        List<String> erros = inicializador.iniciar(1L, null, usuario);
 
         assertThat(erros).isEmpty();
-        verify(subprocessoFacade).criarParaDiagnostico(eq(p), any(), any());
+        verify(subprocessoFacade).criarParaDiagnostico(eq(p), any(), any(), eq(sedoc), eq(usuario));
     }
 
     @Test
@@ -210,8 +232,13 @@ class ProcessoInicializadorTest {
         when(unidadeMapaRepo.findAllById(any())).thenReturn(List.of(um));
         when(unidadeRepo.findAllById(any())).thenReturn(List.of()); // Retorna vazio
 
+        Unidade sedoc = new Unidade();
+        sedoc.setSigla("SEDOC");
+        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+
         List<Long> unidades = List.of(99L);
-        assertThatThrownBy(() -> inicializador.iniciar(1L, unidades))
+        Usuario usuario = new Usuario();
+        assertThatThrownBy(() -> inicializador.iniciar(1L, unidades, usuario))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

@@ -10,8 +10,9 @@ Este documento serve como índice centralizado de toda a documentação técnica
 
 1. **[README.md](README.md)** - Visão geral, stack tecnológico e como executar
 2. **[AGENTS.md](AGENTS.md)** - ⭐ **LEITURA OBRIGATÓRIA**: Convenções, padrões e regras fundamentais
-3. **[backend/README.md](backend/README.md)** - Arquitetura detalhada do backend
-4. **[frontend/README.md](frontend/README.md)** - Arquitetura detalhada do frontend
+3. **[STATUS.md](STATUS.md)** - 📊 Status atual de implementação e trabalho em andamento
+4. **[backend/README.md](backend/README.md)** - Arquitetura detalhada do backend
+5. **[frontend/README.md](frontend/README.md)** - Arquitetura detalhada do frontend
 
 ---
 
@@ -28,6 +29,17 @@ Este documento serve como índice centralizado de toda a documentação técnica
 | [ADR-005](backend/etc/docs/adr/ADR-005-controller-organization.md)        | Controller Organization        | ✅ Implementado |
 | [ADR-006](backend/etc/docs/adr/ADR-006-domain-aggregates-organization.md) | Domain Aggregates Organization | ✅ Aceito       |
 | [ADR-007](backend/etc/docs/adr/ADR-007-circular-dependency-resolution.md) | Circular Dependency Resolution | ✅ Implementado |
+
+---
+
+### 📊 Gerenciamento de Projeto
+
+| Documento                                           | Descrição                                      |
+|-----------------------------------------------------|------------------------------------------------|
+| **[STATUS.md](STATUS.md)**                          | Status atual de implementação e rastreamento   |
+| **[test-organization-tracking.md](test-organization-tracking.md)** | Acompanhamento da reorganização de testes      |
+| **[test-organization-plan.md](test-organization-plan.md)**         | Plano de reorganização de testes               |
+| **[test-organization-report.md](test-organization-report.md)**     | Relatório da reorganização de testes           |
 
 ---
 

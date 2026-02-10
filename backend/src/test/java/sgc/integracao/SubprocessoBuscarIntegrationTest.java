@@ -53,7 +53,7 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))
                 .build();
-        processoEmAndamento.setParticipantes(Set.of(unidade));
+        processoEmAndamento.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processoEmAndamento);
 
         var mapaEmAndamento = mapaRepo.save(new Mapa());
@@ -73,7 +73,7 @@ class SubprocessoBuscarIntegrationTest extends BaseIntegrationTest {
                 .situacao(SituacaoProcesso.FINALIZADO)
                 .dataLimite(LocalDateTime.now().plusDays(30))
                 .build();
-        processoFinalizado.setParticipantes(Set.of(unidade));
+        processoFinalizado.adicionarParticipantes(Set.of(unidade));
         processoFinalizado.setDataFinalizacao(LocalDateTime.now());
         processoRepo.save(processoFinalizado);
 

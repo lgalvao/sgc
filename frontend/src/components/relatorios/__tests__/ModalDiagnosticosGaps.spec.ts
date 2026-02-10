@@ -13,7 +13,7 @@ vi.mock('@/utils/csv', () => ({
 describe('ModalDiagnosticosGaps.vue', () => {
   const mockDiagnosticos = [
     {
-      id: 1,
+      codigo: 1,
       processo: 'Processo A',
       unidade: 'Unidade X',
       gaps: 2,
@@ -24,7 +24,7 @@ describe('ModalDiagnosticosGaps.vue', () => {
       status: 'Finalizado',
     },
     {
-      id: 2,
+      codigo: 2,
       processo: 'Processo B',
       unidade: 'Unidade Y',
       gaps: 5,
@@ -35,7 +35,7 @@ describe('ModalDiagnosticosGaps.vue', () => {
       status: 'Em análise',
     },
     {
-      id: 3,
+      codigo: 3,
       processo: 'Processo C',
       unidade: 'Unidade Z',
       gaps: 0,
@@ -46,7 +46,7 @@ describe('ModalDiagnosticosGaps.vue', () => {
       status: 'Pendente',
     },
      {
-      id: 4,
+      codigo: 4,
       processo: 'Processo D',
       unidade: 'Unidade W',
       gaps: 1,

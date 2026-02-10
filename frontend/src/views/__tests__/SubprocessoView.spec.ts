@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount, RouterLinkStub} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
-import SubprocessoView from '@/views/SubprocessoView.vue';
+import Subprocesso from '@/views/Subprocesso.vue';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useMapasStore} from '@/stores/mapas';
 import {useFeedbackStore} from '@/stores/feedback';
@@ -37,7 +37,7 @@ vi.mock('@/services/processoService', () => ({
   enviarLembrete: vi.fn(),
 }));
 
-describe('SubprocessoView.vue', () => {
+describe('Subprocesso.vue', () => {
   const mockSubprocesso = {
     codigo: 10,
     situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
@@ -168,7 +168,7 @@ describe('SubprocessoView.vue', () => {
       }
     });
 
-    const wrapper = mount(SubprocessoView, {
+    const wrapper = mount(Subprocesso, {
       global: {
         plugins: [pinia],
         stubs: {

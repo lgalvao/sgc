@@ -16,6 +16,10 @@ declare global {
         pinia: ReturnType<typeof createPinia>;
         __pinia__: ReturnType<typeof createPinia>;
     }
+
+    var pinia: ReturnType<typeof createPinia>;
+
+    var __pinia__: ReturnType<typeof createPinia>;
 }
 
 const app = createApp(App);

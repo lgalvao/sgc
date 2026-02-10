@@ -48,6 +48,7 @@ public class E2eController {
     private final UnidadeFacade unidadeFacade;
     private final ResourceLoader resourceLoader;
 
+
     @PostMapping("/reset-database")
     public void resetDatabase() {
         log.info("Iniciando reset do banco de dados para E2E...");
@@ -175,7 +176,7 @@ public class E2eController {
      */
     private <T> T executeAsAdmin(Supplier<T> operation) {
         var auth = new UsernamePasswordAuthenticationToken(
-                "e2e-admin",
+                "111111",
                 null,
                 List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
 
@@ -199,9 +200,6 @@ public class E2eController {
 
         // Buscar unidade pela sigla
         UnidadeDto unidade = unidadeFacade.buscarPorSigla(request.unidadeSigla());
-        if (unidade == null) {
-            throw new ErroEntidadeNaoEncontrada("Unidade", request.unidadeSigla());
-        }
 
         // Calcular data limite
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
@@ -246,13 +244,8 @@ public class E2eController {
             }
 
             // Recarregar processo após iniciar
-            processo =
-                    processoFacade
-                            .obterPorId(processoCodigo)
-                            .orElseThrow(
-                                    () ->
-                                            new ErroEntidadeNaoEncontrada(
-                                                    "Processo", processoCodigo));
+            processo = processoFacade.obterPorId(processoCodigo)
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", processoCodigo));
         }
 
         return processo;

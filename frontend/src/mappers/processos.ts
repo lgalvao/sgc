@@ -6,7 +6,7 @@ export function mapUnidadeParticipanteDtoToFrontend(
 ): UnidadeParticipante {
     return {
         ...dto,
-        codUnidade: dto.codigo,
+        codUnidade: dto.codUnidade,
         codSubprocesso: dto.codSubprocesso || 0,
         situacaoSubprocesso: (dto.situacaoSubprocesso as any) || 'NAO_INICIADO',
         dataLimite: dto.dataLimite || '',

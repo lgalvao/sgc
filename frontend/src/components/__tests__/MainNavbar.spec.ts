@@ -45,7 +45,7 @@ describe("MainNavbar.vue", () => {
     });
 
     const checkLink = (text: string, to: string) => {
-         const links = ctx.wrapper.findAllComponents(RouterLinkStub);
+         const links = ctx.wrapper!.findAllComponents(RouterLinkStub);
          const link = links.find(w => w.text().includes(text));
          expect(link?.exists()).toBe(true);
          expect(link?.props().to).toBe(to);
@@ -62,8 +62,8 @@ describe("MainNavbar.vue", () => {
         ctx.wrapper = mount(NavBar, options);
 
         checkLink("Painel", "/painel");
-        // ADMIN vê "Unidades" apontando para unidade raiz (código 1)
-        checkLink("Unidades", "/unidade/1");
+        // ADMIN vê "Unidades" apontando para a lista/árvore de unidades
+        checkLink("Unidades", "/unidades");
         checkLink("Relatórios", "/relatorios");
         checkLink("Histórico", "/historico");
     });

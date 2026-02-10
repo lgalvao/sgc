@@ -59,7 +59,8 @@ export interface AlertaDto {
 }
 
 export interface UnidadeParticipanteDto {
-    codigo: number;
+    codUnidade: number;
+    codUnidadeSuperior?: number;
     sigla?: string;
     nome?: string;
     codSubprocesso?: number;

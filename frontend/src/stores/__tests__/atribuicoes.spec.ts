@@ -9,7 +9,7 @@ import {logger} from "@/utils";
 // Define mock data shape that matches what the service returns
 const serviceMockData = [
     {
-        id: 1,
+        codigo: 1,
         unidade: { codigo: 1, nome: "A", sigla: "A" },
         usuario: {
             codigo: 1,
@@ -22,7 +22,7 @@ const serviceMockData = [
         justificativa: "J1",
     },
     {
-        id: 2,
+        codigo: 2,
         unidade: { codigo: 2, nome: "B", sigla: "B" },
         servidor: { // Different field name to test 'usuario || servidor' logic
             codigo: 2,

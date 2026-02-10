@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PersistenceUnitSettings">
+    <persistence-units>
+      <persistence-unit moduleName="sgc.backend.main" name="sgc.backend.main" framework="JPA" ormUnit="sgc.backend.main:sgc.backend.main" defaultDataSourceId="b04cb0c3-0d07-4ce6-8b9e-dc527916a937" />
+    </persistence-units>
+  </component>
+</project>

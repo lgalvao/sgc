@@ -105,10 +105,10 @@ describe('Subprocessos Store', () => {
         processoDetalhe: { codigo: 999 },
     };
     const mockPerfilStore = {
-        perfilSelecionado: null,
-        unidadeSelecionada: null,
-        perfisUnidades: [],
-        unidadeAtual: null,
+        perfilSelecionado: null as string | null,
+        unidadeSelecionada: null as number | null,
+        perfisUnidades: [] as any[],
+        unidadeAtual: null as number | null,
     };
     const mockUnidadesStore = {
         unidade: null,
@@ -464,7 +464,7 @@ describe('Subprocessos Store', () => {
 
     describe('buscarPermissoes', () => {
         it('deve buscar e atualizar permissões se o ID coincidir', async () => {
-            store.subprocessoDetalhe = { unidade: { codigo: 10 }, permissoes: null } as any;
+            store.subprocessoDetalhe = { codigo: 10, unidade: { codigo: 10 }, permissoes: null } as any;
             (obterPermissoes as any).mockResolvedValue({ podeEditar: true });
 
             await store.buscarPermissoes(10);
@@ -474,7 +474,7 @@ describe('Subprocessos Store', () => {
         });
 
         it('deve buscar mas NÃO atualizar permissões se o ID não coincidir', async () => {
-            store.subprocessoDetalhe = { unidade: { codigo: 10 }, permissoes: null } as any;
+            store.subprocessoDetalhe = { codigo: 10, unidade: { codigo: 10 }, permissoes: null } as any;
             (obterPermissoes as any).mockResolvedValue({ podeEditar: true });
 
             await store.buscarPermissoes(20);

@@ -86,12 +86,12 @@ onMounted(() => window.addEventListener('resize', updateWidth));
 onUnmounted(() => window.removeEventListener('resize', updateWidth));
 const isMobile = computed(() => windowWidth.value < 992);
 
-// Para ADMIN: mostra "Unidades" e direciona para unidade raiz (código 1)
+// Para ADMIN: mostra "Unidades" e direciona para a árvore completa
 // Para outros perfis: mostra "Minha unidade" e direciona para unidade do usuário
 const isAdmin = computed(() => perfilStore.perfilSelecionado === 'ADMIN');
 const labelUnidade = computed(() => isAdmin.value ? 'Unidades' : 'Minha unidade');
 const iconUnidade = computed(() => isAdmin.value ? 'bi bi-diagram-3 me-1' : 'bi bi-person me-1');
-const linkUnidade = computed(() => isAdmin.value ? '/unidade/1' : `/unidade/${perfilStore.unidadeSelecionada}`);
+const linkUnidade = computed(() => isAdmin.value ? '/unidades' : `/unidade/${perfilStore.unidadeSelecionada}`);
 
 function setNavbarNavigation() {
   sessionStorage.setItem("cameFromNavbar", "1");

@@ -204,7 +204,7 @@ class AnaliseControllerTest {
                             post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content("{\"tituloUsuario\":\"123456789012\"}"))
+                                    .content("{\"tituloUsuario\":\"123456789012\", \"siglaUnidade\":\"SIGLA\"}"))
                     .andExpect(status().isCreated());
         }
 

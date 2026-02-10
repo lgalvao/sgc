@@ -8,7 +8,7 @@ import org.junit.jupiter.api.*;
 
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("unit")
 @DisplayName("Parametro Validation")
@@ -35,7 +35,7 @@ class ParametroValidationTest {
     void validarParametroValido() {
         Parametro p = Parametro.builder().chave("CHAVE").descricao("Descricao").valor("VALOR").build();
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
-        assertTrue(violations.isEmpty());
+        assertThat(violations).isEmpty();
     }
 
     @Test
@@ -43,9 +43,9 @@ class ParametroValidationTest {
     void validarChaveVazia() {
         Parametro p = Parametro.builder().chave("").descricao("Descricao").valor("VALOR").build();
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
-        assertFalse(violations.isEmpty());
-        assertEquals(1, violations.size());
-        assertEquals("A chave não pode estar vazia", violations.iterator().next().getMessage());
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).hasSize(1);
+        assertThat(violations.iterator().next().getMessage()).isEqualTo("A chave não pode estar vazia");
     }
 
     @Test
@@ -53,9 +53,9 @@ class ParametroValidationTest {
     void validarValorVazio() {
         Parametro p = Parametro.builder().chave("CHAVE").descricao("Descricao").valor("").build();
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
-        assertFalse(violations.isEmpty());
-        assertEquals(1, violations.size());
-        assertEquals("O valor não pode estar vazio", violations.iterator().next().getMessage());
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).hasSize(1);
+        assertThat(violations.iterator().next().getMessage()).isEqualTo("O valor não pode estar vazio");
     }
 
     @Test
@@ -64,8 +64,8 @@ class ParametroValidationTest {
         String chaveLonga = "A".repeat(51);
         Parametro p = Parametro.builder().chave(chaveLonga).descricao("Descricao").valor("VALOR").build();
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
-        assertFalse(violations.isEmpty());
-        assertEquals(1, violations.size());
-        assertEquals("A chave deve ter no máximo 50 caracteres", violations.iterator().next().getMessage());
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).hasSize(1);
+        assertThat(violations.iterator().next().getMessage()).isEqualTo("A chave deve ter no máximo 50 caracteres");
     }
 }

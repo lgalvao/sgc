@@ -24,7 +24,7 @@ describe('dateUtils', () => {
         });
 
         it('deve parsear número (timestamp)', () => {
-            const ts = 1704067200000; // 2024-01-01
+            const ts = 1704110400000; // 2024-01-01 12:00:00 UTC
             expect(parseDate(ts)?.getFullYear()).toBe(2024);
         });
 
@@ -40,7 +40,7 @@ describe('dateUtils', () => {
         });
 
         it('deve parsear string numérica longa', () => {
-            expect(parseDate('1704067200000')?.getFullYear()).toBe(2024);
+            expect(parseDate('1704110400000')?.getFullYear()).toBe(2024);
         });
 
         it('deve retornar null para string inválida', () => {

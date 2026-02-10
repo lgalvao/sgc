@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
-import ProcessoView from "@/views/ProcessoView.vue";
+import Processo from "@/views/Processo.vue";
 import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
@@ -115,7 +115,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
             options.shallow = true;
         }
 
-        return mount(ProcessoView, options);
+        return mount(Processo, options);
     };
 
     beforeEach(() => {

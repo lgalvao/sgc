@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest'
 import {mount} from '@vue/test-utils'
 import {createTestingPinia} from '@pinia/testing'
-import ConfiguracoesView from '@/views/ConfiguracoesView.vue'
+import Configuracoes from '@/views/Configuracoes.vue'
 import {useConfiguracoesStore} from '@/stores/configuracoes'
 
 // Mock dependencies
@@ -34,13 +34,13 @@ vi.mock('@/services/administradorService', () => ({
   removerAdministrador: vi.fn().mockResolvedValue({})
 }))
 
-describe('ConfiguracoesView.vue', () => {
+describe('Configuracoes.vue', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   it('renderiza corretamente e carrega dados', async () => {
-    const wrapper = mount(ConfiguracoesView, {
+    const wrapper = mount(Configuracoes, {
       global: {
         plugins: [createTestingPinia({
           createSpy: vi.fn,
@@ -67,7 +67,7 @@ describe('ConfiguracoesView.vue', () => {
   })
 
   it('atualiza valores do formulário da store', async () => {
-    const wrapper = mount(ConfiguracoesView, {
+    const wrapper = mount(Configuracoes, {
       global: {
         plugins: [createTestingPinia({
           createSpy: vi.fn,

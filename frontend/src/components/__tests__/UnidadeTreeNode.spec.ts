@@ -1,4 +1,4 @@
-import {mount} from "@vue/test-utils";
+import {mount, RouterLinkStub} from "@vue/test-utils";
 import {describe, expect, it, vi} from "vitest";
 import UnidadeTreeNode from "@/components/UnidadeTreeNode.vue";
 import type {Unidade} from "@/types/tipos";
@@ -42,7 +42,8 @@ describe("UnidadeTreeNode.vue", () => {
     const mountOptions = {
         global: {
             stubs: {
-                BFormCheckbox: BFormCheckboxStub
+                BFormCheckbox: BFormCheckboxStub,
+                RouterLink: RouterLinkStub
             }
         }
     };
@@ -192,5 +193,20 @@ describe("UnidadeTreeNode.vue", () => {
         // Check prop on stub
         expect(wrapper.findComponent(BFormCheckboxStub).props('disabled')).toBe(true);
         expect(wrapper.find('.unidade-label').classes()).toContain('text-muted');
+    });
+
+    it("deve renderizar link para unidade em modo navegação", () => {
+        const wrapper = mount(UnidadeTreeNode, {
+            props: {
+                ...defaultProps,
+                modoSelecao: false
+            },
+            ...mountOptions
+        });
+
+        const link = wrapper.findComponent(RouterLinkStub);
+        expect(link.exists()).toBe(true);
+        expect(link.props().to).toBe("/unidade/1");
+        expect(wrapper.findComponent(BFormCheckboxStub).exists()).toBe(false);
     });
 });

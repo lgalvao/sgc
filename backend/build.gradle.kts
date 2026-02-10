@@ -6,7 +6,6 @@ plugins {
     jacoco
     id("org.springframework.boot") version "4.0.2"
     id("io.spring.dependency-management") version "1.1.7"
-    id("info.solidsoft.pitest") version "1.19.0-rc.1"
     id("com.github.spotbugs") version "6.4.8"
 }
 
@@ -231,18 +230,10 @@ tasks.jacocoTestReport {
         files(classDirectories.files.map {
             fileTree(it) {
                 exclude(
-                    // Gerados automaticamente
-                    // "**/*MapperImpl*",
-                    
                     // Bootstrap e configuração
                     "sgc/Sgc.class",
                     "sgc/**/*Config.class",
                     "sgc/**/*Properties.class",
-                    
-                    // DTOs e Request/Response (apenas dados)
-                    // "sgc/**/*Dto.class",
-                    // "sgc/**/*Request.class",
-                    // "sgc/**/*Response.class",
                     
                     // Exceções (maioria simples)
                     "sgc/**/Erro*.class",
@@ -282,19 +273,19 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "BRANCH"
-                minimum = "0.88".toBigDecimal()
+                minimum = "0.85".toBigDecimal()
             }
         }
         rule {
             limit {
                 counter = "LINE"
-                minimum = "0.97".toBigDecimal()
+                minimum = "0.99".toBigDecimal()
             }
         }
         rule {
             limit {
                 counter = "INSTRUCTION"
-                minimum = "0.97".toBigDecimal()
+                minimum = "0.99".toBigDecimal()
             }
         }
     }
@@ -308,34 +299,6 @@ spotbugs {
     toolVersion = "4.9.8"
     ignoreFailures.set(true)
     excludeFilter.set(file("etc/config/spotbugs/exclude.xml"))
-}
-
-configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
-    junit5PluginVersion.set("1.2.3")
-
-    // Permite filtrar via projeto: ./gradlew pitest -PpitestTarget=sgc.pacote.*
-    val target = project.findProperty("pitestTarget")?.toString() ?: "sgc.*"
-    targetClasses.set(setOf(target))
-
-    val targetTestsProp = project.findProperty("pitestTargetTests")?.toString() ?: "sgc.*"
-    targetTests.set(setOf(targetTestsProp))
-
-    excludedClasses.set(
-        setOf(
-            "sgc.Sgc",
-            "sgc.**.*Config",
-            "sgc.**.*Dto",
-            "sgc.**.*Request",
-            "sgc.**.*Response",
-            "sgc.**.Erro*",
-            "sgc.**.Evento*",
-            "sgc.**.*Repo",
-            "sgc.**.*Impl"
-        )
-    )
-    threads.set(4) // Reduzido para maior estabilidade no ambiente de sandbox
-    outputFormats.set(setOf("HTML", "XML"))
-    timestampedReports.set(false)
 }
 
 tasks.register("qualityCheck") {

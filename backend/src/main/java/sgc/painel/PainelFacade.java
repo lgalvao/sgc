@@ -14,7 +14,6 @@ import sgc.alerta.model.Alerta;
 import sgc.comum.util.FormatadorData;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
@@ -118,12 +117,10 @@ public class PainelFacade {
     }
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade, Map<Long, List<Long>> mapaPaiFilhos) {
-        Set<Unidade> participantes = processo.getParticipantes();
+        var participantes = processo.getParticipantes();
+        var participante = participantes.iterator().next();
 
-        // As invariantes de BD e o @NullMarked garantem que participantes nunca é null e processos no painel têm ao menos um participante.
-        Unidade participante = participantes.iterator().next();
-
-        Long codUnidMapeado = participante.getCodigo();
+        Long codUnidMapeado = participante.getUnidadeCodigo();
         String nomeUnidMapeado = participante.getNome();
 
         String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
@@ -147,41 +144,47 @@ public class PainelFacade {
                 .build();
     }
 
-    private String formatarUnidadesParticipantes(Set<Unidade> participantes, Map<Long, List<Long>> mapaPaiFilhos) {
-        Map<Long, Unidade> participantesPorCodigo =
-                participantes.stream().collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
+    private String formatarUnidadesParticipantes(List<sgc.processo.model.UnidadeProcesso> participantes, Map<Long, List<Long>> mapaPaiFilhos) {
+        Map<Long, sgc.processo.model.UnidadeProcesso> participantesPorCodigo =
+                participantes.stream().collect(Collectors.toMap(
+                        sgc.processo.model.UnidadeProcesso::getUnidadeCodigo,
+                        up -> up,
+                        (existing, replacement) -> existing));
 
         Set<Long> participantesIds = participantesPorCodigo.keySet();
 
         Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds, participantesPorCodigo, mapaPaiFilhos);
         return unidadesVisiveis.stream()
                 .map(participantesPorCodigo::get)
-                .map(Unidade::getSigla)
+                .filter(Objects::nonNull)
+                .map(sgc.processo.model.UnidadeProcesso::getSigla)
+                .filter(Objects::nonNull)
                 .sorted()
                 .collect(Collectors.joining(", "));
     }
 
-    private Set<Long> selecionarIdsVisiveis(Set<Long> participantesIds, Map<Long, Unidade> participantesPorCodigo, Map<Long, List<Long>> mapaPaiFilhos) {
+    private Set<Long> selecionarIdsVisiveis(Set<Long> participantesIds, Map<Long, sgc.processo.model.UnidadeProcesso> participantesPorCodigo, Map<Long, List<Long>> mapaPaiFilhos) {
         Set<Long> visiveis = new LinkedHashSet<>();
         for (Long unidadeId : participantesIds) {
-            Unidade unidade = participantesPorCodigo.get(unidadeId);
-            Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds, mapaPaiFilhos);
+            sgc.processo.model.UnidadeProcesso unidade = participantesPorCodigo.get(unidadeId);
+            Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds, participantesPorCodigo, mapaPaiFilhos);
             visiveis.add(candidato);
         }
         return visiveis;
     }
 
-    private Long encontrarMaiorIdVisivel(Unidade unidade, Set<Long> participantesIds, Map<Long, List<Long>> mapaPaiFilhos) {
-        Unidade atual = unidade;
+    private Long encontrarMaiorIdVisivel(sgc.processo.model.UnidadeProcesso unidade, Set<Long> participantesIds, 
+            Map<Long, sgc.processo.model.UnidadeProcesso> participantesPorCodigo, Map<Long, List<Long>> mapaPaiFilhos) {
+        sgc.processo.model.UnidadeProcesso atual = unidade;
         while (true) {
-            if (!todasSubordinadasParticipam(atual.getCodigo(), participantesIds, mapaPaiFilhos)) {
-                return atual.getCodigo();
+            if (!todasSubordinadasParticipam(atual.getUnidadeCodigo(), participantesIds, mapaPaiFilhos)) {
+                return atual.getUnidadeCodigo();
             }
-            Unidade superior = atual.getUnidadeSuperior();
-            if (superior == null || !participantesIds.contains(superior.getCodigo())) {
-                return atual.getCodigo();
+            Long superiorCodigo = atual.getUnidadeSuperiorCodigo();
+            if (superiorCodigo == null || !participantesIds.contains(superiorCodigo)) {
+                return atual.getUnidadeCodigo();
             }
-            atual = superior;
+            atual = participantesPorCodigo.get(superiorCodigo);
         }
     }
 

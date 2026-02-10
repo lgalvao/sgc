@@ -23,18 +23,10 @@ import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
 import java.util.*;
 
 /**
- * Serviço responsável por consultas e queries relacionadas a Processos.
+ * Serviço responsável por consultas relacionadas a Processos.
  *
- * <p>
  * Centraliza operações de leitura e consultas complexas, incluindo
  * listagens filtradas, verificações de elegibilidade e queries específicas.
- * </p>
- *
- * <p><b>Refatoração v3.0:</b> Removido uso de @Lazy e dependência circular.
- * Agora utiliza {@link ProcessoSubprocessoQueryService} para queries de leitura,
- * eliminando acoplamento bidirecional com SubprocessoFacade.</p>
- *
- * @since 3.0.0 - Removido @Lazy, introduzido Query Service Pattern
  */
 @Service
 @Slf4j
@@ -69,9 +61,8 @@ public class ProcessoConsultaService {
         return processoRepo.findAll(pageable);
     }
 
-    public Page<Processo> listarPorParticipantesIgnorandoCriado(
-            List<Long> unidadeIds, Pageable pageable) {
-        return processoRepo.findDistinctByParticipantes_CodigoInAndSituacaoNot(
+    public Page<Processo> listarPorParticipantesIgnorandoCriado(List<Long> unidadeIds, Pageable pageable) {
+        return processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 unidadeIds, SituacaoProcesso.CRIADO, pageable);
     }
 
@@ -84,11 +75,7 @@ public class ProcessoConsultaService {
     }
 
     /**
-     * Lista unidades bloqueadas (participantes de processos ativos) por tipo de
-     * processo.
-     *
-     * @param tipo tipo de processo
-     * @return lista de códigos de unidades bloqueadas
+     * Lista unidades bloqueadas (participantes de processos ativos) por tipo de processo.
      */
     @Transactional(readOnly = true)
     public List<Long> listarUnidadesBloqueadasPorTipo(String tipo) {
@@ -98,9 +85,6 @@ public class ProcessoConsultaService {
 
     /**
      * Lista subprocessos elegíveis para o usuário atual no contexto do processo.
-     *
-     * @param codProcesso código do processo
-     * @return lista de subprocessos elegíveis baseado no perfil do usuário
      */
     @Transactional(readOnly = true)
     public List<SubprocessoElegivelDto> listarSubprocessosElegiveis(Long codProcesso) {
@@ -108,6 +92,7 @@ public class ProcessoConsultaService {
         if (authentication == null || authentication.getName() == null) {
             return List.of();
         }
+
         String username = authentication.getName();
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
@@ -130,9 +115,7 @@ public class ProcessoConsultaService {
         List<PerfilDto> perfis = usuarioService.buscarPerfisUsuario(username);
         Long codUnidadeUsuario = perfis.stream().findFirst().map(PerfilDto::unidadeCodigo).orElse(null);
 
-        if (codUnidadeUsuario == null) {
-            return List.of();
-        }
+
 
         return queryService.listarPorProcessoUnidadeESituacoes(codProcesso, codUnidadeUsuario,
                 List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,

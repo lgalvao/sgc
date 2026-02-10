@@ -5,7 +5,8 @@ import sgc.fixture.UnidadeFixture;
 import sgc.organizacao.model.Unidade;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,8 +73,6 @@ class ProcessoTest {
             assertThat(novoProcesso.getTipo()).isEqualTo(tipo);
             assertThat(novoProcesso.getSituacao()).isEqualTo(situacao);
             assertThat(novoProcesso.getDataLimite()).isEqualTo(dataLimite);
-            // dataCriacao tem valor padrão? Se não setado no builder e não tem @Builder.Default, é null.
-            // Mas EntidadeBase pode ter @PrePersist.
             assertThat(novoProcesso.getCodigo()).isNull();
         }
 
@@ -87,7 +86,7 @@ class ProcessoTest {
             String descricao = "Processo Completo";
             SituacaoProcesso situacao = SituacaoProcesso.EM_ANDAMENTO;
             TipoProcesso tipo = TipoProcesso.MAPEAMENTO;
-            Set<Unidade> participantes = new HashSet<>();
+            List<UnidadeProcesso> participantes = new ArrayList<>();
 
             // Act
             Processo novoProcesso = Processo.builder()
@@ -116,10 +115,10 @@ class ProcessoTest {
     class Participantes {
 
         @Test
-        @DisplayName("Deve inicializar participantes como conjunto vazio")
-        void deveInicializarParticipantesComoConjuntoVazio() {
+        @DisplayName("Deve inicializar participantes como lista vazia")
+        void deveInicializarParticipantesComoListaVazia() {
             // Act
-            Set<Unidade> participantes = processo.getParticipantes();
+            List<UnidadeProcesso> participantes = processo.getParticipantes();
 
             // Assert
             assertThat(participantes)
@@ -128,7 +127,7 @@ class ProcessoTest {
         }
 
         @Test
-        @DisplayName("Deve adicionar unidades participantes")
+        @DisplayName("Deve adicionar unidades participantes (criando snapshots)")
         void deveAdicionarUnidadesParticipantes() {
             // Arrange
             Unidade unidade1 = UnidadeFixture.unidadePadrao();
@@ -140,23 +139,30 @@ class ProcessoTest {
             unidade2.setNome("Unidade 2");
 
             // Act
-            processo.getParticipantes().add(unidade1);
-            processo.getParticipantes().add(unidade2);
+            processo.adicionarParticipantes(Set.of(unidade1));
+            processo.adicionarParticipantes(Set.of(unidade2));
 
             // Assert
+            assertThat(processo.getParticipantes()).hasSize(2);
             assertThat(processo.getParticipantes())
-                    .hasSize(2)
-                    .contains(unidade1, unidade2);
+                    .extracting(UnidadeProcesso::getUnidadeCodigo)
+                    .containsExactlyInAnyOrder(1L, 2L);
+            assertThat(processo.getParticipantes())
+                    .extracting(UnidadeProcesso::getNome)
+                    .containsExactlyInAnyOrder("Unidade 1", "Unidade 2");
         }
 
         @Test
-        @DisplayName("Deve substituir conjunto de participantes")
-        void deveSubstituirConjuntoDeParticipantes() {
+        @DisplayName("Deve substituir lista de participantes")
+        void deveSubstituirListaDeParticipantes() {
             // Arrange
-            Set<Unidade> novosParticipantes = new HashSet<>();
+            List<UnidadeProcesso> novosParticipantes = new ArrayList<>();
             Unidade unidade = UnidadeFixture.unidadePadrao();
             unidade.setCodigo(1L);
-            novosParticipantes.add(unidade);
+            
+            // Simular criação manual de snapshot já que não temos o ID do processo persistido ainda
+            UnidadeProcesso snapshot = UnidadeProcesso.criarSnapshot(processo, unidade);
+            novosParticipantes.add(snapshot);
 
             // Act
             processo.setParticipantes(novosParticipantes);

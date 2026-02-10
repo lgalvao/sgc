@@ -59,7 +59,7 @@ describe("VisMapa.vue", () => {
         await router.isReady();
     });
 
-    const mountComponent = (initialState = {}, siglaUnidade = "TEST") => {
+    const mountComponent = (initialState: any = {}, siglaUnidade = "TEST") => {
         context.wrapper = mount(VisMapa, {
             global: {
                 plugins: [

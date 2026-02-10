@@ -11,6 +11,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,7 +41,7 @@ class ProcessoRepoPerformanceTest {
         processo.setDescricao("Processo Finalizado");
         processo.setSituacao(SituacaoProcesso.FINALIZADO);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        processo.getParticipantes().add(unidade);
+        processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
 
         entityManager.flush();

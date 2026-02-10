@@ -34,7 +34,6 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -139,7 +138,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     @DisplayName("Deve detalhar processo para Admin")
     void testDetalharProcesso_sucesso() throws Exception {
-        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
         subprocessoRepo.save(Subprocesso.builder()
                 .processo(processo)
@@ -166,7 +165,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     @DisplayName("Deve mostrar 'podeFinalizar' como true para Admin com subprocessos homologados")
     void testPodeFinalizar_true_comAdmin() throws Exception {
-        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
         subprocessoRepo.save(Subprocesso.builder()
                 .processo(processo)
@@ -184,7 +183,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve mostrar 'podeFinalizar' como false para não Admin")
     void testPodeFinalizar_false_semAdmin() throws Exception {
-        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
         Authentication auth = setupSecurityContext(unidade, Perfil.CHEFE);
         subprocessoRepo.save(Subprocesso.builder()
@@ -203,7 +202,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro disponibilizado")
     void testPodeHomologarCadastro_true() throws Exception {
-        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
         Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
         subprocessoRepo.save(Subprocesso.builder()
@@ -222,7 +221,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve mostrar 'podeHomologarMapa' como true para Gestor com mapa validado")
     void testPodeHomologarMapa_true() throws Exception {
-        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
         Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
         subprocessoRepo.save(Subprocesso.builder()
@@ -242,7 +241,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     @DisplayName("Deve retornar detalhes da unidade com situação do subprocesso correta")
     void testDetalharProcesso_dadosSubprocesso() throws Exception {
-        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
 
         Subprocesso subprocesso = Subprocesso.builder()

@@ -9,6 +9,7 @@ import sgc.mapa.service.CopiaMapaService;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.model.Movimentacao;
@@ -74,7 +75,7 @@ public class SubprocessoFactory {
      * Cria subprocessos para processo de mapeamento em lote.
      * Aplicável apenas a unidades OPERACIONAL ou INTEROPERACIONAL.
      */
-    public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades) {
+    public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
         List<Unidade> unidadesElegiveis = unidades.stream()
                 .filter(u -> TipoUnidade.OPERACIONAL == u.getTipo() || TipoUnidade.INTEROPERACIONAL == u.getTipo())
                 .toList();
@@ -108,7 +109,9 @@ public class SubprocessoFactory {
         for (Subprocesso sp : subprocessosSalvos) {
             movimentacoes.add(Movimentacao.builder()
                     .subprocesso(sp)
+                    .unidadeOrigem(unidadeOrigem)
                     .unidadeDestino(sp.getUnidade())
+                    .usuario(usuario)
                     .descricao("Processo iniciado")
                     .build());
         }
@@ -118,7 +121,7 @@ public class SubprocessoFactory {
     /**
      * Cria subprocesso para processo de revisão e copia o mapa vigente da unidade.
      */
-    public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa) {
+    public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
 
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
 
@@ -139,7 +142,9 @@ public class SubprocessoFactory {
 
         movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(subprocessoSalvo)
+                .unidadeOrigem(unidadeOrigem)
                 .unidadeDestino(unidade)
+                .usuario(usuario)
                 .descricao("Processo de revisão iniciado")
                 .build());
         log.info("Subprocesso para revisão criado para unidade {}", unidade.getSigla());
@@ -149,7 +154,7 @@ public class SubprocessoFactory {
      * Cria subprocesso para processo de diagnóstico.
      * Copia o mapa vigente e inicia com autoavaliação em andamento.
      */
-    public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa) {
+    public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
 
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
         Subprocesso subprocesso = Subprocesso.builder()
@@ -169,7 +174,9 @@ public class SubprocessoFactory {
 
         movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(subprocessoSalvo)
+                .unidadeOrigem(unidadeOrigem)
                 .unidadeDestino(unidade)
+                .usuario(usuario)
                 .descricao("Processo de diagnóstico iniciado")
                 .build());
         log.info("Subprocesso {} para diagnóstico criado para unidade {}", subprocessoSalvo.getCodigo(), unidade.getSigla());

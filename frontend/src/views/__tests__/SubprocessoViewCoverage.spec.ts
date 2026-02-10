@@ -1,7 +1,7 @@
 import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
-import SubprocessoView from '@/views/SubprocessoView.vue';
+import Subprocesso from '@/views/Subprocesso.vue';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useFeedbackStore} from '@/stores/feedback';
 import {BAlert, BSpinner} from 'bootstrap-vue-next';
@@ -17,7 +17,7 @@ const ModalConfirmacaoStub = {
     emits: ['update:modelValue', 'confirmar']
 };
 
-describe('SubprocessoView Coverage', () => {
+describe('Subprocesso Coverage', () => {
     it('renders loading state when no data and no error', () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
@@ -29,7 +29,7 @@ describe('SubprocessoView Coverage', () => {
             }
         });
 
-        const wrapper = mount(SubprocessoView, {
+        const wrapper = mount(Subprocesso, {
             global: {
                 plugins: [pinia],
                 stubs: {
@@ -61,7 +61,7 @@ describe('SubprocessoView Coverage', () => {
             }
         });
 
-        const wrapper = mount(SubprocessoView, {
+        const wrapper = mount(Subprocesso, {
             global: {
                 plugins: [pinia],
                 stubs: {
@@ -96,7 +96,7 @@ describe('SubprocessoView Coverage', () => {
         });
         const store = useSubprocessosStore(pinia);
 
-        const wrapper = mount(SubprocessoView, {
+        const wrapper = mount(Subprocesso, {
             global: {
                 plugins: [pinia],
                 stubs: {
@@ -140,7 +140,7 @@ describe('SubprocessoView Coverage', () => {
         (store.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue(123);
         const feedbackStore = useFeedbackStore(pinia);
 
-        const wrapper = mount(SubprocessoView, {
+        const wrapper = mount(Subprocesso, {
             global: {
                 plugins: [pinia],
                 stubs: {

@@ -63,7 +63,7 @@ class PainelServiceTest {
         p.setDataCriacao(LocalDateTime.now());
 
         Unidade participante = criarUnidade(1L, "PART");
-        p.setParticipantes(Set.of(participante));
+        p.adicionarParticipantes(Set.of(participante));
 
         return p;
     }
@@ -112,7 +112,7 @@ class PainelServiceTest {
             p.setTipo(TipoProcesso.MAPEAMENTO);
 
             Unidade u = criarUnidade(1L, "U1");
-            p.setParticipantes(Set.of(u));
+            p.adicionarParticipantes(Set.of(u));
 
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
 
@@ -171,7 +171,7 @@ class PainelServiceTest {
             p.setTipo(TipoProcesso.MAPEAMENTO);
 
             Unidade u = criarUnidade(1L, "U1");
-            p.setParticipantes(Set.of(u));
+            p.adicionarParticipantes(Set.of(u));
 
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
 
@@ -203,7 +203,7 @@ class PainelServiceTest {
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
             Unidade u = criarUnidade(1L, "U1");
-            p.setParticipantes(Set.of(u));
+            p.adicionarParticipantes(Set.of(u));
 
             when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any()))
                     .thenReturn(new PageImpl<>(List.of(p)));
@@ -227,7 +227,7 @@ class PainelServiceTest {
             Unidade u = criarUnidade(1L, "U1");
 
             Processo p = criarProcessoMock(1L);
-            p.setParticipantes(Set.of(u));
+            p.adicionarParticipantes(Set.of(u));
 
             when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
@@ -244,7 +244,7 @@ class PainelServiceTest {
             Unidade u = criarUnidade(999L, "U999");
 
             Processo p = criarProcessoMock(1L);
-            p.setParticipantes(Set.of(u));
+            p.adicionarParticipantes(Set.of(u));
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
             // Usamos lenient para atingir indiretamente o fluxo de segurança/null checks se houver
@@ -273,7 +273,7 @@ class PainelServiceTest {
             p.setCodigo(100L);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             p.setTipo(TipoProcesso.MAPEAMENTO);
-            p.setParticipantes(Set.of(pai, filho));
+            p.adicionarParticipantes(Set.of(pai, filho));
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
@@ -296,7 +296,7 @@ class PainelServiceTest {
             p.setCodigo(100L);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             p.setTipo(TipoProcesso.MAPEAMENTO);
-            p.setParticipantes(Set.of(filho));
+            p.adicionarParticipantes(Set.of(filho));
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
@@ -312,7 +312,7 @@ class PainelServiceTest {
 
             Processo p = new Processo();
             p.setCodigo(1L);
-            p.setParticipantes(Set.of(part));
+            p.adicionarParticipantes(Set.of(part));
             p.setTipo(TipoProcesso.MAPEAMENTO);
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
@@ -344,7 +344,7 @@ class PainelServiceTest {
             Unidade u = criarUnidade(999L, "U999");
 
             Processo p = criarProcessoMock(1L);
-            p.setParticipantes(Set.of(u));
+            p.adicionarParticipantes(Set.of(u));
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
             lenient().when(unidadeService.buscarEntidadePorId(999L)).thenThrow(new RuntimeException("ERRO"));

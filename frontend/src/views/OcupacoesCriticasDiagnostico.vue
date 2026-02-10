@@ -51,7 +51,7 @@
                       v-model="gap.ocupacao.situacao"
                       :options="OPCOES_SITUACAO"
                       size="sm"
-                      @change="salvar(servidor.tituloEleitoral, gap.avaliacao.competenciaCodigo, gap.ocupacao.situacao)"
+                      @change="gap.ocupacao.situacao && salvar(servidor.tituloEleitoral, gap.avaliacao.competenciaCodigo, gap.ocupacao.situacao)"
                   />
                   <small v-if="gap.salvo" class="text-success ms-2"><i aria-hidden="true" class="bi bi-check"/></small>
                 </td>

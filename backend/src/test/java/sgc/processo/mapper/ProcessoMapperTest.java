@@ -9,7 +9,7 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,15 +67,15 @@ class ProcessoMapperTest {
             Unidade unidade1 = new Unidade();
             unidade1.setCodigo(1L);
             unidade1.setSigla("SEDIA");
+            unidade1.setNome("Unidade 1");
 
             Unidade unidade2 = new Unidade();
             unidade2.setCodigo(2L);
             unidade2.setSigla("COSIS");
+            unidade2.setNome("Unidade 2");
 
-            Set<Unidade> participantes = new HashSet<>();
-            participantes.add(unidade1);
-            participantes.add(unidade2);
-            processo.setParticipantes(participantes);
+            // Usando adicionarParticipantes criará os snapshots UnidadeProcesso
+            processo.adicionarParticipantes(Set.of(unidade1, unidade2));
 
             ProcessoDto dto = mapper.toDto(processo);
 
@@ -108,7 +108,7 @@ class ProcessoMapperTest {
             processo.setDescricao("Teste");
             processo.setTipo(TipoProcesso.MAPEAMENTO);
             processo.setSituacao(SituacaoProcesso.CRIADO);
-            processo.setParticipantes(new HashSet<>());
+            processo.setParticipantes(new ArrayList<>());
 
             ProcessoDto dto = mapper.toDto(processo);
 
@@ -128,20 +128,19 @@ class ProcessoMapperTest {
             Unidade unidadeZ = new Unidade();
             unidadeZ.setCodigo(1L);
             unidadeZ.setSigla("ZEBRA");
+            unidadeZ.setNome("Unidade Zebra");
 
             Unidade unidadeA = new Unidade();
             unidadeA.setCodigo(2L);
             unidadeA.setSigla("ALFA");
+            unidadeA.setNome("Unidade Alfa");
 
             Unidade unidadeM = new Unidade();
             unidadeM.setCodigo(3L);
             unidadeM.setSigla("MEGA");
+            unidadeM.setNome("Unidade Mega");
 
-            Set<Unidade> participantes = new HashSet<>();
-            participantes.add(unidadeZ);
-            participantes.add(unidadeA);
-            participantes.add(unidadeM);
-            processo.setParticipantes(participantes);
+            processo.adicionarParticipantes(Set.of(unidadeZ, unidadeA, unidadeM));
 
             ProcessoDto dto = mapper.toDto(processo);
 
@@ -168,6 +167,18 @@ class ProcessoMapperTest {
             assertThat(dto.getSituacaoLabel()).isNull();
             assertThat(dto.getTipoLabel()).isNull();
         }
+
+        @Test
+        @DisplayName("Deve cobrir branches de tipo nulo no toDto")
+        void deveCobrirTipoNuloNoToDto() {
+            Processo entity = new Processo();
+            entity.setCodigo(1L);
+            entity.setTipo(null);
+
+            ProcessoDto dto = mapper.toDto(entity);
+            assertThat(dto).isNotNull();
+            assertThat(dto.getTipo()).isNull();
+        }
     }
 
     @Nested
@@ -190,6 +201,19 @@ class ProcessoMapperTest {
             assertThat(processo.getDescricao()).isEqualTo("Mapeamento 2026");
             assertThat(processo.getTipo()).isEqualTo(TipoProcesso.MAPEAMENTO);
             assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.CRIADO);
+        }
+
+        @Test
+        @DisplayName("Deve cobrir branches de tipo nulo no toEntity")
+        void deveCobrirTipoNuloNoToEntity() {
+            ProcessoDto dto = ProcessoDto.builder()
+                    .codigo(1L)
+                    .tipo(null)
+                    .build();
+
+            Processo entity = mapper.toEntity(dto);
+            assertThat(entity).isNotNull();
+            assertThat(entity.getTipo()).isNull();
         }
 
         @Test

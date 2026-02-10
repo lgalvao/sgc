@@ -201,4 +201,54 @@ class GerenciadorJwtTest {
         Optional<String> result = gerenciador.validarTokenPreAuth("invalid.token");
         assertThat(result).isEmpty();
     }
+    @org.junit.jupiter.api.Nested
+    @DisplayName("Cobertura Extra")
+    class CoberturaExtra {
+        private static final String SECRET = "secure-secret-key-minimum-32-chars-length-xyz-123";
+
+        @Test
+        @DisplayName("Deve retornar empty se título for nulo (sub)")
+        void deveRetornarEmptySeTituloNulo() {
+            GerenciadorJwt service = criarService();
+            String token = gerarTokenCustomizado(null, Perfil.ADMIN.name(), 1L);
+            assertThat(service.validarToken(token)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve retornar empty se perfil for nulo")
+        void deveRetornarEmptySePerfilNulo() {
+            GerenciadorJwt service = criarService();
+            String token = gerarTokenCustomizado("123", null, 1L);
+            assertThat(service.validarToken(token)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve retornar empty se unidade for nula")
+        void deveRetornarEmptySeUnidadeNula() {
+            GerenciadorJwt service = criarService();
+            String token = gerarTokenCustomizado("123", Perfil.ADMIN.name(), null);
+            assertThat(service.validarToken(token)).isEmpty();
+        }
+
+        private GerenciadorJwt criarService() {
+            // Reusing the fields from outer class would be cleaner but they are mocks.
+            // The gap test mocked properties manually.
+            // Here we can use the Mockito mocks but we need to configure them for this "new" instance logic
+            // Or just create new mocks to be safe and isolated like the original test.
+            JwtProperties props = org.mockito.Mockito.mock(JwtProperties.class);
+            when(props.secret()).thenReturn(SECRET);
+            return new GerenciadorJwt(props, org.mockito.Mockito.mock(Environment.class));
+        }
+
+        private String gerarTokenCustomizado(String sub, String perfil, Long unidade) {
+            var builder = Jwts.builder()
+                    .signWith(Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)));
+            
+            if (sub != null) builder.subject(sub);
+            if (perfil != null) builder.claim("perfil", perfil);
+            if (unidade != null) builder.claim("unidade", unidade);
+            
+            return builder.compact();
+        }
+    }
 }

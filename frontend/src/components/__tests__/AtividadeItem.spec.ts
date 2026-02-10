@@ -49,8 +49,8 @@ describe("AtividadeItem.vue", () => {
     expect(saveButton.exists()).toBe(true);
     await saveButton.trigger('click');
 
-    expect(context.wrapper.emitted('atualizar-atividade')).toBeTruthy();
-    expect(context.wrapper.emitted('atualizar-atividade')[0]).toEqual(['Atividade Editada']);
+    expect(context.wrapper!.emitted('atualizar-atividade')).toBeTruthy();
+    expect(context.wrapper!.emitted('atualizar-atividade')![0]).toEqual(['Atividade Editada']);
   });
 
   it("deve adicionar novo conhecimento", async () => {
@@ -67,8 +67,8 @@ describe("AtividadeItem.vue", () => {
     // Trigger submit on the form directly
     await context.wrapper.find('[data-testid="form-novo-conhecimento"]').trigger('submit');
 
-    expect(context.wrapper.emitted('adicionar-conhecimento')).toBeTruthy();
-    expect(context.wrapper.emitted('adicionar-conhecimento')[0]).toEqual(['Novo Conhecimento']);
+    expect(context.wrapper!.emitted('adicionar-conhecimento')).toBeTruthy();
+    expect(context.wrapper!.emitted('adicionar-conhecimento')![0]).toEqual(['Novo Conhecimento']);
   });
 
   it("não deve salvar edição de atividade se descrição vazia", async () => {
@@ -134,8 +134,8 @@ describe("AtividadeItem.vue", () => {
       });
 
       await context.wrapper.find('[data-testid="btn-remover-conhecimento"]').trigger('click');
-      expect(context.wrapper.emitted('remover-conhecimento')).toBeTruthy();
-      expect(context.wrapper.emitted('remover-conhecimento')[0]).toEqual([10]);
+      expect(context.wrapper!.emitted('remover-conhecimento')).toBeTruthy();
+      expect(context.wrapper!.emitted('remover-conhecimento')![0]).toEqual([10]);
   });
 
   it("deve salvar edição de conhecimento", async () => {
@@ -150,8 +150,8 @@ describe("AtividadeItem.vue", () => {
       await input.setValue('Conhecimento Editado');
       await context.wrapper.find('[data-testid="btn-salvar-edicao-conhecimento"]').trigger('click');
 
-      expect(context.wrapper.emitted('atualizar-conhecimento')).toBeTruthy();
-      expect(context.wrapper.emitted('atualizar-conhecimento')[0]).toEqual([10, 'Conhecimento Editado']);
+      expect(context.wrapper!.emitted('atualizar-conhecimento')).toBeTruthy();
+      expect(context.wrapper!.emitted('atualizar-conhecimento')![0]).toEqual([10, 'Conhecimento Editado']);
   });
 
   it("não deve salvar edição de conhecimento vazio", async () => {

@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 @Builder
 public class SubprocessoDetalheDto {
+    private final Long codigo;
     private final UnidadeDetalheDto unidade;
     private final ResponsavelDetalheDto titular;
     private final ResponsavelDetalheDto responsavel;

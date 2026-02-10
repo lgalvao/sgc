@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {mount} from '@vue/test-utils';
+import {mount, RouterLinkStub} from '@vue/test-utils';
 import {nextTick} from 'vue';
 import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
 import type {Unidade} from '@/types/tipos';
@@ -7,6 +7,14 @@ import {setupComponentTest} from '@/test-utils/componentTestHelpers';
 
 describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
     setupComponentTest();
+
+    const mountOptions = {
+        global: {
+            stubs: {
+                RouterLink: RouterLinkStub
+            }
+        }
+    };
 
     const criarUnidades = (): Unidade[] => [
         {
@@ -95,7 +103,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
 
     describe('Bug 1: SECRETARIA_1 marcada com filhas desmarcadas', () => {
         it('SECRETARIA_1 deve estar INDETERMINADA quando apenas ASSESSORIA_11 e ASSESSORIA_12 selecionadas', () => {
-            const wrapper = mount(ArvoreUnidades, {
+            const wrapper = mount(ArvoreUnidades, { ...mountOptions,
                 props: {
                     unidades: criarUnidades(),
                     modelValue: [11, 12] // Apenas ASSESSORIA_11 e ASSESSORIA_12
@@ -114,7 +122,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
         });
 
         it('SECRETARIA_1 deve estar MARCADA quando todas filhas estão marcadas', () => {
-            const wrapper = mount(ArvoreUnidades, {
+            const wrapper = mount(ArvoreUnidades, { ...mountOptions,
                 props: {
                     unidades: criarUnidades(),
                     modelValue: [1, 11, 12, 131, 132, 133] // Todas elegíveis
@@ -130,7 +138,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
 
     describe('Bug 2: COORD_11 marcada sem filhas', () => {
         it('COORD_11 deve estar DESMARCADA quando nenhuma filha selecionada', () => {
-            const wrapper = mount(ArvoreUnidades, {
+            const wrapper = mount(ArvoreUnidades, { ...mountOptions,
                 props: {
                     unidades: criarUnidades(),
                     modelValue: [] // Nada selecionado
@@ -138,13 +146,13 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
             });
 
             const vm = wrapper.vm;
-            const coord11 = criarUnidades()[0].filhas[2];
+            const coord11 = criarUnidades()[0].filhas![2];
 
             expect(vm.getEstadoSelecao(coord11)).toBe(false);
         });
 
         it('COORD_11 deve estar MARCADA quando todas filhas selecionadas', () => {
-            const wrapper = mount(ArvoreUnidades, {
+            const wrapper = mount(ArvoreUnidades, { ...mountOptions,
                 props: {
                     unidades: criarUnidades(),
                     modelValue: [131, 132, 133] // Todas filhas de COORD_11
@@ -152,13 +160,13 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
             });
 
             const vm = wrapper.vm;
-            const coord11 = criarUnidades()[0].filhas[2];
+            const coord11 = criarUnidades()[0].filhas![2];
 
             expect(vm.getEstadoSelecao(coord11)).toBe(true);
         });
 
         it('COORD_11 deve estar INDETERMINADA quando algumas filhas selecionadas', () => {
-            const wrapper = mount(ArvoreUnidades, {
+            const wrapper = mount(ArvoreUnidades, { ...mountOptions,
                 props: {
                     unidades: criarUnidades(),
                     modelValue: [131, 132] // 2 de 3 filhas
@@ -166,7 +174,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
             });
 
             const vm = wrapper.vm;
-            const coord11 = criarUnidades()[0].filhas[2];
+            const coord11 = criarUnidades()[0].filhas![2];
 
             expect(vm.getEstadoSelecao(coord11)).toBe('indeterminate');
         });
@@ -174,7 +182,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
 
     describe('Bug 3: Comportamento ao desmarcar', () => {
         it('Desmarcar SECRETARIA_1 deve desmarcar todas filhas', async () => {
-            const wrapper = mount(ArvoreUnidades, {
+            const wrapper = mount(ArvoreUnidades, { ...mountOptions,
                 props: {
                     unidades: criarUnidades(),
                     modelValue: [1, 11, 12, 131, 132, 133]
@@ -195,7 +203,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
         });
 
         it('COORD_12 não deve ficar marcada ao desmarcar SECRETARIA_1', () => {
-            const wrapper = mount(ArvoreUnidades, {
+            const wrapper = mount(ArvoreUnidades, { ...mountOptions,
                 props: {
                     unidades: criarUnidades(),
                     modelValue: [1, 11, 12]
@@ -204,7 +212,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
 
             const vm = wrapper.vm;
             const secretaria = criarUnidades()[0];
-            const coord12 = criarUnidades()[0].filhas[3];
+            const coord12 = criarUnidades()[0].filhas![3];
 
             // Antes de desmarcar
             expect(vm.getEstadoSelecao(coord12)).toBe(false);
@@ -219,7 +227,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
 
     describe('isHabilitado - Habilitação Recursiva', () => {
         it('INTERMEDIARIA com filhas elegíveis deve estar habilitada', () => {
-            const wrapper = mount(ArvoreUnidades, {
+            const wrapper = mount(ArvoreUnidades, { ...mountOptions,
                 props: {
                     unidades: criarUnidades(),
                     modelValue: []
@@ -227,7 +235,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
             });
 
             const vm = wrapper.vm;
-            const coord11 = criarUnidades()[0].filhas[2];
+            const coord11 = criarUnidades()[0].filhas![2];
 
             // COORD_11 não é elegível (INTERMEDIARIA)
             expect(coord11.isElegivel).toBe(false);
@@ -261,7 +269,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
                 }
             ];
 
-            const wrapper = mount(ArvoreUnidades, {
+            const wrapper = mount(ArvoreUnidades, { ...mountOptions,
                 props: {
                     unidades: unidadesComCoordSemFilhas,
                     modelValue: []
@@ -275,7 +283,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
         });
 
         it('Unidade elegível deve sempre estar habilitada', () => {
-            const wrapper = mount(ArvoreUnidades, {
+            const wrapper = mount(ArvoreUnidades, { ...mountOptions,
                 props: {
                     unidades: criarUnidades(),
                     modelValue: []
@@ -283,7 +291,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
             });
 
             const vm = wrapper.vm as any;
-            const assessoria = criarUnidades()[0].filhas[0];
+            const assessoria = criarUnidades()[0].filhas![0];
 
             expect(assessoria.isElegivel).toBe(true);
             expect(vm.isHabilitado(assessoria)).toBe(true);
@@ -292,7 +300,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
 
     describe('Filtro de INTERMEDIARIA no modelValue', () => {
         it('INTERMEDIARIA nunca deve estar no modelValue', () => {
-            const wrapper = mount(ArvoreUnidades, {
+            const wrapper = mount(ArvoreUnidades, { ...mountOptions,
                 props: {
                     unidades: criarUnidades(),
                     modelValue: [131, 132, 133] // Todas filhas de COORD_11
@@ -311,7 +319,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
         });
 
         it('Selecionar COORD_11 deve adicionar apenas filhas ao modelValue', async () => {
-            const wrapper = mount(ArvoreUnidades, {
+            const wrapper = mount(ArvoreUnidades, { ...mountOptions,
                 props: {
                     unidades: criarUnidades(),
                     modelValue: []
@@ -319,7 +327,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
             });
 
             const vm = wrapper.vm;
-            const coord11 = criarUnidades()[0].filhas[2];
+            const coord11 = criarUnidades()[0].filhas![2];
 
             // Selecionar COORD_11
             vm.toggle(coord11, true);

@@ -6,6 +6,7 @@ import {
     buscarArvoreUnidade as serviceBuscarArvoreUnidade,
     buscarSubordinadas as serviceBuscarSubordinadas,
     buscarSuperior as serviceBuscarSuperior,
+    buscarTodasUnidades as serviceBuscarTodasUnidades,
     buscarUnidadePorCodigo as serviceBuscarUnidadePorCodigo,
     buscarUnidadePorSigla,
 } from "@/services/unidadeService";
@@ -39,6 +40,19 @@ export const useUnidadesStore = defineStore("unidades", () => {
                 unidades.value = mapUnidadesArray(response as any) as Unidade[];
             }).catch((err: any) => {
                 error.value = lastError.value?.message || "Erro ao buscar unidades";
+                throw err;
+            });
+        });
+    }
+
+    async function buscarTodasAsUnidades() {
+        error.value = null;
+        await loading.withLoading(async () => {
+            await withErrorHandling(async () => {
+                const response = await serviceBuscarTodasUnidades();
+                unidades.value = mapUnidadesArray(response as any) as Unidade[];
+            }).catch((err: any) => {
+                error.value = lastError.value?.message || "Erro ao buscar todas as unidades";
                 throw err;
             });
         });
@@ -113,6 +127,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         lastError,
         clearError,
         buscarUnidadesParaProcesso,
+        buscarTodasAsUnidades,
         buscarUnidade,
         buscarUnidadePorCodigo,
         buscarArvoreUnidade,

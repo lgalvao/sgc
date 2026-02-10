@@ -58,7 +58,7 @@ class EventoProcessoListenerBranchTest {
         // Unidade 3: unidadeSuperior É a intermediária
         Unidade u3 = Unidade.builder().codigo(3L).sigla("U3").unidadeSuperior(intermediaria).build();
 
-        processo.setParticipantes(Set.of(intermediaria, u1, u2, u3));
+        processo.adicionarParticipantes(Set.of(intermediaria, u1, u2, u3));
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
@@ -75,6 +75,7 @@ class EventoProcessoListenerBranchTest {
 
         lenient().when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("html");
         when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any())).thenReturn("html");
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(intermediaria, u1, u2, u3));
 
         // Act
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build());

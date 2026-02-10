@@ -1,6 +1,5 @@
 package sgc.mapa.model;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

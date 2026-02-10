@@ -431,5 +431,43 @@ class SubprocessoCadastroControllerTest {
             verify(subprocessoFacade).homologarCadastroEmBloco(
                     List.of(1L, 2L), 100L, usuario);
         }
+    @Nested
+    @DisplayName("Testes Unitários Isolados")
+    class UnitTests {
+        
+        // Manual mocks for isolated testing
+        private SubprocessoCadastroController controller;
+        private SubprocessoFacade subprocessoFacadeMock;
+        private AnaliseFacade analiseFacadeMock;
+        private AnaliseMapper analiseMapperMock;
+        private UsuarioFacade usuarioServiceMock;
+
+        @org.junit.jupiter.api.BeforeEach
+        void setUp() {
+            subprocessoFacadeMock = org.mockito.Mockito.mock(SubprocessoFacade.class);
+            analiseFacadeMock = org.mockito.Mockito.mock(AnaliseFacade.class);
+            analiseMapperMock = org.mockito.Mockito.mock(AnaliseMapper.class);
+            usuarioServiceMock = org.mockito.Mockito.mock(UsuarioFacade.class);
+
+            controller = new SubprocessoCadastroController(
+                subprocessoFacadeMock,
+                analiseFacadeMock,
+                analiseMapperMock,
+                usuarioServiceMock
+            );
+        }
+
+        @Test
+        @DisplayName("disponibilizarCadastro lança ErroAutenticacao se principal for nulo")
+        void disponibilizarCadastro_PrincipalNulo() {
+            Object principal = null;
+            Long codigo = 1L;
+
+            when(usuarioServiceMock.extrairTituloUsuario(principal)).thenReturn(null);
+
+            org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAutenticacao.class, 
+                () -> controller.disponibilizarCadastro(codigo, principal));
+        }
     }
+}
 }

@@ -14,11 +14,13 @@
     "lint": "npm run lint --prefix frontend"
   },
   "devDependencies": {
-    "@playwright/test": "^1.58.1",
-    "@types/node": "^25.2.0",
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.2.2",
+    "@vitest/browser-preview": "^4.0.18",
     "chrome-launcher": "^1.2.1",
-    "lighthouse": "^13.0.1",
-    "typescript": "^5.9.3"
+    "lighthouse": "^13.0.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "description": "Testes E2E",
   "dependencies": {

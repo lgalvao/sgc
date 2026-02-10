@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.Usuario;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.eventos.EventoImportacaoAtividades;
 import sgc.mapa.model.Atividade;
@@ -54,6 +56,9 @@ class SubprocessoAtividadeServiceTest {
 
     @Mock
     private MovimentacaoRepo movimentacaoRepo;
+
+    @Mock
+    private UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoAtividadeService service;
@@ -135,6 +140,7 @@ class SubprocessoAtividadeServiceTest {
 
             when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
             when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
 
             // Act
@@ -170,6 +176,7 @@ class SubprocessoAtividadeServiceTest {
             when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
             when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
             when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(spDestino);
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
 
             // Act
@@ -182,6 +189,7 @@ class SubprocessoAtividadeServiceTest {
             Subprocesso subprocessoSalvo = subprocessoCaptor.getValue();
             assertThat(subprocessoSalvo.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
+            verify(usuarioService).obterUsuarioAutenticado();
             verify(eventPublisher).publishEvent(any(EventoImportacaoAtividades.class));
             verify(movimentacaoRepo).save(any(Movimentacao.class));
         }
@@ -203,6 +211,7 @@ class SubprocessoAtividadeServiceTest {
             when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
             when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
             when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(spDestino);
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
 
             // Act
@@ -215,6 +224,7 @@ class SubprocessoAtividadeServiceTest {
             Subprocesso subprocessoSalvo = subprocessoCaptor.getValue();
             assertThat(subprocessoSalvo.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
+            verify(usuarioService).obterUsuarioAutenticado();
             verify(eventPublisher).publishEvent(any(EventoImportacaoAtividades.class));
             verify(movimentacaoRepo).save(any(Movimentacao.class));
         }
@@ -236,6 +246,7 @@ class SubprocessoAtividadeServiceTest {
             when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
             when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
             when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(spDestino);
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
 
             // Act
@@ -262,6 +273,7 @@ class SubprocessoAtividadeServiceTest {
 
             when(subprocessoRepo.findById(codDestino)).thenReturn(Optional.of(spDestino));
             when(subprocessoRepo.findById(codOrigem)).thenReturn(Optional.of(spOrigem));
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
 
             // Act

@@ -27,7 +27,7 @@
         <tbody>
         <tr
             v-for="mapa in mapas"
-            :key="mapa.id"
+            :key="mapa.codigo"
         >
           <td>{{ mapa.unidade }}</td>
           <td>{{ mapa.competencias?.length || 0 }}</td>
@@ -44,7 +44,7 @@ import {computed} from "vue";
 import {downloadCSV, gerarCSV} from "@/utils/csv";
 
 interface MapaVigente {
-  id: number | string;
+  codigo: number | string;
   unidade: string;
   competencias?: any[];
 }

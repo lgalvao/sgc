@@ -143,7 +143,7 @@ import {type Atividade, type ProcessoResumo, type UnidadeParticipante,} from "@/
 
 const props = defineProps<{
   mostrar: boolean;
-  codSubprocessoDestino: number | undefined;
+  codSubprocessoDestino: number | null | undefined;
 }>();
 
 const emit = defineEmits<{

@@ -63,17 +63,17 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     }
 
     async function alterarDataLimiteSubprocesso(
-        id: number,
+        codigo: number,
         dados: { novaData: string },
     ) {
         return withErrorHandling(async () => {
-            await serviceAlterarDataLimite(id, dados);
+            await serviceAlterarDataLimite(codigo, dados);
             // Recarregar os detalhes para refletir a nova data
-            await buscarSubprocessoDetalhe(id);
+            await buscarSubprocessoDetalhe(codigo);
         });
     }
 
-    async function buscarSubprocessoDetalhe(id: number) {
+    async function buscarSubprocessoDetalhe(codigo: number) {
         subprocessoDetalhe.value = null; // Limpa estado anterior
         const perfilStore = usePerfilStore();
         const perfil = perfilStore.perfilSelecionado;
@@ -94,7 +94,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
 
         await withErrorHandling(async () => {
             subprocessoDetalhe.value = await serviceFetchSubprocessoDetalhe(
-                id,
+                codigo,
                 perfil,
                 codUnidade as number,
             );
@@ -117,7 +117,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         }
     }
 
-    async function buscarContextoEdicao(id: number) {
+    async function buscarContextoEdicao(codigo: number) {
         subprocessoDetalhe.value = null; // Limpa estado anterior
         const perfilStore = usePerfilStore();
         const perfil = perfilStore.perfilSelecionado;
@@ -134,7 +134,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         }
 
         return withErrorHandling(async () => {
-            const data = await serviceBuscarContextoEdicao(id, perfil, codUnidade as number);
+            const data = await serviceBuscarContextoEdicao(codigo, perfil, codUnidade as number);
 
             subprocessoDetalhe.value = data.subprocesso;
 
@@ -146,7 +146,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
 
             const atividadesStore = useAtividadesStore();
             const atividadesMapped = (data.atividadesDisponiveis || []).map(mapAtividadeVisualizacaoToModel);
-            atividadesStore.setAtividadesParaSubprocesso(id, atividadesMapped);
+            atividadesStore.setAtividadesParaSubprocesso(codigo, atividadesMapped);
         });
     }
 
@@ -183,11 +183,14 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         );
     }
 
-    async function buscarPermissoes(id: number) {
+    async function buscarPermissoes(codigo: number) {
         return withErrorHandling(async () => {
-            const permissoes = await serviceObterPermissoes(id);
-            if (subprocessoDetalhe.value && subprocessoDetalhe.value.unidade.codigo === id) {
-                subprocessoDetalhe.value.permissoes = permissoes;
+            const permissoes = await serviceObterPermissoes(codigo);
+            if (subprocessoDetalhe.value && subprocessoDetalhe.value.codigo === codigo) {
+                subprocessoDetalhe.value = {
+                    ...subprocessoDetalhe.value,
+                    permissoes: permissoes
+                };
             }
         });
     }

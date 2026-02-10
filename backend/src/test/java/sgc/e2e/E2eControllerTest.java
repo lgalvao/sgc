@@ -22,8 +22,6 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoFacade;
-
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -49,7 +47,7 @@ class E2eControllerTest {
     private NamedParameterJdbcTemplate namedJdbcTemplate;
 
     @Mock
-    private ProcessoFacade processoFacade;
+    private sgc.processo.service.ProcessoFacade processoFacade;
 
     @Mock
     private UnidadeFacade unidadeFacade;
@@ -64,7 +62,6 @@ class E2eControllerTest {
     @BeforeEach
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
-        // Default behavior for resource loader (file found in first path)
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
         controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
     }
@@ -145,7 +142,6 @@ class E2eControllerTest {
         assertCount("sgc.alerta", 1);
         assertCount("sgc.alerta_usuario", 1);
         assertCount("sgc.unidade_processo", 1);
-
         assertCount("sgc.vw_unidade", 1);
         assertCount("sgc.vw_usuario", 1);
 
@@ -360,7 +356,8 @@ class E2eControllerTest {
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "Desc", "SIGLA_NAO_EXISTE", false, null);
 
-        when(unidadeFacade.buscarPorSigla("SIGLA_NAO_EXISTE")).thenReturn(null);
+        when(unidadeFacade.buscarPorSigla("SIGLA_NAO_EXISTE"))
+                .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA_NAO_EXISTE"));
 
         // Act & Assert
         var exception = Assertions.assertThrows(ErroEntidadeNaoEncontrada.class,
@@ -426,5 +423,108 @@ class E2eControllerTest {
 
         // Assert
         verify(processoFacade).iniciarProcessoMapeamento(eq(100L), anyList());
+    }
+    @org.junit.jupiter.api.Nested
+    @DisplayName("Cobertura Extra Isolada")
+    class CoberturaExtra {
+
+        private org.springframework.jdbc.core.JdbcTemplate jdbcTemplateMock;
+        private org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate namedJdbcTemplateMock;
+        private sgc.processo.service.ProcessoFacade processoFacadeMock;
+        private sgc.organizacao.UnidadeFacade unidadeFacadeMock;
+        private org.springframework.core.io.ResourceLoader resourceLoaderMock;
+        private E2eController controllerIsolado;
+
+        @BeforeEach
+        void setUp() {
+            jdbcTemplateMock = mock(org.springframework.jdbc.core.JdbcTemplate.class);
+            namedJdbcTemplateMock = mock(org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate.class);
+            processoFacadeMock = mock(sgc.processo.service.ProcessoFacade.class);
+            unidadeFacadeMock = mock(sgc.organizacao.UnidadeFacade.class);
+            resourceLoaderMock = mock(org.springframework.core.io.ResourceLoader.class);
+
+            controllerIsolado = new E2eController(
+                jdbcTemplateMock, 
+                namedJdbcTemplateMock, 
+                processoFacadeMock, 
+                unidadeFacadeMock, 
+                resourceLoaderMock
+            );
+        }
+
+        @Test
+        @DisplayName("limparTabela: Deve tentar DELETE se TRUNCATE falhar")
+        void limparTabela_TruncateFalha_TentaDelete() throws Exception {
+            Connection conn = mock(Connection.class);
+            Statement stmt = mock(Statement.class);
+            
+            lenient().when(stmt.execute(anyString())).thenReturn(true);
+            doThrow(new java.sql.SQLException("Erro H2")).when(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
+
+            DataSource ds = mock(DataSource.class);
+            when(jdbcTemplateMock.getDataSource()).thenAnswer(i -> ds);
+            when(ds.getConnection()).thenReturn(conn);
+            when(conn.createStatement()).thenReturn(stmt);
+            when(jdbcTemplateMock.queryForList(anyString(), eq(String.class))).thenReturn(List.of("TABELA_TESTE"));
+            
+            Resource resource = mock(Resource.class);
+            when(resourceLoaderMock.getResource(anyString())).thenReturn(resource);
+            when(resource.exists()).thenReturn(true);
+            when(resource.getInputStream()).thenReturn(new ByteArrayInputStream("SELECT 1;".getBytes()));
+
+            controllerIsolado.resetDatabase();
+
+            verify(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
+            verify(stmt).execute(contains("DELETE FROM sgc.TABELA_TESTE"));
+        }
+
+        @Test
+        @DisplayName("criarProcessoFixture: Unidade não encontrada")
+        void criarProcessoFixture_UnidadeNaoEncontrada() {
+            var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", false, 30);
+            when(unidadeFacadeMock.buscarPorSigla("SIGLA")).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA"));
+
+            org.assertj.core.api.Assertions.assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
+        
+        @Test
+        @DisplayName("criarProcessoFixture: Falha ao iniciar processo devolve ErroValidacao")
+        void criarProcessoFixture_FalhaIniciar() {
+            var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
+            
+            UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
+            when(unidadeFacadeMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
+            
+            ProcessoDto dto = ProcessoDto.builder().codigo(100L).build();
+            when(processoFacadeMock.criar(any())).thenReturn(dto);
+            
+            when(processoFacadeMock.iniciarProcessoMapeamento(100L, List.of(10L)))
+                .thenReturn(List.of("Erro 1", "Erro 2"));
+
+            org.assertj.core.api.Assertions.assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining("Erro 1");
+        }
+
+        @Test
+        @DisplayName("criarProcessoFixture: Falha ao recarregar processo")
+        void criarProcessoFixture_FalhaRecarregar() {
+            var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
+            
+            UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
+            when(unidadeFacadeMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
+            
+            ProcessoDto dto = ProcessoDto.builder().codigo(100L).build();
+            when(processoFacadeMock.criar(any())).thenReturn(dto);
+            
+            when(processoFacadeMock.iniciarProcessoMapeamento(100L, List.of(10L)))
+                .thenReturn(List.of()); // Sucesso
+                
+            when(processoFacadeMock.obterPorId(100L)).thenReturn(java.util.Optional.empty()); // Falha ao recarregar
+
+            org.assertj.core.api.Assertions.assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+        }
     }
 }

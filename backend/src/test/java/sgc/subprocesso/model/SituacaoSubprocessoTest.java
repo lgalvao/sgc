@@ -106,4 +106,80 @@ class SituacaoSubprocessoTest {
         assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
         assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(DIAGNOSTICO_MONITORAMENTO, TipoProcesso.DIAGNOSTICO)).isTrue();
     }
+
+    // ===========================================
+    // Testes mesclados de SituacaoSubprocessoCoverageTest
+    // ===========================================
+
+    @Test
+    @DisplayName("Mistura de tipos deve retornar false")
+    void testMisturaTipos() {
+        assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.MAPEAMENTO)).isFalse();
+        assertThat(REVISAO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.REVISAO)).isFalse();
+        assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
+        assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, TipoProcesso.MAPEAMENTO)).isFalse();
+    }
+
+    @ParameterizedTest(name = "De {0} para {1} (Tipo {2}) deve ser {3}")
+    @CsvSource({
+            // Casos de transição inválida (esperado=false) - mesclados do CoverageTest
+            "MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO, false",
+            "MAPEAMENTO_CADASTRO_DISPONIBILIZADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO, false",
+            "MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_VALIDADO, MAPEAMENTO, false",
+            "MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_VALIDADO, MAPEAMENTO, false",
+            "MAPEAMENTO_MAPA_DISPONIBILIZADO, MAPEAMENTO_MAPA_HOMOLOGADO, MAPEAMENTO, false",
+            "MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, MAPEAMENTO, false",
+            "MAPEAMENTO_MAPA_VALIDADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO, false",
+            
+            "REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_HOMOLOGADA, REVISAO, false",
+            "REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_MAPA_AJUSTADO, REVISAO, false",
+            "REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_VALIDADO, REVISAO, false",
+            "REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_VALIDADO, REVISAO, false",
+            "REVISAO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_HOMOLOGADO, REVISAO, false",
+            "REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO, REVISAO, false",
+            "REVISAO_MAPA_VALIDADO, REVISAO_MAPA_AJUSTADO, REVISAO, false",
+            
+            "DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO_CONCLUIDO, DIAGNOSTICO, false",
+            "DIAGNOSTICO_MONITORAMENTO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO, false",
+
+            // Transição para NAO_INICIADO
+            "MAPEAMENTO_CADASTRO_EM_ANDAMENTO, NAO_INICIADO, MAPEAMENTO, false",
+            "REVISAO_CADASTRO_EM_ANDAMENTO, NAO_INICIADO, REVISAO, false",
+            
+            // Casos para podeIniciar - cobrir combinações de falha
+            "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO, false",
+            "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO, false",
+            "NAO_INICIADO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, MAPEAMENTO, false"
+    })
+    @DisplayName("Transições inválidas adicionais")
+    void testTransicoesInvalidasAdicionais(SituacaoSubprocesso de, SituacaoSubprocesso para, TipoProcesso tipo, boolean esperado) {
+        assertThat(de.podeTransicionarPara(para, tipo)).isEqualTo(esperado);
+    }
+
+    // ===========================================
+    // Testes mesclados de SituacaoSubprocessoGapTest
+    // ===========================================
+
+    @Test
+    @DisplayName("Deve cobrir todas as branches de podeIniciar (método privado)")
+    void testPodeIniciarBranches() {
+        // MAPEAMENTO
+        assertThat(invocarPodeIniciar(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.MAPEAMENTO)).isTrue();
+        assertThat(invocarPodeIniciar(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.MAPEAMENTO)).isFalse();
+
+        // REVISAO
+        assertThat(invocarPodeIniciar(REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.REVISAO)).isTrue();
+        assertThat(invocarPodeIniciar(REVISAO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.REVISAO)).isFalse();
+
+        // DIAGNOSTICO
+        assertThat(invocarPodeIniciar(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isTrue();
+        assertThat(invocarPodeIniciar(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
+
+        // Tipo nulo
+        assertThat(invocarPodeIniciar(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, null)).isFalse();
+    }
+
+    private boolean invocarPodeIniciar(SituacaoSubprocesso target, SituacaoSubprocesso nova, TipoProcesso tipo) {
+        return (boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "podeIniciar", nova, tipo);
+    }
 }

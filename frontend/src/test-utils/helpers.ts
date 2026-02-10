@@ -52,7 +52,7 @@ export async function prepareFreshAtividadesStore() {
         Math.max(
             ...initialAtividades.flatMap((a: Atividade) => [
                 a.codigo,
-                ...a.conhecimentos.map((c: any) => c.id),
+                ...a.conhecimentos.map((c: any) => c.codigo),
             ]),
         ) + 1;
     return store;

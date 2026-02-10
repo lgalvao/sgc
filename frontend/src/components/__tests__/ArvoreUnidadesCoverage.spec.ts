@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {mount} from "@vue/test-utils";
+import {mount, RouterLinkStub} from "@vue/test-utils";
 import ArvoreUnidades from "../ArvoreUnidades.vue";
 
 describe("ArvoreUnidades.vue Coverage", () => {
@@ -9,7 +9,12 @@ describe("ArvoreUnidades.vue Coverage", () => {
                 unidades: [],
                 modelValue: []
             },
-            global: { stubs: { UnidadeTreeNode: true } }
+            global: {
+                stubs: {
+                    UnidadeTreeNode: true,
+                    RouterLink: RouterLinkStub
+                }
+            }
         });
 
         // Initial state
@@ -30,7 +35,12 @@ describe("ArvoreUnidades.vue Coverage", () => {
                 unidades: [{ codigo: 1, sigla: "A", nome: "A", filhas: [] }],
                 modelValue: []
             },
-            global: { stubs: { UnidadeTreeNode: true } }
+            global: {
+                stubs: {
+                    UnidadeTreeNode: true,
+                    RouterLink: RouterLinkStub
+                }
+            }
         });
 
         expect((wrapper.vm as any).unidadesSelecionadasLocal).toEqual([]);
@@ -48,7 +58,12 @@ describe("ArvoreUnidades.vue Coverage", () => {
                 unidades: [],
                 modelValue: [1]
             },
-            global: { stubs: { UnidadeTreeNode: true } }
+            global: {
+                stubs: {
+                    UnidadeTreeNode: true,
+                    RouterLink: RouterLinkStub
+                }
+            }
         });
 
         // Update modelValue with same values (different reference)

@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.repo.ComumRepo;
-import sgc.organizacao.model.ResponsabilidadeRepo;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
 
@@ -17,8 +15,6 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class UsuarioConsultaService {
     private final UsuarioRepo usuarioRepo;
-    private final ResponsabilidadeRepo responsabilidadeRepo;
-    private final ComumRepo repo;
     private static final String ENTIDADE_USUARIO = "Usuário";
 
     public Usuario buscarPorId(String titulo) {
