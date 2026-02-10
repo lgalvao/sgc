@@ -1,4 +1,6 @@
 spring:
+  server:
+    port: 10000
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -19,6 +21,11 @@ spring:
       platform: oracle
 
 aplicacao:
+  cors:
+    allowed-origins: http://localhost:5173,http://localhost:3000,http://localhost:8081
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS,HEAD
+    allowed-headers: "*"
+    allow-credentials: true
   ambiente-testes: false
   acesso-ad:
     base-url: ${AD_BASE_URL:https://sedesenvdev01.tre-pe.gov.br/acessoAD}
