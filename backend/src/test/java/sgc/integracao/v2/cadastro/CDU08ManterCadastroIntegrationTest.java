@@ -9,6 +9,7 @@ import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.v2.BaseIntegrationTestV2;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -19,6 +20,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
 /**
  * Testes de integração para CDU-08: Manter Cadastro de Atividades e Conhecimentos
@@ -42,6 +44,34 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
     
     private static final String API_ATIVIDADES = "/api/atividades";
     private static final String API_SUBPROCESSOS = "/api/subprocessos";
+    private static final String TITULO_TITULAR_TESTE = "111111111111";
+    
+    /**
+     * Cria uma unidade com o titular definido para funcionar com @WithMockChefe.
+     * O titular padrão "111111111111" corresponde ao usuário criado por @WithMockChefe.
+     * Também cria a atribuição de perfil CHEFE para essa unidade.
+     */
+    private Unidade criarUnidadeComTitular(String nome) {
+        // Cria a unidade usando criarUnidadeOperacional
+        Unidade unidade = criarUnidadeOperacional(nome);
+        
+        // Define o titular diretamente no objeto antes de salvar
+        unidade.setTituloTitular(TITULO_TITULAR_TESTE);
+        unidade.setMatriculaTitular("11111111");
+        unidade.setDataInicioTitularidade(java.time.LocalDateTime.now());
+        unidade = unidadeRepo.saveAndFlush(unidade);
+        
+        try {
+            // Cria atribuição de perfil CHEFE para o titular na unidade
+            jdbcTemplate.update(
+                "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (TITULO_USUARIO, PERFIL, CODIGO_UNIDADE) VALUES (?, ?, ?)",
+                TITULO_TITULAR_TESTE, "CHEFE", unidade.getCodigo());
+        } catch (Exception e) {
+            // Se já existir, ignora
+        }
+        
+        return unidade;
+    }
     
     /**
      * Cria um subprocesso de mapeamento em andamento para testes.
@@ -84,7 +114,7 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
         @DisplayName("CHEFE deve conseguir adicionar atividade")
         void testChefeAdicionaAtividade() throws Exception {
             // ARRANGE
-            Unidade unidade = criarUnidadeOperacional("Unidade Teste");
+            Unidade unidade = criarUnidadeComTitular("Unidade Teste");
             Long mapaCodigo = criarSubprocessoERetornarMapaCodigo(unidade);
             
             String requestBody = String.format("""
@@ -99,6 +129,7 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
             mockMvc.perform(post(API_ATIVIDADES)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody))
+                    .andDo(print())
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.atividade.codigo").exists())
                     .andExpect(jsonPath("$.atividade.descricao").value("Realizar análise de documentos"));
@@ -109,7 +140,7 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
         @DisplayName("Deve rejeitar atividade sem descrição")
         void testRejeitarAtividadeSemDescricao() throws Exception {
             // ARRANGE
-            Unidade unidade = criarUnidadeOperacional("Unidade Teste");
+            Unidade unidade = criarUnidadeComTitular("Unidade Teste");
             Long mapaCodigo = criarSubprocessoERetornarMapaCodigo(unidade);
             
             String requestBody = String.format("""
@@ -132,7 +163,7 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
         @DisplayName("Deve criar múltiplas atividades")
         void testCriarMultiplasAtividades() throws Exception {
             // ARRANGE
-            Unidade unidade = criarUnidadeOperacional("Unidade Teste");
+            Unidade unidade = criarUnidadeComTitular("Unidade Teste");
             Long mapaCodigo = criarSubprocessoERetornarMapaCodigo(unidade);
             
             // ACT - Criar primeira atividade
@@ -177,7 +208,7 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
         @DisplayName("CHEFE deve conseguir editar atividade")
         void testChefeEditaAtividade() throws Exception {
             // ARRANGE
-            Unidade unidade = criarUnidadeOperacional("Unidade Teste");
+            Unidade unidade = criarUnidadeComTitular("Unidade Teste");
             Long mapaCodigo = criarSubprocessoERetornarMapaCodigo(unidade);
             
             // Criar atividade primeiro
@@ -224,7 +255,7 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
         @DisplayName("CHEFE deve conseguir remover atividade")
         void testChefeRemoveAtividade() throws Exception {
             // ARRANGE
-            Unidade unidade = criarUnidadeOperacional("Unidade Teste");
+            Unidade unidade = criarUnidadeComTitular("Unidade Teste");
             Long mapaCodigo = criarSubprocessoERetornarMapaCodigo(unidade);
             
             // Criar atividade primeiro
@@ -266,7 +297,7 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
         @DisplayName("CHEFE deve conseguir adicionar conhecimento a atividade")
         void testChefeAdicionaConhecimento() throws Exception {
             // ARRANGE
-            Unidade unidade = criarUnidadeOperacional("Unidade Teste");
+            Unidade unidade = criarUnidadeComTitular("Unidade Teste");
             Long mapaCodigo = criarSubprocessoERetornarMapaCodigo(unidade);
             
             // Criar atividade primeiro
@@ -311,7 +342,7 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
         @DisplayName("CHEFE deve conseguir editar conhecimento")
         void testChefeEditaConhecimento() throws Exception {
             // ARRANGE - Criar atividade e conhecimento
-            Unidade unidade = criarUnidadeOperacional("Unidade Teste");
+            Unidade unidade = criarUnidadeComTitular("Unidade Teste");
             Long mapaCodigo = criarSubprocessoERetornarMapaCodigo(unidade);
             
             // Criar atividade
@@ -370,7 +401,7 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
         @DisplayName("CHEFE deve conseguir remover conhecimento")
         void testChefeRemoveConhecimento() throws Exception {
             // ARRANGE - Criar atividade com conhecimento
-            Unidade unidade = criarUnidadeOperacional("Unidade Teste");
+            Unidade unidade = criarUnidadeComTitular("Unidade Teste");
             Long mapaCodigo = criarSubprocessoERetornarMapaCodigo(unidade);
             
             // Criar atividade
@@ -426,7 +457,7 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
         @DisplayName("ADMIN deve conseguir criar atividade")
         void testAdminCriaAtividade() throws Exception {
             // ARRANGE
-            Unidade unidade = criarUnidadeOperacional("Unidade Teste");
+            Unidade unidade = criarUnidadeComTitular("Unidade Teste");
             Long mapaCodigo = criarSubprocessoERetornarMapaCodigo(unidade);
             
             String requestBody = String.format("""
