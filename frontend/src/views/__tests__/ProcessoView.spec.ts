@@ -115,6 +115,9 @@ describe("Processo.vue", () => {
         tipo: "REVISAO",
         situacao: "EM_ANDAMENTO",
         podeHomologarCadastro: true,
+        podeHomologarMapa: true,
+        podeAceitarCadastroBloco: true,
+        podeDisponibilizarMapaBloco: true,
         podeFinalizar: true,
         unidades: [
             {

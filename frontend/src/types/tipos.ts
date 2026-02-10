@@ -134,6 +134,8 @@ export interface Processo {
     podeFinalizar?: boolean;
     podeHomologarCadastro?: boolean;
     podeHomologarMapa?: boolean;
+    podeAceitarCadastroBloco?: boolean;
+    podeDisponibilizarMapaBloco?: boolean;
     unidades: UnidadeParticipante[];
     resumoSubprocessos: ProcessoResumo[];
     // Campos formatados do backend

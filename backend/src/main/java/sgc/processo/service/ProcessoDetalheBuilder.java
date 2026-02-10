@@ -36,6 +36,8 @@ public class ProcessoDetalheBuilder {
                 .podeFinalizar(accessControlService.podeExecutar(usuario, Acao.FINALIZAR_PROCESSO, processo))
                 .podeHomologarCadastro(accessControlService.podeExecutar(usuario, Acao.HOMOLOGAR_CADASTRO_EM_BLOCO, processo))
                 .podeHomologarMapa(accessControlService.podeExecutar(usuario, Acao.HOMOLOGAR_MAPA_EM_BLOCO, processo))
+                .podeAceitarCadastroBloco(accessControlService.podeExecutar(usuario, Acao.ACEITAR_CADASTRO_EM_BLOCO, processo))
+                .podeDisponibilizarMapaBloco(accessControlService.podeExecutar(usuario, Acao.DISPONIBILIZAR_MAPA_EM_BLOCO, processo))
                 .dataCriacaoFormatada(FormatadorData.formatarData(processo.getDataCriacao()))
                 .dataFinalizacaoFormatada(FormatadorData.formatarData(processo.getDataFinalizacao()))
                 .dataLimiteFormatada(FormatadorData.formatarData(processo.getDataLimite()))
@@ -66,7 +68,7 @@ public class ProcessoDetalheBuilder {
             
             // Preencher dados do subprocesso se existir
             Subprocesso sp = mapaSubprocessos.get(participante.getUnidadeCodigo());
-            if (sp != null) {
+            if (sp != null && unidadeDto != null) {
                 unidadeDto.setSituacaoSubprocesso(sp.getSituacao());
                 unidadeDto.setDataLimite(sp.getDataLimiteEtapa1());
                 unidadeDto.setCodSubprocesso(sp.getCodigo());
@@ -77,8 +79,10 @@ public class ProcessoDetalheBuilder {
                         FormatadorData.formatarData(sp.getDataLimiteEtapa1()));
                 unidadeDto.setSituacaoLabel(sp.getSituacao().getDescricao());
             }
-            
-            mapaUnidades.put(participante.getUnidadeCodigo(), unidadeDto);
+
+            if (unidadeDto != null) {
+                mapaUnidades.put(participante.getUnidadeCodigo(), unidadeDto);
+            }
         }
 
         // Loop 2 consolidado: Montar hierarquia E adicionar raízes

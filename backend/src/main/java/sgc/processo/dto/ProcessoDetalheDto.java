@@ -31,6 +31,8 @@ public class ProcessoDetalheDto {
     private boolean podeFinalizar;
     private boolean podeHomologarCadastro;
     private boolean podeHomologarMapa;
+    private boolean podeAceitarCadastroBloco;
+    private boolean podeDisponibilizarMapaBloco;
 
     // Campos formatados para apresentação
     private String dataLimiteFormatada;

@@ -32,7 +32,8 @@ export function useProcessoView() {
     const participantesHierarquia = computed(() => processo.value?.unidades || []);
 
     const podeAceitarBloco = computed(() => {
-        return unidadesElegiveisPorAcao.value.aceitar.length > 0;
+        return (processo.value?.podeAceitarCadastroBloco || false)
+            && unidadesElegiveisPorAcao.value.aceitar.length > 0;
     });
 
     const podeHomologarBloco = computed(() => {
@@ -41,7 +42,7 @@ export function useProcessoView() {
     });
 
     const podeDisponibilizarBloco = computed(() => {
-        return (processo.value?.podeFinalizar || false)
+        return (processo.value?.podeDisponibilizarMapaBloco || false)
             && unidadesElegiveisPorAcao.value.disponibilizar.length > 0;
     });
 

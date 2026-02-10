@@ -69,6 +69,8 @@ public enum Acao {
     EXCLUIR_MAPA("Excluir mapa"),
 
     // ========== AÇÕES EM BLOCO ==========
+    ACEITAR_CADASTRO_EM_BLOCO("Aceitar cadastros em bloco"),
+    DISPONIBILIZAR_MAPA_EM_BLOCO("Disponibilizar mapas em bloco"),
     HOMOLOGAR_CADASTRO_EM_BLOCO("Homologar cadastros em bloco"),
     HOMOLOGAR_MAPA_EM_BLOCO("Homologar mapas em bloco"),
 

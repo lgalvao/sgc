@@ -39,7 +39,9 @@ public class ProcessoAccessPolicy extends AbstractAccessPolicy<Processo> {
             Map.entry(FINALIZAR_PROCESSO, new RegrasAcaoProcesso(EnumSet.of(ADMIN))),
             Map.entry(ENVIAR_LEMBRETE_PROCESSO, new RegrasAcaoProcesso(EnumSet.of(ADMIN))),
             Map.entry(HOMOLOGAR_CADASTRO_EM_BLOCO, new RegrasAcaoProcesso(EnumSet.of(ADMIN, GESTOR, CHEFE))),
-            Map.entry(HOMOLOGAR_MAPA_EM_BLOCO, new RegrasAcaoProcesso(EnumSet.of(ADMIN, GESTOR, CHEFE)))
+            Map.entry(HOMOLOGAR_MAPA_EM_BLOCO, new RegrasAcaoProcesso(EnumSet.of(ADMIN, GESTOR, CHEFE))),
+            Map.entry(ACEITAR_CADASTRO_EM_BLOCO, new RegrasAcaoProcesso(EnumSet.of(ADMIN, GESTOR, CHEFE))),
+            Map.entry(DISPONIBILIZAR_MAPA_EM_BLOCO, new RegrasAcaoProcesso(EnumSet.of(ADMIN, GESTOR, CHEFE)))
     );
 
     @Override
