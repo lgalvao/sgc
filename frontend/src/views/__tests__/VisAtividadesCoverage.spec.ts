@@ -44,6 +44,10 @@ vi.mock("@/services/mapaService", () => ({
 
 vi.mock("@/services/subprocessoService", () => ({
     listarAtividades: vi.fn().mockResolvedValue([]),
+    buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({
+        codigo: 10,
+        permissoes: { podeHomologarCadastro: true, podeVisualizarImpacto: true }
+    }),
     homologarRevisaoCadastro: vi.fn(), // Already mocking in store spy, but good to have
     devolverRevisaoCadastro: vi.fn(),
 }));
@@ -166,7 +170,8 @@ describe("VisAtividades.vue Coverage", () => {
                         {
                             sigla: "U1",
                             codSubprocesso: 10,
-                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, // Triggers isHomologacao=true for ADMIN
+                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
+                            permissoes: { podeHomologarCadastro: true }
                         }
                     ]
                 }

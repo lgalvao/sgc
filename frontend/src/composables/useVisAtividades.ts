@@ -284,7 +284,10 @@ export function useVisAtividades(props: { codProcesso: number | string; sigla: s
     onMounted(async () => {
         await processosStore.buscarProcessoDetalhe(codProcesso.value);
         if (codSubprocesso.value) {
-            await atividadesStore.buscarAtividadesParaSubprocesso(codSubprocesso.value);
+            await Promise.all([
+                atividadesStore.buscarAtividadesParaSubprocesso(codSubprocesso.value),
+                subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value)
+            ]);
         }
     });
 

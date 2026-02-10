@@ -6,10 +6,9 @@ import {useProcessosStore} from '@/stores/processos';
 import {useAtividadesStore} from '@/stores/atividades';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useUnidadesStore} from '@/stores/unidades';
-import {usePerfilStore} from '@/stores/perfil';
 import {useMapasStore} from '@/stores/mapas';
 import {useAnalisesStore} from '@/stores/analises';
-import {Perfil, SituacaoSubprocesso} from '@/types/tipos';
+import {SituacaoSubprocesso} from '@/types/tipos';
 import {flushPromises, mount} from '@vue/test-utils';
 
 const { mockPush } = vi.hoisted(() => ({
@@ -113,12 +112,14 @@ describe('useVisAtividades', () => {
         expect(wrapper.vm.podeVerImpacto).toBe(false);
     });
 
-    it('calcula isHomologacao corretamente para ADMIN', async () => {
+    it('calcula isHomologacao corretamente baseado na permissão', async () => {
         const pinia = createTestingPinia();
-        const perfilStore = usePerfilStore(pinia);
+        const subprocessosStore = useSubprocessosStore(pinia);
         const processosStore = useProcessosStore(pinia);
 
-        perfilStore.perfilSelecionado = Perfil.ADMIN;
+        subprocessosStore.subprocessoDetalhe = {
+            permissoes: { podeHomologarCadastro: true }
+        } as any;
         processosStore.processoDetalhe = {
             unidades: [{ sigla: 'TEST', situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO }]
         } as any;
@@ -131,12 +132,14 @@ describe('useVisAtividades', () => {
         expect(wrapper.vm.isHomologacao).toBe(true);
     });
 
-    it('podeVerImpacto corretamente para GESTOR', () => {
+    it('podeVerImpacto corretamente baseado na permissão', () => {
         const pinia = createTestingPinia();
-        const perfilStore = usePerfilStore(pinia);
+        const subprocessosStore = useSubprocessosStore(pinia);
         const processosStore = useProcessosStore(pinia);
 
-        perfilStore.perfilSelecionado = Perfil.GESTOR;
+        subprocessosStore.subprocessoDetalhe = {
+            permissoes: { podeVisualizarImpacto: true }
+        } as any;
         processosStore.processoDetalhe = {
             unidades: [{ sigla: 'TEST', situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO }]
         } as any;
@@ -189,12 +192,14 @@ describe('useVisAtividades', () => {
         const pinia = createTestingPinia({ stubActions: true });
         const subprocessosStore = useSubprocessosStore(pinia);
         const processosStore = useProcessosStore(pinia);
-        const perfilStore = usePerfilStore(pinia);
 
         processosStore.processoDetalhe = {
             unidades: [{ sigla: 'TEST', codSubprocesso: 123, situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO }]
         } as any;
-        perfilStore.perfilSelecionado = Perfil.ADMIN;
+        subprocessosStore.subprocessoDetalhe = {
+            codigo: 123,
+            permissoes: { podeHomologarCadastro: true }
+        } as any;
 
         const wrapper = mount(TestComponent, {
             props,
@@ -214,13 +219,15 @@ describe('useVisAtividades', () => {
         const pinia = createTestingPinia({ stubActions: true });
         const subprocessosStore = useSubprocessosStore(pinia);
         const processosStore = useProcessosStore(pinia);
-        const perfilStore = usePerfilStore(pinia);
 
         processosStore.processoDetalhe = {
             tipo: 'REVISAO',
             unidades: [{ sigla: 'TEST', codSubprocesso: 123, situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA }]
         } as any;
-        perfilStore.perfilSelecionado = Perfil.ADMIN;
+        subprocessosStore.subprocessoDetalhe = {
+            codigo: 123,
+            permissoes: { podeHomologarCadastro: true }
+        } as any;
 
         const wrapper = mount(TestComponent, {
             props,
@@ -259,13 +266,15 @@ describe('useVisAtividades', () => {
         const pinia = createTestingPinia({ stubActions: true });
         const subprocessosStore = useSubprocessosStore(pinia);
         const processosStore = useProcessosStore(pinia);
-        const perfilStore = usePerfilStore(pinia);
 
         processosStore.processoDetalhe = {
             tipo: 'REVISAO',
             unidades: [{ sigla: 'TEST', codSubprocesso: 123, situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA }]
         } as any;
-        perfilStore.perfilSelecionado = Perfil.GESTOR;
+        subprocessosStore.subprocessoDetalhe = {
+            codigo: 123,
+            permissoes: { podeHomologarCadastro: false, podeAceitarCadastro: true }
+        } as any;
 
         const wrapper = mount(TestComponent, {
             props,
@@ -284,13 +293,15 @@ describe('useVisAtividades', () => {
         const pinia = createTestingPinia({ stubActions: true });
         const subprocessosStore = useSubprocessosStore(pinia);
         const processosStore = useProcessosStore(pinia);
-        const perfilStore = usePerfilStore(pinia);
 
         processosStore.processoDetalhe = {
             tipo: 'MAPEAMENTO',
             unidades: [{ sigla: 'TEST', codSubprocesso: 123, situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO }]
         } as any;
-        perfilStore.perfilSelecionado = Perfil.GESTOR;
+        subprocessosStore.subprocessoDetalhe = {
+            codigo: 123,
+            permissoes: { podeHomologarCadastro: false, podeAceitarCadastro: true }
+        } as any;
 
         const wrapper = mount(TestComponent, {
             props,

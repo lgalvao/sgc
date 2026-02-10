@@ -63,8 +63,21 @@ vi.mock("@/services/processoService", () => ({
     }),
 }));
 
+import { buscarSubprocessoDetalhe } from "@/services/subprocessoService";
+
 vi.mock("@/services/subprocessoService", () => ({
-    buscarSubprocessoDetalhe: vi.fn(),
+    buscarSubprocessoDetalhe: vi.fn().mockImplementation((cod) => Promise.resolve({
+        codigo: cod,
+        permissoes: {
+            podeVerPagina: true,
+            podeEditarMapa: true,
+            podeVisualizarMapa: true,
+            podeVisualizarImpacto: true,
+            podeHomologarCadastro: true,
+            podeAceitarCadastro: true,
+            podeDevolverCadastro: true,
+        }
+    })),
 }));
 
 vi.mock("@/services/mapaService", () => ({
@@ -121,6 +134,7 @@ describe("VisAtividades.vue", () => {
                                         nome: "Unidade 1",
                                         codSubprocesso: 10,
                                         situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                                        permissoes: { podeVisualizarImpacto: true }
                                     }
                                 ]
                             }
@@ -130,6 +144,12 @@ describe("VisAtividades.vue", () => {
                         },
                         atividades: {
                             // ... activities mock if needed
+                        },
+                        subprocessos: {
+                            subprocessoDetalhe: {
+                                codigo: 10,
+                                permissoes: { podeHomologarCadastro: true, podeVisualizarImpacto: true }
+                            }
                         },
                         ...initialState,
                     },
@@ -150,7 +170,22 @@ describe("VisAtividades.vue", () => {
     });
 
     it("deve validar cadastro (Homologar) e redirecionar", async () => {
-        const wrapper = mount(VisAtividades, mountOptions());
+        const wrapper = mount(VisAtividades, mountOptions({
+            processos: {
+                processoDetalhe: {
+                    codigo: 1,
+                    tipo: TipoProcesso.REVISAO,
+                    unidades: [
+                        {
+                            sigla: "U1",
+                            codSubprocesso: 10,
+                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
+                            permissoes: { podeHomologarCadastro: true, podeVisualizarImpacto: true }
+                        }
+                    ]
+                }
+            }
+        }));
         subprocessosStore = useSubprocessosStore();
 
         // Mock success response
@@ -188,8 +223,15 @@ describe("VisAtividades.vue", () => {
                             sigla: "U1",
                             codSubprocesso: 10,
                             situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                            permissoes: { podeAceitarCadastro: true }
                         }
                     ]
+                }
+            },
+            subprocessos: {
+                subprocessoDetalhe: {
+                    codigo: 10,
+                    permissoes: { podeAceitarCadastro: true, podeHomologarCadastro: false }
                 }
             }
         }));
@@ -256,7 +298,7 @@ describe("VisAtividades.vue", () => {
             processos: {
                 processoDetalhe: {
                     codigo: 2,
-                    tipo: 'MAPEAMENTO',
+                    tipo: TipoProcesso.MAPEAMENTO,
                     unidades: [
                         {
                             sigla: "U1",
@@ -264,6 +306,12 @@ describe("VisAtividades.vue", () => {
                             situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
                         }
                     ]
+                }
+            },
+            subprocessos: {
+                subprocessoDetalhe: {
+                    codigo: 20,
+                    permissoes: { podeVisualizarImpacto: true, podeHomologarCadastro: true }
                 }
             }
         });
@@ -317,7 +365,14 @@ describe("VisAtividades.vue", () => {
                             sigla: "U1",
                             codSubprocesso: 20,
                             situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                            permissoes: { podeAceitarCadastro: true }
                         }]
+                    }
+                },
+                subprocessos: {
+                    subprocessoDetalhe: {
+                        codigo: 20,
+                        permissoes: { podeAceitarCadastro: true, podeHomologarCadastro: false }
                     }
                 }
             }));
@@ -375,7 +430,8 @@ describe("VisAtividades.vue", () => {
                 unidades: [{
                     sigla: "U1",
                     codSubprocesso: 10,
-                    situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
+                    situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                    permissoes: { podeHomologarCadastro: true }
                 }]
             });
         });
@@ -497,7 +553,8 @@ describe("VisAtividades.vue", () => {
                 unidades: [{
                     sigla: "U1",
                     codSubprocesso: 20,
-                    situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+                    situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
+                    permissoes: { podeHomologarCadastro: true }
                 }]
             });
             const wrapper = mount(VisAtividades, mountOptions({
@@ -509,7 +566,8 @@ describe("VisAtividades.vue", () => {
                         unidades: [{
                             sigla: "U1",
                             codSubprocesso: 20,
-                            situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+                            situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
+                            permissoes: { podeHomologarCadastro: true }
                         }]
                     }
                 }
@@ -526,7 +584,8 @@ describe("VisAtividades.vue", () => {
                 unidades: [{
                     sigla: "U1",
                     codSubprocesso: 10,
-                    situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
+                    situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
+                    permissoes: { podeHomologarCadastro: true }
                 }]
             });
             const wrapper = mount(VisAtividades, mountOptions({
@@ -538,7 +597,8 @@ describe("VisAtividades.vue", () => {
                         unidades: [{
                             sigla: "U1",
                             codSubprocesso: 10,
-                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
+                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
+                            permissoes: { podeHomologarCadastro: true }
                         }]
                     }
                 }
@@ -547,7 +607,12 @@ describe("VisAtividades.vue", () => {
             expect((wrapper.vm as any).isHomologacao).toBe(true);
         });
 
-        it("isHomologacao deve ser false se perfil não for ADMIN", async () => {
+        it("isHomologacao deve ser false se permissão for false", async () => {
+            (buscarSubprocessoDetalhe as any).mockImplementation((cod: number) => Promise.resolve({
+                codigo: cod,
+                permissoes: { podeHomologarCadastro: false }
+            }));
+
             const wrapper = mount(VisAtividades, mountOptions({
                 perfil: { perfilSelecionado: Perfil.GESTOR },
                 processos: {
@@ -557,11 +622,13 @@ describe("VisAtividades.vue", () => {
                         unidades: [{
                             sigla: "U1",
                             codSubprocesso: 10,
-                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
+                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                            permissoes: { podeAceitarCadastro: true }
                         }]
                     }
                 }
             }));
+            await flushPromises();
             expect((wrapper.vm as any).isHomologacao).toBe(false);
         });
 
@@ -578,7 +645,8 @@ describe("VisAtividades.vue", () => {
                         tipo: TipoProcesso.REVISAO,
                         unidades: []
                     }
-                }
+                },
+                subprocessos: { subprocessoDetalhe: null }
             }));
             expect((wrapper.vm as any).podeVerImpacto).toBe(false);
         });
