@@ -27,7 +27,6 @@ import tools.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -756,18 +755,6 @@ class ProcessoControllerTest {
         void deveRetornarBadRequestQuandoProcessadorNulo() {
             IniciarProcessoRequest req = new IniciarProcessoRequest(null, List.of());
             
-            // Como getProcessadoresInicio é protected/private e estamos testando controller real,
-            // não podemos mockar facilmente sem spy. 
-            // Mas o teste original usava spy. Aqui vamos testar o fluxo que leva ao erro.
-            // Se tipoProcesso é null no request, deve dar bad request se a validação não pegar antes.
-            // Assumindo que a validação @Valid deixa passar null (se não tiver @NotNull no DTO),
-            // ou se o DTO permite null mas o controller valida.
-
-            // No controller original:
-            // var processador = getProcessadoresInicio().get(request.tipoProcesso());
-            // if (processador == null) return ResponseEntity.badRequest()...
-            
-            // Se passarmos um tipo que não está no map (ex: null), deve retornar bad request.
                         org.springframework.http.ResponseEntity<Object> response = controller.iniciar(1L, req);
                         assertEquals(org.springframework.http.HttpStatus.BAD_REQUEST, response.getStatusCode());
                     }
@@ -775,15 +762,8 @@ class ProcessoControllerTest {
                     @Test
                     @DisplayName("Deve retornar bad request quando tipo de processo é desconhecido")
                     void deveRetornarBadRequestQuandoTipoDesconhecido() {
-                        // Criando um mock de TipoProcesso que não existe no Map real (se possível)
-                        // Ou apenas passando null para o tipo se a validação permitir (já testado)
-                        // No controller: var processador = getProcessadoresInicio().get(req.tipo());
-                        
-                        // Como TipoProcesso é enum, não podemos criar novos valores em runtime facilmente.
-                        // Mas podemos fazer o Map retornar null se o enum for mockado ou se usarmos um valor que não está no Map.
-                        // O Map real tem MAPEAMENTO, REVISAO, DIAGNOSTICO.
-                        
-                        // Vamos usar Spy no controller para mockar o Map retornado por getProcessadoresInicio
+                       
+                       // Vamos usar Spy no controller para mockar o Map retornado por getProcessadoresInicio
                         ProcessoController spyController = spy(controller);
                         doReturn(Collections.emptyMap()).when(spyController).getProcessadoresInicio();
                         

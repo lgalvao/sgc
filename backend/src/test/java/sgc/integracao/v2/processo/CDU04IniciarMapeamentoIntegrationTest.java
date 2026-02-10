@@ -14,7 +14,6 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -42,9 +41,6 @@ class CDU04IniciarMapeamentoIntegrationTest extends BaseIntegrationTestV2 {
     
     private static final String API_PROCESSOS = "/api/processos";
     private static final String API_SUBPROCESSOS = "/api/subprocessos";
-    private static final String API_ALERTAS = "/api/alertas";
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-    
     /**
      * Cria um processo de mapeamento na situação 'Criado' para teste.
      * Usa repository diretamente para evitar problemas de autenticação em testes não-admin.
@@ -222,7 +218,7 @@ class CDU04IniciarMapeamentoIntegrationTest extends BaseIntegrationTestV2 {
             mockMvc.perform(post(API_PROCESSOS + "/{codigo}/iniciar", processoJaIniciado.getCodigo())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody))
-                    .andExpect(status().isUnprocessableEntity()); // 422
+                    .andExpect(status().is(422)); // 422 (Unprocessable Entity)
         }
         
         @Test
@@ -253,7 +249,7 @@ class CDU04IniciarMapeamentoIntegrationTest extends BaseIntegrationTestV2 {
         @DisplayName("GESTOR não deve conseguir iniciar processo")
         void testGestorNaoPodeIniciarProcesso() throws Exception {
             // ARRANGE
-            Unidade unidade = criarUnidadeOperacional("Unidade Teste");
+            Unidade unidade = criarUnidadeOperacional("Unidade Teste Gestor");
             Processo processo = criarProcessoCriadoMapeamento(List.of(unidade));
             
             String requestBody = String.format("""

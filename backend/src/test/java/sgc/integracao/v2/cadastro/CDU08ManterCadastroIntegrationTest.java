@@ -9,7 +9,6 @@ import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.v2.BaseIntegrationTestV2;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -43,7 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
     
     private static final String API_ATIVIDADES = "/api/atividades";
-    private static final String API_SUBPROCESSOS = "/api/subprocessos";
     private static final String TITULO_TITULAR_TESTE = "111111111111";
     
     /**

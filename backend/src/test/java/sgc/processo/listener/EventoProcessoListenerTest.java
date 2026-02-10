@@ -710,11 +710,6 @@ class EventoProcessoListenerTest {
                     .substitutoTitulo("SUB") 
                     .build();
             
-            UsuarioDto titular = UsuarioDto.builder()
-                    .tituloEleitoral("TIT")
-                    .email("tit@test.com")
-                    .build();
-
             when(processoFacade.buscarEntidadePorId(codProcesso)).thenReturn(processo);
             when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(11L, resp));

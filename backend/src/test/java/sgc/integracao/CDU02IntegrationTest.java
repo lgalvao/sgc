@@ -25,7 +25,6 @@ import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -140,15 +139,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             }
             return newUser;
         });
-
-        Set<UsuarioPerfil> perfisSet = new HashSet<>();
-        for (String perfilStr : perfis) {
-            perfisSet.add(UsuarioPerfil.builder()
-                    .usuario(usuario)
-                    .unidade(unidade)
-                    .perfil(Perfil.valueOf(perfilStr))
-                    .build());
-        }
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario, null,
                 usuario.getAuthorities());
