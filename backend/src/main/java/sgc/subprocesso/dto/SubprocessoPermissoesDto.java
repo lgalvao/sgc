@@ -15,6 +15,7 @@ public record SubprocessoPermissoesDto(
         boolean podeDisponibilizarCadastro,
         boolean podeDevolverCadastro,
         boolean podeAceitarCadastro,
+        boolean podeHomologarCadastro,
         boolean podeVisualizarDiagnostico,
         boolean podeAlterarDataLimite,
         boolean podeVisualizarImpacto,

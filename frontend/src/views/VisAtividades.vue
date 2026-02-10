@@ -37,7 +37,7 @@
             variant="success"
             @click="validarCadastro"
         >
-          {{ perfilSelecionado === Perfil.ADMIN ? 'Homologar' : 'Registrar aceite' }}
+          {{ isHomologacao ? 'Homologar' : 'Registrar aceite' }}
         </BButton>
       </template>
     </PageHeader>
@@ -148,8 +148,6 @@ const {
   mostrarModalDevolver,
   loadingDevolucao,
   observacaoDevolucao,
-  perfilSelecionado,
-  Perfil,
   abrirModalImpacto,
   fecharModalImpacto,
   abrirModalHistoricoAnalise,

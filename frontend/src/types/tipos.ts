@@ -295,6 +295,7 @@ export interface SubprocessoPermissoes {
     podeDisponibilizarCadastro: boolean;
     podeDevolverCadastro: boolean;
     podeAceitarCadastro: boolean;
+    podeHomologarCadastro?: boolean;
     podeVisualizarDiagnostico: boolean;
     podeAlterarDataLimite: boolean;
     podeVisualizarImpacto: boolean;

@@ -4,7 +4,6 @@ import {storeToRefs} from "pinia";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useProcessosStore} from "@/stores/processos";
-import {usePerfilStore} from "@/stores/perfil";
 import {useAnalisesStore} from "@/stores/analises";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -16,8 +15,6 @@ import {
     type DevolverCadastroRequest,
     type HomologarCadastroRequest,
     type ImpactoMapa,
-    Perfil,
-    SituacaoSubprocesso,
     TipoProcesso,
     type Unidade,
     type UnidadeParticipante,
@@ -35,8 +32,6 @@ export interface UseVisAtividades {
     podeVerImpacto: ComputedRef<boolean>;
     codSubprocesso: ComputedRef<number | undefined>;
     historicoAnalises: ComputedRef<Analise[]>;
-    perfilSelecionado: ComputedRef<Perfil | null>;
-    Perfil: typeof Perfil;
 
     // Modais
     impactoMapa: Ref<ImpactoMapa | null>;
@@ -81,7 +76,6 @@ export function useVisAtividades(props: { codProcesso: number | string; sigla: s
     const atividadesStore = useAtividadesStore();
     const unidadesStore = useUnidadesStore();
     const processosStore = useProcessosStore();
-    const perfilStore = usePerfilStore();
     const analisesStore = useAnalisesStore();
     const mapasStore = useMapasStore();
     const subprocessosStore = useSubprocessosStore();
@@ -106,7 +100,6 @@ export function useVisAtividades(props: { codProcesso: number | string; sigla: s
 
     const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value);
     const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ""));
-    const perfilSelecionado = computed(() => perfilStore.perfilSelecionado);
 
     const subprocesso = computed(() => {
         if (!processosStore.processoDetalhe) return null;
@@ -125,27 +118,14 @@ export function useVisAtividades(props: { codProcesso: number | string; sigla: s
         return encontrarUnidade(processosStore.processoDetalhe.unidades);
     });
 
+    const permissoes = computed(() => subprocessosStore.subprocessoDetalhe?.permissoes);
+
     const isHomologacao = computed(() => {
-        if (!subprocesso.value) return false;
-        const { situacaoSubprocesso } = subprocesso.value;
-        const perfil = perfilSelecionado.value;
-        return (
-            perfil === Perfil.ADMIN &&
-            (situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-                situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO ||
-                situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
-                situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
-        );
+        return permissoes.value?.podeHomologarCadastro ?? false;
     });
 
     const podeVerImpacto = computed(() => {
-        if (!subprocesso.value || !perfilSelecionado.value) return false;
-        const perfil = perfilSelecionado.value;
-        const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
-        const situacaoCorreta =
-            subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-            subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
-        return podeVer && situacaoCorreta;
+        return permissoes.value?.podeVisualizarImpacto ?? false;
     });
 
     const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
@@ -318,8 +298,6 @@ export function useVisAtividades(props: { codProcesso: number | string; sigla: s
         podeVerImpacto,
         codSubprocesso,
         historicoAnalises,
-        perfilSelecionado,
-        Perfil,
 
         // Modais
         impactoMapa,
