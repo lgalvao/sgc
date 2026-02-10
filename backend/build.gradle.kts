@@ -79,6 +79,9 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.5.25")
     implementation("ch.qos.logback:logback-core:1.5.25")
     testImplementation("org.assertj:assertj-core:3.27.7")
+
+    // Analise Estatica
+    implementation("org.jspecify:jspecify:1.0.0")
 }
 
 
