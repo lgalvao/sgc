@@ -13,6 +13,7 @@ public class UsuarioFixture {
     public static Usuario usuarioPadrao() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("123456789012");
+        usuario.setMatricula("12345678"); // Campo obrigatório para VW_USUARIO
         usuario.setNome("Usuário Teste");
         usuario.setEmail("teste@example.com");
         usuario.setRamal("1234");
@@ -42,6 +43,9 @@ public class UsuarioFixture {
     public static Usuario usuarioComTitulo(String titulo) {
         Usuario usuario = usuarioPadrao();
         usuario.setTituloEleitoral(titulo);
+        // Gera matrícula a partir do título (últimos 8 caracteres ou padding com zeros)
+        String matricula = titulo.length() >= 8 ? titulo.substring(titulo.length() - 8) : String.format("%08d", Integer.parseInt(titulo));
+        usuario.setMatricula(matricula);
         return usuario;
     }
 }

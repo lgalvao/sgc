@@ -1,5 +1,7 @@
 package sgc.integracao.v2.cadastro;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,6 +44,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @DisplayName("CDU-08: Manter Cadastro de Atividades e Conhecimentos")
 class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
     
+    @PersistenceContext
+    private EntityManager entityManager;
+    
     private static final String API_ATIVIDADES = "/api/atividades";
     private static final String API_SUBPROCESSOS = "/api/subprocessos";
     private static final String TITULO_TITULAR_TESTE = "111111111111";
@@ -52,13 +57,16 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
      * Também cria a atribuição de perfil CHEFE para essa unidade.
      */
     private Unidade criarUnidadeComTitular(String nome) {
-        // Cria a unidade usando criarUnidadeOperacional
-        Unidade unidade = criarUnidadeOperacional(nome);
-        
-        // Define o titular diretamente no objeto antes de salvar
+        // Cria a unidade com TODOS os campos obrigatórios ANTES de salvar
+        // (Unidade é @Immutable, não pode ser alterada depois de persistida)
+        Unidade unidade = new Unidade();
+        unidade.setNome(nome);
+        unidade.setSigla(nome.substring(0, Math.min(nome.length(), 10)).toUpperCase());
+        unidade.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        unidade.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
         unidade.setTituloTitular(TITULO_TITULAR_TESTE);
         unidade.setMatriculaTitular("11111111");
-        unidade.setDataInicioTitularidade(java.time.LocalDateTime.now());
+        unidade.setDataInicioTitularidade(LocalDateTime.now());
         unidade = unidadeRepo.saveAndFlush(unidade);
         
         try {
@@ -101,6 +109,11 @@ class CDU08ManterCadastroIntegrationTest extends BaseIntegrationTestV2 {
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocesso);
         mapa = mapaRepo.saveAndFlush(mapa);
+        
+        // Força o flush e limpa o cache do entity manager para garantir que
+        // a próxima busca do subprocesso carregue o mapa do banco de dados
+        entityManager.flush();
+        entityManager.clear();
         
         return mapa.getCodigo();
     }
