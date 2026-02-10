@@ -126,7 +126,7 @@ class SubprocessoAtividadeService {
      */
     @Transactional(readOnly = true)
     public List<AtividadeDto> listarAtividadesSubprocesso(Long codSubprocesso) {
-        Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
+        Subprocesso subprocesso = crudService.buscarSubprocessoComMapa(codSubprocesso);
         List<Atividade> todasAtividades = mapaManutencaoService
                 .buscarAtividadesPorMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
         return todasAtividades.stream().map(this::mapAtividadeToDto).toList();

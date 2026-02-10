@@ -60,7 +60,9 @@ public class SubprocessoCrudService {
      * que exista.
      */
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
-        return buscarSubprocesso(codigo);
+        return subprocessoRepo
+                .findByIdWithMapa(codigo)
+                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(MSG_SUBPROCESSO_NAO_ENCONTRADO));
     }
 
     @Transactional(readOnly = true)
@@ -81,7 +83,7 @@ public class SubprocessoCrudService {
     @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
         return subprocessoRepo
-                .findByMapaCodigo(codMapa)
+                .findByMapaCodigoWithMapa(codMapa)
                 .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(
                         "%s para o mapa com código %d".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codMapa)));
     }
