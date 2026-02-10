@@ -392,10 +392,60 @@ Baseado no rastreamento, os próximos CDUs a implementar são:
 - `data.sql`: Usado automaticamente por `application.yml` test profile
 - `integration-test-seed.sql`: Referência para criação de novos dados base (se necessário no futuro)
 
-## 12. Changelog
+## 12. Problemas em Investigação
+
+### 12.1. CDU-08: Campo tituloTitular Não Persiste
+
+**Status**: 🔴 Bloqueado - Aguardando decisão técnica
+
+**Problema**: Testes de CDU-08 (Manter Cadastro) falham com HTTP 500 devido a `NullPointerException` em `AbstractAccessPolicy.verificaHierarquia()` linha 104.
+
+**Causa Raiz Identificada**:
+```
+java.lang.NullPointerException: Cannot invoke "String.equals(Object)" because "tituloTitular" is null
+    at sgc.seguranca.acesso.AbstractAccessPolicy.verificaHierarquia(AbstractAccessPolicy.java:104)
+    at sgc.seguranca.acesso.AtividadeAccessPolicy.canExecute(AtividadeAccessPolicy.java:73)
+```
+
+O access control verifica se o usuário é o titular da unidade comparando:
+```java
+String tituloTitular = unidade.getTituloTitular();
+yield tituloTitular.equals(usuario.getTituloEleitoral());  // NPE se tituloTitular é null
+```
+
+**Tentativas de Correção (todas falharam)**:
+1. ❌ `jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET TITULO_TITULAR...")` - Não persiste
+2. ❌ `unidade.setTituloTitular(...)` + `unidadeRepo.saveAndFlush()` - Não persiste  
+3. ❌ `jdbcTemplate.update("INSERT INTO SGC.VW_UNIDADE ...")` - N/A (unidade já existe)
+
+**Hipótese**: VW_UNIDADE é uma VIEW do banco, não uma tabela. Campos como `TITULO_TITULAR` vêm de tabela base e não são atualizáveis via JPA ou UPDATE na view.
+
+**Workaround Temporário**: Usar unidades pré-existentes do `data.sql` que já possuem `titulo_titular` definido.
+
+**Opções de Solução Permanente**:
+1. Modificar `AbstractAccessPolicy` para null-safe check (mudança em produção - requer análise de impacto)
+2. Descobrir tabela base e inserir dados corretamente (requer investigação do schema)
+3. Aceitar limitação e usar apenas unidades do `data.sql` nos testes (limita flexibilidade)
+
+**Próximos Passos**:
+- Consultar DBA ou documentação para entender schema de VW_UNIDADE
+- Verificar se VW_UNIDADE é uma VIEW e qual a tabela base
+- Decidir entre fix em produção (null-safe) ou ajuste de teste
+
+**Impacto**:
+- CDU-08 bloqueado (8/9 testes falhando)
+- CDU-09 e CDU-13 dependem de CDU-08 funcionando
+- Pode impactar outros testes futuros que precisem criar unidades com titular
+
+**Data**: 2026-02-10
+
+---
+
+## 13. Changelog
 
 | Data | Autor | Mudanças |
 |------|-------|----------|
+| 2026-02-10 | Sistema | Documentação de bloqueio em CDU-08: tituloTitular não persiste |
 | 2026-02-10 | Sistema | Implementação de CDU-04: Iniciar Processo de Mapeamento |
 | 2026-02-10 | Sistema | Resolução do problema de isolamento de testes |
 | 2026-02-09 | Sistema | Criação do documento com aprendizados iniciais |
@@ -405,7 +455,7 @@ Baseado no rastreamento, os próximos CDUs a implementar são:
 
 ---
 
-## 12. Contribuidores
+## 14. Contribuidores
 
 Para contribuir com este documento:
 1. Documente aprendizados ao criar novos testes
