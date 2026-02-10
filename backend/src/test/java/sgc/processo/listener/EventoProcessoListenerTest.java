@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import sgc.alerta.AlertaFacade;
-import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UnidadeFacade;
@@ -150,7 +149,7 @@ class EventoProcessoListenerTest {
 
         // Testa ErroEstadoImpossivel ao criar corpo
         assertThatThrownBy(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.RAIZ, processo, s))
-                .isInstanceOf(ErroEstadoImpossivel.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         // Testa ErroEstadoImpossivel ao definir assunto no fluxo principal
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
@@ -371,7 +370,7 @@ class EventoProcessoListenerTest {
         s.setUnidade(u);
 
         assertThatThrownBy(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, processo, s))
-                .isInstanceOf(ErroEstadoImpossivel.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -716,9 +715,7 @@ class EventoProcessoListenerTest {
             processo.setTipo(TipoProcesso.MAPEAMENTO);
 
             Subprocesso subprocesso = new Subprocesso();
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(99L);
-            unidade.setTipo(TipoUnidade.OPERACIONAL);
+            Unidade unidade = criarUnidade(99L, TipoUnidade.OPERACIONAL);
             unidade.setSigla("U99");
             subprocesso.setUnidade(unidade);
             subprocesso.setCodigo(201L);
@@ -747,16 +744,12 @@ class EventoProcessoListenerTest {
             processo.setCodigo(codProcesso);
             processo.setDescricao("Processo");
 
-            Unidade uInter = new Unidade();
-            uInter.setCodigo(1L);
-            uInter.setTipo(TipoUnidade.INTERMEDIARIA);
+            Unidade uInter = criarUnidade(1L, TipoUnidade.INTERMEDIARIA);
             uInter.setSigla("UI");
 
-            Unidade uSuperiorDiferente = new Unidade();
-            uSuperiorDiferente.setCodigo(9L);
+            Unidade uSuperiorDiferente = criarUnidade(9L, TipoUnidade.OPERACIONAL);
 
-            Unidade uSubordinadaInvalida = new Unidade();
-            uSubordinadaInvalida.setCodigo(2L);
+            Unidade uSubordinadaInvalida = criarUnidade(2L, TipoUnidade.OPERACIONAL);
             uSubordinadaInvalida.setUnidadeSuperior(uSuperiorDiferente);
 
             processo.adicionarParticipantes(Set.of(uInter, uSubordinadaInvalida));
@@ -792,9 +785,11 @@ class EventoProcessoListenerTest {
         @Test
         @DisplayName("criarCorpoEmailPorTipo deve disparar ErroEstadoImpossivel para tipo RAIZ (isolado)")
         void criarCorpoEmailPorTipo_Erro() {
+            Processo p = new Processo();
+            Subprocesso s = new Subprocesso();
             org.assertj.core.api.Assertions.assertThatThrownBy(() -> 
-                listener.criarCorpoEmailPorTipo(TipoUnidade.RAIZ, new Processo(), new Subprocesso())
-            ).isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class);
+                listener.criarCorpoEmailPorTipo(TipoUnidade.RAIZ, p, s)
+            ).isInstanceOf(IllegalArgumentException.class);
         }
     }
 }

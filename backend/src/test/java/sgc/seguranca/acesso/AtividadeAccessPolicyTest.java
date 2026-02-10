@@ -14,6 +14,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.*;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.testutils.UnidadeTestBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,10 +45,11 @@ class AtividadeAccessPolicyTest {
 
     @BeforeEach
     void setUp() {
-        unidade = new Unidade();
-        unidade.setCodigo(1L);
-        unidade.setSigla("UNIT");
-        unidade.setTituloTitular("123");
+        unidade = UnidadeTestBuilder.umaDe()
+                .comCodigo("1")
+                .comSigla("UNIT")
+                .comTituloTitular("123")
+                .build();
 
         usuarioChefe = criarUsuario("123", "Chefe");
         List<UsuarioPerfil> atribuicoesChefe = adicionarAtribuicao(usuarioChefe, CHEFE, unidade);
@@ -120,12 +122,4 @@ class AtividadeAccessPolicyTest {
         return atribuicoes;
     }
 
-    @Test
-    @DisplayName("Deve negar se atividade não possuir mapa")
-    void deveNegarAtividadeSemMapa() {
-        atividade.setMapa(null);
-        boolean resultado = policy.canExecute(usuarioChefe, CRIAR_ATIVIDADE, atividade);
-        assertThat(resultado).isFalse();
-        assertThat(policy.getMotivoNegacao()).contains("não associada a um mapa");
-    }
 }

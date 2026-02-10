@@ -18,6 +18,7 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.comum.erros.ErroAcessoNegado;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -113,7 +114,7 @@ class SubprocessoTransicaoServiceTest {
     void deveLancarErroQuandoUsuarioNaoAutenticado() {
         // Arrange
         Subprocesso subprocesso = mock(Subprocesso.class);
-        when(usuarioFacade.obterUsuarioAutenticado()).thenReturn(null);
+        when(usuarioFacade.obterUsuarioAutenticado()).thenThrow(new ErroAcessoNegado("Erro"));
 
         RegistrarTransicaoCommand cmd = RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
@@ -121,7 +122,7 @@ class SubprocessoTransicaoServiceTest {
                 .build();
 
         // Act & Assert
-        org.junit.jupiter.api.Assertions.assertThrows(sgc.processo.erros.ErroProcessoEmSituacaoInvalida.class, () -> {
+        org.junit.jupiter.api.Assertions.assertThrows(ErroAcessoNegado.class, () -> {
             service.registrar(cmd);
         });
     }

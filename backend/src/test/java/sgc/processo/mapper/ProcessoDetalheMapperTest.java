@@ -6,6 +6,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.UnidadeProcesso;
+import sgc.testutils.UnidadeTestBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,11 +17,11 @@ class ProcessoDetalheMapperTest {
     @Test
     @DisplayName("Deve cobrir unidade com unidade superior")
     void deveCobrirUnidadeComSuperior() {
-        Unidade superior = Unidade.builder().codigo(10L).sigla("SUP").build();
-        Unidade unidade = Unidade.builder()
-                .codigo(20L)
-                .sigla("UNI")
-                .unidadeSuperior(superior)
+        Unidade superior = UnidadeTestBuilder.umaDe().comCodigo("10").comSigla("SUP").build();
+        Unidade unidade = UnidadeTestBuilder.umaDe()
+                .comCodigo("20")
+                .comSigla("UNI")
+                .comSuperior(superior)
                 .build();
 
         ProcessoDetalheDto.UnidadeParticipanteDto dto = mapper.fromUnidade(unidade);
@@ -33,10 +34,10 @@ class ProcessoDetalheMapperTest {
     @Test
     @DisplayName("Deve cobrir unidade sem unidade superior")
     void deveCobrirUnidadeSemSuperior() {
-        Unidade unidade = Unidade.builder()
-                .codigo(20L)
-                .sigla("UNI")
-                .unidadeSuperior(null)
+        Unidade unidade = UnidadeTestBuilder.umaDe()
+                .comCodigo("20")
+                .comSigla("UNI")
+                .comSuperior(null)
                 .build();
 
         ProcessoDetalheDto.UnidadeParticipanteDto dto = mapper.fromUnidade(unidade);
@@ -49,12 +50,12 @@ class ProcessoDetalheMapperTest {
     @Test
     @DisplayName("Deve cobrir snapshot com unidade superior")
     void deveCobrirSnapshotComSuperior() {
-        Unidade superior = Unidade.builder().codigo(10L).sigla("SUP").build();
-        Unidade unidade = Unidade.builder()
-                .codigo(20L)
-                .sigla("UNI")
-                .nome("Unidade Teste")
-                .unidadeSuperior(superior)
+        Unidade superior = UnidadeTestBuilder.umaDe().comCodigo("10").comSigla("SUP").build();
+        Unidade unidade = UnidadeTestBuilder.umaDe()
+                .comCodigo("20")
+                .comSigla("UNI")
+                .comNome("Unidade Teste")
+                .comSuperior(superior)
                 .build();
 
         Processo processo = Processo.builder().codigo(1L).build();
@@ -71,11 +72,11 @@ class ProcessoDetalheMapperTest {
     @Test
     @DisplayName("Deve cobrir snapshot sem unidade superior")
     void deveCobrirSnapshotSemSuperior() {
-        Unidade unidade = Unidade.builder()
-                .codigo(20L)
-                .sigla("UNI")
-                .nome("Unidade Teste")
-                .unidadeSuperior(null)
+        Unidade unidade = UnidadeTestBuilder.umaDe()
+                .comCodigo("20")
+                .comSigla("UNI")
+                .comNome("Unidade Teste")
+                .comSuperior(null)
                 .build();
 
         Processo processo = Processo.builder().codigo(1L).build();

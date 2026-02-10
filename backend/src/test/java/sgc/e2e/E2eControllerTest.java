@@ -29,8 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.List;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -63,7 +61,7 @@ class E2eControllerTest {
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
-        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader, mock(sgc.comum.repo.ComumRepo.class));
+        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
     }
 
     @AfterEach
@@ -311,7 +309,7 @@ class E2eControllerTest {
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
         Mockito.doThrow(new RuntimeException("Error")).when(mockJdbc).execute(any(String.class));
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader, mock(sgc.comum.repo.ComumRepo.class));
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
         var exception = Assertions.assertThrows(RuntimeException.class, controllerComErro::resetDatabase);
         Assertions.assertNotNull(exception);
     }
@@ -401,8 +399,7 @@ class E2eControllerTest {
             processoFacadeMock = mock(sgc.processo.service.ProcessoFacade.class);
             unidadeFacadeMock = mock(sgc.organizacao.UnidadeFacade.class);
             resourceLoaderMock = mock(org.springframework.core.io.ResourceLoader.class);
-            var repoMock = mock(sgc.comum.repo.ComumRepo.class);
-            controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoFacadeMock, unidadeFacadeMock, resourceLoaderMock, repoMock);
+            controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoFacadeMock, unidadeFacadeMock, resourceLoaderMock);
         }
 
         @Test

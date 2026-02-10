@@ -12,7 +12,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.ErroAcessoNegado;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
@@ -22,10 +21,9 @@ import sgc.processo.model.TipoProcesso;
 import sgc.processo.model.AcaoProcesso;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.dto.SubprocessoDto;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,14 +40,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("ProcessoController")
 class ProcessoControllerTest {
     private static final String NOVO_PROCESSO = "Novo Processo";
-    private static final String API_PROCESSOS = "/api/processos";
-    private static final String API_PROCESSOS_1 = "/api/processos/1";
-    private static final String API_PROCESSOS_999 = "/api/processos/999";
-    private static final String CODIGO_JSON_PATH = "$.codigo";
-    private static final String DESCRICAO_JSON_PATH = "$.descricao";
-    private static final String PROCESSO_ATUALIZADO = "Processo Atualizado";
-    private static final String PROCESSO_NAO_ENCONTRADO = "Processo não encontrado";
-
+    protected static final String API_PROCESSOS = "/api/processos";
+    protected static final String API_PROCESSOS_1 = "/api/processos/1";
+    protected static final String API_PROCESSOS_999 = "/api/processos/999";
+    protected static final String CODIGO_JSON_PATH = "$.codigo";
+    protected static final String DESCRICAO_JSON_PATH = "$.descricao";
+    protected static final String PROCESSO_ATUALIZADO = "Processo Atualizado";
+    protected static final String PROCESSO_NAO_ENCONTRADO = "Processo não encontrado";
     @MockitoBean
     private ProcessoFacade processoFacade;
 
@@ -69,7 +66,7 @@ class ProcessoControllerTest {
     @BeforeEach
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
-        objectMapper = new ObjectMapper();
+        objectMapper = new ObjectMapper().findAndRegisterModules();
     }
 
     @AfterEach

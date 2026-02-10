@@ -106,8 +106,15 @@ public class UnidadeHierarquiaService {
         if (found.isPresent()) {
             return found.get();
         }
-        repo.buscar(Unidade.class, codigo);
-        return null; // Unreachable - repo.buscar throws exception
+        Unidade u = repo.buscar(Unidade.class, codigo);
+        // Mapeamento manual simples para evitar retorno nulo
+        UnidadeDto dto = new UnidadeDto();
+        dto.setCodigo(u.getCodigo());
+        dto.setNome(u.getNome());
+        dto.setSigla(u.getSigla());
+        dto.setTipo(u.getTipo().name());
+        dto.setSubunidades(new ArrayList<>());
+        return dto;
     }
 
     /**
@@ -123,7 +130,7 @@ public class UnidadeHierarquiaService {
         
         if (found.isEmpty()) {
             repo.buscarPorSigla(Unidade.class, sigla);
-            return List.of(); // Unreachable
+            return List.of(); 
         }
 
         List<String> resultado = new ArrayList<>();

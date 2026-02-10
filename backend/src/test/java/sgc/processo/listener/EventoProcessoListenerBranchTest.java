@@ -12,7 +12,6 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
-import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.model.Processo;

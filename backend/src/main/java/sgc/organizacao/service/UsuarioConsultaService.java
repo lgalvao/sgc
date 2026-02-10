@@ -15,7 +15,6 @@ import java.util.Optional;
 public class UsuarioConsultaService {
     private final UsuarioRepo usuarioRepo;
     private final sgc.comum.repo.ComumRepo repo;
-    private static final String ENTIDADE_USUARIO = "Usuário";
 
     public Usuario buscarPorId(String titulo) {
         return repo.buscar(Usuario.class, titulo);
@@ -26,8 +25,7 @@ public class UsuarioConsultaService {
     }
 
     public Usuario buscarPorIdComAtribuicoes(String titulo) {
-        return usuarioRepo.findByIdWithAtribuicoes(titulo)
-                .orElseThrow(sgc.comum.erros.ErroEntidadeNaoEncontrada.naoEncontrada(ENTIDADE_USUARIO, titulo));
+        return repo.buscar(Usuario.class, titulo);
     }
 
     public Optional<Usuario> buscarPorIdComAtribuicoesOpcional(String titulo) {

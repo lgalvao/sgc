@@ -1,6 +1,5 @@
 package sgc.e2e;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Profile;
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
@@ -37,7 +35,6 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping("/e2e")
 @Profile("e2e")
-@RequiredArgsConstructor
 @Slf4j
 public class E2eController {
     private static final String SQL_SUBPROCESSO_POR_PROCESSO = " sgc.subprocesso WHERE processo_codigo = ?)";
@@ -47,7 +44,15 @@ public class E2eController {
     private final ProcessoFacade processoFacade;
     private final UnidadeFacade unidadeFacade;
     private final ResourceLoader resourceLoader;
-    private final ComumRepo repo;
+    public E2eController(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate, 
+                         ProcessoFacade processoFacade, UnidadeFacade unidadeFacade, 
+                         ResourceLoader resourceLoader) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.namedJdbcTemplate = namedJdbcTemplate;
+        this.processoFacade = processoFacade;
+        this.unidadeFacade = unidadeFacade;
+        this.resourceLoader = resourceLoader;
+    }
 
     @PostMapping("/reset-database")
     public void resetDatabase() {

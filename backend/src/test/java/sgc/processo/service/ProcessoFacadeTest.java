@@ -29,6 +29,7 @@ import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
+import sgc.testutils.UnidadeTestBuilder;
 import org.mockito.ArgumentCaptor;
 import sgc.processo.model.AcaoProcesso;
 import sgc.processo.model.ProcessoRepo;
@@ -126,8 +127,9 @@ class ProcessoFacadeTest {
             Processo processo = new Processo();
             processo.setDescricao("Proc");
             processo.setDataLimite(null);
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(codUnidade);
+            Unidade unidade = UnidadeTestBuilder.umaDe()
+                    .comCodigo(String.valueOf(codUnidade))
+                    .build();
             processo.adicionarParticipantes(Set.of(unidade));
 
             when(processoConsultaService.buscarPorId(codProcesso)).thenReturn(processo);

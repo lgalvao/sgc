@@ -29,8 +29,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,7 +56,6 @@ class RestExceptionHandlerTest {
                 .when(controller).teste(any());
 
         mockMvc.perform(post("/test/validacao")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"campo\": \"valor\"}"))
                 .andDo(print())
@@ -72,7 +70,6 @@ class RestExceptionHandlerTest {
                 .when(controller).teste(any());
 
         mockMvc.perform(post("/test/validacao")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"campo\": \"valor\"}"))
                 .andExpect(status().isForbidden())
@@ -86,7 +83,6 @@ class RestExceptionHandlerTest {
                 .when(controller).teste(any());
 
         mockMvc.perform(post("/test/validacao")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"campo\": \"valor\"}"))
                 .andExpect(status().isUnauthorized())
@@ -100,7 +96,6 @@ class RestExceptionHandlerTest {
                 .when(controller).teste(any());
 
         mockMvc.perform(post("/test/validacao")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"campo\": \"valor\"}"))
                 .andExpect(status().isConflict())
@@ -114,7 +109,6 @@ class RestExceptionHandlerTest {
                 .when(controller).teste(any());
 
         mockMvc.perform(post("/test/validacao")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"campo\": \"valor\"}"))
                 .andExpect(status().isBadRequest())
@@ -128,7 +122,6 @@ class RestExceptionHandlerTest {
                 .when(controller).teste(any());
 
         mockMvc.perform(post("/test/validacao")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"campo\": \"valor\"}"))
                 .andExpect(status().isInternalServerError())
@@ -148,7 +141,6 @@ class RestExceptionHandlerTest {
                 .when(controller).teste(any());
 
         mockMvc.perform(post("/test/validacao")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"campo\": \"valor\"}"))
                 .andExpect(status().isBadRequest())

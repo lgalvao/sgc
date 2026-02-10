@@ -1,7 +1,7 @@
 package sgc.integracao;
 
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -28,8 +28,6 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
-
 import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -48,8 +46,6 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
-    @Autowired
-    private SubprocessoFacade subprocessoFacade;
     @Autowired
     private UsuarioRepo usuarioRepo;
     @Autowired

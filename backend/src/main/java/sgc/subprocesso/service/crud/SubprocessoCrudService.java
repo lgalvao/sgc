@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
@@ -42,7 +41,6 @@ import java.util.stream.Stream;
 @Transactional
 @RequiredArgsConstructor
 public class SubprocessoCrudService {
-    private static final String MSG_SUBPROCESSO_NAO_ENCONTRADO = "Subprocesso não encontrado";
     private final SubprocessoRepo subprocessoRepo;
     private final ComumRepo repositorioComum;
     private final SubprocessoMapper subprocessoMapper;
@@ -130,11 +128,12 @@ public class SubprocessoCrudService {
 
     @Transactional(readOnly = true)
     public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
-        Subprocesso sp = subprocessoRepo
-                .findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
-                .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(
-                        "%s para o processo %s e unidade %s".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codProcesso,
-                                codUnidade)));
+        // Substituído por repo.buscar para centralizar tratamento de exceção (evitar explicit throw)
+        java.util.Map<String, Object> filtros = java.util.Map.of(
+                "processo.codigo", codProcesso,
+                "unidade.codigo", codUnidade
+        );
+        Subprocesso sp = repositorioComum.buscar(Subprocesso.class, filtros);
         return subprocessoMapper.toDto(sp);
     }
 

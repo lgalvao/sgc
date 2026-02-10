@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
+import sgc.testutils.UnidadeTestBuilder;
 
 import java.util.List;
 import java.util.Set;
@@ -31,10 +32,11 @@ class ProcessoRepoPerformanceTest {
     @Test
     void listarPorSituacaoComParticipantes_deveCarregarParticipantesComFetch() {
         // Arrange
-        Unidade unidade = new Unidade();
-        unidade.setNome("Unidade Teste");
-        unidade.setSigla("UT");
-        unidade.setTituloTitular("Titular");
+        Unidade unidade = UnidadeTestBuilder.umaDe()
+                .comNome("Unidade Teste")
+                .comSigla("UT")
+                .comTituloTitular("Titular")
+                .build();
         unidadeRepo.save(unidade);
 
         Processo processo = new Processo();

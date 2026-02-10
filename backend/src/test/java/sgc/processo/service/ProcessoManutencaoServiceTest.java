@@ -425,8 +425,6 @@ class ProcessoManutencaoServiceTest {
             processo.setCodigo(codigoProcesso);
             processo.setSituacao(SituacaoProcesso.CRIADO);
 
-            Unidade unidade1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
-
             when(processoConsultaService.buscarPorId(codigoProcesso)).thenReturn(processo);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList()))
                     .thenReturn(Optional.of("Unidades sem mapa: Unidade 1"));
@@ -459,9 +457,7 @@ class ProcessoManutencaoServiceTest {
             processo.setCodigo(codigoProcesso);
             processo.setSituacao(SituacaoProcesso.CRIADO);
 
-            Unidade unidade1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
-            Unidade unidade2 = UnidadeTestBuilder.umaDe().comCodigo("2").build();
-
+            
             when(processoConsultaService.buscarPorId(codigoProcesso)).thenReturn(processo);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList()))
                     .thenReturn(Optional.of("Unidades sem mapa: Unidade 1, Unidade 2"));

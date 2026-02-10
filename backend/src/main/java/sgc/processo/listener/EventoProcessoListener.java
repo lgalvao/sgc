@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 import sgc.alerta.AlertaFacade;
-import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UnidadeFacade;
@@ -248,7 +247,7 @@ public class EventoProcessoListener {
             if (responsavel.substitutoTitulo() != null) {
                 enviarEmailParaSubstituto(responsavel.substitutoTitulo(), usuarios, assunto, corpoHtml, nomeUnidade);
             }
-        } catch (ErroEstadoImpossivel e) {
+        } catch (Exception e) {
             log.error("Erro ao enviar e-mail para a unidade {}: {}", codigoUnidade, e.getClass().getSimpleName(), e);
         }
     }
@@ -261,7 +260,7 @@ public class EventoProcessoListener {
                     processo.getTipo().name(),
                     subprocesso.getDataLimiteEtapa1());
             case RAIZ, SEM_EQUIPE ->
-                throw new ErroEstadoImpossivel("Tipo de unidade não suportado para geração de e-mail: " + tipoUnidade);
+                throw new IllegalArgumentException("Tipo de unidade não suportado para geração de e-mail: " + tipoUnidade);
         };
     }
 

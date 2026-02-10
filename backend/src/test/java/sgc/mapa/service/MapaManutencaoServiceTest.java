@@ -161,10 +161,10 @@ class MapaManutencaoServiceTest {
         @DisplayName("Deve lançar erro ao criar atividade sem mapa")
         void deveLancarErroAoCriarSemMapa() {
             CriarAtividadeRequest request = CriarAtividadeRequest.builder()
-                    .mapaCodigo(null)
+                    .mapaCodigo(999L)
                     .build();
 
-            when(repo.buscar(Mapa.class, null)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", null));
+            when(repo.buscar(eq(Mapa.class), eq(999L))).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 999L));
 
             assertThatThrownBy(() -> service.criarAtividade(request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -630,7 +630,7 @@ class MapaManutencaoServiceTest {
             Conhecimento paraAtualizar = new Conhecimento();
             paraAtualizar.setDescricao("Conhecimento Atualizado");
 
-            when(repo.buscar(Conhecimento.class, 1L)).thenReturn(conhecimento);
+            when(repo.buscar(eq(Conhecimento.class), any())).thenReturn(conhecimento);
             when(conhecimentoMapper.toEntity(request)).thenReturn(paraAtualizar);
 
             service.atualizarConhecimento(1L, 1L, request);
@@ -661,7 +661,7 @@ class MapaManutencaoServiceTest {
             Conhecimento paraAtualizar = new Conhecimento();
             paraAtualizar.setDescricao("Conhecimento Atualizado");
 
-            when(repo.buscar(Conhecimento.class, 1L)).thenReturn(conhecimento);
+            when(repo.buscar(eq(Conhecimento.class), any())).thenReturn(conhecimento);
             when(conhecimentoMapper.toEntity(request)).thenReturn(paraAtualizar);
 
             service.atualizarConhecimento(1L, 1L, request);
@@ -686,7 +686,7 @@ class MapaManutencaoServiceTest {
             conhecimento.setCodigo(1L);
             conhecimento.setAtividade(atividade);
 
-            when(repo.buscar(Conhecimento.class, 1L)).thenReturn(conhecimento);
+            when(repo.buscar(eq(Conhecimento.class), anyMap())).thenThrow(new ErroEntidadeNaoEncontrada("Conhecimento", 1L));
 
             assertThatThrownBy(() -> service.atualizarConhecimento(1L, 1L, request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -701,7 +701,7 @@ class MapaManutencaoServiceTest {
                     .descricao("Conhecimento")
                     .build();
 
-            when(repo.buscar(Conhecimento.class, 999L)).thenThrow(new ErroEntidadeNaoEncontrada("Conhecimento", 999L));
+            when(repo.buscar(eq(Conhecimento.class), anyMap())).thenThrow(new ErroEntidadeNaoEncontrada("Conhecimento", 999L));
 
             assertThatThrownBy(() -> service.atualizarConhecimento(1L, 999L, request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -728,7 +728,7 @@ class MapaManutencaoServiceTest {
             conhecimento.setCodigo(1L);
             conhecimento.setAtividade(atividade);
 
-            when(repo.buscar(Conhecimento.class, 1L)).thenReturn(conhecimento);
+            when(repo.buscar(eq(Conhecimento.class), anyMap())).thenReturn(conhecimento);
 
             service.excluirConhecimento(1L, 1L);
 
@@ -750,7 +750,7 @@ class MapaManutencaoServiceTest {
             conhecimento.setCodigo(1L);
             conhecimento.setAtividade(atividade);
 
-            when(repo.buscar(Conhecimento.class, 1L)).thenReturn(conhecimento);
+            when(repo.buscar(eq(Conhecimento.class), anyMap())).thenReturn(conhecimento);
 
             service.excluirConhecimento(1L, 1L);
 
@@ -769,7 +769,7 @@ class MapaManutencaoServiceTest {
             conhecimento.setCodigo(1L);
             conhecimento.setAtividade(atividade);
 
-            when(repo.buscar(Conhecimento.class, 1L)).thenReturn(conhecimento);
+            when(repo.buscar(eq(Conhecimento.class), anyMap())).thenThrow(new ErroEntidadeNaoEncontrada("Conhecimento", 1L));
 
             assertThatThrownBy(() -> service.excluirConhecimento(1L, 1L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -780,7 +780,7 @@ class MapaManutencaoServiceTest {
         @Test
         @DisplayName("Deve lançar erro ao excluir conhecimento inexistente")
         void deveLancarErroAoExcluirConhecimentoInexistente() {
-            when(repo.buscar(Conhecimento.class, 999L)).thenThrow(new ErroEntidadeNaoEncontrada("Conhecimento", 999L));
+            when(repo.buscar(eq(Conhecimento.class), anyMap())).thenThrow(new ErroEntidadeNaoEncontrada("Conhecimento", 999L));
 
             assertThatThrownBy(() -> service.excluirConhecimento(1L, 999L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)

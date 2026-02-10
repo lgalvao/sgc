@@ -36,9 +36,6 @@ class AnaliseControllerTest {
     private static final String OBSERVACAO_1 = "Observação 1";
     private static final String OBSERVACAO_2 = "Observação 2";
     private static final String API_SUBPROCESSOS_1_ANALISES_CADASTRO = "/api/subprocessos/1/analises-cadastro";
-    private static final String ERRO_INESPERADO = "Erro inesperado";
-    private static final String MESSAGE_JSON_PATH = "$.message";
-    private static final String OCORREU_UM_ERRO_INESPERADO = "Erro inesperado";
     private static final String NOVA_ANALISE_DE_CADASTRO = "Nova análise de cadastro";
     private static final String ANALISE_INVALIDA = "Análise inválida";
     private static final String API_SUBPROCESSOS_1_ANALISES_VALIDACAO = "/api/subprocessos/1/analises-validacao";
@@ -74,16 +71,16 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar lista de análises de cadastro com status 200 OK")
         @WithMockUser
         void deveRetornarListaDeAnalisesCadastro() throws Exception {
-            var analise1 = new Analise();
+            Analise analise1 = new Analise();
             analise1.setCodigo(1L);
             analise1.setObservacoes(OBSERVACAO_1);
 
-            var analise2 = new Analise();
+            Analise analise2 = new Analise();
             analise2.setCodigo(2L);
             analise2.setObservacoes(OBSERVACAO_2);
 
-            var dto1 = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_1).build();
-            var dto2 = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_2).build();
+            AnaliseHistoricoDto dto1 = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_1).build();
+            AnaliseHistoricoDto dto2 = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_2).build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO))
@@ -121,9 +118,9 @@ class AnaliseControllerTest {
         @DisplayName("Deve criar uma análise de cadastro e retornar 201 Created")
         @WithMockUser(roles = "GESTOR")
         void deveCriarAnaliseCadastro() throws Exception {
-            var request = new CriarAnaliseRequest("123456789012", NOVA_ANALISE_DE_CADASTRO, "SIGLA", "MOTIVO");
-            var analise = new Analise();
-            var dto = AnaliseHistoricoDto.builder().observacoes(NOVA_ANALISE_DE_CADASTRO).build();
+            CriarAnaliseRequest request = new CriarAnaliseRequest("123456789012", NOVA_ANALISE_DE_CADASTRO, "SIGLA", "MOTIVO");
+            Analise analise = new Analise();
+            AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes(NOVA_ANALISE_DE_CADASTRO).build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
@@ -142,9 +139,9 @@ class AnaliseControllerTest {
         @DisplayName("Deve criar uma análise de cadastro com observações vazias e retornar 201 Created")
         @WithMockUser(roles = "GESTOR")
         void deveCriarAnaliseCadastroComObservacoesVazias() throws Exception {
-            var request = new CriarAnaliseRequest("123456789012", "", "SIGLA", "MOTIVO");
-            var analise = new Analise();
-            var dto = AnaliseHistoricoDto.builder().observacoes("").build();
+            CriarAnaliseRequest request = new CriarAnaliseRequest("123456789012", "", "SIGLA", "MOTIVO");
+            Analise analise = new Analise();
+            AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes("").build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
@@ -163,8 +160,8 @@ class AnaliseControllerTest {
         @WithMockUser(roles = "ADMIN")
         void deveCriarAnaliseCadastroSemPayload() throws Exception {
             // Need a valid request object for required fields if any, or just empty JSON if allowed
-            var analise = new Analise();
-            var dto = AnaliseHistoricoDto.builder().build();
+            Analise analise = new Analise();
+            AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
@@ -182,7 +179,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar 400 Bad Request para parâmetro inválido")
         @WithMockUser(roles = "GESTOR")
         void deveRetornarBadRequestParaParametroInvalido() throws Exception {
-            var request = new CriarAnaliseRequest("123456789012", ANALISE_INVALIDA, "S", "M");
+            CriarAnaliseRequest request = new CriarAnaliseRequest("123456789012", ANALISE_INVALIDA, "S", "M");
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any()))
@@ -205,8 +202,8 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar lista de análises de validação com status 200 OK")
         @WithMockUser
         void deveRetornarListaDeAnalisesValidacao() throws Exception {
-            var analise = new Analise();
-            var dto = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_1).build();
+            Analise analise = new Analise();
+            AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_1).build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO))
@@ -240,9 +237,9 @@ class AnaliseControllerTest {
         @DisplayName("Deve criar uma análise de validação e retornar 201 Created")
         @WithMockUser(roles = "ADMIN")
         void deveCriarAnaliseValidacao() throws Exception {
-            var request = new CriarAnaliseRequest("123456789012", NOVA_ANALISE_DE_VALIDACAO, "S", "M");
-            var analise = new Analise();
-            var dto = AnaliseHistoricoDto.builder().observacoes(NOVA_ANALISE_DE_VALIDACAO).build();
+            CriarAnaliseRequest request = new CriarAnaliseRequest("123456789012", NOVA_ANALISE_DE_VALIDACAO, "S", "M");
+            Analise analise = new Analise();
+            AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes(NOVA_ANALISE_DE_VALIDACAO).build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);

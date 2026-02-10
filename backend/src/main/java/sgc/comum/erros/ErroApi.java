@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatusCode;
 
 import java.time.LocalDateTime;
@@ -21,14 +22,15 @@ public class ErroApi {
     private String message;
     private String code;
     @Setter
-    private String traceId;
-    private List<ErroSubApi> subErrors;
+    private @Nullable String traceId;
+    private @Nullable List<ErroSubApi> subErrors;
 
     @Setter
     private Map<String, ?> details;
 
     private ErroApi() {
         this.timestamp = LocalDateTime.now();
+        this.message = "";
     }
 
     public ErroApi(HttpStatusCode status, String message) {
@@ -52,7 +54,7 @@ public class ErroApi {
         this.subErrors = new ArrayList<>(subErrors);
     }
 
-    public List<ErroSubApi> getSubErrors() {
-        return new ArrayList<>(subErrors);
+    public @Nullable List<ErroSubApi> getSubErrors() {
+        return subErrors != null ? new ArrayList<>(subErrors) : null;
     }
 }
