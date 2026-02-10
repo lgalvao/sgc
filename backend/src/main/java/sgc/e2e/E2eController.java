@@ -15,8 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroConfiguracao;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
+import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
@@ -47,7 +47,7 @@ public class E2eController {
     private final ProcessoFacade processoFacade;
     private final UnidadeFacade unidadeFacade;
     private final ResourceLoader resourceLoader;
-
+    private final ComumRepo repo;
 
     @PostMapping("/reset-database")
     public void resetDatabase() {
@@ -231,12 +231,16 @@ public class E2eController {
             Long processoCodigo = processo.getCodigo();
             List<String> erros;
 
-            if (tipo == TipoProcesso.MAPEAMENTO) {
-                erros = processoFacade.iniciarProcessoMapeamento(processoCodigo, unidades);
-            } else if (tipo == TipoProcesso.REVISAO) {
-                erros = processoFacade.iniciarProcessoRevisao(processoCodigo, unidades);
-            } else {
-                erros = List.of();
+            switch (tipo) {
+              case TipoProcesso.MAPEAMENTO -> {
+                  erros = processoFacade.iniciarProcessoMapeamento(processoCodigo, unidades);
+              }
+              case TipoProcesso.REVISAO -> {
+                  erros = processoFacade.iniciarProcessoRevisao(processoCodigo, unidades);
+              }
+              default -> {
+                  erros = List.of();
+              }
             }
 
             if (erros != null && !erros.isEmpty()) {
@@ -244,8 +248,7 @@ public class E2eController {
             }
 
             // Recarregar processo após iniciar
-            processo = processoFacade.obterPorId(processoCodigo)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", processoCodigo));
+            processo = repo.buscar(ProcessoDto.class, processoCodigo);
         }
 
         return processo;

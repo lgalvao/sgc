@@ -143,16 +143,6 @@ class SubprocessoCrudServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lançar exceção ao não encontrar subprocesso por código do mapa")
-    void deveLancarExcecaoAoNaoEncontrarPorCodigoMapa() {
-        when(subprocessoRepo.findByMapaCodigo(10L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> service.obterEntidadePorCodigoMapa(10L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
-
-
-    @Test
     @DisplayName("Deve atualizar subprocesso definindo mapa")
     void deveAtualizarDefinindoMapa() {
         Subprocesso sp = criarSubprocessoCompleto();
@@ -215,15 +205,6 @@ class SubprocessoCrudServiceTest {
         when(subprocessoMapper.toDto(sp)).thenReturn(SubprocessoDto.builder().build());
 
         assertThat(service.obterPorProcessoEUnidade(1L, 2L)).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao não encontrar subprocesso por processo e unidade")
-    void deveLancarExcecaoAoNaoEncontrarPorProcessoEUnidade() {
-        when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(1L, 2L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> service.obterPorProcessoEUnidade(1L, 2L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test

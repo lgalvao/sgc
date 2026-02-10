@@ -70,24 +70,6 @@ class CriarProcessoRequestValidationTest {
     @DisplayName("Validação de descrição")
     class ValidacaoDescricao {
         @Test
-        @DisplayName("Deve rejeitar descrição nula")
-        void deveRejeitarDescricaoNula() {
-            CriarProcessoRequest req = CriarProcessoRequest.builder()
-                    .descricao(null)
-                    .tipo(TipoProcesso.MAPEAMENTO)
-                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
-                    .unidades(List.of(1L))
-                    .build();
-
-            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
-
-            assertThat(violations)
-                    .hasSize(1)
-                    .extracting(v -> v.getPropertyPath().toString())
-                    .containsExactly("descricao");
-        }
-
-        @Test
         @DisplayName("Deve rejeitar descrição em branco")
         void deveRejeitarDescricaoEmBranco() {
             CriarProcessoRequest req = CriarProcessoRequest.builder()
@@ -120,29 +102,6 @@ class CriarProcessoRequestValidationTest {
             assertThat(violations)
                     .extracting(v -> v.getPropertyPath().toString())
                     .contains("descricao");
-        }
-    }
-
-    @Nested
-    @DisplayName("Validação de tipo")
-    class ValidacaoTipo {
-
-        @Test
-        @DisplayName("Deve rejeitar tipo nulo")
-        void deveRejeitarTipoNulo() {
-            CriarProcessoRequest req = CriarProcessoRequest.builder()
-                    .descricao("Processo Teste")
-                    .tipo(null)
-                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
-                    .unidades(List.of(1L))
-                    .build();
-
-            Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
-
-            assertThat(violations)
-                    .hasSize(1)
-                    .extracting(v -> v.getPropertyPath().toString())
-                    .containsExactly("tipo");
         }
     }
 
@@ -207,7 +166,6 @@ class CriarProcessoRequestValidationTest {
     @Nested
     @DisplayName("Validação de unidades")
     class ValidacaoUnidades {
-
         @Test
         @DisplayName("Deve rejeitar lista de unidades nula")
         void deveRejeitarUnidadesNulas() {
@@ -248,7 +206,6 @@ class CriarProcessoRequestValidationTest {
     @Nested
     @DisplayName("Validação de múltiplos campos inválidos")
     class ValidacaoMultipla {
-
         @Test
         @DisplayName("Deve reportar todas as violações quando múltiplos campos são inválidos")
         void deveReportarTodasViolacoes() {

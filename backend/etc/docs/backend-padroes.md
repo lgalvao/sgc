@@ -281,13 +281,7 @@ public abstract class SubprocessoMapper {
     public abstract SubprocessoDto toDTO(Subprocesso subprocesso);
     
     @Mapping(source = "codProcesso", target = "processo")
-    public abstract Subprocesso toEntity(SubprocessoDto dto);
-    
-    // Método auxiliar para resolver relacionamento
-    public Processo mapProcesso(Long codigo) {
-        return processoRepo.findById(codigo)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
-    }
+    public abstract Subprocesso toEntity(SubprocessoDto dto);  
 }
 ```
 

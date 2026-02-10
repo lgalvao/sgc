@@ -15,14 +15,7 @@ import sgc.mapa.model.*;
 
 import java.util.*;
 import java.util.stream.Stream;
-import sgc.comum.erros.ErroEstadoImpossivel;
 
-/**
- * Serviço unificado responsável pela manutenção da estrutura do Mapa de Competências.
- * 
- * <p>Consolida as operações de {@link Atividade}, {@link Competencia} e {@link Conhecimento},
- * eliminando dependências circulares e garantindo consistência transacional.
- */
 @Slf4j
 @Service
 @Transactional
@@ -30,6 +23,7 @@ import sgc.comum.erros.ErroEstadoImpossivel;
 public class MapaManutencaoService {
     private static final String ENTIDADE_COMPETENCIA = "Competência";
     private static final String ENTIDADE_ATIVIDADE = "Atividade";
+
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo competenciaRepo;
     private final ConhecimentoRepo conhecimentoRepo;
@@ -48,11 +42,7 @@ public class MapaManutencaoService {
 
     @Transactional(readOnly = true)
     public AtividadeResponse obterAtividadeResponse(Long codAtividade) {
-        var response = atividadeMapper.toResponse(obterAtividadePorCodigo(codAtividade));
-        if (response == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter atividade para resposta.");
-        }
-        return response;
+        return atividadeMapper.toResponse(obterAtividadePorCodigo(codAtividade));
     }
 
     @Transactional(readOnly = true)
@@ -70,32 +60,18 @@ public class MapaManutencaoService {
         notificarAlteracaoMapa(request.mapaCodigo());
 
         Atividade entidade = atividadeMapper.toEntity(request);
-        if (entidade == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter requisição para entidade atividade.");
-        }
         entidade.setMapa(mapa);
 
         Atividade salvo = atividadeRepo.save(entidade);
-        var response = atividadeMapper.toResponse(salvo);
-        if (response == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter atividade salva para resposta.");
-        }
-        return response;
+        return atividadeMapper.toResponse(salvo);
     }
 
     public void atualizarAtividade(Long codigo, AtualizarAtividadeRequest request) {
         Atividade existente = repo.buscar(Atividade.class, codigo);
-
-        if (existente.getMapa() != null) {
-            notificarAlteracaoMapa(existente.getMapa().getCodigo());
-        }
+        notificarAlteracaoMapa(existente.getMapa().getCodigo());
 
         var entidadeParaAtualizar = atividadeMapper.toEntity(request);
-        if (entidadeParaAtualizar == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter requisição para entidade atividade.");
-        }
         existente.setDescricao(entidadeParaAtualizar.getDescricao());
-
         atividadeRepo.save(existente);
     }
 
@@ -109,9 +85,7 @@ public class MapaManutencaoService {
                 atividade.setDescricao(novaDescricao);
             }
             var mapa = atividade.getMapa();
-            if (mapa != null) {
-                mapasAfetados.add(mapa.getCodigo());
-            }
+            mapasAfetados.add(mapa.getCodigo());
         }
 
         atividadeRepo.saveAll(atividades);
@@ -129,10 +103,8 @@ public class MapaManutencaoService {
 
     private void excluirAtividadeEConhecimentos(Atividade atividade) {
         var mapa = atividade.getMapa();
-        if (mapa != null) {
-            notificarAlteracaoMapa(mapa.getCodigo());
-        }
-        
+        notificarAlteracaoMapa(mapa.getCodigo());
+       
         // Remove conhecimentos associados
         List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
         conhecimentoRepo.deleteAll(conhecimentos);
@@ -156,8 +128,7 @@ public class MapaManutencaoService {
     }
 
     public Competencia buscarCompetenciaPorCodigo(Long codCompetencia) {
-        return competenciaRepo.findById(codCompetencia)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_COMPETENCIA, codCompetencia));
+        return repo.buscar(Competencia.class, codCompetencia);
     }
 
     public List<Competencia> buscarCompetenciasPorCodMapa(Long codMapa) {
@@ -168,7 +139,6 @@ public class MapaManutencaoService {
         return competenciaRepo.findByMapaCodigoSemFetch(codMapa);
     }
 
-    @SuppressWarnings("ConstantConditions")
     public Map<Long, Set<Long>> buscarIdsAssociacoesCompetenciaAtividade(Long codMapa) {
         List<Object[]> rows = competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(codMapa);
         Map<Long, Set<Long>> result = new HashMap<>();
@@ -207,9 +177,7 @@ public class MapaManutencaoService {
     }
 
     public void atualizarCompetencia(Long codCompetencia, String descricao, List<Long> atividadesIds) {
-        Competencia competencia = competenciaRepo.findById(codCompetencia)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_COMPETENCIA, codCompetencia));
-
+        Competencia competencia = repo.buscar(Competencia.class, codCompetencia);
         competencia.setDescricao(descricao);
 
         List<Atividade> atividadesAntigas = atividadeRepo.listarPorCompetencia(competencia);
@@ -248,6 +216,7 @@ public class MapaManutencaoService {
         if (!atividadeRepo.existsById(codAtividade)) {
             throw new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade);
         }
+
         return conhecimentoRepo.findByAtividadeCodigo(codAtividade).stream()
                 .flatMap(c -> Stream.ofNullable(conhecimentoMapper.toResponse(c)))
                 .toList();
@@ -264,25 +233,15 @@ public class MapaManutencaoService {
     }
 
     public ConhecimentoResponse criarConhecimento(Long codAtividade, CriarConhecimentoRequest request) {
-        var atividade = atividadeRepo.findById(codAtividade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(ENTIDADE_ATIVIDADE, codAtividade));
-
+        var atividade = repo.buscar(Atividade.class, codAtividade);
         var mapa = atividade.getMapa();
-        if (mapa != null) {
-            notificarAlteracaoMapa(mapa.getCodigo());
-        }
+        notificarAlteracaoMapa(mapa.getCodigo());
 
         var conhecimento = conhecimentoMapper.toEntity(request);
-        if (conhecimento == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter requisição para entidade conhecimento.");
-        }
         conhecimento.setAtividade(atividade);
+        atividade.getConhecimentos().add(conhecimento);
         var salvo = conhecimentoRepo.save(conhecimento);
-        var response = conhecimentoMapper.toResponse(salvo);
-        if (response == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter conhecimento salvo para resposta.");
-        }
-        return response;
+        return conhecimentoMapper.toResponse(salvo);
     }
 
     public void atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
@@ -291,13 +250,9 @@ public class MapaManutencaoService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Conhecimento", codConhecimento));
 
         var mapa = existente.getAtividade().getMapa();
-        if (mapa != null) {
-            notificarAlteracaoMapa(mapa.getCodigo());
-        }
+        notificarAlteracaoMapa(mapa.getCodigo());
+
         var paraAtualizar = conhecimentoMapper.toEntity(request);
-        if (paraAtualizar == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter requisição para entidade conhecimento.");
-        }
         existente.setDescricao(paraAtualizar.getDescricao());
         conhecimentoRepo.save(existente);
     }
@@ -314,9 +269,8 @@ public class MapaManutencaoService {
     
     private void executarExclusaoConhecimento(Conhecimento conhecimento) {
         var mapa = conhecimento.getAtividade().getMapa();
-        if (mapa != null) {
-            notificarAlteracaoMapa(mapa.getCodigo());
-        }
+        notificarAlteracaoMapa(mapa.getCodigo());
+        conhecimento.getAtividade().getConhecimentos().remove(conhecimento);
         conhecimentoRepo.delete(conhecimento);
     }
 

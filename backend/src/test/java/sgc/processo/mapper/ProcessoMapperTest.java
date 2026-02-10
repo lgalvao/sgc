@@ -48,14 +48,6 @@ class ProcessoMapperTest {
         }
 
         @Test
-        @DisplayName("Deve retornar null quando entidade é null")
-        void deveRetornarNullQuandoEntidadeNull() {
-            ProcessoDto dto = mapper.toDto(null);
-
-            assertThat(dto).isNull();
-        }
-
-        @Test
         @DisplayName("Deve mapear unidades participantes para string de siglas")
         void deveMapearUnidadesParticipantes() {
             Processo processo = new Processo();

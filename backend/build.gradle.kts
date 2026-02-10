@@ -121,7 +121,7 @@ tasks.withType<Test> {
 
     testLogging {
         events(TestLogEvent.SKIPPED, TestLogEvent.FAILED)
-        exceptionFormat = TestExceptionFormat.FULL
+        exceptionFormat = TestExceptionFormat.SHORT
         showStackTraces = true
         showCauses = true
         showStandardStreams = false
@@ -273,7 +273,7 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "BRANCH"
-                minimum = "0.85".toBigDecimal()
+                minimum = "0.95".toBigDecimal()
             }
         }
         rule {

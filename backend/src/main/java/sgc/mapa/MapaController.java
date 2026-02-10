@@ -14,7 +14,6 @@ import sgc.mapa.service.MapaFacade;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
-import sgc.comum.erros.ErroEstadoImpossivel;
 
 /**
  * Controlador REST para gerenciar Mapas usando DTOs. Evita expor entidades JPA diretamente nas
@@ -55,65 +54,31 @@ public class MapaController {
     public ResponseEntity<MapaDto> obterPorId(@PathVariable Long codigo) {
         var mapa = mapaFacade.obterPorCodigo(codigo);
         var dto = mapaMapper.toDto(mapa);
-        if (dto == null) {
-             throw new ErroEstadoImpossivel("Falha ao converter mapa para DTO.");
-        }
         return ResponseEntity.ok(dto);
     }
 
-    /**
-     * Cria um novo mapa de competências.
-     *
-     * @param mapaDto O DTO com os dados do mapa a ser criado.
-     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo mapa e o {@link
-     * MapaDto} criado no corpo da resposta.
-     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cria um mapa")
     public ResponseEntity<MapaDto> criar(@Valid @RequestBody MapaDto mapaDto) {
         var entidade = mapaMapper.toEntity(mapaDto);
-        if (entidade == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter DTO para entidade mapa.");
-        }
-        var salvo = mapaFacade.criar(entidade);
+        var salvo = mapaFacade.salvar(entidade);
+
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
         var salvoDto = mapaMapper.toDto(salvo);
-        if (salvoDto == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter mapa salvo para DTO.");
-        }
         return ResponseEntity.created(uri).body(salvoDto);
     }
 
-    /**
-     * Atualiza um mapa de competências existente.
-     *
-     * @param codMapa O código do mapa a ser atualizado.
-     * @param mapaDto O DTO com os novos dados do mapa.
-     * @return Um {@link ResponseEntity} com status 200 OK e o {@link MapaDto} atualizado.
-     */
     @PostMapping("/{codMapa}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza um mapa existente")
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
         var entidade = mapaMapper.toEntity(mapaDto);
-        if (entidade == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter DTO para entidade mapa.");
-        }
         var atualizado = mapaFacade.atualizar(codMapa, entidade);
         var atualizadoDto = mapaMapper.toDto(atualizado);
-        if (atualizadoDto == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter mapa atualizado para DTO.");
-        }
         return ResponseEntity.ok(atualizadoDto);
     }
 
-    /**
-     * Exclui um mapa de competências.
-     *
-     * @param codMapa O código do mapa a ser excluído.
-     * @return Um {@link ResponseEntity} com status 204 No Content.
-     */
     @PostMapping("/{codMapa}/excluir")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Exclui um mapa")

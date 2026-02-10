@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Propagation;
@@ -43,9 +42,6 @@ class E2eControllerTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private NamedParameterJdbcTemplate namedJdbcTemplate;
-
     @Mock
     private sgc.processo.service.ProcessoFacade processoFacade;
 
@@ -63,7 +59,6 @@ class E2eControllerTest {
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
-        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
     }
 
     @AfterEach
@@ -197,7 +192,6 @@ class E2eControllerTest {
     void deveUsarSegundoCaminhoParaSeedSql() throws Exception {
         // Usa mocks de DB para focar na lógica de recursos e evitar erros de SQL
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
-        NamedParameterJdbcTemplate mockNamed = Mockito.mock(NamedParameterJdbcTemplate.class);
         DataSource mockDataSource = Mockito.mock(DataSource.class);
         Connection mockConnection = Mockito.mock(Connection.class);
         Statement mockStatement = Mockito.mock(Statement.class);
@@ -207,12 +201,10 @@ class E2eControllerTest {
         when(mockConnection.createStatement()).thenReturn(mockStatement);
         when(mockJdbc.queryForList(anyString(), eq(String.class))).thenReturn(List.of());
 
-        E2eController localController = new E2eController(mockJdbc, mockNamed, processoFacade, unidadeFacade, resourceLoader);
-
         mockResourceLoader("file:../e2e/setup/seed.sql", false);
         mockResourceLoader("file:e2e/setup/seed.sql", false); // Ambos não existem para forçar ErroConfiguracao
 
-        var exception = Assertions.assertThrows(ErroConfiguracao.class, localController::resetDatabase);
+        var exception = Assertions.assertThrows(ErroConfiguracao.class, controller::resetDatabase);
         Assertions.assertNotNull(exception);
         Assertions.assertTrue(exception.getMessage().contains("Arquivo seed.sql não encontrado"));
 
@@ -224,14 +216,10 @@ class E2eControllerTest {
     @Test
     @DisplayName("Deve lançar erro se seed.sql não encontrado em nenhum lugar")
     void deveLancarErroSeSeedNaoEncontrado() {
-        // Usa mocks de DB
-        JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
-        E2eController localController = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
-
         mockResourceLoader("file:../e2e/setup/seed.sql", false);
         mockResourceLoader("file:e2e/setup/seed.sql", false);
 
-        var exception = Assertions.assertThrows(ErroConfiguracao.class, localController::resetDatabase);
+        var exception = Assertions.assertThrows(ErroConfiguracao.class, controller::resetDatabase);
         Assertions.assertNotNull(exception);
     }
 
@@ -318,9 +306,7 @@ class E2eControllerTest {
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
         Mockito.doThrow(new RuntimeException("Error")).when(mockJdbc).execute(any(String.class));
 
-        E2eController localController = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
-
-        var exception = Assertions.assertThrows(RuntimeException.class, localController::resetDatabase);
+        var exception = Assertions.assertThrows(RuntimeException.class, controller::resetDatabase);
         Assertions.assertNotNull(exception);
     }
 
@@ -429,7 +415,6 @@ class E2eControllerTest {
     class CoberturaExtra {
 
         private org.springframework.jdbc.core.JdbcTemplate jdbcTemplateMock;
-        private org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate namedJdbcTemplateMock;
         private sgc.processo.service.ProcessoFacade processoFacadeMock;
         private sgc.organizacao.UnidadeFacade unidadeFacadeMock;
         private org.springframework.core.io.ResourceLoader resourceLoaderMock;
@@ -438,18 +423,10 @@ class E2eControllerTest {
         @BeforeEach
         void setUp() {
             jdbcTemplateMock = mock(org.springframework.jdbc.core.JdbcTemplate.class);
-            namedJdbcTemplateMock = mock(org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate.class);
+            mock(org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate.class);
             processoFacadeMock = mock(sgc.processo.service.ProcessoFacade.class);
             unidadeFacadeMock = mock(sgc.organizacao.UnidadeFacade.class);
             resourceLoaderMock = mock(org.springframework.core.io.ResourceLoader.class);
-
-            controllerIsolado = new E2eController(
-                jdbcTemplateMock, 
-                namedJdbcTemplateMock, 
-                processoFacadeMock, 
-                unidadeFacadeMock, 
-                resourceLoaderMock
-            );
         }
 
         @Test

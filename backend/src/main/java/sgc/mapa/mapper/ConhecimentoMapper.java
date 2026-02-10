@@ -1,29 +1,23 @@
 package sgc.mapa.mapper;
 
-import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import sgc.comum.config.CentralMapperConfig;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;
 import sgc.mapa.dto.ConhecimentoResponse;
 import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.model.Conhecimento;
 
-/**
- * Mapper (usando MapStruct) entre a entidade Conhecimento e seus DTOs.
- * 
- * <p>Este mapper é puro e não injeta repositórios. Conversões de IDs para entidades
- * devem ser feitas nos Services antes de chamar o mapper.</p>
- */
-@Mapper(componentModel = "spring")
+@Mapper(config = CentralMapperConfig.class)
 public interface ConhecimentoMapper {
     @Mapping(source = "atividade.codigo", target = "atividadeCodigo")
-    @Nullable ConhecimentoResponse toResponse(@Nullable Conhecimento conhecimento);
+    ConhecimentoResponse toResponse(Conhecimento conhecimento);
 
     @Mapping(target = "codigo", ignore = true)
     @Mapping(target = "atividade", ignore = true)
-    @Nullable Conhecimento toEntity(@Nullable CriarConhecimentoRequest request);
+    Conhecimento toEntity(CriarConhecimentoRequest request);
 
     @Mapping(target = "codigo", ignore = true)
     @Mapping(target = "atividade", ignore = true)
-    @Nullable Conhecimento toEntity(@Nullable AtualizarConhecimentoRequest request);
+    Conhecimento toEntity(AtualizarConhecimentoRequest request);
 }

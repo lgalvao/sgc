@@ -2,7 +2,6 @@ package sgc.mapa;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +103,7 @@ class MapaControllerTest {
         mapa.setCodigo(1L);
 
         when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(mapa);
-        when(mapaFacade.criar(any(Mapa.class))).thenReturn(mapa);
+        when(mapaFacade.salvar(any(Mapa.class))).thenReturn(mapa);
         when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(
@@ -175,81 +174,5 @@ class MapaControllerTest {
         mockMvc.perform(post(API_MAPAS_1_EXCLUIR).with(csrf())).andExpect(status().isNotFound());
     }
 
-    @Nested
-    @DisplayName("Cobertura de Erros de Mapeamento")
-    class CoberturaMapeamento {
 
-        @Test
-        @WithMockUser
-        @DisplayName("Deve lançar erro quando conversão para DTO falha no obterPorId")
-        void deveLancarErroQuandoConversaoParaDtoFalhaNoObterPorId() throws Exception {
-            when(mapaFacade.obterPorCodigo(1L)).thenReturn(new Mapa());
-            when(mapaMapper.toDto(any())).thenReturn(null);
-
-            mockMvc.perform(get(API_MAPAS_1))
-                    .andExpect(status().isInternalServerError());
-        }
-
-        @Test
-        @WithMockUser(roles = "ADMIN")
-        @DisplayName("Deve lançar erro quando conversão para entidade falha no criar")
-        void deveLancarErroQuandoConversaoParaEntidadeFalhaNoCriar() throws Exception {
-            MapaDto dto = MapaDto.builder().build();
-            when(mapaMapper.toEntity(any())).thenReturn(null);
-
-            mockMvc.perform(post(API_MAPAS)
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(dto)))
-                    .andExpect(status().isInternalServerError());
-        }
-
-        @Test
-        @WithMockUser(roles = "ADMIN")
-        @DisplayName("Deve lançar erro quando conversão para DTO falha após criar")
-        void deveLancarErroQuandoConversaoParaDtoFalhaAposCriar() throws Exception {
-            MapaDto dto = MapaDto.builder().build();
-            Mapa entidade = new Mapa();
-            when(mapaMapper.toEntity(any())).thenReturn(entidade);
-            when(mapaFacade.criar(any())).thenReturn(entidade);
-            when(mapaMapper.toDto(any())).thenReturn(null);
-
-            mockMvc.perform(post(API_MAPAS)
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(dto)))
-                    .andExpect(status().isInternalServerError());
-        }
-
-        @Test
-        @WithMockUser(roles = "ADMIN")
-        @DisplayName("Deve lançar erro quando conversão para entidade falha no atualizar")
-        void deveLancarErroQuandoConversaoParaEntidadeFalhaNoAtualizar() throws Exception {
-            MapaDto dto = MapaDto.builder().build();
-            when(mapaMapper.toEntity(any())).thenReturn(null);
-
-            mockMvc.perform(post(API_MAPAS_1_ATUALIZAR)
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(dto)))
-                    .andExpect(status().isInternalServerError());
-        }
-
-        @Test
-        @WithMockUser(roles = "ADMIN")
-        @DisplayName("Deve lançar erro quando conversão para DTO falha após atualizar")
-        void deveLancarErroQuandoConversaoParaDtoFalhaAposAtualizar() throws Exception {
-            MapaDto dto = MapaDto.builder().build();
-            Mapa entidade = new Mapa();
-            when(mapaMapper.toEntity(any())).thenReturn(entidade);
-            when(mapaFacade.atualizar(eq(1L), any())).thenReturn(entidade);
-            when(mapaMapper.toDto(any())).thenReturn(null);
-
-            mockMvc.perform(post(API_MAPAS_1_ATUALIZAR)
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(dto)))
-                    .andExpect(status().isInternalServerError());
-        }
-    }
 }

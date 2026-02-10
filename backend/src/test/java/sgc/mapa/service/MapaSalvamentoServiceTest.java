@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroEstadoImpossivel;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.ComumRepo;
@@ -27,7 +26,6 @@ import static org.mockito.Mockito.when;
 @Tag("unit")
 @DisplayName("MapaSalvamentoService Tests")
 class MapaSalvamentoServiceTest {
-
     @Mock
     private MapaRepo mapaRepo;
     @Mock
@@ -41,27 +39,6 @@ class MapaSalvamentoServiceTest {
 
     @InjectMocks
     private MapaSalvamentoService mapaSalvamentoService;
-
-    @Test
-    @DisplayName("Deve falhar ao salvar competência inexistente que deveria existir")
-    void deveFalharCompetenciaInexistente() {
-        Long codMapa = 1L;
-        CompetenciaMapaDto compDto = CompetenciaMapaDto.builder()
-                .codigo(999L)
-                .descricao("Desc")
-                .build();
-        SalvarMapaRequest request = SalvarMapaRequest.builder()
-                .competencias(List.of(compDto))
-                .build();
-
-        Mapa mapa = new Mapa();
-        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(Collections.emptyList());
-        when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(Collections.emptyList());
-
-        assertThatThrownBy(() -> mapaSalvamentoService.salvarMapaCompleto(codMapa, request))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
 
     @Test
     @DisplayName("Deve falhar ao associar atividade que não pertence ao mapa")

@@ -217,13 +217,9 @@ public class ImpactoMapaService {
     }
 
     private boolean conhecimentosDiferentes(List<Conhecimento> lista1, List<Conhecimento> lista2) {
-        if (lista1.size() != lista2.size())
-            return true;
+        if (lista1.size() != lista2.size()) return true;
 
-        // Otimização: Evitar overhead de Stream/Set para listas vazias ou muito
-        // pequenas
-        if (lista1.isEmpty())
-            return false;
+        if (lista1.isEmpty()) return false;
 
         Set<String> descricoes1 = HashSet.newHashSet(lista1.size());
         for (Conhecimento c : lista1) {

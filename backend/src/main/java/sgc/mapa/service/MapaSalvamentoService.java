@@ -18,17 +18,9 @@ import sgc.seguranca.sanitizacao.UtilSanitizacao;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import sgc.comum.erros.ErroEstadoImpossivel;
 
 /**
  * Serviço especializado para salvar o mapa completo de competências.
- *
- * <p>
- * <b>IMPORTANTE:</b> Este serviço deve ser acessado APENAS via
- * {@link MapaFacade}.
- * Controllers não devem injetar este serviço diretamente.
- *
- * <p>
  * Responsável por processar requisições de salvamento que incluem:
  * <ul>
  * <li>Atualização das observações do mapa</li>
@@ -50,13 +42,6 @@ public class MapaSalvamentoService {
 
     /**
      * Salva o mapa completo with todas as competências e suas associações.
-     *
-     * @param codMapa O código do mapa a ser salvo.
-     * @param request A requisição contendo as competências e observações.
-     * @return O DTO do mapa completo atualizado.
-     * @throws ErroEntidadeNaoEncontrada se o mapa não for encontrado.
-     * @throws ErroValidacao             se houver atividades inválidas na
-     *                                   requisição.
      */
     public MapaCompletoDto salvarMapaCompleto(Long codMapa, SalvarMapaRequest request) {
         Mapa mapa = repo.buscar(Mapa.class, codMapa);
@@ -66,16 +51,13 @@ public class MapaSalvamentoService {
 
         ContextoSalvamento contexto = prepararContexto(codMapa, request);
         removerCompetenciasObsoletas(contexto);
+
         List<Competencia> competenciasSalvas = salvarCompetencias(mapa, contexto);
         atualizarAssociacoesAtividades(contexto, competenciasSalvas);
 
         validarIntegridadeMapa(codMapa, contexto.atividadesAtuais, competenciasSalvas);
 
-        var response = mapaCompletoMapper.toDto(mapa, null, competenciasSalvas);
-        if (response == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter mapa salvo para DTO.");
-        }
-        return response;
+        return mapaCompletoMapper.toDto(mapa, null, competenciasSalvas);
     }
 
     private void atualizarObservacoes(Mapa mapa, @Nullable String observacoes) {
@@ -90,7 +72,6 @@ public class MapaSalvamentoService {
 
         Set<Long> atividadesDoMapaIds = atividadesAtuais.stream()
                 .map(Atividade::getCodigo)
-                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         Set<Long> codigosNovos = request.competencias().stream()
@@ -162,9 +143,7 @@ public class MapaSalvamentoService {
         Long codMapa = null;
         if (!contexto.atividadesAtuais.isEmpty()) {
             Atividade primeiraAtividade = contexto.atividadesAtuais.getFirst();
-            if (primeiraAtividade.getMapa() != null) {
-                codMapa = primeiraAtividade.getMapa().getCodigo();
-            }
+            codMapa = primeiraAtividade.getMapa().getCodigo();
         }
 
         Map<Long, Set<Competencia>> mapAtividadeCompetencias = construirMapaAssociacoes(
@@ -180,8 +159,6 @@ public class MapaSalvamentoService {
             @Nullable Long codMapa) {
 
         Map<Long, Set<Competencia>> mapAtividadeCompetencias = new HashMap<>();
-
-        // Inicializar with conjuntos vazios para todas as atividades
         for (Long ativId : contexto.atividadesDoMapaIds) {
             mapAtividadeCompetencias.put(ativId, new HashSet<>());
         }
@@ -202,7 +179,8 @@ public class MapaSalvamentoService {
 
     private void validarAtividadePertenceAoMapa(Long ativId, Set<Long> atividadesDoMapaIds, @Nullable Long codMapa) {
         if (!atividadesDoMapaIds.contains(ativId)) {
-            throw new ErroValidacao("Atividade %d não pertence ao mapa %s".formatted(ativId, Objects.toString(codMapa)));
+            throw new ErroValidacao(
+                    "Atividade %d não pertence ao mapa %s".formatted(ativId, Objects.toString(codMapa)));
         }
     }
 
@@ -219,15 +197,13 @@ public class MapaSalvamentoService {
     private void validarIntegridadeMapa(Long codMapa, List<Atividade> atividades, List<Competencia> competencias) {
         for (Atividade atividade : atividades) {
             if (atividade.getCompetencias().isEmpty()) {
-                log.warn("Atividade {} não vinculada a nenhuma competência no mapa {}",
-                        atividade.getCodigo(), codMapa);
+                log.warn("Atividade {} não vinculada a nenhuma competência no mapa {}", atividade.getCodigo(), codMapa);
             }
         }
 
         for (Competencia competencia : competencias) {
             if (competencia.getAtividades().isEmpty()) {
-                log.warn("Competência {} sem atividades vinculadas no mapa {}",
-                        competencia.getCodigo(), codMapa);
+                log.warn("Competência {} sem atividades vinculadas no mapa {}", competencia.getCodigo(), codMapa);
             }
         }
     }

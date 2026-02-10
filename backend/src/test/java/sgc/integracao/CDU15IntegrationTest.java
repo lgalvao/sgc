@@ -43,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 class CDU15IntegrationTest extends BaseIntegrationTest {
     private static final String API_SUBPROCESSO_MAPA = "/api/subprocessos/{codigo}/mapa";
+    private static final String API_SUBPROCESSO_MAPA_ATUALIZAR = "/api/subprocessos/{codigo}/mapa/atualizar";
 
     private Subprocesso subprocesso;
     private Atividade atividade1;
@@ -104,7 +105,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         // When & Then
         mockMvc.perform(
                         post(
-                                "/api/subprocessos/{codSubprocesso}/mapa/atualizar",
+                                API_SUBPROCESSO_MAPA_ATUALIZAR,
                                 subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -133,7 +134,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
                                 List.of(atividade1.getCodigo()))));
         String responseBody = mockMvc.perform(
                         post(
-                                "/api/subprocessos/{codSubprocesso}/mapa/atualizar",
+                                API_SUBPROCESSO_MAPA_ATUALIZAR,
                                 subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -161,7 +162,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(
                         post(
-                                "/api/subprocessos/{codSubprocesso}/mapa/atualizar",
+                                API_SUBPROCESSO_MAPA_ATUALIZAR,
                                 subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -197,7 +198,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
         // When & Then
         mockMvc.perform(
                         post(
-                                "/api/subprocessos/{codSubprocesso}/mapa/atualizar",
+                                API_SUBPROCESSO_MAPA_ATUALIZAR,
                                 subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -218,13 +219,16 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
                                 "Competência para GET",
                                 List.of(atividade1.getCodigo()))));
         mockMvc.perform(
-                post("/api/subprocessos/{codSubprocesso}/mapa/atualizar", subprocesso.getCodigo())
+                post(API_SUBPROCESSO_MAPA_ATUALIZAR, subprocesso.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)));
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
+                .andExpect(status().isOk());
 
         // When & Then
         mockMvc.perform(get(API_SUBPROCESSO_MAPA, subprocesso.getCodigo()))
+                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocessoCodigo").value(subprocesso.getCodigo()))
                 .andExpect(jsonPath("$.competencias.length()").value(1))

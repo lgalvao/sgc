@@ -85,13 +85,6 @@ class MapaFacadeTest {
             assertThat(facade.salvar(mapa)).isEqualTo(mapa);
         }
 
-        @Test
-        @DisplayName("Deve criar mapa")
-        void deveCriarMapa() {
-            Mapa mapa = new Mapa();
-            when(mapaManutencaoService.salvarMapa(mapa)).thenReturn(mapa);
-            assertThat(facade.criar(mapa)).isEqualTo(mapa);
-        }
 
         @Test
         @DisplayName("Deve atualizar mapa existente")
@@ -191,17 +184,6 @@ class MapaFacadeTest {
             verify(mapaManutencaoService).buscarCompetenciasPorCodMapa(1L);
         }
 
-        @Test
-        @DisplayName("Deve lançar erro se falhar converter mapa para DTO")
-        void deveLancarErroSeFalharConverter() {
-            when(mapaManutencaoService.buscarMapaPorCodigo(1L)).thenReturn(new Mapa());
-            when(mapaManutencaoService.buscarCompetenciasPorCodMapa(1L)).thenReturn(List.of());
-            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(null);
-
-            assertThatThrownBy(() -> facade.obterMapaCompleto(1L, 10L))
-                    .isInstanceOf(sgc.comum.erros.ErroEstadoImpossivel.class)
-                    .hasMessageContaining("Falha ao converter mapa completo para DTO");
-        }
     }
 
     @Nested

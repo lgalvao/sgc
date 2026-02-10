@@ -158,25 +158,7 @@ if (processo.getSituacao() != CRIADO) {
 
 ## 3. Catálogo de Exceções de Negócio
 
-### 3.1. ErroEntidadeNaoEncontrada (404 Not Found)
-
-**Quando usar**: Recurso solicitado não existe no sistema
-
-**Exemplos**:
-
-```java
-// ✓ CORRETO
-Processo processo = processoRepo.findById(codigo)
-    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
-
-// ✓ CORRETO - com mensagem customizada
-Unidade unidade = unidadeRepo.findBySigla(sigla)
-    .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-        "Unidade com sigla '" + sigla + "' não encontrada"
-    ));
-```
-
-### 3.2. ErroValidacao (422 Unprocessable Content)
+### 3.1. ErroValidacao (422 Unprocessable Content)
 
 **Quando usar**: Validação de dados de entrada ou regras de negócio
 
@@ -203,7 +185,7 @@ Map<String, String> detalhes = Map.of(
 throw new ErroValidacao("Dados de entrada inválidos", detalhes);
 ```
 
-### 3.3. ErroAccessoNegado (403 Forbidden)
+### 3.2. ErroAccessoNegado (403 Forbidden)
 
 **Quando usar**: Usuário autenticado mas sem permissão para a ação
 
@@ -218,7 +200,7 @@ if (!usuario.getTituloEleitoral().equals(tituloTitular)) {
 }
 ```
 
-### 3.4. ErroXxxEmSituacaoInvalida (422 Unprocessable Content)
+### 3.3. ErroXxxEmSituacaoInvalida (422 Unprocessable Content)
 
 **Quando usar**: Operação em estado de workflow incorreto
 

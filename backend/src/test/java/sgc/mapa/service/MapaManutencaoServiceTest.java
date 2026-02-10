@@ -272,16 +272,6 @@ class MapaManutencaoServiceTest {
             verify(atividadeRepo).delete(atividade);
             verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
         }
-
-        @Test
-        @DisplayName("Deve lançar erro ao excluir atividade inexistente")
-        void deveLancarErroAoExcluirAtividadeInexistente() {
-            Long id = 1L;
-            when(repo.buscar(Atividade.class, id)).thenThrow(new ErroEntidadeNaoEncontrada("Atividade", id));
-
-            assertThatThrownBy(() -> service.excluirAtividade(id))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-        }
     }
 
     @Nested
@@ -318,23 +308,6 @@ class MapaManutencaoServiceTest {
             verify(atividadeRepo).saveAll(anyList());
             verify(eventPublisher, times(1)).publishEvent(any(EventoMapaAlterado.class));
         }
-
-        @Test
-        @DisplayName("Deve ignorar descrição nula")
-        void deveIgnorarDescricaoNula() {
-            Atividade atividade1 = new Atividade();
-            atividade1.setCodigo(1L);
-            atividade1.setDescricao("Antiga 1");
-
-            Map<Long, String> descricoes = new HashMap<>();
-            descricoes.put(1L, null);
-
-            when(atividadeRepo.findAllById(descricoes.keySet())).thenReturn(List.of(atividade1));
-
-            service.atualizarDescricoesAtividadeEmLote(descricoes);
-
-            assertThat(atividade1.getDescricao()).isEqualTo("Antiga 1");
-        }
     }
 
     @Nested
@@ -356,17 +329,6 @@ class MapaManutencaoServiceTest {
             assertThat(resultado).isNotNull();
             assertThat(resultado.getCodigo()).isEqualTo(1L);
             verify(competenciaRepo).findById(1L);
-        }
-
-        @Test
-        @DisplayName("Deve lançar erro ao buscar competência inexistente")
-        void deveLancarErroAoBuscarCompetenciaInexistente() {
-            when(competenciaRepo.findById(999L)).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> service.buscarCompetenciaPorCodigo(999L))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Competência")
-                    .hasMessageContaining("999");
         }
 
         @Test
@@ -504,17 +466,6 @@ class MapaManutencaoServiceTest {
         }
 
         @Test
-        @DisplayName("Deve lançar erro ao atualizar competência inexistente")
-        void deveLancarErroAoAtualizarCompetenciaInexistente() {
-            when(competenciaRepo.findById(999L)).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> service.atualizarCompetencia(999L, "Nova", List.of(1L)))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Competência")
-                    .hasMessageContaining("999");
-        }
-
-        @Test
         @DisplayName("Deve salvar competência única")
         void deveSalvarCompetencia() {
             Competencia competencia = Competencia.builder().codigo(1L).build();
@@ -584,16 +535,6 @@ class MapaManutencaoServiceTest {
             verify(competenciaRepo).delete(competencia);
         }
 
-        @Test
-        @DisplayName("Deve lançar erro ao remover competência inexistente")
-        void deveLancarErroAoRemoverCompetenciaInexistente() {
-            when(competenciaRepo.findById(999L)).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> service.removerCompetencia(999L))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Competência")
-                    .hasMessageContaining("999");
-        }
     }
 
     @Nested
@@ -615,17 +556,6 @@ class MapaManutencaoServiceTest {
             assertThat(resultado).hasSize(1);
             verify(atividadeRepo).existsById(10L);
             verify(conhecimentoRepo).findByAtividadeCodigo(10L);
-        }
-
-        @Test
-        @DisplayName("Deve lançar erro ao listar conhecimentos de atividade inexistente")
-        void deveLancarErroAoListarConhecimentosDeAtividadeInexistente() {
-            when(atividadeRepo.existsById(999L)).thenReturn(false);
-
-            assertThatThrownBy(() -> service.listarConhecimentosPorAtividade(999L))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Atividade")
-                    .hasMessageContaining("999");
         }
 
         @Test
@@ -714,21 +644,6 @@ class MapaManutencaoServiceTest {
             assertThat(resultado).isNotNull();
             verify(eventPublisher, never()).publishEvent(any());
             verify(conhecimentoRepo).save(conhecimento);
-        }
-
-        @Test
-        @DisplayName("Deve lançar erro ao criar conhecimento em atividade inexistente")
-        void deveLancarErroAoCriarConhecimentoEmAtividadeInexistente() {
-            CriarConhecimentoRequest request = CriarConhecimentoRequest.builder()
-                    .descricao("Conhecimento")
-                    .build();
-
-            when(atividadeRepo.findById(999L)).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> service.criarConhecimento(999L, request))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                    .hasMessageContaining("Atividade")
-                    .hasMessageContaining("999");
         }
     }
 

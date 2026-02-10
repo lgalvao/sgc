@@ -44,14 +44,6 @@ class AtividadeMapperTest {
         }
 
         @Test
-        @DisplayName("Deve retornar null quando entidade é null")
-        void deveRetornarNullQuandoEntidadeNull() {
-            AtividadeResponse dto = mapper.toResponse(null);
-
-            assertThat(dto).isNull();
-        }
-
-        @Test
         @DisplayName("Deve lidar com mapa null na entidade")
         void deveLidarComMapaNull() {
             Atividade atividade = new Atividade();

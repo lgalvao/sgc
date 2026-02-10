@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.*;
 
 import java.util.*;
@@ -19,18 +20,20 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class CopiaMapaService {
-    private final MapaRepo repositorioMapa;
+    private final ComumRepo repo;
+
+    private final MapaRepo mapaRepo;
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo competenciaRepo;
 
     @Transactional
     public Mapa copiarMapaParaUnidade(Long codMapaOrigem) {
-        Mapa fonte = repositorioMapa
+        Mapa fonte = mapaRepo
                 .findById(codMapaOrigem)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codMapaOrigem));
 
         Mapa novoMapa = criarNovoMapa(fonte);
-        Mapa mapaSalvo = repositorioMapa.save(novoMapa);
+        Mapa mapaSalvo = mapaRepo.save(novoMapa);
 
         Map<Long, Atividade> mapaAtividades = copiarAtividades(fonte.getCodigo(), mapaSalvo);
         copiarCompetencias(fonte.getCodigo(), mapaSalvo, mapaAtividades);
@@ -41,18 +44,12 @@ public class CopiaMapaService {
     /**
      * Importa atividades de um mapa de origem para um mapa de destino.
      * Apenas atividades que ainda não existem no destino serão importadas.
-     *
-     * @param mapaOrigemId  O código do mapa de origem.
-     * @param mapaDestinoId O código do mapa de destino.
-     * @throws ErroEntidadeNaoEncontrada se o mapa de destino não for encontrado.
      */
     @Transactional
     public void importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId) {
         List<Atividade> atividadesOrigem = atividadeRepo.findWithConhecimentosByMapaCodigo(mapaOrigemId);
         Set<String> descricoesExistentes = obterDescricoesExistentes(mapaDestinoId);
-
-        Mapa mapaDestino = repositorioMapa.findById(mapaDestinoId)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", mapaDestinoId));
+        Mapa mapaDestino = repo.buscar(Mapa.class, mapaDestinoId);
 
         List<Atividade> atividadesParaSalvar = new ArrayList<>();
         for (Atividade atividadeOrigem : atividadesOrigem) {
@@ -66,10 +63,6 @@ public class CopiaMapaService {
         }
     }
 
-    // ===================================================================================
-    // Métodos auxiliares de cópia
-    // ===================================================================================
-
     private Mapa criarNovoMapa(Mapa fonte) {
         return Mapa.builder()
                 .dataHoraDisponibilizado(fonte.getDataHoraDisponibilizado())
@@ -80,11 +73,8 @@ public class CopiaMapaService {
 
     private Map<Long, Atividade> copiarAtividades(Long codMapaFonte, Mapa mapaSalvo) {
         Map<Long, Atividade> mapaAtividades = new HashMap<>();
-
         List<Atividade> atividadesFonte = atividadeRepo.findWithConhecimentosByMapaCodigo(codMapaFonte);
-
         List<Atividade> novasAtividades = new ArrayList<>();
-        // Use IdentityHashMap to map unsaved object -> source ID, to later map source ID -> saved object
         Map<Atividade, Long> atividadeParaFonteId = new IdentityHashMap<>();
 
         for (Atividade atividadeFonte : atividadesFonte) {
@@ -158,10 +148,8 @@ public class CopiaMapaService {
     }
 
     private Set<String> obterDescricoesExistentes(Long mapaDestinoId) {
-        return new HashSet<>(
-                atividadeRepo.findByMapaCodigo(mapaDestinoId).stream()
-                        .map(Atividade::getDescricao)
-                        .toList()
-        );
+        return new HashSet<>(atividadeRepo.findByMapaCodigo(mapaDestinoId).stream()
+                .map(Atividade::getDescricao)
+                .toList());
     }
 }
