@@ -103,7 +103,7 @@ class MapaFacadeTest {
         @Test
         @DisplayName("Deve excluir mapa")
         void deveExcluirMapa() {
-            when(mapaManutencaoService.mapaExiste(1L)).thenReturn(true);
+
             facade.excluir(1L);
             verify(mapaManutencaoService).excluirMapa(1L);
         }
