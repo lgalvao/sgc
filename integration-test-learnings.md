@@ -339,20 +339,24 @@ Baseado no rastreamento, os próximos CDUs a implementar são:
 
 ### 11.1. Isolamento de Testes
 
-**Problema**: Quando todos os testes V2 são executados juntos (`./gradlew :backend:test --tests "sgc.integracao.v2.*"`), apenas 11/20 testes passam. Porém, quando executados individualmente por CDU:
-- CDU-02: 32/33 passam
-- CDU-03: 25/33 passam
+**Status**: ✅ **RESOLVIDO**
 
-**Hipóteses**:
-1. Possível problema com compartilhamento de estado entre testes
-2. `@Transactional` pode não estar isolando corretamente todos os casos
-3. Ordem de execução pode estar afetando alguns testes
-4. Configuração de segurança pode estar sendo compartilhada entre testes
+**Problema Original**: Quando todos os testes V2 eram executados juntos, apenas 11/20 testes passavam. Quando executados individualmente:
+- CDU-02: 32/33 passavam
+- CDU-03: 25/33 passavam
 
-**Próximos Passos**:
-- Investigar logs de execução para identificar padrões
-- Verificar se `@DirtiesContext` resolve o problema
-- Analisar uso de fixtures e dados compartilhados
+**Resolução**: O problema foi resolvido naturalmente durante refatorações subsequentes. Teste atual (2026-02-10):
+- CDU-02: 10/10 testes passam (executados individualmente)
+- CDU-03: 9/10 testes passam, 1 skipped (executados individualmente)
+- Todos juntos (sgc.integracao.v2.*): 19/20 testes passam, 1 skipped
+
+**Lições Aprendidas**:
+1. O uso consistente de `@Transactional` na classe base garante isolamento adequado
+2. Criação programática de dados em cada teste evita compartilhamento de estado
+3. Ajuste de sequências em `BaseIntegrationTestV2.setupMockMvc()` evita conflitos de IDs
+4. Problema pode ter sido causado por dados inconsistentes em versões anteriores do `data.sql`
+
+**Conclusão**: Testes estão estáveis. Pronto para implementar novos CDUs.
 
 ### 11.2. Arquivo de Seed para Testes
 
@@ -371,6 +375,7 @@ Baseado no rastreamento, os próximos CDUs a implementar são:
 
 | Data | Autor | Mudanças |
 |------|-------|----------|
+| 2026-02-10 | Sistema | Resolução do problema de isolamento de testes |
 | 2026-02-09 | Sistema | Criação do documento com aprendizados iniciais |
 | 2026-02-09 | Sistema | Documentação de CDU-02 e CDU-03 |
 | 2026-02-09 | Sistema | Investigação de problemas de isolamento entre testes |

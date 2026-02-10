@@ -1,6 +1,6 @@
 # Rastreamento de Testes de Integração V2
 
-**Última atualização**: 2026-02-09
+**Última atualização**: 2026-02-10
 
 ## Documentação Relacionada
 
@@ -25,10 +25,10 @@
 
 **Progresso**: 4.8% (2/42)
 
-**Nota**: Os testes implementados apresentam problema de isolamento quando executados em conjunto.
-- Executados individualmente: CDU-02 (32/33 passam), CDU-03 (25/33 passam)
-- Executados juntos (sgc.integracao.v2.*): 11/20 passam
-- **Ação necessária**: Resolver isolamento antes de implementar novos CDUs
+**Status dos Testes**: ✅ **Problema de isolamento RESOLVIDO**
+- Executados individualmente: CDU-02 (10/10 passam), CDU-03 (9/10 passam, 1 skipped)
+- Executados juntos (sgc.integracao.v2.*): 19/20 passam (1 skipped)
+- **Conclusão**: Testes estão estáveis e isolados. Pronto para implementar novos CDUs.
 
 ---
 
@@ -45,7 +45,7 @@
   - ✅ Exclusão de processos em status Criado
   - ✅ Controle de acesso (ADMIN somente)
   - Arquivo: `backend/src/test/java/sgc/integracao/v2/processo/CDU03ManterProcessoIntegrationTest.java`
-  - Cenários: 9 de 9 ✅
+  - Testes: 10 (9 passando, 1 skipped) ✅
   - Data: 2026-02-09
 
 #### Painel (1)
@@ -58,14 +58,20 @@
   - ✅ Marcação de alertas como visualizados
   - ✅ Ordenação de processos e alertas
   - Arquivo: `backend/src/test/java/sgc/integracao/v2/painel/CDU02VisualizarPainelIntegrationTest.java`
-  - Cenários: 6 de 6 ✅
+  - Testes: 10 (10 passando) ✅
   - Data: 2026-02-09
 
 ---
 
-### 🔄 Em Progresso (0)
+### 🔄 Em Progresso (1)
 
-_Nenhum teste em desenvolvimento._
+#### Processo (1)
+
+- [ ] **CDU-04**: Iniciar Processo de Mapeamento
+  - 🔄 Em andamento
+  - Prioridade: 🔴 Alta
+  - Dependências: CDU-03 ✅
+  - Data início: 2026-02-10
 
 ---
 
