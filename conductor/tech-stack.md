@@ -3,7 +3,7 @@
 ## Backend
 - **Linguagem:** Java 21
 - **Framework Principal:** Spring Boot 4.0.2
-- **Gerenciamento de Dependências:** Gradle 9.3.0
+- **Gerenciamento de Dependências:** Gradle 9.3.1
 - **Persistência:** Spring Data JPA / Hibernate 7
 - **Mapeamento de Objetos:** MapStruct 1.6.3
 - **Utilidades:** 
@@ -31,9 +31,8 @@
   - AssertJ 3
   - ArchUnit (Regras de Arquitetura)
   - Jacoco (Cobertura de Código)
-  - Pitest (Testes de Mutação)
 - **Frontend:** 
-  - Vitest (Testes Unitários)
+  - Vitest 4 (Testes Unitários)
   - Vue Test Utils
 - **End-to-End (E2E):** 
-  - Playwright 1.57.0
+  - Playwright 1.58.0
