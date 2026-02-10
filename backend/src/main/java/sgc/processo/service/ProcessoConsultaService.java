@@ -37,7 +37,6 @@ public class ProcessoConsultaService {
     private final ProcessoSubprocessoQueryService queryService;
     private final UsuarioFacade usuarioService;
 
-
     public Processo buscarPorId(Long id) {
         return repo.buscar(Processo.class, id);
     }

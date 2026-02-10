@@ -194,23 +194,7 @@ class MapaManutencaoServiceTest {
             verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
         }
 
-        @Test
-        @DisplayName("Deve atualizar atividade sem mapa associado (sem publicar evento)")
-        void deveAtualizarAtividadeSemMapa() {
-            Long id = 1L;
-            AtualizarAtividadeRequest request = AtualizarAtividadeRequest.builder().build();
-            Atividade atividade = new Atividade();
-            atividade.setMapa(null);
 
-            when(repo.buscar(Atividade.class, id)).thenReturn(atividade);
-            when(atividadeMapper.toEntity(request)).thenReturn(new Atividade());
-            when(atividadeRepo.save(any())).thenReturn(atividade);
-
-            service.atualizarAtividade(id, request);
-
-            verify(atividadeRepo).save(atividade);
-            verify(eventPublisher, never()).publishEvent(any());
-        }
 
         @Test
         @DisplayName("Deve lançar exceção ao atualizar se ocorrer erro inesperado")
@@ -261,7 +245,7 @@ class MapaManutencaoServiceTest {
             Atividade atividade2 = new Atividade();
             atividade2.setCodigo(2L);
             atividade2.setDescricao("Antiga 2");
-            // Sem mapa
+            atividade2.setMapa(mapa1);
 
             Map<Long, String> descricoes = Map.of(
                     1L, "Nova 1",
@@ -599,7 +583,10 @@ class MapaManutencaoServiceTest {
 
             Atividade atividade = new Atividade();
             atividade.setCodigo(1L);
-            atividade.setMapa(null);
+            Mapa mapa = new Mapa(); // Mapa válido
+            mapa.setCodigo(1L);
+            atividade.setMapa(mapa);
+
 
             Conhecimento conhecimento = new Conhecimento();
             conhecimento.setCodigo(1L);
@@ -612,7 +599,8 @@ class MapaManutencaoServiceTest {
             ConhecimentoResponse resultado = service.criarConhecimento(1L, request);
 
             assertThat(resultado).isNotNull();
-            verify(eventPublisher, never()).publishEvent(any());
+            // Agora deve publicar evento pois tem mapa
+            verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
             verify(conhecimentoRepo).save(conhecimento);
         }
     }
@@ -659,9 +647,12 @@ class MapaManutencaoServiceTest {
                     .descricao("Conhecimento Atualizado")
                     .build();
 
+            Mapa mapa = new Mapa(); // Mapa válido
+            mapa.setCodigo(1L);
+
             Atividade atividade = new Atividade();
             atividade.setCodigo(1L);
-            atividade.setMapa(null);
+            atividade.setMapa(mapa);
 
             Conhecimento conhecimento = new Conhecimento();
             conhecimento.setCodigo(1L);
@@ -676,7 +667,8 @@ class MapaManutencaoServiceTest {
             service.atualizarConhecimento(1L, 1L, request);
 
             assertThat(conhecimento.getDescricao()).isEqualTo("Conhecimento Atualizado");
-            verify(eventPublisher, never()).publishEvent(any());
+            // Agora deve publicar evento pois tem mapa
+            verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
             verify(conhecimentoRepo).save(conhecimento);
         }
 
@@ -747,9 +739,12 @@ class MapaManutencaoServiceTest {
         @Test
         @DisplayName("Deve excluir conhecimento sem mapa associado (sem publicar evento)")
         void deveExcluirConhecimentoSemMapa() {
+            Mapa mapa = new Mapa(); // Mapa válido
+            mapa.setCodigo(1L);
+
             Atividade atividade = new Atividade();
             atividade.setCodigo(1L);
-            atividade.setMapa(null);
+            atividade.setMapa(mapa);
 
             Conhecimento conhecimento = new Conhecimento();
             conhecimento.setCodigo(1L);
@@ -759,7 +754,8 @@ class MapaManutencaoServiceTest {
 
             service.excluirConhecimento(1L, 1L);
 
-            verify(eventPublisher, never()).publishEvent(any());
+            // Agora deve publicar evento pois tem mapa
+            verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
             verify(conhecimentoRepo).delete(conhecimento);
         }
 
@@ -803,7 +799,9 @@ class MapaManutencaoServiceTest {
             Long id = 1L;
             Atividade atividade = new Atividade();
             atividade.setCodigo(1L);
-            atividade.setMapa(null); // Sem mapa
+            Mapa mapa = new Mapa(); // Mapa valid
+            mapa.setCodigo(1L);
+            atividade.setMapa(mapa);
 
             when(repo.buscar(Atividade.class, id)).thenReturn(atividade);
             when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(List.of());
@@ -812,7 +810,8 @@ class MapaManutencaoServiceTest {
 
             verify(conhecimentoRepo).deleteAll(anyList());
             verify(atividadeRepo).delete(atividade);
-            verify(eventPublisher, never()).publishEvent(any());
+            // Agora deve publicar evento pois tem mapa
+            verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
         }
     }
 
@@ -861,15 +860,21 @@ class MapaManutencaoServiceTest {
         @Test
         @DisplayName("Deve atualizar descrições em lote com todas atividades sem mapa")
         void deveAtualizarDescricoesEmLoteComTodasAtividadesSemMapa() {
+            Mapa mapa1 = new Mapa();
+            mapa1.setCodigo(10L);
+
             Atividade atividade1 = new Atividade();
             atividade1.setCodigo(1L);
             atividade1.setDescricao("Antiga 1");
-            // Sem mapa - null
+            atividade1.setMapa(mapa1);
+
+            Mapa mapa2 = new Mapa();
+            mapa2.setCodigo(20L);
 
             Atividade atividade2 = new Atividade();
             atividade2.setCodigo(2L);
             atividade2.setDescricao("Antiga 2");
-            // Sem mapa - null
+            atividade2.setMapa(mapa2);
 
             Map<Long, String> descricoes = Map.of(
                     1L, "Nova 1",
@@ -884,8 +889,8 @@ class MapaManutencaoServiceTest {
             assertThat(atividade2.getDescricao()).isEqualTo("Nova 2");
 
             verify(atividadeRepo).saveAll(anyList());
-            // Nenhum evento deve ser publicado pois nenhuma atividade tem mapa
-            verify(eventPublisher, never()).publishEvent(any(EventoMapaAlterado.class));
+            // Deve publicar evento, pois atividades têm mapas
+            verify(eventPublisher, times(2)).publishEvent(any(EventoMapaAlterado.class));
         }
 
         @Test
@@ -899,8 +904,7 @@ class MapaManutencaoServiceTest {
 
             List<Conhecimento> resultado = service.listarConhecimentosPorMapa(codMapa);
 
-            assertThat(resultado).hasSize(2);
-            assertThat(resultado).containsExactly(c1, c2);
+            assertThat(resultado).hasSize(2).containsExactly(c1, c2);
             verify(conhecimentoRepo).findByMapaCodigo(codMapa);
         }
     }

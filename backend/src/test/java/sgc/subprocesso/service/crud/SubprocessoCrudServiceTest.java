@@ -101,7 +101,7 @@ class SubprocessoCrudServiceTest {
     void deveBuscarSubprocessoComMapa() {
         Subprocesso sp = new Subprocesso();
         sp.setMapa(new Mapa());
-        when(repositorioComum.buscar(Subprocesso.class, 1L)).thenReturn(sp);
+        when(subprocessoRepo.findByIdWithMapa(1L)).thenReturn(Optional.of(sp));
 
         Subprocesso resultado = service.buscarSubprocessoComMapa(1L);
         assertThat(resultado).isNotNull();
