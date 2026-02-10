@@ -89,7 +89,7 @@ Este documento orienta desenvolvedores na escolha da exceção apropriada para c
 
 **Características**:
 
-- Indicam bugs, configuração incorreta ou violação de invariantes
+- Indicam bugs ou configuração incorretas
 - NUNCA deveriam ocorrer se sistema está funcionando corretamente
 - Retornam HTTP 500 (Internal Server Error)
 - Logados como ERROR com stack trace completo
@@ -102,7 +102,6 @@ Este documento orienta desenvolvedores na escolha da exceção apropriada para c
 ✓ Dados corrompidos (FK inválida, entidade obrigatória ausente)
 ✓ Estado "impossível" se UI funciona corretamente
 ✓ Switch/case sem match em enum completo
-✓ Violação de invariante do sistema
 ```
 
 **Quando NÃO usar**:
@@ -114,37 +113,6 @@ Este documento orienta desenvolvedores na escolha da exceção apropriada para c
 ✗ Violação de permissão
 ```
 
-**Subclasses**:
-
-| Classe                  | Quando Usar                             | Exemplo                           |
-|-------------------------|-----------------------------------------|-----------------------------------|
-| `ErroConfiguracao`      | Problemas de configuração               | JWT secret ausente ou muito curto |
-| `ErroInvarianteViolada` | Violação de invariante do sistema       | FK obrigatória não encontrada     |
-| `ErroEstadoImpossivel`  | Estado que UI impede mas backend valida | Tipo de enum desconhecido         |
-
-**Exemplo**:
-
-```java
-// ✓ CORRETO - Erro interno
-if (secret.length() < 32) {
-    throw new ErroConfiguracao("JWT secret deve ter no mínimo 32 caracteres");
-}
-
-// ✓ CORRETO - Invariante violada
-Unidade superior = unidade.getUnidadeSuperior();
-if (superior == null && unidade.getTipo() == OPERACIONAL) {
-    // Unidade operacional DEVE ter superior. Isso indica dados corrompidos.
-    throw new ErroInvarianteViolada(
-        "Unidade operacional sem unidade superior: " + unidade.getSigla()
-    );
-}
-
-// ✗ INCORRETO - Este é um erro de negócio!
-if (processo.getSituacao() != CRIADO) {
-    throw new ErroEstadoImpossivel("Processo não está em estado CRIADO");
-    // Use ErroProcessoEmSituacaoInvalida - pode ocorrer legitimamente
-}
-```
 
 ### 2.2. Erros de Negócio
 
@@ -240,48 +208,6 @@ if (subprocesso.getSituacao() != REVISAO_CADASTRO_DISPONIBILIZADA) {
 - `ErroUnidadesNaoDefinidas` - processo sem unidades
 - `ErroMapaNaoAssociado` - mapa não vinculado
 - etc.
-
-## 4. Casos Especiais
-
-### 4.1. Unidade Superior Não Encontrada
-
-**Cenário**: Código busca `unidade.getUnidadeSuperior()` e retorna `null`
-
-**Decisão**:
-
-```java
-// Se superior é OBRIGATÓRIO pela estrutura do sistema:
-if (unidadeSuperior == null) {
-    throw new ErroInvarianteViolada(
-        "Unidade superior não encontrada - possível corrupção de dados"
-    );
-}
-
-// Se superior é OPCIONAL (ex: unidade raiz):
-if (unidadeSuperior == null) {
-    // Tratamento normal, não é erro
-}
-```
-
-### 4.2. Múltiplos Usuários e Condições de Corrida
-
-**Cenário**: Usuário A inicia ação quando processo está em estado X. Antes de completar, usuário B muda para estado Y.
-Ação de A falha.
-
-**Decisão**:
-
-```java
-// ✓ CORRETO - Erro de negócio
-if (processo.getSituacao() != estadoEsperado) {
-    throw new ErroProcessoEmSituacaoInvalida(
-        "O estado do processo foi alterado. Por favor, recarregue a página."
-    );
-}
-
-// ✗ INCORRETO - Não é erro interno!
-if (processo.getSituacao() != estadoEsperado) {
-    throw new ErroEstadoImpossivel("Estado inesperado");
-}
 ```
 
 ## 5. Checklist de Decisão
@@ -321,8 +247,6 @@ throw new IllegalArgumentException("...");
 
 // Se for erro interno:
 throw new ErroConfiguracao("...");          // ou
-throw new ErroInvarianteViolada("...");     // ou
-throw new ErroEstadoImpossivel("...");
 
 // Se for erro de negócio:
 throw new ErroValidacao("...");                    // ou
@@ -351,22 +275,6 @@ public void homologarCadastro(Long codSubprocesso, Usuario usuario) {
 }
 ```
 
-### Exemplo 2: Invariante Violada (Interno)
-
-```java
-private void validarHierarquiaUnidades(Subprocesso sp) {
-    Unidade unidade = sp.getUnidade();
-    Unidade superior = unidade.getUnidadeSuperior();
-    
-    // ✓ CORRETO - Indica dados corrompidos, nunca deveria acontecer
-    if (superior == null && unidade.getTipo() == TipoUnidade.OPERACIONAL) {
-        throw new ErroInvarianteViolada(
-            "Unidade operacional sem unidade superior: " + unidade.getSigla() +
-            " - possível corrupção de dados"
-        );
-    }
-}
-```
 
 ### Exemplo 3: Configuração (Interno)
 

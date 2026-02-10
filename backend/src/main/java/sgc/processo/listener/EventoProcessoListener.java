@@ -36,8 +36,7 @@ import static sgc.organizacao.model.TipoUnidade.*;
  *
  * <p>
  * Processa eventos de processo iniciado e finalizado, criando alertas e
- * enviando e-mails para as unidades
- * participantes de forma diferenciada, conforme o tipo de unidade.
+ * enviando e-mails para as unidades participantes de forma diferenciada, conforme o tipo de unidade.
  */
 @Component
 @RequiredArgsConstructor
@@ -106,7 +105,6 @@ public class EventoProcessoListener {
 
     private void processarInicioProcesso(EventoProcessoIniciado evento) {
         Processo processo = processoFacade.buscarEntidadePorId(evento.getCodProcesso());
-
         List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(evento.getCodProcesso());
 
         if (subprocessos.isEmpty()) {
@@ -175,13 +173,7 @@ public class EventoProcessoListener {
             List<Unidade> subordinadas) {
         try {
             UnidadeResponsavelDto responsavel = responsaveis.get(unidade.getCodigo());
-            if (responsavel == null)
-                return;
-
             UsuarioDto titular = usuarios.get(responsavel.titularTitulo());
-            if (titular == null || titular.email() == null || titular.email().isBlank())
-                return;
-
             String emailTitular = titular.email();
             TipoUnidade tipoUnidade = unidade.getTipo();
 
@@ -198,7 +190,8 @@ public class EventoProcessoListener {
 
     private void enviarEmailUnidadeFinal(Processo processo, Unidade unidade, String email) {
         String assunto = String.format("SGC: Finalização do processo %s", processo.getDescricao());
-        String html = notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(unidade.getSigla(),
+        String html = notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(
+                unidade.getSigla(),
                 processo.getDescricao());
         notificacaoEmailService.enviarEmailHtml(email, assunto, html);
         log.info("E-mail de finalização enviado para {}", unidade.getSigla());
@@ -207,7 +200,8 @@ public class EventoProcessoListener {
     private void enviarEmailUnidadeIntermediaria(Processo processo, Unidade unidade, String email,
             List<Unidade> subordinadas) {
         List<String> siglasSubordinadas = subordinadas.stream()
-                .filter(u -> u.getUnidadeSuperior() != null && u.getUnidadeSuperior().getCodigo().equals(unidade.getCodigo()))
+                .filter(u -> u.getUnidadeSuperior() != null
+                        && u.getUnidadeSuperior().getCodigo().equals(unidade.getCodigo()))
                 .map(Unidade::getSigla)
                 .sorted()
                 .toList();
@@ -238,27 +232,18 @@ public class EventoProcessoListener {
 
         try {
             UnidadeResponsavelDto responsavel = responsaveis.get(codigoUnidade);
-            if (responsavel == null)
-                return;
-
             String nomeUnidade = unidade.getNome();
             UsuarioDto titular = usuarios.get(responsavel.titularTitulo());
-
             String assunto = switch (unidade.getTipo()) {
                 case OPERACIONAL, INTEROPERACIONAL -> "Processo Iniciado - %s".formatted(processo.getDescricao());
                 case INTERMEDIARIA ->
                     "Processo Iniciado em Unidades Subordinadas - %s".formatted(processo.getDescricao());
-                case RAIZ, SEM_EQUIPE ->
-                    throw new ErroEstadoImpossivel("Tipo de unidade não suportada para e-mail: " + unidade.getTipo());
+                case RAIZ, SEM_EQUIPE -> "Notificação não enviada para unidade (N/A)";
             };
-            String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
 
-            if (titular != null && titular.email() != null && !titular.email().isBlank()) {
-                notificacaoEmailService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
-                log.info("E-mail enviado para unidade {}", unidade.getSigla());
-            } else {
-                log.warn("Titular não encontrado ou sem e-mail para unidade {}", unidade.getSigla());
-            }
+            String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
+            notificacaoEmailService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
+            log.info("E-mail enviado para unidade {}", unidade.getSigla());
 
             if (responsavel.substitutoTitulo() != null) {
                 enviarEmailParaSubstituto(responsavel.substitutoTitulo(), usuarios, assunto, corpoHtml, nomeUnidade);

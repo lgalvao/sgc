@@ -472,8 +472,6 @@ graph TD
     subgraph "Erros Internos (500)"
         EI[ErroInterno - abstrata]
         EC[ErroConfiguracao]
-        EIV[ErroInvarianteViolada]
-        EEI[ErroEstadoImpossivel]
     end
     
     subgraph "Erros de Negócio (4xx)"

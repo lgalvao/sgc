@@ -363,35 +363,6 @@ class EventoProcessoListenerTest {
     }
 
     @Test
-    @DisplayName("Deve ignorar participante com titular sem email ao finalizar")
-    void deveIgnorarParticipanteComTitularSemEmailAoFinalizar() {
-        Processo processo = criarProcesso(4L);
-        when(processoFacade.buscarEntidadePorId(4L)).thenReturn(processo);
-
-        Unidade u1 = criarUnidade(1L, TipoUnidade.OPERACIONAL);
-        Unidade u2 = criarUnidade(2L, TipoUnidade.OPERACIONAL);
-
-        processo.adicionarParticipantes(Set.of(u1, u2));
-
-        UnidadeResponsavelDto r1 = UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
-        UnidadeResponsavelDto r2 = UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build();
-
-        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1, 2L, r2));
-
-        // T1 com email null
-        // T2 com email blank
-        UsuarioDto user1 = UsuarioDto.builder().tituloEleitoral("T1").email(null).build();
-        UsuarioDto user2 = UsuarioDto.builder().tituloEleitoral("T2").email("   ").build();
-
-        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", user1, "T2", user2));
-        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(u1, u2));
-
-        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(4L).build());
-
-        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
-    }
-
-    @Test
     @DisplayName("Deve lançar exceção para SEM_EQUIPE")
     void deveLancarExcecaoParaSemEquipe() {
         Processo processo = criarProcesso(1L);

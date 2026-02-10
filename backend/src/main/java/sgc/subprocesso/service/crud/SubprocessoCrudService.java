@@ -55,9 +55,6 @@ public class SubprocessoCrudService {
 
     /**
      * Busca subprocesso e seu mapa associado.
-     * <p>
-     * O mapa é um invariante do subprocesso após a criação, portanto é garantido
-     * que exista.
      */
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
         return subprocessoRepo
@@ -90,11 +87,7 @@ public class SubprocessoCrudService {
 
     public SubprocessoDto criar(CriarSubprocessoRequest request) {
         Subprocesso salvo = subprocessoFactory.criar(request);
-        var dto = subprocessoMapper.toDto(salvo);
-        if (dto == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter subprocesso criado para DTO.");
-        }
-        return dto;
+        return subprocessoMapper.toDto(salvo);
     }
 
     public SubprocessoDto atualizar(Long codigo, AtualizarSubprocessoRequest request) {
@@ -102,12 +95,7 @@ public class SubprocessoCrudService {
         processarAlteracoes(subprocesso, request);
 
         Subprocesso salvo = subprocessoRepo.save(subprocesso);
-
-        var dto = subprocessoMapper.toDto(salvo);
-        if (dto == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter subprocesso atualizado para DTO.");
-        }
-        return dto;
+        return subprocessoMapper.toDto(salvo);
     }
 
     private void processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
@@ -153,11 +141,7 @@ public class SubprocessoCrudService {
                 .orElseThrow(ErroEntidadeNaoEncontrada.naoEncontrada(
                         "%s para o processo %s e unidade %s".formatted(MSG_SUBPROCESSO_NAO_ENCONTRADO, codProcesso,
                                 codUnidade)));
-        var dto = subprocessoMapper.toDto(sp);
-        if (dto == null) {
-            throw new ErroEstadoImpossivel("Falha ao converter subprocesso para DTO.");
-        }
-        return dto;
+        return subprocessoMapper.toDto(sp);
     }
 
     @Transactional(readOnly = true)

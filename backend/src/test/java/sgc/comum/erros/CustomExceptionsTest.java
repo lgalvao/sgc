@@ -40,14 +40,6 @@ class CustomExceptionsTest {
     }
 
     @Test
-    @DisplayName("Deve instanciar ErroEstadoImpossivel")
-    void testErroEstadoImpossivel() {
-        String message = "Estado impossível";
-        ErroEstadoImpossivel exception = new ErroEstadoImpossivel(message);
-        assertThat(exception.getMessage()).isEqualTo(message);
-    }
-
-    @Test
     @DisplayName("Deve instanciar ErroMapaNaoAssociado")
     void testErroMapaNaoAssociado() {
         String message = "Mapa não associado";

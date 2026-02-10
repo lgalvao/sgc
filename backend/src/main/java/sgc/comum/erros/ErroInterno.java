@@ -11,7 +11,6 @@ package sgc.comum.erros;
  * <p><strong>Quando usar:</strong>
  * <ul>
  *   <li>Configuração inválida ou ausente (ex: JWT secret não configurado)</li>
- *   <li>Violação de invariantes do sistema (ex: dados corrompidos, FK inválida)</li>
  *   <li>Estado que deveria ser impossível se o UI funciona corretamente (programação defensiva)</li>
  *   <li>Condições que indicam bugs no código</li>
  * </ul>

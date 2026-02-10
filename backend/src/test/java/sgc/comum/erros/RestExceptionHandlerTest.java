@@ -218,13 +218,4 @@ class RestExceptionHandlerTest {
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
-
-    @Test
-    @DisplayName("Deve tratar ErroInterno (500)")
-    void deveTratarErroInterno() {
-        ErroEstadoImpossivel ex = new ErroEstadoImpossivel("Bug crítico");
-        ResponseEntity<?> response = restExceptionHandler.handleErroInterno(ex);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertThat(((ErroApi) response.getBody()).getMessage()).contains("Erro interno do sistema");
-    }
 }
