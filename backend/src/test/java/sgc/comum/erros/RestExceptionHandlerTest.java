@@ -76,7 +76,7 @@ class RestExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"campo\": \"valor\"}"))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("Acesso negado."));
+                .andExpect(jsonPath("$.message").value("Operação não pôde ser realizada."));
     }
 
     @Test
@@ -226,15 +226,5 @@ class RestExceptionHandlerTest {
         ResponseEntity<?> response = restExceptionHandler.handleErroInterno(ex);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertThat(((ErroApi) response.getBody()).getMessage()).contains("Erro interno do sistema");
-    }
-
-    @Test
-    @DisplayName("Deve tratar casos nulos nos handlers da Spring")
-    void deveTratarCasosNulos() {
-        ResponseEntity<Object> r1 = restExceptionHandler.handleHttpMessageNotReadable(null, new HttpHeaders(), HttpStatus.BAD_REQUEST, null);
-        assertEquals(HttpStatus.BAD_REQUEST, r1.getStatusCode());
-
-        ResponseEntity<Object> r2 = restExceptionHandler.handleMethodArgumentNotValid(null, new HttpHeaders(), HttpStatus.BAD_REQUEST, null);
-        assertEquals(HttpStatus.BAD_REQUEST, r2.getStatusCode());
     }
 }

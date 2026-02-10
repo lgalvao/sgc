@@ -11,13 +11,13 @@ describe("ProcessoAcoes.vue", () => {
     const mountOptions = getCommonMountOptions();
     mountOptions.global.components = { BButton };
 
-    it('deve renderizar botão "Aceitar em bloco" para GESTOR', async () => {
+    it('deve renderizar botão "Aceitar em bloco" quando podeAceitarBloco é true', async () => {
         context.wrapper = mount(ProcessoAcoes, {
             ...mountOptions,
             props: {
-                mostrarBotoesBloco: true,
-                perfil: "GESTOR",
-                situacaoProcesso: "EM_ANDAMENTO",
+                podeAceitarBloco: true,
+                podeHomologarBloco: false,
+                podeFinalizar: false,
             },
         });
 
@@ -29,13 +29,13 @@ describe("ProcessoAcoes.vue", () => {
         expect(context.wrapper.emitted("aceitarBloco")).toBeTruthy();
     });
 
-    it("não deve renderizar botões de bloco se mostrarBotoesBloco for falso", () => {
+    it("não deve renderizar botão de aceitar quando podeAceitarBloco é false", () => {
         context.wrapper = mount(ProcessoAcoes, {
             ...mountOptions,
             props: {
-                mostrarBotoesBloco: false,
-                perfil: "GESTOR",
-                situacaoProcesso: "EM_ANDAMENTO",
+                podeAceitarBloco: false,
+                podeHomologarBloco: false,
+                podeFinalizar: false,
             },
         });
 
@@ -44,13 +44,13 @@ describe("ProcessoAcoes.vue", () => {
         );
     });
 
-    it('deve renderizar botão "Homologar em bloco" para ADMIN', async () => {
+    it('deve renderizar botão "Homologar em bloco" quando podeHomologarBloco é true', async () => {
         context.wrapper = mount(ProcessoAcoes, {
             ...mountOptions,
             props: {
-                mostrarBotoesBloco: true,
-                perfil: "ADMIN",
-                situacaoProcesso: "EM_ANDAMENTO",
+                podeAceitarBloco: false,
+                podeHomologarBloco: true,
+                podeFinalizar: false,
             },
         });
 
@@ -62,13 +62,13 @@ describe("ProcessoAcoes.vue", () => {
         expect(context.wrapper.emitted("homologarBloco")).toBeTruthy();
     });
 
-    it('deve renderizar botão "Finalizar processo" para ADMIN em processo EM_ANDAMENTO', async () => {
+    it('deve renderizar botão "Finalizar processo" quando podeFinalizar é true', async () => {
         context.wrapper = mount(ProcessoAcoes, {
             ...mountOptions,
             props: {
-                mostrarBotoesBloco: true,
-                perfil: "ADMIN",
-                situacaoProcesso: "EM_ANDAMENTO",
+                podeAceitarBloco: false,
+                podeHomologarBloco: false,
+                podeFinalizar: true,
             },
         });
 
@@ -80,33 +80,33 @@ describe("ProcessoAcoes.vue", () => {
         expect(context.wrapper.emitted("finalizar")).toBeTruthy();
     });
 
-    it('não deve renderizar botão "Finalizar processo" se não for ADMIN', () => {
+    it('não deve renderizar botão "Finalizar processo" quando podeFinalizar é false', () => {
         context.wrapper = mount(ProcessoAcoes, {
             ...mountOptions,
             props: {
-                mostrarBotoesBloco: true,
-                perfil: "GESTOR",
-                situacaoProcesso: "EM_ANDAMENTO",
+                podeAceitarBloco: false,
+                podeHomologarBloco: false,
+                podeFinalizar: false,
             },
         });
 
         expect(
-            context.wrapper.find('[data-testid="btn-finalizar-processo"]').exists(),
+            context.wrapper.find('[data-testid="btn-processo-finalizar"]').exists(),
         ).toBe(false);
     });
 
-    it('não deve renderizar botão "Finalizar processo" se situação não for EM_ANDAMENTO', () => {
+    it("não deve renderizar botão de homologar quando podeHomologarBloco é false", () => {
         context.wrapper = mount(ProcessoAcoes, {
             ...mountOptions,
             props: {
-                mostrarBotoesBloco: true,
-                perfil: "ADMIN",
-                situacaoProcesso: "FINALIZADO",
+                podeAceitarBloco: false,
+                podeHomologarBloco: false,
+                podeFinalizar: false,
             },
         });
 
         expect(
-            context.wrapper.find('[data-testid="btn-finalizar-processo"]').exists(),
+            context.wrapper.find('[data-testid="btn-acao-bloco-homologar"]').exists(),
         ).toBe(false);
     });
 
@@ -114,9 +114,9 @@ describe("ProcessoAcoes.vue", () => {
         context.wrapper = mount(ProcessoAcoes, {
             ...mountOptions,
             props: {
-                mostrarBotoesBloco: true,
-                perfil: "ADMIN",
-                situacaoProcesso: "EM_ANDAMENTO",
+                podeAceitarBloco: true,
+                podeHomologarBloco: true,
+                podeFinalizar: true,
             },
         });
         await checkA11y(context.wrapper.element as HTMLElement);

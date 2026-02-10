@@ -1,11 +1,11 @@
 <template>
   <div>
     <div
-        v-if="mostrarBotoesBloco"
+        v-if="podeAceitarBloco || podeHomologarBloco"
         class="mt-3 d-flex gap-2"
     >
       <BButton
-          v-if="perfil === 'GESTOR'"
+          v-if="podeAceitarBloco"
           data-testid="btn-acao-bloco-aceitar"
           variant="outline-primary"
           @click="emit('aceitarBloco')"
@@ -14,7 +14,7 @@
         Aceitar em bloco
       </BButton>
       <BButton
-          v-if="perfil === 'ADMIN'"
+          v-if="podeHomologarBloco"
           data-testid="btn-acao-bloco-homologar"
           variant="outline-success"
           @click="emit('homologarBloco')"
@@ -24,7 +24,7 @@
       </BButton>
     </div>
     <BButton
-        v-if="perfil === 'ADMIN' && situacaoProcesso === 'EM_ANDAMENTO'"
+        v-if="podeFinalizar"
         class="mt-3"
         data-testid="btn-processo-finalizar"
         variant="danger"
@@ -37,12 +37,11 @@
 
 <script lang="ts" setup>
 import {BButton} from "bootstrap-vue-next";
-import type {Perfil, SituacaoProcesso} from "@/types/tipos";
 
 defineProps<{
-  mostrarBotoesBloco: boolean;
-  perfil: Perfil | string | null;
-  situacaoProcesso: SituacaoProcesso | string;
+  podeAceitarBloco: boolean;
+  podeHomologarBloco: boolean;
+  podeFinalizar: boolean;
 }>();
 
 const emit = defineEmits<{

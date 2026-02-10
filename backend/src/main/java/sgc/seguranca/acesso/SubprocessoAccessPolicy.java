@@ -239,14 +239,14 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
 
         // 1. Verifica perfil
         if (!temPerfilPermitido(usuario, regras.perfisPermitidos)) {
-            log.debug("Permissão negada: Usuário {} não tem perfil permitido {} para ação {}", usuario.getTituloEleitoral(), regras.perfisPermitidos, acao);
+            log.trace("Permissão negada: Usuário {} não tem perfil permitido {} para ação {}", usuario.getTituloEleitoral(), regras.perfisPermitidos, acao);
             definirMotivoNegacao(usuario, regras.perfisPermitidos, acao);
             return false;
         }
 
         // 2. Verifica situação do subprocesso
         if (!regras.situacoesPermitidas.contains(sp.getSituacao())) {
-            log.debug("Permissão negada: Situação {} não permitida para ação {} (Permitidas: {})", sp.getSituacao(), acao, regras.situacoesPermitidas);
+            log.trace("Permissão negada: Situação {} não permitida para ação {} (Permitidas: {})", sp.getSituacao(), acao, regras.situacoesPermitidas);
             definirMotivoNegacao(String.format(
                     "Ação '%s' não pode ser executada com o sp na situação '%s'. Situações permitidas: %s",
                     acao.getDescricao(),
@@ -261,7 +261,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
         }
 
         if (!verificaHierarquia(usuario, sp.getUnidade(), regras.requisitoHierarquia)) {
-            log.debug("Permissão negada: Falha no requisito de hierarquia {} para usuário {} na unidade {} para ação {}", 
+            log.trace("Permissão negada: Falha no requisito de hierarquia {} para usuário {} na unidade {} para ação {}", 
                 regras.requisitoHierarquia, usuario.getTituloEleitoral(), sp.getUnidade().getSigla(), acao);
             definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, sp.getUnidade(), regras.requisitoHierarquia));
             return false;

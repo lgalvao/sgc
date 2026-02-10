@@ -4,4 +4,7 @@
  * <p>Inclui o handler de exceções global (RestExceptionHandler) e as classes que definem a
  * estrutura de resposta de erro da API (ApiError, ApiSubError).
  */
+@NullMarked
 package sgc.comum.erros;
+
+import org.jspecify.annotations.NullMarked;

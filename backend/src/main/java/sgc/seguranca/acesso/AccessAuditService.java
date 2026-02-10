@@ -42,7 +42,7 @@ public class AccessAuditService {
      * @param motivo  O motivo da negação
      */
     public void logAccessDenied(Usuario usuario, Acao acao, Object recurso, String motivo) {
-        log.warn("ACCESS_DENIED: user={}, action={}, resource={}, reason={}, timestamp={}",
+        log.debug("ACCESS_DENIED: user={}, action={}, resource={}, reason={}, timestamp={}",
                 usuario.getTituloEleitoral(),
                 acao,
                 getResourceId(recurso),

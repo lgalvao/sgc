@@ -77,6 +77,7 @@ describe('apiError utils', () => {
         expect(shouldNotifyGlobally({ kind: 'unauthorized' } as any)).toBe(true);
         expect(shouldNotifyGlobally({ kind: 'validation' } as any)).toBe(false);
         expect(shouldNotifyGlobally({ kind: 'network' } as any)).toBe(true);
+        expect(shouldNotifyGlobally({ kind: 'forbidden' } as any)).toBe(false);
     });
 
     it('notifyError deve chamar o feedbackStore', () => {

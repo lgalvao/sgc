@@ -3,7 +3,7 @@ import {useRoute, useRouter} from "vue-router";
 import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
-import {Perfil, SituacaoSubprocesso} from "@/types/tipos";
+import {SituacaoSubprocesso} from "@/types/tipos";
 
 function flattenUnidades(unidades: any[]): any[] {
     let result: any[] = [];
@@ -31,20 +31,26 @@ export function useProcessoView() {
     const processo = computed(() => processosStore.processoDetalhe);
     const participantesHierarquia = computed(() => processo.value?.unidades || []);
 
-    const mostrarBotoesBloco = computed(() => {
-        return perfilStore.isAdmin || perfilStore.perfis.includes(Perfil.GESTOR);
-    });
-
     const podeAceitarBloco = computed(() => {
         return unidadesElegiveisPorAcao.value.aceitar.length > 0;
     });
 
     const podeHomologarBloco = computed(() => {
-        return perfilStore.isAdmin && unidadesElegiveisPorAcao.value.homologar.length > 0;
+        return (processo.value?.podeHomologarCadastro || processo.value?.podeHomologarMapa || false)
+            && unidadesElegiveisPorAcao.value.homologar.length > 0;
     });
 
     const podeDisponibilizarBloco = computed(() => {
-        return perfilStore.isAdmin && unidadesElegiveisPorAcao.value.disponibilizar.length > 0;
+        return (processo.value?.podeFinalizar || false)
+            && unidadesElegiveisPorAcao.value.disponibilizar.length > 0;
+    });
+
+    const mostrarBotoesBloco = computed(() => {
+        return podeAceitarBloco.value || podeHomologarBloco.value || podeDisponibilizarBloco.value;
+    });
+
+    const podeFinalizar = computed(() => {
+        return processo.value?.podeFinalizar || false;
     });
 
     const unidadesElegiveisPorAcao = computed(() => {
@@ -114,17 +120,6 @@ export function useProcessoView() {
     async function abrirDetalhesUnidade(row: any) {
         if (!row.clickable) return;
 
-        const isPropriaUnidade = perfilStore.unidadeSelecionada === row.codigo;
-        const temPermissao = perfilStore.isAdmin ||
-                           perfilStore.perfis.includes(Perfil.GESTOR) ||
-                           perfilStore.perfilSelecionado === Perfil.GESTOR ||
-                           (perfilStore.perfis.includes(Perfil.CHEFE) && isPropriaUnidade) ||
-                           (perfilStore.perfilSelecionado === Perfil.CHEFE && isPropriaUnidade);
-
-        if (!temPermissao) {
-            return;
-        }
-
         await router.push({
             name: "Subprocesso",
             params: {
@@ -188,6 +183,7 @@ export function useProcessoView() {
         podeAceitarBloco,
         podeHomologarBloco,
         podeDisponibilizarBloco,
+        podeFinalizar,
         tituloModalBloco,
         textoModalBloco,
         rotuloBotaoBloco,

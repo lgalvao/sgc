@@ -2,7 +2,6 @@ package sgc.comum.erros;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -15,9 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import sgc.seguranca.sanitizacao.UtilSanitizacao;
-
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Handler centralizado para tratamento de exceções REST.
@@ -69,10 +66,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
-            @Nullable HttpMessageNotReadableException ex,
-            @Nullable HttpHeaders headers,
-            @Nullable HttpStatusCode status,
-            @Nullable WebRequest request) {
+            HttpMessageNotReadableException ex,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request) {
+
         log.warn("Erro de mensagem HTTP não legível: {}", ex != null ? ex.getMessage() : "sem detalhe");
         String error = "Requisição JSON malformada";
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, error));
@@ -80,21 +78,19 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            @Nullable MethodArgumentNotValidException ex,
-            @Nullable HttpHeaders headers,
-            @Nullable HttpStatusCode status,
-            @Nullable WebRequest request) {
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request) {
 
         log.info("Erro de validação de argumento");
 
         String message = "A requisição contém dados de entrada inválidos.";
-        var subErrors = ex != null
-                ? ex.getBindingResult().getFieldErrors().stream().map(
+        var subErrors = ex.getBindingResult().getFieldErrors().stream().map(
                         error -> new ErroSubApi(error.getObjectName(),
                                 error.getField(),
                                 sanitizar(error.getDefaultMessage())))
-                .toList()
-                : null;
+                .toList();
 
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
@@ -109,7 +105,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                         violation.getRootBeanClass().getSimpleName(),
                         violation.getPropertyPath().toString(),
                         sanitizar(violation.getMessage())))
-                .collect(Collectors.toList());
+                .toList();
 
         ErroApi erroApi = new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors);
         erroApi.setTraceId(traceId);
@@ -118,8 +114,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<?> handleAccessDenied(AccessDeniedException ex) {
-        log.warn("Acesso negado via Spring Security: {}", ex.getMessage());
-        ErroApi erroApi = new ErroApi(HttpStatus.FORBIDDEN, "Acesso negado.");
+        log.debug("Acesso negado via Spring Security: {}", ex.getMessage());
+        ErroApi erroApi = new ErroApi(HttpStatus.FORBIDDEN, "Operação não pôde ser realizada.");
         return buildResponseEntity(erroApi);
     }
 

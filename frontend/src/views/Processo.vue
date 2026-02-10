@@ -43,9 +43,9 @@ v-if="mostrarBotoesBloco && podeDisponibilizarBloco" variant="info" class="text-
           @row-click="abrirDetalhesUnidade"/>
 
       <ProcessoAcoes
-          :mostrar-botoes-bloco="false"
-          :perfil="perfilStore.perfilSelecionado"
-          :situacao-processo="processo.situacao"
+          :pode-aceitar-bloco="podeAceitarBloco"
+          :pode-homologar-bloco="podeHomologarBloco"
+          :pode-finalizar="podeFinalizar"
           @finalizar="finalizarProcesso"/>
     </div>
 
@@ -114,6 +114,7 @@ const {
   podeAceitarBloco,
   podeHomologarBloco,
   podeDisponibilizarBloco,
+  podeFinalizar,
   tituloModalBloco,
   textoModalBloco,
   rotuloBotaoBloco,

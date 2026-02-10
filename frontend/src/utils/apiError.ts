@@ -145,7 +145,7 @@ export function notifyError(normalized: NormalizedError): void {
  * Erros globais: unauthorized, network, unexpected
  */
 export function shouldNotifyGlobally(normalized: NormalizedError): boolean {
-  return ['unauthorized', 'forbidden', 'network', 'unexpected'].includes(normalized.kind);
+  return ['unauthorized', 'network', 'unexpected'].includes(normalized.kind);
 }
 
 /**
