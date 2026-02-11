@@ -66,11 +66,11 @@ const modelValueComputed = computed({
   set: (val) => emit('update:modelValue', val),
 });
 
-const calcularPercentualConcluido = () => {
+function calcularPercentualConcluido() {
   // A lógica de percentual concluído precisa ser reavaliada com os novos DTOs.
   // Por enquanto, retornaremos um valor fixo ou uma lógica simplificada.
   return 0;
-};
+}
 
 function exportar() {
   const dados = props.processos.map((processo) => ({
@@ -85,4 +85,10 @@ function exportar() {
   const csv = gerarCSV(dados);
   downloadCSV(csv, "andamento-geral.csv");
 }
+
+defineExpose({
+  modelValueComputed,
+  calcularPercentualConcluido,
+  exportar
+});
 </script>

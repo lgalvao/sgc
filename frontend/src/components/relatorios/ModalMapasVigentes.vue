@@ -72,4 +72,9 @@ function exportar() {
   const csv = gerarCSV(dados);
   downloadCSV(csv, "mapas-vigentes.csv");
 }
+
+defineExpose({
+  modelValueComputed,
+  exportar
+});
 </script>

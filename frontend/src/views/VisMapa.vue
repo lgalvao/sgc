@@ -258,10 +258,49 @@ const {
   fecharModalHistorico
 } = useVisMapa();
 
-const verHistorico = abrirModalHistorico;
+function verHistorico() {
+  abrirModalHistorico();
+}
 
 // Refs para foco
 const sugestoesTextareaRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 const observacaoDevolucaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
+
+defineExpose({
+  perfilSelecionado,
+  mapa,
+  unidade,
+  podeValidar,
+  podeAnalisar,
+  podeVerSugestoes,
+  temHistoricoAnalise,
+  historicoAnalise,
+  mostrarModalAceitar,
+  mostrarModalSugestoes,
+  mostrarModalVerSugestoes,
+  mostrarModalValidar,
+  mostrarModalDevolucao,
+  mostrarModalHistorico,
+  sugestoes,
+  sugestoesVisualizacao,
+  observacaoDevolucao,
+  isLoading,
+  confirmarSugestoes,
+  confirmarValidacao,
+  confirmarAceitacao,
+  confirmarDevolucao,
+  abrirModalAceitar,
+  fecharModalAceitar,
+  abrirModalSugestoes,
+  verSugestoes,
+  fecharModalVerSugestoes,
+  abrirModalValidar,
+  abrirModalDevolucao,
+  abrirModalHistorico,
+  fecharModalHistorico,
+  verHistorico,
+  sugestoesTextareaRef,
+  observacaoDevolucaoRef
+});
 
 </script>

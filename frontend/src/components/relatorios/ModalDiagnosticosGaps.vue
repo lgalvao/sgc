@@ -90,7 +90,7 @@ const modelValueComputed = computed({
   set: (val) => emit('update:modelValue', val),
 });
 
-const getClasseStatus = (status: string) => {
+function getClasseStatus(status: string) {
   switch (status) {
     case "Finalizado":
       return "badge bg-success";
@@ -101,7 +101,7 @@ const getClasseStatus = (status: string) => {
     default:
       return "badge bg-secondary";
   }
-};
+}
 
 function exportar() {
   const dados = props.diagnosticos.map((diag) => ({
@@ -118,4 +118,11 @@ function exportar() {
   const csv = gerarCSV(dados);
   downloadCSV(csv, "diagnosticos-gaps.csv");
 }
+
+defineExpose({
+  modelValueComputed,
+  getClasseStatus,
+  exportar,
+  formatDateBR
+});
 </script>
