@@ -10,7 +10,7 @@ import MainNavbar from "./components/MainNavbar.vue";
 interface PackageJson {
   version: string;
 
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const route = useRoute();
