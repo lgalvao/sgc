@@ -2,6 +2,7 @@ package sgc.organizacao.mapper;
 
 import sgc.comum.config.CentralMapperConfig;
 
+import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -35,12 +36,12 @@ public interface UsuarioMapper {
     @Mapping(target = "nome", expression = "java(mapUnidadeNomeParaUsuario(unidade))")
     UnidadeDto toUnidadeDtoBase(Unidade unidade);
 
-    default String mapUnidadeSiglaParaUsuario(Unidade unidade) {
+    default String mapUnidadeSiglaParaUsuario(@Nullable Unidade unidade) {
         if (unidade == null) return null;
         return Long.valueOf(1L).equals(unidade.getCodigo()) ? "SEDOC" : unidade.getSigla();
     }
 
-    default String mapUnidadeNomeParaUsuario(Unidade unidade) {
+    default String mapUnidadeNomeParaUsuario(@Nullable Unidade unidade) {
         if (unidade == null) return null;
         return Long.valueOf(1L).equals(unidade.getCodigo()) ? "Secretaria de Documentação" : unidade.getNome();
     }

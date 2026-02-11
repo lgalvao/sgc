@@ -2,10 +2,10 @@ package sgc.subprocesso.mapper;
 
 import sgc.comum.config.CentralMapperConfig;
 
-import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import sgc.comum.util.FormatadorData;
+import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.dto.MovimentacaoDto;
 import sgc.subprocesso.model.Movimentacao;
 
@@ -21,7 +21,7 @@ public interface MovimentacaoMapper {
     @Mapping(target = "unidadeDestinoSigla", expression = "java(mapUnidadeSiglaParaUsuario(movimentacao.getUnidadeDestino()))")
     @Mapping(source = "unidadeDestino.nome", target = "unidadeDestinoNome")
     @Mapping(target = "dataHoraFormatada", expression = "java(FormatadorData.formatarDataHora(movimentacao.getDataHora()))")
-    @Nullable MovimentacaoDto toDto(@Nullable Movimentacao movimentacao);
+    MovimentacaoDto toDto(Movimentacao movimentacao);
 
     /**
      * Mapeia sigla da unidade, substituindo RAIZ (id=1) por "SEDOC" para o usuário.
@@ -30,11 +30,7 @@ public interface MovimentacaoMapper {
      * @param unidade a unidade a mapear
      * @return a sigla para exibição ao usuário ("SEDOC" se for RAIZ, senão a sigla original)
      */
-    default String mapUnidadeSiglaParaUsuario(sgc.organizacao.model.Unidade unidade) {
-        if (unidade == null) {
-            return null;
-        }
-        // Se é unidade RAIZ (id=1), exibe "SEDOC" para o usuário
+    default String mapUnidadeSiglaParaUsuario(Unidade unidade) {
         return unidade.getCodigo() == 1L ? "SEDOC" : unidade.getSigla();
     }
 }
