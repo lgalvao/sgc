@@ -61,4 +61,6 @@ const opcoesTipo = [
   { value: TipoProcesso.REVISAO, text: "Revisão" },
   { value: TipoProcesso.DIAGNOSTICO, text: "Diagnóstico" },
 ];
+
+defineExpose({ opcoesTipo });
 </script>
