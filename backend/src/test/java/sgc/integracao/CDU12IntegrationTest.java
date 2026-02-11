@@ -152,6 +152,16 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     private void setupChefeForUnidade(String titulo, Unidade unidade) {
         jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
                 titulo, unidade.getCodigo(), Perfil.CHEFE.name());
+
+        // Also update the Authentication in the SecurityContext to reflect this new unit
+        // because the AccessPolicy uses usuario.getUnidadeAtivaCodigo() from the Principal.
+        // The Principal was created by @WithMockChefe with a default (or old) unit.
+        org.springframework.security.core.Authentication auth =
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null && auth.getPrincipal() instanceof sgc.organizacao.model.Usuario usuario) {
+            usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
+        }
     }
 
     @Nested

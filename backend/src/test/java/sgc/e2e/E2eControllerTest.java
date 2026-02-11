@@ -305,9 +305,11 @@ class E2eControllerTest {
 
     @Test
     @DisplayName("Deve lidar com erro ao resetar banco")
-    void deveLidarComErroAoResetarBanco() {
+    void deveLidarComErroAoResetarBanco() throws Exception {
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
-        Mockito.doThrow(new RuntimeException("Error")).when(mockJdbc).execute(any(String.class));
+        DataSource mockDataSource = Mockito.mock(DataSource.class);
+        when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
+        when(mockDataSource.getConnection()).thenThrow(new java.sql.SQLException("Error"));
 
         E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
         var exception = Assertions.assertThrows(RuntimeException.class, controllerComErro::resetDatabase);

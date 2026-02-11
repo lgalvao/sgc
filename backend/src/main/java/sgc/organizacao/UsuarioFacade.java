@@ -81,6 +81,10 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public Usuario obterUsuarioAutenticado() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof Usuario usuario) {
+            return usuario;
+        }
         return obterTituloUsuarioAutenticado()
                 .map(this::buscarPorLoginInterno)
                 .orElseThrow(() -> new ErroAcessoNegado("Nenhum usuário autenticado no contexto"));

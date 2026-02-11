@@ -22,8 +22,6 @@ import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.integracao.mocks.WithMockGestor;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
@@ -44,6 +42,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -107,7 +106,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
              jdbcTemplate.update(sqlInsertPerfil, tituloAdmin, "ADMIN", idSuperior);
         }
 
-        String tituloGestor = "202020202020";
+        String tituloGestor = "132313231323";
         if (usuarioRepo.findById(tituloGestor).isEmpty()) {
             jdbcTemplate.update(sqlInsertUsuario, tituloGestor, "Gestor Mock", "gestor@test.com", "2020", idSuperior, "");
             jdbcTemplate.update(sqlInsertPerfil, tituloGestor, "GESTOR", idSuperior);
@@ -152,9 +151,13 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Deve devolver cadastro, registrar análise corretamente e alterar situação")
-    @WithMockGestor("202020202020")
     void devolverCadastro_deveFuncionarCorretamente() throws Exception {
         // Given
+        Usuario gestor = usuarioRepo.findById("132313231323").orElseThrow();
+        gestor.setPerfilAtivo(sgc.organizacao.model.Perfil.GESTOR);
+        gestor.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo());
+        gestor.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.GESTOR.toGrantedAuthority()));
+
         String observacoes = "Favor revisar a atividade X e Y.";
         DevolverCadastroRequest requestBody = new DevolverCadastroRequest(observacoes);
 
@@ -164,6 +167,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                                 "/api/subprocessos/{id}/devolver-cadastro",
                                 subprocesso.getCodigo())
                                 .with(csrf())
+                                .with(user(gestor))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk());
@@ -197,14 +201,19 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Deve aceitar cadastro, registrar análise e mover para unidade superior")
-    @WithMockGestor("202020202020")
     void aceitarCadastro_deveFuncionarCorretamente() throws Exception {
+        Usuario gestor = usuarioRepo.findById("132313231323").orElseThrow();
+        gestor.setPerfilAtivo(sgc.organizacao.model.Perfil.GESTOR);
+        gestor.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo());
+        gestor.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.GESTOR.toGrantedAuthority()));
+
         String observacoes = "Cadastro parece OK.";
         AceitarCadastroRequest requestBody = new AceitarCadastroRequest(observacoes);
 
         mockMvc.perform(
                         post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
                                 .with(csrf())
+                                .with(user(gestor))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk());
@@ -219,7 +228,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
         assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
         assertThat(analiseRegistrada.getUsuarioTitulo())
-                .isEqualTo("202020202020");
+                .isEqualTo("132313231323");
 
         List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
                 subprocesso.getCodigo());
@@ -236,8 +245,12 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Deve homologar cadastro, alterar situação e registrar movimentação da SEDOC")
-    @WithMockAdmin
     void homologarCadastro_deveFuncionarCorretamente() throws Exception {
+        Usuario admin = usuarioRepo.findById("101010101010").orElseThrow();
+        admin.setPerfilAtivo(sgc.organizacao.model.Perfil.ADMIN);
+        admin.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo()); // Or default admin unit
+        admin.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.ADMIN.toGrantedAuthority()));
+
         HomologarCadastroRequest requestBody = new HomologarCadastroRequest("Homologado via teste.");
 
         mockMvc.perform(
@@ -245,6 +258,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                                 "/api/subprocessos/{id}/homologar-cadastro",
                                 subprocesso.getCodigo())
                                 .with(csrf())
+                                .with(user(admin))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk());
@@ -270,13 +284,18 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Deve retornar o histórico de devoluções e aceites ordenado")
-    @WithMockGestor("202020202020")
     void getHistorico_deveRetornarAcoesOrdenadas() throws Exception {
+        Usuario gestor = usuarioRepo.findById("132313231323").orElseThrow();
+        gestor.setPerfilAtivo(sgc.organizacao.model.Perfil.GESTOR);
+        gestor.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo());
+        gestor.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.GESTOR.toGrantedAuthority()));
+
         String obsDevolucao = "Falta atividade Z";
         DevolverCadastroRequest devolverReq = new DevolverCadastroRequest(obsDevolucao);
 
         mockMvc.perform(post("/api/subprocessos/{id}/devolver-cadastro", subprocesso.getCodigo())
                         .with(csrf())
+                        .with(user(gestor))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(devolverReq)))
                 .andExpect(status().isOk());
@@ -289,6 +308,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         AceitarCadastroRequest aceitarReq = new AceitarCadastroRequest(obsAceite);
         mockMvc.perform(post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
                         .with(csrf())
+                        .with(user(gestor))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(aceitarReq)))
                 .andExpect(status().isOk());
@@ -297,6 +317,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                 .perform(MockMvcRequestBuilders.get(
                                 "/api/subprocessos/{id}/historico-cadastro",
                                 subprocesso.getCodigo())
+                        .with(user(gestor))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn()

@@ -81,6 +81,15 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         unidade.setCodigo(null);
         unidade = unidadeRepo.save(unidade);
 
+        // Assign users to this new unit so login works
+        String sql = "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)";
+        // Chefe (User 3)
+        jdbcTemplate.update(sql, "3", unidade.getCodigo(), Perfil.CHEFE.name());
+        // Gestor (User 8 - Gestor)
+        jdbcTemplate.update(sql, "8", unidade.getCodigo(), Perfil.GESTOR.name());
+        // Servidor (User 1)
+        jdbcTemplate.update(sql, "1", unidade.getCodigo(), Perfil.SERVIDOR.name());
+
         // Login real obtendo tokens JWT
         tokenChefe = loginHelper.loginChefe(mockMvc, "3", unidade.getCodigo());
         tokenGestor = loginHelper.loginGestor(mockMvc, "8", unidade.getCodigo());

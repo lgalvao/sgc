@@ -325,6 +325,9 @@ public class SubprocessoCadastroController {
     }
 
     private Usuario obterUsuarioAutenticado(@Nullable Object principal) {
+        if (principal instanceof Usuario usuario) {
+            return usuario;
+        }
         String titulo = usuarioService.extrairTituloUsuario(principal);
         if (titulo == null) {
             throw new ErroAutenticacao("Usuário não identificado");
