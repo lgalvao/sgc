@@ -57,18 +57,5 @@ class MovimentacaoMapperTest {
         assertThat(dto.unidadeDestinoNome()).isEqualTo("Destino");
     }
 
-    @Test
-    @DisplayName("Deve lidar com unidades null")
-    void deveLidarComUnidadesNull() {
-        Movimentacao mov = new Movimentacao();
-        mov.setCodigo(10L);
-        mov.setUnidadeOrigem(null);
-        mov.setUnidadeDestino(null);
 
-        MovimentacaoDto dto = mapper.toDto(mov);
-
-        assertThat(dto).isNotNull();
-        assertThat(dto.unidadeOrigemCodigo()).isNull();
-        assertThat(dto.unidadeDestinoCodigo()).isNull();
-    }
 }

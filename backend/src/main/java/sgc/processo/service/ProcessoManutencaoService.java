@@ -60,7 +60,7 @@ public class ProcessoManutencaoService {
         processo.adicionarParticipantes(participantes);
 
         // Salva uma única vez com todos os participantes
-        Processo processoSalvo = processoRepo.save(processo);
+        Processo processoSalvo = processoRepo.saveAndFlush(processo);
 
         log.info("Processo {} criado.", processoSalvo.getCodigo());
 
@@ -94,7 +94,7 @@ public class ProcessoManutencaoService {
         // Atualiza participantes com sincronização inteligente
         processo.sincronizarParticipantes(participantes);
 
-        Processo processoAtualizado = processoRepo.save(processo);
+        Processo processoAtualizado = processoRepo.saveAndFlush(processo);
         log.info("Processo {} atualizado.", codigo);
 
         return processoAtualizado;

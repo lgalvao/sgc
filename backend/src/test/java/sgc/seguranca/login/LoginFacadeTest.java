@@ -27,7 +27,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -127,8 +127,8 @@ class LoginFacadeTest {
     }
 
     @Test
-    @DisplayName("Deve negar acesso se unidade não corresponder à atribuição do usuário")
-    void deveNegarSeUnidadeNaoCorresponder() {
+    @DisplayName("Deve permitir ADMIN acessar qualquer unidade")
+    void devePermitirAdminEmQualquerUnidade() {
         // Request pede ADMIN na unidade 1
         EntrarRequest req = new EntrarRequest("123", "ADMIN", 1L);
 
@@ -142,6 +142,39 @@ class LoginFacadeTest {
 
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.ADMIN);
+        up.setUnidade(unidade);
+        up.setUnidadeCodigo(2L);
+        up.setUsuario(usuario);
+
+        when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
+        when(usuarioPerfilService.buscarPorUsuario("123")).thenReturn(List.of(up));
+        when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(unidade))
+            .thenReturn(UnidadeDto.builder().codigo(2L).build());
+        when(gerenciadorJwt.gerarToken(anyString(), any(Perfil.class), anyLong()))
+            .thenReturn("token-fake");
+
+        String token = loginFacade.entrar(req);
+        assertThat(token)
+            .isNotNull()
+            .isEqualTo("token-fake");
+    }
+
+    @Test
+    @DisplayName("Deve negar acesso se unidade não corresponder à atribuição do usuário")
+    void deveNegarSeUnidadeNaoCorresponder() {
+        // Request pede GESTOR na unidade 1
+        EntrarRequest req = new EntrarRequest("123", "GESTOR", 1L);
+
+        // Usuario tem GESTOR na unidade 2
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
+        
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(2L);
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
+
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setPerfil(Perfil.GESTOR);
         up.setUnidade(unidade);
         up.setUnidadeCodigo(2L);
         up.setUsuario(usuario);

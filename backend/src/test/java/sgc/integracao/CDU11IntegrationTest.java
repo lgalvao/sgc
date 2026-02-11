@@ -89,6 +89,8 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         jdbcTemplate.update(sql, "8", unidade.getCodigo(), Perfil.GESTOR.name());
         // Servidor (User 1)
         jdbcTemplate.update(sql, "1", unidade.getCodigo(), Perfil.SERVIDOR.name());
+        // Admin (User 6) na unidade 1 (RAIZ)
+        jdbcTemplate.update(sql, "6", 1L, Perfil.ADMIN.name());
 
         // Login real obtendo tokens JWT
         tokenChefe = loginHelper.loginChefe(mockMvc, "3", unidade.getCodigo());

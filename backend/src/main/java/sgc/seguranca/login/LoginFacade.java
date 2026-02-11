@@ -102,16 +102,26 @@ public class LoginFacade {
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.tituloEleitoral());
         Perfil perfilSolicitado = Perfil.valueOf(request.perfil());
 
-        // Validar perfil + unidade para todos os perfis
-        boolean autorizado = autorizacoes.stream()
-                .anyMatch(pu -> {
-                    Perfil perfil = pu.perfil();
-                    Long codigoUnidade = pu.unidade().getCodigo();
-                    return perfil == perfilSolicitado && codigoUnidade.equals(codUnidade);
-                });
+        // ADMIN tem acesso global - não depende de unidade específica
+        if (perfilSolicitado == Perfil.ADMIN) {
+            boolean temPerfilAdmin = autorizacoes.stream()
+                    .anyMatch(pu -> pu.perfil() == Perfil.ADMIN);
+            
+            if (!temPerfilAdmin) {
+                throw new ErroAcessoNegado("Usuário não tem permissão para acessar com perfil e unidade informados.");
+            }
+        } else {
+            // Para outros perfis (GESTOR, CHEFE, SERVIDOR), validar perfil + unidade
+            boolean autorizado = autorizacoes.stream()
+                    .anyMatch(pu -> {
+                        Perfil perfil = pu.perfil();
+                        Long codigoUnidade = pu.unidade().getCodigo();
+                        return perfil == perfilSolicitado && codigoUnidade.equals(codUnidade);
+                    });
 
-        if (!autorizado) {
-            throw new ErroAcessoNegado("Usuário não tem permissão para acessar com perfil e unidade informados.");
+            if (!autorizado) {
+                throw new ErroAcessoNegado("Usuário não tem permissão para acessar com perfil e unidade informados.");
+            }
         }
 
         return gerenciadorJwt.gerarToken(

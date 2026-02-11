@@ -1,6 +1,5 @@
 package sgc.integracao;
 
-import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +21,6 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.model.*;
-import sgc.organizacao.model.UnidadeRepo;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -37,9 +34,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -71,14 +66,12 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     private EntityManager entityManager;
 
     @MockitoBean
-    private JavaMailSender javaMailSender;
+    private sgc.notificacao.NotificacaoEmailService notificacaoEmailService;
 
     private final Long SP_CODIGO = 60000L; // SEDESENV (Unidade 8) no data.sql
 
     @BeforeEach
     void setUp() {
-        MimeMessage mimeMessage = mock(MimeMessage.class);
-        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
     }
 
     @Test
@@ -123,9 +116,9 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         // --- ETAPA 3: Preparar Dados e Disponibilizar (Passos 9 a 16) ---
         
-        sp = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
-        var competencia = competenciaRepo.save(Competencia.builder().descricao("Java").mapa(sp.getMapa()).build());
-        var atividade = Atividade.builder().mapa(sp.getMapa()).descricao("Desenvolver APIs").build();
+        var spEtapa3 = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
+        var competencia = competenciaRepo.save(Competencia.builder().descricao("Java").mapa(spEtapa3.getMapa()).build());
+        var atividade = Atividade.builder().mapa(spEtapa3.getMapa()).descricao("Desenvolver APIs").build();
         atividade.getCompetencias().add(competencia);
         atividade = atividadeRepo.save(atividade);
         
@@ -157,11 +150,16 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         assertThat(movs.getFirst().getUnidadeDestino().getSigla()).isEqualTo("COSIS");
 
         // 12. Notificação por E-mail (Superior da 8 é COSIS)
-        verify(javaMailSender, atLeastOnce()).send(any(MimeMessage.class));
+        verify(notificacaoEmailService, atLeastOnce()).enviarEmail(any(), any(), any());
 
-        // 13. Criação de Alerta para Unidade Superior
-        var alertas = alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo());
-        assertThat(alertas.stream().anyMatch(a -> a.getUnidadeDestino().getCodigo() == 6L)).isTrue();
+        // 13. Criação de Alerta para Unidade Superior (Async)
+        final Long processoCodigo = spEtapa3.getProcesso().getCodigo();
+        org.awaitility.Awaitility.await()
+                .atMost(java.time.Duration.ofSeconds(5))
+                .untilAsserted(() -> {
+                    var alertas = alertaRepo.findByProcessoCodigo(processoCodigo);
+                    assertThat(alertas.stream().anyMatch(a -> a.getUnidadeDestino() != null && a.getUnidadeDestino().getCodigo() == 6L)).isTrue();
+                });
 
         // 14. Data de Fim Etapa 1
         assertThat(atualizado.getDataFimEtapa1()).isNotNull();

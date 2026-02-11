@@ -17,10 +17,10 @@ import sgc.subprocesso.model.Movimentacao;
 @Mapper(componentModel = "spring", config = CentralMapperConfig.class, imports = FormatadorData.class)
 public interface MovimentacaoMapper {
     @Mapping(source = "unidadeOrigem.codigo", target = "unidadeOrigemCodigo")
-    @Mapping(target = "unidadeOrigemSigla", expression = "java(mapUnidadeSiglaParaUsuario(movimentacao.getUnidadeOrigem()))")
+    @Mapping(source = "unidadeOrigem", target = "unidadeOrigemSigla")
     @Mapping(source = "unidadeOrigem.nome", target = "unidadeOrigemNome")
     @Mapping(source = "unidadeDestino.codigo", target = "unidadeDestinoCodigo")
-    @Mapping(target = "unidadeDestinoSigla", expression = "java(mapUnidadeSiglaParaUsuario(movimentacao.getUnidadeDestino()))")
+    @Mapping(source = "unidadeDestino", target = "unidadeDestinoSigla")
     @Mapping(source = "unidadeDestino.nome", target = "unidadeDestinoNome")
     @Mapping(target = "dataHoraFormatada", expression = "java(FormatadorData.formatarDataHora(movimentacao.getDataHora()))")
     MovimentacaoDto toDto(Movimentacao movimentacao);
@@ -29,7 +29,7 @@ public interface MovimentacaoMapper {
      * Mapeia sigla da unidade, substituindo RAIZ (id=1) por "SEDOC" para o usuário.
      * A unidade RAIZ é interna/técnica e nunca deve aparecer na UI.
      * 
-     * @param unidade a unidade a mapear
+     * @param unidade a unidade a mapear (garantida não nula pelo MapStruct)
      * @return a sigla para exibição ao usuário ("SEDOC" se for RAIZ, senão a sigla original)
      */
     default String mapUnidadeSiglaParaUsuario(Unidade unidade) {

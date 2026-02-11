@@ -350,8 +350,8 @@ VALUES ('10001', 1001, 'Desenvolvimento em Java');
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10002', 1001, 'Desenvolvimento em Vue.js');
 
-INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_titulo, descricao, data_hora)
-VALUES ('80000', 60000, '50001', 'INICIADO', CURRENT_TIMESTAMP);
+INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_titulo, descricao, data_hora, unidade_origem_codigo, unidade_destino_codigo)
+VALUES ('80000', 60000, '50001', 'INICIADO', CURRENT_TIMESTAMP, 1, 8);
 
 -- DADOS ADICIONAIS PARA CDU-17 e CDU-19 e CDU-02
 -- Processo 1700 (para CDU-17)
