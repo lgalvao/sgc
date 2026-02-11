@@ -15,13 +15,12 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
     List<Usuario> findByUnidadeLotacaoCodigo(Long codigoUnidade);
 
     @Query("""
-            SELECT u FROM Usuario u LEFT JOIN FETCH u.atribuicoesTemporarias WHERE u.tituloEleitoral = :titulo
+            SELECT u FROM Usuario u WHERE u.tituloEleitoral = :titulo
             """)
     Optional<Usuario> findByIdWithAtribuicoes(@Param("titulo") String titulo);
 
     @Query("""
             SELECT DISTINCT u FROM Usuario u
-            LEFT JOIN FETCH u.atribuicoesTemporarias
             WHERE u.tituloEleitoral IN :titulos
             """)
     List<Usuario> findByIdInWithAtribuicoes(@Param("titulos") List<String> titulos);

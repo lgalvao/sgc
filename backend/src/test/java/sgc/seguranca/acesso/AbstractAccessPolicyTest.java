@@ -73,10 +73,7 @@ class AbstractAccessPolicyTest {
     void deveRetornarTrueSeTemPerfil() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("123");
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.GESTOR);
-        
-        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(List.of(up));
+        usuario.setPerfilAtivo(Perfil.GESTOR);
 
         boolean result = policy.testTemPerfilPermitido(usuario, EnumSet.of(Perfil.GESTOR, Perfil.ADMIN));
         assertTrue(result);
@@ -87,40 +84,12 @@ class AbstractAccessPolicyTest {
     void deveRetornarFalseSeNaoTemPerfil() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("123");
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.SERVIDOR);
-        
-        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(List.of(up));
+        usuario.setPerfilAtivo(Perfil.SERVIDOR);
 
         boolean result = policy.testTemPerfilPermitido(usuario, EnumSet.of(Perfil.GESTOR, Perfil.ADMIN));
         assertFalse(result);
     }
     
-    @Test
-    @DisplayName("Deve considerar atribuições temporárias")
-    void deveConsiderarAtribuicoesTemporarias() {
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("123");
-        AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
-        atribuicao.setPerfil(Perfil.ADMIN);
-        
-        // Setup temporaria valida
-        atribuicao.setDataInicio(LocalDateTime.now().minusDays(1));
-        atribuicao.setDataTermino(LocalDateTime.now().plusDays(1));
-        
-        // Mock unidade para atribuicao temporaria
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
-        atribuicao.setUnidade(u);
-        
-        usuario.setAtribuicoesTemporarias(new HashSet<>(Collections.singletonList(atribuicao)));
-        
-        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(Collections.emptyList());
-
-        boolean result = policy.testTemPerfilPermitido(usuario, EnumSet.of(Perfil.ADMIN));
-        assertTrue(result);
-    }
-
     @Test
     @DisplayName("Deve formatar perfis corretamente")
     void deveFormatarPerfis() {

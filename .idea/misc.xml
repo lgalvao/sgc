@@ -87,6 +87,7 @@
     <pattern value="sgc.mapa.service.MapaFacade" method="listar" />
     <pattern value="sgc.mapa.service.MapaFacade" />
     <pattern value="sgc.subprocesso.model.SubprocessoRepo" method="findByMapaCodigo" />
+    <pattern value="sgc.subprocesso.model.SubprocessoRepo" method="findByProcessoCodigoAndUnidadeCodigo" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">

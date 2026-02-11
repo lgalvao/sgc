@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,27 +20,17 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.processo.dto.AcaoEmBlocoRequest;
-import sgc.processo.dto.AtualizarProcessoRequest;
-import sgc.processo.dto.CriarProcessoRequest;
-import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.SubprocessoElegivelDto;
+import sgc.processo.dto.*;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.mapper.ProcessoMapper;
-import sgc.processo.model.Processo;
-import sgc.testutils.UnidadeTestBuilder;
-import org.mockito.ArgumentCaptor;
-import sgc.processo.model.AcaoProcesso;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
+import sgc.processo.model.*;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.testutils.UnidadeTestBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,7 +41,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -115,7 +106,7 @@ class ProcessoFacadeTest {
         void buscarIdsUnidadesEmProcessosAtivos_DeveDelegar() {
             Long codigoIgnorar = 1L;
             processoFacade.buscarIdsUnidadesEmProcessosAtivos(codigoIgnorar);
-            verify(processoConsultaService).buscarIdsUnidadesEmProcessosAtivos(codigoIgnorar);
+            verify(processoConsultaService).buscarIdsUnidadesComProcessosAtivos(codigoIgnorar);
         }
 
         @Test
@@ -132,7 +123,7 @@ class ProcessoFacadeTest {
                     .build();
             processo.adicionarParticipantes(Set.of(unidade));
 
-            when(processoConsultaService.buscarPorId(codProcesso)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(codProcesso)).thenReturn(processo);
             when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(unidade);
 
             processoFacade.enviarLembrete(codProcesso, codUnidade);
@@ -290,7 +281,7 @@ class ProcessoFacadeTest {
             Unidade u = sgc.fixture.UnidadeFixture.unidadeComId(10L);
             p.adicionarParticipantes(Set.of(u));
 
-            when(processoConsultaService.buscarPorId(1L)).thenReturn(p);
+            when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
 
             processoFacade.enviarLembrete(1L, 10L);
@@ -306,7 +297,7 @@ class ProcessoFacadeTest {
             Unidade outra = sgc.fixture.UnidadeFixture.unidadeComId(20L);
             p.adicionarParticipantes(Set.of(outra));
 
-            when(processoConsultaService.buscarPorId(1L)).thenReturn(p);
+            when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
 
             assertThatThrownBy(() -> processoFacade.enviarLembrete(1L, 10L))
@@ -494,7 +485,7 @@ class ProcessoFacadeTest {
             Usuario usuario = criarUsuarioMock();
             Long id = 100L;
             Processo processo = sgc.fixture.ProcessoFixture.processoPadrao();
-            when(processoConsultaService.buscarPorId(id)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(id)).thenReturn(processo);
             when(processoDetalheBuilder.build(eq(processo), any(Usuario.class))).thenReturn(new ProcessoDetalheDto());
 
             // Act
@@ -508,7 +499,7 @@ class ProcessoFacadeTest {
         @DisplayName("Deve falhar ao obter detalhes de processo inexistente")
         void deveFalharAoObterDetalhesProcessoInexistente() {
             Usuario usuario = criarUsuarioMock();
-            when(processoConsultaService.buscarPorId(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 999L));
+            when(processoConsultaService.buscarProcessoCodigo(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 999L));
             assertThatThrownBy(() -> processoFacade.obterDetalhes(999L, usuario))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
@@ -518,7 +509,7 @@ class ProcessoFacadeTest {
         void deveBuscarEntidadePorId() {
             Long id = 100L;
             Processo processo = sgc.fixture.ProcessoFixture.processoPadrao();
-            when(processoConsultaService.buscarPorId(id)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(id)).thenReturn(processo);
 
             Processo res = processoFacade.buscarEntidadePorId(id);
             assertThat(res).isEqualTo(processo);
@@ -527,7 +518,7 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve falhar buscar entidade inexistente")
         void deveFalharBuscarEntidadeInexistente() {
-            when(processoConsultaService.buscarPorId(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 999L));
+            when(processoConsultaService.buscarProcessoCodigo(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 999L));
             assertThatThrownBy(() -> processoFacade.buscarEntidadePorId(999L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
@@ -537,7 +528,7 @@ class ProcessoFacadeTest {
         void deveObterPorIdOptional() {
             Long id = 100L;
             Processo processo = sgc.fixture.ProcessoFixture.processoPadrao();
-            when(processoConsultaService.buscarPorIdOpcional(id)).thenReturn(Optional.of(processo));
+            when(processoConsultaService.buscarProcessoCodigoOpt(id)).thenReturn(Optional.of(processo));
             when(processoMapper.toDto(processo)).thenReturn(ProcessoDto.builder().build());
 
             Optional<ProcessoDto> res = processoFacade.obterPorId(id);
@@ -548,9 +539,9 @@ class ProcessoFacadeTest {
         @DisplayName("Deve listar processos finalizados e ativos")
         void deveListarProcessosFinalizadosEAtivos() {
             // Arrange
-            when(processoConsultaService.listarFinalizados())
+            when(processoConsultaService.processosFinalizados())
                     .thenReturn(List.of(sgc.fixture.ProcessoFixture.processoPadrao()));
-            when(processoConsultaService.listarAtivos())
+            when(processoConsultaService.processosAndamento())
                     .thenReturn(List.of(sgc.fixture.ProcessoFixture.processoPadrao()));
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
@@ -563,7 +554,7 @@ class ProcessoFacadeTest {
         @DisplayName("Deve listar todos com paginação")
         void deveListarTodosPaginado() {
             Pageable pageable = Pageable.unpaged();
-            when(processoConsultaService.listarTodos(pageable)).thenReturn(Page.empty());
+            when(processoConsultaService.processos(pageable)).thenReturn(Page.empty());
 
             var res = processoFacade.listarTodos(pageable);
             assertThat(res).isEmpty();
@@ -573,11 +564,11 @@ class ProcessoFacadeTest {
         @DisplayName("Deve listar unidades bloqueadas por tipo")
         void deveListarUnidadesBloqueadasPorTipo() {
             // Arrange
-            when(processoConsultaService.listarUnidadesBloqueadasPorTipo(MAPEAMENTO))
+            when(processoConsultaService.unidadesBloqueadasPorTipo(TipoProcesso.MAPEAMENTO))
                     .thenReturn(List.of(1L));
 
             // Act
-            List<Long> bloqueadas = processoFacade.listarUnidadesBloqueadasPorTipo(MAPEAMENTO);
+            List<Long> bloqueadas = processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
 
             // Assert
             assertThat(bloqueadas).contains(1L);
@@ -601,7 +592,7 @@ class ProcessoFacadeTest {
             SubprocessoElegivelDto dto = SubprocessoElegivelDto.builder()
                     .codSubprocesso(1L)
                     .build();
-            when(processoConsultaService.listarSubprocessosElegiveis(100L))
+            when(processoConsultaService.subprocessosElegiveis(100L))
                     .thenReturn(List.of(dto));
 
             // Act
@@ -622,7 +613,7 @@ class ProcessoFacadeTest {
             SubprocessoElegivelDto dto2 = SubprocessoElegivelDto.builder()
                     .codSubprocesso(2L)
                     .build();
-            when(processoConsultaService.listarSubprocessosElegiveis(100L))
+            when(processoConsultaService.subprocessosElegiveis(100L))
                     .thenReturn(List.of(dto1, dto2));
 
             // Act
@@ -637,7 +628,7 @@ class ProcessoFacadeTest {
         @DisplayName("Deve retornar vazio ao listar subprocessos se usuário sem unidade")
         void deveRetornarVazioAoListarSubprocessosSeUsuarioSemUnidade() {
             // Arrange
-            when(processoConsultaService.listarSubprocessosElegiveis(100L))
+            when(processoConsultaService.subprocessosElegiveis(100L))
                     .thenReturn(List.of());
 
             // Act
@@ -651,15 +642,12 @@ class ProcessoFacadeTest {
         @DisplayName("Listar por participantes ignorando criado")
         void listarPorParticipantesIgnorandoCriado() {
             processoFacade.listarPorParticipantesIgnorandoCriado(List.of(1L), null);
-            verify(processoConsultaService).listarPorParticipantesIgnorandoCriado(anyList(), any());
+            verify(processoConsultaService).processosIniciadosPorParticipantes(anyList(), any());
         }
 
         @Test
         @DisplayName("Deve lançar exceção para tipo de processo inválido")
         void deveLancarExcecaoParaTipoInvalido() {
-            when(processoConsultaService.listarUnidadesBloqueadasPorTipo("TIPO_INEXISTENTE"))
-                    .thenThrow(new IllegalArgumentException("No enum constant"));
-
             assertThatThrownBy(() -> processoFacade.listarUnidadesBloqueadasPorTipo("TIPO_INEXISTENTE"))
                     .isInstanceOf(IllegalArgumentException.class);
         }
@@ -674,9 +662,9 @@ class ProcessoFacadeTest {
             Processo processo = sgc.fixture.ProcessoFixture.processoPadrao();
             ProcessoDetalheDto detalhes = ProcessoDetalheDto.builder().build();
 
-            when(processoConsultaService.buscarPorId(id)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(id)).thenReturn(processo);
             when(processoDetalheBuilder.build(eq(processo), any(Usuario.class))).thenReturn(detalhes);
-            when(processoConsultaService.listarSubprocessosElegiveis(id))
+            when(processoConsultaService.subprocessosElegiveis(id))
                     .thenReturn(List.of());
 
             // Act
@@ -695,7 +683,7 @@ class ProcessoFacadeTest {
             Usuario usuario = criarUsuarioMock();
             Processo p = new Processo();
             p.setCodigo(1L);
-            when(processoConsultaService.buscarPorId(1L)).thenReturn(p);
+            when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
             when(processoDetalheBuilder.build(eq(p), any(Usuario.class))).thenReturn(ProcessoDetalheDto.builder().build());
 
             assertThat(processoFacade.obterDetalhes(1L, usuario)).isNotNull();
@@ -704,10 +692,10 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("listarUnidadesBloqueadasPorTipo: chama repo")
         void listarUnidadesBloqueadasPorTipo_Test() {
-            when(processoConsultaService.listarUnidadesBloqueadasPorTipo(MAPEAMENTO)).thenReturn(List.of(1L, 2L));
+            when(processoConsultaService.unidadesBloqueadasPorTipo(TipoProcesso.MAPEAMENTO)).thenReturn(List.of(1L, 2L));
 
-            processoFacade.listarUnidadesBloqueadasPorTipo(MAPEAMENTO);
-            verify(processoConsultaService).listarUnidadesBloqueadasPorTipo(MAPEAMENTO);
+            processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
+            verify(processoConsultaService).unidadesBloqueadasPorTipo(TipoProcesso.MAPEAMENTO);
         }
 
         @Test

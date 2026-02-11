@@ -13,7 +13,7 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
+import sgc.subprocesso.service.query.ConsultasSubprocessoService;
 import sgc.testutils.UnidadeTestBuilder;
 
 import java.util.List;
@@ -39,7 +39,7 @@ class ProcessoAcessoServiceTest {
     private UsuarioFacade usuarioService;
 
     @Mock
-    private ProcessoSubprocessoQueryService queryService;
+    private ConsultasSubprocessoService queryService;
 
     @Test
     @DisplayName("Deve negar acesso se authentication for null")

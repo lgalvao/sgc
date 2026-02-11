@@ -146,17 +146,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
                 "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
                 usuario.getTituloEleitoral(), unidade.getCodigo(), perfil.name());
 
-        UsuarioPerfil up = UsuarioPerfil.builder()
-                .usuario(usuario)
-                .usuarioTitulo(usuario.getTituloEleitoral())
-                .unidade(unidade)
-                .unidadeCodigo(unidade.getCodigo())
-                .perfil(perfil)
-                .build();
-
-        Set<UsuarioPerfil> atribuicoes = usuario.getTodasAtribuicoes(new HashSet<>());
-        atribuicoes = new HashSet<>(atribuicoes); // Create mutable copy
-        atribuicoes.add(up);
+        // Agora o perfil é configurado na sessão ativa via autenticarUsuario
     }
 
     private void definirTitular(Unidade unidade, Usuario usuario) {
@@ -168,6 +158,11 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     }
 
     private void autenticarUsuario(Usuario usuario, Perfil perfil) {
+        usuario.setPerfilAtivo(perfil);
+        // Tenta pegar o código da unidade do usuário ou da unidade de lotação
+        Long codUnidade = usuario.getUnidadeLotacao() != null ? usuario.getUnidadeLotacao().getCodigo() : 1L;
+        usuario.setUnidadeAtivaCodigo(codUnidade);
+
         usuario.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_" + perfil.name())));
         Authentication auth = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);

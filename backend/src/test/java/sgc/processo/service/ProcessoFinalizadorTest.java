@@ -10,23 +10,24 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
+import sgc.processo.erros.ErroProcesso;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
-import sgc.comum.repo.ComumRepo;
+import sgc.subprocesso.service.query.ConsultasSubprocessoService;
 
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import sgc.processo.erros.ErroProcesso;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -43,7 +44,7 @@ class ProcessoFinalizadorTest {
     @Mock
     private UnidadeFacade unidadeService;
     @Mock
-    private ProcessoSubprocessoQueryService queryService;
+    private ConsultasSubprocessoService queryService;
     @Mock
     private ProcessoValidador processoValidador;
     @Mock

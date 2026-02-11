@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,6 @@ import sgc.seguranca.login.dto.*;
 
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Controller responsável pelo fluxo de login: autenticação, autorização e
@@ -38,6 +38,7 @@ public class LoginController {
     private final UsuarioFacade usuarioService;
     private final LimitadorTentativasLogin limitadorTentativasLogin;
     private final GerenciadorJwt gerenciadorJwt;
+
     @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
 
@@ -85,6 +86,7 @@ public class LoginController {
     public ResponseEntity<List<PerfilUnidadeDto>> autorizar(
             @Valid @RequestBody AutorizarRequest request,
             HttpServletRequest httpRequest) {
+
         verificarTokenPreAuth(httpRequest, request.tituloEleitoral());
         List<PerfilUnidadeDto> perfis = loginFacade.autorizar(request.tituloEleitoral());
         return ResponseEntity.ok(perfis);

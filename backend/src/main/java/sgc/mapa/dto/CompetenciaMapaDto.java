@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import org.jspecify.annotations.Nullable;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 import java.util.List;
@@ -16,9 +15,13 @@ import java.util.List;
  */
 @Builder
 public record CompetenciaMapaDto(
-        @Nullable Long codigo,
+        Long codigo,
 
-                @NotBlank(message = "Descrição da competência é obrigatória") @Size(max = 255, message = "A descrição deve ter no máximo 255 caracteres") @SanitizarHtml String descricao,
+        @NotBlank(message = "Descrição da competência é obrigatória")
+        @Size(max = 255, message = "A descrição deve ter no máximo 255 caracteres")
+        @SanitizarHtml
+        String descricao,
 
-                @NotEmpty(message = "Lista de atividades não pode ser vazia") List<Long> atividadesCodigos) {
+        @NotEmpty(message = "Lista de atividades não pode ser vazia")
+        List<Long> atividadesCodigos) {
 }

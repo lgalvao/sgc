@@ -27,52 +27,26 @@ public class WithMockCustomUserSecurityContextFactory
 
     @Override
     public @Nullable SecurityContext createSecurityContext(@NonNull WithMockCustomUser customUser) {
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Unidade unidade = null;
-        boolean dbAvailable = false;
-        if (unidadeRepo != null) {
-            try {
-                unidade = unidadeRepo.findById(customUser.unidadeId()).orElse(null);
-                dbAvailable = true;
-            } catch (Exception e) {
-                log.error("Erro ao buscar unidade", e);
-            }
-        }
+        String titulo = customUser.tituloEleitoral();
+        Usuario principal = usuarioRepo.findById(titulo)
+                .orElseThrow(() -> new IllegalStateException("Usuário não encontrado no data.sql: " + titulo));
 
-        if (unidade == null) {
-            unidade = Unidade.builder().nome("Unidade Mock").sigla("MOCK").build();
-            unidade.setCodigo(customUser.unidadeId());
-        }
+        Unidade unidade = unidadeRepo.findById(customUser.unidadeId())
+                .orElseThrow(() -> new IllegalStateException("Unidade " + customUser.unidadeId() + " não encontrada no data.sql"));
 
-        Usuario principal = Usuario.builder()
-                .tituloEleitoral(customUser.tituloEleitoral())
-                .nome(customUser.nome())
-                .email(customUser.email())
-                .ramal("321")
-                .unidadeLotacao(unidade)
-                .build();
+        // Define perfil ativo (pega o primeiro dos informados na anotação)
+        if (customUser.perfis().length > 0) {
+            principal.setPerfilAtivo(Perfil.valueOf(customUser.perfis()[0]));
+        } else {
+            principal.setPerfilAtivo(Perfil.SERVIDOR);
+        }
         
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>();
-        final Unidade finalUnidade = unidade;
-        Arrays.stream(customUser.perfis())
-                .forEach(p -> atribuicoes.add(
-                        UsuarioPerfil.builder()
-                                .usuario(principal)
-                                .unidade(finalUnidade)
-                                .perfil(Perfil.valueOf(p))
-                                .build()));
-
-        if (dbAvailable && usuarioRepo != null) {
-            try {
-                usuarioRepo.save(principal);
-            } catch (Exception e) {
-                log.error("Erro ao salvar usuario", e);
-            }
-        }
+        principal.setUnidadeAtivaCodigo(unidade.getCodigo());
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
                         principal, null, principal.getAuthorities());
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
 
         return context;

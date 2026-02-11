@@ -126,10 +126,8 @@ public class LoginFacade {
             throw new ErroAutenticacao("Credenciais inválidas");
         }
 
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                usuarioPerfilService.buscarPorUsuario(usuario.getTituloEleitoral())
-        );
-        return usuario.getTodasAtribuicoes(atribuicoes).stream()
+        List<UsuarioPerfil> atribuicoes = usuarioPerfilService.buscarPorUsuario(usuario.getTituloEleitoral());
+        return atribuicoes.stream()
                 .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                 .map(atribuicao -> new PerfilUnidadeDto(
                         atribuicao.getPerfil(),

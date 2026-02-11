@@ -16,6 +16,7 @@ import sgc.processo.dto.*;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
+import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.mapper.SubprocessoMapper;
@@ -27,10 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
-import java.util.stream.Stream;
 /**
  * Orquestra operações de Processo.
  */
@@ -56,7 +57,7 @@ public class ProcessoFacade {
      * Busca um processo por ID ou lança exceção se não encontrado.
      */
     private Processo buscarPorId(Long id) {
-        return processoConsultaService.buscarPorId(id);
+        return processoConsultaService.buscarProcessoCodigo(id);
     }
 
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
@@ -82,7 +83,7 @@ public class ProcessoFacade {
 
     @Transactional(readOnly = true)
     public Optional<ProcessoDto> obterPorId(Long codigo) {
-        return processoConsultaService.buscarPorIdOpcional(codigo).map(processoMapper::toDto);
+        return processoConsultaService.buscarProcessoCodigoOpt(codigo).map(processoMapper::toDto);
     }
 
     @Transactional(readOnly = true)
@@ -113,24 +114,24 @@ public class ProcessoFacade {
 
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarFinalizados() {
-        return processoConsultaService.listarFinalizados().stream()
+        return processoConsultaService.processosFinalizados().stream()
                 .flatMap(p -> Stream.ofNullable(processoMapper.toDto(p)))
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarAtivos() {
-        return processoConsultaService.listarAtivos().stream()
+        return processoConsultaService.processosAndamento().stream()
                 .flatMap(p -> Stream.ofNullable(processoMapper.toDto(p)))
                 .toList();
     }
 
     public Page<Processo> listarTodos(Pageable pageable) {
-        return processoConsultaService.listarTodos(pageable);
+        return processoConsultaService.processos(pageable);
     }
 
     public Page<Processo> listarPorParticipantesIgnorandoCriado(List<Long> unidadeIds, Pageable pageable) {
-        return processoConsultaService.listarPorParticipantesIgnorandoCriado(unidadeIds, pageable);
+        return processoConsultaService.processosIniciadosPorParticipantes(unidadeIds, pageable);
     }
 
     @Transactional
@@ -178,17 +179,17 @@ public class ProcessoFacade {
     }
 
     public List<Long> listarUnidadesBloqueadasPorTipo(String tipo) {
-        return processoConsultaService.listarUnidadesBloqueadasPorTipo(tipo);
+        return processoConsultaService.unidadesBloqueadasPorTipo(TipoProcesso.valueOf(tipo));
     }
 
     @Transactional(readOnly = true)
     public Set<Long> buscarIdsUnidadesEmProcessosAtivos(Long codProcessoIgnorar) {
-        return processoConsultaService.buscarIdsUnidadesEmProcessosAtivos(codProcessoIgnorar);
+        return processoConsultaService.buscarIdsUnidadesComProcessosAtivos(codProcessoIgnorar);
     }
 
     @Transactional(readOnly = true)
     public List<SubprocessoElegivelDto> listarSubprocessosElegiveis(Long codProcesso) {
-        return processoConsultaService.listarSubprocessosElegiveis(codProcesso);
+        return processoConsultaService.subprocessosElegiveis(codProcesso);
     }
 
     @Transactional(readOnly = true)

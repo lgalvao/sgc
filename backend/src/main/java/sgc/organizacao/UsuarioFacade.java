@@ -102,10 +102,8 @@ public class UsuarioFacade {
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
         return usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo)
                 .map(usuario -> {
-                    Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                        usuarioPerfilService.buscarPorUsuario(usuario.getTituloEleitoral())
-                    );
-                    return usuario.getTodasAtribuicoes(atribuicoes).stream()
+                    List<UsuarioPerfil> atribuicoes = usuarioPerfilService.buscarPorUsuario(usuario.getTituloEleitoral());
+                    return atribuicoes.stream()
                             .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                             .map(this::toPerfilDto)
                             .toList();
@@ -151,10 +149,8 @@ public class UsuarioFacade {
     public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
         return usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo)
                 .map(u -> {
-                    Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                        usuarioPerfilService.buscarPorUsuario(u.getTituloEleitoral())
-                    );
-                    return u.getTodasAtribuicoes(atribuicoes).stream()
+                    List<UsuarioPerfil> atribuicoes = usuarioPerfilService.buscarPorUsuario(u.getTituloEleitoral());
+                    return atribuicoes.stream()
                             .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                             .anyMatch(a -> a.getPerfil().name().equals(perfil)
                                     && a.getUnidadeCodigo().equals(unidadeCodigo));
@@ -166,10 +162,8 @@ public class UsuarioFacade {
     public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
         return usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo)
                 .map(u -> {
-                    Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                        usuarioPerfilService.buscarPorUsuario(u.getTituloEleitoral())
-                    );
-                    return u.getTodasAtribuicoes(atribuicoes).stream()
+                    List<UsuarioPerfil> atribuicoes = usuarioPerfilService.buscarPorUsuario(u.getTituloEleitoral());
+                    return atribuicoes.stream()
                             .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                             .filter(a -> a.getPerfil().name().equals(perfil))
                             .map(a -> a.getUnidade().getCodigo())

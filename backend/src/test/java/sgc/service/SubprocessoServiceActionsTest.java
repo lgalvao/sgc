@@ -23,6 +23,8 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.SubprocessoFacade;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -78,11 +80,28 @@ class SubprocessoServiceActionsTest {
         gestor = carregarUsuarioComPerfis("666666666666"); // Gestor COSIS - GESTOR
     }
 
+    private void autenticar(Usuario usuario) {
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                usuario, null, usuario.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+
     private Usuario carregarUsuarioComPerfis(String titulo) {
         Usuario usuario = usuarioService.carregarUsuarioParaAutenticacao(titulo);
         if (usuario == null) {
             throw new RuntimeException("Usuário não encontrado: " + titulo);
         }
+        
+        // Simula a lógica do FiltroJwt definindo o perfil ativo
+        // Para estes testes, Ricardo (6) é ADMIN e Gestor COSIS (666666666666) é GESTOR na Unidade 6
+        if ("6".equals(titulo)) {
+            usuario.setPerfilAtivo(sgc.organizacao.model.Perfil.ADMIN);
+            usuario.setUnidadeAtivaCodigo(2L); // Unidade TRE/STIC (Ricardo é lotado na 2)
+        } else {
+            usuario.setPerfilAtivo(sgc.organizacao.model.Perfil.GESTOR);
+            usuario.setUnidadeAtivaCodigo(6L); // Unidade COSIS (Conforme data.sql)
+        }
+        
         return usuario;
     }
 
@@ -114,6 +133,7 @@ class SubprocessoServiceActionsTest {
         void deveAceitarCadastroComSucesso() {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            autenticar(gestor);
             subprocessoFacade.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, gestor);
 
             Optional<Analise> analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
@@ -134,6 +154,7 @@ class SubprocessoServiceActionsTest {
         void deveHomologarCadastroComSucesso() {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            autenticar(admin);
             subprocessoFacade.homologarCadastro(subprocesso.getCodigo(), OBSERVACOES, admin);
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow(() -> new AssertionError("Subprocesso não encontrado após" + " homologação."));
@@ -149,6 +170,7 @@ class SubprocessoServiceActionsTest {
         void deveAceitarRevisaoComSucesso() {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+            autenticar(gestor);
             subprocessoFacade.aceitarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, gestor);
 
             Optional<Analise> analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
@@ -162,6 +184,7 @@ class SubprocessoServiceActionsTest {
 
         @Test
         void deveLancarExcecaoSeSubprocessoNaoEncontrado() {
+            autenticar(gestor);
             var exception = assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoFacade.aceitarRevisaoCadastro(999L, OBSERVACOES, gestor));
             assertNotNull(exception);
         }
@@ -173,6 +196,7 @@ class SubprocessoServiceActionsTest {
             Subprocesso sp = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
             Long spCodigo = sp.getCodigo();
+            autenticar(gestor);
             ErroAcessoNegado erro = assertThrows(ErroAcessoNegado.class,
                     () -> subprocessoFacade.aceitarRevisaoCadastro(spCodigo, OBSERVACOES, gestor));
             assertTrue(erro.getMessage().contains("situação"),
@@ -190,6 +214,7 @@ class SubprocessoServiceActionsTest {
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
             // Primeiro, aceitar a revisão para que a situação mude para AGUARDANDO_HOMOLOGACAO_CADASTRO
+            autenticar(gestor);
             subprocessoFacade.aceitarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, gestor);
 
             // Recarregar o subprocesso do repositório para garantir que o estado esteja atualizado
@@ -199,6 +224,7 @@ class SubprocessoServiceActionsTest {
             when(impactoMapaService.verificarImpactos(any(Subprocesso.class), any(Usuario.class))).thenReturn(ImpactoMapaDto.semImpacto());
 
             // Homologação requer perfil ADMIN
+            autenticar(admin);
             subprocessoFacade.homologarRevisaoCadastro(subprocessoAposAceite.getCodigo(), OBSERVACOES, admin);
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo())
@@ -209,6 +235,7 @@ class SubprocessoServiceActionsTest {
 
         @Test
         void deveLancarExcecaoSeSubprocessoNaoEncontrado_homologar() {
+            autenticar(admin);
             var exception = assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoFacade.homologarRevisaoCadastro(999L, OBSERVACOES, admin));
             assertNotNull(exception);
         }
@@ -220,6 +247,7 @@ class SubprocessoServiceActionsTest {
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
             Long spCodigo = subprocesso.getCodigo();
+            autenticar(admin);
             ErroAcessoNegado erro = assertThrows(ErroAcessoNegado.class,
                     () -> subprocessoFacade.homologarRevisaoCadastro(spCodigo, OBSERVACOES, admin));
 
@@ -236,6 +264,7 @@ class SubprocessoServiceActionsTest {
         void deveDevolverCadastroComSucesso() {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            autenticar(gestor);
             subprocessoFacade.devolverCadastro(subprocesso.getCodigo(), OBSERVACOES, gestor);
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo())

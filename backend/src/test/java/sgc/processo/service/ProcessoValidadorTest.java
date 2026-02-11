@@ -13,7 +13,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
-import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
+import sgc.subprocesso.service.query.ConsultasSubprocessoService;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +21,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -32,7 +33,7 @@ class ProcessoValidadorTest {
     private UnidadeFacade unidadeService;
 
     @Mock
-    private ProcessoSubprocessoQueryService queryService;
+    private ConsultasSubprocessoService queryService;
 
     @InjectMocks
     private ProcessoValidador validador;
@@ -78,7 +79,7 @@ class ProcessoValidadorTest {
         p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         when(queryService.validarSubprocessosParaFinalizacao(1L))
-                .thenReturn(ProcessoSubprocessoQueryService.ValidationResult.ofValido());
+                .thenReturn(ConsultasSubprocessoService.ValidationResult.ofValido());
 
         Assertions.assertDoesNotThrow(() -> validador.validarFinalizacaoProcesso(p));
         verify(queryService).validarSubprocessosParaFinalizacao(1L);
@@ -102,7 +103,7 @@ class ProcessoValidadorTest {
         p.setCodigo(1L);
 
         when(queryService.validarSubprocessosParaFinalizacao(1L))
-                .thenReturn(ProcessoSubprocessoQueryService.ValidationResult.ofValido());
+                .thenReturn(ConsultasSubprocessoService.ValidationResult.ofValido());
 
         // Should not throw exception
         Assertions.assertDoesNotThrow(() -> validador.validarTodosSubprocessosHomologados(p));
@@ -115,7 +116,7 @@ class ProcessoValidadorTest {
         p.setCodigo(1L);
 
         when(queryService.validarSubprocessosParaFinalizacao(1L))
-                .thenReturn(ProcessoSubprocessoQueryService.ValidationResult.ofInvalido("Erro de validação"));
+                .thenReturn(ConsultasSubprocessoService.ValidationResult.ofInvalido("Erro de validação"));
 
         assertThatThrownBy(() -> validador.validarTodosSubprocessosHomologados(p))
                 .isInstanceOf(ErroProcesso.class)

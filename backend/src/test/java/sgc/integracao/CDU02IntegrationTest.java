@@ -24,7 +24,10 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.Collections;
 import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -126,22 +129,36 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         Usuario usuario = usuarioRepo.findById(tituloEleitoral).orElseGet(() -> {
             Usuario newUser = UsuarioFixture.usuarioComTitulo(tituloEleitoral);
             newUser.setUnidadeLotacao(unidade);
-            newUser = usuarioRepo.save(newUser);
-            // Insere na tabela de join simulada se necessário (H2 specific for View)
-            for (String perfilStr : perfis) {
-                try {
-                    jdbcTemplate.update(
-                            "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                            newUser.getTituloEleitoral(), unidade.getCodigo(), perfilStr);
-                } catch (DataAccessException ignored) {
-                    // Ignora se já existe
-                }
-            }
-            return newUser;
+            return usuarioRepo.save(newUser);
         });
 
+        // Configura perfil e unidade ativos da sessão
+        if (perfis.length > 0) {
+            Perfil p = Perfil.valueOf(perfis[0]);
+            usuario.setPerfilAtivo(p);
+            usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
+        }
+
+        // Insere na tabela de join simulada se necessário (H2 specific for View)
+        for (String perfilStr : perfis) {
+            try {
+                jdbcTemplate.update(
+                        "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
+                        usuario.getTituloEleitoral(), unidade.getCodigo(), perfilStr);
+            } catch (DataAccessException ignored) {
+                // Ignora se já existe
+            }
+        }
+
+        // Define authorities como apenas o perfil selecionado para simular o comportamento do FiltroJwt
+        Set<GrantedAuthority> authorities = Collections.emptySet();
+        if (perfis.length > 0) {
+            authorities = Set.of(new SimpleGrantedAuthority("ROLE_" + perfis[0]));
+        }
+        usuario.setAuthorities(authorities);
+
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario, null,
-                usuario.getAuthorities());
+                authorities);
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);

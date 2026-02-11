@@ -10,129 +10,95 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.dto.PerfilDto;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.SubprocessoElegivelDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
+import sgc.subprocesso.service.query.ConsultasSubprocessoService;
 
 import java.util.*;
 
 /**
- * Serviço responsável por consultas relacionadas a Processos.
- * <p>
- * Centraliza operações de leitura e consultas complexas, incluindo
- * listagens filtradas, verificações de elegibilidade e queries específicas.
+ * Centraliza consultas envolvendo processos e subprocessos, incluindo listagens filtradas e verificações de elegibilidade.
  */
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProcessoConsultaService {
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
-    private final ProcessoSubprocessoQueryService queryService;
+    private final ConsultasSubprocessoService servicoConsultas;
     private final UsuarioFacade usuarioService;
+    private final SubprocessoMapper subprocessoMapper;
 
-    public Processo buscarPorId(Long id) {
-        return repo.buscar(Processo.class, id);
+    public Processo buscarProcessoCodigo(Long codigo) {
+        return repo.buscar(Processo.class, codigo);
     }
 
-    public Optional<Processo> buscarPorIdOpcional(Long id) {
+    public Optional<Processo> buscarProcessoCodigoOpt(Long id) {
         return processoRepo.findById(id);
     }
 
-    @Transactional(readOnly = true)
-    public List<Processo> listarFinalizados() {
+    public List<Processo> processosFinalizados() {
         return processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
     }
 
-    @Transactional(readOnly = true)
-    public List<Processo> listarAtivos() {
-        return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
-    }
-
-    public Page<Processo> listarTodos(Pageable pageable) {
+    public Page<Processo> processos(Pageable pageable) {
         return processoRepo.findAll(pageable);
     }
 
-    public Page<Processo> listarPorParticipantesIgnorandoCriado(List<Long> unidadeIds, Pageable pageable) {
+    public List<Processo> processosAndamento() {
+        return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
+    }
+
+    public Page<Processo> processosIniciadosPorParticipantes(List<Long> unidadeIds, Pageable pageable) {
         return processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 unidadeIds, SituacaoProcesso.CRIADO, pageable);
     }
 
-    @Transactional(readOnly = true)
-    public Set<Long> buscarIdsUnidadesEmProcessosAtivos(Long codProcessoIgnorar) {
+
+    public Set<Long> buscarIdsUnidadesComProcessosAtivos(Long codProcessoIgnorar) {
         return new HashSet<>(
                 processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
                         Arrays.asList(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.CRIADO),
                         codProcessoIgnorar));
     }
 
-    /**
-     * Lista unidades bloqueadas (participantes de processos ativos) por tipo de processo.
-     */
-    @Transactional(readOnly = true)
-    public List<Long> listarUnidadesBloqueadasPorTipo(String tipo) {
-        TipoProcesso tipoProcesso = TipoProcesso.valueOf(tipo);
+    public List<Long> unidadesBloqueadasPorTipo(TipoProcesso tipoProcesso) {
         return processoRepo.findUnidadeCodigosBySituacaoAndTipo(SituacaoProcesso.EM_ANDAMENTO, tipoProcesso);
     }
 
     /**
-     * Lista subprocessos elegíveis para o usuário atual no contexto do processo.
+     * Lista subprocessos elegíveis para o usuário atual no contexto do processo especificado
      */
-    @Transactional(readOnly = true)
-    public List<SubprocessoElegivelDto> listarSubprocessosElegiveis(Long codProcesso) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getName() == null) {
-            return List.of();
-        }
+    public List<SubprocessoElegivelDto> subprocessosElegiveis(Long codProcesso) {
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
 
-        String username = authentication.getName();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
-
-        if (isAdmin) {
-            return queryService.listarPorProcessoESituacoes(codProcesso,
-                            List.of(
-                                    SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+        if (usuario.getPerfilAtivo() == Perfil.ADMIN) {
+            return servicoConsultas.listarPorProcessoESituacoes(codProcesso,
+                            List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
                                     SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
                                     SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
                                     SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO,
                                     SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
-                                    SituacaoSubprocesso.REVISAO_MAPA_VALIDADO
-                            ))
+                                    SituacaoSubprocesso.REVISAO_MAPA_VALIDADO))
                     .stream()
-                    .map(this::toSubprocessoElegivelDto)
+                    .map(subprocessoMapper::toElegivelDto)
                     .toList();
         }
 
-        List<PerfilDto> perfis = usuarioService.buscarPerfisUsuario(username);
-        Long codUnidadeUsuario = perfis.stream().findFirst().map(PerfilDto::unidadeCodigo).orElse(null);
-
-
-
-        return queryService.listarPorProcessoUnidadeESituacoes(codProcesso, codUnidadeUsuario,
-                List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-                        SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA))
+        return servicoConsultas.listarPorProcessoUnidadeESituacoes(codProcesso, usuario.getUnidadeAtivaCodigo(),
+                        List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                                SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA))
                 .stream()
-                .map(this::toSubprocessoElegivelDto)
+                .map(subprocessoMapper::toElegivelDto)
                 .toList();
     }
-
-    /**
-     * Converte Subprocesso para DTO de elegibilidade.
-     */
-    private SubprocessoElegivelDto toSubprocessoElegivelDto(Subprocesso sp) {
-        return SubprocessoElegivelDto.builder()
-                .codSubprocesso(sp.getCodigo())
-                .unidadeNome(sp.getUnidade().getNome())
-                .unidadeSigla(sp.getUnidade().getSigla())
-                .situacao(sp.getSituacao())
-                .build();
-    }
 }
-

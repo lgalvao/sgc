@@ -189,14 +189,10 @@ public class UnidadeResponsavelService {
     }
 
     private void carregarAtribuicoesUsuario(Usuario usuario) {
-        Set<UsuarioPerfil> permanentes = new HashSet<>(usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral()));
-        usuario.getTodasAtribuicoes(permanentes);
+        // As atribuições já são carregadas via view consolidada no banco de dados.
     }
 
     private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
-        for (Usuario u : usuarios) {
-            Set<UsuarioPerfil> permanentes = new HashSet<>(usuarioPerfilRepo.findByUsuarioTitulo(u.getTituloEleitoral()));
-            u.getTodasAtribuicoes(permanentes);
-        }
+        // As atribuições já são carregadas via view consolidada no banco de dados.
     }
 }

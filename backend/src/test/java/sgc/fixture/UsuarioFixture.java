@@ -24,20 +24,22 @@ public class UsuarioFixture {
 
     public static Usuario usuarioComPerfil(Unidade unidade, Perfil perfil) {
         Usuario usuario = usuarioPadrao();
-        adicionarPerfil(usuario, unidade, perfil);
+        usuario.setPerfilAtivo(perfil);
+        usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
+        return usuario;
+    }
+
+    public static Usuario usuarioLogado(String titulo, Unidade unidade, Perfil perfil) {
+        Usuario usuario = usuarioComTitulo(titulo);
+        usuario.setPerfilAtivo(perfil);
+        usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
+        usuario.setUnidadeLotacao(unidade);
         return usuario;
     }
 
     public static void adicionarPerfil(Usuario usuario, Unidade unidade, Perfil perfil) {
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setUsuario(usuario);
-        up.setUsuarioTitulo(usuario.getTituloEleitoral());
-        up.setUnidade(unidade);
-        up.setUnidadeCodigo(unidade.getCodigo());
-        up.setPerfil(perfil);
-
-        Set<UsuarioPerfil> atribuicoes = usuario.getTodasAtribuicoes(new HashSet<>());
-        atribuicoes.add(up);
+        usuario.setPerfilAtivo(perfil);
+        usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
     }
 
     public static Usuario usuarioComTitulo(String titulo) {

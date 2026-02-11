@@ -32,20 +32,6 @@ class SubprocessoAccessPolicyTest {
     @Mock
     private HierarquiaService hierarquiaService;
     
-    @Mock
-    private UsuarioPerfilRepo usuarioPerfilRepo;
-    
-    private Map<String, List<UsuarioPerfil>> atribuicoesPorUsuario;
-    
-    @BeforeEach
-    void setUp() {
-        atribuicoesPorUsuario = new HashMap<>();
-        when(usuarioPerfilRepo.findByUsuarioTitulo(anyString())).thenAnswer(inv -> {
-            String titulo = inv.getArgument(0);
-            return atribuicoesPorUsuario.getOrDefault(titulo, Collections.emptyList());
-        });
-    }
-
     @Test
     @DisplayName("canExecute - VERIFICAR_IMPACTOS - Chefe Mesma Unidade")
     void canExecute_VerificarImpactos_ChefeMesmaUnidade() {
@@ -108,15 +94,7 @@ class SubprocessoAccessPolicyTest {
     @DisplayName("canExecute - Hierarquia Titular - OK")
     void canExecute_HierarquiaTitular_OK() {
         Usuario u = criarUsuario(Perfil.CHEFE, 1L);
-        String tituloOriginal = u.getTituloEleitoral();
         u.setTituloEleitoral("123");
-        
-        // Re-configurar o mock com o novo título
-        List<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario.get(tituloOriginal);
-        for (UsuarioPerfil up : atribuicoes) {
-            up.setUsuarioTitulo("123");
-        }
-        atribuicoesPorUsuario.put("123", atribuicoes);
         
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 1L);
         sp.getUnidade().setTituloTitular("123");
@@ -132,8 +110,7 @@ class SubprocessoAccessPolicyTest {
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, 2L);
  
         Unidade sub = sp.getUnidade();
-        List<UsuarioPerfil> atribuicoes = atribuicoesPorUsuario.get(u.getTituloEleitoral());
-        Unidade sup = atribuicoes.getFirst().getUnidade();
+        Unidade sup = u.getUnidadeLotacao();
  
         when(hierarquiaService.isSuperiorImediata(sub, sup)).thenReturn(true);
 
@@ -278,19 +255,12 @@ class SubprocessoAccessPolicyTest {
         String titulo = "titulo-" + (++contadorUsuarios);
         Usuario u = new Usuario();
         u.setTituloEleitoral(titulo);
+        u.setPerfilAtivo(perfil);
+        u.setUnidadeAtivaCodigo(codUnidade);
+        
         Unidade un = new Unidade();
         un.setCodigo(codUnidade);
-
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setUsuario(u);
-        up.setUsuarioTitulo(titulo);
-        up.setPerfil(perfil);
-        up.setUnidade(un);
-        up.setUnidadeCodigo(codUnidade);
-        
-        List<UsuarioPerfil> atribuicoes = new ArrayList<>();
-        atribuicoes.add(up);
-        atribuicoesPorUsuario.put(titulo, atribuicoes);
+        u.setUnidadeLotacao(un);
 
         return u;
     }

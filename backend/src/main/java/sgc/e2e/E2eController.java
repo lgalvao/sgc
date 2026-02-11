@@ -22,6 +22,7 @@ import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -44,8 +45,9 @@ public class E2eController {
     private final ProcessoFacade processoFacade;
     private final UnidadeFacade unidadeFacade;
     private final ResourceLoader resourceLoader;
-    public E2eController(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate, 
-                         ProcessoFacade processoFacade, UnidadeFacade unidadeFacade, 
+
+    public E2eController(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate,
+                         ProcessoFacade processoFacade, UnidadeFacade unidadeFacade,
                          ResourceLoader resourceLoader) {
         this.jdbcTemplate = jdbcTemplate;
         this.namedJdbcTemplate = namedJdbcTemplate;
@@ -56,13 +58,15 @@ public class E2eController {
 
     @PostMapping("/reset-database")
     public void resetDatabase() {
-        log.info("Iniciando reset do banco de dados para E2E...");
-        try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+        DataSource dataSource = jdbcTemplate.getDataSource();
+        if (dataSource == null) return;
+
+        try (Connection conn = dataSource.getConnection()) {
             executeDatabaseReset(conn);
-            log.info("Reset do banco de dados concluído com sucesso.");
+            log.info("Reset do banco de dados concluído.");
         } catch (Exception e) {
             log.error("Erro crítico ao resetar banco de dados", e);
-            throw new ErroConfiguracao("Falha no reset do banco: " + e.getMessage());
+            throw new ErroConfiguracao("Falha no reset do banco: %s".formatted(e.getMessage()));
         }
     }
 
@@ -203,7 +207,6 @@ public class E2eController {
             throw new ErroValidacao("Unidade é obrigatória");
         }
 
-        // Buscar unidade pela sigla
         UnidadeDto unidade = unidadeFacade.buscarPorSigla(request.unidadeSigla());
 
         // Calcular data limite
@@ -219,13 +222,12 @@ public class E2eController {
             descricao = "Processo Fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
         }
 
-        CriarProcessoRequest criarReq =
-                CriarProcessoRequest.builder()
-                        .descricao(descricao)
-                        .tipo(tipo)
-                        .dataLimiteEtapa1(dataLimite)
-                        .unidades(List.of(unidade.getCodigo()))
-                        .build();
+        CriarProcessoRequest criarReq = CriarProcessoRequest.builder()
+                .descricao(descricao)
+                .tipo(tipo)
+                .dataLimiteEtapa1(dataLimite)
+                .unidades(List.of(unidade.getCodigo()))
+                .build();
 
         // Criar processo
         ProcessoDto processo = processoFacade.criar(criarReq);
@@ -237,9 +239,10 @@ public class E2eController {
             List<String> erros;
 
             switch (tipo) {
-              case TipoProcesso.MAPEAMENTO -> erros = processoFacade.iniciarProcessoMapeamento(processoCodigo, unidades);
-              case TipoProcesso.REVISAO -> erros = processoFacade.iniciarProcessoRevisao(processoCodigo, unidades);
-              default -> erros = List.of();
+                case TipoProcesso.MAPEAMENTO ->
+                        erros = processoFacade.iniciarProcessoMapeamento(processoCodigo, unidades);
+                case TipoProcesso.REVISAO -> erros = processoFacade.iniciarProcessoRevisao(processoCodigo, unidades);
+                default -> erros = List.of();
             }
 
             if (!erros.isEmpty()) {

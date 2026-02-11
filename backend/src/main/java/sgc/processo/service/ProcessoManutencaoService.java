@@ -60,7 +60,7 @@ public class ProcessoManutencaoService {
         processo.adicionarParticipantes(participantes);
 
         // Salva uma única vez com todos os participantes
-        Processo processoSalvo = processoRepo.saveAndFlush(processo);
+        Processo processoSalvo = processoRepo.save(processo);
 
         log.info("Processo {} criado.", processoSalvo.getCodigo());
 
@@ -69,7 +69,7 @@ public class ProcessoManutencaoService {
 
     @Transactional
     public Processo atualizar(Long codigo, AtualizarProcessoRequest requisicao) {
-        Processo processo = processoConsultaService.buscarPorId(codigo);
+        Processo processo = processoConsultaService.buscarProcessoCodigo(codigo);
 
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser editados.");
@@ -91,10 +91,10 @@ public class ProcessoManutencaoService {
             participantes.add(unidadeService.buscarEntidadePorId(codigoUnidade));
         }
 
-        // Atualiza participantes com sincronização inteligente para evitar DuplicateKeyException
+        // Atualiza participantes com sincronização inteligente
         processo.sincronizarParticipantes(participantes);
 
-        Processo processoAtualizado = processoRepo.saveAndFlush(processo);
+        Processo processoAtualizado = processoRepo.save(processo);
         log.info("Processo {} atualizado.", codigo);
 
         return processoAtualizado;
@@ -102,7 +102,7 @@ public class ProcessoManutencaoService {
 
     @Transactional
     public void apagar(Long codigo) {
-        Processo processo = processoConsultaService.buscarPorId(codigo);
+        Processo processo = processoConsultaService.buscarProcessoCodigo(codigo);
 
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser removidos.");

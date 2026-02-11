@@ -103,6 +103,8 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         Usuario principal = UsuarioFixture.usuarioPadrao();
         principal.setTituloEleitoral(TEST_USER_ID);
         principal.setUnidadeLotacao(unidade);
+        principal.setPerfilAtivo(perfil);
+        principal.setUnidadeAtivaCodigo(unidade.getCodigo());
         usuarioRepo.save(principal);
         principal.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_" + perfil.name())));
 

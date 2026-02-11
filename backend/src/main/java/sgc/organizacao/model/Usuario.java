@@ -28,6 +28,12 @@ public class Usuario implements UserDetails {
     @Transient
     private @Nullable Set<GrantedAuthority> authorities;
 
+    @Transient
+    private Perfil perfilAtivo;
+
+    @Transient
+    private Long unidadeAtivaCodigo;
+
     @Id
     @Column(name = "titulo", length = 12, nullable = false)
     private String tituloEleitoral;
@@ -51,35 +57,6 @@ public class Usuario implements UserDetails {
     @ManyToOne
     @JoinColumn(name = "unidade_comp_codigo")
     private Unidade unidadeCompetencia;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
-    private Set<AtribuicaoTemporaria> atribuicoesTemporarias = new HashSet<>();
-
-    /**
-     * Retorna todas as atribuições do usuário (permanentes + temporárias ativas).
-     * 
-     * @param atribuicoesPermanentes As atribuições permanentes do usuário (devem ser carregadas externamente)
-     * @return Conjunto de todas as atribuições (permanentes + temporárias ativas)
-     */
-    public Set<UsuarioPerfil> getTodasAtribuicoes(Set<UsuarioPerfil> atribuicoesPermanentes) {
-        Set<UsuarioPerfil> todas = new HashSet<>(atribuicoesPermanentes);
-
-        LocalDateTime now = LocalDateTime.now();
-        for (AtribuicaoTemporaria temp : atribuicoesTemporarias) {
-            if (!temp.getDataInicio().isAfter(now) && !temp.getDataTermino().isBefore(now)) {
-                UsuarioPerfil perfil = new UsuarioPerfil()
-                        .setUsuarioTitulo(this.tituloEleitoral)
-                        .setUsuario(this)
-                        .setUnidadeCodigo(temp.getUnidade().getCodigo())
-                        .setUnidade(temp.getUnidade())
-                        .setPerfil(temp.getPerfil());
-
-                todas.add(perfil);
-            }
-        }
-        return todas;
-    }
 
     @Override
     public boolean equals(Object obj) {

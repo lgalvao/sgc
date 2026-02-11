@@ -47,11 +47,7 @@ public abstract class AbstractAccessPolicy<T> implements AccessPolicy<T> {
     }
 
     protected boolean temPerfilPermitido(Usuario usuario, EnumSet<Perfil> perfisPermitidos) {
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral())
-        );
-        return usuario.getTodasAtribuicoes(atribuicoes).stream()
-                .anyMatch(a -> perfisPermitidos.contains(a.getPerfil()));
+        return perfisPermitidos.contains(usuario.getPerfilAtivo());
     }
 
     protected String formatarPerfis(EnumSet<Perfil> perfis) {
@@ -65,11 +61,7 @@ public abstract class AbstractAccessPolicy<T> implements AccessPolicy<T> {
      * Verifica se o usuário possui o perfil especificado.
      */
     protected boolean temPerfil(Usuario usuario, Perfil perfil) {
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral())
-        );
-        return usuario.getTodasAtribuicoes(atribuicoes).stream()
-                .anyMatch(a -> a.getPerfil() == perfil);
+        return usuario.getPerfilAtivo() == perfil;
     }
 
     /**
@@ -81,23 +73,19 @@ public abstract class AbstractAccessPolicy<T> implements AccessPolicy<T> {
      * @return true se o requisito é atendido
      */
     protected boolean verificaHierarquia(Usuario usuario, Unidade unidade, RequisitoHierarquia requisito) {
-        Set<UsuarioPerfil> atribuicoes = new HashSet<>(
-                usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral())
-        );
-        final Set<UsuarioPerfil> todasAtribuicoes = usuario.getTodasAtribuicoes(atribuicoes);
-        final Long codUnidade = unidade.getCodigo();
+        final Long codUnidadeRecurso = unidade.getCodigo();
+        final Long codUnidadeUsuario = usuario.getUnidadeAtivaCodigo();
 
         return switch (requisito) {
             case NENHUM -> true;
-            case MESMA_UNIDADE -> todasAtribuicoes.stream()
-                    .anyMatch(a -> Objects.equals(a.getUnidade().getCodigo(), codUnidade));
+            case MESMA_UNIDADE -> Objects.equals(codUnidadeUsuario, codUnidadeRecurso);
 
-            case MESMA_OU_SUBORDINADA -> todasAtribuicoes.stream()
-                    .anyMatch(a -> Objects.equals(a.getUnidade().getCodigo(), codUnidade)
-                            || hierarquiaService.isSubordinada(unidade, a.getUnidade()));
+            case MESMA_OU_SUBORDINADA -> Objects.equals(codUnidadeUsuario, codUnidadeRecurso)
+                    || hierarquiaService.isSubordinada(unidade, 
+                        Unidade.builder().codigo(codUnidadeUsuario).build());
 
-            case SUPERIOR_IMEDIATA -> todasAtribuicoes.stream()
-                    .anyMatch(a -> hierarquiaService.isSuperiorImediata(unidade, a.getUnidade()));
+            case SUPERIOR_IMEDIATA -> hierarquiaService.isSuperiorImediata(unidade, 
+                        Unidade.builder().codigo(codUnidadeUsuario).build());
 
             case TITULAR_UNIDADE -> {
                 String tituloTitular = unidade.getTituloTitular();

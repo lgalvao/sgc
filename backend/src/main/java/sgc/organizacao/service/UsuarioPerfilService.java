@@ -22,10 +22,9 @@ public class UsuarioPerfilService {
     }
 
     public void carregarAuthorities(Usuario usuario) {
-        Set<UsuarioPerfil> permanentes = new HashSet<>(usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral()));
-        Set<UsuarioPerfil> todas = usuario.getTodasAtribuicoes(permanentes);
+        List<UsuarioPerfil> perfis = usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral());
 
-        Set<GrantedAuthority> authorities = todas.stream()
+        Set<GrantedAuthority> authorities = perfis.stream()
                 .map(a -> a.getPerfil().toGrantedAuthority())
                 .collect(Collectors.toSet());
 

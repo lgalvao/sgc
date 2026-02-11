@@ -10,7 +10,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
-import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
+import sgc.subprocesso.service.query.ConsultasSubprocessoService;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +22,7 @@ import java.util.Optional;
  * incluindo validação de unidades, subprocessos e regras de finalização.</p>
  *
  * <p><b>Refatoração v3.0:</b> Removido uso de @Lazy e dependência circular.
- * Agora utiliza {@link ProcessoSubprocessoQueryService} para queries de leitura,
+ * Agora utiliza {@link ConsultasSubprocessoService} para queries de leitura,
  * eliminando acoplamento bidirecional com SubprocessoFacade.</p>
  *
  * @since 3.0.0 - Removido @Lazy, introduzido Query Service Pattern
@@ -33,7 +33,7 @@ import java.util.Optional;
 class ProcessoValidador {
 
     private final UnidadeFacade unidadeService;
-    private final ProcessoSubprocessoQueryService queryService;
+    private final ConsultasSubprocessoService queryService;
 
     /**
      * Valida se todas as unidades especificadas possuem mapa vigente.

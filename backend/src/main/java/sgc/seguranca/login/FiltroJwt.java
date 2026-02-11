@@ -15,6 +15,7 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * Filtro de segurança que valida tokens JWT em cada requisição.
@@ -47,7 +48,13 @@ public class FiltroJwt extends OncePerRequestFilter {
                 Usuario usuario = usuarioService.carregarUsuarioParaAutenticacao(claims.tituloEleitoral());
 
                 if (usuario != null) {
-                    var authorities = usuario.getAuthorities();
+                    usuario.setPerfilAtivo(claims.perfil());
+                    usuario.setUnidadeAtivaCodigo(claims.unidadeCodigo());
+
+                    // Carrega apenas o perfil selecionado no momento do login (par único perfil-unidade).
+                    // Isso impede que permissões de outros perfis/unidades do usuário no banco interfiram na sessão atual.
+                    var authorities = Set.of(claims.perfil().toGrantedAuthority());
+                    usuario.setAuthorities(authorities);
 
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                             usuario,

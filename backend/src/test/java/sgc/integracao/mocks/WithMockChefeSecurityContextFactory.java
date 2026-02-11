@@ -27,79 +27,32 @@ public class WithMockChefeSecurityContextFactory
 
     @Override
     public @Nullable SecurityContext createSecurityContext(@NonNull WithMockChefe annotation) {
-        Usuario usuario = null;
-        if (usuarioRepo != null) {
-            try {
-                usuario = usuarioRepo.findById(annotation.value()).orElse(null);
-                // Carregar atribuições do banco de dados se o usuário existir
-                if (usuario != null && usuarioPerfilRepo != null) {
-                    var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(annotation.value());
-                    Set<GrantedAuthority> simpleAuthorities = atribuicoes.stream()
-                            .map(a -> a.getPerfil().toGrantedAuthority())
-                            .collect(Collectors.toSet());
-                    usuario.setAuthorities(simpleAuthorities);
-                }
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
+        String titulo = annotation.value();
+        Usuario usuario = usuarioRepo.findById(titulo)
+                .orElseThrow(() -> new IllegalStateException("Usuário não encontrado no data.sql: " + titulo));
+
+        // Carregar atribuições do banco de dados
+        var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(titulo);
+        if (atribuicoes.isEmpty()) {
+            throw new IllegalStateException("Usuário " + titulo + " não possui perfis no data.sql");
         }
 
-        // Se o usuário não foi encontrado, criar um mock com unidade 10
-        if (usuario == null) {
-            Unidade unidade = null;
-            if (unidadeRepo != null) {
-                try {
-                    unidade = unidadeRepo.findById(10L).orElse(null);
-                } catch (Exception e) {
-                    System.err.println(e.getMessage());
-                }
-            }
-            if (unidade == null) {
-                unidade = Unidade.builder().nome("Unidade Mock").sigla("SESEL").build();
-                unidade.setCodigo(10L);
-            }
+        // Define perfil ativo como CHEFE
+        usuario.setPerfilAtivo(Perfil.CHEFE);
 
-            usuario = Usuario.builder()
-                    .tituloEleitoral(annotation.value())
-                    .nome("Chefe Teste")
-                    .email("chefe@teste.com")
-                    .ramal("123")
-                    .unidadeLotacao(unidade)
-                    .build();
+        // Busca a unidade onde ele é CHEFE
+        UsuarioPerfil chefia = atribuicoes.stream()
+                .filter(a -> a.getPerfil() == Perfil.CHEFE)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Usuário " + titulo + " não possui perfil de CHEFE no data.sql"));
 
-            Set<UsuarioPerfil> atribuicoes = new HashSet<>();
-            atribuicoes.add(
-                    UsuarioPerfil.builder()
-                            .usuario(usuario)
-                            .unidade(unidade)
-                            .perfil(Perfil.CHEFE)
-                            .build());
-            
-            Set<GrantedAuthority> simpleAuthorities = atribuicoes.stream()
-                    .map(a -> a.getPerfil().toGrantedAuthority())
-                    .collect(Collectors.toSet());
-            usuario.setAuthorities(simpleAuthorities);
-        } else {
-            // Usuário existe - garantir que tem pelo menos um perfil CHEFE
-            Set<UsuarioPerfil> atribuicoes = new HashSet<>(usuario.getTodasAtribuicoes(new HashSet<>()));
-            if (atribuicoes.stream().noneMatch(a -> a.getPerfil() == Perfil.CHEFE)) {
-                // Se não tem perfil CHEFE, adicionar com sua unidade de lotação
-                Unidade unidadeLotacao = usuario.getUnidadeLotacao();
-                atribuicoes.add(
-                        UsuarioPerfil.builder()
-                                .usuario(usuario)
-                                .unidade(unidadeLotacao)
-                                .perfil(Perfil.CHEFE)
-                                .build());
-            }
-            Set<GrantedAuthority> simpleAuthorities = atribuicoes.stream()
-                    .map(a -> a.getPerfil().toGrantedAuthority())
-                    .collect(Collectors.toSet());
-            usuario.setAuthorities(simpleAuthorities);
-        }
+        usuario.setUnidadeAtivaCodigo(chefia.getUnidadeCodigo());
+
+        Set<GrantedAuthority> authorities = Set.of(Perfil.CHEFE.toGrantedAuthority());
+        usuario.setAuthorities(authorities);
 
         UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+                new UsernamePasswordAuthenticationToken(usuario, null, authorities);
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         return context;

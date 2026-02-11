@@ -58,7 +58,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 ex.getCode(),
                 traceId);
 
-        if (ex.getDetails() != null && !ex.getDetails().isEmpty()) {
+        if (!ex.getDetails().isEmpty()) {
             erroApi.setDetails(ex.getDetails());
         }
 

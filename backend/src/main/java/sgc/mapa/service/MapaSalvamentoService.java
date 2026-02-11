@@ -16,7 +16,6 @@ import sgc.seguranca.sanitizacao.UtilSanitizacao;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Serviço especializado para salvar o mapa completo de competências.
@@ -51,9 +50,8 @@ public class MapaSalvamentoService {
         ContextoSalvamento contexto = prepararContexto(codMapa, request);
         removerCompetenciasObsoletas(contexto);
 
-        List<Competencia> competenciasSalvas = salvarCompetencias(mapa, contexto);
+        List<Competencia> competenciasSalvas = salvarCompetencias(contexto);
         atualizarAssociacoesAtividades(contexto, competenciasSalvas);
-
         validarIntegridadeMapa(codMapa, contexto.atividadesAtuais, competenciasSalvas);
 
         return mapaCompletoMapper.toDto(mapa, null, competenciasSalvas);
@@ -75,7 +73,6 @@ public class MapaSalvamentoService {
 
         Set<Long> codigosNovos = request.competencias().stream()
                 .map(CompetenciaMapaDto::codigo)
-                .flatMap(Stream::ofNullable)
                 .collect(Collectors.toSet());
 
         return new ContextoSalvamento(
@@ -100,14 +97,14 @@ public class MapaSalvamentoService {
         }
     }
 
-    private List<Competencia> salvarCompetencias(Mapa mapa, ContextoSalvamento contexto) {
+    private List<Competencia> salvarCompetencias(ContextoSalvamento contexto) {
         Map<Long, Competencia> mapaCompetenciasExistentes = contexto.competenciasAtuais.stream()
                 .collect(Collectors.toMap(Competencia::getCodigo, c -> c));
 
         List<Competencia> competenciasParaSalvar = new ArrayList<>();
 
         for (CompetenciaMapaDto compDto : contexto.request.competencias()) {
-            Competencia competencia = processarCompetenciaDto(compDto, mapa, mapaCompetenciasExistentes);
+            Competencia competencia = processarCompetenciaDto(compDto, mapaCompetenciasExistentes);
             competenciasParaSalvar.add(competencia);
         }
 
@@ -116,22 +113,13 @@ public class MapaSalvamentoService {
 
     private Competencia processarCompetenciaDto(
             CompetenciaMapaDto compDto,
-            Mapa mapa,
             Map<Long, Competencia> mapaCompetenciasExistentes) {
 
         Long codigo = compDto.codigo();
         Competencia competencia;
-
-        if (codigo != null) {
-            competencia = mapaCompetenciasExistentes.get(codigo);
-            if (competencia == null) {
-                competencia = repo.buscar(Competencia.class, codigo);
-            }
-        } else {
-            competencia = Competencia.builder()
-                    .mapa(mapa)
-                    .atividades(new HashSet<>())
-                    .build();
+        competencia = mapaCompetenciasExistentes.get(codigo);
+        if (competencia == null) {
+            competencia = repo.buscar(Competencia.class, codigo);
         }
 
         competencia.setDescricao(compDto.descricao());

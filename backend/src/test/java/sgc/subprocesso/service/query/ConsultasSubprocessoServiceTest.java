@@ -16,20 +16,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
- * Testes unitários para ProcessoSubprocessoQueryService.
+ * Testes unitários para ConsultasSubprocessoService.
  *
  * <p>Valida que o serviço de query funciona corretamente sem dependências circulares
  * e com queries otimizadas.
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ProcessoSubprocessoQueryService")
-class ProcessoSubprocessoQueryServiceTest {
+@DisplayName("ConsultasSubprocessoService")
+class ConsultasSubprocessoServiceTest {
 
     @Mock
     private SubprocessoRepo subprocessoRepo;
 
     @InjectMocks
-    private ProcessoSubprocessoQueryService queryService;
+    private ConsultasSubprocessoService queryService;
 
     @Nested
     @DisplayName("verificarAcessoUnidadeAoProcesso")
@@ -212,7 +212,7 @@ class ProcessoSubprocessoQueryServiceTest {
         @DisplayName("valido() deve criar resultado válido sem mensagem")
         void validoDeveCriarResultadoValidoSemMensagem() {
             // Act
-            var resultado = ProcessoSubprocessoQueryService.ValidationResult.ofValido();
+            var resultado = ConsultasSubprocessoService.ValidationResult.ofValido();
 
             // Assert
             assertThat(resultado.valido()).isTrue();
@@ -226,7 +226,7 @@ class ProcessoSubprocessoQueryServiceTest {
             String mensagem = "Erro de validação";
 
             // Act
-            var resultado = ProcessoSubprocessoQueryService.ValidationResult.ofInvalido(mensagem);
+            var resultado = ConsultasSubprocessoService.ValidationResult.ofInvalido(mensagem);
 
             // Assert
             assertThat(resultado.valido()).isFalse();

@@ -10,7 +10,7 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
+import sgc.subprocesso.service.query.ConsultasSubprocessoService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 class ProcessoAcessoService {
     private final UnidadeFacade unidadeService;
     private final UsuarioFacade usuarioService;
-    private final ProcessoSubprocessoQueryService queryService;
+    private final ConsultasSubprocessoService queryService;
 
     /**
      * Verifica se o usuário autenticado tem acesso ao processo.

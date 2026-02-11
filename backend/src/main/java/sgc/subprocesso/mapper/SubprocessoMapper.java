@@ -13,4 +13,9 @@ public interface SubprocessoMapper {
     @Mapping(source = "unidade.codigo", target = "codUnidade")
     @Mapping(source = "mapa.codigo", target = "codMapa")
     SubprocessoDto toDto(Subprocesso subprocesso);
+
+    @Mapping(source = "codigo", target = "codSubprocesso")
+    @Mapping(source = "unidade.nome", target = "unidadeNome")
+    @Mapping(source = "unidade.sigla", target = "unidadeSigla")
+    sgc.processo.dto.SubprocessoElegivelDto toElegivelDto(Subprocesso subprocesso);
 }

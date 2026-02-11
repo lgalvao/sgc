@@ -251,7 +251,7 @@ class ProcessoManutencaoServiceTest {
             Unidade unidade1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
             Unidade unidade2 = UnidadeTestBuilder.umaDe().comCodigo("2").build();
 
-            when(processoConsultaService.buscarPorId(codigoProcesso)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidade1);
             when(unidadeService.buscarEntidadePorId(2L)).thenReturn(unidade2);
             
@@ -266,7 +266,7 @@ class ProcessoManutencaoServiceTest {
             // Then
             assertThat(resultado).isNotNull();
             assertThat(resultado.getCodigo()).isEqualTo(codigoProcesso);
-            verify(processoConsultaService).buscarPorId(codigoProcesso);
+            verify(processoConsultaService).buscarProcessoCodigo(codigoProcesso);
             verify(processoRepo).saveAndFlush(processo);
             assertThat(processo.getDescricao()).isEqualTo("Descrição Atualizada");
             assertThat(processo.getTipo()).isEqualTo(TipoProcesso.MAPEAMENTO);
@@ -292,14 +292,14 @@ class ProcessoManutencaoServiceTest {
             processo.setCodigo(codigoProcesso);
             processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-            when(processoConsultaService.buscarPorId(codigoProcesso)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
 
             // When/Then
             assertThatThrownBy(() -> service.atualizar(codigoProcesso, request))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class)
                     .hasMessage("Apenas processos na situação 'CRIADO' podem ser editados.");
 
-            verify(processoConsultaService).buscarPorId(codigoProcesso);
+            verify(processoConsultaService).buscarProcessoCodigo(codigoProcesso);
             verify(processoRepo, never()).saveAndFlush(any());
         }
 
@@ -322,14 +322,14 @@ class ProcessoManutencaoServiceTest {
             processo.setCodigo(codigoProcesso);
             processo.setSituacao(SituacaoProcesso.FINALIZADO);
 
-            when(processoConsultaService.buscarPorId(codigoProcesso)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
 
             // When/Then
             assertThatThrownBy(() -> service.atualizar(codigoProcesso, request))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class)
                     .hasMessage("Apenas processos na situação 'CRIADO' podem ser editados.");
 
-            verify(processoConsultaService).buscarPorId(codigoProcesso);
+            verify(processoConsultaService).buscarProcessoCodigo(codigoProcesso);
             verify(processoRepo, never()).saveAndFlush(any());
         }
 
@@ -354,7 +354,7 @@ class ProcessoManutencaoServiceTest {
 
             Unidade unidade1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
 
-            when(processoConsultaService.buscarPorId(codigoProcesso)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty());
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidade1);
             when(processoRepo.saveAndFlush(any(Processo.class))).thenReturn(processo);
@@ -390,7 +390,7 @@ class ProcessoManutencaoServiceTest {
             Unidade unidade1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
             Unidade unidade2 = UnidadeTestBuilder.umaDe().comCodigo("2").build();
 
-            when(processoConsultaService.buscarPorId(codigoProcesso)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty());
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidade1);
             when(unidadeService.buscarEntidadePorId(2L)).thenReturn(unidade2);
@@ -425,7 +425,7 @@ class ProcessoManutencaoServiceTest {
             processo.setCodigo(codigoProcesso);
             processo.setSituacao(SituacaoProcesso.CRIADO);
 
-            when(processoConsultaService.buscarPorId(codigoProcesso)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList()))
                     .thenReturn(Optional.of("Unidades sem mapa: Unidade 1"));
 
@@ -458,7 +458,7 @@ class ProcessoManutencaoServiceTest {
             processo.setSituacao(SituacaoProcesso.CRIADO);
 
             
-            when(processoConsultaService.buscarPorId(codigoProcesso)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList()))
                     .thenReturn(Optional.of("Unidades sem mapa: Unidade 1, Unidade 2"));
 
@@ -492,7 +492,7 @@ class ProcessoManutencaoServiceTest {
 
             Unidade unidade1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
 
-            when(processoConsultaService.buscarPorId(codigoProcesso)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
             when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidade1);
             when(processoRepo.saveAndFlush(any(Processo.class))).thenReturn(processo);
 
@@ -520,13 +520,13 @@ class ProcessoManutencaoServiceTest {
             processo.setCodigo(codigoProcesso);
             processo.setSituacao(SituacaoProcesso.CRIADO);
 
-            when(processoConsultaService.buscarPorId(codigoProcesso)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
 
             // When
             service.apagar(codigoProcesso);
 
             // Then
-            verify(processoConsultaService).buscarPorId(codigoProcesso);
+            verify(processoConsultaService).buscarProcessoCodigo(codigoProcesso);
             verify(processoRepo).deleteById(codigoProcesso);
         }
 
@@ -540,14 +540,14 @@ class ProcessoManutencaoServiceTest {
             processo.setCodigo(codigoProcesso);
             processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-            when(processoConsultaService.buscarPorId(codigoProcesso)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
 
             // When/Then
             assertThatThrownBy(() -> service.apagar(codigoProcesso))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class)
                     .hasMessage("Apenas processos na situação 'CRIADO' podem ser removidos.");
 
-            verify(processoConsultaService).buscarPorId(codigoProcesso);
+            verify(processoConsultaService).buscarProcessoCodigo(codigoProcesso);
             verify(processoRepo, never()).deleteById(anyLong());
         }
 
@@ -561,14 +561,14 @@ class ProcessoManutencaoServiceTest {
             processo.setCodigo(codigoProcesso);
             processo.setSituacao(SituacaoProcesso.FINALIZADO);
 
-            when(processoConsultaService.buscarPorId(codigoProcesso)).thenReturn(processo);
+            when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
 
             // When/Then
             assertThatThrownBy(() -> service.apagar(codigoProcesso))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class)
                     .hasMessage("Apenas processos na situação 'CRIADO' podem ser removidos.");
 
-            verify(processoConsultaService).buscarPorId(codigoProcesso);
+            verify(processoConsultaService).buscarProcessoCodigo(codigoProcesso);
             verify(processoRepo, never()).deleteById(anyLong());
         }
     }

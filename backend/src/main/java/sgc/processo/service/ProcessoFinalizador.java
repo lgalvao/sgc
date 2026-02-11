@@ -15,7 +15,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.query.ProcessoSubprocessoQueryService;
+import sgc.subprocesso.service.query.ConsultasSubprocessoService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.Optional;
  * incluindo validações, publicação de mapas vigentes e eventos.</p>
  *
  * <p><b>Refatoração v3.0:</b> Removido uso de @Lazy e dependência circular.
- * Agora utiliza {@link ProcessoSubprocessoQueryService} para queries de leitura,
+ * Agora utiliza {@link ConsultasSubprocessoService} para queries de leitura,
  * eliminando acoplamento bidirecional com SubprocessoFacade.</p>
  *
  * @since 3.0.0 - Removido @Lazy, introduzido Query Service Pattern
@@ -41,7 +41,7 @@ class ProcessoFinalizador {
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
     private final UnidadeFacade unidadeService;
-    private final ProcessoSubprocessoQueryService queryService;
+    private final ConsultasSubprocessoService queryService;
     private final ProcessoValidador processoValidador;
     private final ApplicationEventPublisher publicadorEventos;
 
@@ -83,7 +83,7 @@ class ProcessoFinalizador {
         List<Subprocesso> subprocessos = queryService.listarEntidadesPorProcesso(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
-            Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
+            Unidade unidade = Optional.of(subprocesso.getUnidade())
                     .orElseThrow(() -> new ErroProcesso(
                             "Subprocesso %d sem unidade associada.".formatted(subprocesso.getCodigo())));
 

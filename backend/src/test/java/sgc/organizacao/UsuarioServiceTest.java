@@ -69,12 +69,6 @@ class UsuarioServiceTest {
             // Assert
             assertNotNull(usuario);
             assertEquals(TITULO_ADMIN, usuario.getTituloEleitoral());
-
-            // Verifica se a coleção foi inicializada (não deve lançar
-            // LazyInitializationException)
-            assertDoesNotThrow(() -> {
-                usuario.getAtribuicoesTemporarias().size();
-            });
         }
 
         @Test

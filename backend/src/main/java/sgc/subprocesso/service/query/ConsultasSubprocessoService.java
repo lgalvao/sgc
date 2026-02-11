@@ -15,20 +15,11 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
 
 /**
  * Serviço de consulta compartilhado para queries que envolvem Processo e Subprocesso.
- *
- * <p><b>Padrão:</b> Query Service Pattern (CQRS simplificado)
- * <ul>
- *   <li>Somente leitura (read-only)</li>
- *   <li>Sem lógica de negócio</li>
- *   <li>Queries otimizadas</li>
- *   <li>Independente de módulos de domínio</li>
- * </ul>
- *
  */
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ProcessoSubprocessoQueryService {
+public class ConsultasSubprocessoService {
     private final SubprocessoRepo subprocessoRepo;
 
     /**
@@ -38,8 +29,8 @@ public class ProcessoSubprocessoQueryService {
      * @param unidadeCodigos códigos das unidades a verificar
      * @return true se pelo menos uma unidade participa do processo
      */
-    public boolean verificarAcessoUnidadeAoProcesso(Long processoId, @Nullable List<Long> unidadeCodigos) {
-        if (unidadeCodigos == null || unidadeCodigos.isEmpty()) {
+    public boolean verificarAcessoUnidadeAoProcesso(Long processoId, List<Long> unidadeCodigos) {
+        if (unidadeCodigos.isEmpty()) {
             return false;
         }
         return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(processoId, unidadeCodigos);
@@ -56,10 +47,8 @@ public class ProcessoSubprocessoQueryService {
 
         if (total == 0) return ValidationResult.ofInvalido("O processo não possui subprocessos para finalizar");
 
-        long homologados = subprocessoRepo.countByProcessoCodigoAndSituacaoIn(
-                processoId,
-                List.of(MAPEAMENTO_MAPA_HOMOLOGADO, REVISAO_MAPA_HOMOLOGADO
-                )
+        long homologados = subprocessoRepo.countByProcessoCodigoAndSituacaoIn(processoId,
+                List.of(MAPEAMENTO_MAPA_HOMOLOGADO, REVISAO_MAPA_HOMOLOGADO)
         );
 
         if (total != homologados) {
@@ -106,6 +95,20 @@ public class ProcessoSubprocessoQueryService {
             Long processoId, Long unidadeId, List<SituacaoSubprocesso> situacoes) {
         return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(
                 processoId, unidadeId, situacoes);
+    }
+
+    /**
+     * Lista subprocessos por processo, múltiplas unidades e situações.
+     *
+     * @param processoId     código do processo
+     * @param unidadeCodigos códigos das unidades
+     * @param situacoes      situações dos subprocessos
+     * @return lista de subprocessos
+     */
+    public List<Subprocesso> listarPorProcessoUnidadesESituacoes(
+            Long processoId, List<Long> unidadeCodigos, List<SituacaoSubprocesso> situacoes) {
+        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInAndSituacaoInWithUnidade(
+                processoId, unidadeCodigos, situacoes);
     }
 
     /**

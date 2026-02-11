@@ -27,67 +27,29 @@ public class WithMockGestorSecurityContextFactory
 
     @Override
     public @Nullable SecurityContext createSecurityContext(@NonNull WithMockGestor customUser) {
+        String titulo = customUser.value();
+        Usuario usuario = usuarioRepo.findById(titulo)
+                .orElseThrow(() -> new IllegalStateException("Usuário não encontrado no data.sql: " + titulo));
+
+        var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(titulo);
+        if (atribuicoes.isEmpty()) {
+            throw new IllegalStateException("Usuário " + titulo + " não possui perfis no data.sql");
+        }
+
+        usuario.setPerfilAtivo(Perfil.GESTOR);
+
+        UsuarioPerfil gestao = atribuicoes.stream()
+                .filter(a -> a.getPerfil() == Perfil.GESTOR)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Usuário " + titulo + " não possui perfil de GESTOR no data.sql"));
+
+        usuario.setUnidadeAtivaCodigo(gestao.getUnidadeCodigo());
+
+        Set<GrantedAuthority> authorities = Set.of(Perfil.GESTOR.toGrantedAuthority());
+        usuario.setAuthorities(authorities);
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(usuario, "password", authorities);
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        String tituloGestor = customUser.value();
-        Usuario principal = null;
-        if (usuarioRepo != null) {
-            try {
-                principal = usuarioRepo.findById(tituloGestor).orElse(null);
-                // Carregar atribuições do banco de dados se o usuário existir
-                if (principal != null && usuarioPerfilRepo != null) {
-                    var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(tituloGestor);
-                    Set<GrantedAuthority> simpleAuthorities = atribuicoes.stream()
-                            .map(a -> a.getPerfil().toGrantedAuthority())
-                            .collect(Collectors.toSet());
-                    principal.setAuthorities(simpleAuthorities);
-                }
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
-        }
-
-        if (principal == null) {
-            principal = new Usuario();
-            principal.setTituloEleitoral(tituloGestor);
-            principal.setNome("Gestor User");
-            principal.setEmail("gestor@example.com");
-            Unidade u = Unidade.builder().nome("Unidade Mock").sigla("UO_SUP").build();
-            principal.setUnidadeLotacao(u);
-
-            Set<UsuarioPerfil> atribuicoes = new HashSet<>();
-            atribuicoes.add(
-                    UsuarioPerfil.builder()
-                            .usuario(principal)
-                            .unidade(u)
-                            .perfil(Perfil.GESTOR)
-                            .build());
-
-            Set<GrantedAuthority> simpleAuthorities = atribuicoes.stream()
-                    .map(a -> a.getPerfil().toGrantedAuthority())
-                    .collect(Collectors.toSet());
-            principal.setAuthorities(simpleAuthorities);
-        } else {
-            Set<UsuarioPerfil> atribuicoes = new HashSet<>(principal.getTodasAtribuicoes(new HashSet<>()));
-            if (atribuicoes.stream()
-                    .noneMatch(a -> a.getPerfil() == Perfil.GESTOR)) {
-                // Usuário existe mas não tem perfil GESTOR, adicionar com sua unidade de lotação
-                Unidade unidade = principal.getUnidadeLotacao();
-                atribuicoes.add(
-                        UsuarioPerfil.builder()
-                                .usuario(principal)
-                                .unidade(unidade)
-                                .perfil(Perfil.GESTOR)
-                                .build());
-            }
-            Set<GrantedAuthority> simpleAuthorities = atribuicoes.stream()
-                    .map(a -> a.getPerfil().toGrantedAuthority())
-                    .collect(Collectors.toSet());
-            principal.setAuthorities(simpleAuthorities);
-        }
-
-        Authentication auth =
-                new UsernamePasswordAuthenticationToken(
-                        principal, "password", principal.getAuthorities());
         context.setAuthentication(auth);
         return context;
     }
