@@ -31,6 +31,6 @@ public interface MovimentacaoMapper {
      * @return a sigla para exibição ao usuário ("SEDOC" se for RAIZ, senão a sigla original)
      */
     default String mapUnidadeSiglaParaUsuario(Unidade unidade) {
-        return unidade.getCodigo() == 1L ? "SEDOC" : unidade.getSigla();
+        return Objects.equals(unidade.getCodigo(), 1L) ? "SEDOC" : unidade.getSigla();
     }
 }
