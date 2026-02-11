@@ -33,7 +33,7 @@ Fluxo principal:
    seguintes campos e valores iniciais:
     - `Data limite etapa 1`: Data copiada da data limite da etapa inicial do processo.
     - `Situação`: 'Não iniciado'
-    - `Observações`: Campo de texto formatado reservado para registro de informações futuras pela SEDOC.
+    - `Observações`: Campo de texto formatado reservado para registro de informações futuras pelo perfil ADMIN.
     - `Sugestões`: Campo de texto formatado reservado para registro de sugestões futuras pelas unidades.
 
 10. O sistema cria internamente uma cópia do mapa de competências vigente, juntamente com as respectivas atividades e

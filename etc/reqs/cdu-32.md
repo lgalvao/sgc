@@ -33,7 +33,8 @@
 
     Prezado(a) responsável pela [SIGLA_UNIDADE],
 
-    O cadastro de atividades da sua unidade foi reaberto pela SEDOC para ajustes.
+    O cadastro de atividades da sua unidade foi reaberto para ajustes.
+
     Justificativa: [JUSTIFICATIVA]
 
     Acesse o sistema para realizar as alterações necessárias: [URL_SISTEMA].
@@ -46,7 +47,8 @@
 
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
 
-    Informamos que o cadastro de atividades da unidade [SIGLA_UNIDADE_SUBORDINADA] foi reaberto pela SEDOC para ajustes.
+    Informamos que o cadastro de atividades da unidade [SIGLA_UNIDADE_SUBORDINADA] foi reaberto para ajustes.
+
     Justificativa: [JUSTIFICATIVA]
 
     Após a conclusão dos ajustes, o cadastro será submetido novamente para sua análise.
@@ -55,14 +57,14 @@
 2. O sistema cria internamente alertas:
 
    9.1. Para a unidade solicitante:
-    - `Descrição`: "Cadastro de atividades reaberto pela SEDOC"
+    - `Descrição`: "Cadastro de atividades reaberto"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: SEDOC
     - `Unidade de destino`: [SIGLA_UNIDADE]
 
    9.2. Para as unidades superiores:
-    - `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBORDINADA] reaberto pela SEDOC"
+    - `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBORDINADA] reaberto"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: SEDOC

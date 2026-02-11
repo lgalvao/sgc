@@ -53,14 +53,16 @@ FROM SGC.PARAMETRO;
 -- -------------------------------------------------------------------------------------------------
 -- VW_UNIDADE - simulada como tabela no H2
 -- -------------------------------------------------------------------------------------------------
+-- Unidade RAIZ (id=1) - não é uma unidade real, serve como raiz da hierarquia para ADMIN
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('1', 'Tribunal Regional Eleitoral', 'TRE', 'INTEROPERACIONAL', 'ATIVA', NULL, '6', '00000006', CURRENT_TIMESTAMP);
+VALUES ('1', 'RAIZ', 'RAIZ', 'INTERMEDIARIA', 'ATIVA', NULL, NULL, NULL, NULL);
+
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('2', 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', 'ATIVA', NULL, '777', '00000777', CURRENT_TIMESTAMP);
+VALUES ('2', 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', 'ATIVA', 1, '777', '00000777', CURRENT_TIMESTAMP);
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('100', 'ADMIN-UNIT', 'ADMIN-UNIT', 'INTEROPERACIONAL', 'ATIVA', NULL, '7', '00000007', CURRENT_TIMESTAMP);
+VALUES ('100', 'ADMIN-UNIT', 'ADMIN-UNIT', 'INTEROPERACIONAL', 'ATIVA', 1, '7', '00000007', CURRENT_TIMESTAMP);
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('200', 'Secretaria de Gestao de Pessoas', 'SGP', 'INTERMEDIARIA', 'ATIVA', NULL, '2', '00000002', CURRENT_TIMESTAMP);
+VALUES ('200', 'Secretaria de Gestao de Pessoas', 'SGP', 'INTERMEDIARIA', 'ATIVA', 1, '2', '00000002', CURRENT_TIMESTAMP);
 
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
 VALUES ('3', 'Coordenadoria de Administracao', 'COAD', 'INTERMEDIARIA', 'ATIVA', 2, '777', '00000777', CURRENT_TIMESTAMP);
@@ -230,6 +232,14 @@ VALUES ('50005', 'Carlos Pereira', 10, '00050005');
 INSERT INTO SGC.VW_USUARIO (titulo, nome, unidade_lot_codigo, MATRICULA)
 VALUES ('50006', 'Juliana Lima', 10, '00050006');
 
+-- Usuários adicionais para testes com @WithMockChefe/@WithMockGestor
+INSERT INTO SGC.VW_USUARIO (titulo, nome, email, ramal, unidade_lot_codigo, MATRICULA)
+VALUES ('888888888888', 'Chefe Teste CDU08', 'chefe.cdu08@test.com', '8888', 8, '00888888');
+INSERT INTO SGC.VW_USUARIO (titulo, nome, email, ramal, unidade_lot_codigo, MATRICULA)
+VALUES ('111122223333', 'Chefe Teste CDU11', 'chefe.cdu11@test.com', '1111', 8, '00111122');
+INSERT INTO SGC.VW_USUARIO (titulo, nome, email, ramal, unidade_lot_codigo, MATRICULA)
+VALUES ('202020202020', 'Gestor Teste CDU13', 'gestor.cdu13@test.com', '2020', 2, '00202020');
+
 -- -------------------------------------------------------------------------------------------------
 -- PERFIS DE USUÁRIO (VW_USUARIO_PERFIL_UNIDADE - sem ID autoincrementado)
 -- -------------------------------------------------------------------------------------------------
@@ -261,6 +271,13 @@ INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codig
 VALUES ('999999999999', 'ADMIN', 2);
 INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
 VALUES ('999999999999', 'GESTOR', 2);
+-- Perfis para usuários de teste adicionais
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('888888888888', 'CHEFE', 8);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('111122223333', 'CHEFE', 8);
+INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
+VALUES ('202020202020', 'GESTOR', 2);
 
 -- -------------------------------------------------------------------------------------------------
 -- VW_RESPONSABILIDADE - simulada como tabela no H2

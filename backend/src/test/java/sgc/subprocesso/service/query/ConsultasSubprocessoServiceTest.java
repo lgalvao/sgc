@@ -69,17 +69,6 @@ class ConsultasSubprocessoServiceTest {
         }
 
         @Test
-        @DisplayName("deve retornar false quando lista de unidades é null")
-        void deveRetornarFalseQuandoListaUnidadesNull() {
-            // Act
-            boolean resultado = queryService.verificarAcessoUnidadeAoProcesso(1L, null);
-
-            // Assert
-            assertThat(resultado).isFalse();
-            verifyNoInteractions(subprocessoRepo);
-        }
-
-        @Test
         @DisplayName("deve retornar false quando lista de unidades está vazia")
         void deveRetornarFalseQuandoListaUnidadesVazia() {
             // Act

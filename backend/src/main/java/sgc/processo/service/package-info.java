@@ -212,7 +212,7 @@
  *   </tr>
  *   <tr>
  *     <td>Responsável</td>
- *     <td>ADMIN (SEDOC)</td>
+ *     <td>ADMIN</td>
  *     <td>CHEFE da unidade</td>
  *   </tr>
  *   <tr>

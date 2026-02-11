@@ -4,11 +4,11 @@
 
 ## Fluxo principal
 
-1. O usuário (Administrador) acessa o Painel de Controle ou a lista de subprocessos de Revisão.
+1. O ADMIN acessa o Painel.
 
-2. O usuário localiza o subprocesso da unidade solicitante.
+2. O ADMIN seleciona o subprocesso da unidade solicitante.
 
-3. O usuário seleciona a opção "Reabrir Revisão de Cadastro".
+3. O ADMIN seleciona a opção "Reabrir revisão de cadastro".
 
 4. O sistema solicita uma justificativa.
 
@@ -32,7 +32,8 @@
 
     Prezado(a) responsável pela [SIGLA_UNIDADE],
 
-    A revisão do cadastro de atividades da sua unidade foi reaberta pela SEDOC para ajustes.
+    A revisão do cadastro de atividades da sua unidade foi reaberta para ajustes.
+
     Justificativa: [JUSTIFICATIVA]
 
     Acesse o sistema para realizar as alterações necessárias: [URL_SISTEMA].
@@ -45,7 +46,8 @@
 
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
 
-    Informamos que a revisão do cadastro de atividades da unidade [SIGLA_UNIDADE_SUBORDINADA] foi reaberta pela SEDOC para ajustes.
+    Informamos que a revisão do cadastro de atividades da unidade [SIGLA_UNIDADE_SUBORDINADA] foi reaberta para ajustes.
+
     Justificativa: [JUSTIFICATIVA]
 
     Após a conclusão dos ajustes, o cadastro será submetido novamente para sua análise.
@@ -61,7 +63,7 @@
     - `Unidade de destino`: [SIGLA_UNIDADE]
 
    9.2. Para as unidades superiores:
-    - `Descrição`: "Revisão de cadastro da unidade [SIGLA_UNIDADE_SUBORDINADA] reaberta pela SEDOC"
+    - `Descrição`: "Revisão de cadastro da unidade [SIGLA_UNIDADE_SUBORDINADA] reaberta"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: SEDOC

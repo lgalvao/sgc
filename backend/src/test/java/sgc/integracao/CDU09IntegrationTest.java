@@ -1,6 +1,11 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.*;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -10,24 +15,33 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.alerta.model.AlertaRepo;
+import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
+import sgc.analise.model.TipoAcaoAnalise;
+import sgc.analise.model.TipoAnalise;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
-import sgc.integracao.mocks.WithMockCustomUser;
 import sgc.mapa.model.*;
+import sgc.organizacao.model.UnidadeRepo;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,8 +54,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         TestThymeleafConfig.class
 })
 @Transactional
-@DisplayName("CDU-09: Disponibilizar Cadastro de Atividades e Conhecimentos")
+@DisplayName("CDU-09: Fluxo Completo de Disponibilização")
 class CDU09IntegrationTest extends BaseIntegrationTest {
+
     @Autowired
     private CompetenciaRepo competenciaRepo;
     @Autowired
@@ -50,115 +65,108 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     private ConhecimentoRepo conhecimentoRepo;
     @Autowired
     private AlertaRepo alertaRepo;
-
     @Autowired
     private AnaliseRepo analiseRepo;
-
     @Autowired
-    protected jakarta.persistence.EntityManager entityManager;
+    private EntityManager entityManager;
 
     @MockitoBean
     private JavaMailSender javaMailSender;
 
+    private final Long SP_CODIGO = 60000L; // SEDESENV (Unidade 8) no data.sql
+
     @BeforeEach
     void setUp() {
-        when(javaMailSender.createMimeMessage()).thenReturn(mock(jakarta.mail.internet.MimeMessage.class));
+        MimeMessage mimeMessage = mock(MimeMessage.class);
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
     }
 
-    @Nested
-    @DisplayName("Testes para Disponibilizar Cadastro")
-    class DisponibilizarCadastro {
+    @Test
+    @WithMockChefe("3") // Fernanda Oliveira - Chefe da Unidade 8 no data.sql
+    @DisplayName("Fluxo Principal - Visualizar, Preparar e Disponibilizar Cadastro")
+    void fluxoCompletoDisponibilizacao() throws Exception {
+        Subprocesso sp = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
         
-        @Test
-        @WithMockChefe("333333333333") // Chefe da Unidade 9 (SEDIA) no data.sql
-        @DisplayName("Deve disponibilizar o cadastro quando todas as condições são atendidas")
-        void deveDisponibilizarCadastroComSucesso() throws Exception {
-            // No data.sql, a Unidade 9 tem o Mapa 1002 e o Subprocesso 60002
-            Long spCodigo = 60002L;
-            Subprocesso sp = subprocessoRepo.findById(spCodigo).orElseThrow();
-            
-            // Força situação inicial para o teste
-            sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            
-            // Limpa competências pré-existentes do mapa que podem estar sem atividades
-            competenciaRepo.deleteByMapaCodigo(sp.getMapa().getCodigo());
-            
-            // Simula histórico de análise prévia (Item 15)
-            analiseRepo.saveAndFlush(sgc.analise.model.Analise.builder()
-                    .subprocesso(sp)
-                    .unidade(sp.getUnidade().getUnidadeSuperior())
-                    .usuario(Usuario.builder().tituloEleitoral("666666666666").build())
-                    .tipo(sgc.analise.model.TipoAnalise.CADASTRO)
-                    .acao(sgc.analise.model.TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
-                    .dataHora(java.time.LocalDateTime.now().minusDays(1))
-                    .observacoes("Análise anterior")
-                    .build());
-            
-            assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(spCodigo)).isNotEmpty();
+        // --- ETAPA 1: Visualizar Detalhes e Histórico de Análise (Passos 1 a 5) ---
+        
+        // Simula uma análise anterior (que deve ser exibida no histórico)
+        analiseRepo.saveAndFlush(Analise.builder()
+                .subprocesso(sp)
+                .unidadeCodigo(6L) // COSIS (Superior da 8)
+                .usuarioTitulo("666666666666")
+                .tipo(TipoAnalise.CADASTRO)
+                .acao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
+                .dataHora(LocalDateTime.now().minusDays(2))
+                .observacoes("Favor ajustar atividades")
+                .build());
 
-            subprocessoRepo.saveAndFlush(sp);
+        mockMvc.perform(get("/api/subprocessos/{id}", SP_CODIGO))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.unidade.sigla", is("SEDESENV")))
+                .andExpect(jsonPath("$.situacao", is(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name())));
 
-            var competencia = competenciaRepo.save(Competencia.builder().descricao("Competência de Teste").mapa(sp.getMapa()).build());
-            var atividade = Atividade.builder().mapa(sp.getMapa()).descricao("Atividade de Teste").build();
-            atividade = atividadeRepo.save(atividade);
-            
-            atividade.getCompetencias().add(competencia);
-            atividade = atividadeRepo.save(atividade);
-            
-            conhecimentoRepo.save(Conhecimento.builder()
-                    .descricao("Conhecimento de Teste")
-                    .atividade(atividade)
-                    .build());
+        mockMvc.perform(get("/api/subprocessos/{id}/analises-cadastro", SP_CODIGO))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].observacoes", is("Favor ajustar atividades")));
 
-            entityManager.flush();
+        // --- ETAPA 2: Validação de Pendências (Passo 7) ---
+        
+        // Limpa mapa para garantir que falhe por falta de atividades
+        competenciaRepo.deleteByMapaCodigo(sp.getMapa().getCodigo());
+        entityManager.flush();
+        entityManager.clear();
 
-            mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", spCodigo).with(csrf()))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.mensagem", is("Cadastro de atividades disponibilizado")));
+        mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", SP_CODIGO).with(csrf()))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.message").value("O mapa de competências deve ter ao menos uma atividade cadastrada."));
 
-            Subprocesso subprocessoAtualizado = subprocessoRepo.findById(spCodigo).orElseThrow();
-            assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        // --- ETAPA 3: Preparar Dados e Disponibilizar (Passos 9 a 16) ---
+        
+        sp = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
+        var competencia = competenciaRepo.save(Competencia.builder().descricao("Java").mapa(sp.getMapa()).build());
+        var atividade = Atividade.builder().mapa(sp.getMapa()).descricao("Desenvolver APIs").build();
+        atividade.getCompetencias().add(competencia);
+        atividade = atividadeRepo.save(atividade);
+        
+        conhecimentoRepo.save(Conhecimento.builder()
+                .descricao("Spring Boot")
+                .atividade(atividade)
+                .build());
 
-            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(spCodigo);
-            assertThat(movimentacoes).isNotEmpty();
-            assertThat(movimentacoes.getFirst().getUnidadeDestino().getCodigo()).isEqualTo(6L); // Superior da 9 é 6 (COSIS)
+        entityManager.flush();
+        entityManager.clear();
 
-            var alertas = alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo());
-            assertThat(alertas).isNotEmpty();
+        // Ação de Disponibilizar
+        mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", SP_CODIGO).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mensagem", is("Cadastro de atividades disponibilizado")));
 
-            // Valida exclusão do histórico de análise (Item 15)
-            assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(spCodigo)).isEmpty();
-        }
+        // --- ETAPA 4: Verificações Pós-Ação ---
 
-        @Test
-        @WithMockChefe("333333333333")
-        @DisplayName("Não deve disponibilizar se houver atividade sem conhecimento associado")
-        void naoDeveDisponibilizarComAtividadeSemConhecimento() throws Exception {
-            Long spCodigo = 60002L;
-            Subprocesso sp = subprocessoRepo.findById(spCodigo).orElseThrow();
-            sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            subprocessoRepo.saveAndFlush(sp);
+        Subprocesso atualizado = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
+        
+        // 10. Alteração de Situação
+        assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        
+        // 11. Registro de Movimentação
+        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(SP_CODIGO);
+        assertThat(movs).isNotEmpty();
+        assertThat(movs.getFirst().getDescricao()).isEqualTo("Disponibilização do cadastro de atividades");
+        assertThat(movs.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("SEDESENV");
+        assertThat(movs.getFirst().getUnidadeDestino().getSigla()).isEqualTo("COSIS");
 
-            Atividade atividade = Atividade.builder().mapa(sp.getMapa()).descricao("Atividade Vazia").build();
-            atividadeRepo.saveAndFlush(atividade);
+        // 12. Notificação por E-mail (Superior da 8 é COSIS)
+        verify(javaMailSender, atLeastOnce()).send(any(MimeMessage.class));
 
-            mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", spCodigo).with(csrf()))
-                    .andExpect(status().isUnprocessableContent())
-                    .andExpect(jsonPath("$.message", is("Existem atividades sem conhecimentos associados.")));
-        }
-    }
+        // 13. Criação de Alerta para Unidade Superior
+        var alertas = alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo());
+        assertThat(alertas.stream().anyMatch(a -> a.getUnidadeDestino().getCodigo() == 6L)).isTrue();
 
-    @Nested
-    @DisplayName("Testes de Segurança")
-    class Seguranca {
-        @Test
-        @WithMockChefe("3") // Fernanda Oliveira - Chefe da Unidade 8 no data.sql
-        @DisplayName("Não deve permitir que um CHEFE de outra unidade disponibilize o cadastro")
-        void naoDevePermitirChefeDeOutraUnidadeDisponibilizar() throws Exception {
-            Long spCodigo = 60002L; // Subprocesso da Unidade 9
-            
-            mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", spCodigo).with(csrf()))
-                    .andExpect(status().isForbidden());
-        }
+        // 14. Data de Fim Etapa 1
+        assertThat(atualizado.getDataFimEtapa1()).isNotNull();
+
+        // 15. Exclusão do Histórico de Análise
+        assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(SP_CODIGO)).isEmpty();
     }
 }

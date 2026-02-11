@@ -123,11 +123,11 @@ tasks.withType<Test> {
     useJUnitPlatform()
 
     testLogging {
-        events(TestLogEvent.SKIPPED, TestLogEvent.FAILED)
+        events(TestLogEvent.SKIPPED, TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.STANDARD_ERROR)
         exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
-        showStandardStreams = false
+        showStandardStreams = true
     }
 
     val slowTests = mutableListOf<Pair<String, Long>>()

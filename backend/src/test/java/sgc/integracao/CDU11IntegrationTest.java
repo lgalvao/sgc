@@ -6,15 +6,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.test.context.support.WithMockUser;
+
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.fixture.*;
+import sgc.integracao.mocks.TestLoginHelper;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.integracao.mocks.WithMockChefe;
-import sgc.integracao.mocks.WithMockGestor;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.ConhecimentoRepo;
@@ -38,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-11: Visualizar cadastro de atividades e conhecimentos")
 @Import({
         TestSecurityConfig.class,
+        TestLoginHelper.class,
         UnidadeFixture.class,
         ProcessoFixture.class,
         SubprocessoFixture.class,
@@ -51,19 +50,21 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
     @Autowired
-    private UsuarioRepo usuarioRepo;
-    @Autowired
-    private UsuarioPerfilRepo usuarioPerfilRepo;
+    private TestLoginHelper loginHelper;
 
     private Unidade unidade;
     private Processo processo;
     private Subprocesso subprocesso;
+    private String tokenChefe;
+    private String tokenGestor;
+    private String tokenAdmin;
+    private String tokenServidor;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         // Reset sequence
         try {
             jdbcTemplate.execute("ALTER SEQUENCE SGC.VW_UNIDADE_SEQ RESTART WITH 1000");
@@ -80,10 +81,11 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         unidade.setCodigo(null);
         unidade = unidadeRepo.save(unidade);
 
-        // Setup users for mocks
-        criarUsuario("111122223333", Perfil.CHEFE, unidade); // For @WithMockChefe
-        criarUsuario("222222222222", Perfil.GESTOR, unidade); // For @WithMockGestor
-        criarUsuario("user", Perfil.SERVIDOR, unidade); // For @WithMockUser (default username)
+        // Login real obtendo tokens JWT
+        tokenChefe = loginHelper.loginChefe(mockMvc, "3", unidade.getCodigo());
+        tokenGestor = loginHelper.loginGestor(mockMvc, "8", unidade.getCodigo());
+        tokenAdmin = loginHelper.loginAdmin(mockMvc, "6");
+        tokenServidor = loginHelper.loginServidor(mockMvc, "1", unidade.getCodigo());
 
         // Processo
         processo = ProcessoFixture.processoPadrao();
@@ -127,65 +129,45 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         conhecimentoRepo.save(conhecimento2b);
     }
 
-    private void criarUsuario(String titulo, Perfil perfil, Unidade unidade) {
-        Usuario usuario = UsuarioFixture.usuarioComTitulo(titulo);
-        usuario.setUnidadeLotacao(unidade);
-        usuario = usuarioRepo.save(usuario);
-
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setUsuario(usuario);
-        up.setUsuarioTitulo(titulo);
-        up.setUnidade(unidade);
-        up.setUnidadeCodigo(unidade.getCodigo());
-        up.setPerfil(perfil);
-        usuarioPerfilRepo.save(up);
-    }
-
     @Nested
     @DisplayName("Testes de Cenário de Sucesso")
     class Sucesso {
         @Test
-        @WithMockChefe("111122223333")
-        @DisplayName("Deve retornar o cadastro completo de atividades e conhecimentos para o Chefe da"
-                + " unidade")
+        @DisplayName("Deve retornar o cadastro completo de atividades e conhecimentos para o Chefe da unidade")
         void deveRetornarCadastroCompleto_QuandoChefeDaUnidade() throws Exception {
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo())
+                            .header("Authorization", "Bearer " + tokenChefe))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.subprocessoCodigo", is(subprocesso.getCodigo().intValue())))
                     .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("SENIC")))
                     .andExpect(jsonPath("$.atividades", hasSize(2)))
-                    // Valida a primeira atividade e seu conhecimento
-                    // Nota: a ordem não é garantida, então usamos filtro ou assumptions.
-                    // Mas como inserimos sequencialmente, pode vir sequencial. Vamos ajustar se
-                    // falhar.
-                    // Melhor usar containsInAnyOrder para robustez
                     .andExpect(jsonPath("$.atividades[*].descricao",
                             containsInAnyOrder("Analisar documentação", "Elaborar relatórios")));
         }
 
         @Test
-        @WithMockAdmin
         @DisplayName("Deve permitir que ADMIN visualize o cadastro de qualquer unidade")
         void devePermitirAdminVisualizarCadastro() throws Exception {
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo())
+                            .header("Authorization", "Bearer " + tokenAdmin))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("SENIC")));
         }
 
         @Test
-        @WithMockGestor
         @DisplayName("Deve permitir que GESTOR visualize o cadastro de qualquer unidade")
         void devePermitirGestorVisualizarCadastro() throws Exception {
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo())
+                            .header("Authorization", "Bearer " + tokenGestor))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("SENIC")));
         }
 
         @Test
-        @WithMockUser
         @DisplayName("Deve permitir que SERVIDOR visualize o cadastro de qualquer unidade")
         void devePermitirServidorVisualizarCadastro() throws Exception {
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo())
+                            .header("Authorization", "Bearer " + tokenServidor))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("SENIC")));
         }
@@ -195,15 +177,14 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Testes de Casos de Borda e Falhas")
     class CasosDeBorda {
         @Test
-        @WithMockAdmin
         @DisplayName("Deve retornar 404 Not Found para um subprocesso inexistente")
         void deveRetornarNotFound_QuandoSubprocessoNaoExiste() throws Exception {
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, 9999L))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, 9999L)
+                            .header("Authorization", "Bearer " + tokenAdmin))
                     .andExpect(status().isNotFound());
         }
 
         @Test
-        @WithMockAdmin
         @DisplayName("Deve retornar uma lista de atividades vazia quando o mapa não tem atividades")
         void deveRetornarListaVazia_QuandoNaoHaAtividades() throws Exception {
             var mapaVazio = mapaRepo.save(new Mapa());
@@ -212,7 +193,8 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
             subprocessoSemAtividades.setMapa(mapaVazio);
             subprocessoSemAtividades = subprocessoRepo.save(subprocessoSemAtividades);
 
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocessoSemAtividades.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocessoSemAtividades.getCodigo())
+                            .header("Authorization", "Bearer " + tokenAdmin))
                     .andExpect(status().isOk())
                     .andExpect(
                             jsonPath(
@@ -222,7 +204,6 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @WithMockAdmin
         @DisplayName("Deve retornar uma atividade com a lista de conhecimentos vazia")
         void deveRetornarAtividadeComConhecimentosVazios() throws Exception {
             Mapa mapaNovo = mapaRepo.save(new Mapa());
@@ -237,7 +218,8 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
             atividadeRepo.save(atividadeSemConhecimento);
 
             mockMvc.perform(
-                            get(API_SUBPROCESSOS_ID_CADASTRO, subprocessoAtividadeSemConhecimento.getCodigo()))
+                            get(API_SUBPROCESSOS_ID_CADASTRO, subprocessoAtividadeSemConhecimento.getCodigo())
+                                    .header("Authorization", "Bearer " + tokenAdmin))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(
                             "$.subprocessoCodigo",

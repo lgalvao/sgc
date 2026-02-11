@@ -77,4 +77,10 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      */
     @Query("SELECT c FROM Competencia c WHERE c.mapa.codigo = :mapaCodigo")
     List<Competencia> findByMapaCodigoSemFetch(@Param("mapaCodigo") Long mapaCodigo);
+
+    /**
+     * Remove todas as competências de um mapa.
+     * @param mapaCodigo Código do mapa
+     */
+    void deleteByMapaCodigo(Long mapaCodigo);
 }

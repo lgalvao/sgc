@@ -261,9 +261,9 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
         }
 
         if (!verificaHierarquia(usuario, sp.getUnidade(), regras.requisitoHierarquia)) {
-            log.trace("Permissão negada: Falha no requisito de hierarquia {} para usuário {} na unidade {} para ação {}", 
-                regras.requisitoHierarquia, usuario.getTituloEleitoral(), sp.getUnidade().getSigla(), acao);
-            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, sp.getUnidade(), regras.requisitoHierarquia));
+            String motivo = obterMotivoNegacaoHierarquia(usuario, sp.getUnidade(), regras.requisitoHierarquia);
+            log.info("Permissão negada para {}: {}", usuario.getTituloEleitoral(), motivo);
+            definirMotivoNegacao(motivo);
             return false;
         }
 

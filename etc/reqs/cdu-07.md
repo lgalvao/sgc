@@ -1,6 +1,6 @@
 # CDU-07 - Detalhar subprocesso
 
-Atores: CHEFE e SERVIDOR
+Atores: Todos os perfis
 
 Pré-condições:
 

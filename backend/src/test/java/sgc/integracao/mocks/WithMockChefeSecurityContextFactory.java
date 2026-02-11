@@ -8,12 +8,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
+import org.springframework.stereotype.Component;
 import sgc.organizacao.model.*;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Component
 public class WithMockChefeSecurityContextFactory
         implements WithSecurityContextFactory<WithMockChefe> {
     @Autowired(required = false)
