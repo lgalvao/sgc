@@ -283,7 +283,6 @@ class UnidadeResponsavelServiceTest {
             when(repo.buscarPorSigla(Unidade.class, siglaUnidade)).thenReturn(unidade);
             when(repo.buscar(Responsabilidade.class, 1L)).thenReturn(resp);
             when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuarioCompleto);
-            when(usuarioPerfilRepo.findByUsuarioTitulo("123456789012")).thenReturn(Collections.emptyList());
 
             // When
             Usuario resultado = service.buscarResponsavelAtual(siglaUnidade);
