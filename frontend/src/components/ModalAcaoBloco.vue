@@ -1,5 +1,5 @@
 <template>
-  <div :id="modalId" ref="modalElement" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div :id="id" ref="modalElement" class="modal fade" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
@@ -77,6 +77,7 @@ const props = defineProps<{
   mostrarDataLimite?: boolean;
 }>();
 
+
 const emit = defineEmits<{
   'confirmar': [dados: { ids: number[], dataLimite?: string }];
 }>();
@@ -87,8 +88,6 @@ const selecionadosLocal = ref<number[]>([]);
 const processando = ref(false);
 const erro = ref<string | null>(null);
 const dataLimite = ref<string>('');
-
-const modalId = computed(() => props.id);
 
 const todosSelecionados = computed(() => {
   return props.unidades.length > 0 && selecionadosLocal.value.length === props.unidades.length;
@@ -137,12 +136,14 @@ function setErro(msg: string | null) {
     erro.value = msg;
 }
 
-// Expor métodos para controle do pai
+// Expor métodos para controle do pai e satisfazer o linter (uso no template)
 defineExpose({
   abrir,
   fechar,
   setProcessando,
-  setErro
+  setErro,
+  todosSelecionados,
+  confirmar
 });
 
 watch(() => props.unidadesPreSelecionadas, (newVal) => {

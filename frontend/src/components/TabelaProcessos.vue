@@ -38,19 +38,19 @@ const fields = computed(() => {
   return baseFields;
 });
 
-const handleSortChange = (ctx: any) => {
+function handleSortChange(ctx: any) {
   emit("ordenar", ctx.sortBy);
-};
+}
 
-const handleSelecionarProcesso = (processo: ProcessoResumo) => {
+function handleSelecionarProcesso(processo: ProcessoResumo) {
   emit("selecionarProcesso", processo);
-};
+}
 
-const rowClass = (item: ProcessoResumo | null, type: string) => {
+function rowClass(item: ProcessoResumo | null, type: string) {
   return item && type === 'row' ? `row-processo-${item.codigo}` : '';
-};
+}
 
-const rowAttr = (item: ProcessoResumo | null, type: string) => {
+function rowAttr(item: ProcessoResumo | null, type: string) {
   if (item && type === 'row') {
     return {
       tabindex: '0',
@@ -64,7 +64,9 @@ const rowAttr = (item: ProcessoResumo | null, type: string) => {
     };
   }
   return {};
-};
+}
+
+defineExpose({ fields });
 </script>
 
 <template>
@@ -93,12 +95,12 @@ const rowAttr = (item: ProcessoResumo | null, type: string) => {
             class="border-0 bg-transparent mb-0"/>
       </template>
 
-      <template #cell(situacao)="data">
-        {{ data.item.situacaoLabel }}
+      <template #cell(situacao)="{ item }">
+        {{ item.situacaoLabel }}
       </template>
 
-      <template #cell(tipo)="data">
-        {{ data.item.tipoLabel }}
+      <template #cell(tipo)="{ item }">
+        {{ item.tipoLabel }}
       </template>
     </BTable>
   </div>

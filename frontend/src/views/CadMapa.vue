@@ -331,8 +331,33 @@ function fecharModalDisponibilizar() {
   notificacaoDisponibilizacao.value = "";
   clearErrors();
 }
-</script>
 
-<style scoped>
-/* Estilos restantes que não foram para componentes */
-</style>
+defineExpose({
+  ImpactoMapaModal,
+  CriarCompetenciaModal,
+  DisponibilizarMapaModal,
+  podeVerImpacto,
+  podeEditarMapa,
+  podeDisponibilizarMapa,
+  unidade,
+  competencias,
+  atividades,
+  impactoMapa,
+  mostrarModalImpacto,
+  loadingImpacto,
+  abrirModalImpacto,
+  abrirModalCriarLimpo,
+  iniciarEdicaoCompetencia,
+  excluirAtividade: confirmarExclusaoCompetencia,
+  removerAtividadeAssociada,
+  abrirModalDisponibilizar,
+  disponibilizarMapa,
+  fecharModalDisponibilizar,
+  fecharModalImpacto,
+  fecharModalCriarNovaCompetencia,
+  adicionarCompetenciaEFecharModal,
+  confirmarExclusaoCompetencia,
+  fecharModalExcluirCompetencia,
+  excluirCompetencia
+});
+</script>

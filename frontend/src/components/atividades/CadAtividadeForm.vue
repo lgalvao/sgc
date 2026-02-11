@@ -54,6 +54,8 @@ function onSubmit() {
 }
 
 defineExpose({
-  inputRef
+  modelValue,
+  inputRef,
+  onSubmit
 });
 </script>

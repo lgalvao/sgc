@@ -13,7 +13,6 @@ export default [
         ignores: ["dist/", "node_modules/", "*.config.js"],
     },
 
-    // 2. Global settings for all files
     {
         languageOptions: {
             ecmaVersion: "latest",
@@ -22,11 +21,6 @@ export default [
                 ...globals.browser,
                 ...globals.node,
             },
-        },
-        rules: {
-            // Prevent console.* in production code (use logger instead)
-            // Allows console.error for critical errors that should always be visible
-            "no-console": ["error", { allow: ["error"] }],
         },
     },
 
@@ -102,6 +96,15 @@ export default [
         },
     },
 
-    // 6. Prettier integration
+    // 6. Custom overrides
+    {
+        rules: {
+            // Prevent console.* in production code (use logger instead)
+            // Allows console.error for critical errors that should always be visible
+            "no-console": ["error", { allow: ["error"] }],
+        },
+    },
+
+    // 7. Prettier integration
     eslintConfigPrettier,
 ];

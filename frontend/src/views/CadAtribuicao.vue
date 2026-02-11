@@ -180,4 +180,18 @@ async function criarAtribuicao() {
     isLoading.value = false;
   }
 }
+
+defineExpose({
+  router,
+  codUnidade,
+  unidade,
+  usuarios,
+  usuarioSelecionado,
+  dataInicio,
+  dataTermino,
+  justificativa,
+  isLoading,
+  erroUsuario,
+  criarAtribuicao
+});
 </script>

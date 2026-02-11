@@ -182,7 +182,7 @@ const props = defineProps<{
 
 const router = useRouter();
 
-const navegarPara = (routeName: string) => {
+function navegarPara(routeName: string) {
   router.push({
     name: routeName,
     params: {
@@ -190,9 +190,9 @@ const navegarPara = (routeName: string) => {
       siglaUnidade: props.siglaUnidade
     }
   });
-};
+}
 
-const navegarParaDiag = (routeName: string) => {
+function navegarParaDiag(routeName: string) {
   router.push({
     name: routeName,
     params: {
@@ -200,9 +200,9 @@ const navegarParaDiag = (routeName: string) => {
       siglaUnidade: props.siglaUnidade
     }
   });
-};
+}
 
-const handleKeyDown = (event: KeyboardEvent, routeName: string, diag = false) => {
+function handleKeyDown(event: KeyboardEvent, routeName: string, diag = false) {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
     if (diag) {
@@ -213,7 +213,14 @@ const handleKeyDown = (event: KeyboardEvent, routeName: string, diag = false) =>
         navegarPara(routeName);
     }
   }
-};
+}
+
+defineExpose({
+  TipoProcessoEnum,
+  navegarPara,
+  navegarParaDiag,
+  handleKeyDown
+});
 </script>
 
 <style scoped>

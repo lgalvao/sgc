@@ -96,7 +96,7 @@ const emit = defineEmits<{
 
 const isEditing = ref(false);
 const editValue = ref('');
-const inputRef = ref<HTMLElement | null>(null);
+
 
 function startEdit() {
   editValue.value = props.modelValue;
