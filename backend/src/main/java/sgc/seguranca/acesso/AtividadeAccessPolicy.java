@@ -33,16 +33,16 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
      */
     private static final Map<Acao, RegrasAcaoAtividade> REGRAS = Map.ofEntries(
             Map.entry(CRIAR_ATIVIDADE, new RegrasAcaoAtividade(
-                    EnumSet.of(ADMIN, GESTOR, CHEFE)
+                    EnumSet.of(CHEFE)
             )),
             Map.entry(EDITAR_ATIVIDADE, new RegrasAcaoAtividade(
-                    EnumSet.of(ADMIN, GESTOR, CHEFE)
+                    EnumSet.of(CHEFE)
             )),
             Map.entry(EXCLUIR_ATIVIDADE, new RegrasAcaoAtividade(
-                    EnumSet.of(ADMIN, GESTOR, CHEFE)
+                    EnumSet.of(CHEFE)
             )),
             Map.entry(ASSOCIAR_CONHECIMENTOS, new RegrasAcaoAtividade(
-                    EnumSet.of(ADMIN, GESTOR, CHEFE)
+                    EnumSet.of(CHEFE)
             ))
     );
 

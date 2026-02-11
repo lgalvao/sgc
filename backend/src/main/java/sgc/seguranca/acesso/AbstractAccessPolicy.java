@@ -5,9 +5,7 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.HierarquiaService;
 
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Classe base abstrata para políticas de acesso, centralizando lógica comum
@@ -20,6 +18,7 @@ public abstract class AbstractAccessPolicy<T> implements AccessPolicy<T> {
 
     protected final UsuarioPerfilRepo usuarioPerfilRepo;
     protected final HierarquiaService hierarquiaService;
+    protected final UnidadeRepo unidadeRepo;
     protected String ultimoMotivoNegacao = "";
 
     @Override
@@ -76,23 +75,32 @@ public abstract class AbstractAccessPolicy<T> implements AccessPolicy<T> {
         final Long codUnidadeRecurso = unidade.getCodigo();
         final Long codUnidadeUsuario = usuario.getUnidadeAtivaCodigo();
 
-        // ADMIN tem privilégios especiais POR SER ADMIN, não por estar em unidade específica
-        // A unidade RAIZ (id=1) é apenas por consistência técnica do sistema
-        // ADMIN bypassa verificações de hierarquia (exceto TITULAR_UNIDADE que é pessoal)
-        if (usuario.getPerfilAtivo() == Perfil.ADMIN && requisito != RequisitoHierarquia.TITULAR_UNIDADE) {
-            return true;
-        }
-
         return switch (requisito) {
             case NENHUM -> true;
             case MESMA_UNIDADE -> Objects.equals(codUnidadeUsuario, codUnidadeRecurso);
 
-            case MESMA_OU_SUBORDINADA -> Objects.equals(codUnidadeUsuario, codUnidadeRecurso)
-                    || hierarquiaService.isSubordinada(unidade, 
-                        Unidade.builder().codigo(codUnidadeUsuario).build());
+            case MESMA_OU_SUBORDINADA -> {
+                if (Objects.equals(codUnidadeUsuario, codUnidadeRecurso)) {
+                    yield true;
+                }
+                // Buscar unidade completa do usuário para verificar hierarquia
+                Unidade unidadeUsuario = unidadeRepo.findById(codUnidadeUsuario)
+                        .orElse(null);
+                if (unidadeUsuario == null) {
+                    yield false;
+                }
+                yield hierarquiaService.isSubordinada(unidade, unidadeUsuario);
+            }
 
-            case SUPERIOR_IMEDIATA -> hierarquiaService.isSuperiorImediata(unidade, 
-                        Unidade.builder().codigo(codUnidadeUsuario).build());
+            case SUPERIOR_IMEDIATA -> {
+                // Buscar unidade completa do usuário para verificar hierarquia
+                Unidade unidadeUsuario = unidadeRepo.findById(codUnidadeUsuario)
+                        .orElse(null);
+                if (unidadeUsuario == null) {
+                    yield false;
+                }
+                yield hierarquiaService.isSuperiorImediata(unidade, unidadeUsuario);
+            }
 
             case TITULAR_UNIDADE -> {
                 String tituloTitular = unidade.getTituloTitular();

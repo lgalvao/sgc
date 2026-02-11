@@ -46,6 +46,20 @@ public class AlertaFacade {
     @Getter(lazy = true)
     private final Unidade sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
 
+    /**
+     * Obtém a sigla da unidade para exibição ao usuário.
+     * A unidade RAIZ (id=1, sigla='ADMIN') é substituída por "SEDOC" para clareza.
+     * 
+     * @param unidade a unidade
+     * @return a sigla para apresentação ao usuário
+     */
+    private String obterSiglaParaUsuario(Unidade unidade) {
+        if (unidade.getCodigo() == 1L) {
+            return "SEDOC"; // Usuário vê SEDOC em vez de RAIZ/ADMIN
+        }
+        return unidade.getSigla();
+    }
+
 
     /**
      * Criar e persistir um alerta.
@@ -134,7 +148,7 @@ public class AlertaFacade {
     @Transactional
     public void criarAlertaCadastroDisponibilizado(Processo processo, Unidade unidadeOrigem, Unidade unidadeDestino) {
         String desc = "Cadastro disponibilizado pela unidade %s no processo '%s'. Realize a análise do cadastro."
-                .formatted(unidadeOrigem.getSigla(), processo.getDescricao());
+                .formatted(obterSiglaParaUsuario(unidadeOrigem), processo.getDescricao());
 
         criarAlerta(processo, unidadeOrigem, unidadeDestino, desc);
     }

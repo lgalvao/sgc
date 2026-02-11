@@ -27,16 +27,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Component
 @Slf4j
 public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
-    /**
-     * Ações que ADMIN pode executar sem restrição de hierarquia.
-     */
-    private static final EnumSet<Acao> ACOES_ADMIN_GLOBAIS = EnumSet.of(
-            VISUALIZAR_SUBPROCESSO, VISUALIZAR_MAPA, VISUALIZAR_DIAGNOSTICO,
-            EDITAR_MAPA, DEVOLVER_CADASTRO, ACEITAR_CADASTRO, HOMOLOGAR_CADASTRO,
-            DEVOLVER_REVISAO_CADASTRO, ACEITAR_REVISAO_CADASTRO, HOMOLOGAR_REVISAO_CADASTRO,
-            DISPONIBILIZAR_MAPA, VALIDAR_MAPA, HOMOLOGAR_MAPA, DEVOLVER_MAPA,
-            ALTERAR_DATA_LIMITE, REABRIR_CADASTRO, REABRIR_REVISAO
-    );
+
     /**
      * Situações permitidas para ADMIN em VERIFICAR_IMPACTOS.
      */
@@ -96,7 +87,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
 
             // ========== CADASTRO ==========
             Map.entry(EDITAR_CADASTRO, new RegrasAcao(
-                    EnumSet.of(ADMIN, GESTOR, CHEFE),
+                    EnumSet.of(CHEFE),
                     EnumSet.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO),
                     RequisitoHierarquia.MESMA_UNIDADE)),
 
@@ -122,7 +113,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
 
             // ========== REVISÃO CADASTRO ==========
             Map.entry(EDITAR_REVISAO_CADASTRO, new RegrasAcao(
-                    EnumSet.of(ADMIN, GESTOR, CHEFE),
+                    EnumSet.of(CHEFE),
                     EnumSet.of(REVISAO_CADASTRO_EM_ANDAMENTO),
                     RequisitoHierarquia.MESMA_UNIDADE)),
 
@@ -153,7 +144,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                     RequisitoHierarquia.MESMA_OU_SUBORDINADA)),
 
             Map.entry(EDITAR_MAPA, new RegrasAcao(
-                    EnumSet.of(ADMIN, GESTOR, CHEFE),
+                    EnumSet.of(ADMIN),
                     EnumSet.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
                             MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO,
                             MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO,
@@ -220,13 +211,12 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                     EnumSet.of(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO),
                     RequisitoHierarquia.MESMA_UNIDADE)));
 
-    public SubprocessoAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo, HierarquiaService hierarquiaService) {
-        super(usuarioPerfilRepo, hierarquiaService);
+    public SubprocessoAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo, HierarquiaService hierarquiaService, UnidadeRepo unidadeRepo) {
+        super(usuarioPerfilRepo, hierarquiaService, unidadeRepo);
     }
 
     @Override
     public boolean canExecute(Usuario usuario, Acao acao, Subprocesso sp) {
-        // Caso especial: VERIFICAR_IMPACTOS tem regras diferentes por perfil
         if (acao == VERIFICAR_IMPACTOS) {
             return canExecuteVerificarImpactos(usuario, sp);
         }
@@ -255,11 +245,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
             return false;
         }
 
-        // 3. Verifica hierarquia (ADMIN é global para ações administrativas)
-        if (temPerfil(usuario, ADMIN) && ACOES_ADMIN_GLOBAIS.contains(acao)) {
-            return true;
-        }
-
+        // 3. Verifica hierarquia
         if (!verificaHierarquia(usuario, sp.getUnidade(), regras.requisitoHierarquia)) {
             String motivo = obterMotivoNegacaoHierarquia(usuario, sp.getUnidade(), regras.requisitoHierarquia);
             log.info("Permissão negada para {}: {}", usuario.getTituloEleitoral(), motivo);

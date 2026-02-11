@@ -14,12 +14,9 @@ import sgc.organizacao.service.HierarquiaService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.*;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +28,47 @@ class SubprocessoAccessPolicyTest {
 
     @Mock
     private HierarquiaService hierarquiaService;
+    
+    @BeforeEach
+    void setUp() {
+        // Mock: Unidade RAIZ (id=1) é superior a todas as unidades
+        // Isso simula o comportamento real da hierarquia
+        when(hierarquiaService.isSubordinada(any(), any())).thenAnswer(inv -> {
+            Unidade target = inv.getArgument(0);
+            Unidade superior = inv.getArgument(1);
+            
+            // Null check para evitar NPE
+            if (superior == null || target == null) {
+                return false;
+            }
+            
+            // Se a unidade superior é RAIZ (1), todas as outras são subordinadas
+            if (superior.getCodigo().equals(1L) && !target.getCodigo().equals(1L)) {
+                return true;
+            }
+            
+            // Caso específico: unidade 2 subordinada à 1 (usado em alguns testes)
+            if (target.getCodigo().equals(2L) && superior.getCodigo().equals(1L)) {
+                return true;
+            }
+            
+            return false;
+        });
+        
+        // Mock para isSuperiorImediata
+        when(hierarquiaService.isSuperiorImediata(any(), any())).thenAnswer(inv -> {
+            Unidade target = inv.getArgument(0);
+            Unidade superior = inv.getArgument(1);
+            
+            // Null check
+            if (superior == null || target == null) {
+                return false;
+            }
+            
+            // Unidade 1 é superior imediata de unidade 2
+            return target.getCodigo().equals(2L) && superior.getCodigo().equals(1L);
+        });
+    }
     
     @Test
     @DisplayName("canExecute - VERIFICAR_IMPACTOS - Chefe Mesma Unidade")
@@ -120,7 +158,8 @@ class SubprocessoAccessPolicyTest {
     @Test
     @DisplayName("canExecute - Hierarquia MesmaUnidade - OK")
     void canExecute_HierarquiaMesmaUnidade_OK() {
-        Usuario u = criarUsuario(Perfil.ADMIN, 1L);
+        // EDITAR_CADASTRO agora é apenas para CHEFE
+        Usuario u = criarUsuario(Perfil.CHEFE, 1L);
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 1L);
 
         assertTrue(policy.canExecute(u, Acao.EDITAR_CADASTRO, sp));
@@ -136,14 +175,24 @@ class SubprocessoAccessPolicyTest {
     }
 
     @Test
-    @DisplayName("canExecute - Admin Global Override")
-    void canExecute_AdminGlobal() {
-        Usuario u = criarUsuario(Perfil.ADMIN, 1L);
-        Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 2L); // Different unit
+    @DisplayName("canExecute - Admin Via Hierarquia")
+    void canExecute_AdminViaHierarquia() {
+        // ADMIN (unidade RAIZ id=1) acessa outras unidades via hierarquia, não por bypass
+        Usuario u = criarUsuario(Perfil.ADMIN, 1L); // Unidade RAIZ
+        Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 2L); // Outra unidade
 
-        // ADMIN should be able to execute administrative actions regardless of hierarchy
+        // Mock: unidade 2 é subordinada à RAIZ (1)
+        when(hierarquiaService.isSubordinada(any(), any())).thenAnswer(inv -> {
+            Unidade target = inv.getArgument(0);
+            Unidade superior = inv.getArgument(1);
+            // Unidade 2 é subordinada à 1 (RAIZ)
+            return target.getCodigo().equals(2L) && superior.getCodigo().equals(1L);
+        });
+
+        // VISUALIZAR_SUBPROCESSO requer MESMA_OU_SUBORDINADA - deve passar via hierarquia
         assertTrue(policy.canExecute(u, Acao.VISUALIZAR_SUBPROCESSO, sp));
-        assertTrue(policy.canExecute(u, Acao.EDITAR_MAPA, sp));
+        // EDITAR_MAPA é apenas ADMIN + MESMA_UNIDADE - deve falhar pois unidades diferentes
+        assertFalse(policy.canExecute(u, Acao.EDITAR_MAPA, sp));
     }
 
     @Test

@@ -1,5 +1,6 @@
 {
-  "name": "sgc-e2e",
+  "name": "sgc",
+  "description": "Sistema de Gestão de Conhecimentos",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -22,7 +23,6 @@
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
-  "description": "Testes E2E",
   "dependencies": {
     "xml2js": "^0.6.2"
   }

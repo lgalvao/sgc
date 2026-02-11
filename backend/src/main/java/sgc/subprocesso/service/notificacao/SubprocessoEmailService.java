@@ -33,6 +33,20 @@ public class SubprocessoEmailService {
     private final NotificacaoEmailService notificacaoEmailService;
     private final TemplateEngine templateEngine;
 
+    /**
+     * Obtém a sigla da unidade para exibição ao usuário.
+     * A unidade RAIZ (id=1, sigla='ADMIN') é substituída por "SEDOC" para clareza.
+     *
+     * @param unidade a unidade
+     * @return a sigla para apresentação ao usuário
+     */
+    private String obterSiglaParaUsuario(Unidade unidade) {
+        if (unidade.getCodigo() == 1L) {
+            return "SEDOC"; // Usuário vê SEDOC em vez de RAIZ/ADMIN
+        }
+        return unidade.getSigla();
+    }
+
     public void enviarEmailTransicao(EventoTransicaoSubprocesso evento) {
         TipoTransicao tipo = evento.getTipo();
         if (!tipo.enviaEmail()) return;
@@ -48,7 +62,7 @@ public class SubprocessoEmailService {
             String corpo = processarTemplate(tipo.getTemplateEmail(), variaveis);
 
             notificacaoEmailService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
-            log.info("E-mail enviado para {} - Transição: {}", unidadeDestino.getSigla(), tipo);
+            log.info("E-mail enviado para {} - Transição: {}", obterSiglaParaUsuario(unidadeDestino), tipo);
 
             if (deveNotificarHierarquia(tipo)) {
                 notificarHierarquia(unidadeOrigem, assunto, corpo);
@@ -63,7 +77,7 @@ public class SubprocessoEmailService {
         Map<String, Object> variaveis = new HashMap<>();
 
         Unidade unidade = sp.getUnidade();
-        variaveis.put("siglaUnidade", unidade.getSigla());
+        variaveis.put("siglaUnidade", obterSiglaParaUsuario(unidade));
         variaveis.put("nomeUnidade", unidade.getNome());
 
         variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
@@ -86,7 +100,7 @@ public class SubprocessoEmailService {
     }
 
     private String criarAssunto(TipoTransicao tipo, Subprocesso sp) {
-        String siglaUnidade = sp.getUnidade().getSigla();
+        String siglaUnidade = obterSiglaParaUsuario(sp.getUnidade());
 
         return switch (tipo) {
             case CADASTRO_DISPONIBILIZADO, REVISAO_CADASTRO_DISPONIBILIZADA ->
@@ -124,7 +138,7 @@ public class SubprocessoEmailService {
             try {
                 notificacaoEmailService.enviarEmail(superior.getSigla(), assunto, corpo);
             } catch (Exception e) {
-                log.warn("Falha ao enviar e-mail para {}: {}", superior.getSigla(), e.getMessage());
+                log.warn("Falha ao enviar e-mail para {}: {}", obterSiglaParaUsuario(superior), e.getMessage());
             }
             superior = superior.getUnidadeSuperior();
         }
