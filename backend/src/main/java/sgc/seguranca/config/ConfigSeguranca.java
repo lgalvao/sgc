@@ -16,7 +16,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfigurationSource;
+import sgc.organizacao.UsuarioFacade;
 import sgc.seguranca.login.FiltroJwt;
+import sgc.seguranca.login.GerenciadorJwt;
 
 @Configuration
 @EnableWebSecurity
@@ -24,7 +26,11 @@ import sgc.seguranca.login.FiltroJwt;
 @RequiredArgsConstructor
 @Profile("(!test & !e2e) | secure-test")
 public class ConfigSeguranca {
-    private final FiltroJwt filtroJwt;
+
+    @Bean
+    public FiltroJwt filtroJwt(GerenciadorJwt gerenciadorJwt, UsuarioFacade usuarioFacade) {
+        return new FiltroJwt(gerenciadorJwt, usuarioFacade);
+    }
 
     /**
      * Configura a cadeia de filtros de segurança para a aplicação.
@@ -49,7 +55,8 @@ public class ConfigSeguranca {
      */
     @Bean("defaultSecurityFilterChain")
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   CorsConfigurationSource corsConfigurationSource) {
+                                                   CorsConfigurationSource corsConfigurationSource,
+                                                   FiltroJwt filtroJwt) throws Exception {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/api/usuarios/autenticar",
                                 "/api/usuarios/autorizar",

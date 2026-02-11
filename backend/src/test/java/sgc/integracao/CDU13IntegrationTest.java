@@ -80,11 +80,18 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         Long idUnidade = 3001L;
 
         String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação de Sistemas Teste", "COSIS-TEST",
+        
+        Integer countSuperior = jdbcTemplate.queryForObject("SELECT count(*) FROM SGC.VW_UNIDADE WHERE codigo = ?", Integer.class, idSuperior);
+        if (countSuperior != null && countSuperior == 0) {
+            jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação de Sistemas Teste", "COSIS-TEST",
                 "INTERMEDIARIA", "ATIVA", null, null);
-        jdbcTemplate.update(sqlInsertUnidade, idUnidade, "Serviço de Desenvolvimento Teste", "SEDESENV-TEST",
+        }
+
+        Integer countUnidade = jdbcTemplate.queryForObject("SELECT count(*) FROM SGC.VW_UNIDADE WHERE codigo = ?", Integer.class, idUnidade);
+        if (countUnidade != null && countUnidade == 0) {
+            jdbcTemplate.update(sqlInsertUnidade, idUnidade, "Serviço de Desenvolvimento Teste", "SEDESENV-TEST",
                 "OPERACIONAL", "ATIVA", idSuperior, null);
+        }
 
         // Carregar via Repo
         unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
@@ -92,15 +99,19 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
 
         // Criar Usuários via JDBC (Usuario é @Immutable, não pode ser salvo via Repo)
         String sqlInsertUsuario = "INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo, MATRICULA) VALUES (?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sqlInsertUsuario, "101010101010", "Admin Mock", "admin@test.com", "1010",
-                idSuperior, "");
-        jdbcTemplate.update(sqlInsertUsuario, "202020202020", "Gestor Mock", "gestor@test.com", "2020",
-                idSuperior, "");
-
-        // Criar perfis de usuário via JDBC (VW_USUARIO_PERFIL_UNIDADE é uma view)
         String sqlInsertPerfil = "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sqlInsertPerfil, "101010101010", "ADMIN", idSuperior);
-        jdbcTemplate.update(sqlInsertPerfil, "202020202020", "GESTOR", idSuperior);
+
+        String tituloAdmin = "101010101010";
+        if (usuarioRepo.findById(tituloAdmin).isEmpty()) {
+             jdbcTemplate.update(sqlInsertUsuario, tituloAdmin, "Admin Mock", "admin@test.com", "1010", idSuperior, "");
+             jdbcTemplate.update(sqlInsertPerfil, tituloAdmin, "ADMIN", idSuperior);
+        }
+
+        String tituloGestor = "202020202020";
+        if (usuarioRepo.findById(tituloGestor).isEmpty()) {
+            jdbcTemplate.update(sqlInsertUsuario, tituloGestor, "Gestor Mock", "gestor@test.com", "2020", idSuperior, "");
+            jdbcTemplate.update(sqlInsertPerfil, tituloGestor, "GESTOR", idSuperior);
+        }
 
         // Carregar usuários do banco
         Usuario adminUser = usuarioRepo.findById("101010101010").orElseThrow();

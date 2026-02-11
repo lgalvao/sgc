@@ -6,10 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
@@ -24,8 +22,6 @@ import java.util.Set;
  * <p><b>Refatoração v3.0:</b> Removido @Lazy - filtros são instanciados após
  * o contexto de aplicação estar completo, não há necessidade de lazy loading.</p>
  */
-@Component
-@Profile({"!test", "secure-test"})
 @RequiredArgsConstructor
 @Slf4j
 public class FiltroJwt extends OncePerRequestFilter {
