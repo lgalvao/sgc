@@ -1,6 +1,5 @@
 package sgc.e2e;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -17,6 +16,9 @@ import sgc.seguranca.login.FiltroJwt;
 
 import java.util.List;
 
+import sgc.seguranca.login.GerenciadorJwt;
+import sgc.organizacao.UsuarioFacade;
+
 /**
  * Configuração de segurança específica para testes E2E.
  * <p>
@@ -27,10 +29,13 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
 @Profile("e2e")
 public class E2eSecurityConfig {
-    private final FiltroJwt filtroJwt;
+
+    @Bean
+    public FiltroJwt filtroJwt(GerenciadorJwt gerenciadorJwt, UsuarioFacade usuarioFacade) {
+        return new FiltroJwt(gerenciadorJwt, usuarioFacade);
+    }
 
     /**
      * Configura a cadeia de filtros de segurança para testes E2E.
@@ -43,7 +48,7 @@ public class E2eSecurityConfig {
      * @return o {@link SecurityFilterChain} configurado.
      */
     @Bean
-    public SecurityFilterChain e2eSecurityFilterChain(HttpSecurity http) {
+    public SecurityFilterChain e2eSecurityFilterChain(HttpSecurity http, FiltroJwt filtroJwt) {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/api/usuarios/autenticar",
                                 "/api/usuarios/autorizar",

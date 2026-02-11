@@ -15,6 +15,7 @@ import sgc.subprocesso.service.SubprocessoFacade;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Serviço responsável pela comunicação relacionada a subprocessos via email.
@@ -41,7 +42,7 @@ public class SubprocessoEmailService {
      * @return a sigla para apresentação ao usuário
      */
     private String obterSiglaParaUsuario(Unidade unidade) {
-        if (unidade.getCodigo() == 1L) {
+        if (Objects.equals(unidade.getCodigo(), 1L)) {
             return "SEDOC"; // Usuário vê SEDOC em vez de RAIZ/ADMIN
         }
         return unidade.getSigla();

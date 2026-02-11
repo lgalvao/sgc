@@ -2,6 +2,8 @@ package sgc.subprocesso.mapper;
 
 import sgc.comum.config.CentralMapperConfig;
 
+import java.util.Objects;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import sgc.comum.util.FormatadorData;

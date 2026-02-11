@@ -19,9 +19,7 @@ import sgc.organizacao.service.UsuarioPerfilService;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Serviço responsável pelo fluxo de login: autenticação, autorização e geração
@@ -104,26 +102,16 @@ public class LoginFacade {
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.tituloEleitoral());
         Perfil perfilSolicitado = Perfil.valueOf(request.perfil());
 
-        // ADMIN tem acesso global - não depende de unidade específica
-        if (perfilSolicitado == Perfil.ADMIN) {
-            boolean temPerfilAdmin = autorizacoes.stream()
-                    .anyMatch(pu -> pu.perfil() == Perfil.ADMIN);
-            
-            if (!temPerfilAdmin) {
-                throw new ErroAcessoNegado("Usuário não possui perfil de ADMIN.");
-            }
-        } else {
-            // Para outros perfis (GESTOR, CHEFE, SERVIDOR), validar perfil + unidade
-            boolean autorizado = autorizacoes.stream()
-                    .anyMatch(pu -> {
-                        Perfil perfil = pu.perfil();
-                        Long codigoUnidade = pu.unidade().getCodigo();
-                        return perfil == perfilSolicitado && codigoUnidade.equals(codUnidade);
-                    });
+        // Validar perfil + unidade para todos os perfis
+        boolean autorizado = autorizacoes.stream()
+                .anyMatch(pu -> {
+                    Perfil perfil = pu.perfil();
+                    Long codigoUnidade = pu.unidade().getCodigo();
+                    return perfil == perfilSolicitado && codigoUnidade.equals(codUnidade);
+                });
 
-            if (!autorizado) {
-                throw new ErroAcessoNegado("Usuário não tem permissão para acessar com perfil e unidade informados.");
-            }
+        if (!autorizado) {
+            throw new ErroAcessoNegado("Usuário não tem permissão para acessar com perfil e unidade informados.");
         }
 
         return gerenciadorJwt.gerarToken(
