@@ -44,7 +44,7 @@ public class AlertaFacade {
     
     // Lazy supplier para SEDOC - evita cache manual e é thread-safe
     @Getter(lazy = true)
-    private final Unidade sedoc = unidadeService.buscarEntidadePorSigla("SEDOC");
+    private final Unidade sedoc = unidadeService.buscarEntidadePorId(1L);
 
     /**
      * Obtém a sigla da unidade para exibição ao usuário.
@@ -54,7 +54,8 @@ public class AlertaFacade {
      * @return a sigla para apresentação ao usuário
      */
     private String obterSiglaParaUsuario(Unidade unidade) {
-        if (unidade.getCodigo() == 1L) {
+        if (unidade == null) return null;
+        if (Long.valueOf(1L).equals(unidade.getCodigo())) {
             return "SEDOC"; // Usuário vê SEDOC em vez de RAIZ/ADMIN
         }
         return unidade.getSigla();

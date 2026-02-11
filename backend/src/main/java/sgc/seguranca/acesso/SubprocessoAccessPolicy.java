@@ -3,6 +3,7 @@ package sgc.seguranca.acesso;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import sgc.organizacao.model.Perfil;
+
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.organizacao.service.HierarquiaService;
@@ -211,8 +212,8 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                     EnumSet.of(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO),
                     RequisitoHierarquia.MESMA_UNIDADE)));
 
-    public SubprocessoAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo, HierarquiaService hierarquiaService, UnidadeRepo unidadeRepo) {
-        super(usuarioPerfilRepo, hierarquiaService, unidadeRepo);
+    public SubprocessoAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo, HierarquiaService hierarquiaService) {
+        super(usuarioPerfilRepo, hierarquiaService);
     }
 
     @Override

@@ -3,6 +3,7 @@ package sgc.seguranca.acesso;
 import org.springframework.stereotype.Component;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Perfil;
+
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.organizacao.service.HierarquiaService;

@@ -47,9 +47,11 @@ class MapaAccessPolicyTest {
         mapa.setCodigo(1L);
 
         usuarioAdmin = criarUsuario("1", "Admin");
+        usuarioAdmin.setPerfilAtivo(ADMIN);
         List<UsuarioPerfil> atribuicoesAdmin = adicionarAtribuicao(usuarioAdmin, ADMIN);
 
         usuarioGestor = criarUsuario("2", "Gestor");
+        usuarioGestor.setPerfilAtivo(GESTOR);
         List<UsuarioPerfil> atribuicoesGestor = adicionarAtribuicao(usuarioGestor, GESTOR);
         
         when(usuarioPerfilRepo.findByUsuarioTitulo("1")).thenReturn(atribuicoesAdmin);

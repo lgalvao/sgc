@@ -8,6 +8,8 @@ import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * DTO que representa uma competência no contexto do mapa completo. Contém os
  * dados da competência e
@@ -15,7 +17,7 @@ import java.util.List;
  */
 @Builder
 public record CompetenciaMapaDto(
-        Long codigo,
+        @Nullable Long codigo,
 
         @NotBlank(message = "Descrição da competência é obrigatória")
         @Size(max = 255, message = "A descrição deve ter no máximo 255 caracteres")

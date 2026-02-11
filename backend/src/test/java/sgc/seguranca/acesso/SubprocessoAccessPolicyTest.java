@@ -191,8 +191,8 @@ class SubprocessoAccessPolicyTest {
 
         // VISUALIZAR_SUBPROCESSO requer MESMA_OU_SUBORDINADA - deve passar via hierarquia
         assertTrue(policy.canExecute(u, Acao.VISUALIZAR_SUBPROCESSO, sp));
-        // EDITAR_MAPA é apenas ADMIN + MESMA_UNIDADE - deve falhar pois unidades diferentes
-        assertFalse(policy.canExecute(u, Acao.EDITAR_MAPA, sp));
+        // EDITAR_MAPA requer MESMA_UNIDADE, mas ADMIN bypassa hierarquia -> DEVE PASSAR
+        assertTrue(policy.canExecute(u, Acao.EDITAR_MAPA, sp));
     }
 
     @Test

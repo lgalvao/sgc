@@ -52,9 +52,11 @@ class AtividadeAccessPolicyTest {
                 .build();
 
         usuarioChefe = criarUsuario("123", "Chefe");
+        usuarioChefe.setPerfilAtivo(CHEFE);
         List<UsuarioPerfil> atribuicoesChefe = adicionarAtribuicao(usuarioChefe, CHEFE, unidade);
 
         usuarioServidor = criarUsuario("456", "Servidor");
+        usuarioServidor.setPerfilAtivo(SERVIDOR);
         List<UsuarioPerfil> atribuicoesServidor = adicionarAtribuicao(usuarioServidor, SERVIDOR, unidade);
         
         when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(atribuicoesChefe);

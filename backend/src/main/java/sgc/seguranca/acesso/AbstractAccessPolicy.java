@@ -18,7 +18,6 @@ public abstract class AbstractAccessPolicy<T> implements AccessPolicy<T> {
 
     protected final UsuarioPerfilRepo usuarioPerfilRepo;
     protected final HierarquiaService hierarquiaService;
-    protected final UnidadeRepo unidadeRepo;
     protected String ultimoMotivoNegacao = "";
 
     @Override
@@ -75,32 +74,22 @@ public abstract class AbstractAccessPolicy<T> implements AccessPolicy<T> {
         final Long codUnidadeRecurso = unidade.getCodigo();
         final Long codUnidadeUsuario = usuario.getUnidadeAtivaCodigo();
 
+        // ADMIN tem privilégios especiais POR SER ADMIN
+        // Bypassa verificações de hierarquia (exceto TITULAR_UNIDADE que é pessoal)
+        if (usuario.getPerfilAtivo() == Perfil.ADMIN && requisito != RequisitoHierarquia.TITULAR_UNIDADE) {
+            return true;
+        }
+
         return switch (requisito) {
             case NENHUM -> true;
             case MESMA_UNIDADE -> Objects.equals(codUnidadeUsuario, codUnidadeRecurso);
 
-            case MESMA_OU_SUBORDINADA -> {
-                if (Objects.equals(codUnidadeUsuario, codUnidadeRecurso)) {
-                    yield true;
-                }
-                // Buscar unidade completa do usuário para verificar hierarquia
-                Unidade unidadeUsuario = unidadeRepo.findById(codUnidadeUsuario)
-                        .orElse(null);
-                if (unidadeUsuario == null) {
-                    yield false;
-                }
-                yield hierarquiaService.isSubordinada(unidade, unidadeUsuario);
-            }
+            case MESMA_OU_SUBORDINADA -> Objects.equals(codUnidadeUsuario, codUnidadeRecurso)
+                    || hierarquiaService.isSubordinada(unidade,
+                        Unidade.builder().codigo(codUnidadeUsuario).build());
 
-            case SUPERIOR_IMEDIATA -> {
-                // Buscar unidade completa do usuário para verificar hierarquia
-                Unidade unidadeUsuario = unidadeRepo.findById(codUnidadeUsuario)
-                        .orElse(null);
-                if (unidadeUsuario == null) {
-                    yield false;
-                }
-                yield hierarquiaService.isSuperiorImediata(unidade, unidadeUsuario);
-            }
+            case SUPERIOR_IMEDIATA -> hierarquiaService.isSuperiorImediata(unidade,
+                        Unidade.builder().codigo(codUnidadeUsuario).build());
 
             case TITULAR_UNIDADE -> {
                 String tituloTitular = unidade.getTituloTitular();

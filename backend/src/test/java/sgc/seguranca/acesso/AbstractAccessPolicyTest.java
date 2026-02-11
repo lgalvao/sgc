@@ -10,14 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.HierarquiaService;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractAccessPolicyTest {
@@ -39,7 +33,6 @@ class AbstractAccessPolicyTest {
             return false;
         }
 
-        // Expose protected methods for testing
         public boolean testTemPerfilPermitido(Usuario usuario, EnumSet<Perfil> perfis) {
             return temPerfilPermitido(usuario, perfis);
         }

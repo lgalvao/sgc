@@ -23,7 +23,7 @@ class UsuarioMapperTest {
     void deveMapearParaUnidadeDtoCorretamente() {
         // Arrange
         Unidade unidade = new Unidade();
-        unidade.setCodigo(1L);
+        unidade.setCodigo(2L);
         unidade.setNome("Unidade Teste");
         unidade.setSigla("UT");
         unidade.setTipo(TipoUnidade.OPERACIONAL);
@@ -33,10 +33,30 @@ class UsuarioMapperTest {
 
         // Assert
         assertThat(dto).isNotNull();
-        assertThat(dto.getCodigo()).isEqualTo(1L);
+        assertThat(dto.getCodigo()).isEqualTo(2L);
         assertThat(dto.getNome()).isEqualTo("Unidade Teste");
         assertThat(dto.getSigla()).isEqualTo("UT");
         assertThat(dto.isElegivel()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve mapear unidade RAIZ (1) para SEDOC")
+    void deveMapearRaizParaSedoc() {
+        // Arrange
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        unidade.setNome("Unidade Raiz Interna");
+        unidade.setSigla("ADMIN");
+        unidade.setTipo(TipoUnidade.RAIZ);
+
+        // Act
+        UnidadeDto dto = mapper.toUnidadeDto(unidade);
+
+        // Assert
+        assertThat(dto).isNotNull();
+        assertThat(dto.getCodigo()).isEqualTo(1L);
+        assertThat(dto.getNome()).isEqualTo("Secretaria de Documentação");
+        assertThat(dto.getSigla()).isEqualTo("SEDOC");
     }
 
     @Test

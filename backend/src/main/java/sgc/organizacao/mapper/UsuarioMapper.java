@@ -31,7 +31,19 @@ public interface UsuarioMapper {
     @Mapping(target = "tipo", expression = "java(unidade.getTipo() != null ? unidade.getTipo().name() : null)")
     @Mapping(target = "subunidades", expression = "java(new java.util.ArrayList<>())")
     @Mapping(target = "isElegivel", ignore = true)
+    @Mapping(target = "sigla", expression = "java(mapUnidadeSiglaParaUsuario(unidade))")
+    @Mapping(target = "nome", expression = "java(mapUnidadeNomeParaUsuario(unidade))")
     UnidadeDto toUnidadeDtoBase(Unidade unidade);
+
+    default String mapUnidadeSiglaParaUsuario(Unidade unidade) {
+        if (unidade == null) return null;
+        return Long.valueOf(1L).equals(unidade.getCodigo()) ? "SEDOC" : unidade.getSigla();
+    }
+
+    default String mapUnidadeNomeParaUsuario(Unidade unidade) {
+        if (unidade == null) return null;
+        return Long.valueOf(1L).equals(unidade.getCodigo()) ? "Secretaria de Documentação" : unidade.getNome();
+    }
 
     /**
      * Converte Unidade para UnidadeDto com flag de elegibilidade customizada.

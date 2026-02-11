@@ -50,7 +50,7 @@ public class MapaSalvamentoService {
         ContextoSalvamento contexto = prepararContexto(codMapa, request);
         removerCompetenciasObsoletas(contexto);
 
-        List<Competencia> competenciasSalvas = salvarCompetencias(contexto);
+        List<Competencia> competenciasSalvas = salvarCompetencias(contexto, mapa);
         atualizarAssociacoesAtividades(contexto, competenciasSalvas);
         validarIntegridadeMapa(codMapa, contexto.atividadesAtuais, competenciasSalvas);
 
@@ -97,14 +97,14 @@ public class MapaSalvamentoService {
         }
     }
 
-    private List<Competencia> salvarCompetencias(ContextoSalvamento contexto) {
+    private List<Competencia> salvarCompetencias(ContextoSalvamento contexto, Mapa mapa) {
         Map<Long, Competencia> mapaCompetenciasExistentes = contexto.competenciasAtuais.stream()
                 .collect(Collectors.toMap(Competencia::getCodigo, c -> c));
 
         List<Competencia> competenciasParaSalvar = new ArrayList<>();
 
         for (CompetenciaMapaDto compDto : contexto.request.competencias()) {
-            Competencia competencia = processarCompetenciaDto(compDto, mapaCompetenciasExistentes);
+            Competencia competencia = processarCompetenciaDto(compDto, mapaCompetenciasExistentes, mapa);
             competenciasParaSalvar.add(competencia);
         }
 
@@ -113,13 +113,20 @@ public class MapaSalvamentoService {
 
     private Competencia processarCompetenciaDto(
             CompetenciaMapaDto compDto,
-            Map<Long, Competencia> mapaCompetenciasExistentes) {
+            Map<Long, Competencia> mapaCompetenciasExistentes,
+            Mapa mapa) {
 
         Long codigo = compDto.codigo();
         Competencia competencia;
-        competencia = mapaCompetenciasExistentes.get(codigo);
-        if (competencia == null) {
-            competencia = repo.buscar(Competencia.class, codigo);
+
+        if (codigo == null) {
+            competencia = new Competencia();
+            competencia.setMapa(mapa);
+        } else {
+            competencia = mapaCompetenciasExistentes.get(codigo);
+            if (competencia == null) {
+                competencia = repo.buscar(Competencia.class, codigo);
+            }
         }
 
         competencia.setDescricao(compDto.descricao());

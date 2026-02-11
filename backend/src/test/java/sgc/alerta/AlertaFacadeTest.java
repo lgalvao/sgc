@@ -57,9 +57,9 @@ class AlertaFacadeTest {
 
     private void criarSedocMock() {
         Unidade sedoc = new Unidade();
-        sedoc.setCodigo(15L);
+        sedoc.setCodigo(1L);
         sedoc.setSigla("SEDOC");
-        when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(sedoc);
+        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(sedoc);
     }
 
     @Nested
@@ -491,22 +491,25 @@ class AlertaFacadeTest {
     @Nested
     @DisplayName("Método: getSedoc (Lazy Load)")
     class GetSedoc {
-        @Test
+    @Test
         @DisplayName("Deve inicializar sedoc apenas na primeira chamada (lazy load)")
         void deveInicializarSedocLazyLoad() {
             Unidade sedocMock = new Unidade();
             sedocMock.setSigla("SEDOC");
+            sedocMock.setCodigo(1L);
 
-            when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(sedocMock);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(sedocMock);
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             // Primeira chamada: deve buscar sedoc
             service.criarAlertaSedoc(new Processo(), new Unidade(), "Teste");
-            verify(unidadeService).buscarEntidadePorSigla("SEDOC");
+            verify(unidadeService).buscarEntidadePorId(1L);
 
             // Segunda chamada: não deve buscar novamente (cache)
             service.criarAlertaSedoc(new Processo(), new Unidade(), "Teste 2");
-            verify(unidadeService, times(1)).buscarEntidadePorSigla("SEDOC");
+            // No mockito, verify acumula as chamadas, mas como é lazy, a segunda chamada não deve invocar o metodo no service.
+            // Então verify(times(1)) deve ser correto para o total.
+            verify(unidadeService, times(1)).buscarEntidadePorId(1L);
         }
     }
 }
