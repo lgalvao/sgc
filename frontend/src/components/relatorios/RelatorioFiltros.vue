@@ -8,7 +8,7 @@
             :options="opcoesTipo"
             data-testid="filtro-tipo"
             aria-label="Filtrar por Tipo"
-            @update:model-value="$emit('update:tipo', $event)"
+            @update:model-value="$emit('update:tipo', $event as string)"
         />
       </BFormGroup>
     </BCol>

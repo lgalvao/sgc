@@ -19,7 +19,7 @@
                 data-testid="select-usuario"
                 required
                 text-field="nome"
-                value-field="codigo"
+                value-field="tituloEleitoral"
                 :state="erroUsuario ? false : null"
             >
               <template #first>

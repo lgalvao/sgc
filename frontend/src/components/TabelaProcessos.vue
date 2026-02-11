@@ -81,7 +81,7 @@ const rowAttr = (item: ProcessoResumo | null, type: string) => {
         hover
         responsive
         show-empty
-        @row-clicked="handleSelecionarProcesso"
+        @row-clicked="(event: any) => handleSelecionarProcesso(event.item)"
         @sort-changed="handleSortChange">
 
       <template #empty>

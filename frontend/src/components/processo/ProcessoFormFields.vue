@@ -31,7 +31,7 @@
           :state="fieldErrors.tipo ? false : null"
           data-testid="sel-processo-tipo"
           required
-          @update:model-value="updateField('tipo', $event)"
+          @update:model-value="updateField('tipo', $event as any)"
       >
         <template #first>
           <BFormSelectOption :value="null" disabled>-- Selecione o tipo --</BFormSelectOption>
