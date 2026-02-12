@@ -1,6 +1,6 @@
 [BACKEND] INFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
 [BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
-[FRONTEND]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m221[22m[2m[0m ms[22m
+[FRONTEND]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m311[22m[2m[0m ms[22m
 [FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
 [FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
 [BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:82 - Limpando 25 tabelas no schema SGC
@@ -8,3 +8,6 @@
 [BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
 [BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
 [BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 1 criado.
+[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 1 iniciado para 1 unidade(s).
+[BACKEND] INFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
