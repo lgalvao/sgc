@@ -16,3 +16,20 @@
 [FRONTEND] 9:45:23 AM [vite] (client) hmr update /src/components/TabelaProcessos.vue
 [BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:50 - Erro de negócio (ERRO_PROCESSO): Apenas processos 'EM ANDAMENTO' podem ser finalizados.
 [FRONTEND] 9:54:41 AM [vite] (client) hmr update /src/views/Processo.vue
+[BACKEND] INFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+[BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
+[BACKEND] INFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+[BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
+[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:50 - Erro de negócio (ERRO_PROCESSO): Apenas processos 'EM ANDAMENTO' podem ser finalizados.
+[FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/views/PainelView.vue, /src/views/Processo.vue, /src/views/Subprocesso.vue, /src/views/VisAtividades.vue
+[FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/views/Subprocesso.vue, /src/views/VisAtividades.vue
+[FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/views/PainelView.vue, /src/views/Processo.vue, /src/views/Subprocesso.vue, /src/views/VisAtividades.vue
+[FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/views/Subprocesso.vue, /src/views/VisAtividades.vue
+[FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/components/BarraNavegacao.vue, /src/views/PainelView.vue, /src/views/Processo.vue, /src/views/Subprocesso.vue, /src/views/VisAtividades.vue, /src/components/SubprocessoCards.vue, /src/components/ImpactoMapaModal.vue, /src/components/TabelaProcessos.vue, /src/components/atividades/VisAtividadeItem.vue
+[FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/views/PainelView.vue, /src/views/Processo.vue, /src/views/Subprocesso.vue, /src/views/VisAtividades.vue
+[FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/views/Subprocesso.vue, /src/views/VisAtividades.vue
+[FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/views/PainelView.vue, /src/views/Processo.vue, /src/views/Subprocesso.vue, /src/views/VisAtividades.vue
+[FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/views/Subprocesso.vue, /src/views/VisAtividades.vue
+[FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/components/BarraNavegacao.vue, /src/views/PainelView.vue, /src/views/Processo.vue, /src/views/Subprocesso.vue, /src/views/VisAtividades.vue, /src/components/SubprocessoCards.vue, /src/components/ImpactoMapaModal.vue, /src/components/TabelaProcessos.vue, /src/components/atividades/VisAtividadeItem.vue
+[FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/components/SubprocessoHeader.vue
+[FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/components/SubprocessoHeader.vue

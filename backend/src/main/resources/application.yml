@@ -18,8 +18,8 @@ spring:
     hibernate.ddl-auto: validate
     properties:
       hibernate:
-        default_schema: sgc
-        jdbc.fetch_size: 50
+        "[default_schema]": sgc
+        "[jdbc.fetch_size]": 50
     show-sql: false
     defer-datasource-initialization: false
   sql.init.mode: always
@@ -30,34 +30,34 @@ spring:
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
     properties:
-      mail.smtp.auth: false
-      mail.smtp.starttls.enable: false
+      "[mail.smtp.auth]": false
+      "[mail.smtp.starttls.enable]": false
 springdoc:
   api-docs.enabled: true
   swagger-ui.enabled: true
   api-docs.path: /api-docs
   swagger-ui.path: /swagger-ui.html
-  info:
-    title: SGC - Sistema de Gestão de Competências API
-    version: v1
-    description: API para gerenciar o mapeamento de competências e seus fluxos de trabalho.
 server:
   port: 10000
 logging:
   pattern:
     console: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"
   level:
-    org.hibernate: ERROR
-    org.hibernate.SQL: ERROR
-    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
-    org.springframework.orm.jpa: ERROR
-    org.springframework.jdbc: ERROR
-    com.zaxxer.hikari: ERROR
-    org.springframework: ERROR
-    org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
+    "[org.hibernate]": ERROR
+    "[org.hibernate.SQL]": ERROR
+    "[org.hibernate.type.descriptor.sql.BasicBinder]": ERROR
+    "[org.springframework.orm.jpa]": ERROR
+    "[org.springframework.jdbc]": ERROR
+    "[com.zaxxer.hikari]": ERROR
+    "[org.springframework]": ERROR
+    "[org.hibernate.tool.schema.internal.SchemaDropperImpl]": ERROR
     sgc: INFO
-    sgc.seguranca.acesso.SubprocessoAccessPolicy: DEBUG
+    "[sgc.seguranca.acesso.SubprocessoAccessPolicy]": DEBUG
 aplicacao:
+  openapi:
+    title: SGC - Sistema de Gestão de Competências API
+    version: v1
+    description: API para gerenciar o mapeamento de competências e seus fluxos de trabalho.
   ambiente-testes: true
   acesso-ad:
     base-url: https://sedesenvdev01.tre-pe.gov.br/acessoAD

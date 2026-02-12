@@ -82,6 +82,7 @@ dependencies {
 
     // Analise Estatica
     implementation("org.jspecify:jspecify:1.0.0")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
 
 

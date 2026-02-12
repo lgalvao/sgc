@@ -10,9 +10,9 @@ import org.springframework.context.annotation.Configuration;
 public class ConfigOpenApi {
     @Bean
     public OpenAPI customOpenAPI(
-            @Value("${springdoc.info.title:SGC API}") String title,
-            @Value("${springdoc.info.description:Sistema de Gestão de Competências}") String description,
-            @Value("${springdoc.info.version:v1}") String version) {
+            @Value("${aplicacao.openapi.title:SGC API}") String title,
+            @Value("${aplicacao.openapi.description:Sistema de Gestão de Competências}") String description,
+            @Value("${aplicacao.openapi.version:v1}") String version) {
         return new OpenAPI().info(new Info()
                 .title(title)
                 .description(description)
