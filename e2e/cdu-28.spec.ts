@@ -1,5 +1,4 @@
-import {expect, test} from './fixtures/auth-fixtures.js';
-import {resetDatabase} from './hooks/hooks-limpeza.js';
+import {expect, test} from './fixtures/complete-fixtures.js';
 
 /**
  * CDU-28 - Manter atribuição temporária
@@ -17,10 +16,6 @@ import {resetDatabase} from './hooks/hooks-limpeza.js';
  * 8. Sistema registra atribuição e notifica usuário
  */
 test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
-
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-    });
 
     // ========================================================================
     // CENÁRIO 1: ADMIN navega para árvore de unidades

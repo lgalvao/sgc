@@ -1,8 +1,8 @@
-import {expect, test} from './fixtures/auth-fixtures.js';
+import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
+import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-23 - Homologar cadastros em bloco
@@ -28,24 +28,14 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-23 ${timestamp}`;
     let processoId: number;
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
 
     const atividade1 = `Atividade Homol ${timestamp}`;
-
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-        cleanup = useProcessoCleanup();
-    });
-
-    test.afterAll(async ({request}) => {
-        await cleanup.limpar(request);
-    });
 
     // ========================================================================
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         
 
         await criarProcesso(page, {
@@ -60,7 +50,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoId > 0) cleanup.registrar(processoId);
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

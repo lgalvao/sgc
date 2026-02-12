@@ -1,10 +1,10 @@
 import type {Page} from '@playwright/test';
-import {expect, test} from './fixtures/auth-fixtures.js';
+import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
+import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
     await page.getByText(descProcesso).click();
@@ -17,7 +17,6 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-21 ${timestamp}`;
     let processoId: number;
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
 
     // Atividades e competências para os testes
     const atividade1 = `Atividade 1 ${timestamp}`;
@@ -25,20 +24,11 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     const competencia1 = `Competência 1 ${timestamp}`;
     const competencia2 = `Competência 2 ${timestamp}`;
 
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-        cleanup = useProcessoCleanup();
-    });
-
-    test.afterAll(async ({request}) => {
-        await cleanup.limpar(request);
-    });
-
     // ========================================================================
     // PREPARAÇÃO - Criar mapa homologado para ADMIN finalizar processo
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -52,7 +42,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoId > 0) cleanup.registrar(processoId);
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

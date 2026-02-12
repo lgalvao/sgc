@@ -1,11 +1,11 @@
 import type {Page} from '@playwright/test';
-import {expect, test} from './fixtures/auth-fixtures.js';
+import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {abrirModalCriarCompetencia} from './helpers/helpers-mapas.js';
 import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
+import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));
@@ -25,22 +25,12 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     const conhecimento3 = 'Conhecimento 3';
 
     let processoMapeamentoId: number;
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
-
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-        cleanup = useProcessoCleanup();
-    });
-
-    test.afterAll(async ({request}) => {
-        await cleanup.limpar(request);
-    });
 
     // ========================================================================
     // PREPARAÇÃO - Criar processo de mapeamento com atividades disponibilizadas
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         
 
         await criarProcesso(page, {
@@ -59,7 +49,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcessoMapeamento);
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
         processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoMapeamentoId > 0) cleanup.registrar(processoMapeamentoId);
+        if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
 
         // Iniciar processo
         await page.getByTestId('btn-processo-iniciar').click();
