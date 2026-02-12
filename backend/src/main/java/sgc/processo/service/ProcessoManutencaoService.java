@@ -62,7 +62,17 @@ public class ProcessoManutencaoService {
         // Salva uma única vez com todos os participantes
         Processo processoSalvo = processoRepo.saveAndFlush(processo);
 
-        log.info("Processo {} criado.", processoSalvo.getCodigo());
+        log.info("Processo {} criado com {} participantes: {}. Participante IDs: {}",
+                processoSalvo.getCodigo(),
+                processoSalvo.getParticipantes().size(),
+                processoSalvo.getCodigosParticipantes(),
+                processoSalvo.getParticipantes().stream()
+                        .map(up -> "(" + up.getId().getProcessoCodigo() + "," + up.getId().getUnidadeCodigo() + ")")
+                        .toList());
+        
+        // Verify the data is in the database
+        var countQuery = processoRepo.findById(processoSalvo.getCodigo());
+        log.info("Verificação: Processo {} existe no repo? {}", processoSalvo.getCodigo(), countQuery.isPresent());
 
         return processoSalvo;
     }

@@ -66,6 +66,11 @@ public class PainelFacade {
             codigosUnidades.add(codigoUnidade);
 
             processos = processoFacade.listarPorParticipantesIgnorandoCriado(codigosUnidades, sortedPageable);
+            
+            // Temporary diagnostic
+            if (processos.isEmpty()) {
+                log.warn("CHEFE {} não encontrou processos. Investigar no banco.", codigoUnidade);
+            }
         }
         return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade, mapaPaiFilhos));
     }
