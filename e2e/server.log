@@ -1,10 +1,162 @@
-[BACKEND] INFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
-[BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
-[FRONTEND]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m221[22m[2m[0m ms[22m
-[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
-[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
-[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:82 - Limpando 25 tabelas no schema SGC
-[BACKEND] INFO  sgc.e2e.E2eController.executeDatabaseReset:88 - Executando script de seed: seed.sql
-[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
-[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
-[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 1 criado.
+[BACKEND] Downloading https://services.gradle.org/distributions/gradle-9.3.1-bin.zip
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 10%.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 20%
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 30%.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 40%
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 50
+[BACKEND] %.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 60%
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 70
+[BACKEND] %
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 80%.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 90%.
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] .
+[BACKEND] 100
+[BACKEND] %
+[BACKEND] Welcome to Gradle 9.3.1!
+[BACKEND] Here are the highlights of this release:
+[BACKEND]  - Test reporting improvements
+[BACKEND]  - Error and warning improvements
+[BACKEND]  - Build authoring improvements
+[BACKEND] For more details see https://docs.gradle.org/9.3.1/release-notes.html
+[BACKEND] Calculating task graph as no cached configuration is available for tasks: bootRun
+[BACKEND] Perfil Spring ativado: e2e
+[BACKEND] Carregando configurações de: .env.e2e
+[BACKEND] [Incubating] Problems report is available at: file:///home/runner/work/sgc/sgc/build/reports/problems/problems-report.html
+[BACKEND] 2 actionable tasks: 2 executed
+[BACKEND] Configuration cache entry stored.
+[BACKEND_ERR] FAILURE: Build failed with an exception.
+[BACKEND_ERR] * What went wrong:
+[BACKEND_ERR] Execution failed for task ':backend:compileJava'.
+[BACKEND_ERR] > Java compilation initialization error
+[BACKEND_ERR]     error: invalid source release: 21
+[BACKEND_ERR] * Try:
+[BACKEND_ERR] > Run with --stacktrace option to get the stack trace.
+[BACKEND_ERR] > Run with --info or --debug option to get more log output.
+[BACKEND_ERR] > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+[BACKEND_ERR] > Get more help at https://help.gradle.org.
+[BACKEND_ERR] BUILD FAILED in 1m 7s
