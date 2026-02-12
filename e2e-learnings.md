@@ -169,11 +169,19 @@ grep -i "error\|failed\|timeout" resultado.txt
 **Resultado:** 19 arquivos migrados (CDU-11, 12, 16, 20-36) + 1 já migrado anteriormente (CDU-11)
 **Status Final:** 35/36 testes CDU usando `complete-fixtures` (apenas CDU-01 mantém `auth-fixtures` por ser teste de login puro)
 
-### Fase 2: Validação (CURTO PRAZO)
-- [ ] Executar cada teste CDU individualmente
+### Fase 2: Validação (CURTO PRAZO) - EM PROGRESSO
+- [x] Executar teste CDU-01 individualmente ✅ PASSOU
+- [x] Executar teste CDU-10 individualmente ⚠️ FALHOU
 - [ ] Documentar falhas específicas em arquivo separado
 - [ ] Identificar seletores quebrados
 - [ ] Verificar mudanças em requisitos (comparar com /etc/reqs)
+
+**Falha Identificada em CDU-10:**
+- **Teste:** Preparacao 2 - Chefe adiciona atividades
+- **Erro:** Processo criado pelo ADMIN não aparece no painel do CHEFE
+- **Contexto:** ADMIN cria processo com SECAO_221, inicia, mas CHEFE_SECAO_221 vê painel vazio
+- **Possível Causa:** Problema de visibilidade/permissões após refatoração de segurança
+- **Ação:** Investigar regras de acesso e visibilidade de processos
 
 ### Fase 3: Correção (MÉDIO PRAZO)
 - [ ] Corrigir seletores quebrados
@@ -268,7 +276,38 @@ Após a padronização, uma execução completa dos testes revelará falhas reai
 - ✅ 1 teste CDU usa `auth-fixtures` (CDU-01 - teste de login puro, correto)
 - ✅ 100% dos testes que precisam de DB reset agora o têm automaticamente
 
+## Validação de Testes Pós-Migração
+
+### CDU-01: Login e Estrutura das Telas ✅
+**Status:** PASSOU (1/1)  
+**Tempo:** 14.4s  
+**Detalhes:** Validação de credenciais inválidas funcionou corretamente
+
+### CDU-10: Disponibilizar Revisão do Cadastro ⚠️
+**Status:** FALHOU (1/15)  
+**Tempo:** 25.2s  
+**Falha:** `Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro`  
+**Erro:** `Test timeout of 10000ms exceeded` ao procurar o processo no painel do CHEFE  
+
+**Investigação:**
+- Database reset funcionou: `Reset do banco de dados concluído` ✅
+- Processo foi criado: `Processo 1 criado` ✅
+- Processo foi iniciado: `Processo de mapeamento 1 iniciado para 1 unidade(s)` ✅
+- E-mail mockado enviado: `E-mail enviado para unidade SECAO_221` ✅
+- CHEFE autenticado: `Usuário autenticado: 141414` (CHEFE_SECAO_221) ✅
+- **Problema:** Processo não aparece na lista do CHEFE (painel vazio) ❌
+
+**Possíveis Causas:**
+1. **Filtro "CRIADO":** Backend usa `listarPorParticipantesIgnorandoCriado()` para não-ADMIN (PainelFacade.java:68)
+   - Processos em estado CRIADO são filtrados para CHEFE/GESTOR
+   - Se processo permaneceu em CRIADO após "iniciar", CHEFE não verá
+2. **Subprocesso não Criado:** Processo pode ter sido criado mas subprocessos para SECAO_221 podem não ter sido criados
+3. **Estado do Processo:** Processo "Iniciado" deveria ter situação != CRIADO, mas pode não estar transitando corretamente
+4. **Participantes não Registrados:** Tabela de participantes pode não ter SECAO_221 registrada
+
+**Próxima Ação:** Investigar backend - verificar lógica de listagem de processos para CHEFEs vs ADMINs
+
 ---
 **Responsável:** Jules (Agente Copilot)  
-**Status:** Migração de Fixtures Concluída - Aguardando Validação  
-**Última Atualização:** 2026-02-12 (15:33 UTC)
+**Status:** Migração Concluída - Falha de Teste Identificada (Requer Investigação Backend)  
+**Última Atualização:** 2026-02-12 (15:52 UTC)
