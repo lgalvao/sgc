@@ -1,0 +1,88 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link "Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link "Unidades" [ref=e14] [cursor=pointer]:
+                  - /url: /unidades
+                  - generic [ref=e15]: 
+                  - text: Unidades
+              - listitem [ref=e16]:
+                - link "Relatórios" [active] [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link "Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "ADMIN - SEDOC" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: ADMIN - SEDOC
+              - listitem "Configurações do sistema" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: /configuracoes
+                  - generic [ref=e30]: 
+              - listitem "Sair" [ref=e31]:
+                - link [ref=e32] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e33]: 
+      - main [ref=e34]:
+        - generic [ref=e35]:
+          - heading "Relatórios" [level=2] [ref=e38]
+          - generic [ref=e39]:
+            - group [ref=e41]:
+              - generic [ref=e42]: Filtrar por Tipo
+              - combobox "Filtrar por Tipo" [ref=e43]:
+                - option "Todos os Tipos" [selected]
+                - option "Mapeamento"
+                - option "Revisão"
+                - option "Diagnóstico"
+            - group [ref=e45]:
+              - generic [ref=e46]: Data Início
+              - textbox "Data Início" [ref=e47]
+            - group [ref=e49]:
+              - generic [ref=e50]: Data Fim
+              - textbox "Data Fim" [ref=e51]
+          - generic [ref=e52]:
+            - generic [ref=e55] [cursor=pointer]:
+              - generic [ref=e57]: 
+              - heading "Mapas Vigentes" [level=3] [ref=e58]
+              - generic [ref=e59]: "0"
+              - generic [ref=e60]: Unidades com mapas
+            - generic [ref=e63] [cursor=pointer]:
+              - generic [ref=e65]: 
+              - heading "Diagnósticos de Gaps" [level=3] [ref=e66]
+              - generic [ref=e67]: "4"
+              - generic [ref=e68]: Gaps identificados
+            - generic [ref=e71] [cursor=pointer]:
+              - generic [ref=e73]: 
+              - heading "Andamento Geral" [level=3] [ref=e74]
+              - generic [ref=e75]: "2"
+              - generic [ref=e76]: Processos em andamento
+      - contentinfo [ref=e77]:
+        - generic [ref=e78]:
+          - generic [ref=e79]: Versão 1.0.0
+          - generic [ref=e80]: © SESEL/COSIS/TRE-PE
+  - text:   
+```

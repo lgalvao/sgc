@@ -1,0 +1,116 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - alert [ref=e4]:
+    - generic [ref=e5]:
+      - strong [ref=e6]: Processo iniciado
+      - button "Close" [ref=e7] [cursor=pointer]
+    - generic [ref=e9]: O processo foi iniciado com sucesso.
+  - generic [ref=e10]:
+    - navigation [ref=e11]:
+      - generic [ref=e12]:
+        - link "SGC" [ref=e13] [cursor=pointer]:
+          - /url: /painel
+        - generic [ref=e14]:
+          - list [ref=e15]:
+            - listitem [ref=e16]:
+              - link "Painel" [ref=e17] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e18]: 
+                - text: Painel
+            - listitem [ref=e19]:
+              - link "Unidades" [ref=e20] [cursor=pointer]:
+                - /url: /unidades
+                - generic [ref=e21]: 
+                - text: Unidades
+            - listitem [ref=e22]:
+              - link "Relatórios" [ref=e23] [cursor=pointer]:
+                - /url: /relatorios
+                - generic [ref=e24]: 
+                - text: Relatórios
+            - listitem [ref=e25]:
+              - link "Histórico" [ref=e26] [cursor=pointer]:
+                - /url: /historico
+                - generic [ref=e27]: 
+                - text: Histórico
+          - list [ref=e28]:
+            - listitem [ref=e29]:
+              - link "ADMIN - SEDOC" [ref=e30]:
+                - /url: "#"
+                - generic [ref=e31]:
+                  - generic [ref=e32]: 
+                  - generic [ref=e33]: ADMIN - SEDOC
+            - listitem "Configurações do sistema" [ref=e34]:
+              - link [ref=e35] [cursor=pointer]:
+                - /url: /configuracoes
+                - generic [ref=e36]: 
+            - listitem "Sair" [ref=e37]:
+              - link [ref=e38] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e39]: 
+    - main [ref=e40]:
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - heading "Processos" [level=2] [ref=e45]
+            - button "Criar processo" [ref=e47] [cursor=pointer]:
+              - generic [ref=e48]: 
+              - text: Criar processo
+          - generic "Lista de processos cadastrados" [ref=e50]:
+            - table [ref=e51]:
+              - rowgroup [ref=e52]:
+                - row "Descrição Tipo Unidades Situação" [ref=e53]:
+                  - columnheader "Descrição" [ref=e54] [cursor=pointer]
+                  - columnheader "Tipo" [ref=e55] [cursor=pointer]
+                  - columnheader "Unidades" [ref=e56]
+                  - columnheader "Situação" [ref=e57] [cursor=pointer]
+              - rowgroup [ref=e58]:
+                - row "Mapeamento Setup 1770906467333 Mapeamento ASSESSORIA_21 Finalizado" [ref=e59] [cursor=pointer]:
+                  - cell "Mapeamento Setup 1770906467333" [ref=e60]
+                  - cell "Mapeamento" [ref=e61]
+                  - cell "ASSESSORIA_21" [ref=e62]
+                  - cell "Finalizado" [ref=e63]
+                - row "Processo 99 Mapeamento ASSESSORIA_12 Finalizado" [ref=e64] [cursor=pointer]:
+                  - cell "Processo 99" [ref=e65]
+                  - cell "Mapeamento" [ref=e66]
+                  - cell "ASSESSORIA_12" [ref=e67]
+                  - cell "Finalizado" [ref=e68]
+                - row "Processo CDU-06 Gestor 1770906497740 Mapeamento SECAO_111 Em andamento" [ref=e69] [cursor=pointer]:
+                  - cell "Processo CDU-06 Gestor 1770906497740" [ref=e70]
+                  - cell "Mapeamento" [ref=e71]
+                  - cell "SECAO_111" [ref=e72]
+                  - cell "Em andamento" [ref=e73]
+                - row "Processo Seed 200 Mapeamento SECRETARIA_1 Finalizado" [ref=e74] [cursor=pointer]:
+                  - cell "Processo Seed 200" [ref=e75]
+                  - cell "Mapeamento" [ref=e76]
+                  - cell "SECRETARIA_1" [ref=e77]
+                  - cell "Finalizado" [ref=e78]
+                - row "Revisão Teste 1770906467333 Revisão ASSESSORIA_21 Em andamento" [ref=e79] [cursor=pointer]:
+                  - cell "Revisão Teste 1770906467333" [ref=e80]
+                  - cell "Revisão" [ref=e81]
+                  - cell "ASSESSORIA_21" [ref=e82]
+                  - cell "Em andamento" [ref=e83]
+        - generic [ref=e84]:
+          - heading "Alertas" [level=2] [ref=e87]
+          - table [ref=e90]:
+            - rowgroup [ref=e91]:
+              - row "Data/Hora Descrição Processo Origem" [ref=e92]:
+                - columnheader "Data/Hora" [ref=e93] [cursor=pointer]
+                - columnheader "Descrição" [ref=e94]
+                - columnheader "Processo" [ref=e95] [cursor=pointer]
+                - columnheader "Origem" [ref=e96]
+            - rowgroup [ref=e97]:
+              - row [ref=e98] [cursor=pointer]:
+                - cell [ref=e99]:
+                  - alert [ref=e100]:
+                    - region "Estado vazio" [ref=e102]:
+                      - generic [ref=e103]: 
+                      - paragraph [ref=e104]: Nenhum alerta
+    - contentinfo [ref=e105]:
+      - generic [ref=e106]:
+        - generic [ref=e107]: Versão 1.0.0
+        - generic [ref=e108]: © SESEL/COSIS/TRE-PE
+```
