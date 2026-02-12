@@ -42,8 +42,10 @@ function handleSortChange(ctx: any) {
   emit("ordenar", ctx.sortBy);
 }
 
-function handleSelecionarProcesso(processo: ProcessoResumo) {
-  emit("selecionarProcesso", processo);
+function handleSelecionarProcesso(processo: any) {
+  // O BTable do bootstrap-vue-next pode emitir o item diretamente ou um objeto com {item, index, event}
+  const item = processo?.item || processo;
+  emit("selecionarProcesso", item);
 }
 
 function rowClass(item: ProcessoResumo | null, type: string) {
@@ -83,7 +85,7 @@ defineExpose({ fields });
         hover
         responsive
         show-empty
-        @row-clicked="(event: any) => handleSelecionarProcesso(event.item)"
+        @row-clicked="handleSelecionarProcesso"
         @sort-changed="handleSortChange">
 
       <template #empty>

@@ -112,8 +112,8 @@ function ordenarPor(campo: keyof ProcessoResumo) {
   );
 }
 
-function abrirDetalhesProcesso(processo: ProcessoResumo) {
-  if (processo.linkDestino) {
+function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {
+  if (processo && processo.linkDestino) {
     router.push(processo.linkDestino);
   }
 }

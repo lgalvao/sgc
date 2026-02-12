@@ -156,7 +156,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
   await loading.withLoading('dataLimite', async () => {
     try {
       await subprocessosStore.alterarDataLimiteSubprocesso(
-          subprocesso.value!.unidade.codigo,
+          subprocesso.value!.codigo,
           {novaData},
       );
       fecharModalAlterarDataLimite();

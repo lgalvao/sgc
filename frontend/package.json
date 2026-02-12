@@ -16,7 +16,8 @@
     "quality:test": "vitest --run --coverage --reporter=dot",
     "quality:lint": "eslint . --ext .vue,.js,.mjs,.ts --max-warnings 0 --ignore-pattern coverage --ignore-pattern dist || true",
     "quality:typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict || true",
-    "quality:all": "npm run quality:test && npm run quality:lint && npm run quality:typecheck"
+    "quality:all": "npm run quality:test && npm run quality:lint && npm run quality:typecheck",
+    "api:generate": "openapi-typescript http://localhost:10000/api-docs -o src/types/api.ts"
   },
   "dependencies": {
     "axios": "^1.13.5",
@@ -57,6 +58,7 @@
     "globals": "^17.3.0",
     "jsdom": "^28.0.0",
     "nyc": "^17.1.0",
+    "openapi-typescript": "^7.13.0",
     "playwright": "^1.58.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.55.0",

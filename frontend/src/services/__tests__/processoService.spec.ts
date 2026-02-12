@@ -116,7 +116,9 @@ describe('processoService', () => {
         const codSubprocesso = 1;
         const dados = { novaData: '2024-12-31' };
         await processoService.alterarDataLimiteSubprocesso(codSubprocesso, dados);
-        expect(apiClient.post).toHaveBeenCalledWith(`/processos/alterar-data-limite`, { codigo: codSubprocesso, ...dados });
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/data-limite`, { 
+            novaDataLimite: dados.novaData 
+        });
     });
 
     it('apresentarSugestoes deve fazer requisição POST', async () => {

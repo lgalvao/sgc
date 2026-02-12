@@ -249,7 +249,7 @@ describe('Subprocesso.vue', () => {
 
     await flushPromises();
 
-    expect(store.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(1, { novaData: '2024-01-01' });
+    expect(store.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(10, { novaData: '2024-01-01' });
     expect((wrapper.vm as any).modals.modals.alterarDataLimite.value.isOpen).toBe(false);
     expect(feedbackStore.show).toHaveBeenCalledWith(expect.any(String), expect.stringContaining('sucesso'), 'success');
   });
