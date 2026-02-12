@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import sgc.organizacao.UsuarioFacade;
 import sgc.alerta.dto.AlertaDto;
 import sgc.organizacao.model.Perfil;
+import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.processo.dto.ProcessoResumoDto;
 
 @RestController
@@ -23,7 +23,6 @@ import sgc.processo.dto.ProcessoResumoDto;
 @Tag(name = "Painel", description = "Endpoints para o painel de controle (dashboard)")
 public class PainelController {
     private final PainelFacade painelService;
-    private final UsuarioFacade usuarioFacade;
 
     /**
      * Lista os processos a serem exibidos no painel do usuário.
@@ -44,18 +43,10 @@ public class PainelController {
             @RequestParam(name = "perfil") Perfil perfil,
             @RequestParam(name = "unidade", required = false) Long unidade,
             @PageableDefault(size = 20) Pageable pageable) {
-        Long unidadeResolvida = unidade;
-        if (unidadeResolvida == null && perfil != Perfil.ADMIN) {
-            var usuario = usuarioFacade.obterUsuarioAutenticadoOuNull();
-            if (usuario != null) {
-                unidadeResolvida = usuario.getUnidadeAtivaCodigo();
-                if (unidadeResolvida == null && usuario.getUnidadeLotacao() != null) {
-                    unidadeResolvida = usuario.getUnidadeLotacao().getCodigo();
-                }
-            }
+        if (perfil != Perfil.ADMIN && unidade == null) {
+            throw new ErroParametroPainelInvalido("Parâmetro 'unidade' é obrigatório para perfis não-ADMIN.");
         }
-
-        Page<ProcessoResumoDto> page = painelService.listarProcessos(perfil, unidadeResolvida, pageable);
+        Page<ProcessoResumoDto> page = painelService.listarProcessos(perfil, unidade, pageable);
         return ResponseEntity.ok(page);
     }
 

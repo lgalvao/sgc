@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -72,8 +73,8 @@ class PainelFacadeTest {
     }
 
     @Test
-    @DisplayName("Deve lidar com exceção ao calcular link")
-    void deveLidarComExcecaoAoCalcularLink() {
+    @DisplayName("Deve propagar erro ao calcular link sem fallback")
+    void devePropagarErroAoCalcularLink() {
         Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
         Page<Processo> page = new PageImpl<>(List.of(p));
 
@@ -85,10 +86,9 @@ class PainelFacadeTest {
         when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class))).thenReturn(page);
         when(unidadeFacade.buscarPorCodigo(100L)).thenThrow(new RuntimeException("Erro"));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.CHEFE, 100L, PageRequest.of(0, 10));
-
-        // Link deve ser vazio em caso de exceção
-        assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("");
+        assertThatThrownBy(() -> painelFacade.listarProcessos(Perfil.CHEFE, 100L, PageRequest.of(0, 10)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Erro");
     }
 
     @Test

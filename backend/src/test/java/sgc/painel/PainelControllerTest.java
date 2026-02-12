@@ -12,9 +12,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.alerta.dto.AlertaDto;
-import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.ProcessoResumoDto;
 
 import java.util.Collections;
@@ -34,8 +32,6 @@ class PainelControllerTest {
 
     @MockitoBean
     private PainelFacade painelFacade;
-    @MockitoBean
-    private UsuarioFacade usuarioFacade;
 
     @Test
     @DisplayName("GET /api/painel/processos - Deve listar processos com sucesso")
@@ -52,28 +48,20 @@ class PainelControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/painel/processos - Deve resolver unidade do usuário quando não informada")
-    @WithMockUser
-    void listarProcessos_UnidadeNaoInformada_DeveResolverPeloUsuario() throws Exception {
-        Page<ProcessoResumoDto> page = new PageImpl<>(Collections.emptyList());
-        Usuario usuario = new Usuario();
-        usuario.setUnidadeAtivaCodigo(99L);
-
-        when(usuarioFacade.obterUsuarioAutenticadoOuNull()).thenReturn(usuario);
-        when(painelFacade.listarProcessos(eq(Perfil.GESTOR), eq(99L), any(Pageable.class))).thenReturn(page);
-
-        mockMvc.perform(get("/api/painel/processos")
-                        .param("perfil", "GESTOR")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray());
-    }
-
-    @Test
     @DisplayName("GET /api/painel/processos - Deve falhar sem perfil")
     @WithMockUser
     void listarProcessos_SemPerfil_DeveFalhar() throws Exception {
         mockMvc.perform(get("/api/painel/processos")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("GET /api/painel/processos - Deve falhar sem unidade para perfil não ADMIN")
+    @WithMockUser
+    void listarProcessos_SemUnidadeParaGestor_DeveFalhar() throws Exception {
+        mockMvc.perform(get("/api/painel/processos")
+                        .param("perfil", "GESTOR")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

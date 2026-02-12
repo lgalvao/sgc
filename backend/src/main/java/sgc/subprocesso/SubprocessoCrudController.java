@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
@@ -15,7 +14,6 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -96,20 +94,7 @@ public class SubprocessoCrudController {
     public ResponseEntity<SubprocessoDto> buscarPorProcessoEUnidade(
             @RequestParam Long codProcesso, @RequestParam String siglaUnidade) {
         UnidadeDto unidade = unidadeService.buscarPorSigla(siglaUnidade);
-        SubprocessoDto dto;
-        try {
-            dto = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, unidade.getCodigo());
-        } catch (ErroEntidadeNaoEncontrada ex) {
-            List<Long> codigosUnidades = new ArrayList<>();
-            codigosUnidades.add(unidade.getCodigo());
-            codigosUnidades.addAll(unidadeService.buscarIdsDescendentes(unidade.getCodigo()));
-
-            List<SubprocessoDto> subprocessos = subprocessoFacade.listarPorProcessoEUnidades(codProcesso, codigosUnidades);
-            if (subprocessos.isEmpty()) {
-                throw ex;
-            }
-            dto = subprocessos.getFirst();
-        }
+        SubprocessoDto dto = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, unidade.getCodigo());
         return ResponseEntity.ok(dto);
     }
 

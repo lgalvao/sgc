@@ -186,3 +186,15 @@ Quando isso ocorre com dados válidos e atores corretos, tratar como bug funcion
 **Leitura técnica:**
 - Os ajustes de navegação (evitar `goto /processo/{codigo}` em etapas de preparo) reduziram falhas de carregamento infinito.
 - O bloqueio restante ficou isolado no comportamento de listagem/visibilidade de processo para GESTOR, com indício forte de regra de negócio/hierarquia no backend.
+
+### 17. Correções backend aplicadas para reduzir inconsistências de painel/subprocesso
+
+**Correções implementadas:**
+1. `PainelController` agora resolve `unidade` pelo usuário autenticado (unidade ativa/lotação) quando o parâmetro não é enviado para perfis não-ADMIN.
+2. `SubprocessoCrudController /api/subprocessos/buscar` ganhou fallback para tentar unidades descendentes quando não existir subprocesso direto para a sigla consultada.
+
+**Validação técnica:**
+- Testes backend focados (`PainelControllerTest` e `SubprocessoCrudControllerTest`) passando após ajuste.
+
+**Status funcional:**
+- Ainda persistem falhas E2E de visibilidade no painel para GESTOR (`CDU-20` e `CDU-25`), indicando investigação adicional de regra de negócio/hierarquia (não apenas transporte de parâmetro).
