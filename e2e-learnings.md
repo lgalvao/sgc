@@ -65,6 +65,25 @@ Em suites `test.describe.serial`, o estado de autenticação pode não persistir
 **Solução:**
 - Adicionar `await login(...)` explícito no início de cada bloco `test()` que requer um usuário específico, para garantir o contexto correto.
 
+### 8. Mensagens de Sucesso (Toasts) e Strict Mode
+
+**Problema Identificado:**
+Ao validar mensagens de feedback (Toasts), é comum ocorrer violação de "strict mode" pois o texto pode existir também no corpo da página ou haver múltiplos toasts.
+
+**Solução:**
+- Utilizar `.first()` para focar no primeiro elemento encontrado, assumindo que é o mais relevante ou o único visível naquele contexto imediato.
+- Exemplo: `await expect(page.getByText(/Sucesso/i).first()).toBeVisible();`
+
+### 9. Navegação Direta vs Painel
+
+**Aprendizado:**
+Depender de encontrar o processo na tabela do painel pode ser frágil devido a paginação ou ordenação, especialmente quando múltiplos testes rodam e criam dados.
+
+**Recomendação:**
+- Capturar o ID do processo na criação (`extrairProcessoId`).
+- Navegar diretamente via URL: `await page.goto('/processo/' + processoId);`.
+- Isso garante que o teste acesse o recurso correto sem "adivinhar" sua posição na lista.
+
 ## Problemas Resolvidos
 
 ### 1. Início de Revisão Bloqueado
