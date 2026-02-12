@@ -9,6 +9,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-19 ${timestamp}`;
+    let processoId = 0;
 
     // Atividades e competências para os testes
     const atividade1 = `Atividade 1 ${timestamp}`;
@@ -33,7 +34,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        const processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -42,10 +43,10 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.goto(`/processo/${processoId}`);
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -61,7 +62,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro', async ({page}) => {
+    test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -73,7 +74,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
     });
 
-    test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page}) => {
+    test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -95,7 +96,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     // TESTES PRINCIPAIS - CDU-19
     // ========================================================================
 
-    test('Cenario 1: CHEFE navega para visualização do mapa', async ({page}) => {
+    test('Cenario 1: CHEFE navega para visualização do mapa', async ({page, autenticadoComoChefeSecao221}) => {
         // CDU-19: Passos 1-2
         
 
@@ -118,7 +119,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await expect(page.getByTestId('btn-mapa-validar')).toBeVisible();
     });
 
-    test('Cenario 2: CHEFE cancela validação - permanece na tela', async ({page}) => {
+    test('Cenario 2: CHEFE cancela validação - permanece na tela', async ({page, autenticadoComoChefeSecao221}) => {
         // CDU-19: Passo 5.1.1
         
 
@@ -141,7 +142,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await expect(page.getByTestId('btn-mapa-validar')).toBeVisible();
     });
 
-    test('Cenario 3: CHEFE valida mapa com sucesso', async ({page}) => {
+    test('Cenario 3: CHEFE valida mapa com sucesso', async ({page, autenticadoComoChefeSecao221}) => {
         // CDU-19: Passos 5.2-5.6, 6-8
         
 

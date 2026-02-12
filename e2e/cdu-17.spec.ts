@@ -9,6 +9,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-17 ${timestamp}`;
+    let processoId = 0;
 
     // Atividades e competências para os testes
     const atividade1 = `Atividade 1 ${timestamp}`;
@@ -33,7 +34,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        const processoId = await extrairProcessoId(page);
+        processoId = await extrairProcessoId(page);
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -44,7 +45,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         // Acessar subprocesso
-        await page.getByText(descProcesso).click();
+        await page.goto(`/processo/${processoId}`);
         await navegarParaAtividades(page);
 
         // Três atividades para mapear corretamente

@@ -81,8 +81,8 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         await page.getByRole('link', {name: /Relatórios/i}).click();
         await expect(page).toHaveURL(/\/relatorios/);
 
-        await expect(page.getByTestId('sel-filtro-tipo')).toBeVisible();
-        await expect(page.getByTestId('inp-filtro-data-inicio')).toBeVisible();
-        await expect(page.getByTestId('inp-filtro-data-fim')).toBeVisible();
+        await expect(page.getByLabel('Filtrar por Tipo')).toBeVisible();
+        await expect(page.getByLabel('Data Início')).toBeVisible();
+        await expect(page.getByLabel('Data Fim')).toBeVisible();
     });
 });

@@ -58,11 +58,10 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro', async ({page}) => {
+    test('Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.getByText(descProcessoMapeamento).click();
-        await page.getByText(descProcessoMapeamento).click();
+        await page.goto(`/processo/${processoMapeamentoId}`);
 
         // Chefe vai direto para subprocesso
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
@@ -89,7 +88,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     // TESTES PRINCIPAIS - CDU-11
     // ========================================================================
 
-    test('Cenario 1: ADMIN visualiza cadastro clicando na unidade subordinada', async ({page, autenticadoComoAdmin, autenticadoComoChefeSecao221}) => {
+    test('Cenario 1: ADMIN visualiza cadastro clicando na unidade subordinada', async ({page, autenticadoComoAdmin}) => {
         // Fluxo principal passo 2 - ADMIN/GESTOR: 
         // 2.1 Sistema mostra tela Detalhes do processo
         // 2.2 Usuário clica em unidade subordinada operacional/interoperacional

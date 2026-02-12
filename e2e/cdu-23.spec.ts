@@ -58,10 +58,10 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
+    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.goto(`/processo/${processoId}`);
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -77,7 +77,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: ADMIN visualiza botão Homologar em Bloco', async ({page}) => {
+    test('Cenario 1: ADMIN visualiza botão Homologar em Bloco', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -91,7 +91,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         }
     });
 
-    test('Cenario 2: ADMIN abre modal de homologação em bloco', async ({page}) => {
+    test('Cenario 2: ADMIN abre modal de homologação em bloco', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -113,7 +113,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         }
     });
 
-    test('Cenario 3: Cancelar homologação em bloco permanece na tela', async ({page}) => {
+    test('Cenario 3: Cancelar homologação em bloco permanece na tela', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();

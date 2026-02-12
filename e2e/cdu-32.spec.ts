@@ -55,10 +55,10 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
+    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.goto(`/processo/${processoId}`);
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -74,7 +74,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para subprocesso disponibilizado', async ({page}) => {
+    test('Cenario 1: ADMIN navega para subprocesso disponibilizado', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -84,7 +84,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
             .toHaveText(/Cadastro disponibilizado/i);
     });
 
-    test('Cenario 2: ADMIN visualiza botão Reabrir cadastro', async ({page}) => {
+    test('Cenario 2: ADMIN visualiza botão Reabrir cadastro', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -98,7 +98,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         }
     });
 
-    test('Cenario 3: ADMIN abre modal de reabertura de cadastro', async ({page}) => {
+    test('Cenario 3: ADMIN abre modal de reabertura de cadastro', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -117,7 +117,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         }
     });
 
-    test('Cenario 4: Botão confirmar desabilitado sem justificativa', async ({page}) => {
+    test('Cenario 4: Botão confirmar desabilitado sem justificativa', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();

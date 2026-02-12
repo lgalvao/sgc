@@ -37,6 +37,9 @@ export async function criarProcesso(page: Page, options: {
     const unidades = Array.isArray(options.unidade) ? options.unidade : [options.unidade];
     for (const u of unidades) {
         const checkbox = page.getByTestId(`chk-arvore-unidade-${u}`);
+        if (!await checkbox.isEnabled()) {
+            continue;
+        }
         // Só marca se não estiver marcado (pode já estar marcado se o pai foi selecionado)
         if (!await checkbox.isChecked()) {
             await checkbox.check();

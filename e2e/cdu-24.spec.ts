@@ -59,10 +59,10 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
+    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.goto(`/processo/${processoId}`);
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -74,7 +74,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro e cria competências', async ({page}) => {
+    test('Preparacao 3: Admin homologa cadastro e cria competências', async ({page, autenticadoComoAdmin}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -101,7 +101,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     // TESTES PRINCIPAIS - CDU-24
     // ========================================================================
 
-    test('Cenario 1: ADMIN visualiza botão Disponibilizar Mapas em Bloco', async ({page}) => {
+    test('Cenario 1: ADMIN visualiza botão Disponibilizar Mapas em Bloco', async ({page, autenticadoComoAdmin}) => {
         // CDU-24: Passos 1-4
         
 
@@ -117,7 +117,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         }
     });
 
-    test('Cenario 2: Modal de disponibilização inclui campo de data limite', async ({page}) => {
+    test('Cenario 2: Modal de disponibilização inclui campo de data limite', async ({page, autenticadoComoAdmin}) => {
         // CDU-24: Passo 5 - Modal inclui campo de data limite obrigatório
         
 
@@ -148,7 +148,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         }
     });
 
-    test('Cenario 3: Cancelar disponibilização em bloco', async ({page}) => {
+    test('Cenario 3: Cancelar disponibilização em bloco', async ({page, autenticadoComoAdmin}) => {
         // CDU-24: Passo 6 - Cancelar
         
 

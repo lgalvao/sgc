@@ -17,7 +17,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
     // CENÁRIO 1: Navegação para página de histórico
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para página de histórico', async ({page}) => {
+    test('Cenario 1: ADMIN navega para página de histórico', async ({page, autenticadoComoAdmin}) => {
         // CDU-29: Passos 1-2
         
 
@@ -29,7 +29,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
         await expect(page.getByRole('heading', {name: /Histórico/i})).toBeVisible();
     });
 
-    test('Cenario 2: GESTOR pode acessar histórico', async ({page}) => {
+    test('Cenario 2: GESTOR pode acessar histórico', async ({page, autenticadoComoGestor}) => {
         
 
         // Navegar para histórico
@@ -39,7 +39,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
         await expect(page.getByRole('heading', {name: /Histórico/i})).toBeVisible();
     });
 
-    test('Cenario 3: CHEFE pode acessar histórico', async ({page}) => {
+    test('Cenario 3: CHEFE pode acessar histórico', async ({page, autenticadoComoChefeSecao121}) => {
         
 
         // Navegar para histórico
@@ -53,7 +53,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
     // CENÁRIO 4: Verificar estrutura da tabela de processos finalizados
     // ========================================================================
 
-    test('Cenario 4: Tabela apresenta colunas corretas', async ({page}) => {
+    test('Cenario 4: Tabela apresenta colunas corretas', async ({page, autenticadoComoAdmin}) => {
         // CDU-29: Passo 2 - Verificar colunas da tabela
         
 

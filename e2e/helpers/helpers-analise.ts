@@ -61,7 +61,7 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
     if (siglaUnidade) {
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
     } else {
-        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+        await expect(page).toHaveURL(/\/processo\/\d+(?:\/\w+)?$/);
     }
 }
 

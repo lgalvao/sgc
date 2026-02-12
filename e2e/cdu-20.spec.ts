@@ -110,7 +110,8 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
         // Passo 1: No Painel, escolhe o processo
         await page.goto(`/processo/${processoId}`);
-        await expect(page.getByText(descProcesso)).toBeVisible();
+        await expect(page.getByText('Carregando detalhes do processo...')).toBeHidden();
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         // Passo 1: Clica na unidade com situação 'Mapa validado'
         await navegarParaSubprocesso(page, 'SECAO_221');

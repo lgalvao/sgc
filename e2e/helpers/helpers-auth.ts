@@ -5,7 +5,7 @@ import {Page} from '@playwright/test';
  * Baseado nos dados de e2e/setup/seed.sql
  */
 export const USUARIOS = {
-    ADMIN_2_PERFIS: {titulo: '111111', senha: 'senha', perfil: 'ADMIN - SEDOC'},
+    ADMIN_2_PERFIS: {titulo: '111111', senha: 'senha', perfil: 'ADMIN - ADMIN'},
     ADMIN_1_PERFIL: {titulo: '191919', senha: 'senha'},
     GESTOR_COORD: {titulo: '222222', senha: 'senha'}, // GESTOR_COORD_11 (COORD_11)
     GESTOR_COORD_22: {titulo: '131313', senha: 'senha'}, // Mick Jagger (COORD_22)

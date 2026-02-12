@@ -1,0 +1,2315 @@
+
+> sgc@1.0.0 test:e2e
+> playwright test
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+
+[1A[2K[2m[WebServer] [22mINFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 18 unidades verificadas.
+
+[1A[2K[2m[WebServer] [22m  [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m263[22m[2m[0m ms[22m
+
+[1A[2K[2m[WebServer] [22m  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+
+[1A[2K[2m[WebServer] [22m[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+
+[1A[2K[2m[WebServer] [22m>>> Frontend e Backend no ar!
+
+
+Running 229 tests using 1 worker
+
+[1A[2K[1/229] [chromium] › e2e/captura-telas.spec.ts:59:9 › Captura de Telas - Sistema SGC › 01 - Autenticação › Captura telas de login
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 999999999
+
+[1A[2K[2m[WebServer] [22mWARN  s.c.erros.RestExceptionHandler.handleErroAutenticacao:125 - Erro de autenticação: Credenciais inválidas
+
+[1A[2K[chromium] › e2e/captura-telas.spec.ts:59:9 › Captura de Telas - Sistema SGC › 01 - Autenticação › Captura telas de login
+[BROWSER ERROR] Failed to load resource: the server responded with a status of 401 ()
+
+[1A[2K[NETWORK ERROR] 401 POST http://localhost:10000/api/usuarios/autorizar
+
+[1A[2K[NETWORK BODY] {"code":"NAO_AUTORIZADO","message":"Credenciais inválidas","status":401,"timestamp":"12-02-2026 18:40:32","traceId":"6ac9eac8-ed13-4dcf-b070-80bda83ccc0b"}
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 111111
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 111111
+
+[1A[2K  1) [chromium] › e2e/captura-telas.spec.ts:59:9 › Captura de Telas - Sistema SGC › 01 - Autenticação › Captura telas de login 
+
+    [31mTest timeout of 20000ms exceeded.[39m
+
+    Error: locator.selectOption: Test timeout of 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('sel-login-perfil')[22m
+    [2m    - locator resolved to <select id="par" class="form-select" data-testid="sel-login-perfil">…</select>[22m
+    [2m  - attempting select option action[22m
+    [2m    2 × waiting for element to be visible and enabled[22m
+    [2m      - did not find some options[22m
+    [2m    - retrying select option action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be visible and enabled[22m
+    [2m      - did not find some options[22m
+    [2m    - retrying select option action[22m
+    [2m      - waiting 100ms[22m
+    [2m    36 × waiting for element to be visible and enabled[22m
+    [2m       - did not find some options[22m
+    [2m     - retrying select option action[22m
+    [2m       - waiting 500ms[22m
+
+
+       at helpers/helpers-auth.ts:39
+
+      37 |     await page.goto('/login');
+      38 |     await autenticar(page, usuario, senha);
+    > 39 |     await page.getByTestId('sel-login-perfil').selectOption({label: perfilUnidade});
+         |                                                ^
+      40 |     await page.getByTestId('btn-login-entrar').click();
+      41 |     await page.waitForURL('/painel');
+      42 | }
+        at loginComPerfil (/Users/leonardo/sgc/e2e/helpers/helpers-auth.ts:39:48)
+        at /Users/leonardo/sgc/e2e/captura-telas.spec.ts:80:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/captura-telas-Captura-de-T-69201-ação-Captura-telas-de-login-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/captura-telas-Captura-de-T-69201-ação-Captura-telas-de-login-chromium/error-context.md
+
+
+[1A[2K[2/229] [chromium] › e2e/captura-telas.spec.ts:86:9 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel ADMIN
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 3 participantes: [6, 3, 4]. Participante IDs: [(201,6), (201,3), (201,4)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[3/229] [chromium] › e2e/captura-telas.spec.ts:144:9 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel GESTOR
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 3 participantes: [6, 7, 8]. Participante IDs: [(201,6), (201,7), (201,8)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 3 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_112
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_113
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_111
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 222222
+
+[1A[2K[4/229] [chromium] › e2e/captura-telas.spec.ts:164:9 › Captura de Telas - Sistema SGC › 02 - Painel Principal › Captura painel CHEFE
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [15]. Participante IDs: [(201,15)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_211
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 101010
+
+[1A[2K[5/229] [chromium] › e2e/captura-telas.spec.ts:186:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura criação e detalhamento de processo
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [4]. Participante IDs: [(201,4)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade ASSESSORIA_12
+
+[1A[2K[6/229] [chromium] › e2e/captura-telas.spec.ts:225:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura validações de formulário
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[7/229] [chromium] › e2e/captura-telas.spec.ts:261:9 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura fluxo completo de atividades
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [15]. Participante IDs: [(201,15)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_211
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 101010
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 201 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para COORD_21 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[8/229] [chromium] › e2e/captura-telas.spec.ts:328:9 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura estados de validação inline de atividades
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [16]. Participante IDs: [(201,16)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_212
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 181818
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 201 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[9/229] [chromium] › e2e/captura-telas.spec.ts:428:9 › Captura de Telas - Sistema SGC › 05 - Mapa de Competências › Captura fluxo de mapa de competências
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [10]. Participante IDs: [(201,10)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_121
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 171717
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 201 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para COORD_12 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[chromium] › e2e/captura-telas.spec.ts:428:9 › Captura de Telas - Sistema SGC › 05 - Mapa de Competências › Captura fluxo de mapa de competências
+[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para SECAO_121 - Transição: MAPA_DISPONIBILIZADO
+
+[1A[2K[10/229] [chromium] › e2e/captura-telas.spec.ts:538:9 › Captura de Telas - Sistema SGC › 06 - Navegação e Menus › Captura elementos de navegação
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[11/229] [chromium] › e2e/captura-telas.spec.ts:573:9 › Captura de Telas - Sistema SGC › 07 - Estados e Situações › Captura diferentes estados de processo
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [3]. Participante IDs: [(201,3)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[12/229] [chromium] › e2e/captura-telas.spec.ts:612:9 › Captura de Telas - Sistema SGC › 08 - Responsividade (Tamanhos de Tela) › Captura em diferentes resoluções
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 202 criado com 1 participantes: [4]. Participante IDs: [(202,4)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 202 existe no repo? true
+[2m[WebServer] [22mINFO  s.s.s.f.SubprocessoFactory.criarParaRevisao:152 - Subprocesso para revisão criado para unidade ASSESSORIA_12
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de revisao 202 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade ASSESSORIA_12
+
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[13/229] [chromium] › e2e/captura-telas.spec.ts:637:9 › Captura de Telas - Sistema SGC › 09 - Operações em Bloco › Captura fluxo de aceitar cadastros em bloco
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 2 participantes: [7, 6]. Participante IDs: [(201,7), (201,6)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 2 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_111
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_112
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 333333
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 201 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para COORD_11 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[chromium] › e2e/captura-telas.spec.ts:637:9 › Captura de Telas - Sistema SGC › 09 - Operações em Bloco › Captura fluxo de aceitar cadastros em bloco
+[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 222222
+
+[1A[2K[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[14/229] [chromium] › e2e/captura-telas.spec.ts:736:9 › Captura de Telas - Sistema SGC › 10 - Gestão de Subprocessos › Captura modais de gestão de subprocesso
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [10]. Participante IDs: [(201,10)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_121
+
+[1A[2K[15/229] [chromium] › e2e/captura-telas.spec.ts:793:9 › Captura de Telas - Sistema SGC › 11 - Gestão de Unidades › Captura página de unidades e atribuição temporária
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[16/229] [chromium] › e2e/captura-telas.spec.ts:835:9 › Captura de Telas - Sistema SGC › 12 - Histórico › Captura seção de histórico
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[17/229] [chromium] › e2e/captura-telas.spec.ts:858:9 › Captura de Telas - Sistema SGC › 13 - Configurações › Captura página de configurações e administradores
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[18/229] [chromium] › e2e/captura-telas.spec.ts:895:9 › Captura de Telas - Sistema SGC › 14 - Relatórios › Captura página e modais de relatórios
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[19/229] [chromium] › e2e/cdu-01.spec.ts:10:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir erro com credenciais inválidas
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 999999999
+
+[1A[2K[chromium] › e2e/cdu-01.spec.ts:10:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir erro com credenciais inválidas
+[BROWSER ERROR] Failed to load resource: the server responded with a status of 401 ()
+
+[1A[2K[NETWORK ERROR] 401 POST http://localhost:10000/api/usuarios/autorizar
+
+[1A[2K[NETWORK BODY] {"code":"NAO_AUTORIZADO","message":"Credenciais inválidas","status":401,"timestamp":"12-02-2026 18:42:07","traceId":"669dedad-2383-46c4-9b53-be14803c65d9"}
+
+[1A[2K[2m[WebServer] [22mWARN  s.c.erros.RestExceptionHandler.handleErroAutenticacao:125 - Erro de autenticação: Credenciais inválidas
+
+[1A[2K[20/229] [chromium] › e2e/cdu-01.spec.ts:15:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve realizar login com sucesso (Perfil Único)
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 222222
+
+[1A[2K[21/229] [chromium] › e2e/cdu-01.spec.ts:23:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir seleção de perfil se houver múltiplos
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 111111
+
+[1A[2K  2) [chromium] › e2e/cdu-01.spec.ts:23:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir seleção de perfil se houver múltiplos 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.selectOption: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('sel-login-perfil')[22m
+    [2m    - locator resolved to <select id="par" class="form-select" data-testid="sel-login-perfil">…</select>[22m
+    [2m  - attempting select option action[22m
+    [2m    2 × waiting for element to be visible and enabled[22m
+    [2m      - did not find some options[22m
+    [2m    - retrying select option action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be visible and enabled[22m
+    [2m      - did not find some options[22m
+    [2m    - retrying select option action[22m
+    [2m      - waiting 100ms[22m
+    [2m    19 × waiting for element to be visible and enabled[22m
+    [2m       - did not find some options[22m
+    [2m     - retrying select option action[22m
+    [2m       - waiting 500ms[22m
+
+
+       at helpers/helpers-auth.ts:39
+
+      37 |     await page.goto('/login');
+      38 |     await autenticar(page, usuario, senha);
+    > 39 |     await page.getByTestId('sel-login-perfil').selectOption({label: perfilUnidade});
+         |                                                ^
+      40 |     await page.getByTestId('btn-login-entrar').click();
+      41 |     await page.waitForURL('/painel');
+      42 | }
+        at loginComPerfil (/Users/leonardo/sgc/e2e/helpers/helpers-auth.ts:39:48)
+        at /Users/leonardo/sgc/e2e/cdu-01.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-01-CDU-01---Realizar-l-14062--perfil-se-houver-múltiplos-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-01-CDU-01---Realizar-l-14062--perfil-se-houver-múltiplos-chromium/error-context.md
+
+
+[1A[2K[22/229] [chromium] › e2e/cdu-01.spec.ts:35:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir barra de navegação após login
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[23/229] [chromium] › e2e/cdu-01.spec.ts:46:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir informações do usuário e controles
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K  3) [chromium] › e2e/cdu-01.spec.ts:46:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir informações do usuário e controles 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText('ADMIN - SEDOC')
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByText('ADMIN - SEDOC')[22m
+
+
+      49 |
+      50 |         // Verifica Informações do Usuário
+    > 51 |         await expect(page.getByText('ADMIN - SEDOC')).toBeVisible();
+         |                                                       ^
+      52 |
+      53 |         // Verifica Ícone de Configurações de Admin
+      54 |         await expect(page.getByTestId('btn-configuracoes')).toBeVisible();
+        at /Users/leonardo/sgc/e2e/cdu-01.spec.ts:51:55
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-01-CDU-01---Realizar-l-b1433-ções-do-usuário-e-controles-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-01-CDU-01---Realizar-l-b1433-ções-do-usuário-e-controles-chromium/error-context.md
+
+
+[1A[2K[24/229] [chromium] › e2e/cdu-01.spec.ts:60:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir rodapé
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[25/229] [chromium] › e2e/cdu-02.spec.ts:10:9 › CDU-02 - Visualizar Painel › Como ADMIN › Deve exibir seções de Processos e Alertas
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[26/229] [chromium] › e2e/cdu-02.spec.ts:18:9 › CDU-02 - Visualizar Painel › Como ADMIN › Deve exibir botão "Criar processo"
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[27/229] [chromium] › e2e/cdu-02.spec.ts:22:9 › CDU-02 - Visualizar Painel › Como ADMIN › Deve criar processo e visualizá-lo na tabela
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [3]. Participante IDs: [(201,3)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[28/229] [chromium] › e2e/cdu-02.spec.ts:47:9 › CDU-02 - Visualizar Painel › Como ADMIN › Processos "Criado" devem aparecer apenas para ADMIN
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 202 criado com 1 participantes: [3]. Participante IDs: [(202,3)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 202 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 222222
+
+[1A[2K[29/229] [chromium] › e2e/cdu-02.spec.ts:79:9 › CDU-02 - Visualizar Painel › Como ADMIN › Não deve incluir unidades INTERMEDIARIAS na seleção
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 203 criado com 3 participantes: [7, 6, 8]. Participante IDs: [(203,7), (203,6), (203,8)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 203 existe no repo? true
+
+[1A[2K[30/229] [chromium] › e2e/cdu-02.spec.ts:136:9 › CDU-02 - Visualizar Painel › Como GESTOR › Não deve exibir botão "Criar processo"
+[1A[2K[31/229] [chromium] › e2e/cdu-02.spec.ts:140:9 › CDU-02 - Visualizar Painel › Como GESTOR › Deve exibir mensagem quando não há processos
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 222222
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 222222
+
+[1A[2K[32/229] [chromium] › e2e/cdu-02.spec.ts:151:9 › CDU-02 - Visualizar Painel › Como GESTOR › Deve exibir tabela de alertas vazia
+[1A[2K[33/229] [chromium] › e2e/cdu-03.spec.ts:8:5 › CDU-03 - Manter Processo › Deve validar campos obrigatórios
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 222222
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[34/229] [chromium] › e2e/cdu-03.spec.ts:38:5 › CDU-03 - Manter Processo › Deve editar um processo existente
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 204 criado com 1 participantes: [3]. Participante IDs: [(204,3)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 204 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.atualizar:108 - Processo 204 atualizado.
+
+[1A[2K[35/229] [chromium] › e2e/cdu-03.spec.ts:75:5 › CDU-03 - Manter Processo › Deve remover um processo
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 205 criado com 1 participantes: [3]. Participante IDs: [(205,3)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 205 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.apagar:122 - Processo 205 removido.
+
+[1A[2K[36/229] [chromium] › e2e/cdu-04.spec.ts:5:5 › CDU-04 - Iniciar processo de mapeamento › Deve iniciar um processo com sucesso
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 206 criado com 1 participantes: [3]. Participante IDs: [(206,3)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 206 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 206 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade ASSESSORIA_11
+
+[1A[2K[37/229] [chromium] › e2e/cdu-05.spec.ts:75:5 › CDU-05 - Iniciar processo de revisao › Fase 1.1: ADMIN cria e inicia processo de Mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 207 criado com 1 participantes: [12]. Participante IDs: [(207,12)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 207 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 207 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade ASSESSORIA_21
+
+[1A[2K[38/229] [chromium] › e2e/cdu-05.spec.ts:84:5 › CDU-05 - Iniciar processo de revisao › Fase 1.2: CHEFE adiciona atividades e conhecimentos
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 777777
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 202 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[39/229] [chromium] › e2e/cdu-05.spec.ts:96:5 › CDU-05 - Iniciar processo de revisao › Fase 1.3: CHEFE disponibiliza cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 777777
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para SECRETARIA_2 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[40/229] [chromium] › e2e/cdu-05.spec.ts:107:5 › CDU-05 - Iniciar processo de revisao › Fase 1.4: ADMIN homologa cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[41/229] [chromium] › e2e/cdu-05.spec.ts:114:5 › CDU-05 - Iniciar processo de revisao › Fase 1.5: ADMIN adiciona competências e disponibiliza mapa
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para ASSESSORIA_21 - Transição: MAPA_DISPONIBILIZADO
+
+[1A[2K[42/229] [chromium] › e2e/cdu-05.spec.ts:123:5 › CDU-05 - Iniciar processo de revisao › Fase 1.6: CHEFE valida mapa
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 777777
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para SECRETARIA_2 - Transição: MAPA_VALIDADO
+
+[1A[2K[43/229] [chromium] › e2e/cdu-05.spec.ts:132:5 › CDU-05 - Iniciar processo de revisao › Fase 1.7: ADMIN homologa e finaliza processo
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoValidador.validarTodosSubprocessosHomologados:95 - Todos os subprocessos do processo 207 estão homologados
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoFinalizador.tornarMapasVigentes:86 - Mapa vigente definido para o processo 207
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoFinalizador.tornarMapasVigentes:100 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoFinalizador.finalizar:76 - Processo 207 finalizado
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailUnidadeFinal:196 - E-mail de finalização enviado para ASSESSORIA_21
+
+[1A[2K[44/229] [chromium] › e2e/cdu-05.spec.ts:147:5 › CDU-05 - Iniciar processo de revisao › Fase 2: Iniciar processo de Revisão
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 208 criado com 1 participantes: [12]. Participante IDs: [(208,12)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 208 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.f.SubprocessoFactory.criarParaRevisao:152 - Subprocesso para revisão criado para unidade ASSESSORIA_21
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de revisao 208 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade ASSESSORIA_21
+
+[1A[2K[45/229] [chromium] › e2e/cdu-06.spec.ts:8:5 › CDU-06 - Detalhar processo › Deve exibir detalhes do processo para ADMIN
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 209 criado com 1 participantes: [4]. Participante IDs: [(209,4)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 209 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 209 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade ASSESSORIA_12
+
+[1A[2K[46/229] [chromium] › e2e/cdu-06.spec.ts:48:5 › CDU-06 - Detalhar processo › Deve exibir detalhes do processo para GESTOR
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 210 criado com 1 participantes: [6]. Participante IDs: [(210,6)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 210 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 210 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_111
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 222222
+
+[1A[2K[47/229] [chromium] › e2e/cdu-07.spec.ts:10:5 › CDU-07 - Detalhar subprocesso › Deve exibir detalhes do subprocesso para CHEFE
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 211 criado com 1 participantes: [10]. Participante IDs: [(211,10)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 211 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 211 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_121
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 171717
+
+[1A[2K[48/229] [chromium] › e2e/cdu-08.spec.ts:13:5 › CDU-08 - Manter cadastro de atividades e conhecimentos › Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 212 criado com 1 participantes: [3]. Participante IDs: [(212,3)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 212 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 212 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade ASSESSORIA_11
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 555555
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 207 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para SECRETARIA_1 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[49/229] [chromium] › e2e/cdu-08.spec.ts:84:5 › CDU-08 - Manter cadastro de atividades e conhecimentos › Cenário 2: Processo de Revisão (Botão Impacto)
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 213 criado com 1 participantes: [4]. Participante IDs: [(213,4)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 213 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.f.SubprocessoFactory.criarParaRevisao:152 - Subprocesso para revisão criado para unidade ASSESSORIA_12
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de revisao 213 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade ASSESSORIA_12
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 151515
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:67 - Atualizando situação do subprocesso 208 para REVISAO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[50/229] [chromium] › e2e/cdu-09.spec.ts:25:5 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Preparacao: Admin cria e inicia processo
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 214 criado com 1 participantes: [18]. Participante IDs: [(214,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 214 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 214 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[51/229] [chromium] › e2e/cdu-09.spec.ts:48:5 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Cenario 1: Validacao - Atividade sem conhecimento
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 209 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[52/229] [chromium] › e2e/cdu-09.spec.ts:83:5 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Cenario 2: Caminho feliz - Disponibilizar Cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[53/229] [chromium] › e2e/cdu-09.spec.ts:107:5 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Cenario 3: Devolucao e Historico de Analise
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoTransicaoService.registrarAnaliseETransicao:109 - Workflow executado: Subprocesso 209 -> MAPEAMENTO_CADASTRO_EM_ANDAMENTO, Transição CADASTRO_DEVOLVIDO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para SECAO_221 - Transição: CADASTRO_DEVOLVIDO
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[54/229] [chromium] › e2e/cdu-10.spec.ts:28:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Fluxo completo de revisão de cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K  4) [chromium] › e2e/cdu-10.spec.ts:28:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Fluxo completo de revisão de cadastro › 1. Preparação: Mapeamento completo e Revisão iniciada 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: locator.check: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('chk-arvore-unidade-SECAO_221')[22m
+    [2m    - locator resolved to <input disabled value="true" type="checkbox" true-value="true" id="chk-SECAO_221" false-value="false" class="form-check-input" data-testid="chk-arvore-unidade-SECAO_221"/>[22m
+    [2m  - attempting click action[22m
+    [2m    2 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is not enabled[22m
+    [2m    - retrying click action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is not enabled[22m
+    [2m    - retrying click action[22m
+    [2m      - waiting 100ms[22m
+    [2m    112 × waiting for element to be visible, enabled and stable[22m
+    [2m        - element is not enabled[22m
+    [2m      - retrying click action[22m
+    [2m        - waiting 500ms[22m
+
+
+       at helpers/helpers-processos.ts:42
+
+      40 |         // Só marca se não estiver marcado (pode já estar marcado se o pai foi selecionado)
+      41 |         if (!await checkbox.isChecked()) {
+    > 42 |             await checkbox.check();
+         |                            ^
+      43 |         }
+      44 |     }
+      45 |
+        at criarProcesso (/Users/leonardo/sgc/e2e/helpers/helpers-processos.ts:42:28)
+        at /Users/leonardo/sgc/e2e/cdu-10.spec.ts:39:13
+        at /Users/leonardo/sgc/e2e/cdu-10.spec.ts:37:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-10-CDU-10---Disponibil-8d523-leto-de-revisão-de-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-10-CDU-10---Disponibil-8d523-leto-de-revisão-de-cadastro-chromium/error-context.md
+
+
+[1A[2K[55/229] [chromium] › e2e/cdu-11.spec.ts:33:5 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[56/229] [chromium] › e2e/cdu-11.spec.ts:61:5 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro
+[1A[2K  5) [chromium] › e2e/cdu-11.spec.ts:61:5 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('Map 11 1770932649078')[22m
+
+
+      62 |         
+      63 |
+    > 64 |         await page.getByText(descProcessoMapeamento).click();
+         |                                                      ^
+      65 |         await page.getByText(descProcessoMapeamento).click();
+      66 |
+      67 |         // Chefe vai direto para subprocesso
+        at /Users/leonardo/sgc/e2e/cdu-11.spec.ts:64:54
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-11-CDU-11---Visualizar-4443e-os-e-disponibiliza-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[57/229] [chromium] › e2e/cdu-11.spec.ts:92:5 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Cenario 1: ADMIN visualiza cadastro clicando na unidade subordinada
+[1A[2K[58/229] [chromium] › e2e/cdu-11.spec.ts:140:5 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Cenario 2: CHEFE visualiza cadastro diretamente (sem navegar por unidades)
+[1A[2K[59/229] [chromium] › e2e/cdu-11.spec.ts:170:5 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Cenario 3: Visualizar processo finalizado
+[1A[2K[60/229] [chromium] › e2e/cdu-11.spec.ts:255:5 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Cenario 4: CHEFE visualiza cadastro de processo finalizado
+[1A[2K[61/229] [chromium] › e2e/cdu-12.spec.ts:37:5 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 201 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[chromium] › e2e/cdu-12.spec.ts:37:5 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)
+[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+
+[1A[2K[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+
+[1A[2K[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[Browser Console] debug: [vite] connecting...
+
+[1A[2K[Browser Console] debug: [vite] connected.
+
+[1A[2K[Browser Console] error: Failed to load resource: the server responded with a status of 404 ()
+
+[1A[2K[BROWSER ERROR] Failed to load resource: the server responded with a status of 404 ()
+
+[1A[2K[NETWORK ERROR] 404 GET http://localhost:10000/api/processos/201/detalhes
+
+[1A[2K[NETWORK BODY] {"code":"ENTIDADE_NAO_ENCONTRADA","message":"&#39;Processo&#39; com codigo &#39;201&#39; não encontrado(a).","status":404,"timestamp":"12-02-2026 18:44:47","traceId":"4d24fdd2-3ffd-4ddd-b52c-adaf0eea5685"}
+
+[1A[2K[62/229] [chromium] › e2e/cdu-12.spec.ts:153:5 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 2: Iniciar Processo de Revisão
+[1A[2K[2m[WebServer] [22mINFO  s.p.service.ProcessoValidador.validarTodosSubprocessosHomologados:95 - Todos os subprocessos do processo 201 estão homologados
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoFinalizador.tornarMapasVigentes:86 - Mapa vigente definido para o processo 201
+[2m[WebServer] [22mINFO  s.p.s.ProcessoFinalizador.tornarMapasVigentes:100 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoFinalizador.finalizar:76 - Processo 201 finalizado
+[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailUnidadeFinal:196 - E-mail de finalização enviado para SECAO_221
+[2m[WebServer] [22mWARN  s.c.erros.RestExceptionHandler.handleErroNegocio:50 - Erro de negócio (ENTIDADE_NAO_ENCONTRADA): 'Processo' com codigo '201' não encontrado(a).
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 202 criado com 1 participantes: [18]. Participante IDs: [(202,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 202 existe no repo? true
+
+[1A[2K[chromium] › e2e/cdu-12.spec.ts:153:5 › CDU-12 - Verificar impactos no mapa de competências › Preparacao 2: Iniciar Processo de Revisão
+[BROWSER ERROR] Failed to load resource: the server responded with a status of 500 ()
+
+[1A[2K[NETWORK ERROR] 500 POST http://localhost:10000/api/processos/202/iniciar
+
+[1A[2K[NETWORK BODY] {"code":"ERRO_INTERNO","message":"Erro inesperado","status":500,"timestamp":"12-02-2026 18:44:48","traceId":"83c3553c-9fa1-4206-aec9-6d3a76cd297c"}
+
+[1A[2K[BROWSER ERROR] %cerror%c Erro ao iniciar processo: 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+[1A[2K[63/229] [chromium] › e2e/cdu-12.spec.ts:178:5 › CDU-12 - Verificar impactos no mapa de competências › Cenario 1: Verificar Sem Impactos (Estado Inicial)
+[1A[2K[2m[WebServer] [22mERROR s.c.erros.RestExceptionHandler.handleGenericException:168 - [83c3553c-9fa1-4206-aec9-6d3a76cd297c] Erro inesperado na aplicação
+
+[1A[2K[2m[WebServer] [22morg.springframework.orm.ObjectRetrievalFailureException: No row with the given identifier exists for entity [sgc.mapa.model.Mapa with id '201']
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:198)
+[2m[WebServer] [22m	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
+[2m[WebServer] [22m	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:109)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:199)
+[2m[WebServer] [22m	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:556)
+[2m[WebServer] [22m	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:346)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:166)
+[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.data.util.NullnessMethodInvocationValidator.invoke(NullnessMethodInvocationValidator.java:99)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:222)
+
+[1A[2K[2m[WebServer] [22m	at jdk.proxy4/jdk.proxy4.$Proxy209.findAllById(Unknown Source)
+
+[1A[2K[2m[WebServer] [22m	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+
+[1A[2K[2m[WebServer] [22m	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190)
+[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:158)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint.proceed(MethodInvocationProceedingJoinPoint.java:82)
+
+[1A[2K[2m[WebServer] [22m	at sgc.comum.util.MonitoramentoAspect.monitorarExecucao(MonitoramentoAspect.java:22)
+
+[1A[2K[2m[WebServer] [22m	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+
+[1A[2K[2m[WebServer] [22m	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.aspectj.AbstractAspectJAdvice.invokeAdviceMethodWithGivenArgs(AbstractAspectJAdvice.java:648)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.aspectj.AbstractAspectJAdvice.invokeAdviceMethod(AbstractAspectJAdvice.java:630)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.aspectj.AspectJAroundAdvice.invoke(AspectJAroundAdvice.java:70)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:96)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:222)
+
+[1A[2K[2m[WebServer] [22m	at jdk.proxy4/jdk.proxy4.$Proxy209.findAllById(Unknown Source)
+
+[1A[2K[2m[WebServer] [22m	at sgc.processo.service.ProcessoInicializador.iniciar(ProcessoInicializador.java:86)
+[2m[WebServer] [22m	at sgc.processo.service.ProcessoFacade.iniciarProcesso(ProcessoFacade.java:154)
+[2m[WebServer] [22m	at sgc.processo.service.ProcessoFacade.iniciarProcessoRevisao(ProcessoFacade.java:144)
+
+[1A[2K[2m[WebServer] [22m	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+
+[1A[2K[2m[WebServer] [22m	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+[2m[WebServer] [22m	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:158)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719)
+
+[1A[2K[2m[WebServer] [22m	at sgc.processo.service.ProcessoFacade$$SpringCGLIB$$0.iniciarProcessoRevisao(<generated>)
+
+[1A[2K[2m[WebServer] [22m	at sgc.processo.ProcessoController.iniciar(ProcessoController.java:182)
+
+[1A[2K[2m[WebServer] [22m	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+[2m[WebServer] [22m	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190)
+[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:158)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.proceed(AuthorizationManagerBeforeMethodInterceptor.java:271)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.attemptAuthorization(AuthorizationManagerBeforeMethodInterceptor.java:266)
+[2m[WebServer] [22m	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.invoke(AuthorizationManagerBeforeMethodInterceptor.java:197)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.config.annotation.method.configuration.DeferringMethodInterceptor.invoke(DeferringMethodInterceptor.java:44)
+[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719)
+
+[1A[2K[2m[WebServer] [22m	at sgc.processo.ProcessoController$$SpringCGLIB$$0.iniciar(<generated>)
+
+[1A[2K[2m[WebServer] [22m	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+
+[1A[2K[2m[WebServer] [22m	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:190)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1003)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:903)
+
+[1A[2K[2m[WebServer] [22m	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:653)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874)
+
+[1A[2K[2m[WebServer] [22m	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:723)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.servlet.resource.ResourceUrlEncodingFilter.doFilter(ResourceUrlEncodingFilter.java:66)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:235)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:493)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:354)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:86)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:132)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181)
+[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+
+[1A[2K[2m[WebServer] [22m	at sgc.seguranca.login.FiltroJwt.doFilterInternal(FiltroJwt.java:67)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:337)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
+[2m[WebServer] [22m	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+[2m[WebServer] [22m	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1778)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
+
+[1A[2K[2m[WebServer] [22m	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
+
+[1A[2K[2m[WebServer] [22m	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+[1A[2K[2m[WebServer] [22mCaused by: org.hibernate.ObjectNotFoundException: No row with the given identifier exists for entity [sgc.mapa.model.Mapa with id '201']
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.jpa.internal.JpaEntityNotFoundDelegate.handleEntityNotFound(JpaEntityNotFoundDelegate.java:20)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.event.internal.DefaultLoadEventListener.load(DefaultLoadEventListener.java:191)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.event.internal.DefaultLoadEventListener.loadWithRegularProxy(DefaultLoadEventListener.java:267)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.event.internal.DefaultLoadEventListener.proxyOrLoad(DefaultLoadEventListener.java:219)
+[2m[WebServer] [22m	at org.hibernate.event.internal.DefaultLoadEventListener.doOnLoad(DefaultLoadEventListener.java:96)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.event.internal.DefaultLoadEventListener.onLoad(DefaultLoadEventListener.java:55)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:149)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.internal.SessionImpl.fireLoadNoChecks(SessionImpl.java:1291)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.internal.SessionImpl.internalLoad(SessionImpl.java:1057)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.results.graph.entity.internal.EntitySelectFetchInitializer.initialize(EntitySelectFetchInitializer.java:249)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.results.graph.entity.internal.EntitySelectFetchInitializer.initialize(EntitySelectFetchInitializer.java:216)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.results.graph.entity.internal.EntitySelectFetchInitializer.resolveInstance(EntitySelectFetchInitializer.java:140)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.results.graph.entity.internal.EntitySelectFetchInitializer.resolveInstance(EntitySelectFetchInitializer.java:39)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.results.internal.StandardRowReader.coordinateInitializers(StandardRowReader.java:234)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.results.internal.StandardRowReader.readRow(StandardRowReader.java:137)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.results.spi.ListResultsConsumer.read(ListResultsConsumer.java:243)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.results.spi.ListResultsConsumer.readRows(ListResultsConsumer.java:233)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.results.spi.ListResultsConsumer.consume(ListResultsConsumer.java:164)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.results.spi.ListResultsConsumer.consume(ListResultsConsumer.java:31)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.exec.internal.JdbcSelectExecutorStandardImpl.doExecuteQuery(JdbcSelectExecutorStandardImpl.java:211)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.exec.internal.JdbcSelectExecutorStandardImpl.executeQuery(JdbcSelectExecutorStandardImpl.java:100)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.exec.spi.JdbcSelectExecutor.executeQuery(JdbcSelectExecutor.java:63)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.sql.exec.spi.JdbcSelectExecutor.list(JdbcSelectExecutor.java:137)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.lambda$new$1(ConcreteSqmSelectQueryPlan.java:128)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.withCacheableSqmInterpretation(ConcreteSqmSelectQueryPlan.java:427)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.performList(ConcreteSqmSelectQueryPlan.java:355)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.query.sqm.internal.SqmQueryImpl.doList(SqmQueryImpl.java:374)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.query.spi.AbstractSelectionQuery.list(AbstractSelectionQuery.java:153)
+
+[1A[2K[2m[WebServer] [22m	at org.hibernate.query.Query.getResultList(Query.java:121)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.data.jpa.repository.support.SimpleJpaRepository.findAllById(SimpleJpaRepository.java:444)
+
+[1A[2K[2m[WebServer] [22m	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+
+[1A[2K[2m[WebServer] [22m	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:278)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:169)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:545)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:290)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:690)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:171)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:146)
+[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+
+[1A[2K[2m[WebServer] [22m	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135)
+
+[1A[2K[2m[WebServer] [22m	... 177 common frames omitted
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+
+[1A[2K  6) [chromium] › e2e/cdu-12.spec.ts:178:5 › CDU-12 - Verificar impactos no mapa de competências › Cenario 1: Verificar Sem Impactos (Estado Inicial) 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('tr').filter({ has: getByText('AAA Revisão CDU-12 1770932660935') })
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for locator('tr').filter({ has: getByText('AAA Revisão CDU-12 1770932660935') })[22m
+
+
+       at helpers/helpers-analise.ts:46
+
+      44 |     // Aguardar o processo aparecer na tabela antes de clicar
+      45 |     const linhaProcesso = page.locator('tr', {has: page.getByText(descricaoProcesso)});
+    > 46 |     await expect(linhaProcesso).toBeVisible();
+         |                                 ^
+      47 |     
+      48 |     // Clicar na linha da tabela que contém o processo
+      49 |     await linhaProcesso.click();
+        at acessarSubprocessoChefeDireto (/Users/leonardo/sgc/e2e/helpers/helpers-analise.ts:46:33)
+        at /Users/leonardo/sgc/e2e/cdu-12.spec.ts:181:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-12-CDU-12---Verificar--4fd9c-em-Impactos-Estado-Inicial--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-12-CDU-12---Verificar--4fd9c-em-Impactos-Estado-Inicial--chromium/error-context.md
+
+
+[1A[2K[64/229] [chromium] › e2e/cdu-12.spec.ts:193:5 › CDU-12 - Verificar impactos no mapa de competências › Cenario 2: Verificar Impacto de Inclusão de Atividade
+[1A[2K[65/229] [chromium] › e2e/cdu-12.spec.ts:215:5 › CDU-12 - Verificar impactos no mapa de competências › Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)
+[1A[2K[66/229] [chromium] › e2e/cdu-12.spec.ts:240:5 › CDU-12 - Verificar impactos no mapa de competências › Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)
+[1A[2K[67/229] [chromium] › e2e/cdu-12.spec.ts:265:5 › CDU-12 - Verificar impactos no mapa de competências › Cenario 5: Verificar visualização pelo Admin (Somente Leitura)
+[1A[2K[68/229] [chromium] › e2e/cdu-13.spec.ts:36:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Preparacao 1: ADMIN cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[69/229] [chromium] › e2e/cdu-13.spec.ts:58:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Preparacao 2: CHEFE preenche atividades e disponibiliza
+[1A[2K  7) [chromium] › e2e/cdu-13.spec.ts:58:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Preparacao 2: CHEFE preenche atividades e disponibiliza 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/painel$/[39m
+    Received string:  [31m"about:blank"[39m
+    Timeout: 3000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 3000ms[22m
+    [2m    7 × unexpected value "about:blank"[22m
+
+
+       at helpers/helpers-analise.ts:42
+
+      40 | export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcesso: string, siglaUnidade: string = '') {
+      41 |     // Garantir que estamos no painel e que carregou
+    > 42 |     await expect(page).toHaveURL(/\/painel$/);
+         |                        ^
+      43 |     
+      44 |     // Aguardar o processo aparecer na tabela antes de clicar
+      45 |     const linhaProcesso = page.locator('tr', {has: page.getByText(descricaoProcesso)});
+        at acessarSubprocessoChefeDireto (/Users/leonardo/sgc/e2e/helpers/helpers-analise.ts:42:24)
+        at /Users/leonardo/sgc/e2e/cdu-13.spec.ts:59:15
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-13-CDU-13---Analisar-c-236bc--atividades-e-disponibiliza-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[70/229] [chromium] › e2e/cdu-13.spec.ts:85:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)
+[1A[2K[71/229] [chromium] › e2e/cdu-13.spec.ts:98:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 2: GESTOR devolve cadastro para ajustes COM observação
+[1A[2K[72/229] [chromium] › e2e/cdu-13.spec.ts:106:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 3: CHEFE visualiza histórico após devolução e disponibiliza novamente
+[1A[2K[73/229] [chromium] › e2e/cdu-13.spec.ts:129:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 4: GESTOR cancela devolução
+[1A[2K[74/229] [chromium] › e2e/cdu-13.spec.ts:140:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 5: GESTOR registra aceite COM observação
+[1A[2K[75/229] [chromium] › e2e/cdu-13.spec.ts:148:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 6: ADMIN devolve para nova rodada de aceite
+[1A[2K[76/229] [chromium] › e2e/cdu-13.spec.ts:168:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 7: GESTOR registra aceite com observação padrão
+[1A[2K[77/229] [chromium] › e2e/cdu-13.spec.ts:176:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 8: ADMIN visualiza histórico com múltiplas análises
+[1A[2K[78/229] [chromium] › e2e/cdu-13.spec.ts:193:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 9: ADMIN cancela homologação
+[1A[2K[79/229] [chromium] › e2e/cdu-13.spec.ts:204:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 10: ADMIN homologa cadastro
+[1A[2K[80/229] [chromium] › e2e/cdu-14.spec.ts:41:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.1: ADMIN cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[81/229] [chromium] › e2e/cdu-14.spec.ts:58:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.2: CHEFE adiciona atividades e disponibiliza cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 201 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K  8) [chromium] › e2e/cdu-14.spec.ts:58:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.2: CHEFE adiciona atividades e disponibiliza cadastro 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/Cadastro de atividades disponibilizado/i)
+    Expected: visible
+    Error: strict mode violation: getByText(/Cadastro de atividades disponibilizado/i) resolved to 2 elements:
+        1) <strong>Cadastro de atividades disponibilizado</strong> aka getByText('Cadastro de atividades disponibilizado', { exact: true })
+        2) <div class="toast-body">Cadastro de atividades disponibilizado.</div> aka getByText('Cadastro de atividades disponibilizado.')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByText(/Cadastro de atividades disponibilizado/i)[22m
+
+
+      65 |         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+      66 |         await page.getByTestId('btn-confirmar-disponibilizacao').click();
+    > 67 |         await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
+         |                                                                                 ^
+      68 |         await verificarPaginaPainel(page);
+      69 |     });
+      70 |
+        at /Users/leonardo/sgc/e2e/cdu-14.spec.ts:67:81
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-14-CDU-14---Analisar-r-7db3c-es-e-disponibiliza-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-14-CDU-14---Analisar-r-7db3c-es-e-disponibiliza-cadastro-chromium/error-context.md
+
+
+[1A[2K[82/229] [chromium] › e2e/cdu-14.spec.ts:71:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.3: GESTOR aceita cadastro
+[1A[2K[83/229] [chromium] › e2e/cdu-14.spec.ts:77:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.4: ADMIN homologa cadastro
+[1A[2K[84/229] [chromium] › e2e/cdu-14.spec.ts:83:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.5: ADMIN cria competências e disponibiliza mapa
+[1A[2K[85/229] [chromium] › e2e/cdu-14.spec.ts:90:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.6: CHEFE valida mapa
+[1A[2K[86/229] [chromium] › e2e/cdu-14.spec.ts:98:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.7: ADMIN homologa mapa
+[1A[2K[87/229] [chromium] › e2e/cdu-14.spec.ts:106:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.8: ADMIN finaliza o processo
+[1A[2K[88/229] [chromium] › e2e/cdu-14.spec.ts:114:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 1: ADMIN cria e inicia processo de revisão
+[1A[2K[89/229] [chromium] › e2e/cdu-14.spec.ts:135:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 2: CHEFE revisa atividades e disponibiliza
+[1A[2K[90/229] [chromium] › e2e/cdu-14.spec.ts:162:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)
+[1A[2K[91/229] [chromium] › e2e/cdu-14.spec.ts:172:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 2: GESTOR verifica botão "Impactos no mapa" está disponível
+[1A[2K[92/229] [chromium] › e2e/cdu-14.spec.ts:178:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 3: GESTOR devolve cadastro para ajustes COM observação
+[1A[2K[93/229] [chromium] › e2e/cdu-14.spec.ts:184:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 4: CHEFE visualiza histórico após devolução e disponibiliza novamente
+[1A[2K[94/229] [chromium] › e2e/cdu-14.spec.ts:199:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 5: GESTOR cancela devolução
+[1A[2K[95/229] [chromium] › e2e/cdu-14.spec.ts:206:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 6: GESTOR registra aceite COM observação
+[1A[2K[96/229] [chromium] › e2e/cdu-14.spec.ts:212:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 7: ADMIN devolve para nova rodada de aceite
+[1A[2K[97/229] [chromium] › e2e/cdu-14.spec.ts:227:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 8: GESTOR registra aceite com observação padrão
+[1A[2K[98/229] [chromium] › e2e/cdu-14.spec.ts:233:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 9: ADMIN visualiza histórico com múltiplas análises
+[1A[2K[99/229] [chromium] › e2e/cdu-14.spec.ts:242:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 10: ADMIN cancela homologação
+[1A[2K[100/229] [chromium] › e2e/cdu-14.spec.ts:249:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenario 11: ADMIN homologa cadastro de revisão
+[1A[2K[101/229] [chromium] › e2e/cdu-15.spec.ts:41:5 › CDU-15 - Manter mapa de competências › Preparacao: Criar processo e homologar cadastro de atividades
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K  9) [chromium] › e2e/cdu-15.spec.ts:41:5 › CDU-15 - Manter mapa de competências › Preparacao: Criar processo e homologar cadastro de atividades 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/processo\/\d+\/\w+$/[39m
+    Received string:  [31m"http://localhost:5173/processo/201"[39m
+    Timeout: 3000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 3000ms[22m
+    [2m    7 × unexpected value "http://localhost:5173/processo/201"[22m
+
+
+       at helpers/helpers-analise.ts:64
+
+      62 |         await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
+      63 |     } else {
+    > 64 |         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+         |                            ^
+      65 |     }
+      66 | }
+      67 |
+        at acessarSubprocessoChefeDireto (/Users/leonardo/sgc/e2e/helpers/helpers-analise.ts:64:28)
+        at /Users/leonardo/sgc/e2e/cdu-15.spec.ts:68:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-15-CDU-15---Manter-map-1662a-ogar-cadastro-de-atividades-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-15-CDU-15---Manter-map-1662a-ogar-cadastro-de-atividades-chromium/error-context.md
+
+
+[1A[2K[102/229] [chromium] › e2e/cdu-15.spec.ts:98:5 › CDU-15 - Manter mapa de competências › CT-00 e CT-01: Acessar Edição de Mapa e verificar elementos
+[1A[2K[103/229] [chromium] › e2e/cdu-15.spec.ts:119:5 › CDU-15 - Manter mapa de competências › CT-02: Criar Competência
+[1A[2K[104/229] [chromium] › e2e/cdu-15.spec.ts:134:5 › CDU-15 - Manter mapa de competências › CT-03: Editar Competência
+[1A[2K[105/229] [chromium] › e2e/cdu-15.spec.ts:149:5 › CDU-15 - Manter mapa de competências › CT-05: Validar Cancelamento da Exclusão
+[1A[2K[106/229] [chromium] › e2e/cdu-15.spec.ts:161:5 › CDU-15 - Manter mapa de competências › CT-04: Excluir Competência com Confirmação
+[1A[2K[107/229] [chromium] › e2e/cdu-15.spec.ts:174:5 › CDU-15 - Manter mapa de competências › CT-06: Navegar para Disponibilização
+[1A[2K[108/229] [chromium] › e2e/cdu-16.spec.ts:42:5 › CDU-16 - Ajustar mapa de competências › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[109/229] [chromium] › e2e/cdu-16.spec.ts:65:5 › CDU-16 - Ajustar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K  10) [chromium] › e2e/cdu-16.spec.ts:65:5 › CDU-16 - Ajustar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/processo\/\d+\/\w+$/[39m
+    Received string:  [31m"http://localhost:5173/processo/201"[39m
+    Timeout: 3000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 3000ms[22m
+    [2m    7 × unexpected value "http://localhost:5173/processo/201"[22m
+
+
+       at helpers/helpers-analise.ts:64
+
+      62 |         await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
+      63 |     } else {
+    > 64 |         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+         |                            ^
+      65 |     }
+      66 | }
+      67 |
+        at acessarSubprocessoChefeDireto (/Users/leonardo/sgc/e2e/helpers/helpers-analise.ts:64:28)
+        at /Users/leonardo/sgc/e2e/cdu-16.spec.ts:68:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-16-CDU-16---Ajustar-ma-89701-es-e-disponibiliza-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-16-CDU-16---Ajustar-ma-89701-es-e-disponibiliza-cadastro-chromium/error-context.md
+
+
+[1A[2K[110/229] [chromium] › e2e/cdu-16.spec.ts:88:5 › CDU-16 - Ajustar mapa de competências › Preparacao 3: Admin homologa cadastro
+[1A[2K[111/229] [chromium] › e2e/cdu-16.spec.ts:99:5 › CDU-16 - Ajustar mapa de competências › Preparacao 4: Admin cria competências e disponibiliza mapa
+[1A[2K[112/229] [chromium] › e2e/cdu-16.spec.ts:116:5 › CDU-16 - Ajustar mapa de competências › Preparacao 5: Chefe valida mapa
+[1A[2K[113/229] [chromium] › e2e/cdu-16.spec.ts:130:5 › CDU-16 - Ajustar mapa de competências › Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento
+[1A[2K[114/229] [chromium] › e2e/cdu-16.spec.ts:154:5 › CDU-16 - Ajustar mapa de competências › Preparacao 7: Admin cria e inicia processo de revisão
+[1A[2K[115/229] [chromium] › e2e/cdu-16.spec.ts:177:5 › CDU-16 - Ajustar mapa de competências › Preparacao 8: Chefe revisa atividades com alterações
+[1A[2K[116/229] [chromium] › e2e/cdu-16.spec.ts:206:5 › CDU-16 - Ajustar mapa de competências › Preparacao 9: Admin homologa revisão do cadastro
+[1A[2K[117/229] [chromium] › e2e/cdu-16.spec.ts:228:5 › CDU-16 - Ajustar mapa de competências › Cenario 1: ADMIN navega para tela de edição do mapa
+[1A[2K[118/229] [chromium] › e2e/cdu-16.spec.ts:260:5 › CDU-16 - Ajustar mapa de competências › Cenario 2: ADMIN visualiza impactos no mapa
+[1A[2K[119/229] [chromium] › e2e/cdu-16.spec.ts:293:5 › CDU-16 - Ajustar mapa de competências › Cenario 3: ADMIN pode abrir modal para editar competência
+[1A[2K[120/229] [chromium] › e2e/cdu-16.spec.ts:320:5 › CDU-16 - Ajustar mapa de competências › Cenario 4: ADMIN associa atividade não vinculada a nova competência
+[1A[2K[121/229] [chromium] › e2e/cdu-17.spec.ts:24:5 › CDU-17 - Disponibilizar mapa de competências › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[122/229] [chromium] › e2e/cdu-17.spec.ts:45:5 › CDU-17 - Disponibilizar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+
+[1A[2K  11) [chromium] › e2e/cdu-17.spec.ts:45:5 › CDU-17 - Disponibilizar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('Mapeamento CDU-17 1770932710189')[22m
+
+
+      45 |     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
+      46 |         // Acessar subprocesso
+    > 47 |         await page.getByText(descProcesso).click();
+         |                                            ^
+      48 |         await navegarParaAtividades(page);
+      49 |
+      50 |         // Três atividades para mapear corretamente
+        at /Users/leonardo/sgc/e2e/cdu-17.spec.ts:47:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-17-CDU-17---Disponibil-034c8-es-e-disponibiliza-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-17-CDU-17---Disponibil-034c8-es-e-disponibiliza-cadastro-chromium/error-context.md
+
+
+[1A[2K[123/229] [chromium] › e2e/cdu-17.spec.ts:68:5 › CDU-17 - Disponibilizar mapa de competências › Preparacao 3: Admin homologa cadastro
+[1A[2K[124/229] [chromium] › e2e/cdu-17.spec.ts:78:5 › CDU-17 - Disponibilizar mapa de competências › Preparacao 4: Admin cria competências com todas as atividades associadas
+[1A[2K[125/229] [chromium] › e2e/cdu-17.spec.ts:99:5 › CDU-17 - Disponibilizar mapa de competências › Cenario 1: ADMIN navega para tela de edição do mapa
+[1A[2K[126/229] [chromium] › e2e/cdu-17.spec.ts:116:5 › CDU-17 - Disponibilizar mapa de competências › Cenario 2: ADMIN abre modal de disponibilização
+[1A[2K[127/229] [chromium] › e2e/cdu-17.spec.ts:129:5 › CDU-17 - Disponibilizar mapa de competências › Cenario 3: ADMIN cancela disponibilização - permanece na tela
+[1A[2K[128/229] [chromium] › e2e/cdu-17.spec.ts:145:5 › CDU-17 - Disponibilizar mapa de competências › Cenario 4: ADMIN disponibiliza mapa com sucesso
+[1A[2K[129/229] [chromium] › e2e/cdu-18.spec.ts:17:5 › CDU-18: Visualizar mapa de competências › Cenário 1: ADMIN visualiza mapa via detalhes do processo
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K  12) [chromium] › e2e/cdu-18.spec.ts:17:5 › CDU-18: Visualizar mapa de competências › Cenário 1: ADMIN visualiza mapa via detalhes do processo › 5. Verificar visualização do mapa (CDU-18) 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('vis-mapa__card-competencia')
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByTestId('vis-mapa__card-competencia')[22m
+
+
+      51 |
+      52 |             // 5.3 Competência do seed
+    > 53 |             await expect(page.getByTestId('vis-mapa__card-competencia')).toBeVisible();
+         |                                                                          ^
+      54 |             await expect(page.getByText('Competência Técnica Seed 99')).toBeVisible();
+      55 |
+      56 |             // 5.4 Atividades da competência
+        at /Users/leonardo/sgc/e2e/cdu-18.spec.ts:53:74
+        at /Users/leonardo/sgc/e2e/cdu-18.spec.ts:45:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-18-CDU-18-Visualizar-m-8b923-pa-via-detalhes-do-processo-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-18-CDU-18-Visualizar-m-8b923-pa-via-detalhes-do-processo-chromium/error-context.md
+
+
+[1A[2K[130/229] [chromium] › e2e/cdu-18.spec.ts:66:5 › CDU-18: Visualizar mapa de competências › Cenário 2: CHEFE visualiza mapa da própria unidade
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 151515
+
+[1A[2K[131/229] [chromium] › e2e/cdu-19.spec.ts:23:5 › CDU-19 - Validar mapa de competências › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[132/229] [chromium] › e2e/cdu-19.spec.ts:45:5 › CDU-19 - Validar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
+[1A[2K  13) [chromium] › e2e/cdu-19.spec.ts:45:5 › CDU-19 - Validar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('Mapeamento CDU-19 1770932727233')[22m
+
+
+      46 |         
+      47 |
+    > 48 |         await page.getByText(descProcesso).click();
+         |                                            ^
+      49 |         await navegarParaAtividades(page);
+      50 |
+      51 |         await adicionarAtividade(page, atividade1);
+        at /Users/leonardo/sgc/e2e/cdu-19.spec.ts:48:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-19-CDU-19---Validar-ma-92af8-es-e-disponibiliza-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[133/229] [chromium] › e2e/cdu-19.spec.ts:64:5 › CDU-19 - Validar mapa de competências › Preparacao 3: Admin homologa cadastro
+[1A[2K[134/229] [chromium] › e2e/cdu-19.spec.ts:76:5 › CDU-19 - Validar mapa de competências › Preparacao 4: Admin cria competências e disponibiliza mapa
+[1A[2K[135/229] [chromium] › e2e/cdu-19.spec.ts:98:5 › CDU-19 - Validar mapa de competências › Cenario 1: CHEFE navega para visualização do mapa
+[1A[2K[136/229] [chromium] › e2e/cdu-19.spec.ts:121:5 › CDU-19 - Validar mapa de competências › Cenario 2: CHEFE cancela validação - permanece na tela
+[1A[2K[137/229] [chromium] › e2e/cdu-19.spec.ts:144:5 › CDU-19 - Validar mapa de competências › Cenario 3: CHEFE valida mapa com sucesso
+[1A[2K[138/229] [chromium] › e2e/cdu-20.spec.ts:27:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[139/229] [chromium] › e2e/cdu-20.spec.ts:48:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 201 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[140/229] [chromium] › e2e/cdu-20.spec.ts:67:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 3: Admin homologa cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[141/229] [chromium] › e2e/cdu-20.spec.ts:78:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 4: Admin cria competências e disponibiliza mapa
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+
+[1A[2K[142/229] [chromium] › e2e/cdu-20.spec.ts:94:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 5: Chefe valida o mapa
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+
+[1A[2K[143/229] [chromium] › e2e/cdu-20.spec.ts:108:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 1: GESTOR navega para visualização do mapa validado
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 222222
+
+[1A[2K  14) [chromium] › e2e/cdu-20.spec.ts:108:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 1: GESTOR navega para visualização do mapa validado 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText('Mapeamento CDU-20 1770932738527')
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByText('Mapeamento CDU-20 1770932738527')[22m
+
+
+      111 |         // Passo 1: No Painel, escolhe o processo
+      112 |         await page.goto(`/processo/${processoId}`);
+    > 113 |         await expect(page.getByText(descProcesso)).toBeVisible();
+          |                                                    ^
+      114 |
+      115 |         // Passo 1: Clica na unidade com situação 'Mapa validado'
+      116 |         await navegarParaSubprocesso(page, 'SECAO_221');
+        at /Users/leonardo/sgc/e2e/cdu-20.spec.ts:113:52
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-20-CDU-20---Analisar-v-10ded-sualização-do-mapa-validado-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-20-CDU-20---Analisar-v-10ded-sualização-do-mapa-validado-chromium/error-context.md
+
+
+[1A[2K[144/229] [chromium] › e2e/cdu-20.spec.ts:130:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 2: GESTOR cancela aceite - permanece na tela
+[1A[2K[145/229] [chromium] › e2e/cdu-20.spec.ts:147:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 3: GESTOR registra aceite do mapa
+[1A[2K[146/229] [chromium] › e2e/cdu-20.spec.ts:169:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 4: ADMIN homologa o mapa
+[1A[2K[147/229] [chromium] › e2e/cdu-21.spec.ts:31:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[148/229] [chromium] › e2e/cdu-21.spec.ts:53:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
+[1A[2K  15) [chromium] › e2e/cdu-21.spec.ts:53:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('Mapeamento CDU-21 1770932749525')[22m
+
+
+      54 |         
+      55 |
+    > 56 |         await page.getByText(descProcesso).click();
+         |                                            ^
+      57 |         await navegarParaAtividades(page);
+      58 |
+      59 |         await adicionarAtividade(page, atividade1);
+        at /Users/leonardo/sgc/e2e/cdu-21.spec.ts:56:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-21-CDU-21---Finalizar--4850d-es-e-disponibiliza-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[149/229] [chromium] › e2e/cdu-21.spec.ts:72:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 3: Admin homologa cadastro
+[1A[2K[150/229] [chromium] › e2e/cdu-21.spec.ts:84:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 4: Admin cria competências e disponibiliza mapa
+[1A[2K[151/229] [chromium] › e2e/cdu-21.spec.ts:100:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 5: Chefe valida o mapa
+[1A[2K[152/229] [chromium] › e2e/cdu-21.spec.ts:114:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 6: Gestor registra aceite do mapa
+[1A[2K[153/229] [chromium] › e2e/cdu-21.spec.ts:129:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 7: Admin homologa o mapa
+[1A[2K[154/229] [chromium] › e2e/cdu-21.spec.ts:154:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Cenario 1: ADMIN navega para detalhes do processo
+[1A[2K[155/229] [chromium] › e2e/cdu-21.spec.ts:169:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Cenario 2: ADMIN cancela finalização - permanece na tela
+[1A[2K[156/229] [chromium] › e2e/cdu-21.spec.ts:191:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Cenario 3: ADMIN finaliza processo com sucesso
+[1A[2K[157/229] [chromium] › e2e/cdu-22.spec.ts:45:5 › CDU-22 - Aceitar cadastros em bloco › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 131313
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+
+[1A[2K  16) [chromium] › e2e/cdu-22.spec.ts:45:5 › CDU-22 - Aceitar cadastros em bloco › Preparacao 1: Admin cria e inicia processo de mapeamento 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('btn-painel-criar-processo')[22m
+
+
+       at helpers/helpers-processos.ts:23
+
+      21 |     iniciar?: boolean;
+      22 | }): Promise<void> {
+    > 23 |     await page.getByTestId('btn-painel-criar-processo').click();
+         |                                                         ^
+      24 |     await expect(page).toHaveURL(/\/processo\/cadastro/);
+      25 |
+      26 |     await page.getByTestId('inp-processo-descricao').fill(options.descricao);
+        at criarProcesso (/Users/leonardo/sgc/e2e/helpers/helpers-processos.ts:23:57)
+        at /Users/leonardo/sgc/e2e/cdu-22.spec.ts:48:15
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-22-CDU-22---Aceitar-ca-5e7a6-icia-processo-de-mapeamento-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-22-CDU-22---Aceitar-ca-5e7a6-icia-processo-de-mapeamento-chromium/error-context.md
+
+
+[1A[2K[158/229] [chromium] › e2e/cdu-22.spec.ts:68:5 › CDU-22 - Aceitar cadastros em bloco › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
+[1A[2K[159/229] [chromium] › e2e/cdu-22.spec.ts:87:5 › CDU-22 - Aceitar cadastros em bloco › Cenario 1: GESTOR visualiza botão Aceitar em Bloco
+[1A[2K[160/229] [chromium] › e2e/cdu-22.spec.ts:101:5 › CDU-22 - Aceitar cadastros em bloco › Cenario 2: GESTOR abre modal de aceite em bloco
+[1A[2K[161/229] [chromium] › e2e/cdu-22.spec.ts:122:5 › CDU-22 - Aceitar cadastros em bloco › Cenario 3: Cancelar aceite em bloco permanece na tela
+[1A[2K[162/229] [chromium] › e2e/cdu-23.spec.ts:38:5 › CDU-23 - Homologar cadastros em bloco › Preparacao 1: Admin cria e inicia processo
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[163/229] [chromium] › e2e/cdu-23.spec.ts:61:5 › CDU-23 - Homologar cadastros em bloco › Preparacao 2: Chefe disponibiliza cadastro
+[1A[2K  17) [chromium] › e2e/cdu-23.spec.ts:61:5 › CDU-23 - Homologar cadastros em bloco › Preparacao 2: Chefe disponibiliza cadastro 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('Mapeamento CDU-23 1770932771992')[22m
+
+
+      62 |         
+      63 |
+    > 64 |         await page.getByText(descProcesso).click();
+         |                                            ^
+      65 |         await navegarParaAtividades(page);
+      66 |
+      67 |         await adicionarAtividade(page, atividade1);
+        at /Users/leonardo/sgc/e2e/cdu-23.spec.ts:64:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-23-CDU-23---Homologar--ca1ba-hefe-disponibiliza-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[164/229] [chromium] › e2e/cdu-23.spec.ts:80:5 › CDU-23 - Homologar cadastros em bloco › Cenario 1: ADMIN visualiza botão Homologar em Bloco
+[1A[2K[165/229] [chromium] › e2e/cdu-23.spec.ts:94:5 › CDU-23 - Homologar cadastros em bloco › Cenario 2: ADMIN abre modal de homologação em bloco
+[1A[2K[166/229] [chromium] › e2e/cdu-23.spec.ts:116:5 › CDU-23 - Homologar cadastros em bloco › Cenario 3: Cancelar homologação em bloco permanece na tela
+[1A[2K[167/229] [chromium] › e2e/cdu-24.spec.ts:39:5 › CDU-24 - Disponibilizar mapas em bloco › Preparacao 1: Admin cria e inicia processo
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[168/229] [chromium] › e2e/cdu-24.spec.ts:62:5 › CDU-24 - Disponibilizar mapas em bloco › Preparacao 2: Chefe disponibiliza cadastro
+[1A[2K  18) [chromium] › e2e/cdu-24.spec.ts:62:5 › CDU-24 - Disponibilizar mapas em bloco › Preparacao 2: Chefe disponibiliza cadastro 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('Mapeamento CDU-24 1770932783770')[22m
+
+
+      63 |         
+      64 |
+    > 65 |         await page.getByText(descProcesso).click();
+         |                                            ^
+      66 |         await navegarParaAtividades(page);
+      67 |
+      68 |         await adicionarAtividade(page, atividade1);
+        at /Users/leonardo/sgc/e2e/cdu-24.spec.ts:65:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-24-CDU-24---Disponibil-7a5ff-hefe-disponibiliza-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[169/229] [chromium] › e2e/cdu-24.spec.ts:77:5 › CDU-24 - Disponibilizar mapas em bloco › Preparacao 3: Admin homologa cadastro e cria competências
+[1A[2K[170/229] [chromium] › e2e/cdu-24.spec.ts:104:5 › CDU-24 - Disponibilizar mapas em bloco › Cenario 1: ADMIN visualiza botão Disponibilizar Mapas em Bloco
+[1A[2K[171/229] [chromium] › e2e/cdu-24.spec.ts:120:5 › CDU-24 - Disponibilizar mapas em bloco › Cenario 2: Modal de disponibilização inclui campo de data limite
+[1A[2K[172/229] [chromium] › e2e/cdu-24.spec.ts:151:5 › CDU-24 - Disponibilizar mapas em bloco › Cenario 3: Cancelar disponibilização em bloco
+[1A[2K[173/229] [chromium] › e2e/cdu-25.spec.ts:46:5 › CDU-25 - Aceitar validação de mapas em bloco › Preparacao 1: Admin cria e inicia processo
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[174/229] [chromium] › e2e/cdu-25.spec.ts:69:5 › CDU-25 - Aceitar validação de mapas em bloco › Preparacao 2: Chefe disponibiliza cadastro
+[1A[2K  19) [chromium] › e2e/cdu-25.spec.ts:69:5 › CDU-25 - Aceitar validação de mapas em bloco › Preparacao 2: Chefe disponibiliza cadastro 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('Mapeamento CDU-25 1770932795498')[22m
+
+
+      70 |         
+      71 |
+    > 72 |         await page.getByText(descProcesso).click();
+         |                                            ^
+      73 |         await navegarParaAtividades(page);
+      74 |
+      75 |         await adicionarAtividade(page, atividade1);
+        at /Users/leonardo/sgc/e2e/cdu-25.spec.ts:72:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-25-CDU-25---Aceitar-va-7ad4f-hefe-disponibiliza-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[175/229] [chromium] › e2e/cdu-25.spec.ts:84:5 › CDU-25 - Aceitar validação de mapas em bloco › Preparacao 3: Admin homologa cadastro e cria mapa
+[1A[2K[176/229] [chromium] › e2e/cdu-25.spec.ts:101:5 › CDU-25 - Aceitar validação de mapas em bloco › Preparacao 4: Chefe valida o mapa
+[1A[2K[177/229] [chromium] › e2e/cdu-25.spec.ts:117:5 › CDU-25 - Aceitar validação de mapas em bloco › Cenario 1: GESTOR acessa processo com mapa validado
+[1A[2K[178/229] [chromium] › e2e/cdu-25.spec.ts:131:5 › CDU-25 - Aceitar validação de mapas em bloco › Cenario 2: GESTOR abre modal de aceite de mapa em bloco
+[1A[2K[179/229] [chromium] › e2e/cdu-26.spec.ts:45:5 › CDU-26 - Homologar validação de mapas em bloco › Preparacao 1: Admin cria e inicia processo
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[180/229] [chromium] › e2e/cdu-26.spec.ts:68:5 › CDU-26 - Homologar validação de mapas em bloco › Preparacao 2: Chefe disponibiliza cadastro
+[1A[2K  20) [chromium] › e2e/cdu-26.spec.ts:68:5 › CDU-26 - Homologar validação de mapas em bloco › Preparacao 2: Chefe disponibiliza cadastro 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('Mapeamento CDU-26 1770932807143')[22m
+
+
+      69 |         
+      70 |
+    > 71 |         await page.getByText(descProcesso).click();
+         |                                            ^
+      72 |         await navegarParaAtividades(page);
+      73 |
+      74 |         await adicionarAtividade(page, atividade1);
+        at /Users/leonardo/sgc/e2e/cdu-26.spec.ts:71:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-26-CDU-26---Homologar--fb793-hefe-disponibiliza-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[181/229] [chromium] › e2e/cdu-26.spec.ts:83:5 › CDU-26 - Homologar validação de mapas em bloco › Preparacao 3: Admin homologa cadastro e cria mapa
+[1A[2K[182/229] [chromium] › e2e/cdu-26.spec.ts:100:5 › CDU-26 - Homologar validação de mapas em bloco › Preparacao 4: Chefe valida o mapa
+[1A[2K[183/229] [chromium] › e2e/cdu-26.spec.ts:116:5 › CDU-26 - Homologar validação de mapas em bloco › Cenario 1: ADMIN visualiza botão Homologar Mapa em Bloco
+[1A[2K[184/229] [chromium] › e2e/cdu-26.spec.ts:130:5 › CDU-26 - Homologar validação de mapas em bloco › Cenario 2: ADMIN abre modal de homologação de mapa em bloco
+[1A[2K[185/229] [chromium] › e2e/cdu-26.spec.ts:151:5 › CDU-26 - Homologar validação de mapas em bloco › Cenario 3: Cancelar homologação de mapa em bloco
+[1A[2K[186/229] [chromium] › e2e/cdu-27.spec.ts:38:5 › CDU-27 - Alterar data limite de subprocesso › Preparacao: Admin cria e inicia processo
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[187/229] [chromium] › e2e/cdu-27.spec.ts:65:5 › CDU-27 - Alterar data limite de subprocesso › Cenario 1: ADMIN navega para detalhes do subprocesso
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[188/229] [chromium] › e2e/cdu-27.spec.ts:76:5 › CDU-27 - Alterar data limite de subprocesso › Cenario 2: ADMIN visualiza botão Alterar data limite
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[189/229] [chromium] › e2e/cdu-28.spec.ts:24:5 › CDU-28 - Manter atribuição temporária › Cenario 1: ADMIN acessa menu de Unidades
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[190/229] [chromium] › e2e/cdu-28.spec.ts:41:5 › CDU-28 - Manter atribuição temporária › Cenario 2: ADMIN seleciona unidade na árvore
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[191/229] [chromium] › e2e/cdu-28.spec.ts:70:5 › CDU-28 - Manter atribuição temporária › Cenario 3: Verificar botão de criar atribuição
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[192/229] [chromium] › e2e/cdu-29.spec.ts:20:5 › CDU-29 - Consultar histórico de processos › Cenario 1: ADMIN navega para página de histórico
+[1A[2K  21) [chromium] › e2e/cdu-29.spec.ts:20:5 › CDU-29 - Consultar histórico de processos › Cenario 1: ADMIN navega para página de histórico 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('link', { name: /Histórico/i })[22m
+
+
+      23 |
+      24 |         // Passo 1: Clicar em Histórico na navbar
+    > 25 |         await page.getByRole('link', {name: /Histórico/i}).click();
+         |                                                            ^
+      26 |
+      27 |         // Passo 2: Sistema apresenta tela de histórico
+      28 |         await expect(page).toHaveURL(/\/historico/);
+        at /Users/leonardo/sgc/e2e/cdu-29.spec.ts:25:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-29-CDU-29---Consultar--c8885-ga-para-página-de-histórico-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[193/229] [chromium] › e2e/cdu-29.spec.ts:32:5 › CDU-29 - Consultar histórico de processos › Cenario 2: GESTOR pode acessar histórico
+[1A[2K[194/229] [chromium] › e2e/cdu-29.spec.ts:42:5 › CDU-29 - Consultar histórico de processos › Cenario 3: CHEFE pode acessar histórico
+[1A[2K[195/229] [chromium] › e2e/cdu-29.spec.ts:56:5 › CDU-29 - Consultar histórico de processos › Cenario 4: Tabela apresenta colunas corretas
+[1A[2K[196/229] [chromium] › e2e/cdu-30.spec.ts:23:5 › CDU-30 - Manter Administradores › Cenario 1: ADMIN acessa página de configurações
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[197/229] [chromium] › e2e/cdu-30.spec.ts:35:5 › CDU-30 - Manter Administradores › Cenario 2: Página de configurações contém seção de administradores
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[chromium] › e2e/cdu-30.spec.ts:35:5 › CDU-30 - Manter Administradores › Cenario 2: Página de configurações contém seção de administradores
+Seção Administradores encontrada: [33mfalse[39m
+
+[1A[2K[198/229] [chromium] › e2e/cdu-30.spec.ts:63:5 › CDU-30 - Manter Administradores › Cenario 3: Lista de administradores é exibida
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[199/229] [chromium] › e2e/cdu-31.spec.ts:20:5 › CDU-31 - Configurar sistema › Cenario 1: ADMIN navega para configurações
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[200/229] [chromium] › e2e/cdu-31.spec.ts:36:5 › CDU-31 - Configurar sistema › Cenario 2: Tela exibe configurações editáveis
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[201/229] [chromium] › e2e/cdu-31.spec.ts:55:5 › CDU-31 - Configurar sistema › Cenario 3: ADMIN salva configurações com sucesso
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[202/229] [chromium] › e2e/cdu-32.spec.ts:35:5 › CDU-32 - Reabrir cadastro › Preparacao 1: Admin cria e inicia processo
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[203/229] [chromium] › e2e/cdu-32.spec.ts:58:5 › CDU-32 - Reabrir cadastro › Preparacao 2: Chefe disponibiliza cadastro
+[1A[2K  22) [chromium] › e2e/cdu-32.spec.ts:58:5 › CDU-32 - Reabrir cadastro › Preparacao 2: Chefe disponibiliza cadastro 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('Mapeamento CDU-32 1770932837474')[22m
+
+
+      59 |         
+      60 |
+    > 61 |         await page.getByText(descProcesso).click();
+         |                                            ^
+      62 |         await navegarParaAtividades(page);
+      63 |
+      64 |         await adicionarAtividade(page, atividade1);
+        at /Users/leonardo/sgc/e2e/cdu-32.spec.ts:61:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-32-CDU-32---Reabrir-ca-5d46f-hefe-disponibiliza-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[204/229] [chromium] › e2e/cdu-32.spec.ts:77:5 › CDU-32 - Reabrir cadastro › Cenario 1: ADMIN navega para subprocesso disponibilizado
+[1A[2K[205/229] [chromium] › e2e/cdu-32.spec.ts:87:5 › CDU-32 - Reabrir cadastro › Cenario 2: ADMIN visualiza botão Reabrir cadastro
+[1A[2K[206/229] [chromium] › e2e/cdu-32.spec.ts:101:5 › CDU-32 - Reabrir cadastro › Cenario 3: ADMIN abre modal de reabertura de cadastro
+[1A[2K[207/229] [chromium] › e2e/cdu-32.spec.ts:120:5 › CDU-32 - Reabrir cadastro › Cenario 4: Botão confirmar desabilitado sem justificativa
+[1A[2K[208/229] [chromium] › e2e/cdu-33.spec.ts:35:5 › CDU-33 - Reabrir revisão de cadastro › Preparacao 1: Admin cria e inicia processo
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[209/229] [chromium] › e2e/cdu-33.spec.ts:58:5 › CDU-33 - Reabrir revisão de cadastro › Preparacao 2: Chefe disponibiliza revisão de cadastro
+[1A[2K  23) [chromium] › e2e/cdu-33.spec.ts:58:5 › CDU-33 - Reabrir revisão de cadastro › Preparacao 2: Chefe disponibiliza revisão de cadastro 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('Revisão CDU-33 1770932848680')[22m
+
+
+      59 |         
+      60 |
+    > 61 |         await page.getByText(descProcesso).click();
+         |                                            ^
+      62 |         await navegarParaAtividades(page);
+      63 |
+      64 |         await adicionarAtividade(page, atividade1);
+        at /Users/leonardo/sgc/e2e/cdu-33.spec.ts:61:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-33-CDU-33---Reabrir-re-d8f8a-ibiliza-revisão-de-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[210/229] [chromium] › e2e/cdu-33.spec.ts:77:5 › CDU-33 - Reabrir revisão de cadastro › Cenario 1: ADMIN navega para subprocesso de revisão
+[1A[2K[211/229] [chromium] › e2e/cdu-33.spec.ts:86:5 › CDU-33 - Reabrir revisão de cadastro › Cenario 2: ADMIN visualiza botão Reabrir Revisão
+[1A[2K[212/229] [chromium] › e2e/cdu-33.spec.ts:100:5 › CDU-33 - Reabrir revisão de cadastro › Cenario 3: ADMIN abre modal de reabertura de revisão
+[1A[2K[213/229] [chromium] › e2e/cdu-34.spec.ts:31:5 › CDU-34 - Enviar lembrete de prazo › Preparacao: Admin cria e inicia processo
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+
+[1A[2K[214/229] [chromium] › e2e/cdu-34.spec.ts:58:5 › CDU-34 - Enviar lembrete de prazo › Cenario 1: ADMIN navega para detalhes do processo
+[1A[2K  24) [chromium] › e2e/cdu-34.spec.ts:58:5 › CDU-34 - Enviar lembrete de prazo › Cenario 1: ADMIN navega para detalhes do processo 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('Mapeamento CDU-34 1770932860290')[22m
+
+
+      60 |         
+      61 |
+    > 62 |         await page.getByText(descProcesso).click();
+         |                                            ^
+      63 |         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+      64 |     });
+      65 |
+        at /Users/leonardo/sgc/e2e/cdu-34.spec.ts:62:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-34-CDU-34---Enviar-lem-c8233-a-para-detalhes-do-processo-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[215/229] [chromium] › e2e/cdu-34.spec.ts:66:5 › CDU-34 - Enviar lembrete de prazo › Cenario 2: Verificar indicadores de prazo
+[1A[2K[216/229] [chromium] › e2e/cdu-34.spec.ts:82:5 › CDU-34 - Enviar lembrete de prazo › Cenario 3: Verificar opção de enviar lembrete
+[1A[2K[217/229] [chromium] › e2e/cdu-35.spec.ts:23:5 › CDU-35 - Gerar relatório de andamento › Cenario 1: ADMIN navega para página de relatórios
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[218/229] [chromium] › e2e/cdu-35.spec.ts:32:5 › CDU-35 - Gerar relatório de andamento › Cenario 2: Página exibe card de relatório de andamento
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[219/229] [chromium] › e2e/cdu-35.spec.ts:41:5 › CDU-35 - Gerar relatório de andamento › Cenario 3: Abrir modal de Andamento Geral
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[220/229] [chromium] › e2e/cdu-35.spec.ts:54:5 › CDU-35 - Gerar relatório de andamento › Cenario 4: Modal contém tabela de dados
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[221/229] [chromium] › e2e/cdu-35.spec.ts:68:5 › CDU-35 - Gerar relatório de andamento › Cenario 5: Botão de exportação está disponível
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[222/229] [chromium] › e2e/cdu-35.spec.ts:78:5 › CDU-35 - Gerar relatório de andamento › Cenario 6: Filtros estão disponíveis
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K  25) [chromium] › e2e/cdu-35.spec.ts:78:5 › CDU-35 - Gerar relatório de andamento › Cenario 6: Filtros estão disponíveis 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('sel-filtro-tipo')
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByTestId('sel-filtro-tipo')[22m
+
+
+      82 |         await expect(page).toHaveURL(/\/relatorios/);
+      83 |
+    > 84 |         await expect(page.getByTestId('sel-filtro-tipo')).toBeVisible();
+         |                                                           ^
+      85 |         await expect(page.getByTestId('inp-filtro-data-inicio')).toBeVisible();
+      86 |         await expect(page.getByTestId('inp-filtro-data-fim')).toBeVisible();
+      87 |     });
+        at /Users/leonardo/sgc/e2e/cdu-35.spec.ts:84:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-35-CDU-35---Gerar-rela-35ba2-6-Filtros-estão-disponíveis-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-35-CDU-35---Gerar-rela-35ba2-6-Filtros-estão-disponíveis-chromium/error-context.md
+
+
+[1A[2K[223/229] [chromium] › e2e/cdu-36.spec.ts:23:5 › CDU-36 - Gerar relatório de mapas › Cenario 1: ADMIN navega para página de relatórios
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[224/229] [chromium] › e2e/cdu-36.spec.ts:32:5 › CDU-36 - Gerar relatório de mapas › Cenario 2: Página exibe card de relatório de mapas
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[225/229] [chromium] › e2e/cdu-36.spec.ts:41:5 › CDU-36 - Gerar relatório de mapas › Cenario 3: Abrir modal de Mapas Vigentes
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[226/229] [chromium] › e2e/cdu-36.spec.ts:54:5 › CDU-36 - Gerar relatório de mapas › Cenario 4: Botão de exportação está disponível
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[227/229] [chromium] › e2e/ui-consistency.spec.ts:12:5 › UI Consistency & Accessibility › All views have consistent page headers
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[228/229] [chromium] › e2e/ui-consistency.spec.ts:38:5 › UI Consistency & Accessibility › Interactive elements are keyboard accessible (Tab navigation)
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[229/229] [chromium] › e2e/verificacao-situacoes.spec.ts:7:5 › Verificação de Situações e Labels › Deve exibir label "Não iniciado" corretamente no subprocesso
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [10]. Participante IDs: [(201,10)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_121
+
+[1A[2K  26) [chromium] › e2e/verificacao-situacoes.spec.ts:7:5 › Verificação de Situações e Labels › Deve exibir label "Não iniciado" corretamente no subprocesso 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('row', { name: 'SECAO_121' }).getByRole('link')[22m
+
+
+      21 |         // 2. Navegar para o subprocesso
+      22 |         await page.getByText(descricao, {exact: true}).click();
+    > 23 |         await page.getByRole('row', { name: 'SECAO_121' }).getByRole('link').click();
+         |                                                                              ^
+      24 |
+      25 |         // 3. Verificar que a situação está em minúsculo (conforme refatoração)
+      26 |         await verificarDetalhesSubprocesso(page, {
+        at /Users/leonardo/sgc/e2e/verificacao-situacoes.spec.ts:23:78
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/verificacao-situacoes-Veri-8934a-corretamente-no-subprocesso-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/verificacao-situacoes-Veri-8934a-corretamente-no-subprocesso-chromium/error-context.md
+
+
+[1A[2K  26 failed
+    [chromium] › e2e/captura-telas.spec.ts:59:9 › Captura de Telas - Sistema SGC › 01 - Autenticação › Captura telas de login 
+    [chromium] › e2e/cdu-01.spec.ts:23:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir seleção de perfil se houver múltiplos 
+    [chromium] › e2e/cdu-01.spec.ts:46:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir informações do usuário e controles 
+    [chromium] › e2e/cdu-10.spec.ts:28:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Fluxo completo de revisão de cadastro 
+    [chromium] › e2e/cdu-11.spec.ts:61:5 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro 
+    [chromium] › e2e/cdu-12.spec.ts:178:5 › CDU-12 - Verificar impactos no mapa de competências › Cenario 1: Verificar Sem Impactos (Estado Inicial) 
+    [chromium] › e2e/cdu-13.spec.ts:58:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Preparacao 2: CHEFE preenche atividades e disponibiliza 
+    [chromium] › e2e/cdu-14.spec.ts:58:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Preparacao 0.2: CHEFE adiciona atividades e disponibiliza cadastro 
+    [chromium] › e2e/cdu-15.spec.ts:41:5 › CDU-15 - Manter mapa de competências › Preparacao: Criar processo e homologar cadastro de atividades 
+    [chromium] › e2e/cdu-16.spec.ts:65:5 › CDU-16 - Ajustar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro 
+    [chromium] › e2e/cdu-17.spec.ts:45:5 › CDU-17 - Disponibilizar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro 
+    [chromium] › e2e/cdu-18.spec.ts:17:5 › CDU-18: Visualizar mapa de competências › Cenário 1: ADMIN visualiza mapa via detalhes do processo 
+    [chromium] › e2e/cdu-19.spec.ts:45:5 › CDU-19 - Validar mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro 
+    [chromium] › e2e/cdu-20.spec.ts:108:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 1: GESTOR navega para visualização do mapa validado 
+    [chromium] › e2e/cdu-21.spec.ts:53:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro 
+    [chromium] › e2e/cdu-22.spec.ts:45:5 › CDU-22 - Aceitar cadastros em bloco › Preparacao 1: Admin cria e inicia processo de mapeamento 
+    [chromium] › e2e/cdu-23.spec.ts:61:5 › CDU-23 - Homologar cadastros em bloco › Preparacao 2: Chefe disponibiliza cadastro 
+    [chromium] › e2e/cdu-24.spec.ts:62:5 › CDU-24 - Disponibilizar mapas em bloco › Preparacao 2: Chefe disponibiliza cadastro 
+    [chromium] › e2e/cdu-25.spec.ts:69:5 › CDU-25 - Aceitar validação de mapas em bloco › Preparacao 2: Chefe disponibiliza cadastro 
+    [chromium] › e2e/cdu-26.spec.ts:68:5 › CDU-26 - Homologar validação de mapas em bloco › Preparacao 2: Chefe disponibiliza cadastro 
+    [chromium] › e2e/cdu-29.spec.ts:20:5 › CDU-29 - Consultar histórico de processos › Cenario 1: ADMIN navega para página de histórico 
+    [chromium] › e2e/cdu-32.spec.ts:58:5 › CDU-32 - Reabrir cadastro › Preparacao 2: Chefe disponibiliza cadastro 
+    [chromium] › e2e/cdu-33.spec.ts:58:5 › CDU-33 - Reabrir revisão de cadastro › Preparacao 2: Chefe disponibiliza revisão de cadastro 
+    [chromium] › e2e/cdu-34.spec.ts:58:5 › CDU-34 - Enviar lembrete de prazo › Cenario 1: ADMIN navega para detalhes do processo 
+    [chromium] › e2e/cdu-35.spec.ts:78:5 › CDU-35 - Gerar relatório de andamento › Cenario 6: Filtros estão disponíveis 
+    [chromium] › e2e/verificacao-situacoes.spec.ts:7:5 › Verificação de Situações e Labels › Deve exibir label "Não iniciado" corretamente no subprocesso 
+  108 did not run
+  95 passed (7.9m)

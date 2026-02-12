@@ -29,7 +29,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         );
 
         // Verifica que o perfil selecionado está visível
-        await expect(page.getByText('ADMIN - SEDOC')).toBeVisible();
+        await expect(page.getByText('ADMIN - ADMIN')).toBeVisible();
     });
 
     test('Deve exibir barra de navegação após login', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
@@ -48,7 +48,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         
 
         // Verifica Informações do Usuário
-        await expect(page.getByText('ADMIN - SEDOC')).toBeVisible();
+        await expect(page.getByText('ADMIN - ADMIN')).toBeVisible();
 
         // Verifica Ícone de Configurações de Admin
         await expect(page.getByTestId('btn-configuracoes')).toBeVisible();
