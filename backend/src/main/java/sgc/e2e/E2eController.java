@@ -93,6 +93,48 @@ public class E2eController {
         }
     }
 
+    /**
+     * Endpoint de diagnóstico para verificar participantes de um processo.
+     */
+    @GetMapping("/diagnostico/processo/{codigo}/participantes")
+    public List<Map<String, Object>> diagnosticarParticipantes(@PathVariable Long codigo) {
+        return jdbcTemplate.queryForList(
+            "SELECT processo_codigo, unidade_codigo, sigla FROM sgc.UNIDADE_PROCESSO WHERE processo_codigo = ?",
+            codigo
+        );
+    }
+
+    /**
+     * Endpoint de diagnóstico para listar todos os processos.
+     */
+    @GetMapping("/diagnostico/processos")
+    public List<Map<String, Object>> diagnosticarProcessos() {
+        return jdbcTemplate.queryForList(
+            "SELECT codigo, descricao, situacao FROM sgc.PROCESSO ORDER BY codigo"
+        );
+    }
+
+    /**
+     * Endpoint de diagnóstico para testar a query problemática.
+     */
+    @GetMapping("/diagnostico/test-query")
+    public Map<String, Object> testarQuery() {
+        List<Map<String, Object>> result = jdbcTemplate.queryForList(
+            """
+            SELECT DISTINCT p.codigo, p.descricao, p.situacao, up.unidade_codigo
+            FROM sgc.PROCESSO p
+            JOIN sgc.UNIDADE_PROCESSO up ON p.codigo = up.processo_codigo
+            WHERE up.unidade_codigo IN (18)
+            AND p.situacao <> 'CRIADO'
+            """
+        );
+        return Map.of(
+            "query", "Manual SQL query",
+            "result", result,
+            "count", result.size()
+        );
+    }
+
     private void limparTabela(Statement stmt, String table) throws SQLException {
         log.debug("Limpando tabela: sgc.{}", table);
         try {

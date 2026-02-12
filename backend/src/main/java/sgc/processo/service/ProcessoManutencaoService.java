@@ -62,7 +62,8 @@ public class ProcessoManutencaoService {
         // Salva uma única vez com todos os participantes
         Processo processoSalvo = processoRepo.saveAndFlush(processo);
 
-        log.info("Processo {} criado.", processoSalvo.getCodigo());
+        log.info("Processo {} criado com {} participantes.", processoSalvo.getCodigo(), processoSalvo.getParticipantes().size());
+        processoSalvo.getParticipantes().forEach(p -> log.info("  - Participante: unidadeCodigo={}, sigla={}", p.getUnidadeCodigo(), p.getSigla()));
 
         return processoSalvo;
     }
