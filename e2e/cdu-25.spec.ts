@@ -30,7 +30,7 @@ async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
  * 7. Sistema executa aceite para cada unidade
  */
 test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
-    const UNIDADE_1 = 'ASSESSORIA_22';
+    const UNIDADE_1 = 'SECAO_211';
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-25 ${timestamp}`;
@@ -51,7 +51,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_1,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
@@ -68,7 +68,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
 
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
         
-        await login(page, USUARIOS.CHEFE_ASSESSORIA_22.titulo, USUARIOS.CHEFE_ASSESSORIA_22.senha);
+        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
         await page.getByText(descProcesso).click();
         await navegarParaAtividades(page);
@@ -101,7 +101,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
 
     test('Preparacao 4: Chefe valida o mapa', async ({page}) => {
         
-        await login(page, USUARIOS.CHEFE_ASSESSORIA_22.titulo, USUARIOS.CHEFE_ASSESSORIA_22.senha);
+        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
         await acessarSubprocessoChefe(page, descProcesso);
 
@@ -118,7 +118,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
 
     test('Cenario 1: GESTOR acessa processo com mapa validado', async ({page}) => {
         
-        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
 
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
@@ -133,7 +133,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
 
     test('Cenario 2: GESTOR abre modal de aceite de mapa em bloco', async ({page}) => {
         
-        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
 
         await page.getByText(descProcesso).click();
 
