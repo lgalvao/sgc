@@ -1,2 +1,20 @@
 [1A[2K[2m[WebServer] [22mINFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
 
+[1A[2K[2m[WebServer] [22mINFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 18 unidades verificadas.
+
+[1A[2K[2m[WebServer] [22m  [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m268[22m[2m[0m ms[22m
+
+[1A[2K[2m[WebServer] [22m  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+
+[1A[2K[2m[WebServer] [22m[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+
+[1A[2K[2m[WebServer] [22m>>> Frontend e Backend no ar!
+
+
+Running 105 tests using 1 worker
+
+[1A[2K[1/105] [chromium] › e2e/cdu-11.spec.ts:33:5 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
