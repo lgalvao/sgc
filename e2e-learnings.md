@@ -133,3 +133,56 @@ Em alguns fluxos de CHEFE, abrir URL direta de subprocesso (`/processo/{codigo}/
 **Solução:**
 - Preferir navegação de usuário real via painel (`clicar no processo`) quando o acesso direto não for estável.
 - Manter captura de `codigo` para cenários onde a navegação direta é comprovadamente estável.
+
+### 12. Bug de backend em busca de subprocesso por sigla
+
+**Problema Identificado:**
+Para CHEFE em alguns fluxos (CDU-11, CDU-14 revisão, CDU-17), a chamada `GET /api/subprocessos/buscar?codProcesso={codigo}&siglaUnidade=SECAO_221` retorna `404 ENTIDADE_NAO_ENCONTRADA` mesmo com participante criado e processo iniciado.
+
+**Evidência:**
+- Mensagem backend: `Subprocesso com codigo '[processo, 18]' não encontrado`.
+- Impacto direto: card `card-subprocesso-atividades` não carrega e os passos de cadastro ficam bloqueados.
+
+**Conclusão:**
+Este ponto é bug do sistema (backend/consulta de subprocesso), não instabilidade de seletor.
+
+### 13. Mudança de elegibilidade de unidades no cadastro de processo
+
+**Problema Identificado:**
+Em cenários de criação (ex.: CDU-25 e CDU-34), `SECAO_221` e `COORD_22` aparecem `disabled` no tree de unidades, deixando `Salvar/Iniciar` desabilitado.
+
+**Solução aplicada nos testes:**
+- Ajustar cenários para unidade elegível (`ASSESSORIA_22`) e ator compatível (`CHEFE_ASSESSORIA_22`) quando o objetivo do caso de teste não depende estritamente da `SECAO_221`.
+
+### 14. Painel vazio/inconsistente para perfis com processos iniciados
+
+**Problema Identificado:**
+Mesmo após criação e início de processo com participante confirmado em log backend, alguns perfis (CHEFE/GESTOR) não enxergam o processo no painel (`Nenhum processo encontrado`).
+
+**Evidência:**
+- Backend registra criação/início com participante.
+- UI do ator mostra painel vazio no passo seguinte.
+- Impacta fluxos de preparação em CDU-11, CDU-17 e CDU-20.
+
+### 15. Detalhes do processo ficam em carregamento infinito
+
+**Problema Identificado:**
+Em alguns cenários, a rota de detalhes (`/processo/{codigo}` ou `/processo/{codigo}/{sigla}`) permanece em `Carregando detalhes...` sem renderizar cards/tabela esperados.
+
+**Conclusão:**
+Quando isso ocorre com dados válidos e atores corretos, tratar como bug funcional do sistema e não como problema de timeout/seletor.
+
+### 16. Bloqueio atual concentrado em visibilidade para GESTOR
+
+**Status da rodada `cdu-20/cdu-25/cdu-34` (`test_output_fix7.txt`):**
+- 13 passed
+- 2 failed
+- 4 did not run
+
+**Falhas remanescentes:**
+1. `CDU-20` cenário 1 (`GESTOR_COORD_22`) não encontra o processo no painel após mapa validado.
+2. `CDU-25` cenário 1 (`GESTOR_COORD_22`) não consegue abrir o processo no painel (timeout no clique pelo texto).
+
+**Leitura técnica:**
+- Os ajustes de navegação (evitar `goto /processo/{codigo}` em etapas de preparo) reduziram falhas de carregamento infinito.
+- O bloqueio restante ficou isolado no comportamento de listagem/visibilidade de processo para GESTOR, com indício forte de regra de negócio/hierarquia no backend.

@@ -133,7 +133,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     });
 
     test('Preparacao 2: CHEFE revisa atividades e disponibiliza', async ({page, autenticadoComoChefeSecao221}) => {
-        await acessarSubprocessoChefeDireto(page, descProcesso);
+        await page.goto(`/processo/${processoId}/${UNIDADE_ALVO}`);
         await navegarParaAtividades(page);
 
         // Adicionar 3 atividades com conhecimentos

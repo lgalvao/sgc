@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
@@ -70,6 +71,27 @@ class SubprocessoCrudControllerTest {
                         get("/api/subprocessos/buscar")
                                 .param("codProcesso", "1")
                                 .param("siglaUnidade", "U1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("buscarPorProcessoEUnidade deve buscar em descendentes quando unidade não tiver subprocesso")
+    @WithMockUser
+    void buscarPorProcessoEUnidadeComFallbackDescendentes() throws Exception {
+        UnidadeDto uDto = UnidadeDto.builder().codigo(10L).build();
+        SubprocessoDto dto = new SubprocessoDto();
+        dto.setCodigo(99L);
+
+        when(unidadeService.buscarPorSigla("U1")).thenReturn(uDto);
+        when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L))
+                .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso não encontrado"));
+        when(unidadeService.buscarIdsDescendentes(10L)).thenReturn(List.of(11L));
+        when(subprocessoFacade.listarPorProcessoEUnidades(1L, List.of(10L, 11L)))
+                .thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/api/subprocessos/buscar")
+                        .param("codProcesso", "1")
+                        .param("siglaUnidade", "U1"))
                 .andExpect(status().isOk());
     }
 

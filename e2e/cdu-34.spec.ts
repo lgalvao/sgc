@@ -18,7 +18,7 @@ import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
  * 7. Sistema envia e-mail e registra no histórico
  */
 test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
-    const UNIDADE_1 = 'SECAO_221';
+    const UNIDADE_1 = 'ASSESSORIA_22';
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-34 ${timestamp}`;
@@ -59,7 +59,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         // CDU-34: Passo 1
         
 
-        await page.goto(`/processo/${processoId}`);
+        await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 

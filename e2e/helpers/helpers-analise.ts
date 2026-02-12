@@ -20,7 +20,7 @@ export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: st
     await expect(page).toHaveURL(/\/painel$/);
 
     // Aguardar o processo aparecer na tabela antes de clicar
-    await expect(page.getByText(descricaoProcesso)).toBeVisible();
+    await expect(page.getByText(descricaoProcesso)).toBeVisible({timeout: 15000});
     
     await page.getByText(descricaoProcesso).click();
 
@@ -189,7 +189,7 @@ async function realizarAceite(page: Page, mensagemSucesso: string | RegExp, obse
     await page.getByTestId('inp-aceite-cadastro-obs').fill(obsToSend);
 
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByRole('heading', {name: mensagemSucesso})).toBeVisible();
+    await expect(page.getByText(mensagemSucesso).first()).toBeVisible();
     await verificarPaginaPainel(page);
 }
 

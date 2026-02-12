@@ -58,7 +58,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
@@ -161,7 +161,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
         // Passo 5.6 e 8: Mensagem de sucesso e redirecionamento
         await verificarPaginaPainel(page);
-        await expect(page.getByText(/Mapa validado/i)).toBeVisible();
+        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
 
         // Verificar mudança de situação (Passo 5.3)
         await page.getByText(descProcesso).click();

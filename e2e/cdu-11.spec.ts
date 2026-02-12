@@ -61,7 +61,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     test('Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.getByText(descProcessoMapeamento).click();
+        await page.goto(`/processo/${processoMapeamentoId}/${UNIDADE_ALVO}`);
 
         // Chefe vai direto para subprocesso
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);

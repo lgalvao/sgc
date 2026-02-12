@@ -65,7 +65,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
@@ -108,7 +108,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await expect(page.getByText(/Mapa validado/i)).toBeVisible();
+        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
     });
 
     test('Preparacao 6: Gestor registra aceite do mapa', async ({page, autenticadoComoGestorCoord22}) => {

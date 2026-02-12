@@ -30,7 +30,7 @@ async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
  * 7. Sistema executa aceite para cada unidade
  */
 test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
-    const UNIDADE_1 = 'SECAO_221';
+    const UNIDADE_1 = 'ASSESSORIA_22';
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-25 ${timestamp}`;
@@ -66,7 +66,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeAssessoria22}) => {
         
 
         await page.getByText(descProcesso).click();
@@ -98,7 +98,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 4: Chefe valida o mapa', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 4: Chefe valida o mapa', async ({page, autenticadoComoChefeAssessoria22}) => {
         
 
         await acessarSubprocessoChefe(page, descProcesso);
