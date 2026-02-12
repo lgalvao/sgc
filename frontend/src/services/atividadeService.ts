@@ -1,4 +1,5 @@
 import {
+    mapAtividadeOperacaoResponseToModel,
     mapAtividadeToModel,
     mapAtualizarAtividadeToDto,
     mapAtualizarConhecimentoToDto,
@@ -7,15 +8,16 @@ import {
     mapCriarConhecimentoRequestToDto,
 } from "@/mappers/atividades";
 import type {Atividade, AtividadeOperacaoResponse, Conhecimento, CriarConhecimentoRequest,} from "@/types/tipos";
+import type {AtividadeDto, AtividadeOperacaoResponseDto, ConhecimentoDto} from "@/types/dtos";
 import apiClient from "@/axios-setup";
 
 export async function listarAtividades(): Promise<Atividade[]> {
-    const response = await apiClient.get<any[]>("/atividades");
+    const response = await apiClient.get<AtividadeDto[]>("/atividades");
     return response.data.map(mapAtividadeToModel).filter((a): a is Atividade => a !== null);
 }
 
 export async function obterAtividadePorCodigo(codAtividade: number): Promise<Atividade> {
-    const response = await apiClient.get<any>(`/atividades/${codAtividade}`);
+    const response = await apiClient.get<AtividadeDto>(`/atividades/${codAtividade}`);
     const model = mapAtividadeToModel(response.data);
     if (!model) throw new Error("Atividade não encontrada");
     return model;
@@ -26,8 +28,8 @@ export async function criarAtividade(
     codMapa: number,
 ): Promise<AtividadeOperacaoResponse> {
     const requestDto = mapCriarAtividadeRequestToDto(request, codMapa);
-    const response = await apiClient.post<AtividadeOperacaoResponse>("/atividades", requestDto);
-    return response.data;
+    const response = await apiClient.post<AtividadeOperacaoResponseDto>("/atividades", requestDto);
+    return mapAtividadeOperacaoResponseToModel(response.data);
 }
 
 export async function atualizarAtividade(
@@ -35,22 +37,22 @@ export async function atualizarAtividade(
     request: Atividade,
 ): Promise<AtividadeOperacaoResponse> {
     const payload = mapAtualizarAtividadeToDto(request);
-    const response = await apiClient.post<AtividadeOperacaoResponse>(
+    const response = await apiClient.post<AtividadeOperacaoResponseDto>(
         `/atividades/${codAtividade}/atualizar`,
         payload,
     );
-    return response.data;
+    return mapAtividadeOperacaoResponseToModel(response.data);
 }
 
 export async function excluirAtividade(codAtividade: number): Promise<AtividadeOperacaoResponse> {
-    const response = await apiClient.post<AtividadeOperacaoResponse>(`/atividades/${codAtividade}/excluir`);
-    return response.data;
+    const response = await apiClient.post<AtividadeOperacaoResponseDto>(`/atividades/${codAtividade}/excluir`);
+    return mapAtividadeOperacaoResponseToModel(response.data);
 }
 
 export async function listarConhecimentos(
     codAtividade: number,
 ): Promise<Conhecimento[]> {
-    const response = await apiClient.get<any[]>(
+    const response = await apiClient.get<ConhecimentoDto[]>(
         `/atividades/${codAtividade}/conhecimentos`,
     );
     return response.data.map(mapConhecimentoToModel).filter((c): c is Conhecimento => c !== null);
@@ -61,11 +63,11 @@ export async function criarConhecimento(
     request: CriarConhecimentoRequest,
 ): Promise<AtividadeOperacaoResponse> {
     const requestDto = mapCriarConhecimentoRequestToDto(request, codAtividade);
-    const response = await apiClient.post<AtividadeOperacaoResponse>(
+    const response = await apiClient.post<AtividadeOperacaoResponseDto>(
         `/atividades/${codAtividade}/conhecimentos`,
         requestDto,
     );
-    return response.data;
+    return mapAtividadeOperacaoResponseToModel(response.data);
 }
 
 export async function atualizarConhecimento(
@@ -74,19 +76,19 @@ export async function atualizarConhecimento(
     request: Conhecimento,
 ): Promise<AtividadeOperacaoResponse> {
     const payload = mapAtualizarConhecimentoToDto(request, codAtividade);
-    const response = await apiClient.post<AtividadeOperacaoResponse>(
+    const response = await apiClient.post<AtividadeOperacaoResponseDto>(
         `/atividades/${codAtividade}/conhecimentos/${codConhecimento}/atualizar`,
         payload,
     );
-    return response.data;
+    return mapAtividadeOperacaoResponseToModel(response.data);
 }
 
 export async function excluirConhecimento(
     codAtividade: number,
     codConhecimento: number,
 ): Promise<AtividadeOperacaoResponse> {
-    const response = await apiClient.post<AtividadeOperacaoResponse>(
+    const response = await apiClient.post<AtividadeOperacaoResponseDto>(
         `/atividades/${codAtividade}/conhecimentos/${codConhecimento}/excluir`,
     );
-    return response.data;
+    return mapAtividadeOperacaoResponseToModel(response.data);
 }

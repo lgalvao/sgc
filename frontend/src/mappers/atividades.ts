@@ -1,5 +1,5 @@
-import type {Atividade, Conhecimento, CriarConhecimentoRequest,} from "@/types/tipos";
-import type {AtividadeDto, ConhecimentoDto} from "@/types/dtos";
+import type {Atividade, AtividadeOperacaoResponse, Conhecimento, CriarConhecimentoRequest, SubprocessoStatus,} from "@/types/tipos";
+import type {AtividadeDto, AtividadeOperacaoResponseDto, ConhecimentoDto, SubprocessoSituacaoDto} from "@/types/dtos";
 
 export function mapAtividadeToModel(dto: AtividadeDto | null | undefined): Atividade | null {
     if (!dto) return null;
@@ -26,6 +26,24 @@ export function mapConhecimentoToModel(dto: ConhecimentoDto | null | undefined):
 // Alias for backwards compatibility  
 export const mapConhecimentoVisualizacaoToModel = mapConhecimentoToModel;
 
+export function mapSubprocessoSituacaoToModel(dto: SubprocessoSituacaoDto): SubprocessoStatus {
+    return {
+        codigo: dto.codigo,
+        situacao: dto.situacao,
+        situacaoLabel: dto.situacaoLabel,
+    };
+}
+
+export function mapAtividadeOperacaoResponseToModel(dto: AtividadeOperacaoResponseDto): AtividadeOperacaoResponse {
+    return {
+        atividade: dto.atividade ? mapAtividadeToModel(dto.atividade) : null,
+        subprocesso: mapSubprocessoSituacaoToModel(dto.subprocesso),
+        atividadesAtualizadas: dto.atividadesAtualizadas
+            .map(mapAtividadeToModel)
+            .filter((a): a is Atividade => a !== null),
+    };
+}
+
 export function mapCriarAtividadeRequestToDto(
     request: any,
     codMapa: number,
@@ -38,9 +56,7 @@ export function mapCriarAtividadeRequestToDto(
 
 export function mapAtualizarAtividadeToDto(request: Atividade): any {
     return {
-        codigo: request.codigo,
         descricao: request.descricao,
-        mapaCodigo: request.mapaCodigo,
     };
 }
 
