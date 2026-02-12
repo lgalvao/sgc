@@ -1,0 +1,95 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e4]:
+    - navigation [ref=e5]:
+      - generic [ref=e6]:
+        - link "SGC" [ref=e7] [cursor=pointer]:
+          - /url: /painel
+        - generic [ref=e8]:
+          - list [ref=e9]:
+            - listitem [ref=e10]:
+              - link "Painel" [ref=e11] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e12]: 
+                - text: Painel
+            - listitem [ref=e13]:
+              - link "Minha unidade" [ref=e14] [cursor=pointer]:
+                - /url: /unidade/17
+                - generic [ref=e15]: 
+                - text: Minha unidade
+            - listitem [ref=e16]:
+              - link "Relatórios" [ref=e17] [cursor=pointer]:
+                - /url: /relatorios
+                - generic [ref=e18]: 
+                - text: Relatórios
+            - listitem [ref=e19]:
+              - link "Histórico" [ref=e20] [cursor=pointer]:
+                - /url: /historico
+                - generic [ref=e21]: 
+                - text: Histórico
+          - list [ref=e22]:
+            - listitem [ref=e23]:
+              - link "GESTOR - COORD_22" [ref=e24]:
+                - /url: "#"
+                - generic [ref=e25]:
+                  - generic [ref=e26]: 
+                  - generic [ref=e27]: GESTOR - COORD_22
+            - listitem "Sair" [ref=e28]:
+              - link [ref=e29] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e30]: 
+    - main [ref=e31]:
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - heading "Processos" [level=2] [ref=e36]
+          - generic "Lista de processos cadastrados" [ref=e38]:
+            - table [ref=e39]:
+              - rowgroup [ref=e40]:
+                - row "Descrição Tipo Unidades Situação" [ref=e41]:
+                  - columnheader "Descrição" [ref=e42] [cursor=pointer]
+                  - columnheader "Tipo" [ref=e43] [cursor=pointer]
+                  - columnheader "Unidades" [ref=e44]
+                  - columnheader "Situação" [ref=e45] [cursor=pointer]
+              - rowgroup [ref=e46]:
+                - row "Mapeamento CDU-20 1770939766806 Mapeamento SECAO_221 Em andamento" [ref=e47] [cursor=pointer]:
+                  - cell "Mapeamento CDU-20 1770939766806" [ref=e48]
+                  - cell "Mapeamento" [ref=e49]
+                  - cell "SECAO_221" [ref=e50]
+                  - cell "Em andamento" [ref=e51]
+        - generic [ref=e52]:
+          - heading "Alertas" [level=2] [ref=e55]
+          - table [ref=e58]:
+            - rowgroup [ref=e59]:
+              - row "Data/Hora Descrição Processo Origem" [ref=e60]:
+                - columnheader "Data/Hora" [ref=e61] [cursor=pointer]
+                - columnheader "Descrição" [ref=e62]
+                - columnheader "Processo" [ref=e63] [cursor=pointer]
+                - columnheader "Origem" [ref=e64]
+            - rowgroup [ref=e65]:
+              - row "Não lido:" [ref=e66] [cursor=pointer]:
+                - cell [ref=e67]
+                - cell "Não lido:" [ref=e68]:
+                  - generic [ref=e69]: "Não lido:"
+                - cell [ref=e70]
+                - cell [ref=e71]
+              - row "Não lido:" [ref=e72] [cursor=pointer]:
+                - cell [ref=e73]
+                - cell "Não lido:" [ref=e74]:
+                  - generic [ref=e75]: "Não lido:"
+                - cell [ref=e76]
+                - cell [ref=e77]
+              - row "Não lido:" [ref=e78] [cursor=pointer]:
+                - cell [ref=e79]
+                - cell "Não lido:" [ref=e80]:
+                  - generic [ref=e81]: "Não lido:"
+                - cell [ref=e82]
+                - cell [ref=e83]
+    - contentinfo [ref=e84]:
+      - generic [ref=e85]:
+        - generic [ref=e86]: Versão 1.0.0
+        - generic [ref=e87]: © SESEL/COSIS/TRE-PE
+```
