@@ -349,5 +349,19 @@ SELECT CODIGO, SIGLA FROM UNIDADES WHERE SIGLA = 'SECAO_221';
 ```
 
 ---
-**Status Final:** Migração de Fixtures ✅ Completa | Problema Backend ⚠️ Identificado  
-**Última Atualização:** 2026-02-12 (15:55 UTC)
+**Status:** Investigação Aprofundada - Bug JPA Confirmado  
+**Última Atualização:** 2026-02-12 (17:18 UTC)
+
+## Investigação Final (2026-02-12)
+
+### Bug Confirmado
+Query JPA retorna vazio mesmo com dados válidos. Processo 201 existe, participante (201,18) existe, mas query não encontra.
+
+**SQL gerado (correto):**
+```sql
+SELECT DISTINCT p.* FROM sgc.processo p
+JOIN sgc.unidade_processo up ON p.codigo=up.processo_codigo  
+WHERE up.unidade_codigo IN (18) AND p.situacao<>'CRIADO'
+```
+
+**Solução Recomendada:** Usar Native Query como workaround para o problema de JPA embedded ID path.
