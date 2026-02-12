@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/auth-fixtures.js';
+import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {
@@ -15,7 +15,7 @@ import {
 import {fazerLogout, limparNotificacoes, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
 import {criarCompetencia} from './helpers/helpers-mapas.js';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
+import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -29,22 +29,12 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     const descProcessoRevisao = `AAA Revisão CDU-12 ${timestamp}`;
     let codProcessoMapeamento: number;
     let processoRevisaoId: number;
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
-
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-        cleanup = useProcessoCleanup();
-    });
-
-    test.afterAll(async ({request}) => {
-        await cleanup.limpar(request);
-    });
 
     // ========================================================================
     // PREPARAÇÃO - Criar Mapa Vigente e Iniciar Revisão
     // ========================================================================
 
-    test('Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)', async ({page}) => {
+    test('Preparacao 1: Setup Mapeamento (Atividades, Competências, Homologação)', async ({page, cleanupAutomatico}) => {
         test.slow();
         // 1. Criar Processo Mapeamento
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
@@ -61,7 +51,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await linhaProcesso.click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         codProcessoMapeamento = Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
-        if (codProcessoMapeamento > 0) cleanup.registrar(codProcessoMapeamento);
+        if (codProcessoMapeamento > 0) cleanupAutomatico.registrar(codProcessoMapeamento);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
@@ -160,7 +150,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
     });
 
-    test('Preparacao 2: Iniciar Processo de Revisão', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 2: Iniciar Processo de Revisão', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         
         await criarProcesso(page, {
             descricao: descProcessoRevisao,
@@ -175,7 +165,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await linhaProcesso.click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         processoRevisaoId = Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoRevisaoId > 0) cleanup.registrar(processoRevisaoId);
+        if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

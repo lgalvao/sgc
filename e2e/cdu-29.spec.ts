@@ -1,5 +1,4 @@
-import {expect, test} from './fixtures/auth-fixtures.js';
-import {resetDatabase} from './hooks/hooks-limpeza.js';
+import {expect, test} from './fixtures/complete-fixtures.js';
 
 /**
  * CDU-29 - Consultar histórico de processos
@@ -13,10 +12,6 @@ import {resetDatabase} from './hooks/hooks-limpeza.js';
  * 4. Sistema apresenta Detalhes do processo sem botões de ação
  */
 test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
-
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-    });
 
     // ========================================================================
     // CENÁRIO 1: Navegação para página de histórico

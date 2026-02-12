@@ -1,7 +1,7 @@
-import {expect, test} from './fixtures/auth-fixtures.js';
+import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
+import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-34 - Enviar lembrete de prazo
@@ -23,22 +23,12 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-34 ${timestamp}`;
     let processoId: number;
-    let cleanup: ReturnType<typeof useProcessoCleanup>;
-
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-        cleanup = useProcessoCleanup();
-    });
-
-    test.afterAll(async ({request}) => {
-        await cleanup.limpar(request);
-    });
 
     // ========================================================================
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         
 
         await criarProcesso(page, {
@@ -53,7 +43,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoId > 0) cleanup.registrar(processoId);
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

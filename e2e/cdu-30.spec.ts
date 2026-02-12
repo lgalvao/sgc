@@ -1,5 +1,4 @@
-import {expect, test} from './fixtures/auth-fixtures.js';
-import {resetDatabase} from './hooks/hooks-limpeza.js';
+import {expect, test} from './fixtures/complete-fixtures.js';
 
 /**
  * CDU-30 - Manter Administradores
@@ -16,10 +15,6 @@ import {resetDatabase} from './hooks/hooks-limpeza.js';
  * - Um administrador não pode remover seu próprio acesso
  */
 test.describe.serial('CDU-30 - Manter Administradores', () => {
-
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-    });
 
     // ========================================================================
     // CENÁRIO 1: Navegação para página de administradores

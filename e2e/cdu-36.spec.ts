@@ -1,6 +1,5 @@
-import {expect, test} from './fixtures/auth-fixtures.js';
+import {expect, test} from './fixtures/complete-fixtures.js';
 import {USUARIOS} from './helpers/helpers-auth.js';
-import {resetDatabase} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-36 - Gerar relatório de mapas
@@ -16,10 +15,6 @@ import {resetDatabase} from './hooks/hooks-limpeza.js';
 test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
     const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
     const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
-
-    test.beforeAll(async ({request}) => {
-        await resetDatabase(request);
-    });
 
     // ========================================================================
     // TESTES PRINCIPAIS
