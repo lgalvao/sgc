@@ -61,6 +61,10 @@ const LOG_FILTERS = [
     /use --host to expose/, 
     /[vite] connecting/,
     /[vite] connected/,
+    /connecting/, 
+    /connected/, 
+    /vite/,
+    /debug:/,
 
     // Logs de serviços mockados
     /NotificacaoEmailServiceMock.*ATIVADO/, 
