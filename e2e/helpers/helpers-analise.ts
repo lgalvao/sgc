@@ -130,7 +130,7 @@ export async function fecharHistoricoAnalise(page: Page) {
 /**
  * Função genérica para devolução de cadastro/revisão
  */
-async function realizarDevolucao(page: Page, observacao: string = '', mensagemSucesso: string | RegExp) {
+async function realizarDevolucao(page: Page, mensagemSucesso: string | RegExp, observacao: string = '') {
     await page.getByTestId('btn-acao-devolver').click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByText(/Confirma a devolução.*para ajustes/i)).toBeVisible();
@@ -148,14 +148,14 @@ async function realizarDevolucao(page: Page, observacao: string = '', mensagemSu
  * Devolve cadastro de mapeamento para ajustes (CDU-13)
  */
 export async function devolverCadastroMapeamento(page: Page, observacao: string = '') {
-    await realizarDevolucao(page, observacao, /Cadastro devolvido/i);
+    await realizarDevolucao(page, /Cadastro devolvido/i, observacao);
 }
 
 /**
  * Devolve revisão para ajustes (CDU-14)
  */
 export async function devolverRevisao(page: Page, observacao: string = '') {
-    await realizarDevolucao(page, observacao, /Revisão devolvida/i);
+    await realizarDevolucao(page, /Revisão devolvida/i, observacao);
 }
 
 /**
@@ -180,7 +180,7 @@ export async function cancelarDevolucao(page: Page) {
 /**
  * Função genérica para aceite de cadastro/revisão (GESTOR)
  */
-async function realizarAceite(page: Page, observacao: string = '', mensagemSucesso: string | RegExp) {
+async function realizarAceite(page: Page, mensagemSucesso: string | RegExp, observacao: string = '') {
     await page.getByTestId('btn-acao-analisar-principal').click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByText(/Confirma o aceite/i)).toBeVisible();
@@ -197,14 +197,14 @@ async function realizarAceite(page: Page, observacao: string = '', mensagemSuces
  * Aceita cadastro de mapeamento (GESTOR - CDU-13)
  */
 export async function aceitarCadastroMapeamento(page: Page, observacao: string = '') {
-    await realizarAceite(page, observacao, /Cadastro aceito/i);
+    await realizarAceite(page, /Cadastro aceito/i, observacao);
 }
 
 /**
  * Aceita revisão (GESTOR - CDU-14)
  */
 export async function aceitarRevisao(page: Page, observacao: string = '') {
-    await realizarAceite(page, observacao, /Revisão aceita/i);
+    await realizarAceite(page, /Revisão aceita/i, observacao);
 }
 
 // ============================================================================
