@@ -51,5 +51,5 @@ frontend/coverage/
 !test-results/
 playwright-report/
 .playwright/
-!e2e/server.log
-!screenshots/
+e2e/server.log
+screenshots/

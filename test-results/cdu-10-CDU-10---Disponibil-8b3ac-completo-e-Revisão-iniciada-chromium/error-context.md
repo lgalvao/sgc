@@ -1,0 +1,102 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link "Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link "Unidades" [ref=e14] [cursor=pointer]:
+                  - /url: /unidades
+                  - generic [ref=e15]: 
+                  - text: Unidades
+              - listitem [ref=e16]:
+                - link "Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link "Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "ADMIN - ADMIN" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: ADMIN - ADMIN
+              - listitem "Configurações do sistema" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: /configuracoes
+                  - generic [ref=e30]: 
+              - listitem "Sair" [ref=e31]:
+                - link [ref=e32] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e33]: 
+      - generic [ref=e36]:
+        - button "Voltar" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: 
+        - navigation "breadcrumb" [ref=e39]:
+          - list [ref=e40]:
+            - listitem [ref=e41]:
+              - link "Início" [ref=e42] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e43]: 
+                - generic [ref=e44]: Início
+            - listitem [ref=e45]:
+              - text: ›
+              - link "Detalhes do processo" [ref=e46] [cursor=pointer]:
+                - /url: /processo/201
+            - listitem [ref=e47]:
+              - text: ›
+              - link "SECAO_221" [ref=e48] [cursor=pointer]:
+                - /url: /processo/201/SECAO_221
+            - listitem [ref=e49]:
+              - text: ›
+              - generic [ref=e50]: Mapa de competências
+      - main [ref=e51]:
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - heading "Mapa de competências técnicas" [level=2] [ref=e55]
+              - paragraph [ref=e56]:
+                - generic [ref=e57]: SECAO_221 - Seção 221 Mapa criado
+            - button "Disponibilizar" [ref=e59] [cursor=pointer]
+          - generic [ref=e61]:
+            - button "Criar competência" [ref=e62] [cursor=pointer]:
+              - generic [ref=e63]: 
+              - text: Criar competência
+            - generic [ref=e64]:
+              - generic [ref=e65]:
+                - strong [ref=e67]: Competência Mapeamento 1 1770928991410
+                - generic [ref=e68]:
+                  - button "Editar competência Competência Mapeamento 1 1770928991410" [ref=e69] [cursor=pointer]:
+                    - generic [ref=e70]: 
+                  - button "Excluir competência Competência Mapeamento 1 1770928991410" [ref=e71] [cursor=pointer]:
+                    - generic [ref=e72]: 
+              - generic [ref=e76]:
+                - generic [ref=e77]:
+                  - text: Atividade Mapeamento 1 1770928991410
+                  - generic [ref=e78]: "1"
+                - button "Remover atividade Atividade Mapeamento 1 1770928991410" [ref=e79] [cursor=pointer]:
+                  - generic [ref=e80]: 
+      - contentinfo [ref=e81]:
+        - generic [ref=e82]:
+          - generic [ref=e83]: Versão 1.0.0
+          - generic [ref=e84]: © SESEL/COSIS/TRE-PE
+  - text:  
+```
