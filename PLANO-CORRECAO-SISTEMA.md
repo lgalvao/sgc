@@ -23,5 +23,7 @@ Progresso Atual
   - `PainelFacade`: removido fallback silencioso de link de destino (erros agora propagam explicitamente).
   - Testes backend de controller atualizados e passando.
 - Premissa confirmada: dados de `Usuario`, `Unidade` e perfis vêm completos das views pre-populadas; tratar ausência desses dados como erro grave, nunca com fallback.
+- Correção aplicada em `CadAtribuicao.vue`: removido comportamento silencioso no submit; agora exibe erro explícito quando faltam usuário/campos obrigatórios ou unidade não carregada.
+- Ajuste adicional: para unidade ausente, comportamento agora é **fail-fast** (`Invariante violada`) em vez de mensagem de fallback, alinhado com a premissa de dados obrigatórios vindos das views.
 - Próximo passo imediato: consolidar triagem de erros manuais do PDF e fechar causa raiz dos cenários de visibilidade do GESTOR no painel.
 - Observação de triagem: parte dos erros manuais pode já estar resolvida ou ser falso positivo; validar cada item contra a base atual (`e2e/setup/seed.sql`) antes de implementar novas correções.

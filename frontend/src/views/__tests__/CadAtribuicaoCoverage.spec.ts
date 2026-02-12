@@ -63,7 +63,7 @@ describe('CadAtribuicao Coverage', () => {
         expect((wrapper.vm as any).erroUsuario).toBe("Falha ao carregar dados da unidade ou usuários.");
     });
 
-    it('deve retornar precocemente em criarAtribuicao se unidade ou usuario selecionado estiverem faltando', async () => {
+    it('deve falhar rápido quando invariante de unidade é violada', async () => {
         const wrapper = criarWrapper();
         await flushPromises();
 
@@ -71,9 +71,9 @@ describe('CadAtribuicao Coverage', () => {
         (wrapper.vm as any).unidade = null;
         (wrapper.vm as any).usuarioSelecionado = null;
 
-        await (wrapper.vm as any).criarAtribuicao();
-
-        expect((wrapper.vm as any).isLoading).toBe(false);
+        await expect((wrapper.vm as any).criarAtribuicao())
+            .rejects
+            .toThrow('Invariante violada: unidade não carregada');
     });
 
     it('deve atualizar dataInicio via v-model', async () => {

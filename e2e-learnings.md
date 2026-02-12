@@ -198,3 +198,14 @@ Quando isso ocorre com dados válidos e atores corretos, tratar como bug funcion
 
 **Status funcional:**
 - Ainda persistem falhas E2E de visibilidade no painel para GESTOR (`CDU-20` e `CDU-25`), indicando investigação adicional de regra de negócio/hierarquia (não apenas transporte de parâmetro).
+
+### 18. Formulário de atribuição temporária com falha silenciosa
+
+**Sintoma observado em teste manual:**
+Ao clicar em "Criar atribuição" sem combinação válida de campos/carregamento, não havia feedback claro para o usuário.
+
+**Correção aplicada:**
+- `CadAtribuicao.vue` passou a exibir erro explícito (feedback visual) quando:
+  - unidade não foi carregada,
+  - usuário não foi selecionado,
+  - data de término ou justificativa não foram preenchidas.

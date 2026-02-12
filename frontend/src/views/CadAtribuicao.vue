@@ -153,14 +153,23 @@ onMounted(async () => {
 });
 
 async function criarAtribuicao() {
-  if (!unidade.value || !usuarioSelecionado.value) {
+  const unidadeAtual = unidade.value;
+  if (!unidadeAtual) throw new Error('Invariante violada: unidade não carregada');
+  if (!usuarioSelecionado.value) {
+    erroUsuario.value = "Selecione um usuário para criar a atribuição.";
+    feedbackStore.show('Erro', 'Selecione um usuário para criar a atribuição.', 'danger');
     return;
   }
+  if (!dataTermino.value || !justificativa.value.trim()) {
+    feedbackStore.show('Erro', 'Preencha data de término e justificativa.', 'danger');
+    return;
+  }
+  erroUsuario.value = "";
 
   isLoading.value = true;
 
   try {
-    await atribuicoesStore.criarAtribuicaoTemporaria(unidade.value.codigo, {
+    await atribuicoesStore.criarAtribuicaoTemporaria(unidadeAtual.codigo, {
       tituloEleitoralUsuario: usuarioSelecionado.value,
       dataInicio: dataInicio.value || undefined,
       dataTermino: dataTermino.value,

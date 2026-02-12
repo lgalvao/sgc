@@ -1,0 +1,44 @@
+
+> sgc@1.0.0 test:e2e
+> playwright test e2e/cdu-20.spec.ts e2e/cdu-25.spec.ts e2e/cdu-34.spec.ts
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+
+[1A[2K[2m[WebServer] [22mINFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 18 unidades verificadas.
+
+[1A[2K[2m[WebServer] [22m  [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m253[22m[2m[0m ms[22m
+
+[1A[2K[2m[WebServer] [22m  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+
+
+Running 19 tests using 1 worker
+
+[1A[2K[2m[WebServer] [22m>>> Frontend e Backend no ar!
+
+[1A[2K[1/19] [chromium] › e2e/cdu-20.spec.ts:27:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 1: Admin cria e inicia processo de mapeamento
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [13]. Participante IDs: [(201,13)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2/19] [chromium] › e2e/cdu-20.spec.ts:48:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade ASSESSORIA_22
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 888888
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 201 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para SECRETARIA_2 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[3/19] [chromium] › e2e/cdu-20.spec.ts:67:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 3: Admin homologa cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[4/19] [chromium] › e2e/cdu-20.spec.ts:78:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 4: Admin cria competências e disponibiliza mapa
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
