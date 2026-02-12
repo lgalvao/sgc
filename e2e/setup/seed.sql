@@ -329,3 +329,11 @@ INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_mat
 VALUES (18, '141414', '00141414', 'TITULAR', CURRENT_TIMESTAMP);
 INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (99, '123456789012', '56789012', 'TITULAR', CURRENT_TIMESTAMP);
+-- Reset identity sequences to prevent ID conflicts with test data
+-- This ensures auto-generated IDs start above the manually inserted ones
+ALTER TABLE sgc.processo ALTER COLUMN codigo RESTART WITH 201;
+ALTER TABLE sgc.subprocesso ALTER COLUMN codigo RESTART WITH 201;
+ALTER TABLE sgc.mapa ALTER COLUMN codigo RESTART WITH 201;
+ALTER TABLE sgc.atividade ALTER COLUMN codigo RESTART WITH 3000;
+ALTER TABLE sgc.conhecimento ALTER COLUMN codigo RESTART WITH 300000;
+ALTER TABLE sgc.competencia ALTER COLUMN codigo RESTART WITH 3000;

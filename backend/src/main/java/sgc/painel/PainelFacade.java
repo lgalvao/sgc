@@ -1,6 +1,5 @@
 package sgc.painel;
 
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,7 +31,6 @@ public class PainelFacade {
     private final ProcessoFacade processoFacade;
     private final AlertaFacade alertaService;
     private final UnidadeFacade unidadeService;
-    private final EntityManager entityManager;
 
     /**
      * Lista processos com base no perfil e na unidade do usuário.
@@ -67,41 +65,12 @@ public class PainelFacade {
             // Os demais perfis veem apenas processos da própria unidade
             codigosUnidades.add(codigoUnidade);
 
-            // DIAGNOSTIC: Check what's in the database
-            var diagnosticQuery = entityManager.createNativeQuery(
-                "SELECT p.codigo, p.situacao, up.unidade_codigo FROM sgc.processo p " +
-                "LEFT JOIN sgc.unidade_processo up ON p.codigo = up.processo_codigo " +
-                "WHERE up.unidade_codigo = :unidadeCodigo OR up.unidade_codigo IS NULL"
-            );
-            diagnosticQuery.setParameter("unidadeCodigo", codigoUnidade);
-            var diagnosticResults = diagnosticQuery.getResultList();
-            log.info("DIAGNOSTIC: Processos na base para unidade {}: {}", codigoUnidade, diagnosticResults);
-            
-            // Also check processo table directly
-            var processoQuery = entityManager.createNativeQuery("SELECT codigo, situacao FROM sgc.processo");
-            var processoResults = processoQuery.getResultList();
-            log.info("DIAGNOSTIC: Todos processos na base ({}): {}", processoResults.size(), 
-                processoResults.stream()
-                    .map(r -> {
-                        Object[] row = (Object[]) r;
-                        return "P" + row[0] + ":" + row[1];
-                    })
-                    .toList());
-            
-            // And unidade_processo table
-            var upQuery = entityManager.createNativeQuery("SELECT processo_codigo, unidade_codigo FROM sgc.unidade_processo");
-            var upResults = upQuery.getResultList();
-            log.info("DIAGNOSTIC: Todos unidade_processo ({}): {}", upResults.size(),
-                upResults.stream()
-                    .map(r -> {
-                        Object[] row = (Object[]) r;
-                        return "(" + row[0] + "," + row[1] + ")";
-                    })
-                    .toList());
-
-            log.info("Buscando processos para perfil {} com unidades: {}", perfil, codigosUnidades);
             processos = processoFacade.listarPorParticipantesIgnorandoCriado(codigosUnidades, sortedPageable);
-            log.info("Encontrados {} processos para perfil {} unidade {}", processos.getTotalElements(), perfil, codigoUnidade);
+            
+            // Temporary diagnostic
+            if (processos.isEmpty()) {
+                log.warn("CHEFE {} não encontrou processos. Investigar no banco.", codigoUnidade);
+            }
         }
         return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade, mapaPaiFilhos));
     }
