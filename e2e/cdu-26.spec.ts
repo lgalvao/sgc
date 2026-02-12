@@ -68,7 +68,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.goto(`/processo/${processoId}/${UNIDADE_1}`);
+        await page.getByText(descProcesso).click();
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);

@@ -68,7 +68,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.goto(`/processo/${processoId}/${UNIDADE_1}`);
+        await page.getByText(descProcesso).click();
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);

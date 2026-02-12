@@ -46,7 +46,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.goto(`/processo/${processoId}/${UNIDADE_ALVO}`);
+        await page.getByText(descProcesso).click();
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);

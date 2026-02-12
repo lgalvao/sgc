@@ -114,3 +114,22 @@ npx playwright test e2e/cdu-XX.spec.ts --reporter=list > test_output.txt 2>&1
 2. **Uso de steps**: Use `test.step()` para organizar logs dentro de um teste consolidado longo.
 3. **Limpeza de Toasts**: Use o helper `limparNotificacoes(page)` antes de ações críticas de navegação se toasts estiverem bloqueando a tela.
 
+## Atualização Contínua - 2026-02-12
+
+### 10. Perfil de GESTOR deve refletir a hierarquia do caso
+
+**Problema Identificado:**
+Alguns cenários de revisão/aceite usavam `GESTOR_COORD` (COORD_11), mas o subprocesso testado era da árvore `COORD_22` (`SECAO_221`), causando processo ausente no painel ou 403.
+
+**Solução:**
+- Usar `GESTOR_COORD_22` nos cenários que operam sobre `SECAO_221`.
+- Revisar fixtures de autenticação por cenário para garantir aderência à unidade-alvo.
+
+### 11. Navegação direta para subprocesso pode falhar por contexto de autorização
+
+**Problema Identificado:**
+Em alguns fluxos de CHEFE, abrir URL direta de subprocesso (`/processo/{codigo}/{sigla}`) resultou em erro de autorização/contexto (`403`) durante carregamento.
+
+**Solução:**
+- Preferir navegação de usuário real via painel (`clicar no processo`) quando o acesso direto não for estável.
+- Manter captura de `codigo` para cenários onde a navegação direta é comprovadamente estável.

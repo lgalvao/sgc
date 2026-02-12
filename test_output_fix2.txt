@@ -1,0 +1,2 @@
+[1A[2K[2m[WebServer] [22mINFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+

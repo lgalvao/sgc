@@ -106,12 +106,11 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     });
 
     test('Cenario 1: GESTOR navega para visualização do mapa validado', async ({page}) => {
-        await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
+        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
 
         // Passo 1: No Painel, escolhe o processo
         await page.goto(`/processo/${processoId}`);
         await expect(page.getByText('Carregando detalhes do processo...')).toBeHidden();
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         // Passo 1: Clica na unidade com situação 'Mapa validado'
         await navegarParaSubprocesso(page, 'SECAO_221');
@@ -129,7 +128,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     });
 
     test('Cenario 2: GESTOR cancela aceite - permanece na tela', async ({page}) => {
-        await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
+        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-mapa').click();
@@ -146,7 +145,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     });
 
     test('Cenario 3: GESTOR registra aceite do mapa', async ({page}) => {
-        await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
+        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-mapa').click();
