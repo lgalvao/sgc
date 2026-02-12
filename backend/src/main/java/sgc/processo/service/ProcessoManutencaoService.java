@@ -58,11 +58,18 @@ public class ProcessoManutencaoService {
 
         // Adiciona participantes com snapshot
         processo.adicionarParticipantes(participantes);
+        log.info("Antes de salvar - Processo transiente com {} participantes", processo.getParticipantes().size());
 
         // Salva uma única vez com todos os participantes
         Processo processoSalvo = processoRepo.saveAndFlush(processo);
 
-        log.info("Processo {} criado.", processoSalvo.getCodigo());
+        log.info("Processo {} criado com {} participantes: {}. IDs dos participantes: {}",
+                processoSalvo.getCodigo(),
+                processoSalvo.getParticipantes().size(),
+                processoSalvo.getCodigosParticipantes(),
+                processoSalvo.getParticipantes().stream()
+                        .map(up -> "(" + up.getId().getProcessoCodigo() + "," + up.getId().getUnidadeCodigo() + ")")
+                        .toList());
 
         return processoSalvo;
     }
