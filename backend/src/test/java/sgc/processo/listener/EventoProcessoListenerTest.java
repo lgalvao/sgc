@@ -141,17 +141,21 @@ class EventoProcessoListenerTest {
 
     @Test
     @DisplayName("Deve cobrir exceções de tipo de unidade no início")
-    void deveCobrirExcecaoTipoUnidadeRaizEInvalido() {
+    void deveCobrirExcecaoTipoUnidadeInvalido() {
         Processo processo = criarProcesso(1L);
         Subprocesso s = new Subprocesso();
-        Unidade u = criarUnidade(1L, TipoUnidade.RAIZ);
+        Unidade u = criarUnidade(1L, TipoUnidade.SEM_EQUIPE);
         s.setUnidade(u);
 
-        // Testa ErroEstadoImpossivel ao criar corpo
-        assertThatThrownBy(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.RAIZ, processo, s))
+        // Testa exceção ao criar corpo para tipo não suportado
+        assertThatThrownBy(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, processo, s))
                 .isInstanceOf(IllegalArgumentException.class);
 
-        // Testa ErroEstadoImpossivel ao definir assunto no fluxo principal
+        // Testa que RAIZ não joga exceção
+        assertThatCode(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.RAIZ, processo, s))
+                .doesNotThrowAnyException();
+
+        // Testa catch no fluxo principal para tipo não suportado (ex: SEM_EQUIPE)
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularTitulo("T").build()));
@@ -274,9 +278,10 @@ class EventoProcessoListenerTest {
         Processo processo = criarProcesso(2L);
         when(processoFacade.buscarEntidadePorId(2L)).thenReturn(processo);
 
-        Unidade raiz = criarUnidade(1L, TipoUnidade.RAIZ);
+        // SEM_EQUIPE cai no else implícito de enviarNotificacaoFinalizacao
+        Unidade semEquipe = criarUnidade(1L, TipoUnidade.SEM_EQUIPE);
 
-        processo.adicionarParticipantes(Set.of(raiz));
+        processo.adicionarParticipantes(Set.of(semEquipe));
 
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
                 1L, UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build()
@@ -285,7 +290,7 @@ class EventoProcessoListenerTest {
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
                 "T1", UsuarioDto.builder().email("op@mail.com").build()
         ));
-        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(raiz));
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(semEquipe));
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(2L).build());
 
@@ -534,14 +539,15 @@ class EventoProcessoListenerTest {
     }
 
     @Test
-    @DisplayName("Deve cobrir catch de ErroEstadoImpossivel durante envio de email")
-    void deveCobrirCatchErroEstadoImpossivelDuranteEnvioEmail() {
+    @DisplayName("Deve cobrir catch de exceção durante envio de email")
+    void deveCobrirCatchExcecaoDuranteEnvioEmail() {
         Processo processo = criarProcesso(9L);
         when(processoFacade.buscarEntidadePorId(9L)).thenReturn(processo);
 
-        Unidade u = criarUnidade(1L, TipoUnidade.RAIZ);
-        u.setSigla("RAIZ");
-        u.setNome("Unidade Raiz");
+        // SEM_EQUIPE lançará exceção em criarCorpoEmailPorTipo
+        Unidade u = criarUnidade(1L, TipoUnidade.SEM_EQUIPE);
+        u.setSigla("SEM_EQUIPE");
+        u.setNome("Unidade Sem Equipe");
         Subprocesso s = new Subprocesso();
         s.setUnidade(u);
 
@@ -556,7 +562,6 @@ class EventoProcessoListenerTest {
         UsuarioDto titular = UsuarioDto.builder().tituloEleitoral("T1").email("t@mail.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", titular));
 
-        // RAIZ lançará ErroEstadoImpossivel ao tentar criar assunto (linha 255)
         listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(9L).build());
 
         // Não deve enviar email pois exceção foi capturada
@@ -783,12 +788,12 @@ class EventoProcessoListenerTest {
         }
 
         @Test
-        @DisplayName("criarCorpoEmailPorTipo deve disparar ErroEstadoImpossivel para tipo RAIZ (isolado)")
+        @DisplayName("criarCorpoEmailPorTipo deve disparar exceção para tipo SEM_EQUIPE (isolado)")
         void criarCorpoEmailPorTipo_Erro() {
             Processo p = new Processo();
             Subprocesso s = new Subprocesso();
             org.assertj.core.api.Assertions.assertThatThrownBy(() -> 
-                listener.criarCorpoEmailPorTipo(TipoUnidade.RAIZ, p, s)
+                listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, p, s)
             ).isInstanceOf(IllegalArgumentException.class);
         }
     }
