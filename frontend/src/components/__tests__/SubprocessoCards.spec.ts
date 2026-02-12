@@ -15,6 +15,7 @@ describe('SubprocessoCards.vue', () => {
         mapa: { codigo: 1 } as any,
         permissoes: {
             podeEditarMapa: true,
+            podeEditarCadastro: true,
             podeVisualizarMapa: true,
             podeVisualizarDiagnostico: false,
             podeVerPagina: true,
@@ -96,7 +97,7 @@ describe('SubprocessoCards.vue', () => {
         const wrapper = mount(SubprocessoCards, {
             props: {
                 ...defaultProps,
-                permissoes: { ...defaultProps.permissoes, podeEditarMapa: false }
+                permissoes: { ...defaultProps.permissoes, podeEditarMapa: false, podeEditarCadastro: false }
             },
             global: {
                 stubs: {

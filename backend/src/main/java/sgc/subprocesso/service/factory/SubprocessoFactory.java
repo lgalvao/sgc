@@ -77,7 +77,9 @@ public class SubprocessoFactory {
      */
     public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
         List<Unidade> unidadesElegiveis = unidades.stream()
-                .filter(u -> TipoUnidade.OPERACIONAL == u.getTipo() || TipoUnidade.INTEROPERACIONAL == u.getTipo())
+                .filter(u -> u.getTipo() == TipoUnidade.OPERACIONAL 
+                          || u.getTipo() == TipoUnidade.INTEROPERACIONAL
+                          || u.getTipo() == TipoUnidade.RAIZ)
                 .toList();
 
         if (unidadesElegiveis.isEmpty()) return;

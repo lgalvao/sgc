@@ -689,18 +689,7 @@ create table if not exists sgc.unidade_processo
 (
     6
 ),
-    tipo varchar
-(
-    20
-) check
-(
-    tipo
-    in
-(
-    'OPERACIONAL',
-    'INTERMEDIARIA',
-    'INTEROPERACIONAL'
-)),
+    tipo varchar(20) check (tipo in ('OPERACIONAL', 'INTERMEDIARIA', 'INTEROPERACIONAL', 'SEM_EQUIPE', 'RAIZ')),
     situacao varchar
 (
     20

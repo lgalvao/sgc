@@ -176,7 +176,7 @@ public class EventoProcessoListener {
             String emailTitular = titular.email();
             TipoUnidade tipoUnidade = unidade.getTipo();
 
-            if (tipoUnidade == OPERACIONAL || tipoUnidade == INTEROPERACIONAL) {
+            if (tipoUnidade == OPERACIONAL || tipoUnidade == INTEROPERACIONAL || tipoUnidade == RAIZ) {
                 enviarEmailUnidadeFinal(processo, unidade, emailTitular);
             } else if (tipoUnidade == INTERMEDIARIA) {
                 enviarEmailUnidadeIntermediaria(processo, unidade, emailTitular, subordinadas);
@@ -234,10 +234,10 @@ public class EventoProcessoListener {
             String nomeUnidade = unidade.getNome();
             UsuarioDto titular = usuarios.get(responsavel.titularTitulo());
             String assunto = switch (unidade.getTipo()) {
-                case OPERACIONAL, INTEROPERACIONAL -> "Processo Iniciado - %s".formatted(processo.getDescricao());
+                case OPERACIONAL, INTEROPERACIONAL, RAIZ -> "Processo Iniciado - %s".formatted(processo.getDescricao());
                 case INTERMEDIARIA ->
                     "Processo Iniciado em Unidades Subordinadas - %s".formatted(processo.getDescricao());
-                case RAIZ, SEM_EQUIPE -> "Notificação não enviada para unidade (N/A)";
+                case SEM_EQUIPE -> "Notificação não enviada para unidade (N/A)";
             };
 
             String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
@@ -259,13 +259,14 @@ public class EventoProcessoListener {
 
     String criarCorpoEmailPorTipo(TipoUnidade tipoUnidade, Processo processo, Subprocesso subprocesso) {
         return switch (tipoUnidade) {
-            case OPERACIONAL, INTEROPERACIONAL, INTERMEDIARIA -> notificacaoModelosService.criarEmailProcessoIniciado(
-                    subprocesso.getUnidade().getNome(),
-                    processo.getDescricao(),
-                    processo.getTipo().name(),
-                    subprocesso.getDataLimiteEtapa1());
-            case RAIZ, SEM_EQUIPE ->
-                throw new IllegalArgumentException("Tipo de unidade não suportado para geração de e-mail: " + tipoUnidade);
+            case OPERACIONAL, INTEROPERACIONAL, INTERMEDIARIA, RAIZ ->
+                    notificacaoModelosService.criarEmailProcessoIniciado(
+                            subprocesso.getUnidade().getNome(),
+                            processo.getDescricao(),
+                            processo.getTipo().name(),
+                            subprocesso.getDataLimiteEtapa1());
+            case SEM_EQUIPE ->
+                    throw new IllegalArgumentException("Tipo de unidade não suportado para geração de e-mail: " + tipoUnidade);
         };
     }
 

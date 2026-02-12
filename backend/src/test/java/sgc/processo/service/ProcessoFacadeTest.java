@@ -128,7 +128,7 @@ class ProcessoFacadeTest {
 
             processoFacade.enviarLembrete(codProcesso, codUnidade);
 
-            verify(alertaService).criarAlertaSedoc(eq(processo), eq(unidade), contains("N/A"));
+            verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("N/A"));
         }
 
         @Test
@@ -285,7 +285,7 @@ class ProcessoFacadeTest {
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
 
             processoFacade.enviarLembrete(1L, 10L);
-            verify(alertaService).criarAlertaSedoc(eq(p), eq(u), anyString());
+            verify(alertaService).criarAlertaAdmin(eq(p), eq(u), anyString());
         }
 
         @Test
