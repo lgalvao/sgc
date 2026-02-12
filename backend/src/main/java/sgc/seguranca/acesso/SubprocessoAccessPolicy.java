@@ -115,7 +115,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
             // ========== REVISÃO CADASTRO ==========
             Map.entry(EDITAR_REVISAO_CADASTRO, new RegrasAcao(
                     EnumSet.of(CHEFE),
-                    EnumSet.of(REVISAO_CADASTRO_EM_ANDAMENTO),
+                    EnumSet.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO),
                     RequisitoHierarquia.MESMA_UNIDADE)),
 
             Map.entry(DISPONIBILIZAR_REVISAO_CADASTRO, new RegrasAcao(

@@ -41,24 +41,24 @@ O login no SGC é um processo em **3 etapas**:
 - **Entrada**: Token temporário + perfil escolhido
 - **Processamento**:
   - Para GESTOR/CHEFE/SERVIDOR: consulta VW_USUARIO_PERFIL_UNIDADE e retorna lista de unidades onde o usuário tem esse perfil
-  - Para ADMIN: **NÃO deveria retornar unidades** (ADMIN não escolhe unidade)
+  - Para ADMIN: Retorna a unidade RAIZ (id=1), apresentada como "ADMIN"
 - **Saída**: Lista de unidades disponíveis para o perfil escolhido
 - **Exemplo**: 
   - CHEFE → [{"codigo": 10, "nome": "Zona 001"}]
-  - ADMIN → [] (vazio - não escolhe unidade)
+  - ADMIN → [{"codigo": 1, "nome": "ADMIN"}]
 
 ### Etapa 3: Entrar (`POST /entrar`)
 - **Entrada**: 
   - **GESTOR/CHEFE/SERVIDOR**: Token temporário + perfil + unidade
-  - **ADMIN**: Token temporário + perfil (sem unidade)
+  - **ADMIN**: Token temporário + perfil + unidade RAIZ (ou sem unidade, sistema atribui RAIZ)
 - **Processamento**:
   - **Para GESTOR/CHEFE/SERVIDOR**: Valida que usuário tem esse perfil nessa unidade
-  - **Para ADMIN**: Não requer unidade, atribui automaticamente unidade RAIZ (id=1)
+  - **Para ADMIN**: Valida e atribui unidade RAIZ (id=1)
   - Cria token JWT final com: título eleitor, perfil, unidade
 - **Saída**: Token JWT válido para requisições autenticadas
 - **Exemplo**:
   - CHEFE na unidade 10 → JWT com {titulo: "...", perfil: CHEFE, unidade: 10}
-  - ADMIN (sem unidade) → JWT com {titulo: "...", perfil: ADMIN, unidade: 1}
+  - ADMIN na unidade 1 → JWT com {titulo: "...", perfil: ADMIN, unidade: 1}
 
 ---
 
@@ -71,9 +71,9 @@ O login no SGC é um processo em **3 etapas**:
 - ✅ **Limitado por AÇÃO**: Ações operacionais (ex: editar cadastro de unidade) são bloqueadas na Camada 1.
 - 📌 **Unidade RAIZ (id=1)**: Vinculação técnica para consistência do sistema.
   - **Internamente**: Unidade ID=1, Sigla='ADMIN', Tipo='RAIZ'.
-  - **Externamente (Usuário)**: Apresentada como **"SEDOC"** em movimentações, alertas e históricos.
+  - **Externamente (Usuário)**: Apresentada como **"ADMIN"**.
 
-**Papel:** Gerencia processos e mapas (nível estratégico), faz homologações finais quando o fluxo chega à SEDOC.
+**Papel:** Gerencia processos e mapas (nível estratégico), faz homologações finais quando o fluxo chega à unidade ADMIN.
 
 **AÇÕES EXCLUSIVAS:**
 - **CDU-03**: Manter processo (criar, editar, excluir processos)
@@ -83,6 +83,7 @@ O login no SGC é um processo em **3 etapas**:
 - **CDU-16**: Ajustar mapa de competências (processo de revisão)
 - **CDU-17**: Disponibilizar mapa de competências
 - **CDU-21**: Finalizar processo de mapeamento ou revisão
+- **CDU-23**: Homologar cadastros em bloco
 - **CDU-30**: Manter Administradores
 - **Visualizar processos em situação CRIADO** (único perfil com acesso)
 - **Alterar datas limite** de etapas de subprocessos
@@ -100,7 +101,7 @@ O login no SGC é um processo em **3 etapas**:
   - ✅ Visualiza detalhes de qualquer subprocesso
   
 - **CDU-12**: Verificar impactos no mapa
-  - ✅ Acessa em múltiplas situações ('Revisão homologada', 'Mapa ajustado')
+  - ✅ Acessa em múltiplas situações ('Revisão do cadastro disponibilizada', 'Revisão homologada', 'Mapa ajustado')
   
 - **CDU-13**: Analisar cadastro de atividades (mapeamento)
   - ✅ **HOMOLOGAR** cadastro (aprovação final → 'Cadastro homologado') **[EXCLUSIVO]**
@@ -132,6 +133,7 @@ O login no SGC é um processo em **3 etapas**:
 
 **AÇÕES DESTAQUE:**
 - **Aceite** de cadastros e mapas (CDU-13, CDU-14, CDU-20)
+- **CDU-12**: Verificar impactos no mapa (durante análise de revisão)
 - **Devolver** para ajustes
 - Visualizar processos de sua hierarquia
 
@@ -254,8 +256,8 @@ Verifica se o usuário atende ao requisito de hierarquia (unidade).
 
 **Implementação:** Na classe `AbstractAccessPolicy`, se o usuário tem perfil ADMIN, a verificação de hierarquia espacial (ex: `MESMA_OU_SUBORDINADA`) retorna automaticamente `true`.
 
-**RAIZ vs SEDOC:**
-Embora o ADMIN esteja vinculado tecnicamente à unidade RAIZ (id=1), o sistema apresenta essa unidade como **"SEDOC"** para o usuário final em fluxos de trabalho (movimentações, alertas), mantendo a integridade técnica interna (RAIZ) e a familiaridade de negócio (SEDOC).
+**RAIZ (ADMIN):**
+O ADMIN está vinculado tecnicamente à unidade RAIZ (id=1), que possui a sigla **"ADMIN"**. O sistema utiliza essa unidade para manter a consistência em fluxos de trabalho (movimentações, alertas), onde o ADMIN atua como uma unidade organizacional especial.
 
 ### 4.4. Componentes de Suporte
 
@@ -314,7 +316,7 @@ Embora o ADMIN esteja vinculado tecnicamente à unidade RAIZ (id=1), o sistema a
 
 **Regra:** `[ADMIN]` + `NENHUM (Hierarquia)`
 
-- **ADMIN → Subprocesso (Logicamente na SEDOC)**: 
+- **ADMIN → Subprocesso (Logicamente na unidade ADMIN)**: 
   1. Perfil OK. 
   2. Hierarquia NENHUM. 
   3. **PERMITIDO**.

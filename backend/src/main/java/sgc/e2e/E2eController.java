@@ -79,13 +79,13 @@ public class E2eController {
                     "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE UPPER(TABLE_SCHEMA) = 'SGC'",
                     String.class).stream().flatMap(Stream::ofNullable).toList();
 
-            log.info("Limpando {} tabelas no schema SGC", tables.size());
+            log.debug("Limpando {} tabelas no schema SGC", tables.size());
             for (String table : tables) {
                 limparTabela(stmt, table);
             }
 
             Resource seedResource = getSeedResource();
-            log.info("Executando script de seed: {}", seedResource.getFilename());
+            log.debug("Executando script de seed: {}", seedResource.getFilename());
             ScriptUtils.executeSqlScript(conn, seedResource);
 
             log.debug("Reabilitando integridade referencial");
