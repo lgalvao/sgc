@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.test.util.ReflectionTestUtils;
+import sgc.comum.config.ConfigAplicacao;
 import sgc.comum.util.Sleeper;
 
 import java.util.concurrent.CompletableFuture;
@@ -38,11 +38,18 @@ class NotificacaoEmailAsyncExecutorTest {
     @Mock
     private MimeMessage mimeMessage;
 
+    @Mock
+    private ConfigAplicacao config;
+
+    @Mock
+    private ConfigAplicacao.Email emailConfig;
+
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(executor, "remetente", "teste@sgc.com.br");
-        ReflectionTestUtils.setField(executor, "nomeRemetente", "SGC Teste");
-        ReflectionTestUtils.setField(executor, "prefixoAssunto", "[SGC]");
+        when(config.getEmail()).thenReturn(emailConfig);
+        when(emailConfig.getRemetente()).thenReturn("teste@sgc.com.br");
+        when(emailConfig.getRemetenteNome()).thenReturn("SGC Teste");
+        when(emailConfig.getAssuntoPrefixo()).thenReturn("[SGC]");
     }
 
     private static final String DESTINATARIO = "dest@teste.com";

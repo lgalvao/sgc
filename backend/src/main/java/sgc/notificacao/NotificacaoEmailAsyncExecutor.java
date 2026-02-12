@@ -5,12 +5,12 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import sgc.comum.config.ConfigAplicacao;
 import sgc.comum.util.Sleeper;
 
 import java.io.UnsupportedEncodingException;
@@ -31,15 +31,7 @@ public class NotificacaoEmailAsyncExecutor {
 
     private final JavaMailSender enviadorDeEmail;
     private final Sleeper sleeper;
-
-    @Value("${aplicacao.email.remetente}")
-    private String remetente;
-
-    @Value("${aplicacao.email.remetente-nome}")
-    private String nomeRemetente;
-
-    @Value("${aplicacao.email.assunto-prefixo}")
-    private String prefixoAssunto;
+    private final ConfigAplicacao config;
 
     /**
      * Tenta enviar um email de forma assíncrona, com uma política de retentativas.
@@ -97,9 +89,10 @@ public class NotificacaoEmailAsyncExecutor {
         MimeMessage mensagem = enviadorDeEmail.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
 
-        helper.setFrom(new InternetAddress(remetente, nomeRemetente));
+        var emailConfig = config.getEmail();
+        helper.setFrom(new InternetAddress(emailConfig.getRemetente(), emailConfig.getRemetenteNome()));
         helper.setTo(destinatario);
-        String assuntoCompleto = "%s %s".formatted(prefixoAssunto, assunto);
+        String assuntoCompleto = "%s %s".formatted(emailConfig.getAssuntoPrefixo(), assunto);
         helper.setSubject(assuntoCompleto);
         helper.setText(corpo, html);
 

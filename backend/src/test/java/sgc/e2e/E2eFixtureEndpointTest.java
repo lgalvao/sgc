@@ -16,7 +16,6 @@ import sgc.processo.model.SituacaoProcesso;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,8 +36,10 @@ class E2eFixtureEndpointTest {
     private MockMvc mockMvc;
 
     @BeforeEach
-    void setup() {
+    void setup() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        // Resetar banco para garantir massa de dados (seed.sql)
+        mockMvc.perform(post("/e2e/reset-database")).andExpect(status().isOk());
     }
 
     @Test
@@ -52,7 +53,6 @@ class E2eFixtureEndpointTest {
         // Executar e Validar
         mockMvc.perform(
                         post("/e2e/fixtures/processo-mapeamento")
-                                .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -74,7 +74,6 @@ class E2eFixtureEndpointTest {
 
         // Executar e Validar
         mockMvc.perform(post("/e2e/fixtures/processo-mapeamento")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -94,7 +93,6 @@ class E2eFixtureEndpointTest {
 
         // Executar e Validar
         mockMvc.perform(post("/e2e/fixtures/processo-mapeamento")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is4xxClientError());
@@ -113,7 +111,6 @@ class E2eFixtureEndpointTest {
 
         // Executar e Validar
         mockMvc.perform(post("/e2e/fixtures/processo-mapeamento")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())

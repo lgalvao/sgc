@@ -82,6 +82,7 @@ dependencies {
 
     // Analise Estatica
     implementation("org.jspecify:jspecify:1.0.0")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
 
 
@@ -124,7 +125,7 @@ tasks.withType<Test> {
 
     testLogging {
         events(TestLogEvent.SKIPPED, TestLogEvent.FAILED, TestLogEvent.STANDARD_ERROR)
-        exceptionFormat = TestExceptionFormat.FULL
+        exceptionFormat = TestExceptionFormat.SHORT
         showStackTraces = true
         showCauses = true
         showStandardStreams = false
