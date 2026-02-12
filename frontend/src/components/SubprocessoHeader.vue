@@ -93,7 +93,7 @@ interface Props {
   processoDescricao: string;
   unidadeSigla: string;
   unidadeNome: string;
-  situacao: string;
+  situacao: string | null;
   titularNome: string;
   titularRamal: string;
   titularEmail: string;

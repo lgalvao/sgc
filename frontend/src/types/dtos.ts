@@ -3,13 +3,12 @@
  * Esses tipos são usados para fornecer type safety aos mappers.
  */
 
-import type {TipoImpactoAtividade} from './tipos';
+import type {SituacaoSubprocesso, TipoImpactoAtividade} from './tipos';
 
 export interface AtividadeDto {
     codigo: number;
     descricao: string;
     conhecimentos?: ConhecimentoDto[];
-    mapaCodigo?: number;
 }
 
 export interface ConhecimentoDto {
@@ -109,6 +108,27 @@ export interface LoginResponseDto {
     perfil: string;
     unidadeCodigo: number;
     token: string;
+}
+
+/**
+ * DTO que representa o status atual de um subprocesso.
+ * Usado para retornar informações básicas de status sem precisar carregar o processo completo.
+ */
+export interface SubprocessoSituacaoDto {
+    codigo: number;
+    situacao: SituacaoSubprocesso;
+    situacaoLabel: string | null;
+}
+
+/**
+ * DTO de resposta para operações CRUD em atividades.
+ * Retorna a atividade afetada, o status atualizado do subprocesso,
+ * e a lista completa de atividades atualizadas.
+ */
+export interface AtividadeOperacaoResponseDto {
+    atividade: AtividadeDto | null;
+    subprocesso: SubprocessoSituacaoDto;
+    atividadesAtualizadas: AtividadeDto[];
 }
 
 

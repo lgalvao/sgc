@@ -13,6 +13,11 @@ vi.mock("@/mappers/atividades", () => ({
     mapCriarConhecimentoRequestToDto: vi.fn((req) => ({...req, mapped: true})),
     mapAtualizarAtividadeToDto: vi.fn((req) => ({...req, mapped: true})),
     mapAtualizarConhecimentoToDto: vi.fn((req) => ({...req, mapped: true})),
+    mapAtividadeOperacaoResponseToModel: vi.fn((dto) => ({
+        atividade: dto.atividade ? {...dto.atividade, mapped: true} : null,
+        subprocesso: dto.subprocesso,
+        atividadesAtualizadas: dto.atividadesAtualizadas?.map((a: any) => ({...a, mapped: true})) || [],
+    })),
 }));
 
 describe("atividadeService", () => {
@@ -46,36 +51,51 @@ describe("atividadeService", () => {
 
     it("criarAtividade deve mapear requisição e enviar POST", async () => {
         const request = {descricao: "Nova"};
-        const responseDto = {atividade: {codigo: 1}};
+        const responseDto = {
+            atividade: {codigo: 1, descricao: "Nova", conhecimentos: []},
+            subprocesso: {codigo: 123, situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO", situacaoLabel: "Cadastro em andamento"},
+            atividadesAtualizadas: []
+        };
         mockApi.post.mockResolvedValue({data: responseDto});
 
         const result = await service.criarAtividade(request, 100);
 
         expect(mappers.mapCriarAtividadeRequestToDto).toHaveBeenCalledWith(request, 100);
         expect(mockApi.post).toHaveBeenCalledWith("/atividades", expect.any(Object));
-        expect(result).toEqual(responseDto);
+        expect(result.atividade).toBeDefined();
+        expect(result.subprocesso).toBeDefined();
     });
 
     it("atualizarAtividade deve mapear e enviar POST", async () => {
-        const request = {codigo: 1, descricao: "Editada"} as any;
-        const responseDto = {atividade: request};
+        const request = {codigo: 1, descricao: "Editada", conhecimentos: []} as any;
+        const responseDto = {
+            atividade: request,
+            subprocesso: {codigo: 123, situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO", situacaoLabel: "Cadastro em andamento"},
+            atividadesAtualizadas: []
+        };
         mockApi.post.mockResolvedValue({data: responseDto});
 
         const result = await service.atualizarAtividade(1, request);
 
         expect(mappers.mapAtualizarAtividadeToDto).toHaveBeenCalledWith(request);
         expect(mockApi.post).toHaveBeenCalledWith("/atividades/1/atualizar", expect.any(Object));
-        expect(result).toEqual(responseDto);
+        expect(result.atividade).toBeDefined();
+        expect(result.subprocesso).toBeDefined();
     });
 
     it("excluirAtividade deve enviar POST", async () => {
-        const responseDto = {sucesso: true};
+        const responseDto = {
+            atividade: null,
+            subprocesso: {codigo: 123, situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO", situacaoLabel: "Cadastro em andamento"},
+            atividadesAtualizadas: []
+        };
         mockApi.post.mockResolvedValue({data: responseDto});
 
         const result = await service.excluirAtividade(1);
 
         expect(mockApi.post).toHaveBeenCalledWith("/atividades/1/excluir");
-        expect(result).toEqual(responseDto);
+        expect(result.atividade).toBeNull();
+        expect(result.subprocesso).toBeDefined();
     });
 
     it("listarConhecimentos deve buscar e mapear conhecimentos", async () => {
@@ -97,7 +117,8 @@ describe("atividadeService", () => {
         const requestDto = {...request, mapped: true};
         const responseDto = {
             atividade: {codigo: 1, descricao: "Atividade", conhecimentos: [{codigo: 2, ...requestDto}]},
-            subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
+            subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"},
+            atividadesAtualizadas: []
         };
         mockApi.post.mockResolvedValue({data: responseDto});
 
@@ -122,7 +143,8 @@ describe("atividadeService", () => {
         };
         const responseDto = {
             atividade: {codigo: 1, descricao: "Atividade", conhecimentos: [{...request}]},
-            subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
+            subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"},
+            atividadesAtualizadas: []
         };
         mockApi.post.mockResolvedValue({data: responseDto});
 
@@ -142,7 +164,8 @@ describe("atividadeService", () => {
     it("excluirConhecimento deve chamar POST e retornar AtividadeOperacaoResponse", async () => {
         const responseDto = {
             atividade: {codigo: 1, descricao: "Atividade", conhecimentos: []},
-            subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"}
+            subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"},
+            atividadesAtualizadas: []
         };
         mockApi.post.mockResolvedValue({data: responseDto});
         const result = await service.excluirConhecimento(1, 1);

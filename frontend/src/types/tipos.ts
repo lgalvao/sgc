@@ -318,7 +318,7 @@ export interface SubprocessoDetalhe {
     titular: Usuario;
     responsavel: Usuario;
     situacao: SituacaoSubprocesso;
-    situacaoLabel: string;
+    situacaoLabel: string | null;
     localizacaoAtual: string;
     processoDescricao: string;
     tipoProcesso: TipoProcesso;
@@ -424,7 +424,7 @@ export interface ValidacaoCadastro {
 export interface SubprocessoStatus {
     codigo: number;
     situacao: SituacaoSubprocesso;
-    situacaoLabel: string;
+    situacaoLabel: string | null;
 }
 
 /**
