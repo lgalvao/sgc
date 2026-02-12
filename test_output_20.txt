@@ -1,0 +1,63 @@
+[2m[WebServer] [22mINFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+[2m[WebServer] [22mINFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 18 unidades verificadas.
+[2m[WebServer] [22m  [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m274[22m[2m[0m ms[22m
+[2m[WebServer] [22m  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[WebServer] [22m>>> Frontend e Backend no ar!
+
+Running 9 tests using 1 worker
+
+[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+  ✓  1 [chromium] › e2e/cdu-20.spec.ts:33:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 1: Admin cria e inicia processo de mapeamento (2.0s)
+[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 201 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+  ✘  2 [chromium] › e2e/cdu-20.spec.ts:55:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro (1.3s)
+  -  3 [chromium] › e2e/cdu-20.spec.ts:74:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 3: Admin homologa cadastro
+  -  4 [chromium] › e2e/cdu-20.spec.ts:85:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 4: Admin cria competências e disponibiliza mapa
+  -  5 [chromium] › e2e/cdu-20.spec.ts:101:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 5: Chefe valida o mapa
+  -  6 [chromium] › e2e/cdu-20.spec.ts:120:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 1: GESTOR navega para visualização do mapa validado
+  -  7 [chromium] › e2e/cdu-20.spec.ts:145:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 2: GESTOR cancela aceite - permanece na tela
+  -  8 [chromium] › e2e/cdu-20.spec.ts:168:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 3: GESTOR registra aceite do mapa
+  -  9 [chromium] › e2e/cdu-20.spec.ts:195:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 4: ADMIN homologa o mapa
+
+
+  1) [chromium] › e2e/cdu-20.spec.ts:55:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/Cadastro de atividades disponibilizado/i)
+    Expected: visible
+    Error: strict mode violation: getByText(/Cadastro de atividades disponibilizado/i) resolved to 2 elements:
+        1) <strong>Cadastro de atividades disponibilizado</strong> aka getByText('Cadastro de atividades disponibilizado', { exact: true })
+        2) <div class="toast-body">Cadastro de atividades disponibilizado.</div> aka getByText('Cadastro de atividades disponibilizado.')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByText(/Cadastro de atividades disponibilizado/i)[22m
+
+
+      68 |         await page.getByTestId('btn-confirmar-disponibilizacao').click();
+      69 |
+    > 70 |         await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
+         |                                                                                 ^
+      71 |         await verificarPaginaPainel(page);
+      72 |     });
+      73 |
+        at /Users/leonardo/sgc/e2e/cdu-20.spec.ts:70:81
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-20-CDU-20---Analisar-v-fabaf-es-e-disponibiliza-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-20-CDU-20---Analisar-v-fabaf-es-e-disponibiliza-cadastro-chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/cdu-20.spec.ts:55:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro 
+  7 did not run
+  1 passed (15.4s)

@@ -3,8 +3,9 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {homologarCadastroMapeamento} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
     await page.getByText(descProcesso).click();
@@ -52,7 +53,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
         
-
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.getByText(descProcesso).click();
         await navegarParaAtividades(page);
 
@@ -71,19 +72,18 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
     test('Preparacao 3: Admin homologa cadastro', async ({page}) => {
         
-
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-atividades-vis').click();
-        await page.getByTestId('btn-acao-analisar-principal').click();
-        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+        await homologarCadastroMapeamento(page);
 
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
     });
 
     test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page}) => {
         
-
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await navegarParaMapa(page);
@@ -99,7 +99,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
     test('Preparacao 5: Chefe valida o mapa', async ({page}) => {
         
-
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarSubprocessoChefe(page, descProcesso);
 
         // Validar mapa
@@ -119,6 +119,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     test('Cenario 1: GESTOR navega para visualização do mapa validado', async ({page}) => {
         // CDU-20: Passos 1-4
         
+        await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
 
         // Passo 1: No Painel, escolhe o processo
         await expect(page.getByText(descProcesso)).toBeVisible();
@@ -143,7 +144,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     test('Cenario 2: GESTOR cancela aceite - permanece na tela', async ({page}) => {
         // CDU-20: Passo 9.3
         
-
+        await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-mapa').click();
@@ -166,7 +167,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     test('Cenario 3: GESTOR registra aceite do mapa', async ({page}) => {
         // CDU-20: Passos 9.4-9.9
         
-
+        await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-mapa').click();
@@ -193,7 +194,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     test('Cenario 4: ADMIN homologa o mapa', async ({page}) => {
         // CDU-20: Passos 10.1-10.6
         
-
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-mapa').click();

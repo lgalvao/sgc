@@ -39,6 +39,32 @@ O botão "Voltar" ou botões no topo da página eram interceptados pela `navbar 
 - Usar `{force: true}` no clique quando a intercepção for puramente visual/layout e não funcional.
 - Alternativa: Chamar `scrollIntoViewIfNeeded()` ou usar locatários que garantam que o elemento não está sob a navbar.
 
+### 5. Timeouts em Workflows Longos
+
+**Problema Identificado:**
+Workflows complexos (como o fluxo completo de revisão no CDU-10) podem exceder o timeout padrão de 30s-45s, mesmo que cada passo individual seja rápido.
+
+**Solução:**
+- Aumentar o timeout especificamente para o teste longo usando `test.setTimeout(60000)`.
+- Manter o timeout padrão baixo para falhar rápido em testes unitários/curtos.
+
+### 6. Strict Mode Violations em Tabelas
+
+**Problema Identificado:**
+Seletores como `getByRole('row', {name: 'SECAO_221'})` podem encontrar múltiplas linhas se houver múltiplos processos listados para a mesma unidade (ex: Mapeamento e Revisão).
+
+**Solução:**
+- Usar locators mais específicos ou filters: `page.getByRole('row', {name: UNIDADE_ALVO}).first()` (se a ordem garantir) ou filtrar pelo contexto do subprocesso.
+- Encapsular a navegação em helpers robustos (`acessarSubprocessoAdmin`) que lidam com essas ambiguidades.
+
+### 7. Estado de Login em Tests Serial
+
+**Problema Identificado:**
+Em suites `test.describe.serial`, o estado de autenticação pode não persistir ou ser o esperado entre os testes se não for explicitamente gerenciado, especialmente quando diferentes atores interagem.
+
+**Solução:**
+- Adicionar `await login(...)` explícito no início de cada bloco `test()` que requer um usuário específico, para garantir o contexto correto.
+
 ## Problemas Resolvidos
 
 ### 1. Início de Revisão Bloqueado

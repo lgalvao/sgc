@@ -41,7 +41,7 @@ async function capturarTela(page: Page, categoria: string, nome: string, opcoes?
 }
 
 test.describe('Captura de Telas - Sistema SGC', () => {
-    test.setTimeout(60000); // Aumentar timeout para cenários longos
+    test.setTimeout(20000); // Aumentar timeout para cenários longos
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
     test.beforeEach(async ({request}) => {

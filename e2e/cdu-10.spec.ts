@@ -9,8 +9,14 @@ import {
     navegarParaAtividades
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
-import {abrirHistoricoAnalise, acessarSubprocessoChefeDireto, fecharHistoricoAnalise} from './helpers/helpers-analise.js';
-import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {
+    abrirHistoricoAnalise,
+    acessarSubprocessoAdmin,
+    acessarSubprocessoChefeDireto,
+    fecharHistoricoAnalise,
+    homologarCadastroMapeamento
+} from './helpers/helpers-analise.js';
+import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));
@@ -21,8 +27,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
     test('Fluxo completo de revisão de cadastro', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         // Definir um timeout maior para este teste específico pois ele engloba muitos passos sequenciais
-        // O limite de 15s do guia é para elementos individuais, mas um workflow longo precisa de tempo total.
-        test.setTimeout(45000);
+        test.setTimeout(60000);
 
         const timestamp = Date.now();
         const descProcessoMapeamento = `Map 10 ${timestamp}`;
@@ -51,7 +56,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
             // Chefe adiciona atividades e disponibiliza cadastro
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-            await page.getByText(descProcessoMapeamento).click();
+            await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
             await navegarParaAtividades(page);
             await adicionarAtividade(page, `Atividade Mapeamento 1 ${timestamp}`);
             await adicionarConhecimento(page, `Atividade Mapeamento 1 ${timestamp}`, 'Conhecimento 1');
@@ -69,8 +74,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await linhaUnidade.click();
             
             await page.getByTestId('card-subprocesso-atividades-vis').click();
-            await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-            await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+            await homologarCadastroMapeamento(page);
 
             // Admin adiciona competências e disponibiliza mapa
             await page.goto('/painel');
@@ -86,7 +90,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
             // Chefe valida mapa
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-            await page.getByText(descProcessoMapeamento).click();
+            await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
             await page.getByTestId('card-subprocesso-mapa').click();
             await page.getByTestId('btn-mapa-validar').click();
             await page.getByTestId('btn-validar-mapa-confirmar').click();
@@ -97,6 +101,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await page.getByText(descProcessoMapeamento).click();
             await page.getByRole('row', {name: UNIDADE_ALVO}).click();
             await page.getByTestId('card-subprocesso-mapa').click();
+            await page.getByTestId('btn-mapa-homologar-aceite').click();
             await page.getByTestId('btn-aceite-mapa-confirmar').click();
             await verificarPaginaPainel(page);
             await page.getByText(descProcessoMapeamento).click();
@@ -122,7 +127,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
             // Chefe revisa atividades (muda situação para EM_ANDAMENTO)
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-            await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+            await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaAtividades(page);
             await adicionarAtividade(page, `Atividade Revisão Nova ${timestamp}`);
             await adicionarConhecimento(page, `Atividade Revisão Nova ${timestamp}`, 'Conhecimento Revisão');
@@ -132,7 +137,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
         await test.step('2. Cenário 1: Validação - Atividade sem conhecimento', async () => {
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-            await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+            await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaAtividades(page);
 
             const atividadeIncompleta = `Atividade Incompleta ${timestamp}`;
@@ -154,17 +159,13 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
             await expect(page.getByText(/Revisão disponibilizada/i).first()).toBeVisible();
             await verificarPaginaPainel(page);
-            await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
-            if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-                await page.getByRole('row', {name: UNIDADE_ALVO}).click();
-            }
+            await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro disponibilizada/i);
         });
 
         await test.step('4. Cenário 3: Devolução e Histórico', async () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-            await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
-            await page.getByRole('row', {name: UNIDADE_ALVO}).click();
+            await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
             await page.getByTestId('card-subprocesso-atividades-vis').click();
             await page.getByTestId('btn-acao-devolver').click();
             const motivoDevolucao = 'Necessário revisar os conhecimentos técnicos.';
@@ -187,8 +188,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
         await test.step('5. Cenário 4: Limpeza de Histórico após nova disponibilização', async () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-            await page.goto(`/processo/${processoRevisaoId}`);
-            await page.getByRole('row', {name: UNIDADE_ALVO}).click();
+            await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
             await page.getByTestId('card-subprocesso-atividades-vis').click();
             await page.getByTestId('btn-acao-devolver').click();
             await page.getByTestId('inp-devolucao-cadastro-obs').fill('Segunda devolução');
@@ -205,8 +205,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
             // Admin devolve novamente
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-            await page.goto(`/processo/${processoRevisaoId}`);
-            await page.getByRole('row', {name: UNIDADE_ALVO}).click();
+            await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
             await page.getByTestId('card-subprocesso-atividades-vis').click();
             await page.getByTestId('btn-acao-devolver').click();
             await page.getByTestId('inp-devolucao-cadastro-obs').fill('Terceira devolução');

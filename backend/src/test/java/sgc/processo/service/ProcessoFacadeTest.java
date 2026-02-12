@@ -470,8 +470,6 @@ class ProcessoFacadeTest {
     @Nested
     @DisplayName("Consultas e Detalhes")
     class Consultas {
-        private static final String MAPEAMENTO = "MAPEAMENTO";
-
         private Usuario criarUsuarioMock() {
             Usuario usuario = new Usuario();
             usuario.setTituloEleitoral("12345678901");

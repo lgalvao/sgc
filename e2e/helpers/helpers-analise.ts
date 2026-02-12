@@ -1,8 +1,8 @@
 import {expect, type Page} from '@playwright/test';
-import {fazerLogout, verificarPaginaPainel} from './helpers-navegacao.js';
+import { verificarPaginaPainel} from './helpers-navegacao.js';
 
 // Re-exportar para manter compatibilidade com imports existentes
-export {fazerLogout, verificarPaginaPainel};
+
 
 /**
  * Helpers para análise de cadastro de atividades (CDU-13 e CDU-14)
@@ -31,7 +31,7 @@ export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: st
     await page.getByRole('row', {name: new RegExp(siglaUnidade, 'i')}).click();
 
     // Aguardar navegação para a página do subprocesso
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/\w+$`));
+    await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
 }
 
 /**
@@ -54,14 +54,14 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
     // Se não redirecionou direto para o subprocesso (a URL não termina com a sigla da unidade)
     if (siglaUnidade && !page.url().endsWith(siglaUnidade)) {
         // Clicar na linha da unidade para acessar o subprocesso
-        await page.locator('tr').filter({hasText: new RegExp(`^${siglaUnidade}\\b`, 'i')}).first().click();
+        await page.locator('tr').filter({hasText: new RegExp(String.raw`^${siglaUnidade}\b`, 'i')}).first().click();
     }
     
     // Agora deve estar na página do subprocesso
     if (siglaUnidade) {
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
     } else {
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/\w+$`));
+        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
     }
 }
 
@@ -79,10 +79,10 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
     // O texto da célula começa com a Sigla, mas pode ter traço e nome.
     // Exemplo: "SECAO_121 - Seção 121"
     // Regex: Começa com a sigla, seguida de espaço/traço ou fim de string.
-    await page.locator('tr').filter({hasText: new RegExp(`^\\s*${siglaUnidade}(?:\\s+-\\s+|\\b)`, 'i')}).first().click();
+    await page.locator('tr').filter({hasText: new RegExp(String.raw`^\s*${siglaUnidade}(?:\s+-\s+|\b)`, 'i')}).first().click();
 
     // Aguardar navegação para a página do subprocesso
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/\w+$`));
+    await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
 }
 
 // ============================================================================
@@ -119,7 +119,7 @@ export async function abrirHistoricoAnaliseVisualizacao(page: Page) {
  * Fecha modal de histórico de análise
  */
 export async function fecharHistoricoAnalise(page: Page) {
-    await page.getByRole('button', {name: 'Fechar'}).click();
+    await page.getByRole('button', {name: 'Fechar'}).click({force: true});
     await expect(page.locator('.modal-content').filter({hasText: 'Histórico de Análise'})).toBeHidden();
 }
 
@@ -266,3 +266,5 @@ export async function cancelarHomologacao(page: Page) {
     // Verificar que modal fechou
     await expect(page.getByRole('dialog')).toBeHidden();
 }
+
+export {fazerLogout, verificarPaginaPainel} from './helpers-navegacao.js';
