@@ -53,19 +53,6 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         await verificarPaginaPainel(page);
-
-        // DIAGNÓSTICO: Verificar participantes no banco
-        const diagResponse = await page.request.get(`http://localhost:10000/e2e/diagnostico/processo/${processoMapeamentoId}/participantes`);
-        const participantes = await diagResponse.json();
-        console.log('DIAGNÓSTICO - Participantes no banco:', JSON.stringify(participantes, null, 2));
-
-        const processosResponse = await page.request.get(`http://localhost:10000/e2e/diagnostico/processos`);
-        const processos = await processosResponse.json();
-        console.log('DIAGNÓSTICO - Processos no banco:', JSON.stringify(processos, null, 2));
-
-        const queryTestResponse = await page.request.get(`http://localhost:10000/e2e/diagnostico/test-query`);
-        const queryTest = await queryTestResponse.json();
-        console.log('DIAGNÓSTICO - Test query result:', JSON.stringify(queryTest, null, 2));
     });
 
 

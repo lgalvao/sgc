@@ -19,9 +19,7 @@ spring:
     properties:
       hibernate.default_schema: sgc
       hibernate.jdbc.fetch_size: 50
-      hibernate.show_sql: true
-      hibernate.format_sql: true
-    show-sql: true
+    show-sql: false
     defer-datasource-initialization: false
   sql.init.mode: always
   sql.init.schema-locations: classpath:db/schema.sql
@@ -49,9 +47,7 @@ logging:
   level:
     sgc: INFO
     org:
-      hibernate: DEBUG
-      hibernate.SQL: DEBUG
-      hibernate.type.descriptor.sql.BasicBinder: TRACE
+      hibernate: ERROR
       springframework: ERROR
     com.zaxxer.hikari: ERROR
 

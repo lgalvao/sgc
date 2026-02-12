@@ -59,10 +59,13 @@ public class ProcessoConsultaService {
     }
 
     public Page<Processo> processosIniciadosPorParticipantes(List<Long> unidadeIds, Pageable pageable) {
-        log.info("Buscando processos para unidades: {} (excluindo CRIADO)", unidadeIds);
+        log.info("DEBUG: Buscando processos para unidades: {}", unidadeIds);
         Page<Processo> result = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 unidadeIds, SituacaoProcesso.CRIADO, pageable);
-        log.info("Encontrados {} processos", result.getTotalElements());
+        log.info("DEBUG: Encontrados {} processos", result.getTotalElements());
+        if (result.getTotalElements() > 0) {
+            result.getContent().forEach(p -> log.info("DEBUG:   - Processo {}: {}", p.getCodigo(), p.getDescricao()));
+        }
         return result;
     }
 

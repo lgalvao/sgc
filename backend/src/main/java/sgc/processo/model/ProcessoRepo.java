@@ -33,6 +33,9 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
      * Busca processos onde as unidades participantes incluem as unidades especificadas
      * e o processo não está na situação especificada.
      * 
+     * Usando LEFT JOIN FETCH para eager load dos participantes para resolver issue
+     * onde query JPQL com INNER JOIN não retornava resultados.
+     * 
      * @param codigos Lista de códigos de unidades participantes
      * @param situacao Situação a ser excluída
      * @param pageable Informações de paginação
@@ -40,13 +43,13 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
      */
     @Query(value = """
             SELECT DISTINCT p FROM Processo p
-            JOIN p.participantes up
+            LEFT JOIN FETCH p.participantes up
             WHERE up.id.unidadeCodigo IN :codigos
             AND p.situacao <> :situacao
             """,
             countQuery = """
             SELECT COUNT(DISTINCT p) FROM Processo p
-            JOIN p.participantes up
+            LEFT JOIN p.participantes up
             WHERE up.id.unidadeCodigo IN :codigos
             AND p.situacao <> :situacao
             """)
