@@ -19,7 +19,7 @@
 8 sistema registra uma movimentação para o subprocesso com os campos:
 
 - `Data/hora`: Data/hora atual
-- `Unidade origem`: SEDOC
+- `Unidade origem`: ADMIN
 - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 - `Descrição`: 'Reabertura de cadastro'
 - `Observação`: [JUSTIFICATIVA]
@@ -60,14 +60,14 @@
     - `Descrição`: "Cadastro de atividades reaberto"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: SEDOC
+    - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE]
 
    9.2. Para as unidades superiores:
     - `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBORDINADA] reaberto"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: SEDOC
+    - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
 3. O sistema exibe mensagem de sucesso "Cadastro reaberto com sucesso".

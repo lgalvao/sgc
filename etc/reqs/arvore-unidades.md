@@ -22,7 +22,7 @@ Unidade que tem uma equipe e também tem unidades subordinadas. Pode ter um mapa
 
 ### INTERMEDIARIA
 
-Unidade que não tem uma equipe (além do chefe/responsável), e portanto não pode ter um mapa.
+Unidade que não tem uma equipe (além do responsável), e portanto não pode ter um mapa.
 
 **Exemplos**: COORD_11
 

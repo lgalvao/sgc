@@ -40,8 +40,8 @@
    8.1. O sistema registra uma movimentação para o subprocesso:
 
     - `Data/hora`: [Data/hora atual]
-    - `Unidade origem`: "SEDOC"
-    - `Unidade destino`: "SEDOC"
+    - `Unidade origem`: "ADMIN"
+    - `Unidade destino`: "ADMIN"
     - `Descrição`: "Cadastro de atividades e conhecimentos homologado"
 
    8.2. O sistema altera a situação do subprocesso da unidade para 'Cadastro homologado'.
@@ -51,7 +51,7 @@
     - `Descrição`: "Cadastro de atividades da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado"
     - `Processo`: [DESCRIÇÃO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: SEDOC
+    - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
    8.4. O sistema envia notificação por e-mail para a unidade do subprocesso:

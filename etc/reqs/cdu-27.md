@@ -32,7 +32,7 @@
     - `Descrição`: "Data limite da etapa [NÚMERO_ETAPA] alterada para [NOVA_DATA_LIMITE]"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: 'SEDOC'
+    - `Unidade de origem`: 'ADMIN'
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
 9. Sistema mostra mensagem de confirmação: "Data limite alterada com sucesso" e fecha o modal.

@@ -18,7 +18,7 @@
 
 7. O sistema registra uma movimentação para o subprocesso com os campos:
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: SEDOC
+    - `Unidade origem`: ADMIN
     - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Descrição`: 'Reabertura de revisão de cadastro'
     - `Observação`: [JUSTIFICATIVA]
@@ -56,17 +56,17 @@
 9. O sistema cria internamente alertas:
 
    9.1. Para a unidade solicitante:
-    - `Descrição`: "Revisão de cadastro reaberta pela SEDOC"
+    - `Descrição`: "Revisão de cadastro reaberta"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: SEDOC
+    - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE]
 
    9.2. Para as unidades superiores:
     - `Descrição`: "Revisão de cadastro da unidade [SIGLA_UNIDADE_SUBORDINADA] reaberta"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: SEDOC
+    - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
 10. O sistema exibe mensagem de sucesso "Revisão reaberta com sucesso".

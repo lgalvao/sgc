@@ -176,8 +176,8 @@ Atores: GESTOR e ADMIN
     12.3.4. O sistema registra uma movimentação para o subprocesso com:
 
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: 'SEDOC'
-    - `Unidade destino`: 'SEDOC'
+    - `Unidade origem`: 'ADMIN'
+    - `Unidade destino`: 'ADMIN'
     - `Descrição`: 'Cadastro de atividades e conhecimentos homologado'
 
     12.3.5. O sistema altera a situação do subprocesso da unidade para 'Revisão do cadastro homologada'.

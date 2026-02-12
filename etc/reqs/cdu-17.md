@@ -57,7 +57,7 @@
 15. O sistema registra uma movimentação para o subprocesso com os campos:
 
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: SEDOC
+    - `Unidade origem`: ADMIN
     - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Descrição`: 'Disponibilização do mapa de competências'
 
@@ -92,7 +92,7 @@
     - `Descrição`: "Mapa de competências da unidade  [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: SEDOC
+    - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO].
 
 19. O sistema exclui as sugestões apresentadas, assim como o histórico de análise do mapa de competência do subprocesso

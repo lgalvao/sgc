@@ -81,7 +81,7 @@ SGRH no momento da consulta.
 
 ## SEDOC
 
-Seção de desenvolvimento organizacional e capacitação. Principal unidade usuária do sistema no contexto dos processos de mapeamento, de revisão e de diagnóstico. Os seus servidores geralmente terão o perfil ADMIN, embora possam logar com na sua unidade (SEDOC), com outro perfil aplicavel (CHEFE ou GESTOR)
+Seção de desenvolvimento organizacional e capacitação. Principal unidade usuária do sistema no contexto dos processos de mapeamento, de revisão e de diagnóstico. Os seus servidores geralmente terão o perfil ADMIN, embora possam logar com na sua unidade (SEDOC), com outro perfil aplicavel (CHEFE, GESTOR ou SERVIDOR)
 
 ## SGRH
 
@@ -99,19 +99,19 @@ Elemento da estrutura hierárquica do tribunal (árvore de unidades) onde os ser
 
 ## Unidade intermediária
 
-Unidade abaixo da unidade RAIZ, que possua uma ou mais unidades subordinadas a ela.
+Unidade abaixo da unidade raiz (ADMIN), que possua uma ou mais unidades subordinadas a ela mas que não possua servidores lotados nela além do titular.
 
 ## Unidade interoperacional
 
-Unidade que possui unidades subordinadas, mas também mais de um servidor lotado.
+Unidade que possui unidades subordinadas, mas também possui mais de um servidor lotado.
 
 ## Unidade operacional
 
-Unidade com mais de um servidor lotado.
+Unidade com mais de um servidor lotado e que não possui unidades subordinadas a ela.
 
 ## Unidade raiz
 
-Unidade que não possui unidade superior na árvore de unidades do sistema. Com relação aos processos de mapeamento, de revisão e de diagnóstico, esse papel é exercido por uma unidade 'virtual', acima de todas as unidades, chamada 'RAIZ'
+Unidade que não possui unidade superior na árvore de unidades do sistema. Com relação aos processos de mapeamento, de revisão e de diagnóstico, esse papel é exercido por uma unidade 'virtual', acima de todas as unidades, chamada 'ADMIN'.
 
 ## Validação
 

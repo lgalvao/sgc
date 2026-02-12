@@ -32,7 +32,7 @@
 8. O sistema registra o envio no histórico do processo (Movimentação interna).
 
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: SEDOC
+    - `Unidade origem`: ADMIN
     - `Unidade destino`: [SIGLA_UNIDADE]
     - `Descrição`: 'Lembrete de prazo enviado'
 
@@ -41,7 +41,7 @@
     - `Descrição`: "Lembrete: Prazo do processo [DESCRICAO_PROCESSO] encerra em [DATA_LIMITE]"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: SEDOC
+    - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE]
 
 10. O sistema exibe mensagem de sucesso "Lembrete enviado".

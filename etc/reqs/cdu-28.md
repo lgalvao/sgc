@@ -49,7 +49,7 @@
     - `Descrição`: "Atribuição temporária de perfil de CHEFE na unidade [SIGLA_UNIDADE]"
     - `Processo`: (Vazio)
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: SEDOC
+    - `Unidade de origem`: ADMIN
     - `Usuário destino`: [USUARIO_SERVIDOR]
 
 11. O usuário que recebe a atribuição temporária passa a ter os mesmos direitos do perfil CHEFE. A atribuição temporária

@@ -1,21 +1,21 @@
 # Informações gerais
 
 O Sistema de Gestão de Competências (SGC) visa gerenciar sistematicamente as competências técnicas das unidades
-organizacionais do tribunal. O sistema opera com uma estrutura organizacional hierárquica onde a SEDOC (Seção de
-Desenvolvimento Organizacional e Capacitação) exerce o papel de unidade raiz para todos os processos de mapeamento, de
-revisão e de diagnóstico de competências.
+organizacionais do tribunal. O sistema opera com uma estrutura organizacional hierárquica em que a árvore de unidades
+fica subordinada a uma unidade virtual raiz (sigla ADMIN) a partir da qual os processos de mapeamento, revisão e diagnóstico de 
+competências são iniciados e concluídos, após passarem pela atuação das demais unidades da hierarquia.
 
 Os componentes essenciais do sistema incluem atividades, que são ações específicas desempenhadas por cada unidade no
 exercício de suas funções; conhecimentos, que representam o conjunto de conhecimentos técnicos necessários para executar
 cada atividade; competências, que são elementos sintetizantes agrupando atividades relacionadas e são definidos e
-mantidos apenas pela SEDOC; e mapas de competências, que constituem o conjunto consolidado de competências associadas a
+mantidos apenas pela unidade raiz ADMIN; e mapas de competências, que constituem o conjunto consolidado de competências associadas a
 uma unidade, resultante do processo de mapeamento.
 
 O sistema suporta três tipos principais de processos: mapeamento, que representa o processo inicial de coleta
-sistemática das atividades e conhecimentos necessários para cada unidade operacional; revisão, que consiste na
-atualização periódica dos mapas de competências vigentes considerando mudanças organizacionais; e diagnóstico, que
-avalia a importância e domínio das competências pelos servidores, identificando lacunas (gaps) e necessidades de
-capacitação.
+sistemática das atividades e conhecimentos necessários para cada unidade operacional visando a construção do primeiro
+mapa de competências da unidade; revisão, que consiste na atualização periódica dos mapas de competências vigentes em
+cada unidade considerando as mudanças organizacionais e de atribuições; e diagnóstico, que avalia a importância e domínio
+das competências pelos servidores das unidades, identificando lacunas (gaps) e necessidades de capacitação.
 
 ## Atores e perfis
 
@@ -24,16 +24,19 @@ automaticamente reconhecidos com base na condição de responsabilidade ou lota�
 ou por atribuição de responsabilidade temporária realizada no próprio sistema. Caso um usuário acumule mais de um perfil
 ou seja responsável por mais de uma unidade, será necessário selecionar o perfil e a unidade de trabalho após o login.
 
-- **ADMIN**: Administrador da SEDOC. É responsável por criar, configurar e monitorar processos, além de criar/ajustar os
-  mapas de competências das unidades. A unidade SEDOC é tratada como unidade raiz da estrutura organizacional para
-  efeito dos processos de mapeamento, de revisão e de diagnóstico.
-- **GESTOR**: Responsável por uma unidade intermediária (exemplo: Coordenador). Pode visualizar e validar as informações
-  cadastradas pelas unidades sob sua gestão, submetendo para análise da unidade superior, ou devolver à unidade
-  subordinada para realização de retificações.
+- **ADMIN**: Administrador do sistema. Esse papel, que deverá ser geralmente exercido por servidores da SEDOC, é 
+  responsável por criar, configurar e monitorar processos. Os usuários que logarem com este perfil no sistema estarão
+  associados à unidade raiz ADMIN de maneira a atuar, ao final do processo de validação do cadastro de atividades das unidades,
+  na criação, ajuste e homologação dos mapas de competências assim como na homologação do processo de diagnóstico.
+- **GESTOR**: Responsável por uma unidade intermediária ou interoperacional (exemplo: Coordenador). Pode visualizar e 
+  validar as informações cadastradas pelas unidades sob sua gestão, submetendo para análise da unidade superior, ou 
+  devolvendo à unidade subordinada para realização de retificações.
 - **CHEFE**: Responsável por uma unidade operacional ou interoperacional. Pode cadastrar as informações de sua unidade
   em cada processo e submeter essas informações para validação pela unidade superior.
 - **SERVIDOR**: Servidor lotado em uma unidade operacional ou interoperacional. Este papel só atua nos processos de
   diagnóstico.
+
+O sistema atribuirá simultaneamente os perfis GESTOR e CHEFE para os responsáveis por unidades interoperacionais.
 
 ## Situações
 
@@ -49,27 +52,27 @@ exemplo, 'Não iniciado') nas especificações de casos de uso.
 
 ### Situações de Subprocessos de Mapeamento
 
-- Não iniciado: Unidade notificada pela SEDOC, mas sem cadastro salvo.
-- Cadastro em andamento: Cadastro salvo mas não finalizado.
+- Não iniciado: Unidade notificada do início do processo, mas sem nenhum cadastro de atividades salvo.
+- Cadastro em andamento: Cadastro salvo pela unidade mas não marcado como finalizado.
 - Cadastro disponibilizado: Cadastro finalizado, aguardando validação.
-- Cadastro homologado: Cadastro validado pela SEDOC.
-- Mapa criado: SEDOC criou mapa para a unidade mas ainda não disponibilizou.
-- Mapa disponibilizado: SEDOC disponibilizou mapa da unidade para validação.
+- Cadastro homologado: Cadastro validado na unidade ADMIN.
+- Mapa criado: Unidade ADMIN criou o mapa para a unidade mas ainda não disponibilizou.
+- Mapa disponibilizado: Unidade ADMIN disponibilizou o mapa da unidade para validação.
 - Mapa com sugestões: CHEFE indicou sugestões para o mapa da unidade.
-- Mapa validado: Hierarquia aprovou mapa disponibilizado pela SEDOC.
-- Mapa homologado: SEDOC homologou mapa para a unidade após validações sem sugestões.
+- Mapa validado: Hierarquia aprovou o mapa disponibilizado pela unidade ADMIN.
+- Mapa homologado: Unidade ADMIN homologou o mapa após a sua validação pela hierarquia da unidade.
 
 ### Situações de Subprocessos de Revisão
 
-- Não iniciado: Unidade foi notificada, mas não alterou cadastro.
-- Revisão do cadastro em andamento: Unidade fez alteração no cadastro.
+- Não iniciado: Unidade notificada do início do processo, mas ainda não iniciou a revisão do seu cadastro de atividades.
+- Revisão do cadastro em andamento: Cadastro de atividades da unidade com revisão iniciada.
 - Revisão do cadastro disponibilizada: Revisão do cadastro concluída, aguardando validação.
-- Revisão do cadastro homologada: Revisão do cadastro validada pela SEDOC.
-- Mapa ajustado: SEDOC criou mapa ajustado para a unidade mas ainda não disponibilizou.
-- Mapa disponibilizado: SEDOC disponibilizou mapa ajustado da unidade para validação.
+- Revisão do cadastro homologada: Revisão do cadastro validada na unidade ADMIN.
+- Mapa ajustado: Unidade ADMIN criou o mapa ajustado para a unidade mas ainda não disponibilizou.
+- Mapa disponibilizado: Unidade ADMIN disponibilizou o mapa ajustado da unidade para validação.
 - Mapa com sugestões: CHEFE indicou sugestões para o mapa da unidade.
-- Mapa homologado: SEDOC homologou mapa para a unidade após validações sem sugestões.
-- Mapa validado: Hierarquia aprovou o mapa disponibilizado pela SEDOC.
+- Mapa validado: Hierarquia aprovou o mapa disponibilizado pela unidade ADMIN.
+- Mapa homologado: Unidade ADMIN homologou o mapa após a sua validação pela hierarquia da unidade.
 
 ```mermaid
 ---
@@ -100,10 +103,10 @@ stateDiagram-v2
         DecisaoDevolucao --> CadastroEmAndamento: para udp?
         DecisaoDevolucao --> CadastroDisponibilizado: para int?
 
-        DecisaoValidacao --> CadastroHomologado: SEDOC?
+        DecisaoValidacao --> CadastroHomologado: ADMIN?
         DecisaoValidacao --> CadastroDisponibilizado: int?
 
-        CadastroHomologado --> MapaCriado: SEDOC criou mapa
+        CadastroHomologado --> MapaCriado: ADMIN criou mapa
     }
 
     state Mapa {
@@ -124,7 +127,7 @@ stateDiagram-v2
         state DecisaoAcaoMapaSugestoes <<choice>>
         state DecisaoAcaoMapaValidado <<choice>>
 
-        MapaCriado --> MapaDisponibilizado: SEDOC disponibilizou
+        MapaCriado --> MapaDisponibilizado: ADMIN disponibilizou
 
         MapaDisponibilizado --> DecisaoSugestoes: udp tem sugestões?
         DecisaoSugestoes --> MapaComSugestoes: sim
@@ -138,7 +141,7 @@ stateDiagram-v2
         DecisaoAcaoMapaSugestoes --> DecisaoDevolveSugestoes: devolveu
 
         DecisaoValidaSugestoes --> MapaComSugestoes: int?
-        DecisaoValidaSugestoes --> MapaCriado: SEDOC?
+        DecisaoValidaSugestoes --> MapaCriado: ADMIN?
 
         DecisaoDevolveValidacaoMapa --> MapaValidado: para int?
         DecisaoDevolveValidacaoMapa --> MapaDisponibilizado: para udp?
@@ -147,7 +150,7 @@ stateDiagram-v2
         DecisaoAcaoMapaValidado --> DecisaoValidaMapa: validou
         DecisaoAcaoMapaValidado --> DecisaoDevolveValidacaoMapa: devolveu
 
-        DecisaoValidaMapa --> MapaHomologado: SEDOC?
+        DecisaoValidaMapa --> MapaHomologado: ADMIN?
         DecisaoValidaMapa --> MapaValidado: int?
     }
     MapaHomologado --> [*]
@@ -174,17 +177,17 @@ stateDiagram-v2
 
         RevisaoEmAndamento --> RevisaoDisponibilizada: unidade disponibiliza
 
-        RevisaoDisponibilizada --> DecisaoAcaoCadastro: SEDOC avalia
+        RevisaoDisponibilizada --> DecisaoAcaoCadastro: ADMIN avalia
         DecisaoAcaoCadastro --> DecisaoDevolucaoCadastro: devolve
         DecisaoAcaoCadastro --> DecisaoValidacaoCadastro: valida
 
         DecisaoDevolucaoCadastro --> RevisaoEmAndamento: para unidade
-        DecisaoDevolucaoCadastro --> RevisaoDisponibilizada: para SEDOC (ajuste interno)
+        DecisaoDevolucaoCadastro --> RevisaoDisponibilizada: para ADMIN (ajuste interno)
 
-        DecisaoValidacaoCadastro --> RevisaoHomologada: SEDOC homologa
-        DecisaoValidacaoCadastro --> RevisaoDisponibilizada: para SEDOC (ajuste interno)
+        DecisaoValidacaoCadastro --> RevisaoHomologada: ADMIN homologa
+        DecisaoValidacaoCadastro --> RevisaoDisponibilizada: para ADMIN (ajuste interno)
 
-        RevisaoHomologada --> MapaAjustado: SEDOC ajusta mapa
+        RevisaoHomologada --> MapaAjustado: ADMIN ajusta mapa
     }
 
     state Mapa {
@@ -202,31 +205,31 @@ stateDiagram-v2
         state DecisaoValidaMapa <<choice>>
         state DecisaoDevolveValidacao <<choice>>
 
-        MapaAjustado --> MapaDisponibilizado: SEDOC disponibiliza
+        MapaAjustado --> MapaDisponibilizado: ADMIN disponibiliza
         MapaDisponibilizado --> DecisaoSugestoesMapa: hierarquia avalia
         DecisaoSugestoesMapa --> MapaComSugestoes: com sugestões
         DecisaoSugestoesMapa --> MapaValidado: sem sugestões (valida)
-        DecisaoSugestoesMapa --> MapaAjustado: hierarquia devolve para SEDOC (ajuste)
+        DecisaoSugestoesMapa --> MapaAjustado: hierarquia devolve para ADMIN (ajuste)
 
-        MapaComSugestoes --> DecisaoAcaoSugestoes: SEDOC avalia sugestões
+        MapaComSugestoes --> DecisaoAcaoSugestoes: ADMIN avalia sugestões
         DecisaoAcaoSugestoes --> DecisaoValidaSugestoes: valida
         DecisaoAcaoSugestoes --> DecisaoDevolveSugestoes: devolve
 
-        DecisaoValidaSugestoes --> MapaAjustado: SEDOC acata e ajusta
-        DecisaoValidaSugestoes --> MapaComSugestoes: para SEDOC (ajuste interno)
+        DecisaoValidaSugestoes --> MapaAjustado: ADMIN acata e ajusta
+        DecisaoValidaSugestoes --> MapaComSugestoes: para ADMIN (ajuste interno)
 
         DecisaoDevolveSugestoes --> MapaDisponibilizado: para hierarquia
-        DecisaoDevolveSugestoes --> MapaComSugestoes: para SEDOC (ajuste interno)
+        DecisaoDevolveSugestoes --> MapaComSugestoes: para ADMIN (ajuste interno)
 
-        MapaValidado --> DecisaoAcaoValidado: SEDOC avalia mapa validado
+        MapaValidado --> DecisaoAcaoValidado: ADMIN avalia mapa validado
         DecisaoAcaoValidado --> DecisaoValidaMapa: homologa
         DecisaoAcaoValidado --> DecisaoDevolveValidacao: devolve
 
-        DecisaoValidaMapa --> MapaHomologado: SEDOC homologa
-        DecisaoValidaMapa --> MapaValidado: para SEDOC (ajuste interno)
+        DecisaoValidaMapa --> MapaHomologado: ADMIN homologa
+        DecisaoValidaMapa --> MapaValidado: para ADMIN (ajuste interno)
 
         DecisaoDevolveValidacao --> MapaDisponibilizado: para hierarquia
-        DecisaoDevolveValidacao --> MapaValidado: para SEDOC (ajuste interno)
+        DecisaoDevolveValidacao --> MapaValidado: para ADMIN (ajuste interno)
     }
 
     MapaHomologado --> [*]

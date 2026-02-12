@@ -41,7 +41,7 @@ Fluxo principal:
 
 11. O sistema registra uma movimentação para cada subprocesso criado com os campos:
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: 'SEDOC'
+    - `Unidade origem`: 'ADMIN'
     - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Descrição`: 'Processo iniciado'
 
@@ -80,14 +80,14 @@ Fluxo principal:
     - `Descrição`: "Início do processo"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: SEDOC
+    - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE].
 
     13.2. Para cada unidade intermediária será criado um alerta com estes campos/valores:
     - `Descrição`: "Início do processo em unidade(s) subordinada(s)"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: SEDOC
+    - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE].
 
     13.3. Para cada unidade interoperacional serão criados dois alertas: um de unidade operacional e outro de unidade
