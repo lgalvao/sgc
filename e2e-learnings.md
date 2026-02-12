@@ -160,11 +160,14 @@ grep -i "error\|failed\|timeout" resultado.txt
 
 ## Próximos Passos
 
-### Fase 1: Padronização (IMEDIATO)
-- [ ] Criar lista completa de testes a migrar
-- [ ] Migrar testes CDU-11, 12, 16, 20-36 para `complete-fixtures`
-- [ ] Remover imports e chamadas manuais de `resetDatabase()`
-- [ ] Adicionar `cleanupAutomatico` onde apropriado
+### Fase 1: Padronização (IMEDIATO) ✅ CONCLUÍDA
+- [x] Criar lista completa de testes a migrar
+- [x] Migrar testes CDU-11, 12, 16, 20-36 para `complete-fixtures`
+- [x] Remover imports e chamadas manuais de `resetDatabase()`
+- [x] Adicionar `cleanupAutomatico` onde apropriado
+
+**Resultado:** 19 arquivos migrados (CDU-11, 12, 16, 20-36) + 1 já migrado anteriormente (CDU-11)
+**Status Final:** 35/36 testes CDU usando `complete-fixtures` (apenas CDU-01 mantém `auth-fixtures` por ser teste de login puro)
 
 ### Fase 2: Validação (CURTO PRAZO)
 - [ ] Executar cada teste CDU individualmente
@@ -239,7 +242,33 @@ A principal causa das falhas é **inconsistência no uso de fixtures**, com 21 t
 
 Após a padronização, uma execução completa dos testes revelará falhas reais causadas pela refatoração (seletores, mudanças de comportamento), que poderão ser corrigidas uma a uma.
 
+## Correções Implementadas
+
+### Migração de Fixtures (2026-02-12)
+
+**Problema:** 21 testes CDU usavam `auth-fixtures` sem reset automático de banco de dados, causando poluição de estado entre testes.
+
+**Solução Implementada:**
+1. Migrados 20 arquivos de `auth-fixtures` para `complete-fixtures`
+2. Removidos blocos manuais de `beforeAll`/`afterAll` com `resetDatabase`
+3. Substituído `cleanup.registrar()` por `cleanupAutomatico.registrar()`
+4. Simplificados imports (apenas `type {useProcessoCleanup}`)
+
+**Arquivos Migrados:**
+- CDU-11, 12, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36
+
+**Estatísticas:**
+- 20 arquivos modificados
+- +66 linhas (imports e parâmetros)
+- -236 linhas (código boilerplate removido)
+- **Redução líquida: 170 linhas de código**
+
+**Status Atual:**
+- ✅ 35 testes CDU usam `complete-fixtures` (com auto-reset)
+- ✅ 1 teste CDU usa `auth-fixtures` (CDU-01 - teste de login puro, correto)
+- ✅ 100% dos testes que precisam de DB reset agora o têm automaticamente
+
 ---
 **Responsável:** Jules (Agente Copilot)  
-**Status:** Em Progresso  
-**Última Atualização:** 2026-02-12
+**Status:** Migração de Fixtures Concluída - Aguardando Validação  
+**Última Atualização:** 2026-02-12 (15:33 UTC)
