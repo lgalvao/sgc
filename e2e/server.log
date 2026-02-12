@@ -33,3 +33,20 @@
 [FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/components/BarraNavegacao.vue, /src/views/PainelView.vue, /src/views/Processo.vue, /src/views/Subprocesso.vue, /src/views/VisAtividades.vue, /src/components/SubprocessoCards.vue, /src/components/ImpactoMapaModal.vue, /src/components/TabelaProcessos.vue, /src/components/atividades/VisAtividadeItem.vue
 [FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/components/SubprocessoHeader.vue
 [FRONTEND] 11:20:35 AM [vite] (client) hmr update /src/components/SubprocessoHeader.vue
+[BACKEND] INFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+[BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
+[BACKEND] INFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+[BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
+[BACKEND] INFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+[BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
+[BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 19 unidades verificadas.
+[BACKEND] ERROR o.s.b.t.s.DeferredServletContainerInitializers.onStartup:63 - Error starting Tomcat context. Exception: org.springframework.beans.factory.UnsatisfiedDependencyException. Message: Error creating bean with name 'filtroJwt' defined in class path resource [sgc/e2e/E2eSecurityConfig.class]: Unsatisfied dependency expressed through method 'filtroJwt' parameter 0: Error creating bean with name 'gerenciadorJwt' defined in file [/Users/leonardo/sgc/backend/build/classes/java/main/sgc/seguranca/login/GerenciadorJwt.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'sgc.seguranca.config.JwtProperties' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+[BACKEND] INFO  o.a.c.core.StandardService.log:168 - Stopping service [Tomcat]
+[BACKEND] ERROR o.s.b.d.LoggingFailureAnalysisReporter.report:40 - 
+[BACKEND] ***************************
+[BACKEND] APPLICATION FAILED TO START
+[BACKEND] ***************************
+[BACKEND] Description:
+[BACKEND] Parameter 0 of constructor in sgc.seguranca.login.GerenciadorJwt required a bean of type 'sgc.seguranca.config.JwtProperties' that could not be found.
+[BACKEND] Action:
+[BACKEND] Consider defining a bean of type 'sgc.seguranca.config.JwtProperties' in your configuration.

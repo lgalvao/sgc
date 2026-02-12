@@ -17,9 +17,8 @@ spring:
     open-in-view: false
     hibernate.ddl-auto: validate
     properties:
-      hibernate:
-        "[default_schema]": sgc
-        "[jdbc.fetch_size]": 50
+      hibernate.default_schema: sgc
+      hibernate.jdbc.fetch_size: 50
     show-sql: false
     defer-datasource-initialization: false
   sql.init.mode: always
@@ -30,29 +29,28 @@ spring:
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
     properties:
-      "[mail.smtp.auth]": false
-      "[mail.smtp.starttls.enable]": false
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
+
 springdoc:
   api-docs.enabled: true
   swagger-ui.enabled: true
   api-docs.path: /api-docs
   swagger-ui.path: /swagger-ui.html
+
 server:
   port: 10000
+
 logging:
   pattern:
     console: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"
   level:
-    "[org.hibernate]": ERROR
-    "[org.hibernate.SQL]": ERROR
-    "[org.hibernate.type.descriptor.sql.BasicBinder]": ERROR
-    "[org.springframework.orm.jpa]": ERROR
-    "[org.springframework.jdbc]": ERROR
-    "[com.zaxxer.hikari]": ERROR
-    "[org.springframework]": ERROR
-    "[org.hibernate.tool.schema.internal.SchemaDropperImpl]": ERROR
     sgc: INFO
-    "[sgc.seguranca.acesso.SubprocessoAccessPolicy]": DEBUG
+    org:
+      hibernate: ERROR
+      springframework: ERROR
+    com.zaxxer.hikari: ERROR
+
 aplicacao:
   openapi:
     title: SGC - Sistema de Gestão de Competências API
@@ -71,3 +69,99 @@ aplicacao:
     remetente: sgc@tre-pe.jus.br
     remetente-nome: "Sistema de Gestão de Competências"
     assunto-prefixo: "[SGC]"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: e2e
+  datasource:
+    url: jdbc:h2:mem:sgc-e2e;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate.ddl-auto: update
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      schema-locations: file:src/test/resources/db/schema.sql
+      data-locations: file:../e2e/setup/seed.sql
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+server:
+  address: 0.0.0.0
+
+logging:
+  pattern:
+    console: "%-5level %logger{30}.%M:%L - %msg%n"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: hom
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: oracle.jdbc.OracleDriver
+  jpa:
+    hibernate.ddl-auto: validate
+    properties:
+      hibernate.jdbc.fetch_size: 50
+    show-sql: false
+  sql:
+    init:
+      mode: never
+      platform: oracle
+
+aplicacao:
+  cors:
+    allowed-origins: http://localhost:5173,http://localhost:3000,http://localhost:8081
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS,HEAD
+    allowed-headers: "*"
+    allow-credentials: true
+  ambiente-testes: false
+  acesso-ad:
+    base-url: ${AD_BASE_URL:https://sedesenvdev01.tre-pe.gov.br/acessoAD}
+
+logging:
+  level:
+    org.hibernate: WARN
+    org.springframework: WARN
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:oracle:thin:@desenvolvimentobd:1521:admdes2
+    username: sgc
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate.ddl-auto: validate
+    properties:
+      hibernate.default_schema: sgc
+    show-sql: false
+  sql:
+    init:
+      mode: never
+      platform: oracle
+
+aplicacao:
+  ambiente-testes: false
+  jwt:
+    secret: ${JWT_SECRET}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}
+
+logging:
+  level:
+    org.hibernate: WARN
+    org.springframework: WARN
