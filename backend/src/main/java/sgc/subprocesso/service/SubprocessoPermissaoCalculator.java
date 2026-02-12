@@ -71,6 +71,10 @@ class SubprocessoPermissaoCalculator {
     public SubprocessoPermissoesDto calcularPermissoes(Subprocesso subprocesso, Usuario usuario) {
         boolean isRevisao = subprocesso.getProcesso().getTipo() == TipoProcesso.REVISAO;
 
+        Acao acaoEditarCadastro = isRevisao
+                ? Acao.EDITAR_REVISAO_CADASTRO
+                : Acao.EDITAR_CADASTRO;
+
         Acao acaoDisponibilizarCadastro = isRevisao
                 ? Acao.DISPONIBILIZAR_REVISAO_CADASTRO
                 : Acao.DISPONIBILIZAR_CADASTRO;
@@ -90,7 +94,7 @@ class SubprocessoPermissaoCalculator {
         return SubprocessoPermissoesDto.builder()
                 .podeVerPagina(podeExecutar(usuario, Acao.VISUALIZAR_SUBPROCESSO, subprocesso))
                 .podeEditarMapa(podeExecutar(usuario, Acao.EDITAR_MAPA, subprocesso))
-                .podeEditarCadastro(podeExecutar(usuario, Acao.EDITAR_CADASTRO, subprocesso))
+                .podeEditarCadastro(podeExecutar(usuario, acaoEditarCadastro, subprocesso))
                 .podeVisualizarMapa(podeExecutar(usuario, Acao.VISUALIZAR_MAPA, subprocesso))
                 .podeDisponibilizarMapa(podeExecutar(usuario, Acao.DISPONIBILIZAR_MAPA, subprocesso))
                 .podeDisponibilizarCadastro(podeExecutar(usuario, acaoDisponibilizarCadastro, subprocesso))

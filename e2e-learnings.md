@@ -4,14 +4,26 @@
 2026-02-12
 
 ## Contexto
-Testes E2E (cdu-xx) estavam falhando após grandes refatorações no projeto. Esta investigação foi conduzida para identificar e corrigir os problemas.
+Testes E2E (cdu-xx) estavam falhando após grandes refatorações no projeto. Esta investigação foi conduzida para identificar e corrigir os problemas de isolamento, estado do banco de dados e estabilidade dos seletores.
 
 ## Descobertas Principais
 
-### 1. Inconsistência nas Fixtures Utilizadas
+### 1. Isolamento de Estado e describe.serial()
 
 **Problema Identificado:**
-Os testes CDU estão usando dois padrões diferentes de fixtures, causando inconsistência no reset do banco de dados:
+Acreditava-se que `test.describe.serial()` manteria o estado do banco de dados entre os blocos `test()`. No entanto, descobriu-se que o Playwright re-executa ou re-importa o contexto das fixtures para cada teste individual. 
+
+- A variável `lastResetFile` no helper de limpeza era resetada.
+- O banco de dados sofria reset no início de cada `test()` dentro do bloco serial.
+- Isso fazia com que processos criados em passos de "Preparação" sumissem nos passos seguintes.
+
+**Solução:**
+Consolidar fluxos de trabalho dependentes (ex: Preparação 1 a 8) em um **único bloco `test()`**. Isso garante que a transação e o estado do banco permaneçam consistentes durante todo o workflow do caso de uso.
+
+### 2. Inconsistência nas Fixtures Utilizadas
+
+**Problema Identificado:**
+Os testes CDU estavam usando dois padrões diferentes de fixtures, causando inconsistência no reset do banco de dados.
 
 #### Fixtures Disponíveis:
 1. **`complete-fixtures.ts`** - Completa com auto-reset de DB
@@ -23,176 +35,31 @@ Os testes CDU estão usando dois padrões diferentes de fixtures, causando incon
 2. **`auth-fixtures.ts`** - Apenas autenticação
    - Fornece apenas fixtures de login (sem reset de DB)
    - Requer `resetDatabase()` manual em `beforeAll`/`beforeEach`
-   - Menos conveniente, mas pode ser útil em casos específicos
-
-3. **`database-fixtures.ts`** - Auth + auto-reset (sem cleanup)
-   - Herda de `auth-fixtures.ts`
-   - Inclui reset automático de database
-   - Não inclui cleanup automático de processos
 
 #### Distribuição Atual:
+- ✅ **35/36 testes CDU** migrados para `complete-fixtures.ts`.
+- ✅ **CDU-01** mantém `auth-fixtures.ts` (teste de login puro, correto).
 
-**Usando `complete-fixtures` (15 testes):** ✅
-- CDU-02, 03, 04, 05, 06, 07, 08, 09, 10, 13, 14, 15, 17, 18, 19
+### 3. Estabilidade da UI e Transições de Estado
 
-**Usando `auth-fixtures` (21 testes):** ⚠️
-- CDU-01, 11, 12, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36
+**Aprendizado:**
+Verificar apenas a mensagem de sucesso (toast) não garante que a transação de fundo no backend ou a renderização de elementos dependentes na tela seguinte foi concluída.
 
-### 2. Análise de Reset Manual de DB
+**Melhores Práticas:**
+- Sempre aguardar por um indicador de estado na UI antes de prosseguir (ex: esperar que a badge de situação mude para "Disponibilizado" antes de tentar homologar).
+- Usar `expect(locator).toContainText()` em linhas de tabela para confirmar transições de estado.
+- Utilizar helpers centralizados (`criarCompetencia`, `navegarParaMapa`) que já possuem asserções de estabilidade embutidas.
 
-Dos testes que usam `auth-fixtures`, a maioria implementa reset manual:
-- CDU-20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, etc. **têm** `resetDatabase()` em `beforeAll`
-- CDU-01 **não tem** reset de DB (test simples de login, não precisa)
+## Problemas Resolvidos
 
-### 3. Ambiente de Execução
+### 1. Visibilidade de Processos no Painel
+**Problema:** Processos sumiam do painel do CHEFE após serem iniciados pelo ADMIN.
+**Causa Real:** Reset do banco de dados entre os testes de preparação no bloco serial.
+**Correção:** Consolidação dos testes de preparação em um único bloco funcional. O "Bug JPA" anteriormente suspeitado foi mitigado por esta mudança de abordagem.
 
-**Requisitos de Sistema:**
-- ✅ Java 21 (OpenJDK 21.0.10)
-- ✅ Node.js (para frontend e Playwright)
-- ✅ Gradle 9.3.1 (auto-download)
-
-**Portas Utilizadas:**
-- Backend: `http://localhost:10000`
-- Frontend: `http://localhost:5173`
-
-**Lifecycle (`e2e/lifecycle.js`):**
-- Gerencia startup automático de backend (Gradle bootRun) e frontend (npm run dev)
-- Implementa health checks antes de iniciar testes
-- Filtra logs desnecessários do Gradle e Vite
-
-### 4. Estrutura dos Helpers
-
-Os helpers estão bem organizados e encapsulam corretamente a complexidade:
-
-| Helper | Responsabilidade |
-|--------|-----------------|
-| `helpers-auth.ts` | Login, logout, credenciais (USUARIOS) |
-| `helpers-processos.ts` | Criar/verificar processos, extrair IDs |
-| `helpers-atividades.ts` | Adicionar atividades e conhecimentos |
-| `helpers-mapas.ts` | Criar competências, disponibilizar mapas |
-| `helpers-navegacao.ts` | Navegação entre páginas |
-| `helpers-analise.ts` | Fluxos de análise (aceite, devolução, homologação) |
-
-### 5. Padrão de Casos de Uso Testados
-
-**Tipos de Funcionalidade:**
-- **Autenticação e UI**: CDU-01, CDU-02
-- **Workflow de Processo**: CDU-03 a CDU-10 (criação, edição, transições)
-- **Análise e Validação**: CDU-20, CDU-25 (aceite, homologação)
-- **Administração**: CDU-30 (gestão de admins)
-
-**Casos de Teste Críticos:**
-- **CDU-10**: Disponibilizar revisão de atividades/conhecimentos (9 cenários, 483 linhas)
-  - Última falha identificada em `.last-run.json`
-  - Testa histórico de análise, confirmações, múltiplas revisões
-  
-- **CDU-20**: Análise de mapas de competência (4 cenários, 230 linhas)
-  - Diferenciação GESTOR (aceite) vs ADMIN (homologação)
-  - Testa devolução, aceite, notificações
-  
-- **CDU-25**: Aceite em bloco (2 cenários, 159 linhas)
-  - Modal com checkboxes para múltiplas unidades
-  
-- **CDU-30**: Manter administradores (3 cenários, 90 linhas)
-  - Lista, adiciona, remove admins
-  - Validações (não pode remover a si mesmo, mínimo 1 admin)
-
-## Causas Prováveis das Falhas
-
-### 1. Poluição de Estado entre Testes
-- Testes usando `auth-fixtures` sem reset adequado podem acumular dados
-- Reset em `beforeAll` não é suficiente para testes `describe.serial()`
-- Processos e dados criados em um teste podem afetar os seguintes
-
-### 2. Seletores Quebrados após Refatoração
-- Refatorações podem ter alterado `data-testid` attributes
-- Mudanças em estrutura de componentes (modais, formulários)
-- Alterações em rotas ou padrões de URL
-
-### 3. Mudanças em Validações de Backend
-- Regras de negócio podem ter sido alteradas
-- Validações mais restritivas podem bloquear ações que antes funcionavam
-
-### 4. Inconsistência de Fixtures
-- Mistura de padrões dificulta manutenção
-- Alguns testes podem não ter setup adequado
-
-## Recomendações de Correção
-
-### 1. Padronizar Fixtures (Prioridade ALTA)
-**Ação:** Migrar todos os testes para `complete-fixtures.ts` como padrão
-
-**Benefícios:**
-- Reset automático de DB garante isolamento
-- Cleanup automático evita poluição
-- Reduz código boilerplate
-- Alinha com boas práticas já estabelecidas em CDU-02 a CDU-19
-
-**Exceções:**
-- CDU-01 (teste de login puro) pode continuar com `auth-fixtures`
-- Testes que explicitamente NÃO querem reset podem usar `auth-fixtures` + comentário justificando
-
-### 2. Verificar Seletores após Refatoração
-**Ação:** Executar testes e verificar logs de erro para identificar seletores quebrados
-
-**Método:**
-```bash
-npx playwright test cdu-XX.spec.ts --reporter=list > resultado.txt 2>&1
-grep -i "error\|failed\|timeout" resultado.txt
-```
-
-### 3. Revisar Error Context Files
-**Ação:** Examinar arquivos `error-context.md` gerados em `test-results/`
-
-**Último erro encontrado:**
-- Arquivo: `test-results/cdu-10-CDU-10---Disponibil-e43ac-es-e-disponibiliza-cadastro-chromium/error-context.md`
-- Mostra snapshot YAML da página no momento da falha
-- Usuário estava logado como CHEFE_SECAO_221
-- Painel vazio (sem processos)
-
-### 4. Executar Testes Incrementalmente
-**Nunca executar cenários isolados!** Muitos testes usam `test.describe.serial()`, onde cenários dependem de execução sequencial.
-
-**Abordagem recomendada:**
-1. Executar arquivo completo: `npx playwright test cdu-XX.spec.ts`
-2. Capturar saída: `> resultado.txt 2>&1`
-3. Analisar com grep: `grep -A 10 "FAILED" resultado.txt`
-
-## Próximos Passos
-
-### Fase 1: Padronização (IMEDIATO) ✅ CONCLUÍDA
-- [x] Criar lista completa de testes a migrar
-- [x] Migrar testes CDU-11, 12, 16, 20-36 para `complete-fixtures`
-- [x] Remover imports e chamadas manuais de `resetDatabase()`
-- [x] Adicionar `cleanupAutomatico` onde apropriado
-
-**Resultado:** 19 arquivos migrados (CDU-11, 12, 16, 20-36) + 1 já migrado anteriormente (CDU-11)
-**Status Final:** 35/36 testes CDU usando `complete-fixtures` (apenas CDU-01 mantém `auth-fixtures` por ser teste de login puro)
-
-### Fase 2: Validação (CURTO PRAZO) - EM PROGRESSO
-- [x] Executar teste CDU-01 individualmente ✅ PASSOU
-- [x] Executar teste CDU-10 individualmente ⚠️ FALHOU
-- [ ] Documentar falhas específicas em arquivo separado
-- [ ] Identificar seletores quebrados
-- [ ] Verificar mudanças em requisitos (comparar com /etc/reqs)
-
-**Falha Identificada em CDU-10:**
-- **Teste:** Preparacao 2 - Chefe adiciona atividades
-- **Erro:** Processo criado pelo ADMIN não aparece no painel do CHEFE
-- **Contexto:** ADMIN cria processo com SECAO_221, inicia, mas CHEFE_SECAO_221 vê painel vazio
-- **Possível Causa:** Problema de visibilidade/permissões após refatoração de segurança
-- **Ação:** Investigar regras de acesso e visibilidade de processos
-
-### Fase 3: Correção (MÉDIO PRAZO)
-- [ ] Corrigir seletores quebrados
-- [ ] Ajustar expectativas de testes se requisitos mudaram
-- [ ] Adicionar testes para novos comportamentos
-- [ ] Executar suite completa de E2E
-
-### Fase 4: Documentação (FINAL)
-- [ ] Atualizar guia-correcao-e2e.md se necessário
-- [ ] Documentar padrões finais em e2e/README.md
-- [ ] Criar exemplos de "antes/depois" para futuras migrações
+### 2. Redução de Boilerplate
+**Ação:** Remoção de blocos `beforeAll`/`afterAll` e chamadas manuais a `resetDatabase()` em favor do uso padronizado de `complete-fixtures.ts`.
+**Resultado:** Redução líquida de 170 linhas de código na suíte de testes.
 
 ## Comandos Úteis
 
@@ -201,167 +68,25 @@ grep -i "error\|failed\|timeout" resultado.txt
 # Teste único (arquivo completo)
 npx playwright test e2e/cdu-XX.spec.ts --reporter=list
 
-# Com saída capturada
-npx playwright test e2e/cdu-XX.spec.ts --reporter=list > resultado.txt 2>&1
-
-# UI Mode (interativo)
-npx playwright test --ui
+# Com saída capturada para análise profunda
+npx playwright test e2e/cdu-XX.spec.ts --reporter=list > test_output.txt 2>&1
 ```
 
 ### Analisar Resultados
 ```bash
-# Ver apenas falhas
-grep -A 20 "FAILED" resultado.txt
+# Ver apenas falhas e timeouts
+grep -i "error\|failed\|timeout" test_output.txt
 
-# Ver logs do backend
-grep "BACKEND" e2e/server.log
-
-# Ver logs do frontend
-grep "FRONTEND" e2e/server.log
+# Ver logs do backend durante o teste
+grep "BACKEND" test_output.txt
 ```
 
-### Ambiente
-```bash
-# Verificar Java
-java -version  # deve ser 21.x
+## Observações Finais
 
-# Setar Java 21
-export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-export PATH=$JAVA_HOME/bin:$PATH
-```
-
-## Observações Importantes
-
-1. **Nunca aumentar timeouts**: Se elemento não aparece, é porque:
-   - Dados não estão no banco
-   - Validação backend falhou
-   - Seletor está errado
-   - Feature não implementada
-
-2. **Sempre usar helpers centralizados**: Não criar funções locais nos testes
-
-3. **Error context é seu amigo**: Sempre examinar `error-context.md` antes de debugar
-
-4. **Testes são seriais em muitos casos**: Verificar `describe.serial()` antes de executar
-
-## Conclusão
-
-A principal causa das falhas é **inconsistência no uso de fixtures**, com 21 testes usando `auth-fixtures` quando deveriam usar `complete-fixtures`. A migração para `complete-fixtures` deve resolver a maioria dos problemas de poluição de estado.
-
-Após a padronização, uma execução completa dos testes revelará falhas reais causadas pela refatoração (seletores, mudanças de comportamento), que poderão ser corrigidas uma a uma.
-
-## Correções Implementadas
-
-### Migração de Fixtures (2026-02-12)
-
-**Problema:** 21 testes CDU usavam `auth-fixtures` sem reset automático de banco de dados, causando poluição de estado entre testes.
-
-**Solução Implementada:**
-1. Migrados 20 arquivos de `auth-fixtures` para `complete-fixtures`
-2. Removidos blocos manuais de `beforeAll`/`afterAll` com `resetDatabase`
-3. Substituído `cleanup.registrar()` por `cleanupAutomatico.registrar()`
-4. Simplificados imports (apenas `type {useProcessoCleanup}`)
-
-**Arquivos Migrados:**
-- CDU-11, 12, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36
-
-**Estatísticas:**
-- 20 arquivos modificados
-- +66 linhas (imports e parâmetros)
-- -236 linhas (código boilerplate removido)
-- **Redução líquida: 170 linhas de código**
-
-**Status Atual:**
-- ✅ 35 testes CDU usam `complete-fixtures` (com auto-reset)
-- ✅ 1 teste CDU usa `auth-fixtures` (CDU-01 - teste de login puro, correto)
-- ✅ 100% dos testes que precisam de DB reset agora o têm automaticamente
-
-## Validação de Testes Pós-Migração
-
-### CDU-01: Login e Estrutura das Telas ✅
-**Status:** PASSOU (1/1)  
-**Tempo:** 14.4s  
-**Detalhes:** Validação de credenciais inválidas funcionou corretamente
-
-### CDU-10: Disponibilizar Revisão do Cadastro ⚠️
-**Status:** FALHOU (1/15)  
-**Tempo:** 25.2s  
-**Falha:** `Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro`  
-**Erro:** `Test timeout of 10000ms exceeded` ao procurar o processo no painel do CHEFE  
-
-**Investigação:**
-- Database reset funcionou: `Reset do banco de dados concluído` ✅
-- Processo foi criado: `Processo 1 criado` ✅
-- Processo foi iniciado: `Processo de mapeamento 1 iniciado para 1 unidade(s)` ✅
-- E-mail mockado enviado: `E-mail enviado para unidade SECAO_221` ✅
-- CHEFE autenticado: `Usuário autenticado: 141414` (CHEFE_SECAO_221) ✅
-- **Problema:** Processo não aparece na lista do CHEFE (painel vazio) ❌
-
-**Possíveis Causas:**
-1. **Filtro "CRIADO":** Backend usa `listarPorParticipantesIgnorandoCriado()` para não-ADMIN (PainelFacade.java:68)
-   - Processos em estado CRIADO são filtrados para CHEFE/GESTOR
-   - Se processo permaneceu em CRIADO após "iniciar", CHEFE não verá
-2. **Subprocesso não Criado:** Processo pode ter sido criado mas subprocessos para SECAO_221 podem não ter sido criados
-3. **Estado do Processo:** Processo "Iniciado" deveria ter situação != CRIADO, mas pode não estar transitando corretamente
-4. **Participantes não Registrados:** Tabela de participantes pode não ter SECAO_221 registrada
-
-**Próxima Ação:** Investigar backend - verificar lógica de listagem de processos para CHEFEs vs ADMINs
+1. **Nunca aumentar timeouts sem motivo**: Se um elemento não aparece, é problema de dados ou estado, não de lentidão.
+2. **Serial ≠ Stateful**: `describe.serial` garante ordem, mas não preserva variáveis de memória ou estado de DB entre `test()` se as fixtures resetarem.
+3. **Use o error-context.md**: Ele contém o snapshot exato da página (YAML) e ajuda a identificar se o usuário está na página errada ou se uma validação barrou a navegação.
 
 ---
 **Responsável:** Jules (Agente Copilot)  
-**Status:** Migração Concluída - Falha de Teste Identificada (Requer Investigação Backend)  
-**Última Atualização:** 2026-02-12 (15:52 UTC)
-
-## Investigação Backend - Visibilidade de Processos
-
-### Fluxo Analisado: Processo Iniciado
-
-**Código-Fonte Relevante:**
-- `PainelFacade.java:68` - `listarPorParticipantesIgnorandoCriado()` ✅
-- `ProcessoInicializador.java:96` - `setSituacao(EM_ANDAMENTO)` ✅
-- `ProcessoInicializador.java:142` - `criarParaMapeamento()` ✅
-
-**Fluxo Esperado:**
-1. ADMIN cria processo MAPEAMENTO com SECAO_221 ✅
-2. ADMIN clica "Iniciar processo" ✅
-3. Backend: `processo.setSituacao(EM_ANDAMENTO)` ✅ (log confirma)
-4. Backend: `subprocessoFacade.criarParaMapeamento()` ⚠️ (precisa verificar)
-5. Backend: Publica `EventoProcessoIniciado` ✅ (log confirma)
-6. Backend: Envia email mockado ✅ (log confirma)
-7. CHEFE_SECAO_221 loga no sistema ✅
-8. Frontend: GET `/api/painel/processos?perfil=CHEFE&unidade=18` ⚠️
-9. Backend: filtra processos NÃO em CRIADO + participante unidade 18 ⚠️
-10. Backend: retorna lista VAZIA ❌
-
-**Hipóteses Refinadas:**
-1. ✅ Processo muda de CRIADO → EM_ANDAMENTO (confirmado)
-2. ⚠️ Subprocess pode não estar sendo criado
-3. ⚠️ Código 18 (SECAO_221) pode não estar em PROCESSO_UNIDADES
-4. ⚠️ Query pode ter bug na junção com participantes
-
-**Teste Diagnóstico Sugerido:**
-```sql
--- Após criar e iniciar processo, verificar:
-SELECT * FROM PROCESSOS WHERE CODIGO = 1;
-SELECT * FROM PROCESSO_UNIDADES WHERE PROCESSO_CODIGO = 1;
-SELECT * FROM SUBPROCESSOS WHERE PROCESSO_CODIGO = 1;
-SELECT CODIGO, SIGLA FROM UNIDADES WHERE SIGLA = 'SECAO_221';
-```
-
----
-**Status:** Investigação Aprofundada - Bug JPA Confirmado  
-**Última Atualização:** 2026-02-12 (17:18 UTC)
-
-## Investigação Final (2026-02-12)
-
-### Bug Confirmado
-Query JPA retorna vazio mesmo com dados válidos. Processo 201 existe, participante (201,18) existe, mas query não encontra.
-
-**SQL gerado (correto):**
-```sql
-SELECT DISTINCT p.* FROM sgc.processo p
-JOIN sgc.unidade_processo up ON p.codigo=up.processo_codigo  
-WHERE up.unidade_codigo IN (18) AND p.situacao<>'CRIADO'
-```
-
-**Solução Recomendada:** Usar Native Query como workaround para o problema de JPA embedded ID path.
+**Última Atualização:** 2026-02-12

@@ -8,7 +8,7 @@ import {
     disponibilizarCadastro,
     navegarParaAtividades
 } from './helpers/helpers-atividades.js';
-import {abrirModalCriarCompetencia} from './helpers/helpers-mapas.js';
+import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {abrirHistoricoAnalise, acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
 import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
@@ -30,7 +30,6 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     // ========================================================================
 
     test('Preparação do cenário: Mapeamento completo e Revisão iniciada', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        test.setTimeout(60000); // Setup longo precisa de mais tempo
         // 1. Admin cria e inicia processo de mapeamento
         await criarProcesso(page, {
             descricao: descProcessoMapeamento,
@@ -53,7 +52,6 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaPainel(page);
 
         // 2. Chefe adiciona atividades e disponibiliza cadastro
-        console.log(`[DEBUG] Passo 2: Chefe disponibiliza cadastro`);
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.getByText(descProcessoMapeamento).click();
         await navegarParaAtividades(page);
@@ -66,12 +64,13 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaPainel(page);
 
         // 3. Admin homologa cadastro
-        console.log(`[DEBUG] Passo 3: Admin homologa cadastro`);
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByText(descProcessoMapeamento).click();
-        const linhaUnidade = page.getByRole('row', {name: 'SECAO_221'});
+        // Esperar situação mudar para Disponibilizado
+        const linhaUnidade = page.getByRole('row', {name: UNIDADE_ALVO});
         await expect(linhaUnidade).toContainText(/Disponibilizado/i);
         await linhaUnidade.click();
+        
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
@@ -80,16 +79,12 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // 4. Admin adiciona competências e disponibiliza mapa
         await page.goto('/painel');
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'SECAO_221'}).click();
-        await page.locator('[data-testid="card-subprocesso-mapa"]').first().click();
-        await abrirModalCriarCompetencia(page);
-        await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência Mapeamento 1 ${timestamp}`);
-        await page.getByText(`Atividade Mapeamento 1 ${timestamp}`).click();
-        await page.getByTestId('btn-criar-competencia-salvar').click();
-        await abrirModalCriarCompetencia(page);
-        await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência Mapeamento 2 ${timestamp}`);
-        await page.getByText(`Atividade Mapeamento 2 ${timestamp}`).click();
-        await page.getByTestId('btn-criar-competencia-salvar').click();
+        await page.getByRole('row', {name: UNIDADE_ALVO}).click();
+        await navegarParaMapa(page);
+        
+        await criarCompetencia(page, `Competência Mapeamento 1 ${timestamp}`, [`Atividade Mapeamento 1 ${timestamp}`]);
+        await criarCompetencia(page, `Competência Mapeamento 2 ${timestamp}`, [`Atividade Mapeamento 2 ${timestamp}`]);
+        
         await page.getByTestId('btn-cad-mapa-disponibilizar').click();
         await page.getByTestId('inp-disponibilizar-mapa-data').fill('2030-12-31');
         await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
@@ -106,11 +101,12 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // 6. Admin homologa mapa e finaliza processo
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await page.getByRole('row', {name: UNIDADE_ALVO}).click();
         await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await verificarPaginaPainel(page);
+        
         await page.getByText(descProcessoMapeamento).click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
@@ -180,7 +176,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaPainel(page);
         await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
         if (new RegExp(/\/processo\/\d+$/).exec(page.url())) {
-                await page.getByRole('row', {name: 'SECAO_221'}).click();
+                await page.getByRole('row', {name: UNIDADE_ALVO}).click();
         }
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro disponibilizada/i);
     });
@@ -190,7 +186,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
         await page.getByRole('cell', {name: descProcessoRevisao, exact: true}).click();
         await expect(page).toHaveURL(/\/processo\/\d+/);
-        await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await page.getByRole('row', {name: UNIDADE_ALVO}).click();
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-devolver').click();
         const motivoDevolucao = 'Necessário revisar os conhecimentos técnicos adicionados.';
@@ -215,7 +211,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     test('Cenario 4: Devolução e nova disponibilização adicional', async ({page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByText(descProcessoRevisao).click();
-        await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await page.getByRole('row', {name: UNIDADE_ALVO}).click();
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Primeira devolução');
@@ -235,7 +231,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await expect(page.getByText(descProcessoRevisao)).toBeVisible();
         await page.goto(`/processo/${processoRevisaoId}`);
-        await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await page.getByRole('row', {name: UNIDADE_ALVO}).click();
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Segunda devolução');
@@ -254,7 +250,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     test('Cenario 6: Verificar que histórico foi excluído após nova disponibilização', async ({page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.goto(`/processo/${processoRevisaoId}`);
-        await page.getByRole('row', {name: 'SECAO_221'}).click();
+        await page.getByRole('row', {name: UNIDADE_ALVO}).click();
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill('Terceira devolução');

@@ -81,7 +81,7 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate.ddl-auto: update
     defer-datasource-initialization: true
-    show-sql: true
+    show-sql: false
     properties:
       hibernate.format_sql: false
   sql:
@@ -102,6 +102,12 @@ server:
 logging:
   pattern:
     console: "%-5level %logger{30}.%M:%L - %msg%n"
+  level:
+    sgc: INFO
+    org:
+      hibernate: ERROR
+      springframework: ERROR
+    com.zaxxer.hikari: ERROR
 
 ---
 spring:

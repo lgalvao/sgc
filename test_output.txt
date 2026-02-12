@@ -1,143 +1,92 @@
-Reusing configuration cache.
-> Task :backend:processResources UP-TO-DATE
-> Task :backend:processTestResources UP-TO-DATE
-> Task :backend:compileJava UP-TO-DATE
-> Task :backend:classes UP-TO-DATE
-> Task :backend:compileTestJava UP-TO-DATE
-> Task :backend:testClasses UP-TO-DATE
+[2m[WebServer] [22mINFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+[2m[WebServer] [22mINFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 18 unidades verificadas.
+[2m[WebServer] [22m  [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m288[22m[2m[0m ms[22m
+[2m[WebServer] [22m  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[WebServer] [22m>>> Frontend e Backend no ar!
 
-> Task :backend:test
+Running 8 tests using 1 worker
 
-CDU-32: Reabrir cadastro > Não deve permitir reabrir cadastro sem ser ADMIN FAILED
-    java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@1d1a6cac testClass = sgc.integracao.CDU32IntegrationTest, locations = [], classes = [sgc.Sgc], contextInitializerClasses = [], activeProfiles = ["test"], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.webmvc.test.autoconfigure.WebDriverContextCustomizer@4b32465, org.springframework.boot.web.server.context.SpringBootTestRandomPortContextCustomizer@224e6e88, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@2d801d8, [ImportsContextCustomizer@1dba7bb8 key = [sgc.integracao.mocks.TestThymeleafConfig, org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebDriverAutoConfiguration, org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebClientAutoConfiguration, sgc.integracao.mocks.TestSecurityConfig, org.springframework.boot.webmvc.test.autoconfigure.MockMvcAutoConfiguration, sgc.integracao.mocks.TestConfig]], org.springframework.boot.test.context.PropertyMappingContextCustomizer@2d298995, org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@55d1f065, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@3982206a, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@203695bf], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
-        at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.lambda$loadContext$0(DefaultCacheAwareContextLoaderDelegate.java:195)
-        at org.springframework.test.context.cache.DefaultContextCache.put(DefaultContextCache.java:214)
-        at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:160)
-        at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:128)
-        at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200)
-        at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139)
-        at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
-        at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:205)
-        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:186)
-        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:214)
-        at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:197)
-        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:214)
-        at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1716)
-        at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:570)
-        at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:560)
-        at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:153)
-        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:176)
-        at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
-        at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:632)
-        at java.base/java.util.Optional.orElseGet(Optional.java:364)
-        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
-        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+[2m[WebServer] [22mINFO  sgc.e2e.E2eController.executeDatabaseReset:82 - Limpando 25 tabelas no schema SGC
+[2m[WebServer] [22mINFO  sgc.e2e.E2eController.executeDatabaseReset:88 - Executando script de seed: seed.sql
+[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [18]. Participante IDs: [(201,18)]
+[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 201 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para COORD_22 - Transição: CADASTRO_DISPONIBILIZADO
+[Browser Console] debug: [vite] connecting...
+[Browser Console] debug: [vite] connected.
+[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+[Browser Console] debug: [vite] connecting...
+[Browser Console] debug: [vite] connected.
+[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para SECAO_221 - Transição: MAPA_DISPONIBILIZADO
+[Browser Console] debug: [vite] connecting...
+[Browser Console] debug: [vite] connected.
+[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para COORD_22 - Transição: MAPA_VALIDADO
+[Browser Console] debug: [vite] connecting...
+[Browser Console] debug: [vite] connected.
+[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+[2m[WebServer] [22mINFO  s.p.service.ProcessoValidador.validarTodosSubprocessosHomologados:95 - Todos os subprocessos do processo 201 estão homologados
+[2m[WebServer] [22mINFO  s.p.s.ProcessoFinalizador.tornarMapasVigentes:86 - Mapa vigente definido para o processo 201
+[2m[WebServer] [22mINFO  s.p.s.ProcessoFinalizador.tornarMapasVigentes:100 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[2m[WebServer] [22mINFO  s.p.s.ProcessoFinalizador.finalizar:76 - Processo 201 finalizado
+[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailUnidadeFinal:196 - E-mail de finalização enviado para SECAO_221
+[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 202 criado com 1 participantes: [18]. Participante IDs: [(202,18)]
+[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 202 existe no repo? true
+[2m[WebServer] [22mINFO  s.s.s.f.SubprocessoFactory.criarParaRevisao:152 - Subprocesso para revisão criado para unidade SECAO_221
+[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de revisao 202 iniciado para 1 unidade(s).
+[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade SECAO_221
+[Browser Console] debug: [vite] connecting...
+[Browser Console] debug: [vite] connected.
+[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 141414
+  ✘  1 [chromium] › e2e/cdu-10.spec.ts:32:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparação do cenário: Mapeamento completo e Revisão iniciada (10.1s)
+  -  2 [chromium] › e2e/cdu-10.spec.ts:145:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Cenario 1: Validação - Atividade sem conhecimento impede disponibilização
+  -  3 [chromium] › e2e/cdu-10.spec.ts:163:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Cenario 2: Caminho feliz - Disponibilizar revisão do cadastro
+  -  4 [chromium] › e2e/cdu-10.spec.ts:184:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Cenario 3: Devolução e Histórico de Análise
+  -  5 [chromium] › e2e/cdu-10.spec.ts:211:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Cenario 4: Devolução e nova disponibilização adicional
+  -  6 [chromium] › e2e/cdu-10.spec.ts:230:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Cenario 5: Segunda devolução e disponibilização que limpa o histórico
+  -  7 [chromium] › e2e/cdu-10.spec.ts:250:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Cenario 6: Verificar que histórico foi excluído após nova disponibilização
+  -  8 [chromium] › e2e/cdu-10.spec.ts:271:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Cenario 7: Cancelar disponibilização mantém na mesma tela
 
-        Caused by:
-        org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'configCors' defined in file [/Users/leonardo/sgc/backend/build/classes/java/main/sgc/seguranca/config/ConfigCors.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'sgc.seguranca.config.ConfigCorsProperties' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
-            at app//org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804)
-            at app//org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240)
-            at app//org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1382)
-            at app//org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1221)
-            at app//org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565)
-            at app//org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
-            at app//org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
-            at app//org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
-            at app//org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
-            at app//org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:196)
-            at app//org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1218)
-            at app//org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1184)
-            at app//org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1121)
-            at app//org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:993)
-            at app//org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:620)
-            at app//org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756)
-            at app//org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445)
-            at app//org.springframework.boot.SpringApplication.run(SpringApplication.java:321)
-            at app//org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$2(SpringBootContextLoader.java:156)
-            at app//org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58)
-            at app//org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46)
-            at app//org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1465)
-            at app//org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:605)
-            at app//org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:156)
-            at app//org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:115)
-            at app//org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:247)
-            at app//org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.lambda$loadContext$0(DefaultCacheAwareContextLoaderDelegate.java:167)
-            ... 21 more
 
-            Caused by:
-            org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'sgc.seguranca.config.ConfigCorsProperties' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
-                at app//org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoMatchingBeanFound(DefaultListableBeanFactory.java:2297)
-                at app//org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1725)
-                at app//org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1651)
-                at app//org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:912)
-                at app//org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
-                ... 47 more
+  1) [chromium] › e2e/cdu-10.spec.ts:32:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparação do cenário: Mapeamento completo e Revisão iniciada 
 
-CDU-32: Reabrir cadastro > Não deve permitir reabrir cadastro sem justificativa FAILED
-    java.lang.IllegalStateException: ApplicationContext failure threshold (1) exceeded: skipping repeated attempt to load context for [WebMergedContextConfiguration@1d1a6cac testClass = sgc.integracao.CDU32IntegrationTest, locations = [], classes = [sgc.Sgc], contextInitializerClasses = [], activeProfiles = ["test"], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.webmvc.test.autoconfigure.WebDriverContextCustomizer@4b32465, org.springframework.boot.web.server.context.SpringBootTestRandomPortContextCustomizer@224e6e88, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@2d801d8, [ImportsContextCustomizer@1dba7bb8 key = [sgc.integracao.mocks.TestThymeleafConfig, org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebDriverAutoConfiguration, org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebClientAutoConfiguration, sgc.integracao.mocks.TestSecurityConfig, org.springframework.boot.webmvc.test.autoconfigure.MockMvcAutoConfiguration, sgc.integracao.mocks.TestConfig]], org.springframework.boot.test.context.PropertyMappingContextCustomizer@2d298995, org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@55d1f065, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@3982206a, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@203695bf], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
-        at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:157)
-        at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:128)
-        at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200)
-        at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139)
-        at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
-        at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:205)
-        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:186)
-        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:214)
-        at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:197)
-        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:214)
-        at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1716)
-        at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:570)
-        at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:560)
-        at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:153)
-        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:176)
-        at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
-        at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:632)
-        at java.base/java.util.Optional.orElseGet(Optional.java:364)
-        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
-        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+    [31mTest timeout of 10000ms exceeded.[39m
 
-CDU-32: Reabrir cadastro > Deve reabrir cadastro com justificativa válida quando ADMIN FAILED
-    java.lang.IllegalStateException: ApplicationContext failure threshold (1) exceeded: skipping repeated attempt to load context for [WebMergedContextConfiguration@1d1a6cac testClass = sgc.integracao.CDU32IntegrationTest, locations = [], classes = [sgc.Sgc], contextInitializerClasses = [], activeProfiles = ["test"], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.webmvc.test.autoconfigure.WebDriverContextCustomizer@4b32465, org.springframework.boot.web.server.context.SpringBootTestRandomPortContextCustomizer@224e6e88, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@2d801d8, [ImportsContextCustomizer@1dba7bb8 key = [sgc.integracao.mocks.TestThymeleafConfig, org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebDriverAutoConfiguration, org.springframework.boot.webmvc.test.autoconfigure.MockMvcWebClientAutoConfiguration, sgc.integracao.mocks.TestSecurityConfig, org.springframework.boot.webmvc.test.autoconfigure.MockMvcAutoConfiguration, sgc.integracao.mocks.TestConfig]], org.springframework.boot.test.context.PropertyMappingContextCustomizer@2d298995, org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@55d1f065, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@3982206a, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@203695bf], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
-        at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:157)
-        at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:128)
-        at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200)
-        at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139)
-        at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
-        at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:205)
-        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:186)
-        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:214)
-        at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:197)
-        at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:214)
-        at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1716)
-        at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:570)
-        at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:560)
-        at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:153)
-        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:176)
-        at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
-        at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:632)
-        at java.base/java.util.Optional.orElseGet(Optional.java:364)
-        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
-        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
-  Results: FAILURE
-  Total:     3 tests run
-  ✓ Passed:  0
-  ✗ Failed:  3
-  ○ Ignored: 0
-  Time:     6.758s
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
 
-3 tests completed, 3 failed
+    Locator: getByTestId('card-subprocesso-atividades')
+    Expected: visible
+    Error: element(s) not found
 
-> Task :backend:test FAILED
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByTestId('card-subprocesso-atividades')[22m
 
-FAILURE: Build failed with an exception.
 
-* What went wrong:
-Execution failed for task ':backend:test'.
-> There were failing tests. See the report at: file:///Users/leonardo/sgc/backend/build/reports/tests/test/index.html
+       at helpers/helpers-atividades.ts:10
 
-* Try:
-> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+       8 |     });
+       9 |     
+    > 10 |     await expect(page.getByTestId(testId)).toBeVisible();
+         |                                            ^
+      11 |     await page.getByTestId(testId).click();
+      12 |     await page.waitForURL(/\/cadastro$/);
+      13 |
+        at navegarParaAtividades (/Users/leonardo/sgc/e2e/helpers/helpers-atividades.ts:10:44)
+        at /Users/leonardo/sgc/e2e/cdu-10.spec.ts:134:15
 
-BUILD FAILED in 7s
-5 actionable tasks: 1 executed, 4 up-to-date
-Configuration cache entry reused.
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-10-CDU-10---Disponibil-8b3ac-completo-e-Revisão-iniciada-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-10-CDU-10---Disponibil-8b3ac-completo-e-Revisão-iniciada-chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/cdu-10.spec.ts:32:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Preparação do cenário: Mapeamento completo e Revisão iniciada 
+  7 did not run
