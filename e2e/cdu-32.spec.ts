@@ -58,7 +58,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.goto(`/processo/${processoId}`);
+        await page.goto(`/processo/${processoId}/${UNIDADE_1}`);
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);

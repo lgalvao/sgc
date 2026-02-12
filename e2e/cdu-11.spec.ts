@@ -1,7 +1,7 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
+import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {abrirModalCriarCompetencia} from './helpers/helpers-mapas.js';
 import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
@@ -48,7 +48,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await linhaProcesso.click();
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcessoMapeamento);
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
-        processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoMapeamentoId = await extrairProcessoId(page);
         if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
 
         // Iniciar processo
@@ -61,7 +61,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     test('Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.goto(`/processo/${processoMapeamentoId}`);
+        await page.goto(`/processo/${processoMapeamentoId}/${UNIDADE_ALVO}`);
 
         // Chefe vai direto para subprocesso
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);

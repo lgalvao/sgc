@@ -53,7 +53,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.goto(`/processo/${processoId}`);
+        await page.goto(`/processo/${processoId}/${UNIDADE_ALVO}`);
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
