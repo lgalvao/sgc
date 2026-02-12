@@ -149,3 +149,29 @@ Running 19 tests using 1 worker
 
 [1A[2K[15/19] [chromium] › e2e/cdu-25.spec.ts:131:5 › CDU-25 - Aceitar validação de mapas em bloco › Cenario 2: GESTOR abre modal de aceite de mapa em bloco
 [1A[2K[16/19] [chromium] › e2e/cdu-34.spec.ts:31:5 › CDU-34 - Enviar lembrete de prazo › Preparacao: Admin cria e inicia processo
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [13]. Participante IDs: [(201,13)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade ASSESSORIA_22
+
+[1A[2K[17/19] [chromium] › e2e/cdu-34.spec.ts:58:5 › CDU-34 - Enviar lembrete de prazo › Cenario 1: ADMIN navega para detalhes do processo
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[18/19] [chromium] › e2e/cdu-34.spec.ts:66:5 › CDU-34 - Enviar lembrete de prazo › Cenario 2: Verificar indicadores de prazo
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[19/19] [chromium] › e2e/cdu-34.spec.ts:82:5 › CDU-34 - Enviar lembrete de prazo › Cenario 3: Verificar opção de enviar lembrete
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K  2 failed
+    [chromium] › e2e/cdu-20.spec.ts:108:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 1: GESTOR navega para visualização do mapa validado 
+    [chromium] › e2e/cdu-25.spec.ts:117:5 › CDU-25 - Aceitar validação de mapas em bloco › Cenario 1: GESTOR acessa processo com mapa validado 
+  4 did not run
+  13 passed (48.7s)

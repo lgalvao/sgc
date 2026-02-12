@@ -13,7 +13,7 @@ async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
 }
 
 test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {
-    const UNIDADE_ALVO = 'ASSESSORIA_22';
+    const UNIDADE_ALVO = 'SECAO_221';
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-20 ${timestamp}`;
@@ -47,7 +47,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
         
-        await login(page, USUARIOS.CHEFE_ASSESSORIA_22.titulo, USUARIOS.CHEFE_ASSESSORIA_22.senha);
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.getByText(descProcesso).click();
         await navegarParaAtividades(page);
 
@@ -92,7 +92,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     });
 
     test('Preparacao 5: Chefe valida o mapa', async ({page}) => {
-        await login(page, USUARIOS.CHEFE_ASSESSORIA_22.titulo, USUARIOS.CHEFE_ASSESSORIA_22.senha);
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarSubprocessoChefe(page, descProcesso);
 
         // Validar mapa
