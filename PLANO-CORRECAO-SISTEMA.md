@@ -25,5 +25,9 @@ Progresso Atual
 - Premissa confirmada: dados de `Usuario`, `Unidade` e perfis vêm completos das views pre-populadas; tratar ausência desses dados como erro grave, nunca com fallback.
 - Correção aplicada em `CadAtribuicao.vue`: removido comportamento silencioso no submit; agora exibe erro explícito quando faltam usuário/campos obrigatórios ou unidade não carregada.
 - Ajuste adicional: para unidade ausente, comportamento agora é **fail-fast** (`Invariante violada`) em vez de mensagem de fallback, alinhado com a premissa de dados obrigatórios vindos das views.
-- Próximo passo imediato: consolidar triagem de erros manuais do PDF e fechar causa raiz dos cenários de visibilidade do GESTOR no painel.
+- Correção de cenário por hierarquia no `CDU-25`: fluxo migrado para `SECAO_211`/`COORD_21` com atores compatíveis (`CHEFE_SECAO_211` e `GESTOR_COORD_21`), eliminando falso negativo de visibilidade no painel.
+- Validação E2E atualizada:
+  - `cdu-25.spec.ts`: 6/6 passed
+  - subset `cdu-20 + cdu-25 + cdu-34`: 19/19 passed
+- Próximo passo imediato: consolidar triagem de erros manuais do PDF/DOCX e revalidar os itens remanescentes como bug real vs falso positivo.
 - Observação de triagem: parte dos erros manuais pode já estar resolvida ou ser falso positivo; validar cada item contra a base atual (`e2e/setup/seed.sql`) antes de implementar novas correções.

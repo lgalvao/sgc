@@ -70,10 +70,6 @@ public class ProcessoManutencaoService {
                         .map(up -> "(" + up.getId().getProcessoCodigo() + "," + up.getId().getUnidadeCodigo() + ")")
                         .toList());
         
-        // Verify the data is in the database
-        var countQuery = processoRepo.findById(processoSalvo.getCodigo());
-        log.info("Verificação: Processo {} existe no repo? {}", processoSalvo.getCodigo(), countQuery.isPresent());
-
         return processoSalvo;
     }
 

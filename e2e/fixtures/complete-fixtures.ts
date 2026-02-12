@@ -25,25 +25,10 @@ import {resetDatabase, useProcessoCleanup} from '../hooks/hooks-limpeza.js';
  * ```
  */
 
-// Adicionar reset de database como beforeEach (uma vez por arquivo)
-const test = base;
-
-test.beforeEach(async ({request}, testInfo) => {
-    // @ts-ignore
-    if (!global.__databaseResetFiles) {
-        // @ts-ignore
-        global.__databaseResetFiles = new Set();
-    }
-    // @ts-ignore
-    if (!global.__databaseResetFiles.has(testInfo.file)) {
-        await resetDatabase(request);
-        // @ts-ignore
-        global.__databaseResetFiles.add(testInfo.file);
-    }
-});
+const arquivosResetados = new Set<string>();
 
 // Extend para adicionar cleanup automático
-export const testWithCleanup = test.extend<{
+const test = base.extend<{
     cleanupAutomatico: ReturnType<typeof useProcessoCleanup>;
 }>({
     // Cleanup automático configurado para cada teste
@@ -61,6 +46,13 @@ export const testWithCleanup = test.extend<{
     }
 });
 
-// Export alias
-export {testWithCleanup as test};
+// Reset de database uma vez por arquivo por worker.
+test.beforeEach(async ({request}, testInfo) => {
+    if (!arquivosResetados.has(testInfo.file)) {
+        await resetDatabase(request);
+        arquivosResetados.add(testInfo.file);
+    }
+});
+
 export {expect} from './auth-fixtures.js';
+export {test};

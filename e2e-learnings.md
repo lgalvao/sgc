@@ -209,3 +209,19 @@ Ao clicar em "Criar atribuição" sem combinação válida de campos/carregament
   - unidade não foi carregada,
   - usuário não foi selecionado,
   - data de término ou justificativa não foram preenchidas.
+
+### 19. CDU-25 estabilizado por alinhamento hierárquico real do seed
+
+**Problema Identificado:**
+`CDU-25` falhava em sequência por combinação ator/unidade incoerente com a árvore e com os dados do `seed.sql`, gerando ausência de processo no painel do GESTOR.
+
+**Correção aplicada:**
+- `CDU-25` foi alinhado para fluxo completo em `SECAO_211` (árvore `COORD_21`).
+- Atores ajustados para a hierarquia correta do caso:
+  - CHEFE: `CHEFE_SECAO_211` (`101010`)
+  - GESTOR: `GESTOR_COORD_21` (`999999`)
+- Login explícito mantido em cada etapa para evitar estado implícito entre testes serial.
+
+**Validação:**
+- `npx playwright test e2e/cdu-25.spec.ts` → **6 passed**
+- `npx playwright test e2e/cdu-20.spec.ts e2e/cdu-25.spec.ts e2e/cdu-34.spec.ts` → **19 passed**
