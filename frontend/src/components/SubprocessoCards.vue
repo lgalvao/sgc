@@ -6,7 +6,7 @@
           md="4"
       >
         <BCard
-            v-if="permissoes.podeEditarMapa"
+            v-if="permissoes.podeEditarCadastro"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-atividades"
             role="button"

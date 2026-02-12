@@ -1,0 +1,141 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e4]:
+    - navigation [ref=e5]:
+      - generic [ref=e6]:
+        - link "SGC" [ref=e7] [cursor=pointer]:
+          - /url: /painel
+        - generic [ref=e8]:
+          - list [ref=e9]:
+            - listitem [ref=e10]:
+              - link "Painel" [ref=e11] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e12]: 
+                - text: Painel
+            - listitem [ref=e13]:
+              - link "Unidades" [ref=e14] [cursor=pointer]:
+                - /url: /unidades
+                - generic [ref=e15]: 
+                - text: Unidades
+            - listitem [ref=e16]:
+              - link "Relatórios" [ref=e17] [cursor=pointer]:
+                - /url: /relatorios
+                - generic [ref=e18]: 
+                - text: Relatórios
+            - listitem [ref=e19]:
+              - link "Histórico" [ref=e20] [cursor=pointer]:
+                - /url: /historico
+                - generic [ref=e21]: 
+                - text: Histórico
+          - list [ref=e22]:
+            - listitem [ref=e23]:
+              - link "ADMIN - SEDOC" [ref=e24]:
+                - /url: "#"
+                - generic [ref=e25]:
+                  - generic [ref=e26]: 
+                  - generic [ref=e27]: ADMIN - SEDOC
+            - listitem "Configurações do sistema" [ref=e28]:
+              - link [ref=e29] [cursor=pointer]:
+                - /url: /configuracoes
+                - generic [ref=e30]: 
+            - listitem "Sair" [ref=e31]:
+              - link [ref=e32] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e33]: 
+    - generic [ref=e36]:
+      - button "Voltar" [ref=e37] [cursor=pointer]:
+        - generic [ref=e38]: 
+      - navigation "breadcrumb" [ref=e39]:
+        - list [ref=e40]:
+          - listitem [ref=e41]:
+            - generic [ref=e42]:
+              - generic [ref=e43]: 
+              - generic [ref=e44]: Início
+    - main [ref=e45]:
+      - generic [ref=e46]:
+        - heading "Cadastro de processo" [level=2] [ref=e49]
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - group [ref=e52]:
+              - generic [ref=e53]: Descrição *
+              - textbox "Descrição" [ref=e54]:
+                - /placeholder: Descreva o processo
+                - text: Map 10 1770906532066
+            - group [ref=e55]:
+              - generic [ref=e56]: Tipo *
+              - combobox "Tipo" [ref=e57]:
+                - option "-- Selecione o tipo --" [disabled]
+                - option "Mapeamento" [selected]
+                - option "Revisão"
+                - option "Diagnóstico"
+            - group "Unidades participantes" [ref=e58]:
+              - generic [ref=e59]: Unidades participantes *
+              - generic [ref=e61]:
+                - generic [ref=e62]:
+                  - button "Selecionar todas as unidades elegíveis" [ref=e63] [cursor=pointer]:
+                    - generic [ref=e64]: 
+                    - text: Selecionar todas as unidades elegíveis
+                  - button "Desmarcar todas as unidades" [ref=e65] [cursor=pointer]:
+                    - generic [ref=e66]: 
+                    - text: Desmarcar todas as unidades
+                - generic [ref=e68]:
+                  - button "Expandir SECRETARIA_1" [ref=e69] [cursor=pointer]:
+                    - generic [ref=e70]: 
+                  - generic [ref=e71]:
+                    - checkbox "SECRETARIA_1" [ref=e72]
+                    - generic [ref=e73]: SECRETARIA_1
+                - generic [ref=e74]:
+                  - generic [ref=e75]:
+                    - button "Recolher SECRETARIA_2" [expanded] [ref=e76] [cursor=pointer]:
+                      - generic [ref=e77]: 
+                    - generic [ref=e78]:
+                      - checkbox "SECRETARIA_2" [ref=e79]
+                      - generic [ref=e80]: SECRETARIA_2
+                  - generic [ref=e81]:
+                    - generic [ref=e84]:
+                      - checkbox "ASSESSORIA_21" [ref=e85]
+                      - generic [ref=e86]: ASSESSORIA_21
+                    - generic [ref=e89]:
+                      - checkbox "ASSESSORIA_22" [ref=e90]
+                      - generic [ref=e91]: ASSESSORIA_22
+                    - generic [ref=e93]:
+                      - button "Expandir COORD_21" [ref=e94] [cursor=pointer]:
+                        - generic [ref=e95]: 
+                      - generic [ref=e96]:
+                        - checkbox "COORD_21" [ref=e97]
+                        - generic [ref=e98]: COORD_21
+                    - generic [ref=e99]:
+                      - generic [ref=e100]:
+                        - button "Recolher COORD_22" [expanded] [active] [ref=e101] [cursor=pointer]:
+                          - generic [ref=e102]: 
+                        - generic [ref=e103]:
+                          - checkbox "COORD_22" [disabled]
+                          - generic [ref=e104]: COORD_22
+                      - generic [ref=e108]:
+                        - checkbox "SECAO_221" [disabled]
+                        - generic [ref=e109]: SECAO_221
+                    - generic [ref=e112]:
+                      - checkbox "UNIT_TEST_DIAG" [ref=e113]
+                      - generic [ref=e114]: UNIT_TEST_DIAG
+            - group [ref=e115]:
+              - generic [ref=e116]: Data limite *
+              - textbox "Data limite" [ref=e117]: 2026-03-14
+              - generic [ref=e118]: Prazo para conclusão da primeira etapa (Mapeamento/Revisão).
+          - generic [ref=e119]:
+            - generic [ref=e120]:
+              - button "Iniciar processo" [disabled]:
+                - generic: 
+                - text: Iniciar processo
+              - button "Salvar" [disabled]:
+                - generic: 
+                - text: Salvar
+            - button "Cancelar" [ref=e121] [cursor=pointer]
+    - contentinfo [ref=e122]:
+      - generic [ref=e123]:
+        - generic [ref=e124]: Versão 1.0.0
+        - generic [ref=e125]: © SESEL/COSIS/TRE-PE
+```

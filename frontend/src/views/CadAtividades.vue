@@ -80,7 +80,7 @@
     <CadAtividadeForm
         ref="atividadeFormRef"
         v-model="novaAtividade"
-        :disabled="!codSubprocesso || !permissoes?.podeEditarMapa"
+        :disabled="!codSubprocesso || !permissoes?.podeEditarCadastro"
         :loading="loadingAdicionar"
         @submit="handleAdicionarAtividade"
     />
