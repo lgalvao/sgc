@@ -42,3 +42,110 @@ Running 19 tests using 1 worker
 [1A[2K[4/19] [chromium] › e2e/cdu-20.spec.ts:78:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 4: Admin cria competências e disponibiliza mapa
 [1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
 
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para ASSESSORIA_22 - Transição: MAPA_DISPONIBILIZADO
+
+[1A[2K[5/19] [chromium] › e2e/cdu-20.spec.ts:94:5 › CDU-20 - Analisar validação de mapa de competências › Preparacao 5: Chefe valida o mapa
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 888888
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para SECRETARIA_2 - Transição: MAPA_VALIDADO
+
+[1A[2K[6/19] [chromium] › e2e/cdu-20.spec.ts:108:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 1: GESTOR navega para visualização do mapa validado
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 131313
+
+[1A[2K  1) [chromium] › e2e/cdu-20.spec.ts:108:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 1: GESTOR navega para visualização do mapa validado 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText('Mapeamento CDU-20 1770939389564')
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for getByText('Mapeamento CDU-20 1770939389564')[22m
+
+
+       at helpers/helpers-analise.ts:23
+
+      21 |
+      22 |     // Aguardar o processo aparecer na tabela antes de clicar
+    > 23 |     await expect(page.getByText(descricaoProcesso)).toBeVisible({timeout: 15000});
+         |                                                     ^
+      24 |     
+      25 |     await page.getByText(descricaoProcesso).click();
+      26 |
+        at acessarSubprocessoGestor (/Users/leonardo/sgc/e2e/helpers/helpers-analise.ts:23:53)
+        at /Users/leonardo/sgc/e2e/cdu-20.spec.ts:112:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-20-CDU-20---Analisar-v-10ded-sualização-do-mapa-validado-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-20-CDU-20---Analisar-v-10ded-sualização-do-mapa-validado-chromium/error-context.md
+
+
+[1A[2K[7/19] [chromium] › e2e/cdu-20.spec.ts:126:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 2: GESTOR cancela aceite - permanece na tela
+[1A[2K[8/19] [chromium] › e2e/cdu-20.spec.ts:143:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 3: GESTOR registra aceite do mapa
+[1A[2K[9/19] [chromium] › e2e/cdu-20.spec.ts:165:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 4: ADMIN homologa o mapa
+[1A[2K[10/19] [chromium] › e2e/cdu-25.spec.ts:46:5 › CDU-25 - Aceitar validação de mapas em bloco › Preparacao 1: Admin cria e inicia processo
+[1A[2K[2m[WebServer] [22mINFO  sgc.e2e.E2eController.resetDatabase:66 - Reset do banco de dados concluído.
+
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:65 - Processo 201 criado com 1 participantes: [13]. Participante IDs: [(201,13)]
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoManutencaoService.criar:75 - Verificação: Processo 201 existe no repo? true
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.s.ProcessoInicializador.iniciar:108 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+
+[1A[2K[2m[WebServer] [22mINFO  s.p.l.EventoProcessoListener.enviarEmailProcessoIniciado:247 - E-mail enviado para unidade ASSESSORIA_22
+
+[1A[2K[11/19] [chromium] › e2e/cdu-25.spec.ts:69:5 › CDU-25 - Aceitar validação de mapas em bloco › Preparacao 2: Chefe disponibiliza cadastro
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 888888
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.w.SubprocessoAdminWorkflowService.atualizarSituacaoParaEmAndamento:63 - Atualizando situação do subprocesso 201 para MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para SECRETARIA_2 - Transição: CADASTRO_DISPONIBILIZADO
+
+[1A[2K[12/19] [chromium] › e2e/cdu-25.spec.ts:84:5 › CDU-25 - Aceitar validação de mapas em bloco › Preparacao 3: Admin homologa cadastro e cria mapa
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 191919
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para ASSESSORIA_22 - Transição: MAPA_DISPONIBILIZADO
+
+[1A[2K[13/19] [chromium] › e2e/cdu-25.spec.ts:101:5 › CDU-25 - Aceitar validação de mapas em bloco › Preparacao 4: Chefe valida o mapa
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 888888
+
+[1A[2K[2m[WebServer] [22mINFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicao:66 - E-mail enviado para SECRETARIA_2 - Transição: MAPA_VALIDADO
+
+[1A[2K[14/19] [chromium] › e2e/cdu-25.spec.ts:117:5 › CDU-25 - Aceitar validação de mapas em bloco › Cenario 1: GESTOR acessa processo com mapa validado
+[1A[2K[2m[WebServer] [22mINFO  s.seguranca.login.LoginFacade.autenticar:64 - Usuário autenticado: 131313
+
+[1A[2K  2) [chromium] › e2e/cdu-25.spec.ts:117:5 › CDU-25 - Aceitar validação de mapas em bloco › Cenario 1: GESTOR acessa processo com mapa validado 
+
+    [31mTest timeout of 10000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('Mapeamento CDU-25 1770939410484')[22m
+
+
+      118 |         
+      119 |
+    > 120 |         await page.getByText(descProcesso).click();
+          |                                            ^
+      121 |         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+      122 |
+      123 |         const btnAceitar = page.getByRole('button', {name: /Aceitar.*Bloco/i});
+        at /Users/leonardo/sgc/e2e/cdu-25.spec.ts:120:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-25-CDU-25---Aceitar-va-35f02--processo-com-mapa-validado-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-25-CDU-25---Aceitar-va-35f02--processo-com-mapa-validado-chromium/error-context.md
+
+
+[1A[2K[15/19] [chromium] › e2e/cdu-25.spec.ts:131:5 › CDU-25 - Aceitar validação de mapas em bloco › Cenario 2: GESTOR abre modal de aceite de mapa em bloco
+[1A[2K[16/19] [chromium] › e2e/cdu-34.spec.ts:31:5 › CDU-34 - Enviar lembrete de prazo › Preparacao: Admin cria e inicia processo
