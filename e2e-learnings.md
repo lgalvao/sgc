@@ -311,3 +311,43 @@ Após a padronização, uma execução completa dos testes revelará falhas reai
 **Responsável:** Jules (Agente Copilot)  
 **Status:** Migração Concluída - Falha de Teste Identificada (Requer Investigação Backend)  
 **Última Atualização:** 2026-02-12 (15:52 UTC)
+
+## Investigação Backend - Visibilidade de Processos
+
+### Fluxo Analisado: Processo Iniciado
+
+**Código-Fonte Relevante:**
+- `PainelFacade.java:68` - `listarPorParticipantesIgnorandoCriado()` ✅
+- `ProcessoInicializador.java:96` - `setSituacao(EM_ANDAMENTO)` ✅
+- `ProcessoInicializador.java:142` - `criarParaMapeamento()` ✅
+
+**Fluxo Esperado:**
+1. ADMIN cria processo MAPEAMENTO com SECAO_221 ✅
+2. ADMIN clica "Iniciar processo" ✅
+3. Backend: `processo.setSituacao(EM_ANDAMENTO)` ✅ (log confirma)
+4. Backend: `subprocessoFacade.criarParaMapeamento()` ⚠️ (precisa verificar)
+5. Backend: Publica `EventoProcessoIniciado` ✅ (log confirma)
+6. Backend: Envia email mockado ✅ (log confirma)
+7. CHEFE_SECAO_221 loga no sistema ✅
+8. Frontend: GET `/api/painel/processos?perfil=CHEFE&unidade=18` ⚠️
+9. Backend: filtra processos NÃO em CRIADO + participante unidade 18 ⚠️
+10. Backend: retorna lista VAZIA ❌
+
+**Hipóteses Refinadas:**
+1. ✅ Processo muda de CRIADO → EM_ANDAMENTO (confirmado)
+2. ⚠️ Subprocess pode não estar sendo criado
+3. ⚠️ Código 18 (SECAO_221) pode não estar em PROCESSO_UNIDADES
+4. ⚠️ Query pode ter bug na junção com participantes
+
+**Teste Diagnóstico Sugerido:**
+```sql
+-- Após criar e iniciar processo, verificar:
+SELECT * FROM PROCESSOS WHERE CODIGO = 1;
+SELECT * FROM PROCESSO_UNIDADES WHERE PROCESSO_CODIGO = 1;
+SELECT * FROM SUBPROCESSOS WHERE PROCESSO_CODIGO = 1;
+SELECT CODIGO, SIGLA FROM UNIDADES WHERE SIGLA = 'SECAO_221';
+```
+
+---
+**Status Final:** Migração de Fixtures ✅ Completa | Problema Backend ⚠️ Identificado  
+**Última Atualização:** 2026-02-12 (15:55 UTC)
