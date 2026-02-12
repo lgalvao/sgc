@@ -10,8 +10,7 @@ import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.List;
 
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**
  * Serviço de consulta compartilhado para queries que envolvem Processo e Subprocesso.
@@ -48,7 +47,11 @@ public class ConsultasSubprocessoService {
         if (total == 0) return ValidationResult.ofInvalido("O processo não possui subprocessos para finalizar");
 
         long homologados = subprocessoRepo.countByProcessoCodigoAndSituacaoIn(processoId,
-                List.of(MAPEAMENTO_MAPA_HOMOLOGADO, REVISAO_MAPA_HOMOLOGADO)
+                List.of(
+                        MAPEAMENTO_MAPA_HOMOLOGADO,
+                        REVISAO_MAPA_HOMOLOGADO,
+                        DIAGNOSTICO_CONCLUIDO
+                )
         );
 
         if (total != homologados) {

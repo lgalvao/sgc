@@ -140,7 +140,8 @@ export function useProcessoView() {
             feedbackStore.show("Sucesso", "Processo finalizado com sucesso", "success");
             await router.push("/painel");
         } catch (error: any) {
-            feedbackStore.show("Erro ao finalizar", error.message || "Ocorreu um erro", "danger");
+            const mensagem = processosStore.lastError?.message || error.message || "Ocorreu um erro";
+            feedbackStore.show("Erro ao finalizar", mensagem, "danger");
         }
     }
 

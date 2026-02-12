@@ -81,6 +81,7 @@ public class Subprocesso extends EntidadeBase {
                 Arrays.asList(
                         SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
                         SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
+                        SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO,
                         SituacaoSubprocesso.NAO_INICIADO);
 
         return !situacoesFinalizadas.contains(this.situacao);
@@ -90,7 +91,8 @@ public class Subprocesso extends EntidadeBase {
         final List<SituacaoSubprocesso> situacoesFinalizadas =
                 Arrays.asList(
                         SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-                        SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
+                        SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
+                        SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
         return !situacoesFinalizadas.contains(this.situacao) ? 1 : null;
     }

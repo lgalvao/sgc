@@ -17,6 +17,7 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.query.ConsultasSubprocessoService;
 
+import sgc.processo.model.TipoProcesso;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +58,10 @@ class ProcessoFinalizador {
         Processo processo = repo.buscar(Processo.class, codigo);
 
         processoValidador.validarFinalizacaoProcesso(processo);
-        tornarMapasVigentes(processo);
+        
+        if (processo.getTipo() != TipoProcesso.DIAGNOSTICO) {
+            tornarMapasVigentes(processo);
+        }
 
         processo.setSituacao(SituacaoProcesso.FINALIZADO);
         processo.setDataFinalizacao(LocalDateTime.now());

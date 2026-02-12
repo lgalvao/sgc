@@ -14,3 +14,5 @@
 [FRONTEND] 9:44:24 AM [vite] (client) hmr update /src/components/TabelaProcessos.vue
 [FRONTEND] 9:44:32 AM [vite] (client) hmr update /src/views/PainelView.vue
 [FRONTEND] 9:45:23 AM [vite] (client) hmr update /src/components/TabelaProcessos.vue
+[BACKEND] WARN  s.c.erros.RestExceptionHandler.handleErroNegocio:50 - Erro de negócio (ERRO_PROCESSO): Apenas processos 'EM ANDAMENTO' podem ser finalizados.
+[FRONTEND] 9:54:41 AM [vite] (client) hmr update /src/views/Processo.vue
