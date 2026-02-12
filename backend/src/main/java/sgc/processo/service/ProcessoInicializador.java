@@ -86,11 +86,11 @@ public class ProcessoInicializador {
             unidadesMapas = unidadeMapaRepo.findAllById(codigosUnidades);
         }
 
-        // Buscar SEDOC como unidade de origem para as movimentações iniciais
-        Unidade sedoc = repo.buscarPorSigla(Unidade.class, "SEDOC");
+        // Buscar ADMIN como unidade de origem para as movimentações iniciais
+        Unidade admin = repo.buscarPorSigla(Unidade.class, "ADMIN");
 
         // Criar subprocessos
-        criarSubprocessos(processo, tipo, codigosUnidades, unidadesParaProcessar, unidadesMapas, sedoc, usuario);
+        criarSubprocessos(processo, tipo, codigosUnidades, unidadesParaProcessar, unidadesMapas, admin, usuario);
 
         // Atualizar situação e salvar
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -133,25 +133,25 @@ public class ProcessoInicializador {
 
     private void criarSubprocessos(Processo processo, TipoProcesso tipo,
                                    List<Long> codigosUnidades, Set<Unidade> unidadesParaProcessar,
-                                   List<UnidadeMapa> unidadesMapas, Unidade sedoc, Usuario usuario) {
+                                   List<UnidadeMapa> unidadesMapas, Unidade admin, Usuario usuario) {
 
         Map<Long, UnidadeMapa> mapaUnidadeMapa = unidadesMapas.stream()
                 .collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigo, m -> m));
 
         switch (tipo) {
-          case TipoProcesso.MAPEAMENTO -> subprocessoFacade.criarParaMapeamento(processo, unidadesParaProcessar, sedoc, usuario);
+          case TipoProcesso.MAPEAMENTO -> subprocessoFacade.criarParaMapeamento(processo, unidadesParaProcessar, admin, usuario);
           case TipoProcesso.REVISAO -> {
               for (Long codUnidade : codigosUnidades) {
                   Unidade unidade = repo.buscar(Unidade.class, codUnidade);
                   UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
-                  subprocessoFacade.criarParaRevisao(processo, unidade, um, sedoc, usuario);
+                  subprocessoFacade.criarParaRevisao(processo, unidade, um, admin, usuario);
               }
           }
           default -> {
               // Caso DIAGNOSTICO
               for (Unidade unidade : unidadesParaProcessar) {
                   UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
-                  subprocessoFacade.criarParaDiagnostico(processo, unidade, um, sedoc, usuario);
+                  subprocessoFacade.criarParaDiagnostico(processo, unidade, um, admin, usuario);
               }
           }
         }

@@ -175,7 +175,7 @@ public class ProcessoFacade {
         String descricao = "Lembrete: Prazo do processo %s encerra em %s"
                 .formatted(processo.getDescricao(), dataLimite);
 
-        alertaService.criarAlertaSedoc(processo, unidade, descricao);
+        alertaService.criarAlertaAdmin(processo, unidade, descricao);
     }
 
     public List<Long> listarUnidadesBloqueadasPorTipo(String tipo) {

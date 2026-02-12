@@ -53,9 +53,9 @@ FROM SGC.PARAMETRO;
 -- -------------------------------------------------------------------------------------------------
 -- VW_UNIDADE - simulada como tabela no H2
 -- -------------------------------------------------------------------------------------------------
--- Unidade RAIZ (id=1) - não é uma unidade real, serve como raiz da hierarquia para ADMIN
+-- Unidade ADMIN (id=1) - não é uma unidade real, serve como raiz da hierarquia
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('1', 'RAIZ', 'RAIZ', 'INTERMEDIARIA', 'ATIVA', NULL, NULL, NULL, NULL);
+VALUES ('1', 'ADMIN', 'ADMIN', 'INTERMEDIARIA', 'ATIVA', NULL, NULL, NULL, NULL);
 
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
 VALUES ('2', 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', 'ATIVA', 1, '777', '00000777', CURRENT_TIMESTAMP);

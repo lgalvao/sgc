@@ -26,13 +26,13 @@ public interface MovimentacaoMapper {
     MovimentacaoDto toDto(Movimentacao movimentacao);
 
     /**
-     * Mapeia sigla da unidade, substituindo RAIZ (id=1) por "SEDOC" para o usuário.
-     * A unidade RAIZ é interna/técnica e nunca deve aparecer na UI.
+     * Mapeia sigla da unidade, substituindo ADMIN (id=1) por "ADMIN" para o usuário.
+     * A unidade ADMIN é interna/técnica.
      * 
      * @param unidade a unidade a mapear (garantida não nula pelo MapStruct)
-     * @return a sigla para exibição ao usuário ("SEDOC" se for RAIZ, senão a sigla original)
+     * @return a sigla para exibição ao usuário ("ADMIN" se for a unidade raiz, senão a sigla original)
      */
     default String mapUnidadeSiglaParaUsuario(Unidade unidade) {
-        return Objects.equals(unidade.getCodigo(), 1L) ? "SEDOC" : unidade.getSigla();
+        return Objects.equals(unidade.getCodigo(), 1L) ? "ADMIN" : unidade.getSigla();
     }
 }

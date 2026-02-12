@@ -74,7 +74,7 @@ public class TestLoginHelper {
     }
 
     /**
-     * Login como ADMIN na unidade SEDOC (código 1 - raiz da hierarquia).
+     * Login como ADMIN na unidade ADMIN (código 1 - raiz da hierarquia).
      */
     public String loginAdmin(MockMvc mockMvc, String titulo) throws Exception {
         return login(mockMvc, titulo, Perfil.ADMIN, 1L);

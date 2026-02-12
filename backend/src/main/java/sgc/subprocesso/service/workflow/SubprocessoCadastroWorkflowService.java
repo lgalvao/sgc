@@ -36,7 +36,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Slf4j
 @RequiredArgsConstructor
 public class SubprocessoCadastroWorkflowService {
-    private static final String SIGLA_SEDOC = "SEDOC";
+    private static final String SIGLA_ADMIN = "ADMIN";
 
     private final SubprocessoRepo subprocessoRepo;
     private final SubprocessoCrudService crudService;
@@ -72,7 +72,7 @@ public class SubprocessoCadastroWorkflowService {
         validacaoService.validarSituacaoMinima(sp, situacaoMinima,
             "Subprocesso ainda está em fase de " + (isRevisao ? "revisão" : "cadastro") + ".");
 
-        Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
+        Unidade admin = unidadeService.buscarEntidadePorSigla(SIGLA_ADMIN);
         Usuario usuario = usuarioServiceFacade.obterUsuarioAutenticadoOuNull();
 
         sp.setSituacao(novaSituacao);
@@ -82,7 +82,7 @@ public class SubprocessoCadastroWorkflowService {
         transicaoService.registrar(RegistrarTransicaoCommand.builder()
                 .sp(sp)
                 .tipo(tipoTransicao)
-                .origem(sedoc)
+                .origem(admin)
                 .destino(sp.getUnidade())
                 .usuario(usuario)
                 .observacoes(justificativa)
@@ -230,15 +230,15 @@ public class SubprocessoCadastroWorkflowService {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, HOMOLOGAR_CADASTRO, sp);
 
-        Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
+        Unidade admin = unidadeService.buscarEntidadePorSigla(SIGLA_ADMIN);
         sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocessoRepo.save(sp);
 
         transicaoService.registrar(RegistrarTransicaoCommand.builder()
                 .sp(sp)
                 .tipo(TipoTransicao.CADASTRO_HOMOLOGADO)
-                .origem(sedoc)
-                .destino(sedoc)
+                .origem(admin)
+                .destino(admin)
                 .usuario(usuario)
                 .observacoes(observacoes)
                 .build());
@@ -307,14 +307,14 @@ public class SubprocessoCadastroWorkflowService {
 
         var impactos = impactoMapaService.verificarImpactos(sp, usuario);
         if (impactos.temImpactos()) {
-            Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
+            Unidade admin = unidadeService.buscarEntidadePorSigla(SIGLA_ADMIN);
             sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
             subprocessoRepo.save(sp);
             transicaoService.registrar(RegistrarTransicaoCommand.builder()
                     .sp(sp)
                     .tipo(TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA)
-                    .origem(sedoc)
-                    .destino(sedoc)
+                    .origem(admin)
+                    .destino(admin)
                     .usuario(usuario)
                     .observacoes(observacoes)
                     .build());

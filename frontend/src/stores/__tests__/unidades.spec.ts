@@ -6,8 +6,8 @@ import {useUnidadesStore} from "../unidades";
 
 const mockUnidades: Unidade[] = [
     {
-        sigla: "SEDOC",
-        nome: "Seção de Desenvolvimento Organizacional e Capacitação",
+        sigla: "ADMIN",
+        nome: "Administração",
         tipo: "INTEROPERACIONAL",
         usuarioCodigo: 7,
         responsavel: null,

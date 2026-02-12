@@ -117,14 +117,14 @@ class ProcessoInicializadorTest {
         when(repo.buscar(Processo.class, 1L)).thenReturn(p);
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of());
 
-        Unidade sedoc = criarUnidade(999L, "SEDOC");
-        when(repo.buscarPorSigla(Unidade.class, "SEDOC")).thenReturn(sedoc);
+        Unidade admin = criarUnidade(999L, "ADMIN");
+        when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
 
         Usuario usuario = new Usuario();
         List<String> erros = inicializador.iniciar(1L, null, usuario);
 
         assertThat(erros).isEmpty();
-        verify(subprocessoFacade).criarParaMapeamento(eq(p), any(), eq(sedoc), eq(usuario));
+        verify(subprocessoFacade).criarParaMapeamento(eq(p), any(), eq(admin), eq(usuario));
         verify(publicadorEventos).publishEvent(any(Object.class));
         assertThat(p.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
     }
@@ -184,14 +184,14 @@ class ProcessoInicializadorTest {
         Unidade u = criarUnidade(1L, "U1");
         when(repo.buscar(Unidade.class, 1L)).thenReturn(u);
 
-        Unidade sedoc = criarUnidade(999L, "SEDOC");
-        when(repo.buscarPorSigla(Unidade.class, "SEDOC")).thenReturn(sedoc);
+        Unidade admin = criarUnidade(999L, "ADMIN");
+        when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
 
         Usuario usuario = new Usuario();
         List<String> erros = inicializador.iniciar(1L, List.of(1L), usuario);
 
         assertThat(erros).isEmpty();
-        verify(subprocessoFacade).criarParaRevisao(eq(p), any(), any(), eq(sedoc), eq(usuario));
+        verify(subprocessoFacade).criarParaRevisao(eq(p), any(), any(), eq(admin), eq(usuario));
     }
 
     @Test
@@ -211,13 +211,13 @@ class ProcessoInicializadorTest {
         when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of(um));
         when(unidadeRepo.findAllById(anyList())).thenReturn(List.of(u));
 
-        Unidade sedoc = criarUnidade(999L, "SEDOC");
-        when(repo.buscarPorSigla(Unidade.class, "SEDOC")).thenReturn(sedoc);
+        Unidade admin = criarUnidade(999L, "ADMIN");
+        when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
 
         Usuario usuario = new Usuario();
         List<String> erros = inicializador.iniciar(1L, null, usuario);
 
         assertThat(erros).isEmpty();
-        verify(subprocessoFacade).criarParaDiagnostico(eq(p), any(), any(), eq(sedoc), eq(usuario));
+        verify(subprocessoFacade).criarParaDiagnostico(eq(p), any(), any(), eq(admin), eq(usuario));
     }
 }

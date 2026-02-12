@@ -50,7 +50,7 @@ class MovimentacaoMapperTest {
         assertThat(dto.codigo()).isEqualTo(10L);
         assertThat(dto.descricao()).isEqualTo("Movimentacao Teste");
         assertThat(dto.unidadeOrigemCodigo()).isEqualTo(1L);
-        assertThat(dto.unidadeOrigemSigla()).isEqualTo("SEDOC");
+        assertThat(dto.unidadeOrigemSigla()).isEqualTo("ADMIN");
         assertThat(dto.unidadeOrigemNome()).isEqualTo("Origem");
         assertThat(dto.unidadeDestinoCodigo()).isEqualTo(2L);
         assertThat(dto.unidadeDestinoSigla()).isEqualTo("DES");

@@ -250,7 +250,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         Unidade sedoc = new Unidade();
 
         when(crudService.buscarSubprocesso(id)).thenReturn(sp);
-        when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(sedoc);
+        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(sedoc);
 
         service.homologarCadastro(id, user, "obs");
 
@@ -359,7 +359,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         when(crudService.buscarSubprocesso(id)).thenReturn(sp);
         when(impactoMapaService.verificarImpactos(any(Subprocesso.class), eq(user))).thenReturn(impactoDto);
-        when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
+        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(new Unidade());
 
         service.homologarRevisaoCadastro(id, user, "obs");
 
@@ -491,7 +491,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(new Unidade());
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
-        when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
+        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(new Unidade());
         when(usuarioServiceFacade.obterUsuarioAutenticadoOuNull()).thenReturn(new Usuario());
 
         service.reabrirCadastro(codigo, "Justificativa");
@@ -512,7 +512,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(new Unidade());
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
-        when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
+        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(new Unidade());
         when(usuarioServiceFacade.obterUsuarioAutenticadoOuNull()).thenReturn(new Usuario());
 
         service.reabrirRevisaoCadastro(codigo, "Justificativa");
@@ -545,7 +545,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(unidadeNivel1);
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
-        when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
+        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(new Unidade());
         when(usuarioServiceFacade.obterUsuarioAutenticadoOuNull()).thenReturn(new Usuario());
 
         service.reabrirCadastro(codigo, "Justificativa");
@@ -570,7 +570,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(unidadeSemSuperior);
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
-        when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
+        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(new Unidade());
         when(usuarioServiceFacade.obterUsuarioAutenticadoOuNull()).thenReturn(new Usuario());
 
         service.reabrirCadastro(codigo, "Justificativa");
@@ -603,7 +603,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(unidadeNivel1);
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
-        when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
+        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(new Unidade());
         when(usuarioServiceFacade.obterUsuarioAutenticadoOuNull()).thenReturn(new Usuario());
 
         service.reabrirRevisaoCadastro(codigo, "Justificativa");
@@ -628,7 +628,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         sp.setUnidade(unidadeSemSuperior);
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
-        when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
+        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(new Unidade());
         when(usuarioServiceFacade.obterUsuarioAutenticadoOuNull()).thenReturn(new Usuario());
 
         service.reabrirRevisaoCadastro(codigo, "Justificativa");

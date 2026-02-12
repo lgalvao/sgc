@@ -45,7 +45,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @RequiredArgsConstructor
 public class SubprocessoMapaWorkflowService {
 
-    private static final String SIGLA_SEDOC = "SEDOC";
+    private static final String SIGLA_ADMIN = "ADMIN";
 
     private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_DISPONIBILIZADO = new EnumMap<>(Map.of(
             TipoProcesso.MAPEAMENTO, MAPEAMENTO_MAPA_DISPONIBILIZADO,
@@ -190,12 +190,12 @@ public class SubprocessoMapaWorkflowService {
         sp.setDataFimEtapa1(LocalDateTime.now());
         subprocessoRepo.save(sp);
 
-        Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
+        Unidade admin = unidadeService.buscarEntidadePorSigla(SIGLA_ADMIN);
 
         transicaoService.registrar(RegistrarTransicaoCommand.builder()
                 .sp(sp)
                 .tipo(TipoTransicao.MAPA_DISPONIBILIZADO)
-                .origem(sedoc)
+                .origem(admin)
                 .destino(sp.getUnidade())
                 .usuario(usuario)
                 .observacoes(request.observacoes())
@@ -369,12 +369,12 @@ public class SubprocessoMapaWorkflowService {
         sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
         subprocessoRepo.save(sp);
 
-        Unidade sedoc = unidadeService.buscarEntidadePorSigla(SIGLA_SEDOC);
+        Unidade admin = unidadeService.buscarEntidadePorSigla(SIGLA_ADMIN);
         transicaoService.registrar(RegistrarTransicaoCommand.builder()
                 .sp(sp)
                 .tipo(TipoTransicao.MAPA_HOMOLOGADO)
-                .origem(sedoc)
-                .destino(sedoc)
+                .origem(admin)
+                .destino(admin)
                 .usuario(usuario)
                 .build());
     }

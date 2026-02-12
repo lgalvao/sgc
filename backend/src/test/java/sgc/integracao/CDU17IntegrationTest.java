@@ -54,7 +54,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CDU17IntegrationTest extends BaseIntegrationTest {
     private static final String API_URL = "/api/subprocessos/{codigo}/disponibilizar-mapa";
     private static final String OBS_LITERAL = "Obs";
-    private static final String SEDOC_LITERAL = "SEDOC";
+    private static final String ADMIN_LITERAL = "ADMIN";
 
     @Autowired
     private CompetenciaRepo competenciaRepo;
@@ -73,12 +73,12 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Use existing SEDOC from data.sql (ID 15) instead of creating a duplicate with ID 100.
-        // Creating a duplicate 'SEDOC' causes NonUniqueResultException in services looking up by sigla.
-
-        // Ensure Admin user has profile in SEDOC (ID 15)
+        // Use existing ADMIN from data.sql (ID 1) instead of creating a duplicate with ID 100.
+        // Creating a duplicate 'ADMIN' causes NonUniqueResultException in services looking up by sigla.
+ 
+        // Ensure Admin user has profile in ADMIN (ID 1)
         jdbcTemplate.update("MERGE INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) KEY(usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                "111111111111", 15, "ADMIN");
+                "111111111111", 1, "ADMIN");
 
         // Criar Unidade via Fixture
         unidade = UnidadeFixture.unidadePadrao();
@@ -177,7 +177,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                             subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(1);
             Movimentacao mov = movimentacoes.getFirst();
-            assertThat(mov.getUnidadeOrigem().getSigla()).isEqualTo(SEDOC_LITERAL);
+            assertThat(mov.getUnidadeOrigem().getSigla()).isEqualTo(ADMIN_LITERAL);
             assertThat(mov.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
             assertThat(mov.getDescricao())
                     .isEqualTo("Disponibilização do mapa de competências para validação");

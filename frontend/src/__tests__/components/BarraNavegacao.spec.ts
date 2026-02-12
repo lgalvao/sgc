@@ -156,12 +156,12 @@ describe('BarraNavegacao.vue', () => {
         mockRoute.params = { codUnidade: '1' };
         const wrapper = mountComponent({
              perfil: { perfilSelecionado: Perfil.ADMIN },
-             unidades: { unidade: { codigo: 1, sigla: 'SEDOC' } }
+             unidades: { unidade: { codigo: 1, sigla: 'ADMIN' } }
         });
         const items = wrapper.findAllComponents(BBreadcrumbItemStub);
-        // Home -> SEDOC -> Unidades
+        // Home -> ADMIN -> Unidades
         expect(items.length).toBe(3);
-        expect(items[1].text()).toBe('SEDOC');
+        expect(items[1].text()).toBe('ADMIN');
         expect(items[2].text()).toBe('Unidades');
     });
 

@@ -40,8 +40,8 @@ class UsuarioMapperTest {
     }
 
     @Test
-    @DisplayName("Deve mapear unidade RAIZ (1) para SEDOC")
-    void deveMapearRaizParaSedoc() {
+    @DisplayName("Deve mapear unidade RAIZ (1) para ADMIN")
+    void deveMapearRaizParaAdmin() {
         // Arrange
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -55,8 +55,8 @@ class UsuarioMapperTest {
         // Assert
         assertThat(dto).isNotNull();
         assertThat(dto.getCodigo()).isEqualTo(1L);
-        assertThat(dto.getNome()).isEqualTo("Secretaria de Documentação");
-        assertThat(dto.getSigla()).isEqualTo("SEDOC");
+        assertThat(dto.getNome()).isEqualTo("Administração");
+        assertThat(dto.getSigla()).isEqualTo("ADMIN");
     }
 
     @Test

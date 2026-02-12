@@ -20,7 +20,7 @@
 -- ================================================================================
 -- Hierarquia de Unidades para Testes
 --
--- SEDOC (1)
+-- ADMIN (1)
 --   ├── SECRETARIA_1 (2)
 --   │   ├── ASSESSORIA_11 (3)
 --   │   ├── ASSESSORIA_12 (4)
@@ -40,7 +40,7 @@
 --           └── SECAO_221 (18)
 
 INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES (1, 'Seção de Desenvolvimento e Capacitação', 'SEDOC', 'INTEROPERACIONAL', 'ATIVA', NULL, '111111', '00111111', CURRENT_TIMESTAMP);
+VALUES (1, 'Administração', 'ADMIN', 'RAIZ', 'ATIVA', NULL, '111111', '00111111', CURRENT_TIMESTAMP);
 
 INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
 VALUES (2, 'Secretaria 1', 'SECRETARIA_1', 'INTEROPERACIONAL', 'ATIVA', 1, '202020', '00202020', CURRENT_TIMESTAMP);
@@ -104,7 +104,7 @@ VALUES ('111111111111', '11111111', 'Admin Teste V2', 'admin.teste.v2@tre-pe.jus
 
 -- Outros administradores
 INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
-VALUES ('111111', '00111111', 'ADMIN_SEDOC_E_CHEFE_SEDOC', 'admin_sedoc_e_chefe_sedoc@tre-pe.jus.br', '2001', 1, 1);
+VALUES ('111111', '00111111', 'ADMIN_E_CHEFE_SEDOC', 'admin_e_chefe_sedoc@tre-pe.jus.br', '2001', 1, 1);
 
 INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
 VALUES ('191919', '00191919', 'ADMIN_1_PERFIL', 'admin_unico@tre-pe.jus.br', '2002', 1, 1);

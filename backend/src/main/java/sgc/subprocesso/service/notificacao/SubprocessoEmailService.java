@@ -43,7 +43,7 @@ public class SubprocessoEmailService {
      */
     private String obterSiglaParaUsuario(Unidade unidade) {
         if (Objects.equals(unidade.getCodigo(), 1L)) {
-            return "SEDOC"; // Usuário vê SEDOC em vez de RAIZ/ADMIN
+            return "ADMIN"; // Usuário vê ADMIN em vez de RAIZ
         }
         return unidade.getSigla();
     }

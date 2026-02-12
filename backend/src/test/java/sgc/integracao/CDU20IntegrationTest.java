@@ -253,8 +253,8 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         assertThat(movimentacoes).hasSize(1); // Apenas a movimentação de homologação
         assertThat(movimentacoes.getFirst().getDescricao())
                 .isEqualTo("Mapa de competências homologado");
-        assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("SEDOC");
-        assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
+        assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("ADMIN");
+        assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo("ADMIN");
 
         // Homologação não gera alerta (por design)
         List<Alerta> alertas =

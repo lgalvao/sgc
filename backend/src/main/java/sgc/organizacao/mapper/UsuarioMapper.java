@@ -38,12 +38,12 @@ public interface UsuarioMapper {
 
     default String mapUnidadeSiglaParaUsuario(@Nullable Unidade unidade) {
         if (unidade == null) return null;
-        return Long.valueOf(1L).equals(unidade.getCodigo()) ? "SEDOC" : unidade.getSigla();
+        return Long.valueOf(1L).equals(unidade.getCodigo()) ? "ADMIN" : unidade.getSigla();
     }
 
     default String mapUnidadeNomeParaUsuario(@Nullable Unidade unidade) {
         if (unidade == null) return null;
-        return Long.valueOf(1L).equals(unidade.getCodigo()) ? "Secretaria de Documentação" : unidade.getNome();
+        return Long.valueOf(1L).equals(unidade.getCodigo()) ? "Administração" : unidade.getNome();
     }
 
     /**

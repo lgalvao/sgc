@@ -50,7 +50,7 @@ class UnidadeHierarquiaServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Hierarquia: SEDOC -> COORD_11 -> ASSESSORIA_11
+        // Hierarquia: ADMIN -> COORD_11 -> ASSESSORIA_11
         unidadeRaiz = UnidadeTestBuilder.raiz().build();
         unidadeRaiz.setCodigo(1L);
 
@@ -77,7 +77,7 @@ class UnidadeHierarquiaServiceTest {
                     unidadeRaiz, unidadeIntermediaria, unidadeOperacional
             ));
             
-            UnidadeDto dtoRaiz = criarDtoComSubunidades(1L, "SEDOC");
+            UnidadeDto dtoRaiz = criarDtoComSubunidades(1L, "ADMIN");
             UnidadeDto dtoInter = criarDtoComSubunidades(2L, "COORD_11");
             UnidadeDto dtoOper = criarDtoComSubunidades(3L, "ASSESSORIA_11");
             
@@ -122,7 +122,7 @@ class UnidadeHierarquiaServiceTest {
                     unidadeRaiz, raiz2
             ));
             
-            UnidadeDto dto1 = criarDtoComSubunidades(1L, "SEDOC");
+            UnidadeDto dto1 = criarDtoComSubunidades(1L, "ADMIN");
             UnidadeDto dto2 = criarDtoComSubunidades(10L, "RAIZ2");
             
             when(usuarioMapper.toUnidadeDto(unidadeRaiz, true)).thenReturn(dto1);
@@ -152,7 +152,7 @@ class UnidadeHierarquiaServiceTest {
                     u.getCodigo().equals(1L);
 
             when(usuarioMapper.toUnidadeDto(unidadeRaiz, true))
-                    .thenReturn(criarDtoComSubunidades(1L, "SEDOC"));
+                    .thenReturn(criarDtoComSubunidades(1L, "ADMIN"));
             when(usuarioMapper.toUnidadeDto(unidadeIntermediaria, false))
                     .thenReturn(criarDtoComSubunidades(2L, "COORD_11"));
 
@@ -174,7 +174,7 @@ class UnidadeHierarquiaServiceTest {
             Predicate<Unidade> todasElegiveis = u -> true;
 
             when(usuarioMapper.toUnidadeDto(unidadeRaiz, true))
-                    .thenReturn(criarDtoComSubunidades(1L, "SEDOC"));
+                    .thenReturn(criarDtoComSubunidades(1L, "ADMIN"));
 
             // Act
             List<UnidadeDto> resultado = service.buscarArvoreComElegibilidade(todasElegiveis);
@@ -192,7 +192,7 @@ class UnidadeHierarquiaServiceTest {
             Predicate<Unidade> nenhumaElegivel = u -> false;
 
             when(usuarioMapper.toUnidadeDto(unidadeRaiz, false))
-                    .thenReturn(criarDtoComSubunidades(1L, "SEDOC"));
+                    .thenReturn(criarDtoComSubunidades(1L, "ADMIN"));
 
             // Act
             List<UnidadeDto> resultado = service.buscarArvoreComElegibilidade(nenhumaElegivel);
@@ -358,7 +358,7 @@ class UnidadeHierarquiaServiceTest {
                     unidadeRaiz, unidadeIntermediaria, unidadeOperacional
             ));
 
-            UnidadeDto dtoRaiz = criarDtoComSubunidades(1L, "SEDOC");
+            UnidadeDto dtoRaiz = criarDtoComSubunidades(1L, "ADMIN");
             UnidadeDto dtoInter = criarDtoComSubunidades(2L, "COORD_11");
             UnidadeDto dtoOper = criarDtoComSubunidades(3L, "ASSESSORIA_11");
 
@@ -380,7 +380,7 @@ class UnidadeHierarquiaServiceTest {
             // Arrange
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz));
 
-            UnidadeDto dto = criarDtoComSubunidades(1L, "SEDOC");
+            UnidadeDto dto = criarDtoComSubunidades(1L, "ADMIN");
             when(usuarioMapper.toUnidadeDto(any(), anyBoolean())).thenReturn(dto);
 
             when(repo.buscar(Unidade.class, 999L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 999L));
@@ -400,7 +400,7 @@ class UnidadeHierarquiaServiceTest {
                     unidadeRaiz, unidadeIntermediaria, unidadeOperacional
             ));
 
-            UnidadeDto dtoRaiz = criarDtoComSubunidades(1L, "SEDOC");
+            UnidadeDto dtoRaiz = criarDtoComSubunidades(1L, "ADMIN");
             UnidadeDto dtoInter = criarDtoComSubunidades(2L, "COORD_11");
             UnidadeDto dtoOper = criarDtoComSubunidades(3L, "ASSESSORIA_11");
 
@@ -433,7 +433,7 @@ class UnidadeHierarquiaServiceTest {
             UnidadeDto dtoOper = criarDtoComSubunidades(3L, "ASSESSORIA_11");
             UnidadeDto dtoInter = criarDtoComSubunidades(2L, "COORD_11");
             dtoInter.setSubunidades(List.of(dtoOper));
-            UnidadeDto dtoRaiz = criarDtoComSubunidades(1L, "SEDOC");
+            UnidadeDto dtoRaiz = criarDtoComSubunidades(1L, "ADMIN");
             dtoRaiz.setSubunidades(List.of(dtoInter));
 
             when(usuarioMapper.toUnidadeDto(unidadeRaiz, true)).thenReturn(dtoRaiz);
@@ -441,10 +441,10 @@ class UnidadeHierarquiaServiceTest {
             when(usuarioMapper.toUnidadeDto(unidadeOperacional, true)).thenReturn(dtoOper);
 
             // Act
-            List<String> resultado = service.buscarSiglasSubordinadas("SEDOC");
+            List<String> resultado = service.buscarSiglasSubordinadas("ADMIN");
 
             // Assert
-            assertThat(resultado).containsExactly("SEDOC", "COORD_11", "ASSESSORIA_11");
+            assertThat(resultado).containsExactly("ADMIN", "COORD_11", "ASSESSORIA_11");
         }
 
         @Test
@@ -454,7 +454,7 @@ class UnidadeHierarquiaServiceTest {
             when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz));
 
             when(usuarioMapper.toUnidadeDto(unidadeRaiz, true))
-                    .thenReturn(criarDtoComSubunidades(1L, "SEDOC"));
+                    .thenReturn(criarDtoComSubunidades(1L, "ADMIN"));
 
             when(repo.buscarPorSigla(Unidade.class, "INEXISTENTE"))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "INEXISTENTE"));
@@ -496,7 +496,7 @@ class UnidadeHierarquiaServiceTest {
             UnidadeDto dtoOper = criarDtoComSubunidades(3L, "ASSESSORIA_11");
             UnidadeDto dtoInter = criarDtoComSubunidades(2L, "COORD_11");
             dtoInter.setSubunidades(List.of(dtoOper));
-            UnidadeDto dtoRaiz = criarDtoComSubunidades(1L, "SEDOC");
+            UnidadeDto dtoRaiz = criarDtoComSubunidades(1L, "ADMIN");
             dtoRaiz.setSubunidades(List.of(dtoInter));
 
             when(usuarioMapper.toUnidadeDto(unidadeRaiz, true)).thenReturn(dtoRaiz);
@@ -533,11 +533,11 @@ class UnidadeHierarquiaServiceTest {
         @DisplayName("deve retornar Optional vazio when não há unidade superior")
         void deveRetornarVazioQuandoNaoHaSuperior() {
             // Arrange
-            when(repo.buscarPorSigla(Unidade.class, "SEDOC"))
+            when(repo.buscarPorSigla(Unidade.class, "ADMIN"))
                     .thenReturn(unidadeRaiz);
 
             // Act
-            Optional<String> resultado = service.buscarSiglaSuperior("SEDOC");
+            Optional<String> resultado = service.buscarSiglaSuperior("ADMIN");
 
             // Assert
             assertThat(resultado).isEmpty();

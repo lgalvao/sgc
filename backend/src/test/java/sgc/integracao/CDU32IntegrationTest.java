@@ -62,14 +62,14 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Garantir que SEDOC existe
-        if (unidadeRepo.findBySigla("SEDOC").isEmpty()) {
-            Unidade sedoc = new Unidade();
-            sedoc.setSigla("SEDOC");
-            sedoc.setNome("Secretaria de Documentação");
-            sedoc.setSituacao(SituacaoUnidade.ATIVA);
-            sedoc.setTipo(TipoUnidade.OPERACIONAL);
-            unidadeRepo.save(sedoc);
+        // Garantir que ADMIN existe
+        if (unidadeRepo.findBySigla("ADMIN").isEmpty()) {
+            Unidade admin = new Unidade();
+            admin.setSigla("ADMIN");
+            admin.setNome("Administração");
+            admin.setSituacao(SituacaoUnidade.ATIVA);
+            admin.setTipo(TipoUnidade.RAIZ);
+            unidadeRepo.save(admin);
         }
 
         // Obter Unidade

@@ -425,7 +425,7 @@ class SubprocessoMapaWorkflowServiceTest {
 
             Unidade sedoc = new Unidade();
             sedoc.setCodigo(99L);
-            when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(sedoc);
+            when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(sedoc);
 
             DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder()
                     .dataLimite(LocalDate.now())
@@ -730,7 +730,7 @@ class SubprocessoMapaWorkflowServiceTest {
             Competencia c = new Competencia();
             c.setAtividades(new HashSet<>(List.of(new Atividade())));
             when(mapaManutencaoService.buscarCompetenciasPorCodMapa(20L)).thenReturn(List.of(c));
-            when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
+            when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(new Unidade());
             when(mapaManutencaoService.buscarAtividadesPorMapaCodigo(20L)).thenReturn(List.of());
 
             DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder()
@@ -748,7 +748,7 @@ class SubprocessoMapaWorkflowServiceTest {
         @Test
         void deveHomologarEmBloco() {
             Subprocesso target = mockSubprocesso(10L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-            when(unidadeService.buscarEntidadePorSigla("SEDOC")).thenReturn(new Unidade());
+            when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(new Unidade());
 
             service.homologarValidacaoEmBloco(List.of(10L), new Usuario());
 

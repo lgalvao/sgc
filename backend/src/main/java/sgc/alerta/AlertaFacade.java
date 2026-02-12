@@ -42,13 +42,13 @@ public class AlertaFacade {
     private final AlertaMapper alertaMapper;
     private final UnidadeFacade unidadeService;
     
-    // Lazy supplier para SEDOC - evita cache manual e é thread-safe
+    // Lazy supplier para Unidade Raiz - evita cache manual e é thread-safe
     @Getter(lazy = true)
-    private final Unidade sedoc = unidadeService.buscarEntidadePorId(1L);
+    private final Unidade unidadeRaiz = unidadeService.buscarEntidadePorId(1L);
 
     /**
      * Obtém a sigla da unidade para exibição ao usuário.
-     * A unidade RAIZ (id=1, sigla='ADMIN') é substituída por "SEDOC" para clareza.
+     * A unidade RAIZ (id=1, sigla='ADMIN') é substituída por "ADMIN" para clareza.
      * 
      * @param unidade a unidade
      * @return a sigla para apresentação ao usuário
@@ -56,7 +56,7 @@ public class AlertaFacade {
     private String obterSiglaParaUsuario(Unidade unidade) {
         if (unidade == null) return null;
         if (Long.valueOf(1L).equals(unidade.getCodigo())) {
-            return "SEDOC"; // Usuário vê SEDOC em vez de RAIZ/ADMIN
+            return "ADMIN"; // Usuário vê ADMIN em vez de RAIZ
         }
         return unidade.getSigla();
     }
@@ -77,11 +77,11 @@ public class AlertaFacade {
     }
 
     /**
-     * Cria e persistir alerta com origem SEDOC
+     * Cria e persistir alerta com origem ADMIN (unidade raiz)
      */
     @Transactional
-    public Alerta criarAlertaSedoc(Processo processo, Unidade destino, String descricao) {
-        return criarAlerta(processo, getSedoc(), destino, descricao);
+    public Alerta criarAlertaAdmin(Processo processo, Unidade destino, String descricao) {
+        return criarAlerta(processo, getUnidadeRaiz(), destino, descricao);
     }
 
     /**
@@ -131,12 +131,12 @@ public class AlertaFacade {
 
         // Alertas operacionais
         for (Unidade unidade : unidadesOperacionais) {
-            alertasCriados.add(criarAlertaSedoc(processo, unidade, "Início do processo"));
+            alertasCriados.add(criarAlertaAdmin(processo, unidade, "Início do processo"));
         }
 
         // Alertas intermediários (consolidados)
         for (Unidade unidade : unidadesIntermediarias.values()) {
-            Alerta alerta = criarAlertaSedoc(processo, unidade, "Início do processo em unidades subordinadas");
+            Alerta alerta = criarAlertaAdmin(processo, unidade, "Início do processo em unidades subordinadas");
             alertasCriados.add(alerta);
         }
 
@@ -162,13 +162,13 @@ public class AlertaFacade {
         String desc = "Cadastro devolvido no processo '%s'. Motivo: %s. Realize os ajustes necessários."
                 .formatted(processo.getDescricao(), motivo);
 
-        criarAlerta(processo, getSedoc(), unidadeDestino, desc);
+        criarAlerta(processo, getUnidadeRaiz(), unidadeDestino, desc);
     }
 
     @Transactional
     public void criarAlertaAlteracaoDataLimite(Processo processo, Unidade unidadeDestino, String novaData, int etapa) {
         String desc = "Data limite da etapa %d alterada para %s".formatted(etapa, novaData);
-        criarAlerta(processo, getSedoc(), unidadeDestino, desc);
+        criarAlerta(processo, getUnidadeRaiz(), unidadeDestino, desc);
     }
 
     /**
@@ -261,25 +261,25 @@ public class AlertaFacade {
 
     @Transactional
     public void criarAlertaReaberturaCadastro(Processo processo, Unidade unidade, String justificativa) {
-        String descricao = "Cadastro de atividades reaberto pela SEDOC. Justificativa: %s".formatted(justificativa);
-        criarAlertaSedoc(processo, unidade, descricao);
+        String descricao = "Cadastro de atividades reaberto pela ADMIN. Justificativa: %s".formatted(justificativa);
+        criarAlertaAdmin(processo, unidade, descricao);
     }
 
     @Transactional
     public void criarAlertaReaberturaCadastroSuperior(Processo processo, Unidade superior, Unidade subordinada) {
-        String descricao = "Cadastro da unidade %s reaberto pela SEDOC".formatted(subordinada.getSigla());
-        criarAlertaSedoc(processo, superior, descricao);
+        String descricao = "Cadastro da unidade %s reaberto pela ADMIN".formatted(subordinada.getSigla());
+        criarAlertaAdmin(processo, superior, descricao);
     }
 
     @Transactional
     public void criarAlertaReaberturaRevisao(Processo processo, Unidade unidade, String justificativa) {
-        String descricao = "Revisão de cadastro da unidade %s reaberta pela SEDOC. Justificativa: %s".formatted(unidade.getSigla(), justificativa);
-        criarAlertaSedoc(processo, unidade, descricao);
+        String descricao = "Revisão de cadastro da unidade %s reaberta pela ADMIN. Justificativa: %s".formatted(unidade.getSigla(), justificativa);
+        criarAlertaAdmin(processo, unidade, descricao);
     }
 
     @Transactional
     public void criarAlertaReaberturaRevisaoSuperior(Processo processo, Unidade superior, Unidade subordinada) {
-        String descricao = "Revisão de cadastro da unidade %s reaberta pela SEDOC".formatted(subordinada.getSigla());
-        criarAlertaSedoc(processo, superior, descricao);
+        String descricao = "Revisão de cadastro da unidade %s reaberta pela ADMIN".formatted(subordinada.getSigla());
+        criarAlertaAdmin(processo, superior, descricao);
     }
 }

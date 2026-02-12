@@ -70,14 +70,14 @@ class UnidadeConsultaServiceTest {
         void deveRetornarUnidadeQuandoEncontradaPorSigla() {
             // Arrange
             Unidade unidade = UnidadeTestBuilder.raiz().build();
-            when(repo.buscarPorSigla(Unidade.class, "SEDOC")).thenReturn(unidade);
+            when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(unidade);
 
             // Act
-            Unidade resultado = service.buscarPorSigla("SEDOC");
+            Unidade resultado = service.buscarPorSigla("ADMIN");
 
             // Assert
             assertThat(resultado).isNotNull();
-            assertThat(resultado.getSigla()).isEqualTo("SEDOC");
+            assertThat(resultado.getSigla()).isEqualTo("ADMIN");
         }
     }
 
@@ -149,13 +149,13 @@ class UnidadeConsultaServiceTest {
         void deveRetornarListaDeSiglas() {
             // Arrange
             when(unidadeRepo.findSiglasByCodigos(List.of(1L, 2L)))
-                    .thenReturn(List.of("SEDOC", "COORD_11"));
+                    .thenReturn(List.of("ADMIN", "COORD_11"));
 
             // Act
             List<String> resultado = service.buscarSiglasPorIds(List.of(1L, 2L));
 
             // Assert
-            assertThat(resultado).containsExactly("SEDOC", "COORD_11");
+            assertThat(resultado).containsExactly("ADMIN", "COORD_11");
         }
 
         @Test

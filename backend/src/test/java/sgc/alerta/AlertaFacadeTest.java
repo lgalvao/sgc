@@ -55,11 +55,11 @@ class AlertaFacadeTest {
     @InjectMocks
     private AlertaFacade service;
 
-    private void criarSedocMock() {
-        Unidade sedoc = new Unidade();
-        sedoc.setCodigo(1L);
-        sedoc.setSigla("SEDOC");
-        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(sedoc);
+    private void criarUnidadeRaizMock() {
+        Unidade unidadeRaiz = new Unidade();
+        unidadeRaiz.setCodigo(1L);
+        unidadeRaiz.setSigla("ADMIN");
+        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidadeRaiz);
     }
 
     @Nested
@@ -69,7 +69,7 @@ class AlertaFacadeTest {
         @DisplayName("Deve criar alerta com sucesso")
         void deveCriarAlertaComSucesso() {
             // Given
-            criarSedocMock();
+            criarUnidadeRaizMock();
             Processo p = new Processo();
             Unidade u = new Unidade();
             u.setCodigo(1L);
@@ -79,7 +79,7 @@ class AlertaFacadeTest {
             when(alertaService.salvar(any())).thenReturn(alertaSalvo);
 
             // When
-            Alerta resultado = service.criarAlertaSedoc(p, u, "desc");
+            Alerta resultado = service.criarAlertaAdmin(p, u, "desc");
 
             // Then
             assertThat(resultado).isNotNull();
@@ -94,7 +94,7 @@ class AlertaFacadeTest {
         @DisplayName("Deve criar alerta operacional com texto fixo")
         void deveCriarAlertaOperacional() {
             // Given
-            criarSedocMock();
+            criarUnidadeRaizMock();
             Processo p = new Processo();
             p.setDescricao("Proc");
             Unidade u = new Unidade();
@@ -114,7 +114,7 @@ class AlertaFacadeTest {
         @DisplayName("Deve criar alerta para unidade participante e seus ancestrais")
         void deveCriarAlertaParaAncestrais() {
             // Given
-            criarSedocMock();
+            criarUnidadeRaizMock();
             Processo p = new Processo();
 
             Unidade root = Unidade.builder().nome("Root").tipo(TipoUnidade.INTEROPERACIONAL).build();
@@ -143,7 +143,7 @@ class AlertaFacadeTest {
         @DisplayName("Deve criar 2 alertas para interoperacional participante")
         void deveCriarDoisAlertasInteroperacional() {
             // Given
-            criarSedocMock();
+            criarUnidadeRaizMock();
             Processo p = new Processo();
             Unidade u = Unidade.builder().tipo(TipoUnidade.INTEROPERACIONAL).build();
             u.setCodigo(1L);
@@ -185,7 +185,7 @@ class AlertaFacadeTest {
         @DisplayName("Deve criar alerta de cadastro devolvido com sucesso")
         void deveCriarAlertaCadastroDevolvido() {
             // Given
-            criarSedocMock();
+            criarUnidadeRaizMock();
             Processo p = new Processo();
             p.setDescricao("P");
             Unidade uDestino = new Unidade();
@@ -225,7 +225,7 @@ class AlertaFacadeTest {
         @Test
         @DisplayName("Deve criar alerta de alteração de data limite")
         void deveCriarAlertaAlteracaoDataLimite() {
-            criarSedocMock();
+            criarUnidadeRaizMock();
             Processo p = new Processo();
             Unidade uDestino = new Unidade();
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
@@ -237,7 +237,7 @@ class AlertaFacadeTest {
         @Test
         @DisplayName("Deve criar alertas de reabertura")
         void deveCriarAlertasDeReabertura() {
-            criarSedocMock();
+            criarUnidadeRaizMock();
             Processo p = new Processo();
             Unidade u = new Unidade();
             u.setSigla("U1");
@@ -489,24 +489,24 @@ class AlertaFacadeTest {
     }
 
     @Nested
-    @DisplayName("Método: getSedoc (Lazy Load)")
-    class GetSedoc {
+    @DisplayName("Método: getUnidadeRaiz (Lazy Load)")
+    class GetUnidadeRaiz {
     @Test
-        @DisplayName("Deve inicializar sedoc apenas na primeira chamada (lazy load)")
-        void deveInicializarSedocLazyLoad() {
-            Unidade sedocMock = new Unidade();
-            sedocMock.setSigla("SEDOC");
-            sedocMock.setCodigo(1L);
+        @DisplayName("Deve inicializar unidadeRaiz apenas na primeira chamada (lazy load)")
+        void deveInicializarUnidadeRaizLazyLoad() {
+            Unidade unidadeRaizMock = new Unidade();
+            unidadeRaizMock.setSigla("ADMIN");
+            unidadeRaizMock.setCodigo(1L);
 
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(sedocMock);
+            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidadeRaizMock);
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
-            // Primeira chamada: deve buscar sedoc
-            service.criarAlertaSedoc(new Processo(), new Unidade(), "Teste");
+            // Primeira chamada: deve buscar unidadeRaiz
+            service.criarAlertaAdmin(new Processo(), new Unidade(), "Teste");
             verify(unidadeService).buscarEntidadePorId(1L);
 
             // Segunda chamada: não deve buscar novamente (cache)
-            service.criarAlertaSedoc(new Processo(), new Unidade(), "Teste 2");
+            service.criarAlertaAdmin(new Processo(), new Unidade(), "Teste 2");
             // No mockito, verify acumula as chamadas, mas como é lazy, a segunda chamada não deve invocar o metodo no service.
             // Então verify(times(1)) deve ser correto para o total.
             verify(unidadeService, times(1)).buscarEntidadePorId(1L);

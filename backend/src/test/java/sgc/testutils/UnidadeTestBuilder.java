@@ -65,13 +65,13 @@ public class UnidadeTestBuilder {
     }
 
     /**
-     * Cria uma Unidade Raiz padrão (SEDOC)
+     * Cria uma Unidade Raiz padrão (ADMIN)
      */
     public static UnidadeTestBuilder raiz() {
         return new UnidadeTestBuilder()
-            .comCodigo("13")
-            .comSigla("SEDOC")
-            .comNome("SEDOC")
+            .comCodigo("1")
+            .comSigla("ADMIN")
+            .comNome("Administração")
             .comTipo(TipoUnidade.RAIZ)
             .comTituloTitular("191919");
     }
@@ -109,7 +109,7 @@ public class UnidadeTestBuilder {
     public Unidade build() {
         Unidade unidade = new Unidade();
         // Try to set numeric id if codigo is numeric; otherwise prefer leaving id null
-        // and rely on sigla to identify the unit in tests that use human codes like "SEDOC".
+        // and rely on sigla to identify the unit in tests that use human codes like "ADMIN".
         if (codigo != null) {
             try {
                 Long codigoLong = Long.parseLong(codigo);

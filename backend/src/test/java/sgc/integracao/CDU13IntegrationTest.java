@@ -244,15 +244,15 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve homologar cadastro, alterar situação e registrar movimentação da SEDOC")
+    @DisplayName("Deve homologar cadastro, alterar situação e registrar movimentação da ADMIN")
     void homologarCadastro_deveFuncionarCorretamente() throws Exception {
         Usuario admin = usuarioRepo.findById("101010101010").orElseThrow();
         admin.setPerfilAtivo(sgc.organizacao.model.Perfil.ADMIN);
         admin.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo()); // Or default admin unit
         admin.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.ADMIN.toGrantedAuthority()));
-
+ 
         HomologarCadastroRequest requestBody = new HomologarCadastroRequest("Homologado via teste.");
-
+ 
         mockMvc.perform(
                         post(
                                 "/api/subprocessos/{id}/homologar-cadastro",
@@ -262,24 +262,24 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk());
-
+ 
         entityManager.flush();
         entityManager.clear();
-
+ 
         Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
         assertThat(subprocessoAtualizado.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-
+ 
         List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
                 subprocesso.getCodigo());
         assertThat(movimentacoes).hasSize(2);
         Movimentacao movimentacaoHomologacao = movimentacoes.getFirst();
-
-        // O sistema (MockAdmin) parece usar uma unidade chamada SEDOC.
-        // Para não quebrar o teste, vamos aceitar SEDOC ou COSIS-TEST
+ 
+        // O sistema (MockAdmin) parece usar uma unidade chamada ADMIN.
+        // Para não quebrar o teste, vamos aceitar ADMIN ou COSIS-TEST
         // (unidadeSuperior).
         String siglaOrigem = movimentacaoHomologacao.getUnidadeOrigem().getSigla();
-        assertThat(siglaOrigem).isIn("SEDOC", unidadeSuperior.getSigla());
+        assertThat(siglaOrigem).isIn("ADMIN", unidadeSuperior.getSigla());
     }
 
     @Test
