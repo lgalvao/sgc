@@ -11,8 +11,6 @@ import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.mapper.ProcessoDetalheMapper;
 import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
 import sgc.processo.model.UnidadeProcesso;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -44,8 +42,8 @@ class ProcessoDetalheBuilderCoverageTest {
         // Arrange
         Processo processo = new Processo();
         processo.setCodigo(1L);
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
+        processo.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
         
         UnidadeProcesso participante = new UnidadeProcesso();
         participante.setUnidadeCodigo(100L);
@@ -62,5 +60,44 @@ class ProcessoDetalheBuilderCoverageTest {
 
         // Assert
         assertThat(dto.getUnidades()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("build deve mapear subprocesso e mapa quando existem")
+    void deveMapearSubprocessoEMapa() {
+        // Arrange
+        Long codProcesso = 1L;
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
+        processo.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+        
+        UnidadeProcesso participante = new UnidadeProcesso();
+        participante.setUnidadeCodigo(100L);
+        processo.setParticipantes(List.of(participante));
+
+        sgc.organizacao.model.Unidade unidade = new sgc.organizacao.model.Unidade();
+        unidade.setCodigo(100L);
+
+        sgc.subprocesso.model.Subprocesso sp = new sgc.subprocesso.model.Subprocesso();
+        sp.setCodigo(500L);
+        sp.setUnidade(unidade);
+        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setMapa(sgc.mapa.model.Mapa.builder().codigo(900L).build());
+
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
+        
+        ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto = new ProcessoDetalheDto.UnidadeParticipanteDto();
+        unidadeDto.setCodUnidade(100L);
+        when(processoDetalheMapper.fromSnapshot(participante)).thenReturn(unidadeDto);
+
+        // Act
+        ProcessoDetalheDto dto = builder.build(processo, new Usuario());
+
+        // Assert
+        assertThat(dto.getUnidades()).hasSize(1);
+        ProcessoDetalheDto.UnidadeParticipanteDto result = dto.getUnidades().get(0);
+        assertThat(result.getCodSubprocesso()).isEqualTo(500L);
+        assertThat(result.getMapaCodigo()).isEqualTo(900L);
     }
 }

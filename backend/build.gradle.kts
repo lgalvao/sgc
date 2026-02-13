@@ -265,7 +265,10 @@ tasks.jacocoTestReport {
                     
                     // Enums simples sem lógica de negócio
                     "sgc/**/Status*.class",
-                    "sgc/**/Tipo*.class"
+                    "sgc/**/Tipo*.class",
+                    
+                    // Classes geradas pelo MapStruct
+                    "sgc/**/*Impl.class"
                 )
             }
         })

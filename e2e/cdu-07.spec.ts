@@ -1,66 +1,57 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, verificarDetalhesSubprocesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 
 test.describe('CDU-07 - Detalhar subprocesso', () => {
-    const UNIDADE_ALVO = 'SECAO_121';
-    const CHEFE_UNIDADE = USUARIOS.CHEFE_SECAO_121.titulo;
-    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_121.senha;
+    const UNIDADE_ALVO = 'SECAO_211';
+    const CHEFE_UNIDADE = USUARIOS.CHEFE_SECAO_211.titulo;
+    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_211.senha;
+    const GESTOR_UNIDADE = USUARIOS.GESTOR_COORD_21.titulo;
+    const SENHA_GESTOR = USUARIOS.GESTOR_COORD_21.senha;
 
-    test('Deve exibir detalhes do subprocesso para CHEFE', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Deve exibir detalhes do subprocesso para ADMIN, GESTOR e CHEFE', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-07 ${timestamp}`;
-
-        // 1. ADMIN cria e inicia processo
-        
 
         await criarProcesso(page, {
             descricao,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_1', 'COORD_12'],
+            expandir: ['SECRETARIA_2', 'COORD_21'],
             iniciar: true
         });
 
-        // Esperar confirmação na tabela antes de sair
         await verificarProcessoNaTabela(page, {
             descricao,
             situacao: 'Em andamento',
             tipo: 'Mapeamento'
         });
-        await page.getByTestId('btn-logout').click();
-
-        // 2. CHEFE loga e acessa subprocesso
-        await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
-
-        // Esperar tabela estabilizar
-        await page.waitForLoadState('networkidle');
-
-        // Navegar para o subprocesso clicando no processo da lista
         await page.getByText(descricao, {exact: true}).click();
-
-        // Verificar URL (deve conter ID e Sigla)
-        await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_121$/);
-
-        // Capturar ID do processo para cleanup
         const processoId = Number.parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
 
-        // 3. Verificar seções da tela
-
-        // Seção Dados da Unidade
         await verificarDetalhesSubprocesso(page, {
-            sigla: 'SECAO_121',
-            situacao: 'Não iniciado', // Ajustado conforme o UI
+            sigla: UNIDADE_ALVO,
+            situacao: 'Não iniciado',
             prazo: '/'
         });
-
-        // Verificar Cards (Elementos do Processo)
-        await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
-
-        // Seção Movimentações
+        await expect(page.locator('[data-testid="card-subprocesso-atividades"], [data-testid="card-subprocesso-atividades-vis"]').first()).toBeVisible();
         await expect(page.getByRole('heading', {name: 'Movimentações'})).toBeVisible();
         await expect(page.locator('table tbody tr')).not.toHaveCount(0);
+
+        await page.getByTestId('btn-logout').click();
+        await login(page, GESTOR_UNIDADE, SENHA_GESTOR);
+        await page.getByText(descricao, {exact: true}).click();
+        await expect(page).toHaveURL(/\/processo\/\d+$/);
+        await expect(page.getByRole('row').filter({has: page.getByRole('cell', {name: UNIDADE_ALVO})})).toBeVisible();
+
+        await page.getByTestId('btn-logout').click();
+        await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
+        await page.getByText(descricao, {exact: true}).click();
+        await expect(page).toHaveURL(new RegExp(`/processo/\\d+/${UNIDADE_ALVO}$`));
+        await expect(page.getByTestId('subprocesso-header__txt-unidade')).toContainText(UNIDADE_ALVO);
     });
 });

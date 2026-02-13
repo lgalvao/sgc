@@ -35,9 +35,6 @@ class RestExceptionHandlerCoverageTest {
     @Test
     @DisplayName("sanitizar deve lidar com texto nulo")
     void deveLidarComTextoNuloNoSanitizar() {
-        // O método sanitizar é privado, mas é chamado via handleErroNegocio
-        // Vamos disparar um ErroNegocio com mensagem nula para cobrir o branch if (texto == null)
-        
         // Arrange
         class ErroTeste extends ErroNegocioBase {
             public ErroTeste() {
