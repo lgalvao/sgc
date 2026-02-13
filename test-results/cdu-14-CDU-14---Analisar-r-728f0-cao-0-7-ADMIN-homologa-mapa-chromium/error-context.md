@@ -1,0 +1,113 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link "Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link "Unidades" [ref=e14] [cursor=pointer]:
+                  - /url: /unidades
+                  - generic [ref=e15]: 
+                  - text: Unidades
+              - listitem [ref=e16]:
+                - link "Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link "Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "ADMIN - ADMIN" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: ADMIN - ADMIN
+              - listitem "Configurações do sistema" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: /configuracoes
+                  - generic [ref=e30]: 
+              - listitem "Sair" [ref=e31]:
+                - link [ref=e32] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e33]: 
+      - generic [ref=e36]:
+        - button "Voltar" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: 
+        - navigation "breadcrumb" [ref=e39]:
+          - list [ref=e40]:
+            - listitem [ref=e41]:
+              - link "Início" [ref=e42] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e43]: 
+                - generic [ref=e44]: Início
+            - listitem [ref=e45]:
+              - text: ›
+              - generic [ref=e46]: Detalhes do processo
+      - main [ref=e47]:
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - generic [ref=e51]:
+              - heading "Mapeamento para CDU-14 1770945616263" [level=2] [ref=e52]
+              - paragraph [ref=e53]:
+                - generic [ref=e54]: Detalhes do processo
+                - generic [ref=e55]:
+                  - generic [ref=e56]:
+                    - strong [ref=e57]: "Tipo:"
+                    - text: Mapeamento
+                  - generic [ref=e58]:
+                    - strong [ref=e59]: "Situação:"
+                    - text: Em andamento
+            - generic [ref=e60]:
+              - button "Aceitar em bloco" [ref=e61] [cursor=pointer]
+              - button "Homologar em bloco" [ref=e62] [cursor=pointer]
+          - generic [ref=e63]:
+            - generic [ref=e64]:
+              - heading "Unidades participantes" [level=4] [ref=e65]
+              - generic [ref=e66]:
+                - button "Expandir todas as linhas" [ref=e67] [cursor=pointer]:
+                  - generic [ref=e68]: 
+                - button "Recolher todas as linhas" [ref=e69] [cursor=pointer]:
+                  - generic [ref=e70]: 
+            - table [ref=e72]:
+              - rowgroup [ref=e77]:
+                - row "Unidade Situação Data Limite" [ref=e78]:
+                  - columnheader "Unidade" [ref=e79]
+                  - columnheader "Situação" [ref=e80]
+                  - columnheader "Data Limite" [ref=e81]
+              - rowgroup [ref=e82]:
+                - row "SECAO_211 - Seção 211 Mapa validado 15/03/2026" [ref=e83] [cursor=pointer]:
+                  - cell "SECAO_211 - Seção 211" [ref=e84]
+                  - cell "Mapa validado" [ref=e85]
+                  - cell "15/03/2026" [ref=e86]
+          - generic [ref=e87]:
+            - generic [ref=e88]:
+              - button "Aceitar em bloco" [ref=e89] [cursor=pointer]:
+                - generic [ref=e90]: 
+                - text: Aceitar em bloco
+              - button "Homologar em bloco" [ref=e91] [cursor=pointer]:
+                - generic [ref=e92]: 
+                - text: Homologar em bloco
+            - button "Finalizar processo" [ref=e93] [cursor=pointer]
+      - contentinfo [ref=e94]:
+        - generic [ref=e95]:
+          - generic [ref=e96]: Versão 1.0.0
+          - generic [ref=e97]: © SESEL/COSIS/TRE-PE
+  - text: 
+```

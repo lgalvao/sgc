@@ -23,7 +23,7 @@ import {
     homologarCadastroMapeamento,
     homologarCadastroRevisaoComImpacto,
 } from './helpers/helpers-analise.js';
-import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 
 test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {
@@ -68,7 +68,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 0.3: GESTOR aceita cadastro', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Preparacao 0.3: GESTOR aceita cadastro', async ({page, autenticadoComoGestorCoord21}) => {
         await acessarSubprocessoGestor(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
@@ -76,12 +76,18 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Preparacao 0.4: ADMIN homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descMapeamento, UNIDADE_ALVO);
+        if (!await page.getByTestId('card-subprocesso-atividades-vis').isVisible().catch(() => false)) {
+            await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        }
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await homologarCadastroMapeamento(page);
     });
 
     test('Preparacao 0.5: ADMIN cria competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descMapeamento, UNIDADE_ALVO);
+        if (!await page.getByTestId('card-subprocesso-mapa').isVisible().catch(() => false)) {
+            await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        }
         await navegarParaMapa(page);
         await criarCompetencia(page, `Competência Map ${timestamp}`, [`Atividade Map 1 ${timestamp}`]);
         await disponibilizarMapa(page, '2030-12-31');
@@ -151,7 +157,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Verificar mensagem de sucesso
-        await expect(page.getByText(/Revisão disponibilizada/i)).toBeVisible();
+        await expect(page.getByText(/Revisão disponibilizada/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
@@ -159,7 +165,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     // CENÁRIOS DE TESTE
     // ========================================================================
 
-    test('Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente)', async ({page, autenticadoComoGestorCoord21}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
 
@@ -169,13 +175,13 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await fecharHistoricoAnalise(page);
     });
 
-    test('Cenario 2: GESTOR verifica botão "Impactos no mapa" está disponível', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 2: GESTOR verifica botão "Impactos no mapa" está disponível', async ({page, autenticadoComoGestorCoord21}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await verificarBotaoImpactoDireto(page);
     });
 
-    test('Cenario 3: GESTOR devolve cadastro para ajustes COM observação', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 3: GESTOR devolve cadastro para ajustes COM observação', async ({page, autenticadoComoGestorCoord21}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await devolverRevisao(page, 'Favor revisar as competências associadas');
@@ -192,18 +198,18 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
-        await expect(page.getByText(/Revisão disponibilizada/i)).toBeVisible();
+        await expect(page.getByText(/Revisão disponibilizada/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
-    test('Cenario 5: GESTOR cancela devolução', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 5: GESTOR cancela devolução', async ({page, autenticadoComoGestorCoord21}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await cancelarDevolucao(page);
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
     });
 
-    test('Cenario 6: GESTOR registra aceite COM observação', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 6: GESTOR registra aceite COM observação', async ({page, autenticadoComoGestorCoord21}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarRevisao(page, 'Revisão aprovada conforme análise');
@@ -224,7 +230,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await verificarPaginaPainel(page);
     });
 
-    test('Cenario 8: GESTOR registra aceite com observação padrão', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 8: GESTOR registra aceite com observação padrão', async ({page, autenticadoComoGestorCoord21}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarRevisao(page);

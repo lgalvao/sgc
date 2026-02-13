@@ -29,8 +29,8 @@ Progresso Atual
 - Validação E2E atualizada:
   - `cdu-25.spec.ts`: 6/6 passed
   - subset `cdu-20 + cdu-25 + cdu-34`: 19/19 passed
-- Revalidação da lista de falhas reportadas (13 cenários) reduziu para 8 falhas ativas:
-  - CDU-11, CDU-12, CDU-13, CDU-14, CDU-15, CDU-16, CDU-17, CDU-18.
-- Evidência recorrente nos erros ativos: `GET /api/subprocessos/buscar` retornando `404 ENTIDADE_NAO_ENCONTRADA` para processo+sigla logo após início de processo.
-- Próximo passo imediato: corrigir causa raiz da busca de subprocesso no backend (processo/unidade) e só então retomar ajustes finos de E2E.
+- Revalidação progressiva com correções de fluxo/fixtures:
+  - O erro 404 em `/api/subprocessos/buscar` deixou de ser dominante após ajuste de isolamento/cleanup dos testes seriais.
+  - Subset em foco (`cdu-11`, `cdu-13`, `cdu-14`) evoluiu para **2 falhas remanescentes** (de 8 iniciais nesse grupo), ambas ligadas a navegação em detalhes de processo quando o card de subprocesso não está visível diretamente.
+- Próximo passo imediato: padronizar helper/navegação ADMIN para sempre resolver subprocesso alvo (tabela de unidades vs detalhe direto) e concluir o fechamento desse trio antes de avançar para `cdu-12/15/16/17/18`.
 - Observação de triagem: parte dos erros manuais pode já estar resolvida ou ser falso positivo; validar cada item contra a base atual (`e2e/setup/seed.sql`) antes de implementar novas correções.

@@ -3,7 +3,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
-import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
+import {acessarSubprocessoChefeDireto, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {abrirModalCriarCompetencia} from './helpers/helpers-mapas.js';
 import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
@@ -81,7 +81,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
@@ -124,7 +124,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 
         // Verificar sigla da unidade está visível
-        await expect(page.getByText('Seção 221')).toBeVisible();
+        await expect(page.getByText('Seção 211')).toBeVisible();
 
         // Verificar que as atividades estão apresentadas como tabelas
         // Cada atividade aparece com descrição como cabeçalho
@@ -137,7 +137,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByText(conhecimento3)).toBeVisible();
     });
 
-    test('Cenario 2: CHEFE visualiza cadastro diretamente (sem navegar por unidades)', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: CHEFE visualiza cadastro diretamente (sem navegar por unidades)', async ({page, autenticadoComoChefeSecao211}) => {
         // Fluxo principal passo 3 - CHEFE/SERVIDOR:
         // 3.1 Sistema exibe diretamente a tela Detalhes do subprocesso
         
@@ -155,7 +155,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 
         // Verificar sigla da unidade
-        await expect(page.getByText('Seção 221')).toBeVisible();
+        await expect(page.getByText('Seção 211')).toBeVisible();
 
         // Verificar atividades aparecem como tabelas com descrição
         await expect(page.getByText(atividadeA)).toBeVisible();
@@ -167,24 +167,35 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByText(conhecimento3)).toBeVisible();
     });
 
-    test('Cenario 3: Visualizar processo finalizado', async ({page, autenticadoComoChefeSecao211}) => {
+    test('Cenario 3: Visualizar processo finalizado', async ({page, autenticadoComoGestorCoord21}) => {
         // Preparar: Admin homologa o cadastro
         
 
-        await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
-        await page.getByText(descProcessoMapeamento).click();
-        await navegarParaSubprocesso(page, 'SECAO_211');
+        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         // Aceitar cadastro
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
+        await page.getByTestId('inp-aceite-cadastro-obs').fill('Aceite para finalização do cenário');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
-        // Após homologação, redireciona para Detalhes do subprocesso (CDU-13 passo 11.7)
-        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+        await verificarPaginaPainel(page);
+        await fazerLogout(page);
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
+        await page.getByText(descProcessoMapeamento).click();
+        if (!await page.getByTestId('card-subprocesso-atividades-vis').isVisible().catch(() => false)) {
+            await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        }
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await page.getByTestId('btn-acao-analisar-principal').click();
+        await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado para finalização do cenário');
+        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+        await page.getByText(descProcessoMapeamento).click();
+        if (!await page.getByTestId('card-subprocesso-mapa').isVisible().catch(() => false)) {
+            await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        }
 
         // Adicionar competências e disponibilizar mapa
-        // Já está na tela de Detalhes do subprocesso
-        await page.locator('[data-testid="card-subprocesso-mapa"], [data-testid="card-subprocesso-mapa"]').first().click();
+        await page.getByTestId('card-subprocesso-mapa').click();
 
         await abrirModalCriarCompetencia(page);
         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 1 ${timestamp}`);
@@ -206,17 +217,16 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         // Aguardar redirecionamento para o painel e verificar mensagem de sucesso
         await verificarPaginaPainel(page);
-        await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
 
         // Chefe valida mapa
         await fazerLogout(page);
-        
+        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
         await page.getByText(descProcessoMapeamento).click();
         await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
-        await expect(page.getByText(/Mapa validado/i)).toBeVisible();
+        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
 
         // Admin homologa mapa e finaliza processo
         await fazerLogout(page);

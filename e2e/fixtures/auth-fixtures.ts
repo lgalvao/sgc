@@ -20,6 +20,7 @@ import {login, loginComPerfil, USUARIOS} from '../helpers/helpers-auth.js';
 export const test = base.extend<{
     autenticadoComoAdmin: void;
     autenticadoComoGestor: void;
+    autenticadoComoGestorCoord21: void;
     autenticadoComoGestorCoord22: void;
     autenticadoComoChefeSecao111: void;
     autenticadoComoChefeSecao211: void;
@@ -39,6 +40,11 @@ export const test = base.extend<{
 
     autenticadoComoGestor: async ({page}, use) => {
         await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
+        await use();
+    },
+
+    autenticadoComoGestorCoord21: async ({page}, use) => {
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await use();
     },
 

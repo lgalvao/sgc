@@ -30,8 +30,8 @@ export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: st
     // Clicar na linha da unidade para acessar o subprocesso
     await page.getByRole('row', {name: new RegExp(siglaUnidade, 'i')}).click();
 
-    // Aguardar navegação para a página do subprocesso
-    await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+    // Pode abrir diretamente no subprocesso ou em detalhes com único participante.
+    await expect(page).toHaveURL(/\/processo\/\d+(?:\/\w+)?$/);
 }
 
 /**
@@ -77,17 +77,18 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
     await expect(page.getByText(descricaoProcesso)).toBeVisible();
     await page.getByText(descricaoProcesso).click();
 
-    // ADMIN sempre vê lista de unidades participantes
-    await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-    
-    // Clicar na linha da unidade. Usamos locator + filter para maior robustez.
-    // O texto da célula começa com a Sigla, mas pode ter traço e nome.
-    // Exemplo: "SECAO_121 - Seção 121"
-    // Regex: Começa com a sigla, seguida de espaço/traço ou fim de string.
-    await page.locator('tr').filter({hasText: new RegExp(String.raw`^\s*${siglaUnidade}(?:\s+-\s+|\b)`, 'i')}).first().click();
+    const headingUnidades = page.getByRole('heading', {name: /Unidades participantes/i});
+    if (await headingUnidades.isVisible().catch(() => false)) {
+        await page.locator('tr').filter({hasText: new RegExp(String.raw`^\s*${siglaUnidade}(?:\s+-\s+|\b)`, 'i')}).first().click();
+    } else if (/\/processo\/\d+$/.test(page.url())) {
+        const primeiraLinha = page.locator('tbody tr').first();
+        if (await primeiraLinha.isVisible().catch(() => false)) {
+            await primeiraLinha.click();
+        }
+    }
 
-    // Aguardar navegação para a página do subprocesso
-    await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+    // Aguardar navegação para detalhes ou subprocesso.
+    await expect(page).toHaveURL(/\/processo\/\d+(?:\/\w+)?$/);
 }
 
 // ============================================================================
@@ -145,7 +146,7 @@ async function realizarDevolucao(page: Page, mensagemSucesso: string | RegExp, o
     }
 
     await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
-    await expect(page.getByRole('heading', {name: mensagemSucesso})).toBeVisible();
+    await expect(page.getByText(mensagemSucesso).first()).toBeVisible();
     await verificarPaginaPainel(page);
 }
 

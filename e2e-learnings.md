@@ -240,3 +240,16 @@ Após nova rodada dos CDUs com falha, vários fluxos de CHEFE/ADMIN quebram na e
 
 **Leitura técnica:**
 O problema dominante deixou de ser seletor/timeout e passou a ser funcional de backend na resolução processo+unidade para subprocesso em parte dos fluxos.
+
+### 21. Isolamento de cleanup em suíte serial impacta falsos negativos
+
+**Problema Identificado:**
+Em fluxos `test.describe.serial`, o cleanup automático por teste removia processo entre etapas de preparação/cenário, causando sintomas semelhantes a bug de backend.
+
+**Correção aplicada:**
+- Fixture `complete-fixtures` foi ajustada para não executar limpeza destrutiva entre testes do mesmo arquivo serial.
+- Fluxos críticos passaram a manter estado entre etapas como esperado pelo desenho dos CDUs.
+
+**Efeito prático:**
+- O erro 404 em `/api/subprocessos/buscar` deixou de ser padrão dominante.
+- No trio `CDU-11/13/14`, o status evoluiu para **2 falhas remanescentes** focadas em navegação de detalhe/subprocesso (não mais em ausência de subprocesso por limpeza prematura).

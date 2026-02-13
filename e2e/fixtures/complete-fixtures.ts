@@ -45,12 +45,6 @@ const test = base.extend<{
         
         // Use
         await use(cleanup);
-        
-        // Teardown: limpar processos registrados
-        const {request} = await import('@playwright/test');
-        const ctx = await request.newContext();
-        await cleanup.limpar(ctx);
-        await ctx.dispose();
     }
 });
 
