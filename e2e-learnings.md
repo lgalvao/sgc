@@ -218,6 +218,16 @@ Quando isso ocorre com dados válidos e atores corretos, tratar como bug funcion
 
 ### 17. Correções backend aplicadas para reduzir inconsistências de painel/subprocesso
 
+### 18. CDU-34 deve validar confirmação e efeito de negócio (sem branch defensivo)
+
+**Problema Identificado:**
+`e2e/cdu-34.spec.ts` estava com `if/catch` e não validava o fluxo principal do requisito (modelo de mensagem, confirmação, registro no histórico).
+
+**Solução aplicada:**
+- Teste reescrito para fluxo explícito: botão `btn-enviar-lembrete` -> modal de confirmação -> confirmar envio.
+- Assert obrigatório de sucesso (`Lembrete enviado`) e da movimentação (`Lembrete de prazo enviado`) em `tbl-movimentacoes`.
+- Backend ajustado para registrar movimentação no envio de lembrete (além do alerta já existente), evitando adaptação do E2E para bug funcional.
+
 **Correções implementadas:**
 1. `PainelController` agora resolve `unidade` pelo usuário autenticado (unidade ativa/lotação) quando o parâmetro não é enviado para perfis não-ADMIN.
 2. `SubprocessoCrudController /api/subprocessos/buscar` ganhou fallback para tentar unidades descendentes quando não existir subprocesso direto para a sigla consultada.
@@ -300,3 +310,36 @@ Padrões como `isVisible().catch(() => false)` e condicionais do tipo `if (botao
 **Diretriz de auditoria:**
 - Tratar esses pontos como risco de aderência aos requisitos.
 - Sempre que possível, substituir por assert explícito do comportamento obrigatório do CDU (falhando quando o elemento/estado esperado não existir).
+
+### 24. CDU-30 endurecido sem mascaramento + bug real de toast corrigido
+
+**Correções aplicadas:**
+- `e2e/cdu-30.spec.ts` foi endurecido para validar fluxos reais (listagem, adição, duplicidade, remoção e bloqueio de auto-remoção).
+- `frontend/src/stores/feedback.ts` passou a enfileirar toasts, evitando perda de mensagens de erro quando já existe toast ativo.
+
+**Validação:**
+- `npx playwright test e2e/cdu-30.spec.ts` → **4 passed**
+- `npm run test:unit --prefix frontend -- src/stores/__tests__/feedback.spec.ts` → **pass**
+
+### 25. CDU-28 endurecido + data de início obrigatória
+
+**Correções aplicadas:**
+- `e2e/cdu-28.spec.ts` reescrito sem `if/catch` mascarador.
+- `CadAtribuicao.vue` ajustado para exigir `dataInicio`, `dataTermino` e `justificativa`.
+- `CadAtribuicao.spec.ts` atualizado para o novo contrato.
+
+**Validação:**
+- `npx playwright test e2e/cdu-28.spec.ts` → **3 passed**
+- `npm run test:unit --prefix frontend -- src/views/__tests__/CadAtribuicao.spec.ts` → **4 passed**
+
+### 26. Regressões backend reportadas não reproduzidas no estado atual
+
+**Contexto:**
+Falhas reportadas em testes de Mapa/Unidade/Usuario com `NoClassDefFoundError` e `initializationError`.
+
+**Verificação executada:**
+- Subset direcionado dos testes reportados.
+- Suíte completa: `./gradlew :backend:test`.
+
+**Resultado:**
+- Execução local com **0 falhas** no momento.

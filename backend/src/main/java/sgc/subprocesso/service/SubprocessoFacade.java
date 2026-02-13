@@ -352,6 +352,11 @@ public class SubprocessoFacade {
     }
 
     @Transactional
+    public void registrarMovimentacaoLembrete(Long codigo) {
+        adminWorkflowService.registrarMovimentacaoLembrete(codigo);
+    }
+
+    @Transactional
     public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
         ajusteMapaService.salvarAjustesMapa(codSubprocesso, competencias);
     }

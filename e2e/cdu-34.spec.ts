@@ -1,7 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-34 - Enviar lembrete de prazo
@@ -29,12 +28,9 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     // ========================================================================
 
     test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        
-
         await criarProcesso(page, {
             descricao: descProcesso,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 5, // Prazo curto para simular urgência
+            tipo: 'MAPEAMENTO', diasLimite: 5,
             unidade: UNIDADE_1,
             expandir: ['SECRETARIA_2', 'COORD_22']
         });
@@ -55,53 +51,22 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para detalhes do processo', async ({page, autenticadoComoAdmin}) => {
-        // CDU-34: Passo 1
-        
-
+    test('Cenario principal: ADMIN envia lembrete e sistema registra histórico/alerta', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-    });
 
-    test('Cenario 2: Verificar indicadores de prazo', async ({page, autenticadoComoAdmin}) => {
-        // CDU-34: Passo 2 - Sistema exibe indicadores de prazo
-        
-
-        await page.getByText(descProcesso).click();
-
-        // Verificar que tabela de unidades está visível
-        const tabela = page.getByTestId('tbl-tree');
-        if (await tabela.isVisible().catch(() => false)) {
-            await expect(tabela).toBeVisible();
-        }
-
-        // Verificar se há indicadores visuais de prazo (badges, cores, ícones)
-        // Isso depende da implementação visual
-    });
-
-    test('Cenario 3: Verificar opção de enviar lembrete', async ({page, autenticadoComoAdmin}) => {
-        // CDU-34: Passo 4
-        
-
-        await page.getByText(descProcesso).click();
+        await expect(page.getByTestId('tbl-tree')).toBeVisible();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
-        // Verificar se existe opção de enviar lembrete
-        const btnLembrete = page.getByRole('button', {name: /Lembrete|Enviar lembrete/i});
-        const btnVisivel = await btnLembrete.isVisible().catch(() => false);
+        const btnLembrete = page.getByTestId('btn-enviar-lembrete');
+        await expect(btnLembrete).toBeVisible();
+        await btnLembrete.click();
 
-        if (btnVisivel) {
-            await expect(btnLembrete).toBeEnabled();
-        } else {
-            // Verificar no menu "Mais ações"
-            const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
-            if (await btnMaisAcoes.isVisible().catch(() => false)) {
-                await btnMaisAcoes.click();
-                
-                const itemLembrete = page.getByRole('menuitem', {name: /Lembrete/i});
-                const itemVisivel = await itemLembrete.isVisible().catch(() => false);
-                console.log('Opção Enviar lembrete disponível:', itemVisivel);
-            }
-        }
+        await expect(page.getByTestId('txt-modelo-lembrete')).toBeVisible();
+        await expect(page.getByTestId('txt-modelo-lembrete')).toContainText('Este lembrete será enviado');
+        await page.getByTestId('btn-confirmar-enviar-lembrete').click();
+
+        await expect(page.getByText('Lembrete enviado').first()).toBeVisible();
+        await expect(page.getByTestId('tbl-movimentacoes')).toContainText('Lembrete de prazo enviado');
     });
 });

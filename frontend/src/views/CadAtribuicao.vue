@@ -38,14 +38,14 @@
 
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label" for="dataInicio">Data de Início (Opcional)</label>
+              <label class="form-label" for="dataInicio">Data de Início</label>
               <BFormInput
                   id="dataInicio"
                   v-model="dataInicio"
                   data-testid="input-data-inicio"
+                  required
                   type="date"
               />
-              <div class="form-text">Se não informada, será considerada a data atual.</div>
             </div>
 
             <div class="col-md-6 mb-3">
@@ -160,8 +160,8 @@ async function criarAtribuicao() {
     feedbackStore.show('Erro', 'Selecione um usuário para criar a atribuição.', 'danger');
     return;
   }
-  if (!dataTermino.value || !justificativa.value.trim()) {
-    feedbackStore.show('Erro', 'Preencha data de término e justificativa.', 'danger');
+  if (!dataInicio.value || !dataTermino.value || !justificativa.value.trim()) {
+    feedbackStore.show('Erro', 'Preencha data de início, data de término e justificativa.', 'danger');
     return;
   }
   erroUsuario.value = "";
@@ -171,7 +171,7 @@ async function criarAtribuicao() {
   try {
     await atribuicoesStore.criarAtribuicaoTemporaria(unidadeAtual.codigo, {
       tituloEleitoralUsuario: usuarioSelecionado.value,
-      dataInicio: dataInicio.value || undefined,
+      dataInicio: dataInicio.value,
       dataTermino: dataTermino.value,
       justificativa: justificativa.value,
     });

@@ -130,6 +130,9 @@ describe('CadAtribuicao.vue', () => {
         const dateInput = context.wrapper!.find('[data-testid="input-data-termino"]');
         await dateInput.setValue('2023-12-31');
 
+        const dateInicioInput = context.wrapper!.find('[data-testid="input-data-inicio"]');
+        await dateInicioInput.setValue('2023-01-01');
+
         const textarea = context.wrapper!.find('[data-testid="textarea-justificativa"]');
         await textarea.setValue('Justificativa de teste');
 
@@ -138,9 +141,9 @@ describe('CadAtribuicao.vue', () => {
 
         expect(criarAtribuicaoTemporaria).toHaveBeenCalledWith(1, {
             tituloEleitoralUsuario: '111',
+            dataInicio: '2023-01-01',
             dataTermino: '2023-12-31',
-            justificativa: 'Justificativa de teste',
-            dataInicio: undefined
+            justificativa: 'Justificativa de teste'
         });
 
         expect(mockFeedbackShow).toHaveBeenCalledWith('Sucesso', 'Atribuição criada com sucesso!', 'success');
@@ -157,6 +160,7 @@ describe('CadAtribuicao.vue', () => {
 
         // Preencher formulário
         context.wrapper!.vm.usuarioSelecionado = '111';
+        context.wrapper!.vm.dataInicio = '2023-01-01';
         context.wrapper!.vm.dataTermino = '2023-12-31';
         context.wrapper!.vm.justificativa = 'Teste';
 

@@ -125,10 +125,14 @@ class ProcessoFacadeTest {
 
             when(processoConsultaService.buscarProcessoCodigo(codProcesso)).thenReturn(processo);
             when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(unidade);
+            SubprocessoDto subprocessoDto = new SubprocessoDto();
+            subprocessoDto.setCodigo(99L);
+            when(subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocessoDto);
 
             processoFacade.enviarLembrete(codProcesso, codUnidade);
 
             verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("N/A"));
+            verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
         }
 
         @Test
@@ -283,9 +287,13 @@ class ProcessoFacadeTest {
 
             when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
+            SubprocessoDto subprocessoDto = new SubprocessoDto();
+            subprocessoDto.setCodigo(99L);
+            when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L)).thenReturn(subprocessoDto);
 
             processoFacade.enviarLembrete(1L, 10L);
             verify(alertaService).criarAlertaAdmin(eq(p), eq(u), anyString());
+            verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
         }
 
         @Test

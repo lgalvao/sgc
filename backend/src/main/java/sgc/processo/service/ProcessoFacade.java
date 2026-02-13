@@ -175,6 +175,9 @@ public class ProcessoFacade {
         String descricao = "Lembrete: Prazo do processo %s encerra em %s"
                 .formatted(processo.getDescricao(), dataLimite);
 
+        SubprocessoDto subprocesso = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, unidadeCodigo);
+        subprocessoFacade.registrarMovimentacaoLembrete(subprocesso.getCodigo());
+
         alertaService.criarAlertaAdmin(processo, unidade, descricao);
     }
 

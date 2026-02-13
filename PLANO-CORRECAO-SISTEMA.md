@@ -62,3 +62,20 @@ Progresso da Auditoria (iniciado)
   - `CDU-04..CDU-10` auditados e registrados como `parcial`.
   - Lacunas recorrentes identificadas nesse lote: ausência de asserts para e-mail/alerta/movimentação/data de conclusão e cobertura incompleta de regras por perfil.
   - Próximo lote: `CDU-11..CDU-18`, mantendo análise explícita de risco de mascaramento por `if/catch/force`.
+
+Atualização de execução (2026-02-13)
+- CDU-30:
+  - E2E endurecido sem `if/catch` mascarador.
+  - Fluxos cobertos: listagem, adição, duplicidade, remoção e bloqueio de auto-remoção.
+  - Bug real corrigido no sistema: fila de toasts no `feedbackStore` para não ocultar erros.
+- CDU-28:
+  - E2E reescrito com asserts explícitos (sem fallback silencioso).
+  - Validação de obrigatoriedade de `dataInicio` implementada em `CadAtribuicao.vue` e coberta em unit/e2e.
+  - Evidências: `cdu-28.spec.ts` (3 passed) e `CadAtribuicao.spec.ts` (4 passed).
+- Regressões backend reportadas (Mapa/Unidade/Usuario):
+  - Revalidação local executada em subset e suíte completa.
+  - Resultado atual: `./gradlew :backend:test` com sucesso (0 falhas).
+- CDU-34 (em execução):
+  - E2E endurecido sem `if/catch` mascarador.
+  - Fluxo principal coberto com confirmação explícita do lembrete em modal.
+  - Correção funcional no backend: envio de lembrete agora registra movimentação interna (`Lembrete de prazo enviado`) além do alerta.

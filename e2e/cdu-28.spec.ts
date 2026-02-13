@@ -1,98 +1,56 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 
-/**
- * CDU-28 - Manter atribuição temporária
- * 
- * Ator: ADMIN
- * 
- * Fluxo principal:
- * 1. ADMIN clica em 'Unidades' no menu
- * 2. Sistema mostra árvore de unidades
- * 3. ADMIN clica em uma unidade
- * 4. Sistema mostra página Detalhes da unidade
- * 5. ADMIN clica no botão 'Criar atribuição'
- * 6. Sistema apresenta modal com campos
- * 7. ADMIN preenche e confirma
- * 8. Sistema registra atribuição e notifica usuário
- */
 test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
+    const SIGLA_UNIDADE = 'SECRETARIA_2';
 
-    // ========================================================================
-    // CENÁRIO 1: ADMIN navega para árvore de unidades
-    // ========================================================================
+    async function acessarUnidadeAlvo(page: import('@playwright/test').Page) {
+        await expect(page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`)).toBeVisible();
+        await page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`).click();
+    }
 
-    test('Cenario 1: ADMIN acessa menu de Unidades', async ({page, autenticadoComoAdmin}) => {
-        // CDU-28: Passos 1-2
-        
-
-        // Para ADMIN, o menu mostra "Unidades" em vez de "Minha unidade"
-        const linkUnidades = page.getByRole('link', {name: /Unidades/i});
-        if (await linkUnidades.isVisible().catch(() => false)) {
-            await linkUnidades.click();
-            // Verificar que árvore de unidades é exibida
-            await expect(page).toHaveURL(/\/unidade/);
-        }
+    test.beforeEach(async ({page, autenticadoComoAdmin}) => {
+        await page.getByRole('link', {name: /Unidades/i}).click();
+        await expect(page).toHaveURL(/\/unidades/);
     });
 
-    // ========================================================================
-    // CENÁRIO 2: ADMIN seleciona uma unidade
-    // ========================================================================
-
-    test('Cenario 2: ADMIN seleciona unidade na árvore', async ({page, autenticadoComoAdmin}) => {
-        // CDU-28: Passos 3-4
-        
-
-        const linkUnidades = page.getByRole('link', {name: /Unidades/i});
-        if (await linkUnidades.isVisible().catch(() => false)) {
-            await linkUnidades.click();
-
-            // Esperar carregamento da árvore de unidades
-            await page.waitForTimeout(1000);
-
-            // Clicar em uma unidade (pode precisar expandir primeiro)
-            const unidade = page.getByText('SECAO_221').first();
-            if (await unidade.isVisible().catch(() => false)) {
-                await unidade.click();
-
-                // Verificar que página de detalhes da unidade carregou
-                await expect(page.getByText(/Detalhes|Dados da unidade/i)).toBeVisible().catch(() => {
-                    // Log para debug
-                    console.log('Página de detalhes da unidade não encontrada');
-                });
-            }
-        }
+    test('Cenario 1: ADMIN acessa detalhes da unidade e opção de criar atribuição', async ({page}) => {
+        await acessarUnidadeAlvo(page);
+        await expect(page).toHaveURL(/\/unidade\/\d+$/);
+        await expect(page.getByRole('heading', {name: new RegExp(SIGLA_UNIDADE)})).toBeVisible();
+        await expect(page.getByTestId('unidade-view__btn-criar-atribuicao')).toBeVisible();
     });
 
-    // ========================================================================
-    // CENÁRIO 3: Verificar opção de criar atribuição
-    // ========================================================================
+    test('Cenario 2: Campos obrigatórios devem ser validados', async ({page}) => {
+        await acessarUnidadeAlvo(page);
+        await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
+        await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao$/);
 
-    test('Cenario 3: Verificar botão de criar atribuição', async ({page, autenticadoComoAdmin}) => {
-        // CDU-28: Passo 5
-        
+        const selectUsuario = page.getByTestId('select-usuario');
+        const valorPrimeiroUsuario = await selectUsuario.locator('option:not([disabled])').first().getAttribute('value');
+        await selectUsuario.selectOption(valorPrimeiroUsuario ?? '');
 
-        const linkUnidades = page.getByRole('link', {name: /Unidades/i});
-        if (await linkUnidades.isVisible().catch(() => false)) {
-            await linkUnidades.click();
-            await page.waitForTimeout(1000);
+        await page.getByTestId('textarea-justificativa').fill('Cobertura de férias');
+        await page.getByTestId('input-data-termino').fill('2030-12-31');
+        await page.getByTestId('cad-atribuicao__btn-criar-atribuicao').click();
 
-            // Navegar para uma unidade
-            const unidade = page.getByText('SECAO_221').first();
-            if (await unidade.isVisible().catch(() => false)) {
-                await unidade.click();
-                await page.waitForTimeout(500);
+        const dataInicioInvalida = await page.getByTestId('input-data-inicio').evaluate((el) => !(el as HTMLInputElement).checkValidity());
+        expect(dataInicioInvalida).toBe(true);
+    });
 
-                // Verificar se existe botão de criar atribuição
-                const btnCriarAtribuicao = page.getByRole('button', {name: /Criar atribuição|Atribuição/i});
-                const btnVisivel = await btnCriarAtribuicao.isVisible().catch(() => false);
+    test('Cenario 3: ADMIN cria atribuição temporária com sucesso', async ({page}) => {
+        await acessarUnidadeAlvo(page);
+        await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
+        await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao$/);
 
-                if (btnVisivel) {
-                    await expect(btnCriarAtribuicao).toBeEnabled();
-                } else {
-                    // Log para debug - funcionalidade pode não estar implementada
-                    console.log('Botão Criar atribuição não encontrado');
-                }
-            }
-        }
+        const selectUsuario = page.getByTestId('select-usuario');
+        const valorPrimeiroUsuario = await selectUsuario.locator('option:not([disabled])').first().getAttribute('value');
+        await selectUsuario.selectOption(valorPrimeiroUsuario ?? '');
+
+        await page.getByTestId('input-data-inicio').fill('2030-01-01');
+        await page.getByTestId('input-data-termino').fill('2030-12-31');
+        await page.getByTestId('textarea-justificativa').fill('Cobertura de férias');
+        await page.getByTestId('cad-atribuicao__btn-criar-atribuicao').click();
+
+        await expect(page.getByText(/Atribuição criada com sucesso/i).first()).toBeVisible();
     });
 });

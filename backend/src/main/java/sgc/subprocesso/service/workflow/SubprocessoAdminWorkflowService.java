@@ -6,7 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
 import sgc.comum.repo.ComumRepo;
+import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -26,6 +31,9 @@ public class SubprocessoAdminWorkflowService {
     private final ComumRepo repo;
     private final SubprocessoCrudService crudService;
     private final AlertaFacade alertaService;
+    private final MovimentacaoRepo movimentacaoRepo;
+    private final UnidadeFacade unidadeService;
+    private final UsuarioFacade usuarioService;
 
     @Transactional
     public void alterarDataLimite(Long codSubprocesso, LocalDate novaDataLimite) {
@@ -67,6 +75,21 @@ public class SubprocessoAdminWorkflowService {
                 subprocessoRepo.save(subprocesso);
             }
         }
+    }
+
+    @Transactional
+    public void registrarMovimentacaoLembrete(Long codSubprocesso) {
+        Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        var unidadeAdmin = unidadeService.buscarEntidadePorSigla("ADMIN");
+
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(unidadeAdmin)
+                .unidadeDestino(subprocesso.getUnidade())
+                .descricao("Lembrete de prazo enviado")
+                .usuario(usuario)
+                .build());
     }
 
     public List<Subprocesso> listarSubprocessosHomologados() {

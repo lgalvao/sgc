@@ -76,6 +76,11 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                     EnumSet.allOf(SituacaoSubprocesso.class),
                     RequisitoHierarquia.NENHUM)),
 
+            Map.entry(ENVIAR_LEMBRETE_PROCESSO, new RegrasAcao(
+                    EnumSet.of(ADMIN),
+                    EnumSet.allOf(SituacaoSubprocesso.class),
+                    RequisitoHierarquia.NENHUM)),
+
             Map.entry(REABRIR_CADASTRO, new RegrasAcao(
                     EnumSet.of(ADMIN),
                     EnumSet.allOf(SituacaoSubprocesso.class),

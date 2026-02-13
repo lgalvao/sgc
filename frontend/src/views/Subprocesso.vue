@@ -75,6 +75,21 @@
         rows="3"
     />
   </ModalConfirmacao>
+
+  <ModalConfirmacao
+      v-model="modalLembreteAberto"
+      titulo="Enviar lembrete"
+      variant="info"
+      ok-title="Confirmar envio"
+      :auto-close="false"
+      test-id-confirmar="btn-confirmar-enviar-lembrete"
+      @confirmar="enviarLembreteConfirmado"
+  >
+    <p data-testid="txt-modelo-lembrete">
+      Este lembrete será enviado para os responsáveis da unidade {{ subprocesso?.unidade?.sigla }} sobre o prazo do
+      processo {{ subprocesso?.processoDescricao }}.
+    </p>
+  </ModalConfirmacao>
 </template>
 
 <script lang="ts" setup>
@@ -109,6 +124,7 @@ const loading = useLoadingManager(['dataLimite', 'reabertura']);
 const tipoReabertura = ref<'cadastro' | 'revisao'>('cadastro');
 const justificativaReabertura = ref('');
 const codSubprocesso = ref<number | null>(null);
+const modalLembreteAberto = ref(false);
 
 const subprocesso = computed<SubprocessoDetalhe | null>(
     () => subprocessosStore.subprocessoDetalhe,
@@ -207,8 +223,18 @@ async function confirmarReabertura() {
 }
 
 async function confirmarEnviarLembrete() {
-  if (!subprocesso.value) return;
-  
+  if (!subprocesso.value) {
+    return;
+  }
+  modalLembreteAberto.value = true;
+}
+
+async function enviarLembreteConfirmado() {
+  if (!subprocesso.value || !codSubprocesso.value) {
+    return;
+  }
   await processosStore.enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
+  await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
+  modalLembreteAberto.value = false;
 }
 </script>
