@@ -282,3 +282,12 @@ Em fluxos `test.describe.serial`, o cleanup automático por teste removia proces
 **Efeito prático:**
 - O erro 404 em `/api/subprocessos/buscar` deixou de ser padrão dominante.
 - No trio `CDU-11/13/14`, o status evoluiu para **2 falhas remanescentes** focadas em navegação de detalhe/subprocesso (não mais em ausência de subprocesso por limpeza prematura).
+
+### 22. Logs de autenticação repetidos em E2E são esperados
+
+**Observação:**
+Em ambiente de testes, `LoginFacade.autenticar` registra `Usuário autenticado` a cada chamada de `/api/usuarios/autenticar`.
+
+**Implicação prática:**
+- Ver o mesmo usuário aparecer 2-3 vezes no log em sequência geralmente significa múltiplos `login(...)` explícitos no fluxo (troca de ator/reentrada) ou cenários paralelos usando o mesmo usuário.
+- Isso, isoladamente, não indica fallback de unidade nem problema de JWT nas rotas de negócio.
