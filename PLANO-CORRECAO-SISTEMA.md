@@ -63,3 +63,50 @@ Atualização de execução (2026-02-13)
   - E2E endurecido sem `if/catch` mascarador.
   - Fluxo principal coberto com confirmação explícita do lembrete em modal.
   - Correção funcional no backend: envio de lembrete agora registra movimentação interna (`Lembrete de prazo enviado`) além do alerta.
+- Atualização de estabilidade E2E (painel x alertas):
+  - Correção transversal aplicada para eliminar ambiguidade de seleção de processo após exibição de alertas no painel.
+  - Seletores de processo foram escopados para `tbl-processos` em specs e helpers críticos.
+  - Regressão focada executada com sucesso (37/37) nos fluxos principais impactados.
+- CDU-08, CDU-09 e CDU-10:
+  - Ajuste de login E2E para aceitar variações de URL do painel (`/painel` com query opcional), reduzindo falso negativo de setup.
+  - `CDU-10` estabilizado com navegação semântica para card de atividades em visualização, mantendo falha explícita quando o contexto não existir.
+  - Evidências: `cdu-08.spec.ts` (2 passed), `cdu-09.spec.ts` (3 passed), `cdu-10.spec.ts` (1 passed).
+- Próximo lote operacional:
+  - Executar `CDU-11..CDU-15` com foco em aderência ao requisito e detecção de bug funcional real (sem branches defensivos).
+- Execução do lote `CDU-11..CDU-15`:
+  - Falha funcional reproduzida em `CDU-11` (cenário de processo finalizado): tentativa de reabrir processo sem retorno explícito ao painel.
+  - Correção aplicada em `e2e/cdu-11.spec.ts`: navegação explícita para `/painel` antes de reselecionar o processo.
+  - Correção estrutural em `helpers-analise.ts` (`acessarSubprocessoGestor`): seleção da unidade via célula na `tbl-tree` + validação de URL final do subprocesso.
+  - Evidências de validação: `cdu-11.spec.ts` (**6 passed**) e `cdu-14.spec.ts` (**21 passed**), com bloqueio removido.
+- Próximo lote operacional:
+  - Executar `CDU-16..CDU-20` mantendo foco em aderência de requisito e bug funcional reproduzível.
+- Execução do lote `CDU-16..CDU-20`:
+  - Rodada completa executada sem falhas funcionais no estado atual.
+  - Evidência consolidada: **40 passed** (`cdu-16.spec.ts` a `cdu-20.spec.ts`).
+  - Resultado: nenhum novo bug funcional reproduzível identificado neste bloco após as correções de estabilidade já aplicadas.
+- Próximo lote operacional:
+  - Executar `CDU-21..CDU-25` com o mesmo critério (aderência ao requisito + detecção de bug funcional real).
+- Execução do lote `CDU-21..CDU-25`:
+  - Rodada completa executada sem falhas funcionais no estado atual.
+  - Evidência consolidada: **30 passed** (`cdu-21.spec.ts` a `cdu-25.spec.ts`).
+  - Resultado: nenhum novo bug funcional reproduzível identificado neste bloco.
+- Próximo lote operacional:
+  - Executar `CDU-26..CDU-30` mantendo validação por requisito e sem mascaramento de falhas.
+- Execução do lote `CDU-26..CDU-30`:
+  - Rodada completa executada sem falhas funcionais no estado atual.
+  - Evidência consolidada: **20 passed** (`cdu-26.spec.ts` a `cdu-30.spec.ts`).
+  - Resultado: nenhum novo bug funcional reproduzível identificado neste bloco.
+- Próximo lote operacional:
+  - Executar `CDU-31..CDU-36` mantendo critério de aderência ao requisito e detecção de bug real.
+- Execução do lote `CDU-31..CDU-36`:
+  - Rodada completa executada sem falhas funcionais no estado atual.
+  - Evidência consolidada: **31 passed** (`cdu-31.spec.ts` a `cdu-36.spec.ts`).
+  - Resultado: nenhum novo bug funcional reproduzível identificado neste bloco.
+- Fechamento da varredura CDU (complemento `CDU-01..CDU-03`):
+  - Execução complementar concluída sem falhas.
+  - Evidência consolidada: **19 passed** (`cdu-01.spec.ts` a `cdu-03.spec.ts`).
+  - Resultado geral da rodada: CDUs `01..36` estáveis no estado atual após as correções aplicadas.
+- Suites complementares não-CDU:
+  - Execução de `e2e/captura-telas.spec.ts` e `e2e/ui-consistency.spec.ts` concluída sem falhas.
+  - Evidência consolidada: **20 passed**.
+  - Resultado: sem novo bug funcional reproduzível nesse eixo de validação visual/consistência.

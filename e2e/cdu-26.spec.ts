@@ -7,7 +7,7 @@ import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-n
 import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
-    await page.getByText(descProcesso).click();
+    await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
     await page.getByTestId('card-subprocesso-mapa').click();
 }
 
@@ -53,7 +53,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
             expandir: ['SECRETARIA_2', 'COORD_22']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
@@ -68,7 +68,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -83,7 +83,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page, autenticadoComoAdmin}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
@@ -116,7 +116,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     test('Cenario 1: ADMIN visualiza botão Homologar Mapa em Bloco', async ({page, autenticadoComoAdmin}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         const btnHomologar = page.getByRole('button', {name: /^Homologar em bloco$/i}).first();
@@ -127,7 +127,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({page, autenticadoComoAdmin}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
         const btnHomologar = page.getByRole('button', {name: /^Homologar em bloco$/i}).first();
         await expect(btnHomologar).toBeVisible();
@@ -146,7 +146,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     test('Cenario 3: Cancelar homologação de mapa em bloco', async ({page, autenticadoComoAdmin}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
         const btnHomologar = page.getByRole('button', {name: /^Homologar em bloco$/i}).first();
         await expect(btnHomologar).toBeVisible();

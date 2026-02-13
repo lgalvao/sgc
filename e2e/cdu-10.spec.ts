@@ -45,7 +45,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
                 expandir: ['SECRETARIA_2', 'COORD_22']
             });
 
-            const linhaProcessoMap = page.locator('tr').filter({has: page.getByText(descProcessoMapeamento)});
+            const linhaProcessoMap = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descProcessoMapeamento)});
             await linhaProcessoMap.click();
 
             const processoMapeamentoId = await extrairProcessoId(page);
@@ -69,7 +69,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
             // Admin homologa cadastro
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-            await page.getByText(descProcessoMapeamento).click();
+            await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
             const linhaUnidade = page.getByRole('row', {name: UNIDADE_ALVO});
             await expect(linhaUnidade).toContainText(/Disponibilizado/i);
             await linhaUnidade.click();
@@ -79,7 +79,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
             // Admin adiciona competências e disponibiliza mapa
             await page.goto('/painel');
-            await page.getByText(descProcessoMapeamento).click();
+            await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
             await navegarParaMapa(page);
             await criarCompetencia(page, `Competência Mapeamento 1 ${timestamp}`, [`Atividade Mapeamento 1 ${timestamp}`]);
@@ -109,7 +109,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await page.getByTestId('btn-mapa-homologar-aceite').click();
             await page.getByTestId('btn-aceite-mapa-confirmar').click();
             await verificarPaginaPainel(page);
-            await page.getByText(descProcessoMapeamento).click();
+            await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
             await page.getByTestId('btn-processo-finalizar').click();
             await page.getByTestId('btn-finalizar-processo-confirmar').click();
             await verificarPaginaPainel(page);
@@ -122,7 +122,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
                 unidade: UNIDADE_ALVO,
                 expandir: ['SECRETARIA_2', 'COORD_22']
             });
-            const linhaProcessoRev = page.locator('tr', {has: page.getByText(descProcessoRevisao)});
+            const linhaProcessoRev = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)});
             await linhaProcessoRev.click();
             processoRevisaoId = await extrairProcessoId(page);
             if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);

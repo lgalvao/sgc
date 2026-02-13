@@ -44,7 +44,7 @@ const UNIDADE_CRIACAO = 'ASSESSORIA_12';
             expandir: ['SECRETARIA_1']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
@@ -57,7 +57,7 @@ const UNIDADE_CRIACAO = 'ASSESSORIA_12';
     });
 
     test('Preparacao 2: Chefe disponibiliza revisão de cadastro', async ({page, autenticadoComoChefeAssessoria12}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -70,7 +70,7 @@ const UNIDADE_CRIACAO = 'ASSESSORIA_12';
     });
 
     test('Preparacao 3: ADMIN homologa revisão de cadastro', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await homologarCadastroRevisaoComImpacto(page);
@@ -81,14 +81,14 @@ const UNIDADE_CRIACAO = 'ASSESSORIA_12';
     // ========================================================================
 
     test('Cenario 1: ADMIN navega para subprocesso de revisão', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão de cadastro homologada/i);
     });
 
     test('Cenario 2: ADMIN visualiza botão Reabrir Revisão', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const btnReabrir = page.getByTestId('btn-reabrir-revisao');
@@ -97,7 +97,7 @@ const UNIDADE_CRIACAO = 'ASSESSORIA_12';
     });
 
     test('Cenario 3: ADMIN abre modal de reabertura de revisão', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const btnReabrir = page.getByTestId('btn-reabrir-revisao');
@@ -113,7 +113,7 @@ const UNIDADE_CRIACAO = 'ASSESSORIA_12';
     });
 
     test('Cenario 4: ADMIN confirma reabertura da revisão', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await page.getByTestId('btn-reabrir-revisao').click();
 

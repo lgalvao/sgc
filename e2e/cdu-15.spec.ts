@@ -49,7 +49,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
             expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
-        const linhaProcesso = page.locator('tr').filter({has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         await page.getByTestId('btn-processo-iniciar').click();

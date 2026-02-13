@@ -31,7 +31,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
             expandir: ['SECRETARIA_2', 'COORD_22']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
@@ -46,7 +46,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -65,7 +65,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
@@ -77,7 +77,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await navegarParaMapa(page);
 
@@ -101,8 +101,8 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         
 
         // Passo 1: CHEFE escolhe o processo
-        await expect(page.getByText(descProcesso)).toBeVisible();
-        await page.getByText(descProcesso).click();
+        await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
         // Verificar situação do subprocesso
         await expect(page.getByTestId('subprocesso-header__txt-situacao'))
@@ -123,7 +123,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         // CDU-19: Passo 5.1.1
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await page.getByTestId('card-subprocesso-mapa').click();
 
         // Clicar em Validar
@@ -146,7 +146,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         // CDU-19: Passos 5.2-5.6, 6-8
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await page.getByTestId('card-subprocesso-mapa').click();
 
         // Passo 5: Clicar em Validar
@@ -164,7 +164,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
 
         // Verificar mudança de situação (Passo 5.3)
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa validado/i);
     });

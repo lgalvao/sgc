@@ -47,7 +47,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
             expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoMapeamento)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)});
         await expect(linhaProcesso).toBeVisible();
         await linhaProcesso.click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
@@ -82,8 +82,8 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // 3. Admin homologa cadastro
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await expect(page.locator('tr', {has: page.getByText(descProcessoMapeamento)})).toBeVisible();
-        await page.locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
+        await expect(page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)})).toBeVisible();
+        await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
         await expect(page).toHaveURL(/\/processo\/\d+/);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -131,8 +131,8 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await expect(page.locator('tr', {has: page.getByText(descProcessoMapeamento)})).toBeVisible();
-        await page.locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
+        await expect(page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)})).toBeVisible();
+        await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
         await expect(page).toHaveURL(/\/processo\/\d+/);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -144,8 +144,8 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
         // Finalizar Processo
         await page.goto('/painel');
-        await expect(page.locator('tr', {has: page.getByText(descProcessoMapeamento)})).toBeVisible();
-        await page.locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
+        await expect(page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)})).toBeVisible();
+        await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
     });
@@ -160,7 +160,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
             expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoRevisao)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)});
         await expect(linhaProcesso).toBeVisible();
         await linhaProcesso.click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
@@ -274,8 +274,8 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         
-        await expect(page.locator('tr', {has: page.getByText(descProcessoRevisao)})).toBeVisible();
-        await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
+        await expect(page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)})).toBeVisible();
+        await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
         await expect(page).toHaveURL(/\/processo\/\d+/);
         await limparNotificacoes(page); // Limpar possível toast de "Sucesso ao criar/iniciar"
         await navegarParaSubprocesso(page, UNIDADE_ALVO);

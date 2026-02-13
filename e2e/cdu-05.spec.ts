@@ -50,7 +50,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
             tipo: 'Mapeamento'
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descricao)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descricao)});
         await linhaProcesso.click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricao);
@@ -77,7 +77,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
         // Capturar ID do processo para cleanup
         await page.goto('/painel');
-        await page.getByText(descProcMapeamento).first().click();
+        await page.getByTestId('tbl-processos').getByText(descProcMapeamento).first().click();
         const processoMapeamentoId = Number.parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
         if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
     });
@@ -139,7 +139,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
 
         await page.goto('/painel');
-        await page.getByText(descProcMapeamento).first().click();
+        await page.getByTestId('tbl-processos').getByText(descProcMapeamento).first().click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
         await verificarPaginaPainel(page);
@@ -159,7 +159,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         });
 
         // Capturar ID do processo para cleanup
-        await page.getByText(descProcRevisao).click();
+        await page.getByTestId('tbl-processos').getByText(descProcRevisao).first().click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         const processoRevisaoId = Number.parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
         if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);

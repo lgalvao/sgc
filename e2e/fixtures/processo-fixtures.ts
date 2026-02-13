@@ -52,7 +52,7 @@ export const test = base.extend<ProcessoContext>({
         });
 
         // Capturar código do processo
-        await page.getByText(descricao).click();
+        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await page.waitForURL(/processo\/cadastro\?codProcesso=\d+/);
         const url = new URL(page.url());
         const codigo = parseInt(url.searchParams.get('codProcesso') || '0');
@@ -117,7 +117,7 @@ export async function criarMultiplosProcessos(
             expandir: ['SECRETARIA_1']
         });
 
-        await page.getByText(descricao).click();
+        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await page.waitForURL(/processo\/cadastro\?codProcesso=\d+/);
         const url = new URL(page.url());
         const codigo = parseInt(url.searchParams.get('codProcesso') || '0');

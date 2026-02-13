@@ -26,7 +26,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             });
 
             // Capturar ID para cleanup
-            await page.getByText(descricaoProcesso).first().click();
+            await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
             await expect(page).toHaveURL(/\/processo\/\d+/);
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanupAutomatico.registrar(processoId);

@@ -124,10 +124,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-processo-salvar').click();
             await expect(page).toHaveURL(/\/painel/);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
-            await expect(page.getByText(descricaoProcesso)).toBeVisible();
+            await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
 
             // Capturar ID para cleanup
-            await page.getByText(descricaoProcesso).click();
+            await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
             await expect(page).toHaveURL(/codProcesso=\d+/);
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
@@ -157,7 +157,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
-            await expect(page.getByText(desc)).toBeVisible();
+            await expect(page.getByTestId('tbl-processos').getByText(desc).first()).toBeVisible();
             await capturarTela(page, '02-painel', '10-painel-gestor', {fullPage: true});
         });
 
@@ -177,7 +177,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
-            await expect(page.getByText(desc)).toBeVisible();
+            await expect(page.getByTestId('tbl-processos').getByText(desc).first()).toBeVisible();
             await capturarTela(page, '02-painel', '11-painel-chefe', {fullPage: true});
         });
     });
@@ -196,7 +196,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
 
             // Capturar ID para cleanup
-            await page.getByText(descricao).click();
+            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
@@ -211,7 +211,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page).toHaveURL(/\/painel/);
 
             // Acessar detalhes do processo iniciado
-            await page.getByText(descricao).click();
+            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await expect(page).toHaveURL(/\/processo\/\d+/);
             await capturarTela(page, '03-processo', '03-detalhes-processo-iniciado', {fullPage: true});
 
@@ -273,7 +273,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 expandir: ['SECRETARIA_2', 'COORD_21']
             });
 
-            const linhaProcesso = page.locator('tr').filter({has: page.getByText(descricao)});
+            const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
@@ -287,7 +287,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
             // Acessar subprocesso
-            await page.getByText(descricao).click();
+            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await capturarTela(page, '04-subprocesso', '01-dashboard-subprocesso', {fullPage: true});
 
             // Entrar em atividades
@@ -339,7 +339,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 expandir: ['SECRETARIA_2', 'COORD_21']
             });
 
-            const linhaProcesso = page.locator('tr').filter({has: page.getByText(descricao)});
+            const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
@@ -350,7 +350,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-logout').click();
             await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
 
-            await page.getByText(descricao).click();
+            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await navegarParaAtividades(page);
 
             // Capturar tela inicial vazia com label "Conhecimentos *"
@@ -446,7 +446,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 expandir: ['SECRETARIA_1', 'COORD_12']
             });
 
-            const linhaProcesso = page.locator('tr').filter({has: page.getByText(descricao)});
+            const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
@@ -654,7 +654,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-logout').click();
             await login(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
 
-            await page.getByText(descricao).click();
+            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await expect(page).toHaveURL(/processo\/\d+/);
             
             // Capturar ID para cleanup (após navegar para o subprocesso)
@@ -672,7 +672,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-logout').click();
             await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
 
-            await page.getByText(descricao).click();
+            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
             await capturarTela(page, '09-operacoes-bloco', '01-detalhes-processo-gestor', {fullPage: true});
 
@@ -689,7 +689,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-logout').click();
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            await page.getByText(descricao).click();
+            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
             // Capturar botão de homologar cadastro em bloco (CDU-23)
@@ -747,7 +747,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
 
             // Navegar para a página de detalhes do processo (estamos em /painel após criar)
-            await page.getByText(descricao).click();
+            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await expect(page).toHaveURL(/\/processo\/\d+/);
 
             // Registrar para cleanup

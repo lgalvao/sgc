@@ -7,7 +7,7 @@ import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-n
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 
 async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
-    await page.getByText(descProcesso).click();
+    await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
     await page.getByTestId('card-subprocesso-mapa').click();
 }
 
@@ -54,7 +54,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
             expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
@@ -70,7 +70,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -85,7 +85,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page, autenticadoComoAdmin}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
@@ -119,7 +119,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     test('Cenario 1: GESTOR acessa processo com mapa validado', async ({page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         const btnAceitar = page.getByRole('button', {name: /Aceitar em bloco/i}).first();
@@ -130,7 +130,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     test('Cenario 2: GESTOR abre modal de aceite de mapa em bloco', async ({page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         const btnAceitar = page.getByRole('button', {name: /Aceitar em bloco/i}).first();
         await btnAceitar.click();
 

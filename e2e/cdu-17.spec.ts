@@ -31,7 +31,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
             expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         processoId = await extrairProcessoId(page);
@@ -67,7 +67,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     });
 
     test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_211');
         await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
@@ -77,7 +77,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     });
 
     test('Preparacao 4: Admin cria competências com todas as atividades associadas', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_211');
         await navegarParaMapa(page);
 
@@ -99,8 +99,8 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     test('Cenario 1: ADMIN navega para tela de edição do mapa', async ({page, autenticadoComoAdmin}) => {
         // Passo 1: ADMIN escolhe o processo de mapeamento
-        await expect(page.getByText(descProcesso)).toBeVisible();
-        await page.getByText(descProcesso).click();
+        await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
         // Passo 2-3: Detalhes do processo, clica na unidade
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
@@ -115,7 +115,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     });
 
     test('Cenario 2: ADMIN abre modal de disponibilização', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_211');
         await navegarParaMapa(page);
 
@@ -128,7 +128,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     });
 
     test('Cenario 3: ADMIN cancela disponibilização - permanece na tela', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_211');
         await navegarParaMapa(page);
 
@@ -144,7 +144,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     });
 
     test('Cenario 4: ADMIN disponibiliza mapa com sucesso', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_211');
         await navegarParaMapa(page);
 

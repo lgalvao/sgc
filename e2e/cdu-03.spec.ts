@@ -47,7 +47,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         });
 
         // Capturar ID do processo para cleanup
-        await page.getByText(descricaoOriginal).click();
+        await page.getByTestId('tbl-processos').getByText(descricaoOriginal).first().click();
         await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/);
         const url = new URL(page.url());
         const processoId = Number.parseInt(url.searchParams.get('codProcesso') || '0');
@@ -82,7 +82,7 @@ test.describe('CDU-03 - Manter Processo', () => {
             expandir: ['SECRETARIA_2']
         });
 
-        await page.getByText(descricao).click();
+        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         await page.getByTestId('btn-processo-remover').click();
         await expect(page.getByText(`Remover o processo '${descricao}'?`)).toBeVisible();

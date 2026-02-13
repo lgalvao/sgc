@@ -46,7 +46,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
             expandir: ['SECRETARIA_2', 'COORD_22']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
@@ -61,7 +61,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -76,7 +76,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     test('Preparacao 3: Admin homologa cadastro e cria competências', async ({page, autenticadoComoAdmin}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
@@ -90,7 +90,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
 
         // Verificar que mapa foi criado (situação 'Mapa criado')
         await page.goto('/painel');
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa criado/i);
@@ -101,7 +101,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     // ========================================================================
 
     test('Cenario 1: ADMIN visualiza botão Disponibilizar Mapas em Bloco', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
         const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar.*Bloco/i}).first();
         await expect(btnDisponibilizar).toBeVisible();
@@ -109,7 +109,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     });
 
     test('Cenario 2: Modal de disponibilização inclui campo de data limite', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
         const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar.*Bloco/i}).first();
         await btnDisponibilizar.click();
@@ -127,7 +127,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     });
 
     test('Cenario 3: ADMIN confirma disponibilização em bloco', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar.*Bloco/i}).first();
         await btnDisponibilizar.click();
 

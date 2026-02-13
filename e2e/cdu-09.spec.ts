@@ -32,7 +32,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         });
 
         // Iniciar processo
-        const linhaProcesso = page.locator('tr').filter({has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcesso);

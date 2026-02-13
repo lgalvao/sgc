@@ -70,9 +70,9 @@ export async function verificarProcessoNaTabela(page: Page, options: {
     tipo: string;
 }): Promise<void> {
     await expect(page.getByTestId('tbl-processos')).toBeVisible();
-    await expect(page.getByText(options.descricao)).toBeVisible();
+    await expect(page.getByTestId('tbl-processos').getByText(options.descricao).first()).toBeVisible();
 
-    const linhaProcesso = page.locator('tr', {has: page.getByText(options.descricao)});
+    const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(options.descricao)});
     await expect(linhaProcesso.getByText(options.situacao)).toBeVisible();
     await expect(linhaProcesso.getByText(options.tipo, {exact: true})).toBeVisible();
 }

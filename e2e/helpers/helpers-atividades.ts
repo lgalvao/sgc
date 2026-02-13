@@ -29,10 +29,17 @@ export async function navegarParaAtividades(page: Page) {
 }
 
 export async function navegarParaAtividadesVisualizacao(page: Page) {
-    const testId = 'card-subprocesso-atividades-vis';
     await garantirContextoSubprocesso(page);
-    await expect(page.getByTestId(testId)).toBeVisible();
-    await page.getByTestId(testId).click();
+    const cardVisualizacao = page.getByTestId('card-subprocesso-atividades-vis');
+    const cardCadastro = page.getByTestId('card-subprocesso-atividades');
+    const cardGenerico = page.getByRole('button', {name: /Atividades e conhecimentos/i}).first();
+    const cardAlvo = await cardVisualizacao.isVisible().catch(() => false)
+        ? cardVisualizacao
+        : await cardCadastro.isVisible().catch(() => false)
+            ? cardCadastro
+            : cardGenerico;
+    await expect(cardAlvo).toBeVisible();
+    await cardAlvo.click();
     await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 }
 

@@ -17,12 +17,17 @@ import { verificarPaginaPainel} from './helpers-navegacao.js';
  */
 export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: string, siglaUnidade: string) {
     await expect(page).toHaveURL(/\/painel$/);
-    await expect(page.getByText(descricaoProcesso)).toBeVisible({timeout: 15000});
-    await page.getByText(descricaoProcesso).click();
+    await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible({timeout: 15000});
+    await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
 
     const headingUnidades = page.getByRole('heading', {name: /Unidades participantes/i});
     if (await headingUnidades.isVisible().catch(() => false)) {
-        await page.getByRole('row', {name: new RegExp(siglaUnidade, 'i')}).click();
+        const tabela = page.getByTestId('tbl-tree');
+        const celulaUnidade = tabela.getByRole('cell', {name: new RegExp(String.raw`^\s*${siglaUnidade}\b`, 'i')}).first();
+        await expect(celulaUnidade).toBeVisible();
+        await celulaUnidade.click();
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
+        return;
     } else if (/\/processo\/\d+$/.test(page.url())) {
         const primeiraLinha = page.locator('tbody tr').first();
         if (await primeiraLinha.isVisible().catch(() => false)) {
@@ -42,7 +47,7 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
     await expect(page).toHaveURL(/\/painel$/);
     
     // Aguardar o processo aparecer na tabela antes de clicar
-    const linhaProcesso = page.locator('tr', {has: page.getByText(descricaoProcesso)});
+    const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descricaoProcesso)});
     await expect(linhaProcesso).toBeVisible();
     
     // Clicar na linha da tabela que contém o processo
@@ -77,8 +82,8 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
     if (!await page.getByText(descricaoProcesso).first().isVisible().catch(() => false)) {
         await page.goto('/painel');
     }
-    await expect(page.getByText(descricaoProcesso)).toBeVisible();
-    await page.getByText(descricaoProcesso).click();
+    await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
+    await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
 
     const headingUnidades = page.getByRole('heading', {name: /Unidades participantes/i});
     if (await headingUnidades.isVisible().catch(() => false)) {

@@ -35,7 +35,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
             expandir: ['SECRETARIA_2', 'COORD_22']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');

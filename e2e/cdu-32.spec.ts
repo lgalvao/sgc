@@ -43,7 +43,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
             expandir: ['SECRETARIA_2', 'COORD_22']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
@@ -58,7 +58,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -71,7 +71,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
     test('Preparacao 3: ADMIN homologa cadastro', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await homologarCadastroMapeamento(page);
@@ -84,7 +84,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     test('Cenario 1: ADMIN navega para subprocesso disponibilizado', async ({page, autenticadoComoAdmin}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         await expect(page.getByTestId('subprocesso-header__txt-situacao'))
@@ -92,7 +92,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
     test('Cenario 2: ADMIN visualiza botão Reabrir cadastro', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const btnReabrir = page.getByTestId('btn-reabrir-cadastro');
@@ -101,7 +101,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
     test('Cenario 3: ADMIN abre modal de reabertura de cadastro', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const btnReabrir = page.getByTestId('btn-reabrir-cadastro');
@@ -117,7 +117,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
     test('Cenario 4: Botão confirmar desabilitado sem justificativa', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const btnReabrir = page.getByTestId('btn-reabrir-cadastro');
@@ -131,7 +131,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
     test('Cenario 5: ADMIN confirma reabertura de cadastro', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await page.getByTestId('btn-reabrir-cadastro').click();
 

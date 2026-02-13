@@ -20,7 +20,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         });
 
         // Navegar para detalhes do processo
-        await page.getByRole('row', {name: descricao}).click();
+        await page.getByTestId('tbl-processos').getByRole('row', {name: descricao}).click();
         await expect(page).toHaveURL(/\/processo\/\d+/);
 
         // Capturar ID do processo para cleanup
@@ -66,8 +66,8 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
 
         // Aguardar que o processo apareça no painel
-        await expect(page.getByRole('row', {name: descricao})).toBeVisible();
-        await page.getByRole('row', {name: descricao}).click();
+        await expect(page.getByTestId('tbl-processos').getByRole('row', {name: descricao})).toBeVisible();
+        await page.getByTestId('tbl-processos').getByRole('row', {name: descricao}).click();
 
         await expect(page).toHaveURL(/\/processo\/\d+/);
 

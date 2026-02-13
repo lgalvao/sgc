@@ -43,7 +43,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         });
 
         // Iniciar processo
-        const linhaProcesso = page.locator('tr').filter({has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         // Capturar ID do processo para cleanup

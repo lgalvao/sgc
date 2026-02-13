@@ -44,7 +44,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
             expandir: ['SECRETARIA_2', 'COORD_22']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
@@ -59,7 +59,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -76,7 +76,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     // ========================================================================
 
     test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({page, autenticadoComoGestorCoord22}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         const btnAceitar = page.getByRole('button', {name: /Aceitar em Bloco/i}).first();
@@ -96,7 +96,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     });
 
     test('Cenario 2: GESTOR confirma aceite em bloco e retorna ao painel', async ({page, autenticadoComoGestorCoord22}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         const btnAceitar = page.getByRole('button', {name: /Aceitar em Bloco/i}).first();
         await expect(btnAceitar).toBeVisible();
         await btnAceitar.click();

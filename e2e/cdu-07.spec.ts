@@ -28,7 +28,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
             situacao: 'Em andamento',
             tipo: 'Mapeamento'
         });
-        await page.getByText(descricao, {exact: true}).click();
+        await page.getByTestId('tbl-processos').getByText(descricao, {exact: true}).first().click();
         const processoId = Number.parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
@@ -44,13 +44,13 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
         await page.getByTestId('btn-logout').click();
         await login(page, GESTOR_UNIDADE, SENHA_GESTOR);
-        await page.getByText(descricao, {exact: true}).click();
+        await page.getByTestId('tbl-processos').getByText(descricao, {exact: true}).first().click();
         await expect(page).toHaveURL(/\/processo\/\d+$/);
         await expect(page.getByRole('row').filter({has: page.getByRole('cell', {name: UNIDADE_ALVO})})).toBeVisible();
 
         await page.getByTestId('btn-logout').click();
         await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
-        await page.getByText(descricao, {exact: true}).click();
+        await page.getByTestId('tbl-processos').getByText(descricao, {exact: true}).first().click();
         await expect(page).toHaveURL(new RegExp(`/processo/\\d+/${UNIDADE_ALVO}$`));
         await verificarDetalhesSubprocesso(page, {
             sigla: UNIDADE_ALVO,

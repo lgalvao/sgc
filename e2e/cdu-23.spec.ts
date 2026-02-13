@@ -45,7 +45,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
             expandir: ['SECRETARIA_2', 'COORD_22']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
@@ -60,7 +60,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -77,7 +77,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     // ========================================================================
 
     test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         const btnHomologar = page.getByRole('button', {name: /Homologar em Bloco/i}).first();
@@ -97,7 +97,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     });
 
     test('Cenario 2: ADMIN confirma homologação em bloco e permanece na tela', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         const btnHomologar = page.getByRole('button', {name: /Homologar em Bloco/i}).first();
         await expect(btnHomologar).toBeVisible();
         await btnHomologar.click();

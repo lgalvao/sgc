@@ -52,7 +52,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
             expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoMapeamento)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)});
         await linhaProcesso.click();
 
         processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
@@ -146,7 +146,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
         // Finalizar processo
         await page.goto('/painel');
-        await page.getByText(descProcessoMapeamento).click();
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
 
@@ -164,7 +164,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
             expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoRevisao)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)});
         await linhaProcesso.click();
 
         processoRevisaoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
@@ -233,7 +233,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         
 
         // Passo 1: No Painel, ADMIN escolhe o processo de revisão
-        await expect(page.getByText(descProcessoRevisao)).toBeVisible();
+        await expect(page.getByTestId('tbl-processos').getByText(descProcessoRevisao).first()).toBeVisible();
         
         // Passo 2-4: Sistema mostra Detalhes do processo, ADMIN clica na unidade
         await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);

@@ -47,7 +47,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
             expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
-        const linhaProcesso = page.locator('tr').filter({has: page.getByText(descMapeamento)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descMapeamento)});
         await linhaProcesso.click();
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').waitFor({state: 'visible'});
@@ -110,7 +110,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     });
 
     test('Preparacao 0.8: ADMIN finaliza o processo', async ({page, autenticadoComoAdmin}) => {
-        await page.locator('tr').filter({has: page.getByText(descMapeamento)}).click();
+        await page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descMapeamento)}).click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
         await expect(page.getByText('Processo finalizado')).toBeVisible();
@@ -126,7 +126,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
             expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
-        const linhaProcesso = page.locator('tr').filter({has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         // Capturar ID do processo para cleanup

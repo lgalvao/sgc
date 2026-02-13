@@ -42,7 +42,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
             expandir: ['SECRETARIA_2', 'COORD_22']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
@@ -57,7 +57,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
         
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -76,7 +76,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     test('Preparacao 3: Admin homologa cadastro', async ({page}) => {
         
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await homologarCadastroMapeamento(page);
@@ -87,7 +87,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page}) => {
         
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
@@ -133,7 +133,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
     test('Cenario 2: GESTOR cancela aceite - permanece na tela', async ({page}) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
@@ -165,7 +165,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
     test('Cenario 4: GESTOR registra aceite do mapa', async ({page}) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
@@ -178,7 +178,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await expect(page.getByText(/Aceite registrado/i).first()).toBeVisible();
 
         // Verificar que o mapa avançou para ADMIN analisar
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
 
         // Após aceite do GESTOR, o mapa ainda está validado mas agora no nível do ADMIN
@@ -187,7 +187,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
     test('Cenario 5: ADMIN homologa o mapa', async ({page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
@@ -200,7 +200,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await verificarPaginaPainel(page);
         await expect(page.getByText(/Homologação efetivada/i).first()).toBeVisible();
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await expect(page.getByText(/Mapa homologado/i).first()).toBeVisible();
     });

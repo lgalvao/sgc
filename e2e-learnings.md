@@ -45,7 +45,7 @@ O botão "Voltar" ou botões no topo da página eram interceptados pela `navbar 
 Workflows complexos (como o fluxo completo de revisão no CDU-10) podem exceder o timeout padrão de 30s-45s, mesmo que cada passo individual seja rápido.
 
 **Solução:**
-- Aumentar o timeout especificamente para o teste longo usando `test.setTimeout(60000)`.
+- Aumentar o timeout especificamente para o teste longo usando `test.setTimeout(30000)`.
 - Manter o timeout padrão baixo para falhar rápido em testes unitários/curtos.
 
 ### 6. Strict Mode Violations em Tabelas

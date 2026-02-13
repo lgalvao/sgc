@@ -15,7 +15,7 @@ test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
         });
 
         // 2. Entra na edição
-        await page.getByText(descricao).click();
+        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
 
         // Capturar ID do processo para cleanup

@@ -7,7 +7,7 @@ import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-n
 import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
-    await page.getByText(descProcesso).click();
+    await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
     await page.getByTestId('card-subprocesso-mapa').click();
 }
 
@@ -38,7 +38,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
             expandir: ['SECRETARIA_2', 'COORD_22']
         });
 
-        const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
@@ -53,7 +53,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividade1);
@@ -72,7 +72,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
@@ -84,7 +84,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await navegarParaMapa(page);
 
@@ -114,7 +114,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     test('Preparacao 6: Gestor registra aceite do mapa', async ({page, autenticadoComoGestorCoord22}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-mapa').click();
 
@@ -129,7 +129,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     test('Preparacao 7: Admin homologa o mapa', async ({page, autenticadoComoAdmin}) => {
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-mapa').click();
 
@@ -141,7 +141,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await verificarPaginaPainel(page);
 
         // Verificar que mapa foi homologado
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Mapa homologado/i);
@@ -156,8 +156,8 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         
 
         // Passo 1: ADMIN clica no processo
-        await expect(page.getByText(descProcesso)).toBeVisible();
-        await page.getByText(descProcesso).click();
+        await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
         // Passo 2: Sistema exibe tela Detalhes do processo
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
@@ -170,7 +170,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         // CDU-21: Passo 6.1
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
         // Passo 3: Clicar em Finalizar processo
         await page.getByTestId('btn-processo-finalizar').click();
@@ -192,7 +192,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         // CDU-21: Passos 7-10
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
         // Passo 3: Clicar em Finalizar processo
         await page.getByTestId('btn-processo-finalizar').click();

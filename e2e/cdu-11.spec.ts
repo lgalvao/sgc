@@ -49,7 +49,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         // Selecionar o processo na tabela para obter o ID
 
-        const linhaProcesso = page.locator('tr').filter({has: page.getByText(descProcessoMapeamento)});
+        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descProcessoMapeamento)});
 
         await linhaProcesso.click();
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcessoMapeamento);
@@ -102,8 +102,8 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         
 
-        await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
-        await page.getByText(descProcessoMapeamento).click();
+        await expect(page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first()).toBeVisible();
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
 
         // Aguardar página de Detalhes do processo carregar
         await expect(page).toHaveURL(/\/processo\/\d+$/);
@@ -148,7 +148,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         
 
         // Passo 1: Clicar no processo em andamento
-        await page.getByText(descProcessoMapeamento).click();
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
 
         // Verifica que foi diretamente para o subprocesso (sem passar pela lista de unidades)
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
@@ -186,7 +186,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaPainel(page);
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await page.getByText(descProcessoMapeamento).click();
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         if (!await page.getByTestId('card-subprocesso-atividades-vis').isVisible().catch(() => false)) {
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
         }
@@ -194,7 +194,8 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado para finalização do cenário');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        await page.getByText(descProcessoMapeamento).click();
+        await page.goto('/painel');
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         if (!await page.getByTestId('card-subprocesso-mapa').isVisible().catch(() => false)) {
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
         }
@@ -227,7 +228,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await fazerLogout(page);
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
-        await page.getByText(descProcessoMapeamento).click();
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
@@ -237,18 +238,18 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
-        await page.getByText(descProcessoMapeamento).click();
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         await navegarParaSubprocesso(page, 'SECAO_211');
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
         await page.goto('/painel');
-        await page.getByText(descProcessoMapeamento).click();
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
         await verificarPaginaPainel(page);
-        await page.getByText(descProcessoMapeamento).click();
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
 
         // Verificar que estamos na página de detalhes do processo
         await expect(page).toHaveURL(/\/processo\/\d+$/);
@@ -272,7 +273,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         
 
         // Clicar no processo finalizado
-        await page.getByText(descProcessoMapeamento).click();
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
 
         // Verificar que foi diretamente para subprocesso (perfil CHEFE)
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);

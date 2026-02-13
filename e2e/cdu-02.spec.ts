@@ -31,7 +31,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             });
 
             // Capturar ID do processo para cleanup
-            await page.getByText(descricaoProcesso).click();
+            await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
             await expect(page).toHaveURL(/processo\/cadastro/);
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanupAutomatico.registrar(processoId);
@@ -56,14 +56,14 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             });
 
             // Capturar ID do processo para cleanup
-            await page.getByText(descricaoProcesso).click();
+            await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
             await expect(page).toHaveURL(/processo\/cadastro/);
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanupAutomatico.registrar(processoId);
             await page.goto('/painel');
 
             // Verifica que o processo está visível para ADMIN
-            await expect(page.getByText(descricaoProcesso)).toBeVisible();
+            await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
 
             // Faz logout e login como GESTOR
             await fazerLogout(page);
@@ -73,7 +73,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             );
 
             // Verifica que o processo NÃO está visível para GESTOR
-            await expect(page.getByText(descricaoProcesso)).not.toBeVisible();
+            await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso)).not.toBeVisible();
         });
 
         test('Deve alternar ordenação da coluna Descrição na tabela de processos', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
@@ -131,14 +131,14 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await expect(page).toHaveURL(/\/painel/);
 
             // Capturar ID do processo para cleanup
-            await page.getByText(descricaoProcesso).click();
+            await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
             await expect(page).toHaveURL(/processo\/cadastro/);
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanupAutomatico.registrar(processoId);
             await page.goto('/painel');
 
             // Verifica que o processo foi criado e aparece na tabela
-            await expect(page.getByText(descricaoProcesso)).toBeVisible();
+            await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
         });
     });
 

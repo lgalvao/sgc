@@ -19,7 +19,7 @@ test.describe('Verificação de Situações e Labels', () => {
         });
 
         // 2. Navegar para o subprocesso
-        await page.getByText(descricao, {exact: true}).click();
+        await page.getByTestId('tbl-processos').getByText(descricao, {exact: true}).first().click();
         await page.getByRole('row', {name: /SECAO_121/i}).click();
 
         // 3. Verificar que a situação está em minúsculo (conforme refatoração)

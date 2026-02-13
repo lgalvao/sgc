@@ -22,7 +22,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
 
         await test.step('2. Navegar para processo finalizado com mapa', async () => {
             // Clicar no processo 99 que tem mapa homologado
-            await page.getByRole('row', {name: 'Processo 99'}).click();
+            await page.getByTestId('tbl-processos').getByRole('row', {name: 'Processo 99'}).click();
             await expect(page).toHaveURL(/\/processo\/\d+$/);
         });
 
@@ -68,7 +68,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
 
         await test.step('2. Navegar para processo via painel', async () => {
             // CHEFE vê processo no painel e clica
-            await page.getByRole('row', {name: 'Processo 99'}).click();
+            await page.getByTestId('tbl-processos').getByRole('row', {name: 'Processo 99'}).click();
 
             // CHEFE vai direto para detalhes do subprocesso da sua unidade
             await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_12$/);
