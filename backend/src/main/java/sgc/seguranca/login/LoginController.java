@@ -47,7 +47,7 @@ public class LoginController {
      *
      * @param request O DTO contendo o título de eleitor e a senha.
      * @return Um {@link ResponseEntity} com {@code true} se a autenticação for
-     *         bem-sucedida.
+     * bem-sucedida.
      */
     @PostMapping("/autenticar")
     @Operation(summary = "Autentica um usuário com título e senha")
@@ -57,7 +57,7 @@ public class LoginController {
             HttpServletResponse httpResponse) {
 
         String ip = extrairIp(httpRequest);
-        limitadorTentativasLogin.verificar(ip);
+        if (ip != null) limitadorTentativasLogin.verificar(ip);
 
         boolean autenticado = loginFacade.autenticar(request.tituloEleitoral(), request.senha());
 
@@ -79,7 +79,7 @@ public class LoginController {
      * acesso.
      *
      * @return Um {@link ResponseEntity} contendo a lista de
-     *         {@link PerfilUnidadeDto}.
+     * {@link PerfilUnidadeDto}.
      */
     @PostMapping("/autorizar")
     @Operation(summary = "Retorna os perfis e unidades disponíveis para o usuário")

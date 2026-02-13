@@ -84,7 +84,7 @@ class SubprocessoAjusteMapaService {
         Analise analise = analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO)
                 .stream()
                 .findFirst()
-                .orElse(null);
+                .orElse(new Analise());
         
         List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapaSemRelacionamentos(codMapa);
         List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoSemRelacionamentos(codMapa);

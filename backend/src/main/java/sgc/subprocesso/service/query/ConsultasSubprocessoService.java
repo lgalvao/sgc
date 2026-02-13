@@ -101,20 +101,6 @@ public class ConsultasSubprocessoService {
     }
 
     /**
-     * Lista subprocessos por processo, múltiplas unidades e situações.
-     *
-     * @param processoId     código do processo
-     * @param unidadeCodigos códigos das unidades
-     * @param situacoes      situações dos subprocessos
-     * @return lista de subprocessos
-     */
-    public List<Subprocesso> listarPorProcessoUnidadesESituacoes(
-            Long processoId, List<Long> unidadeCodigos, List<SituacaoSubprocesso> situacoes) {
-        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInAndSituacaoInWithUnidade(
-                processoId, unidadeCodigos, situacoes);
-    }
-
-    /**
      * Resultado de validação imutável.
      *
      * @param valido   indica se a validação passou

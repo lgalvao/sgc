@@ -3,6 +3,7 @@ package sgc.alerta;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,6 @@ import sgc.processo.model.Processo;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import org.springframework.data.domain.Page;
 
 /**
  * Facade para gerenciamento de alertas do sistema.
@@ -54,7 +54,6 @@ public class AlertaFacade {
      * @return a sigla para apresentação ao usuário
      */
     private String obterSiglaParaUsuario(Unidade unidade) {
-        if (unidade == null) return null;
         if (Long.valueOf(1L).equals(unidade.getCodigo())) {
             return "ADMIN"; // Usuário vê ADMIN em vez de RAIZ
         }

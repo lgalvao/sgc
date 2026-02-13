@@ -14,10 +14,10 @@ import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.query.ConsultasSubprocessoService;
 
-import sgc.processo.model.TipoProcesso;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -87,7 +87,7 @@ class ProcessoFinalizador {
         List<Subprocesso> subprocessos = queryService.listarEntidadesPorProcesso(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
-            Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
+            Unidade unidade = Optional.of(subprocesso.getUnidade())
                     .orElseThrow(() -> new ErroProcesso(
                             "Subprocesso %d sem unidade associada.".formatted(subprocesso.getCodigo())));
 

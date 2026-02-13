@@ -56,7 +56,7 @@ public class ConfigSeguranca {
     @Bean("defaultSecurityFilterChain")
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    CorsConfigurationSource corsConfigurationSource,
-                                                   FiltroJwt filtroJwt) throws Exception {
+                                                   FiltroJwt filtroJwt) {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/api/usuarios/autenticar",
                                 "/api/usuarios/autorizar",

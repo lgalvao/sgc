@@ -2,6 +2,7 @@ package sgc.comum.erros;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -30,7 +31,8 @@ import java.util.UUID;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private String sanitizar(String texto) {
+    private String sanitizar(@Nullable String texto) {
+        if (texto == null) return "";
         return UtilSanitizacao.sanitizar(texto);
     }
 

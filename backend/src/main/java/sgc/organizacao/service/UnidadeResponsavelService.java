@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Serviço especializado para gerenciar responsáveis e atribuições de unidades.
@@ -95,7 +95,6 @@ public class UnidadeResponsavelService {
         Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigo());
         Usuario usuarioCompleto = repo.buscar(Usuario.class, resp.getUsuarioTitulo());
 
-        carregarAtribuicoesUsuario(usuarioCompleto);
         return usuarioCompleto;
     }
 
@@ -137,8 +136,6 @@ public class UnidadeResponsavelService {
 
         Map<String, Usuario> usuariosPorTitulo = usuarioRepo.findByIdInWithAtribuicoes(new ArrayList<>(todosTitulos)).stream()
                 .collect(toMap(Usuario::getTituloEleitoral, u -> u));
-
-        carregarAtribuicoesEmLote(new ArrayList<>(usuariosPorTitulo.values()));
 
         return responsabilidades.stream()
                 .filter(r -> usuariosPorTitulo.containsKey(r.getUsuarioTitulo()))
@@ -186,13 +183,5 @@ public class UnidadeResponsavelService {
         return responsabilidadeRepo.findByUsuarioTitulo(titulo).stream()
                 .map(Responsabilidade::getUnidadeCodigo)
                 .toList();
-    }
-
-    private void carregarAtribuicoesUsuario(Usuario usuario) {
-        // As atribuições já são carregadas via view consolidada no banco de dados.
-    }
-
-    private void carregarAtribuicoesEmLote(List<Usuario> usuarios) {
-        // As atribuições já são carregadas via view consolidada no banco de dados.
     }
 }
