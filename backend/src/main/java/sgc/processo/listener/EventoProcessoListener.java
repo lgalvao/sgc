@@ -244,16 +244,16 @@ public class EventoProcessoListener {
             
             if (titular != null && titular.email() != null && !titular.email().isBlank()) {
                 notificacaoEmailService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
-                log.info("E-mail enviado para unidade {}", unidade.getSigla());
+                log.info("E-mail enviado para {}", unidade.getSigla());
             } else {
-                log.warn("E-mail não enviado para unidade {}: titular ou e-mail inválido", unidade.getSigla());
+                log.warn("E-mail não enviado para {}: titular ou e-mail inválido", unidade.getSigla());
             }
 
             if (responsavel.substitutoTitulo() != null) {
                 enviarEmailParaSubstituto(responsavel.substitutoTitulo(), usuarios, assunto, corpoHtml, nomeUnidade);
             }
         } catch (Exception e) {
-            log.error("Erro ao enviar e-mail para a unidade {}: {}", codigoUnidade, e.getClass().getSimpleName(), e);
+            log.error("Erro ao enviar e-mail para {}: {}", codigoUnidade, e.getClass().getSimpleName(), e);
         }
     }
 
