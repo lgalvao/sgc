@@ -52,3 +52,41 @@ Progresso Atual
     - `cdu-12 + cdu-15 + cdu-16`: 16 passed / 2 falhas intermediárias corrigidas no ciclo
   - Estado no conjunto amplo dos 13 arquivos previamente falhos:
     - falhas funcionais reduzidas de 13 para **1 ponto remanescente/intermitente** (CDU-09 durante troca de sessão em execução longa), com evidência de instabilidade de ambiente (queda de conexão do Vite em reexecução parcial).
+
+---
+
+Novo Objetivo (2026-02-13)
+Validar aderência entre requisitos (`etc/reqs/cdu-xx.md`) e testes E2E (`e2e/cdu-xx.spec.ts`) para detectar divergências após as correções.
+
+Abordagem de Verificação
+1) Mapear todos os pares CDU↔spec por número (`01..36`) e listar faltantes em qualquer lado.
+2) Para cada CDU, comparar:
+   - objetivo e atores,
+   - pré-condições e dados necessários,
+   - fluxo principal,
+   - fluxos alternativos/exceções,
+   - regras e validações obrigatórias.
+3) Classificar achados por tipo:
+   - lacuna de teste (requisito sem cobertura),
+   - teste excedente (cobre comportamento não previsto),
+   - divergência de regra (esperado vs implementado no teste),
+   - ambiguidade de requisito (texto insuficiente para assert claro),
+   - risco de mascaramento (if/catch/branch que evita falha explícita e pode esconder bug real).
+4) Registrar evidência objetiva por achado:
+   - arquivo e trecho do requisito,
+   - arquivo/linha do e2e correspondente,
+   - impacto no negócio,
+   - recomendação objetiva de ajuste (req, teste ou ambos).
+5) Consolidar relatório final com priorização:
+   - Alta: altera regra de negócio/resultado do caso de uso,
+   - Média: afeta fluxo alternativo/importante,
+   - Baixa: nomenclatura, dados de exemplo, detalhe não funcional.
+
+Entregáveis
+- Matriz CDU x E2E com status por caso (`Aderente`, `Parcial`, `Divergente`).
+- Lista priorizada de divergências com ação recomendada.
+- Backlog de correções (ordem por risco).
+
+Critério de Conclusão
+- 100% dos CDUs em `etc/reqs` comparados contra seus `e2e/cdu-xx.spec.ts`.
+- Todas as divergências registradas com evidência e decisão proposta.
