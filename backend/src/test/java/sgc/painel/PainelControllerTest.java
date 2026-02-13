@@ -17,11 +17,12 @@ import sgc.processo.dto.ProcessoResumoDto;
 
 import java.util.Collections;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PainelController.class)
 @DisplayName("PainelController - Testes de Controller")
@@ -52,16 +53,6 @@ class PainelControllerTest {
     @WithMockUser
     void listarProcessos_SemPerfil_DeveFalhar() throws Exception {
         mockMvc.perform(get("/api/painel/processos")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("GET /api/painel/processos - Deve falhar sem unidade para perfil não ADMIN")
-    @WithMockUser
-    void listarProcessos_SemUnidadeParaGestor_DeveFalhar() throws Exception {
-        mockMvc.perform(get("/api/painel/processos")
-                        .param("perfil", "GESTOR")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

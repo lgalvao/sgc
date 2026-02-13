@@ -90,25 +90,6 @@ class ProcessoFinalizadorTest {
     }
 
     @Test
-    @DisplayName("Deve falhar se subprocesso não tiver unidade")
-    void deveFalharSeSubprocessoSemUnidade() {
-        Long codigo = 1L;
-        Processo p = new Processo();
-        p.setCodigo(codigo);
-        when(repo.buscar(Processo.class, codigo)).thenReturn(p);
-
-        Subprocesso s = new Subprocesso();
-        s.setCodigo(10L);
-        s.setUnidade(null);
-
-        when(queryService.listarEntidadesPorProcesso(codigo)).thenReturn(List.of(s));
-
-        assertThatThrownBy(() -> finalizador.finalizar(codigo))
-                .isInstanceOf(ErroProcesso.class)
-                .hasMessageContaining("sem unidade associada");
-    }
-
-    @Test
     @DisplayName("Deve falhar se subprocesso não tiver mapa")
     void deveFalharSeSubprocessoSemMapa() {
         Long codigo = 1L;

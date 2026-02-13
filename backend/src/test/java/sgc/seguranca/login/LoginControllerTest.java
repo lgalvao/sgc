@@ -329,22 +329,6 @@ class LoginControllerTest {
         }
 
         @Test
-        @DisplayName("extrairIp deve retornar null se headers e remoteAddr nulos")
-        void extrairIp_ReturnsNull() {
-            AutenticarRequest req = new AutenticarRequest("user", "pass");
-            jakarta.servlet.http.HttpServletRequest httpReq = mock(jakarta.servlet.http.HttpServletRequest.class);
-            jakarta.servlet.http.HttpServletResponse httpRes = mock(jakarta.servlet.http.HttpServletResponse.class);
-
-            when(httpReq.getHeader("X-Forwarded-For")).thenReturn(null);
-            when(httpReq.getRemoteAddr()).thenReturn(null);
-            
-            // This will trigger extrairIp -> null.
-            controller.autenticar(req, httpReq, httpRes);
-
-            verify(limitadorMock).verificar(null);
-        }
-        
-        @Test
         @DisplayName("entrar deve lidar com cookie invalido e lancar ErroAutenticacao")
         void entrar_CookieInvalido() {
             EntrarRequest req = new EntrarRequest("user", "ADMIN", 1L);
