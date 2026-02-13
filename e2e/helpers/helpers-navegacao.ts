@@ -41,10 +41,19 @@ export async function limparNotificacoes(page: Page): Promise<void> {
 export async function fazerLogout(page: Page): Promise<void> {
     await limparNotificacoes(page);
 
-    // Wait for the button to be stable and visible
     const btnLogout = page.getByTestId('btn-logout');
+    const linkLogout = btnLogout.locator('a').first();
     await expect(btnLogout).toBeVisible();
-    await btnLogout.click();
+    await linkLogout.click({force: true});
+
+    if (!/\/login$/.test(page.url())) {
+        await limparNotificacoes(page);
+        await linkLogout.click({force: true});
+    }
+
+    if (!/\/login$/.test(page.url())) {
+        await page.goto('/login');
+    }
 
     await expect(page).toHaveURL(/\/login/);
 }

@@ -6,7 +6,8 @@ import {
     adicionarAtividade,
     adicionarConhecimento,
     disponibilizarCadastro,
-    navegarParaAtividades
+    navegarParaAtividades,
+    navegarParaAtividadesVisualizacao
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {
@@ -73,7 +74,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await expect(linhaUnidade).toContainText(/Disponibilizado/i);
             await linhaUnidade.click();
             
-            await page.getByTestId('card-subprocesso-atividades-vis').click();
+            await navegarParaAtividadesVisualizacao(page);
             await homologarCadastroMapeamento(page);
 
             // Admin adiciona competências e disponibiliza mapa
@@ -91,7 +92,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             // Chefe valida mapa
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
             await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
-            await page.getByTestId('card-subprocesso-mapa').click();
+            await navegarParaMapa(page);
             await page.getByTestId('btn-mapa-validar').click();
             await page.getByTestId('btn-validar-mapa-confirmar').click();
             await verificarPaginaPainel(page);
@@ -100,7 +101,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await page.getByText(descProcessoMapeamento).click();
             await page.getByRole('row', {name: UNIDADE_ALVO}).click();
-            await page.getByTestId('card-subprocesso-mapa').click();
+            await navegarParaMapa(page);
             await page.getByTestId('btn-mapa-homologar-aceite').click();
             await page.getByTestId('btn-aceite-mapa-confirmar').click();
             await verificarPaginaPainel(page);
@@ -166,7 +167,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
         await test.step('4. Cenário 3: Devolução e Histórico', async () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
-            await page.getByTestId('card-subprocesso-atividades-vis').click();
+            await navegarParaAtividadesVisualizacao(page);
             await page.getByTestId('btn-acao-devolver').click();
             const motivoDevolucao = 'Necessário revisar os conhecimentos técnicos.';
             await page.getByTestId('inp-devolucao-cadastro-obs').fill(motivoDevolucao);
@@ -189,7 +190,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
         await test.step('5. Cenário 4: Limpeza de Histórico após nova disponibilização', async () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
-            await page.getByTestId('card-subprocesso-atividades-vis').click();
+            await navegarParaAtividadesVisualizacao(page);
             await page.getByTestId('btn-acao-devolver').click();
             await page.getByTestId('inp-devolucao-cadastro-obs').fill('Segunda devolução');
             await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
@@ -206,7 +207,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             // Admin devolve novamente
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
-            await page.getByTestId('card-subprocesso-atividades-vis').click();
+            await navegarParaAtividadesVisualizacao(page);
             await page.getByTestId('btn-acao-devolver').click();
             await page.getByTestId('inp-devolucao-cadastro-obs').fill('Terceira devolução');
             await page.getByTestId('btn-devolucao-cadastro-confirmar').click();

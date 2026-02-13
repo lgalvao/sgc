@@ -1,12 +1,23 @@
 import {expect, type Page} from '@playwright/test';
 
+async function garantirContextoSubprocesso(page: Page) {
+    const cardEdicao = page.getByTestId('card-subprocesso-atividades');
+    const cardVisualizacao = page.getByTestId('card-subprocesso-atividades-vis');
+    if (await cardEdicao.or(cardVisualizacao).first().isVisible()) {
+        return;
+    }
+
+    if (/\/processo\/\d+$/.test(page.url())) {
+        const linhasUnidade = page.locator('table tbody tr');
+        if (await linhasUnidade.first().isVisible()) {
+            await linhasUnidade.first().click();
+        }
+    }
+}
+
 export async function navegarParaAtividades(page: Page) {
     const testId = 'card-subprocesso-atividades';
-    
-    page.on('console', msg => {
-        console.log(`[Browser Console] ${msg.type()}: ${msg.text()}`);
-    });
-    
+    await garantirContextoSubprocesso(page);
     await expect(page.getByTestId(testId)).toBeVisible();
     await page.getByTestId(testId).click();
     await page.waitForURL(/\/cadastro$/);
@@ -17,6 +28,7 @@ export async function navegarParaAtividades(page: Page) {
 
 export async function navegarParaAtividadesVisualizacao(page: Page) {
     const testId = 'card-subprocesso-atividades-vis';
+    await garantirContextoSubprocesso(page);
     await expect(page.getByTestId(testId)).toBeVisible();
     await page.getByTestId(testId).click();
     await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();

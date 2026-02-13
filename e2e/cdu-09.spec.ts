@@ -2,7 +2,7 @@ import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
     acessarSubprocessoAdmin,
@@ -109,7 +109,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
 
         // Entrar no cadastro de atividades (visualização)
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
 
         // Devolver cadastro
         await page.getByTestId('btn-acao-devolver').click();

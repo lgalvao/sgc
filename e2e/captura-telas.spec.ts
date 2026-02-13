@@ -2,7 +2,7 @@ import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/base.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
 import {abrirModalCriarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
@@ -482,7 +482,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await acessarSubprocessoAdmin(page, descricao, UNIDADE_ALVO);
 
             // Entrar no cadastro de atividades (visualização)
-            await page.getByTestId('card-subprocesso-atividades-vis').click();
+            await navegarParaAtividadesVisualizacao(page);
 
             // Homologar cadastro
             await page.getByTestId('btn-acao-analisar-principal').click();

@@ -30,7 +30,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         // Seleciona unidade - agora botões devem estar habilitados
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
-        await page.getByTestId('chk-arvore-unidade-ASSESSORIA_11').click();
+        await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').click();
         await expect(page.getByTestId('btn-processo-salvar')).toBeEnabled();
         await expect(page.getByTestId('btn-processo-iniciar')).toBeEnabled();
     });
@@ -42,7 +42,7 @@ test.describe('CDU-03 - Manter Processo', () => {
             descricao: descricaoOriginal,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
-            unidade: 'ASSESSORIA_11',
+            unidade: 'ASSESSORIA_12',
             expandir: ['SECRETARIA_1']
         });
 
@@ -60,7 +60,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
 
-        await expect(page.getByTestId('chk-arvore-unidade-ASSESSORIA_11')).toBeChecked();
+        await expect(page.getByTestId('chk-arvore-unidade-ASSESSORIA_12')).toBeChecked();
 
         // Modifica o processo
         const novaDescricao = descricaoOriginal + ' (Editado)';
@@ -78,8 +78,8 @@ test.describe('CDU-03 - Manter Processo', () => {
             descricao: descricao,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
-            unidade: 'ASSESSORIA_11',
-            expandir: ['SECRETARIA_1']
+            unidade: 'ASSESSORIA_21',
+            expandir: ['SECRETARIA_2']
         });
 
         await page.getByText(descricao).click();

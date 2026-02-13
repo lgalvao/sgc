@@ -79,7 +79,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         if (!await page.getByTestId('card-subprocesso-atividades-vis').isVisible().catch(() => false)) {
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
         }
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         await homologarCadastroMapeamento(page);
     });
 
@@ -217,7 +217,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Cenario 7: ADMIN devolve para nova rodada de aceite', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         await devolverRevisao(page, 'Pequeno ajuste necessário na revisão');
 
         await fazerLogout(page);
@@ -238,7 +238,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Cenario 9: ADMIN visualiza histórico com múltiplas análises', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         const modal = await abrirHistoricoAnaliseVisualizacao(page);
         await expect(modal).toBeVisible();
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/ACEITE_REVISAO/i);
@@ -247,14 +247,14 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Cenario 10: ADMIN cancela homologação', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         await cancelarHomologacao(page);
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
     });
 
     test('Cenario 11: ADMIN homologa cadastro de revisão', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         await homologarCadastroRevisaoComImpacto(page);
     });
 });

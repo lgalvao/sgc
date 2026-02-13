@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
@@ -62,14 +62,14 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
     test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_211');
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
@@ -107,7 +107,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await navegarParaSubprocesso(page, 'SECAO_211');
         
         // Passo 5-6: Clica no card Mapa de Competências
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         // Verificar tela de Edição de mapa
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
@@ -117,7 +117,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     test('Cenario 2: ADMIN abre modal de disponibilização', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_211');
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         // Passo 7: ADMIN clica em Disponibilizar
         await page.getByTestId('btn-cad-mapa-disponibilizar').click();
@@ -130,7 +130,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     test('Cenario 3: ADMIN cancela disponibilização - permanece na tela', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_211');
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         await page.getByTestId('btn-cad-mapa-disponibilizar').click();
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeVisible();
@@ -146,13 +146,13 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     test('Cenario 4: ADMIN disponibiliza mapa com sucesso', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_211');
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         // Usar helper para disponibilizar
         await disponibilizarMapa(page, '2030-12-31');
 
         // Passo 20: Redireciona para Painel com confirmação
         await verificarPaginaPainel(page);
-        await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
+        await expect(page.getByText(/Mapa disponibilizado/i).first()).toBeVisible();
     });
 });

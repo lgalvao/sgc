@@ -8,13 +8,14 @@ import {
     editarAtividade,
     fecharModalImpacto,
     navegarParaAtividades,
+    navegarParaAtividadesVisualizacao,
     removerAtividade,
     verificarBotaoImpactoDireto,
     verificarBotaoImpactoDropdown
 } from './helpers/helpers-atividades.js';
 import {fazerLogout, limparNotificacoes, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
-import {criarCompetencia} from './helpers/helpers-mapas.js';
+import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
@@ -85,7 +86,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
         await expect(page).toHaveURL(/\/processo\/\d+/);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
@@ -97,8 +98,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         // 4. Admin cria competências (Mapa)
         // Já está na tela de Detalhes do subprocesso
         // Verificar se o card de mapa EDITAVEL está visível (confirma permissão/status correto)
-        await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         // Aguardar carregamento da tela do mapa (título da unidade)
         await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toBeVisible();
@@ -124,7 +124,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
         await limparNotificacoes(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
@@ -135,7 +135,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
         await expect(page).toHaveURL(/\/processo\/\d+/);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
         await limparNotificacoes(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await expect(page.getByTestId('btn-aceite-mapa-confirmar')).toBeVisible();
@@ -279,7 +279,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await limparNotificacoes(page); // Limpar possível toast de "Sucesso ao criar/iniciar"
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         // Acessar visualização
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
 
         // Verificar botão de impacto
         await verificarBotaoImpactoDireto(page);

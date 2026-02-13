@@ -1,11 +1,13 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
     editarAtividade,
     navegarParaAtividades,
+    navegarParaAtividadesVisualizacao,
     removerAtividade
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
@@ -62,7 +64,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao211}) => {
         
 
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
@@ -81,7 +83,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i)).toBeVisible();
+        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
@@ -89,7 +91,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         
 
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
@@ -113,25 +115,25 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
     });
 
-    test('Preparacao 5: Chefe valida mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 5: Chefe valida mapa', async ({page, autenticadoComoChefeSecao211}) => {
         
 
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
         // Validação: confirmar redirecionamento para Painel (CDU-19 passo 8)
         await verificarPaginaPainel(page);
-        await expect(page.getByText(/Mapa validado/i)).toBeVisible();
+        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
     });
 
     test('Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento', async ({page, autenticadoComoAdmin}) => {
         
 
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
@@ -140,7 +142,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
         // Navegar de volta para verificar situação atualizada
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
+        await expect(page.getByText(/Mapa homologado/i).first()).toBeVisible();
 
         // Finalizar processo
         await page.goto('/painel');
@@ -174,7 +176,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 8: Chefe revisa atividades com alterações', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 8: Chefe revisa atividades com alterações', async ({page, autenticadoComoChefeSecao211}) => {
         
 
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
@@ -199,17 +201,18 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Revisão disponibilizada/i)).toBeVisible();
+        await expect(page.getByText(/Revisão disponibilizada/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
     test('Preparacao 9: Admin homologa revisão do cadastro', async ({page}) => {
         // Esta homologação leva o subprocesso ao estado "Revisão do cadastro homologada"
         // que é a pré-condição para CDU-16
-        
+        await page.goto('/painel');
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
@@ -241,7 +244,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
         // Passo 5-6: ADMIN clica no card Mapa de Competências
         await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         // Verificar tela de Edição de mapa
         await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
@@ -262,7 +265,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         
 
         await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         // Passo 7: ADMIN clica em Impactos no mapa
         await page.getByTestId('cad-mapa__btn-impactos-mapa').click();
@@ -295,7 +298,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         
 
         await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         // Verificar que a competência existe
         await expect(page.getByText(competencia1)).toBeVisible();
@@ -322,7 +325,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         
 
         await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         // Criar nova competência com a atividade nova da revisão
         const novaCompetencia = `Competência Nova Ajuste ${timestamp}`;

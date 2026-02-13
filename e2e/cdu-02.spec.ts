@@ -26,8 +26,8 @@ test.describe('CDU-02 - Visualizar Painel', () => {
                 descricao: descricaoProcesso,
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
-                unidade: 'ASSESSORIA_11',
-                expandir: ['SECRETARIA_1']
+                unidade: 'ASSESSORIA_21',
+                expandir: ['SECRETARIA_2']
             });
 
             // Capturar ID do processo para cleanup
@@ -51,7 +51,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
                 descricao: descricaoProcesso,
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
-                unidade: 'ASSESSORIA_11',
+                unidade: 'ASSESSORIA_12',
                 expandir: ['SECRETARIA_1']
             });
 

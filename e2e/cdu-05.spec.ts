@@ -13,6 +13,7 @@ import {
     adicionarConhecimento,
     disponibilizarCadastro,
     navegarParaAtividades,
+    navegarParaAtividadesVisualizacao,
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa,} from './helpers/helpers-mapas.js';
 
@@ -107,7 +108,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     test('Fase 1.4: ADMIN homologa cadastro', async ({page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         await homologarCadastroMapeamento(page);
     });
 

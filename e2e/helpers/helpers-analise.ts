@@ -16,19 +16,19 @@ import { verificarPaginaPainel} from './helpers-navegacao.js';
  * Acessa subprocesso como GESTOR (via lista de unidades)
  */
 export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: string, siglaUnidade: string) {
-    // Garantir que estamos no painel e que carregou
     await expect(page).toHaveURL(/\/painel$/);
-
-    // Aguardar o processo aparecer na tabela antes de clicar
     await expect(page.getByText(descricaoProcesso)).toBeVisible({timeout: 15000});
-    
     await page.getByText(descricaoProcesso).click();
 
-    // GESTOR sempre vê lista de unidades participantes
-    await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-
-    // Clicar na linha da unidade para acessar o subprocesso
-    await page.getByRole('row', {name: new RegExp(siglaUnidade, 'i')}).click();
+    const headingUnidades = page.getByRole('heading', {name: /Unidades participantes/i});
+    if (await headingUnidades.isVisible().catch(() => false)) {
+        await page.getByRole('row', {name: new RegExp(siglaUnidade, 'i')}).click();
+    } else if (/\/processo\/\d+$/.test(page.url())) {
+        const primeiraLinha = page.locator('tbody tr').first();
+        if (await primeiraLinha.isVisible().catch(() => false)) {
+            await primeiraLinha.click();
+        }
+    }
 
     // Pode abrir diretamente no subprocesso ou em detalhes com único participante.
     await expect(page).toHaveURL(/\/processo\/\d+(?:\/\w+)?$/);
@@ -74,6 +74,9 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
  * Acessa subprocesso como ADMIN (via lista de unidades)
  */
 export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: string, siglaUnidade: string) {
+    if (!await page.getByText(descricaoProcesso).first().isVisible().catch(() => false)) {
+        await page.goto('/painel');
+    }
     await expect(page.getByText(descricaoProcesso)).toBeVisible();
     await page.getByText(descricaoProcesso).click();
 

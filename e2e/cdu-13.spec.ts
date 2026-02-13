@@ -151,7 +151,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         if (!await page.getByTestId('card-subprocesso-atividades-vis').isVisible().catch(() => false)) {
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
         }
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
 
         await devolverCadastroMapeamento(page, 'Pequeno ajuste necessário');
 
@@ -181,7 +181,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         if (!await page.getByTestId('card-subprocesso-atividades-vis').isVisible().catch(() => false)) {
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
         }
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
 
         // Abrir histórico
         const modal = await abrirHistoricoAnaliseVisualizacao(page);
@@ -198,7 +198,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 
     test('Cenario 9: ADMIN cancela homologação', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
 
         // Cancelar homologação
         await cancelarHomologacao(page);
@@ -209,7 +209,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 
     test('Cenario 10: ADMIN homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
 
         // Homologar
         await homologarCadastroMapeamento(page);

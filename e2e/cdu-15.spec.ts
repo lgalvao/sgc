@@ -63,7 +63,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByText('Processo iniciado')).toBeVisible();
 
         // 2. Chefe adiciona atividades e conhecimentos
-        
+        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
         await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);
@@ -78,7 +78,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // 3. Gestor aceita
-        
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -88,7 +88,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         await homologarCadastroMapeamento(page);
 
         // Agora deve estar em "Cadastro homologado"
@@ -102,7 +102,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         // Verificar card do mapa
         await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         // Verificar título
         await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();

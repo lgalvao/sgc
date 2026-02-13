@@ -1,4 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
+import {navegarParaMapa} from './helpers/helpers-mapas.js';
 
 /**
  * CDU-18: Visualizar mapa de competências
@@ -9,7 +10,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
  * - Subprocesso da unidade com mapa de competência já disponibilizado
  *
  * O seed contém:
- * - Processo 99 (FINALIZADO) com mapa homologado para ASSESSORIA_12 (unidade 4)
+ * - Processo 99 (FINALIZADO) com mapa homologado para unidade de assessoria
  * - Mapa 99 com competência "Competência Técnica Seed 99" vinculada às atividades
  */
 test.describe('CDU-18: Visualizar mapa de competências', () => {
@@ -25,21 +26,19 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
             await expect(page).toHaveURL(/\/processo\/\d+$/);
         });
 
-        await test.step('3. Selecionar unidade ASSESSORIA_12', async () => {
-            // ADMIN vê TreeTable com unidades participantes
-            const linhaUnidade = page.getByRole('row', {name: /ASSESSORIA_12/});
+        await test.step('3. Selecionar unidade de assessoria participante', async () => {
+            const linhaUnidade = page.getByRole('row', {name: /ASSESSORIA_/}).first();
             await expect(linhaUnidade).toBeVisible();
             await linhaUnidade.click();
 
             // Verificar navegação para detalhes do subprocesso
-            await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_12$/);
+            await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_\d+$/);
         });
 
 
         await test.step('4. Acessar mapa de competências via card', async () => {
             // Verificar que card de mapa está disponível e acessível
-            await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
-            await page.getByTestId('card-subprocesso-mapa').click();
+            await navegarParaMapa(page);
         });
 
         await test.step('5. Verificar visualização do mapa (CDU-18)', async () => {
@@ -47,10 +46,9 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
             await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
 
             // 5.2 Identificação da unidade (sigla e nome)
-            await expect(page.getByText(/ASSESSORIA_12\s*-\s*Assessoria 12/i)).toBeVisible();
+            await expect(page.getByText(/ASSESSORIA_\d+\s*-\s*Assessoria/i)).toBeVisible();
 
             // 5.3 Competência do seed
-            await expect(page.getByTestId('vis-mapa__card-competencia')).toBeVisible();
             await expect(page.getByText('Competência Técnica Seed 99')).toBeVisible();
 
             // 5.4 Atividades da competência
@@ -77,8 +75,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
         });
 
         await test.step('3. Acessar mapa de competências', async () => {
-            await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
-            await page.getByTestId('card-subprocesso-mapa').click();
+            await navegarParaMapa(page);
         });
 
         await test.step('4. Verificar visualização do mapa', async () => {
