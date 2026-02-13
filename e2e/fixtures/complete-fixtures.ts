@@ -30,7 +30,15 @@ const arquivosResetados = new Set<string>();
 // Extend para adicionar cleanup automático
 const test = base.extend<{
     cleanupAutomatico: ReturnType<typeof useProcessoCleanup>;
+    resetPorArquivo: void;
 }>({
+    resetPorArquivo: [async ({request}, use, testInfo) => {
+        if (!arquivosResetados.has(testInfo.file)) {
+            await resetDatabase(request);
+            arquivosResetados.add(testInfo.file);
+        }
+        await use();
+    }, {auto: true}],
     // Cleanup automático configurado para cada teste
     cleanupAutomatico: async ({}, use, testInfo) => {
         const cleanup = useProcessoCleanup();
@@ -43,14 +51,6 @@ const test = base.extend<{
         const ctx = await request.newContext();
         await cleanup.limpar(ctx);
         await ctx.dispose();
-    }
-});
-
-// Reset de database uma vez por arquivo por worker.
-test.beforeEach(async ({request}, testInfo) => {
-    if (!arquivosResetados.has(testInfo.file)) {
-        await resetDatabase(request);
-        arquivosResetados.add(testInfo.file);
     }
 });
 
