@@ -90,3 +90,18 @@ Entregáveis
 Critério de Conclusão
 - 100% dos CDUs em `etc/reqs` comparados contra seus `e2e/cdu-xx.spec.ts`.
 - Todas as divergências registradas com evidência e decisão proposta.
+
+Progresso da Auditoria (iniciado)
+- Mapeamento concluído: `etc/reqs` e `e2e` possuem cobertura 1:1 de `CDU-01..CDU-36` (sem faltantes).
+- Eixo adicional de risco de mascaramento incorporado na análise (branches que evitam falha explícita).
+- Primeira amostra auditada (`CDU-01`, `CDU-02`, `CDU-03`) registrada:
+  - `CDU-01`: parcial (2 divergências).
+  - `CDU-02`: parcial (4 divergências, risco médio por branch condicional no cenário de painel vazio).
+  - `CDU-03`: parcial (4 divergências).
+- Hotspots técnicos de mascaramento já identificados para revisão detalhada:
+  - padrão `isVisible().catch(() => false)` em múltiplos CDUs (ex.: 28, 30, 34, 24, 22, 23, 26, 27, 32, 33, 11, 13, 14, 25);
+  - ocorrência de `expect(...).toBeVisible().catch(...)` em `CDU-28`.
+- Execução em andamento:
+  - `CDU-04..CDU-10` auditados e registrados como `parcial`.
+  - Lacunas recorrentes identificadas nesse lote: ausência de asserts para e-mail/alerta/movimentação/data de conclusão e cobertura incompleta de regras por perfil.
+  - Próximo lote: `CDU-11..CDU-18`, mantendo análise explícita de risco de mascaramento por `if/catch/force`.

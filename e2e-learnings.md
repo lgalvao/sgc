@@ -291,3 +291,12 @@ Em ambiente de testes, `LoginFacade.autenticar` registra `Usuário autenticado` 
 **Implicação prática:**
 - Ver o mesmo usuário aparecer 2-3 vezes no log em sequência geralmente significa múltiplos `login(...)` explícitos no fluxo (troca de ator/reentrada) ou cenários paralelos usando o mesmo usuário.
 - Isso, isoladamente, não indica fallback de unidade nem problema de JWT nas rotas de negócio.
+
+### 23. Branches defensivos em E2E podem mascarar bug real
+
+**Risco identificado:**
+Padrões como `isVisible().catch(() => false)` e condicionais do tipo `if (botaoVisivel) { ... }` em cenários críticos podem transformar falha funcional em sucesso silencioso.
+
+**Diretriz de auditoria:**
+- Tratar esses pontos como risco de aderência aos requisitos.
+- Sempre que possível, substituir por assert explícito do comportamento obrigatório do CDU (falhando quando o elemento/estado esperado não existir).
