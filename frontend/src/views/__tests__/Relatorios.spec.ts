@@ -41,7 +41,6 @@ describe("Relatorios.vue", () => {
   let wrapper: any;
   let processosStore: any;
   let mapasStore: any;
-  let perfilStore: any;
 
   const createWrapper = (initialState = {}) => {
     return mount(Relatorios, {

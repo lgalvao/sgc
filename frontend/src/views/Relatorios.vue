@@ -56,7 +56,6 @@ const {
   mostrarModalAndamentoGeral,
   processosFiltrados,
   mapasVigentes,
-  diagnosticosGaps,
   diagnosticosGapsFiltrados,
   abrirModalMapasVigentes,
   abrirModalDiagnosticosGaps,

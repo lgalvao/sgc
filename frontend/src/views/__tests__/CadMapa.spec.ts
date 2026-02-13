@@ -716,7 +716,7 @@ describe("CadMapa.vue", () => {
         (wrapper.vm as any).mostrarModalExcluirCompetencia = true;
         await nextTick();
         // findComponent with the data-testid of the root element in the stub
-        const modal = wrapper.findComponent('[data-testid="mdl-excluir-competencia"]');
+        const modal = wrapper.findComponent('[data-testid="mdl-excluir-competencia"]') as any;
         await modal.vm.$emit('update:modelValue', false);
         expect((wrapper.vm as any).mostrarModalExcluirCompetencia).toBe(false);
     });
