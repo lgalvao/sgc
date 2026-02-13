@@ -362,3 +362,24 @@ No estado atual, ADMIN/CHEFE acessam detalhes do subprocesso diretamente, enquan
 **Ajuste aplicado:**
 - E2E passou a validar os três perfis no mesmo fluxo.
 - Para GESTOR, a validação confirma acesso ao processo e visibilidade da linha da unidade alvo antes de aprofundar em subprocesso.
+
+### 29. CDU-02 deve evitar branches condicionais para estado vazio
+
+**Problema Identificado:**
+O cenário de painel vazio para GESTOR usava `if (!temProcessos)`, o que podia mascarar divergência de comportamento.
+
+**Solução aplicada:**
+- Assert explícito para `empty-state-processos` (sem condicional).
+- Cobertura adicional de ordenação clicável nas tabelas de processos e alertas.
+
+**Pendência conhecida:**
+- Ainda falta validar no E2E o ciclo completo de alerta não lido (negrito) -> visualizado (sem negrito), que depende de geração determinística de alertas no fluxo.
+
+### 30. CDU-08: botão de importação pode estar em caminhos diferentes da UI
+
+**Problema Identificado:**
+No cadastro de atividades, o gatilho de importação pode aparecer no empty state (`btn-empty-state-importar`) e não apenas no dropdown de ações.
+
+**Solução aplicada:**
+- Cobertura E2E passou a validar abertura/fechamento do modal "Importação de atividades" a partir do empty state no fluxo de mapeamento.
+- Mantidos os asserts de fluxo principal (cadastro/edição/remoção/disponibilização) e de impacto no mapa no fluxo de revisão.

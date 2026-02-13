@@ -122,6 +122,24 @@ Consolidar, em um único documento, as correções aplicadas durante a auditoria
   - Navegação por perfil validada explicitamente (subprocesso para ADMIN/CHEFE e visibilidade da unidade no detalhe para GESTOR).
 - **Validação:** `npx playwright test e2e/cdu-07.spec.ts --reporter=list` (**1/1**).
 
+### 13) CDU-02 - Endurecimento de painel e ordenação
+- **Arquivo:** `e2e/cdu-02.spec.ts`
+- **Problemas:**
+  - Cenário de painel vazio com branch condicional (`if (!temProcessos)`), sujeito a falso positivo.
+  - Cobertura fraca para ordenação clicável das tabelas do painel.
+- **Correções:**
+  - Removido branch condicional e substituído por assert obrigatório de `empty-state-processos`.
+  - Incluídos cenários explícitos de ordenação clicável:
+    - tabela de processos (cabeçalho de descrição clicável),
+    - tabela de alertas (alternância por coluna Processo).
+- **Validação:** `npx playwright test e2e/cdu-02.spec.ts --reporter=list` (**10/10**).
+
+### 14) CDU-08 - Cobertura adicional do fluxo de importação
+- **Arquivo:** `e2e/cdu-08.spec.ts`
+- **Problema:** cenário dizia "Fluxo Completo + Importação", mas não validava abertura/fechamento do modal de importação.
+- **Correção:** no cenário de mapeamento, adicionada validação explícita do botão de importação no empty state, abertura do modal "Importação de atividades" e fechamento via botão cancelar.
+- **Validação:** `npx playwright test e2e/cdu-08.spec.ts --reporter=list` (**2/2**).
+
 ---
 
 ## Estado atual da execução
@@ -156,6 +174,8 @@ npx playwright test e2e/cdu-24.spec.ts --reporter=list
 npx playwright test e2e/cdu-32.spec.ts --reporter=list
 npx playwright test e2e/cdu-33.spec.ts --reporter=list
 npx playwright test e2e/cdu-07.spec.ts --reporter=list
+npx playwright test e2e/cdu-02.spec.ts --reporter=list
+npx playwright test e2e/cdu-08.spec.ts --reporter=list
 
 npm run test:unit --prefix frontend -- src/stores/__tests__/feedback.spec.ts
 npm run test:unit --prefix frontend -- src/views/__tests__/CadAtribuicao.spec.ts

@@ -42,6 +42,13 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
             // Agora navega para atividades
             await AtividadeHelpers.navegarParaAtividades(page);
+
+            await expect(page.getByTestId('btn-empty-state-importar')).toBeVisible();
+            await page.getByTestId('btn-empty-state-importar').click();
+            const modalImportacao = page.getByRole('dialog');
+            await expect(modalImportacao.getByText('Importação de atividades')).toBeVisible();
+            await modalImportacao.getByTestId('importar-atividades-modal__btn-modal-cancelar').click();
+            await expect(modalImportacao).toBeHidden();
         });
 
         const atividade1 = `Atividade 1 ${timestamp}`;

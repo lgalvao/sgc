@@ -245,24 +245,6 @@ tasks.jacocoTestReport {
                     // Mocks de teste
                     "sgc/notificacao/NotificacaoModelosServiceMock.class",
                     
-                    // Entidades JPA simples (sem lógica de negócio)
-                    "sgc/**/model/*Perfil.class",
-                    "sgc/**/model/Usuario.class",
-                    "sgc/**/model/Unidade*.class",
-                    "sgc/**/model/Administrador.class",
-                    "sgc/**/model/Vinculacao*.class",
-                    "sgc/**/model/Atribuicao*.class",
-                    "sgc/**/model/Parametro.class",
-                    "sgc/**/model/Movimentacao.class",
-                    "sgc/**/model/Analise.class",
-                    "sgc/**/model/Alerta*.class",
-                    "sgc/**/model/Conhecimento.class",
-                    "sgc/**/model/Mapa.class",
-                    "sgc/**/model/Atividade.class",
-                    "sgc/**/model/Competencia*.class",
-                    "sgc/**/model/Notificacao.class",
-                    "sgc/**/model/Processo.class",
-                    
                     // Enums simples sem lógica de negócio
                     "sgc/**/Status*.class",
                     "sgc/**/Tipo*.class",

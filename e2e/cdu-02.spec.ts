@@ -76,6 +76,16 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await expect(page.getByText(descricaoProcesso)).not.toBeVisible();
         });
 
+        test('Deve alternar ordenação da coluna Descrição na tabela de processos', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
+            const cabecalhoDescricao = page.getByTestId('tbl-processos').getByRole('columnheader', {name: 'Descrição'});
+            await expect(cabecalhoDescricao).toHaveClass(/b-table-sortable-column/);
+            await cabecalhoDescricao.click();
+            await expect(cabecalhoDescricao).toBeVisible();
+
+            await cabecalhoDescricao.click();
+            await expect(cabecalhoDescricao).toBeVisible();
+        });
+
         test('Não deve incluir unidades INTERMEDIARIAS na seleção', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: ReturnType<typeof useProcessoCleanup>}) => {
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
@@ -140,12 +150,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
         test('Deve exibir mensagem quando não há processos', async ({page, autenticadoComoGestor}: {page: Page, autenticadoComoGestor: void}) => {
             const tabela = page.getByTestId('tbl-processos');
             await expect(tabela).toBeVisible();
-
-            // Verifica se há a mensagem de "Nenhum processo encontrado" OU se há processos
-            const temProcessos = await page.getByRole('row').count() > 1;
-            if (!temProcessos) {
-                await expect(page.getByText('Nenhum processo encontrado.')).toBeVisible();
-            }
+            await expect(page.getByTestId('empty-state-processos')).toBeVisible();
         });
 
         test('Deve exibir tabela de alertas vazia', async ({page, autenticadoComoGestor}: {page: Page, autenticadoComoGestor: void}) => {
@@ -156,6 +161,15 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             const linhasAlertas = await tabelaAlertas.getByRole('row').count();
             expect(linhasAlertas).toBeLessThanOrEqual(2);
             await expect(tabelaAlertas).toContainText('Nenhum alerta');
+        });
+
+        test('Deve alternar ordenação de alertas por Processo', async ({page, autenticadoComoGestor}: {page: Page, autenticadoComoGestor: void}) => {
+            const cabecalhoProcesso = page.getByTestId('tbl-alertas').getByRole('columnheader', {name: 'Processo'});
+            await cabecalhoProcesso.click();
+            await expect(cabecalhoProcesso).toHaveAttribute('aria-sort', 'ascending');
+
+            await cabecalhoProcesso.click();
+            await expect(cabecalhoProcesso).toHaveAttribute('aria-sort', 'descending');
         });
     });
 });
