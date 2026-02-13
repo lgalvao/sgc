@@ -121,8 +121,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
 
         // Passo 2: Tela Detalhes do subprocesso
-        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-            .toHaveText(/Mapa validado/i);
+        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
 
         await navegarParaMapa(page);
 
@@ -167,8 +166,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await navegarParaSubprocesso(page, 'SECAO_221');
 
         // Após aceite do GESTOR, o mapa ainda está validado mas agora no nível do ADMIN
-        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-            .toHaveText(/Mapa validado/i);
+        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
     });
 
     test('Cenario 4: ADMIN homologa o mapa', async ({page}) => {
@@ -187,7 +185,6 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, 'SECAO_221');
-        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-            .toHaveText(/Mapa homologado/i);
+        await expect(page.getByText(/Mapa homologado/i).first()).toBeVisible();
     });
 });

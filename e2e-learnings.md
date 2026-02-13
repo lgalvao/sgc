@@ -127,6 +127,22 @@ Mesmo com estado de banco preservado por arquivo, o contexto de autenticação p
 **Solução aplicada:**
 - Adicionar fixture de autenticação no próprio teste (`autenticadoComoAdmin`) ou `login(...)` explícito no início de cada caso dependente.
 
+### 16. Helpers de card devem garantir entrada no subprocesso
+
+**Problema Identificado:**
+Vários cenários falhavam por permanecer em `/processo/{codigo}` (detalhes do processo), onde os cards do subprocesso não existem.
+
+**Solução aplicada:**
+- Em `helpers-atividades.ts` e `helpers-mapas.ts`, o guard de contexto agora tenta selecionar a unidade pela primeira `row` com `cell` visível antes de validar o card.
+
+### 17. Evitar `@Builder` em request record com desserialização Jackson
+
+**Problema Identificado:**
+Fluxos de devolução de revisão (`/devolver-revisao-cadastro`) geraram 500 com `NoClassDefFoundError` para `DevolverCadastroRequestBuilder`.
+
+**Solução aplicada:**
+- Removido `@Builder` de `DevolverCadastroRequest` (record request), mantendo desserialização direta do Jackson e eliminando a falha em runtime.
+
 ## Atualização Contínua - 2026-02-12
 
 ### 10. Perfil de GESTOR deve refletir a hierarquia do caso

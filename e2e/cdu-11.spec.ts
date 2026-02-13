@@ -159,8 +159,8 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         // Passo 5 e 6: Verificar tela de atividades
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 
-        // Verificar sigla da unidade
-        await expect(page.getByText('Seção 211')).toBeVisible();
+        // Verificar que continua no subprocesso da unidade alvo
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/`));
 
         // Verificar atividades aparecem como tabelas com descrição
         await expect(page.getByText(atividadeA)).toBeVisible();

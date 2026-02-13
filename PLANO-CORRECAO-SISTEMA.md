@@ -34,6 +34,15 @@ Progresso Atual
   - Subset em foco (`cdu-11`, `cdu-13`, `cdu-14`) evoluiu para **2 falhas remanescentes** (de 8 iniciais nesse grupo), ambas ligadas a navegação em detalhes de processo quando o card de subprocesso não está visível diretamente.
 - Próximo passo imediato: padronizar helper/navegação ADMIN para sempre resolver subprocesso alvo (tabela de unidades vs detalhe direto) e concluir o fechamento desse trio antes de avançar para `cdu-12/15/16/17/18`.
 - Observação de triagem: parte dos erros manuais pode já estar resolvida ou ser falso positivo; validar cada item contra a base atual (`e2e/setup/seed.sql`) antes de implementar novas correções.
+- Rodada atual (reporte de 6 falhas):
+  - Falhas atacadas: `CDU-05`, `CDU-08`, `CDU-10`, `CDU-11`, `CDU-16`, `CDU-20`.
+  - Correções-chave:
+    - Navegação robusta para subprocesso em helpers de atividades/mapa.
+    - Migração de cliques diretos de cards para helpers resilientes em `CDU-10/11/20`.
+    - Correção backend de erro 500 em devolução de revisão (`DevolverCadastroRequest` sem `@Builder`).
+  - Revalidação:
+    - `CDU-11 + CDU-20`: **15/15 pass**.
+    - Subconjunto dos 6 arquivos anteriormente falhos: estabilizado após patches finais.
 - Nova rodada de estabilização (2026-02-13):
   - Correções aplicadas em navegação E2E (helpers de atividades/mapa/logout e acesso ADMIN/GESTOR).
   - Ajustes de autenticação explícita e robustez de precondição em `cdu-02/03/12/15/16/18`.
