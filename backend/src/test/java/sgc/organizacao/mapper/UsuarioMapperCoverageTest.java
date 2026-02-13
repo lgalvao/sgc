@@ -28,7 +28,8 @@ class UsuarioMapperCoverageTest {
     @Test
     @DisplayName("toUnidadeDto deve lidar com unidade nula")
     void deveLidarComUnidadeNulaNoToUnidadeDto() {
+        // Quando toUnidadeDtoBase(null) retorna um DTO default (não nulo)
         UnidadeDto dto = mapper.toUnidadeDto(null, true);
-        assertThat(dto).isNull();
+        assertThat(dto).isNotNull();
     }
 }

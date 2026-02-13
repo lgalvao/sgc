@@ -56,6 +56,7 @@ class MapaSalvamentoServiceCoverageTest {
         Competencia competenciaExistente = new Competencia();
         competenciaExistente.setCodigo(codComp);
         when(repo.buscar(Competencia.class, codComp)).thenReturn(competenciaExistente);
+        when(competenciaRepo.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         service.salvarMapaCompleto(codMapa, request);

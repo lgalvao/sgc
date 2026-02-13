@@ -84,7 +84,7 @@ const UNIDADE_CRIACAO = 'ASSESSORIA_12';
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
-        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão cadastro homologada/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão de cadastro homologada/i);
     });
 
     test('Cenario 2: ADMIN visualiza botão Reabrir Revisão', async ({page, autenticadoComoAdmin}) => {
@@ -121,7 +121,7 @@ const UNIDADE_CRIACAO = 'ASSESSORIA_12';
         await page.getByTestId('btn-confirmar-reabrir').click();
 
         await expect(page.getByText(/Revisão de cadastro reaberta|Revisão reaberta/i).first()).toBeVisible();
-        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão cadastro em andamento/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão de cadastro em andamento/i);
         await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de revisão de cadastro/i);
     });
 });

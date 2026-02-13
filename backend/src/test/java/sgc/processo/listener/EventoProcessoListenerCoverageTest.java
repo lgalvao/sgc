@@ -63,6 +63,12 @@ class EventoProcessoListenerCoverageTest {
         Processo processo = new Processo();
         processo.setCodigo(codProcesso);
         processo.setDescricao("Processo Teste");
+        
+        sgc.processo.model.UnidadeProcesso up1 = new sgc.processo.model.UnidadeProcesso();
+        up1.setUnidadeCodigo(10L);
+        sgc.processo.model.UnidadeProcesso up2 = new sgc.processo.model.UnidadeProcesso();
+        up2.setUnidadeCodigo(1L);
+        processo.setParticipantes(List.of(up1, up2));
 
         Unidade u1 = new Unidade();
         u1.setCodigo(10L);
@@ -75,11 +81,6 @@ class EventoProcessoListenerCoverageTest {
         u2.setTipo(TipoUnidade.RAIZ);
 
         when(processoFacade.buscarEntidadePorId(codProcesso)).thenReturn(processo);
-        // Simular que unidades participantes são u1 e u2
-        // Na prática, processo.getCodigosParticipantes() precisaria retornar esses IDs
-        // Mas o listener chama unidadeService.buscarEntidadesPorIds(codigos)
-        
-        // Mocking individual methods instead of dependency setup for simplicity in coverage
         when(unidadeService.buscarEntidadesPorIds(any())).thenReturn(List.of(u1, u2));
         
         UnidadeResponsavelDto resp1 = new UnidadeResponsavelDto(10L, "Tit1", "Nome1", "Sub1", "NomeSub1");

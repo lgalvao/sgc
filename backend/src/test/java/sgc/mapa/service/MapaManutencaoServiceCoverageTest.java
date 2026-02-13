@@ -13,8 +13,6 @@ import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.Mapa;
 
 import java.util.List;
-import java.util.Map;
-
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,8 +41,10 @@ class MapaManutencaoServiceCoverageTest {
         when(atividadeRepo.findAllById(any())).thenReturn(List.of(atividade));
 
         // Act
-        // Passando null como valor para o código 1L
-        service.atualizarDescricoesAtividadeEmLote(Map.of(codAtiv, (String)null));
+        // Passando null como valor para o código 1L (Map.of não permite null values)
+        java.util.Map<Long, String> descricoes = new java.util.HashMap<>();
+        descricoes.put(codAtiv, null);
+        service.atualizarDescricoesAtividadeEmLote(descricoes);
 
         // Assert
         // A descrição não deve ter mudado (cobertura da linha 80)
