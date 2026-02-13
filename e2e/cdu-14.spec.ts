@@ -157,7 +157,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         // Verificar mensagem de sucesso
-        await expect(page.getByText(/Revisão disponibilizada/i).first()).toBeVisible();
+        await expect(page.getByText(/Revisão do cadastro de atividades disponibilizada/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
@@ -198,7 +198,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
-        await expect(page.getByText(/Revisão disponibilizada/i).first()).toBeVisible();
+        await expect(page.getByText(/Revisão do cadastro de atividades disponibilizada/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 

@@ -117,37 +117,30 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     // ========================================================================
 
     test('Cenario 1: GESTOR acessa processo com mapa validado', async ({page}) => {
-        
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
 
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnAceitar = page.getByRole('button', {name: /Aceitar.*Bloco/i});
-        const btnVisivel = await btnAceitar.isVisible().catch(() => false);
-        
-        if (btnVisivel) {
-            await expect(btnAceitar).toBeEnabled();
-        }
+        const btnAceitar = page.getByRole('button', {name: /Aceitar em bloco/i}).first();
+        await expect(btnAceitar).toBeVisible();
+        await expect(btnAceitar).toBeEnabled();
     });
 
     test('Cenario 2: GESTOR abre modal de aceite de mapa em bloco', async ({page}) => {
-        
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
 
         await page.getByText(descProcesso).click();
+        const btnAceitar = page.getByRole('button', {name: /Aceitar em bloco/i}).first();
+        await btnAceitar.click();
 
-        const btnAceitar = page.getByRole('button', {name: /Aceitar.*Bloco/i});
-        
-        if (await btnAceitar.isVisible().catch(() => false)) {
-            await btnAceitar.click();
-
-            const modal = page.getByRole('dialog');
-            await expect(modal).toBeVisible();
-            await expect(modal.locator('table')).toBeVisible();
-            await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
-
-            await modal.getByRole('button', {name: /Cancelar/i}).click();
-        }
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await expect(modal.getByRole('heading', {name: /bloco/i})).toBeVisible();
+        await expect(modal.getByText(/Selecione as unidades/i)).toBeVisible();
+        await expect(modal.getByRole('button', {name: /Registrar aceite|Aceitar selecionados/i})).toBeVisible();
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
+        await expect(modal).toBeHidden();
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 });

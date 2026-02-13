@@ -79,6 +79,7 @@ export function useProcessoView() {
 
     const unidadesElegiveis = computed(() => {
         const elegiveis = unidadesElegiveisPorAcao.value[acaoBlocoAtual.value];
+        if (!elegiveis) return [];
         return elegiveis.map(u => ({
             codigo: u.codUnidade,
             sigla: u.sigla,
@@ -202,6 +203,8 @@ export function useProcessoView() {
         tituloModalBloco,
         textoModalBloco,
         rotuloBotaoBloco,
+        mensagemSucessoAcaoBloco,
+        unidadesElegiveisPorAcao,
         abrirDetalhesUnidade,
         finalizarProcesso,
         confirmarFinalizacao,

@@ -18,6 +18,11 @@ async function garantirContextoSubprocesso(page: Page) {
 }
 
 export async function navegarParaMapa(page: Page) {
+    if (/\/vis-mapa$/.test(page.url())) {
+        await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
+        return;
+    }
+
     const testId = 'card-subprocesso-mapa';
     await garantirContextoSubprocesso(page);
     await expect(page.getByTestId(testId)).toBeVisible();

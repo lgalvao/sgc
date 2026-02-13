@@ -217,7 +217,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         disponibilizarRevisaoCadastro: (codSubrocesso: number) =>
             _executarAcao(
                 () => disponibilizarRevisaoCadastro(codSubrocesso),
-                "Revisão disponibilizada",
+                "Revisão do cadastro de atividades disponibilizada",
                 "Erro ao disponibilizar",
             ),
         devolverCadastro: (codSubrocesso: number, req: DevolverCadastroRequest) =>

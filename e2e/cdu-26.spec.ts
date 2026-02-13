@@ -119,12 +119,9 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnHomologar = page.getByRole('button', {name: /Homologar.*Bloco/i});
-        const btnVisivel = await btnHomologar.isVisible().catch(() => false);
-        
-        if (btnVisivel) {
-            await expect(btnHomologar).toBeEnabled();
-        }
+        const btnHomologar = page.getByRole('button', {name: /^Homologar em bloco$/i}).first();
+        await expect(btnHomologar).toBeVisible();
+        await expect(btnHomologar).toBeEnabled();
     });
 
     test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({page, autenticadoComoAdmin}) => {
@@ -132,20 +129,18 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
 
         await page.getByText(descProcesso).click();
 
-        const btnHomologar = page.getByRole('button', {name: /Homologar.*Bloco/i});
-        
-        if (await btnHomologar.isVisible().catch(() => false)) {
-            await btnHomologar.click();
+        const btnHomologar = page.getByRole('button', {name: /^Homologar em bloco$/i}).first();
+        await expect(btnHomologar).toBeVisible();
+        await btnHomologar.click();
 
-            const modal = page.getByRole('dialog');
-            await expect(modal).toBeVisible();
-            await expect(modal.getByText(/Homologar/i)).toBeVisible();
-            await expect(modal.locator('table')).toBeVisible();
-            await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
-            await expect(modal.getByRole('button', {name: /Homologar/i})).toBeVisible();
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await expect(modal.getByText(/Homologar/i).first()).toBeVisible();
+        await expect(modal.locator('table')).toBeVisible();
+        await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
+        await expect(modal.getByRole('button', {name: /Homologar/i})).toBeVisible();
 
-            await modal.getByRole('button', {name: /Cancelar/i}).click();
-        }
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
     });
 
     test('Cenario 3: Cancelar homologação de mapa em bloco', async ({page, autenticadoComoAdmin}) => {
@@ -153,18 +148,16 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
 
         await page.getByText(descProcesso).click();
 
-        const btnHomologar = page.getByRole('button', {name: /Homologar.*Bloco/i});
-        
-        if (await btnHomologar.isVisible().catch(() => false)) {
-            await btnHomologar.click();
+        const btnHomologar = page.getByRole('button', {name: /^Homologar em bloco$/i}).first();
+        await expect(btnHomologar).toBeVisible();
+        await btnHomologar.click();
 
-            const modal = page.getByRole('dialog');
-            await expect(modal).toBeVisible();
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
 
-            await modal.getByRole('button', {name: /Cancelar/i}).click();
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
 
-            await expect(modal).toBeHidden();
-            await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-        }
+        await expect(modal).toBeHidden();
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 });

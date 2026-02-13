@@ -176,4 +176,26 @@ describe('CadAtribuicao.vue', () => {
 
         expect(mockPush).toHaveBeenCalledWith('/unidade/1');
     });
+
+    it('valida campos obrigatorios', async () => {
+        context.wrapper = criarWrapper();
+        await flushPromises();
+
+        // Sem usuario
+        await context.wrapper!.find('form').trigger('submit');
+        expect(mockFeedbackShow).toHaveBeenCalledWith('Erro', expect.stringContaining('Selecione um usuário'), 'danger');
+
+        // Com usuario, sem justificativa
+        context.wrapper!.vm.usuarioSelecionado = '111';
+        await context.wrapper!.find('form').trigger('submit');
+        expect(mockFeedbackShow).toHaveBeenCalledWith('Erro', expect.stringContaining('Preencha data de início'), 'danger');
+    });
+
+    it('lida com erro no mount', async () => {
+        mockBuscarUnidade.mockRejectedValueOnce(new Error('Fetch Error'));
+        context.wrapper = criarWrapper();
+        await flushPromises();
+
+        expect(context.wrapper!.vm.erroUsuario).toBe("Falha ao carregar dados da unidade ou usuários.");
+    });
 });

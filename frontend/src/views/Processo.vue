@@ -118,6 +118,8 @@ const {
   tituloModalBloco,
   textoModalBloco,
   rotuloBotaoBloco,
+  mensagemSucessoAcaoBloco,
+  unidadesElegiveisPorAcao,
   abrirDetalhesUnidade,
   finalizarProcesso,
   confirmarFinalizacao,
@@ -131,5 +133,9 @@ defineExpose({
   acaoBlocoAtual,
   unidadesElegiveis,
   perfilStore,
+  tituloModalBloco,
+  textoModalBloco,
+  rotuloBotaoBloco,
+  mensagemSucessoAcaoBloco,
 });
 </script>

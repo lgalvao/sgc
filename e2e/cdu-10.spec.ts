@@ -100,8 +100,11 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
             // Admin homologa mapa e finaliza processo
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-            await page.getByText(descProcessoMapeamento).click();
-            await navegarParaSubprocesso(page, UNIDADE_ALVO);
+            await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
+            if (/\/processo\/\d+$/.test(page.url())) {
+                await page.getByRole('row', {name: new RegExp(UNIDADE_ALVO)}).click();
+            }
+            await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
             await navegarParaMapa(page);
             await page.getByTestId('btn-mapa-homologar-aceite').click();
             await page.getByTestId('btn-aceite-mapa-confirmar').click();
@@ -134,7 +137,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await adicionarAtividade(page, `Atividade Revisão Nova ${timestamp}`);
             await adicionarConhecimento(page, `Atividade Revisão Nova ${timestamp}`, 'Conhecimento Revisão');
             await page.getByTestId('btn-cad-atividades-voltar').click({force: true});
-            await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
+            await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro em andamento/i);
         });
 
@@ -177,7 +180,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await page.getByTestId('btn-acao-devolver').click();
             const motivoDevolucao = 'Necessário revisar os conhecimentos técnicos.';
             await page.getByTestId('inp-devolucao-cadastro-obs').fill(motivoDevolucao);
-            await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
+            await page.getByTestId('btn-devolucao-cadastro-confirmar').click({force: true});
             await verificarPaginaPainel(page);
 
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
@@ -189,7 +192,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await fecharHistoricoAnalise(page);
 
             await disponibilizarCadastro(page);
-            await expect(page.getByText(/Revisão disponibilizada/i).first()).toBeVisible();
+            await expect(page.getByText(/Revisão do cadastro de atividades disponibilizada/i).first()).toBeVisible();
             await verificarPaginaPainel(page);
         });
 
@@ -199,7 +202,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await navegarParaAtividadesVisualizacao(page);
             await page.getByTestId('btn-acao-devolver').click();
             await page.getByTestId('inp-devolucao-cadastro-obs').fill('Segunda devolução');
-            await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
+            await page.getByTestId('btn-devolucao-cadastro-confirmar').click({force: true});
             await verificarPaginaPainel(page);
 
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
@@ -207,7 +210,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await navegarParaAtividades(page);
             
             await disponibilizarCadastro(page);
-            await expect(page.getByText(/Revisão disponibilizada/i).first()).toBeVisible();
+            await expect(page.getByText(/Revisão do cadastro de atividades disponibilizada/i).first()).toBeVisible();
             await verificarPaginaPainel(page);
 
             // Admin devolve novamente
@@ -216,7 +219,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await navegarParaAtividadesVisualizacao(page);
             await page.getByTestId('btn-acao-devolver').click();
             await page.getByTestId('inp-devolucao-cadastro-obs').fill('Terceira devolução');
-            await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
+            await page.getByTestId('btn-devolucao-cadastro-confirmar').click({force: true});
             await verificarPaginaPainel(page);
 
             // Chefe verifica que histórico tem apenas a última devolução

@@ -1,7 +1,21 @@
-# Relatório Integral de Correções - Auditoria REQ x E2E
+# Relatório Integral de Bugs de Sistema Corrigidos
 
 ## Objetivo
-Consolidar, em um único documento, as correções aplicadas durante a auditoria de aderência entre requisitos (`etc/reqs`) e testes E2E (`e2e/cdu-xx.spec.ts`), incluindo bugs reais de sistema corrigidos.
+Consolidar, em um único documento, **bugs reais de sistema** corrigidos (backend/frontend), com evidência de validação.
+
+## Escopo corrigido (2026-02-13)
+- Este arquivo passa a ser mantido com foco primário em bug de sistema.
+- Endurecimento de E2E sem correção funcional deve ficar no relatório de auditoria (`RELATORIO-AUDITORIA-REQ-E2E.md`) e em `e2e-learnings.md`.
+- Entradas históricas de endurecimento ainda presentes abaixo serão gradualmente migradas para não perder rastreabilidade.
+
+## Bugs de sistema corrigidos (resumo executivo)
+- Feedback global com descarte de toasts simultâneos (fila no `feedbackStore`).
+- Registro de movimentação/permissão no envio de lembrete (CDU-34).
+- Regressão arquitetural (Facade acessando repo diretamente) corrigida.
+- Ação em bloco com endpoint/payload incompatível corrigida no frontend.
+- Template de e-mail ausente para reabertura de cadastro/revisão (erro runtime) corrigido.
+- Regressão de runtime em `Processo.vue` (`defineExpose` inválido) corrigida.
+- Feedback de sucesso ausente em fluxo de mapa (`useVisMapa`) corrigido.
 
 ---
 
@@ -140,6 +154,42 @@ Consolidar, em um único documento, as correções aplicadas durante a auditoria
 - **Correção:** no cenário de mapeamento, adicionada validação explícita do botão de importação no empty state, abertura do modal "Importação de atividades" e fechamento via botão cancelar.
 - **Validação:** `npx playwright test e2e/cdu-08.spec.ts --reporter=list` (**2/2**).
 
+### 15) CDU-10 - Ajustes de aderência na disponibilização de revisão
+- **Arquivos:** `e2e/cdu-10.spec.ts`, `frontend/src/stores/subprocessos.ts`, `e2e/helpers/helpers-mapas.ts`
+- **Correções:**
+  - E2E reforçado para validar texto/mensagem do modal de confirmação na disponibilização da revisão.
+  - Mensagem de sucesso alinhada ao requisito: `"Revisão do cadastro de atividades disponibilizada"`.
+  - Validação explícita de movimentação após disponibilização.
+  - Ajustes de robustez no fluxo de preparação (navegação de subprocesso/mapa) para evitar falso negativo por contexto de rota.
+- **Validação:** `npx playwright test e2e/cdu-10.spec.ts --reporter=list` (**1/1**).
+
+### 16) CDU-20 - Endurecimento de análise de validação do mapa
+- **Arquivos:** `e2e/cdu-20.spec.ts`, `frontend/src/composables/useVisMapa.ts`, `frontend/src/views/Processo.vue`
+- **Correções:**
+  - E2E ampliado com cenário de cancelamento da devolução para ajustes, incluindo validação do conteúdo do modal.
+  - Asserts de mensagens de sucesso pós-ação:
+    - `Aceite registrado` (GESTOR)
+    - `Homologação efetivada` (ADMIN)
+  - Correção de regressão em `Processo.vue` (`defineExpose`) que causava `ReferenceError` durante navegação em fluxo real.
+  - `useVisMapa` atualizado para exibir feedback explícito também em devolução confirmada (`Devolução realizada`).
+- **Validação:** `npx playwright test e2e/cdu-20.spec.ts --reporter=list` (**10/10**).
+
+### 17) CDU-25 - Endurecimento de aceite de mapa em bloco
+- **Arquivo:** `e2e/cdu-25.spec.ts`
+- **Correções:**
+  - Removidos branches defensivos (`if isVisible/catch`) dos cenários de acesso e abertura de modal.
+  - Seletores endurecidos para o botão de ação em bloco e heading do modal.
+  - Cenário de cancelamento agora valida permanência na tela de detalhes do processo com assert explícito.
+- **Validação:** `npx playwright test e2e/cdu-25.spec.ts --reporter=list` (**6/6**).
+
+### 18) CDU-26 - Endurecimento de homologação de mapa em bloco
+- **Arquivo:** `e2e/cdu-26.spec.ts`
+- **Correções:**
+  - Removidos `if/catch` de visibilidade nos cenários de homologação em bloco.
+  - Assert explícito do botão principal "Homologar em bloco" e validação obrigatória de modal.
+  - Cenário de cancelamento validando fechamento do modal e permanência na tela.
+- **Validação:** `npx playwright test e2e/cdu-26.spec.ts --reporter=list` (**7/7**).
+
 ---
 
 ## Estado atual da execução
@@ -176,6 +226,10 @@ npx playwright test e2e/cdu-33.spec.ts --reporter=list
 npx playwright test e2e/cdu-07.spec.ts --reporter=list
 npx playwright test e2e/cdu-02.spec.ts --reporter=list
 npx playwright test e2e/cdu-08.spec.ts --reporter=list
+npx playwright test e2e/cdu-10.spec.ts --reporter=list
+npx playwright test e2e/cdu-20.spec.ts --reporter=list
+npx playwright test e2e/cdu-25.spec.ts --reporter=list
+npx playwright test e2e/cdu-26.spec.ts --reporter=list
 
 npm run test:unit --prefix frontend -- src/stores/__tests__/feedback.spec.ts
 npm run test:unit --prefix frontend -- src/views/__tests__/CadAtribuicao.spec.ts

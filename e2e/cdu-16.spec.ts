@@ -201,7 +201,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Revisão disponibilizada/i).first()).toBeVisible();
+        await expect(page.getByText(/Revisão do cadastro de atividades disponibilizada/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 

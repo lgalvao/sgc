@@ -1,0 +1,153 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/leonardo/sgc/frontend[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | src/views/__tests__/ProcessoView.spec.ts[2m > [22m[2mProcesso.vue[2m > [22m[2mdeve cobrir default cases nos switches de useProcessoView
+[22m[39m[Vue warn]: Unhandled error during execution of render function 
+  at <Anonymous class="mt-4" > 
+  at <Processo ref="VTU_COMPONENT" > 
+  at <VTUROOT>
+[Vue warn]: Unhandled error during execution of component update 
+  at <Anonymous class="mt-4" > 
+  at <Processo ref="VTU_COMPONENT" > 
+  at <VTUROOT>
+
+[90mstderr[2m | src/views/__tests__/ProcessoView.spec.ts[2m > [22m[2mProcesso.vue[2m > [22m[2mdeve achatar unidades recursivamente
+[22m[39m[Vue warn]: Unhandled error during execution of render function 
+  at <Anonymous class="mt-4" > 
+  at <Processo ref="VTU_COMPONENT" > 
+  at <VTUROOT>
+[Vue warn]: Unhandled error during execution of component update 
+  at <Anonymous class="mt-4" > 
+  at <Processo ref="VTU_COMPONENT" > 
+  at <VTUROOT>
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[31mx[39m[33m[39m[31mx[39m[33m[39m[32m·[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/views/__tests__/ProcessoView.spec.ts[2m > [22mProcesso.vue[2m > [22mdeve cobrir default cases nos switches de useProcessoView
+[31m[1mAssertionError[22m: expected undefined to be 'Ação em bloco realizada com sucesso' // Object.is equality[39m
+
+[32m- Expected:[39m 
+"Ação em bloco realizada com sucesso"
+
+[31m+ Received:[39m 
+undefined
+
+[36m [2m❯[22m src/views/__tests__/ProcessoView.spec.ts:[2m602:62[22m[39m
+    [90m600| [39m        [34mexpect[39m((wrapper[33m.[39mvm [35mas[39m any)[33m.[39mtextoModalBloco)[33m.[39m[34mtoBe[39m([32m""[39m)[33m;[39m
+    [90m601| [39m        [34mexpect[39m((wrapper[33m.[39mvm [35mas[39m any)[33m.[39mrotuloBotaoBloco)[33m.[39m[34mtoBe[39m([32m""[39m)[33m;[39m
+    [90m602| [39m        expect((wrapper.vm as any).mensagemSucessoAcaoBloco).toBe("Açã…
+    [90m   | [39m                                                             [31m^[39m
+    [90m603| [39m    })[33m;[39m
+    [90m604| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/views/__tests__/ProcessoView.spec.ts[2m > [22mProcesso.vue[2m > [22mdeve achatar unidades recursivamente
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'map')[39m
+[36m [2m❯[22m ComputedRefImpl.fn src/composables/useProcessoView.ts:[2m82:26[22m[39m
+    [90m 80| [39m    [35mconst[39m unidadesElegiveis [33m=[39m [34mcomputed[39m(() [33m=>[39m {
+    [90m 81| [39m        const elegiveis = unidadesElegiveisPorAcao.value[acaoBlocoAtua…
+    [90m 82| [39m        [35mreturn[39m elegiveis[33m.[39m[34mmap[39m(u [33m=>[39m ({
+    [90m   | [39m                         [31m^[39m
+    [90m 83| [39m            codigo[33m:[39m u[33m.[39mcodUnidade[33m,[39m
+    [90m 84| [39m            sigla[33m:[39m u[33m.[39msigla[33m,[39m
+[90m [2m❯[22m refreshComputed node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m397:28[22m[39m
+[90m [2m❯[22m ComputedRefImpl.get value [as value] node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m1711:5[22m[39m
+[90m [2m❯[22m unref node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m1536:45[22m[39m
+[90m [2m❯[22m Object.get node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m1542:64[22m[39m
+[90m [2m❯[22m src/views/Processo.vue:[2m64:20[22m[39m
+[90m [2m❯[22m renderFnWithContext node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:[2m692:13[22m[39m
+[90m [2m❯[22m renderSlot node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:[2m3231:53[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/vue/dist/vue.cjs.js:[2m71:18[22m[39m
+[90m [2m❯[22m renderComponentRoot node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:[2m4499:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Unhandled Errors [49m[22m[31m⎯⎯⎯⎯⎯⎯[39m
+[31m[1m
+Vitest caught 3 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.[22m[39m
+
+[31m⎯⎯⎯⎯[39m[1m[41m Unhandled Rejection [49m[22m[31m⎯⎯⎯⎯⎯[39m
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'map')[39m
+[36m [2m❯[22m ComputedRefImpl.fn src/composables/useProcessoView.ts:[2m82:26[22m[39m
+    [90m 80| [39m    [35mconst[39m unidadesElegiveis [33m=[39m [34mcomputed[39m(() [33m=>[39m {
+    [90m 81| [39m        const elegiveis = unidadesElegiveisPorAcao.value[acaoBlocoAtua…
+    [90m 82| [39m        [35mreturn[39m elegiveis[33m.[39m[34mmap[39m(u [33m=>[39m ({
+    [90m   | [39m                         [31m^[39m
+    [90m 83| [39m            codigo[33m:[39m u[33m.[39mcodUnidade[33m,[39m
+    [90m 84| [39m            sigla[33m:[39m u[33m.[39msigla[33m,[39m
+[90m [2m❯[22m refreshComputed node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m397:28[22m[39m
+[90m [2m❯[22m ComputedRefImpl.get value [as value] node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m1711:5[22m[39m
+[90m [2m❯[22m unref node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m1536:45[22m[39m
+[90m [2m❯[22m Object.get node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m1542:64[22m[39m
+[90m [2m❯[22m src/views/Processo.vue:[2m64:20[22m[39m
+[90m [2m❯[22m renderFnWithContext node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:[2m692:13[22m[39m
+[90m [2m❯[22m renderSlot node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:[2m3231:53[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/vue/dist/vue.cjs.js:[2m71:18[22m[39m
+[90m [2m❯[22m renderComponentRoot node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:[2m4499:16[22m[39m
+
+[31mThis error originated in "[1msrc/views/__tests__/ProcessoView.spec.ts[22m" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.[39m
+[31mThe latest test that might've caused the error is "[1mdeve ser acessível[22m". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.[39m
+
+[31m⎯⎯⎯⎯[39m[1m[41m Unhandled Rejection [49m[22m[31m⎯⎯⎯⎯⎯[39m
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'map')[39m
+[36m [2m❯[22m ComputedRefImpl.fn src/composables/useProcessoView.ts:[2m82:26[22m[39m
+    [90m 80| [39m    [35mconst[39m unidadesElegiveis [33m=[39m [34mcomputed[39m(() [33m=>[39m {
+    [90m 81| [39m        const elegiveis = unidadesElegiveisPorAcao.value[acaoBlocoAtua…
+    [90m 82| [39m        [35mreturn[39m elegiveis[33m.[39m[34mmap[39m(u [33m=>[39m ({
+    [90m   | [39m                         [31m^[39m
+    [90m 83| [39m            codigo[33m:[39m u[33m.[39mcodUnidade[33m,[39m
+    [90m 84| [39m            sigla[33m:[39m u[33m.[39msigla[33m,[39m
+[90m [2m❯[22m refreshComputed node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m397:28[22m[39m
+[90m [2m❯[22m ComputedRefImpl.get value [as value] node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m1711:5[22m[39m
+[90m [2m❯[22m unref node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m1536:45[22m[39m
+[90m [2m❯[22m Object.get node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m1542:64[22m[39m
+[90m [2m❯[22m src/views/Processo.vue:[2m64:20[22m[39m
+[90m [2m❯[22m renderFnWithContext node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:[2m692:13[22m[39m
+[90m [2m❯[22m renderSlot node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:[2m3231:53[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/vue/dist/vue.cjs.js:[2m71:18[22m[39m
+[90m [2m❯[22m renderComponentRoot node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:[2m4499:16[22m[39m
+
+[31mThis error originated in "[1msrc/views/__tests__/ProcessoView.spec.ts[22m" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.[39m
+[31mThe latest test that might've caused the error is "[1mdeve ser acessível[22m". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.[39m
+
+[31m⎯⎯⎯⎯[39m[1m[41m Unhandled Rejection [49m[22m[31m⎯⎯⎯⎯⎯[39m
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'map')[39m
+[36m [2m❯[22m ComputedRefImpl.fn src/composables/useProcessoView.ts:[2m82:26[22m[39m
+    [90m 80| [39m    [35mconst[39m unidadesElegiveis [33m=[39m [34mcomputed[39m(() [33m=>[39m {
+    [90m 81| [39m        const elegiveis = unidadesElegiveisPorAcao.value[acaoBlocoAtua…
+    [90m 82| [39m        [35mreturn[39m elegiveis[33m.[39m[34mmap[39m(u [33m=>[39m ({
+    [90m   | [39m                         [31m^[39m
+    [90m 83| [39m            codigo[33m:[39m u[33m.[39mcodUnidade[33m,[39m
+    [90m 84| [39m            sigla[33m:[39m u[33m.[39msigla[33m,[39m
+[90m [2m❯[22m refreshComputed node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m397:28[22m[39m
+[90m [2m❯[22m ComputedRefImpl.get value [as value] node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m1711:5[22m[39m
+[90m [2m❯[22m unref node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m1536:45[22m[39m
+[90m [2m❯[22m Object.get node_modules/@vue/reactivity/dist/reactivity.cjs.js:[2m1542:64[22m[39m
+[90m [2m❯[22m src/views/Processo.vue:[2m64:20[22m[39m
+[90m [2m❯[22m renderFnWithContext node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:[2m692:13[22m[39m
+[90m [2m❯[22m renderSlot node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:[2m3231:53[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/vue/dist/vue.cjs.js:[2m71:18[22m[39m
+[90m [2m❯[22m renderComponentRoot node_modules/@vue/runtime-core/dist/runtime-core.cjs.js:[2m4499:16[22m[39m
+
+[31mThis error originated in "[1msrc/views/__tests__/ProcessoView.spec.ts[22m" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.[39m
+[31mThe latest test that might've caused the error is "[1mdeve ser acessível[22m". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.[39m
+[31m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m19 passed[39m[22m[90m (21)[39m
+[2m     Errors [22m [1m[31m3 errors[39m[22m
+[2m   Start at [22m 16:57:50
+[2m   Duration [22m 2.87s[2m (transform 228ms, setup 110ms, import 1.89s, tests 240ms, environment 429ms)[22m
+

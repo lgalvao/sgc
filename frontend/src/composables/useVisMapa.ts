@@ -193,6 +193,11 @@ export function useVisMapa(): UseVisMapa {
                 });
             }
             fecharModalAceitar();
+            feedbackStore.show(
+                "Sucesso",
+                isHomologacao ? "Homologação efetivada" : "Aceite registrado",
+                "success",
+            );
             await router.push({ name: "Painel" });
         } catch (error) {
             logger.error(error);
@@ -212,6 +217,7 @@ export function useVisMapa(): UseVisMapa {
                 observacoes: observacaoDevolucao.value,
             });
             fecharModalDevolucao();
+            feedbackStore.show("Sucesso", "Devolução realizada", "success");
             await router.push({ name: "Painel" });
         } catch (error) {
             logger.error(error);

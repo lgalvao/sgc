@@ -548,6 +548,81 @@ describe("Processo.vue", () => {
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro ao finalizar", "Erro finalização", "danger");
     });
 
+    it("não deve redirecionar se unidade não for clicável", async () => {
+        wrapper = createWrapper();
+        processosStore = useProcessosStore();
+        processosStore.$patch({ processoDetalhe: mockProcesso });
+        await flushPromises();
+
+        const treeTable = wrapper.findComponent(TreeTableStub);
+        await treeTable.vm.$emit("row-click", { sigla: "UNI1", clickable: false });
+
+        expect(mocks.push).not.toHaveBeenCalled();
+    });
+
+    it("deve usar mensagem de erro da store ao falhar finalização", async () => {
+        wrapper = createWrapper();
+        processosStore = useProcessosStore();
+        feedbackStore = useFeedbackStore();
+        processosStore.$patch({ processoDetalhe: mockProcesso });
+
+        await nextTick();
+        await flushPromises();
+
+        processosStore.finalizarProcesso.mockRejectedValue(new Error("Erro original"));
+        // Mock lastError is usually reactive, but in testing-pinia with stubActions:true it's just a ref if we want
+        // But here we just set it on the mock store
+        processosStore.lastError = { message: "Erro customizado da store" };
+
+        const acoes = wrapper.findComponent(ProcessoAcoesStub);
+        await acoes.vm.$emit("finalizar"); // Abre modal
+        const modalConfirmacao = wrapper.findComponent(ModalConfirmacaoStub);
+        await modalConfirmacao.vm.$emit("confirmar");
+
+        expect(feedbackStore.show).toHaveBeenCalledWith("Erro ao finalizar", "Erro customizado da store", "danger");
+    });
+
+    it("deve cobrir default cases nos switches de useProcessoView", async () => {
+        wrapper = createWrapper();
+        processosStore = useProcessosStore();
+        processosStore.$patch({ processoDetalhe: mockProcesso });
+        await flushPromises();
+
+        // Acessamos as computeds via wrapper.vm
+        (wrapper.vm as any).acaoBlocoAtual = "invalido";
+        expect((wrapper.vm as any).tituloModalBloco).toBe("");
+        expect((wrapper.vm as any).textoModalBloco).toBe("");
+        expect((wrapper.vm as any).rotuloBotaoBloco).toBe("");
+        expect((wrapper.vm as any).mensagemSucessoAcaoBloco).toBe("Ação em bloco realizada com sucesso");
+    });
+
+    it("deve achatar unidades recursivamente", async () => {
+        wrapper = createWrapper();
+        processosStore = useProcessosStore();
+        const processoComFilhos = {
+            ...mockProcesso,
+            unidades: [{
+                codUnidade: 201,
+                sigla: "PAI",
+                situacaoSubprocesso: SituacaoSubprocesso.NAO_INICIADO,
+                filhos: [{
+                    codUnidade: 202,
+                    sigla: "FILHO",
+                    situacaoSubprocesso: SituacaoSubprocesso.NAO_INICIADO,
+                    filhos: []
+                }]
+            }]
+        };
+        processosStore.$patch({ processoDetalhe: processoComFilhos });
+        
+        // Mudamos para acao que aceita NAO_INICIADO
+        (wrapper.vm as any).acaoBlocoAtual = 'disponibilizar';
+        await nextTick();
+        
+        // As duas unidades devem ser elegíveis para disponibilizar
+        expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(2);
+    });
+
     it("deve ser acessível", async () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();

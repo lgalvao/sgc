@@ -383,3 +383,42 @@ No cadastro de atividades, o gatilho de importação pode aparecer no empty stat
 **Solução aplicada:**
 - Cobertura E2E passou a validar abertura/fechamento do modal "Importação de atividades" a partir do empty state no fluxo de mapeamento.
 - Mantidos os asserts de fluxo principal (cadastro/edição/remoção/disponibilização) e de impacto no mapa no fluxo de revisão.
+
+### 31. CDU-10: alinhar mensagem de sucesso com o requisito
+
+**Problema Identificado:**
+Na disponibilização de revisão, o feedback usava texto genérico ("Revisão disponibilizada"), divergente do requisito.
+
+**Solução aplicada:**
+- Mensagem de sucesso ajustada no store para: **"Revisão do cadastro de atividades disponibilizada"**.
+- E2E passou a validar conteúdo do modal de confirmação e movimentação após disponibilização.
+
+### 32. CDU-20: feedback explícito após aceite/homologação melhora aderência
+
+**Problema Identificado:**
+Após `Registrar aceite` e `Homologar`, o fluxo redirecionava ao painel sem mensagem de sucesso aderente ao CDU.
+
+**Solução aplicada:**
+- `useVisMapa` passou a exibir feedback de sucesso explícito:
+  - `Aceite registrado` (GESTOR)
+  - `Homologação efetivada` (ADMIN)
+  - `Devolução realizada` (devolução confirmada)
+- E2E inclui validação de cancelamento da devolução com permanência na tela.
+
+### 33. CDU-25: modal de ação em bloco exige seletor semântico para evitar ambiguidade
+
+**Problema Identificado:**
+No `CDU-25`, `modal.getByText(/bloco/i)` gerava violação de strict mode por múltiplas ocorrências de “bloco” no mesmo diálogo.
+
+**Solução aplicada:**
+- Substituir assert genérico por seletor semântico: `getByRole('heading', { name: /bloco/i })`.
+- Manter validação adicional do texto descritivo do modal para garantir aderência funcional.
+
+### 34. CDU-26: distinguir botão principal de ação em bloco do botão secundário
+
+**Problema Identificado:**
+No detalhe do processo havia dois botões com rótulos semelhantes para homologação, causando ambiguidade no locator por role/name.
+
+**Solução aplicada:**
+- Validar e acionar explicitamente o botão principal `"Homologar em bloco"` para abrir modal.
+- Evitar locators genéricos quando existirem ações de contexto com texto parecido na mesma tela.

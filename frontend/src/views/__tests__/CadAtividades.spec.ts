@@ -533,4 +533,42 @@ describe("CadAtividades.vue", () => {
 
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro na remoção", "Erro ao remover", "danger");
     });
+
+    it("não deve remover atividade se codSubprocesso nulo", async () => {
+        const { wrapper } = createWrapper();
+        await flushPromises();
+        (wrapper.vm as any).codSubprocesso = null;
+        
+        const item = wrapper.findComponent(AtividadeItemStub);
+        await item.vm.$emit('remover-atividade');
+        expect((wrapper.vm as any).mostrarModalConfirmacaoRemocao).toBe(false);
+    });
+
+    it("não deve salvar edição de atividade se codSubprocesso nulo", async () => {
+        const { wrapper, atividadesStore } = createWrapper();
+        await flushPromises();
+        (wrapper.vm as any).codSubprocesso = null;
+        
+        await (wrapper.vm as any).salvarEdicaoAtividade(1, "Desc");
+        expect(atividadesStore.atualizarAtividade).not.toHaveBeenCalled();
+    });
+
+    it("não deve adicionar conhecimento se codSubprocesso nulo", async () => {
+        const { wrapper, atividadesStore } = createWrapper();
+        await flushPromises();
+        (wrapper.vm as any).codSubprocesso = null;
+        
+        const item = wrapper.findComponent(AtividadeItemStub);
+        await item.vm.$emit('adicionar-conhecimento', 'Novo');
+        expect(atividadesStore.adicionarConhecimento).not.toHaveBeenCalled();
+    });
+
+    it("não deve disponibilizar se codSubprocesso nulo", async () => {
+        const { wrapper } = createWrapper();
+        await flushPromises();
+        (wrapper.vm as any).codSubprocesso = null;
+        
+        await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
+        expect((wrapper.vm as any).mostrarModalConfirmacao).toBe(false);
+    });
 });

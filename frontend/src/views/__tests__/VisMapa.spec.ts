@@ -590,4 +590,85 @@ describe("VisMapa.vue", () => {
 
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro ao apresentar sugestões", expect.any(String), "danger");
     });
+
+    it("closes ver sugestoes modal", async () => {
+        const { wrapper } = mountComponent({
+            perfil: { perfilSelecionado: "GESTOR" },
+            subprocessos: {
+                subprocessoDetalhe: {
+                    codigo: 10,
+                    permissoes: { 
+                        podeApresentarSugestoes: true, 
+                        podeVisualizarMapa: true, 
+                        podeAceitarMapa: true 
+                    }
+                }
+            },
+            processos: {
+                processoDetalhe: {
+                    unidades: [{
+                        sigla: 'TEST',
+                        codSubprocesso: 10,
+                        situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES
+                    }]
+                }
+            }
+        });
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-mapa-ver-sugestoes"]').trigger("click");
+        expect(wrapper.vm.mostrarModalVerSugestoes).toBe(true);
+
+        await wrapper.find('[data-testid="btn-ver-sugestoes-mapa-fechar"]').trigger("click");
+        expect(wrapper.vm.mostrarModalVerSugestoes).toBe(false);
+    });
+
+    it("closes historico modal", async () => {
+        const { wrapper } = mountComponent({
+            perfil: { perfilSelecionado: "GESTOR" }
+        });
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-mapa-historico-gestor"]').trigger("click");
+        expect(wrapper.vm.mostrarModalHistorico).toBe(true);
+
+        const modal = wrapper.findComponent({ name: 'HistoricoAnaliseModal' });
+        await modal.vm.$emit('fechar');
+        expect(wrapper.vm.mostrarModalHistorico).toBe(false);
+    });
+
+    it("triggers focus on shown in sugestoes modal", async () => {
+        const { wrapper } = mountComponent();
+        await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
+        
+        const modal = wrapper.findAllComponents({ name: 'ModalConfirmacao' }).find(c => c.props('titulo') === 'Apresentar Sugestões');
+        await modal?.vm.$emit('shown');
+    });
+
+    it("triggers focus on shown in devolucao modal", async () => {
+        const { wrapper } = mountComponent({
+            perfil: { perfilSelecionado: "GESTOR" },
+            subprocessos: {
+                subprocessoDetalhe: {
+                    codigo: 10,
+                    permissoes: { podeDevolverMapa: true, podeVisualizarMapa: true }
+                }
+            },
+            processos: {
+                processoDetalhe: {
+                    unidades: [{
+                        sigla: 'TEST',
+                        codSubprocesso: 10,
+                        situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO
+                    }]
+                }
+            }
+        });
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
+        
+        const modal = wrapper.findAllComponents({ name: 'ModalConfirmacao' }).find(c => c.props('titulo') === 'Devolução');
+        await modal?.vm.$emit('shown');
+    });
 });

@@ -1,7 +1,7 @@
 import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
-import {computed, defineComponent} from "vue";
+import {computed, defineComponent, nextTick} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
@@ -641,5 +641,98 @@ describe("CadMapa.vue", () => {
         await flushPromises();
 
         expect((wrapper.vm as any).fieldErrors.generic).toBe("Erro API");
+    });
+
+    it('deve formatar erros de atividades corretamente', async () => {
+        const { wrapper } = createWrapper();
+        // Simular o comportamento de handleErrors que recebe um erro normalizado
+        const store = { lastError: { 
+            kind: 'validation',
+            message: 'Erro',
+            subErrors: [{ field: 'atividadesAssociadas', message: 'Erro Atividades' }] 
+        }};
+        (wrapper.vm as any).handleErrors(store);
+        expect((wrapper.vm as any).fieldErrors.atividades).toBe("Erro Atividades");
+
+        const store2 = { lastError: { 
+            kind: 'validation',
+            message: 'Erro',
+            subErrors: [{ field: 'atividadesIds', message: 'Erro IDs' }] 
+        }};
+        (wrapper.vm as any).handleErrors(store2);
+        expect((wrapper.vm as any).fieldErrors.atividades).toBe("Erro IDs");
+    });
+
+    it('retorna atividades vazias se codSubprocesso não for numero', async () => {
+        const { wrapper } = createWrapper();
+        (wrapper.vm as any).codSubprocesso = null;
+        expect((wrapper.vm as any).atividades).toEqual([]);
+    });
+
+    it('fecha modal de impacto', async () => {
+        const { wrapper } = createWrapper();
+        (wrapper.vm as any).mostrarModalImpacto = true;
+        (wrapper.vm as any).fecharModalImpacto();
+        expect((wrapper.vm as any).mostrarModalImpacto).toBe(false);
+    });
+
+    it('limpa erro ao emitir dismiss no ErrorAlert', async () => {
+        const { wrapper, mapasStore } = createWrapper();
+        await flushPromises();
+        const errorAlert = wrapper.findComponent({ name: 'ErrorAlert' });
+        await errorAlert.vm.$emit('dismiss');
+        expect(mapasStore.clearError).toHaveBeenCalled();
+    });
+
+    it('removerAtividadeAssociada lida com atividades nulas', async () => {
+        const { wrapper, mapasStore } = createWrapper();
+        await flushPromises();
+        
+        // Injetar uma competência sem atividades
+        (wrapper.vm as any).mapasStore.mapaCompleto.competencias.push({
+            codigo: 20,
+            descricao: 'Sem Atv',
+            atividadesAssociadas: null
+        });
+        
+        await (wrapper.vm as any).removerAtividadeAssociada(20, 999);
+        expect(mapasStore.atualizarCompetencia).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining({ codigo: 20, atividadesAssociadas: [] })
+        );
+    });
+
+    it('abre modal criar limpo ao emitir criar no CompetenciasListSection', async () => {
+        const { wrapper } = createWrapper();
+        await flushPromises();
+        const listSection = wrapper.findComponent({ name: 'CompetenciasListSection' });
+        await listSection.vm.$emit('criar');
+        expect((wrapper.vm as any).mostrarModalCriarNovaCompetencia).toBe(true);
+        expect((wrapper.vm as any).competenciaSendoEditada).toBeNull();
+    });
+
+    it('deve atualizar mostrarModalExcluirCompetencia via v-model', async () => {
+        const { wrapper } = createWrapper();
+        (wrapper.vm as any).mostrarModalExcluirCompetencia = true;
+        await nextTick();
+        // findComponent with the data-testid of the root element in the stub
+        const modal = wrapper.findComponent('[data-testid="mdl-excluir-competencia"]');
+        await modal.vm.$emit('update:modelValue', false);
+        expect((wrapper.vm as any).mostrarModalExcluirCompetencia).toBe(false);
+    });
+
+    it('deve fechar modal de exclusão ao chamar fecharModalExcluirCompetencia', async () => {
+        const { wrapper } = createWrapper();
+        (wrapper.vm as any).mostrarModalExcluirCompetencia = true;
+        (wrapper.vm as any).fecharModalExcluirCompetencia();
+        expect((wrapper.vm as any).mostrarModalExcluirCompetencia).toBe(false);
+        expect((wrapper.vm as any).competenciaParaExcluir).toBeNull();
+    });
+
+    it('disponibilizarMapa não faz nada se codSubprocesso for nulo', async () => {
+        const { wrapper, mapasStore } = createWrapper();
+        (wrapper.vm as any).codSubprocesso = null;
+        await (wrapper.vm as any).disponibilizarMapa({ dataLimite: '2023-12-31', observacoes: 'Obs' });
+        expect(mapasStore.clearError).not.toHaveBeenCalled();
     });
 });
