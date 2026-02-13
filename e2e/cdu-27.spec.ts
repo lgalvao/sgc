@@ -1,8 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-27 - Alterar data limite de subprocesso
@@ -22,11 +20,6 @@ import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
  */
 test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     const UNIDADE_1 = 'SECAO_221';
-    const USUARIO_CHEFE_1 = USUARIOS.CHEFE_SECAO_221.titulo;
-    const SENHA_CHEFE_1 = USUARIOS.CHEFE_SECAO_221.senha;
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
-
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-27 ${timestamp}`;
     let processoId: number;
@@ -73,30 +66,26 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN visualiza botão Alterar data limite', async ({page, autenticadoComoAdmin}) => {
-        // CDU-27: Passo 3
-        
-
+    test('Cenario 2: ADMIN altera data limite e recebe confirmação', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
-        // Verificar se existe botão para alterar data limite
-        // O botão pode ter diferentes testIds ou texto
-        const btnAlterarData = page.getByRole('button', {name: /Alterar data limite|Data limite/i});
-        const btnVisivel = await btnAlterarData.isVisible().catch(() => false);
-        
-        if (btnVisivel) {
-            await expect(btnAlterarData).toBeEnabled();
-        } else {
-            // Pode estar em um menu dropdown
-            const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
-            if (await btnMaisAcoes.isVisible().catch(() => false)) {
-                await btnMaisAcoes.click();
-                // Verificar item no menu
-                const itemAlterarData = page.getByRole('menuitem', {name: /Data limite/i});
-                const itemVisivel = await itemAlterarData.isVisible().catch(() => false);
-                expect(itemVisivel || true).toBe(true); // Teste passa se funcionalidade existe
-            }
-        }
+        const btnAlterarData = page.getByTestId('btn-alterar-data-limite');
+        await expect(btnAlterarData).toBeVisible();
+        await expect(btnAlterarData).toBeEnabled();
+        await btnAlterarData.click();
+
+        const inputData = page.getByTestId('input-nova-data-limite');
+        await expect(inputData).toBeVisible();
+        const novaData = new Date();
+        novaData.setDate(novaData.getDate() + 7);
+        const yyyy = novaData.getFullYear();
+        const mm = String(novaData.getMonth() + 1).padStart(2, '0');
+        const dd = String(novaData.getDate()).padStart(2, '0');
+        await inputData.fill(`${yyyy}-${mm}-${dd}`);
+
+        await page.getByTestId('btn-modal-confirmar').click();
+        await expect(page.getByText(/Data limite alterada/i).first()).toBeVisible();
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toBeVisible();
     });
 });

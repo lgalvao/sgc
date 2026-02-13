@@ -1,10 +1,7 @@
 import {defineStore} from "pinia";
 import type {TipoProcesso,} from "@/types/tipos";
-import {SituacaoSubprocesso} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {flattenTree} from "@/utils";
 import * as processoService from "@/services/processoService";
-import * as subprocessoService from "@/services/subprocessoService";
 import {useProcessosCoreStore} from "./core";
 import {useFeedbackStore} from "@/stores/feedback";
 
@@ -87,54 +84,12 @@ export const useProcessosWorkflowStore = defineStore("processos-workflow", () =>
             if (!coreStore.processoDetalhe) {
                 throw new Error("Detalhes do processo não carregados.");
             }
-
-            const all = flattenTree(coreStore.processoDetalhe.unidades || [], 'filhos');
-
-            const unidadeExemplo = all.find((u) => u.codUnidade === ids[0]);
-
-            if (!unidadeExemplo) {
-                throw new Error("Unidade selecionada não encontrada no contexto do processo.");
-            }
-
-            const codSubprocessoBase = unidadeExemplo.codSubprocesso;
-            const situacao = unidadeExemplo.situacaoSubprocesso;
-
             const payload = {
                 unidadeCodigos: ids,
+                acao,
                 dataLimite: dataLimite,
             };
-
-            if (acao === 'aceitar') {
-                if (
-                    situacao === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-                    situacao === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
-                ) {
-                    await subprocessoService.aceitarCadastroEmBloco(codSubprocessoBase, payload);
-                } else if (
-                    situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
-                    situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO
-                ) {
-                    await subprocessoService.aceitarValidacaoEmBloco(codSubprocessoBase, payload);
-                } else {
-                    throw new Error(`Situação ${situacao} não permite ação de aceitar em bloco.`);
-                }
-            } else if (acao === 'homologar') {
-                if (
-                    situacao === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-                    situacao === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
-                ) {
-                    await subprocessoService.homologarCadastroEmBloco(codSubprocessoBase, payload);
-                } else if (
-                    situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
-                    situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO
-                ) {
-                    await subprocessoService.homologarValidacaoEmBloco(codSubprocessoBase, payload);
-                } else {
-                    throw new Error(`Situação ${situacao} não permite ação de homologar em bloco.`);
-                }
-            } else if (acao === 'disponibilizar') {
-                await subprocessoService.disponibilizarMapaEmBloco(codSubprocessoBase, payload);
-            }
+            await processoService.executarAcaoEmBloco(coreStore.processoDetalhe.codigo, payload);
 
             // Reload details
             await coreStore.buscarProcessoDetalhe(coreStore.processoDetalhe.codigo);

@@ -116,6 +116,15 @@ export function useProcessoView() {
         }
     });
 
+    const mensagemSucessoAcaoBloco = computed(() => {
+        switch (acaoBlocoAtual.value) {
+            case "aceitar": return "Cadastros aceitos em bloco";
+            case "homologar": return "Cadastros homologados em bloco";
+            case "disponibilizar": return "Mapas de competências disponibilizados em bloco";
+            default: return "Ação em bloco realizada com sucesso";
+        }
+    });
+
 
 
     async function abrirDetalhesUnidade(row: any) {
@@ -155,8 +164,12 @@ export function useProcessoView() {
             modalBlocoRef.value?.setProcessando(true);
             await processosStore.executarAcaoBloco(acaoBlocoAtual.value, dados.ids, dados.dataLimite);
 
-            feedbackStore.show("Sucesso", "Ação em bloco realizada com sucesso", "success");
+            feedbackStore.show("Sucesso", mensagemSucessoAcaoBloco.value, "success");
             modalBlocoRef.value?.fechar();
+            if (acaoBlocoAtual.value === "aceitar" || acaoBlocoAtual.value === "disponibilizar") {
+                await router.push("/painel");
+                return;
+            }
             await processosStore.buscarContextoCompleto(codProcesso);
         } catch (error: any) {
             modalBlocoRef.value?.setErro(error.message || "Erro ao executar ação em bloco");

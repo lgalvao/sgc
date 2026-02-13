@@ -2,7 +2,6 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-23 - Homologar cadastros em bloco
@@ -49,7 +48,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -77,59 +76,38 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: ADMIN visualiza botão Homologar em Bloco', async ({page, autenticadoComoAdmin}) => {
-        
-
+    test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnHomologar = page.getByRole('button', {name: /Homologar em Bloco/i});
-        const btnVisivel = await btnHomologar.isVisible().catch(() => false);
-        
-        if (btnVisivel) {
-            await expect(btnHomologar).toBeEnabled();
-        }
-    });
+        const btnHomologar = page.getByRole('button', {name: /Homologar em Bloco/i}).first();
+        await expect(btnHomologar).toBeVisible();
+        await expect(btnHomologar).toBeEnabled();
+        await btnHomologar.click();
 
-    test('Cenario 2: ADMIN abre modal de homologação em bloco', async ({page, autenticadoComoAdmin}) => {
-        
+        const modal = page.locator('#modal-acao-bloco');
+        await expect(modal).toHaveClass(/show/);
+        await expect(modal.getByText(/Homologar em Bloco/i)).toBeVisible();
+        await expect(modal.getByText(/Selecione as unidades/i)).toBeVisible();
+        await expect(modal.locator('table')).toBeVisible();
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
 
-        await page.getByText(descProcesso).click();
+        await expect(modal).not.toHaveClass(/show/);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-
-        const btnHomologar = page.getByRole('button', {name: /Homologar em Bloco/i});
-        
-        if (await btnHomologar.isVisible().catch(() => false)) {
-            await btnHomologar.click();
-
-            const modal = page.getByRole('dialog');
-            await expect(modal).toBeVisible();
-            await expect(modal.getByText(/Homologar em Bloco/i)).toBeVisible();
-            await expect(modal.locator('table')).toBeVisible();
-            await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
-            await expect(modal.getByRole('button', {name: /Homologar/i})).toBeVisible();
-
-            await modal.getByRole('button', {name: /Cancelar/i}).click();
-        }
     });
 
-    test('Cenario 3: Cancelar homologação em bloco permanece na tela', async ({page, autenticadoComoAdmin}) => {
-        
-
+    test('Cenario 2: ADMIN confirma homologação em bloco e permanece na tela', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
+        const btnHomologar = page.getByRole('button', {name: /Homologar em Bloco/i}).first();
+        await expect(btnHomologar).toBeVisible();
+        await btnHomologar.click();
 
-        const btnHomologar = page.getByRole('button', {name: /Homologar em Bloco/i});
-        
-        if (await btnHomologar.isVisible().catch(() => false)) {
-            await btnHomologar.click();
+        const modal = page.locator('#modal-acao-bloco');
+        await expect(modal).toHaveClass(/show/);
+        await modal.getByRole('button', {name: /Homologar Selecionados/i}).click();
 
-            const modal = page.getByRole('dialog');
-            await expect(modal).toBeVisible();
-
-            await modal.getByRole('button', {name: /Cancelar/i}).click();
-
-            await expect(modal).toBeHidden();
-            await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-        }
+        await expect(page.getByText(/Cadastros homologados em bloco/i).first()).toBeVisible();
+        await expect(page).toHaveURL(/\/processo\/\d+$/);
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 });

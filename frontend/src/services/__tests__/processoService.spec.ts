@@ -101,6 +101,19 @@ describe('processoService', () => {
         expect(apiClient.post).toHaveBeenCalledWith(`/processos/${payload.codProcesso}/acoes-em-bloco`, payload);
     });
 
+    it('executarAcaoEmBloco deve fazer requisição POST com ação em maiúsculo', async () => {
+        await processoService.executarAcaoEmBloco(1, {
+            unidadeCodigos: [10],
+            acao: 'aceitar',
+            dataLimite: '2026-12-31'
+        });
+        expect(apiClient.post).toHaveBeenCalledWith('/processos/1/acao-em-bloco', {
+            unidadeCodigos: [10],
+            acao: 'ACEITAR',
+            dataLimite: '2026-12-31'
+        });
+    });
+
     it('buscarSubprocessosElegiveis deve fazer requisição GET', async () => {
         const codProcesso = 1;
         const responseData = [{ codSubprocesso: 1, siglaUnidade: 'U1' }];

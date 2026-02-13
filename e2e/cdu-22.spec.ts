@@ -1,9 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-22 - Aceitar cadastros em bloco
@@ -25,13 +23,6 @@ import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
  */
 test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     const UNIDADE_1 = 'SECAO_221';
-    const USUARIO_CHEFE_1 = USUARIOS.CHEFE_SECAO_221.titulo;
-    const SENHA_CHEFE_1 = USUARIOS.CHEFE_SECAO_221.senha;
-    const USUARIO_GESTOR = USUARIOS.GESTOR_COORD_22.titulo;
-    const SENHA_GESTOR = USUARIOS.GESTOR_COORD_22.senha;
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
-
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-22 ${timestamp}`;
     let processoId: number;
@@ -56,7 +47,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -84,58 +75,37 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: GESTOR visualiza botão Aceitar em Bloco', async ({page, autenticadoComoGestorCoord22}) => {
-        
-
+    test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({page, autenticadoComoGestorCoord22}) => {
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnAceitar = page.getByRole('button', {name: /Aceitar em Bloco/i});
-        const btnVisivel = await btnAceitar.isVisible().catch(() => false);
-        
-        if (btnVisivel) {
-            await expect(btnAceitar).toBeEnabled();
-        }
-    });
+        const btnAceitar = page.getByRole('button', {name: /Aceitar em Bloco/i}).first();
+        await expect(btnAceitar).toBeVisible();
+        await expect(btnAceitar).toBeEnabled();
+        await btnAceitar.click();
 
-    test('Cenario 2: GESTOR abre modal de aceite em bloco', async ({page, autenticadoComoGestorCoord22}) => {
-        
+        const modal = page.locator('#modal-acao-bloco');
+        await expect(modal).toHaveClass(/show/);
+        await expect(modal.getByText(/Aceitar em Bloco/i)).toBeVisible();
+        await expect(modal.getByText(/Selecione as unidades/i)).toBeVisible();
+        await expect(modal.locator('table')).toBeVisible();
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
 
-        await page.getByText(descProcesso).click();
+        await expect(modal).not.toHaveClass(/show/);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-
-        const btnAceitar = page.getByRole('button', {name: /Aceitar em Bloco/i});
-        
-        if (await btnAceitar.isVisible().catch(() => false)) {
-            await btnAceitar.click();
-
-            const modal = page.getByRole('dialog');
-            await expect(modal).toBeVisible();
-            await expect(modal.getByText(/Aceitar em Bloco/i)).toBeVisible();
-            await expect(modal.locator('table')).toBeVisible();
-            await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
-
-            await modal.getByRole('button', {name: /Cancelar/i}).click();
-        }
     });
 
-    test('Cenario 3: Cancelar aceite em bloco permanece na tela', async ({page, autenticadoComoGestorCoord22}) => {
-        
-
+    test('Cenario 2: GESTOR confirma aceite em bloco e retorna ao painel', async ({page, autenticadoComoGestorCoord22}) => {
         await page.getByText(descProcesso).click();
+        const btnAceitar = page.getByRole('button', {name: /Aceitar em Bloco/i}).first();
+        await expect(btnAceitar).toBeVisible();
+        await btnAceitar.click();
 
-        const btnAceitar = page.getByRole('button', {name: /Aceitar em Bloco/i});
-        
-        if (await btnAceitar.isVisible().catch(() => false)) {
-            await btnAceitar.click();
+        const modal = page.locator('#modal-acao-bloco');
+        await expect(modal).toHaveClass(/show/);
+        await modal.getByRole('button', {name: /Aceitar Selecionados/i}).click();
 
-            const modal = page.getByRole('dialog');
-            await expect(modal).toBeVisible();
-
-            await modal.getByRole('button', {name: /Cancelar/i}).click();
-
-            await expect(modal).toBeHidden();
-            await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-        }
+        await expect(page.getByText(/Cadastros aceitos em bloco/i).first()).toBeVisible();
+        await expect(page).toHaveURL(/\/painel/);
     });
 });

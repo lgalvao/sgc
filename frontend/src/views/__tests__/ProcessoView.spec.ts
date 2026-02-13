@@ -285,8 +285,9 @@ describe("Processo.vue", () => {
         await modal.vm.$emit("confirmar", dadosConfirmacao);
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('aceitar', [101], undefined);
-        expect(feedbackStore.show).toHaveBeenCalledWith(expect.anything(), expect.stringContaining("realizada"), "success");
+        expect(feedbackStore.show).toHaveBeenCalledWith("Sucesso", "Cadastros aceitos em bloco", "success");
         expect(modalSpies.fechar).toHaveBeenCalled();
+        expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
     it("deve executar ação em bloco com sucesso (Aceitar Validação)", async () => {

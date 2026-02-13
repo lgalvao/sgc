@@ -1,18 +1,5 @@
-Problema
-Corrigir falhas nos testes E2E com base no guia de correção e learnings do projeto, priorizando causa raiz e mudanças mínimas.
+Objetivo
 
-Abordagem
-1) Executar os testes E2E com saída capturada em arquivo.
-2) Analisar os cenários com falha e seus error-context.md.
-3) Aplicar correções cirúrgicas (preferencialmente nos testes/helpers; no backend/frontend apenas se necessário).
-4) Reexecutar os testes afetados e depois validar a suíte necessária.
-
-Notas
-- Não usar aumento indiscriminado de timeout.
-- Não executar cenário isolado quando houver dependência serial.
-- Preferir helpers centralizados e seletores robustos.
-
-Novo Objetivo (2026-02-13)
 Validar aderência entre requisitos (`etc/reqs/cdu-xx.md`) e testes E2E (`e2e/cdu-xx.spec.ts`) para detectar divergências após as correções.
 
 Abordagem de Verificação
@@ -72,9 +59,6 @@ Atualização de execução (2026-02-13)
   - E2E reescrito com asserts explícitos (sem fallback silencioso).
   - Validação de obrigatoriedade de `dataInicio` implementada em `CadAtribuicao.vue` e coberta em unit/e2e.
   - Evidências: `cdu-28.spec.ts` (3 passed) e `CadAtribuicao.spec.ts` (4 passed).
-- Regressões backend reportadas (Mapa/Unidade/Usuario):
-  - Revalidação local executada em subset e suíte completa.
-  - Resultado atual: `./gradlew :backend:test` com sucesso (0 falhas).
 - CDU-34 (em execução):
   - E2E endurecido sem `if/catch` mascarador.
   - Fluxo principal coberto com confirmação explícita do lembrete em modal.
