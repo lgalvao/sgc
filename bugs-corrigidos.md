@@ -16,6 +16,10 @@ Consolidar, em um único documento, **bugs reais de sistema** corrigidos (backen
 - Template de e-mail ausente para reabertura de cadastro/revisão (erro runtime) corrigido.
 - Regressão de runtime em `Processo.vue` (`defineExpose` inválido) corrigida.
 - Feedback de sucesso ausente em fluxo de mapa (`useVisMapa`) corrigido.
+- CDU-27: alteração de data limite sem envio de e-mail aderente ao requisito, corrigido no backend.
+- CDU-27: mensagem de confirmação divergente do requisito, corrigida no frontend.
+- CDU-34: envio de lembrete sem e-mail de prazo, corrigido no backend.
+- Painel de alertas com campos vazios (mensagem/processo/origem), corrigido no backend.
 
 ---
 
@@ -190,6 +194,42 @@ Consolidar, em um único documento, **bugs reais de sistema** corrigidos (backen
   - Cenário de cancelamento validando fechamento do modal e permanência na tela.
 - **Validação:** `npx playwright test e2e/cdu-26.spec.ts --reporter=list` (**7/7**).
 
+### 19) CDU-27 - Correção funcional de notificação por e-mail e mensagem de confirmação
+- **Arquivos:**
+  - `backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoAdminWorkflowService.java`
+  - `frontend/src/views/Subprocesso.vue`
+  - `backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoAdminWorkflowServiceTest.java`
+  - `e2e/cdu-27.spec.ts`
+- **Problemas de sistema corrigidos:**
+  - Fluxo de alteração de data limite não enviava e-mail específico do CDU-27 (`Assunto: SGC: Data limite alterada` + corpo com unidade/processo/data).
+  - Mensagem de sucesso exibida na UI era apenas `"Data limite alterada"`, divergindo do requisito.
+- **Correções:**
+  - Backend passou a enviar e-mail de alteração de data limite para a unidade do subprocesso no ato da alteração.
+  - Frontend passou a exibir `"Data limite alterada com sucesso"`.
+  - E2E endurecido para validar mensagem exata e fechamento do modal após confirmação.
+- **Validação:**
+  - `./gradlew :backend:test --tests 'sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowServiceTest' --tests 'sgc.integracao.CDU27IntegrationTest'` (**10/10**)
+  - `npm run test:unit --prefix frontend -- src/views/__tests__/SubprocessoView.spec.ts` (**13/13**)
+  - `npx playwright test e2e/cdu-27.spec.ts --reporter=list` (**3/3**)
+
+### 20) CDU-34 - Correção funcional de e-mail de lembrete e payload de alertas do painel
+- **Arquivos:**
+  - `backend/src/main/java/sgc/processo/service/ProcessoFacade.java`
+  - `backend/src/main/java/sgc/painel/PainelFacade.java`
+  - `backend/src/test/java/sgc/processo/service/ProcessoFacadeTest.java`
+  - `backend/src/test/java/sgc/painel/PainelFacadeTest.java`
+  - `e2e/cdu-34.spec.ts`
+- **Problemas de sistema corrigidos:**
+  - `enviarLembrete` não disparava e-mail conforme CDU-34.
+  - Endpoint de alertas do painel retornava DTO incompleto (`mensagem`, `processo`, `origem`, `dataHoraFormatada`), deixando descrição de alerta vazia na UI.
+- **Correções:**
+  - `ProcessoFacade.enviarLembrete` passou a enviar e-mail com assunto/corpo aderentes ao requisito.
+  - `PainelFacade.paraAlertaDto` passou a preencher campos necessários para renderização completa da tabela de alertas.
+  - E2E do CDU-34 ampliado para validar alerta no painel da unidade de destino.
+- **Validação:**
+  - `./gradlew :backend:test --tests 'sgc.painel.PainelFacadeTest' --tests 'sgc.processo.service.ProcessoFacadeTest' --tests 'sgc.integracao.CDU34IntegrationTest'` (**74/74**)
+  - `npx playwright test e2e/cdu-34.spec.ts --reporter=list` (**3/3**)
+
 ---
 
 ## Estado atual da execução
@@ -230,8 +270,11 @@ npx playwright test e2e/cdu-10.spec.ts --reporter=list
 npx playwright test e2e/cdu-20.spec.ts --reporter=list
 npx playwright test e2e/cdu-25.spec.ts --reporter=list
 npx playwright test e2e/cdu-26.spec.ts --reporter=list
+npx playwright test e2e/cdu-27.spec.ts --reporter=list
+npx playwright test e2e/cdu-34.spec.ts --reporter=list
 
 npm run test:unit --prefix frontend -- src/stores/__tests__/feedback.spec.ts
 npm run test:unit --prefix frontend -- src/views/__tests__/CadAtribuicao.spec.ts
+npm run test:unit --prefix frontend -- src/views/__tests__/SubprocessoView.spec.ts
 npm run test:unit --prefix frontend -- src/services/__tests__/processoService.spec.ts src/stores/__tests__/processos.spec.ts src/views/__tests__/ProcessoView.spec.ts
 ```

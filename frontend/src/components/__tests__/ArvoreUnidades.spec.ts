@@ -414,4 +414,63 @@ describe("ArvoreUnidades.vue", () => {
         const wrapper = createWrapper({ unidades: unidadesSemFilhas, modelValue: [700] });
         expect((wrapper.vm as any).isHabilitado(unidadesSemFilhas[0])).toBe(true);
     });
+
+    it("getEstadoSelecao deve retornar selfSelected se não houver filhas", () => {
+        const wrapper = createWrapper();
+        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const leaf: Unidade = { codigo: 999, sigla: "L", nome: "L", isElegivel: true, filhas: undefined };
+        expect(root.props("getEstadoSelecao")(leaf)).toBe(false);
+    });
+
+    it("getEstadoSelecao deve retornar selfSelected se não houver descendentes elegíveis", () => {
+        const unidadesTeste: Unidade[] = [
+            {
+                codigo: 800,
+                sigla: "PAI",
+                nome: "Pai",
+                isElegivel: true,
+                filhas: [
+                    { codigo: 801, sigla: "F1", nome: "F1", isElegivel: false, filhas: [] }
+                ]
+            }
+        ];
+        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [800] });
+        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        expect(root.props("getEstadoSelecao")(unidadesTeste[0])).toBe(true);
+    });
+
+    it("watch unidades deve lidar com lista vazia", async () => {
+        const wrapper = createWrapper();
+        await wrapper.setProps({ unidades: [] });
+    });
+
+    it("unidadesExibidas lida com ocultarRaiz true e unidade sem filhas", () => {
+        const units: Unidade[] = [{ codigo: 1, sigla: "R", nome: "R", filhas: undefined }];
+        const wrapper = createWrapper({ unidades: units, ocultarRaiz: true });
+        expect((wrapper.vm as any).unidadesExibidas).toHaveLength(0);
+    });
+
+    it("isHabilitado deve ser recursivo", () => {
+        const units: Unidade[] = [{
+            codigo: 1, sigla: "R", nome: "R", isElegivel: false,
+            filhas: [{ codigo: 2, sigla: "F", nome: "F", isElegivel: true, filhas: [] }]
+        }];
+        const wrapper = createWrapper({ unidades: units, modoSelecao: true });
+        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        expect(root.props("isHabilitado")(units[0])).toBe(true);
+    });
+
+    it("getEstadoSelecao para INTEROPERACIONAL com filhos parcial selecionados", () => {
+        const units: Unidade[] = [{
+            codigo: 1000, sigla: "INTER", nome: "Inter", isElegivel: true, tipo: "INTEROPERACIONAL",
+            filhas: [
+                { codigo: 1001, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL" },
+                { codigo: 1002, sigla: "F2", nome: "F2", isElegivel: true, filhas: [], tipo: "OPERACIONAL" }
+            ]
+        }];
+        const wrapper = createWrapper({ unidades: units, modelValue: [1000, 1001] });
+        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        // Self selected AND some children selected -> true
+        expect(root.props("getEstadoSelecao")(units[0])).toBe(true);
+    });
 });

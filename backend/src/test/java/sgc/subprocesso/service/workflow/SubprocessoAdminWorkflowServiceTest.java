@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
 import sgc.comum.repo.ComumRepo;
+import sgc.notificacao.NotificacaoEmailService;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
@@ -35,6 +36,8 @@ class SubprocessoAdminWorkflowServiceTest {
     @Mock
     private AlertaFacade alertaService;
     @Mock
+    private NotificacaoEmailService notificacaoEmailService;
+    @Mock
     private ComumRepo repo;
 
     @Test
@@ -44,7 +47,12 @@ class SubprocessoAdminWorkflowServiceTest {
         LocalDate novaData = LocalDate.of(2023, 10, 1);
         Subprocesso sp = new Subprocesso();
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        sp.setUnidade(new Unidade());
+        Unidade unidade = new Unidade();
+        unidade.setSigla("SECAO_211");
+        sp.setUnidade(unidade);
+        Processo processo = new Processo();
+        processo.setDescricao("Processo teste");
+        sp.setProcesso(processo);
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
 
@@ -52,6 +60,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
         verify(subprocessoRepo).save(sp);
         assertEquals(novaData.atStartOfDay(), sp.getDataLimiteEtapa1());
+        verify(notificacaoEmailService).enviarEmail(anyString(), eq("SGC: Data limite alterada"), contains("foi alterada para"));
         verify(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), any(), eq(1));
     }
 
@@ -62,7 +71,12 @@ class SubprocessoAdminWorkflowServiceTest {
         LocalDate novaData = LocalDate.of(2023, 10, 1);
         Subprocesso sp = new Subprocesso();
         sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
-        sp.setUnidade(new Unidade());
+        Unidade unidade = new Unidade();
+        unidade.setSigla("SECAO_211");
+        sp.setUnidade(unidade);
+        Processo processo = new Processo();
+        processo.setDescricao("Processo teste");
+        sp.setProcesso(processo);
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
 
@@ -70,6 +84,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
         verify(subprocessoRepo).save(sp);
         assertEquals(novaData.atStartOfDay(), sp.getDataLimiteEtapa1());
+        verify(notificacaoEmailService).enviarEmail(anyString(), eq("SGC: Data limite alterada"), contains("foi alterada para"));
         verify(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), any(), eq(1));
     }
 
@@ -80,7 +95,12 @@ class SubprocessoAdminWorkflowServiceTest {
         LocalDate novaData = LocalDate.of(2023, 10, 1);
         Subprocesso sp = new Subprocesso();
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
-        sp.setUnidade(new Unidade());
+        Unidade unidade = new Unidade();
+        unidade.setSigla("SECAO_211");
+        sp.setUnidade(unidade);
+        Processo processo = new Processo();
+        processo.setDescricao("Processo teste");
+        sp.setProcesso(processo);
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
 
@@ -88,6 +108,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
         verify(subprocessoRepo).save(sp);
         assertEquals(novaData.atStartOfDay(), sp.getDataLimiteEtapa2());
+        verify(notificacaoEmailService).enviarEmail(anyString(), eq("SGC: Data limite alterada"), contains("foi alterada para"));
         verify(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), any(), eq(2));
     }
 
@@ -161,7 +182,12 @@ class SubprocessoAdminWorkflowServiceTest {
         LocalDate novaData = LocalDate.of(2023, 10, 1);
         Subprocesso sp = new Subprocesso();
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        sp.setUnidade(new Unidade());
+        Unidade unidade = new Unidade();
+        unidade.setSigla("SECAO_211");
+        sp.setUnidade(unidade);
+        Processo processo = new Processo();
+        processo.setDescricao("Processo teste");
+        sp.setProcesso(processo);
 
         when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
         doThrow(new RuntimeException("Error sending alert")).when(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), any(), anyInt());

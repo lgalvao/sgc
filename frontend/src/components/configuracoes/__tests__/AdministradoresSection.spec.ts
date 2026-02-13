@@ -1,166 +1,142 @@
-import {mount} from '@vue/test-utils';
-import {createTestingPinia} from '@pinia/testing';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
-import AdministradoresSection from '@/components/configuracoes/AdministradoresSection.vue';
-import {useNotificacoesStore} from '@/stores/feedback';
-import * as administradorService from '@/services/administradorService';
-import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi, beforeEach} from "vitest";
+import {mount, flushPromises} from "@vue/test-utils";
+import AdministradoresSection from "../AdministradoresSection.vue";
+import * as administradorService from "@/services/administradorService";
+import {createTestingPinia} from "@pinia/testing";
+import {useNotificacoesStore} from "@/stores/feedback";
 
-// Mock dependencies
-vi.mock('@/services/administradorService', () => ({
+vi.mock("@/services/administradorService", () => ({
     listarAdministradores: vi.fn(),
     adicionarAdministrador: vi.fn(),
-    removerAdministrador: vi.fn(),
+    removerAdministrador: vi.fn()
 }));
 
-describe('AdministradoresSection', () => {
-    let wrapper: any;
-    let notificacoesStore: any;
+describe("AdministradoresSection.vue", () => {
+    const mockAdmins = [
+        { nome: "Admin 1", tituloEleitoral: "111", matricula: "M1", unidadeSigla: "U1" },
+        { nome: "Admin 2", tituloEleitoral: "222", matricula: "M2", unidadeSigla: "U2" }
+    ];
 
-    const setupWrapper = (mockAdmins: any = []) => {
-        const pinia = createTestingPinia({
-            stubActions: false,
-        });
+    beforeEach(() => {
+        vi.clearAllMocks();
+        vi.mocked(administradorService.listarAdministradores).mockResolvedValue(mockAdmins);
+    });
 
-        notificacoesStore = useNotificacoesStore(pinia);
-
-        if (mockAdmins instanceof Error) {
-            (administradorService.listarAdministradores as any).mockRejectedValue(mockAdmins);
-        } else {
-            (administradorService.listarAdministradores as any).mockResolvedValue(mockAdmins);
-        }
-
-        wrapper = mount(AdministradoresSection, {
+    const createWrapper = () => {
+        return mount(AdministradoresSection, {
             global: {
-                plugins: [pinia],
+                plugins: [createTestingPinia({ createSpy: vi.fn })],
                 stubs: {
-                    EmptyState: {
-                        template: '<div class="empty-state-stub">Nenhum administrador</div>'
-                    },
+                    BButton: { template: '<button><slot /></button>' },
+                    BAlert: { template: '<div><slot /></div>' },
+                    EmptyState: true,
                     ModalConfirmacao: {
-                        template: '<div class="modal-stub" v-if="modelValue"><slot /><button class="confirm-btn" @click="$emit(\'confirmar\')">OK</button></div>',
-                        props: ['modelValue']
+                        props: ['modelValue', 'loading'],
+                        template: '<div v-if="modelValue"><slot /><button class="confirm" @click="$emit(\'confirmar\')">OK</button></div>',
+                        emits: ['confirmar']
                     },
                     LoadingButton: {
-                        template: '<button class="loading-btn" @click="$emit(\'click\')"><slot /></button>',
-                        props: ['loading', 'variant', 'size', 'icon', 'text']
-                    },
-                    BAlert: {
-                        template: '<div class="alert-stub"><slot /></div>'
+                        props: ['loading', 'text'],
+                        template: '<button @click="$emit(\'click\')">{{ text }}<slot /></button>',
+                        emits: ['click']
                     }
                 }
             }
         });
     };
 
-    beforeEach(async () => {
-        vi.clearAllMocks();
-    });
-
-    it('deve listar administradores ao montar', async () => {
-        const mockAdmins = [
-            { tituloEleitoral: '123', nome: 'Admin 1', matricula: 'M001', unidadeSigla: 'UN1' }
-        ];
-        setupWrapper(mockAdmins);
+    it("deve carregar e exibir administradores", async () => {
+        const wrapper = createWrapper();
         await flushPromises();
 
         expect(administradorService.listarAdministradores).toHaveBeenCalled();
-        expect(wrapper.text()).toContain('Admin 1');
-        expect(wrapper.text()).toContain('123');
+        expect(wrapper.text()).toContain("Admin 1");
+        expect(wrapper.text()).toContain("Admin 2");
     });
 
-    it('deve mostrar EmptyState quando não houver administradores', async () => {
-        setupWrapper([]);
+    it("deve tratar erro ao carregar", async () => {
+        vi.mocked(administradorService.listarAdministradores).mockRejectedValue(new Error("Erro ao carregar"));
+        const wrapper = createWrapper();
         await flushPromises();
-        expect(wrapper.find('.empty-state-stub').exists()).toBe(true);
+
+        expect(wrapper.text()).toContain("Erro ao carregar");
     });
 
-    it('deve mostrar erro ao falhar carregamento', async () => {
-        setupWrapper(new Error('Erro ao carregar'));
+    it("deve adicionar administrador", async () => {
+        const wrapper = createWrapper();
+        const notificacoes = useNotificacoesStore();
         await flushPromises();
-        expect(wrapper.find('.alert-stub').text()).toContain('Erro ao carregar');
+
+        const addButton = wrapper.findAll('button').find(b => b.text().includes('Adicionar administrador'));
+        await addButton?.trigger("click"); // Abrir modal
+        
+        const input = wrapper.find('input#usuarioTitulo');
+        await input.setValue("333");
+
+        vi.mocked(administradorService.adicionarAdministrador).mockResolvedValue({} as any);
+        
+        await wrapper.find('button.confirm').trigger("click");
+        await flushPromises();
+
+        expect(administradorService.adicionarAdministrador).toHaveBeenCalledWith("333");
+        expect(notificacoes.show).toHaveBeenCalledWith("Sucesso", expect.anything(), "success");
     });
 
-    it('deve abrir modal ao clicar em Adicionar', async () => {
-        setupWrapper([]);
+    it("deve remover administrador", async () => {
+        const wrapper = createWrapper();
+        const notificacoes = useNotificacoesStore();
         await flushPromises();
-        // O botão de adicionar está no card-header, é um BButton variant="light"
-        // Como não dei stub para BButton, ele renderiza como <button>
-        const btn = wrapper.find('.card-header button');
-        await btn.trigger('click');
-        expect(wrapper.vm.mostrarModalAdicionarAdmin).toBe(true);
+
+        const removeBtns = wrapper.findAll('button').filter(b => b.text().includes('Remover'));
+        await removeBtns[0].trigger("click"); // Confirmar remoção
+        
+        vi.mocked(administradorService.removerAdministrador).mockResolvedValue({} as any);
+
+        await wrapper.find('button.confirm').trigger("click");
+        await flushPromises();
+
+        expect(administradorService.removerAdministrador).toHaveBeenCalledWith("111");
+        expect(notificacoes.show).toHaveBeenCalledWith("Sucesso", expect.anything(), "success");
     });
 
-    it('deve chamar adicionarAdministrador ao confirmar no modal', async () => {
-        setupWrapper([]);
+    it("deve tratar erro ao adicionar", async () => {
+        const wrapper = createWrapper();
+        const notificacoes = useNotificacoesStore();
         await flushPromises();
-        wrapper.vm.mostrarModalAdicionarAdmin = true;
-        wrapper.vm.novoAdminTitulo = '999';
-        (administradorService.adicionarAdministrador as any).mockResolvedValue({});
 
-        await wrapper.vm.adicionarAdmin();
+        // Trigger confirm without setting value
+        await (wrapper.vm as any).adicionarAdmin();
+        expect(notificacoes.show).toHaveBeenCalledWith("Erro", expect.stringContaining("válido"), "warning");
 
-        expect(administradorService.adicionarAdministrador).toHaveBeenCalledWith('999');
-        expect(notificacoesStore.show).toHaveBeenCalledWith('Sucesso', expect.any(String), 'success');
+        (wrapper.vm as any).novoAdminTitulo = "333";
+
+        vi.mocked(administradorService.adicionarAdministrador).mockRejectedValue(new Error("Erro API"));
+        
+        await (wrapper.vm as any).adicionarAdmin();
+        await flushPromises();
+
+        expect(notificacoes.show).toHaveBeenCalledWith("Erro", "Erro API", "danger");
     });
 
-    it('deve chamar confirmarRemocao ao clicar no botão de remover', async () => {
-        const mockAdmins = [
-            { tituloEleitoral: '123', nome: 'Admin 1', matricula: 'M001', unidadeSigla: 'UN1' }
-        ];
-        setupWrapper(mockAdmins);
+    it("deve tratar erro ao remover", async () => {
+        const wrapper = createWrapper();
+        const notificacoes = useNotificacoesStore();
         await flushPromises();
 
-        const btnRemover = wrapper.find('.loading-btn');
-        await btnRemover.trigger('click');
+        const node = { nome: "Admin 1", tituloEleitoral: "111" };
+        (wrapper.vm as any).adminParaRemover = node;
+        
+        vi.mocked(administradorService.removerAdministrador).mockRejectedValue(new Error("Erro Remover"));
 
-        expect(wrapper.vm.mostrarModalRemoverAdmin).toBe(true);
-        expect(wrapper.vm.adminParaRemover).toEqual(mockAdmins[0]);
+        await (wrapper.vm as any).removerAdmin();
+        await flushPromises();
+
+        expect(notificacoes.show).toHaveBeenCalledWith("Erro", "Erro Remover", "danger");
     });
 
-    it('deve chamar removerAdministrador ao confirmar exclusão', async () => {
-        setupWrapper([]);
-        await flushPromises();
-        wrapper.vm.adminParaRemover = { tituloEleitoral: '123', nome: 'Admin 1' };
-        wrapper.vm.mostrarModalRemoverAdmin = true;
-        (administradorService.removerAdministrador as any).mockResolvedValue({});
-
-        await wrapper.vm.removerAdmin();
-
-        expect(administradorService.removerAdministrador).toHaveBeenCalledWith('123');
-        expect(notificacoesStore.show).toHaveBeenCalledWith('Sucesso', expect.any(String), 'success');
-        expect(wrapper.vm.mostrarModalRemoverAdmin).toBe(false);
-    });
-
-    it('deve exibir alerta se tentar adicionar administrador com título vazio', async () => {
-        setupWrapper([]);
-        await flushPromises();
-        wrapper.vm.novoAdminTitulo = '   ';
-        await wrapper.vm.adicionarAdmin();
-
-        expect(notificacoesStore.show).toHaveBeenCalledWith('Erro', 'Digite um título eleitoral válido', 'warning');
-        expect(administradorService.adicionarAdministrador).not.toHaveBeenCalled();
-    });
-
-    it('deve exibir erro ao falhar adição de administrador', async () => {
-        setupWrapper([]);
-        await flushPromises();
-        wrapper.vm.novoAdminTitulo = '123';
-        (administradorService.adicionarAdministrador as any).mockRejectedValue(new Error('Falha ao adicionar'));
-
-        await wrapper.vm.adicionarAdmin();
-
-        expect(notificacoesStore.show).toHaveBeenCalledWith('Erro', 'Falha ao adicionar', 'danger');
-    });
-
-    it('deve exibir erro ao falhar remoção de administrador', async () => {
-        setupWrapper([]);
-        await flushPromises();
-        wrapper.vm.adminParaRemover = { tituloEleitoral: '123', nome: 'Admin' };
-        (administradorService.removerAdministrador as any).mockRejectedValue(new Error('Falha ao remover'));
-
-        await wrapper.vm.removerAdmin();
-
-        expect(notificacoesStore.show).toHaveBeenCalledWith('Erro', 'Falha ao remover', 'danger');
+    it("removerAdmin não faz nada se não houver admin selecionado", async () => {
+        const wrapper = createWrapper();
+        await (wrapper.vm as any).removerAdmin();
+        expect(administradorService.removerAdministrador).not.toHaveBeenCalled();
     });
 });

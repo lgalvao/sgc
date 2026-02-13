@@ -52,7 +52,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     // ========================================================================
 
     test('Cenario principal: ADMIN envia lembrete e sistema registra histórico/alerta', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         await expect(page.getByTestId('tbl-tree')).toBeVisible();
@@ -68,5 +68,12 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
 
         await expect(page.getByText('Lembrete enviado').first()).toBeVisible();
         await expect(page.getByTestId('tbl-movimentacoes')).toContainText('Lembrete de prazo enviado');
+    });
+
+    test('Cenario complementar: unidade de destino visualiza alerta de lembrete no painel', async ({page, autenticadoComoChefeAssessoria22}) => {
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        await expect(tabelaAlertas).toBeVisible();
+        await expect(tabelaAlertas).toContainText(descProcesso);
+        await expect(tabelaAlertas).toContainText(/Lembrete/i);
     });
 });

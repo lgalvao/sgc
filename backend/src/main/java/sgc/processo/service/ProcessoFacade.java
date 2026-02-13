@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
+import sgc.notificacao.NotificacaoEmailService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -49,6 +50,7 @@ public class ProcessoFacade {
     private final UsuarioFacade usuarioService;
     private final ProcessoInicializador processoInicializador;
     private final AlertaFacade alertaService;
+    private final NotificacaoEmailService notificacaoEmailService;
 
     private final ProcessoAcessoService processoAcessoService;
     private final ProcessoFinalizador processoFinalizador;
@@ -174,9 +176,18 @@ public class ProcessoFacade {
                 : "N/A";
         String descricao = "Lembrete: Prazo do processo %s encerra em %s"
                 .formatted(processo.getDescricao(), dataLimite);
+        String assunto = "SGC: Lembrete de prazo - %s".formatted(processo.getDescricao());
+        String corpo = """
+                Prezado(a) responsável pela %s,
+                
+                Este é um lembrete de que o prazo para a conclusão da etapa atual do processo %s encerra em %s.
+                
+                Por favor, acesse o sistema para concluir suas pendências: /painel.
+                """.formatted(unidade.getSigla(), processo.getDescricao(), dataLimite);
 
         SubprocessoDto subprocesso = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, unidadeCodigo);
         subprocessoFacade.registrarMovimentacaoLembrete(subprocesso.getCodigo());
+        notificacaoEmailService.enviarEmail(unidade.getSigla(), assunto, corpo);
 
         alertaService.criarAlertaAdmin(processo, unidade, descricao);
     }

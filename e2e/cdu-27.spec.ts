@@ -59,7 +59,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         // CDU-27: Passos 1-2
         
 
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         // Verificar que está na página do subprocesso
@@ -67,7 +67,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     });
 
     test('Cenario 2: ADMIN altera data limite e recebe confirmação', async ({page, autenticadoComoAdmin}) => {
-        await page.getByText(descProcesso).click();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const btnAlterarData = page.getByTestId('btn-alterar-data-limite');
@@ -85,7 +85,8 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await inputData.fill(`${yyyy}-${mm}-${dd}`);
 
         await page.getByTestId('btn-modal-confirmar').click();
-        await expect(page.getByText(/Data limite alterada/i).first()).toBeVisible();
+        await expect(page.getByText(/Data limite alterada com sucesso/i).first()).toBeVisible();
+        await expect(inputData).toBeHidden();
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toBeVisible();
     });
 });

@@ -422,3 +422,22 @@ No detalhe do processo havia dois botões com rótulos semelhantes para homologa
 **Solução aplicada:**
 - Validar e acionar explicitamente o botão principal `"Homologar em bloco"` para abrir modal.
 - Evitar locators genéricos quando existirem ações de contexto com texto parecido na mesma tela.
+
+### 35. CDU-27: assert de mensagem exata ajuda a revelar divergência funcional
+
+**Problema Identificado:**
+O fluxo de alteração de data limite passava com assert genérico (`/Data limite alterada/i`), mas a mensagem exibida não batia com o requisito (`"Data limite alterada com sucesso"`).
+
+**Solução aplicada:**
+- E2E passou a exigir o texto completo de confirmação e fechamento do modal.
+- Sistema ajustado no frontend para exibir a mensagem exata do requisito.
+- Backend ajustado para envio de e-mail específico da alteração de prazo, cobrindo lacuna funcional do CDU-27.
+
+### 36. CDU-34: quando alerta passa a ser exibido corretamente, seletor de processo precisa escopo
+
+**Problema Identificado:**
+Após correção do payload de alertas no painel, a descrição do processo passou a aparecer também na tabela de alertas, causando ambiguidade no clique por texto no E2E.
+
+**Solução aplicada:**
+- Escopar seleção do processo para `tbl-processos` no cenário ADMIN (`getByTestId('tbl-processos').getByText(...)`).
+- Manter cenário separado para validar alerta na `tbl-alertas` com login da unidade destino.

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.notificacao.NotificacaoEmailService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -65,6 +66,8 @@ class ProcessoFacadeTest {
     private UnidadeFacade unidadeService;
     @Mock
     private AlertaFacade alertaService;
+    @Mock
+    private NotificacaoEmailService notificacaoEmailService;
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock
@@ -133,6 +136,7 @@ class ProcessoFacadeTest {
 
             verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("N/A"));
             verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
+            verify(notificacaoEmailService).enviarEmail(eq(unidade.getSigla()), contains("SGC: Lembrete de prazo"), contains("encerra em N/A"));
         }
 
         @Test
@@ -294,6 +298,7 @@ class ProcessoFacadeTest {
             processoFacade.enviarLembrete(1L, 10L);
             verify(alertaService).criarAlertaAdmin(eq(p), eq(u), anyString());
             verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
+            verify(notificacaoEmailService).enviarEmail(eq(u.getSigla()), contains("SGC: Lembrete de prazo"), contains(p.getDescricao()));
         }
 
         @Test

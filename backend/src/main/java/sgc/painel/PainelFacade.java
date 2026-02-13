@@ -207,13 +207,18 @@ public class PainelFacade {
     }
 
     private AlertaDto paraAlertaDto(Alerta alerta, LocalDateTime dataHoraLeitura) {
+        String descricao = alerta.getDescricao();
         return AlertaDto.builder()
                 .codigo(alerta.getCodigo())
                 .codProcesso(alerta.getProcesso().getCodigo())
-                .descricao(alerta.getDescricao())
+                .descricao(descricao)
                 .dataHora(alerta.getDataHora())
+                .dataHoraFormatada(FormatadorData.formatarDataHora(alerta.getDataHora()))
                 .unidadeOrigem(alerta.getUnidadeOrigem().getSigla())
                 .unidadeDestino(alerta.getUnidadeDestino().getSigla())
+                .mensagem(descricao)
+                .origem(alerta.getUnidadeOrigem().getSigla())
+                .processo(alerta.getProcesso().getDescricao())
                 .dataHoraLeitura(dataHoraLeitura)
                 .build();
     }

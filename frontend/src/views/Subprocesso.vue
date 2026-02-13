@@ -176,7 +176,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
           {novaData},
       );
       fecharModalAlterarDataLimite();
-      feedbackStore.show("Data limite alterada", "A data limite foi alterada com sucesso!", "success");
+      feedbackStore.show("Data limite alterada com sucesso", "A data limite foi alterada com sucesso!", "success");
     } catch {
       feedbackStore.show("Erro ao alterar data limite", "Não foi possível alterar a data limite.", "danger");
     }

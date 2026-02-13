@@ -98,6 +98,8 @@ class PainelFacadeTest {
         a.setCodigo(1L);
         a.setProcesso(new Processo());
         a.getProcesso().setCodigo(10L);
+        a.getProcesso().setDescricao("Processo teste");
+        a.setDescricao("Lembrete de prazo enviado");
         a.setUnidadeOrigem(new Unidade());
         a.getUnidadeOrigem().setSigla("U1");
         a.setUnidadeDestino(new Unidade());
@@ -112,6 +114,8 @@ class PainelFacadeTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.getContent().getFirst().getDataHoraLeitura()).isNotNull();
+        assertThat(result.getContent().getFirst().getMensagem()).contains("Lembrete");
+        assertThat(result.getContent().getFirst().getProcesso()).isEqualTo("Processo teste");
     }
 
     @Test
@@ -124,6 +128,8 @@ class PainelFacadeTest {
         a.setCodigo(1L);
         a.setProcesso(new Processo());
         a.getProcesso().setCodigo(10L);
+        a.getProcesso().setDescricao("Processo teste");
+        a.setDescricao("Lembrete de prazo enviado");
         a.setUnidadeOrigem(new Unidade());
         a.getUnidadeOrigem().setSigla("U1");
         a.setUnidadeDestino(new Unidade());
@@ -150,6 +156,8 @@ class PainelFacadeTest {
         a.setCodigo(1L);
         a.setProcesso(new Processo());
         a.getProcesso().setCodigo(10L);
+        a.getProcesso().setDescricao("Processo teste");
+        a.setDescricao("Lembrete de prazo enviado");
         a.setUnidadeOrigem(new Unidade());
         a.getUnidadeOrigem().setSigla("U1");
         a.setUnidadeDestino(new Unidade());

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
 import sgc.comum.repo.ComumRepo;
+import sgc.notificacao.NotificacaoEmailService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
@@ -31,6 +32,7 @@ public class SubprocessoAdminWorkflowService {
     private final ComumRepo repo;
     private final SubprocessoCrudService crudService;
     private final AlertaFacade alertaService;
+    private final NotificacaoEmailService notificacaoEmailService;
     private final MovimentacaoRepo movimentacaoRepo;
     private final UnidadeFacade unidadeService;
     private final UsuarioFacade usuarioService;
@@ -54,6 +56,14 @@ public class SubprocessoAdminWorkflowService {
 
         try {
             String novaDataStr = novaDataLimite.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            String assunto = "SGC: Data limite alterada";
+            String corpo = """
+                    Prezado(a) responsável pela %s,
+                    
+                    A data limite da etapa atual no processo %s foi alterada para %s.
+                    """.formatted(sp.getUnidade().getSigla(), sp.getProcesso().getDescricao(), novaDataStr);
+
+            notificacaoEmailService.enviarEmail(sp.getUnidade().getSigla(), assunto, corpo);
             alertaService.criarAlertaAlteracaoDataLimite(sp.getProcesso(), sp.getUnidade(), novaDataStr, etapa);
         } catch (Exception e) {
             log.error("Erro ao enviar notificações de alteração de prazo: {}", e.getMessage());
