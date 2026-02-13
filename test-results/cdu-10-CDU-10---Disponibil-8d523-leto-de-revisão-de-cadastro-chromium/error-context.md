@@ -1,0 +1,96 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link "Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link "Minha unidade" [ref=e14] [cursor=pointer]:
+                  - /url: /unidade/18
+                  - generic [ref=e15]: 
+                  - text: Minha unidade
+              - listitem [ref=e16]:
+                - link "Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link "Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "CHEFE - SECAO_221" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: CHEFE - SECAO_221
+              - listitem "Sair" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e30]: 
+      - generic [ref=e33]:
+        - button "Voltar" [ref=e34] [cursor=pointer]:
+          - generic [ref=e35]: 
+        - navigation "breadcrumb" [ref=e36]:
+          - list [ref=e37]:
+            - listitem [ref=e38]:
+              - link "Início" [ref=e39] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e40]: 
+                - generic [ref=e41]: Início
+            - listitem [ref=e42]:
+              - text: ›
+              - link "SECAO_221" [ref=e43] [cursor=pointer]:
+                - /url: /processo/201/SECAO_221
+            - listitem [ref=e44]:
+              - text: ›
+              - generic [ref=e45]: Visualizar mapa
+      - main [ref=e46]:
+        - generic [ref=e47]:
+          - generic [ref=e48]:
+            - heading "Mapa de competências técnicas" [level=2] [ref=e50]
+            - generic [ref=e51]:
+              - button "Apresentar sugestões" [ref=e52] [cursor=pointer]
+              - button "Validar" [ref=e53] [cursor=pointer]
+          - generic [ref=e54]:
+            - generic [ref=e56]: SECAO_221 - Seção 221
+            - generic [ref=e57]:
+              - generic [ref=e59]:
+                - heading "Competência Mapeamento 1 1771010977860" [level=5] [ref=e61]
+                - generic [ref=e63]:
+                  - generic [ref=e64]:
+                    - generic [ref=e65]: 
+                    - paragraph [ref=e66]: Atividade Mapeamento 1 1771010977860
+                  - generic [ref=e69]:
+                    - generic [ref=e70]: 
+                    - text: Conhecimento 1
+              - generic [ref=e72]:
+                - heading "Competência Mapeamento 2 1771010977860" [level=5] [ref=e74]
+                - generic [ref=e76]:
+                  - generic [ref=e77]:
+                    - generic [ref=e78]: 
+                    - paragraph [ref=e79]: Atividade Mapeamento 2 1771010977860
+                  - generic [ref=e82]:
+                    - generic [ref=e83]: 
+                    - text: Conhecimento 2
+      - contentinfo [ref=e84]:
+        - generic [ref=e85]:
+          - generic [ref=e86]: Versão 1.0.0
+          - generic [ref=e87]: © SESEL/COSIS/TRE-PE
+  - text:  
+```

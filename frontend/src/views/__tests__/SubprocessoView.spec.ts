@@ -349,6 +349,10 @@ describe('Subprocesso.vue', () => {
 
     const header = wrapper.findComponent(SubprocessoHeaderStub);
     await header.vm.$emit('enviar-lembrete');
+    await (wrapper.vm as any).$nextTick();
+
+    const btn = wrapper.find('[data-testid="btn-confirmar-enviar-lembrete"]');
+    await btn.trigger('click');
     await flushPromises();
 
     expect(processoService.enviarLembrete).toHaveBeenCalledWith(1, 1);
@@ -362,6 +366,10 @@ describe('Subprocesso.vue', () => {
 
     const header = wrapper.findComponent(SubprocessoHeaderStub);
     await header.vm.$emit('enviar-lembrete');
+    await (wrapper.vm as any).$nextTick();
+
+    const btn = wrapper.find('[data-testid="btn-confirmar-enviar-lembrete"]');
+    await btn.trigger('click');
     await flushPromises();
 
     expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining('Não foi possível enviar'), 'danger');

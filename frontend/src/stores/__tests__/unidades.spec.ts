@@ -202,5 +202,25 @@ describe("useUnidadesStore", () => {
             ).rejects.toThrow("Fail");
             expect(context.store.error).toContain("Fail");
         });
+
+        it("buscarTodasAsUnidades deve definir unidades", async () => {
+            context.store.unidades = [];
+            await context.store.buscarTodasAsUnidades();
+            expect(unidadesService.buscarTodasUnidades).toHaveBeenCalled();
+            expect(context.store.unidades.length).toBeGreaterThan(0);
+        });
+
+        it("buscarTodasAsUnidades deve lidar com erro", async () => {
+            vi.mocked(unidadesService.buscarTodasUnidades).mockRejectedValueOnce(new Error("API Error"));
+            await expect(context.store.buscarTodasAsUnidades()).rejects.toThrow("API Error");
+            expect(context.store.error).toContain("API Error");
+        });
+
+        it("clearError deve limpar erros", () => {
+            context.store.error = "Algo deu errado";
+            context.store.clearError();
+            expect(context.store.error).toBeNull();
+        });
     });
 });
+

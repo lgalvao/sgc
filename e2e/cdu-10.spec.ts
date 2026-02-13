@@ -133,6 +133,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await adicionarAtividade(page, `Atividade Revisão Nova ${timestamp}`);
             await adicionarConhecimento(page, `Atividade Revisão Nova ${timestamp}`, 'Conhecimento Revisão');
             await page.getByTestId('btn-cad-atividades-voltar').click({force: true});
+            await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro em andamento/i);
         });
 
@@ -156,12 +157,16 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
         await test.step('3. Cenário 2: Caminho feliz - Disponibilizar revisão', async () => {
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+            const modalConfirmacao = page.getByRole('dialog');
+            await expect(modalConfirmacao.getByText('Disponibilização da revisão do cadastro')).toBeVisible();
+            await expect(modalConfirmacao.getByText(/Confirma a finalização da revisão e a disponibilização do cadastro/i)).toBeVisible();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-            await expect(page.getByText(/Revisão disponibilizada/i).first()).toBeVisible();
+            await expect(page.getByText(/Revisão do cadastro de atividades disponibilizada/i).first()).toBeVisible();
             await verificarPaginaPainel(page);
             await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro disponibilizada/i);
+            await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Disponibilização da revisão do cadastro de atividades/i);
         });
 
         await test.step('4. Cenário 3: Devolução e Histórico', async () => {
