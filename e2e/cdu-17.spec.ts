@@ -5,7 +5,7 @@ import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/h
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
-    const UNIDADE_ALVO = 'SECAO_221';
+    const UNIDADE_ALVO = 'SECAO_211';
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-17 ${timestamp}`;
@@ -28,7 +28,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
@@ -43,7 +43,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao211}) => {
         // Acessar subprocesso
         await page.goto(`/processo/${processoId}/${UNIDADE_ALVO}`);
         await navegarParaAtividades(page);
@@ -68,7 +68,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
-        await navegarParaSubprocesso(page, 'SECAO_221');
+        await navegarParaSubprocesso(page, 'SECAO_211');
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
@@ -78,7 +78,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     test('Preparacao 4: Admin cria competências com todas as atividades associadas', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
-        await navegarParaSubprocesso(page, 'SECAO_221');
+        await navegarParaSubprocesso(page, 'SECAO_211');
         await navegarParaMapa(page);
 
         // Criar duas competências cobrindo todas as três atividades
@@ -104,7 +104,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
         // Passo 2-3: Detalhes do processo, clica na unidade
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-        await navegarParaSubprocesso(page, 'SECAO_221');
+        await navegarParaSubprocesso(page, 'SECAO_211');
         
         // Passo 5-6: Clica no card Mapa de Competências
         await page.getByTestId('card-subprocesso-mapa').click();
@@ -116,7 +116,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     test('Cenario 2: ADMIN abre modal de disponibilização', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
-        await navegarParaSubprocesso(page, 'SECAO_221');
+        await navegarParaSubprocesso(page, 'SECAO_211');
         await page.getByTestId('card-subprocesso-mapa').click();
 
         // Passo 7: ADMIN clica em Disponibilizar
@@ -129,7 +129,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     test('Cenario 3: ADMIN cancela disponibilização - permanece na tela', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
-        await navegarParaSubprocesso(page, 'SECAO_221');
+        await navegarParaSubprocesso(page, 'SECAO_211');
         await page.getByTestId('card-subprocesso-mapa').click();
 
         await page.getByTestId('btn-cad-mapa-disponibilizar').click();
@@ -145,7 +145,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     test('Cenario 4: ADMIN disponibiliza mapa com sucesso', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
-        await navegarParaSubprocesso(page, 'SECAO_221');
+        await navegarParaSubprocesso(page, 'SECAO_211');
         await page.getByTestId('card-subprocesso-mapa').click();
 
         // Usar helper para disponibilizar

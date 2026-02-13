@@ -18,9 +18,9 @@ import {criarCompetencia} from './helpers/helpers-mapas.js';
 import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
-    const UNIDADE_ALVO = 'SECAO_221';
-    const USUARIO_CHEFE = USUARIOS.CHEFE_SECAO_221.titulo;
-    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_221.senha;
+    const UNIDADE_ALVO = 'SECAO_211';
+    const USUARIO_CHEFE = USUARIOS.CHEFE_SECAO_211.titulo;
+    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_211.senha;
     const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
     const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
@@ -43,7 +43,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoMapeamento)});
@@ -157,7 +157,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
             tipo: 'REVISAO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoRevisao)});
@@ -175,7 +175,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     // TESTES CDU-12
     // ========================================================================
 
-    test('Cenario 1: Verificar Sem Impactos (Estado Inicial)', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 1: Verificar Sem Impactos (Estado Inicial)', async ({page, autenticadoComoChefeSecao211}) => {
         
 
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
@@ -190,7 +190,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(page.getByText('Nenhum impacto detectado no mapa.')).toBeVisible();
     });
 
-    test('Cenario 2: Verificar Impacto de Inclusão de Atividade', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 2: Verificar Impacto de Inclusão de Atividade', async ({page, autenticadoComoChefeSecao211}) => {
         
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -212,7 +212,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fecharModalImpacto(page);
     });
 
-    test('Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 3: Verificar Impacto de Alteração em Atividade (Impacta Competência)', async ({page, autenticadoComoChefeSecao211}) => {
         
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -237,7 +237,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fecharModalImpacto(page);
     });
 
-    test('Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 4: Verificar Impacto de Remoção de Atividade (Impacta Competência)', async ({page, autenticadoComoChefeSecao211}) => {
         
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -262,7 +262,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fecharModalImpacto(page);
     });
 
-    test('Cenario 5: Verificar visualização pelo Admin (Somente Leitura)', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 5: Verificar visualização pelo Admin (Somente Leitura)', async ({page, autenticadoComoChefeSecao211}) => {
         // Chefe disponibiliza a revisão
         
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);

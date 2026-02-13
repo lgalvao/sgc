@@ -29,5 +29,8 @@ Progresso Atual
 - Validação E2E atualizada:
   - `cdu-25.spec.ts`: 6/6 passed
   - subset `cdu-20 + cdu-25 + cdu-34`: 19/19 passed
-- Próximo passo imediato: consolidar triagem de erros manuais do PDF/DOCX e revalidar os itens remanescentes como bug real vs falso positivo.
+- Revalidação da lista de falhas reportadas (13 cenários) reduziu para 8 falhas ativas:
+  - CDU-11, CDU-12, CDU-13, CDU-14, CDU-15, CDU-16, CDU-17, CDU-18.
+- Evidência recorrente nos erros ativos: `GET /api/subprocessos/buscar` retornando `404 ENTIDADE_NAO_ENCONTRADA` para processo+sigla logo após início de processo.
+- Próximo passo imediato: corrigir causa raiz da busca de subprocesso no backend (processo/unidade) e só então retomar ajustes finos de E2E.
 - Observação de triagem: parte dos erros manuais pode já estar resolvida ou ser falso positivo; validar cada item contra a base atual (`e2e/setup/seed.sql`) antes de implementar novas correções.

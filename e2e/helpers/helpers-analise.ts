@@ -55,6 +55,11 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
     if (siglaUnidade && !page.url().endsWith(siglaUnidade)) {
         // Clicar na linha da unidade para acessar o subprocesso
         await page.locator('tr').filter({hasText: new RegExp(String.raw`^${siglaUnidade}\b`, 'i')}).first().click();
+    } else if (!siglaUnidade && /\/processo\/\d+$/.test(page.url())) {
+        const linhaUnidade = page.locator('tbody tr').first();
+        if (await linhaUnidade.isVisible().catch(() => false)) {
+            await linhaUnidade.click();
+        }
     }
     
     // Agora deve estar na página do subprocesso

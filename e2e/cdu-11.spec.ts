@@ -3,6 +3,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
 import {abrirModalCriarCompetencia} from './helpers/helpers-mapas.js';
 import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
@@ -12,7 +13,7 @@ async function verificarPaginaSubprocesso(page: Page, unidade: string) {
 }
 
 test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos', () => {
-    const UNIDADE_ALVO = 'SECAO_221';
+    const UNIDADE_ALVO = 'SECAO_211';
     const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
     const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
@@ -38,7 +39,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
         // Selecionar o processo na tabela para obter o ID
@@ -58,10 +59,10 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao211}) => {
         
 
-        await page.goto(`/processo/${processoMapeamentoId}/${UNIDADE_ALVO}`);
+        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
 
         // Chefe vai direto para subprocesso
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
@@ -107,8 +108,8 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         const tabela = page.getByTestId('tbl-tree');
         await expect(tabela).toBeVisible();
         
-        // Clicar na célula SECAO_221 dentro da tabela de unidades
-        const celula = tabela.getByRole('cell', {name: 'SECAO_221'}).first();
+        // Clicar na célula SECAO_211 dentro da tabela de unidades
+        const celula = tabela.getByRole('cell', {name: 'SECAO_211'}).first();
         await expect(celula).toBeVisible();
         await celula.click();
         
@@ -166,13 +167,13 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByText(conhecimento3)).toBeVisible();
     });
 
-    test('Cenario 3: Visualizar processo finalizado', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 3: Visualizar processo finalizado', async ({page, autenticadoComoChefeSecao211}) => {
         // Preparar: Admin homologa o cadastro
         
 
         await expect(page.getByText(descProcessoMapeamento)).toBeVisible();
         await page.getByText(descProcessoMapeamento).click();
-        await navegarParaSubprocesso(page, 'SECAO_221');
+        await navegarParaSubprocesso(page, 'SECAO_211');
         // Aceitar cadastro
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await page.getByTestId('btn-acao-analisar-principal').click();
@@ -222,7 +223,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
         await page.getByText(descProcessoMapeamento).click();
-        await navegarParaSubprocesso(page, 'SECAO_221');
+        await navegarParaSubprocesso(page, 'SECAO_211');
         await page.getByTestId('card-subprocesso-mapa').click();
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
@@ -241,7 +242,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         // Clicar na linha da unidade
-        await navegarParaSubprocesso(page, 'SECAO_221');
+        await navegarParaSubprocesso(page, 'SECAO_211');
 
         // O card deve estar visível para visualização em processo finalizado
         await page.getByTestId('card-subprocesso-atividades-vis').click();
@@ -251,7 +252,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByText(atividadeB)).toBeVisible();
     });
 
-    test('Cenario 4: CHEFE visualiza cadastro de processo finalizado', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 4: CHEFE visualiza cadastro de processo finalizado', async ({page, autenticadoComoChefeSecao211}) => {
         // Mesmo cenário mas com perfil CHEFE - deve ir direto para subprocesso
         
 

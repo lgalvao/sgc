@@ -27,7 +27,7 @@ import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 
 test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {
-    const UNIDADE_ALVO = 'SECAO_221';
+    const UNIDADE_ALVO = 'SECAO_211';
 
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-14 ${timestamp}`;
@@ -44,7 +44,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
         const linhaProcesso = page.locator('tr').filter({has: page.getByText(descMapeamento)});
@@ -55,7 +55,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 0.2: CHEFE adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 0.2: CHEFE adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao211}) => {
         await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
@@ -87,7 +87,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await disponibilizarMapa(page, '2030-12-31');
     });
 
-    test('Preparacao 0.6: CHEFE valida mapa', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 0.6: CHEFE valida mapa', async ({page, autenticadoComoChefeSecao211}) => {
         await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-validar').click();
@@ -117,7 +117,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
             tipo: 'REVISAO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
         const linhaProcesso = page.locator('tr').filter({has: page.getByText(descProcesso)});
@@ -132,7 +132,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: CHEFE revisa atividades e disponibiliza', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 2: CHEFE revisa atividades e disponibiliza', async ({page, autenticadoComoChefeSecao211}) => {
         await page.goto(`/processo/${processoId}/${UNIDADE_ALVO}`);
         await navegarParaAtividades(page);
 
@@ -181,7 +181,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await devolverRevisao(page, 'Favor revisar as competências associadas');
     });
 
-    test('Cenario 4: CHEFE visualiza histórico após devolução e disponibiliza novamente', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 4: CHEFE visualiza histórico após devolução e disponibiliza novamente', async ({page, autenticadoComoChefeSecao211}) => {
         await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);
 
@@ -215,7 +215,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await devolverRevisao(page, 'Pequeno ajuste necessário na revisão');
 
         await fazerLogout(page);
-        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
         await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);

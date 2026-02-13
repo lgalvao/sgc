@@ -1,0 +1,124 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link "Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link "Unidades" [ref=e14] [cursor=pointer]:
+                  - /url: /unidades
+                  - generic [ref=e15]: 
+                  - text: Unidades
+              - listitem [ref=e16]:
+                - link "Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link "Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "ADMIN - ADMIN" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: ADMIN - ADMIN
+              - listitem "Configurações do sistema" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: /configuracoes
+                  - generic [ref=e30]: 
+              - listitem "Sair" [ref=e31]:
+                - link [ref=e32] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e33]: 
+      - generic [ref=e36]:
+        - button "Voltar" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: 
+        - navigation "breadcrumb" [ref=e39]:
+          - list [ref=e40]:
+            - listitem [ref=e41]:
+              - link "Início" [ref=e42] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e43]: 
+                - generic [ref=e44]: Início
+            - listitem [ref=e45]:
+              - text: ›
+              - link "Detalhes do processo" [ref=e46] [cursor=pointer]:
+                - /url: /processo/201
+            - listitem [ref=e47]:
+              - text: ›
+              - generic [ref=e48]: SECAO_211
+      - main [ref=e49]:
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - generic [ref=e54]:
+                - heading "SECAO_211" [level=2] [ref=e55]
+                - paragraph [ref=e56]: Seção 211
+              - generic [ref=e57]:
+                - button "Alterar data limite" [ref=e58] [cursor=pointer]:
+                  - generic [ref=e59]: 
+                  - text: Alterar data limite
+                - button "Reabrir cadastro" [ref=e60] [cursor=pointer]:
+                  - generic [ref=e61]: 
+                  - text: Reabrir cadastro
+                - button "Reabrir Revisão" [ref=e62] [cursor=pointer]:
+                  - generic [ref=e63]: 
+                  - text: Reabrir Revisão
+            - generic [ref=e65]:
+              - paragraph [ref=e66]: "Processo: Mapeamento CDU-16 1770941377881"
+              - paragraph [ref=e67]: Situação:Não iniciado
+              - paragraph [ref=e68]:
+                - strong [ref=e69]: "Titular:"
+                - text: Debbie Harry
+              - paragraph [ref=e70]:
+                - generic [ref=e71]: 
+                - text: "2015"
+                - generic [ref=e72]: 
+                - text: debbie.harry@tre-pe.jus.br
+          - generic [ref=e73]:
+            - button "Atividades e conhecimentos Visualização das atividades e conhecimentos da unidade" [ref=e75] [cursor=pointer]:
+              - generic [ref=e77]:
+                - heading "Atividades e conhecimentos" [level=4] [ref=e78]
+                - paragraph [ref=e79]: Visualização das atividades e conhecimentos da unidade
+            - button "Mapa de Competências Mapa de competências técnicas da unidade" [ref=e81] [cursor=pointer]:
+              - generic [ref=e83]:
+                - heading "Mapa de Competências" [level=4] [ref=e84]
+                - paragraph [ref=e85]: Mapa de competências técnicas da unidade
+          - generic [ref=e86]:
+            - heading "Movimentações" [level=4] [ref=e87]
+            - table [ref=e89]:
+              - rowgroup [ref=e90]:
+                - row "Data/Hora Unidade Origem Unidade Destino Descrição" [ref=e91]:
+                  - columnheader "Data/Hora" [ref=e92]
+                  - columnheader "Unidade Origem" [ref=e93]
+                  - columnheader "Unidade Destino" [ref=e94]
+                  - columnheader "Descrição" [ref=e95]
+              - rowgroup [ref=e96]:
+                - row "12/02/2026 21:09 - - Processo iniciado" [ref=e97]:
+                  - cell "12/02/2026 21:09" [ref=e98]
+                  - cell "-" [ref=e99]
+                  - cell "-" [ref=e100]
+                  - cell "Processo iniciado" [ref=e101]
+      - contentinfo [ref=e102]:
+        - generic [ref=e103]:
+          - generic [ref=e104]: Versão 1.0.0
+          - generic [ref=e105]: © SESEL/COSIS/TRE-PE
+  - text:  
+```

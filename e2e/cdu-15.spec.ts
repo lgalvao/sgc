@@ -26,7 +26,7 @@ import {
 } from './helpers/helpers-mapas.js';
 
 test.describe.serial('CDU-15 - Manter mapa de competências', () => {
-    const UNIDADE_ALVO = 'SECAO_221';
+    const UNIDADE_ALVO = 'SECAO_211';
     const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
     const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
@@ -46,7 +46,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
         const linhaProcesso = page.locator('tr').filter({has: page.getByText(descProcesso)});

@@ -225,3 +225,18 @@ Ao clicar em "Criar atribuição" sem combinação válida de campos/carregament
 **Validação:**
 - `npx playwright test e2e/cdu-25.spec.ts` → **6 passed**
 - `npx playwright test e2e/cdu-20.spec.ts e2e/cdu-25.spec.ts e2e/cdu-34.spec.ts` → **19 passed**
+
+### 20. Falhas remanescentes concentradas em busca de subprocesso
+
+**Problema Identificado:**
+Após nova rodada dos CDUs com falha, vários fluxos de CHEFE/ADMIN quebram na etapa inicial com:
+- `GET /api/subprocessos/buscar?codProcesso={codigo}&siglaUnidade={sigla}`
+- resposta `404 ENTIDADE_NAO_ENCONTRADA`
+- mensagem: `Subprocesso com codigo '[{processo}, {unidade}]' não encontrado(a)`.
+
+**Impacto observado:**
+- Etapas de preparação falham por ausência dos cards de subprocesso (atividades/mapa), gerando efeito cascata nos cenários seguintes.
+- Rodada atual dos arquivos críticos ficou em **8 falhas** (CDU-11/12/13/14/15/16/17/18), com padrão consistente.
+
+**Leitura técnica:**
+O problema dominante deixou de ser seletor/timeout e passou a ser funcional de backend na resolução processo+unidade para subprocesso em parte dos fluxos.

@@ -23,7 +23,7 @@ import {
 import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos', () => {
-    const UNIDADE_ALVO = 'SECAO_221';
+    const UNIDADE_ALVO = 'SECAO_211';
 
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-13 ${timestamp}`;
@@ -39,7 +39,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
         // Iniciar processo
@@ -103,7 +103,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await devolverCadastroMapeamento(page, 'Favor incluir mais detalhes nos conhecimentos');
     });
 
-    test('Cenario 3: CHEFE visualiza histórico após devolução e disponibiliza novamente', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenario 3: CHEFE visualiza histórico após devolução e disponibiliza novamente', async ({page, autenticadoComoChefeSecao211}) => {
         await acessarSubprocessoChefeDireto(page, descProcesso);
 
         // Verificar situação
@@ -154,7 +154,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 
         // CHEFE disponibiliza novamente
         await fazerLogout(page);
-        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
         await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);

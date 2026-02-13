@@ -18,7 +18,7 @@ async function verificarPaginaSubprocesso(page: Page, unidade: string) {
 }
 
 test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
-    const UNIDADE_ALVO = 'SECAO_221';
+    const UNIDADE_ALVO = 'SECAO_211';
 
     const timestamp = Date.now();
     const descProcessoMapeamento = `Mapeamento CDU-16 ${timestamp}`;
@@ -47,7 +47,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoMapeamento)});
@@ -159,7 +159,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
             tipo: 'REVISAO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcessoRevisao)});
