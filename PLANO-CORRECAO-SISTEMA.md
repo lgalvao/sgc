@@ -34,3 +34,12 @@ Progresso Atual
   - Subset em foco (`cdu-11`, `cdu-13`, `cdu-14`) evoluiu para **2 falhas remanescentes** (de 8 iniciais nesse grupo), ambas ligadas a navegação em detalhes de processo quando o card de subprocesso não está visível diretamente.
 - Próximo passo imediato: padronizar helper/navegação ADMIN para sempre resolver subprocesso alvo (tabela de unidades vs detalhe direto) e concluir o fechamento desse trio antes de avançar para `cdu-12/15/16/17/18`.
 - Observação de triagem: parte dos erros manuais pode já estar resolvida ou ser falso positivo; validar cada item contra a base atual (`e2e/setup/seed.sql`) antes de implementar novas correções.
+- Nova rodada de estabilização (2026-02-13):
+  - Correções aplicadas em navegação E2E (helpers de atividades/mapa/logout e acesso ADMIN/GESTOR).
+  - Ajustes de autenticação explícita e robustez de precondição em `cdu-02/03/12/15/16/18`.
+  - Reexecuções locais:
+    - `cdu-15`: 7/7 passed
+    - `cdu-16`: 13/13 passed
+    - `cdu-12 + cdu-15 + cdu-16`: 16 passed / 2 falhas intermediárias corrigidas no ciclo
+  - Estado no conjunto amplo dos 13 arquivos previamente falhos:
+    - falhas funcionais reduzidas de 13 para **1 ponto remanescente/intermitente** (CDU-09 durante troca de sessão em execução longa), com evidência de instabilidade de ambiente (queda de conexão do Vite em reexecução parcial).

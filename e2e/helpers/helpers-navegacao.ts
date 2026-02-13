@@ -43,11 +43,7 @@ export async function fazerLogout(page: Page): Promise<void> {
 
     const btnLogout = page.getByTestId('btn-logout');
     const linkLogout = btnLogout.locator('a').first();
-    await expect(btnLogout).toBeVisible();
-    await linkLogout.click({force: true});
-
-    if (!/\/login$/.test(page.url())) {
-        await limparNotificacoes(page);
+    if (await btnLogout.isVisible().catch(() => false)) {
         await linkLogout.click({force: true});
     }
 

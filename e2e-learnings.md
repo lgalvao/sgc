@@ -114,6 +114,22 @@ npx playwright test e2e/cdu-XX.spec.ts --reporter=list > test_output.txt 2>&1
 2. **Uso de steps**: Use `test.step()` para organizar logs dentro de um teste consolidado longo.
 3. **Limpeza de Toasts**: Use o helper `limparNotificacoes(page)` antes de ações críticas de navegação se toasts estiverem bloqueando a tela.
 
+### 14. Logout em fluxos longos pode falhar por estado de UI
+
+**Problema Identificado:**
+Em alguns fluxos (ex.: CDU-09/CDU-12), o botão de logout pode não estar disponível ou clicável no instante da troca de ator (overlay/toast/transição de rota), gerando timeout.
+
+**Solução aplicada:**
+- `fazerLogout` ficou resiliente: tenta logout pelo menu quando disponível e, se não houver redirecionamento, navega explicitamente para `/login`.
+
+### 15. Suites seriais ainda exigem autenticação explícita por teste
+
+**Problema Identificado:**
+Mesmo com estado de banco preservado por arquivo, o contexto de autenticação pode não ser o esperado entre testes (novo contexto/página).
+
+**Solução aplicada:**
+- Adicionar fixture de autenticação no próprio teste (`autenticadoComoAdmin`) ou `login(...)` explícito no início de cada caso dependente.
+
 ## Atualização Contínua - 2026-02-12
 
 ### 10. Perfil de GESTOR deve refletir a hierarquia do caso
