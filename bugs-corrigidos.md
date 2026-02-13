@@ -79,14 +79,40 @@ Consolidar, em um único documento, as correções aplicadas durante a auditoria
 - **Ajustes:** asserts atualizados para novo contrato (mensagem, redirecionamento e uso de endpoint unificado).
 - **Validação unitária:** `87 passed`.
 
+### 9) CDU-24 - Disponibilização em bloco alinhada ao requisito
+- **Arquivos:** `e2e/cdu-24.spec.ts`, `frontend/src/composables/useProcessoView.ts`
+- **Problemas:**
+  - E2E com branches defensivos no botão/modal.
+  - Mensagem de sucesso diferente do texto do requisito.
+  - Fluxo de disponibilização em bloco não redirecionava ao painel.
+- **Correções:**
+  - E2E endurecido com asserts obrigatórios para botão, modal, campo de data limite e confirmação.
+  - Mensagem ajustada para `"Mapas de competências disponibilizados em bloco"`.
+  - Redirecionamento para `/painel` após disponibilização em bloco.
+- **Validação:** `npx playwright test e2e/cdu-24.spec.ts --reporter=list` (6/6).
+
+### 10) CDU-32 - Reabrir cadastro + bug real de template de e-mail
+- **Arquivos:** `e2e/cdu-32.spec.ts`, `backend/src/main/resources/templates/email/cadastro-reaberto.html`, `backend/src/main/resources/templates/email/revisao-cadastro-reaberta.html`
+- **Problemas:**
+  - E2E com branches defensivos e preparação incompleta (sem homologação prévia).
+  - Bug real no sistema: template Thymeleaf `cadastro-reaberto` ausente (erro em runtime ao enviar e-mail da transição).
+- **Correções:**
+  - Preparação do E2E corrigida para homologar cadastro antes da reabertura.
+  - Cenário de confirmação validando sucesso, situação e movimentação.
+  - Criação dos templates de e-mail faltantes para reabertura de cadastro e revisão.
+- **Validação:** `npx playwright test e2e/cdu-32.spec.ts --reporter=list` (8/8) sem erro de template.
+
 ---
 
 ## Estado atual da execução
 
 - **Verde nesta rodada:**
+- **Verde nesta rodada:**
   - `CDU-22`: preparação + cancelamento + confirmação do aceite em bloco.
   - `CDU-23`: preparação + cancelamento + confirmação da homologação em bloco.
   - `CDU-27`: preparação + navegação + alteração de data limite.
+  - `CDU-24`: confirmação de disponibilização em bloco com data limite e redirecionamento.
+  - `CDU-32`: reabertura de cadastro com preparo correto e validação completa do fluxo.
   - Unit tests frontend relacionados (`87 passed`).
 
 - **Ajuste final concluído no CDU-23:**
@@ -104,6 +130,8 @@ npx playwright test e2e/cdu-28.spec.ts --reporter=list
 npx playwright test e2e/cdu-30.spec.ts --reporter=list
 npx playwright test e2e/cdu-34.spec.ts --reporter=list
 npx playwright test e2e/cdu-22.spec.ts e2e/cdu-23.spec.ts e2e/cdu-27.spec.ts --reporter=list
+npx playwright test e2e/cdu-24.spec.ts --reporter=list
+npx playwright test e2e/cdu-32.spec.ts --reporter=list
 
 npm run test:unit --prefix frontend -- src/stores/__tests__/feedback.spec.ts
 npm run test:unit --prefix frontend -- src/views/__tests__/CadAtribuicao.spec.ts

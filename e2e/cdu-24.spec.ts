@@ -3,7 +3,6 @@ import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-24 - Disponibilizar mapas de competências em bloco
@@ -50,7 +49,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -102,70 +101,48 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     // ========================================================================
 
     test('Cenario 1: ADMIN visualiza botão Disponibilizar Mapas em Bloco', async ({page, autenticadoComoAdmin}) => {
-        // CDU-24: Passos 1-4
-        
-
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-
-        // Verificar botão
-        const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar.*Bloco/i});
-        const btnVisivel = await btnDisponibilizar.isVisible().catch(() => false);
-        
-        if (btnVisivel) {
-            await expect(btnDisponibilizar).toBeEnabled();
-        }
+        const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar.*Bloco/i}).first();
+        await expect(btnDisponibilizar).toBeVisible();
+        await expect(btnDisponibilizar).toBeEnabled();
     });
 
     test('Cenario 2: Modal de disponibilização inclui campo de data limite', async ({page, autenticadoComoAdmin}) => {
-        // CDU-24: Passo 5 - Modal inclui campo de data limite obrigatório
-        
-
         await page.getByText(descProcesso).click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar.*Bloco/i}).first();
+        await btnDisponibilizar.click();
 
-        const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar.*Bloco/i});
-        
-        if (await btnDisponibilizar.isVisible().catch(() => false)) {
-            await btnDisponibilizar.click();
-
-            const modal = page.getByRole('dialog');
-            await expect(modal).toBeVisible();
-
-            // Verificar elementos específicos do CDU-24
-            await expect(modal.getByRole('heading', {name: /Disponibilizar/i})).toBeVisible();
-            await expect(modal.locator('table')).toBeVisible();
-            
-            // Campo de data limite (obrigatório para CDU-24)
-            const inputData = modal.getByRole('textbox', {name: /Data Limite/i});
-            await expect(inputData).toBeVisible();
-
-            await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
-            await expect(modal.getByRole('button', {name: /Disponibilizar/i})).toBeVisible();
-
-            // Fechar modal
-            await modal.getByRole('button', {name: /Cancelar/i}).click();
-        }
+        const modal = page.locator('#modal-acao-bloco');
+        await expect(modal).toHaveClass(/show/);
+        await expect(modal.getByText(/Disponibilizar Mapas em Bloco/i)).toBeVisible();
+        await expect(modal.getByText(/Selecione as unidades/i)).toBeVisible();
+        await expect(modal.locator('table')).toBeVisible();
+        await expect(modal.getByLabel(/Data Limite/i)).toBeVisible();
+        await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
+        await expect(modal.getByRole('button', {name: /Disponibilizar Selecionados/i})).toBeVisible();
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
+        await expect(modal).not.toHaveClass(/show/);
     });
 
-    test('Cenario 3: Cancelar disponibilização em bloco', async ({page, autenticadoComoAdmin}) => {
-        // CDU-24: Passo 6 - Cancelar
-        
-
+    test('Cenario 3: ADMIN confirma disponibilização em bloco', async ({page, autenticadoComoAdmin}) => {
         await page.getByText(descProcesso).click();
+        const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar.*Bloco/i}).first();
+        await btnDisponibilizar.click();
 
-        const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar.*Bloco/i});
-        
-        if (await btnDisponibilizar.isVisible().catch(() => false)) {
-            await btnDisponibilizar.click();
+        const modal = page.locator('#modal-acao-bloco');
+        await expect(modal).toHaveClass(/show/);
 
-            const modal = page.getByRole('dialog');
-            await expect(modal).toBeVisible();
+        const data = new Date();
+        data.setDate(data.getDate() + 10);
+        const yyyy = data.getFullYear();
+        const mm = String(data.getMonth() + 1).padStart(2, '0');
+        const dd = String(data.getDate()).padStart(2, '0');
+        await modal.getByLabel(/Data Limite/i).fill(`${yyyy}-${mm}-${dd}`);
 
-            await modal.getByRole('button', {name: /Cancelar/i}).click();
-
-            await expect(modal).toBeHidden();
-            await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-        }
+        await modal.getByRole('button', {name: /Disponibilizar Selecionados/i}).click();
+        await expect(page.getByText(/Mapas de competências disponibilizados em bloco/i).first()).toBeVisible();
+        await expect(page).toHaveURL(/\/painel/);
     });
 });

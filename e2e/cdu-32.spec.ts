@@ -1,8 +1,8 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {homologarCadastroMapeamento} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-32 - Reabrir cadastro
@@ -46,7 +46,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -70,6 +70,13 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await verificarPaginaPainel(page);
     });
 
+    test('Preparacao 3: ADMIN homologa cadastro', async ({page, autenticadoComoAdmin}) => {
+        await page.getByText(descProcesso).click();
+        await navegarParaSubprocesso(page, UNIDADE_1);
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await homologarCadastroMapeamento(page);
+    });
+
     // ========================================================================
     // TESTES PRINCIPAIS
     // ========================================================================
@@ -81,62 +88,58 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-            .toHaveText(/Cadastro disponibilizado/i);
+            .toHaveText(/Cadastro homologado/i);
     });
 
     test('Cenario 2: ADMIN visualiza botão Reabrir cadastro', async ({page, autenticadoComoAdmin}) => {
-        
-
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const btnReabrir = page.getByTestId('btn-reabrir-cadastro');
-        const btnVisivel = await btnReabrir.isVisible().catch(() => false);
-        
-        if (btnVisivel) {
-            await expect(btnReabrir).toBeEnabled();
-        }
+        await expect(btnReabrir).toBeVisible();
+        await expect(btnReabrir).toBeEnabled();
     });
 
     test('Cenario 3: ADMIN abre modal de reabertura de cadastro', async ({page, autenticadoComoAdmin}) => {
-        
-
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const btnReabrir = page.getByTestId('btn-reabrir-cadastro');
-        
-        if (await btnReabrir.isVisible().catch(() => false)) {
-            await btnReabrir.click();
+        await btnReabrir.click();
 
-            const modal = page.getByRole('dialog');
-            await expect(modal).toBeVisible();
-            await expect(modal.getByText(/Reabrir cadastro/i)).toBeVisible();
-            await expect(page.getByTestId('inp-justificativa-reabrir')).toBeVisible();
-            await expect(page.getByTestId('btn-confirmar-reabrir')).toBeVisible();
-        }
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await expect(modal.getByText(/Reabrir cadastro/i)).toBeVisible();
+        await expect(page.getByTestId('inp-justificativa-reabrir')).toBeVisible();
+        await expect(page.getByTestId('btn-confirmar-reabrir')).toBeVisible();
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
+        await expect(modal).toBeHidden();
     });
 
     test('Cenario 4: Botão confirmar desabilitado sem justificativa', async ({page, autenticadoComoAdmin}) => {
-        
-
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const btnReabrir = page.getByTestId('btn-reabrir-cadastro');
-        
-        if (await btnReabrir.isVisible().catch(() => false)) {
-            await btnReabrir.click();
+        await btnReabrir.click();
 
-            const modal = page.getByRole('dialog');
-            await expect(modal).toBeVisible();
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await expect(page.getByTestId('btn-confirmar-reabrir')).toBeDisabled();
+        await page.getByTestId('inp-justificativa-reabrir').fill('Justificativa de teste');
+        await expect(page.getByTestId('btn-confirmar-reabrir')).toBeEnabled();
+    });
 
-            // Sem justificativa, botão deve estar desabilitado
-            await expect(page.getByTestId('btn-confirmar-reabrir')).toBeDisabled();
+    test('Cenario 5: ADMIN confirma reabertura de cadastro', async ({page, autenticadoComoAdmin}) => {
+        await page.getByText(descProcesso).click();
+        await navegarParaSubprocesso(page, UNIDADE_1);
+        await page.getByTestId('btn-reabrir-cadastro').click();
 
-            // Preencher justificativa
-            await page.getByTestId('inp-justificativa-reabrir').fill('Justificativa de teste');
-            await expect(page.getByTestId('btn-confirmar-reabrir')).toBeEnabled();
-        }
+        await page.getByTestId('inp-justificativa-reabrir').fill('Ajustes necessários identificados na revisão.');
+        await page.getByTestId('btn-confirmar-reabrir').click();
+
+        await expect(page.getByText(/Cadastro reaberto/i).first()).toBeVisible();
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Em andamento/i);
+        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de cadastro/i);
     });
 });
