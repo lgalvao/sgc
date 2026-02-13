@@ -47,7 +47,7 @@ export async function fazerLogout(page: Page): Promise<void> {
         await linkLogout.click({force: true});
     }
 
-    if (!/\/login$/.test(page.url())) {
+    if (!page.url().endsWith("/login")) {
         await page.goto('/login');
     }
 
