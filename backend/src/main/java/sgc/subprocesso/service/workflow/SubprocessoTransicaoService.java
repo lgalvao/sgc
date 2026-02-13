@@ -106,7 +106,7 @@ public class SubprocessoTransicaoService {
                 .observacoes(cmd.observacoes())
                 .build());
 
-        log.info("Workflow executado: Subprocesso {} -> {}, Transição {}",
+        log.info("Workflow executado: SP{} -> {}, Trans. {}",
                 sp.getCodigo(), cmd.novaSituacao(), cmd.tipoTransicao());
     }
 }
