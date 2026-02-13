@@ -95,7 +95,8 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await navegarParaMapa(page);
             await page.getByTestId('btn-mapa-validar').click();
             await page.getByTestId('btn-validar-mapa-confirmar').click();
-            await verificarPaginaPainel(page);
+            await expect(page).toHaveURL(/\/vis-mapa/);
+            await page.goto('/painel');
 
             // Admin homologa mapa e finaliza processo
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);

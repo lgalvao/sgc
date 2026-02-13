@@ -10,7 +10,7 @@
 
     <RelatorioCards
         :mapas-vigentes-count="mapasVigentes.length"
-        :diagnosticos-gaps-count="diagnosticosGaps.length"
+        :diagnosticos-gaps-count="diagnosticosGapsFiltrados.length"
         :processos-filtrados-count="processosFiltrados.length"
         @abrir-mapas-vigentes="abrirModalMapasVigentes"
         @abrir-diagnosticos-gaps="abrirModalDiagnosticosGaps"

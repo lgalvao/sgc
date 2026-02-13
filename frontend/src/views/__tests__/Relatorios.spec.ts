@@ -4,7 +4,6 @@ import Relatorios from "@/views/Relatorios.vue";
 import { createTestingPinia } from "@pinia/testing";
 import { useProcessosStore } from "@/stores/processos";
 import { useMapasStore } from "@/stores/mapas";
-import { usePerfilStore } from "@/stores/perfil";
 import { nextTick } from "vue";
 
 // Stubs
@@ -44,13 +43,14 @@ describe("Relatorios.vue", () => {
   let mapasStore: any;
   let perfilStore: any;
 
-  const createWrapper = () => {
+  const createWrapper = (initialState = {}) => {
     return mount(Relatorios, {
       global: {
         plugins: [
           createTestingPinia({
             createSpy: vi.fn,
             stubActions: true,
+            initialState
           }),
         ],
         stubs: {
@@ -71,14 +71,18 @@ describe("Relatorios.vue", () => {
   });
 
   it("deve carregar processos ao montar se necessário", async () => {
-    wrapper = createWrapper();
+    const initialState = {
+      perfil: {
+        perfilSelecionado: 'GESTOR',
+        unidadeSelecionada: 1
+      },
+      processos: {
+        processosPainel: []
+      }
+    };
+    wrapper = createWrapper(initialState);
     processosStore = useProcessosStore();
-    perfilStore = usePerfilStore();
     
-    perfilStore.perfilSelecionado = 'GESTOR';
-    perfilStore.unidadeSelecionada = 1;
-    processosStore.processosPainel = [];
-
     // Trigger onMounted
     await flushPromises();
 
