@@ -272,6 +272,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
         // Admin acessa
         await fazerLogout(page);
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         
         await expect(page.locator('tr', {has: page.getByText(descProcessoRevisao)})).toBeVisible();
         await page.locator('tr', {has: page.getByText(descProcessoRevisao)}).click();

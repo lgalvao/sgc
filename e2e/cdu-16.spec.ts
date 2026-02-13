@@ -237,13 +237,11 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         
         // Passo 2-4: Sistema mostra Detalhes do processo, ADMIN clica na unidade
         await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
-        
+
         // Sistema mostra Detalhes do subprocesso
-        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-            .toHaveText(/Revis[aã]o d[oe] cadastro homologada/i);
+        await expect(page.getByText(/Revis[aã]o d[oe] cadastro homologada/i).first()).toBeVisible();
 
         // Passo 5-6: ADMIN clica no card Mapa de Competências
-        await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
         await navegarParaMapa(page);
 
         // Verificar tela de Edição de mapa

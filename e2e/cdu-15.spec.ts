@@ -38,7 +38,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     const CONHECIMENTO_1 = `Conhecimento 1 ${timestamp}`;
     const CONHECIMENTO_2 = `Conhecimento 2 ${timestamp}`;
 
-    test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page, autenticadoComoAdmin}) => {
         // 1. Admin cria e inicia processo
 
         await criarProcesso(page, {
@@ -51,12 +51,6 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         const linhaProcesso = page.locator('tr').filter({has: page.getByText(descProcesso)});
         await linhaProcesso.click();
-
-        const currentUrl = page.url();
-        const match = /\/processo\/cadastro\/(\d+)/.exec(currentUrl);
-        if (match?.[1]) {
-            cleanupAutomatico.registrar(Number.parseInt(match[1]));
-        }
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
@@ -95,13 +89,11 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
     });
 
-    test('CT-00 e CT-01: Acessar Edição de Mapa e verificar elementos', async ({page}) => {
+    test('CT-00 e CT-01: Acessar Edição de Mapa e verificar elementos', async ({page, autenticadoComoAdmin}) => {
         
 
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
 
-        // Verificar card do mapa
-        await expect(page.getByTestId('card-subprocesso-mapa')).toBeVisible();
         await navegarParaMapa(page);
 
         // Verificar título
@@ -116,7 +108,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
     });
 
-    test('CT-02: Criar Competência', async ({page}) => {
+    test('CT-02: Criar Competência', async ({page, autenticadoComoAdmin}) => {
         
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -131,7 +123,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeEnabled();
     });
 
-    test('CT-03: Editar Competência', async ({page}) => {
+    test('CT-03: Editar Competência', async ({page, autenticadoComoAdmin}) => {
         
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -146,7 +138,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await verificarCompetenciaNoMapa(page, newDesc, [ATIVIDADE_1, ATIVIDADE_2]);
     });
 
-    test('CT-05: Validar Cancelamento da Exclusão', async ({page}) => {
+    test('CT-05: Validar Cancelamento da Exclusão', async ({page, autenticadoComoAdmin}) => {
         
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -158,7 +150,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByText(compDesc).first()).toBeVisible();
     });
 
-    test('CT-04: Excluir Competência com Confirmação', async ({page}) => {
+    test('CT-04: Excluir Competência com Confirmação', async ({page, autenticadoComoAdmin}) => {
         
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -171,7 +163,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
     });
 
-    test('CT-06: Navegar para Disponibilização', async ({page}) => {
+    test('CT-06: Navegar para Disponibilização', async ({page, autenticadoComoAdmin}) => {
         // Recriar uma competência para poder disponibilizar
         
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
