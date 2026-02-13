@@ -8,9 +8,11 @@ async function garantirContextoSubprocesso(page: Page) {
     }
 
     if (/\/processo\/\d+$/.test(page.url())) {
-        const linhasUnidade = page.locator('table tbody tr');
-        if (await linhasUnidade.first().isVisible()) {
-            await linhasUnidade.first().click();
+        const linhaUnidade = page.getByRole('row')
+            .filter({has: page.getByRole('cell')})
+            .first();
+        if (await linhaUnidade.isVisible().catch(() => false)) {
+            await linhaUnidade.click();
         }
     }
 }

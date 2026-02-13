@@ -17,7 +17,7 @@ import {
     fecharHistoricoAnalise,
     homologarCadastroMapeamento
 } from './helpers/helpers-analise.js';
-import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));
@@ -80,7 +80,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             // Admin adiciona competências e disponibiliza mapa
             await page.goto('/painel');
             await page.getByText(descProcessoMapeamento).click();
-            await page.getByRole('row', {name: UNIDADE_ALVO}).click();
+            await navegarParaSubprocesso(page, UNIDADE_ALVO);
             await navegarParaMapa(page);
             await criarCompetencia(page, `Competência Mapeamento 1 ${timestamp}`, [`Atividade Mapeamento 1 ${timestamp}`]);
             await criarCompetencia(page, `Competência Mapeamento 2 ${timestamp}`, [`Atividade Mapeamento 2 ${timestamp}`]);
@@ -100,7 +100,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             // Admin homologa mapa e finaliza processo
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await page.getByText(descProcessoMapeamento).click();
-            await page.getByRole('row', {name: UNIDADE_ALVO}).click();
+            await navegarParaSubprocesso(page, UNIDADE_ALVO);
             await navegarParaMapa(page);
             await page.getByTestId('btn-mapa-homologar-aceite').click();
             await page.getByTestId('btn-aceite-mapa-confirmar').click();

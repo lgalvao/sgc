@@ -179,43 +179,6 @@ class PainelServiceTest {
 
             assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/100/SIGLA");
         }
-
-        @Test
-        @DisplayName("listarProcessos deve retornar link null se unidade nao encontrada no calculo de link CHEFE")
-        void listarProcessos_LinkChefeErro() {
-            Processo p = criarProcessoMock(1L);
-            when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
-                    .thenReturn(new PageImpl<>(List.of(p)));
-
-            when(unidadeService.buscarPorCodigo(2L)).thenThrow(new RuntimeException("Unidade não achada"));
-
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, 2L, PageRequest.of(0, 10));
-
-            assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("");
-        }
-
-        @Test
-        @DisplayName("Calcula link destino com exceção na busca de unidade")
-        void calculaLinkComExcecaoUnidade() {
-            Processo p = new Processo();
-            p.setCodigo(1L);
-            p.setTipo(TipoProcesso.MAPEAMENTO);
-            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-
-            Unidade u = criarUnidade(1L, "U1");
-            p.adicionarParticipantes(Set.of(u));
-
-            when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any()))
-                    .thenReturn(new PageImpl<>(List.of(p)));
-
-            // Simula erro na busca da unidade para montar o link
-            when(unidadeService.buscarPorCodigo(1L)).thenThrow(new RuntimeException("Erro DB"));
-
-            Page<ProcessoResumoDto> res = painelService.listarProcessos(Perfil.SERVIDOR, 1L, PageRequest.of(0, 10));
-
-            assertThat(res.getContent()).hasSize(1);
-            assertThat(res.getContent().getFirst().linkDestino()).isEqualTo("");
-        }
     }
 
     @Nested

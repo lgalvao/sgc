@@ -2,9 +2,14 @@ import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {
+    adicionarAtividade,
+    adicionarConhecimento,
+    navegarParaAtividades,
+    navegarParaAtividadesVisualizacao
+} from './helpers/helpers-atividades.js';
 import {acessarSubprocessoChefeDireto, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
-import {abrirModalCriarCompetencia} from './helpers/helpers-mapas.js';
+import {abrirModalCriarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
@@ -117,7 +122,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
         
         // Passo 2.3: Verificar visualização
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', exact: true})).toBeVisible();
 
         // Passo 5 e 6: Verificar tela de atividades com dados da unidade
@@ -149,7 +154,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
 
         // Passo 4: Clicar no card Atividades e conhecimentos
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
 
         // Passo 5 e 6: Verificar tela de atividades
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
@@ -173,7 +178,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         // Aceitar cadastro
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Aceite para finalização do cenário');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
@@ -185,7 +190,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         if (!await page.getByTestId('card-subprocesso-atividades-vis').isVisible().catch(() => false)) {
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
         }
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado para finalização do cenário');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
@@ -195,7 +200,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         }
 
         // Adicionar competências e disponibilizar mapa
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         await abrirModalCriarCompetencia(page);
         await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 1 ${timestamp}`);
@@ -223,7 +228,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
         await page.getByText(descProcessoMapeamento).click();
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
         await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
@@ -234,7 +239,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         await page.getByText(descProcessoMapeamento).click();
         await navegarParaSubprocesso(page, 'SECAO_211');
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
@@ -255,7 +260,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await navegarParaSubprocesso(page, 'SECAO_211');
 
         // O card deve estar visível para visualização em processo finalizado
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
 
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
         await expect(page.getByText(atividadeA)).toBeVisible();
@@ -273,7 +278,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
 
         // Visualizar atividades
-        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await navegarParaAtividadesVisualizacao(page);
 
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
         await expect(page.getByText(atividadeA)).toBeVisible();
