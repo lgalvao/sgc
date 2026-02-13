@@ -182,7 +182,7 @@ public class SubprocessoFacade {
 
     @Transactional
     public void atualizarSituacaoParaEmAndamento(Long mapaCodigo) {
-        adminWorkflowService.atualizarSituacaoParaEmAndamento(mapaCodigo);
+        adminWorkflowService.atualizarParaEmAndamento(mapaCodigo);
     }
 
     @Transactional(readOnly = true)

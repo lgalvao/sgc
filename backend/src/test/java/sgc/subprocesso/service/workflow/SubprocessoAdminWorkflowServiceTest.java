@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
+import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
@@ -14,7 +15,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
-import sgc.comum.repo.ComumRepo;
+
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -92,7 +93,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
     @Test
     @DisplayName("atualizarSituacaoParaEmAndamento - Mapeamento")
-    void atualizarSituacaoParaEmAndamento_Mapeamento() {
+    void atualizarParaEmAndamento_Mapeamento() {
         Long codMapa = 100L;
         Subprocesso sp = new Subprocesso();
         sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
@@ -102,7 +103,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
         when(repo.buscar(Subprocesso.class, "mapa.codigo", codMapa)).thenReturn(sp);
 
-        service.atualizarSituacaoParaEmAndamento(codMapa);
+        service.atualizarParaEmAndamento(codMapa);
 
         assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, sp.getSituacao());
         verify(subprocessoRepo).save(sp);
@@ -110,7 +111,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
     @Test
     @DisplayName("atualizarSituacaoParaEmAndamento - Outro Tipo (Inalterado/Branch Gap)")
-    void atualizarSituacaoParaEmAndamento_OutroTipo() {
+    void atualizarParaEmAndamento_OutroTipo() {
         Long codMapa = 100L;
         Subprocesso sp = new Subprocesso();
         sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
@@ -120,7 +121,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
         when(repo.buscar(Subprocesso.class, "mapa.codigo", codMapa)).thenReturn(sp);
 
-        service.atualizarSituacaoParaEmAndamento(codMapa);
+        service.atualizarParaEmAndamento(codMapa);
 
         // Situação não deve mudar
         assertEquals(SituacaoSubprocesso.NAO_INICIADO, sp.getSituacao());
@@ -130,7 +131,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
     @Test
     @DisplayName("atualizarSituacaoParaEmAndamento - Revisao")
-    void atualizarSituacaoParaEmAndamento_Revisao() {
+    void atualizarParaEmAndamento_Revisao() {
         Long codMapa = 100L;
         Subprocesso sp = new Subprocesso();
         sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
@@ -140,7 +141,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
         when(repo.buscar(Subprocesso.class, "mapa.codigo", codMapa)).thenReturn(sp);
 
-        service.atualizarSituacaoParaEmAndamento(codMapa);
+        service.atualizarParaEmAndamento(codMapa);
 
         assertEquals(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, sp.getSituacao());
         verify(subprocessoRepo).save(sp);

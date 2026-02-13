@@ -1,10 +1,6 @@
 package sgc.subprocesso.service;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -269,7 +265,7 @@ class SubprocessoFacadeTest {
         @DisplayName("Deve atualizar situação para EM ANDAMENTO")
         void deveAtualizarParaEmAndamento() {
             facade.atualizarSituacaoParaEmAndamento(100L);
-            verify(adminWorkflowService).atualizarSituacaoParaEmAndamento(100L);
+            verify(adminWorkflowService).atualizarParaEmAndamento(100L);
         }
 
         @Test

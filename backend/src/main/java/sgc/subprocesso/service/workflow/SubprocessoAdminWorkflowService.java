@@ -22,7 +22,6 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Slf4j
 @RequiredArgsConstructor
 public class SubprocessoAdminWorkflowService {
-
     private final SubprocessoRepo subprocessoRepo;
     private final ComumRepo repo;
     private final SubprocessoCrudService crudService;
@@ -54,16 +53,16 @@ public class SubprocessoAdminWorkflowService {
     }
 
     @Transactional
-    public void atualizarSituacaoParaEmAndamento(Long mapaCodigo) {
+    public void atualizarParaEmAndamento(Long mapaCodigo) {
         var subprocesso = repo.buscar(Subprocesso.class, "mapa.codigo", mapaCodigo);
         if (subprocesso.getSituacao() == NAO_INICIADO) {
             var tipoProcesso = subprocesso.getProcesso().getTipo();
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
-                log.info("Atualizando sit de {} para MAPEAMENTO_CADASTRO_EM_ANDAMENTO", subprocesso.getCodigo());
+                log.info("Atualizando sit. SP{} para MAPEAMENTO_CADASTRO_EM_ANDAMENTO", subprocesso.getCodigo());
                 subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
                 subprocessoRepo.save(subprocesso);
             } else if (tipoProcesso == TipoProcesso.REVISAO) {
-                log.info("Atualizando sit de {} para REVISAO_CADASTRO_EM_ANDAMENTO", subprocesso.getCodigo());
+                log.info("Atualizando sit. SP{} para REVISAO_CADASTRO_EM_ANDAMENTO", subprocesso.getCodigo());
                 subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
                 subprocessoRepo.save(subprocesso);
             }
