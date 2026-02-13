@@ -9,12 +9,15 @@ import {
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
-import {acessarSubprocessoGestor, homologarCadastroMapeamento} from './helpers/helpers-analise.js';
+import {
+    acessarSubprocessoChefeDireto,
+    acessarSubprocessoGestor,
+    homologarCadastroMapeamento
+} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
-    await page.getByText(descProcesso).click();
-    await navegarParaSubprocesso(page, 'SECAO_221');
+    await acessarSubprocessoChefeDireto(page, descProcesso, 'SECAO_221');
     await navegarParaMapa(page);
 }
 

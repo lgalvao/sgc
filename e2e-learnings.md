@@ -105,9 +105,6 @@ npx playwright test e2e/cdu-XX.spec.ts --reporter=list
 # Com saída capturada para análise profunda
 npx playwright test e2e/cdu-XX.spec.ts --reporter=list > test_output.txt 2>&1
 ```
-
-### Analisar Resultados com grep
-
 ## Observações Finais
 
 1. **Nunca aumentar timeouts sem motivo**: Se um elemento não aparece em 15s em um banco H2 local, o problema é de lógica ou permissão.
