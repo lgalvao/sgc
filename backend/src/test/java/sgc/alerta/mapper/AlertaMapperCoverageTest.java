@@ -17,10 +17,11 @@ class AlertaMapperCoverageTest {
     private final AlertaMapper mapper = Mappers.getMapper(AlertaMapper.class);
 
     @Test
-    @DisplayName("toDto com dataHoraLeitura deve retornar null se alerta for nulo")
-    void deveRetornarNullSeAlertaForNulo() {
-        // Quando toDto(null) retorna null, o branch if (dto == null) será true
-        AlertaDto dto = mapper.toDto(null, LocalDateTime.now());
-        assertThat(dto).isNull();
+    @DisplayName("toDto com dataHoraLeitura deve retornar DTO vazio mas não nulo se alerta for nulo")
+    void deveRetornarDtoVazioMasNaoNuloSeAlertaForNulo() {
+        LocalDateTime agora = LocalDateTime.now();
+        AlertaDto dto = mapper.toDto(null, agora);
+        assertThat(dto).isNotNull();
+        assertThat(dto.getDataHoraLeitura()).isEqualTo(agora);
     }
 }

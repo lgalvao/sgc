@@ -1,8 +1,8 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {homologarCadastroRevisaoComImpacto} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 /**
  * CDU-33 - Reabrir revisão de cadastro
@@ -20,7 +20,8 @@ import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
  * 5. Sistema altera situação e envia notificações
  */
 test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
-    const UNIDADE_1 = 'SECAO_221';
+const UNIDADE_1 = 'ASSESSORIA_12';
+const UNIDADE_CRIACAO = 'ASSESSORIA_12';
 
     const timestamp = Date.now();
     const descProcesso = `Revisão CDU-33 ${timestamp}`;
@@ -37,16 +38,16 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
 
         await criarProcesso(page, {
             descricao: descProcesso,
-            tipo: 'MAPEAMENTO',
+            tipo: 'REVISAO',
             diasLimite: 30,
-            unidade: UNIDADE_1,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            unidade: UNIDADE_CRIACAO,
+            expandir: ['SECRETARIA_1']
         });
 
         const linhaProcesso = page.locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -55,9 +56,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza revisão de cadastro', async ({page, autenticadoComoChefeSecao221}) => {
-        
-
+    test('Preparacao 2: Chefe disponibiliza revisão de cadastro', async ({page, autenticadoComoChefeAssessoria12}) => {
         await page.getByText(descProcesso).click();
         await navegarParaAtividades(page);
 
@@ -70,49 +69,59 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await verificarPaginaPainel(page);
     });
 
+    test('Preparacao 3: ADMIN homologa revisão de cadastro', async ({page, autenticadoComoAdmin}) => {
+        await page.getByText(descProcesso).click();
+        await navegarParaSubprocesso(page, UNIDADE_1);
+        await page.getByTestId('card-subprocesso-atividades-vis').click();
+        await homologarCadastroRevisaoComImpacto(page);
+    });
+
     // ========================================================================
     // TESTES PRINCIPAIS
     // ========================================================================
 
     test('Cenario 1: ADMIN navega para subprocesso de revisão', async ({page, autenticadoComoAdmin}) => {
-        
-
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
-        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toBeVisible();
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão cadastro homologada/i);
     });
 
     test('Cenario 2: ADMIN visualiza botão Reabrir Revisão', async ({page, autenticadoComoAdmin}) => {
-        
-
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const btnReabrir = page.getByTestId('btn-reabrir-revisao');
-        const btnVisivel = await btnReabrir.isVisible().catch(() => false);
-        
-        if (btnVisivel) {
-            await expect(btnReabrir).toBeEnabled();
-        }
+        await expect(btnReabrir).toBeVisible();
+        await expect(btnReabrir).toBeEnabled();
     });
 
     test('Cenario 3: ADMIN abre modal de reabertura de revisão', async ({page, autenticadoComoAdmin}) => {
-        
-
         await page.getByText(descProcesso).click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const btnReabrir = page.getByTestId('btn-reabrir-revisao');
-        
-        if (await btnReabrir.isVisible().catch(() => false)) {
-            await btnReabrir.click();
+        await btnReabrir.click();
 
-            const modal = page.getByRole('dialog');
-            await expect(modal).toBeVisible();
-            await expect(modal.getByText(/Reabrir Revisão/i)).toBeVisible();
-            await expect(page.getByTestId('inp-justificativa-reabrir')).toBeVisible();
-            await expect(page.getByTestId('btn-confirmar-reabrir')).toBeVisible();
-        }
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await expect(modal.getByText(/Reabrir Revisão/i)).toBeVisible();
+        await expect(page.getByTestId('inp-justificativa-reabrir')).toBeVisible();
+        await expect(page.getByTestId('btn-confirmar-reabrir')).toBeVisible();
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
+        await expect(modal).toBeHidden();
+    });
+
+    test('Cenario 4: ADMIN confirma reabertura da revisão', async ({page, autenticadoComoAdmin}) => {
+        await page.getByText(descProcesso).click();
+        await navegarParaSubprocesso(page, UNIDADE_1);
+        await page.getByTestId('btn-reabrir-revisao').click();
+
+        await page.getByTestId('inp-justificativa-reabrir').fill('Necessário revisar inconsistências apontadas.');
+        await page.getByTestId('btn-confirmar-reabrir').click();
+
+        await expect(page.getByText(/Revisão de cadastro reaberta|Revisão reaberta/i).first()).toBeVisible();
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão cadastro em andamento/i);
+        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de revisão de cadastro/i);
     });
 });

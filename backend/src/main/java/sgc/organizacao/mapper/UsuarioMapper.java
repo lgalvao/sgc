@@ -29,12 +29,12 @@ public interface UsuarioMapper {
      * Flag isElegivel é ignorada para ser tratada nos métodos default.
      */
     @Mapping(target = "codigoPai", source = "unidadeSuperior.codigo")
-    @Mapping(target = "tipo", expression = "java(unidade.getTipo() != null ? unidade.getTipo().name() : null)")
+    @Mapping(target = "tipo", expression = "java(unidade != null && unidade.getTipo() != null ? unidade.getTipo().name() : null)")
     @Mapping(target = "subunidades", expression = "java(new java.util.ArrayList<>())")
     @Mapping(target = "isElegivel", ignore = true)
     @Mapping(target = "sigla", expression = "java(mapUnidadeSiglaParaUsuario(unidade))")
     @Mapping(target = "nome", expression = "java(mapUnidadeNomeParaUsuario(unidade))")
-    UnidadeDto toUnidadeDtoBase(Unidade unidade);
+    UnidadeDto toUnidadeDtoBase(@Nullable Unidade unidade);
 
     default String mapUnidadeSiglaParaUsuario(@Nullable Unidade unidade) {
         if (unidade == null) return null;
@@ -51,9 +51,7 @@ public interface UsuarioMapper {
      */
     default UnidadeDto toUnidadeDto(Unidade unidade, boolean isElegivel) {
         UnidadeDto dto = toUnidadeDtoBase(unidade);
-        if (dto != null) {
-            dto.setElegivel(isElegivel);
-        }
+        dto.setElegivel(isElegivel);
         return dto;
     }
 

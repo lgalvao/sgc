@@ -10,9 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.Mockito.*;
@@ -65,7 +63,6 @@ class CopiaMapaServiceCoverageTest {
         service.copiarMapaParaUnidade(codMapaOrigem);
 
         // Assert
-        // O branch if (novaAtividade != null) na linha 126 será false para a atividade 999
         verify(competenciaRepo).saveAll(anyList());
     }
 }
