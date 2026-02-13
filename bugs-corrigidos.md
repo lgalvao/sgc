@@ -102,6 +102,26 @@ Consolidar, em um único documento, as correções aplicadas durante a auditoria
   - Criação dos templates de e-mail faltantes para reabertura de cadastro e revisão.
 - **Validação:** `npx playwright test e2e/cdu-32.spec.ts --reporter=list` (8/8) sem erro de template.
 
+### 11) CDU-33 - Reabrir revisão de cadastro (endurecimento completo)
+- **Arquivo:** `e2e/cdu-33.spec.ts`
+- **Problemas:**
+  - Setup usava tipo/unidade incompatíveis para revisão.
+  - Fluxo com `if/catch` defensivo mascarava ausência de pré-condições.
+- **Correções:**
+  - Preparação reescrita para fluxo real: criar revisão (`ASSESSORIA_12`) -> disponibilizar -> homologar.
+  - Cenários obrigatórios com assert explícito: situação homologada, botão/modal, cancelamento e confirmação da reabertura com justificativa.
+  - Validação de efeito de negócio: situação volta para "Revisão de cadastro em andamento" e movimentação registrada.
+- **Validação:** `npx playwright test e2e/cdu-33.spec.ts --reporter=list` (**7/7**).
+
+### 12) CDU-07 - Cobertura ampliada para múltiplos perfis
+- **Arquivo:** `e2e/cdu-07.spec.ts`
+- **Problema:** cobertura restrita a CHEFE, sem validar comportamento de ADMIN e GESTOR.
+- **Correções:**
+  - Cenário ampliado para ADMIN/GESTOR/CHEFE no mesmo fluxo.
+  - Unidade ajustada para `SECAO_211` com hierarquia consistente (`COORD_21`).
+  - Navegação por perfil validada explicitamente (subprocesso para ADMIN/CHEFE e visibilidade da unidade no detalhe para GESTOR).
+- **Validação:** `npx playwright test e2e/cdu-07.spec.ts --reporter=list` (**1/1**).
+
 ---
 
 ## Estado atual da execução
@@ -113,6 +133,8 @@ Consolidar, em um único documento, as correções aplicadas durante a auditoria
   - `CDU-27`: preparação + navegação + alteração de data limite.
   - `CDU-24`: confirmação de disponibilização em bloco com data limite e redirecionamento.
   - `CDU-32`: reabertura de cadastro com preparo correto e validação completa do fluxo.
+  - `CDU-33`: reabertura de revisão com preparo completo e confirmação sem branch defensivo.
+  - `CDU-07`: detalhamento validado em fluxo multi-perfil.
   - Unit tests frontend relacionados (`87 passed`).
 
 - **Ajuste final concluído no CDU-23:**
@@ -132,6 +154,8 @@ npx playwright test e2e/cdu-34.spec.ts --reporter=list
 npx playwright test e2e/cdu-22.spec.ts e2e/cdu-23.spec.ts e2e/cdu-27.spec.ts --reporter=list
 npx playwright test e2e/cdu-24.spec.ts --reporter=list
 npx playwright test e2e/cdu-32.spec.ts --reporter=list
+npx playwright test e2e/cdu-33.spec.ts --reporter=list
+npx playwright test e2e/cdu-07.spec.ts --reporter=list
 
 npm run test:unit --prefix frontend -- src/stores/__tests__/feedback.spec.ts
 npm run test:unit --prefix frontend -- src/views/__tests__/CadAtribuicao.spec.ts

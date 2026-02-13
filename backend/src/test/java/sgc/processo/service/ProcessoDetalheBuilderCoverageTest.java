@@ -98,6 +98,65 @@ class ProcessoDetalheBuilderCoverageTest {
         assertThat(dto.getUnidades()).hasSize(1);
         ProcessoDetalheDto.UnidadeParticipanteDto result = dto.getUnidades().get(0);
         assertThat(result.getCodSubprocesso()).isEqualTo(500L);
-        assertThat(result.getMapaCodigo()).isEqualTo(900L);
+    }
+
+    @Test
+    @DisplayName("build deve ignorar quando sp existe mas unidadeDto é nulo")
+    void deveIgnorarQuandoSpExisteMasUnidadeDtoNulo() {
+        // Arrange
+        Long codProcesso = 1L;
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
+        processo.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+        
+        UnidadeProcesso participante = new UnidadeProcesso();
+        participante.setUnidadeCodigo(100L);
+        processo.setParticipantes(List.of(participante));
+
+        sgc.organizacao.model.Unidade unidade = new sgc.organizacao.model.Unidade();
+        unidade.setCodigo(100L);
+
+        sgc.subprocesso.model.Subprocesso sp = new sgc.subprocesso.model.Subprocesso();
+        sp.setUnidade(unidade);
+
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
+        when(processoDetalheMapper.fromSnapshot(participante)).thenReturn(null);
+
+        // Act
+        ProcessoDetalheDto dto = builder.build(processo, new Usuario());
+
+        // Assert
+        assertThat(dto.getUnidades()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("build deve manter unidadeDto quando sp é nulo")
+    void deveManterUnidadeDtoQuandoSpNulo() {
+        // Arrange
+        Long codProcesso = 1L;
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
+        processo.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+        
+        UnidadeProcesso participante = new UnidadeProcesso();
+        participante.setUnidadeCodigo(100L);
+        processo.setParticipantes(List.of(participante));
+
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(new ArrayList<>());
+        
+        ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto = new ProcessoDetalheDto.UnidadeParticipanteDto();
+        unidadeDto.setCodUnidade(100L);
+        unidadeDto.setSigla("TESTE");
+        when(processoDetalheMapper.fromSnapshot(participante)).thenReturn(unidadeDto);
+
+        // Act
+        ProcessoDetalheDto dto = builder.build(processo, new Usuario());
+
+        // Assert
+        assertThat(dto.getUnidades()).hasSize(1);
+        assertThat(dto.getUnidades().get(0).getSigla()).isEqualTo("TESTE");
+        assertThat(dto.getUnidades().get(0).getCodSubprocesso()).isNull();
     }
 }

@@ -343,3 +343,22 @@ Falhas reportadas em testes de Mapa/Unidade/Usuario com `NoClassDefFoundError` e
 
 **Resultado:**
 - Execução local com **0 falhas** no momento.
+
+### 27. CDU-33 exige revisão homologada e unidade elegível no seed
+
+**Problema Identificado:**
+Ao endurecer o CDU-33, o setup falhava quando a unidade escolhida não era elegível para criação de processo de revisão.
+
+**Solução aplicada:**
+- Setup ajustado para `ASSESSORIA_12` (elegível no seed atual).
+- Fluxo obrigatório consolidado: criar revisão -> disponibilizar -> homologar -> reabrir revisão com justificativa.
+- Removidos `if/catch` defensivos; todos os cenários passaram a falhar explicitamente quando o pré-estado não existia.
+
+### 28. CDU-07 deve respeitar comportamento por perfil na navegação
+
+**Aprendizado:**
+No estado atual, ADMIN/CHEFE acessam detalhes do subprocesso diretamente, enquanto GESTOR pode cair primeiro no detalhe do processo.
+
+**Ajuste aplicado:**
+- E2E passou a validar os três perfis no mesmo fluxo.
+- Para GESTOR, a validação confirma acesso ao processo e visibilidade da linha da unidade alvo antes de aprofundar em subprocesso.

@@ -52,6 +52,10 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
         await page.getByText(descricao, {exact: true}).click();
         await expect(page).toHaveURL(new RegExp(`/processo/\\d+/${UNIDADE_ALVO}$`));
-        await expect(page.getByTestId('subprocesso-header__txt-unidade')).toContainText(UNIDADE_ALVO);
+        await verificarDetalhesSubprocesso(page, {
+            sigla: UNIDADE_ALVO,
+            situacao: 'Não iniciado',
+            prazo: '/'
+        });
     });
 });
