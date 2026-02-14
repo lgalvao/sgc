@@ -374,8 +374,18 @@ class UsuarioFacadeTest {
 
             // Assert
             assertThat(resultado).hasSize(1);
-            assertThat(resultado.getFirst().tituloEleitoral()).isEqualTo(titulo);
+            AdministradorDto dto = resultado.getFirst();
+            assertThat(dto).isNotNull()
+                    .satisfies(d -> {
+                        assertThat(d.tituloEleitoral()).isEqualTo(titulo);
+                        assertThat(d.nome()).isEqualTo(usuario.getNome());
+                        assertThat(d.matricula()).isEqualTo(usuario.getMatricula());
+                        assertThat(d.unidadeCodigo()).isEqualTo(usuario.getUnidadeLotacao().getCodigo());
+                        assertThat(d.unidadeSigla()).isEqualTo(usuario.getUnidadeLotacao().getSigla());
+                    });
         }
+
+
 
         @Test
         @DisplayName("Deve adicionar administrador com sucesso")
@@ -390,10 +400,18 @@ class UsuarioFacadeTest {
             AdministradorDto resultado = facade.adicionarAdministrador(titulo);
 
             // Assert
-            assertThat(resultado).isNotNull();
-            assertThat(resultado.tituloEleitoral()).isEqualTo(titulo);
+            assertThat(resultado).isNotNull()
+                    .satisfies(r -> {
+                        assertThat(r.tituloEleitoral()).isEqualTo(titulo);
+                        assertThat(r.nome()).isEqualTo(usuario.getNome());
+                        assertThat(r.matricula()).isEqualTo(usuario.getMatricula());
+                        assertThat(r.unidadeCodigo()).isEqualTo(usuario.getUnidadeLotacao().getCodigo());
+                        assertThat(r.unidadeSigla()).isEqualTo(usuario.getUnidadeLotacao().getSigla());
+                    });
             verify(administradorService).adicionar(titulo);
         }
+
+
 
         @Test
         @DisplayName("Deve remover administrador com sucesso")
@@ -534,8 +552,17 @@ class UsuarioFacadeTest {
 
             // Assert
             assertThat(resultado).hasSize(1);
-            assertThat(resultado.getFirst().perfil()).isEqualTo("CHEFE");
+            PerfilDto dto = resultado.getFirst();
+            assertThat(dto).isNotNull()
+                    .satisfies(d -> {
+                        assertThat(d.perfil()).isEqualTo("CHEFE");
+                        assertThat(d.usuarioTitulo()).isEqualTo(titulo);
+                        assertThat(d.unidadeCodigo()).isEqualTo(unidade.getCodigo());
+                        assertThat(d.unidadeNome()).isEqualTo(unidade.getNome());
+                    });
         }
+
+
 
         @Test
         @DisplayName("Deve retornar lista vazia quando usuário não for encontrado")
@@ -758,8 +785,31 @@ class UsuarioFacadeTest {
             // Assert
             assertThat(resultado).hasSize(2).containsKeys("111111", "222222");
             assertThat(resultado.get("111111")).isNotNull();
+            assertThat(resultado.get("111111").nome()).isEqualTo(usuario1.getNome());
+            assertThat(resultado.get("111111").matricula()).isEqualTo(usuario1.getMatricula());
+            assertThat(resultado.get("111111").unidadeCodigo()).isEqualTo(usuario1.getUnidadeLotacao().getCodigo());
+            
             assertThat(resultado.get("222222")).isNotNull();
+            assertThat(resultado.get("222222").nome()).isEqualTo(usuario2.getNome());
         }
+
+        @Test
+        @DisplayName("Deve lidar com duplicidade ao buscar por títulos (merge function coverage)")
+        void deveLidarComDuplicidadeAoBuscarPorTitulos() {
+            // Arrange
+            List<String> titulos = List.of("111111");
+            Usuario usuario1 = criarUsuario("111111");
+            
+            // O repo retorna 2 com o mesmo ID
+            when(usuarioConsultaService.buscarTodosPorIds(titulos)).thenReturn(List.of(usuario1, usuario1));
+
+            // Act
+            Map<String, UsuarioDto> resultado = facade.buscarUsuariosPorTitulos(titulos);
+
+            // Assert
+            assertThat(resultado).hasSize(1);
+        }
+
 
         @Test
         @DisplayName("Deve garantir que o mapa retornado não é nulo mesmo para lista vazia")

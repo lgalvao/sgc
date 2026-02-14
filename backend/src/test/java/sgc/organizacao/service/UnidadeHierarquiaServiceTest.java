@@ -134,7 +134,29 @@ class UnidadeHierarquiaServiceTest {
             // Assert
             assertThat(resultado).hasSize(2);
         }
+        @Test
+        @DisplayName("deve lidar com unidades cujo superior não está na lista (computeIfAbsent coverage)")
+        void deveLidarComSuperiorForaDaLista() {
+            // Arrange
+            Unidade superiorExterno = UnidadeTestBuilder.raiz().build();
+            superiorExterno.setCodigo(999L);
+            
+            unidadeRaiz.setUnidadeSuperior(superiorExterno);
+
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz));
+            
+            UnidadeDto dtoRaiz = criarDtoComSubunidades(1L, "ADMIN");
+            when(usuarioMapper.toUnidadeDto(unidadeRaiz, true)).thenReturn(dtoRaiz);
+
+            // Act
+            List<UnidadeDto> resultado = service.buscarArvoreHierarquica();
+
+            // Assert
+            assertThat(resultado).hasSize(1);
+            assertThat(resultado.getFirst().getCodigo()).isEqualTo(1L);
+        }
     }
+
 
     @Nested
     @DisplayName("buscarArvoreComElegibilidade")

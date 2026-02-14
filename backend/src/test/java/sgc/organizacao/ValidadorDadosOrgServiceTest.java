@@ -148,7 +148,25 @@ class ValidadorDadosOrgServiceTest {
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("1 violação");
         }
+        @Test
+        @DisplayName("Deve lidar com duplicidade de usuários (merge function coverage)")
+        void deveLidarComDuplicidadeUsuarios() {
+            // Arrange
+            Unidade u1 = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
+            Usuario titular1 = criarUsuarioValido("TITULO_1");
+            Usuario titular2 = criarUsuarioValido("TITULO_1"); // Duplicado
+
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
+            when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular1, titular2));
+            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(
+                    Responsabilidade.builder().unidadeCodigo(1L).usuarioTitulo("TITULO_1").build()
+            ));
+
+            // Act & Assert
+            assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
+        }
     }
+
 
     @Nested
     @DisplayName("Cenários de Violação")

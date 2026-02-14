@@ -342,8 +342,9 @@ pitest {
     outputFormats.set(listOf("CSV"))
     timestampedReports.set(false)
     threads.set(Runtime.getRuntime().availableProcessors())
-    timeoutFactor.set(BigDecimal("2.0"))
-    verbose.set(false)
+    timeoutFactor.set(BigDecimal("5.0"))
+    // timeoutConstant.set(10000)
+    verbose.set(true)
     failWhenNoMutations.set(false)
     
     val agentFile = project.configurations.getByName("testRuntimeClasspath").files.find {
