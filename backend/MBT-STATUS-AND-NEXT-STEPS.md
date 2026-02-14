@@ -204,6 +204,19 @@ Progress achieved:
 - ✅ Documentation: MBT-melhorias-seguranca-organizacao.md created
 - ✅ Total: 10 test improvements (8 new + 2 enhanced)
 
+**Sprint 5 Completed (2026-02-14):**
+- ✅ Painel Module: 3 tests improved (3 Pattern 1 assertions)
+- ✅ Configuração Module: 4 tests created (2 Pattern 1, 2 basic tests)
+- ✅ Documentation: MBT-melhorias-painel-configuracao.md created
+- ✅ Total: 7 test improvements (4 new + 3 enhanced)
+- ✅ All 1657 tests passing (+4 from 1653)
+
+**Updated Global Totals (2026-02-14 - Post Sprint 5):**
+- Total improvements: 59 tests (49 previous + 7 new + 3 enhanced)
+- Modules improved: 8 (Processo, Subprocesso, Mapa, Segurança, Organização, Alerta, Painel, Configuração)
+- Estimated mutation score: 70% → 84-87% (in improved modules)
+- All 1657 tests passing ✅
+
 ---
 
 ## 📚 Available Resources
@@ -215,9 +228,10 @@ Progress achieved:
 1. **MBT-README.md** - Start here for overview and navigation
 2. **MBT-RELATORIO-CONSOLIDADO.md** - Complete consolidated report with all improvements (Sprints 2-3)
 3. **MBT-melhorias-seguranca-organizacao.md** - Sprint 4 improvements (Segurança, Organização, Alerta)
-4. **MBT-STATUS-AND-NEXT-STEPS.md** - This document - Current status and next steps
-5. **MBT-analise-alerta.md** - Real examples of mutants and fixes (baseline)
-6. **MBT-quickstart.md** - Quick guide to run mutation testing
+4. **MBT-melhorias-painel-configuracao.md** - Sprint 5 improvements (Painel, Configuração)
+5. **MBT-STATUS-AND-NEXT-STEPS.md** - This document - Current status and next steps
+6. **MBT-analise-alerta.md** - Real examples of mutants and fixes (baseline)
+7. **MBT-quickstart.md** - Quick guide to run mutation testing
 
 **Archived Documentation** (in etc/docs/mbt/archive/):
 
