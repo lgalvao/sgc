@@ -49,6 +49,20 @@ class SubprocessoCrudControllerTest {
     }
 
     @Test
+    @DisplayName("listar deve retornar lista vazia quando não há subprocessos")
+    @WithMockUser(roles = "ADMIN")
+    void listarDeveRetornarListaVaziaQuandoNaoHaSubprocessos() throws Exception {
+        // Arrange
+        when(subprocessoFacade.listar()).thenReturn(List.of());
+
+        // Act & Assert
+        mockMvc.perform(get("/api/subprocessos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
     @DisplayName("obterPorCodigo deve retornar detalhe")
     @WithMockUser
     void obterPorCodigo() throws Exception {

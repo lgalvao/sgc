@@ -146,7 +146,9 @@ class AtividadeControllerTest {
         void deveListarConhecimentos() throws Exception {
             Mockito.when(atividadeFacade.listarConhecimentosPorAtividade(1L)).thenReturn(List.of());
             mockMvc.perform(get("/api/atividades/1/conhecimentos").with(user("123")))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$").isEmpty());
         }
 
         @Test

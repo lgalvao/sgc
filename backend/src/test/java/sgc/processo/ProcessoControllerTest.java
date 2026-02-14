@@ -510,6 +510,20 @@ class ProcessoControllerTest {
 
         @Test
         @WithMockUser
+        @DisplayName("Deve retornar lista vazia quando não há processos finalizados")
+        void deveRetornarListaVaziaQuandoNaoHaProcessosFinalizados() throws Exception {
+            // Arrange
+            when(processoFacade.listarFinalizados()).thenReturn(List.of());
+
+            // Act & Assert
+            mockMvc.perform(get("/api/processos/finalizados"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$").isEmpty());
+        }
+
+        @Test
+        @WithMockUser
         @DisplayName("Deve retornar lista de processos ativos")
         void deveRetornarListaDeProcessosAtivos() throws Exception {
             // Arrange
@@ -521,6 +535,20 @@ class ProcessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$[0].codigo").value(1L));
+        }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar lista vazia quando não há processos ativos")
+        void deveRetornarListaVaziaQuandoNaoHaProcessosAtivos() throws Exception {
+            // Arrange
+            when(processoFacade.listarAtivos()).thenReturn(List.of());
+
+            // Act & Assert
+            mockMvc.perform(get("/api/processos/ativos"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$").isEmpty());
         }
 
         @Test
@@ -540,6 +568,20 @@ class ProcessoControllerTest {
 
         @Test
         @WithMockUser
+        @DisplayName("Deve retornar map com lista vazia quando não há unidades desabilitadas")
+        void deveRetornarMapComListaVaziaQuandoNaoHaUnidadesDesabilitadas() throws Exception {
+            // Arrange
+            when(processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO")).thenReturn(List.of());
+
+            // Act & Assert
+            mockMvc.perform(get("/api/processos/status-unidades").param("tipo", "MAPEAMENTO"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.unidadesDesabilitadas").isArray())
+                    .andExpect(jsonPath("$.unidadesDesabilitadas").isEmpty());
+        }
+
+        @Test
+        @WithMockUser
         @DisplayName("Deve retornar lista de unidades bloqueadas")
         void deveRetornarListaDeUnidadesBloqueadas() throws Exception {
             // Arrange
@@ -551,6 +593,20 @@ class ProcessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$[0]").value(100L));
+        }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar lista vazia quando não há unidades bloqueadas")
+        void deveRetornarListaVaziaQuandoNaoHaUnidadesBloqueadas() throws Exception {
+            // Arrange
+            when(processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO")).thenReturn(List.of());
+
+            // Act & Assert
+            mockMvc.perform(get("/api/processos/unidades-bloqueadas").param("tipo", "MAPEAMENTO"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$").isEmpty());
         }
 
         @Test
@@ -574,6 +630,20 @@ class ProcessoControllerTest {
 
         @Test
         @WithMockUser
+        @DisplayName("Deve retornar lista vazia quando não há subprocessos elegíveis")
+        void deveRetornarListaVaziaQuandoNaoHaSubprocessosElegiveis() throws Exception {
+            // Arrange
+            when(processoFacade.listarSubprocessosElegiveis(1L)).thenReturn(List.of());
+
+            // Act & Assert
+            mockMvc.perform(get("/api/processos/1/subprocessos-elegiveis"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$").isEmpty());
+        }
+
+        @Test
+        @WithMockUser
         @DisplayName("Deve retornar lista de subprocessos")
         void deveRetornarListaDeSubprocessos() throws Exception {
             // Arrange
@@ -586,6 +656,20 @@ class ProcessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$[0].codigo").value(10L));
+        }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar lista vazia quando processo não tem subprocessos")
+        void deveRetornarListaVaziaQuandoProcessoNaoTemSubprocessos() throws Exception {
+            // Arrange
+            when(processoFacade.listarTodosSubprocessos(1L)).thenReturn(List.of());
+
+            // Act & Assert
+            mockMvc.perform(get("/api/processos/1/subprocessos"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$").isEmpty());
         }
     }
 
