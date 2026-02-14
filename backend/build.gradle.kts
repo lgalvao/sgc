@@ -1,5 +1,6 @@
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import info.solidsoft.gradle.pitest.PitestTask
 
 plugins {
     java
@@ -7,6 +8,7 @@ plugins {
     id("org.springframework.boot") version "4.0.2"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.github.spotbugs") version "6.4.8"
+    id("info.solidsoft.pitest") version "1.19.0-rc.3"
 }
 
 tasks.withType<JavaCompile> {
@@ -67,6 +69,9 @@ dependencies {
     testImplementation("nl.jqno.equalsverifier:equalsverifier:3.18.1")
     testImplementation("io.rest-assured:rest-assured-all:6.0.0")
     testImplementation("org.apache.groovy:groovy-all:5.0.3")
+    
+    // Mutation Testing
+    testImplementation("org.pitest:pitest-junit5-plugin:1.2.1")
 
     // Documentação da API
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
@@ -300,4 +305,131 @@ tasks.register("qualityCheckFast") {
     group = "quality"
     description = "Runs fast backend quality checks (tests, coverage)"
     dependsOn("test", "jacocoTestCoverageVerification")
+}
+
+// ============================================
+// Mutation Testing Configuration (PIT)
+// ============================================
+
+pitest {
+    // Versão do PIT e plugins
+    pitestVersion.set("1.18.1")
+    junit5PluginVersion.set("1.2.1")
+    
+    // Classes alvo - todo o pacote sgc
+    targetClasses.set(listOf("sgc.*"))
+    targetTests.set(listOf("sgc.*"))
+    
+    // Exclusões - classes que não agregam valor para mutation testing
+    excludedClasses.set(listOf(
+        "sgc.config.*",              // Configurações Spring
+        "sgc.*Exception",            // Classes de exceção
+        "sgc.*Mapper",               // Mappers MapStruct (gerados)
+        "sgc.*MapperImpl",           // Mappers MapStruct (gerados)
+        "sgc.*.dto.*",               // DTOs (baixa lógica)
+        "sgc.Sgc",                   // Classe main
+        "sgc.SgcTest"                // Classe de teste da main
+    ))
+    
+    // Métodos ignorados (getters/setters já são excluídos por padrão)
+    excludedMethods.set(listOf(
+        "hashCode",
+        "equals",
+        "toString"
+    ))
+    
+    // Mutadores - começar com DEFAULTS (Fase 1-4 do plano)
+    // Opções: DEFAULTS, STRONGER, ALL
+    mutators.set(listOf("DEFAULTS"))
+    
+    // Formatos de relatório
+    outputFormats.set(listOf("HTML", "XML", "CSV"))
+    
+    // Relatórios com timestamp desabilitado (facilita comparação)
+    timestampedReports.set(false)
+    
+    // Performance - usar todos os cores disponíveis
+    threads.set(Runtime.getRuntime().availableProcessors())
+    
+    // Verbose output para debug
+    verbose.set(false)
+    
+    // Detectar mutantes não cobertos por testes (failWhenNoMutations = false)
+    failWhenNoMutations.set(false)
+    
+    // Thresholds desabilitados inicialmente (habilitar na Fase 6)
+    // mutationThreshold.set(80)
+    // coverageThreshold.set(99)
+}
+
+// Tarefa customizada para mutation testing completo
+tasks.register("mutationTest") {
+    group = "quality"
+    description = "Executa mutation testing completo com PIT (gera relatório em build/reports/pitest)"
+    dependsOn("pitest")
+    
+    doLast {
+        val reportDir = layout.buildDirectory.dir("reports/pitest").get().asFile
+        println("════════════════════════════════════════════════════════════")
+        println("✅ Mutation Testing Concluído!")
+        println("📊 Relatório disponível em: $reportDir/index.html")
+        println("════════════════════════════════════════════════════════════")
+    }
+}
+
+// Tarefa para mutation testing incremental (apenas mudanças recentes)
+tasks.register("mutationTestIncremental") {
+    group = "quality"
+    description = "Mutation testing incremental (apenas classes modificadas recentemente)"
+    
+    doFirst {
+        // Detectar classes modificadas via git
+        val gitDiff = providers.exec {
+            commandLine("git", "diff", "--name-only", "HEAD~1", "HEAD")
+        }.standardOutput.asText.get()
+        
+        val modifiedClasses = gitDiff.lines()
+            .filter { it.startsWith("backend/src/main/java/") && it.endsWith(".java") }
+            .map { 
+                it.removePrefix("backend/src/main/java/")
+                  .removeSuffix(".java")
+                  .replace("/", ".")
+            }
+        
+        if (modifiedClasses.isEmpty()) {
+            println("⚠️  Nenhuma classe Java modificada detectada")
+        } else {
+            println("🎯 Analisando ${modifiedClasses.size} classe(s) modificada(s):")
+            modifiedClasses.forEach { println("   - $it") }
+            
+            // Configurar PIT para analisar apenas classes modificadas
+            tasks.named<PitestTask>("pitest") {
+                targetClasses.set(modifiedClasses)
+            }
+        }
+    }
+    
+    finalizedBy("pitest")
+}
+
+// Tarefa para análise de mutantes por módulo
+tasks.register("mutationTestModulo") {
+    group = "quality"
+    description = "Mutation testing de um módulo específico (use -PtargetModule=processo)"
+    
+    doFirst {
+        val targetModule = project.findProperty("targetModule")?.toString()
+        
+        if (targetModule == null) {
+            throw GradleException("Especifique o módulo com -PtargetModule=<modulo> (ex: processo, subprocesso, mapa)")
+        }
+        
+        println("🎯 Analisando módulo: sgc.$targetModule.*")
+        
+        tasks.named<PitestTask>("pitest") {
+            targetClasses.set(listOf("sgc.$targetModule.*"))
+        }
+    }
+    
+    finalizedBy("pitest")
 }
