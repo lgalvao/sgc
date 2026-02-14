@@ -1,14 +1,9 @@
 <template>
   <BContainer class="mt-4">
-    <BAlert
-        v-if="unidadesStore.lastError"
-        :model-value="true"
-        variant="danger"
-        dismissible
-        @dismissed="unidadesStore.clearError()"
-    >
-      {{ unidadesStore.lastError.message }}
-    </BAlert>
+    <ErrorAlert
+        :error="unidadesStore.lastError"
+        @dismiss="unidadesStore.clearError()"
+    />
 
     <div v-if="unidadeComResponsavelDinamico">
       <PageHeader :title="`${unidadeComResponsavelDinamico.sigla} - ${unidadeComResponsavelDinamico.nome}`">
@@ -40,9 +35,12 @@
           :titular-detalhes="titularDetalhes"
       />
     </div>
-    <div v-else>
-      <p>Unidade não encontrada.</p>
-    </div>
+    <EmptyState
+        v-else
+        icon="bi-building"
+        title="Unidade não encontrada"
+        description="Não foi possível localizar os dados da unidade solicitada."
+    />
 
     <div
         v-if="unidadeComResponsavelDinamico && unidadeComResponsavelDinamico.filhas && unidadeComResponsavelDinamico.filhas.length > 0"
@@ -60,12 +58,14 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BContainer} from "bootstrap-vue-next";
+import {BButton, BContainer} from "bootstrap-vue-next";
 import {computed} from "vue";
 import type {Unidade} from "@/types/tipos";
 import TreeTable from "../components/TreeTableView.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import UnidadeInfoCard from "@/components/unidade/UnidadeInfoCard.vue";
+import ErrorAlert from "@/components/common/ErrorAlert.vue";
+import EmptyState from "@/components/EmptyState.vue";
 import {useUnidadeView} from "@/composables/useUnidadeView";
 
 const props = defineProps<{ codUnidade: number }>();

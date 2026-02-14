@@ -66,16 +66,10 @@
       </template>
     </PageHeader>
 
-    <BAlert
-        v-if="erroGlobal"
-        :model-value="true"
-        class="mb-4"
-        dismissible
-        variant="danger"
-        @dismissed="erroGlobal = null"
-    >
-      {{ erroGlobal }}
-    </BAlert>
+    <ErrorAlert
+        :error="erroGlobalFormatado"
+        @dismiss="erroGlobal = null"
+    />
 
     <CadAtividadeForm
         ref="atividadeFormRef"
@@ -161,8 +155,8 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BContainer, BDropdown, BDropdownItem} from "bootstrap-vue-next";
-import {nextTick, ref, watch} from "vue";
+import {BButton, BContainer, BDropdown, BDropdownItem} from "bootstrap-vue-next";
+import {computed, nextTick, ref, watch} from "vue";
 import {badgeClass} from "@/utils";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
@@ -172,6 +166,7 @@ import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
 import EmptyState from "@/components/EmptyState.vue";
+import ErrorAlert from "@/components/common/ErrorAlert.vue";
 import AtividadeItem from "@/components/AtividadeItem.vue";
 import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
 import {useCadAtividades} from "@/composables/useCadAtividades";
@@ -224,6 +219,9 @@ const {
 } = useCadAtividades(props);
 
 const atividadeFormRef = ref<InstanceType<typeof CadAtividadeForm> | null>(null);
+const erroGlobalFormatado = computed(() =>
+    erroGlobal.value ? {message: erroGlobal.value} : null
+);
 
 async function handleAdicionarAtividade() {
   const sucesso = await adicionarAtividade();

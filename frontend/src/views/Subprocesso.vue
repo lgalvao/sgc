@@ -35,10 +35,11 @@
 
       <TabelaMovimentacoes :movimentacoes="movimentacoes"/>
     </div>
-    <div v-else-if="subprocessosStore.lastError" class="text-center py-5">
-      <BAlert :model-value="true" variant="danger">
-        {{ subprocessosStore.lastError.message || "Erro ao carregar subprocesso." }}
-      </BAlert>
+    <div v-else-if="subprocessosStore.lastError" class="py-2">
+      <ErrorAlert
+          :error="subprocessosStore.lastError"
+          @dismiss="subprocessosStore.clearError()"
+      />
     </div>
     <div v-else class="text-center py-5">
       <BSpinner label="Carregando informações da unidade..." variant="primary" />
@@ -93,13 +94,14 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BContainer, BFormTextarea, BSpinner} from "bootstrap-vue-next";
+import {BContainer, BFormTextarea, BSpinner} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/SubprocessoCards.vue";
 import SubprocessoHeader from "@/components/SubprocessoHeader.vue";
 import SubprocessoModal from "@/components/SubprocessoModal.vue";
 import TabelaMovimentacoes from "@/components/TabelaMovimentacoes.vue";
+import ErrorAlert from "@/components/common/ErrorAlert.vue";
 import {useMapasStore} from "@/stores/mapas";
 import {useFeedbackStore} from "@/stores/feedback";
 import {useModalManager} from "@/composables/useModalManager";

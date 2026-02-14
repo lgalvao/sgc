@@ -6,19 +6,14 @@
       </template>
     </PageHeader>
 
-    <BAlert
-      v-if="unidadesStore.error"
-      :model-value="true"
-      variant="danger"
-      dismissible
-      @dismissed="unidadesStore.clearError()"
-    >
-      {{ unidadesStore.error }}
-    </BAlert>
+    <ErrorAlert
+        :error="erroUnidades"
+        @dismiss="unidadesStore.clearError()"
+    />
 
-    <div v-if="unidadesStore.isLoading" class="text-center my-5">
+    <div v-if="unidadesStore.isLoading" class="text-center py-5">
       <BSpinner variant="primary" label="Carregando unidades..." />
-      <p class="mt-2">Carregando árvore de unidades...</p>
+      <p class="mt-2 text-muted">Carregando árvore de unidades...</p>
     </div>
 
     <div v-else-if="unidades.length > 0" class="card shadow-sm">
@@ -33,21 +28,29 @@
       </div>
     </div>
 
-    <div v-else class="text-center my-5">
-      <p>Nenhuma unidade encontrada.</p>
-    </div>
+    <EmptyState
+        v-else
+        icon="bi-diagram-3"
+        title="Nenhuma unidade encontrada."
+        description="Tente atualizar a página ou ajustar os filtros de visualização."
+    />
   </BContainer>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted} from "vue";
-import {BAlert, BContainer, BSpinner} from "bootstrap-vue-next";
+import {BContainer, BSpinner} from "bootstrap-vue-next";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
+import ErrorAlert from "@/components/common/ErrorAlert.vue";
+import EmptyState from "@/components/EmptyState.vue";
 import {useUnidadesStore} from "@/stores/unidades";
 
 const unidadesStore = useUnidadesStore();
 const unidades = computed(() => unidadesStore.unidades);
+const erroUnidades = computed(() =>
+    unidadesStore.error ? {message: unidadesStore.error} : null
+);
 
 onMounted(async () => {
   await unidadesStore.buscarTodasAsUnidades();
