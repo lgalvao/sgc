@@ -13,8 +13,8 @@ vi.mock("@/services/administradorService", () => ({
 
 describe("AdministradoresSection.vue", () => {
     const mockAdmins = [
-        { nome: "Admin 1", tituloEleitoral: "111", matricula: "M1", unidadeSigla: "U1" },
-        { nome: "Admin 2", tituloEleitoral: "222", matricula: "M2", unidadeSigla: "U2" }
+        { nome: "Admin 1", tituloEleitoral: "111", matricula: "M1", unidadeSigla: "U1", unidadeCodigo: 1 },
+        { nome: "Admin 2", tituloEleitoral: "222", matricula: "M2", unidadeSigla: "U2", unidadeCodigo: 2 }
     ];
 
     beforeEach(() => {
