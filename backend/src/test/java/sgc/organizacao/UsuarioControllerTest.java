@@ -97,7 +97,8 @@ class UsuarioControllerTest {
     @Test
     @DisplayName("POST /api/usuarios/administradores/{usuarioTitulo}/remover - Deve remover (ADMIN)")
     void removerAdministrador_Sucesso() throws Exception {
-        Usuario usuarioAtual = Usuario.builder().tituloEleitoral("999").build();
+        Usuario usuarioAtual = new Usuario();
+        usuarioAtual.setTituloEleitoral("999");
         usuarioAtual.setAuthorities(java.util.Set.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN")));
         
         mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/usuarios/administradores/123/remover")
@@ -111,8 +112,12 @@ class UsuarioControllerTest {
         
         org.mockito.Mockito.verify(usuarioService).removerAdministrador(captorTitulo.capture(), captorAutor.capture());
         
-        org.assertj.core.api.Assertions.assertThat(captorTitulo.getValue()).isEqualTo("123");
-        org.assertj.core.api.Assertions.assertThat(captorAutor.getValue()).isEqualTo("999");
+        org.assertj.core.api.Assertions.assertThat(captorTitulo.getValue())
+                .as("Título do usuário a ser removido (PathVariable)")
+                .isEqualTo("123");
+        org.assertj.core.api.Assertions.assertThat(captorAutor.getValue())
+                .as("Título do autor da ação (AuthenticationPrincipal)")
+                .isEqualTo("999");
     }
 
 }

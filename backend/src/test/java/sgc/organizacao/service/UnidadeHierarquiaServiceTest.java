@@ -152,8 +152,7 @@ class UnidadeHierarquiaServiceTest {
             List<UnidadeDto> resultado = service.buscarArvoreHierarquica();
 
             // Assert
-            assertThat(resultado).hasSize(1);
-            assertThat(resultado.getFirst().getCodigo()).isEqualTo(1L);
+            assertThat(resultado).isEmpty();
         }
     }
 

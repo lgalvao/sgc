@@ -61,7 +61,6 @@ class ProcessoRepoPerformanceTest {
                 .isTrue();
         }
 
-        // Verify content for our created process
         Processo returnedProcess = processos.stream()
                 .filter(p -> p.getCodigo().equals(processo.getCodigo()))
                 .findFirst()
