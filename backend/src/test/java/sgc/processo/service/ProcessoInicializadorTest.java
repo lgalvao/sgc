@@ -192,7 +192,7 @@ class ProcessoInicializadorTest {
 
         assertThat(erros).isEmpty();
         verify(unidadeMapaRepo).findAllById(anyList());
-        verify(subprocessoFacade).criarParaRevisao(eq(p), eq(u), eq(um), eq(admin), eq(usuario));
+        verify(subprocessoFacade).criarParaRevisao(p, u, um, admin, usuario);
     }
 
     @Test

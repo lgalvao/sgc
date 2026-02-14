@@ -797,8 +797,7 @@ class ProcessoFacadeTest {
 
             List<Long> resultado = processoFacade.listarUnidadesBloqueadasPorTipo("REVISAO");
             
-            assertThat(resultado).isNotNull();
-            assertThat(resultado).isEmpty();
+            assertThat(resultado).isNotNull().isEmpty();
             verify(processoConsultaService).unidadesBloqueadasPorTipo(TipoProcesso.REVISAO);
         }
 

@@ -319,8 +319,8 @@ pitest {
     junit5PluginVersion.set("1.2.3")
     
     // Classes alvo - todo o pacote sgc
-    targetClasses.set(listOf("sgc.processo.*"))
-    targetTests.set(listOf("sgc.processo.*"))
+    targetClasses.set(listOf("sgc.organizacao.*"))
+    targetTests.set(listOf("sgc.organizacao.*"))
     
     // Exclusões - classes que não agregam valor para mutation testing
     excludedClasses.set(listOf(
