@@ -44,7 +44,3 @@ Para gerar um relatório técnico das classes prioritárias:
 ```bash
 node backend/etc/scripts/gerar-plano-cobertura.cjs
 ```
-
-## Referências
-- `test-coverage-plan.md` no root do projeto.
-- `coverage-tracking.md` para acompanhamento de metas.
