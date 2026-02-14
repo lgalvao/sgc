@@ -115,6 +115,20 @@ class ProcessoConsultaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve retornar lista vazia quando não há unidades bloqueadas por tipo")
+    void deveRetornarListaVaziaQuandoNaoHaUnidadesBloqueadasPorTipo() {
+        // Arrange
+        when(processoRepo.findUnidadeCodigosBySituacaoAndTipo(SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.REVISAO))
+                .thenReturn(List.of());
+
+        // Act
+        List<Long> ids = processoConsultaService.unidadesBloqueadasPorTipo(TipoProcesso.REVISAO);
+
+        // Assert
+        assertThat(ids).isEmpty();
+    }
+
+    @Test
     @DisplayName("Deve listar subprocessos para Admin")
     void deveListarParaAdmin() {
         Usuario admin = Usuario.builder()
@@ -165,5 +179,34 @@ class ProcessoConsultaServiceTest {
     void deveProcessosAndamento() {
         processoConsultaService.processosAndamento();
         verify(processoRepo).findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando não há processos ativos")
+    void deveRetornarListaVaziaQuandoNaoHaProcessosAtivos() {
+        // Arrange
+        when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
+
+        // Act
+        List<sgc.processo.model.Processo> resultado = processoConsultaService.processosAndamento();
+
+        // Assert
+        assertThat(resultado).isEmpty();
+        verify(processoRepo).findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando não há processos finalizados")
+    void deveRetornarListaVaziaQuandoNaoHaProcessosFinalizados() {
+        // Arrange
+        when(processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO))
+                .thenReturn(List.of());
+
+        // Act
+        List<sgc.processo.model.Processo> resultado = processoConsultaService.processosFinalizados();
+
+        // Assert
+        assertThat(resultado).isEmpty();
+        verify(processoRepo).listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
     }
 }
