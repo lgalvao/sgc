@@ -97,6 +97,29 @@ class LoginControllerTest {
     }
 
     @Test
+    @DisplayName("POST /api/usuarios/autenticar - Deve retornar false quando credenciais inválidas")
+    @WithMockUser
+    void autenticar_FalhaAutenticacao() throws Exception {
+        AutenticarRequest req = AutenticarRequest.builder()
+                .tituloEleitoral("123")
+                .senha("senhaErrada")
+                .build();
+
+        doNothing().when(limitadorTentativasLogin).verificar(anyString());
+        when(loginFacade.autenticar("123", "senhaErrada")).thenReturn(false);
+
+        mockMvc.perform(post("/api/usuarios/autenticar")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("false"))
+                .andExpect(cookie().doesNotExist("SGC_PRE_AUTH"));
+
+        verify(limitadorTentativasLogin).verificar(anyString());
+    }
+
+    @Test
     @DisplayName("POST /api/usuarios/autenticar - Deve obter IP do header X-Forwarded-For")
     @WithMockUser
     void autenticar_IpHeader() throws Exception {
@@ -199,6 +222,25 @@ class LoginControllerTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].perfil").value("ADMIN"));
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios/autorizar - Deve retornar lista vazia quando usuário sem perfis ativos")
+    @WithMockUser
+    void autorizar_DeveRetornarListaVaziaQuandoSemPerfisAtivos() throws Exception {
+        when(loginFacade.autorizar("123")).thenReturn(List.of());
+        when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
+
+        AutorizarRequest req = AutorizarRequest.builder().tituloEleitoral("123").build();
+
+        mockMvc.perform(post("/api/usuarios/autorizar")
+                        .with(csrf())
+                        .cookie(new Cookie("SGC_PRE_AUTH", "token-pre-auth"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
     }
 
     @Test
