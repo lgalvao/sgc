@@ -14,7 +14,43 @@ Com base na análise MBT do módulo `alerta` (79% mutation score, 7 mutantes sob
 2. **Pattern 2**: Condicionais com um branch apenas (falta testar caminho alternativo)
 3. **Pattern 3**: String vazia vs null não diferenciadas (falta assertions específicas)
 
-Esta sessão focou na aplicação do **Pattern 1** aos módulos críticos do sistema.
+---
+
+## 📈 Resumo Executivo Global
+
+| Métrica | Valor |
+|---------|-------|
+| **Sessões Completas** | 3 (Processo, Subprocesso, Analise) |
+| **Testes Adicionados Total** | 22 novos testes |
+| **Classes Modificadas** | 8 classes de teste |
+| **Módulos Trabalhados** | Processo, Subprocesso, Mapa, Analise |
+| **Padrões Aplicados** | Pattern 1 e Pattern 2 |
+| **Status Final** | ✅ Todos os testes passando |
+| **Impacto Estimado** | +10-15% mutation score nos módulos trabalhados |
+
+---
+
+## 📈 Resumo Executivo - Sessão 3 (Subprocesso - NOVA)
+
+| Métrica | Valor |
+|---------|-------|
+| **Testes adicionados** | 10 novos testes |
+| **Classes modificadas** | 3 classes de teste |
+| **Módulo trabalhado** | Subprocesso |
+| **Padrões aplicados** | MBT Pattern 1 (6 testes) e Pattern 2 (4 testes) |
+| **Status final** | ✅ Todos os testes passando (100+ testes no módulo) |
+| **Impacto estimado** | +6-8% mutation score no módulo subprocesso |
+
+### Detalhes da Sessão 3
+- **SubprocessoFacadeTest:** 48 → 56 testes (+8)
+  - Pattern 1: 4 testes (listas vazias)
+  - Pattern 2: 4 testes (branches condicionais)
+- **SubprocessoMapaControllerTest:** 19 → 20 testes (+1)
+  - Pattern 1: 1 teste (endpoint listarAtividades vazio)
+- **SubprocessoValidacaoControllerTest:** 11 → 12 testes (+1)
+  - Pattern 1: 1 teste (obterHistoricoValidacao vazio)
+
+**Documentação:** Ver `MBT-melhorias-subprocesso.md` para análise completa
 
 ---
 

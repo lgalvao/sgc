@@ -112,6 +112,22 @@ class SubprocessoValidacaoControllerTest {
     }
 
     @Test
+    @DisplayName("Deve retornar lista vazia quando não há histórico de validação")
+    void deveRetornarListaVaziaQuandoNaoHaHistoricoValidacao() {
+        // Pattern 1: Empty list validation
+        Long codigo = 1L;
+
+        when(analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.VALIDACAO)).thenReturn(List.of());
+
+        List<AnaliseValidacaoHistoricoDto> result = controller.obterHistoricoValidacao(codigo);
+
+        assertThat(result)
+                .isNotNull()
+                .isEmpty();
+        verify(analiseFacade).listarPorSubprocesso(codigo, TipoAnalise.VALIDACAO);
+    }
+
+    @Test
     @DisplayName("Deve devolver validação")
     void deveDevolverValidacao() {
         Long codigo = 1L;
