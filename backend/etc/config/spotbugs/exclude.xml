@@ -38,6 +38,7 @@
             <Class name="sgc.subprocesso.service.workflow.SubprocessoWorkflowService"/>
             <Class name="sgc.processo.service.ProcessoConsultaService"/>
             <Class name="sgc.seguranca.login.LoginFacade"/>
+            <Class name="sgc.e2e.E2eController"/>
         </Or>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>

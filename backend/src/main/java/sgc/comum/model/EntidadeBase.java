@@ -16,6 +16,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @SuperBuilder
 public abstract class EntidadeBase implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo")

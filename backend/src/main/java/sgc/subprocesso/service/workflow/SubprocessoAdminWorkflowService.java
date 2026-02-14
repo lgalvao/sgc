@@ -57,11 +57,9 @@ public class SubprocessoAdminWorkflowService {
         try {
             String novaDataStr = novaDataLimite.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             String assunto = "SGC: Data limite alterada";
-            String corpo = """
-                    Prezado(a) responsável pela %s,
-                    
-                    A data limite da etapa atual no processo %s foi alterada para %s.
-                    """.formatted(sp.getUnidade().getSigla(), sp.getProcesso().getDescricao(), novaDataStr);
+            String corpo = ("Prezado(a) responsável pela %s," + "%n%n" +
+                    "A data limite da etapa atual no processo %s foi alterada para %s.%n")
+                    .formatted(sp.getUnidade().getSigla(), sp.getProcesso().getDescricao(), novaDataStr);
 
             notificacaoEmailService.enviarEmail(sp.getUnidade().getSigla(), assunto, corpo);
             alertaService.criarAlertaAlteracaoDataLimite(sp.getProcesso(), sp.getUnidade(), novaDataStr, etapa);

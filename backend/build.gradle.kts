@@ -36,7 +36,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
-    // BD
+    // Banco de Dados
     runtimeOnly("com.oracle.database.jdbc:ojdbc11")
     implementation("com.h2database:h2")
 
@@ -70,7 +70,7 @@ dependencies {
     testImplementation("io.rest-assured:rest-assured-all:6.0.0")
     testImplementation("org.apache.groovy:groovy-all:5.0.3")
     
-    // Mutation Testing
+    // Testes de Mutação
     testImplementation("org.pitest:pitest-junit5-plugin:1.2.1")
 
     // Documentação da API
@@ -144,12 +144,12 @@ tasks.withType<Test> {
             // Exibir resumo apenas para a suite raiz (nível do projeto)
             if (suite.parent == null) {
                 val output = """
-                    |  Results: ${result.resultType}
-                    |  Total:     ${result.testCount} tests run
-                    |  ✓ Passed:  ${result.successfulTestCount}
-                    |  ✗ Failed:  ${result.failedTestCount}
-                    |  ○ Ignored: ${result.skippedTestCount}
-                    |  Time:     ${(result.endTime - result.startTime) / 1000.0}s
+                    |  Resultado: ${result.resultType}
+                    |  Total:     ${result.testCount} testes executados
+                    |  ✓ Passou:   ${result.successfulTestCount}
+                    |  ✗ Falhou:   ${result.failedTestCount}
+                    |  ○ Ignorado: ${result.skippedTestCount}
+                    |  Tempo:     ${(result.endTime - result.startTime) / 1000.0}s
                 """.trimMargin()
                 println(output)
 
@@ -359,16 +359,16 @@ pitest {
     // Performance - usar todos os cores disponíveis
     threads.set(Runtime.getRuntime().availableProcessors())
     
-    // Timeout configuration - Phase 2 optimization
+    // Configuração de timeout - Otimização da Fase 2
     timeoutFactor.set(BigDecimal("2.0"))  // Multiply test runtime by 2 for mutation timeout
     
-    // Verbose output para debug
+    // Saída detalhada (verbose) para depuração
     verbose.set(false)
     
     // Detectar mutantes não cobertos por testes (failWhenNoMutations = false)
     failWhenNoMutations.set(false)
     
-    // Memory optimization
+    // Otimização de memória
     jvmArgs.set(listOf("-Xmx2048m", "-Xms512m"))
     
     // Thresholds desabilitados inicialmente (habilitar na Fase 6)

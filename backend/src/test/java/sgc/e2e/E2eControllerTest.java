@@ -407,27 +407,28 @@ class E2eControllerTest {
         @Test
         @DisplayName("limparTabela: Deve tentar DELETE se TRUNCATE falhar")
         void limparTabela_TruncateFalha_TentaDelete() throws Exception {
-            Connection conn = mock(Connection.class);
-            Statement stmt = mock(Statement.class);
-            
-            lenient().when(stmt.execute(anyString())).thenReturn(true);
-            doThrow(new java.sql.SQLException("Erro H2")).when(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
+            try (Connection conn = mock(Connection.class);
+                 Statement stmt = mock(Statement.class)) {
+                
+                lenient().when(stmt.execute(anyString())).thenReturn(true);
+                doThrow(new java.sql.SQLException("Erro H2")).when(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
 
-            DataSource ds = mock(DataSource.class);
-            when(jdbcTemplateMock.getDataSource()).thenAnswer(i -> ds);
-            when(ds.getConnection()).thenReturn(conn);
-            when(conn.createStatement()).thenReturn(stmt);
-            when(jdbcTemplateMock.queryForList(anyString(), eq(String.class))).thenReturn(List.of("TABELA_TESTE"));
-            
-            Resource resource = mock(Resource.class);
-            when(resourceLoaderMock.getResource(anyString())).thenReturn(resource);
-            when(resource.exists()).thenReturn(true);
-            when(resource.getInputStream()).thenReturn(new ByteArrayInputStream("SELECT 1;".getBytes()));
+                DataSource ds = mock(DataSource.class);
+                when(jdbcTemplateMock.getDataSource()).thenAnswer(i -> ds);
+                when(ds.getConnection()).thenReturn(conn);
+                when(conn.createStatement()).thenReturn(stmt);
+                when(jdbcTemplateMock.queryForList(anyString(), eq(String.class))).thenReturn(List.of("TABELA_TESTE"));
+                
+                Resource resource = mock(Resource.class);
+                when(resourceLoaderMock.getResource(anyString())).thenReturn(resource);
+                when(resource.exists()).thenReturn(true);
+                when(resource.getInputStream()).thenReturn(new ByteArrayInputStream("SELECT 1;".getBytes(StandardCharsets.UTF_8)));
 
-            controllerIsolado.resetDatabase();
+                controllerIsolado.resetDatabase();
 
-            verify(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
-            verify(stmt).execute(contains("DELETE FROM sgc.TABELA_TESTE"));
+                verify(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
+                verify(stmt).execute(contains("DELETE FROM sgc.TABELA_TESTE"));
+            }
         }
 
         @Test

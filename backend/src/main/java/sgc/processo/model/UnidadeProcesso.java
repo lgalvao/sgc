@@ -8,7 +8,9 @@ import org.jspecify.annotations.Nullable;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+
 
 /**
  * Entidade que representa a associação entre um Processo e uma Unidade participante,
@@ -23,9 +25,11 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UnidadeProcesso {
+public class UnidadeProcesso implements Serializable {
+    private static final long serialVersionUID = 1L;
     
     @EmbeddedId
+
     private UnidadeProcessoId id = new UnidadeProcessoId();
     
     @ManyToOne(fetch = FetchType.LAZY)

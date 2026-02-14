@@ -1,4 +1,6 @@
 tasks.register<Exec>("dev") {
+    group = "application"
+    description = "Inicia o servidor de desenvolvimento do frontend (Vite)"
     workingDir = project.projectDir
     commandLine = if (System.getProperty("os.name").lowercase().contains("win")) listOf(
         "cmd",
@@ -10,6 +12,8 @@ tasks.register<Exec>("dev") {
 }
 
 tasks.register<Exec>("buildVue") {
+    group = "build"
+    description = "Gera o build de produção do frontend Vue"
     workingDir = project.projectDir
     commandLine = if (System.getProperty("os.name").lowercase().contains("win")) listOf(
         "cmd",

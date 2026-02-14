@@ -68,7 +68,7 @@ tasks.register<Delete>("cleanFrontend") {
 
 tasks.register<Exec>("frontendQualityCheck") {
     group = "quality"
-    description = "Runs frontend quality checks (tests, lint, typecheck)"
+    description = "Executa verificações de qualidade do frontend (testes, lint, typecheck)"
     dependsOn("installFrontend")
     workingDir = file("frontend")
     commandLine = if (System.getProperty("os.name").lowercase().contains("win")) listOf(
@@ -84,25 +84,25 @@ tasks.register<Exec>("frontendQualityCheck") {
 
 tasks.register("backendQualityCheck") {
     group = "quality"
-    description = "Runs backend quality checks"
+    description = "Executa verificações de qualidade do backend"
     dependsOn(":backend:qualityCheck")
 }
 
 tasks.register("backendQualityCheckFast") {
     group = "quality"
-    description = "Runs backend quality checks (fast)"
+    description = "Executa verificações de qualidade rápidas do backend"
     dependsOn(":backend:qualityCheckFast")
 }
 
 tasks.register("qualityCheckAll") {
     group = "quality"
-    description = "Runs all quality checks for both frontend and backend"
+    description = "Executa todas as verificações de qualidade (frontend e backend)"
     dependsOn("backendQualityCheck", "frontendQualityCheck")
 }
 
 tasks.register<Exec>("qualityCheckFast") {
     group = "quality"
-    description = "Runs fast quality checks (tests + coverage) for both frontend and backend"
+    description = "Executa verificações de qualidade rápidas (testes + cobertura) para frontend e backend"
     dependsOn("backendQualityCheckFast")
 
     workingDir = file("frontend")

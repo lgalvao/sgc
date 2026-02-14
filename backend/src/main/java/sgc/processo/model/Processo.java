@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @SuperBuilder
 @AttributeOverride(name = "codigo", column = @Column(name = "codigo"))
 public class Processo extends EntidadeBase {
+    private static final long serialVersionUID = 1L;
     
     @Builder.Default
     @Column(name = "data_criacao", nullable = false)

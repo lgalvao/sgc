@@ -177,13 +177,10 @@ public class ProcessoFacade {
         String descricao = "Lembrete: Prazo do processo %s encerra em %s"
                 .formatted(processo.getDescricao(), dataLimite);
         String assunto = "SGC: Lembrete de prazo - %s".formatted(processo.getDescricao());
-        String corpo = """
-                Prezado(a) responsável pela %s,
-                
-                Este é um lembrete de que o prazo para a conclusão da etapa atual do processo %s encerra em %s.
-                
-                Por favor, acesse o sistema para concluir suas pendências: /painel.
-                """.formatted(unidade.getSigla(), processo.getDescricao(), dataLimite);
+        String corpo = ("Prezado(a) responsável pela %s," + "%n%n" +
+                "Este é um lembrete de que o prazo para a conclusão da etapa atual do processo %s encerra em %s." + "%n%n" +
+                "Por favor, acesse o sistema para concluir suas pendências: /painel.%n")
+                .formatted(unidade.getSigla(), processo.getDescricao(), dataLimite);
 
         SubprocessoDto subprocesso = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, unidadeCodigo);
         subprocessoFacade.registrarMovimentacaoLembrete(subprocesso.getCodigo());
