@@ -102,9 +102,7 @@ class UsuarioControllerTest {
         usuarioAtual.setAuthorities(java.util.Set.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN")));
         
         mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/usuarios/administradores/123/remover")
-                        .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication(
-                                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(usuarioAtual, null, usuarioAtual.getAuthorities())
-                        )))
+                        .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(usuarioAtual)))
                 .andExpect(status().isOk());
         
         org.mockito.ArgumentCaptor<String> captorTitulo = org.mockito.ArgumentCaptor.forClass(String.class);
