@@ -212,10 +212,11 @@ Progress achieved:
 - ✅ All 1657 tests passing (+4 from 1653)
 
 **Updated Global Totals (2026-02-14 - Post Sprint 5):**
-- Total improvements: 59 tests (49 previous + 7 new + 3 enhanced)
+- Total test improvements: 49 (42 from Sprints 2-4 + 7 from Sprint 5)
+  - Sprint 5 breakdown: 4 new tests + 3 enhanced tests = 7 improvements
 - Modules improved: 8 (Processo, Subprocesso, Mapa, Segurança, Organização, Alerta, Painel, Configuração)
+- Test count: 1657 tests passing (increased from 1653)
 - Estimated mutation score: 70% → 84-87% (in improved modules)
-- All 1657 tests passing ✅
 
 ---
 
