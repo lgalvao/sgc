@@ -38,6 +38,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.Set;
+import sgc.organizacao.model.Perfil;
 
 @Tag("integration")
 @SpringBootTest
@@ -81,14 +83,14 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
 
         // Load users from database with their profiles
         usuarioGestor = usuarioService.buscarPorLogin("666666666666");
-        usuarioGestor.setPerfilAtivo(sgc.organizacao.model.Perfil.GESTOR);
+        usuarioGestor.setPerfilAtivo(Perfil.GESTOR);
         usuarioGestor.setUnidadeAtivaCodigo(6L);
-        usuarioGestor.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.GESTOR.toGrantedAuthority()));
+        usuarioGestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
 
         usuarioChefe = usuarioService.buscarPorLogin("333333333333");
-        usuarioChefe.setPerfilAtivo(sgc.organizacao.model.Perfil.CHEFE);
+        usuarioChefe.setPerfilAtivo(Perfil.CHEFE);
         usuarioChefe.setUnidadeAtivaCodigo(9L);
-        usuarioChefe.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.CHEFE.toGrantedAuthority()));
+        usuarioChefe.setAuthorities(Set.of(Perfil.CHEFE.toGrantedAuthority()));
 
         // Create test process and subprocess
         Processo processo = ProcessoFixture.processoPadrao();

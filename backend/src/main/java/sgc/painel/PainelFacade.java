@@ -22,6 +22,7 @@ import sgc.processo.service.ProcessoFacade;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import sgc.processo.model.UnidadeProcesso;
 
 @Service
 @RequiredArgsConstructor
@@ -144,10 +145,10 @@ public class PainelFacade {
                 .build();
     }
 
-    private String formatarUnidadesParticipantes(List<sgc.processo.model.UnidadeProcesso> participantes, Map<Long, List<Long>> mapaPaiFilhos) {
-        Map<Long, sgc.processo.model.UnidadeProcesso> participantesPorCodigo =
+    private String formatarUnidadesParticipantes(List<UnidadeProcesso> participantes, Map<Long, List<Long>> mapaPaiFilhos) {
+        Map<Long, UnidadeProcesso> participantesPorCodigo =
                 participantes.stream().collect(Collectors.toMap(
-                        sgc.processo.model.UnidadeProcesso::getUnidadeCodigo,
+                        UnidadeProcesso::getUnidadeCodigo,
                         up -> up,
                         (existing, replacement) -> existing));
 
@@ -157,25 +158,25 @@ public class PainelFacade {
         return unidadesVisiveis.stream()
                 .map(participantesPorCodigo::get)
                 .filter(Objects::nonNull)
-                .map(sgc.processo.model.UnidadeProcesso::getSigla)
+                .map(UnidadeProcesso::getSigla)
                 .filter(Objects::nonNull)
                 .sorted()
                 .collect(Collectors.joining(", "));
     }
 
-    private Set<Long> selecionarIdsVisiveis(Set<Long> participantesIds, Map<Long, sgc.processo.model.UnidadeProcesso> participantesPorCodigo, Map<Long, List<Long>> mapaPaiFilhos) {
+    private Set<Long> selecionarIdsVisiveis(Set<Long> participantesIds, Map<Long, UnidadeProcesso> participantesPorCodigo, Map<Long, List<Long>> mapaPaiFilhos) {
         Set<Long> visiveis = new LinkedHashSet<>();
         for (Long unidadeId : participantesIds) {
-            sgc.processo.model.UnidadeProcesso unidade = participantesPorCodigo.get(unidadeId);
+            UnidadeProcesso unidade = participantesPorCodigo.get(unidadeId);
             Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds, participantesPorCodigo, mapaPaiFilhos);
             visiveis.add(candidato);
         }
         return visiveis;
     }
 
-    private Long encontrarMaiorIdVisivel(sgc.processo.model.UnidadeProcesso unidade, Set<Long> participantesIds, 
-            Map<Long, sgc.processo.model.UnidadeProcesso> participantesPorCodigo, Map<Long, List<Long>> mapaPaiFilhos) {
-        sgc.processo.model.UnidadeProcesso atual = unidade;
+    private Long encontrarMaiorIdVisivel(UnidadeProcesso unidade, Set<Long> participantesIds, 
+            Map<Long, UnidadeProcesso> participantesPorCodigo, Map<Long, List<Long>> mapaPaiFilhos) {
+        UnidadeProcesso atual = unidade;
         while (true) {
             if (!todasSubordinadasParticipam(atual.getUnidadeCodigo(), participantesIds, mapaPaiFilhos)) {
                 return atual.getUnidadeCodigo();

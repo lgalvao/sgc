@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -92,10 +93,10 @@ class MapaSalvamentoServiceTest {
         when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
         
         // Mock repo.buscar throwing ErroEntidadeNaoEncontrada
-        when(repo.buscar(Competencia.class, codComp)).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Competência", codComp));
+        when(repo.buscar(Competencia.class, codComp)).thenThrow(new ErroEntidadeNaoEncontrada("Competência", codComp));
 
         assertThatThrownBy(() -> mapaSalvamentoService.salvarMapaCompleto(codMapa, request))
-                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
     @Test

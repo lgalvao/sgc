@@ -21,6 +21,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Nested;
+import org.mockito.Mockito;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -201,7 +203,7 @@ class GerenciadorJwtTest {
         Optional<String> result = gerenciador.validarTokenPreAuth("invalid.token");
         assertThat(result).isEmpty();
     }
-    @org.junit.jupiter.api.Nested
+    @Nested
     @DisplayName("Cobertura Extra")
     class CoberturaExtra {
         private static final String SECRET = "secure-secret-key-minimum-32-chars-length-xyz-123";
@@ -235,9 +237,9 @@ class GerenciadorJwtTest {
             // The gap test mocked properties manually.
             // Here we can use the Mockito mocks but we need to configure them for this "new" instance logic
             // Or just create new mocks to be safe and isolated like the original test.
-            JwtProperties props = org.mockito.Mockito.mock(JwtProperties.class);
+            JwtProperties props = Mockito.mock(JwtProperties.class);
             when(props.secret()).thenReturn(SECRET);
-            return new GerenciadorJwt(props, org.mockito.Mockito.mock(Environment.class));
+            return new GerenciadorJwt(props, Mockito.mock(Environment.class));
         }
 
         private String gerarTokenCustomizado(String sub, String perfil, Long unidade) {

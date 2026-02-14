@@ -29,6 +29,12 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Nested;
+import org.springframework.test.util.ReflectionTestUtils;
+import sgc.comum.erros.ErroAutenticacao;
 
 @WebMvcTest(LoginController.class)
 @Import(RestExceptionHandler.class)
@@ -313,7 +319,7 @@ class LoginControllerTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isUnauthorized());
     }
-    @org.junit.jupiter.api.Nested
+    @Nested
     @DisplayName("Unit Tests (Isolated)")
     class UnitTests {
 
@@ -341,10 +347,10 @@ class LoginControllerTest {
         @Test
         @DisplayName("autenticar deve configurar cookie seguro se ambienteTestes false")
         void autenticar_SecureCookie() {
-            org.springframework.test.util.ReflectionTestUtils.setField(controller, "ambienteTestes", false);
+            ReflectionTestUtils.setField(controller, "ambienteTestes", false);
             AutenticarRequest req = new AutenticarRequest("user", "pass");
-            jakarta.servlet.http.HttpServletRequest httpReq = mock(jakarta.servlet.http.HttpServletRequest.class);
-            jakarta.servlet.http.HttpServletResponse httpRes = mock(jakarta.servlet.http.HttpServletResponse.class);
+            HttpServletRequest httpReq = mock(HttpServletRequest.class);
+            HttpServletResponse httpRes = mock(HttpServletResponse.class);
 
             when(loginFacadeMock.autenticar("user", "pass")).thenReturn(true);
             when(gerenciadorJwtMock.gerarTokenPreAuth("user")).thenReturn("token");
@@ -357,10 +363,10 @@ class LoginControllerTest {
         @Test
         @DisplayName("autenticar NAO deve configurar cookie seguro se ambienteTestes true")
         void autenticar_NonSecureCookie() {
-            org.springframework.test.util.ReflectionTestUtils.setField(controller, "ambienteTestes", true);
+            ReflectionTestUtils.setField(controller, "ambienteTestes", true);
             AutenticarRequest req = new AutenticarRequest("user", "pass");
-            jakarta.servlet.http.HttpServletRequest httpReq = mock(jakarta.servlet.http.HttpServletRequest.class);
-            jakarta.servlet.http.HttpServletResponse httpRes = mock(jakarta.servlet.http.HttpServletResponse.class);
+            HttpServletRequest httpReq = mock(HttpServletRequest.class);
+            HttpServletResponse httpRes = mock(HttpServletResponse.class);
 
             when(loginFacadeMock.autenticar("user", "pass")).thenReturn(true);
             when(gerenciadorJwtMock.gerarTokenPreAuth("user")).thenReturn("token");
@@ -374,12 +380,12 @@ class LoginControllerTest {
         @DisplayName("entrar deve lidar com cookie invalido e lancar ErroAutenticacao")
         void entrar_CookieInvalido() {
             EntrarRequest req = new EntrarRequest("user", "ADMIN", 1L);
-            jakarta.servlet.http.HttpServletRequest httpReq = mock(jakarta.servlet.http.HttpServletRequest.class);
+            HttpServletRequest httpReq = mock(HttpServletRequest.class);
             
             // No cookies
             when(httpReq.getCookies()).thenReturn(null);
 
-            org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAutenticacao.class, 
+            Assertions.assertThrows(ErroAutenticacao.class, 
                 () -> controller.entrar(req, httpReq));
         }
 
@@ -387,13 +393,13 @@ class LoginControllerTest {
         @DisplayName("entrar deve lidar com sessao invalida (token mismatch)")
         void entrar_TokenMismatch() {
             EntrarRequest req = new EntrarRequest("user", "ADMIN", 1L);
-            jakarta.servlet.http.HttpServletRequest httpReq = mock(jakarta.servlet.http.HttpServletRequest.class);
+            HttpServletRequest httpReq = mock(HttpServletRequest.class);
             Cookie cookie = new Cookie("SGC_PRE_AUTH", "token");
             
             when(httpReq.getCookies()).thenReturn(new Cookie[]{cookie});
             when(gerenciadorJwtMock.validarTokenPreAuth("token")).thenReturn(Optional.of("otherUser"));
 
-            org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAutenticacao.class, 
+            Assertions.assertThrows(ErroAutenticacao.class, 
                 () -> controller.entrar(req, httpReq));
         }
         
@@ -401,13 +407,13 @@ class LoginControllerTest {
         @DisplayName("entrar deve lidar com sessao invalida (token empty)")
         void entrar_TokenEmpty() {
             EntrarRequest req = new EntrarRequest("user", "ADMIN", 1L);
-            jakarta.servlet.http.HttpServletRequest httpReq = mock(jakarta.servlet.http.HttpServletRequest.class);
+            HttpServletRequest httpReq = mock(HttpServletRequest.class);
             Cookie cookie = new Cookie("SGC_PRE_AUTH", "token");
             
             when(httpReq.getCookies()).thenReturn(new Cookie[]{cookie});
             when(gerenciadorJwtMock.validarTokenPreAuth("token")).thenReturn(Optional.empty());
 
-            org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAutenticacao.class, 
+            Assertions.assertThrows(ErroAutenticacao.class, 
                 () -> controller.entrar(req, httpReq));
         }
     }

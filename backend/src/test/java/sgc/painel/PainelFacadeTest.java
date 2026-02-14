@@ -27,6 +27,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import sgc.processo.model.UnidadeProcesso;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -201,11 +202,11 @@ class PainelFacadeTest {
         when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
         when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
         
-        sgc.processo.model.UnidadeProcesso up1 = mock(sgc.processo.model.UnidadeProcesso.class);
+        UnidadeProcesso up1 = mock(UnidadeProcesso.class);
         when(up1.getUnidadeCodigo()).thenReturn(10L);
         when(up1.getSigla()).thenReturn("U1");
         
-        sgc.processo.model.UnidadeProcesso up2 = mock(sgc.processo.model.UnidadeProcesso.class);
+        UnidadeProcesso up2 = mock(UnidadeProcesso.class);
         when(up2.getUnidadeCodigo()).thenReturn(10L); // Mesmo código
 
         // Retorna lista com duplicados
@@ -231,12 +232,12 @@ class PainelFacadeTest {
         when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
 
         // U1 (Pai) -> U2 (Filho)
-        sgc.processo.model.UnidadeProcesso up1 = mock(sgc.processo.model.UnidadeProcesso.class);
+        UnidadeProcesso up1 = mock(UnidadeProcesso.class);
         when(up1.getUnidadeCodigo()).thenReturn(1L);
         when(up1.getSigla()).thenReturn("U1");
         when(up1.getUnidadeSuperiorCodigo()).thenReturn(null);
 
-        sgc.processo.model.UnidadeProcesso up2 = mock(sgc.processo.model.UnidadeProcesso.class);
+        UnidadeProcesso up2 = mock(UnidadeProcesso.class);
         when(up2.getUnidadeCodigo()).thenReturn(2L);
         when(up2.getUnidadeSuperiorCodigo()).thenReturn(1L);
 

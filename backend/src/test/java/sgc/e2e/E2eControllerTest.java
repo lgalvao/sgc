@@ -31,6 +31,12 @@ import java.sql.Statement;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import java.sql.SQLException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Nested;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import sgc.processo.service.ProcessoFacade;
 
 @Tag("integration")
 @SpringBootTest
@@ -42,10 +48,10 @@ class E2eControllerTest {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate namedJdbcTemplate;
+    private NamedParameterJdbcTemplate namedJdbcTemplate;
 
     @Mock
-    private sgc.processo.service.ProcessoFacade processoFacade;
+    private ProcessoFacade processoFacade;
 
     @Mock
     private UnidadeFacade unidadeFacade;
@@ -309,7 +315,7 @@ class E2eControllerTest {
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
         DataSource mockDataSource = Mockito.mock(DataSource.class);
         when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
-        when(mockDataSource.getConnection()).thenThrow(new java.sql.SQLException("Error"));
+        when(mockDataSource.getConnection()).thenThrow(new SQLException("Error"));
 
         E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
         var exception = Assertions.assertThrows(RuntimeException.class, controllerComErro::resetDatabase);
@@ -385,22 +391,22 @@ class E2eControllerTest {
         // Assert
         verify(processoFacade).iniciarProcessoMapeamento(eq(100L), anyList());
     }
-    @org.junit.jupiter.api.Nested
+    @Nested
     @DisplayName("Cobertura Extra Isolada")
     class CoberturaExtra {
-        private org.springframework.jdbc.core.JdbcTemplate jdbcTemplateMock;
-        private sgc.processo.service.ProcessoFacade processoFacadeMock;
-        private sgc.organizacao.UnidadeFacade unidadeFacadeMock;
-        private org.springframework.core.io.ResourceLoader resourceLoaderMock;
+        private JdbcTemplate jdbcTemplateMock;
+        private ProcessoFacade processoFacadeMock;
+        private UnidadeFacade unidadeFacadeMock;
+        private ResourceLoader resourceLoaderMock;
         private E2eController controllerIsolado;
 
         @BeforeEach
         void setUp() {
-            jdbcTemplateMock = mock(org.springframework.jdbc.core.JdbcTemplate.class);
-            var namedJdbcTemplateMock = mock(org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate.class);
-            processoFacadeMock = mock(sgc.processo.service.ProcessoFacade.class);
-            unidadeFacadeMock = mock(sgc.organizacao.UnidadeFacade.class);
-            resourceLoaderMock = mock(org.springframework.core.io.ResourceLoader.class);
+            jdbcTemplateMock = mock(JdbcTemplate.class);
+            var namedJdbcTemplateMock = mock(NamedParameterJdbcTemplate.class);
+            processoFacadeMock = mock(ProcessoFacade.class);
+            unidadeFacadeMock = mock(UnidadeFacade.class);
+            resourceLoaderMock = mock(ResourceLoader.class);
             controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoFacadeMock, unidadeFacadeMock, resourceLoaderMock);
         }
 
@@ -411,7 +417,7 @@ class E2eControllerTest {
                  Statement stmt = mock(Statement.class)) {
                 
                 lenient().when(stmt.execute(anyString())).thenReturn(true);
-                doThrow(new java.sql.SQLException("Erro H2")).when(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
+                doThrow(new SQLException("Erro H2")).when(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
 
                 DataSource ds = mock(DataSource.class);
                 when(jdbcTemplateMock.getDataSource()).thenAnswer(i -> ds);
@@ -437,7 +443,7 @@ class E2eControllerTest {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", false, 30);
             when(unidadeFacadeMock.buscarPorSigla("SIGLA")).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA"));
 
-            org.assertj.core.api.Assertions.assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
+            assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
         
@@ -455,7 +461,7 @@ class E2eControllerTest {
             when(processoFacadeMock.iniciarProcessoMapeamento(100L, List.of(10L)))
                 .thenReturn(List.of("Erro 1", "Erro 2"));
 
-            org.assertj.core.api.Assertions.assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
+            assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining("Erro 1");
         }
@@ -476,7 +482,7 @@ class E2eControllerTest {
                 
             when(processoFacadeMock.obterDtoPorId(100L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 100L)); // Falha ao recarregar
 
-            org.assertj.core.api.Assertions.assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
+            assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }

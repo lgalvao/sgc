@@ -34,6 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 @SpringBootTest(classes = Sgc.class)
 @DisplayName("CDU-15: Manter Mapa de Competências")
@@ -226,12 +227,12 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
 
         // When & Then
         mockMvc.perform(get(API_SUBPROCESSO_MAPA, subprocesso.getCodigo()))
-                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocessoCodigo").value(subprocesso.getCodigo()))
                 .andExpect(jsonPath("$.competencias.length()").value(1))

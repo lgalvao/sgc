@@ -14,6 +14,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import sgc.comum.repo.ComumRepo;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -44,7 +48,7 @@ class MapaManutencaoServiceCoverageTest {
 
         // Act
         // Passando null como valor para o código 1L (Map.of não permite null values)
-        java.util.Map<Long, String> descricoes = new java.util.HashMap<>();
+        Map<Long, String> descricoes = new HashMap<>();
         descricoes.put(codAtiv, null);
         service.atualizarDescricoesAtividadeEmLote(descricoes);
 
@@ -65,7 +69,7 @@ class MapaManutencaoServiceCoverageTest {
     private MapaRepo mapaRepo;
 
     @Mock
-    private sgc.comum.repo.ComumRepo repo;
+    private ComumRepo repo;
 
     @Test
     @DisplayName("buscarMapaPorCodigo deve usar o ComumRepo")
@@ -117,7 +121,7 @@ class MapaManutencaoServiceCoverageTest {
         Long codComp = 1L;
         Competencia comp = new Competencia();
         comp.setCodigo(codComp);
-        comp.setAtividades(new java.util.HashSet<>());
+        comp.setAtividades(new HashSet<>());
         
         Atividade ativAntiga = new Atividade();
         ativAntiga.getCompetencias().add(comp);

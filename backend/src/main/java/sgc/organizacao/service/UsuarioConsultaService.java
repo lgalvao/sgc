@@ -8,13 +8,14 @@ import sgc.organizacao.model.UsuarioRepo;
 
 import java.util.List;
 import java.util.Optional;
+import sgc.comum.repo.ComumRepo;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UsuarioConsultaService {
     private final UsuarioRepo usuarioRepo;
-    private final sgc.comum.repo.ComumRepo repo;
+    private final ComumRepo repo;
 
     public Usuario buscarPorId(String titulo) {
         return repo.buscar(Usuario.class, titulo);

@@ -107,6 +107,6 @@ public class Processo extends EntidadeBase {
                 .map(UnidadeProcesso::getSigla)
                 .filter(Objects::nonNull)
                 .sorted()
-                .collect(java.util.stream.Collectors.joining(", "));
+                .collect(Collectors.joining(", "));
     }
 }

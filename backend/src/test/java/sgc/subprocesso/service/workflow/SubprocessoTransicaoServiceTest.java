@@ -22,6 +22,7 @@ import sgc.comum.erros.ErroAcessoNegado;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Assertions;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -122,7 +123,7 @@ class SubprocessoTransicaoServiceTest {
                 .build();
 
         // Act & Assert
-        org.junit.jupiter.api.Assertions.assertThrows(ErroAcessoNegado.class, () -> {
+        Assertions.assertThrows(ErroAcessoNegado.class, () -> {
             service.registrar(cmd);
         });
     }

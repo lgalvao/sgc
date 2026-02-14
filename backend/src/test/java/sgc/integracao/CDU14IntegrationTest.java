@@ -37,6 +37,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.Set;
+import sgc.organizacao.model.Perfil;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -84,19 +86,19 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                 // unit 9)
 
                 admin = usuarioService.buscarPorLogin("111111111111");
-                admin.setPerfilAtivo(sgc.organizacao.model.Perfil.ADMIN);
+                admin.setPerfilAtivo(Perfil.ADMIN);
                 admin.setUnidadeAtivaCodigo(100L);
-                admin.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.ADMIN.toGrantedAuthority()));
+                admin.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
 
                 gestor = usuarioService.buscarPorLogin("666666666666");
-                gestor.setPerfilAtivo(sgc.organizacao.model.Perfil.GESTOR);
+                gestor.setPerfilAtivo(Perfil.GESTOR);
                 gestor.setUnidadeAtivaCodigo(6L);
-                gestor.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.GESTOR.toGrantedAuthority()));
+                gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
 
                 chefe = usuarioService.buscarPorLogin("333333333333");
-                chefe.setPerfilAtivo(sgc.organizacao.model.Perfil.CHEFE);
+                chefe.setPerfilAtivo(Perfil.CHEFE);
                 chefe.setUnidadeAtivaCodigo(9L);
-                chefe.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.CHEFE.toGrantedAuthority()));
+                chefe.setAuthorities(Set.of(Perfil.CHEFE.toGrantedAuthority()));
 
                 unidadeChefe = unidadeRepo.findById(9L).orElseThrow();
 

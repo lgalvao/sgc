@@ -18,6 +18,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import sgc.comum.repo.ComumRepo;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.*;
 class CopiaMapaServiceTest {
 
     @Mock
-    private sgc.comum.repo.ComumRepo repo;
+    private ComumRepo repo;
     @Mock
     private MapaRepo mapaRepo;
     @Mock

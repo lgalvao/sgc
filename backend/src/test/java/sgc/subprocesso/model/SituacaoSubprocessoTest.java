@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 import sgc.processo.model.TipoProcesso;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @DisplayName("SituacaoSubprocesso - Teste de Transições")
 class SituacaoSubprocessoTest {
@@ -180,6 +181,6 @@ class SituacaoSubprocessoTest {
     }
 
     private boolean invocarPodeIniciar(SituacaoSubprocesso target, SituacaoSubprocesso nova, TipoProcesso tipo) {
-        return (boolean) org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "podeIniciar", nova, tipo);
+        return (boolean) ReflectionTestUtils.invokeMethod(target, "podeIniciar", nova, tipo);
     }
 }

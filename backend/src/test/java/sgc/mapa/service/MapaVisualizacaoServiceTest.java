@@ -20,6 +20,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import sgc.mapa.model.Conhecimento;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -98,7 +99,7 @@ class MapaVisualizacaoServiceTest {
         ativ.setCodigo(1L);
         ativ.setDescricao("A1");
         
-        sgc.mapa.model.Conhecimento k = sgc.mapa.model.Conhecimento.builder()
+        Conhecimento k = Conhecimento.builder()
                 .codigo(100L)
                 .descricao("K1")
                 .build();

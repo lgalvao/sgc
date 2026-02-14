@@ -40,6 +40,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.time.Duration;
+import org.awaitility.Awaitility;
+import sgc.notificacao.NotificacaoEmailService;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -66,7 +69,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     private EntityManager entityManager;
 
     @MockitoBean
-    private sgc.notificacao.NotificacaoEmailService notificacaoEmailService;
+    private NotificacaoEmailService notificacaoEmailService;
 
     private final Long SP_CODIGO = 60000L; // SEDESENV (Unidade 8) no data.sql
 
@@ -154,8 +157,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         // 13. Criação de Alerta para Unidade Superior (Async)
         final Long processoCodigo = spEtapa3.getProcesso().getCodigo();
-        org.awaitility.Awaitility.await()
-                .atMost(java.time.Duration.ofSeconds(5))
+        Awaitility.await()
+                .atMost(Duration.ofSeconds(5))
                 .untilAsserted(() -> {
                     var alertas = alertaRepo.findByProcessoCodigo(processoCodigo);
                     assertThat(alertas.stream().anyMatch(a -> a.getUnidadeDestino() != null && a.getUnidadeDestino().getCodigo() == 6L)).isTrue();

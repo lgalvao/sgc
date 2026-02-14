@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import sgc.organizacao.model.SituacaoUnidade;
 
 @Tag("unit")
 @DisplayName("Modelos - Cobertura de Casos de Borda")
@@ -43,14 +44,14 @@ class ModelCoverageTest {
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
         u1.setSigla("U1");
-        u1.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+        u1.setSituacao(SituacaoUnidade.ATIVA);
         u1.setMatriculaTitular("1234");
         u1.setTituloTitular("123456");
         
         Unidade u2 = new Unidade();
         u2.setCodigo(2L);
         u2.setSigla("U2");
-        u2.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+        u2.setSituacao(SituacaoUnidade.ATIVA);
         u2.setMatriculaTitular("5678");
         u2.setTituloTitular("789012");
 

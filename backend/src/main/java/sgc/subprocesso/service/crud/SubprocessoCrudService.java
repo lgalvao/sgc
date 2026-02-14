@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+import java.util.Map;
 
 /**
  * Serviço especializado para operações CRUD básicas de Subprocesso.
@@ -129,7 +130,7 @@ public class SubprocessoCrudService {
     @Transactional(readOnly = true)
     public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
         // Substituído por repo.buscar para centralizar tratamento de exceção (evitar explicit throw)
-        java.util.Map<String, Object> filtros = java.util.Map.of(
+        Map<String, Object> filtros = Map.of(
                 "processo.codigo", codProcesso,
                 "unidade.codigo", codUnidade
         );

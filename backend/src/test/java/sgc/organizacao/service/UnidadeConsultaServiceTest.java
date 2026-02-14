@@ -17,6 +17,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+import sgc.comum.repo.ComumRepo;
 
 /**
  * Testes unitários para {@link UnidadeConsultaService}.
@@ -32,7 +33,7 @@ class UnidadeConsultaServiceTest {
     private UnidadeRepo unidadeRepo;
 
     @Mock
-    private sgc.comum.repo.ComumRepo repo;
+    private ComumRepo repo;
 
     @InjectMocks
     private UnidadeConsultaService service;

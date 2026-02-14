@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Assertions;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -218,7 +219,7 @@ class AnaliseFacadeTest {
                     .siglaUnidade(null)
                     .build();
 
-            org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            Assertions.assertThrows(IllegalArgumentException.class, () -> {
                 facade.criarAnalise(subprocesso, command);
             });
         }

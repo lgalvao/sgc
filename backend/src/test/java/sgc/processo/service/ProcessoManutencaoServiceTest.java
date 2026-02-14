@@ -25,6 +25,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import java.util.ArrayList;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -77,7 +78,7 @@ class ProcessoManutencaoServiceTest {
             // Adiciona um participante ao mock para cobrir a lambda do log (linha 70)
             UnidadeProcesso up = new UnidadeProcesso();
             up.setId(new UnidadeProcessoId(100L, 1L));
-            processoSalvo.setParticipantes(new java.util.ArrayList<>(java.util.List.of(up)));
+            processoSalvo.setParticipantes(new ArrayList<>(List.of(up)));
             
             when(processoRepo.saveAndFlush(any(Processo.class))).thenReturn(processoSalvo);
 

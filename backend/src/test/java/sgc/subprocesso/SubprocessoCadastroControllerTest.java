@@ -34,6 +34,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mockito;
+import sgc.comum.erros.ErroAutenticacao;
 
 @WebMvcTest(SubprocessoCadastroController.class)
 @Import(RestExceptionHandler.class)
@@ -442,12 +446,12 @@ class SubprocessoCadastroControllerTest {
         private AnaliseMapper analiseMapperMock;
         private UsuarioFacade usuarioServiceMock;
 
-        @org.junit.jupiter.api.BeforeEach
+        @BeforeEach
         void setUp() {
-            subprocessoFacadeMock = org.mockito.Mockito.mock(SubprocessoFacade.class);
-            analiseFacadeMock = org.mockito.Mockito.mock(AnaliseFacade.class);
-            analiseMapperMock = org.mockito.Mockito.mock(AnaliseMapper.class);
-            usuarioServiceMock = org.mockito.Mockito.mock(UsuarioFacade.class);
+            subprocessoFacadeMock = Mockito.mock(SubprocessoFacade.class);
+            analiseFacadeMock = Mockito.mock(AnaliseFacade.class);
+            analiseMapperMock = Mockito.mock(AnaliseMapper.class);
+            usuarioServiceMock = Mockito.mock(UsuarioFacade.class);
 
             controller = new SubprocessoCadastroController(
                 subprocessoFacadeMock,
@@ -465,7 +469,7 @@ class SubprocessoCadastroControllerTest {
 
             when(usuarioServiceMock.extrairTituloUsuario(principal)).thenReturn(null);
 
-            org.junit.jupiter.api.Assertions.assertThrows(sgc.comum.erros.ErroAutenticacao.class, 
+            Assertions.assertThrows(ErroAutenticacao.class, 
                 () -> controller.disponibilizarCadastro(codigo, principal));
         }
     }

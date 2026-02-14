@@ -1,6 +1,9 @@
 package sgc.comum.config;
 
 import org.mapstruct.MapperConfig;
+import org.mapstruct.NullValueMappingStrategy;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.ReportingPolicy;
 
 /**
  * Configuração central para mappers MapStruct.
@@ -15,9 +18,9 @@ import org.mapstruct.MapperConfig;
  */
 @MapperConfig(
     componentModel = "spring",
-    nullValueMappingStrategy = org.mapstruct.NullValueMappingStrategy.RETURN_DEFAULT,
-    nullValuePropertyMappingStrategy = org.mapstruct.NullValuePropertyMappingStrategy.IGNORE,
-    unmappedTargetPolicy = org.mapstruct.ReportingPolicy.ERROR
+    nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+    unmappedTargetPolicy = ReportingPolicy.ERROR
 )
 public interface CentralMapperConfig {
 }

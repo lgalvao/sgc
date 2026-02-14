@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.time.LocalDateTime;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -153,8 +154,8 @@ class SubprocessoDetalheMapperTest {
         @Test
         @DisplayName("Deve cobrir branches de mapPrazoEtapaAtual")
         void deveCobrirMapPrazoEtapaAtual() {
-            java.time.LocalDateTime d1 = java.time.LocalDateTime.now();
-            java.time.LocalDateTime d2 = d1.plusDays(1);
+            LocalDateTime d1 = LocalDateTime.now();
+            LocalDateTime d2 = d1.plusDays(1);
 
             Subprocesso sp = new Subprocesso();
             sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);

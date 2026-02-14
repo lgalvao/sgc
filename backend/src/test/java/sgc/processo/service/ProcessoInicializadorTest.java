@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import java.util.ArrayList;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -97,7 +98,7 @@ class ProcessoInicializadorTest {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
-        p.setParticipantes(new java.util.ArrayList<>());
+        p.setParticipantes(new ArrayList<>());
         when(repo.buscar(Processo.class, 1L)).thenReturn(p);
 
         Usuario usuario = new Usuario();

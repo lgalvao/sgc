@@ -32,6 +32,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import sgc.organizacao.model.Perfil;
 
 @Tag("integration")
 @SpringBootTest
@@ -95,10 +96,10 @@ class SubprocessoServiceActionsTest {
         // Simula a lógica do FiltroJwt definindo o perfil ativo
         // Para estes testes, Ricardo (6) é ADMIN e Gestor COSIS (666666666666) é GESTOR na Unidade 6
         if ("6".equals(titulo)) {
-            usuario.setPerfilAtivo(sgc.organizacao.model.Perfil.ADMIN);
+            usuario.setPerfilAtivo(Perfil.ADMIN);
             usuario.setUnidadeAtivaCodigo(2L); // Unidade TRE/STIC (Ricardo é lotado na 2)
         } else {
-            usuario.setPerfilAtivo(sgc.organizacao.model.Perfil.GESTOR);
+            usuario.setPerfilAtivo(Perfil.GESTOR);
             usuario.setUnidadeAtivaCodigo(6L); // Unidade COSIS (Conforme data.sql)
         }
         

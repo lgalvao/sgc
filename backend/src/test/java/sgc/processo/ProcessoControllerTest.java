@@ -33,6 +33,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import java.time.LocalDate;
+import org.junit.jupiter.api.Nested;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 @WebMvcTest(ProcessoController.class)
 @Import(RestExceptionHandler.class)
@@ -851,7 +855,7 @@ class ProcessoControllerTest {
             var request = new AcaoEmBlocoRequest(
                     List.of(10L, 20L), 
                     AcaoProcesso.ACEITAR, 
-                    java.time.LocalDate.now());
+                    LocalDate.now());
             doNothing().when(processoFacade).executarAcaoEmBloco(1L, request);
 
             // Act & Assert
@@ -873,7 +877,7 @@ class ProcessoControllerTest {
             var request = new AcaoEmBlocoRequest(
                     List.of(10L), 
                     AcaoProcesso.HOMOLOGAR, 
-                    java.time.LocalDate.now());
+                    LocalDate.now());
             doThrow(new ErroAcessoNegado("Sem permissão"))
                     .when(processoFacade).executarAcaoEmBloco(1L, request);
 
@@ -894,7 +898,7 @@ class ProcessoControllerTest {
             var request = new AcaoEmBlocoRequest(
                     List.of(), 
                     AcaoProcesso.ACEITAR, 
-                    java.time.LocalDate.now());
+                    LocalDate.now());
 
             // Act & Assert
             mockMvc.perform(
@@ -905,7 +909,7 @@ class ProcessoControllerTest {
                     .andExpect(status().isBadRequest());
         }
     }
-    @org.junit.jupiter.api.Nested
+    @Nested
     @DisplayName("Cobertura Extra")
     class CoberturaExtra {
         
@@ -926,17 +930,17 @@ class ProcessoControllerTest {
             when(processoFacadeMock.iniciarProcessoMapeamento(anyLong(), anyList()))
                 .thenReturn(List.of("erro"));
 
-            org.springframework.http.ResponseEntity<Object> response = controller.iniciar(1L, req);
-            assertEquals(org.springframework.http.HttpStatus.BAD_REQUEST, response.getStatusCode());
+            ResponseEntity<Object> response = controller.iniciar(1L, req);
+            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         }
 
         @Test
         @DisplayName("executarAcaoEmBloco chama facade e retorna 200")
         void executarAcaoEmBloco_Sucesso() {
             Long codigo = 1L;
-            AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(10L), AcaoProcesso.ACEITAR, java.time.LocalDate.now());
+            AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(10L), AcaoProcesso.ACEITAR, LocalDate.now());
 
-            org.springframework.http.ResponseEntity<Void> response = controller.executarAcaoEmBloco(codigo, req);
+            ResponseEntity<Void> response = controller.executarAcaoEmBloco(codigo, req);
 
             verify(processoFacadeMock).executarAcaoEmBloco(codigo, req);
             assertEquals(200, response.getStatusCode().value());

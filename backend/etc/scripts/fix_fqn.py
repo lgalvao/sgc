@@ -15,7 +15,9 @@ STATIC_PREFIX = "static "
 # THEN a Class part (Uppercase start)
 MATCH_PTRN = re.compile(r'("[^"]*")|(\b([a-z]\w*(?:\.[a-z]\w*)+)\.([A-Z]\w*)\b)')
 
-def should_ignore_fqn(package_part):
+def should_ignore_fqn(package_part, class_part):
+    if class_part == "Assertions":
+        return True
     return package_part == "java.lang"
 
 def parse_imports(lines):
@@ -79,7 +81,7 @@ def determine_replacement(match, current_package, existing_imports, new_imports_
     # Logic to decide if we should replace
     var = False
     
-    if should_ignore_fqn(pkg):
+    if should_ignore_fqn(pkg, cls):
          should_replace = True
     elif current_package and pkg == current_package:
          should_replace = True

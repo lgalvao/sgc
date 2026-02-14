@@ -36,6 +36,9 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import java.util.ArrayList;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Nested;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -79,7 +82,7 @@ class EventoProcessoListenerTest {
         p.setCodigo(codigo);
         p.setDescricao("Processo " + codigo);
         p.setTipo(TipoProcesso.MAPEAMENTO);
-        p.setParticipantes(new java.util.ArrayList<>());
+        p.setParticipantes(new ArrayList<>());
         return p;
     }
 
@@ -312,7 +315,7 @@ class EventoProcessoListenerTest {
     @DisplayName("Deve ignorar se participantes for vazio ao finalizar")
     void deveLogarWarningSeParticipantesVazio() {
         Processo p = criarProcesso(1L);
-        p.setParticipantes(new java.util.ArrayList<>());
+        p.setParticipantes(new ArrayList<>());
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
 
         listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build());
@@ -612,7 +615,7 @@ class EventoProcessoListenerTest {
         // Isso cobre u.getUnidadeSuperior() == null E u.getUnidadeSuperior().getCodigo() != unidade.getCodigo()
         verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
     }
-    @org.junit.jupiter.api.Nested
+    @Nested
     @DisplayName("Cobertura Extra Isolada")
     class CoberturaExtra {
         
@@ -692,7 +695,7 @@ class EventoProcessoListenerTest {
             // Retornar null para usuários vai causar NPE no enviarEmailParaSubstituto
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(null);
             
-            org.assertj.core.api.Assertions.assertThatCode(() -> listener.aoIniciarProcesso(evento)).doesNotThrowAnyException();
+            Assertions.assertThatCode(() -> listener.aoIniciarProcesso(evento)).doesNotThrowAnyException();
         }
 
         @Test
@@ -702,7 +705,7 @@ class EventoProcessoListenerTest {
             // e marcado como coberto, já que ao chamar via aoIniciarProcesso
             // a exceção pode estar sendo capturada por um catch superior se não for cuidadoso.
             
-            org.assertj.core.api.Assertions.assertThatCode(() -> 
+            Assertions.assertThatCode(() -> 
                 listener.enviarEmailParaSubstituto("TIT", null, "assunto", "corpo", "unidade")
             ).doesNotThrowAnyException();
         }
@@ -784,7 +787,7 @@ class EventoProcessoListenerTest {
 
             when(processoFacade.buscarEntidadePorId(codProcesso)).thenThrow(new RuntimeException("Erro inesperado"));
 
-            org.assertj.core.api.Assertions.assertThatCode(() -> listener.aoFinalizarProcesso(evento)).doesNotThrowAnyException();
+            Assertions.assertThatCode(() -> listener.aoFinalizarProcesso(evento)).doesNotThrowAnyException();
         }
 
         @Test
@@ -792,7 +795,7 @@ class EventoProcessoListenerTest {
         void criarCorpoEmailPorTipo_Erro() {
             Processo p = new Processo();
             Subprocesso s = new Subprocesso();
-            org.assertj.core.api.Assertions.assertThatThrownBy(() -> 
+            Assertions.assertThatThrownBy(() -> 
                 listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, p, s)
             ).isInstanceOf(IllegalArgumentException.class);
         }

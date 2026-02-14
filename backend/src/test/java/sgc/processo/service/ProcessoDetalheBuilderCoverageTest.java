@@ -20,6 +20,12 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -42,8 +48,8 @@ class ProcessoDetalheBuilderCoverageTest {
         // Arrange
         Processo processo = new Processo();
         processo.setCodigo(1L);
-        processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
-        processo.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
         
         UnidadeProcesso participante = new UnidadeProcesso();
         participante.setUnidadeCodigo(100L);
@@ -69,21 +75,21 @@ class ProcessoDetalheBuilderCoverageTest {
         Long codProcesso = 1L;
         Processo processo = new Processo();
         processo.setCodigo(codProcesso);
-        processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
-        processo.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
         
         UnidadeProcesso participante = new UnidadeProcesso();
         participante.setUnidadeCodigo(100L);
         processo.setParticipantes(List.of(participante));
 
-        sgc.organizacao.model.Unidade unidade = new sgc.organizacao.model.Unidade();
+        Unidade unidade = new Unidade();
         unidade.setCodigo(100L);
 
-        sgc.subprocesso.model.Subprocesso sp = new sgc.subprocesso.model.Subprocesso();
+        Subprocesso sp = new Subprocesso();
         sp.setCodigo(500L);
         sp.setUnidade(unidade);
-        sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        sp.setMapa(sgc.mapa.model.Mapa.builder().codigo(900L).build());
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setMapa(Mapa.builder().codigo(900L).build());
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
         
@@ -107,17 +113,17 @@ class ProcessoDetalheBuilderCoverageTest {
         Long codProcesso = 1L;
         Processo processo = new Processo();
         processo.setCodigo(codProcesso);
-        processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
-        processo.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
         
         UnidadeProcesso participante = new UnidadeProcesso();
         participante.setUnidadeCodigo(100L);
         processo.setParticipantes(List.of(participante));
 
-        sgc.organizacao.model.Unidade unidade = new sgc.organizacao.model.Unidade();
+        Unidade unidade = new Unidade();
         unidade.setCodigo(100L);
 
-        sgc.subprocesso.model.Subprocesso sp = new sgc.subprocesso.model.Subprocesso();
+        Subprocesso sp = new Subprocesso();
         sp.setUnidade(unidade);
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
@@ -137,8 +143,8 @@ class ProcessoDetalheBuilderCoverageTest {
         Long codProcesso = 1L;
         Processo processo = new Processo();
         processo.setCodigo(codProcesso);
-        processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
-        processo.setTipo(sgc.processo.model.TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
         
         UnidadeProcesso participante = new UnidadeProcesso();
         participante.setUnidadeCodigo(100L);

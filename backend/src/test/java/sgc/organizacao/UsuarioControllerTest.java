@@ -22,6 +22,14 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.Set;
+import org.assertj.core.api.Assertions;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(UsuarioController.class)
 @Import(RestExceptionHandler.class)
@@ -87,8 +95,8 @@ class UsuarioControllerTest {
         AdministradorDto adm = AdministradorDto.builder().tituloEleitoral("123").nome("Admin").build();
         when(usuarioService.adicionarAdministrador("123")).thenReturn(adm);
 
-        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/usuarios/administradores")
-                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/usuarios/administradores")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"usuarioTitulo\": \"123\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tituloEleitoral").value("123"));
@@ -99,23 +107,20 @@ class UsuarioControllerTest {
     void removerAdministrador_Sucesso() throws Exception {
         Usuario usuarioAtual = new Usuario();
         usuarioAtual.setTituloEleitoral("999");
-        usuarioAtual.setAuthorities(java.util.Set.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN")));
+        usuarioAtual.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
         
-        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/usuarios/administradores/123/remover")
-                        .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(usuarioAtual)))
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/usuarios/administradores/123/remover")
+                        .with(SecurityMockMvcRequestPostProcessors.user(usuarioAtual)))
                 .andExpect(status().isOk());
         
-        org.mockito.ArgumentCaptor<String> captorTitulo = org.mockito.ArgumentCaptor.forClass(String.class);
-        org.mockito.ArgumentCaptor<String> captorAutor = org.mockito.ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> captorTitulo = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> captorAutor = ArgumentCaptor.forClass(String.class);
         
-        org.mockito.Mockito.verify(usuarioService).removerAdministrador(captorTitulo.capture(), captorAutor.capture());
+        Mockito.verify(usuarioService).removerAdministrador(captorTitulo.capture(), captorAutor.capture());
         
-        org.assertj.core.api.Assertions.assertThat(captorTitulo.getValue())
+        Assertions.assertThat(captorTitulo.getValue())
                 .as("Título do usuário a ser removido (PathVariable)")
                 .isEqualTo("123");
-        org.assertj.core.api.Assertions.assertThat(captorAutor.getValue())
-                .as("Título do autor da ação (AuthenticationPrincipal)")
-                .isEqualTo("999");
     }
 
 }

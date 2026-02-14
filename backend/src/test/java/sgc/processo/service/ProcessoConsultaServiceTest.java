@@ -24,6 +24,13 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import sgc.comum.repo.ComumRepo;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -37,7 +44,7 @@ class ProcessoConsultaServiceTest {
     private ProcessoRepo processoRepo;
 
     @Mock
-    private sgc.comum.repo.ComumRepo repo;
+    private ComumRepo repo;
 
     @Mock
     private ConsultasSubprocessoService queryService;
@@ -51,8 +58,8 @@ class ProcessoConsultaServiceTest {
     @Test
     @DisplayName("Deve buscar processo por ID")
     void deveBuscarProcessoCodigo() {
-        sgc.processo.model.Processo p = new sgc.processo.model.Processo();
-        when(repo.buscar(sgc.processo.model.Processo.class, 1L)).thenReturn(p);
+        Processo p = new Processo();
+        when(repo.buscar(Processo.class, 1L)).thenReturn(p);
         assertThat(processoConsultaService.buscarProcessoCodigo(1L)).isEqualTo(p);
     }
 
@@ -126,11 +133,11 @@ class ProcessoConsultaServiceTest {
     void deveListarParaAdmin() {
         Usuario admin = Usuario.builder()
                 .tituloEleitoral("admin")
-                .perfilAtivo(sgc.organizacao.model.Perfil.ADMIN)
+                .perfilAtivo(Perfil.ADMIN)
                 .build();
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(admin);
 
-        Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).unidade(sgc.organizacao.model.Unidade.builder().nome("U1").sigla("S1").build()).build();
+        Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).unidade(Unidade.builder().nome("U1").sigla("S1").build()).build();
         s1.setCodigo(1L);
 
         when(queryService.listarPorProcessoESituacoes(eq(1L), anyList())).thenReturn(List.of(s1));
@@ -147,12 +154,12 @@ class ProcessoConsultaServiceTest {
     void deveListarParaUsuarioComum() {
         Usuario user = Usuario.builder()
                 .tituloEleitoral("user")
-                .perfilAtivo(sgc.organizacao.model.Perfil.GESTOR)
+                .perfilAtivo(Perfil.GESTOR)
                 .unidadeAtivaCodigo(100L)
                 .build();
         when(usuarioService.obterUsuarioAutenticado()).thenReturn(user);
 
-        sgc.organizacao.model.Unidade u1 = sgc.organizacao.model.Unidade.builder().nome("U1").sigla("S1").build();
+        Unidade u1 = Unidade.builder().nome("U1").sigla("S1").build();
         u1.setCodigo(100L);
 
         Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(u1).build();
@@ -181,7 +188,7 @@ class ProcessoConsultaServiceTest {
         when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
 
         // Act
-        List<sgc.processo.model.Processo> resultado = processoConsultaService.processosAndamento();
+        List<Processo> resultado = processoConsultaService.processosAndamento();
 
         // Assert
         assertThat(resultado).isEmpty();
@@ -196,7 +203,7 @@ class ProcessoConsultaServiceTest {
                 .thenReturn(List.of());
 
         // Act
-        List<sgc.processo.model.Processo> resultado = processoConsultaService.processosFinalizados();
+        List<Processo> resultado = processoConsultaService.processosFinalizados();
 
         // Assert
         assertThat(resultado).isEmpty();
@@ -206,20 +213,20 @@ class ProcessoConsultaServiceTest {
     @Test
     @DisplayName("Deve retornar Optional de processo por código")
     void deveBuscarProcessoCodigoOpt() {
-        sgc.processo.model.Processo p = new sgc.processo.model.Processo();
-        when(processoRepo.findById(1L)).thenReturn(java.util.Optional.of(p));
+        Processo p = new Processo();
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         
-        java.util.Optional<sgc.processo.model.Processo> res = processoConsultaService.buscarProcessoCodigoOpt(1L);
+        Optional<Processo> res = processoConsultaService.buscarProcessoCodigoOpt(1L);
         assertThat(res).isPresent().contains(p);
     }
 
     @Test
     @DisplayName("Deve buscar processos paginados")
     void deveListarProcessosPaginados() {
-        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.Pageable.unpaged();
-        when(processoRepo.findAll(pageable)).thenReturn(org.springframework.data.domain.Page.empty());
+        Pageable pageable = Pageable.unpaged();
+        when(processoRepo.findAll(pageable)).thenReturn(Page.empty());
         
-        org.springframework.data.domain.Page<sgc.processo.model.Processo> res = processoConsultaService.processos(pageable);
+        Page<Processo> res = processoConsultaService.processos(pageable);
         assertThat(res).isEmpty();
     }
 
@@ -227,11 +234,11 @@ class ProcessoConsultaServiceTest {
     @DisplayName("Deve buscar processos iniciados por participantes")
     void deveBuscarProcessosIniciadosPorParticipantes() {
         List<Long> unidadeIds = List.of(1L);
-        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.Pageable.unpaged();
+        Pageable pageable = Pageable.unpaged();
         when(processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(unidadeIds, SituacaoProcesso.CRIADO, pageable))
-                .thenReturn(org.springframework.data.domain.Page.empty());
+                .thenReturn(Page.empty());
 
-        org.springframework.data.domain.Page<sgc.processo.model.Processo> res = processoConsultaService.processosIniciadosPorParticipantes(unidadeIds, pageable);
+        Page<Processo> res = processoConsultaService.processosIniciadosPorParticipantes(unidadeIds, pageable);
         assertThat(res).isEmpty();
     }
 }

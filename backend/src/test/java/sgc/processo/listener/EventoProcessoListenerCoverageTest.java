@@ -27,6 +27,7 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import sgc.processo.model.UnidadeProcesso;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -64,9 +65,9 @@ class EventoProcessoListenerCoverageTest {
         processo.setCodigo(codProcesso);
         processo.setDescricao("Processo Teste");
         
-        sgc.processo.model.UnidadeProcesso up1 = new sgc.processo.model.UnidadeProcesso();
+        UnidadeProcesso up1 = new UnidadeProcesso();
         up1.setUnidadeCodigo(10L);
-        sgc.processo.model.UnidadeProcesso up2 = new sgc.processo.model.UnidadeProcesso();
+        UnidadeProcesso up2 = new UnidadeProcesso();
         up2.setUnidadeCodigo(1L);
         processo.setParticipantes(List.of(up1, up2));
 

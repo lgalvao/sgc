@@ -45,6 +45,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.Set;
+import sgc.organizacao.model.Perfil;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -154,9 +156,9 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
     void devolverCadastro_deveFuncionarCorretamente() throws Exception {
         // Given
         Usuario gestor = usuarioRepo.findById("132313231323").orElseThrow();
-        gestor.setPerfilAtivo(sgc.organizacao.model.Perfil.GESTOR);
+        gestor.setPerfilAtivo(Perfil.GESTOR);
         gestor.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo());
-        gestor.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.GESTOR.toGrantedAuthority()));
+        gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
 
         String observacoes = "Favor revisar a atividade X e Y.";
         DevolverCadastroRequest requestBody = new DevolverCadastroRequest(observacoes);
@@ -203,9 +205,9 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve aceitar cadastro, registrar análise e mover para unidade superior")
     void aceitarCadastro_deveFuncionarCorretamente() throws Exception {
         Usuario gestor = usuarioRepo.findById("132313231323").orElseThrow();
-        gestor.setPerfilAtivo(sgc.organizacao.model.Perfil.GESTOR);
+        gestor.setPerfilAtivo(Perfil.GESTOR);
         gestor.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo());
-        gestor.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.GESTOR.toGrantedAuthority()));
+        gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
 
         String observacoes = "Cadastro parece OK.";
         AceitarCadastroRequest requestBody = new AceitarCadastroRequest(observacoes);
@@ -247,9 +249,9 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve homologar cadastro, alterar situação e registrar movimentação da ADMIN")
     void homologarCadastro_deveFuncionarCorretamente() throws Exception {
         Usuario admin = usuarioRepo.findById("101010101010").orElseThrow();
-        admin.setPerfilAtivo(sgc.organizacao.model.Perfil.ADMIN);
+        admin.setPerfilAtivo(Perfil.ADMIN);
         admin.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo()); // Or default admin unit
-        admin.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.ADMIN.toGrantedAuthority()));
+        admin.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
  
         HomologarCadastroRequest requestBody = new HomologarCadastroRequest("Homologado via teste.");
  
@@ -286,9 +288,9 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve retornar o histórico de devoluções e aceites ordenado")
     void getHistorico_deveRetornarAcoesOrdenadas() throws Exception {
         Usuario gestor = usuarioRepo.findById("132313231323").orElseThrow();
-        gestor.setPerfilAtivo(sgc.organizacao.model.Perfil.GESTOR);
+        gestor.setPerfilAtivo(Perfil.GESTOR);
         gestor.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo());
-        gestor.setAuthorities(java.util.Set.of(sgc.organizacao.model.Perfil.GESTOR.toGrantedAuthority()));
+        gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
 
         String obsDevolucao = "Falta atividade Z";
         DevolverCadastroRequest devolverReq = new DevolverCadastroRequest(obsDevolucao);

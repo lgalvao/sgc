@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Component;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import java.util.Map;
 
 /**
  * Componente centralizado para busca de entidades usando Hibernate/EntityManager.
@@ -61,7 +62,7 @@ public class ComumRepo {
      * @return A entidade encontrada
      * @throws ErroEntidadeNaoEncontrada se a entidade não existir ou não atender aos critérios
      */
-    public <T> T buscar(Class<T> classe, java.util.Map<String, Object> filtros) {
+    public <T> T buscar(Class<T> classe, Map<String, Object> filtros) {
         StringBuilder jpql = new StringBuilder("SELECT e FROM " + classe.getSimpleName() + " e WHERE 1=1");
         filtros.keySet().forEach(campo -> jpql.append(" AND e.").append(campo).append(" = :").append(campo.replace(".", "_")));
         

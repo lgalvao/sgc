@@ -9,13 +9,14 @@ import sgc.organizacao.model.UnidadeRepo;
 
 import java.util.List;
 import java.util.Map;
+import sgc.comum.repo.ComumRepo;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UnidadeConsultaService {
     private final UnidadeRepo unidadeRepo;
-    private final sgc.comum.repo.ComumRepo repo;
+    private final ComumRepo repo;
 
     public Unidade buscarPorId(Long codigo) {
         return repo.buscar(Unidade.class, Map.of("codigo", codigo, "situacao", SituacaoUnidade.ATIVA));

@@ -31,6 +31,9 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import sgc.organizacao.model.Usuario;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
@@ -156,10 +159,10 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         // Also update the Authentication in the SecurityContext to reflect this new unit
         // because the AccessPolicy uses usuario.getUnidadeAtivaCodigo() from the Principal.
         // The Principal was created by @WithMockChefe with a default (or old) unit.
-        org.springframework.security.core.Authentication auth =
-                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        Authentication auth =
+                SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth != null && auth.getPrincipal() instanceof sgc.organizacao.model.Usuario usuario) {
+        if (auth != null && auth.getPrincipal() instanceof Usuario usuario) {
             usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
         }
     }

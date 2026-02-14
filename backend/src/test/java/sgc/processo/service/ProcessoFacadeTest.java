@@ -45,6 +45,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import sgc.fixture.ProcessoFixture;
+import sgc.fixture.SubprocessoFixture;
+import sgc.fixture.UnidadeFixture;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
@@ -341,9 +344,9 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve enviar lembrete com sucesso")
         void deveEnviarLembrete() {
-            Processo p = sgc.fixture.ProcessoFixture.processoEmAndamento();
+            Processo p = ProcessoFixture.processoEmAndamento();
             p.setCodigo(1L);
-            Unidade u = sgc.fixture.UnidadeFixture.unidadeComId(10L);
+            Unidade u = UnidadeFixture.unidadeComId(10L);
             p.adicionarParticipantes(Set.of(u));
 
             when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
@@ -361,17 +364,17 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve falhar ao enviar lembrete se unidade nao participa")
         void deveFalharEnviarLembreteUnidadeNaoParticipa() {
-            Processo p = sgc.fixture.ProcessoFixture.processoEmAndamento();
+            Processo p = ProcessoFixture.processoEmAndamento();
             p.setCodigo(1L);
-            Unidade u = sgc.fixture.UnidadeFixture.unidadeComId(10L);
-            Unidade outra = sgc.fixture.UnidadeFixture.unidadeComId(20L);
+            Unidade u = UnidadeFixture.unidadeComId(10L);
+            Unidade outra = UnidadeFixture.unidadeComId(20L);
             p.adicionarParticipantes(Set.of(outra));
 
             when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
 
             assertThatThrownBy(() -> processoFacade.enviarLembrete(1L, 10L))
-                    .isInstanceOf(sgc.processo.erros.ErroProcesso.class)
+                    .isInstanceOf(ErroProcesso.class)
                     .hasMessageContaining("não participa");
         }
     }
@@ -444,7 +447,7 @@ class ProcessoFacadeTest {
         void deveAtualizarProcessoQuandoEmSituacaoCriado() {
             // Arrange
             Long id = 100L;
-            Processo processo = sgc.fixture.ProcessoFixture.processoPadrao();
+            Processo processo = ProcessoFixture.processoPadrao();
             processo.setCodigo(id);
 
             AtualizarProcessoRequest req = AtualizarProcessoRequest.builder()
@@ -552,7 +555,7 @@ class ProcessoFacadeTest {
             // Arrange
             Usuario usuario = criarUsuarioMock();
             Long id = 100L;
-            Processo processo = sgc.fixture.ProcessoFixture.processoPadrao();
+            Processo processo = ProcessoFixture.processoPadrao();
             when(processoConsultaService.buscarProcessoCodigo(id)).thenReturn(processo);
             when(processoDetalheBuilder.build(eq(processo), any(Usuario.class))).thenReturn(new ProcessoDetalheDto());
 
@@ -576,7 +579,7 @@ class ProcessoFacadeTest {
         @DisplayName("Deve buscar entidade por ID")
         void deveBuscarEntidadePorId() {
             Long id = 100L;
-            Processo processo = sgc.fixture.ProcessoFixture.processoPadrao();
+            Processo processo = ProcessoFixture.processoPadrao();
             when(processoConsultaService.buscarProcessoCodigo(id)).thenReturn(processo);
 
             Processo res = processoFacade.buscarEntidadePorId(id);
@@ -595,7 +598,7 @@ class ProcessoFacadeTest {
         @DisplayName("Deve obter processo por ID (Optional)")
         void deveObterPorIdOptional() {
             Long id = 100L;
-            Processo processo = sgc.fixture.ProcessoFixture.processoPadrao();
+            Processo processo = ProcessoFixture.processoPadrao();
             when(processoConsultaService.buscarProcessoCodigoOpt(id)).thenReturn(Optional.of(processo));
             when(processoMapper.toDto(processo)).thenReturn(ProcessoDto.builder().build());
 
@@ -619,7 +622,7 @@ class ProcessoFacadeTest {
         @DisplayName("Deve obter DTO de processo por ID")
         void deveObterDtoPorId() {
             Long id = 100L;
-            Processo processo = sgc.fixture.ProcessoFixture.processoPadrao();
+            Processo processo = ProcessoFixture.processoPadrao();
             when(processoConsultaService.buscarProcessoCodigo(id)).thenReturn(processo);
             when(processoMapper.toDto(processo)).thenReturn(ProcessoDto.builder().build());
 
@@ -632,9 +635,9 @@ class ProcessoFacadeTest {
         void deveListarProcessosFinalizadosEAtivos() {
             // Arrange
             when(processoConsultaService.processosFinalizados())
-                    .thenReturn(List.of(sgc.fixture.ProcessoFixture.processoPadrao()));
+                    .thenReturn(List.of(ProcessoFixture.processoPadrao()));
             when(processoConsultaService.processosAndamento())
-                    .thenReturn(List.of(sgc.fixture.ProcessoFixture.processoPadrao()));
+                    .thenReturn(List.of(ProcessoFixture.processoPadrao()));
             when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
 
             // Act & Assert
@@ -670,7 +673,7 @@ class ProcessoFacadeTest {
         @DisplayName("Deve listar todos subprocessos")
         void deveListarTodosSubprocessos() {
             when(subprocessoFacade.listarEntidadesPorProcesso(100L))
-                    .thenReturn(List.of(sgc.fixture.SubprocessoFixture.subprocessoPadrao(null, null)));
+                    .thenReturn(List.of(SubprocessoFixture.subprocessoPadrao(null, null)));
             when(subprocessoMapper.toDto(any())).thenReturn(SubprocessoDto.builder().build());
 
             var res = processoFacade.listarTodosSubprocessos(100L);
@@ -751,7 +754,7 @@ class ProcessoFacadeTest {
             // Arrange
             Usuario usuario = criarUsuarioMock();
             Long id = 100L;
-            Processo processo = sgc.fixture.ProcessoFixture.processoPadrao();
+            Processo processo = ProcessoFixture.processoPadrao();
             ProcessoDetalheDto detalhes = ProcessoDetalheDto.builder().build();
 
             when(processoConsultaService.buscarProcessoCodigo(id)).thenReturn(processo);

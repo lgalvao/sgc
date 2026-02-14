@@ -23,6 +23,8 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Nested;
+import sgc.comum.repo.ComumRepo;
 
 @ExtendWith(MockitoExtension.class)
 class ImpactoMapaServiceTest {
@@ -30,7 +32,7 @@ class ImpactoMapaServiceTest {
     @Mock private CompetenciaRepo competenciaRepo;
     @Mock private MapaManutencaoService mapaManutencaoService;
     @Mock private AccessControlService accessControlService;
-    @Mock private sgc.comum.repo.ComumRepo repo;
+    @Mock private ComumRepo repo;
 
     @InjectMocks
     private ImpactoMapaService impactoMapaService;
@@ -272,7 +274,7 @@ class ImpactoMapaServiceTest {
                 .build();
     }
 
-    @org.junit.jupiter.api.Nested
+    @Nested
     @DisplayName("Cobertura Extra")
     class Coverage {
 

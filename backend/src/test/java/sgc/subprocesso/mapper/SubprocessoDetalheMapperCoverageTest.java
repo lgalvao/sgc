@@ -7,6 +7,7 @@ import org.mapstruct.factory.Mappers;
 import sgc.subprocesso.model.Subprocesso;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import sgc.organizacao.model.Usuario;
 
 @Tag("unit")
 @DisplayName("SubprocessoDetalheMapper - Cobertura Adicional")
@@ -19,7 +20,7 @@ class SubprocessoDetalheMapperCoverageTest {
     void deveRetornarNullSeEntradasNulasNoMapResponsavel() {
         assertThat(mapper.mapResponsavel(null, null)).isNull();
         assertThat(mapper.mapResponsavel(new Subprocesso(), null)).isNull();
-        assertThat(mapper.mapResponsavel(null, new sgc.organizacao.model.Usuario())).isNull();
+        assertThat(mapper.mapResponsavel(null, new Usuario())).isNull();
     }
 
     @Test
