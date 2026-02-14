@@ -1,4 +1,4 @@
-import type {Page} from '@playwright/test';
+import type {Locator, Page} from '@playwright/test';
 import {expect, test} from './fixtures/base.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
@@ -40,6 +40,12 @@ async function capturarTela(page: Page, categoria: string, nome: string, opcoes?
     });
 }
 
+async function capturarComponente(elemento: Locator, categoria: string, nome: string) {
+    const nomeArquivo = `${categoria}--${nome}.png`;
+    const caminhoCompleto = path.join(SCREENSHOTS_DIR, nomeArquivo);
+    await elemento.screenshot({path: caminhoCompleto});
+}
+
 test.describe('Captura de Telas - Sistema SGC', () => {
     test.setTimeout(20000); // Aumentar timeout para cenários longos
     let cleanup: ReturnType<typeof useProcessoCleanup>;
@@ -60,9 +66,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.goto('/login');
             // Tela de login inicial
             await capturarTela(page, '01-seguranca', '01-login-inicial');
+            await page.getByTestId('inp-login-usuario').click();
+            await capturarTela(page, '01-seguranca', '01b-login-campo-usuario-foco');
 
             // Erro de credenciais inválidas
             await page.getByTestId('inp-login-usuario').fill(USUARIOS.INVALIDO.titulo);
+            await capturarTela(page, '01-seguranca', '01c-login-usuario-preenchido');
             await page.getByTestId('inp-login-senha').fill(USUARIOS.INVALIDO.senha);
             await page.getByTestId('btn-login-entrar').click();
             await page.waitForTimeout(500);
@@ -125,6 +134,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page).toHaveURL(/\/painel/);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
             await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
+            await capturarComponente(page.getByTestId('tbl-processos'), '02-painel', '06a-tabela-processos');
 
             // Capturar ID para cleanup
             await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
@@ -220,6 +230,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.waitForTimeout(300);
             await capturarTela(page, '03-processo', '04-modal-finalizar-processo');
             await page.getByRole('button', {name: 'Cancelar'}).click();
+            await capturarTela(page, '03-processo', '05-detalhes-processo-apos-cancelar-finalizacao');
         });
 
         test('Captura validações de formulário', async ({page}) => {
@@ -323,6 +334,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
             await page.waitForTimeout(500);
             await capturarTela(page, '04-subprocesso', '09-cadastro-atividades-disponibilizado', {fullPage: true});
+            const cardDisponibilizado = page.locator('.atividade-card').first();
+            if (await cardDisponibilizado.isVisible().catch(() => false)) {
+                await capturarComponente(cardDisponibilizado, '04-subprocesso', '10-card-atividade-disponibilizada');
+            }
         });
 
         test('Captura estados de validação inline de atividades', async ({page}) => {
@@ -531,6 +546,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
             await page.waitForTimeout(100);
             await capturarTela(page, '05-mapa', '08-mapa-disponibilizado', {fullPage: true});
+            const cardCompetencia = page.locator('.competencia-card').first();
+            if (await cardCompetencia.isVisible().catch(() => false)) {
+                await capturarComponente(cardCompetencia, '05-mapa', '09-card-competencia-detalhe');
+            }
         });
     });
 
@@ -561,6 +580,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByText('Histórico').click();
             await page.waitForTimeout(100);
             await capturarTela(page, '06-navegacao', '05-historico', {fullPage: true});
+            await capturarComponente(page.getByRole('navigation').first(), '06-navegacao', '05a-barra-lateral');
 
             // Rodapé
             await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -605,6 +625,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
 
             await capturarTela(page, '07-estados', '02-processo-em-andamento');
+            await capturarComponente(page.getByTestId('tbl-processos'), '07-estados', '03-tabela-com-multiplos-estados');
         });
     });
 
@@ -846,6 +867,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 const tabela = page.locator('table');
                 if (await tabela.isVisible().catch(() => false)) {
                     await capturarTela(page, '12-historico', '02-tabela-processos-finalizados', {fullPage: true});
+                    await capturarComponente(tabela.first(), '12-historico', '03-tabela-processos-finalizados-detalhe');
                 }
             }
         });
@@ -908,6 +930,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                     await cardAndamento.click();
                     await page.waitForTimeout(300);
                     await capturarTela(page, '14-relatorios', '02-modal-relatorio-andamento');
+                    const modalRelatorio = page.locator('.modal-content').first();
+                    if (await modalRelatorio.isVisible().catch(() => false)) {
+                        await capturarComponente(modalRelatorio, '14-relatorios', '02a-modal-relatorio-andamento-detalhe');
+                    }
 
                     // Verificar filtros
                     const filtroTipo = page.getByTestId('sel-filtro-tipo');
