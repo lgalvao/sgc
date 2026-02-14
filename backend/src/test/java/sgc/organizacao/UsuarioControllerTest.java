@@ -67,4 +67,16 @@ class UsuarioControllerTest {
                 .andExpect(jsonPath("$[0].nome").value("Admin"));
     }
 
+    @Test
+    @DisplayName("GET /api/usuarios/administradores - Deve retornar lista vazia quando não há administradores")
+    @WithMockUser(roles = "ADMIN")
+    void listarAdministradores_DeveRetornarListaVaziaQuandoNaoHaAdministradores() throws Exception {
+        when(usuarioService.listarAdministradores()).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/usuarios/administradores"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
 }

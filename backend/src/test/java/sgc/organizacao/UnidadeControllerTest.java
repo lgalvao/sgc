@@ -101,7 +101,24 @@ class UnidadeControllerTest {
         when(unidadeService.buscarTodasUnidades()).thenReturn(Collections.emptyList());
 
         // Act & Assert
-        mockMvc.perform(get("/api/unidades")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/unidades"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia ao buscar atribuições quando não há nenhuma")
+    @WithMockUser(roles = "ADMIN")
+    void deveRetornarListaVaziaAoBuscarAtribuicoes() throws Exception {
+        // Arrange
+        when(unidadeService.buscarTodasAtribuicoes()).thenReturn(List.of());
+
+        // Act & Assert
+        mockMvc.perform(get("/api/unidades/atribuicoes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
     }
 
     @Test
@@ -177,6 +194,20 @@ class UnidadeControllerTest {
     }
 
     @Test
+    @DisplayName("Deve retornar lista vazia quando unidade não tem usuários")
+    @WithMockUser(roles = "CHEFE")
+    void deveRetornarListaVaziaQuandoUnidadeNaoTemUsuarios() throws Exception {
+        // Arrange
+        when(unidadeService.buscarUsuariosPorUnidade(999L)).thenReturn(List.of());
+
+        // Act & Assert
+        mockMvc.perform(get("/api/unidades/999/usuarios"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
     @DisplayName("Deve retornar unidade por sigla")
     @WithMockUser
     void deveRetornarUnidadePorSigla() throws Exception {
@@ -220,6 +251,20 @@ class UnidadeControllerTest {
         // Act & Assert
         mockMvc.perform(get("/api/unidades/sigla/SIGLA/subordinadas"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando unidade não tem subordinadas")
+    @WithMockUser
+    void deveRetornarListaVaziaQuandoNaoTemSubordinadas() throws Exception {
+        // Arrange
+        when(unidadeService.buscarSiglasSubordinadas("FOLHA")).thenReturn(List.of());
+
+        // Act & Assert
+        mockMvc.perform(get("/api/unidades/sigla/FOLHA/subordinadas"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
     }
 
     @Test

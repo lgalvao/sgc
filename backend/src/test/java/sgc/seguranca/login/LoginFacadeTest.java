@@ -21,6 +21,7 @@ import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
 import sgc.organizacao.service.UsuarioPerfilService;
 import sgc.seguranca.login.dto.EntrarRequest;
+import sgc.seguranca.login.dto.PerfilUnidadeDto;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -239,5 +241,28 @@ class LoginFacadeTest {
         assertThatThrownBy(() -> loginFacade.autorizar("999"))
                 .isInstanceOf(ErroAutenticacao.class)
                 .hasMessageContaining("Credenciais inválidas");
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando todas as unidades estão inativas")
+    void deveRetornarListaVaziaQuandoTodasUnidadesInativas() {
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
+
+        Unidade unidadeInativa = new Unidade();
+        unidadeInativa.setCodigo(1L);
+        unidadeInativa.setSituacao(SituacaoUnidade.INATIVA);
+
+        UsuarioPerfil up = new UsuarioPerfil();
+        up.setPerfil(Perfil.GESTOR);
+        up.setUnidade(unidadeInativa);
+        up.setUsuario(usuario);
+
+        when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
+        when(usuarioPerfilService.buscarPorUsuario("123")).thenReturn(List.of(up));
+
+        List<PerfilUnidadeDto> resultado = loginFacade.autorizar("123");
+
+        assertThat(resultado).isEmpty();
     }
 }
