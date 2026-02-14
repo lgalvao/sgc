@@ -33,5 +33,20 @@
 - Após correção do BUG-001, não foram encontradas novas falhas na suíte completa.
 - Fluxos críticos de login, painel, subprocessos, lembretes e relatórios permaneceram estáveis.
 
+## Regressões mapeadas a partir de `Erros.docx`
+
+Testes focados adicionados em `e2e/erros-reportados-regressao.spec.ts`:
+- ADMIN em `Unidades` visualiza árvore ampla (SECRETARIA_1 e SECRETARIA_2), evitando cenário de exibir apenas "minha unidade".
+- Fluxo de importação de atividades abre modal sem erro de "Acesso Negado".
+- Botão `CRIAR` em atribuição temporária efetiva criação com mensagem de sucesso.
+
+Testes focados adicionais em `e2e/micro-painel-funcionalidades.spec.ts`:
+- Regras de menu por perfil (`Unidades` vs `Minha unidade`).
+- Clique em processo `Criado` abre cadastro.
+- Ordenação de alertas no painel (ordem padrão e alternância por coluna Processo).
+
+Validação:
+- `npm run test:e2e -- e2e/micro-painel-funcionalidades.spec.ts e2e/erros-reportados-regressao.spec.ts` ✅ (9 passed)
+
 ## Observações
 - Durante execução de CDU-01 com credencial inválida, ocorreu `401` esperado (não é bug).
