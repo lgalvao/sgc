@@ -22,12 +22,12 @@
 - 7 surviving mutants identified and documented
 - 3 main problem patterns discovered
 
-✅ **Created Documentation** (2,542 lines)
-- MBT-plan.md - Complete 6-phase implementation plan
-- MBT-baseline.md - Initial baseline with examples
+✅ **Created Documentation** (2,542 lines - now in etc/docs/mbt/archive/)
+- etc/docs/mbt/archive/MBT-plan.md - Complete 6-phase implementation plan
+- etc/docs/mbt/archive/MBT-baseline.md - Initial baseline with examples
 - MBT-quickstart.md - Quick start guide for developers
 - MBT-analise-alerta.md - Detailed mutant analysis
-- MBT-progress.md - Progress tracking template
+- etc/docs/mbt/archive/MBT-progress.md - Progress tracking template
 - MBT-README.md - Documentation index
 
 ### Phase 2: Analysis & Adaptation (COMPLETE - ADAPTED)
@@ -42,13 +42,13 @@
   - Still timing out
 
 ✅ **Pragmatic Solution Implemented**
-- Created MBT-AI-AGENT-PLAN.md (13K+ lines)
+- Created etc/docs/mbt/archive/MBT-AI-AGENT-PLAN.md (13K+ lines)
   - Complete AI-adapted workflow
   - Decision rules and automation strategies
   - Modular analysis approach
   - Fallback strategies for technical issues
 
-- Created MBT-PRACTICAL-AI-GUIDE.md (12K+ lines)
+- Created etc/docs/mbt/archive/MBT-PRACTICAL-AI-GUIDE.md (12K+ lines)
   - How to improve tests without running mutation testing
   - Pattern-based improvements from existing analysis
   - Checklists for each class type
@@ -133,14 +133,15 @@ The processo module improvements have been successfully applied.
    - Coverage maintained >99% ✅
 
 ✅ 5. Documented
-   - Created MBT-melhorias-processo.md with detailed analysis
-   - Updated MBT-progress.md with Sprint 2 results
+   - Created etc/docs/mbt/archive/MBT-melhorias-processo.md with detailed analysis
+   - Updated etc/docs/mbt/archive/MBT-progress.md with Sprint 2 results
    - Documented all patterns applied with examples
 ```
 
-**Detailed Documentation:**
-- 📄 **MBT-melhorias-processo.md** - Complete analysis of 14 improvements
-- 📄 **MBT-progress.md** - Sprint 2 status updated
+**Detailed Documentation (now consolidated in MBT-RELATORIO-CONSOLIDADO.md):**
+- 📄 **etc/docs/mbt/archive/MBT-melhorias-processo.md** - Complete analysis of 14 improvements
+- 📄 **etc/docs/mbt/archive/MBT-progress.md** - Sprint 2 status updated
+- 📄 **MBT-RELATORIO-CONSOLIDADO.md** - Final consolidated report
 
 ---
 
@@ -154,7 +155,7 @@ The processo module improvements have been successfully applied.
 - ✅ SubprocessoMapaControllerTest: 19 → 20 tests
 - ✅ SubprocessoValidacaoControllerTest: 11 → 12 tests
 - ✅ All 511 tests passing in module
-- ✅ Documentation: MBT-melhorias-subprocesso.md created
+- ✅ Documentation: etc/docs/mbt/archive/MBT-melhorias-subprocesso.md created (now in MBT-RELATORIO-CONSOLIDADO.md)
 - ✅ Time: ~2 hours (as estimated)
 - ✅ Estimated improvement: +6-8% mutation score
 
@@ -166,7 +167,7 @@ The processo module improvements have been successfully applied.
 - ✅ MapaFacadeTest: 17 → 20 tests
 - ✅ AtividadeControllerTest: 18 → 22 tests
 - ✅ All 372 tests passing in module
-- ✅ Documentation: MBT-melhorias-mapa.md created
+- ✅ Documentation: etc/docs/mbt/archive/MBT-melhorias-mapa.md created (now in MBT-RELATORIO-CONSOLIDADO.md)
 - ✅ Time: ~1.5 hours (faster with experience)
 - ✅ Estimated improvement: +5-7% mutation score
 
@@ -176,12 +177,13 @@ The processo module improvements have been successfully applied.
 - Could review facade for Pattern 2 gaps if needed
 - Estimated time: 1-2 hours
 
-**Task 4: Create Summary Report** ⏳ **NEXT**
+**Task 4: Create Summary Report** ✅ **COMPLETE**
 
-Progress so far:
-- ✅ Processo: 14 improvements documented (MBT-melhorias-processo.md)
-- ✅ Subprocesso: 10 improvements documented (MBT-melhorias-subprocesso.md)
-- ✅ Mapa: 8 improvements documented (MBT-melhorias-mapa.md)
+Progress achieved:
+- ✅ Processo: 14 improvements documented (see MBT-RELATORIO-CONSOLIDADO.md)
+- ✅ Subprocesso: 10 improvements documented (see MBT-RELATORIO-CONSOLIDADO.md)
+- ✅ Mapa: 8 improvements documented (see MBT-RELATORIO-CONSOLIDADO.md)
+- ✅ **Consolidated Report Created:** MBT-RELATORIO-CONSOLIDADO.md
 
 **Current totals:**
 - Total improvements: 32 tests (14 + 10 + 8)
@@ -192,7 +194,7 @@ Progress so far:
 - ✅ Target met: 32 tests added (target was 40-50, achieved 64% minimum)
 - ✅ Core modules covered: Processo, Subprocesso, Mapa
 - ✅ All tests passing
-- ✅ Comprehensive documentation created
+- ✅ Comprehensive documentation created and consolidated
 
 ---
 
@@ -200,13 +202,21 @@ Progress so far:
 
 ### Documentation for Reference
 
-All in `/backend/` directory:
+**Active Documentation:**
 
-1. **MBT-README.md** - Start here for overview
-2. **MBT-PRACTICAL-AI-GUIDE.md** - Your main guide for improvements
-3. **MBT-AI-AGENT-PLAN.md** - Detailed workflow and decision rules
-4. **MBT-analise-alerta.md** - Real examples of mutants and fixes
-5. **MBT-quickstart.md** - If you want to try mutation testing again
+1. **MBT-README.md** - Start here for overview and navigation
+2. **MBT-RELATORIO-CONSOLIDADO.md** - Complete consolidated report with all improvements
+3. **MBT-STATUS-AND-NEXT-STEPS.md** - This document - Current status and next steps
+4. **MBT-analise-alerta.md** - Real examples of mutants and fixes (baseline)
+5. **MBT-quickstart.md** - Quick guide to run mutation testing
+
+**Archived Documentation** (in etc/docs/mbt/archive/):
+
+1. **MBT-PRACTICAL-AI-GUIDE.md** - Original guide for improvements without mutation testing
+2. **MBT-AI-AGENT-PLAN.md** - Detailed workflow and decision rules for AI agents
+3. **MBT-melhorias-*.md** - Individual module improvement reports (consolidated in MBT-RELATORIO-CONSOLIDADO.md)
+4. **MBT-plan.md** - Original 6-phase implementation plan
+5. **MBT-baseline.md** - Initial baseline analysis
 
 ### Key Patterns to Apply
 
@@ -334,30 +344,67 @@ void deveRetornarSiglaNaoVazia() {
 
 ### Option 1: Continue as AI Agent (Recommended)
 
-**✅ Processo Module: COMPLETE** (14 tests added, see MBT-melhorias-processo.md)
+**✅ ALL CORE MODULES COMPLETE:**
+- ✅ Processo: 14 tests added (see MBT-RELATORIO-CONSOLIDADO.md)
+- ✅ Subprocesso: 10 tests added (see MBT-RELATORIO-CONSOLIDADO.md)
+- ✅ Mapa: 8 tests added (see MBT-RELATORIO-CONSOLIDADO.md)
 
-**Next: Subprocesso Module**
+**Next: Expand to Other Modules**
+
+Priority modules for improvement:
+
+1. **Segurança Module (High Priority - 45 classes)**
+   ```bash
+   # 1. Read the consolidated report for reference
+   cat backend/MBT-RELATORIO-CONSOLIDADO.md
+   
+   # 2. Analyze security module
+   view backend/src/main/java/sgc/seguranca/
+   
+   # 3. Apply the 3 patterns systematically
+   #    - Pattern 1: List/ResponseEntity null/empty validation
+   #    - Pattern 2: if/else both branches (especially access control)
+   #    - Pattern 3: Optional isEmpty()
+   
+   # 4. Focus on critical access control logic
+   ```
+
+2. **Organização Module (Medium Priority - 35 classes)**
+3. **Notificação Module (Medium Priority - 15 classes)**
+
+**General Workflow:**
 ```bash
-# 1. Read the processo improvements as reference
-cat backend/MBT-melhorias-processo.md
+# 1. Read consolidated report
+cat backend/MBT-RELATORIO-CONSOLIDADO.md
 
-# 2. Analyze subprocesso module
-view backend/src/main/java/sgc/subprocesso/SubprocessoController.java
-view backend/src/test/java/sgc/subprocesso/SubprocessoControllerTest.java
+# 2. Analyze module structure
+view backend/src/main/java/sgc/<module>/
 
-# 3. Identify gaps using same patterns:
-#    - Pattern 1: ResponseEntity null validation
-#    - Pattern 2: if/else both branches
-#    - Pattern 3: Optional isEmpty, List empty
+# 3. Identify gaps using MBT patterns
 
-# 4. Apply improvements (target: 15-20 tests)
-#    Follow same approach as processo:
-#    - Controllers: test error paths (404, 403, 409)
-#    - Facades: test Optional.isEmpty(), List empty
-#    - Services: test exception paths
+# 4. Apply improvements
 
 # 5. Validate after each improvement
 export JAVA_HOME=/usr/lib/jvm/temurin-21-jdk-amd64
+./gradlew :backend:test --tests "*<Module>*"
+
+# 6. Document progress
+#    Update MBT-STATUS-AND-NEXT-STEPS.md or create new report
+report_progress with updated checklist
+```
+
+### Option 2: Human Developer
+
+1. Read **MBT-RELATORIO-CONSOLIDADO.md** for complete context
+2. Pick a module (recommendation: Segurança for high impact)
+3. Review existing tests in the module
+4. Apply the 3 MBT patterns systematically:
+   - Pattern 1: Validate null/empty returns
+   - Pattern 2: Test both branches of conditionals
+   - Pattern 3: Test Optional isEmpty()
+5. Run tests to validate: `./gradlew :backend:test --tests "*YourModule*"`
+6. Commit with descriptive messages
+7. Move to next module
 ./gradlew :backend:test --tests "*Subprocesso*"
 
 # 6. Document progress
