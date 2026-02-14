@@ -478,6 +478,24 @@ class SubprocessoFacadeTest {
         }
 
         @Test
+        @DisplayName("homologarCadastroEmBloco deve delegar se houver itens")
+        void homologarCadastroEmBloco_DeveDelegar() {
+            // Pattern 2: Testing both branches
+            Long codProcesso = 1L;
+            List<Long> unidades = List.of(10L, 20L);
+            Usuario usuario = new Usuario();
+            when(crudService.listarPorProcessoEUnidades(codProcesso, unidades))
+                    .thenReturn(List.of(
+                            SubprocessoDto.builder().codigo(50L).build(),
+                            SubprocessoDto.builder().codigo(60L).build()
+                    ));
+
+            facade.homologarCadastroEmBloco(unidades, codProcesso, usuario);
+
+            verify(cadastroWorkflowService).homologarCadastroEmBloco(List.of(50L, 60L), usuario);
+        }
+
+        @Test
         @DisplayName("homologarCadastroEmBloco não faz nada se lista ids vazia")
         void homologarCadastroEmBloco_Empty() {
             Long codProcesso = 1L;
@@ -488,6 +506,22 @@ class SubprocessoFacadeTest {
             facade.homologarCadastroEmBloco(unidades, codProcesso, usuario);
 
             verify(cadastroWorkflowService, never()).homologarCadastroEmBloco(any(), any());
+        }
+
+        @Test
+        @DisplayName("disponibilizarMapaEmBloco deve delegar se houver itens")
+        void disponibilizarMapaEmBloco_DeveDelegar() {
+            // Pattern 2: Testing both branches
+            Long codProcesso = 1L;
+            List<Long> unidades = List.of(10L);
+            Usuario usuario = new Usuario();
+            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(LocalDate.now(), "Obs");
+            when(crudService.listarPorProcessoEUnidades(codProcesso, unidades))
+                    .thenReturn(List.of(SubprocessoDto.builder().codigo(50L).build()));
+
+            facade.disponibilizarMapaEmBloco(unidades, codProcesso, req, usuario);
+
+            verify(mapaWorkflowService).disponibilizarMapaEmBloco(List.of(50L), req, usuario);
         }
 
         @Test
@@ -505,6 +539,24 @@ class SubprocessoFacadeTest {
         }
 
         @Test
+        @DisplayName("aceitarValidacaoEmBloco deve delegar se houver itens")
+        void aceitarValidacaoEmBloco_DeveDelegar() {
+            // Pattern 2: Testing both branches
+            Long codProcesso = 1L;
+            List<Long> unidades = List.of(10L, 20L);
+            Usuario usuario = new Usuario();
+            when(crudService.listarPorProcessoEUnidades(codProcesso, unidades))
+                    .thenReturn(List.of(
+                            SubprocessoDto.builder().codigo(50L).build(),
+                            SubprocessoDto.builder().codigo(60L).build()
+                    ));
+
+            facade.aceitarValidacaoEmBloco(unidades, codProcesso, usuario);
+
+            verify(mapaWorkflowService).aceitarValidacaoEmBloco(List.of(50L, 60L), usuario);
+        }
+
+        @Test
         @DisplayName("aceitarValidacaoEmBloco não faz nada se lista ids vazia")
         void aceitarValidacaoEmBloco_Empty() {
             Long codProcesso = 1L;
@@ -515,6 +567,21 @@ class SubprocessoFacadeTest {
             facade.aceitarValidacaoEmBloco(unidades, codProcesso, usuario);
 
             verify(mapaWorkflowService, never()).aceitarValidacaoEmBloco(any(), any());
+        }
+
+        @Test
+        @DisplayName("homologarValidacaoEmBloco deve delegar se houver itens")
+        void homologarValidacaoEmBloco_DeveDelegar() {
+            // Pattern 2: Testing both branches
+            Long codProcesso = 1L;
+            List<Long> unidades = List.of(10L);
+            Usuario usuario = new Usuario();
+            when(crudService.listarPorProcessoEUnidades(codProcesso, unidades))
+                    .thenReturn(List.of(SubprocessoDto.builder().codigo(50L).build()));
+
+            facade.homologarValidacaoEmBloco(unidades, codProcesso, usuario);
+
+            verify(mapaWorkflowService).homologarValidacaoEmBloco(List.of(50L), usuario);
         }
 
         @Test
