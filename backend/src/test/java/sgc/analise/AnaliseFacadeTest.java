@@ -13,6 +13,7 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -99,6 +100,21 @@ class AnaliseFacadeTest {
                     .hasSize(1)
                     .extracting(Analise::getTipo)
                     .containsExactly(TipoAnalise.CADASTRO);
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia quando não há análises do tipo solicitado")
+        void deveRetornarListaVaziaQuandoNaoHaAnalisesDoTipo() {
+            // Pattern 1: Empty list validation
+            when(analiseService.listarPorSubprocesso(1L))
+                    .thenReturn(Collections.emptyList());
+
+            List<Analise> resultado = facade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
+
+            assertThat(resultado)
+                    .isNotNull()
+                    .isEmpty();
+            verify(analiseService).listarPorSubprocesso(1L);
         }
     }
 
