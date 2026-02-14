@@ -119,7 +119,6 @@ const {
   textoModalBloco,
   rotuloBotaoBloco,
   mensagemSucessoAcaoBloco,
-  unidadesElegiveisPorAcao,
   abrirDetalhesUnidade,
   finalizarProcesso,
   confirmarFinalizacao,
