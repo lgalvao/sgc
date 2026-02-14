@@ -278,6 +278,58 @@ class ProcessoControllerTest {
             // Act & Assert
             mockMvc.perform(get("/api/processos/1/detalhes")).andExpect(status().isForbidden());
         }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar 404 Not Found quando processo não existe")
+        void deveRetornarNotFoundQuandoProcessoNaoExiste() throws Exception {
+            // Arrange
+            when(processoFacade.obterPorId(999L)).thenReturn(Optional.empty());
+
+            // Act & Assert
+            mockMvc.perform(get(API_PROCESSOS_999))
+                    .andExpect(status().isNotFound());
+
+            verify(processoFacade).obterPorId(999L);
+        }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar 200 OK ao obter contexto completo quando processo existe")
+        void deveRetornarOkAoObterContextoCompleto() throws Exception {
+            // Arrange
+            var dto =
+                    ProcessoDetalheDto.builder()
+                            .codigo(1L)
+                            .descricao("Processo Contexto Completo")
+                            .tipo(TipoProcesso.MAPEAMENTO.name())
+                            .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                            .dataCriacao(LocalDateTime.now())
+                            .build();
+
+            when(processoFacade.obterContextoCompleto(eq(1L), any(Usuario.class))).thenReturn(dto);
+
+            // Act & Assert
+            mockMvc.perform(get("/api/processos/1/contexto-completo"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
+                    .andExpect(jsonPath("$.descricao").value("Processo Contexto Completo"));
+
+            verify(processoFacade).obterContextoCompleto(eq(1L), any(Usuario.class));
+        }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar 403 Forbidden ao obter contexto completo se acesso negado")
+        void deveRetornarForbiddenAoObterContextoCompletoQuandoAcessoNegado() throws Exception {
+            // Arrange
+            doThrow(new ErroAcessoNegado("Acesso negado"))
+                    .when(processoFacade).obterContextoCompleto(eq(1L), any(Usuario.class));
+
+            // Act & Assert
+            mockMvc.perform(get("/api/processos/1/contexto-completo"))
+                    .andExpect(status().isForbidden());
+        }
     }
 
     @Nested
@@ -737,6 +789,122 @@ class ProcessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.codigo").value(1L));
         }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve enviar lembrete com sucesso")
+        void deveEnviarLembreteComSucesso() throws Exception {
+            // Arrange
+            var request = new EnviarLembreteRequest(10L);
+            doNothing().when(processoFacade).enviarLembrete(1L, 10L);
+
+            // Act & Assert
+            mockMvc.perform(
+                            post("/api/processos/1/enviar-lembrete")
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(processoFacade).enviarLembrete(1L, 10L);
+        }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar 400 Bad Request ao enviar lembrete com request inválida")
+        void deveRetornarBadRequestAoEnviarLembreteInvalido() throws Exception {
+            // Arrange - request com unidadeCodigo null
+            var request = new EnviarLembreteRequest(null);
+
+            // Act & Assert
+            mockMvc.perform(
+                            post("/api/processos/1/enviar-lembrete")
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar erro quando lembrete falha")
+        void deveRetornarErroQuandoLembreteFalha() throws Exception {
+            // Arrange
+            var request = new EnviarLembreteRequest(10L);
+            doThrow(new ErroProcesso("Erro ao enviar lembrete"))
+                    .when(processoFacade).enviarLembrete(1L, 10L);
+
+            // Act & Assert
+            mockMvc.perform(
+                            post("/api/processos/1/enviar-lembrete")
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isConflict());
+        }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve executar ação em bloco com sucesso")
+        void deveExecutarAcaoEmBlocoComSucesso() throws Exception {
+            // Arrange
+            var request = new AcaoEmBlocoRequest(
+                    List.of(10L, 20L), 
+                    AcaoProcesso.ACEITAR, 
+                    java.time.LocalDate.now());
+            doNothing().when(processoFacade).executarAcaoEmBloco(1L, request);
+
+            // Act & Assert
+            mockMvc.perform(
+                            post("/api/processos/1/acao-em-bloco")
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(processoFacade).executarAcaoEmBloco(1L, request);
+        }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar 403 Forbidden quando executar ação em bloco sem permissão")
+        void deveRetornarForbiddenAoExecutarAcaoEmBlocoSemPermissao() throws Exception {
+            // Arrange
+            var request = new AcaoEmBlocoRequest(
+                    List.of(10L), 
+                    AcaoProcesso.HOMOLOGAR, 
+                    java.time.LocalDate.now());
+            doThrow(new ErroAcessoNegado("Sem permissão"))
+                    .when(processoFacade).executarAcaoEmBloco(1L, request);
+
+            // Act & Assert
+            mockMvc.perform(
+                            post("/api/processos/1/acao-em-bloco")
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockUser
+        @DisplayName("Deve retornar 400 Bad Request ao executar ação em bloco com lista de unidades vazia")
+        void deveRetornarBadRequestAoExecutarAcaoEmBlocoComListaVazia() throws Exception {
+            // Arrange - lista de unidades vazia
+            var request = new AcaoEmBlocoRequest(
+                    List.of(), 
+                    AcaoProcesso.ACEITAR, 
+                    java.time.LocalDate.now());
+
+            // Act & Assert
+            mockMvc.perform(
+                            post("/api/processos/1/acao-em-bloco")
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest());
+        }
+    }
     @org.junit.jupiter.api.Nested
     @DisplayName("Cobertura Extra")
     class CoberturaExtra {
@@ -774,5 +942,4 @@ class ProcessoControllerTest {
             assertEquals(200, response.getStatusCode().value());
         }
     }
-}
 }
