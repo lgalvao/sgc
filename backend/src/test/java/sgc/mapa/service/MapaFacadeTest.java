@@ -9,11 +9,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Usuario;
+import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 import java.util.Optional;
@@ -98,6 +102,20 @@ class MapaFacadeTest {
 
             Mapa atualizado = facade.atualizar(1L, novosDados);
             assertThat(atualizado.getObservacoesDisponibilizacao()).isEqualTo("Obs");
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção ao atualizar mapa inexistente")
+        void deveLancarExcecaoAoAtualizarMapaInexistente() {
+            // Pattern 2: Testing error branch
+            Mapa novosDados = new Mapa();
+            when(mapaManutencaoService.buscarMapaPorCodigo(999L))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 999L));
+
+            assertThatThrownBy(() -> facade.atualizar(999L, novosDados))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+
+            verify(mapaManutencaoService).buscarMapaPorCodigo(999L);
         }
 
         @Test
@@ -187,6 +205,43 @@ class MapaFacadeTest {
 
             assertThat(resultado).isNotNull().isSameAs(expectedDto);
             verify(mapaSalvamentoService).salvarMapaCompleto(mapaId, req);
+        }
+    }
+
+    @Nested
+    @DisplayName("Visualização e Impactos")
+    class VisualizacaoEImpactos {
+        @Test
+        @DisplayName("Deve obter mapa para visualização")
+        void deveObterMapaParaVisualizacao() {
+            // Pattern: Testing previously untested method
+            Subprocesso subprocesso = new Subprocesso();
+            subprocesso.setCodigo(1L);
+            MapaVisualizacaoDto expectedDto = MapaVisualizacaoDto.builder().build();
+
+            when(mapaVisualizacaoService.obterMapaParaVisualizacao(subprocesso)).thenReturn(expectedDto);
+
+            var resultado = facade.obterMapaParaVisualizacao(subprocesso);
+
+            assertThat(resultado).isNotNull().isSameAs(expectedDto);
+            verify(mapaVisualizacaoService).obterMapaParaVisualizacao(subprocesso);
+        }
+
+        @Test
+        @DisplayName("Deve verificar impactos de alteração no mapa")
+        void deveVerificarImpactos() {
+            // Pattern: Testing previously untested method
+            Subprocesso subprocesso = new Subprocesso();
+            subprocesso.setCodigo(1L);
+            Usuario usuario = new Usuario();
+            ImpactoMapaDto expectedDto = ImpactoMapaDto.builder().build();
+
+            when(impactoMapaService.verificarImpactos(subprocesso, usuario)).thenReturn(expectedDto);
+
+            var resultado = facade.verificarImpactos(subprocesso, usuario);
+
+            assertThat(resultado).isNotNull().isSameAs(expectedDto);
+            verify(impactoMapaService).verificarImpactos(subprocesso, usuario);
         }
     }
 }

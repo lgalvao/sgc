@@ -20,6 +20,8 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -96,6 +98,19 @@ class MapaControllerTest {
         mockMvc.perform(get(API_MAPAS_1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("Deve retornar NotFound quando mapa não existir")
+    void deveRetornarNotFoundQuandoMapaNaoExistir() throws Exception {
+        // Pattern 2: Testing error branch
+        when(mapaFacade.obterPorCodigo(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 999L));
+
+        mockMvc.perform(get("/api/mapas/999"))
+                .andExpect(status().isNotFound());
+
+        verify(mapaFacade).obterPorCodigo(999L);
     }
 
     @Test

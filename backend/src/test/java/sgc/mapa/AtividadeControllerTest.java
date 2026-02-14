@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.dto.AtividadeResponse;
@@ -197,6 +198,71 @@ class AtividadeControllerTest {
                     .andExpect(status().isOk());
 
             Mockito.verify(atividadeFacade).excluirConhecimento(1L, 2L);
+        }
+    }
+
+    @Nested
+    @DisplayName("Casos de Erro - Pattern 2")
+    class CasosDeErro {
+        @Test
+        @DisplayName("Deve retornar NotFound ao obter atividade inexistente")
+        void deveRetornarNotFoundAoObterAtividadeInexistente() throws Exception {
+            // Pattern 2: Testing error branch
+            Mockito.when(atividadeFacade.obterAtividadePorId(999L))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
+
+            mockMvc.perform(get("/api/atividades/999")
+                    .with(user("123")))
+                    .andExpect(status().isNotFound());
+
+            Mockito.verify(atividadeFacade).obterAtividadePorId(999L);
+        }
+
+        @Test
+        @DisplayName("Deve retornar NotFound ao excluir atividade inexistente")
+        void deveRetornarNotFoundAoExcluirAtividadeInexistente() throws Exception {
+            // Pattern 2: Testing error branch
+            Mockito.when(atividadeFacade.excluirAtividade(999L))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
+
+            mockMvc.perform(post("/api/atividades/999/excluir")
+                    .with(user("123").roles("CHEFE"))
+                    .with(csrf()))
+                    .andExpect(status().isNotFound());
+
+            Mockito.verify(atividadeFacade).excluirAtividade(999L);
+        }
+
+        @Test
+        @DisplayName("Deve retornar NotFound ao atualizar atividade inexistente")
+        void deveRetornarNotFoundAoAtualizarAtividadeInexistente() throws Exception {
+            // Pattern 2: Testing error branch
+            Mockito.when(atividadeFacade.atualizarAtividade(eq(999L), any()))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
+
+            mockMvc.perform(post("/api/atividades/999/atualizar")
+                    .with(user("123").roles("CHEFE"))
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
+                    .andExpect(status().isNotFound());
+
+            Mockito.verify(atividadeFacade).atualizarAtividade(eq(999L), any());
+        }
+
+        @Test
+        @DisplayName("Deve retornar NotFound ao excluir conhecimento de atividade inexistente")
+        void deveRetornarNotFoundAoExcluirConhecimentoDeAtividadeInexistente() throws Exception {
+            // Pattern 2: Testing error branch
+            Mockito.when(atividadeFacade.excluirConhecimento(999L, 2L))
+                    .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
+
+            mockMvc.perform(post("/api/atividades/999/conhecimentos/2/excluir")
+                    .with(user("123").roles("CHEFE"))
+                    .with(csrf()))
+                    .andExpect(status().isNotFound());
+
+            Mockito.verify(atividadeFacade).excluirConhecimento(999L, 2L);
         }
     }
 }
