@@ -95,6 +95,7 @@ public class PainelFacade {
      * @param pageable      As informações de paginação.
      * @return Uma página {@link Page} de {@link AlertaDto}.
      */
+    @Transactional
     public Page<AlertaDto> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
         // Aplica ordenação padrão por dataHora decrescente para alertas também
         Pageable sortedPageable = pageable;
@@ -110,11 +111,20 @@ public class PainelFacade {
         // Alertas são filtrados pela unidade do usuário (sem subordinadas)
         alertasPage = alertaService.listarPorUnidade(codigoUnidade, sortedPageable);
 
-        return alertasPage.map(
-                alerta -> {
-                    LocalDateTime dataHoraLeitura = alertaService.obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo).orElse(null);
-                    return paraAlertaDto(alerta, dataHoraLeitura);
-                });
+        List<Long> alertasNaoLidosVisualizados = new ArrayList<>();
+        Page<AlertaDto> resultado = alertasPage.map(alerta -> {
+            LocalDateTime dataHoraLeitura = alertaService.obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo).orElse(null);
+            if (usuarioTitulo != null && dataHoraLeitura == null) {
+                alertasNaoLidosVisualizados.add(alerta.getCodigo());
+            }
+            return paraAlertaDto(alerta, dataHoraLeitura);
+        });
+
+        if (usuarioTitulo != null && !alertasNaoLidosVisualizados.isEmpty()) {
+            alertaService.marcarComoLidos(usuarioTitulo, alertasNaoLidosVisualizados);
+        }
+
+        return resultado;
     }
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade, Map<Long, List<Long>> mapaPaiFilhos) {
