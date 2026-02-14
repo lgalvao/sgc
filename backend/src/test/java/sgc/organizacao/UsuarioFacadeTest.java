@@ -80,6 +80,26 @@ class UsuarioFacadeTest {
         }
 
         @Test
+        @DisplayName("Deve obter usuário diretamente do principal se já for instância de Usuario")
+        void deveObterUsuarioDiretamenteDoPrincipal() {
+            // Arrange
+            Usuario usuario = criarUsuario("123456");
+            Authentication auth = mock(Authentication.class);
+            when(auth.getPrincipal()).thenReturn(usuario);
+            SecurityContext context = mock(SecurityContext.class);
+            when(context.getAuthentication()).thenReturn(auth);
+            SecurityContextHolder.setContext(context);
+
+            // Act
+            Usuario resultado = facade.obterUsuarioAutenticado();
+
+            // Assert
+            assertThat(resultado).isSameAs(usuario);
+            verifyNoInteractions(usuarioConsultaService);
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
         @DisplayName("Deve filtrar atribuições em unidades inativas")
         void deveFiltrarUnidadesInativas() {
             // Arrange
@@ -471,6 +491,24 @@ class UsuarioFacadeTest {
             // Assert
             assertThat(resultado).isNull();
         }
+
+        @Test
+        @DisplayName("Deve extrair título de um objeto arbitrário usando toString")
+        void deveExtrairTituloDeObjetoArbitrario() {
+            // Arrange
+            Object principal = new Object() {
+                @Override
+                public String toString() {
+                    return "custom-titulo";
+                }
+            };
+
+            // Act
+            String resultado = facade.extrairTituloUsuario(principal);
+
+            // Assert
+            assertThat(resultado).isEqualTo("custom-titulo");
+        }
     }
 
     @Nested
@@ -588,6 +626,24 @@ class UsuarioFacadeTest {
         }
 
         @Test
+        @DisplayName("Deve buscar unidades por perfil e garantir que a lista não é nula mesmo sem resultados")
+        void deveBuscarUnidadesPorPerfilSemResultados() {
+            // Arrange
+            String titulo = "123456";
+            Usuario usuario = criarUsuario(titulo);
+            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
+                    .thenReturn(Optional.of(usuario));
+            when(usuarioPerfilService.buscarPorUsuario(titulo))
+                    .thenReturn(Collections.emptyList());
+
+            // Act
+            List<Long> resultado = facade.buscarUnidadesPorPerfil(titulo, "SERVIDOR");
+
+            // Assert
+            assertThat(resultado).isNotNull().isEmpty();
+        }
+
+        @Test
         @DisplayName("Deve filtrar unidades inativas ao buscar perfis")
         void deveFiltrarUnidadesInativasEmBuscaPerfis() {
             // Arrange
@@ -701,6 +757,22 @@ class UsuarioFacadeTest {
 
             // Assert
             assertThat(resultado).hasSize(2).containsKeys("111111", "222222");
+            assertThat(resultado.get("111111")).isNotNull();
+            assertThat(resultado.get("222222")).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve garantir que o mapa retornado não é nulo mesmo para lista vazia")
+        void deveGarantirMapaNaoNuloParaListaVazia() {
+            // Arrange
+            List<String> titulos = Collections.emptyList();
+            when(usuarioConsultaService.buscarTodosPorIds(titulos)).thenReturn(Collections.emptyList());
+
+            // Act
+            Map<String, UsuarioDto> resultado = facade.buscarUsuariosPorTitulos(titulos);
+
+            // Assert
+            assertThat(resultado).isNotNull().isEmpty();
         }
 
         @Test

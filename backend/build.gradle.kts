@@ -10,7 +10,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("com.github.spotbugs") version "6.4.8"
     id("info.solidsoft.pitest") version "1.19.0-rc.3"
-    id("com.github.ben-manes.versions") version "0.52.0"
+    id("com.github.ben-manes.versions") version "0.53.0"
 }
 
 tasks.withType<JavaCompile> {
@@ -33,13 +33,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.security:spring-security-test:7.0.3")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     // Banco de Dados
-    runtimeOnly("com.oracle.database.jdbc:ojdbc11")
+    runtimeOnly("com.oracle.database.jdbc:ojdbc11:23.26.1.0.0")
     implementation("com.h2database:h2")
 
     // Lombok
@@ -68,9 +68,9 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("net.jqwik:jqwik:1.9.3")
-    testImplementation("nl.jqno.equalsverifier:equalsverifier:3.18.1")
+    testImplementation("nl.jqno.equalsverifier:equalsverifier:4.3.1")
     testImplementation("io.rest-assured:rest-assured-all:6.0.0")
-    testImplementation("org.apache.groovy:groovy-all:5.0.3")
+    testImplementation("org.apache.groovy:groovy-all:5.0.4")
     
     // Testes de Mutação
     testImplementation("org.pitest:pitest-junit5-plugin:1.2.3")
@@ -83,8 +83,8 @@ dependencies {
 
     // Dependências básicas com versões mais recentes que as definidas pelo Spring (reduz CVEs)
     implementation("org.apache.commons:commons-lang3:3.20.0")
-    implementation("ch.qos.logback:logback-classic:1.5.25")
-    implementation("ch.qos.logback:logback-core:1.5.25")
+    // implementation("ch.qos.logback:logback-classic:1.5.30")
+    // implementation("ch.qos.logback:logback-core:1.5.30")
     testImplementation("org.assertj:assertj-core:3.27.7")
 
     // Analise Estatica
@@ -309,20 +309,12 @@ tasks.register("qualityCheckFast") {
     dependsOn("test", "jacocoTestCoverageVerification")
 }
 
-// ============================================
-// Mutation Testing Configuration (PIT)
-// ============================================
-
 pitest {
-    // Versão do PIT e plugins
     pitestVersion.set("1.22.1")
     junit5PluginVersion.set("1.2.3")
-    
-    // Classes alvo - todo o pacote sgc
     targetClasses.set(listOf("sgc.organizacao.*"))
     targetTests.set(listOf("sgc.organizacao.*"))
     
-    // Exclusões - classes que não agregam valor para mutation testing
     excludedClasses.set(listOf(
         "sgc.config.*",              // Configurações Spring
         "sgc.*Exception",            // Classes de exceção
@@ -348,28 +340,14 @@ pitest {
         "toString"
     ))
     
-    // Opções: DEFAULTS, STRONGER, ALL
-    mutators.set(listOf("DEFAULTS"))
-    
-    // Formatos de relatório
+    mutators.set(listOf("ALL"))
     outputFormats.set(listOf("CSV"))
-    
-    // Relatórios com timestamp desabilitado (facilita comparação)
     timestampedReports.set(false)
-    
-    // Performance - usar todos os cores disponíveis
     threads.set(Runtime.getRuntime().availableProcessors())
-    
-    // Configuração de timeout - Otimização da Fase 2
-    timeoutFactor.set(BigDecimal("2.0"))  // Multiply test runtime by 2 for mutation timeout
-    
-    // Saída detalhada (verbose) para depuração
+    timeoutFactor.set(BigDecimal("2.0"))
     verbose.set(false)
-    
-    // Detectar mutantes não cobertos por testes (failWhenNoMutations = false)
     failWhenNoMutations.set(false)
     
-    // Otimização de memória e supressão de avisos da JVM/Mockito
     val agentFile = project.configurations.getByName("testRuntimeClasspath").files.find {
         it.name.contains("byte-buddy-agent")
     }
@@ -386,23 +364,10 @@ pitest {
     jvmArgs.set(pitestJvmArgs)
 }
 
-// ============================================
-// Dependency Updates Configuration (Versions)
-// ============================================
-
 tasks.withType<DependencyUpdatesTask> {
-    // Foca apenas em atualizações de release estáveis para evitar ruído de SNAPSHOTs/Milestones
     revision = "release"
-    
-    // Melhora a visualização no terminal
     outputFormatter = "plain"
-    
-    // Verifica dependências gerenciadas (BOM)
     checkConstraints = true
-    
-    rejectVersionIf {
-        isNonStable(candidate.version)
-    }
 }
 
 fun isNonStable(version: String): Boolean {
