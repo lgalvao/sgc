@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import sgc.comum.erros.ErroAcessoNegado;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -92,6 +93,20 @@ class SubprocessoFacadeTest {
         }
 
         @Test
+        @DisplayName("Deve retornar lista vazia quando não há subprocessos")
+        void deveRetornarListaVaziaQuandoNaoHaSubprocessos() {
+            // Pattern 1: Empty list validation
+            when(crudService.listar()).thenReturn(List.of());
+
+            List<SubprocessoDto> resultado = facade.listar();
+
+            assertThat(resultado)
+                    .isNotNull()
+                    .isEmpty();
+            verify(crudService).listar();
+        }
+
+        @Test
         @DisplayName("Deve obter por processo e unidade")
         void deveObterPorProcessoEUnidade() {
             when(crudService.obterPorProcessoEUnidade(1L, 10L))
@@ -107,7 +122,31 @@ class SubprocessoFacadeTest {
         void deveListarPorProcessoEUnidades() {
             Long codProcesso = 1L;
             List<Long> unidades = List.of(2L);
-            facade.listarPorProcessoEUnidades(codProcesso, unidades);
+            when(crudService.listarPorProcessoEUnidades(codProcesso, unidades))
+                    .thenReturn(List.of(new SubprocessoDto()));
+
+            List<SubprocessoDto> resultado = facade.listarPorProcessoEUnidades(codProcesso, unidades);
+
+            assertThat(resultado)
+                    .isNotNull()
+                    .hasSize(1);
+            verify(crudService).listarPorProcessoEUnidades(codProcesso, unidades);
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia quando não há subprocessos para processo e unidades")
+        void deveRetornarListaVaziaQuandoNaoHaSubprocessosParaProcessoEUnidades() {
+            // Pattern 1: Empty list validation
+            Long codProcesso = 1L;
+            List<Long> unidades = List.of(2L, 3L);
+            when(crudService.listarPorProcessoEUnidades(codProcesso, unidades))
+                    .thenReturn(List.of());
+
+            List<SubprocessoDto> resultado = facade.listarPorProcessoEUnidades(codProcesso, unidades);
+
+            assertThat(resultado)
+                    .isNotNull()
+                    .isEmpty();
             verify(crudService).listarPorProcessoEUnidades(codProcesso, unidades);
         }
 
@@ -122,7 +161,29 @@ class SubprocessoFacadeTest {
         @Test
         @DisplayName("Deve listar atividades do subprocesso")
         void deveListarAtividadesSubprocesso() {
-            facade.listarAtividadesSubprocesso(1L);
+            when(atividadeService.listarAtividadesSubprocesso(1L))
+                    .thenReturn(List.of(new AtividadeDto(1L, "Atividade 1", List.of())));
+
+            List<AtividadeDto> resultado = facade.listarAtividadesSubprocesso(1L);
+
+            assertThat(resultado)
+                    .isNotNull()
+                    .hasSize(1);
+            verify(atividadeService).listarAtividadesSubprocesso(1L);
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia quando subprocesso não tem atividades")
+        void deveRetornarListaVaziaQuandoSubprocessoNaoTemAtividades() {
+            // Pattern 1: Empty list validation
+            when(atividadeService.listarAtividadesSubprocesso(1L))
+                    .thenReturn(List.of());
+
+            List<AtividadeDto> resultado = facade.listarAtividadesSubprocesso(1L);
+
+            assertThat(resultado)
+                    .isNotNull()
+                    .isEmpty();
             verify(atividadeService).listarAtividadesSubprocesso(1L);
         }
 
@@ -173,6 +234,21 @@ class SubprocessoFacadeTest {
             when(crudService.listarEntidadesPorProcesso(1L))
                     .thenReturn(List.of(new Subprocesso()));
             assertThat(facade.listarEntidadesPorProcesso(1L)).hasSize(1);
+            verify(crudService).listarEntidadesPorProcesso(1L);
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia quando processo não tem subprocessos")
+        void deveRetornarListaVaziaQuandoProcessoNaoTemSubprocessos() {
+            // Pattern 1: Empty list validation
+            when(crudService.listarEntidadesPorProcesso(1L))
+                    .thenReturn(List.of());
+
+            List<Subprocesso> resultado = facade.listarEntidadesPorProcesso(1L);
+
+            assertThat(resultado)
+                    .isNotNull()
+                    .isEmpty();
             verify(crudService).listarEntidadesPorProcesso(1L);
         }
 

@@ -36,6 +36,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(SubprocessoMapaController.class)
@@ -322,6 +323,21 @@ class SubprocessoMapaControllerTest {
 
                 mockMvc.perform(get("/api/subprocessos/1/atividades"))
                                 .andExpect(status().isOk());
+
+                verify(subprocessoFacade).listarAtividadesSubprocesso(1L);
+        }
+
+        @Test
+        @DisplayName("listarAtividades - deve retornar lista vazia quando subprocesso não tem atividades")
+        @WithMockUser
+        void listarAtividades_DeveRetornarListaVaziaQuandoNaoHaAtividades() throws Exception {
+                // Pattern 1: Empty list validation
+                when(subprocessoFacade.listarAtividadesSubprocesso(1L)).thenReturn(List.of());
+
+                mockMvc.perform(get("/api/subprocessos/1/atividades"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$").isArray())
+                                .andExpect(jsonPath("$").isEmpty());
 
                 verify(subprocessoFacade).listarAtividadesSubprocesso(1L);
         }
