@@ -84,6 +84,22 @@ Este documento serve como índice centralizado de toda a documentação técnica
 
 ---
 
+### 📋 Especificações de Requisitos
+
+| Documento                                                                                | Descrição                                                |
+|------------------------------------------------------------------------------------------|----------------------------------------------------------|
+| **[views-indice.md](etc/reqs/views-indice.md)** ⭐                                       | Índice completo das especificações de views do sistema  |
+| **[view-01-vinculacao-unidade.md](etc/reqs/view-01-vinculacao-unidade.md)**             | VW_VINCULACAO_UNIDADE - Histórico de vinculações        |
+| **[view-02-zona-resp-central.md](etc/reqs/view-02-zona-resp-central.md)**               | VW_ZONA_RESP_CENTRAL - Responsabilidade de zonas        |
+| **[view-03-unidade.md](etc/reqs/view-03-unidade.md)**                                   | VW_UNIDADE - Unidades organizacionais (view principal)  |
+| **[view-04-usuario.md](etc/reqs/view-04-usuario.md)**                                   | VW_USUARIO - Usuários do sistema                        |
+| **[view-05-responsabilidade.md](etc/reqs/view-05-responsabilidade.md)**                 | VW_RESPONSABILIDADE - Responsabilidades de unidades     |
+| **[view-06-usuario-perfil-unidade.md](etc/reqs/view-06-usuario-perfil-unidade.md)**     | VW_USUARIO_PERFIL_UNIDADE - Sistema de autorização      |
+| **[_intro.md](etc/reqs/_intro.md)**                                                     | Informações gerais e perfis de usuário                  |
+| **[_intro-glossario.md](etc/reqs/_intro-glossario.md)**                                 | Glossário de termos do sistema                          |
+
+---
+
 ### 📊 Diagramas
 
 | Documento                                                                                   | Descrição                                 |
@@ -167,6 +183,12 @@ Cada módulo possui um README.md detalhando suas responsabilidades:
 
 1. [diagramas-arquitetura.md](backend/etc/docs/diagramas-arquitetura.md)
 2. Todos os [ADRs](backend/etc/docs/adr/)
+
+### "Preciso entender o modelo de dados e views"
+
+1. [views-indice.md](etc/reqs/views-indice.md) - Índice completo das especificações de views
+2. SQL DDL: [ddl_views.sql](backend/etc/sql/ddl_views.sql), [ddl_tabelas.sql](backend/etc/sql/ddl_tabelas.sql)
+3. Especificações individuais de views em [etc/reqs/](etc/reqs/)
 
 ---
 
