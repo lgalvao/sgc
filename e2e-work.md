@@ -27,6 +27,11 @@
 - `npm run test:e2e -- e2e/cdu-02-alertas-leitura.spec.ts` ✅
 - `npm run test:e2e -- e2e/cdu-02.spec.ts e2e/cdu-34.spec.ts e2e/cdu-07.spec.ts e2e/cdu-02-alertas-leitura.spec.ts` ✅
 - `npm run test:e2e -- e2e/cdu-01.spec.ts e2e/cdu-06.spec.ts e2e/cdu-27.spec.ts e2e/cdu-32.spec.ts e2e/cdu-33.spec.ts e2e/cdu-34.spec.ts` ✅
+- `npm run test:e2e` (suíte completa) ✅ `236 passed (6.4m)`
+
+## Resultado da exploração ampla
+- Após correção do BUG-001, não foram encontradas novas falhas na suíte completa.
+- Fluxos críticos de login, painel, subprocessos, lembretes e relatórios permaneceram estáveis.
 
 ## Observações
 - Durante execução de CDU-01 com credencial inválida, ocorreu `401` esperado (não é bug).
