@@ -70,6 +70,20 @@ class MapaControllerTest {
 
     @Test
     @WithMockUser
+    @DisplayName("Deve retornar lista vazia quando não há mapas")
+    void deveRetornarListaVaziaQuandoNaoHaMapas() throws Exception {
+        // Arrange
+        when(mapaFacade.listar()).thenReturn(List.of());
+
+        // Act & Assert
+        mockMvc.perform(get(API_MAPAS))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    @WithMockUser
     @DisplayName("Deve retornar mapa quando existir")
     void deveRetornarMapaQuandoExistir() throws Exception {
         Mapa mapa = new Mapa();
