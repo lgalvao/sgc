@@ -1,6 +1,7 @@
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import info.solidsoft.gradle.pitest.PitestTask
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
 plugins {
     java
@@ -9,6 +10,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("com.github.spotbugs") version "6.4.8"
     id("info.solidsoft.pitest") version "1.19.0-rc.3"
+    id("com.github.ben-manes.versions") version "0.52.0"
 }
 
 tasks.withType<JavaCompile> {
@@ -71,7 +73,7 @@ dependencies {
     testImplementation("org.apache.groovy:groovy-all:5.0.3")
     
     // Testes de Mutação
-    testImplementation("org.pitest:pitest-junit5-plugin:1.2.1")
+    testImplementation("org.pitest:pitest-junit5-plugin:1.2.3")
 
     // Documentação da API
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
@@ -267,7 +269,7 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "BRANCH"
-                minimum = "0.95".toBigDecimal()
+                minimum = "0.99".toBigDecimal()
             }
         }
         rule {
@@ -313,12 +315,12 @@ tasks.register("qualityCheckFast") {
 
 pitest {
     // Versão do PIT e plugins
-    pitestVersion.set("1.18.1")
-    junit5PluginVersion.set("1.2.1")
+    pitestVersion.set("1.22.1")
+    junit5PluginVersion.set("1.2.3")
     
     // Classes alvo - todo o pacote sgc
-    targetClasses.set(listOf("sgc.*"))
-    targetTests.set(listOf("sgc.*"))
+    targetClasses.set(listOf("sgc.processo.*"))
+    targetTests.set(listOf("sgc.processo.*"))
     
     // Exclusões - classes que não agregam valor para mutation testing
     excludedClasses.set(listOf(
@@ -346,12 +348,11 @@ pitest {
         "toString"
     ))
     
-    // Mutadores - começar com DEFAULTS (Fase 1-4 do plano)
     // Opções: DEFAULTS, STRONGER, ALL
     mutators.set(listOf("DEFAULTS"))
     
     // Formatos de relatório
-    outputFormats.set(listOf("HTML", "XML", "CSV"))
+    outputFormats.set(listOf("CSV"))
     
     // Relatórios com timestamp desabilitado (facilita comparação)
     timestampedReports.set(false)
@@ -368,12 +369,51 @@ pitest {
     // Detectar mutantes não cobertos por testes (failWhenNoMutations = false)
     failWhenNoMutations.set(false)
     
-    // Otimização de memória
-    jvmArgs.set(listOf("-Xmx2048m", "-Xms512m"))
+    // Otimização de memória e supressão de avisos da JVM/Mockito
+    val agentFile = project.configurations.getByName("testRuntimeClasspath").files.find {
+        it.name.contains("byte-buddy-agent")
+    }
+    val pitestJvmArgs = mutableListOf(
+        "-Xmx4096m",
+        "-Xms512m",
+        "-XX:+EnableDynamicAgentLoading",
+        "-Xshare:off",
+        "--add-opens=java.base/java.lang=ALL-UNNAMED",
+        "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
+        "--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED"
+    )
+    agentFile?.let { pitestJvmArgs.add("-javaagent:${it.path}") }
+    jvmArgs.set(pitestJvmArgs)
+}
+
+// ============================================
+// Dependency Updates Configuration (Versions)
+// ============================================
+
+tasks.withType<DependencyUpdatesTask> {
+    // Foca apenas em atualizações de release estáveis para evitar ruído de SNAPSHOTs/Milestones
+    revision = "release"
     
-    // Thresholds desabilitados inicialmente (habilitar na Fase 6)
-    // mutationThreshold.set(80)
-    // coverageThreshold.set(99)
+    // Melhora a visualização no terminal
+    outputFormatter = "plain"
+    
+    // Verifica dependências gerenciadas (BOM)
+    checkConstraints = true
+    
+    rejectVersionIf {
+        isNonStable(candidate.version)
+    }
+}
+
+fun isNonStable(version: String): Boolean {
+    val nonStableKeywords = listOf("ALPHA", "BETA", "RC", "CR", "M", "PREVIEW", "BUILD", "SNAPSHOT")
+    val upperVersion = version.uppercase()
+    val hasNonStableKeyword = nonStableKeywords.any { upperVersion.contains(it) }
+    
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { upperVersion.contains(it) }
+    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    
+    return hasNonStableKeyword || (!stableKeyword && !regex.matches(version))
 }
 
 // Tarefa customizada para mutation testing completo

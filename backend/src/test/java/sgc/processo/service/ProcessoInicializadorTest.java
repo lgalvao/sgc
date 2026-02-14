@@ -191,7 +191,8 @@ class ProcessoInicializadorTest {
         List<String> erros = inicializador.iniciar(1L, List.of(1L), usuario);
 
         assertThat(erros).isEmpty();
-        verify(subprocessoFacade).criarParaRevisao(eq(p), any(), any(), eq(admin), eq(usuario));
+        verify(unidadeMapaRepo).findAllById(anyList());
+        verify(subprocessoFacade).criarParaRevisao(eq(p), eq(u), eq(um), eq(admin), eq(usuario));
     }
 
     @Test

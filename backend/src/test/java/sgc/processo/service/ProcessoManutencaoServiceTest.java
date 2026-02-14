@@ -15,10 +15,7 @@ import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
+import sgc.processo.model.*;
 import sgc.testutils.UnidadeTestBuilder;
 
 import java.time.LocalDateTime;
@@ -76,6 +73,12 @@ class ProcessoManutencaoServiceTest {
             processoSalvo.setCodigo(100L);
             processoSalvo.setDescricao("Processo de Revisão");
             processoSalvo.setTipo(TipoProcesso.REVISAO);
+            
+            // Adiciona um participante ao mock para cobrir a lambda do log (linha 70)
+            UnidadeProcesso up = new UnidadeProcesso();
+            up.setId(new UnidadeProcessoId(100L, 1L));
+            processoSalvo.setParticipantes(new java.util.ArrayList<>(java.util.List.of(up)));
+            
             when(processoRepo.saveAndFlush(any(Processo.class))).thenReturn(processoSalvo);
 
             // When

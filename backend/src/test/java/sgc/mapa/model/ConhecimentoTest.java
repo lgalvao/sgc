@@ -24,4 +24,16 @@ class ConhecimentoTest {
         assertThat(k.getDescricao()).isEqualTo("desc");
         assertThat(k.getAtividade()).isEqualTo(atividade);
     }
+
+    @Test
+    @DisplayName("Deve retornar código da atividade")
+    void deveRetornarCodigoAtividade() {
+        Atividade atividade = new Atividade();
+        atividade.setCodigo(100L);
+        Conhecimento k = Conhecimento.builder()
+                .atividade(atividade)
+                .build();
+        
+        assertThat(k.getCodigoAtividade()).isEqualTo(100L);
+    }
 }

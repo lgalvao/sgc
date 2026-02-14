@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -64,5 +65,49 @@ class CopiaMapaServiceCoverageTest {
 
         // Assert
         verify(competenciaRepo).saveAll(anyList());
+    }
+
+    @Test
+    @DisplayName("importarAtividadesDeOutroMapa deve importar atividades que não existem no destino")
+    void deveImportarAtividadesNaoExistentes() {
+        // Arrange
+        Long mapaOrigemId = 1L;
+        Long mapaDestinoId = 2L;
+        
+        Atividade ativOrigem = Atividade.builder()
+                .descricao("Nova Atividade")
+                .conhecimentos(new ArrayList<>())
+                .build();
+        
+        when(atividadeRepo.findWithConhecimentosByMapaCodigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));
+        when(atividadeRepo.findByMapaCodigo(mapaDestinoId)).thenReturn(List.of()); // Destino vazio
+        when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
+        
+        // Act
+        service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId);
+        
+        // Assert
+        verify(atividadeRepo).saveAll(anyList());
+    }
+
+    @Test
+    @DisplayName("importarAtividadesDeOutroMapa não deve importar atividades com descrição já existente")
+    void naoDeveImportarAtividadesExistentes() {
+        // Arrange
+        Long mapaOrigemId = 1L;
+        Long mapaDestinoId = 2L;
+        
+        Atividade ativOrigem = Atividade.builder().descricao("Existente").build();
+        Atividade ativDestino = Atividade.builder().descricao("Existente").build();
+        
+        when(atividadeRepo.findWithConhecimentosByMapaCodigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));
+        when(atividadeRepo.findByMapaCodigo(mapaDestinoId)).thenReturn(List.of(ativDestino));
+        when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
+        
+        // Act
+        service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId);
+        
+        // Assert
+        verify(atividadeRepo, never()).saveAll(anyList());
     }
 }

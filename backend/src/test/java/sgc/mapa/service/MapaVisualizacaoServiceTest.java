@@ -85,4 +85,31 @@ class MapaVisualizacaoServiceTest {
 
         assertThat(dto.competencias().getFirst().getAtividades()).isEmpty();
     }
+
+    @Test
+    @DisplayName("Deve mapear conhecimentos das atividades")
+    void deveMapearConhecimentos() {
+        Subprocesso sub = new Subprocesso();
+        sub.setMapa(new Mapa());
+        sub.getMapa().setCodigo(10L);
+        sub.setUnidade(new Unidade());
+
+        Atividade ativ = new Atividade();
+        ativ.setCodigo(1L);
+        ativ.setDescricao("A1");
+        
+        sgc.mapa.model.Conhecimento k = sgc.mapa.model.Conhecimento.builder()
+                .codigo(100L)
+                .descricao("K1")
+                .build();
+        ativ.setConhecimentos(List.of(k));
+
+        when(atividadeRepo.findWithConhecimentosByMapaCodigo(10L)).thenReturn(List.of(ativ));
+        when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(10L)).thenReturn(List.of());
+
+        MapaVisualizacaoDto dto = service.obterMapaParaVisualizacao(sub);
+
+        assertThat(dto.atividadesSemCompetencia().getFirst().conhecimentos()).hasSize(1);
+        assertThat(dto.atividadesSemCompetencia().getFirst().conhecimentos().getFirst().descricao()).isEqualTo("K1");
+    }
 }

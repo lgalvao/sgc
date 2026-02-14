@@ -108,7 +108,12 @@ class ProcessoFacadeTest {
         @DisplayName("buscarIdsUnidadesEmProcessosAtivos deve delegar para consulta service")
         void buscarIdsUnidadesEmProcessosAtivos_DeveDelegar() {
             Long codigoIgnorar = 1L;
-            processoFacade.buscarIdsUnidadesEmProcessosAtivos(codigoIgnorar);
+            Set<Long> unidades = Set.of(10L, 20L);
+            when(processoConsultaService.buscarIdsUnidadesComProcessosAtivos(codigoIgnorar)).thenReturn(unidades);
+            
+            Set<Long> resultado = processoFacade.buscarIdsUnidadesEmProcessosAtivos(codigoIgnorar);
+            
+            assertThat(resultado).isEqualTo(unidades);
             verify(processoConsultaService).buscarIdsUnidadesComProcessosAtivos(codigoIgnorar);
         }
 
@@ -608,6 +613,18 @@ class ProcessoFacadeTest {
             
             assertThat(res).isEmpty();
             verify(processoMapper, never()).toDto(any());
+        }
+
+        @Test
+        @DisplayName("Deve obter DTO de processo por ID")
+        void deveObterDtoPorId() {
+            Long id = 100L;
+            Processo processo = sgc.fixture.ProcessoFixture.processoPadrao();
+            when(processoConsultaService.buscarProcessoCodigo(id)).thenReturn(processo);
+            when(processoMapper.toDto(processo)).thenReturn(ProcessoDto.builder().build());
+
+            processoFacade.obterDtoPorId(id);
+            verify(processoMapper).toDto(processo);
         }
 
         @Test

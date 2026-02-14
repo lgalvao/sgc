@@ -7,15 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.dto.PerfilDto;
-import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.Perfil;
 import sgc.processo.dto.SubprocessoElegivelDto;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -208,5 +201,37 @@ class ProcessoConsultaServiceTest {
         // Assert
         assertThat(resultado).isEmpty();
         verify(processoRepo).listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
+    }
+
+    @Test
+    @DisplayName("Deve retornar Optional de processo por código")
+    void deveBuscarProcessoCodigoOpt() {
+        sgc.processo.model.Processo p = new sgc.processo.model.Processo();
+        when(processoRepo.findById(1L)).thenReturn(java.util.Optional.of(p));
+        
+        java.util.Optional<sgc.processo.model.Processo> res = processoConsultaService.buscarProcessoCodigoOpt(1L);
+        assertThat(res).isPresent().contains(p);
+    }
+
+    @Test
+    @DisplayName("Deve buscar processos paginados")
+    void deveListarProcessosPaginados() {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.Pageable.unpaged();
+        when(processoRepo.findAll(pageable)).thenReturn(org.springframework.data.domain.Page.empty());
+        
+        org.springframework.data.domain.Page<sgc.processo.model.Processo> res = processoConsultaService.processos(pageable);
+        assertThat(res).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve buscar processos iniciados por participantes")
+    void deveBuscarProcessosIniciadosPorParticipantes() {
+        List<Long> unidadeIds = List.of(1L);
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.Pageable.unpaged();
+        when(processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(unidadeIds, SituacaoProcesso.CRIADO, pageable))
+                .thenReturn(org.springframework.data.domain.Page.empty());
+
+        org.springframework.data.domain.Page<sgc.processo.model.Processo> res = processoConsultaService.processosIniciadosPorParticipantes(unidadeIds, pageable);
+        assertThat(res).isEmpty();
     }
 }
