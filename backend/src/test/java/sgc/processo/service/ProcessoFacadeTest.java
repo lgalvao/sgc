@@ -140,6 +140,58 @@ class ProcessoFacadeTest {
         }
 
         @Test
+        @DisplayName("enviarLembrete deve formatar data corretamente quando presente")
+        void enviarLembrete_DeveFormatarDataQuandoPresente() {
+            Long codProcesso = 1L;
+            Long codUnidade = 2L;
+            LocalDateTime dataLimite = LocalDateTime.of(2026, 3, 15, 23, 59);
+
+            Processo processo = new Processo();
+            processo.setDescricao("Processo com prazo");
+            processo.setDataLimite(dataLimite);
+            Unidade unidade = UnidadeTestBuilder.umaDe()
+                    .comCodigo(String.valueOf(codUnidade))
+                    .build();
+            processo.adicionarParticipantes(Set.of(unidade));
+
+            when(processoConsultaService.buscarProcessoCodigo(codProcesso)).thenReturn(processo);
+            when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(unidade);
+            SubprocessoDto subprocessoDto = new SubprocessoDto();
+            subprocessoDto.setCodigo(99L);
+            when(subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocessoDto);
+
+            processoFacade.enviarLembrete(codProcesso, codUnidade);
+
+            verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("15/03/2026"));
+            verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
+            verify(notificacaoEmailService).enviarEmail(
+                eq(unidade.getSigla()), 
+                contains("SGC: Lembrete de prazo"), 
+                contains("encerra em 15/03/2026")
+            );
+        }
+
+        @Test
+        @DisplayName("enviarLembrete deve lançar exceção quando unidade não participa")
+        void enviarLembrete_DeveLancarExcecaoQuandoUnidadeNaoParticipa() {
+            Long codProcesso = 1L;
+            Long codUnidade = 99L; // Unidade que não participa
+            
+            Processo processo = new Processo();
+            processo.setDescricao("Processo");
+            Unidade unidadeParticipante = UnidadeTestBuilder.umaDe()
+                    .comCodigo("2") // Outra unidade
+                    .build();
+            processo.adicionarParticipantes(Set.of(unidadeParticipante));
+            
+            when(processoConsultaService.buscarProcessoCodigo(codProcesso)).thenReturn(processo);
+            
+            assertThatThrownBy(() -> processoFacade.enviarLembrete(codProcesso, codUnidade))
+                    .isInstanceOf(ErroProcesso.class)
+                    .hasMessageContaining("não participa");
+        }
+
+        @Test
         @DisplayName("executarAcaoEmBloco ignora ação null na categorização")
         void executarAcaoEmBloco_IgnoraAcaoNull() {
             Long codProcesso = 1L;
@@ -547,6 +599,18 @@ class ProcessoFacadeTest {
         }
 
         @Test
+        @DisplayName("Deve retornar Optional vazio quando processo não existe")
+        void deveRetornarOptionalVazioQuandoProcessoNaoExiste() {
+            Long id = 999L;
+            when(processoConsultaService.buscarProcessoCodigoOpt(id)).thenReturn(Optional.empty());
+
+            Optional<ProcessoDto> res = processoFacade.obterPorId(id);
+            
+            assertThat(res).isEmpty();
+            verify(processoMapper, never()).toDto(any());
+        }
+
+        @Test
         @DisplayName("Deve listar processos finalizados e ativos")
         void deveListarProcessosFinalizadosEAtivos() {
             // Arrange
@@ -707,6 +771,18 @@ class ProcessoFacadeTest {
 
             processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
             verify(processoConsultaService).unidadesBloqueadasPorTipo(TipoProcesso.MAPEAMENTO);
+        }
+
+        @Test
+        @DisplayName("listarUnidadesBloqueadasPorTipo: deve retornar lista vazia quando não há unidades bloqueadas")
+        void listarUnidadesBloqueadasPorTipo_DeveRetornarListaVazia() {
+            when(processoConsultaService.unidadesBloqueadasPorTipo(TipoProcesso.REVISAO)).thenReturn(List.of());
+
+            List<Long> resultado = processoFacade.listarUnidadesBloqueadasPorTipo("REVISAO");
+            
+            assertThat(resultado).isNotNull();
+            assertThat(resultado).isEmpty();
+            verify(processoConsultaService).unidadesBloqueadasPorTipo(TipoProcesso.REVISAO);
         }
 
         @Test
