@@ -1,0 +1,114 @@
+package sgc.configuracao;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import sgc.configuracao.dto.ParametroRequest;
+import sgc.configuracao.dto.ParametroResponse;
+
+import java.util.Collections;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(ConfiguracaoController.class)
+@Tag("unit")
+@DisplayName("Testes do ConfiguracaoController")
+class ConfiguracaoControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @MockitoBean
+    private ConfiguracaoFacade configuracaoFacade;
+
+    @Test
+    @DisplayName("GET /api/configuracoes - Deve listar configurações com sucesso")
+    @WithMockUser(roles = "ADMIN")
+    void deveListarConfiguracoes() throws Exception {
+        ParametroResponse param = ParametroResponse.builder()
+                .codigo(1L)
+                .chave("KEY")
+                .descricao("Description")
+                .valor("VALUE")
+                .build();
+        
+        when(configuracaoFacade.buscarTodos()).thenReturn(List.of(param));
+
+        mockMvc.perform(get("/api/configuracoes")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].chave").value("KEY"))
+                .andExpect(jsonPath("$[0].valor").value("VALUE"));
+    }
+
+    @Test
+    @DisplayName("GET /api/configuracoes - Deve retornar lista vazia quando não há configurações")
+    @WithMockUser(roles = "ADMIN")
+    void deveRetornarListaVaziaQuandoNaoHaConfiguracoes() throws Exception {
+        // Pattern 1: Empty list validation
+        when(configuracaoFacade.buscarTodos()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/api/configuracoes")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    @DisplayName("POST /api/configuracoes - Deve atualizar configurações com sucesso")
+    @WithMockUser(roles = "ADMIN")
+    void deveAtualizarConfiguracoes() throws Exception {
+        ParametroRequest request = new ParametroRequest(1L, "KEY", "Description", "NEW_VALUE");
+        ParametroResponse response = ParametroResponse.builder()
+                .codigo(1L)
+                .chave("KEY")
+                .descricao("Description")
+                .valor("NEW_VALUE")
+                .build();
+        
+        when(configuracaoFacade.salvar(any())).thenReturn(List.of(response));
+
+        mockMvc.perform(post("/api/configuracoes")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(List.of(request))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].chave").value("KEY"))
+                .andExpect(jsonPath("$[0].valor").value("NEW_VALUE"));
+    }
+
+    @Test
+    @DisplayName("POST /api/configuracoes - Deve retornar lista vazia quando atualização não retorna dados")
+    @WithMockUser(roles = "ADMIN")
+    void deveRetornarListaVaziaAposAtualizacao() throws Exception {
+        // Pattern 1: Empty list validation
+        when(configuracaoFacade.salvar(any())).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(post("/api/configuracoes")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Collections.emptyList())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+}

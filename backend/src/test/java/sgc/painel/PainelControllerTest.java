@@ -45,7 +45,8 @@ class PainelControllerTest {
                         .param("perfil", "ADMIN")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray());
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content").isEmpty()); // Pattern 1: Empty list validation
     }
 
     @Test
@@ -67,7 +68,8 @@ class PainelControllerTest {
         mockMvc.perform(get("/api/painel/alertas")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray());
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content").isEmpty()); // Pattern 1: Empty list validation
     }
 
     @Test
@@ -82,7 +84,8 @@ class PainelControllerTest {
                         .param("unidade", "1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray());
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content").isEmpty()); // Pattern 1: Empty list validation
     }
 
 }
