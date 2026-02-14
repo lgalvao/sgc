@@ -12,10 +12,32 @@ Este diretório contém toda a documentação relacionada a Mutation-Based Testi
 
 | Documento                                        | Descrição                                      | Quando Usar                          |
 |--------------------------------------------------|------------------------------------------------|--------------------------------------|
-| **[MBT-plan.md](MBT-plan.md)**                   | Plano completo de implementação em 6 fases     | Entender estratégia e roadmap        |
-| **[MBT-quickstart.md](MBT-quickstart.md)**       | Guia rápido para desenvolvedores               | Começar a usar MBT no dia a dia      |
+| **[MBT-STATUS-AND-NEXT-STEPS.md](MBT-STATUS-AND-NEXT-STEPS.md)** | 🌟 **START HERE** - Status atual e próximos passos | Começar a trabalhar em melhorias |
+| **[MBT-PRACTICAL-AI-GUIDE.md](MBT-PRACTICAL-AI-GUIDE.md)** | 🤖 Guia prático para agentes IA | Quando mutation testing não funciona |
+| **[MBT-AI-AGENT-PLAN.md](MBT-AI-AGENT-PLAN.md)** | 🤖 Plano completo adaptado para IA | Workflows e decisões automatizadas |
+| **[MBT-plan.md](MBT-plan.md)**                   | Plano original de implementação em 6 fases     | Entender estratégia completa        |
+| **[MBT-analise-alerta.md](MBT-analise-alerta.md)** | Análise detalhada dos mutantes (alerta) | Ver exemplos reais de problemas |
+| **[MBT-quickstart.md](MBT-quickstart.md)**       | Guia rápido para desenvolvedores               | Rodar mutation testing manualmente      |
 | **[MBT-baseline.md](MBT-baseline.md)**           | Baseline inicial e resultados da amostra       | Entender situação atual              |
-| **[MBT-progress.md](MBT-progress.md)**           | Rastreamento de progresso por sprint           | Acompanhar evolução                  |
+| **[MBT-progress.md](MBT-progress.md)**           | Template de rastreamento de progresso           | Acompanhar evolução                  |
+| **[MBT-SUMMARY.md](MBT-SUMMARY.md)**             | Resumo executivo atualizado | Visão geral rápida |
+
+### 🌟 Recomendação de Leitura
+
+**Se você é um Agente de IA:**
+1. **START:** [MBT-STATUS-AND-NEXT-STEPS.md](MBT-STATUS-AND-NEXT-STEPS.md)
+2. **Guia Prático:** [MBT-PRACTICAL-AI-GUIDE.md](MBT-PRACTICAL-AI-GUIDE.md)
+3. **Exemplos:** [MBT-analise-alerta.md](MBT-analise-alerta.md)
+
+**Se você é um Desenvolvedor:**
+1. **START:** [MBT-STATUS-AND-NEXT-STEPS.md](MBT-STATUS-AND-NEXT-STEPS.md)
+2. **Guia Prático:** [MBT-PRACTICAL-AI-GUIDE.md](MBT-PRACTICAL-AI-GUIDE.md)
+3. **Quick Start:** [MBT-quickstart.md](MBT-quickstart.md) (se quiser rodar mutation testing)
+
+**Se você é Gestor/Tech Lead:**
+1. **START:** [MBT-STATUS-AND-NEXT-STEPS.md](MBT-STATUS-AND-NEXT-STEPS.md)
+2. **Resumo:** [MBT-SUMMARY.md](MBT-SUMMARY.md)
+3. **Plano Completo:** [MBT-plan.md](MBT-plan.md)
 
 ---
 

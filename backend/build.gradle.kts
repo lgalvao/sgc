@@ -324,11 +324,19 @@ pitest {
     excludedClasses.set(listOf(
         "sgc.config.*",              // Configurações Spring
         "sgc.*Exception",            // Classes de exceção
+        "sgc.*Erro*",                // Todas as classes de erro
         "sgc.*Mapper",               // Mappers MapStruct (gerados)
         "sgc.*MapperImpl",           // Mappers MapStruct (gerados)
         "sgc.*.dto.*",               // DTOs (baixa lógica)
+        "sgc.*Request",              // Request DTOs
+        "sgc.*Response",             // Response DTOs
+        "sgc.*Query",                // Query objects
+        "sgc.*Command",              // Command objects
+        "sgc.*View",                 // View objects
+        "sgc.*Event*",               // Event classes (domain events)
         "sgc.Sgc",                   // Classe main
-        "sgc.SgcTest"                // Classe de teste da main
+        "sgc.SgcTest",               // Classe de teste da main
+        "sgc.arquitetura.*"          // Architecture tests
     ))
     
     // Métodos ignorados (getters/setters já são excluídos por padrão)
@@ -351,11 +359,17 @@ pitest {
     // Performance - usar todos os cores disponíveis
     threads.set(Runtime.getRuntime().availableProcessors())
     
+    // Timeout configuration - Phase 2 optimization
+    timeoutFactor.set(BigDecimal("2.0"))  // Multiply test runtime by 2 for mutation timeout
+    
     // Verbose output para debug
     verbose.set(false)
     
     // Detectar mutantes não cobertos por testes (failWhenNoMutations = false)
     failWhenNoMutations.set(false)
+    
+    // Memory optimization
+    jvmArgs.set(listOf("-Xmx2048m", "-Xms512m"))
     
     // Thresholds desabilitados inicialmente (habilitar na Fase 6)
     // mutationThreshold.set(80)
