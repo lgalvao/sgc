@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {BTable} from "bootstrap-vue-next";
+import {BButton, BTable} from "bootstrap-vue-next";
 import {computed} from "vue";
 import EmptyState from "@/components/EmptyState.vue";
 import BadgeSituacao from "@/components/comum/BadgeSituacao.vue";
@@ -11,11 +11,14 @@ const props = defineProps<{
   direcaoOrdenacaoAsc: boolean;
   showDataFinalizacao?: boolean;
   compacto?: boolean;
+  mostrarCtaVazio?: boolean;
+  textoCtaVazio?: string;
 }>();
 
 const emit = defineEmits<{
   (e: "ordenar", campo: keyof ProcessoResumo | "dataFinalizacao"): void;
   (e: "selecionarProcesso", processo: ProcessoResumo): void;
+  (e: "ctaVazio"): void;
 }>();
 
 const fields = computed(() => {
@@ -95,7 +98,17 @@ defineExpose({ fields });
             title="Nenhum processo encontrado"
             description="Os processos em que sua unidade participa aparecerão aqui."
             data-testid="empty-state-processos"
-            class="border-0 bg-transparent mb-0"/>
+            class="border-0 bg-transparent mb-0">
+          <BButton
+              v-if="mostrarCtaVazio"
+              data-testid="btn-empty-state-criar-processo"
+              size="sm"
+              variant="outline-primary"
+              @click="emit('ctaVazio')"
+          >
+            {{ textoCtaVazio || 'Criar processo' }}
+          </BButton>
+        </EmptyState>
       </template>
 
       <template #cell(situacao)="{ item }">

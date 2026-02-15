@@ -269,6 +269,24 @@ describe("TabelaProcessos.vue", () => {
         expect(context.wrapper.text()).toContain("Nenhum processo encontrado");
     });
 
+    it("deve exibir CTA no estado vazio e emitir evento ao clicar", async () => {
+        context.wrapper = mount(TabelaProcessos, {
+            ...getCommonMountOptions(),
+            props: {
+                processos: [],
+                criterioOrdenacao: "descricao",
+                direcaoOrdenacaoAsc: true,
+                mostrarCtaVazio: true,
+            },
+        });
+
+        await context.wrapper.vm.$nextTick();
+        const botaoCta = context.wrapper.find('[data-testid="btn-empty-state-criar-processo"]');
+        expect(botaoCta.exists()).toBe(true);
+        await botaoCta.trigger("click");
+        expect(context.wrapper.emitted("ctaVazio")).toBeTruthy();
+    });
+
     describe("Modo Compacto", () => {
         it("deve exibir o rótulo reduzido 'Unidades' quando compacto é true", async () => {
             // Need real BTable to check headers

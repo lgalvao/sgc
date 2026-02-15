@@ -1,7 +1,7 @@
 # Rastreamento de Melhorias de UX - SGC
 
 **Data de início:** 2026-02-14  
-**Última atualização:** 2026-02-15 (UX-003 em andamento)  
+**Última atualização:** 2026-02-15 (UX-003 concluído)  
 **Documento base:** `ux-improvement-plan.md`
 
 ---
@@ -12,10 +12,10 @@
 
 | Categoria | Total | Concluído | Em Andamento | Pendente | % Completo |
 |-----------|-------|-----------|--------------|----------|------------|
-| **Prioridade Alta** | 3 | 2 | 1 | 0 | 67% |
+| **Prioridade Alta** | 3 | 3 | 0 | 0 | 100% |
 | **Prioridade Média** | 3 | 0 | 0 | 3 | 0% |
 | **Prioridade Estrutural** | 4 | 0 | 0 | 4 | 0% |
-| **TOTAL** | 10 | 2 | 1 | 7 | **20%** |
+| **TOTAL** | 10 | 3 | 0 | 7 | **30%** |
 
 ### Legenda de Status
 - ⬜ **Pendente:** Não iniciado
@@ -63,8 +63,8 @@
 
 ---
 
-#### 🔵 UX-003: Melhorar Legibilidade de Tabelas
-**Status:** Em Andamento  
+#### ✅ UX-003: Melhorar Legibilidade de Tabelas
+**Status:** Concluído  
 **Prioridade:** Alta  
 **Complexidade:** Média  
 **Esforço estimado:** 4-5 horas  
@@ -73,8 +73,8 @@
 - [x] Criar `frontend/src/components/comum/BadgeSituacao.vue`
 - [x] Definir cores para situações (CRIADO, EM_ANDAMENTO, FINALIZADO)
 - [x] Aplicar em `TabelaProcessos.vue`
-- [ ] Aplicar em `TabelaMovimentacoes.vue`
-- [ ] Implementar estado vazio com CTA
+- [x] Aplicar em `TabelaMovimentacoes.vue`
+- [x] Implementar estado vazio com CTA
 
 ---
 
@@ -190,6 +190,7 @@
 - 🔵 UX-002 evoluído com `CampoTexto.vue`, `useValidacao.ts` e testes unitários focados
 - ✅ UX-002 concluído com cobertura de formulários mapeados no frontend
 - 🔵 UX-003 iniciado com `BadgeSituacao.vue` e aplicação em `TabelaProcessos.vue`
+- ✅ UX-003 concluído com `BadgeSituacao` em tabelas e CTA no estado vazio
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial

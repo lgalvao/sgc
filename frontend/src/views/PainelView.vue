@@ -18,9 +18,11 @@
           :compacto="true"
           :criterio-ordenacao="criterio"
           :direcao-ordenacao-asc="asc"
+          :mostrar-cta-vazio="perfil.isAdmin"
           :processos="processosOrdenados"
           @ordenar="ordenarPor"
           @selecionar-processo="abrirDetalhesProcesso"
+          @cta-vazio="router.push({ name: 'CadProcesso' })"
       />
     </div>
 
