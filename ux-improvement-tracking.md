@@ -1,7 +1,7 @@
 # Rastreamento de Melhorias de UX - SGC
 
 **Data de início:** 2026-02-14  
-**Última atualização:** 2026-02-15 (UX-006 concluído)  
+**Última atualização:** 2026-02-15 (UX-007 concluído)  
 **Documento base:** `ux-improvement-plan.md`
 
 ---
@@ -14,8 +14,8 @@
 |-----------|-------|-----------|--------------|----------|------------|
 | **Prioridade Alta** | 3 | 3 | 0 | 0 | 100% |
 | **Prioridade Média** | 3 | 3 | 0 | 0 | 100% |
-| **Prioridade Estrutural** | 4 | 0 | 0 | 4 | 0% |
-| **TOTAL** | 10 | 6 | 0 | 4 | **60%** |
+| **Prioridade Estrutural** | 4 | 1 | 0 | 3 | 25% |
+| **TOTAL** | 10 | 7 | 0 | 3 | **70%** |
 
 ### Legenda de Status
 - ⬜ **Pendente:** Não iniciado
@@ -123,17 +123,17 @@
 
 ### Prioridade Estrutural (Fundação)
 
-#### ⬜ UX-007: Criar Design Tokens (CSS Nativo)
-**Status:** Pendente  
+#### ✅ UX-007: Criar Design Tokens (CSS Nativo)
+**Status:** Concluído  
 **Prioridade:** Estrutural  
 **Complexidade:** Alta  
 **Esforço estimado:** 8-10 horas  
 
 **Checklist de Implementação:**
-- [ ] Criar `frontend/src/assets/css/tokens.css`
-- [ ] Definir cores semânticas (mapeadas do Bootstrap)
-- [ ] Definir escala de espaçamento e tipografia
-- [ ] Importar globalmente em `main.ts` ou `style.css`
+- [x] Criar `frontend/src/assets/css/tokens.css`
+- [x] Definir cores semânticas (mapeadas do Bootstrap)
+- [x] Definir escala de espaçamento e tipografia
+- [x] Importar globalmente em `main.ts` ou `style.css`
 
 ---
 
@@ -200,6 +200,7 @@
 - 🔵 UX-005 expandido para views adicionais com validação completa de typecheck/lint/testes unitários
 - ✅ UX-005 concluído com migração de todas as views de conteúdo para `LayoutPadrao.vue`
 - ✅ UX-006 concluído com padronização de mensagens/CTA em estados vazios prioritários (`TabelaAlertas`, `HistoricoView`, `Unidades`)
+- ✅ UX-007 concluído com criação e importação global de design tokens em `frontend/src/assets/css/tokens.css`
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial

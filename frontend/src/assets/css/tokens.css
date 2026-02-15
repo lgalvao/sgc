@@ -1,0 +1,31 @@
+:root {
+    /* Cores semânticas baseadas em tokens do Bootstrap */
+    --cor-primaria: var(--bs-primary);
+    --cor-secundaria: var(--bs-secondary);
+    --cor-sucesso: var(--bs-success);
+    --cor-perigo: var(--bs-danger);
+    --cor-aviso: var(--bs-warning);
+    --cor-info: var(--bs-info);
+    --cor-clara: var(--bs-light);
+    --cor-escura: var(--bs-dark);
+    --cor-texto-padrao: var(--bs-body-color);
+    --cor-fundo-padrao: var(--bs-body-bg);
+
+    /* Escala de espaçamento */
+    --espacamento-1: 0.25rem;
+    --espacamento-2: 0.5rem;
+    --espacamento-3: 1rem;
+    --espacamento-4: 1.5rem;
+    --espacamento-5: 3rem;
+
+    /* Tipografia base */
+    --fonte-familia-base: var(--bs-font-sans-serif);
+    --fonte-tamanho-xs: 0.75rem;
+    --fonte-tamanho-sm: 0.875rem;
+    --fonte-tamanho-md: 1rem;
+    --fonte-tamanho-lg: 1.25rem;
+    --fonte-peso-normal: 400;
+    --fonte-peso-semi-bold: 600;
+    --fonte-peso-bold: 700;
+    --linha-altura-base: 1.5;
+}
