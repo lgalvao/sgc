@@ -56,13 +56,10 @@ public class ProcessoManutencaoService {
                 .setSituacao(CRIADO)
                 .setDataCriacao(LocalDateTime.now());
 
-        // Adiciona participantes com snapshot
         processo.adicionarParticipantes(participantes);
-
-        // Salva uma única vez com todos os participantes
         Processo processoSalvo = processoRepo.saveAndFlush(processo);
 
-        log.info("Processo {} criado com {} participantes: {}. Participante IDs: {}",
+        log.info("Processo {} criado com {} participantes: {} - {}",
                 processoSalvo.getCodigo(),
                 processoSalvo.getParticipantes().size(),
                 processoSalvo.getCodigosParticipantes(),
@@ -97,7 +94,6 @@ public class ProcessoManutencaoService {
             participantes.add(unidadeService.buscarEntidadePorId(codigoUnidade));
         }
 
-        // Atualiza participantes com sincronização inteligente
         processo.sincronizarParticipantes(participantes);
 
         Processo processoAtualizado = processoRepo.saveAndFlush(processo);

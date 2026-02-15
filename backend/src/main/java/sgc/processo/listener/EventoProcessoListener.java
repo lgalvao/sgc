@@ -244,7 +244,7 @@ public class EventoProcessoListener {
             
             if (titular != null && titular.email() != null && !titular.email().isBlank()) {
                 notificacaoEmailService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
-                log.info("E-mail enviado para {}", unidade.getSigla());
+                log.info("E-mail enviado a {}", unidade.getSigla());
             } else {
                 log.warn("E-mail não enviado para {}: titular ou e-mail inválido", unidade.getSigla());
             }
@@ -276,10 +276,10 @@ public class EventoProcessoListener {
             UsuarioDto substituto = usuarios.get(tituloSubstituto);
             if (substituto != null && substituto.email() != null && !substituto.email().isBlank()) {
                 notificacaoEmailService.enviarEmailHtml(substituto.email(), assunto, corpoHtml);
-                log.info("E-mail enviado para o substituto da unidade {}.", nomeUnidade);
+                log.info("E-mail enviado ao substituto da unidade {}.", nomeUnidade);
             }
         } catch (Exception e) {
-            log.warn("Erro ao enviar e-mail para o substituto da unidade {}: {}", nomeUnidade,
+            log.warn("Erro ao enviar e-mail ao substituto da unidade {}: {}", nomeUnidade,
                     e.getClass().getSimpleName());
         }
     }

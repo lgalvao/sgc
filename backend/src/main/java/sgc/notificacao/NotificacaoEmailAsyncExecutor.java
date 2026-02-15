@@ -52,7 +52,7 @@ public class NotificacaoEmailAsyncExecutor {
         for (int tentativa = 1; tentativa <= MAX_TENTATIVAS; tentativa++) {
             try {
                 enviarEmailSmtp(destinatario, assunto, corpo, html);
-                log.info("E-mail enviado para: {}", destinatario);
+                log.info("E-mail enviado a: {}", destinatario);
                 return CompletableFuture.completedFuture(true);
             } catch (MessagingException | UnsupportedEncodingException | RuntimeException e) {
                 excecaoFinal = e;
