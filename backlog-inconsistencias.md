@@ -34,3 +34,11 @@ Consolidar inconsistências identificadas durante a execução do plano de melho
 - **Alta:** itens 1, 2 e 4
 - **Média:** item 5
 - **Baixa/Técnica:** item 3
+
+## Andamento de tratamento
+
+- ✅ **Item 1 (parcial):** documentação de tracking alinhada com nomes reais de arquivos atuais; renomeações formais permanecem no escopo do UX-010.
+- ✅ **Item 2 (parcial):** caminhos principais de tokens e referências de UX já sincronizados no plano/tracking.
+- ✅ **Item 4 (parcial):** formulários mapeados em UX-002 revisados com validação inline e foco no primeiro erro.
+- 🔄 **Item 3 (pendente):** manter acompanhamento de tipagens frouxas para redução incremental.
+- 🔄 **Item 5 (contínuo):** manter atualização de `ux-improvement-tracking.md` e `plan.md` a cada ciclo.

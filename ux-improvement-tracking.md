@@ -40,8 +40,8 @@
 - [x] Criar `frontend/src/components/comum/ModalPadrao.vue`
 - [x] Definir taxonomia de variantes (primary, secondary, danger)
 - [x] Migrar `ModalConfirmacao.vue` (ajustar se necessário)
-- [x] Migrar `ModalMapaDisponibilizar.vue` (antigo `DisponibilizarMapaModal`)
-- [x] Migrar `ModalRelatorioAndamento.vue`
+- [x] Migrar `DisponibilizarMapaModal.vue` (renomeação para `ModalMapaDisponibilizar.vue` planejada no UX-010)
+- [x] Migrar `ModalAndamentoGeral.vue` (renomeação para `ModalRelatorioAndamento.vue` planejada no UX-010)
 - [x] Migrar demais modais padronizados (`Modal[Contexto][Acao]`)
 - [x] Criar teste E2E `e2e/ux/botoes-modais.spec.ts`
 
@@ -57,7 +57,7 @@
 - [x] Criar `frontend/src/components/comum/CampoTexto.vue`
 - [x] Criar `frontend/src/composables/useValidacao.ts`
 - [x] Aplicar em `ProcessoFormFields.vue`
-- [x] Aplicar em `AtividadeCadastroForm.vue`
+- [x] Aplicar em `CadAtividadeForm.vue`
 - [x] Aplicar em demais formulários
 - [x] Implementar foco automático no primeiro erro
 
