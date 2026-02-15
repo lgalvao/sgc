@@ -1,7 +1,7 @@
 # Rastreamento de Melhorias de UX - SGC
 
 **Data de início:** 2026-02-14  
-**Última atualização:** 2026-02-15 (UX-003 concluído)  
+**Última atualização:** 2026-02-15 (UX-004 concluído)  
 **Documento base:** `ux-improvement-plan.md`
 
 ---
@@ -13,9 +13,9 @@
 | Categoria | Total | Concluído | Em Andamento | Pendente | % Completo |
 |-----------|-------|-----------|--------------|----------|------------|
 | **Prioridade Alta** | 3 | 3 | 0 | 0 | 100% |
-| **Prioridade Média** | 3 | 0 | 1 | 2 | 0% |
+| **Prioridade Média** | 3 | 1 | 0 | 2 | 33% |
 | **Prioridade Estrutural** | 4 | 0 | 0 | 4 | 0% |
-| **TOTAL** | 10 | 3 | 1 | 6 | **30%** |
+| **TOTAL** | 10 | 4 | 0 | 6 | **40%** |
 
 ### Legenda de Status
 - ⬜ **Pendente:** Não iniciado
@@ -80,8 +80,8 @@
 
 ### Prioridade Média
 
-#### 🔵 UX-004: Adicionar Cabeçalho Contextual por Etapa/Perfil
-**Status:** Em Andamento  
+#### ✅ UX-004: Adicionar Cabeçalho Contextual por Etapa/Perfil
+**Status:** Concluído  
 **Prioridade:** Média  
 **Complexidade:** Média  
 **Esforço estimado:** 3-4 horas  
@@ -89,8 +89,8 @@
 **Checklist de Implementação:**
 - [x] Criar/Refatorar `frontend/src/components/layout/PageHeader.vue`
 - [x] Criar `frontend/src/composables/useProximaAcao.ts`
-- [x] Aplicar em `ProcessoDetalheView.vue` e `SubprocessoDetalheView.vue`
-- [ ] Implementar breadcrumb dinâmico
+- [x] Aplicar em `Processo.vue` e `Subprocesso.vue`
+- [x] Implementar breadcrumb dinâmico (via `BarraNavegacao.vue` + `useBreadcrumbs.ts`)
 
 ---
 
@@ -192,6 +192,8 @@
 - 🔵 UX-003 iniciado com `BadgeSituacao.vue` e aplicação em `TabelaProcessos.vue`
 - ✅ UX-003 concluído com `BadgeSituacao` em tabelas e CTA no estado vazio
 - 🔵 UX-004 iniciado com cabeçalho contextual e `useProximaAcao.ts`
+- ✅ UX-004 concluído com contexto por etapa/perfil em `PageHeader` e validação de breadcrumb dinâmico existente
+- ✅ Executada rodada periódica `npm run test:e2e:captura` (18/18 cenários de captura aprovados)
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial
