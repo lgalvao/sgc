@@ -1,7 +1,7 @@
 # Rastreamento de Melhorias de UX - SGC
 
 **Data de início:** 2026-02-14  
-**Última atualização:** 2026-02-15 (UX-008 concluído)  
+**Última atualização:** 2026-02-15 (UX-009 concluído)  
 **Documento base:** `ux-improvement-plan.md`
 
 ---
@@ -14,8 +14,8 @@
 |-----------|-------|-----------|--------------|----------|------------|
 | **Prioridade Alta** | 3 | 3 | 0 | 0 | 100% |
 | **Prioridade Média** | 3 | 3 | 0 | 0 | 100% |
-| **Prioridade Estrutural** | 4 | 2 | 0 | 2 | 50% |
-| **TOTAL** | 10 | 8 | 0 | 2 | **80%** |
+| **Prioridade Estrutural** | 4 | 3 | 0 | 1 | 75% |
+| **TOTAL** | 10 | 9 | 0 | 1 | **90%** |
 
 ### Legenda de Status
 - ⬜ **Pendente:** Não iniciado
@@ -150,15 +150,15 @@
 
 ---
 
-#### ⬜ UX-009: Manter Suíte de Captura como Auditoria Visual
-**Status:** Pendente  
+#### ✅ UX-009: Manter Suíte de Captura como Auditoria Visual
+**Status:** Concluído  
 **Prioridade:** Estrutural  
 **Complexidade:** Baixa  
 **Esforço estimado:** 2 horas  
 
 **Checklist de Implementação:**
-- [ ] Manter `e2e/captura-telas.spec.ts` atualizado
-- [ ] Adicionar novas capturas conforme necessário
+- [x] Manter `e2e/captura-telas.spec.ts` atualizado
+- [x] Adicionar novas capturas conforme necessário
 
 ---
 
@@ -202,6 +202,7 @@
 - ✅ UX-006 concluído com padronização de mensagens/CTA em estados vazios prioritários (`TabelaAlertas`, `HistoricoView`, `Unidades`)
 - ✅ UX-007 concluído com criação e importação global de design tokens em `frontend/src/assets/css/tokens.css`
 - ✅ UX-008 concluído com utilitários de responsividade, tabelas em modo `stacked` no mobile e rodapé de modais adaptado para telas pequenas
+- ✅ UX-009 concluído com execução periódica da suíte de captura visual (`npm run test:e2e:captura`) com 18/18 cenários aprovados
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial
