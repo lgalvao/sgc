@@ -1,5 +1,14 @@
 # SGC Complexity Analysis - Executive Summary
 
+⚠️ ATENÇÃO: Esta é a versão 1. Uma versão 2 revisada está disponível em:
+   - LEIA-ME-COMPLEXIDADE-V2.md (análise completa)
+   - complexity-summary-v2.txt (sumário executivo)
+   - complexity-v1-vs-v2-comparison.md (comparação detalhada)
+
+Recomendação: Leia a versão 2 para análise mais fundamentada e equilibrada.
+
+---
+
 ## Overview
 System designed for 10-20 concurrent users with enterprise-grade architecture
 

@@ -1,6 +1,18 @@
 # Relatório de Complexidade do SGC
 ## Sistema de Gestão de Competências
 
+> ⚠️ **ATENÇÃO:** Esta é a **versão 1** da análise. Uma **versão 2 revisada e mais fundamentada** está disponível em [LEIA-ME-COMPLEXIDADE-V2.md](LEIA-ME-COMPLEXIDADE-V2.md)
+> 
+> **Principais diferenças da v2:**
+> - ✅ Baseada em análise de requisitos reais (6.104 linhas)
+> - ✅ Métricas medidas, não estimadas
+> - ✅ Provas concretas de viabilidade com exemplos de código
+> - ✅ Diferenciação entre complexidade obrigatória (40%) e opcional (60%)
+> - ✅ Roadmap com classificação de risco (Baixo/Médio/Alto)
+> - ✅ Respeito explícito aos padrões arquiteturais válidos
+> 
+> **Recomendação:** Leia a [versão 2](LEIA-ME-COMPLEXIDADE-V2.md) para uma análise mais equilibrada.
+
 **Data:** 15 de Fevereiro de 2026  
 **Contexto:** Sistema corporativo para intranet com **10-20 usuários simultâneos**  
 **Problema:** Sobre-engenharia por otimização prematura para alta escalabilidade
