@@ -1,10 +1,10 @@
 <template>
-  <BModal
+  <ModalPadrao
       v-model="modelValueComputed"
-      :fade="false"
-      hide-footer
-      size="xl"
-      title="Diagnósticos de Gaps"
+      tamanho="xl"
+      titulo="Diagnósticos de Gaps"
+      :mostrar-botao-acao="false"
+      texto-cancelar="Fechar"
   >
     <div class="mb-3">
       <BButton
@@ -55,14 +55,15 @@
         </tbody>
       </table>
     </div>
-  </BModal>
+  </ModalPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BModal} from "bootstrap-vue-next";
+import {BButton} from "bootstrap-vue-next";
 import {computed} from "vue";
 import {downloadCSV, gerarCSV} from "@/utils/csv";
 import {formatDateBR} from "@/utils";
+import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 
 interface Diagnostico {
   codigo: number;

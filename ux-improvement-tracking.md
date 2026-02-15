@@ -1,7 +1,7 @@
 # Rastreamento de Melhorias de UX - SGC
 
 **Data de início:** 2026-02-14  
-**Última atualização:** 2026-02-15 (UX-001 em andamento)  
+**Última atualização:** 2026-02-15 (UX-001 concluído)  
 **Documento base:** `ux-improvement-plan.md`
 
 ---
@@ -12,10 +12,10 @@
 
 | Categoria | Total | Concluído | Em Andamento | Pendente | % Completo |
 |-----------|-------|-----------|--------------|----------|------------|
-| **Prioridade Alta** | 3 | 0 | 1 | 2 | 0% |
+| **Prioridade Alta** | 3 | 1 | 0 | 2 | 33% |
 | **Prioridade Média** | 3 | 0 | 0 | 3 | 0% |
 | **Prioridade Estrutural** | 4 | 0 | 0 | 4 | 0% |
-| **TOTAL** | 10 | 0 | 1 | 9 | **0%** |
+| **TOTAL** | 10 | 1 | 0 | 9 | **10%** |
 
 ### Legenda de Status
 - ⬜ **Pendente:** Não iniciado
@@ -30,8 +30,8 @@
 
 ### Prioridade Alta (Impacto Imediato)
 
-#### 🔵 UX-001: Padronizar Rodapé e Semântica de Botões em Modais
-**Status:** Em Andamento  
+#### ✅ UX-001: Padronizar Rodapé e Semântica de Botões em Modais
+**Status:** Concluído  
 **Prioridade:** Alta  
 **Complexidade:** Média  
 **Esforço estimado:** 3-4 horas  
@@ -42,8 +42,8 @@
 - [x] Migrar `ModalConfirmacao.vue` (ajustar se necessário)
 - [x] Migrar `ModalMapaDisponibilizar.vue` (antigo `DisponibilizarMapaModal`)
 - [x] Migrar `ModalRelatorioAndamento.vue`
-- [ ] Migrar demais modais padronizados (`Modal[Contexto][Acao]`)
-- [ ] Criar teste E2E `e2e/ux/botoes-modais.spec.ts`
+- [x] Migrar demais modais padronizados (`Modal[Contexto][Acao]`)
+- [x] Criar teste E2E `e2e/ux/botoes-modais.spec.ts`
 
 ---
 
@@ -184,7 +184,8 @@
 - ✅ Adicionado UX-010 (Nomenclatura)
 - ✅ Atualizado UX-007 para CSS Tokens
 - ✅ Atualizado terminologias (Situacao, Modais, Views)
-- 🔵 UX-001 iniciado com `ModalPadrao.vue` e migração dos modais críticos
+- ✅ UX-001 concluído com migração de modais críticos e adicionais
+- ✅ Criados testes focados: unitários (`ModalPadrao`) e E2E (`e2e/ux/botoes-modais.spec.ts`)
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial

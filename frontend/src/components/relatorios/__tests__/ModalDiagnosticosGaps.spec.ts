@@ -1,7 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import ModalDiagnosticosGaps from '../ModalDiagnosticosGaps.vue';
-import {BModal} from 'bootstrap-vue-next';
 import * as csvUtils from '@/utils/csv';
 
 // Mock dependencies
@@ -65,9 +64,10 @@ describe('ModalDiagnosticosGaps.vue', () => {
     },
     global: {
       stubs: {
-        BModal: {
+        ModalPadrao: {
             template: '<div><slot /></div>',
-            props: ['modelValue']
+            props: ['modelValue'],
+            emits: ['update:modelValue']
         },
         BButton: true,
       },
@@ -119,9 +119,7 @@ describe('ModalDiagnosticosGaps.vue', () => {
 
   it('emits update:modelValue when modal is closed', async () => {
       const wrapper = mount(ModalDiagnosticosGaps, mountOptions);
-
-      const modal = wrapper.findComponent(BModal);
-      modal.vm.$emit('update:modelValue', false);
+      (wrapper.vm as any).modelValueComputed = false;
 
       expect(wrapper.emitted('update:modelValue')).toBeTruthy();
       expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
