@@ -2,13 +2,13 @@
   <LayoutPadrao>
     <PageHeader title="Relatórios" />
 
-    <RelatorioFiltros
+    <RelatorioFiltrosSection
         v-model:tipo="filtroTipo"
         v-model:data-inicio="filtroDataInicio"
         v-model:data-fim="filtroDataFim"
     />
 
-    <RelatorioCards
+    <RelatorioCardsSection
         :mapas-vigentes-count="mapasVigentes.length"
         :diagnosticos-gaps-count="diagnosticosGapsFiltrados.length"
         :processos-filtrados-count="processosFiltrados.length"
@@ -30,7 +30,7 @@
     />
 
     <!-- Modal Andamento Geral -->
-    <ModalAndamentoGeral
+    <ModalRelatorioAndamento
         v-model="mostrarModalAndamentoGeral"
         :processos="processosFiltrados"
     />
@@ -42,9 +42,9 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ModalMapasVigentes from "@/components/relatorios/ModalMapasVigentes.vue";
 import ModalDiagnosticosGaps from "@/components/relatorios/ModalDiagnosticosGaps.vue";
-import ModalAndamentoGeral from "@/components/relatorios/ModalAndamentoGeral.vue";
-import RelatorioFiltros from "@/components/relatorios/RelatorioFiltros.vue";
-import RelatorioCards from "@/components/relatorios/RelatorioCards.vue";
+import ModalRelatorioAndamento from "@/components/relatorios/ModalRelatorioAndamento.vue";
+import RelatorioFiltrosSection from "@/components/relatorios/RelatorioFiltrosSection.vue";
+import RelatorioCardsSection from "@/components/relatorios/RelatorioCardsSection.vue";
 import {useRelatorios} from "@/composables/useRelatorios";
 
 const {

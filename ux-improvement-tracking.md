@@ -1,7 +1,7 @@
 # Rastreamento de Melhorias de UX - SGC
 
 **Data de início:** 2026-02-14  
-**Última atualização:** 2026-02-15 (UX-009 concluído)  
+**Última atualização:** 2026-02-15 (UX-010 em andamento)  
 **Documento base:** `ux-improvement-plan.md`
 
 ---
@@ -14,8 +14,8 @@
 |-----------|-------|-----------|--------------|----------|------------|
 | **Prioridade Alta** | 3 | 3 | 0 | 0 | 100% |
 | **Prioridade Média** | 3 | 3 | 0 | 0 | 100% |
-| **Prioridade Estrutural** | 4 | 3 | 0 | 1 | 75% |
-| **TOTAL** | 10 | 9 | 0 | 1 | **90%** |
+| **Prioridade Estrutural** | 4 | 3 | 1 | 0 | 75% |
+| **TOTAL** | 10 | 9 | 1 | 0 | **90%** |
 
 ### Legenda de Status
 - ⬜ **Pendente:** Não iniciado
@@ -162,20 +162,20 @@
 
 ---
 
-#### ⬜ UX-010: Padronização de Nomenclatura (Refatoração)
-**Status:** Pendente  
+#### 🔵 UX-010: Padronização de Nomenclatura (Refatoração)
+**Status:** Em Andamento  
 **Prioridade:** Estrutural  
 **Complexidade:** Média  
 **Esforço estimado:** 4-6 horas  
 **Impacto:** Manutenibilidade e consistência cognitiva
 
 **Checklist de Implementação:**
-- [ ] Renomear Views (`CadProcesso` -> `ProcessoCadastroView`, `Processo` -> `ProcessoDetalheView`, etc.)
-- [ ] Renomear Modais (`DisponibilizarMapaModal` -> `ModalMapaDisponibilizar`)
-- [ ] Renomear Componentes e Formulários (`Cad` -> `Form`)
-- [ ] Atualizar rotas em `processo.routes.ts`
-- [ ] Atualizar importações
-- [ ] Validar build e testes
+- [x] Renomear Views (`CadProcesso` -> `ProcessoCadastroView`, `Processo` -> `ProcessoDetalheView`, etc.) via wrappers e nova estrutura por domínio
+- [x] Renomear Modais (`DisponibilizarMapaModal` -> `ModalMapaDisponibilizar`) via alias compatível
+- [x] Renomear componentes de seção em relatórios para sufixo `Section` (`RelatorioFiltrosSection`, `RelatorioCardsSection`)
+- [x] Atualizar rotas em `processo.routes.ts` e `unidade.routes.ts`
+- [x] Atualizar importações principais
+- [x] Validar build e testes
 
 ---
 
@@ -203,6 +203,7 @@
 - ✅ UX-007 concluído com criação e importação global de design tokens em `frontend/src/assets/css/tokens.css`
 - ✅ UX-008 concluído com utilitários de responsividade, tabelas em modo `stacked` no mobile e rodapé de modais adaptado para telas pequenas
 - ✅ UX-009 concluído com execução periódica da suíte de captura visual (`npm run test:e2e:captura`) com 18/18 cenários aprovados
+- 🔵 UX-010 iniciado com organização de views em subdiretórios de domínio e padronização incremental de nomenclatura (`View`/`Modal`/`Section`)
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial

@@ -47,4 +47,4 @@ Consolidar inconsistências identificadas durante a execução do plano de melho
 - ✅ **Item 4 (parcial):** formulários mapeados em UX-002 revisados com validação inline e foco no primeiro erro.
 - 🔄 **Item 3 (pendente):** manter acompanhamento de tipagens frouxas para redução incremental.
 - 🔄 **Item 5 (contínuo):** manter atualização de `ux-improvement-tracking.md` e `plan.md` a cada ciclo e incluir execução periódica de `npm run test:e2e:captura` como auditoria visual de integração.
-- 🔄 **Item 6 (novo):** incluir auditoria de sufixo `Section` em componentes de partes de view.
+- ✅ **Item 6 (parcial):** auditoria iniciada com padronização aplicada em relatórios (`RelatorioFiltrosSection`, `RelatorioCardsSection`); continuar em componentes residuais.

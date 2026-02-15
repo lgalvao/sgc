@@ -85,7 +85,7 @@ vi.mock("@/components/CriarCompetenciaModal.vue", () => ({
     }
 }));
 
-vi.mock("@/components/DisponibilizarMapaModal.vue", () => ({
+vi.mock("@/components/ModalMapaDisponibilizar.vue", () => ({
     __esModule: true,
     default: {
         props: ['mostrar'],
@@ -242,7 +242,7 @@ describe("CadMapa.vue", () => {
                 </div>
             `
         },
-        DisponibilizarMapaModal: {
+        ModalMapaDisponibilizar: {
             props: ['mostrar'],
             emits: ['disponibilizar', 'fechar'],
             template: `

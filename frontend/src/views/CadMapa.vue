@@ -56,7 +56,7 @@
         @salvar="adicionarCompetenciaEFecharModal"
     />
 
-    <DisponibilizarMapaModal
+    <ModalMapaDisponibilizar
         :field-errors="fieldErrors"
         :loading="loadingDisponibilizacao"
         :mostrar="mostrarModalDisponibilizar"
@@ -108,7 +108,7 @@ import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 // Lazy loading de componentes pesados ou modais
 const ImpactoMapaModal = defineAsyncComponent(() => import("@/components/ImpactoMapaModal.vue"));
 const CriarCompetenciaModal = defineAsyncComponent(() => import("@/components/CriarCompetenciaModal.vue"));
-const DisponibilizarMapaModal = defineAsyncComponent(() => import("@/components/DisponibilizarMapaModal.vue"));
+const ModalMapaDisponibilizar = defineAsyncComponent(() => import("@/components/ModalMapaDisponibilizar.vue"));
 
 const route = useRoute();
 const router = useRouter();
@@ -334,7 +334,7 @@ function fecharModalDisponibilizar() {
 defineExpose({
   ImpactoMapaModal,
   CriarCompetenciaModal,
-  DisponibilizarMapaModal,
+  ModalMapaDisponibilizar,
   podeVerImpacto,
   podeEditarMapa,
   podeDisponibilizarMapa,

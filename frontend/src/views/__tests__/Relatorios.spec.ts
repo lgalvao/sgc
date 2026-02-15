@@ -55,11 +55,11 @@ describe("Relatorios.vue", () => {
         stubs: {
           BContainer: { template: '<div><slot /></div>' },
           PageHeader: PageHeaderStub,
-          RelatorioFiltros: RelatorioFiltrosStub,
-          RelatorioCards: RelatorioCardsStub,
+          RelatorioFiltrosSection: RelatorioFiltrosStub,
+          RelatorioCardsSection: RelatorioCardsStub,
           ModalMapasVigentes: ModalMapasVigentesStub,
           ModalDiagnosticosGaps: ModalDiagnosticosGapsStub,
-          ModalAndamentoGeral: ModalAndamentoGeralStub,
+          ModalRelatorioAndamento: ModalAndamentoGeralStub,
         },
       },
     });
