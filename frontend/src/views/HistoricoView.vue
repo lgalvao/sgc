@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <PageHeader title="Histórico de processos" subtitle="Lista de processos finalizados." />
 
     <BCard no-body class="shadow-sm">
@@ -52,13 +52,14 @@
         </table>
       </div>
     </BCard>
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script setup lang="ts">
 import {computed, onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
-import {BCard, BContainer, BSpinner} from 'bootstrap-vue-next';
+import {BCard, BSpinner} from 'bootstrap-vue-next';
+import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import {useProcessosStore} from '@/stores/processos';

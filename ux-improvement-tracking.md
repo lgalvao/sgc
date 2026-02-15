@@ -103,6 +103,7 @@
 **Checklist de Implementação:**
 - [x] Criar `frontend/src/components/layout/LayoutPadrao.vue`
 - [x] Migrar views principais (`PainelView.vue`, `Processo.vue`, `Subprocesso.vue`) para usar layout base
+- [x] Expandir migração inicial para `CadAtividades.vue`, `HistoricoView.vue`, `Relatorios.vue` e `Unidades.vue`
 - [x] Testar consistência visual entre módulos (typecheck, lint e testes unitários)
 
 ---
@@ -195,6 +196,7 @@
 - ✅ UX-004 concluído com contexto por etapa/perfil em `PageHeader` e validação de breadcrumb dinâmico existente
 - ✅ Executada rodada periódica `npm run test:e2e:captura` (18/18 cenários de captura aprovados)
 - 🔵 UX-005 iniciado com criação de `LayoutPadrao.vue` e migração inicial de views principais
+- 🔵 UX-005 expandido para views adicionais com validação completa de typecheck/lint/testes unitários
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial

@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <PageHeader title="Unidades do TRE-PE">
       <template #description>
         Clique em unidade para ver detalhes.
@@ -34,12 +34,13 @@
         title="Nenhuma unidade encontrada."
         description="Tente atualizar a página ou ajustar os filtros de visualização."
     />
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted} from "vue";
-import {BContainer, BSpinner} from "bootstrap-vue-next";
+import {BSpinner} from "bootstrap-vue-next";
+import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
 import ErrorAlert from "@/components/common/ErrorAlert.vue";

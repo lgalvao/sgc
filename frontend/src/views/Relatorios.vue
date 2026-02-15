@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <PageHeader title="Relatórios" />
 
     <RelatorioFiltros
@@ -34,11 +34,11 @@
         v-model="mostrarModalAndamentoGeral"
         :processos="processosFiltrados"
     />
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BContainer} from "bootstrap-vue-next";
+import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ModalMapasVigentes from "@/components/relatorios/ModalMapasVigentes.vue";
 import ModalDiagnosticosGaps from "@/components/relatorios/ModalDiagnosticosGaps.vue";

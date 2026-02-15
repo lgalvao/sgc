@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <PageHeader title="Atividades e conhecimentos">
       <template #default>
         <div class="d-flex align-items-center gap-2">
@@ -152,11 +152,11 @@
         @confirmar="confirmarRemocao"
     />
 
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BContainer, BDropdown, BDropdownItem} from "bootstrap-vue-next";
+import {BButton, BDropdown, BDropdownItem} from "bootstrap-vue-next";
 import {computed, nextTick, ref, watch} from "vue";
 import {badgeClass} from "@/utils";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
@@ -164,6 +164,7 @@ import ImportarAtividadesModal from "@/components/ImportarAtividadesModal.vue";
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
 import ConfirmacaoDisponibilizacaoModal from "@/components/ConfirmacaoDisponibilizacaoModal.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
+import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
 import EmptyState from "@/components/EmptyState.vue";
