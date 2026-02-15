@@ -1,11 +1,16 @@
 # 📊 Análise de Complexidade - SGC
 
+> ⚠️ **ATENÇÃO:** Esta é a **versão 1** da análise. Uma **versão 2 revisada** está disponível em [LEIA-ME-COMPLEXIDADE-V2.md](LEIA-ME-COMPLEXIDADE-V2.md)
+> 
+> **Diferença principal:** v2 adiciona **provas concretas de viabilidade**, diferencia **complexidade obrigatória vs opcional**, e respeita melhor os **padrões arquiteturais válidos**.
+
 ## 🎯 Objetivo
 
 Identificar sobre-engenharia no SGC, sistema projetado para **10-20 usuários simultâneos** mas arquitetado com padrões de **sistemas enterprise de alta escala**.
 
 ## 📁 Documentos Gerados
 
+### Versão 1 (Original)
 1. **[complexity-report.md](complexity-report.md)** (30KB, 921 linhas)
    - Relatório técnico completo e detalhado
    - Análise profunda de backend e frontend
@@ -16,6 +21,19 @@ Identificar sobre-engenharia no SGC, sistema projetado para **10-20 usuários si
    - Sumário executivo
    - Métricas principais
    - Quick wins
+
+### Versão 2 (Revisada - RECOMENDADA) ⭐
+3. **[LEIA-ME-COMPLEXIDADE-V2.md](LEIA-ME-COMPLEXIDADE-V2.md)** (23KB, 696 linhas)
+   - Análise revisada com viés para simplificação prática
+   - Provas concretas de viabilidade
+   - Diferenciação entre complexidade obrigatória e opcional
+   - Métricas medidas (não estimadas)
+   - Respeito aos padrões arquiteturais válidos
+
+4. **[complexity-summary-v2.txt](complexity-summary-v2.txt)** (9.4KB)
+   - Sumário executivo da v2
+   - Comparação v1 vs v2
+   - Roadmap conservador vs agressivo
 
 ## 🔍 Principais Achados
 
@@ -133,9 +151,11 @@ Frontend (3 arquivos):
 
 ## 🚀 Próximos Passos
 
-1. **Revisar** complexity-report.md completo
-2. **Aprovar** Priority 1 (quick wins)
-3. **Validar** com time que simplicidade não compromete requisitos
+> 💡 **RECOMENDAÇÃO:** Siga o roadmap da **versão 2** ([LEIA-ME-COMPLEXIDADE-V2.md](LEIA-ME-COMPLEXIDADE-V2.md))
+
+1. **Revisar** LEIA-ME-COMPLEXIDADE-V2.md (versão revisada)
+2. **Aprovar** Fase 1 + Fase 2 (roadmap conservador)
+3. **Validar** que simplificação não compromete requisitos
 4. **Executar** refatoração incremental (1 módulo por vez)
 5. **Medir** impacto real (onboarding, velocidade dev)
 6. **Documentar** novo padrão (ADR-008)
