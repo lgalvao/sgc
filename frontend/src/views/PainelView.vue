@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <!-- Tabela de Processos -->
     <div class="mb-5">
       <PageHeader title="Processos" title-test-id="txt-painel-titulo-processos">
@@ -33,14 +33,15 @@
           @ordenar="ordenarAlertasPor"
       />
     </div>
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BContainer} from "bootstrap-vue-next";
+import {BButton} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
+import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import TabelaAlertas from "@/components/TabelaAlertas.vue";
 import TabelaProcessos from "@/components/TabelaProcessos.vue";

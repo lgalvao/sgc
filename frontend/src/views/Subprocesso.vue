@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <div v-if="subprocesso">
       <PageHeader
           :title="`Subprocesso - ${subprocesso.unidade.sigla}`"
@@ -52,7 +52,7 @@
       <BSpinner label="Carregando informações da unidade..." variant="primary" />
       <p class="mt-2 text-muted">Carregando informações da unidade...</p>
     </div>
-  </BContainer>
+  </LayoutPadrao>
 
   <SubprocessoModal
       :data-limite-atual="dataLimite"
@@ -101,8 +101,9 @@
 </template>
 
 <script lang="ts" setup>
-import {BContainer, BFormTextarea, BSpinner} from "bootstrap-vue-next";
+import {BFormTextarea, BSpinner} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
+import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/SubprocessoCards.vue";
 import SubprocessoHeader from "@/components/SubprocessoHeader.vue";

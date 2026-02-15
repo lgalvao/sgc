@@ -13,9 +13,9 @@
 | Categoria | Total | Concluído | Em Andamento | Pendente | % Completo |
 |-----------|-------|-----------|--------------|----------|------------|
 | **Prioridade Alta** | 3 | 3 | 0 | 0 | 100% |
-| **Prioridade Média** | 3 | 1 | 0 | 2 | 33% |
+| **Prioridade Média** | 3 | 1 | 1 | 1 | 33% |
 | **Prioridade Estrutural** | 4 | 0 | 0 | 4 | 0% |
-| **TOTAL** | 10 | 4 | 0 | 6 | **40%** |
+| **TOTAL** | 10 | 4 | 1 | 5 | **40%** |
 
 ### Legenda de Status
 - ⬜ **Pendente:** Não iniciado
@@ -94,16 +94,16 @@
 
 ---
 
-#### ⬜ UX-005: Padronizar Layout Base das Páginas
-**Status:** Pendente  
+#### 🔵 UX-005: Padronizar Layout Base das Páginas
+**Status:** Em Andamento  
 **Prioridade:** Média  
 **Complexidade:** Alta  
 **Esforço estimado:** 6-8 horas  
 
 **Checklist de Implementação:**
-- [ ] Criar `frontend/src/components/layout/LayoutPadrao.vue`
-- [ ] Migrar views principais para usar layout base
-- [ ] Testar consistência visual entre módulos
+- [x] Criar `frontend/src/components/layout/LayoutPadrao.vue`
+- [x] Migrar views principais (`PainelView.vue`, `Processo.vue`, `Subprocesso.vue`) para usar layout base
+- [x] Testar consistência visual entre módulos (typecheck, lint e testes unitários)
 
 ---
 
@@ -194,6 +194,7 @@
 - 🔵 UX-004 iniciado com cabeçalho contextual e `useProximaAcao.ts`
 - ✅ UX-004 concluído com contexto por etapa/perfil em `PageHeader` e validação de breadcrumb dinâmico existente
 - ✅ Executada rodada periódica `npm run test:e2e:captura` (18/18 cenários de captura aprovados)
+- 🔵 UX-005 iniciado com criação de `LayoutPadrao.vue` e migração inicial de views principais
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial

@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <ErrorAlert
         :error="processosStore.lastError"
         @dismiss="processosStore.clearError()"/>
@@ -90,14 +90,15 @@ v-if="mostrarBotoesBloco && podeDisponibilizarBloco" variant="info" class="text-
         participantes do processo.
       </BAlert>
     </ModalConfirmacao>
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BBadge, BButton, BContainer, BSpinner} from "bootstrap-vue-next";
+import {BAlert, BBadge, BButton, BSpinner} from "bootstrap-vue-next";
 import {computed} from "vue";
 import ModalAcaoBloco from "@/components/ModalAcaoBloco.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
+import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ProcessoAcoes from "@/components/ProcessoAcoes.vue";
 import ErrorAlert from "@/components/common/ErrorAlert.vue";
