@@ -32,6 +32,7 @@ A documentação técnica foi desacoplada deste README para facilitar a manuten�
   padrões de projeto e regras fundamentais.
 * **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
 * **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
+* **[PLANO-REDUCAO-COMPLEXIDADE-CONSOLIDADO.md](PLANO-REDUCAO-COMPLEXIDADE-CONSOLIDADO.md)**: Plano consolidado de simplificação e redução de complexidade (incluindo impacto em testes e documentação).
 
 ---
 
