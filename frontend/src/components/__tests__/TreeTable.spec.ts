@@ -1,8 +1,8 @@
 import {mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import TreeRowItem from "../TreeRowItem.vue";
-import TreeTableView from "../TreeTableView.vue";
-import EmptyState from "@/components/EmptyState.vue";
+import TreeRowItem from "../comum/TreeRowItem.vue";
+import TreeTable from "../comum/TreeTable.vue";
+import EmptyState from "@/components/comum/EmptyState.vue";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mock do componente TreeRow
@@ -34,7 +34,7 @@ describe("TreeTable.vue", () => {
     });
 
     it("deve renderizar o título corretamente", () => {
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {data: [], columns: [], title: "Meu Título"},
             global: {stubs: {TreeRowItem: mockTreeRow}},
         });
@@ -42,7 +42,7 @@ describe("TreeTable.vue", () => {
     });
 
     it("não deve renderizar o título se não for fornecido", () => {
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {data: [], columns: []},
             global: {stubs: {TreeRowItem: mockTreeRow}},
         });
@@ -50,7 +50,7 @@ describe("TreeTable.vue", () => {
     });
 
     it("deve renderizar os cabeçalhos da tabela corretamente", () => {
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {data: [], columns: mockColumns},
             global: {stubs: {TreeRowItem: mockTreeRow}},
         });
@@ -61,7 +61,7 @@ describe("TreeTable.vue", () => {
     });
 
     it("não deve renderizar os cabeçalhos se hideHeaders for true", () => {
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {data: [], columns: mockColumns, hideHeaders: true},
             global: {stubs: {TreeRowItem: mockTreeRow}},
         });
@@ -70,7 +70,7 @@ describe("TreeTable.vue", () => {
 
     it("deve renderizar as linhas da tabela passando os dados para TreeRow", async () => {
         const expandedData = mockData.map((item) => ({...item, expanded: true}));
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {data: expandedData, columns: mockColumns},
         });
 
@@ -90,7 +90,7 @@ describe("TreeTable.vue", () => {
 
     it("deve emitir o evento row-click quando uma TreeRowItem filha emite", async () => {
         const expandedData = mockData.map((item) => ({...item, expanded: true}));
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {data: expandedData, columns: mockColumns},
         });
         await wrapper.vm.$nextTick();
@@ -108,7 +108,7 @@ describe("TreeTable.vue", () => {
                 children: [{codigo: 11, nome: "SubItem 1.1", expanded: false}],
             },
         ];
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {
                 data: dataWithChildren,
                 columns: mockColumns,
@@ -143,7 +143,7 @@ describe("TreeTable.vue", () => {
                 children: [{codigo: 11, nome: "SubItem 1.1", expanded: true}],
             },
         ];
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {
                 data: dataWithChildren,
                 columns: mockColumns,
@@ -179,7 +179,7 @@ describe("TreeTable.vue", () => {
             },
             {codigo: 2, nome: "Item 2", expanded: false},
         ];
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {data: dataWithNestedChildren, columns: mockColumns},
             global: {stubs: {TreeRowItem: mockTreeRow}},
         });
@@ -202,7 +202,7 @@ describe("TreeTable.vue", () => {
             {codigo: 1, nome: "Item 1"},
             {codigo: 2, nome: "Item 2"},
         ];
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {data: mockData, columns: mockColumns},
             global: {stubs: {TreeRowItem: mockTreeRow}},
         });
@@ -221,7 +221,7 @@ describe("TreeTable.vue", () => {
                 children: [{codigo: 11, nome: "SubItem 1.1"}],
             },
         ];
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {data: dataWithChildren, columns: mockColumns},
             global: {stubs: {TreeRowItem: mockTreeRow}},
         });
@@ -242,7 +242,7 @@ describe("TreeTable.vue", () => {
 
     it("não deve fazer nada ao tentar alternar item inexistente usando toggleExpand", async () => {
         const mockData = [{codigo: 1, nome: "Item 1", expanded: false}];
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {data: mockData, columns: mockColumns},
             global: {stubs: {TreeRowItem: mockTreeRow}},
         });
@@ -257,7 +257,7 @@ describe("TreeTable.vue", () => {
     });
 
     it("deve renderizar o estado vazio quando não houver dados", () => {
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {data: [], columns: mockColumns},
             global: {stubs: {TreeRowItem: mockTreeRow}},
         });
@@ -272,7 +272,7 @@ describe("TreeTable.vue", () => {
     });
 
     it("deve renderizar o estado vazio customizado", () => {
-        const wrapper = mount(TreeTableView, {
+        const wrapper = mount(TreeTable, {
             props: {
                 data: [],
                 columns: mockColumns,

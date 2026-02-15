@@ -1,6 +1,6 @@
 import {mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import TreeRowItem from "../TreeRowItem.vue";
+import TreeRowItem from "../comum/TreeRowItem.vue";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 describe("TreeRowItem.vue", () => {

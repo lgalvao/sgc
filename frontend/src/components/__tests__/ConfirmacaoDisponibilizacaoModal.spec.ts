@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest'
 import {mount} from '@vue/test-utils'
-import ConfirmacaoDisponibilizacaoModal from '../ConfirmacaoDisponibilizacaoModal.vue'
+import ConfirmacaoDisponibilizacaoModal from '../mapa/ConfirmacaoDisponibilizacaoModal.vue'
 import {BButton} from 'bootstrap-vue-next'
 
 describe('ConfirmacaoDisponibilizacaoModal.vue', () => {

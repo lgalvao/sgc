@@ -1,6 +1,6 @@
 import {mount, RouterLinkStub} from '@vue/test-utils';
 import {describe, expect, it} from 'vitest';
-import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
+import ArvoreUnidades from '@/components/unidade/ArvoreUnidades.vue';
 import {Unidade} from '@/types/tipos';
 
 // Mock UnidadeTreeNode since it is a child component

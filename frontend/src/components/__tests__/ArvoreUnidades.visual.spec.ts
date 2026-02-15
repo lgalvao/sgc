@@ -1,7 +1,7 @@
 import {describe, expect, it} from 'vitest';
 import {mount, RouterLinkStub} from '@vue/test-utils';
 import {nextTick} from 'vue';
-import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
+import ArvoreUnidades from '@/components/unidade/ArvoreUnidades.vue';
 import type {Unidade} from '@/types/tipos';
 import {setupComponentTest} from '@/test-utils/componentTestHelpers';
 

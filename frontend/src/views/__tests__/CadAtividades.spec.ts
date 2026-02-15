@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
-import CadAtividades from "@/views/CadAtividades.vue";
+import CadAtividades from "@/views/processo/AtividadesCadastroView.vue";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";

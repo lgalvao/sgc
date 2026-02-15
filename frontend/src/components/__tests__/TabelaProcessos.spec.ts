@@ -2,8 +2,8 @@ import {mount} from "@vue/test-utils";
 import {BTable as _BTable} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import {type ProcessoResumo, SituacaoProcesso, TipoProcesso,} from "@/types/tipos";
-import TabelaProcessos from "../TabelaProcessos.vue";
-import EmptyState from "../EmptyState.vue";
+import TabelaProcessos from "../processo/TabelaProcessos.vue";
+import EmptyState from "../comum/EmptyState.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
 

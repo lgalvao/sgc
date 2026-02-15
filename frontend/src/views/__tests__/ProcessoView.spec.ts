@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
-import Processo from "@/views/Processo.vue";
+import Processo from "@/views/processo/ProcessoDetalheView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useProcessosStore} from "@/stores/processos";
 import {useProcessosCoreStore} from "@/stores/processos/core";

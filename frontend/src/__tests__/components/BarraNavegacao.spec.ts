@@ -1,6 +1,6 @@
 import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import BarraNavegacao from '@/components/BarraNavegacao.vue';
+import BarraNavegacao from '@/components/layout/BarraNavegacao.vue';
 import {useRoute, useRouter} from 'vue-router';
 
 import {createTestingPinia} from '@pinia/testing';

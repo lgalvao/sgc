@@ -104,9 +104,9 @@
 
 <script setup lang="ts">
 import {onMounted, ref} from 'vue';
-import EmptyState from '@/components/EmptyState.vue';
-import ModalConfirmacao from '@/components/ModalConfirmacao.vue';
-import LoadingButton from '@/components/ui/LoadingButton.vue';
+import EmptyState from '@/components/comum/EmptyState.vue';
+import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
+import LoadingButton from '@/components/comum/LoadingButton.vue';
 import {BAlert, BButton} from 'bootstrap-vue-next';
 import {
   adicionarAdministrador,

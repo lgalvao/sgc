@@ -1,7 +1,7 @@
 # Rastreamento de Melhorias de UX - SGC
 
 **Data de início:** 2026-02-14  
-**Última atualização:** 2026-02-15 (UX-010 em andamento)  
+**Última atualização:** 2026-02-15 (UX-010 concluído)  
 **Documento base:** `ux-improvement-plan.md`
 
 ---
@@ -14,8 +14,8 @@
 |-----------|-------|-----------|--------------|----------|------------|
 | **Prioridade Alta** | 3 | 3 | 0 | 0 | 100% |
 | **Prioridade Média** | 3 | 3 | 0 | 0 | 100% |
-| **Prioridade Estrutural** | 4 | 3 | 1 | 0 | 75% |
-| **TOTAL** | 10 | 9 | 1 | 0 | **90%** |
+| **Prioridade Estrutural** | 4 | 4 | 0 | 0 | 100% |
+| **TOTAL** | 10 | 10 | 0 | 0 | **100%** |
 
 ### Legenda de Status
 - ⬜ **Pendente:** Não iniciado
@@ -162,16 +162,16 @@
 
 ---
 
-#### 🔵 UX-010: Padronização de Nomenclatura (Refatoração)
-**Status:** Em Andamento  
+#### ✅ UX-010: Padronização de Nomenclatura (Refatoração)
+**Status:** Concluído  
 **Prioridade:** Estrutural  
 **Complexidade:** Média  
 **Esforço estimado:** 4-6 horas  
 **Impacto:** Manutenibilidade e consistência cognitiva
 
 **Checklist de Implementação:**
-- [x] Renomear Views (`CadProcesso` -> `ProcessoCadastroView`, `Processo` -> `ProcessoDetalheView`, etc.) via wrappers e nova estrutura por domínio
-- [x] Renomear Modais (`DisponibilizarMapaModal` -> `ModalMapaDisponibilizar`) via alias compatível
+- [x] Renomear Views (`CadProcesso` -> `ProcessoCadastroView`, `Processo` -> `ProcessoDetalheView`, etc.) com nomes finais por domínio
+- [x] Renomear Modais (`DisponibilizarMapaModal` -> `ModalMapaDisponibilizar`) com imports finais atualizados
 - [x] Renomear componentes de seção em relatórios para sufixo `Section` (`RelatorioFiltrosSection`, `RelatorioCardsSection`)
 - [x] Atualizar rotas em `processo.routes.ts` e `unidade.routes.ts`
 - [x] Atualizar importações principais
@@ -203,7 +203,15 @@
 - ✅ UX-007 concluído com criação e importação global de design tokens em `frontend/src/assets/css/tokens.css`
 - ✅ UX-008 concluído com utilitários de responsividade, tabelas em modo `stacked` no mobile e rodapé de modais adaptado para telas pequenas
 - ✅ UX-009 concluído com execução periódica da suíte de captura visual (`npm run test:e2e:captura`) com 18/18 cenários aprovados
-- 🔵 UX-010 iniciado com organização de views em subdiretórios de domínio e padronização incremental de nomenclatura (`View`/`Modal`/`Section`)
+- ✅ UX-010 concluído com padronização de nomenclatura (`View`/`Modal`/`Section`) e organização inicial de diretórios por domínio
+- 🔵 UX-011 iniciado com auditoria de `components` e remoção de nomenclatura de view em componente (`TreeTableView.vue` -> `TreeTable.vue`)
+- 🔵 UX-011 evoluído com unificação de pastas utilitárias (`common` -> `comum`) e migração de imports para padrão em português
+- 🔵 UX-011 evoluído com reorganização inicial por domínio em `components/processo` (`ProcessoAcoes`, `SubprocessoHeader`, `SubprocessoCards`, `SubprocessoModal`)
+- 🔵 UX-011 evoluído com reorganização por domínio em `components/mapa`, `components/unidade` e `components/atividades`, reduzindo a raiz de `components` para componentes globais residuais
+- ✅ Executada nova rodada periódica `npm run test:e2e:captura` após reorganização estrutural (18/18 cenários aprovados)
+- ✅ UX-011 concluído com reorganização completa de `frontend/src/components` por domínio/camada, sem arquivos `.vue` remanescentes na raiz
+- ✅ UX-012 concluído com clarificação das fronteiras entre `layout` e `comum` e unificação da pasta `ui` em `comum` (`LoadingButton`)
+- ⚠️ Captura E2E periódica final bloqueada no ambiente atual: `404 Not Found` no reset de base (`e2e/hooks/hooks-limpeza.ts`, `resetDatabase`) em 18/18 cenários
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial

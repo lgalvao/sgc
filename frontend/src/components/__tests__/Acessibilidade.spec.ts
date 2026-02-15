@@ -1,8 +1,8 @@
 import {describe, it, vi} from "vitest";
 import {mount} from "@vue/test-utils";
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
-import EmptyState from "../EmptyState.vue";
-import BarraNavegacao from "../BarraNavegacao.vue";
+import EmptyState from "../comum/EmptyState.vue";
+import BarraNavegacao from "../layout/BarraNavegacao.vue";
 
 // Mock das dependências de roteamento para BarraNavegacao
 vi.mock("vue-router", () => ({

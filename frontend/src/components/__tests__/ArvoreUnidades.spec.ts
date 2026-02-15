@@ -1,6 +1,6 @@
 import {describe, expect, it} from "vitest";
 import {mount, RouterLinkStub} from "@vue/test-utils";
-import ArvoreUnidades from "../ArvoreUnidades.vue";
+import ArvoreUnidades from "../unidade/ArvoreUnidades.vue";
 import type {Unidade} from "@/types/tipos";
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
 

@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from "vitest";
 import {mount, VueWrapper} from "@vue/test-utils";
-import TabelaMovimentacoes from "../TabelaMovimentacoes.vue";
+import TabelaMovimentacoes from "../processo/TabelaMovimentacoes.vue";
 import type {Movimentacao, Unidade} from "@/types/tipos";
 import {BTable as _BTable} from "bootstrap-vue-next";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";

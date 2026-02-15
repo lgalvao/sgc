@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
-import Relatorios from "@/views/Relatorios.vue";
+import Relatorios from "@/views/RelatoriosView.vue";
 import { createTestingPinia } from "@pinia/testing";
 import { useProcessosStore } from "@/stores/processos";
 import { useMapasStore } from "@/stores/mapas";

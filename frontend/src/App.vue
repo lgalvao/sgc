@@ -4,8 +4,8 @@ import {useRoute} from "vue-router";
 import {BOrchestrator, useToast} from "bootstrap-vue-next";
 import {useFeedbackStore} from "@/stores/feedback";
 import pkg from "../package.json";
-import BarraNavegacao from "./components/BarraNavegacao.vue";
-import MainNavbar from "./components/MainNavbar.vue";
+import BarraNavegacao from "./components/layout/BarraNavegacao.vue";
+import MainNavbar from "./components/layout/MainNavbar.vue";
 
 interface PackageJson {
   version: string;

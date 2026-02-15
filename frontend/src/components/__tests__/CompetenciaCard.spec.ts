@@ -1,6 +1,6 @@
 import {mount} from "@vue/test-utils";
 import {describe, expect, it} from "vitest";
-import CompetenciaCard from "@/components/CompetenciaCard.vue";
+import CompetenciaCard from "@/components/mapa/CompetenciaCard.vue";
 import type {Atividade, Competencia} from "@/types/tipos";
 
 // Stubs para componentes do Bootstrap Vue Next

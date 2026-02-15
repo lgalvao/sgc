@@ -38,7 +38,7 @@
 <script lang="ts" setup>
 import {BCol, BForm, BFormInput, BFormInvalidFeedback} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
-import LoadingButton from "@/components/ui/LoadingButton.vue";
+import LoadingButton from "@/components/comum/LoadingButton.vue";
 
 const modelValue = defineModel<string>({ default: '' });
 

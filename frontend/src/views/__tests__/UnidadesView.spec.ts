@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {mount} from "@vue/test-utils";
-import Unidades from "@/views/Unidades.vue";
+import Unidades from "@/views/unidade/UnidadesView.vue";
 import {useUnidadesStore} from "@/stores/unidades";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 

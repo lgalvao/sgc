@@ -1,7 +1,7 @@
 import {describe, expect, it} from "vitest";
 import {mount, VueWrapper} from "@vue/test-utils";
-import TabelaAlertas from "../TabelaAlertas.vue";
-import EmptyState from "../EmptyState.vue";
+import TabelaAlertas from "../processo/TabelaAlertas.vue";
+import EmptyState from "../comum/EmptyState.vue";
 import type {Alerta} from "@/types/tipos";
 import {BTable as _BTable} from "bootstrap-vue-next";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";

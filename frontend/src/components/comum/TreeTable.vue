@@ -79,7 +79,7 @@
 import {BButton} from "bootstrap-vue-next";
 import {computed, nextTick, ref, toRaw, watch} from "vue";
 import TreeRowItem from "./TreeRowItem.vue";
-import EmptyState from "@/components/EmptyState.vue";
+import EmptyState from "@/components/comum/EmptyState.vue";
 
 interface TreeItem {
   codigo: number | string;

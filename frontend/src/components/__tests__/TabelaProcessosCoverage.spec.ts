@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
-import TabelaProcessos from '../TabelaProcessos.vue';
+import TabelaProcessos from '../processo/TabelaProcessos.vue';
 import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 import {createMockProcessoResumo} from '@/test-utils/mockFactories';
 

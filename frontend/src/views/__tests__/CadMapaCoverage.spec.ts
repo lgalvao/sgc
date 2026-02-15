@@ -1,7 +1,7 @@
 import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
-import CadMapa from '@/views/CadMapa.vue';
+import CadMapa from '@/views/processo/MapaCadastroView.vue';
 import {useMapasStore} from '@/stores/mapas';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 

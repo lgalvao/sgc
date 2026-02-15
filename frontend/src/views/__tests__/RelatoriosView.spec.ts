@@ -1,6 +1,6 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
-import Relatorios from '@/views/Relatorios.vue';
+import Relatorios from '@/views/RelatoriosView.vue';
 import {Perfil, TipoProcesso} from '@/types/tipos';
 import {useProcessosStore} from '@/stores/processos';
 import {usePerfilStore} from '@/stores/perfil';

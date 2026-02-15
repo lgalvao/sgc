@@ -1,6 +1,6 @@
 import {mount, RouterLinkStub} from "@vue/test-utils";
 import {describe, expect, it, vi} from "vitest";
-import UnidadeTreeNode from "@/components/UnidadeTreeNode.vue";
+import UnidadeTreeNode from "@/components/unidade/UnidadeTreeNode.vue";
 import type {Unidade} from "@/types/tipos";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 

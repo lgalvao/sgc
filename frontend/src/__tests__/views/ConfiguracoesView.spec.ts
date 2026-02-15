@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest'
 import {mount} from '@vue/test-utils'
 import {createTestingPinia} from '@pinia/testing'
-import Configuracoes from '@/views/Configuracoes.vue'
+import Configuracoes from '@/views/ConfiguracoesView.vue'
 import {useConfiguracoesStore} from '@/stores/configuracoes'
 
 // Mock dependencies

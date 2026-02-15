@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {mount} from "@vue/test-utils";
-import ModalAcaoBloco from "../ModalAcaoBloco.vue";
+import ModalAcaoBloco from "../processo/ModalAcaoBloco.vue";
 
 // Mock Bootstrap Modal with hoisted variables
 const { mockShow, mockHide } = vi.hoisted(() => ({

@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
-import CadAtividades from '@/views/CadAtividades.vue';
+import CadAtividades from '@/views/processo/AtividadesCadastroView.vue';
 import {useAtividadesStore} from '@/stores/atividades';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useMapasStore} from '@/stores/mapas';

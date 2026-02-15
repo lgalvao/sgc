@@ -1,6 +1,6 @@
 import {mount} from "@vue/test-utils";
 import {describe, expect, it} from "vitest";
-import AtividadeItem from "@/components/AtividadeItem.vue";
+import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import {Atividade} from "@/types/tipos";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 

@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
-import OcupacoesCriticasDiagnostico from '@/views/OcupacoesCriticasDiagnostico.vue';
+import OcupacoesCriticasDiagnostico from '@/views/OcupacoesCriticasDiagnosticoView.vue';
 import {diagnosticoService} from '@/services/diagnosticoService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {useFeedbackStore} from '@/stores/feedback';

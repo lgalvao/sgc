@@ -47,8 +47,8 @@
 
 <script setup lang="ts">
 import {BButton} from 'bootstrap-vue-next';
-import EmptyState from '@/components/EmptyState.vue';
-import CompetenciaCard from '@/components/CompetenciaCard.vue';
+import EmptyState from '@/components/comum/EmptyState.vue';
+import CompetenciaCard from '@/components/mapa/CompetenciaCard.vue';
 import type {Atividade, Competencia, Unidade} from '@/types/tipos';
 
 defineProps<{

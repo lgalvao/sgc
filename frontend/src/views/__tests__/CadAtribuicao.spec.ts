@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
-import CadAtribuicao from '@/views/CadAtribuicao.vue';
+import CadAtribuicao from '@/views/unidade/AtribuicaoTemporariaView.vue';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 

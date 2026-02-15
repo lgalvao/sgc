@@ -1,6 +1,6 @@
 import {describe, expect, it} from "vitest";
 import {mount} from "@vue/test-utils";
-import SubprocessoHeader from "../SubprocessoHeader.vue";
+import SubprocessoHeader from "../processo/SubprocessoHeader.vue";
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 describe("SubprocessoHeader.vue", () => {

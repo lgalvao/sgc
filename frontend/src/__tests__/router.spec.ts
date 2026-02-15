@@ -37,10 +37,10 @@ vi.mock("../views/DiagnosticoEquipe.vue", () => ({
 vi.mock("../views/OcupacoesCriticas.vue", () => ({
     default: {template: "<div>OcupacoesCriticas</div>"},
 }));
-vi.mock("../views/AutoavaliacaoDiagnostico.vue", () => ({
+vi.mock("../views/AutoavaliacaoDiagnosticoView.vue", () => ({
     default: {template: "<div>AutoavaliacaoDiagnostico</div>"},
 }));
-vi.mock("../views/OcupacoesCriticasDiagnostico.vue", () => ({
+vi.mock("../views/OcupacoesCriticasDiagnosticoView.vue", () => ({
     default: {template: "<div>OcupacoesCriticasDiagnostico</div>"},
 }));
 vi.mock("../views/Unidade.vue", () => ({
@@ -52,10 +52,10 @@ vi.mock("../views/CadAtribuicao.vue", () => ({
 vi.mock("../views/HistoricoView.vue", () => ({
     default: {template: "<div>Historico</div>"},
 }));
-vi.mock("../views/Relatorios.vue", () => ({
+vi.mock("../views/RelatoriosView.vue", () => ({
     default: {template: "<div>Relatorios</div>"},
 }));
-vi.mock("../views/Configuracoes.vue", () => ({
+vi.mock("../views/ConfiguracoesView.vue", () => ({
     default: {template: "<div>Configuracoes</div>"},
 }));
 

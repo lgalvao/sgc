@@ -1,7 +1,7 @@
 import {mount} from "@vue/test-utils";
 import {afterEach, describe, expect, it, vi} from "vitest";
 import * as utils from "@/utils";
-import SubprocessoModal from "../SubprocessoModal.vue";
+import SubprocessoModal from "../processo/SubprocessoModal.vue";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 describe("SubprocessoModal", () => {

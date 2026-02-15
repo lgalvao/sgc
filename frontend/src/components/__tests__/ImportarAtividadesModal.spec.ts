@@ -3,7 +3,7 @@ import {BFormSelect} from "bootstrap-vue-next";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import {type Atividade, SituacaoProcesso, TipoProcesso} from "@/types/tipos";
-import ImportarAtividadesModal from "../ImportarAtividadesModal.vue";
+import ImportarAtividadesModal from "../atividades/ImportarAtividadesModal.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {createMockProcessoResumo} from "@/test-utils/mockFactories";
 import {useAtividadesStore} from "@/stores/atividades";

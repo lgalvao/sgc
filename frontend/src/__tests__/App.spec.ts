@@ -10,8 +10,8 @@ import {useToast} from "bootstrap-vue-next";
 import {useFeedbackStore} from "@/stores/feedback";
 
 // Mock de components
-vi.mock("@/components/BarraNavegacao.vue", () => ({default: {template: '<div data-testid="barra-navegacao"></div>'}}));
-vi.mock("@/components/MainNavbar.vue", () => ({default: {template: '<div data-testid="main-navbar"></div>'}}));
+vi.mock("@/components/layout/BarraNavegacao.vue", () => ({default: {template: '<div data-testid="barra-navegacao"></div>'}}));
+vi.mock("@/components/layout/MainNavbar.vue", () => ({default: {template: '<div data-testid="main-navbar"></div>'}}));
 vi.mock("bootstrap-vue-next", async () => {
     const actual = await vi.importActual("bootstrap-vue-next");
     return {

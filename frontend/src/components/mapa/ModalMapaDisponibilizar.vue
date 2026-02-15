@@ -74,7 +74,7 @@
 
 <script lang="ts" setup>
 import {BAlert, BFormInput, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
-import LoadingButton from "@/components/ui/LoadingButton.vue";
+import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import {ref, watch} from "vue";
 

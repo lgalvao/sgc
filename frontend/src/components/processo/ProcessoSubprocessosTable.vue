@@ -9,7 +9,7 @@
 
 <script lang="ts" setup>
 import {computed} from "vue";
-import TreeTable from "@/components/TreeTableView.vue";
+import TreeTable from "@/components/comum/TreeTable.vue";
 import type {UnidadeParticipante} from "@/types/tipos";
 
 const props = defineProps<{

@@ -2,7 +2,7 @@ import {mount, RouterLinkStub} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
-import NavBar from "../MainNavbar.vue";
+import NavBar from "../layout/MainNavbar.vue";
 import {usePerfil} from "@/composables/usePerfil";
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
 

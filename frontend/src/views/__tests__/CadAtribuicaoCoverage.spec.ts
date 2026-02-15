@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
-import CadAtribuicao from '@/views/CadAtribuicao.vue';
+import CadAtribuicao from '@/views/unidade/AtribuicaoTemporariaView.vue';
 import { getCommonMountOptions } from "@/test-utils/componentTestHelpers";
 import { useUnidadesStore } from '@/stores/unidades';
 import { createTestingPinia } from '@pinia/testing';

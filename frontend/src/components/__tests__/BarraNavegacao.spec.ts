@@ -3,7 +3,7 @@ import {BBreadcrumbItem, BButton} from "bootstrap-vue-next";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {useRoute} from "vue-router";
 import {Perfil} from "@/types/tipos";
-import BarraNavegacao from "../BarraNavegacao.vue";
+import BarraNavegacao from "../layout/BarraNavegacao.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
 

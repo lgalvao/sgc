@@ -1,7 +1,7 @@
 import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
-import Subprocesso from '@/views/Subprocesso.vue';
+import Subprocesso from '@/views/processo/SubprocessoDetalheView.vue';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useFeedbackStore} from '@/stores/feedback';
 import {BAlert, BSpinner} from 'bootstrap-vue-next';

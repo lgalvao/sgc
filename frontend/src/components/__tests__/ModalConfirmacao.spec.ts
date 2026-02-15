@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest'
 import {mount} from '@vue/test-utils'
-import ModalConfirmacao from '../ModalConfirmacao.vue'
+import ModalConfirmacao from '../comum/ModalConfirmacao.vue'
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 describe('ModalConfirmacao.vue', () => {

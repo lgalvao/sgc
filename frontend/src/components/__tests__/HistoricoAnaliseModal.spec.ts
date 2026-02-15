@@ -1,7 +1,7 @@
 import {mount} from "@vue/test-utils";
 import {describe, expect, it} from "vitest";
 import {formatDateBR} from "@/utils";
-import HistoricoAnaliseModal from "../HistoricoAnaliseModal.vue";
+import HistoricoAnaliseModal from "../processo/HistoricoAnaliseModal.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 const mockAnalises: any[] = [

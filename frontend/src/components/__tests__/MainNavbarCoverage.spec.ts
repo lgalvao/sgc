@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from "vitest";
 import {mount} from "@vue/test-utils";
-import MainNavbar from "../MainNavbar.vue";
+import MainNavbar from "../layout/MainNavbar.vue";
 import {usePerfil} from "@/composables/usePerfil";
 import {ref} from "vue";
 import {createTestingPinia} from "@pinia/testing";

@@ -1,7 +1,7 @@
 import {mount} from "@vue/test-utils";
 import {BButton} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
-import ProcessoAcoes from "../ProcessoAcoes.vue";
+import ProcessoAcoes from "../processo/ProcessoAcoes.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
 

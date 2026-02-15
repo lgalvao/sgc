@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
-import Unidade from '@/views/Unidade.vue';
+import Unidade from '@/views/unidade/UnidadeDetalheView.vue';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes';
 import {usePerfilStore} from '@/stores/perfil';

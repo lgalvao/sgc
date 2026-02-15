@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import {nextTick} from 'vue';
-import CadProcesso from '@/views/CadProcesso.vue';
+import CadProcesso from '@/views/processo/ProcessoCadastroView.vue';
 import {useProcessosStore} from '@/stores/processos';
 import {useUnidadesStore} from '@/stores/unidades';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";

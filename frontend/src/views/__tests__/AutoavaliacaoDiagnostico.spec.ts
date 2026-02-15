@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
-import AutoavaliacaoDiagnostico from '@/views/AutoavaliacaoDiagnostico.vue';
+import AutoavaliacaoDiagnostico from '@/views/AutoavaliacaoDiagnosticoView.vue';
 import {createTestingPinia} from '@pinia/testing';
 import {setupComponentTest} from '@/test-utils/componentTestHelpers';
 

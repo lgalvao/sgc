@@ -136,7 +136,7 @@
 import {BAlert, BButton, BCard, BCardBody, BCol, BForm, BFormInput} from "bootstrap-vue-next";
 import {ref} from "vue";
 import type {Atividade} from "@/types/tipos";
-import InlineEditor from "@/components/common/InlineEditor.vue";
+import InlineEditor from "@/components/comum/InlineEditor.vue";
 
 interface Props {
   atividade: Atividade;

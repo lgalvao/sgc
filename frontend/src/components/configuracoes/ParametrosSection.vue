@@ -75,7 +75,7 @@
 
 <script setup lang="ts">
 import {onMounted, reactive, ref} from 'vue';
-import LoadingButton from '@/components/ui/LoadingButton.vue';
+import LoadingButton from '@/components/comum/LoadingButton.vue';
 import {BAlert} from 'bootstrap-vue-next';
 import {type Parametro, useConfiguracoesStore} from '@/stores/configuracoes';
 import {useNotificacoesStore} from '@/stores/feedback';

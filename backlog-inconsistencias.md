@@ -35,6 +35,11 @@ Consolidar inconsistências identificadas durante a execução do plano de melho
    - Impacto: reduz previsibilidade de navegação e manutenção.
    - Ação sugerida: auditoria de nomenclatura e correção incremental no escopo do UX-010.
 
+7. **Diretório `components` com organização e nomes inconsistentes**
+   - Evidência: componente com sufixo de view (`TreeTableView.vue`) dentro de `components` e mistura de domínios sem agrupamento consistente.
+   - Impacto: dificulta descoberta/reuso e aumenta custo de manutenção.
+   - Ação sugerida: executar UX-011 com auditoria, reorganização por domínio/camada e migração de imports.
+
 ## Priorização sugerida
 - **Alta:** itens 1, 2, 4 e 6
 - **Média:** item 5
@@ -47,4 +52,6 @@ Consolidar inconsistências identificadas durante a execução do plano de melho
 - ✅ **Item 4 (parcial):** formulários mapeados em UX-002 revisados com validação inline e foco no primeiro erro.
 - 🔄 **Item 3 (pendente):** manter acompanhamento de tipagens frouxas para redução incremental.
 - 🔄 **Item 5 (contínuo):** manter atualização de `ux-improvement-tracking.md` e `plan.md` a cada ciclo e incluir execução periódica de `npm run test:e2e:captura` como auditoria visual de integração.
-- ✅ **Item 6 (parcial):** auditoria iniciada com padronização aplicada em relatórios (`RelatorioFiltrosSection`, `RelatorioCardsSection`); continuar em componentes residuais.
+- ✅ **Item 6:** padronização de seções concluída no escopo UX-010.
+- ✅ **Item 7:** UX-011 concluído com renomeação de `TreeTableView.vue` para `TreeTable.vue`, unificação de `common` em `comum` e reorganização completa por domínio/camada (`processo`, `mapa`, `unidade`, `atividades`, `layout`, `comum`), eliminando `.vue` residuais na raiz de `components` (com captura E2E periódica validada em 18/18).
+- ✅ **Item 8:** confusão entre `layout`, `comum` e `ui` tratada no UX-012 com unificação de `ui` em `comum` (`LoadingButton`) e atualização da documentação de componentes.

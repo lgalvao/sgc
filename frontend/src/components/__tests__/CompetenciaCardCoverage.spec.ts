@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
-import CompetenciaCard from '@/components/CompetenciaCard.vue';
+import CompetenciaCard from '@/components/mapa/CompetenciaCard.vue';
 
 describe('CompetenciaCard Coverage', () => {
     const commonStubs = {

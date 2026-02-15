@@ -42,7 +42,7 @@
 
 <script lang="ts" setup>
 import {BButton, BTable} from "bootstrap-vue-next";
-import EmptyState from "@/components/EmptyState.vue";
+import EmptyState from "@/components/comum/EmptyState.vue";
 import type {Alerta} from "@/types/tipos";
 
 defineProps<{

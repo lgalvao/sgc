@@ -1,6 +1,6 @@
 import {flushPromises, mount} from "@vue/test-utils";
 import {describe, expect, it} from "vitest";
-import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
+import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import {TipoImpactoCompetencia} from "@/types/tipos";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 

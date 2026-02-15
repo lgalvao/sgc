@@ -1,7 +1,7 @@
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import Configuracoes from '../Configuracoes.vue';
+import Configuracoes from '../ConfiguracoesView.vue';
 import {usePerfilStore} from '@/stores/perfil';
 import * as administradorService from '@/services/administradorService';
 

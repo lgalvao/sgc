@@ -1,6 +1,6 @@
 import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import ImportarAtividadesModal from "../ImportarAtividadesModal.vue";
+import ImportarAtividadesModal from "../atividades/ImportarAtividadesModal.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {useProcessosStore} from "@/stores/processos";
 import {useAtividadesStore} from "@/stores/atividades";

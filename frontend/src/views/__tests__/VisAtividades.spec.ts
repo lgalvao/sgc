@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
-import VisAtividades from "@/views/VisAtividades.vue";
+import VisAtividades from "@/views/processo/AtividadesVisualizacaoView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useAnalisesStore} from "@/stores/analises";

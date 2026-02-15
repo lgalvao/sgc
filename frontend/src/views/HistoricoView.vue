@@ -70,7 +70,7 @@ import {useRouter} from 'vue-router';
 import {BButton, BCard, BSpinner} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
-import EmptyState from '@/components/EmptyState.vue';
+import EmptyState from '@/components/comum/EmptyState.vue';
 import {useProcessosStore} from '@/stores/processos';
 import {logger} from '@/utils';
 

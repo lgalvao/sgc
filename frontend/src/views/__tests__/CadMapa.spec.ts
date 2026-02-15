@@ -11,7 +11,7 @@ import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
 import {Perfil} from "@/types/tipos";
-import CadMapa from "@/views/CadMapa.vue";
+import CadMapa from "@/views/processo/MapaCadastroView.vue";
 
 const {pushMock} = vi.hoisted(() => {
     return {pushMock: vi.fn()};
@@ -69,7 +69,7 @@ vi.mock("@/services/unidadeService", () => ({
 
 // Mocks for Async Components - simplified to avoid require issues
 
-vi.mock("@/components/CriarCompetenciaModal.vue", () => ({
+vi.mock("@/components/mapa/CriarCompetenciaModal.vue", () => ({
     __esModule: true,
     default: {
         props: ['mostrar'],
@@ -85,7 +85,7 @@ vi.mock("@/components/CriarCompetenciaModal.vue", () => ({
     }
 }));
 
-vi.mock("@/components/ModalMapaDisponibilizar.vue", () => ({
+vi.mock("@/components/mapa/ModalMapaDisponibilizar.vue", () => ({
     __esModule: true,
     default: {
         props: ['mostrar'],
@@ -100,7 +100,7 @@ vi.mock("@/components/ModalMapaDisponibilizar.vue", () => ({
     }
 }));
 
-vi.mock("@/components/ImpactoMapaModal.vue", () => ({
+vi.mock("@/components/mapa/ImpactoMapaModal.vue", () => ({
     __esModule: true,
     default: {
         props: ['mostrar'],

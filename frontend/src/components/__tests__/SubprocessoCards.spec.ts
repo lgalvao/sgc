@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
-import SubprocessoCards from '@/components/SubprocessoCards.vue';
+import SubprocessoCards from '@/components/processo/SubprocessoCards.vue';
 import {TipoProcesso} from '@/types/tipos';
 import {checkA11y} from "@/test-utils/a11yTestHelpers";
 

@@ -1,6 +1,6 @@
 import {describe, expect, it} from "vitest";
 import {mount, RouterLinkStub} from "@vue/test-utils";
-import ArvoreUnidades from "../ArvoreUnidades.vue";
+import ArvoreUnidades from "../unidade/ArvoreUnidades.vue";
 
 describe("ArvoreUnidades.vue Coverage", () => {
     it("deve atualizar unidades expandidas quando a prop unidades muda", async () => {

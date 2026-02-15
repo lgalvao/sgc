@@ -174,7 +174,7 @@ import {
 } from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import {useRouter} from "vue-router";
-import LoadingButton from "@/components/ui/LoadingButton.vue";
+import LoadingButton from "@/components/comum/LoadingButton.vue";
 import type {PerfilUnidade} from "@/mappers/sgrh";
 import {logger} from "@/utils";
 

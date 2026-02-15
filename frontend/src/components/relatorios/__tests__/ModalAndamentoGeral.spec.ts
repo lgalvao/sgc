@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
-import ModalAndamentoGeral from '../ModalAndamentoGeral.vue';
+import ModalAndamentoGeral from '../ModalRelatorioAndamento.vue';
 import * as csvUtils from '@/utils/csv';
 import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
