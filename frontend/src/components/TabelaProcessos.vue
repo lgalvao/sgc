@@ -2,6 +2,7 @@
 import {BTable} from "bootstrap-vue-next";
 import {computed} from "vue";
 import EmptyState from "@/components/EmptyState.vue";
+import BadgeSituacao from "@/components/comum/BadgeSituacao.vue";
 import type {ProcessoResumo} from "@/types/tipos";
 
 const props = defineProps<{
@@ -98,7 +99,7 @@ defineExpose({ fields });
       </template>
 
       <template #cell(situacao)="{ item }">
-        {{ item.situacaoLabel }}
+        <BadgeSituacao :situacao="item.situacao" :texto="item.situacaoLabel" />
       </template>
 
       <template #cell(tipo)="{ item }">

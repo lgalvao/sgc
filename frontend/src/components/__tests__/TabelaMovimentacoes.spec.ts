@@ -177,4 +177,32 @@ describe("TabelaMovimentacoes.vue", () => {
         expect(cells[0].text()).toBe("-");
         expect(cells[1].text()).toBe("-");
     });
+
+    it("deve renderizar badge de situação do subprocesso", () => {
+        const wrapper = mount(TabelaMovimentacoes, {
+            props: {movimentacoes: mockMovimentacoes},
+            global: {
+                stubs: {
+                    BTable: {
+                        props: ['items'],
+                        template: `
+                          <table>
+                          <tbody>
+                          <tr v-for="item in items" :key="item.codigo">
+                            <td>
+                              <slot name="cell(situacao)" :item="item"></slot>
+                            </td>
+                          </tr>
+                          </tbody>
+                          </table>
+                        `
+                    }
+                }
+            }
+        });
+
+        const badge = wrapper.find('[data-testid="badge-situacao"]');
+        expect(badge.exists()).toBe(true);
+        expect(badge.text()).toContain("NAO INICIADO");
+    });
 });

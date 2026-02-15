@@ -1,7 +1,7 @@
 # Rastreamento de Melhorias de UX - SGC
 
 **Data de início:** 2026-02-14  
-**Última atualização:** 2026-02-15 (UX-002 em andamento)  
+**Última atualização:** 2026-02-15 (UX-003 em andamento)  
 **Documento base:** `ux-improvement-plan.md`
 
 ---
@@ -12,10 +12,10 @@
 
 | Categoria | Total | Concluído | Em Andamento | Pendente | % Completo |
 |-----------|-------|-----------|--------------|----------|------------|
-| **Prioridade Alta** | 3 | 1 | 1 | 1 | 33% |
+| **Prioridade Alta** | 3 | 2 | 1 | 0 | 67% |
 | **Prioridade Média** | 3 | 0 | 0 | 3 | 0% |
 | **Prioridade Estrutural** | 4 | 0 | 0 | 4 | 0% |
-| **TOTAL** | 10 | 1 | 1 | 8 | **10%** |
+| **TOTAL** | 10 | 2 | 1 | 7 | **20%** |
 
 ### Legenda de Status
 - ⬜ **Pendente:** Não iniciado
@@ -47,8 +47,8 @@
 
 ---
 
-#### 🔵 UX-002: Unificar Padrão de Validação Inline
-**Status:** Em Andamento  
+#### ✅ UX-002: Unificar Padrão de Validação Inline
+**Status:** Concluído  
 **Prioridade:** Alta  
 **Complexidade:** Alta  
 **Esforço estimado:** 5-6 horas  
@@ -58,21 +58,21 @@
 - [x] Criar `frontend/src/composables/useValidacao.ts`
 - [x] Aplicar em `ProcessoFormFields.vue`
 - [x] Aplicar em `AtividadeCadastroForm.vue`
-- [ ] Aplicar em demais formulários
+- [x] Aplicar em demais formulários
 - [x] Implementar foco automático no primeiro erro
 
 ---
 
-#### ⬜ UX-003: Melhorar Legibilidade de Tabelas
-**Status:** Pendente  
+#### 🔵 UX-003: Melhorar Legibilidade de Tabelas
+**Status:** Em Andamento  
 **Prioridade:** Alta  
 **Complexidade:** Média  
 **Esforço estimado:** 4-5 horas  
 
 **Checklist de Implementação:**
-- [ ] Criar `frontend/src/components/comum/BadgeSituacao.vue`
-- [ ] Definir cores para situações (CRIADO, EM_ANDAMENTO, FINALIZADO)
-- [ ] Aplicar em `TabelaProcessos.vue`
+- [x] Criar `frontend/src/components/comum/BadgeSituacao.vue`
+- [x] Definir cores para situações (CRIADO, EM_ANDAMENTO, FINALIZADO)
+- [x] Aplicar em `TabelaProcessos.vue`
 - [ ] Aplicar em `TabelaMovimentacoes.vue`
 - [ ] Implementar estado vazio com CTA
 
@@ -188,6 +188,8 @@
 - ✅ Criados testes focados: unitários (`ModalPadrao`) e E2E (`e2e/ux/botoes-modais.spec.ts`)
 - 🔵 UX-002 iniciado com validação inline em `ProcessoFormFields` e `CadAtividadeForm`
 - 🔵 UX-002 evoluído com `CampoTexto.vue`, `useValidacao.ts` e testes unitários focados
+- ✅ UX-002 concluído com cobertura de formulários mapeados no frontend
+- 🔵 UX-003 iniciado com `BadgeSituacao.vue` e aplicação em `TabelaProcessos.vue`
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial
