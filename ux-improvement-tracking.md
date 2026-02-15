@@ -1,7 +1,7 @@
 # Rastreamento de Melhorias de UX - SGC
 
 **Data de início:** 2026-02-14  
-**Última atualização:** 2026-02-15 (UX-007 concluído)  
+**Última atualização:** 2026-02-15 (UX-008 concluído)  
 **Documento base:** `ux-improvement-plan.md`
 
 ---
@@ -14,8 +14,8 @@
 |-----------|-------|-----------|--------------|----------|------------|
 | **Prioridade Alta** | 3 | 3 | 0 | 0 | 100% |
 | **Prioridade Média** | 3 | 3 | 0 | 0 | 100% |
-| **Prioridade Estrutural** | 4 | 1 | 0 | 3 | 25% |
-| **TOTAL** | 10 | 7 | 0 | 3 | **70%** |
+| **Prioridade Estrutural** | 4 | 2 | 0 | 2 | 50% |
+| **TOTAL** | 10 | 8 | 0 | 2 | **80%** |
 
 ### Legenda de Status
 - ⬜ **Pendente:** Não iniciado
@@ -137,16 +137,16 @@
 
 ---
 
-#### ⬜ UX-008: Definir Regras de Responsividade
-**Status:** Pendente  
+#### ✅ UX-008: Definir Regras de Responsividade
+**Status:** Concluído  
 **Prioridade:** Estrutural  
 **Complexidade:** Alta  
 **Esforço estimado:** 6-8 horas  
 
 **Checklist de Implementação:**
-- [ ] Criar utilitários de breakpoint
-- [ ] Adaptar tabelas para mobile (visualização em cards)
-- [ ] Adaptar modais para mobile
+- [x] Criar utilitários de breakpoint
+- [x] Adaptar tabelas para mobile (visualização em cards)
+- [x] Adaptar modais para mobile
 
 ---
 
@@ -201,6 +201,7 @@
 - ✅ UX-005 concluído com migração de todas as views de conteúdo para `LayoutPadrao.vue`
 - ✅ UX-006 concluído com padronização de mensagens/CTA em estados vazios prioritários (`TabelaAlertas`, `HistoricoView`, `Unidades`)
 - ✅ UX-007 concluído com criação e importação global de design tokens em `frontend/src/assets/css/tokens.css`
+- ✅ UX-008 concluído com utilitários de responsividade, tabelas em modo `stacked` no mobile e rodapé de modais adaptado para telas pequenas
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial

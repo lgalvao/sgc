@@ -89,6 +89,7 @@ defineExpose({ fields });
         hover
         responsive
         show-empty
+        stacked="md"
         @row-clicked="handleSelecionarProcesso"
         @sort-changed="handleSortChange">
 

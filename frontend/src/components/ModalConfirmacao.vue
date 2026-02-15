@@ -2,6 +2,7 @@
   <BModal
       v-model="modelValueComputed"
       :title="titulo"
+      modal-class="modal-responsivo"
       centered
       @hide="fechar"
       @shown="onShown"
@@ -17,7 +18,7 @@
       </div>
     </slot>
     <template #footer>
-      <div class="d-flex justify-content-between w-100">
+      <div class="d-flex justify-content-between w-100 footer-confirmacao">
         <BButton
             ref="btnCancelar"
             :data-testid="testIdCancelar || 'btn-modal-confirmacao-cancelar'"
@@ -109,3 +110,20 @@ function onShown() {
   emit('shown');
 }
 </script>
+
+<style scoped>
+@media (max-width: 575.98px) {
+  .footer-confirmacao {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .footer-confirmacao > button {
+    width: 100%;
+  }
+
+  :deep(.modal-responsivo .modal-dialog) {
+    margin: 0.5rem;
+  }
+}
+</style>

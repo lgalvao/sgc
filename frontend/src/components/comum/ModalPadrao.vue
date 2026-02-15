@@ -3,6 +3,7 @@
       v-model="modelValueComputed"
       :centered="centralizado"
       :fade="fade"
+      modal-class="modal-responsivo"
       :size="tamanho"
       :title="titulo"
       @hide="fechar"
@@ -10,7 +11,7 @@
   >
     <slot />
     <template #footer>
-      <div class="d-flex justify-content-between w-100">
+      <div class="d-flex justify-content-between w-100 footer-modal-padrao">
         <BButton
             :data-testid="testIdCancelar || 'btn-modal-padrao-cancelar'"
             :disabled="loading"
@@ -91,3 +92,20 @@ function fechar() {
   modelValueComputed.value = false;
 }
 </script>
+
+<style scoped>
+@media (max-width: 575.98px) {
+  .footer-modal-padrao {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .footer-modal-padrao > button {
+    width: 100%;
+  }
+
+  :deep(.modal-responsivo .modal-dialog) {
+    margin: 0.5rem;
+  }
+}
+</style>

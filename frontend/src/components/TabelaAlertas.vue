@@ -9,6 +9,7 @@
         hover
         responsive
         show-empty
+        stacked="md"
         :striped="alertas.length > 0"
         @sort-changed="handleSortChange"
     >
