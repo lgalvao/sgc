@@ -1,7 +1,7 @@
 # Rastreamento de Melhorias de UX - SGC
 
 **Data de início:** 2026-02-14  
-**Última atualização:** 2026-02-15 (UX-001 concluído)  
+**Última atualização:** 2026-02-15 (UX-002 em andamento)  
 **Documento base:** `ux-improvement-plan.md`
 
 ---
@@ -12,10 +12,10 @@
 
 | Categoria | Total | Concluído | Em Andamento | Pendente | % Completo |
 |-----------|-------|-----------|--------------|----------|------------|
-| **Prioridade Alta** | 3 | 1 | 0 | 2 | 33% |
+| **Prioridade Alta** | 3 | 1 | 1 | 1 | 33% |
 | **Prioridade Média** | 3 | 0 | 0 | 3 | 0% |
 | **Prioridade Estrutural** | 4 | 0 | 0 | 4 | 0% |
-| **TOTAL** | 10 | 1 | 0 | 9 | **10%** |
+| **TOTAL** | 10 | 1 | 1 | 8 | **10%** |
 
 ### Legenda de Status
 - ⬜ **Pendente:** Não iniciado
@@ -47,19 +47,19 @@
 
 ---
 
-#### ⬜ UX-002: Unificar Padrão de Validação Inline
-**Status:** Pendente  
+#### 🔵 UX-002: Unificar Padrão de Validação Inline
+**Status:** Em Andamento  
 **Prioridade:** Alta  
 **Complexidade:** Alta  
 **Esforço estimado:** 5-6 horas  
 
 **Checklist de Implementação:**
-- [ ] Criar `frontend/src/components/comum/CampoTexto.vue`
-- [ ] Criar `frontend/src/composables/useValidacao.ts`
-- [ ] Aplicar em `ProcessoFormFields.vue`
-- [ ] Aplicar em `AtividadeCadastroForm.vue`
+- [x] Criar `frontend/src/components/comum/CampoTexto.vue`
+- [x] Criar `frontend/src/composables/useValidacao.ts`
+- [x] Aplicar em `ProcessoFormFields.vue`
+- [x] Aplicar em `AtividadeCadastroForm.vue`
 - [ ] Aplicar em demais formulários
-- [ ] Implementar foco automático no primeiro erro
+- [x] Implementar foco automático no primeiro erro
 
 ---
 
@@ -186,6 +186,8 @@
 - ✅ Atualizado terminologias (Situacao, Modais, Views)
 - ✅ UX-001 concluído com migração de modais críticos e adicionais
 - ✅ Criados testes focados: unitários (`ModalPadrao`) e E2E (`e2e/ux/botoes-modais.spec.ts`)
+- 🔵 UX-002 iniciado com validação inline em `ProcessoFormFields` e `CadAtividadeForm`
+- 🔵 UX-002 evoluído com `CampoTexto.vue`, `useValidacao.ts` e testes unitários focados
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial

@@ -75,6 +75,7 @@
         ref="atividadeFormRef"
         v-model="novaAtividade"
         :disabled="!codSubprocesso || !permissoes?.podeEditarCadastro"
+        :erro="erroNovaAtividade"
         :loading="loadingAdicionar"
         @submit="handleAdicionarAtividade"
     />
@@ -188,6 +189,7 @@ const {
   historicoAnalises,
   novaAtividade,
   loadingAdicionar,
+  erroNovaAtividade,
   loadingValidacao,
   loadingImpacto,
   impactoMapa,
@@ -225,10 +227,8 @@ const erroGlobalFormatado = computed(() =>
 
 async function handleAdicionarAtividade() {
   const sucesso = await adicionarAtividade();
-  if (sucesso) {
-    await nextTick();
-    atividadeFormRef.value?.inputRef?.$el?.focus();
-  }
+  await nextTick();
+  if (sucesso || erroNovaAtividade.value) atividadeFormRef.value?.inputRef?.$el?.focus();
 }
 
 // Auto-focus if empty on load

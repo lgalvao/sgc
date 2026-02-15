@@ -43,6 +43,7 @@ export interface UseCadAtividades {
     // Formulário de nova atividade
     novaAtividade: Ref<string>;
     loadingAdicionar: Ref<boolean>;
+    erroNovaAtividade: Ref<string | null>;
 
     // Modais
     mostrarModalImpacto: Ref<boolean>;
@@ -131,6 +132,7 @@ export function useCadAtividades(props: { codProcesso: number | string; sigla: s
 
     // Formulário de nova atividade
     const { novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction } = useAtividadeForm();
+    const erroNovaAtividade = ref<string | null>(null);
 
     // Modais
     const mostrarModalImpacto = ref(false);
@@ -161,7 +163,14 @@ export function useCadAtividades(props: { codProcesso: number | string; sigla: s
 
     async function adicionarAtividade(): Promise<boolean> {
         if (codMapa.value && codSubprocesso.value) {
-            return await adicionarAtividadeAction(codSubprocesso.value, codMapa.value);
+            try {
+                const sucesso = await adicionarAtividadeAction(codSubprocesso.value, codMapa.value);
+                if (sucesso) erroNovaAtividade.value = null;
+                return sucesso;
+            } catch {
+                erroNovaAtividade.value = atividadesStore.lastError?.message || "Não foi possível adicionar atividade.";
+                return false;
+            }
         }
         return false;
     }
@@ -385,6 +394,7 @@ export function useCadAtividades(props: { codProcesso: number | string; sigla: s
         // Formulário
         novaAtividade,
         loadingAdicionar,
+        erroNovaAtividade,
 
         // Modais
         mostrarModalImpacto,

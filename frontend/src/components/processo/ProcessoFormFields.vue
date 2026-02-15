@@ -26,6 +26,7 @@
       </template>
       <BFormSelect
           id="tipo"
+          ref="selectTipoRef"
           :model-value="modelValue.tipo"
           :options="tipoOptions"
           :state="fieldErrors.tipo ? false : null"
@@ -46,7 +47,13 @@
       <template #label>
         Unidades participantes <span class="text-danger" aria-hidden="true">*</span>
       </template>
-      <div class="border rounded p-3" :class="{ 'border-danger': fieldErrors.unidades }">
+      <div
+          ref="containerUnidadesRef"
+          class="border rounded p-3"
+          :class="{ 'border-danger': fieldErrors.unidades }"
+          data-testid="container-processo-unidades"
+          tabindex="-1"
+      >
         <ArvoreUnidades
             v-if="!isLoadingUnidades"
             :model-value="modelValue.unidadesSelecionadas"
@@ -73,6 +80,7 @@
       </template>
       <BFormInput
           id="dataLimite"
+          ref="inputDataLimiteRef"
           :model-value="modelValue.dataLimite"
           :state="fieldErrors.dataLimite ? false : null"
           data-testid="inp-processo-data-limite"
@@ -89,10 +97,11 @@
 
 <script lang="ts" setup>
 import {BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect, BFormSelectOption} from "bootstrap-vue-next";
-import {ref} from "vue";
+import {nextTick, ref, watch} from "vue";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
 import type {Unidade} from "@/types/tipos";
 import {TipoProcesso} from "@/types/tipos";
+import {useValidacao} from "@/composables/useValidacao";
 
 interface ProcessoFormData {
   descricao: string;
@@ -120,6 +129,10 @@ const emit = defineEmits<{
 }>();
 
 const inputDescricaoRef = ref<InstanceType<typeof BFormInput> | null>(null);
+const selectTipoRef = ref<any>(null);
+const inputDataLimiteRef = ref<InstanceType<typeof BFormInput> | null>(null);
+const containerUnidadesRef = ref<HTMLElement | null>(null);
+const {obterPrimeiroCampoComErro, possuiErros} = useValidacao();
 
 const tipoOptions = [
   { value: TipoProcesso.MAPEAMENTO, text: 'Mapeamento' },
@@ -134,5 +147,48 @@ function updateField<K extends keyof ProcessoFormData>(field: K, value: Processo
   });
 }
 
-defineExpose({ inputDescricaoRef });
+function focarPrimeiroErro() {
+  const primeiroCampo = obterPrimeiroCampoComErro(props.fieldErrors);
+  switch (primeiroCampo) {
+    case "descricao":
+      inputDescricaoRef.value?.$el?.focus?.();
+      return;
+    case "tipo": {
+      const select = selectTipoRef.value?.$el?.querySelector?.("select");
+      select?.focus?.();
+      return;
+    }
+    case "unidades":
+      containerUnidadesRef.value?.focus?.();
+      return;
+    case "dataLimite":
+      inputDataLimiteRef.value?.$el?.focus?.();
+      return;
+    default:
+      return;
+  }
+}
+
+watch(
+    () => [
+      props.fieldErrors.descricao,
+      props.fieldErrors.tipo,
+      props.fieldErrors.unidades,
+      props.fieldErrors.dataLimite
+    ],
+    async (erros) => {
+      if (possuiErros({
+        descricao: erros[0],
+        tipo: erros[1],
+        unidades: erros[2],
+        dataLimite: erros[3]
+      })) {
+        await nextTick();
+        focarPrimeiroErro();
+      }
+    },
+    { immediate: true }
+);
+
+defineExpose({ inputDescricaoRef, focarPrimeiroErro });
 </script>

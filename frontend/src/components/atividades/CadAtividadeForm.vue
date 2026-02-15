@@ -11,10 +11,14 @@
           aria-label="Nova atividade"
           data-testid="inp-nova-atividade"
           :disabled="loading"
+          :state="estadoInput"
           placeholder="Nova atividade"
           type="text"
           required
       />
+      <BFormInvalidFeedback :state="estadoInput">
+        {{ mensagemErro }}
+      </BFormInvalidFeedback>
     </BCol>
     <BCol cols="auto">
       <LoadingButton
@@ -32,15 +36,16 @@
 </template>
 
 <script lang="ts" setup>
-import {BCol, BForm, BFormInput} from "bootstrap-vue-next";
-import {ref} from "vue";
+import {BCol, BForm, BFormInput, BFormInvalidFeedback} from "bootstrap-vue-next";
+import {computed, ref, watch} from "vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
 
 const modelValue = defineModel<string>({ default: '' });
 
-defineProps<{
+const props = defineProps<{
   loading?: boolean;
   disabled?: boolean;
+  erro?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -48,10 +53,30 @@ const emit = defineEmits<{
 }>();
 
 const inputRef = ref<InstanceType<typeof BFormInput> | null>(null);
+const validacaoSubmetida = ref(false);
+
+const mensagemErro = computed(() => {
+  if (props.erro) return props.erro;
+  if (validacaoSubmetida.value && !modelValue.value.trim()) return "Informe a atividade.";
+  return "";
+});
+
+const estadoInput = computed(() => (mensagemErro.value ? false : null));
 
 function onSubmit() {
+  validacaoSubmetida.value = true;
+  if (!modelValue.value.trim()) return;
   emit('submit');
 }
+
+watch(
+    () => modelValue.value,
+    (valor) => {
+      if (valor.trim()) {
+        validacaoSubmetida.value = false;
+      }
+    }
+);
 
 defineExpose({
   modelValue,
