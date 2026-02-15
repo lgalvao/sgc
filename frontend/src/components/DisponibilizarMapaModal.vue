@@ -1,11 +1,16 @@
 <template>
-  <BModal
-      :fade="false"
+  <ModalPadrao
       :model-value="mostrar"
-      centered
+      :loading="loading"
+      :acao-desabilitada="!dataLimiteValidacao"
+      test-id-cancelar="btn-disponibilizar-mapa-cancelar"
+      titulo="Disponibilização do mapa de competências"
       data-testid="mdl-disponibilizar-mapa"
-      title="Disponibilização do mapa de competências"
-      @hide="fechar"
+      variant-acao="success"
+      texto-acao="Disponibilizar"
+      texto-acao-carregando="Disponibilizando..."
+      @fechar="fechar"
+      @confirmar="disponibilizar"
   >
     <div v-if="fieldErrors?.generic" class="alert alert-danger mb-3">
       {{ fieldErrors.generic }}
@@ -53,15 +58,7 @@
     >
       {{ notificacao }}
     </BAlert>
-    <template #footer>
-      <BButton
-          :disabled="loading"
-          data-testid="btn-disponibilizar-mapa-cancelar"
-          variant="secondary"
-          @click="fechar"
-      >
-        Cancelar
-      </BButton>
+    <template #acao>
       <LoadingButton
           :loading="loading"
           :disabled="!dataLimiteValidacao"
@@ -72,12 +69,13 @@
           @click="disponibilizar"
       />
     </template>
-  </BModal>
+  </ModalPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BFormInput, BFormInvalidFeedback, BFormTextarea, BModal} from "bootstrap-vue-next";
+import {BAlert, BFormInput, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
+import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import {ref, watch} from "vue";
 
 const props = defineProps<{

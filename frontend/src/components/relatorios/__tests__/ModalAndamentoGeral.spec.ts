@@ -1,7 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import ModalAndamentoGeral from '../ModalAndamentoGeral.vue';
-import {BModal} from 'bootstrap-vue-next';
 import * as csvUtils from '@/utils/csv';
 import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
@@ -48,9 +47,10 @@ describe('ModalAndamentoGeral.vue', () => {
     },
     global: {
       stubs: {
-        BModal: {
+        ModalPadrao: {
             template: '<div><slot /></div>',
-            props: ['modelValue']
+            props: ['modelValue'],
+            emits: ['update:modelValue']
         },
         BButton: true,
       },
@@ -87,9 +87,7 @@ describe('ModalAndamentoGeral.vue', () => {
 
   it('emits update:modelValue when modal is closed', async () => {
     const wrapper = mount(ModalAndamentoGeral, mountOptions);
-    const modal = wrapper.findComponent(BModal);
-
-    await modal.vm.$emit('update:modelValue', false);
+    (wrapper.vm as any).modelValueComputed = false;
 
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
     expect(wrapper.emitted('update:modelValue')![0]).toEqual([false]);

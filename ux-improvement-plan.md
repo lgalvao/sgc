@@ -2,7 +2,7 @@
 ## Documento Orientado para Agentes de IA
 
 **Data de atualização:** 2026-02-15
-**Versão:** 1.1 (Refinado)
+**Versão:** 1.2 (Sincronizado)
 **Baseado em:** `ux-improvement-report.md`  
 **Escopo:** Autenticação, Painel, Processos, Subprocessos, Mapa, Navegação, Responsividade e Relatórios
 
@@ -181,7 +181,7 @@ frontend/src/
 #### UX-007: Criar Design Tokens
 **Complexidade:** Alta  
 **Esforço estimado:** 8-10 horas  
-**Impacto:** Centralizar cores, espaçamentos e tipografia. Criar `frontend/src/assets/styles/_tokens.scss`.
+**Impacto:** Centralizar cores, espaçamentos e tipografia. Criar `frontend/src/assets/css/tokens.css`.
 
 #### UX-008: Definir Regras de Responsividade
 **Evidências:**
@@ -198,7 +198,7 @@ frontend/src/
 
 #### UX-010: Padronização de Nomenclatura e Estrutura (Refatoração)
 **Complexidade:** Média
-**Esforço estimado:** 6-8 horas
+**Esforço estimado:** 4-6 horas
 **Impacto:** Manutenibilidade, escalabilidade e consistência cognitiva
 **Alvo:** Reorganizar views e componentes em pastas de domínio (`views/processo/`, `views/mapa/`) e padronizar nomes.
 
@@ -287,8 +287,8 @@ Criar composable `useProximaAcao.ts` que consome `usePerfilStore` e o estado do 
 
 ### 4.5 UX-007: Design Tokens (Fundação)
 
-Criar estrutura de CSS/SCSS em `frontend/src/assets/styles/`.
-- `_variables.scss` ou `_tokens.scss`.
+Criar estrutura CSS nativa em `frontend/src/assets/css/`.
+- `tokens.css` com variáveis em `:root`.
 - Importar no `style.css` ou `main.ts`.
 
 ### 4.7 UX-010: Padronização de Nomenclatura e Estrutura
@@ -358,7 +358,6 @@ Além de renomear, os arquivos devem ser movidos para diretórios contextualizad
 - [ ] Mapear `origem -> destino` de todos os arquivos
 - [ ] Rodar script para mover arquivos e atualizar imports automaticamente
 - [ ] Rodar `eslint --fix` após migração
-- [ ] Validar build e E2E após renomeação
 - [ ] Validar build e E2E após renomeação
 
 ---

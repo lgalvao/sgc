@@ -1,25 +1,32 @@
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {mount} from "@vue/test-utils";
-import {BFormInput, BModal} from "bootstrap-vue-next";
+import {BFormInput} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import DisponibilizarMapaModal from "@/components/DisponibilizarMapaModal.vue";
 
-const BModalStub = {
+const ModalPadraoStub = {
     template: `
         <div v-if="modelValue" data-testid="modal-stub">
             <slot />
-            <slot name="footer" />
+            <button
+                :data-testid="testIdCancelar || 'btn-modal-padrao-cancelar'"
+                :disabled="loading"
+                @click="$emit('fechar')"
+            >
+                Cancelar
+            </button>
+            <slot name="acao" />
         </div>
     `,
-    props: ["modelValue"],
-    emits: ["update:modelValue", "hide"],
+    props: ["modelValue", "testIdCancelar", "loading"],
+    emits: ["update:modelValue", "fechar", "confirmar"],
 };
 
 describe("DisponibilizarMapaModal.vue", () => {
     const context = setupComponentTest();
 
     const createWrapper = (propsOverride = {}) => {
-        const options = getCommonMountOptions({}, { BModal: BModalStub });
+        const options = getCommonMountOptions({}, { ModalPadrao: ModalPadraoStub });
 
         context.wrapper = mount(DisponibilizarMapaModal, {
             ...options,
@@ -31,7 +38,6 @@ describe("DisponibilizarMapaModal.vue", () => {
                 ...options.global,
                 components: {
                     BFormInput,
-                    BModal,
                     ...(options.global.components || {})
                 }
             },

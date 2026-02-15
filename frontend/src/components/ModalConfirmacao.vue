@@ -17,28 +17,30 @@
       </div>
     </slot>
     <template #footer>
-      <BButton
-          ref="btnCancelar"
-          :data-testid="testIdCancelar || 'btn-modal-confirmacao-cancelar'"
-          variant="secondary"
-          :disabled="loading"
-          @click="fechar"
-      >
-        {{ cancelTitle }}
-      </BButton>
-      <BButton
-          :variant="(okVariant || variant || 'primary') as any"
-          :data-testid="testIdConfirmar || 'btn-modal-confirmacao-confirmar'"
-          :disabled="loading || okDisabled"
-          @click="confirmar"
-      >
-        <output
-            v-if="loading"
-            class="spinner-border spinner-border-sm me-1"
-            aria-hidden="true"
-        />
-        {{ loading ? (okTitle === 'Confirmar' ? 'Processando...' : okTitle) : okTitle }}
-      </BButton>
+      <div class="d-flex justify-content-between w-100">
+        <BButton
+            ref="btnCancelar"
+            :data-testid="testIdCancelar || 'btn-modal-confirmacao-cancelar'"
+            variant="secondary"
+            :disabled="loading"
+            @click="fechar"
+        >
+          {{ cancelTitle }}
+        </BButton>
+        <BButton
+            :variant="(okVariant || variant || 'primary') as any"
+            :data-testid="testIdConfirmar || 'btn-modal-confirmacao-confirmar'"
+            :disabled="loading || okDisabled"
+            @click="confirmar"
+        >
+          <output
+              v-if="loading"
+              class="spinner-border spinner-border-sm me-1"
+              aria-hidden="true"
+          />
+          {{ loading ? (okTitle === 'Confirmar' ? 'Processando...' : okTitle) : okTitle }}
+        </BButton>
+      </div>
     </template>
   </BModal>
 </template>
