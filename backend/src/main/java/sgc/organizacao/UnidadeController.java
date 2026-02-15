@@ -1,5 +1,6 @@
 package sgc.organizacao;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UsuarioDto;
+import sgc.organizacao.model.OrganizacaoViews;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
@@ -66,6 +68,7 @@ public class UnidadeController {
      * processo para selecionar unidades participantes
      */
     @GetMapping
+    @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<List<UnidadeDto>> buscarTodasUnidades() {
         List<UnidadeDto> hierarquia = unidadeService.buscarTodasUnidades();
         return ResponseEntity.ok(hierarquia);
@@ -80,6 +83,7 @@ public class UnidadeController {
      * @return A lista de unidades raiz com a árvore de filhas e a elegibilidade.
      */
     @GetMapping("/arvore-com-elegibilidade")
+    @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<List<UnidadeDto>> buscarArvoreComElegibilidade(
             @RequestParam("tipoProcesso") String tipoProcesso,
             @RequestParam(value = "codProcesso", required = false) Long codProcesso) {
@@ -114,6 +118,7 @@ public class UnidadeController {
      */
     @GetMapping("/{codUnidade}/usuarios")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<List<UsuarioDto>> buscarUsuariosPorUnidade(@PathVariable Long codUnidade) {
         List<UsuarioDto> usuarios = unidadeService.buscarUsuariosPorUnidade(codUnidade);
         return ResponseEntity.ok(usuarios);
@@ -126,6 +131,7 @@ public class UnidadeController {
      * @return Os dados da unidade.
      */
     @GetMapping("/sigla/{siglaUnidade}")
+    @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarUnidadePorSigla(
             @PathVariable @Pattern(regexp = "^[a-zA-Z0-9_.-]+$") String siglaUnidade) {
         UnidadeDto unidade = unidadeService.buscarPorSigla(siglaUnidade);
@@ -139,6 +145,7 @@ public class UnidadeController {
      * @return Os dados da unidade.
      */
     @GetMapping("/{codigo}")
+    @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarUnidadePorCodigo(@PathVariable Long codigo) {
         UnidadeDto unidade = unidadeService.buscarPorCodigo(codigo);
         return ResponseEntity.ok(unidade);
@@ -151,6 +158,7 @@ public class UnidadeController {
      * @return A unidade com sua árvore de subunidades.
      */
     @GetMapping("/{codigo}/arvore")
+    @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarArvoreUnidade(@PathVariable Long codigo) {
         return ResponseEntity.ok(unidadeService.buscarArvore(codigo));
     }

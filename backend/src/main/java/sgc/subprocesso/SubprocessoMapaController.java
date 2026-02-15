@@ -15,7 +15,7 @@ import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
@@ -32,7 +32,7 @@ import java.util.List;
 public class SubprocessoMapaController {
     private final SubprocessoFacade subprocessoFacade;
     private final MapaFacade mapaFacade;
-    private final UsuarioFacade usuarioService;
+    private final OrganizacaoFacade organizacaoFacade;
 
     /**
      * Obtém o contexto completo para edição de mapa (BFF).
@@ -65,7 +65,7 @@ public class SubprocessoMapaController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
     public ImpactoMapaDto verificarImpactos(@PathVariable Long codigo) {
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = organizacaoFacade.obterUsuarioAutenticado();
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codigo);
         return mapaFacade.verificarImpactos(subprocesso, usuario);
     }

@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import sgc.acompanhamento.AcompanhamentoFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.dto.CriarAnaliseRequest;
@@ -30,7 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Análises", description = "Endpoints para gerenciar as análises de cadastro e validação de subprocessos")
 public class AnaliseController {
-    private final AnaliseFacade analiseFacade;
+    private final AcompanhamentoFacade acompanhamentoFacade;
     private final SubprocessoFacade subprocessoFacade;
     private final AnaliseMapper analiseMapper;
 
@@ -45,7 +46,7 @@ public class AnaliseController {
     @Operation(summary = "Lista o histórico de análises de cadastro")
     public List<AnaliseHistoricoDto> listarAnalisesCadastro(@PathVariable("codSubprocesso") Long codigo) {
         subprocessoFacade.buscarSubprocesso(codigo); // Valida existência (lança 404 se não existir)
-        return analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.CADASTRO)
+        return acompanhamentoFacade.listarAnalisesPorSubprocesso(codigo, TipoAnalise.CADASTRO)
                 .stream()
                 .map(analiseMapper::toAnaliseHistoricoDto)
                 .toList();
@@ -83,7 +84,7 @@ public class AnaliseController {
     @Operation(summary = "Lista o histórico de análises de validação")
     public List<AnaliseHistoricoDto> listarAnalisesValidacao(@PathVariable Long codSubprocesso) {
         subprocessoFacade.buscarSubprocesso(codSubprocesso);
-        return analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO)
+        return acompanhamentoFacade.listarAnalisesPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO)
                 .stream()
                 .map(analiseMapper::toAnaliseHistoricoDto)
                 .toList();
@@ -122,7 +123,7 @@ public class AnaliseController {
                 .motivo(request.motivo())
                 .build();
 
-        Analise analise = analiseFacade.criarAnalise(subprocesso, command);
+        Analise analise = acompanhamentoFacade.criarAnalise(subprocesso, command);
         return analiseMapper.toAnaliseHistoricoDto(analise);
     }
 }

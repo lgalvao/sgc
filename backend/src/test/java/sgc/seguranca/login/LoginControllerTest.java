@@ -12,7 +12,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
@@ -50,7 +50,7 @@ class LoginControllerTest {
     private LoginFacade loginFacade;
 
     @MockitoBean
-    private UsuarioFacade usuarioService;
+    private OrganizacaoFacade organizacaoFacade;
 
     @MockitoBean
     private LimitadorTentativasLogin limitadorTentativasLogin;
@@ -264,7 +264,7 @@ class LoginControllerTest {
         usuario.setTituloEleitoral("123");
 
         when(loginFacade.entrar(any(EntrarRequest.class))).thenReturn("token-jwt");
-        when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
+        when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
         when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
 
         mockMvc.perform(post("/api/usuarios/entrar")
@@ -325,20 +325,20 @@ class LoginControllerTest {
 
         private LoginController controller;
         private LoginFacade loginFacadeMock;
-        private UsuarioFacade usuarioServiceMock;
+        private OrganizacaoFacade organizacaoFacadeMock;
         private LimitadorTentativasLogin limitadorMock;
         private GerenciadorJwt gerenciadorJwtMock;
 
         @BeforeEach
         void setUp() {
             loginFacadeMock = mock(LoginFacade.class);
-            usuarioServiceMock = mock(UsuarioFacade.class);
+            organizacaoFacadeMock = mock(OrganizacaoFacade.class);
             limitadorMock = mock(LimitadorTentativasLogin.class);
             gerenciadorJwtMock = mock(GerenciadorJwt.class);
 
             controller = new LoginController(
                 loginFacadeMock, 
-                usuarioServiceMock, 
+                organizacaoFacadeMock, 
                 limitadorMock, 
                 gerenciadorJwtMock
             );

@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.acompanhamento.AcompanhamentoFacade;
 
 import java.util.List;
 
@@ -37,7 +38,7 @@ class AlertaControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockitoBean
-    private AlertaFacade alertaService;
+    private sgc.acompanhamento.AcompanhamentoFacade acompanhamentoFacade;
 
     @Nested
     @DisplayName("Marcar como Lidos")
@@ -52,7 +53,7 @@ class AlertaControllerTest {
                             .content("[1, 2, 3]"))
                     .andExpect(status().isOk());
 
-            verify(alertaService).marcarComoLidos(eq(TITULO_TESTE), anyList());
+            verify(acompanhamentoFacade).marcarAlertasComoLidos(eq(TITULO_TESTE), anyList());
         }
 
         @Test
@@ -65,7 +66,7 @@ class AlertaControllerTest {
                             .content("[]"))
                     .andExpect(status().isOk());
 
-            verify(alertaService).marcarComoLidos(eq(TITULO_TESTE), anyList());
+            verify(acompanhamentoFacade).marcarAlertasComoLidos(eq(TITULO_TESTE), anyList());
         }
     }
 
@@ -75,7 +76,7 @@ class AlertaControllerTest {
         @Test
         @DisplayName("Deve retornar lista de alertas com sucesso")
         void listarAlertas_quandoSucesso_deveRetornarListaDeAlertas() throws Exception {
-            when(alertaService.listarAlertasPorUsuario(TITULO_TESTE))
+            when(acompanhamentoFacade.listarAlertasPorUsuario(TITULO_TESTE))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/api/alertas")
@@ -85,13 +86,13 @@ class AlertaControllerTest {
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$").isEmpty());
 
-            verify(alertaService).listarAlertasPorUsuario(TITULO_TESTE);
+            verify(acompanhamentoFacade).listarAlertasPorUsuario(TITULO_TESTE);
         }
 
         @Test
         @DisplayName("Deve retornar lista de alertas não lidos com sucesso")
         void listarNaoLidos_quandoSucesso_deveRetornarListaDeAlertas() throws Exception {
-            when(alertaService.listarAlertasNaoLidos(TITULO_TESTE))
+            when(acompanhamentoFacade.listarAlertasNaoLidos(TITULO_TESTE))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/api/alertas/nao-lidos")
@@ -101,7 +102,7 @@ class AlertaControllerTest {
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$").isEmpty());
 
-            verify(alertaService).listarAlertasNaoLidos(TITULO_TESTE);
+            verify(acompanhamentoFacade).listarAlertasNaoLidos(TITULO_TESTE);
         }
     }
 
@@ -115,7 +116,7 @@ class AlertaControllerTest {
             // Este caso já é coberto pelos testes acima usando .with(user(TITULO_TESTE))
             // que passa uma String como principal
             
-            when(alertaService.listarAlertasPorUsuario(TITULO_TESTE))
+            when(acompanhamentoFacade.listarAlertasPorUsuario(TITULO_TESTE))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/api/alertas")
@@ -123,7 +124,7 @@ class AlertaControllerTest {
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk());
 
-            verify(alertaService).listarAlertasPorUsuario(TITULO_TESTE);
+            verify(acompanhamentoFacade).listarAlertasPorUsuario(TITULO_TESTE);
         }
         
         @Test
@@ -135,7 +136,7 @@ class AlertaControllerTest {
                     .authorities("ROLE_USER")
                     .build();
             
-            when(alertaService.listarAlertasNaoLidos("98765432100"))
+            when(acompanhamentoFacade.listarAlertasNaoLidos("98765432100"))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/api/alertas/nao-lidos")
@@ -143,7 +144,7 @@ class AlertaControllerTest {
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk());
 
-            verify(alertaService).listarAlertasNaoLidos("98765432100");
+            verify(acompanhamentoFacade).listarAlertasNaoLidos("98765432100");
         }
     }
 }

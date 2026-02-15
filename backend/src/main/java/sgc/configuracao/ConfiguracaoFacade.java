@@ -3,7 +3,6 @@ package sgc.configuracao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.configuracao.dto.ParametroRequest;
-import sgc.configuracao.dto.ParametroResponse;
 import sgc.configuracao.mapper.ParametroMapper;
 import sgc.configuracao.model.Parametro;
 
@@ -26,10 +25,8 @@ public class ConfiguracaoFacade {
     /**
      * Busca todos os parâmetros de configuração.
      */
-    public List<ParametroResponse> buscarTodos() {
-        return configuracaoService.buscarTodos().stream()
-                .map(parametroMapper::toResponse)
-                .toList();
+    public List<Parametro> buscarTodos() {
+        return configuracaoService.buscarTodos();
     }
 
     /**
@@ -42,7 +39,7 @@ public class ConfiguracaoFacade {
     /**
      * Salva uma lista de parâmetros.
      */
-    public List<ParametroResponse> salvar(List<ParametroRequest> requests) {
+    public List<Parametro> salvar(List<ParametroRequest> requests) {
         // Buscar parâmetros existentes e atualizar com dados das requests
         List<Parametro> parametros = requests.stream()
                 .map(request -> {
@@ -54,9 +51,7 @@ public class ConfiguracaoFacade {
         
         List<Parametro> parametrosSalvos = configuracaoService.salvar(parametros);
         
-        return parametrosSalvos.stream()
-                .map(parametroMapper::toResponse)
-                .toList();
+        return parametrosSalvos;
     }
 
     /**

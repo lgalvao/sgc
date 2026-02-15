@@ -11,7 +11,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.configuracao.dto.ParametroRequest;
-import sgc.configuracao.dto.ParametroResponse;
+import sgc.configuracao.model.Parametro;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,8 +41,7 @@ class ConfiguracaoControllerTest {
     @DisplayName("GET /api/configuracoes - Deve listar configurações com sucesso")
     @WithMockUser(roles = "ADMIN")
     void deveListarConfiguracoes() throws Exception {
-        ParametroResponse param = ParametroResponse.builder()
-                .codigo(1L)
+        Parametro param = Parametro.builder()
                 .chave("KEY")
                 .descricao("Description")
                 .valor("VALUE")
@@ -77,8 +76,7 @@ class ConfiguracaoControllerTest {
     @WithMockUser(roles = "ADMIN")
     void deveAtualizarConfiguracoes() throws Exception {
         ParametroRequest request = new ParametroRequest(1L, "KEY", "Description", "NEW_VALUE");
-        ParametroResponse response = ParametroResponse.builder()
-                .codigo(1L)
+        Parametro response = Parametro.builder()
                 .chave("KEY")
                 .descricao("Description")
                 .valor("NEW_VALUE")

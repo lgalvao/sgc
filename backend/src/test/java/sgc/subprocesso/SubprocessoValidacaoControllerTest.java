@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-import sgc.analise.AnaliseFacade;
+import sgc.acompanhamento.AcompanhamentoFacade;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.Analise;
@@ -38,7 +38,7 @@ class SubprocessoValidacaoControllerTest {
     private SubprocessoFacade subprocessoFacade;
 
     @Mock
-    private AnaliseFacade analiseFacade;
+    private AcompanhamentoFacade acompanhamentoFacade;
 
     @Mock
     private AnaliseMapper analiseMapper;
@@ -102,7 +102,7 @@ class SubprocessoValidacaoControllerTest {
         Analise analise = new Analise();
         AnaliseValidacaoHistoricoDto dto = new AnaliseValidacaoHistoricoDto(null, null, null, null, null, null, null);
 
-        when(analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.VALIDACAO)).thenReturn(List.of(analise));
+        when(acompanhamentoFacade.listarAnalisesPorSubprocesso(codigo, TipoAnalise.VALIDACAO)).thenReturn(List.of(analise));
         when(analiseMapper.toAnaliseValidacaoHistoricoDto(analise)).thenReturn(dto);
 
         List<AnaliseValidacaoHistoricoDto> result = controller.obterHistoricoValidacao(codigo);
@@ -117,14 +117,14 @@ class SubprocessoValidacaoControllerTest {
         // Pattern 1: Empty list validation
         Long codigo = 1L;
 
-        when(analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.VALIDACAO)).thenReturn(List.of());
+        when(acompanhamentoFacade.listarAnalisesPorSubprocesso(codigo, TipoAnalise.VALIDACAO)).thenReturn(List.of());
 
         List<AnaliseValidacaoHistoricoDto> result = controller.obterHistoricoValidacao(codigo);
 
         assertThat(result)
                 .isNotNull()
                 .isEmpty();
-        verify(analiseFacade).listarPorSubprocesso(codigo, TipoAnalise.VALIDACAO);
+        verify(acompanhamentoFacade).listarAnalisesPorSubprocesso(codigo, TipoAnalise.VALIDACAO);
     }
 
     @Test

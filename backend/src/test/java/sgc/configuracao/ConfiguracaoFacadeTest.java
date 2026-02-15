@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.configuracao.dto.ParametroRequest;
-import sgc.configuracao.dto.ParametroResponse;
 import sgc.configuracao.mapper.ParametroMapper;
 import sgc.configuracao.model.Parametro;
 
@@ -39,10 +38,9 @@ class ConfiguracaoFacadeTest {
         Parametro p1 = Parametro.builder().chave("CHAVE_1").valor("VALOR_1").descricao("Desc 1").build();
         Parametro p2 = Parametro.builder().chave("CHAVE_2").valor("VALOR_2").descricao("Desc 2").build();
         when(configuracaoService.buscarTodos()).thenReturn(List.of(p1, p2));
-        when(parametroMapper.toResponse(any())).thenReturn(mock(ParametroResponse.class));
 
         // Act
-        List<ParametroResponse> resultado = configuracaoFacade.buscarTodos();
+        List<Parametro> resultado = configuracaoFacade.buscarTodos();
 
         // Assert
         assertThat(resultado).hasSize(2);
@@ -86,11 +84,11 @@ class ConfiguracaoFacadeTest {
         ParametroRequest req = new ParametroRequest(1L, "CHAVE_1", "VALOR_1", "Desc 1");
         Parametro p1 = Parametro.builder().chave("CHAVE_1").valor("VALOR_1").descricao("Desc 1").build();
         List<ParametroRequest> lista = List.of(req);
+        when(configuracaoService.buscarPorId(1L)).thenReturn(p1);
         when(configuracaoService.salvar(any())).thenReturn(List.of(p1));
-        when(parametroMapper.toResponse(any())).thenReturn(mock(ParametroResponse.class));
 
         // Act
-        List<ParametroResponse> resultado = configuracaoFacade.salvar(lista);
+        List<Parametro> resultado = configuracaoFacade.salvar(lista);
 
         // Assert
         assertThat(resultado).hasSize(1);

@@ -11,7 +11,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.processo.service.ProcessoFacade;
 
 import javax.sql.DataSource;
@@ -32,7 +32,7 @@ class E2eControllerCoverageTest {
     @Mock
     private ProcessoFacade processoFacade;
     @Mock
-    private UnidadeFacade unidadeFacade;
+    private OrganizacaoFacade organizacaoFacade;
     @Mock
     private ResourceLoader resourceLoader;
     @Mock

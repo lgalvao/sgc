@@ -11,7 +11,7 @@
 Propomos **simplificar o SGC** através de 2 fases com risco controlado:
 
 - **Fase 1** (7 dias, BAIXO risco): Consolidar services e stores → **-19 arquivos**
-- **Fase 2** (12 dias, MÉDIO risco): Remover facades pass-through, introduzir @JsonView → **-23 arquivos**
+- **Fase 2** (12 dias, MÉDIO risco): Consolidar módulos mantendo facades, introduzir @JsonView → **-23 arquivos**
 - **Resultado:** **-65% de arquivos alterados** por mudança típica, sem perda funcional
 
 **Fase 3** (simplificação de segurança) está **POSTERADA** devido ao alto risco.
@@ -40,10 +40,10 @@ Propomos **simplificar o SGC** através de 2 fases com risco controlado:
    - Eliminar wrappers puros e services com < 3 métodos
    - **Impacto:** ~30 testes ajustados
 
-2. **Remover Facades Pass-Through** (12 → 4)
-   - Manter apenas facades complexos (Processo, Subprocesso, Mapa, Atividade)
-   - Controllers chamam Services diretamente quando apropriado
-   - **Impacto:** ~20 testes ajustados, 2 regras ArchUnit adaptadas
+2. **Consolidar Módulos mantendo Facades** (12 facades → facades consolidadas por domínio)
+   - Manter Facades como fronteira estável para Controllers
+   - Consolidar responsabilidades por módulo para reduzir acoplamento interno
+   - **Impacto:** ~20 testes ajustados, 2 regras ArchUnit reforçadas
 
 3. **Introduzir @JsonView** (78 DTOs → ~25)
    - Usar @JsonView do Jackson para controle de serialização
@@ -160,7 +160,7 @@ Propomos **simplificar o SGC** através de 2 fases com risco controlado:
    - Limpar documentação
    
 2. ✅ **Planejar Fase 2** (12 dias, MÉDIO risco)
-   - Remover facades pass-through
+   - Consolidar módulos mantendo facades
    - Introduzir @JsonView
    - Atualizar ADRs
 
@@ -181,15 +181,13 @@ Para detalhes técnicos completos, consulte:
 
 ## 👥 Próximos Passos
 
-1. **Revisão** (2 dias): Tech Lead + Arquiteto revisam este documento
-2. **Aprovação** (1 dia): Decisão sobre Fases 1 e 2
-3. **Kickoff** (1 dia): Brief para o time, criar branch
-4. **Execução** (19 dias): Implementar Fases 1+2
-5. **Review** (2 dias): Validação final e deploy
+1. **Concluir validação ampla**: rerodar smoke E2E `captura` em ambiente limpo, mantendo backend/frontend já validados.
+2. **Consolidar documentação da Fase 2**: atualizar plano consolidado e resumo com resultados finais desta execução.
+3. **Fechamento técnico**: registrar status final dos gates obrigatórios e preparar handoff para próximo ciclo.
 
 ---
 
 **Preparado por:** Agente de Consolidação de Complexidade  
 **Data:** 15 de Fevereiro de 2026  
-**Status:** 🟡 Aguardando Aprovação  
+**Status:** 🟡 Em Execução Controlada  
 **Contato:** Abrir issue no GitHub para discussão

@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
@@ -43,16 +43,16 @@ public class E2eController {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final ProcessoFacade processoFacade;
-    private final UnidadeFacade unidadeFacade;
+    private final OrganizacaoFacade organizacaoFacade;
     private final ResourceLoader resourceLoader;
 
     public E2eController(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate,
-                         ProcessoFacade processoFacade, UnidadeFacade unidadeFacade,
+                         ProcessoFacade processoFacade, OrganizacaoFacade organizacaoFacade,
                          ResourceLoader resourceLoader) {
         this.jdbcTemplate = jdbcTemplate;
         this.namedJdbcTemplate = namedJdbcTemplate;
         this.processoFacade = processoFacade;
-        this.unidadeFacade = unidadeFacade;
+        this.organizacaoFacade = organizacaoFacade;
         this.resourceLoader = resourceLoader;
     }
 
@@ -207,7 +207,7 @@ public class E2eController {
             throw new ErroValidacao("Unidade é obrigatória");
         }
 
-        UnidadeDto unidade = unidadeFacade.buscarPorSigla(request.unidadeSigla());
+        UnidadeDto unidade = organizacaoFacade.buscarUnidadePorSigla(request.unidadeSigla());
 
         // Calcular data limite
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;

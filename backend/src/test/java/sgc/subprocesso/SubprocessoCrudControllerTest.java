@@ -10,7 +10,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -31,7 +31,7 @@ class SubprocessoCrudControllerTest {
     private SubprocessoFacade subprocessoFacade;
 
     @MockitoBean
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade organizacaoFacade;
 
     @Autowired
     private MockMvc mockMvc;
@@ -76,7 +76,7 @@ class SubprocessoCrudControllerTest {
     void buscarPorProcessoEUnidade() throws Exception {
         UnidadeDto uDto = UnidadeDto.builder().codigo(10L).build();
 
-        when(unidadeService.buscarPorSigla("U1")).thenReturn(uDto);
+        when(organizacaoFacade.buscarUnidadePorSigla("U1")).thenReturn(uDto);
         when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L))
                 .thenReturn(new SubprocessoDto());
 

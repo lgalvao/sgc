@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sgc.comum.erros.ErroAutenticacao;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.login.dto.*;
@@ -35,7 +35,7 @@ import java.util.Optional;
 @Tag(name = "Login", description = "Autenticação e autorização de usuários")
 public class LoginController {
     private final LoginFacade loginFacade;
-    private final UsuarioFacade usuarioService;
+    private final OrganizacaoFacade organizacaoFacade;
     private final LimitadorTentativasLogin limitadorTentativasLogin;
     private final GerenciadorJwt gerenciadorJwt;
 
@@ -108,7 +108,7 @@ public class LoginController {
 
         verificarTokenPreAuth(httpRequest, request.tituloEleitoral());
         String token = loginFacade.entrar(request);
-        Usuario usuario = usuarioService.buscarPorLogin(request.tituloEleitoral());
+        Usuario usuario = organizacaoFacade.buscarPorLogin(request.tituloEleitoral());
 
         EntrarResponse response = EntrarResponse.builder()
                 .tituloEleitoral(request.tituloEleitoral())

@@ -9,7 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sgc.analise.AnaliseFacade;
+import sgc.acompanhamento.AcompanhamentoFacade;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
@@ -26,7 +26,7 @@ import java.util.List;
 @Tag(name = "Subprocessos", description = "Gerenciamento do workflow de subprocessos")
 public class SubprocessoValidacaoController {
     private final SubprocessoFacade subprocessoFacade;
-    private final AnaliseFacade analiseFacade;
+    private final AcompanhamentoFacade acompanhamentoFacade;
     private final AnaliseMapper analiseMapper;
 
     /**
@@ -90,7 +90,7 @@ public class SubprocessoValidacaoController {
     @GetMapping("/{codigo}/historico-validacao")
     @PreAuthorize("isAuthenticated()")
     public List<AnaliseValidacaoHistoricoDto> obterHistoricoValidacao(@PathVariable Long codigo) {
-        return analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.VALIDACAO).stream()
+        return acompanhamentoFacade.listarAnalisesPorSubprocesso(codigo, TipoAnalise.VALIDACAO).stream()
                 .map(analiseMapper::toAnaliseValidacaoHistoricoDto)
                 .toList();
     }

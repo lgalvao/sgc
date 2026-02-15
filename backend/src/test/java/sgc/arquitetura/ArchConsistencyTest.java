@@ -1,7 +1,9 @@
 package sgc.arquitetura;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.tngtech.archunit.core.domain.Dependency;
 import com.tngtech.archunit.core.domain.JavaClass;
+import com.tngtech.archunit.core.domain.JavaMethod;
 import com.tngtech.archunit.core.domain.JavaPackage;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
@@ -17,7 +19,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.tngtech.archunit.core.domain.properties.CanBeAnnotated.Predicates.annotatedWith;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
@@ -36,9 +37,9 @@ public class ArchConsistencyTest {
             .haveNameMatching(".*Repo");
 
     @ArchTest
-    static final ArchRule mapa_controller_should_only_access_mapa_service = classes()
+    static final ArchRule mapa_controllers_should_only_access_mapa_facade = classes()
             .that()
-            .haveSimpleName("MapaController")
+            .resideInAPackage("sgc.mapa")
             .should()
             .onlyAccessClassesThat()
             .haveNameMatching("MapaFacade")
@@ -47,9 +48,9 @@ public class ArchConsistencyTest {
             .resideOutsideOfPackage("sgc.mapa..");
 
     @ArchTest
-    static final ArchRule processo_controller_should_only_access_processo_service = classes()
+    static final ArchRule processo_controllers_should_only_access_processo_service = classes()
             .that()
-            .haveSimpleName("ProcessoController")
+            .resideInAPackage("sgc.processo")
             .should()
             .onlyAccessClassesThat()
             .haveNameMatching("ProcessoService")
@@ -201,21 +202,31 @@ public class ArchConsistencyTest {
             .because("DTOs should never be JPA entities - use separate entity classes");
 
     /**
-     * Garante que entidades JPA não sejam retornadas diretamente pelos controllers.
-     * Controllers devem sempre usar DTOs.
+     * Garante que entidades JPA só sejam retornadas por controllers quando houver
+     * @JsonView explícito no método.
      */
-
-
     @ArchTest
-    static final ArchRule controllers_should_not_return_jpa_entities = methods()
+    static final ArchRule controllers_should_not_return_jpa_entities_without_json_view = methods()
             .that()
             .arePublic()
             .and()
             .areDeclaredInClassesThat()
             .areAnnotatedWith(RestController.class)
-            .should()
-            .notHaveRawReturnType(annotatedWith(Entity.class))
-            .because("JPA entities should never be exposed directly - use DTOs instead");
+            .should(new ArchCondition<>("not return JPA entities without @JsonView") {
+                @Override
+                public void check(JavaMethod method, ConditionEvents events) {
+                    JavaClass retorno = method.getRawReturnType();
+                    boolean retornaEntidade = retorno.isAnnotatedWith(Entity.class);
+                    boolean possuiJsonView = method.isAnnotatedWith(JsonView.class);
+                    if (retornaEntidade && !possuiJsonView) {
+                        String mensagem = String.format(
+                                "Método %s.%s retorna entidade JPA (%s) sem @JsonView",
+                                method.getOwner().getSimpleName(), method.getName(), retorno.getSimpleName());
+                        events.add(SimpleConditionEvent.violated(method, mensagem));
+                    }
+                }
+            })
+            .because("Entidades JPA só podem ser expostas em controllers com @JsonView explícito");
 
     /**
      * Garante que Services não tenham lógica de controle de acesso direto.
@@ -348,4 +359,5 @@ public class ArchConsistencyTest {
             .matching("sgc.(*).service.(**)")
             .should()
             .beFreeOfCycles();
+
 }

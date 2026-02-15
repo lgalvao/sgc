@@ -10,14 +10,14 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import sgc.analise.AnaliseFacade;
+import sgc.acompanhamento.AcompanhamentoFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.model.Atividade;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -48,13 +48,13 @@ class SubprocessoCadastroControllerTest {
     private SubprocessoFacade subprocessoFacade;
 
     @MockitoBean
-    private AnaliseFacade analiseFacade;
+    private AcompanhamentoFacade acompanhamentoFacade;
 
     @MockitoBean
     private AnaliseMapper analiseMapper;
 
     @MockitoBean
-    private UsuarioFacade usuarioService;
+    private OrganizacaoFacade organizacaoFacade;
 
     @Autowired
     private MockMvc mockMvc;
@@ -81,7 +81,7 @@ class SubprocessoCadastroControllerTest {
                     .tipo(null)
                     .build();
             
-            when(analiseFacade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO))
+            when(acompanhamentoFacade.listarAnalisesPorSubprocesso(1L, TipoAnalise.CADASTRO))
                     .thenReturn(List.of(analise));
             when(analiseMapper.toAnaliseHistoricoDto(any(Analise.class)))
                     .thenReturn(dto);
@@ -90,7 +90,7 @@ class SubprocessoCadastroControllerTest {
             mockMvc.perform(get("/api/subprocessos/1/historico-cadastro"))
                     .andExpect(status().isOk());
 
-            verify(analiseFacade).listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
+            verify(acompanhamentoFacade).listarAnalisesPorSubprocesso(1L, TipoAnalise.CADASTRO);
         }
     }
 
@@ -103,8 +103,8 @@ class SubprocessoCadastroControllerTest {
         void deveDisponibilizarCadastro() throws Exception {
             // Arrange
             Usuario usuario = new Usuario();
-            when(usuarioService.extrairTituloUsuario(any())).thenReturn("123");
-            when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
+            when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
+            when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
             when(subprocessoFacade.obterAtividadesSemConhecimento(1L))
                     .thenReturn(Collections.emptyList());
 
@@ -126,8 +126,8 @@ class SubprocessoCadastroControllerTest {
             atividade.setCodigo(10L);
             atividade.setDescricao("Atividade sem conhecimento");
             
-            when(usuarioService.extrairTituloUsuario(any())).thenReturn("123");
-            when(usuarioService.buscarPorLogin("123")).thenReturn(new Usuario());
+            when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
+            when(organizacaoFacade.buscarPorLogin("123")).thenReturn(new Usuario());
             when(subprocessoFacade.obterAtividadesSemConhecimento(1L))
                     .thenReturn(List.of(atividade));
 
@@ -147,8 +147,8 @@ class SubprocessoCadastroControllerTest {
         void deveDisponibilizarRevisao() throws Exception {
             // Arrange
             Usuario usuario = new Usuario();
-            when(usuarioService.extrairTituloUsuario(any())).thenReturn("123");
-            when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
+            when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
+            when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
             when(subprocessoFacade.obterAtividadesSemConhecimento(1L))
                     .thenReturn(Collections.emptyList());
 
@@ -170,8 +170,8 @@ class SubprocessoCadastroControllerTest {
             atividade.setCodigo(20L);
             atividade.setDescricao("Atividade sem conhecimento");
             
-            when(usuarioService.extrairTituloUsuario(any())).thenReturn("123");
-            when(usuarioService.buscarPorLogin("123")).thenReturn(new Usuario());
+            when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
+            when(organizacaoFacade.buscarPorLogin("123")).thenReturn(new Usuario());
             when(subprocessoFacade.obterAtividadesSemConhecimento(1L))
                     .thenReturn(List.of(atividade));
 
@@ -213,8 +213,8 @@ class SubprocessoCadastroControllerTest {
         void deveDevolverCadastro() throws Exception {
             // Arrange
             Usuario usuario = new Usuario();
-            when(usuarioService.extrairTituloUsuario(any())).thenReturn("123");
-            when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
+            when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
+            when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
             DevolverCadastroRequest request = new DevolverCadastroRequest(
                     "Precisa de ajustes");
@@ -239,8 +239,8 @@ class SubprocessoCadastroControllerTest {
         void deveAceitarCadastro() throws Exception {
             // Arrange
             Usuario usuario = new Usuario();
-            when(usuarioService.extrairTituloUsuario(any())).thenReturn("123");
-            when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
+            when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
+            when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
             AceitarCadastroRequest request = new AceitarCadastroRequest("Aprovado");
 
@@ -264,8 +264,8 @@ class SubprocessoCadastroControllerTest {
         void deveHomologarCadastro() throws Exception {
             // Arrange
             Usuario usuario = new Usuario();
-            when(usuarioService.extrairTituloUsuario(any())).thenReturn("123");
-            when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
+            when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
+            when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
             HomologarCadastroRequest request = new HomologarCadastroRequest("Homologado");
 
@@ -289,8 +289,8 @@ class SubprocessoCadastroControllerTest {
         void deveDevolverRevisaoCadastro() throws Exception {
             // Arrange
             Usuario usuario = new Usuario();
-            when(usuarioService.extrairTituloUsuario(any())).thenReturn("123");
-            when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
+            when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
+            when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
             DevolverCadastroRequest request = new DevolverCadastroRequest("Revisar");
 
@@ -314,8 +314,8 @@ class SubprocessoCadastroControllerTest {
         void deveAceitarRevisaoCadastro() throws Exception {
             // Arrange
             Usuario usuario = new Usuario();
-            when(usuarioService.extrairTituloUsuario(any())).thenReturn("123");
-            when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
+            when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
+            when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
             AceitarCadastroRequest request = new AceitarCadastroRequest("Revisão aceita");
 
@@ -339,8 +339,8 @@ class SubprocessoCadastroControllerTest {
         void deveHomologarRevisaoCadastro() throws Exception {
             // Arrange
             Usuario usuario = new Usuario();
-            when(usuarioService.extrairTituloUsuario(any())).thenReturn("123");
-            when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
+            when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
+            when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
             HomologarCadastroRequest request = new HomologarCadastroRequest("Homologado");
 
@@ -386,8 +386,8 @@ class SubprocessoCadastroControllerTest {
         void deveAceitarCadastroEmBloco() throws Exception {
             // Arrange
             Usuario usuario = new Usuario();
-            when(usuarioService.extrairTituloUsuario(any())).thenReturn("123");
-            when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
+            when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
+            when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
             ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                     .acao("ACEITAR")
@@ -416,8 +416,8 @@ class SubprocessoCadastroControllerTest {
         void deveHomologarCadastroEmBloco() throws Exception {
             // Arrange
             Usuario usuario = new Usuario();
-            when(usuarioService.extrairTituloUsuario(any())).thenReturn("123");
-            when(usuarioService.buscarPorLogin("123")).thenReturn(usuario);
+            when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
+            when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
             ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                     .acao("HOMOLOGAR")
@@ -442,22 +442,22 @@ class SubprocessoCadastroControllerTest {
         // Manual mocks for isolated testing
         private SubprocessoCadastroController controller;
         private SubprocessoFacade subprocessoFacadeMock;
-        private AnaliseFacade analiseFacadeMock;
+        private AcompanhamentoFacade acompanhamentoFacadeMock;
         private AnaliseMapper analiseMapperMock;
-        private UsuarioFacade usuarioServiceMock;
+        private OrganizacaoFacade organizacaoFacadeMock;
 
         @BeforeEach
         void setUp() {
             subprocessoFacadeMock = Mockito.mock(SubprocessoFacade.class);
-            analiseFacadeMock = Mockito.mock(AnaliseFacade.class);
+            acompanhamentoFacadeMock = Mockito.mock(AcompanhamentoFacade.class);
             analiseMapperMock = Mockito.mock(AnaliseMapper.class);
-            usuarioServiceMock = Mockito.mock(UsuarioFacade.class);
+            organizacaoFacadeMock = Mockito.mock(OrganizacaoFacade.class);
 
             controller = new SubprocessoCadastroController(
                 subprocessoFacadeMock,
-                analiseFacadeMock,
+                acompanhamentoFacadeMock,
                 analiseMapperMock,
-                usuarioServiceMock
+                organizacaoFacadeMock
             );
         }
 
@@ -467,7 +467,7 @@ class SubprocessoCadastroControllerTest {
             Object principal = null;
             Long codigo = 1L;
 
-            when(usuarioServiceMock.extrairTituloUsuario(principal)).thenReturn(null);
+            when(organizacaoFacadeMock.extrairTituloUsuario(principal)).thenReturn(null);
 
             Assertions.assertThrows(ErroAutenticacao.class, 
                 () -> controller.disponibilizarCadastro(codigo, principal));

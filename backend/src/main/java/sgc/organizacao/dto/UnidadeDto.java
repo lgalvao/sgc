@@ -1,7 +1,9 @@
 package sgc.organizacao.dto;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import sgc.organizacao.model.OrganizacaoViews;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,18 +20,26 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UnidadeDto {
+    @JsonView(OrganizacaoViews.Publica.class)
     private Long codigo;
+    @JsonView(OrganizacaoViews.Publica.class)
     private String nome;
+    @JsonView(OrganizacaoViews.Publica.class)
     private String sigla;
+    @JsonView(OrganizacaoViews.Publica.class)
     private Long codigoPai;
+    @JsonView(OrganizacaoViews.Publica.class)
     private String tipo;
 
     @Builder.Default
+    @JsonView(OrganizacaoViews.Publica.class)
     private List<UnidadeDto> subunidades = new ArrayList<>();
 
+    @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("tituloTitular")
     private String tituloTitular;
 
+    @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("isElegivel")
     private boolean isElegivel;
 }

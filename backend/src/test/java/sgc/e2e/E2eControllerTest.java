@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
@@ -54,7 +54,7 @@ class E2eControllerTest {
     private ProcessoFacade processoFacade;
 
     @Mock
-    private UnidadeFacade unidadeFacade;
+    private OrganizacaoFacade organizacaoFacade;
 
     @Mock
     private ResourceLoader resourceLoader;
@@ -67,7 +67,7 @@ class E2eControllerTest {
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
-        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
+        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoFacade, organizacaoFacade, resourceLoader);
     }
 
     @AfterEach
@@ -247,7 +247,7 @@ class E2eControllerTest {
 
         UnidadeDto un = new UnidadeDto();
         un.setCodigo(1L);
-        when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
 
         ProcessoDto proc = new ProcessoDto();
         proc.setCodigo(100L);
@@ -270,7 +270,7 @@ class E2eControllerTest {
 
         UnidadeDto un = new UnidadeDto();
         un.setCodigo(1L);
-        when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
 
         ProcessoDto proc = new ProcessoDto();
         proc.setCodigo(100L);
@@ -294,7 +294,7 @@ class E2eControllerTest {
 
         UnidadeDto un = new UnidadeDto();
         un.setCodigo(1L);
-        when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
 
         ProcessoDto proc = new ProcessoDto();
         proc.setCodigo(100L);
@@ -317,7 +317,7 @@ class E2eControllerTest {
         when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
         when(mockDataSource.getConnection()).thenThrow(new SQLException("Error"));
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, unidadeFacade, resourceLoader);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, organizacaoFacade, resourceLoader);
         var exception = Assertions.assertThrows(RuntimeException.class, controllerComErro::resetDatabase);
         Assertions.assertNotNull(exception);
     }
@@ -342,7 +342,7 @@ class E2eControllerTest {
 
         UnidadeDto un = new UnidadeDto();
         un.setCodigo(1L);
-        when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
 
         ProcessoDto proc = new ProcessoDto();
         proc.setCodigo(100L);
@@ -371,7 +371,7 @@ class E2eControllerTest {
 
         UnidadeDto un = new UnidadeDto();
         un.setCodigo(1L);
-        when(unidadeFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
 
         ProcessoDto proc = new ProcessoDto();
         proc.setCodigo(100L);
@@ -396,7 +396,7 @@ class E2eControllerTest {
     class CoberturaExtra {
         private JdbcTemplate jdbcTemplateMock;
         private ProcessoFacade processoFacadeMock;
-        private UnidadeFacade unidadeFacadeMock;
+        private OrganizacaoFacade organizacaoFacadeMock;
         private ResourceLoader resourceLoaderMock;
         private E2eController controllerIsolado;
 
@@ -405,9 +405,9 @@ class E2eControllerTest {
             jdbcTemplateMock = mock(JdbcTemplate.class);
             var namedJdbcTemplateMock = mock(NamedParameterJdbcTemplate.class);
             processoFacadeMock = mock(ProcessoFacade.class);
-            unidadeFacadeMock = mock(UnidadeFacade.class);
+            organizacaoFacadeMock = mock(OrganizacaoFacade.class);
             resourceLoaderMock = mock(ResourceLoader.class);
-            controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoFacadeMock, unidadeFacadeMock, resourceLoaderMock);
+            controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoFacadeMock, organizacaoFacadeMock, resourceLoaderMock);
         }
 
         @Test
@@ -441,7 +441,7 @@ class E2eControllerTest {
         @DisplayName("criarProcessoFixture: Unidade não encontrada")
         void criarProcessoFixture_UnidadeNaoEncontrada() {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", false, 30);
-            when(unidadeFacadeMock.buscarPorSigla("SIGLA")).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA"));
+            when(organizacaoFacadeMock.buscarUnidadePorSigla("SIGLA")).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA"));
 
             assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -453,7 +453,7 @@ class E2eControllerTest {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
             
             UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
-            when(unidadeFacadeMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
+            when(organizacaoFacadeMock.buscarUnidadePorSigla("SIGLA")).thenReturn(unidade);
             
             ProcessoDto dto = ProcessoDto.builder().codigo(100L).build();
             when(processoFacadeMock.criar(any())).thenReturn(dto);
@@ -472,7 +472,7 @@ class E2eControllerTest {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
             
             UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
-            when(unidadeFacadeMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
+            when(organizacaoFacadeMock.buscarUnidadePorSigla("SIGLA")).thenReturn(unidade);
             
             ProcessoDto dto = ProcessoDto.builder().codigo(100L).build();
             when(processoFacadeMock.criar(any())).thenReturn(dto);

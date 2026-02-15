@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.seguranca.login.dto.AutenticarRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +25,7 @@ class LoginControllerCoverageTest {
     @Mock
     private LoginFacade loginFacade;
     @Mock
-    private UsuarioFacade usuarioService;
+    private OrganizacaoFacade organizacaoFacade;
     @Mock
     private LimitadorTentativasLogin limitadorTentativasLogin;
     @Mock

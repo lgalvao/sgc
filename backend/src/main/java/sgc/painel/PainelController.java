@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sgc.alerta.dto.AlertaDto;
+import sgc.acompanhamento.AcompanhamentoFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.processo.dto.ProcessoResumoDto;
 
@@ -21,7 +22,7 @@ import sgc.processo.dto.ProcessoResumoDto;
 @RequiredArgsConstructor
 @Tag(name = "Painel", description = "Endpoints para o painel de controle (dashboard)")
 public class PainelController {
-    private final PainelFacade painelService;
+    private final AcompanhamentoFacade acompanhamentoFacade;
 
     /**
      * Lista os processos a serem exibidos no painel do usuário.
@@ -42,7 +43,7 @@ public class PainelController {
             @RequestParam(name = "perfil") Perfil perfil,
             @RequestParam(name = "unidade", required = false) Long unidade,
             @PageableDefault(size = 20) Pageable pageable) {
-        Page<ProcessoResumoDto> page = painelService.listarProcessos(perfil, unidade, pageable);
+        Page<ProcessoResumoDto> page = acompanhamentoFacade.listarProcessosPainel(perfil, unidade, pageable);
         return ResponseEntity.ok(page);
     }
 
@@ -65,7 +66,7 @@ public class PainelController {
             @RequestParam(name = "usuarioTitulo", required = false) String usuarioTitulo,
             @RequestParam(name = "unidade", required = false) Long unidade,
             @PageableDefault(size = 20) Pageable pageable) {
-        Page<AlertaDto> page = painelService.listarAlertas(usuarioTitulo, unidade, pageable);
+        Page<AlertaDto> page = acompanhamentoFacade.listarAlertasPainel(usuarioTitulo, unidade, pageable);
         return ResponseEntity.ok(page);
     }
 }

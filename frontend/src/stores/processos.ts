@@ -4,11 +4,6 @@ import {useProcessosCoreStore} from "./processos/core";
 import {useProcessosWorkflowStore} from "./processos/workflow";
 import {useProcessosContextStore} from "./processos/context";
 
-// Re-export new stores for direct usage
-export * from "./processos/core";
-export * from "./processos/workflow";
-export * from "./processos/context";
-
 export const useProcessosStore = defineStore("processos", () => {
     const core = useProcessosCoreStore();
     const workflow = useProcessosWorkflowStore();

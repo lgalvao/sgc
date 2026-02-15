@@ -10,14 +10,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sgc.analise.AnaliseFacade;
+import sgc.acompanhamento.AcompanhamentoFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.sanitizacao.UtilSanitizacao;
 import sgc.subprocesso.dto.*;
@@ -34,9 +34,9 @@ import java.util.Optional;
 public class SubprocessoCadastroController {
 
     private final SubprocessoFacade subprocessoFacade;
-    private final AnaliseFacade analiseFacade;
+    private final AcompanhamentoFacade acompanhamentoFacade;
     private final AnaliseMapper analiseMapper;
-    private final UsuarioFacade usuarioService;
+    private final OrganizacaoFacade organizacaoFacade;
 
     /**
      * Obtém o histórico de análises da fase de cadastro de um subprocesso.
@@ -47,7 +47,7 @@ public class SubprocessoCadastroController {
     @GetMapping("/{codigo}/historico-cadastro")
     @PreAuthorize("isAuthenticated()")
     public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long codigo) {
-        return analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.CADASTRO).stream()
+        return acompanhamentoFacade.listarAnalisesPorSubprocesso(codigo, TipoAnalise.CADASTRO).stream()
                 .map(analiseMapper::toAnaliseHistoricoDto)
                 .toList();
     }
@@ -328,10 +328,10 @@ public class SubprocessoCadastroController {
         if (principal instanceof Usuario usuario) {
             return usuario;
         }
-        String titulo = usuarioService.extrairTituloUsuario(principal);
+        String titulo = organizacaoFacade.extrairTituloUsuario(principal);
         if (titulo == null) {
             throw new ErroAutenticacao("Usuário não identificado");
         }
-        return usuarioService.buscarPorLogin(titulo);
+        return organizacaoFacade.buscarPorLogin(titulo);
     }
 }

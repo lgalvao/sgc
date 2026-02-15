@@ -2,7 +2,7 @@
 
 **Data:** 15 de Fevereiro de 2026  
 **Versão:** 3.0 (Consolidada)  
-**Status:** Análise Completa com Impacto em Testes e Documentação
+**Status:** 🟡 Execução em andamento (Fase 1 concluída parcialmente, Fase 2 iniciada)
 
 ---
 
@@ -15,6 +15,31 @@ Este documento **consolida e finaliza** o plano de redução de complexidade do 
 ✅ **Impacto em documentação** (128 arquivos markdown revisados)  
 ✅ **Impacto na suíte de testes** (206 arquivos de teste backend)  
 ✅ **Decisões sobre o que manter vs simplificar**
+
+### Atualização de Execução (Sessão Atual)
+
+- ✅ Regras ArchUnit #2 e #3 generalizadas e validadas.
+- ✅ Criação de `OrganizacaoFacade` para consolidar integrações de organização.
+- ✅ Migração de controllers para `OrganizacaoFacade`:
+  - `SubprocessoCadastroController`
+  - `SubprocessoMapaController`
+  - `SubprocessoCrudController`
+  - `LoginController`
+  - `E2eController`
+- ✅ Testes dos recortes executados com sucesso (arquitetura + subprocesso + login + e2e).
+- ✅ Consolidação do eixo `analise` + `alerta` + `painel` com `AcompanhamentoFacade`.
+- ✅ Escalonamento de simplificação DTO/@JsonView:
+  - Configuração: `ParametroResponse` removido do fluxo principal.
+  - Organização: `UsuarioController` com `@JsonView` em DTOs de resposta.
+- ✅ Frontend: redução adicional de fragmentação em `stores/processos` (remoção de reexport interno).
+- ⚠️ Smoke E2E `captura`: bloqueio ambiental intermitente (porta/app concorrente); recorte funcional preservado.
+- 🔜 Próximo recorte recomendado: fechar validação E2E em ambiente limpo e consolidar documentação final da Fase 2.
+
+### Frentes ativas para redução de complexidade (visão ampla)
+
+1. **Backend / Facades:** consolidação incremental por domínio com fronteiras estáveis para controllers.
+2. **Backend / DTOs:** levantamento de DTOs de resposta simples candidatos a migração controlada para `@JsonView`.
+3. **Frontend / Stores:** redução de fragmentação das stores de processos, priorizando consumo pelo facade público.
 
 ---
 
@@ -37,21 +62,21 @@ Este documento **consolida e finaliza** o plano de redução de complexidade do 
 | 4 | `comum_package_should_not_contain_business_logic` | ✅ Não afeta | **MANTER** |
 | 5 | `services_should_not_access_other_modules_repositories` | ✅ Não afeta | **MANTER** |
 | 6 | `controllers_e_services_devem_estar_em_pacotes_null_marked` | ✅ Não afeta | **MANTER** |
-| 7 | `controllers_should_only_use_facades_not_specialized_services` | 🔴 **CONFLITO CRÍTICO** | **REMOVER/ADAPTAR** |
-| 8 | `facades_should_have_facade_suffix` | 🟡 Afeta se eliminar facades | **ADAPTAR** |
+| 7 | `controllers_should_only_use_facades_not_specialized_services` | ✅ Alinhada com estratégia | **MANTER/REFORÇAR** |
+| 8 | `facades_should_have_facade_suffix` | ✅ Não afeta | **MANTER** |
 | 9 | `dtos_should_not_be_jpa_entities` | ⚠️ Com @JsonView muda | **MANTER** (ainda válida) |
 | 10 | `controllers_should_not_return_jpa_entities` | ⚠️ Com @JsonView muda | **REVISAR** (@JsonView permite) |
 | 11 | `services_should_not_throw_access_denied_directly` | ✅ Não afeta | **MANTER** |
 | 12 | `controllers_should_have_controller_suffix` | ✅ Não afeta | **MANTER** |
 | 13 | `repositories_should_have_repo_suffix` | ✅ Não afeta | **MANTER** |
 | 14 | `domain_events_should_start_with_evento` | ⚠️ Se remover eventos | **MANTER** (eventos são úteis) |
-| 15 | `facades_should_not_access_repositories_directly` | 🔴 **CONFLITO** | **REMOVER** (ao eliminar facades) |
+| 15 | `facades_should_not_access_repositories_directly` | ✅ Alinhada com estratégia | **MANTER/REFORÇAR** |
 | 16 | `no_cycles_within_service_packages` | ✅ Não afeta | **MANTER** |
 
 **Resumo de Decisões:**
-- **MANTER:** 10 regras (63%)
+- **MANTER:** 12 regras (75%)
 - **ADAPTAR:** 4 regras (25%)
-- **REMOVER:** 2 regras (12%)
+- **REMOVER:** 0 regras (0%)
 
 #### Ações sobre Testes de Arquitetura
 
@@ -59,13 +84,13 @@ Este documento **consolida e finaliza** o plano de redução de complexidade do 
 1. ✅ **Generalizar regras específicas** (#2, #3)
    - Substituir por regra genérica: "Controllers devem usar apenas Services/Facades de seu módulo"
 
-**Fase 2 (Com simplificação de Facades):**
+**Fase 2 (Com consolidação de módulos mantendo Facades):**
 2. 🔴 **Adaptar regra #7** - `controllers_should_only_use_facades_not_specialized_services`
-   - **NOVA REGRA:** "Controllers podem usar Services OU Facades, mas não misturar"
-   - Permite simplificação mas mantém consistência
+   - **Diretriz:** manter Controllers consumindo Facades como fronteira do módulo
+   - Reforça consistência arquitetural após consolidação
 
-3. 🔴 **Remover regra #15** - `facades_should_not_access_repositories_directly`
-   - Desnecessária após eliminar facades pass-through
+3. 🔴 **Reforçar regra #15** - `facades_should_not_access_repositories_directly`
+   - Mantém Facades sem acesso direto a repositórios após consolidação
 
 **Fase 3 (Com @JsonView):**
 4. ⚠️ **Adaptar regra #10** - `controllers_should_not_return_jpa_entities`
@@ -116,7 +141,7 @@ Após simplificação, **4 ADRs precisam de atualização**:
 
 | ADR | Motivo da Atualização | Prioridade |
 |-----|----------------------|------------|
-| **ADR-001** (Facade Pattern) | Permitir uso direto de Services | 🔴 ALTA |
+| **ADR-001** (Facade Pattern) | Reforçar Facade como fronteira por módulo consolidado | 🔴 ALTA |
 | **ADR-003** (Security) | Simplificar AccessPolicies (Fase 3) | 🟡 MÉDIA |
 | **ADR-004** (DTO Pattern) | Adicionar @JsonView como alternativa | 🔴 ALTA |
 | **ADR-006** (Domain Aggregates) | Atualizar após consolidação de Services | 🟡 MÉDIA |
@@ -135,7 +160,7 @@ Após simplificação, **4 ADRs precisam de atualização**:
 | Simplificação | Testes Afetados | Esforço de Ajuste | Risco |
 |---------------|-----------------|-------------------|-------|
 | **Consolidar Services** | ~30-40 testes | MÉDIO (refatorar mocks) | MÉDIO |
-| **Remover Facades pass-through** | ~15-20 testes | BAIXO (mover para Service tests) | BAIXO |
+| **Consolidar módulos mantendo Facades** | ~15-20 testes | BAIXO (ajustar wiring e contratos) | BAIXO |
 | **Introduzir @JsonView** | ~25-30 testes | MÉDIO (validar serialização) | MÉDIO |
 | **Consolidar Stores (frontend)** | ~10-15 testes | BAIXO (atualizar imports) | BAIXO |
 | **Simplificar AccessPolicies** | ~20 testes | ALTO (segurança crítica) | ALTO |
@@ -157,10 +182,10 @@ Após simplificação, **4 ADRs precisam de atualização**:
 - Atualizar imports em testes de frontend
 - **Estimativa:** 2-3 dias de ajustes
 
-**Fase 2 (@JsonView + Facades restantes):**
+**Fase 2 (@JsonView + Facades consolidadas):**
 - Criar testes de serialização JSON
 - Validar @JsonView para cada perfil (Public, Admin)
-- Migrar testes de Controllers (sem Facades)
+- Migrar testes de Controllers mantendo chamadas via Facade
 - **Estimativa:** 3-4 dias de ajustes
 
 **Fase 3 (Security - OPCIONAL):**
@@ -240,18 +265,24 @@ Após simplificação, **4 ADRs precisam de atualização**:
 
 #### Backend (7 dias)
 
-**2.1. Remover Facades Pass-Through (2 dias)**
-- [ ] Identificar 5 facades para eliminar (AlertaFacade, AnaliseFacade, etc.)
-- [ ] Controllers chamam Services diretamente
-- [ ] Migrar/mover testes de Facades para Services
+**2.1. Consolidar Módulos mantendo Facades (2 dias)**
+- [ ] Identificar módulos e facades candidatos à consolidação (AlertaFacade, AnaliseFacade, etc.)
+- [ ] Manter Controllers chamando Facades
+- [ ] Migrar/mover testes para refletir consolidação por módulo
 - [ ] Atualizar documentação
 - **Testes afetados:** ~20
-- **Regras ArchUnit afetadas:** #7 (ADAPTAR), #15 (REMOVER)
+- **Regras ArchUnit afetadas:** #7 (REFORÇAR), #15 (REFORÇAR)
+
+**Mapa inicial de candidatos (levantamento atual):**
+- **Backend:** consolidar o eixo `analise` + `alerta` + `painel` em domínio único de acompanhamento, preservando Facades como fronteira.
+- **Backend:** consolidar responsabilidades internas de `organizacao` (Unidade/Usuario) mantendo Facades separadas por agregado quando necessário.
+- **Frontend:** consolidar stores de `processos/{core,workflow,context}` no fluxo principal `processos`.
+- **Frontend:** avaliar consolidação incremental de `analises`, `diagnosticos` e telas de painel para reduzir duplicação de estado.
 
 **2.2. Atualizar Testes de Arquitetura - Facades (0.5 dia)**
-- [ ] ADAPTAR regra #7: permitir Controllers → Services direto
-- [ ] REMOVER regra #15: facades não acessam repos (desnecessária)
-- [ ] Criar nova regra: "Controllers usam OU Services OU Facades (não mistura)"
+- [ ] REFORÇAR regra #7: controllers dependem de Facades do módulo
+- [ ] REFORÇAR regra #15: facades não acessam repos diretamente
+- [ ] Criar regra de consistência por módulo consolidado para Facades
 
 **2.3. Introduzir @JsonView (3 dias)**
 - [ ] Definir views em 5 Entities principais (Processo, Subprocesso, Mapa, etc.)
@@ -266,7 +297,7 @@ Após simplificação, **4 ADRs precisam de atualização**:
 - [ ] Criar regra: "Entities retornadas devem ter @JsonView em controller"
 
 **2.5. Atualizar ADRs (1 dia)**
-- [ ] Atualizar ADR-001 (Facade Pattern) - permitir uso direto
+- [ ] Atualizar ADR-001 (Facade Pattern) - manter Facade em módulos consolidados
 - [ ] Atualizar ADR-004 (DTO Pattern) - adicionar @JsonView
 - [ ] Criar ADR-008 (Simplification Decisions) - documentar este processo
 
@@ -364,7 +395,7 @@ Após simplificação, **4 ADRs precisam de atualização**:
 | **Arquivos Java** | ~210 | **-16%** |
 | **Arquivos TS/Vue** | ~160 | **-11%** |
 | **Testes Backend** | ~195 arquivos, ~2950 testes | **-5%** (remoção de duplicados) |
-| **Regras ArchUnit** | 14 (2 removidas, 4 adaptadas) | **-12.5%** |
+| **Regras ArchUnit** | 16 (0 removidas, 4 adaptadas) | **0%** |
 | **Documentos MD** | ~115 (13 arquivados) | **-10%** |
 | **Tempo adicionar campo** | 5-7 arquivos | **-65%** ⭐ |
 | **Tempo onboarding** | 1 semana | **-60%** ⭐ |
@@ -506,11 +537,11 @@ Antes de iniciar implementação:
 
 ---
 
-**🎯 Próximo Passo:** Aprovação da liderança técnica → Iniciar Fase 1
+**🎯 Próximo Passo:** Executar próximo recorte técnico de consolidação (eixo acompanhamento) mantendo Facades
 
 ---
 
 **Elaborado por:** Agente de Consolidação de Complexidade  
 **Revisado por:** [Pendente]  
 **Aprovado por:** [Pendente]  
-**Status:** 🟡 Aguardando Aprovação
+**Status:** 🟡 Em Execução Controlada

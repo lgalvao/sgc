@@ -1,5 +1,6 @@
 package sgc.organizacao;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.UsuarioDto;
+import sgc.organizacao.model.OrganizacaoViews;
 import sgc.organizacao.model.Usuario;
 
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.Map;
 public class UsuarioController {
     private final UsuarioFacade usuarioService;
 
+    @JsonView(OrganizacaoViews.Publica.class)
     @GetMapping("/{titulo}")
     public ResponseEntity<UsuarioDto> buscarUsuarioPorTitulo(@PathVariable String titulo) {
         return usuarioService.buscarUsuarioPorTitulo(titulo)
@@ -30,6 +33,7 @@ public class UsuarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @JsonView(OrganizacaoViews.Publica.class)
     @GetMapping("/administradores")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lista todos os administradores")
@@ -37,6 +41,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.listarAdministradores());
     }
 
+    @JsonView(OrganizacaoViews.Publica.class)
     @PostMapping("/administradores")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Adiciona um administrador")

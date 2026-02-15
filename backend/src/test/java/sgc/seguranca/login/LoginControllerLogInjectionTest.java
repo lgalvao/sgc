@@ -12,7 +12,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.seguranca.login.dto.AutenticarRequest;
 
 import static org.mockito.Mockito.verify;
@@ -35,7 +35,7 @@ class LoginControllerLogInjectionTest {
     private LoginFacade loginFacade;
 
     @MockitoBean
-    private UsuarioFacade usuarioService;
+    private OrganizacaoFacade organizacaoFacade;
 
     @MockitoBean
     private LimitadorTentativasLogin limitadorTentativasLogin;
