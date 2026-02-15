@@ -18,8 +18,8 @@ export default defineConfig({
         url: 'http://localhost:5173',
         reuseExistingServer: true,
         timeout: 100 * 1000,
-        stdout: 'pipe',
-        stderr: 'pipe',
+        stdout: 'inherit',
+        stderr: 'inherit',
     },
     projects: [{name: 'chromium', use: {...devices['Desktop Chrome'], channel: 'chromium-headless-shell'}}],
 });

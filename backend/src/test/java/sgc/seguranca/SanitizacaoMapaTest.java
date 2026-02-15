@@ -17,7 +17,7 @@ import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.subprocesso.SubprocessoMapaController;
 import sgc.subprocesso.service.SubprocessoFacade;
 import tools.jackson.databind.ObjectMapper;
@@ -48,7 +48,7 @@ class SanitizacaoMapaTest {
     private MapaFacade mapaFacade;
 
     @MockitoBean
-    private UsuarioFacade usuarioFacade;
+    private OrganizacaoFacade organizacaoFacade;
 
 
     @Test

@@ -174,6 +174,32 @@ public class ArchConsistencyTest {
             .because("Controllers should only use Facades (ADR-001, ADR-006 Phase 2) - specialized services must be accessed through Facades");
 
     /**
+     * Garante consistência no módulo consolidado de acompanhamento.
+     * Controllers de análise/alerta/painel devem depender de AcompanhamentoFacade.
+     */
+    @ArchTest
+    static final ArchRule acompanhamento_controllers_should_depend_on_acompanhamento_facade = classes()
+            .that()
+            .haveNameMatching(".*Controller")
+            .and()
+            .resideInAnyPackage("sgc.analise..", "sgc.alerta..", "sgc.painel..")
+            .should(new ArchCondition<>("depend on AcompanhamentoFacade") {
+                @Override
+                public void check(JavaClass controller, ConditionEvents events) {
+                    boolean dependeDaFacade = controller.getDirectDependenciesFromSelf().stream()
+                            .map(Dependency::getTargetClass)
+                            .anyMatch(target -> target.getSimpleName().equals("AcompanhamentoFacade"));
+                    if (!dependeDaFacade) {
+                        String mensagem = String.format(
+                                "Controller %s deve depender de AcompanhamentoFacade no módulo consolidado de acompanhamento",
+                                controller.getSimpleName());
+                        events.add(SimpleConditionEvent.violated(controller, mensagem));
+                    }
+                }
+            })
+            .because("Controllers de analise/alerta/painel devem manter fronteira única via AcompanhamentoFacade");
+
+    /**
      * Garante que todas as classes Facade tenham o sufixo "Facade" no nome.
      * Isso melhora a consistência e clareza arquitetural.
      */

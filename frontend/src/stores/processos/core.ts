@@ -86,12 +86,7 @@ export const useProcessosCoreStore = defineStore("processos-core", () => {
         criarProcesso,
         atualizarProcesso,
         removerProcesso,
-        setProcessoDetalhe, // Exported for other stores
+        setProcessoDetalhe,
         clearError,
-        withErrorHandling, // Exported for other stores if they want to reuse the same error state? 
-                           // Ideally each store has its own error state, but 'processos.ts' shared it.
-                           // Let's keep it local to this store, other stores will have their own.
-                           // But wait, if Workflow fails, do we want to show error in the UI component bound to Core?
-                           // Usually components bind to the store they trigger actions on.
     };
 });

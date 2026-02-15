@@ -216,8 +216,8 @@ Após simplificação, **4 ADRs precisam de atualização**:
 - **Regras ArchUnit afetadas:** Nenhuma
 
 **1.3. Atualizar Testes de Arquitetura (0.5 dia)**
-- [ ] Generalizar regras #2 e #3 (controllers específicos)
-- [ ] Validar todas as 16 regras ainda passam
+- [x] Generalizar regras #2 e #3 (controllers específicos)
+- [x] Validar todas as 16 regras ainda passam
 - **Regras afetadas:** 2
 
 **1.4. Documentação: Arquivar v1 (0.5 dia)**
@@ -266,10 +266,10 @@ Após simplificação, **4 ADRs precisam de atualização**:
 #### Backend (7 dias)
 
 **2.1. Consolidar Módulos mantendo Facades (2 dias)**
-- [ ] Identificar módulos e facades candidatos à consolidação (AlertaFacade, AnaliseFacade, etc.)
-- [ ] Manter Controllers chamando Facades
-- [ ] Migrar/mover testes para refletir consolidação por módulo
-- [ ] Atualizar documentação
+- [x] Identificar módulos e facades candidatos à consolidação (AlertaFacade, AnaliseFacade, etc.)
+- [x] Manter Controllers chamando Facades
+- [x] Migrar/mover testes para refletir consolidação por módulo
+- [x] Atualizar documentação
 - **Testes afetados:** ~20
 - **Regras ArchUnit afetadas:** #7 (REFORÇAR), #15 (REFORÇAR)
 
@@ -280,9 +280,9 @@ Após simplificação, **4 ADRs precisam de atualização**:
 - **Frontend:** avaliar consolidação incremental de `analises`, `diagnosticos` e telas de painel para reduzir duplicação de estado.
 
 **2.2. Atualizar Testes de Arquitetura - Facades (0.5 dia)**
-- [ ] REFORÇAR regra #7: controllers dependem de Facades do módulo
-- [ ] REFORÇAR regra #15: facades não acessam repos diretamente
-- [ ] Criar regra de consistência por módulo consolidado para Facades
+- [x] REFORÇAR regra #7: controllers dependem de Facades do módulo
+- [x] REFORÇAR regra #15: facades não acessam repos diretamente
+- [x] Criar regra de consistência por módulo consolidado para Facades
 
 **2.3. Introduzir @JsonView (3 dias)**
 - [ ] Definir views em 5 Entities principais (Processo, Subprocesso, Mapa, etc.)
@@ -293,8 +293,8 @@ Após simplificação, **4 ADRs precisam de atualização**:
 - **Regras ArchUnit afetadas:** #10 (ADAPTAR para permitir @JsonView)
 
 **2.4. Atualizar Testes de Arquitetura - DTOs (0.5 dia)**
-- [ ] ADAPTAR regra #10: "Entities com @JsonView são permitidas"
-- [ ] Criar regra: "Entities retornadas devem ter @JsonView em controller"
+- [x] ADAPTAR regra #10: "Entities com @JsonView são permitidas"
+- [x] Criar regra: "Entities retornadas devem ter @JsonView em controller"
 
 **2.5. Atualizar ADRs (1 dia)**
 - [ ] Atualizar ADR-001 (Facade Pattern) - manter Facade em módulos consolidados
@@ -305,14 +305,14 @@ Após simplificação, **4 ADRs precisam de atualização**:
 
 **2.6. Validação Completa**
 - [ ] Rodar suite completa (backend + frontend)
-- [ ] Validar TODAS as regras ArchUnit
+- [x] Validar TODAS as regras ArchUnit
 - [ ] Testes de serialização JSON (100% coverage)
-- [ ] Testes E2E principais (smoke tests)
+- [x] Testes E2E principais (smoke tests)
 - [ ] Performance: validar que não degradou
 - [ ] Security: validar que @JsonView não vaza dados sensíveis
 
 **2.7. Documentação Final**
-- [ ] Atualizar este documento com resultados
+- [x] Atualizar este documento com resultados
 - [ ] Criar guia de migração para futuros desenvolvedores
 - [ ] Atualizar README principal
 
