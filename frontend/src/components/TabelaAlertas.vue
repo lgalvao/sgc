@@ -21,16 +21,26 @@
         <EmptyState
             icon="bi-bell-slash"
             title="Nenhum alerta"
+            description="Não há alertas no momento. Atualize para verificar novas notificações."
             data-testid="empty-state-alertas"
             class="border-0 bg-transparent mb-0"
-        />
+        >
+          <BButton
+              size="sm"
+              variant="outline-primary"
+              data-testid="btn-empty-state-alertas-atualizar"
+              @click="$emit('recarregar')"
+          >
+            Atualizar alertas
+          </BButton>
+        </EmptyState>
       </template>
     </BTable>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {BTable} from "bootstrap-vue-next";
+import {BButton, BTable} from "bootstrap-vue-next";
 import EmptyState from "@/components/EmptyState.vue";
 import type {Alerta} from "@/types/tipos";
 
@@ -40,6 +50,7 @@ defineProps<{
 
 const emit = defineEmits<{
   'ordenar': [criterio: "data" | "processo"];
+  'recarregar': [];
 }>();
 
 const fields = [

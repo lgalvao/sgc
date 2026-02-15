@@ -69,6 +69,7 @@ describe('CadAtribuicao.vue', () => {
                     }
                 },
                 {
+                    LayoutPadrao: { template: '<div><slot /></div>' },
                     BContainer: { template: '<div><slot /></div>' },
                     BCard: { template: '<div><slot /></div>' },
                     BCardBody: { template: '<div><slot /></div>' },

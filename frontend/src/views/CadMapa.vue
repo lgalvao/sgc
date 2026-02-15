@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <PageHeader title="Mapa de competências técnicas">
       <template #default>
         <div class="fs-5">
@@ -83,11 +83,12 @@
         :mostrar="mostrarModalImpacto"
         @fechar="fecharModalImpacto"
     />
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BContainer,} from "bootstrap-vue-next";
+import {BButton} from "bootstrap-vue-next";
+import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/ui/LoadingButton.vue";
 import ErrorAlert from "@/components/common/ErrorAlert.vue";
@@ -243,8 +244,7 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
   const competencia: Competencia = {
     codigo: competenciaSendoEditada.value?.codigo ?? undefined,
     descricao: dados.descricao,
-    atividadesAssociadas: dados.atividadesSelecionadas,
-  } as any;
+    atividadesAssociadas: dados.atividadesSelecionadas} as any;
 
   try {
     if (competenciaSendoEditada.value) {
@@ -301,8 +301,7 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
       ...competencia,
       atividadesAssociadas: (competencia.atividadesAssociadas || []).filter(
           (id) => id !== atividadeId,
-      ),
-    };
+      )};
     mapasStore.atualizarCompetencia(
         codSubprocesso.value as number,
         competenciaAtualizada,

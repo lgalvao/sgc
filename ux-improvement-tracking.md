@@ -1,7 +1,7 @@
 # Rastreamento de Melhorias de UX - SGC
 
 **Data de início:** 2026-02-14  
-**Última atualização:** 2026-02-15 (UX-004 concluído)  
+**Última atualização:** 2026-02-15 (UX-006 concluído)  
 **Documento base:** `ux-improvement-plan.md`
 
 ---
@@ -13,9 +13,9 @@
 | Categoria | Total | Concluído | Em Andamento | Pendente | % Completo |
 |-----------|-------|-----------|--------------|----------|------------|
 | **Prioridade Alta** | 3 | 3 | 0 | 0 | 100% |
-| **Prioridade Média** | 3 | 1 | 1 | 1 | 33% |
+| **Prioridade Média** | 3 | 3 | 0 | 0 | 100% |
 | **Prioridade Estrutural** | 4 | 0 | 0 | 4 | 0% |
-| **TOTAL** | 10 | 4 | 1 | 5 | **40%** |
+| **TOTAL** | 10 | 6 | 0 | 4 | **60%** |
 
 ### Legenda de Status
 - ⬜ **Pendente:** Não iniciado
@@ -94,8 +94,8 @@
 
 ---
 
-#### 🔵 UX-005: Padronizar Layout Base das Páginas
-**Status:** Em Andamento  
+#### ✅ UX-005: Padronizar Layout Base das Páginas
+**Status:** Concluído  
 **Prioridade:** Média  
 **Complexidade:** Alta  
 **Esforço estimado:** 6-8 horas  
@@ -104,19 +104,20 @@
 - [x] Criar `frontend/src/components/layout/LayoutPadrao.vue`
 - [x] Migrar views principais (`PainelView.vue`, `Processo.vue`, `Subprocesso.vue`) para usar layout base
 - [x] Expandir migração inicial para `CadAtividades.vue`, `HistoricoView.vue`, `Relatorios.vue` e `Unidades.vue`
+- [x] Expandir migração para `CadProcesso.vue`, `CadMapa.vue`, `VisMapa.vue`, `VisAtividades.vue`, `Unidade.vue`, `CadAtribuicao.vue`, `MonitoramentoDiagnostico.vue`, `OcupacoesCriticasDiagnostico.vue`, `AutoavaliacaoDiagnostico.vue` e `ConclusaoDiagnostico.vue`
 - [x] Testar consistência visual entre módulos (typecheck, lint e testes unitários)
 
 ---
 
-#### ⬜ UX-006: Fortalecer Estado Vazio com CTA Orientado
-**Status:** Pendente  
+#### ✅ UX-006: Fortalecer Estado Vazio com CTA Orientado
+**Status:** Concluído  
 **Prioridade:** Média  
 **Complexidade:** Baixa  
 **Esforço estimado:** 2-3 horas  
 
 **Checklist de Implementação:**
-- [ ] Validar uso atual de `EmptyState.vue`
-- [ ] Padronizar mensagens e ações
+- [x] Validar uso atual de `EmptyState.vue`
+- [x] Padronizar mensagens e ações
 
 ---
 
@@ -197,6 +198,8 @@
 - ✅ Executada rodada periódica `npm run test:e2e:captura` (18/18 cenários de captura aprovados)
 - 🔵 UX-005 iniciado com criação de `LayoutPadrao.vue` e migração inicial de views principais
 - 🔵 UX-005 expandido para views adicionais com validação completa de typecheck/lint/testes unitários
+- ✅ UX-005 concluído com migração de todas as views de conteúdo para `LayoutPadrao.vue`
+- ✅ UX-006 concluído com padronização de mensagens/CTA em estados vazios prioritários (`TabelaAlertas`, `HistoricoView`, `Unidades`)
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial

@@ -23,9 +23,18 @@
                 <EmptyState
                     icon="bi-folder2-open"
                     title="Nenhum processo finalizado"
-                    description="Os processos finalizados aparecerão aqui."
+                    description="Ainda não há processos finalizados para exibir."
                     class="border-0 bg-transparent mb-0"
-                />
+                >
+                  <BButton
+                      variant="outline-primary"
+                      size="sm"
+                      data-testid="btn-historico-atualizar"
+                      @click="carregarHistorico"
+                  >
+                    Atualizar lista
+                  </BButton>
+                </EmptyState>
               </td>
             </tr>
             <tr
@@ -58,7 +67,7 @@
 <script setup lang="ts">
 import {computed, onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
-import {BCard, BSpinner} from 'bootstrap-vue-next';
+import {BButton, BCard, BSpinner} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';

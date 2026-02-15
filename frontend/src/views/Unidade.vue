@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <ErrorAlert
         :error="unidadesStore.lastError"
         @dismiss="unidadesStore.clearError()"
@@ -54,11 +54,12 @@
           @row-click="navegarParaUnidadeSubordinada"
       />
     </div>
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BContainer} from "bootstrap-vue-next";
+import {BButton} from "bootstrap-vue-next";
+import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import {computed} from "vue";
 import type {Unidade} from "@/types/tipos";
 import TreeTable from "../components/TreeTableView.vue";
@@ -109,8 +110,7 @@ function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
       codigo: item.codigo,
       nome: item.sigla + " - " + item.nome,
       expanded: true,
-      ...(children.length > 0 && {children}),
-    };
+      ...(children.length > 0 && {children})};
   });
 }
 </script>

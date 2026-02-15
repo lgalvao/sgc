@@ -52,6 +52,7 @@ describe('ConclusaoDiagnostico.vue', () => {
   };
 
   const stubs = {
+    LayoutPadrao: { template: '<div><slot /></div>' },
     BContainer: { template: '<div><slot /></div>' },
     BCard: { template: '<div><slot /></div>' },
     BButton: { template: '<button><slot /></button>' },

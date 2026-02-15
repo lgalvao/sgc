@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <PageHeader title="Atividades e conhecimentos">
       <template #default>
         <div class="unidade-cabecalho mb-0">
@@ -112,11 +112,12 @@
         />
       </BFormGroup>
     </ModalConfirmacao>
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BContainer, BFormGroup, BFormTextarea,} from "bootstrap-vue-next";
+import {BButton, BFormGroup, BFormTextarea} from "bootstrap-vue-next";
+import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import HistoricoAnaliseModal from "@/components/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
@@ -155,14 +156,12 @@ const {
   validarCadastro,
   devolverCadastro,
   confirmarValidacao,
-  confirmarDevolucao,
-} = useVisAtividades(props);
+  confirmarDevolucao} = useVisAtividades(props);
 
 defineExpose({
   mostrarModalHistoricoAnalise,
   mostrarModalValidar,
-  mostrarModalDevolver,
-});
+  mostrarModalDevolver});
 </script>
 
 <style>

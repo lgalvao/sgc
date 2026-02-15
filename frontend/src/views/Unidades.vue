@@ -32,14 +32,23 @@
         v-else
         icon="bi-diagram-3"
         title="Nenhuma unidade encontrada."
-        description="Tente atualizar a página ou ajustar os filtros de visualização."
-    />
+        description="Nenhuma unidade retornada. Tente atualizar a listagem."
+    >
+      <BButton
+          variant="outline-primary"
+          size="sm"
+          data-testid="btn-unidades-recarregar"
+          @click="carregarUnidades"
+      >
+        Atualizar unidades
+      </BButton>
+    </EmptyState>
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted} from "vue";
-import {BSpinner} from "bootstrap-vue-next";
+import {BButton, BSpinner} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ArvoreUnidades from "@/components/ArvoreUnidades.vue";
@@ -53,9 +62,11 @@ const erroUnidades = computed(() =>
     unidadesStore.error ? {message: unidadesStore.error} : null
 );
 
-onMounted(async () => {
+async function carregarUnidades() {
   await unidadesStore.buscarTodasAsUnidades();
-});
+}
+
+onMounted(carregarUnidades);
 
 </script>
 

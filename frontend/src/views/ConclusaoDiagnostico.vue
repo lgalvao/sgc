@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <PageHeader title="Conclusão do Diagnóstico" />
     <div class="row justify-content-center">
       <div class="col-md-8">
@@ -53,7 +53,7 @@
         </BCard>
       </div>
     </div>
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
@@ -62,7 +62,6 @@ import {useRoute, useRouter} from 'vue-router';
 import {
   BButton,
   BCard,
-  BContainer,
   BFormGroup,
   BFormInvalidFeedback,
   BFormTextarea,

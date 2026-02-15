@@ -31,6 +31,7 @@
       <TabelaAlertas
           :alertas="alertas"
           @ordenar="ordenarAlertasPor"
+          @recarregar="carregarDados"
       />
     </div>
   </LayoutPadrao>

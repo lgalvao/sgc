@@ -28,6 +28,7 @@ describe('CadAtribuicao Coverage', () => {
             global: {
                 plugins: [pinia],
                 stubs: {
+                    LayoutPadrao: true,
                     BContainer: true,
                     BCard: true,
                     BCardBody: true,

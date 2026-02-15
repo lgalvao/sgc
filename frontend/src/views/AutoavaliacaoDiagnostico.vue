@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <PageHeader
         title="Autoavaliação de Competências"
         :subtitle="`${siglaUnidade} - ${nomeUnidade}`"
@@ -79,13 +79,14 @@
         </BCard>
       </div>
     </div>
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
-import {BAlert, BButton, BCard, BContainer, BFormSelect, BFormTextarea, BSpinner} from 'bootstrap-vue-next';
+import {BAlert, BButton, BCard, BFormSelect, BFormTextarea, BSpinner} from 'bootstrap-vue-next';
+import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import {logger} from '@/utils';
 import {useMapasStore} from '@/stores/mapas';

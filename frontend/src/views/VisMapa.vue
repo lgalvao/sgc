@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <PageHeader title="Mapa de competências técnicas">
       <template #actions>
         <BButton
@@ -210,11 +210,12 @@
         :mostrar="mostrarModalHistorico"
         @fechar="fecharModalHistorico"
     />
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BContainer, BFormTextarea, BModal,} from "bootstrap-vue-next";
+import {BButton, BFormTextarea, BModal} from "bootstrap-vue-next";
+import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import EmptyState from "@/components/EmptyState.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";

@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <PageHeader
         title="Monitoramento do Diagnóstico"
     >
@@ -97,13 +97,14 @@
         </div>
       </BCard>
     </div>
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
-import {BButton, BCard, BContainer, BProgress, BSpinner} from 'bootstrap-vue-next';
+import {BButton, BCard, BProgress, BSpinner} from 'bootstrap-vue-next';
+import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import {useFeedbackStore} from '@/stores/feedback';
 import {useDiagnosticosStore} from '@/stores/diagnosticos';

@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <PageHeader title="Cadastro de processo" />
 
     <BForm class="mt-4 col-md-6 col-sm-8 col-12">
@@ -97,11 +97,12 @@
     >
       <p>Remover o processo '{{ descricao }}'? Esta ação não poderá ser desfeita.</p>
     </ModalConfirmacao>
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BContainer, BForm,} from "bootstrap-vue-next";
+import {BButton, BForm} from "bootstrap-vue-next";
+import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";

@@ -30,8 +30,13 @@ Consolidar inconsistências identificadas durante a execução do plano de melho
    - Impacto: risco de leitura de status defasado.
    - Ação sugerida: checklist obrigatório de atualização de `ux-improvement-tracking.md` e `plan.md` ao final de cada entrega.
 
+6. **Nomenclatura inconsistente de partes de views sem sufixo `Section`**
+   - Evidência: componentes/seções equivalentes com nomes mistos (com e sem `Section`).
+   - Impacto: reduz previsibilidade de navegação e manutenção.
+   - Ação sugerida: auditoria de nomenclatura e correção incremental no escopo do UX-010.
+
 ## Priorização sugerida
-- **Alta:** itens 1, 2 e 4
+- **Alta:** itens 1, 2, 4 e 6
 - **Média:** item 5
 - **Baixa/Técnica:** item 3
 
@@ -42,3 +47,4 @@ Consolidar inconsistências identificadas durante a execução do plano de melho
 - ✅ **Item 4 (parcial):** formulários mapeados em UX-002 revisados com validação inline e foco no primeiro erro.
 - 🔄 **Item 3 (pendente):** manter acompanhamento de tipagens frouxas para redução incremental.
 - 🔄 **Item 5 (contínuo):** manter atualização de `ux-improvement-tracking.md` e `plan.md` a cada ciclo e incluir execução periódica de `npm run test:e2e:captura` como auditoria visual de integração.
+- 🔄 **Item 6 (novo):** incluir auditoria de sufixo `Section` em componentes de partes de view.

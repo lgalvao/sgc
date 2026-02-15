@@ -1,5 +1,5 @@
 <template>
-  <BContainer class="mt-4">
+  <LayoutPadrao>
     <PageHeader title="Criar atribuição temporária" />
     <BCard class="mb-4 mt-4">
       <BCardBody>
@@ -93,7 +93,7 @@
         </BForm>
       </BCardBody>
     </BCard>
-  </BContainer>
+  </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
@@ -101,14 +101,12 @@ import {
   BButton,
   BCard,
   BCardBody,
-  BContainer,
   BForm,
   BFormInput,
   BFormInvalidFeedback,
   BFormSelect,
   BFormSelectOption,
-  BFormTextarea,
-} from "bootstrap-vue-next";
+  BFormTextarea} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {logger} from "@/utils";
@@ -173,8 +171,7 @@ async function criarAtribuicao() {
       tituloEleitoralUsuario: usuarioSelecionado.value,
       dataInicio: dataInicio.value,
       dataTermino: dataTermino.value,
-      justificativa: justificativa.value,
-    });
+      justificativa: justificativa.value});
 
     feedbackStore.show('Sucesso', 'Atribuição criada com sucesso!', 'success');
 
