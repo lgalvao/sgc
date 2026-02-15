@@ -13,9 +13,9 @@
 | Categoria | Total | Concluído | Em Andamento | Pendente | % Completo |
 |-----------|-------|-----------|--------------|----------|------------|
 | **Prioridade Alta** | 3 | 3 | 0 | 0 | 100% |
-| **Prioridade Média** | 3 | 0 | 0 | 3 | 0% |
+| **Prioridade Média** | 3 | 0 | 1 | 2 | 0% |
 | **Prioridade Estrutural** | 4 | 0 | 0 | 4 | 0% |
-| **TOTAL** | 10 | 3 | 0 | 7 | **30%** |
+| **TOTAL** | 10 | 3 | 1 | 6 | **30%** |
 
 ### Legenda de Status
 - ⬜ **Pendente:** Não iniciado
@@ -80,16 +80,16 @@
 
 ### Prioridade Média
 
-#### ⬜ UX-004: Adicionar Cabeçalho Contextual por Etapa/Perfil
-**Status:** Pendente  
+#### 🔵 UX-004: Adicionar Cabeçalho Contextual por Etapa/Perfil
+**Status:** Em Andamento  
 **Prioridade:** Média  
 **Complexidade:** Média  
 **Esforço estimado:** 3-4 horas  
 
 **Checklist de Implementação:**
-- [ ] Criar/Refatorar `frontend/src/components/layout/PageHeader.vue`
-- [ ] Criar `frontend/src/composables/useProximaAcao.ts`
-- [ ] Aplicar em `ProcessoDetalheView.vue` e `SubprocessoDetalheView.vue`
+- [x] Criar/Refatorar `frontend/src/components/layout/PageHeader.vue`
+- [x] Criar `frontend/src/composables/useProximaAcao.ts`
+- [x] Aplicar em `ProcessoDetalheView.vue` e `SubprocessoDetalheView.vue`
 - [ ] Implementar breadcrumb dinâmico
 
 ---
@@ -191,6 +191,7 @@
 - ✅ UX-002 concluído com cobertura de formulários mapeados no frontend
 - 🔵 UX-003 iniciado com `BadgeSituacao.vue` e aplicação em `TabelaProcessos.vue`
 - ✅ UX-003 concluído com `BadgeSituacao` em tabelas e CTA no estado vazio
+- 🔵 UX-004 iniciado com cabeçalho contextual e `useProximaAcao.ts`
 
 ### 2026-02-14
 - ✅ Criado documento de rastreamento inicial

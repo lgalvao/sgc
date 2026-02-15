@@ -1,6 +1,13 @@
 <template>
   <BContainer class="mt-4">
     <div v-if="subprocesso">
+      <PageHeader
+          :title="`Subprocesso - ${subprocesso.unidade.sigla}`"
+          :subtitle="subprocesso.processoDescricao"
+          :etapa="`Etapa atual: ${subprocesso.situacaoLabel || subprocesso.situacao}`"
+          :proxima-acao="proximaAcaoSubprocesso"
+      />
+
       <SubprocessoHeader
           :pode-alterar-data-limite="subprocesso.permissoes.podeAlterarDataLimite"
           :pode-reabrir-cadastro="subprocesso.permissoes.podeReabrirCadastro"
@@ -102,8 +109,11 @@ import SubprocessoHeader from "@/components/SubprocessoHeader.vue";
 import SubprocessoModal from "@/components/SubprocessoModal.vue";
 import TabelaMovimentacoes from "@/components/TabelaMovimentacoes.vue";
 import ErrorAlert from "@/components/common/ErrorAlert.vue";
+import PageHeader from "@/components/layout/PageHeader.vue";
+import {useProximaAcao} from "@/composables/useProximaAcao";
 import {useMapasStore} from "@/stores/mapas";
 import {useFeedbackStore} from "@/stores/feedback";
+import {usePerfilStore} from "@/stores/perfil";
 import {useModalManager} from "@/composables/useModalManager";
 import {useLoadingManager} from "@/composables/useLoadingManager";
 
@@ -118,6 +128,7 @@ const processosStore = useProcessosStore();
 
 const mapaStore = useMapasStore();
 const feedbackStore = useFeedbackStore();
+const perfilStore = usePerfilStore();
 
 // Gerenciamento simplificado de modals e loading com composables
 const modals = useModalManager(['alterarDataLimite', 'reabrir']);
@@ -140,6 +151,13 @@ const dataLimite = computed(() =>
         ? new Date(subprocesso.value.prazoEtapaAtual)
         : new Date(),
 );
+const {obterProximaAcao} = useProximaAcao();
+const proximaAcaoSubprocesso = computed(() => obterProximaAcao({
+  perfil: perfilStore.perfilSelecionado,
+  situacao: subprocesso.value?.situacaoLabel || subprocesso.value?.situacao,
+  podeDisponibilizarCadastro: subprocesso.value?.permissoes?.podeDisponibilizarCadastro,
+  podeEditarCadastro: subprocesso.value?.permissoes?.podeEditarCadastro,
+}));
 
 onMounted(async () => {
   const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(

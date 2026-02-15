@@ -5,7 +5,12 @@
         @dismiss="processosStore.clearError()"/>
 
     <div v-if="processo">
-      <PageHeader :title="processo.descricao" title-test-id="processo-info">
+      <PageHeader
+          :title="processo.descricao"
+          :etapa="`Etapa atual: ${processo.situacaoLabel || processo.situacao}`"
+          :proxima-acao="proximaAcaoProcesso"
+          title-test-id="processo-info"
+      >
         <template #default>
           <BBadge class="mb-2" style="border-radius: 0" variant="secondary">
             Detalhes do processo
@@ -90,6 +95,7 @@ v-if="mostrarBotoesBloco && podeDisponibilizarBloco" variant="info" class="text-
 
 <script lang="ts" setup>
 import {BAlert, BBadge, BButton, BContainer, BSpinner} from "bootstrap-vue-next";
+import {computed} from "vue";
 import ModalAcaoBloco from "@/components/ModalAcaoBloco.vue";
 import ModalConfirmacao from "@/components/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
@@ -97,6 +103,7 @@ import ProcessoAcoes from "@/components/ProcessoAcoes.vue";
 import ErrorAlert from "@/components/common/ErrorAlert.vue";
 import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
+import {useProximaAcao} from "@/composables/useProximaAcao";
 
 import {useProcessoView} from "@/composables/useProcessoView";
 
@@ -125,6 +132,13 @@ const {
   abrirModalBloco,
   executarAcaoBloco
 } = useProcessoView();
+const {obterProximaAcao} = useProximaAcao();
+
+const proximaAcaoProcesso = computed(() => obterProximaAcao({
+  perfil: perfilStore.perfilSelecionado,
+  situacao: processo.value?.situacaoLabel || processo.value?.situacao,
+  podeFinalizar: podeFinalizar.value,
+}));
 
 defineExpose({
   abrirDetalhesUnidade,
