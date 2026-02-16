@@ -3,7 +3,6 @@ package sgc.subprocesso.service.workflow;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -68,7 +67,7 @@ public class SubprocessoMapaWorkflowService {
     private final MapaManutencaoService mapaManutencaoService;
     private final MapaFacade mapaFacade;
     private final AccessControlService accessControlService;
-    @Lazy private final SubprocessoValidacaoService validacaoService;
+    private final SubprocessoValidacaoService validacaoService;
     private final AnaliseFacade analiseFacade;
     private final SubprocessoTransicaoService transicaoService;
     private final UnidadeFacade unidadeService;
