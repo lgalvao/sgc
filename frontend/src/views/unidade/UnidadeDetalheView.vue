@@ -60,27 +60,93 @@
 <script lang="ts" setup>
 import {BButton} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
-import {computed} from "vue";
-import type {Unidade} from "@/types/tipos";
+import {computed, onMounted, ref, watch} from "vue";
+import {useRouter} from "vue-router";
+import type {Unidade, Usuario} from "@/types/tipos";
 import TreeTable from "@/components/comum/TreeTable.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import UnidadeInfoCard from "@/components/unidade/UnidadeInfoCard.vue";
 import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import {useUnidadeView} from "@/composables/useUnidadeView";
+import {useUnidadesStore} from "@/stores/unidades";
+import {useAtribuicaoTemporariaStore} from "@/stores/atribuicoes";
+import {usePerfilStore} from "@/stores/perfil";
+import {useMapasStore} from "@/stores/mapas";
+import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
+import {logger} from "@/utils";
 
 const props = defineProps<{ codUnidade: number }>();
 
-const {
-  unidadesStore,
-  perfilStore,
-  unidadeComResponsavelDinamico,
-  titularDetalhes,
-  mapaVigente,
-  irParaCriarAtribuicao,
-  navegarParaUnidadeSubordinada,
-  visualizarMapa
-} = useUnidadeView(props.codUnidade);
+const router = useRouter();
+const unidadesStore = useUnidadesStore();
+const atribuicaoStore = useAtribuicaoTemporariaStore();
+const perfilStore = usePerfilStore();
+const mapasStore = useMapasStore();
+
+const titularDetalhes = ref<Usuario | null>(null);
+
+const unidade = computed(() => unidadesStore.unidade);
+const mapaVigente = computed(() => mapasStore.mapaCompleto);
+
+const unidadeComResponsavelDinamico = computed(() => {
+    if (!unidade.value) return null;
+
+    const atribuicoes = atribuicaoStore.obterAtribuicoesPorUnidade(unidade.value.sigla);
+    const agora = new Date();
+    const atribuicaoAtiva = atribuicoes.find(a => {
+        const inicio = new Date(a.dataInicio);
+        let fim = null;
+        if (a.dataTermino) {
+            fim = new Date(a.dataTermino);
+        } else if (a.dataFim) {
+            fim = new Date(a.dataFim);
+        }
+        return inicio <= agora && (!fim || fim >= agora);
+    });
+
+    return {
+        ...unidade.value,
+        responsavel: atribuicaoAtiva ? atribuicaoAtiva.usuario : (unidade.value.responsavel || null)
+    };
+});
+
+async function carregarDados() {
+    try {
+        await Promise.all([
+            unidadesStore.buscarArvoreUnidade(props.codUnidade),
+            atribuicaoStore.buscarAtribuicoes()
+        ]);
+
+        if (unidade.value?.tituloTitular) {
+            titularDetalhes.value = await buscarUsuarioPorTitulo(unidade.value.tituloTitular);
+        }
+    } catch (error) {
+        logger.error("Erro ao buscar titular:", error);
+    }
+}
+
+function irParaCriarAtribuicao() {
+    router.push({ path: `/unidade/${props.codUnidade}/atribuicao` });
+}
+
+function navegarParaUnidadeSubordinada(row: any) {
+    router.push({ path: `/unidade/${row.codigo}` });
+}
+
+function visualizarMapa() {
+    if (mapaVigente.value) {
+        router.push({
+            name: "SubprocessoVisMapa",
+            params: {
+                codProcesso: mapaVigente.value.subprocessoCodigo,
+                siglaUnidade: unidade.value?.sigla
+            }
+        });
+    }
+}
+
+onMounted(carregarDados);
+watch(() => props.codUnidade, carregarDados);
 
 const colunasTabela = [{key: "nome", label: "Unidade"}];
 
