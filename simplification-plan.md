@@ -42,7 +42,7 @@ O SGC é um sistema interno para tribunal eleitoral com:
 **Reduzir complexidade em 15-25% mantendo:**
 - ✅ Todas as funcionalidades de negócio
 - ✅ Segurança e controle de acesso
-- ✅ Cobertura de testes ≥70%
+- ✅ Cobertura de testes >95%
 - ✅ Padrões arquiteturais fundamentais
 
 ---
