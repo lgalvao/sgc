@@ -369,7 +369,6 @@ class SubprocessoMapaWorkflowServiceTest {
             when(sp.getProcesso()).thenReturn(p);
 
             Unidade u = mock(Unidade.class);
-            when(u.getSigla()).thenReturn("U1");
             when(sp.getUnidade()).thenReturn(u);
 
             Unidade superior = mock(Unidade.class);

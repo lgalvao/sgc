@@ -2,6 +2,7 @@
 
 📍 Etapa 1: Executar testes e gerar relatório JaCoCo
 ─────────────────────────────────────────
+Starting a Gradle Daemon, 1 busy and 1 incompatible Daemons could not be reused, use --status for details
 Reusing configuration cache.
 > Task :backend:processTestResources UP-TO-DATE
 > Task :backend:processResources UP-TO-DATE
@@ -9,19 +10,3 @@ Reusing configuration cache.
 > Task :backend:classes UP-TO-DATE
 > Task :backend:compileTestJava
 > Task :backend:testClasses
-
-> Task :backend:test
-
-SubprocessoMapaWorkflowService > Workflow de Validação > Deve aceitar validação e homologar se não tem proxima unidade FAILED
-    org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
-    Unnecessary stubbings detected.
-    Clean & maintainable test code requires zero unnecessary code.
-    Following stubbings are unnecessary (click to navigate to relevant line of code):
-      1. -> at sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowServiceTest$WorkflowValidacao.deveAceitarEHomologarSeNaoProxima(SubprocessoMapaWorkflowServiceTest.java:372)
-    Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
-        at app//org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
-        at java.base@25.0.1/java.util.Optional.ifPresent(Optional.java:178)
-        at app//org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
-        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
-        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
-        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
