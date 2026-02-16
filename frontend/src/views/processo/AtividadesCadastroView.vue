@@ -157,7 +157,9 @@
 
 <script lang="ts" setup>
 import {BButton, BDropdown, BDropdownItem} from "bootstrap-vue-next";
-import {computed, nextTick, ref, watch} from "vue";
+import {computed, nextTick, onMounted, ref, watch} from "vue";
+import {useRouter} from "vue-router";
+import {storeToRefs} from "pinia";
 import {badgeClass} from "@/utils";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/atividades/ImportarAtividadesModal.vue";
@@ -171,60 +173,289 @@ import EmptyState from "@/components/comum/EmptyState.vue";
 import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
-import {useCadAtividades} from "@/composables/useCadAtividades";
+import {useAtividadeForm} from "@/composables/useAtividadeForm";
+import {useAtividadesStore} from "@/stores/atividades";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useMapasStore} from "@/stores/mapas";
+import {useUnidadesStore} from "@/stores/unidades";
+import {useAnalisesStore} from "@/stores/analises";
+import {useFeedbackStore} from "@/stores/feedback";
+import {usePerfil} from "@/composables/usePerfil";
+import type {
+  AnaliseCadastro,
+  AnaliseValidacao,
+  Atividade,
+  Conhecimento,
+  CriarConhecimentoRequest,
+  ErroValidacao,
+} from "@/types/tipos";
+import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
+import logger from "@/utils/logger";
+
+type Analise = AnaliseCadastro | AnaliseValidacao;
+type DadosRemocao = {tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number} | null;
 
 const props = defineProps<{
   codProcesso: number | string;
   sigla: string;
 }>();
 
-const {
-  router,
-  isChefe,
-  codSubprocesso,
-  subprocesso,
-  nomeUnidade,
-  permissoes,
-  atividades,
-  isRevisao,
-  historicoAnalises,
-  novaAtividade,
-  loadingAdicionar,
-  erroNovaAtividade,
-  loadingValidacao,
-  loadingImpacto,
-  impactoMapa,
-  mostrarModalImpacto,
-  mostrarModalImportar,
-  mostrarModalConfirmacao,
-  mostrarModalHistorico,
-  mostrarModalConfirmacaoRemocao,
-  dadosRemocao,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  errosValidacao,
-  erroGlobal,
-  podeVerImpacto,
-  adicionarAtividade,
-  removerAtividade,
-  confirmarRemocao,
-  adicionarConhecimento,
-  removerConhecimento,
-  salvarEdicaoConhecimento,
-  salvarEdicaoAtividade,
-  handleImportAtividades,
-  obterErroParaAtividade,
-  setAtividadeRef,
-  abrirModalHistorico,
-  abrirModalImpacto,
-  disponibilizarCadastro,
-  confirmarDisponibilizacao,
-  fecharModalImpacto
-} = useCadAtividades(props);
+const router = useRouter();
+const atividadesStore = useAtividadesStore();
+const unidadesStore = useUnidadesStore();
+const subprocessosStore = useSubprocessosStore();
+const analisesStore = useAnalisesStore();
+const mapasStore = useMapasStore();
+const feedbackStore = useFeedbackStore();
+const {impactoMapa} = storeToRefs(mapasStore);
+
+const {perfilSelecionado} = usePerfil();
+const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
+const codSubprocesso = ref<number | null>(null);
+
+const codMapa = computed(() => mapasStore.mapaCompleto?.codigo || null);
+const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
+const nomeUnidade = computed(() => unidadesStore.unidade?.nome || "");
+const permissoes = computed(() => subprocesso.value?.permissoes || null);
+const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
+const podeVerImpacto = computed(() => permissoes.value?.podeVisualizarImpacto ?? false);
+
+const atividades = computed(() => {
+  if (codSubprocesso.value === null) return [];
+  return atividadesStore.obterAtividadesPorSubprocesso(codSubprocesso.value);
+});
+
+const historicoAnalises = computed(() => {
+  if (!codSubprocesso.value) return [];
+  return analisesStore.obterAnalisesPorSubprocesso(codSubprocesso.value);
+});
+
+const {novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction} = useAtividadeForm();
+const erroNovaAtividade = ref<string | null>(null);
+
+// Modais
+const mostrarModalImpacto = ref(false);
+const mostrarModalImportar = ref(false);
+const mostrarModalConfirmacao = ref(false);
+const mostrarModalHistorico = ref(false);
+const mostrarModalConfirmacaoRemocao = ref(false);
+const dadosRemocao = ref<DadosRemocao>(null);
+const loadingImpacto = ref(false);
+
+// Validação
+const loadingValidacao = ref(false);
+const errosValidacao = ref<ErroValidacao[]>([]);
+const erroGlobal = ref<string | null>(null);
+const atividadeRefs = new Map<number, Element>();
+
+const mapaErros = computed(() => {
+  const mapa = new Map<number, string>();
+  errosValidacao.value.forEach((erro) => {
+    if (erro.atividadeCodigo) {
+      mapa.set(erro.atividadeCodigo, erro.mensagem);
+    }
+  });
+  return mapa;
+});
 
 const atividadeFormRef = ref<InstanceType<typeof CadAtividadeForm> | null>(null);
 const erroGlobalFormatado = computed(() =>
-    erroGlobal.value ? {message: erroGlobal.value} : null
+  erroGlobal.value ? {message: erroGlobal.value} : null
 );
+
+async function adicionarAtividade(): Promise<boolean> {
+  if (codMapa.value && codSubprocesso.value) {
+    try {
+      const sucesso = await adicionarAtividadeAction(codSubprocesso.value, codMapa.value);
+      if (sucesso) erroNovaAtividade.value = null;
+      return sucesso;
+    } catch {
+      erroNovaAtividade.value = atividadesStore.lastError?.message || "Não foi possível adicionar atividade.";
+      return false;
+    }
+  }
+  return false;
+}
+
+function removerAtividade(idx: number) {
+  if (!codSubprocesso.value) return;
+  dadosRemocao.value = {tipo: "atividade", index: idx};
+  mostrarModalConfirmacaoRemocao.value = true;
+}
+
+async function confirmarRemocao() {
+  if (!dadosRemocao.value || !codSubprocesso.value) return;
+
+  const {tipo, index, conhecimentoCodigo} = dadosRemocao.value;
+
+  try {
+    if (tipo === "atividade") {
+      const atividadeRemovida = atividades.value[index];
+      await atividadesStore.removerAtividade(codSubprocesso.value, atividadeRemovida.codigo);
+    } else if (tipo === "conhecimento" && conhecimentoCodigo !== undefined) {
+      const atividade = atividades.value[index];
+      await atividadesStore.removerConhecimento(codSubprocesso.value, atividade.codigo, conhecimentoCodigo);
+    }
+    mostrarModalConfirmacaoRemocao.value = false;
+    dadosRemocao.value = null;
+  } catch (e: any) {
+    feedbackStore.show("Erro na remoção", e.message || "Não foi possível remover o item.", "danger");
+    mostrarModalConfirmacaoRemocao.value = false;
+  }
+}
+
+async function salvarEdicaoAtividade(codigo: number, descricao: string) {
+  if (descricao.trim() && codSubprocesso.value) {
+    const atividadeOriginal = atividades.value.find((a) => a.codigo === codigo);
+    if (atividadeOriginal) {
+      const atividadeAtualizada: Atividade = {
+        ...atividadeOriginal,
+        descricao: descricao.trim(),
+      };
+      await atividadesStore.atualizarAtividade(codSubprocesso.value, codigo, atividadeAtualizada);
+    }
+  }
+}
+
+async function adicionarConhecimento(idx: number, descricao: string) {
+  if (!codSubprocesso.value) return;
+  const atividade = atividades.value[idx];
+  if (descricao.trim()) {
+    const request: CriarConhecimentoRequest = {
+      descricao: descricao.trim(),
+    };
+    await atividadesStore.adicionarConhecimento(codSubprocesso.value, atividade.codigo, request);
+  }
+}
+
+function removerConhecimento(idx: number, conhecimentoCodigo: number) {
+  if (!codSubprocesso.value) return;
+  dadosRemocao.value = {tipo: "conhecimento", index: idx, conhecimentoCodigo};
+  mostrarModalConfirmacaoRemocao.value = true;
+}
+
+async function salvarEdicaoConhecimento(atividadeCodigo: number, conhecimentoCodigo: number, descricao: string) {
+  if (!codSubprocesso.value) return;
+
+  if (descricao.trim()) {
+    const conhecimentoAtualizado: Conhecimento = {
+      codigo: conhecimentoCodigo,
+      descricao: descricao.trim(),
+    };
+    await atividadesStore.atualizarConhecimento(
+      codSubprocesso.value,
+      atividadeCodigo,
+      conhecimentoCodigo,
+      conhecimentoAtualizado,
+    );
+  }
+}
+
+async function handleImportAtividades() {
+  mostrarModalImportar.value = false;
+  if (codSubprocesso.value) {
+    await atividadesStore.buscarAtividadesParaSubprocesso(codSubprocesso.value);
+  }
+  feedbackStore.show("Importação Concluída", "As atividades foram importadas para o seu mapa.", "success");
+}
+
+function obterErroParaAtividade(atividadeCodigo: number): string | undefined {
+  return mapaErros.value.get(atividadeCodigo);
+}
+
+function setAtividadeRef(atividadeCodigo: number, el: unknown) {
+  if (el && el instanceof Element) {
+    atividadeRefs.set(atividadeCodigo, el);
+  }
+}
+
+function scrollParaPrimeiroErro() {
+  if (errosValidacao.value.length > 0 && errosValidacao.value[0].atividadeCodigo) {
+    const primeiraAtividadeComErro = atividadeRefs.get(errosValidacao.value[0].atividadeCodigo);
+    if (primeiraAtividadeComErro) {
+      primeiraAtividadeComErro.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }
+}
+
+async function disponibilizarCadastro() {
+  const situacaoEsperada = isRevisao.value
+    ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+    : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+
+  if (subprocesso.value?.situacao !== situacaoEsperada) {
+    feedbackStore.show(
+      "Ação não permitida",
+      `Ação permitida apenas na situação: "${situacaoEsperada}".`,
+      "danger",
+    );
+    return;
+  }
+
+  if (codSubprocesso.value) {
+    loadingValidacao.value = true;
+    errosValidacao.value = [];
+    erroGlobal.value = null;
+    try {
+      const resultado = await subprocessosStore.validarCadastro(codSubprocesso.value);
+      if (resultado?.valido) {
+        mostrarModalConfirmacao.value = true;
+      } else if (resultado) {
+        errosValidacao.value = resultado.erros;
+
+        const erroSemAtividade = resultado.erros.find((e) => !e.atividadeCodigo);
+        if (erroSemAtividade) {
+          erroGlobal.value = erroSemAtividade.mensagem;
+        }
+
+        await nextTick();
+        scrollParaPrimeiroErro();
+      }
+    } catch {
+      feedbackStore.show("Erro na validação", "Não foi possível validar o cadastro.", "danger");
+    } finally {
+      loadingValidacao.value = false;
+    }
+  }
+}
+
+async function confirmarDisponibilizacao() {
+  if (!codSubprocesso.value) return;
+
+  let sucesso: boolean;
+  if (isRevisao.value) {
+    sucesso = await subprocessosStore.disponibilizarRevisaoCadastro(codSubprocesso.value);
+  } else {
+    sucesso = await subprocessosStore.disponibilizarCadastro(codSubprocesso.value);
+  }
+
+  mostrarModalConfirmacao.value = false;
+  if (sucesso) {
+    await router.push("/painel");
+  }
+}
+
+async function abrirModalHistorico() {
+  if (codSubprocesso.value) {
+    await analisesStore.buscarAnalisesCadastro(codSubprocesso.value);
+  }
+  mostrarModalHistorico.value = true;
+}
+
+function abrirModalImpacto() {
+  mostrarModalImpacto.value = true;
+  if (codSubprocesso.value) {
+    loadingImpacto.value = true;
+    mapasStore.buscarImpactoMapa(codSubprocesso.value).finally(() => (loadingImpacto.value = false));
+  }
+}
+
+function fecharModalImpacto() {
+  mostrarModalImpacto.value = false;
+}
 
 async function handleAdicionarAtividade() {
   const sucesso = await adicionarAtividade();
@@ -232,11 +463,22 @@ async function handleAdicionarAtividade() {
   if (sucesso || erroNovaAtividade.value) atividadeFormRef.value?.inputRef?.$el?.focus();
 }
 
+onMounted(async () => {
+  const codProcessoRef = Number(props.codProcesso);
+  const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcessoRef, props.sigla);
+
+  if (id) {
+    codSubprocesso.value = id;
+    await subprocessosStore.buscarContextoEdicao(id);
+  } else {
+    logger.error("[CadAtividades] ERRO: Subprocesso não encontrado!");
+  }
+});
+
 // Auto-focus if empty on load
 watch(() => atividades.value?.length, (newLen, oldLen) => {
   if (newLen === 0 && oldLen === undefined) {
     nextTick(() => atividadeFormRef.value?.inputRef?.$el?.focus());
   }
-}, { immediate: true });
-
+}, {immediate: true});
 </script>

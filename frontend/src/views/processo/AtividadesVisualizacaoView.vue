@@ -117,51 +117,255 @@
 
 <script lang="ts" setup>
 import {BButton, BFormGroup, BFormTextarea} from "bootstrap-vue-next";
+import {computed, onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+import {storeToRefs} from "pinia";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import VisAtividadeItem from "@/components/atividades/VisAtividadeItem.vue";
-import {useVisAtividades} from "@/composables/useVisAtividades";
+import {useAtividadesStore} from "@/stores/atividades";
+import {useUnidadesStore} from "@/stores/unidades";
+import {useProcessosStore} from "@/stores/processos";
+import {useAnalisesStore} from "@/stores/analises";
+import {useMapasStore} from "@/stores/mapas";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import type {
+  AceitarCadastroRequest,
+  AnaliseCadastro,
+  AnaliseValidacao,
+  Atividade,
+  DevolverCadastroRequest,
+  HomologarCadastroRequest,
+  Unidade,
+  UnidadeParticipante,
+} from "@/types/tipos";
+import {TipoProcesso} from "@/types/tipos";
+
+type Analise = AnaliseCadastro | AnaliseValidacao;
 
 const props = defineProps<{
   codProcesso: number | string;
   sigla: string;
 }>();
 
-const {
-  atividades,
-  siglaUnidade,
-  nomeUnidade,
-  isRevisao,
-  isHomologacao,
-  podeVerImpacto,
-  codSubprocesso,
-  impactoMapa,
-  loadingImpacto,
-  mostrarModalImpacto,
-  historicoAnalises,
-  mostrarModalHistoricoAnalise,
-  mostrarModalValidar,
-  loadingValidacao,
-  observacaoValidacao,
-  mostrarModalDevolver,
-  loadingDevolucao,
-  observacaoDevolucao,
-  abrirModalImpacto,
-  fecharModalImpacto,
-  abrirModalHistoricoAnalise,
-  fecharModalHistoricoAnalise,
-  validarCadastro,
-  devolverCadastro,
-  confirmarValidacao,
-  confirmarDevolucao} = useVisAtividades(props);
+const router = useRouter();
+const atividadesStore = useAtividadesStore();
+const unidadesStore = useUnidadesStore();
+const processosStore = useProcessosStore();
+const analisesStore = useAnalisesStore();
+const mapasStore = useMapasStore();
+const subprocessosStore = useSubprocessosStore();
+const {impactoMapa} = storeToRefs(mapasStore);
+
+const unidadeId = computed(() => props.sigla);
+const codProcesso = computed(() => Number(props.codProcesso));
+
+const unidade = computed(() => {
+  function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | undefined {
+    for (const u of unidades) {
+      if (u.sigla === sigla) return u;
+      if (u.filhas?.length) {
+        const encontrada = buscarUnidade(u.filhas, sigla);
+        if (encontrada) return encontrada;
+      }
+    }
+  }
+  return buscarUnidade(unidadesStore.unidades as Unidade[], unidadeId.value);
+});
+
+const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value);
+const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ""));
+
+const subprocesso = computed(() => {
+  if (!processosStore.processoDetalhe) return null;
+
+  function encontrarUnidade(unidades: UnidadeParticipante[]): UnidadeParticipante | undefined {
+    for (const u of unidades) {
+      if (u.sigla === unidadeId.value) return u;
+      if (u.filhos && u.filhos.length > 0) {
+        const encontrada = encontrarUnidade(u.filhos);
+        if (encontrada) return encontrada;
+      }
+    }
+    return undefined;
+  }
+
+  return encontrarUnidade(processosStore.processoDetalhe.unidades);
+});
+
+const permissoes = computed(() => subprocessosStore.subprocessoDetalhe?.permissoes);
+
+const isHomologacao = computed(() => {
+  return permissoes.value?.podeHomologarCadastro ?? false;
+});
+
+const podeVerImpacto = computed(() => {
+  return permissoes.value?.podeVisualizarImpacto ?? false;
+});
+
+const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
+
+const atividades = computed(() => {
+  if (codSubprocesso.value === undefined) return [];
+  return atividadesStore.obterAtividadesPorSubprocesso(codSubprocesso.value) || [];
+});
+
+const processoAtual = computed(() => processosStore.processoDetalhe);
+const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
+
+const historicoAnalises = computed(() => {
+  if (!codSubprocesso.value) return [];
+  return analisesStore.obterAnalisesPorSubprocesso(codSubprocesso.value);
+});
+
+// Modais
+const loadingImpacto = ref(false);
+const mostrarModalImpacto = ref(false);
+const mostrarModalValidar = ref(false);
+const mostrarModalDevolver = ref(false);
+const mostrarModalHistoricoAnalise = ref(false);
+const observacaoValidacao = ref("");
+const observacaoDevolucao = ref("");
+
+// Ações de validação/devolução
+const loadingValidacao = ref(false);
+const loadingDevolucao = ref(false);
+
+async function abrirModalImpacto() {
+  mostrarModalImpacto.value = true;
+  if (codSubprocesso.value) {
+    loadingImpacto.value = true;
+    try {
+      await mapasStore.buscarImpactoMapa(codSubprocesso.value);
+    } finally {
+      loadingImpacto.value = false;
+    }
+  }
+}
+
+function fecharModalImpacto() {
+  mostrarModalImpacto.value = false;
+}
+
+async function abrirModalHistoricoAnalise() {
+  if (codSubprocesso.value) {
+    await analisesStore.buscarAnalisesCadastro(codSubprocesso.value);
+  }
+  mostrarModalHistoricoAnalise.value = true;
+}
+
+function fecharModalHistoricoAnalise() {
+  mostrarModalHistoricoAnalise.value = false;
+}
+
+function validarCadastro() {
+  mostrarModalValidar.value = true;
+}
+
+function devolverCadastro() {
+  mostrarModalDevolver.value = true;
+}
+
+function fecharModalValidar() {
+  mostrarModalValidar.value = false;
+  observacaoValidacao.value = "";
+}
+
+function fecharModalDevolver() {
+  mostrarModalDevolver.value = false;
+  observacaoDevolucao.value = "";
+}
+
+async function confirmarValidacao() {
+  if (!codSubprocesso.value) return;
+
+  loadingValidacao.value = true;
+  try {
+    let sucesso: boolean;
+
+    if (isHomologacao.value) {
+      const req: HomologarCadastroRequest = {
+        observacoes: observacaoValidacao.value,
+      };
+      if (isRevisao.value) {
+        sucesso = await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, req);
+      } else {
+        sucesso = await subprocessosStore.homologarCadastro(codSubprocesso.value, req);
+      }
+
+      if (sucesso) {
+        fecharModalValidar();
+        await router.push({
+          name: "Subprocesso",
+          params: {
+            codProcesso: props.codProcesso,
+            siglaUnidade: props.sigla,
+          },
+        });
+      }
+    } else {
+      const req: AceitarCadastroRequest = {
+        observacoes: observacaoValidacao.value,
+      };
+      if (isRevisao.value) {
+        sucesso = await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, req);
+      } else {
+        sucesso = await subprocessosStore.aceitarCadastro(codSubprocesso.value, req);
+      }
+
+      if (sucesso) {
+        fecharModalValidar();
+        await router.push({name: "Painel"});
+      }
+    }
+  } finally {
+    loadingValidacao.value = false;
+  }
+}
+
+async function confirmarDevolucao() {
+  if (!codSubprocesso.value) return;
+  loadingDevolucao.value = true;
+
+  try {
+    const req: DevolverCadastroRequest = {
+      observacoes: observacaoDevolucao.value,
+    };
+
+    let sucesso: boolean;
+    if (isRevisao.value) {
+      sucesso = await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, req);
+    } else {
+      sucesso = await subprocessosStore.devolverCadastro(codSubprocesso.value, req);
+    }
+
+    if (sucesso) {
+      fecharModalDevolver();
+      await router.push("/painel");
+    }
+  } finally {
+    loadingDevolucao.value = false;
+  }
+}
+
+onMounted(async () => {
+  await processosStore.buscarProcessoDetalhe(codProcesso.value);
+  if (codSubprocesso.value) {
+    await Promise.all([
+      atividadesStore.buscarAtividadesParaSubprocesso(codSubprocesso.value),
+      subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value)
+    ]);
+  }
+});
 
 defineExpose({
   mostrarModalHistoricoAnalise,
   mostrarModalValidar,
-  mostrarModalDevolver});
+  mostrarModalDevolver
+});
 </script>
 
 <style>
