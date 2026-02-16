@@ -1,5 +1,6 @@
 package sgc.mapa;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -8,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.dto.*;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.MapaViews;
 import sgc.mapa.service.AtividadeFacade;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 
@@ -35,14 +39,15 @@ public class AtividadeController {
      * Busca e retorna uma atividade específica pelo seu código.
      *
      * @param codAtividade O código da atividade a ser buscada.
-     * @return Um {@link ResponseEntity} contendo a {@link AtividadeResponse}
+     * @return Um {@link ResponseEntity} contendo a {@link Atividade}
      *         correspondente ou um status
      *         404 Not Found se a atividade não for encontrada.
      */
+    @JsonView(MapaViews.Publica.class)
     @GetMapping("/{codAtividade}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém uma atividade pelo código")
-    public ResponseEntity<AtividadeResponse> obterPorId(@PathVariable Long codAtividade) {
+    public ResponseEntity<Atividade> obterPorId(@PathVariable Long codAtividade) {
         return ResponseEntity.ok(atividadeFacade.obterAtividadePorId(codAtividade));
     }
 
@@ -108,12 +113,13 @@ public class AtividadeController {
      *
      * @param codAtividade O código da atividade pai.
      * @return Um {@link ResponseEntity} com status 200 OK e a lista de
-     *         {@link ConhecimentoResponse}.
+     *         {@link Conhecimento}.
      */
+    @JsonView(MapaViews.Publica.class)
     @GetMapping("/{codAtividade}/conhecimentos")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista todos os conhecimentos de uma atividade")
-    public ResponseEntity<List<ConhecimentoResponse>> listarConhecimentos(@PathVariable Long codAtividade) {
+    public ResponseEntity<List<Conhecimento>> listarConhecimentos(@PathVariable Long codAtividade) {
         return ResponseEntity.ok(atividadeFacade.listarConhecimentosPorAtividade(codAtividade));
     }
 

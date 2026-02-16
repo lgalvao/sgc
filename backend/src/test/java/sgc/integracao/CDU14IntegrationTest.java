@@ -111,7 +111,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                 });
 
                 // Ensure mapa has at least one atividade with conhecimento for validation
-                if (atividadeRepo.findByMapaCodigo(mapaVigente.getCodigo()).isEmpty()) {
+                if (atividadeRepo.findByMapa_Codigo(mapaVigente.getCodigo()).isEmpty()) {
                         Atividade atividade = Atividade.builder().mapa(mapaVigente).descricao("Atividade CDU-14 Test")
                                         .build();
                         atividade = atividadeRepo.save(atividade);
@@ -287,7 +287,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                 void adminHomologaComImpactos() throws Exception {
                         Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
 
-                        Atividade atividadeExistente = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo()).stream()
+                        Atividade atividadeExistente = atividadeRepo.findByMapa_Codigo(sp.getMapa().getCodigo()).stream()
                                         .findFirst()
                                         .orElseThrow();
                         atividadeRepo.delete(atividadeExistente);
@@ -342,7 +342,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                         Long subprocessoId = criarEComecarProcessoDeRevisao();
                         Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
 
-                        Atividade atividadeExistente = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo()).stream()
+                        Atividade atividadeExistente = atividadeRepo.findByMapa_Codigo(sp.getMapa().getCodigo()).stream()
                                         .findFirst()
                                         .orElseThrow();
                         atividadeRepo.delete(atividadeExistente);

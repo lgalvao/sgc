@@ -86,7 +86,7 @@ class ImpactoMapaServiceTest {
         nova.setConhecimentos(Collections.emptyList());
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L)).thenReturn(Collections.singletonList(nova));
 
-        when(competenciaRepo.findByMapaCodigo(100L)).thenReturn(Collections.emptyList());
+        when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
         ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
@@ -127,7 +127,7 @@ class ImpactoMapaServiceTest {
         comp.setCodigo(50L);
         comp.setDescricao("Comp A");
         comp.setAtividades(Set.of(antiga));
-        when(competenciaRepo.findByMapaCodigo(100L)).thenReturn(Collections.singletonList(comp));
+        when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.singletonList(comp));
 
         ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
@@ -176,7 +176,7 @@ class ImpactoMapaServiceTest {
         
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L)).thenReturn(Collections.singletonList(ativAtual));
 
-        when(competenciaRepo.findByMapaCodigo(100L)).thenReturn(Collections.emptyList());
+        when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
         ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
@@ -212,7 +212,7 @@ class ImpactoMapaServiceTest {
                 .thenReturn(Collections.singletonList(ativVigente));
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L))
                 .thenReturn(Collections.singletonList(ativAtual));
-        when(competenciaRepo.findByMapaCodigo(100L)).thenReturn(Collections.emptyList());
+        when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
         ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
@@ -252,7 +252,7 @@ class ImpactoMapaServiceTest {
                 .thenReturn(Collections.singletonList(ativVigente));
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L))
                 .thenReturn(Collections.singletonList(ativAtual));
-        when(competenciaRepo.findByMapaCodigo(100L)).thenReturn(Collections.emptyList());
+        when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
         ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
@@ -327,7 +327,7 @@ class ImpactoMapaServiceTest {
                     .thenReturn(List.of());
             
             // Necessário mockar competenciaRepo se as atividades forem removidas
-            when(competenciaRepo.findByMapaCodigo(20L)).thenReturn(Collections.emptyList());
+            when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(Collections.emptyList());
 
             ImpactoMapaDto dto = impactoMapaService.verificarImpactos(sp, new Usuario());
             
@@ -379,7 +379,7 @@ class ImpactoMapaServiceTest {
             comp.setDescricao("Comp A");
             comp.setAtividades(Set.of(aVigente));
             
-            when(competenciaRepo.findByMapaCodigo(20L)).thenReturn(List.of(comp));
+            when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of(comp));
 
             ImpactoMapaDto dto = impactoMapaService.verificarImpactos(sp, new Usuario());
             

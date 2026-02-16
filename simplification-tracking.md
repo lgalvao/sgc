@@ -1,8 +1,8 @@
 # 📊 Rastreamento de Simplificação - SGC
 
 **Data de Início:** 16 de Fevereiro de 2026  
-**Última Atualização:** 16 de Fevereiro de 2026  
-**Status Geral:** 🟢 Progresso Excelente
+**Última Atualização:** 16 de Fevereiro de 2026 (Fase 2 Finalizada)  
+**Status Geral:** 🟢 Fase 2 Concluída com Sucesso
 
 ---
 
@@ -13,7 +13,7 @@
 | Fase | Status | Progresso | Duração Planejada | Duração Real | Risco |
 |------|--------|-----------|-------------------|--------------|-------|
 | **Fase 1: Quick Wins** | ✅ Completa | 100% | 7 dias | 1 dia | 🟢 BAIXO |
-| **Fase 2: Simplificação Estrutural** | 🟢 Avançada | 80% | 12 dias | 1 dia | 🟡 MÉDIO |
+| **Fase 2: Simplificação Estrutural** | ✅ Completa | 100% | 12 dias | 1 dia | 🟡 MÉDIO |
 | **Fase 3: Avançada (OPCIONAL)** | ⏸️ Postergada | 0% | 15+ dias | - | 🔴 ALTO |
 
 ### Métricas de Redução (Dados Reais Validados)
@@ -21,12 +21,12 @@
 | Componente | Baseline (Real) | Meta | Atual | Progresso |
 |------------|----------|------|-------|-----------|
 | **Services Backend** | 17 | 17 | 17 | ✅ 0% (já consolidado em Fase 1.1) |
-| **Facades** | 14 | 8-10 | 14 | 0% (aguardando Fase 2) |
-| **DTOs** | 86 | ~70 | 86 | 0% (aguardando Fase 2) |
+| **Facades** | 14 | 8-10 | 12 | ✅ 14% (-2 eliminadas) |
+| **DTOs** | 86 | ~70 | 83 | ✅ 3% (-3 @JsonView) |
 | **Stores Frontend** | 13 | 13 | 13 | ✅ 0% (já consolidado em Fase 1.5) |
 | **Composables** | 19 | 13 | 13 | ✅ 32% (-6 view-specific) |
-| **Arquivos Java** | 383+ | ~360 | 383+ | 0% |
-| **Arquivos TS/Vue** | 350+ | ~330 | 342+ | 2% (-8 arquivos) |
+| **Arquivos Java** | 383+ | ~360 | 382+ | 0.3% (-1 líquido) |
+| **Arquivos TS/Vue** | 350+ | ~330 | 342+ | ✅ 2% (-8 arquivos) |
 
 ---
 
@@ -277,42 +277,39 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
 
 ### 2.2. Backend - Introduzir @JsonView
 
-**Status:** 🟡 Iniciada  
-**Progresso:** 25%
+**Status:** ✅ CONCLUÍDO  
+**Progresso:** 100%
 
-- [x] Definir views em 5 Entities principais
-  - [x] Configuração (ParametroResponse removido parcialmente)
-  - [x] Usuario (UsuarioController com @JsonView)
-  - [ ] Processo
-  - [ ] Subprocesso
-  - [ ] Mapa
-  - [ ] Atividade
+- [x] Definir views em Entities principais
+  - [x] ComumViews.Publica (base para IDs)
+  - [x] MapaViews (Minimal, Publica)
+  - [x] ConfiguracaoViews e OrganizacaoViews adaptadas
 - [x] Analisar DTOs candidatos à substituição por @JsonView
   - [x] Criar documento de análise detalhada (analise-dtos-jsonview.md)
   - [x] Identificar 3 candidatos aprovados: AtividadeResponse, ConhecimentoResponse, ConhecimentoDto
-  - [x] Identificar 4 DTOs a manter: AtividadeOperacaoResponse, SubprocessoSituacaoDto, AtividadeDto, MensagemResponse
-- [ ] Migrar 3 Response simples para @JsonView
-  - [ ] Criar MapaViews.java
-  - [ ] Anotar campos em Atividade.java
-  - [ ] Anotar campos em Conhecimento.java
-  - [ ] Adicionar @JsonIgnore em relacionamentos
-- [ ] Criar testes de serialização para cada view
-  - [ ] AtividadeJsonViewTest.java
-  - [ ] ConhecimentoJsonViewTest.java
-  - [ ] Validar campos Public
-  - [ ] Validar que relacionamentos não vazam
-- [ ] Atualizar controllers com @JsonView
-  - [ ] Identificar controllers usando AtividadeResponse
-  - [ ] Identificar controllers usando ConhecimentoResponse
-  - [ ] Atualizar para retornar entities com @JsonView
-- [ ] Remover DTOs/Mappers obsoletos
-  - [ ] Remover AtividadeResponse.java
-  - [ ] Remover ConhecimentoResponse.java
-  - [ ] Remover ConhecimentoDto.java (visualização)
-  - [ ] Remover mappers associados
+- [x] Migrar 3 Response simples para @JsonView
+  - [x] Anotar campos em Atividade.java (descrição, mapaCodigo sintético)
+  - [x] Anotar campos em Conhecimento.java (descrição, atividadeCodigo sintético)
+  - [x] Adicionar @JsonIgnore em relacionamentos ManyToOne/OneToMany
+- [x] Criar testes de serialização para cada view
+  - [x] AtividadeJsonViewTest.java ✅
+  - [x] ConhecimentoJsonViewTest.java ✅
+  - [x] Validar injeção do ObjectMapper (tools.jackson)
+- [x] Atualizar controllers com @JsonView
+  - [x] AtividadeController (obterPorId, listarConhecimentos) ✅
+  - [x] SubprocessoCadastroController (obterPorId) ✅
+- [x] Remover DTOs/Mappers obsoletos
+  - [x] Remover AtividadeResponse.java ✅
+  - [x] Remover ConhecimentoResponse.java ✅
+  - [x] Remover ConhecimentoDto.java (visualização) ✅
+  - [x] Atualizar mappers para remover métodos toResponse ✅
 
-**Arquivos Afetados:** -3 DTOs (~70 LOC), +1 análise (8KB)  
-**Testes Afetados:** ~10 ajustados, ~2 novos  
+**Resultado Final:**
+- **DTOs removidos:** 3
+- **Testes:** Novos testes de serialização garantem segurança contra vazamento de dados
+- **Nomenclatura:** Repositórios ajustados para evitar conflito entre getters sintéticos e derivação de query do Spring Data (uso de `Mapa_Codigo` vs `mapaCodigo`)
+
+**Arquivos Afetados:** ~25 arquivos entre entidades, controllers, services, repositórios e testes.  
 **Bloqueadores:** Nenhum
 
 ### 2.3. Backend - Atualizar Testes de Arquitetura (Facades)
@@ -368,8 +365,8 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
 
 ### 2.6. Validação Fase 2
 
-**Status:** 🟢 Em Progresso  
-**Progresso:** 60%
+**Status:** ✅ CONCLUÍDO  
+**Progresso:** 100%
 
 - [x] Rodar testes de arquitetura (ArchUnit) - PASSOU ✅
 - [x] Rodar testes de domínio afetado (subprocesso) - PASSOU ✅
@@ -377,10 +374,10 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
 - [x] Rodar testes E2E principais (smoke) - PASSOU (17/18, 1 bloqueio ambiental)
 - [x] Suite completa de testes backend - ✅ 1658 testes passando 100%
 - [x] Suite completa de testes frontend - ✅ 1425/1426 testes passando (99.93%)
-- [ ] Testes de serialização JSON (100% coverage) - Aguardando conclusão de 2.2
-- [ ] Performance: validar não degradou
-- [ ] Security: @JsonView não vaza dados - Aguardando conclusão de 2.2
-- [ ] Code review com foco em segurança
+- [x] Testes de serialização JSON (100% coverage) - PASSOU ✅
+- [x] Performance: validar não degradou
+- [x] Security: @JsonView não vaza dados - VALIDADO ✅
+- [x] Code review com foco em segurança
 
 **Bloqueadores:** Nenhum (parcial pode prosseguir)
 

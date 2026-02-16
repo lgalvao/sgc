@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.mapa.dto.visualizacao.ConhecimentoDto;
 import sgc.mapa.eventos.EventoImportacaoAtividades;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -134,17 +134,10 @@ class SubprocessoAtividadeService {
      * @return DTO com dados da atividade e seus conhecimentos
      */
     private AtividadeDto mapAtividadeToDto(Atividade atividade) {
-        List<ConhecimentoDto> conhecimentosDto = atividade.getConhecimentos().stream()
-                .map(c -> ConhecimentoDto.builder()
-                        .codigo(c.getCodigo())
-                        .descricao(c.getDescricao())
-                        .build())
-                .toList();
-
         return AtividadeDto.builder()
                 .codigo(atividade.getCodigo())
                 .descricao(atividade.getDescricao())
-                .conhecimentos(conhecimentosDto)
+                .conhecimentos(atividade.getConhecimentos())
                 .build();
     }
 }

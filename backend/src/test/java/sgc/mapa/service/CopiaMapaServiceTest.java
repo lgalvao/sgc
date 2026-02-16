@@ -63,7 +63,7 @@ class CopiaMapaServiceTest {
 
         when(repo.buscar(Mapa.class, origemId)).thenReturn(mapaOrigem);
         when(mapaRepo.save(any(Mapa.class))).thenReturn(mapaSalvo);
-        when(atividadeRepo.findWithConhecimentosByMapaCodigo(origemId)).thenReturn(List.of(atividadeOrigem));
+        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(origemId)).thenReturn(List.of(atividadeOrigem));
 
         when(atividadeRepo.saveAll(anyList())).thenAnswer(i -> {
             List<Atividade> list = i.getArgument(0);
@@ -71,7 +71,7 @@ class CopiaMapaServiceTest {
             return list;
         });
 
-        when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(List.of(competenciaOrigem));
+        when(competenciaRepo.findByMapa_Codigo(origemId)).thenReturn(List.of(competenciaOrigem));
 
         Mapa resultado = service.copiarMapaParaUnidade(origemId);
 
@@ -107,8 +107,8 @@ class CopiaMapaServiceTest {
 
         when(repo.buscar(Mapa.class, origemId)).thenReturn(mapaOrigem);
         when(mapaRepo.save(any(Mapa.class))).thenReturn(new Mapa());
-        when(atividadeRepo.findWithConhecimentosByMapaCodigo(origemId)).thenReturn(List.of()); // Empty list
-        when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(List.of()); // Empty list
+        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(origemId)).thenReturn(List.of()); // Empty list
+        when(competenciaRepo.findByMapa_Codigo(origemId)).thenReturn(List.of()); // Empty list
 
         Mapa resultado = service.copiarMapaParaUnidade(origemId);
 
@@ -130,8 +130,8 @@ class CopiaMapaServiceTest {
 
         when(repo.buscar(Mapa.class, origemId)).thenReturn(mapaOrigem);
         when(mapaRepo.save(any(Mapa.class))).thenReturn(new Mapa());
-        when(atividadeRepo.findWithConhecimentosByMapaCodigo(origemId)).thenReturn(List.of(atividadeOrigem));
-        when(competenciaRepo.findByMapaCodigo(origemId)).thenReturn(List.of());
+        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(origemId)).thenReturn(List.of(atividadeOrigem));
+        when(competenciaRepo.findByMapa_Codigo(origemId)).thenReturn(List.of());
 
         service.copiarMapaParaUnidade(origemId);
 

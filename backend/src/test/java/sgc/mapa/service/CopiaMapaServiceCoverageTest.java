@@ -47,7 +47,7 @@ class CopiaMapaServiceCoverageTest {
         Atividade ativFonte = new Atividade();
         ativFonte.setCodigo(100L);
         ativFonte.setDescricao("Atividade Teste");
-        when(atividadeRepo.findWithConhecimentosByMapaCodigo(codMapaOrigem)).thenReturn(List.of(ativFonte));
+        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(codMapaOrigem)).thenReturn(List.of(ativFonte));
         
         Competencia compFonte = new Competencia();
         compFonte.setCodigo(200L);
@@ -58,7 +58,7 @@ class CopiaMapaServiceCoverageTest {
         ativFantasma.setCodigo(999L);
         compFonte.setAtividades(Set.of(ativFantasma));
         
-        when(competenciaRepo.findByMapaCodigo(codMapaOrigem)).thenReturn(List.of(compFonte));
+        when(competenciaRepo.findByMapa_Codigo(codMapaOrigem)).thenReturn(List.of(compFonte));
 
         // Act
         service.copiarMapaParaUnidade(codMapaOrigem);
@@ -79,8 +79,8 @@ class CopiaMapaServiceCoverageTest {
                 .conhecimentos(new ArrayList<>())
                 .build();
         
-        when(atividadeRepo.findWithConhecimentosByMapaCodigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));
-        when(atividadeRepo.findByMapaCodigo(mapaDestinoId)).thenReturn(List.of()); // Destino vazio
+        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));
+        when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of()); // Destino vazio
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
         
         // Act
@@ -100,8 +100,8 @@ class CopiaMapaServiceCoverageTest {
         Atividade ativOrigem = Atividade.builder().descricao("Existente").build();
         Atividade ativDestino = Atividade.builder().descricao("Existente").build();
         
-        when(atividadeRepo.findWithConhecimentosByMapaCodigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));
-        when(atividadeRepo.findByMapaCodigo(mapaDestinoId)).thenReturn(List.of(ativDestino));
+        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));
+        when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of(ativDestino));
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
         
         // Act

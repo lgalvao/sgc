@@ -61,8 +61,8 @@ class MapaSalvamentoServiceTest {
         compExistente.setDescricao("Velha Desc");
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(compExistente));
-        when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
+        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(compExistente));
+        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of());
         when(competenciaRepo.saveAll(any())).thenAnswer(i -> i.getArgument(0));
         when(mapaCompletoMapper.toDto(any(), any(), any())).thenReturn(MapaCompletoDto.builder().build());
 
@@ -89,8 +89,8 @@ class MapaSalvamentoServiceTest {
         Mapa mapa = new Mapa();
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
-        when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
+        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of());
+        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of());
         
         // Mock repo.buscar throwing ErroEntidadeNaoEncontrada
         when(repo.buscar(Competencia.class, codComp)).thenThrow(new ErroEntidadeNaoEncontrada("Competência", codComp));
@@ -117,8 +117,8 @@ class MapaSalvamentoServiceTest {
         ativ1.setMapa(mapa);
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(Collections.emptyList());
-        when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(ativ1));
+        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
+        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativ1));
         when(competenciaRepo.saveAll(any())).thenAnswer(i -> i.getArgument(0));
 
         assertThatThrownBy(() -> mapaSalvamentoService.salvarMapaCompleto(codMapa, request))
@@ -143,8 +143,8 @@ class MapaSalvamentoServiceTest {
         ativ1.setCompetencias(new HashSet<>(List.of(compExistente)));
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(new ArrayList<>(List.of(compExistente)));
-        when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(ativ1));
+        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(new ArrayList<>(List.of(compExistente)));
+        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativ1));
         when(competenciaRepo.saveAll(any())).thenAnswer(i -> i.getArgument(0));
         when(mapaRepo.save(any())).thenAnswer(i -> i.getArgument(0));
         when(mapaCompletoMapper.toDto(any(), any(), any())).thenReturn(MapaCompletoDto.builder().build());
@@ -162,8 +162,8 @@ class MapaSalvamentoServiceTest {
         mapa.setCodigo(codMapa);
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
-        when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
+        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of());
+        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of());
 
         when(competenciaRepo.saveAll(anyList())).thenReturn(List.of());
         when(atividadeRepo.saveAll(anyList())).thenReturn(List.of());
@@ -202,8 +202,8 @@ class MapaSalvamentoServiceTest {
             ativExistente.setCompetencias(new HashSet<>());
 
             when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-            when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(List.of());
-            when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(List.of(ativExistente));
+            when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of());
+            when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativExistente));
             
             Competencia savedComp = new Competencia();
             savedComp.setCodigo(100L);

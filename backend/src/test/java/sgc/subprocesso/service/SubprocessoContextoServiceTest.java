@@ -8,10 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.mapa.dto.ConhecimentoResponse;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
@@ -67,9 +65,6 @@ class SubprocessoContextoServiceTest {
     
     @Mock
     private SubprocessoDetalheMapper subprocessoDetalheMapper;
-    
-    @Mock
-    private ConhecimentoMapper conhecimentoMapper;
     
     @Mock
     private AccessControlService accessControlService;
@@ -288,14 +283,9 @@ class SubprocessoContextoServiceTest {
             
             List<Atividade> atividades = List.of(atividade1, atividade2);
             
-            ConhecimentoResponse conhecimentoResp1 = new ConhecimentoResponse(1L, 1L, "Conhecimento 1");
-            ConhecimentoResponse conhecimentoResp2 = new ConhecimentoResponse(2L, 1L, "Conhecimento 2");
-            
             when(crudService.buscarSubprocesso(codSubprocesso)).thenReturn(sp);
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(codMapa)).thenReturn(atividades);
-            when(conhecimentoMapper.toResponse(conhecimento1)).thenReturn(conhecimentoResp1);
-            when(conhecimentoMapper.toResponse(conhecimento2)).thenReturn(conhecimentoResp2);
             
             // Act
             SubprocessoCadastroDto result = service.obterCadastro(codSubprocesso);
@@ -308,6 +298,7 @@ class SubprocessoContextoServiceTest {
             assertThat(atividadeDto1.getCodigo()).isEqualTo(1L);
             assertThat(atividadeDto1.getDescricao()).isEqualTo("Atividade 1");
             assertThat(atividadeDto1.getConhecimentos()).hasSize(2);
+            assertThat(atividadeDto1.getConhecimentos().getFirst().getCodigo()).isEqualTo(1L);
             
             SubprocessoCadastroDto.AtividadeCadastroDto atividadeDto2 = result.getAtividades().get(1);
             assertThat(atividadeDto2.getCodigo()).isEqualTo(2L);

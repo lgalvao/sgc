@@ -1,5 +1,6 @@
 package sgc.subprocesso;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -17,6 +18,7 @@ import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.MapaViews;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.sanitizacao.UtilSanitizacao;
@@ -132,6 +134,7 @@ public class SubprocessoCadastroController {
      * @param codigo O código do subprocesso.
      * @return Um {@link SubprocessoCadastroDto} com os dados do cadastro.
      */
+    @JsonView(MapaViews.Publica.class)
     @GetMapping("/{codigo}/cadastro")
     @PreAuthorize("isAuthenticated()")
     public SubprocessoCadastroDto obterCadastro(@PathVariable Long codigo) {

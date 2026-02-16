@@ -64,8 +64,8 @@ public class MapaSalvamentoService {
     }
 
     private ContextoSalvamento prepararContexto(Long codMapa, SalvarMapaRequest request) {
-        List<Competencia> competenciasAtuais = new ArrayList<>(competenciaRepo.findByMapaCodigo(codMapa));
-        List<Atividade> atividadesAtuais = new ArrayList<>(atividadeRepo.findByMapaCodigo(codMapa));
+        List<Competencia> competenciasAtuais = new ArrayList<>(competenciaRepo.findByMapa_Codigo(codMapa));
+        List<Atividade> atividadesAtuais = new ArrayList<>(atividadeRepo.findByMapa_Codigo(codMapa));
 
         Set<Long> atividadesDoMapaIds = atividadesAtuais.stream()
                 .map(Atividade::getCodigo)

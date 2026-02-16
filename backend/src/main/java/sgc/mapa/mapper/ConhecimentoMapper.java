@@ -4,15 +4,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import sgc.comum.config.CentralMapperConfig;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;
-import sgc.mapa.dto.ConhecimentoResponse;
 import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.model.Conhecimento;
 
 @SuppressWarnings("NullableProblems")
 @Mapper(config = CentralMapperConfig.class)
 public interface ConhecimentoMapper {
-    @Mapping(source = "atividade.codigo", target = "atividadeCodigo")
-    ConhecimentoResponse toResponse(Conhecimento conhecimento);
 
     @Mapping(target = "codigo", ignore = true)
     @Mapping(target = "atividade", ignore = true)

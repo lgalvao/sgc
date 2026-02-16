@@ -16,9 +16,9 @@ import java.util.List;
  * cada um otimizado para um caso de uso específico:
  * 
  * <ul>
- * <li>{@link #findByMapaCodigo(Long)} - Carrega competências com atividades (EntityGraph)</li>
+ * <li>{@link #findByMapa_Codigo(Long)} - Carrega competências com atividades (EntityGraph)</li>
  * <li>{@link #findCompetenciaAndAtividadeIdsByMapaCodigo(Long)} - Projeção SQL otimizada</li>
- * <li>{@link #findByMapaCodigoSemFetch(Long)} - Sem relacionamentos (mais leve)</li>
+ * <li>{@link #findByMapa_CodigoSemFetch(Long)} - Sem relacionamentos (mais leve)</li>
  * </ul>
  * 
  */
@@ -35,7 +35,7 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      * @param mapaCodigo Código do mapa
      */
     @EntityGraph(attributePaths = {"atividades"})
-    List<Competencia> findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
+    List<Competencia> findByMapa_Codigo(@Param("mapaCodigo") Long mapaCodigo);
 
     /**
      * Busca dados projetados (id, descricao, id_atividade) das competências de um mapa.
@@ -82,5 +82,5 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      * Remove todas as competências de um mapa.
      * @param mapaCodigo Código do mapa
      */
-    void deleteByMapaCodigo(Long mapaCodigo);
+    void deleteByMapa_Codigo(Long mapaCodigo);
 }

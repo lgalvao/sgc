@@ -16,9 +16,9 @@ import java.util.List;
  * 
  * <ul>
  * <li>{@link #findAll()} - Carrega todas atividades com mapa (EntityGraph)</li>
- * <li>{@link #findByMapaCodigo(Long)} - Atividades com competências</li>
- * <li>{@link #findWithConhecimentosByMapaCodigo(Long)} - Atividades com conhecimentos</li>
- * <li>{@link #findByMapaCodigoSemFetch(Long)} - Sem relacionamentos</li>
+ * <li>{@link #findByMapa_Codigo(Long)} - Atividades com competências</li>
+ * <li>{@link #findWithConhecimentosByMapa_Codigo(Long)} - Atividades com conhecimentos</li>
+ * <li>{@link #findByMapa_CodigoSemFetch(Long)} - Sem relacionamentos</li>
  * </ul>
  */
 @Repository
@@ -43,7 +43,7 @@ public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
      * <p><b>Performance:</b> Carrega relacionamento ManyToMany competências de forma eficiente.
      */
     @EntityGraph(attributePaths = {"competencias"})
-    List<Atividade> findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
+    List<Atividade> findByMapa_Codigo(@Param("mapaCodigo") Long mapaCodigo);
 
     /**
      * Busca atividades por código de mapa sem carregar relacionamentos.
@@ -71,7 +71,7 @@ public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
      * @see sgc.mapa.service.MapaVisualizacaoService#obterMapaParaVisualizacao(sgc.subprocesso.model.Subprocesso)
      */
     @EntityGraph(attributePaths = {"conhecimentos"})
-    List<Atividade> findWithConhecimentosByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
+    List<Atividade> findWithConhecimentosByMapa_Codigo(@Param("mapaCodigo") Long mapaCodigo);
 
     @Query("""
             SELECT a FROM Atividade a
@@ -87,5 +87,5 @@ public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
             """)
     List<Atividade> listarPorCompetencia(@Param("competencia") Competencia competencia);
 
-    long countByMapaCodigo(Long mapaCodigo);
+    long countByMapa_Codigo(Long mapaCodigo);
 }

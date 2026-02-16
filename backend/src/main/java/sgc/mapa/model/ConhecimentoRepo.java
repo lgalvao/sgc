@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface ConhecimentoRepo extends JpaRepository<Conhecimento, Long> {
-    List<Conhecimento> findByAtividadeCodigo(Long atividadeCodigo);
+    List<Conhecimento> findByAtividade_Codigo(Long atividadeCodigo);
 
     @Query("""
             SELECT c FROM Conhecimento c

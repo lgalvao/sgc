@@ -15,9 +15,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.mapa.dto.AtividadeResponse;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.AtividadeFacade;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
@@ -50,7 +51,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve obter por ID")
         void deveObterPorId() throws Exception {
-            AtividadeResponse response = AtividadeResponse.builder()
+            Atividade response = Atividade.builder()
                     .codigo(1L)
                     .build();
             Mockito.when(atividadeFacade.obterAtividadePorId(1L)).thenReturn(response);

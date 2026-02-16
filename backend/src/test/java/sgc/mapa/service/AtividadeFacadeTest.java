@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.dto.*;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
@@ -51,15 +52,18 @@ class AtividadeFacadeTest {
         @DisplayName("deve obter atividade por ID com sucesso")
         void deveObterAtividadePorId() {
             Long atividadeCodigo = 300L;
-            AtividadeResponse expected = new AtividadeResponse(atividadeCodigo, 100L, "Atividade");
+            Atividade expected = Atividade.builder()
+                    .codigo(atividadeCodigo)
+                    .descricao("Atividade")
+                    .build();
             
-            when(mapaManutencaoService.obterAtividadeResponse(atividadeCodigo)).thenReturn(expected);
+            when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(expected);
             
-            AtividadeResponse result = atividadeFacade.obterAtividadePorId(atividadeCodigo);
+            Atividade result = atividadeFacade.obterAtividadePorId(atividadeCodigo);
             
             assertNotNull(result);
             assertEquals(expected, result);
-            verify(mapaManutencaoService).obterAtividadeResponse(atividadeCodigo);
+            verify(mapaManutencaoService).obterAtividadePorCodigo(atividadeCodigo);
         }
     }
 
@@ -71,14 +75,14 @@ class AtividadeFacadeTest {
         @DisplayName("deve listar conhecimentos por atividade")
         void deveListarConhecimentosPorAtividade() {
             Long atividadeCodigo = 300L;
-            List<ConhecimentoResponse> expected = List.of(
-                    new ConhecimentoResponse(1L, atividadeCodigo, "Conhecimento 1"),
-                    new ConhecimentoResponse(2L, atividadeCodigo, "Conhecimento 2")
+            List<Conhecimento> expected = List.of(
+                    Conhecimento.builder().codigo(1L).descricao("Conhecimento 1").build(),
+                    Conhecimento.builder().codigo(2L).descricao("Conhecimento 2").build()
             );
             
             when(mapaManutencaoService.listarConhecimentosPorAtividade(atividadeCodigo)).thenReturn(expected);
             
-            List<ConhecimentoResponse> result = atividadeFacade.listarConhecimentosPorAtividade(atividadeCodigo);
+            List<Conhecimento> result = atividadeFacade.listarConhecimentosPorAtividade(atividadeCodigo);
             
             assertNotNull(result);
             assertEquals(2, result.size());
@@ -105,11 +109,15 @@ class AtividadeFacadeTest {
             subprocesso.setCodigo(subCodigo);
             mapa.setSubprocesso(subprocesso);
             
-            AtividadeResponse responseSalvo = new AtividadeResponse(atividadeCodigo, mapaCodigo, "Desc");
+            Atividade salvo = Atividade.builder()
+                    .codigo(atividadeCodigo)
+                    .mapa(mapa)
+                    .descricao("Desc")
+                    .build();
             
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
             when(mapaFacade.obterPorCodigo(mapaCodigo)).thenReturn(mapa);
-            when(mapaManutencaoService.criarAtividade(request)).thenReturn(responseSalvo);
+            when(mapaManutencaoService.criarAtividade(request)).thenReturn(salvo);
             when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Cadastro em andamento"));
             when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
@@ -221,7 +229,11 @@ class AtividadeFacadeTest {
             atividade.setCodigo(atividadeCodigo);
             atividade.setMapa(mapa);
             
-            ConhecimentoResponse conhecimentoSalvo = new ConhecimentoResponse(500L, atividadeCodigo, "Conhecimento");
+            Conhecimento conhecimentoSalvo = Conhecimento.builder()
+                    .codigo(500L)
+                    .atividade(atividade)
+                    .descricao("Conhecimento")
+                    .build();
             
             when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(atividade);
             when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);

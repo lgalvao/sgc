@@ -153,7 +153,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
         assertThat(sub.getMapa()).isNotNull();
 
         // Verificar que o mapa não tem competências (Mapeamento inicia vazio)
-        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(sub.getMapa().getCodigo());
+        List<Competencia> competencias = competenciaRepo.findByMapa_Codigo(sub.getMapa().getCodigo());
         assertThat(competencias).isEmpty();
 
         // 5. Assert: Geração de Alertas

@@ -30,15 +30,8 @@ public class MapaManutencaoService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
-    public List<AtividadeResponse> listarAtividades() {
-        return atividadeRepo.findAll().stream()
-                .flatMap(a -> Stream.ofNullable(atividadeMapper.toResponse(a)))
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public AtividadeResponse obterAtividadeResponse(Long codAtividade) {
-        return atividadeMapper.toResponse(obterAtividadePorCodigo(codAtividade));
+    public List<Atividade> listarAtividades() {
+        return atividadeRepo.findAll();
     }
 
     @Transactional(readOnly = true)
@@ -51,15 +44,14 @@ public class MapaManutencaoService {
         return atividadeRepo.findAllById(codigos);
     }
 
-    public AtividadeResponse criarAtividade(CriarAtividadeRequest request) {
+    public Atividade criarAtividade(CriarAtividadeRequest request) {
         Mapa mapa = repo.buscar(Mapa.class, request.mapaCodigo());
         notificarAlteracaoMapa(request.mapaCodigo());
 
         Atividade entidade = atividadeMapper.toEntity(request);
         entidade.setMapa(mapa);
 
-        Atividade salvo = atividadeRepo.save(entidade);
-        return atividadeMapper.toResponse(salvo);
+        return atividadeRepo.save(entidade);
     }
 
     public void atualizarAtividade(Long codigo, AtualizarAtividadeRequest request) {
@@ -102,7 +94,7 @@ public class MapaManutencaoService {
         notificarAlteracaoMapa(mapa.getCodigo());
 
         // Remove conhecimentos associados
-        List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
+        List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividade_Codigo(atividade.getCodigo());
         conhecimentoRepo.deleteAll(conhecimentos);
 
         atividadeRepo.delete(atividade);
@@ -110,7 +102,7 @@ public class MapaManutencaoService {
 
     @Transactional(readOnly = true)
     public List<Atividade> buscarAtividadesPorMapaCodigo(Long mapaCodigo) {
-        return atividadeRepo.findByMapaCodigo(mapaCodigo);
+        return atividadeRepo.findByMapa_Codigo(mapaCodigo);
     }
 
     @Transactional(readOnly = true)
@@ -120,7 +112,7 @@ public class MapaManutencaoService {
 
     @Transactional(readOnly = true)
     public List<Atividade> buscarAtividadesPorMapaCodigoComConhecimentos(Long mapaCodigo) {
-        return atividadeRepo.findWithConhecimentosByMapaCodigo(mapaCodigo);
+        return atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaCodigo);
     }
 
     public Competencia buscarCompetenciaPorCodigo(Long codCompetencia) {
@@ -128,7 +120,7 @@ public class MapaManutencaoService {
     }
 
     public List<Competencia> buscarCompetenciasPorCodMapa(Long codMapa) {
-        return competenciaRepo.findByMapaCodigo(codMapa);
+        return competenciaRepo.findByMapa_Codigo(codMapa);
     }
 
     public List<Competencia> buscarCompetenciasPorCodMapaSemRelacionamentos(Long codMapa) {
@@ -205,17 +197,14 @@ public class MapaManutencaoService {
     }
 
     @Transactional(readOnly = true)
-    public List<ConhecimentoResponse> listarConhecimentosPorAtividade(Long codAtividade) {
+    public List<Conhecimento> listarConhecimentosPorAtividade(Long codAtividade) {
         repo.buscar(Atividade.class, codAtividade);
-
-        return conhecimentoRepo.findByAtividadeCodigo(codAtividade).stream()
-                .flatMap(c -> Stream.ofNullable(conhecimentoMapper.toResponse(c)))
-                .toList();
+        return conhecimentoRepo.findByAtividade_Codigo(codAtividade);
     }
 
     @Transactional(readOnly = true)
     public List<Conhecimento> listarConhecimentosEntidadesPorAtividade(Long codAtividade) {
-        return conhecimentoRepo.findByAtividadeCodigo(codAtividade);
+        return conhecimentoRepo.findByAtividade_Codigo(codAtividade);
     }
 
     @Transactional(readOnly = true)
@@ -223,7 +212,7 @@ public class MapaManutencaoService {
         return conhecimentoRepo.findByMapaCodigo(codMapa);
     }
 
-    public ConhecimentoResponse criarConhecimento(Long codAtividade, CriarConhecimentoRequest request) {
+    public Conhecimento criarConhecimento(Long codAtividade, CriarConhecimentoRequest request) {
         var atividade = repo.buscar(Atividade.class, codAtividade);
         var mapa = atividade.getMapa();
         notificarAlteracaoMapa(mapa.getCodigo());
@@ -231,8 +220,7 @@ public class MapaManutencaoService {
         var conhecimento = conhecimentoMapper.toEntity(request);
         conhecimento.setAtividade(atividade);
         atividade.getConhecimentos().add(conhecimento);
-        var salvo = conhecimentoRepo.save(conhecimento);
-        return conhecimentoMapper.toResponse(salvo);
+        return conhecimentoRepo.save(conhecimento);
     }
 
     public void atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {

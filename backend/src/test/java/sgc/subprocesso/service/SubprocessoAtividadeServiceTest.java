@@ -327,14 +327,14 @@ class SubprocessoAtividadeServiceTest {
             assertThat(dto1.codigo()).isEqualTo(1L);
             assertThat(dto1.descricao()).isEqualTo("Atividade 1");
             assertThat(dto1.conhecimentos()).hasSize(1);
-            assertThat(dto1.conhecimentos().getFirst().codigo()).isEqualTo(100L);
-            assertThat(dto1.conhecimentos().getFirst().descricao()).isEqualTo("Conhecimento 1");
+            assertThat(dto1.conhecimentos().getFirst().getCodigo()).isEqualTo(100L);
+            assertThat(dto1.conhecimentos().getFirst().getDescricao()).isEqualTo("Conhecimento 1");
 
             AtividadeDto dto2 = resultado.get(1);
             assertThat(dto2.codigo()).isEqualTo(2L);
             assertThat(dto2.descricao()).isEqualTo("Atividade 2");
             assertThat(dto2.conhecimentos()).hasSize(1);
-            assertThat(dto2.conhecimentos().getFirst().codigo()).isEqualTo(101L);
+            assertThat(dto2.conhecimentos().getFirst().getCodigo()).isEqualTo(101L);
 
             verify(crudService).buscarSubprocessoComMapa(codSubprocesso);
             verify(mapaManutencaoService).buscarAtividadesPorMapaCodigoComConhecimentos(codMapa);

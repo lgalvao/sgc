@@ -1,5 +1,6 @@
 package sgc.comum.model;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public abstract class EntidadeBase implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo")
+    @JsonView(ComumViews.Publica.class)
     private Long codigo;
 
     @Override

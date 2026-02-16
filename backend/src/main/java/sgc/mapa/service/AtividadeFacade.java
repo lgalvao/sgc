@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.dto.*;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
@@ -43,12 +44,12 @@ public class AtividadeFacade {
     }
 
     @Transactional(readOnly = true)
-    public AtividadeResponse obterAtividadePorId(Long codAtividade) {
-        return mapaManutencaoService.obterAtividadeResponse(codAtividade);
+    public Atividade obterAtividadePorId(Long codAtividade) {
+        return mapaManutencaoService.obterAtividadePorCodigo(codAtividade);
     }
 
     @Transactional(readOnly = true)
-    public List<ConhecimentoResponse> listarConhecimentosPorAtividade(Long codAtividade) {
+    public List<Conhecimento> listarConhecimentosPorAtividade(Long codAtividade) {
         return mapaManutencaoService.listarConhecimentosPorAtividade(codAtividade);
     }
 
@@ -61,8 +62,8 @@ public class AtividadeFacade {
         Atividade atividadeTemp = Atividade.builder().mapa(mapa).build();
         accessControlService.verificarPermissao(usuario, CRIAR_ATIVIDADE, atividadeTemp);
 
-        AtividadeResponse salvo = mapaManutencaoService.criarAtividade(request);
-        return criarRespostaOperacaoPorMapaCodigo(mapaCodigo, salvo.codigo(), true);
+        Atividade salvo = mapaManutencaoService.criarAtividade(request);
+        return criarRespostaOperacaoPorMapaCodigo(mapaCodigo, salvo.getCodigo(), true);
     }
 
     public AtividadeOperacaoResponse atualizarAtividade(Long codigo, AtualizarAtividadeRequest request) {
@@ -92,10 +93,10 @@ public class AtividadeFacade {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
         accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
 
-        var salvo = mapaManutencaoService.criarConhecimento(codAtividade, request);
-        var response = criarRespostaOperacaoPorAtividade(codAtividade);
+        Conhecimento salvo = mapaManutencaoService.criarConhecimento(codAtividade, request);
+        AtividadeOperacaoResponse response = criarRespostaOperacaoPorAtividade(codAtividade);
 
-        return new ResultadoOperacaoConhecimento(salvo.codigo(), response);
+        return new ResultadoOperacaoConhecimento(salvo.getCodigo(), response);
     }
 
     public AtividadeOperacaoResponse atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {

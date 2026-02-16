@@ -109,7 +109,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         // --- ETAPA 2: Validação de Pendências (Passo 7) ---
         
         // Limpa mapa para garantir que falhe por falta de atividades
-        competenciaRepo.deleteByMapaCodigo(sp.getMapa().getCodigo());
+        competenciaRepo.deleteByMapa_Codigo(sp.getMapa().getCodigo());
         entityManager.flush();
         entityManager.clear();
 

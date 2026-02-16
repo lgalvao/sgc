@@ -44,7 +44,7 @@ public class CopiaMapaService {
      */
     @Transactional
     public void importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId) {
-        List<Atividade> atividadesOrigem = atividadeRepo.findWithConhecimentosByMapaCodigo(mapaOrigemId);
+        List<Atividade> atividadesOrigem = atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId);
         Set<String> descricoesExistentes = obterDescricoesExistentes(mapaDestinoId);
         Mapa mapaDestino = repo.buscar(Mapa.class, mapaDestinoId);
 
@@ -70,7 +70,7 @@ public class CopiaMapaService {
 
     private Map<Long, Atividade> copiarAtividades(Long codMapaFonte, Mapa mapaSalvo) {
         Map<Long, Atividade> mapaAtividades = new HashMap<>();
-        List<Atividade> atividadesFonte = atividadeRepo.findWithConhecimentosByMapaCodigo(codMapaFonte);
+        List<Atividade> atividadesFonte = atividadeRepo.findWithConhecimentosByMapa_Codigo(codMapaFonte);
         List<Atividade> novasAtividades = new ArrayList<>();
         Map<Atividade, Long> atividadeParaFonteId = new IdentityHashMap<>();
 
@@ -114,7 +114,7 @@ public class CopiaMapaService {
     }
 
     private void copiarCompetencias(Long codMapaFonte, Mapa mapaSalvo, Map<Long, Atividade> mapaAtividades) {
-        List<Competencia> competenciasFonte = competenciaRepo.findByMapaCodigo(codMapaFonte);
+        List<Competencia> competenciasFonte = competenciaRepo.findByMapa_Codigo(codMapaFonte);
         if (competenciasFonte.isEmpty()) return;
 
         List<Competencia> novasCompetencias = new ArrayList<>();
@@ -145,7 +145,7 @@ public class CopiaMapaService {
     }
 
     private Set<String> obterDescricoesExistentes(Long mapaDestinoId) {
-        return new HashSet<>(atividadeRepo.findByMapaCodigo(mapaDestinoId).stream()
+        return new HashSet<>(atividadeRepo.findByMapa_Codigo(mapaDestinoId).stream()
                 .map(Atividade::getDescricao)
                 .toList());
     }

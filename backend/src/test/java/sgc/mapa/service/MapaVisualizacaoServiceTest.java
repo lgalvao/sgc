@@ -58,7 +58,7 @@ class MapaVisualizacaoServiceTest {
         List<Object[]> projectionResult = new ArrayList<>();
         projectionResult.add(new Object[]{50L, "C1", 1L});
 
-        when(atividadeRepo.findWithConhecimentosByMapaCodigo(10L)).thenReturn(List.of(ativ1, ativ2));
+        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(10L)).thenReturn(List.of(ativ1, ativ2));
         when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(10L)).thenReturn(projectionResult);
 
         MapaVisualizacaoDto dto = service.obterMapaParaVisualizacao(sub);
@@ -79,7 +79,7 @@ class MapaVisualizacaoServiceTest {
         List<Object[]> projectionResult = new ArrayList<>();
         projectionResult.add(new Object[]{50L, "C1", 999L}); // 999L não existe nas atividades
 
-        when(atividadeRepo.findWithConhecimentosByMapaCodigo(10L)).thenReturn(List.of());
+        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(10L)).thenReturn(List.of());
         when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(10L)).thenReturn(projectionResult);
 
         MapaVisualizacaoDto dto = service.obterMapaParaVisualizacao(sub);
@@ -105,12 +105,12 @@ class MapaVisualizacaoServiceTest {
                 .build();
         ativ.setConhecimentos(List.of(k));
 
-        when(atividadeRepo.findWithConhecimentosByMapaCodigo(10L)).thenReturn(List.of(ativ));
+        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(10L)).thenReturn(List.of(ativ));
         when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(10L)).thenReturn(List.of());
 
         MapaVisualizacaoDto dto = service.obterMapaParaVisualizacao(sub);
 
         assertThat(dto.atividadesSemCompetencia().getFirst().conhecimentos()).hasSize(1);
-        assertThat(dto.atividadesSemCompetencia().getFirst().conhecimentos().getFirst().descricao()).isEqualTo("K1");
+        assertThat(dto.atividadesSemCompetencia().getFirst().conhecimentos().getFirst().getDescricao()).isEqualTo("K1");
     }
 }

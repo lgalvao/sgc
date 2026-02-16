@@ -25,7 +25,7 @@
  * Visão completa do mapa incluindo atividades e competências.
  * </p>
  * <ul>
- *   <li>Lista de {@link sgc.mapa.dto.AtividadeResponse} com competências</li>
+ *   <li>Lista de {@link sgc.mapa.model.Atividade} com competências</li>
  *   <li>Lista de {@link sgc.mapa.dto.CompetenciaMapaDto} consolidadas</li>
  *   <li>Usado em visualizações detalhadas e relatórios</li>
  * </ul>
@@ -42,13 +42,13 @@
  *
  * <h2>DTOs de Atividades</h2>
  *
- * <h3>{@link sgc.mapa.dto.AtividadeResponse}</h3>
+ * <h3>{@link sgc.mapa.model.Atividade}</h3>
  * <p>
  * Representa uma atividade no contexto do mapa.
  * </p>
  * <ul>
  *   <li>Descrição, código</li>
- *   <li>Conhecimentos associados ({@link sgc.mapa.dto.ConhecimentoResponse})</li>
+ *   <li>Conhecimentos associados ({@link sgc.mapa.model.Conhecimento})</li>
  * </ul>
  *
  * <h3>{@link sgc.mapa.dto.AtividadeImpactadaDto}</h3>
@@ -82,7 +82,7 @@
  *   <li>Nível anterior vs. nível novo</li>
  * </ul>
  *
- * <h3>{@link sgc.mapa.dto.ConhecimentoResponse}</h3>
+ * <h3>{@link sgc.mapa.model.Conhecimento}</h3>
  * <p>
  * Conhecimento associado a uma atividade.
  * </p>

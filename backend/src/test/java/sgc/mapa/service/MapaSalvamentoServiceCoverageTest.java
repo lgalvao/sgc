@@ -47,8 +47,8 @@ class MapaSalvamentoServiceCoverageTest {
         mapa.setCodigo(codMapa);
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-        when(competenciaRepo.findByMapaCodigo(codMapa)).thenReturn(new ArrayList<>()); // Mapa vazio
-        when(atividadeRepo.findByMapaCodigo(codMapa)).thenReturn(new ArrayList<>());
+        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(new ArrayList<>()); // Mapa vazio
+        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(new ArrayList<>());
 
         CompetenciaMapaDto compDto = new CompetenciaMapaDto(codComp, "Desc", List.of());
         SalvarMapaRequest request = new SalvarMapaRequest("Obs", List.of(compDto));

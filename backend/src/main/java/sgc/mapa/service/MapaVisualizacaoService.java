@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.dto.visualizacao.CompetenciaDto;
-import sgc.mapa.dto.visualizacao.ConhecimentoDto;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
@@ -37,7 +36,7 @@ public class MapaVisualizacaoService {
                 .build();
 
         List<Atividade> atividadesComConhecimentos =
-                atividadeRepo.findWithConhecimentosByMapaCodigo(mapa.getCodigo());
+                atividadeRepo.findWithConhecimentosByMapa_Codigo(mapa.getCodigo());
 
         Map<Long, AtividadeDto> atividadeDtoMap = atividadesComConhecimentos.stream()
                 .collect(Collectors.toMap(Atividade::getCodigo, this::mapAtividadeToDto));
@@ -84,19 +83,10 @@ public class MapaVisualizacaoService {
     }
 
     private AtividadeDto mapAtividadeToDto(Atividade atividade) {
-        List<Conhecimento> conhecimentos = atividade.getConhecimentos();
-
-        List<ConhecimentoDto> conhecimentosDto = conhecimentos.stream()
-                .map(c -> ConhecimentoDto.builder()
-                        .codigo(c.getCodigo())
-                        .descricao(c.getDescricao())
-                        .build())
-                .toList();
-
         return AtividadeDto.builder()
                 .codigo(atividade.getCodigo())
                 .descricao(atividade.getDescricao())
-                .conhecimentos(conhecimentosDto)
+                .conhecimentos(atividade.getConhecimentos())
                 .build();
     }
 }

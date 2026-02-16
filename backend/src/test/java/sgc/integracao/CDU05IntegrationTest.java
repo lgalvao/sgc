@@ -155,18 +155,18 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         assertThat(mapaCopiado.getCodigo()).isNotEqualTo(mapaOriginal.getCodigo());
 
         // 3.2. Verificar se o conteúdo foi copiado
-        List<Competencia> competenciasCopiadas = competenciaRepo.findByMapaCodigo(mapaCopiado.getCodigo());
+        List<Competencia> competenciasCopiadas = competenciaRepo.findByMapa_Codigo(mapaCopiado.getCodigo());
         assertThat(competenciasCopiadas).hasSize(1);
         assertThat(competenciasCopiadas.getFirst().getDescricao())
                 .isEqualTo(competenciaOriginal.getDescricao());
 
-        List<Atividade> atividadesCopiadas = atividadeRepo.findByMapaCodigo(mapaCopiado.getCodigo());
+        List<Atividade> atividadesCopiadas = atividadeRepo.findByMapa_Codigo(mapaCopiado.getCodigo());
         assertThat(atividadesCopiadas).hasSize(1);
         assertThat(atividadesCopiadas.getFirst().getDescricao())
                 .isEqualTo(atividadeOriginal.getDescricao());
 
         List<Conhecimento> conhecimentosCopiados = conhecimentoRepo
-                .findByAtividadeCodigo(atividadesCopiadas.getFirst().getCodigo());
+                .findByAtividade_Codigo(atividadesCopiadas.getFirst().getCodigo());
         assertThat(conhecimentosCopiados).hasSize(1);
         assertThat(conhecimentosCopiados.getFirst().getDescricao())
                 .isEqualTo(conhecimentoOriginal.getDescricao());

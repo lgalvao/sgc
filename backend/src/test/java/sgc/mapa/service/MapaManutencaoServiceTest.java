@@ -65,18 +65,16 @@ class MapaManutencaoServiceTest {
         @DisplayName("Deve listar todas as atividades")
         void deveListarTodas() {
             when(atividadeRepo.findAll()).thenReturn(List.of(new Atividade()));
-            when(atividadeMapper.toResponse(any())).thenReturn(AtividadeResponse.builder().build());
             assertThat(service.listarAtividades())
                     .isNotNull()
                     .hasSize(1);
         }
 
         @Test
-        @DisplayName("Deve obter por código Response")
-        void deveObterPorCodigoDto() {
+        @DisplayName("Deve obter por código")
+        void deveObterPorCodigo() {
             when(repo.buscar(Atividade.class, 1L)).thenReturn(new Atividade());
-            when(atividadeMapper.toResponse(any())).thenReturn(AtividadeResponse.builder().build());
-            assertThat(service.obterAtividadeResponse(1L)).isNotNull();
+            assertThat(service.obterAtividadePorCodigo(1L)).isNotNull();
         }
 
         @Test
@@ -90,7 +88,7 @@ class MapaManutencaoServiceTest {
         @Test
         @DisplayName("Deve buscar por mapa")
         void deveBuscarPorMapa() {
-            when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Atividade()));
+            when(atividadeRepo.findByMapa_Codigo(1L)).thenReturn(List.of(new Atividade()));
             assertThat(service.buscarAtividadesPorMapaCodigo(1L))
                     .isNotNull()
                     .hasSize(1);
@@ -99,7 +97,7 @@ class MapaManutencaoServiceTest {
         @Test
         @DisplayName("Deve retornar lista vazia quando mapa não possui atividades")
         void deveRetornarListaVaziaQuandoMapaSemAtividades() {
-            when(atividadeRepo.findByMapaCodigo(999L)).thenReturn(List.of());
+            when(atividadeRepo.findByMapa_Codigo(999L)).thenReturn(List.of());
             assertThat(service.buscarAtividadesPorMapaCodigo(999L))
                     .isNotNull()
                     .isEmpty();
@@ -108,7 +106,7 @@ class MapaManutencaoServiceTest {
         @Test
         @DisplayName("Deve buscar por mapa com conhecimentos")
         void deveBuscarPorMapaComConhecimentos() {
-            when(atividadeRepo.findWithConhecimentosByMapaCodigo(1L)).thenReturn(List.of(new Atividade()));
+            when(atividadeRepo.findWithConhecimentosByMapa_Codigo(1L)).thenReturn(List.of(new Atividade()));
             assertThat(service.buscarAtividadesPorMapaCodigoComConhecimentos(1L))
                     .isNotNull()
                     .hasSize(1);
@@ -117,7 +115,7 @@ class MapaManutencaoServiceTest {
         @Test
         @DisplayName("Deve retornar lista vazia quando mapa não possui atividades com conhecimentos")
         void deveRetornarListaVaziaQuandoMapaSemAtividadesComConhecimentos() {
-            when(atividadeRepo.findWithConhecimentosByMapaCodigo(999L)).thenReturn(List.of());
+            when(atividadeRepo.findWithConhecimentosByMapa_Codigo(999L)).thenReturn(List.of());
             assertThat(service.buscarAtividadesPorMapaCodigoComConhecimentos(999L))
                     .isNotNull()
                     .isEmpty();
@@ -133,9 +131,6 @@ class MapaManutencaoServiceTest {
             CriarAtividadeRequest request = CriarAtividadeRequest.builder()
                     .mapaCodigo(1L)
                     .build();
-            AtividadeResponse dto = AtividadeResponse.builder()
-                    .mapaCodigo(1L)
-                    .build();
             String titulo = "123";
 
             Mapa mapa = new Mapa();
@@ -149,9 +144,8 @@ class MapaManutencaoServiceTest {
             when(repo.buscar(Mapa.class, 1L)).thenReturn(mapa);
             when(atividadeMapper.toEntity(request)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(new Atividade());
-            when(atividadeMapper.toResponse(any())).thenReturn(dto);
 
-            AtividadeResponse res = service.criarAtividade(request);
+            Atividade res = service.criarAtividade(request);
 
             assertThat(res).isNotNull();
             verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
@@ -218,7 +212,7 @@ class MapaManutencaoServiceTest {
             atividade.setMapa(new Mapa());
 
             when(repo.buscar(Atividade.class, id)).thenReturn(atividade);
-            when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(List.of());
+            when(conhecimentoRepo.findByAtividade_Codigo(1L)).thenReturn(List.of());
 
             service.excluirAtividade(id);
 
@@ -291,12 +285,12 @@ class MapaManutencaoServiceTest {
             Competencia comp1 = Competencia.builder().codigo(1L).build();
             Competencia comp2 = Competencia.builder().codigo(2L).build();
 
-            when(competenciaRepo.findByMapaCodigo(10L)).thenReturn(List.of(comp1, comp2));
+            when(competenciaRepo.findByMapa_Codigo(10L)).thenReturn(List.of(comp1, comp2));
 
             List<Competencia> resultado = service.buscarCompetenciasPorCodMapa(10L);
 
             assertThat(resultado).hasSize(2);
-            verify(competenciaRepo).findByMapaCodigo(10L);
+            verify(competenciaRepo).findByMapa_Codigo(10L);
         }
 
         @Test
@@ -502,14 +496,13 @@ class MapaManutencaoServiceTest {
             conhecimento.setCodigo(1L);
 
             when(repo.buscar(Atividade.class, 10L)).thenReturn(new Atividade());
-            when(conhecimentoRepo.findByAtividadeCodigo(10L)).thenReturn(List.of(conhecimento));
-            when(conhecimentoMapper.toResponse(any())).thenReturn(ConhecimentoResponse.builder().build());
+            when(conhecimentoRepo.findByAtividade_Codigo(10L)).thenReturn(List.of(conhecimento));
 
-            List<ConhecimentoResponse> resultado = service.listarConhecimentosPorAtividade(10L);
+            List<Conhecimento> resultado = service.listarConhecimentosPorAtividade(10L);
 
             assertThat(resultado).hasSize(1);
             verify(repo).buscar(Atividade.class, 10L);
-            verify(conhecimentoRepo).findByAtividadeCodigo(10L);
+            verify(conhecimentoRepo).findByAtividade_Codigo(10L);
         }
 
         @Test
@@ -518,12 +511,12 @@ class MapaManutencaoServiceTest {
             Conhecimento conhecimento = new Conhecimento();
             conhecimento.setCodigo(1L);
 
-            when(conhecimentoRepo.findByAtividadeCodigo(10L)).thenReturn(List.of(conhecimento));
+            when(conhecimentoRepo.findByAtividade_Codigo(10L)).thenReturn(List.of(conhecimento));
 
             List<Conhecimento> resultado = service.listarConhecimentosEntidadesPorAtividade(10L);
 
             assertThat(resultado).hasSize(1);
-            verify(conhecimentoRepo).findByAtividadeCodigo(10L);
+            verify(conhecimentoRepo).findByAtividade_Codigo(10L);
         }
 
         @Test
@@ -565,9 +558,8 @@ class MapaManutencaoServiceTest {
             when(repo.buscar(Atividade.class, 1L)).thenReturn(atividade);
             when(conhecimentoMapper.toEntity(request)).thenReturn(conhecimento);
             when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
-            when(conhecimentoMapper.toResponse(conhecimento)).thenReturn(ConhecimentoResponse.builder().build());
 
-            ConhecimentoResponse resultado = service.criarConhecimento(1L, request);
+            Conhecimento resultado = service.criarConhecimento(1L, request);
 
             assertThat(resultado).isNotNull();
             verify(eventPublisher).publishEvent(any(EventoMapaAlterado.class));
@@ -594,9 +586,8 @@ class MapaManutencaoServiceTest {
             when(repo.buscar(Atividade.class, 1L)).thenReturn(atividade);
             when(conhecimentoMapper.toEntity(request)).thenReturn(conhecimento);
             when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
-            when(conhecimentoMapper.toResponse(conhecimento)).thenReturn(ConhecimentoResponse.builder().build());
 
-            ConhecimentoResponse resultado = service.criarConhecimento(1L, request);
+            Conhecimento resultado = service.criarConhecimento(1L, request);
 
             assertThat(resultado).isNotNull();
             // Agora deve publicar evento pois tem mapa
@@ -804,7 +795,7 @@ class MapaManutencaoServiceTest {
             atividade.setMapa(mapa);
 
             when(repo.buscar(Atividade.class, id)).thenReturn(atividade);
-            when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(List.of());
+            when(conhecimentoRepo.findByAtividade_Codigo(1L)).thenReturn(List.of());
 
             service.excluirAtividade(id);
 
