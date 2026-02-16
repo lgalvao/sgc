@@ -1,5 +1,7 @@
 # ADR-001: Uso do Padrão Facade para Orquestração de Serviços
 
+**Status:** ✅ Ativo (Atualizado 2026-02-16)
+
 ---
 
 ## Contexto e Problema
@@ -23,10 +25,55 @@ Adotar o **Padrão Facade** para encapsular a orquestração de services especia
 
 **Princípios:**
 
-1. Um Facade por módulo de domínio
-2. Controllers usam APENAS Facades
+1. Um Facade por módulo de domínio (ou submódulo coeso)
+2. Controllers usam APENAS Facades (exceto casos simples CRUD)
 3. Facades orquestram services especializados
 4. Services especializados focam em responsabilidade única
+
+### Exceções à Regra (Atualizado 2026-02-16)
+
+Após revisão arquitetural, identificamos que facades "pass-through" (que apenas delegam sem orquestração) adicionam indireção desnecessária.
+
+**Casos onde Facade NÃO é necessário:**
+
+1. **CRUD Simples:** Controllers de configuração que apenas fazem operações básicas podem acessar Service diretamente
+   ```java
+   // ✅ PERMITIDO: CRUD simples sem orquestração
+   @RestController
+   public class ConfiguracaoController {
+       private final ConfiguracaoService service;  // Acesso direto OK
+   }
+   ```
+
+2. **Facades Wrapper Puros:** Eliminadas se não agregam valor
+   - **Exemplo Removido:** `AcompanhamentoFacade` (apenas delegava para AlertaFacade, AnaliseFacade, PainelFacade)
+   - **Decisão:** Controllers acessam facades específicas diretamente
+
+**Casos onde Facade É necessário:**
+
+1. **Orquestração Complexa:** Coordena múltiplos services
+   ```java
+   // ✅ NECESSÁRIO: Orquestração de workflow
+   @Service
+   public class SubprocessoFacade {
+       private final SubprocessoWorkflowService workflowService;
+       private final SubprocessoAtividadeService atividadeService;
+       private final SubprocessoContextoService contextoService;
+       private final NotificacaoService notificacaoService;
+       
+       public void aceitarCadastro(Long codigo, AceitarCadastroRequest req) {
+           // Orquestra múltiplos services + validações
+       }
+   }
+   ```
+
+2. **Agregação de Módulos:** Combina funcionalidades de módulos relacionados
+   ```java
+   // ✅ NECESSÁRIO: Agregação
+   public class ProcessoFacade {
+       // Coordena Processo + Subprocesso + Mapa
+   }
+   ```
 
 ---
 
@@ -35,16 +82,42 @@ Adotar o **Padrão Facade** para encapsular a orquestração de services especia
 
 ### Positivas ✅
 
-- Controllers mais simples
-- Lógica de orquestração centralizada
-- Services mais coesos
-- Melhor testabilidade
-- Facilita evolução
+- Controllers mais simples e focados
+- Lógica de orquestração centralizada e reutilizável
+- Services mais coesos com responsabilidade única
+- Melhor testabilidade (testes de orquestração isolados)
+- Facilita evolução e manutenção
 
 ### Negativas ❌
 
-- Camada adicional
-- Possível God Class se mal gerenciada
+- Camada adicional de abstração
+- Possível God Class se mal gerenciada (mitigado por services especializados)
+- ⚠️ **Atualização 2026-02-16:** Facades sem orquestração real adicionam indireção desnecessária
+
+### Lições Aprendidas (2026-02-16)
+
+Durante revisão arquitetural identificamos:
+
+1. **Facades Pass-Through São Anti-Padrão:**
+   - `AcompanhamentoFacade` apenas delegava → **eliminada**
+   - `ConfiguracaoFacade` apenas delegava → **eliminada**
+   - **Resultado:** -2 facades (-117 LOC de indireção)
+
+2. **Critérios para Justificar Facade:**
+   - Orquestra 3+ services
+   - Possui lógica de coordenação complexa
+   - Gerencia transações cross-cutting
+   - Agrega funcionalidades de múltiplos módulos
+
+3. **Exceções Documentadas:**
+   - Controllers CRUD simples podem usar Service diretamente
+   - Documentado em ArchConsistencyTest com exceções explícitas
+   - Code review valida justificativa
+
+**Métricas:**
+- Facades totais: 14 → 12 (-14%)
+- Facades com orquestração real: 12/12 (100%)
+- Indireção desnecessária eliminada: 117 LOC
 
 ---
 

@@ -224,7 +224,7 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
 
 ## 🟡 FASE 2: Simplificação Estrutural (MÉDIO risco)
 
-**Status:** 🟢 Em Progresso (60% completo)  
+**Status:** 🟢 Em Progresso (80% completo)  
 **Início:** 16 de Fevereiro de 2026  
 **Prazo:** 12 dias  
 **Responsável:** Jules (Agente)
@@ -328,24 +328,27 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
 
 ### 2.5. Backend - Atualizar ADRs
 
-**Status:** ⏳ Não Iniciado  
-**Progresso:** 0%
+**Status:** ✅ CONCLUÍDO  
+**Progresso:** 100%
 
-- [ ] Atualizar ADR-001 (Facade Pattern)
-  - [ ] Documentar consolidação de módulos
-  - [ ] Critérios para Facade vs Service direto
-  - [ ] Exemplos de consolidação
-- [ ] Atualizar ADR-004 (DTO Pattern)
-  - [ ] Adicionar @JsonView como alternativa
-  - [ ] Quando usar DTO vs @JsonView
-  - [ ] Exemplos de uso seguro
-- [ ] Criar ADR-008 (Simplification Decisions)
-  - [ ] Documentar processo completo
-  - [ ] Justificativas e métricas
-  - [ ] Lições aprendidas
+- [x] Atualizar ADR-001 (Facade Pattern)
+  - [x] Documentar exceções (ConfiguracaoController)
+  - [x] Critérios para Facade vs Service direto
+  - [x] Documentar eliminação de facades pass-through
+  - [x] Lições aprendidas da consolidação
+- [x] Atualizar ADR-004 (DTO Pattern)
+  - [x] Adicionar @JsonView como alternativa válida
+  - [x] Critérios de quando usar DTO vs @JsonView
+  - [x] Exemplos de uso seguro de @JsonView
+  - [x] Tabela de decisão DTO vs @JsonView
+- [x] Criar ADR-008 (Simplification Decisions)
+  - [x] Documentar processo completo de simplificação
+  - [x] Justificativas e métricas detalhadas
+  - [x] Lições aprendidas de cada fase
+  - [x] Decisões de postergar Fase 3
 
 **Arquivos Afetados:** 2 atualizados, 1 criado  
-**Bloqueadores:** Dependente de conclusão de 2.1-2.2
+**Bloqueadores:** Nenhum
 
 ### 2.6. Validação Fase 2
 
@@ -483,6 +486,10 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
 | 16/02/2026 | Fase 2.1 | ArchConsistencyTest atualizado com exceção para ConfiguracaoController | Jules |
 | 16/02/2026 | Fase 1.7 | ✅ **CONCLUÍDA Validação Fase 1** - Backend: 1658 testes ✅, Frontend: 1425/1426 ✅ | Jules |
 | 16/02/2026 | Fase 1.7 | Linters passando ✅ - Corrigidos 5 avisos de imports não utilizados | Jules |
+| 16/02/2026 | Fase 2.5 | ✅ **CONCLUÍDA Atualização de ADRs** | Jules |
+| 16/02/2026 | Fase 2.5 | ADR-001 atualizado: Documentadas exceções e critérios Facade vs Service | Jules |
+| 16/02/2026 | Fase 2.5 | ADR-004 atualizado: @JsonView adicionado como alternativa válida com critérios | Jules |
+| 16/02/2026 | Fase 2.5 | ADR-008 criado: Decisões de Simplificação completas com métricas e lições | Jules |
 
 ---
 
