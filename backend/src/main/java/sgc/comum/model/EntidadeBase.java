@@ -10,6 +10,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @MappedSuperclass
 @Getter
@@ -39,6 +40,6 @@ public abstract class EntidadeBase implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(codigo);
     }
 }

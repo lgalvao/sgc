@@ -71,8 +71,13 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocesso = subprocessoRepo.save(subprocesso);
 
-        Atividade atividade1 = atividadeRepo.save(Atividade.builder().mapa(mapa).descricao("Atividade 1").build());
-        Atividade atividade2 = atividadeRepo.save(Atividade.builder().mapa(mapa).descricao("Atividade 2").build());
+        Atividade atividade1 = Atividade.builder().mapa(mapa).descricao("Atividade 1").build();
+        atividade1 = atividadeRepo.save(atividade1);
+        mapa.getAtividades().add(atividade1);
+
+        Atividade atividade2 = Atividade.builder().mapa(mapa).descricao("Atividade 2").build();
+        atividade2 = atividadeRepo.save(atividade2);
+        mapa.getAtividades().add(atividade2);
 
         Conhecimento conhecimento1 =
                 conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 1.1").atividade(atividade1).build());
@@ -85,10 +90,12 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
         atividade2.getConhecimentos().add(conhecimento3);
 
         Competencia competencia1 = Competencia.builder().descricao("Competência 1").mapa(mapa).build();
-        competenciaRepo.save(competencia1);
+        competencia1 = competenciaRepo.save(competencia1);
+        mapa.getCompetencias().add(competencia1);
 
         Competencia competencia2 = Competencia.builder().descricao("Competência 2").mapa(mapa).build();
-        competenciaRepo.save(competencia2);
+        competencia2 = competenciaRepo.save(competencia2);
+        mapa.getCompetencias().add(competencia2);
 
         // Configurar relacionamento bidirecional no lado owning (Atividade)
         atividade1.getCompetencias().add(competencia1);
@@ -100,6 +107,7 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
         
         atividadeRepo.saveAll(List.of(atividade1, atividade2));
         competenciaRepo.saveAll(List.of(competencia1, competencia2));
+        mapaRepo.save(mapa);
     }
 
     @Test
@@ -110,51 +118,17 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.unidade.sigla").value(unidade.getSigla()))
                 .andExpect(jsonPath("$.unidade.nome").value(unidade.getNome()))
-                .andExpect(jsonPath("$.competencias").isArray())
-                .andExpect(jsonPath("$.competencias.length()").value(2))
-                .andExpect(
-                        jsonPath(
-                                "$.competencias[?(@.descricao == 'Competência"
-                                        + " 1')][0].atividades.length()")
-                                .value(1))
-                .andExpect(
-                        jsonPath(
-                                "$.competencias[?(@.descricao == 'Competência"
-                                        + " 1')][0].atividades[?(@.descricao == 'Atividade"
-                                        + " 1')][0].conhecimentos.length()")
-                                .value(2))
-                .andExpect(
-                        jsonPath(
-                                "$.competencias[?(@.descricao == 'Competência"
-                                        + " 1')][0].atividades[?(@.descricao == 'Atividade"
-                                        + " 1')][0].conhecimentos[?(@.descricao == 'Conhecimento"
-                                        + " 1.1')]")
-                                .exists())
-                .andExpect(
-                        jsonPath(
-                                "$.competencias[?(@.descricao == 'Competência"
-                                        + " 1')][0].atividades[?(@.descricao == 'Atividade"
-                                        + " 1')][0].conhecimentos[?(@.descricao == 'Conhecimento"
-                                        + " 1.2')]")
-                                .exists())
-                .andExpect(
-                        jsonPath(
-                                "$.competencias[?(@.descricao == 'Competência"
-                                        + " 2')][0].atividades.length()")
-                                .value(1))
-                .andExpect(
-                        jsonPath(
-                                "$.competencias[?(@.descricao == 'Competência"
-                                        + " 2')][0].atividades[?(@.descricao == 'Atividade"
-                                        + " 2')][0].conhecimentos.length()")
-                                .value(1))
-                .andExpect(
-                        jsonPath(
-                                "$.competencias[?(@.descricao == 'Competência"
-                                        + " 2')][0].atividades[?(@.descricao == 'Atividade"
-                                        + " 2')][0].conhecimentos[?(@.descricao == 'Conhecimento"
-                                        + " 2.1')]")
-                                .exists());
+                .andExpect(jsonPath("$.competencias[0].descricao").value("Competência 1"))
+                .andExpect(jsonPath("$.competencias[0].atividades.length()").value(1))
+                .andExpect(jsonPath("$.competencias[0].atividades[0].descricao").value("Atividade 1"))
+                .andExpect(jsonPath("$.competencias[0].atividades[0].conhecimentos.length()").value(2))
+                .andExpect(jsonPath("$.competencias[0].atividades[0].conhecimentos[0].descricao").exists())
+                .andExpect(jsonPath("$.competencias[0].atividades[0].conhecimentos[1].descricao").exists())
+                .andExpect(jsonPath("$.competencias[1].descricao").value("Competência 2"))
+                .andExpect(jsonPath("$.competencias[1].atividades.length()").value(1))
+                .andExpect(jsonPath("$.competencias[1].atividades[0].descricao").value("Atividade 2"))
+                .andExpect(jsonPath("$.competencias[1].atividades[0].conhecimentos.length()").value(1))
+                .andExpect(jsonPath("$.competencias[1].atividades[0].conhecimentos[0].descricao").value("Conhecimento 2.1"));
     }
 
     @Test

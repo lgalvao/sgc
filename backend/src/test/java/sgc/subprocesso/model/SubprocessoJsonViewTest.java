@@ -18,12 +18,13 @@ class SubprocessoJsonViewTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void deveOcultarRelacionamentosNaVisaoComum() throws Exception {
+    void deveIncluirRelacionamentosNaVisaoPublica() throws Exception {
         Processo processo = new Processo();
         processo.setCodigo(50L);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
+        unidade.setSigla("U1");
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(100L);
@@ -41,34 +42,9 @@ class SubprocessoJsonViewTest {
 
         assertThat(json).contains("\"codigo\":1");
         assertThat(json).contains("\"codProcesso\":50");
-        
-        // Relacionamentos completos devem ser ignorados na visão Comum
-        assertThat(json).doesNotContain("\"processo\":{");
-        assertThat(json).doesNotContain("\"unidade\":{");
-        assertThat(json).doesNotContain("\"mapa\":{");
-    }
-
-    @Test
-    void deveIncluirRelacionamentosNaVisaoSubprocessoPublica() throws Exception {
-        Processo processo = new Processo();
-        processo.setCodigo(50L);
-
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(10L);
-        unidade.setSigla("U1");
-
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-        sp.setProcesso(processo);
-        sp.setUnidade(unidade);
-        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-
-        String json = objectMapper
-                .writerWithView(SubprocessoViews.Publica.class)
-                .writeValueAsString(sp);
-
         assertThat(json).contains("\"processo\":{");
         assertThat(json).contains("\"unidade\":{");
         assertThat(json).contains("\"sigla\":\"U1\"");
+        assertThat(json).contains("\"mapa\":{");
     }
 }

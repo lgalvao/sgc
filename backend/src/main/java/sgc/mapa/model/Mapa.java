@@ -48,4 +48,9 @@ public class Mapa extends EntidadeBase {
     @lombok.Builder.Default
     @JsonView(MapaViews.Publica.class)
     private Set<Atividade> atividades = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "mapa", cascade = CascadeType.ALL, orphanRemoval = true)
+    @lombok.Builder.Default
+    @JsonView(MapaViews.Publica.class)
+    private Set<Competencia> competencias = new LinkedHashSet<>();
 }

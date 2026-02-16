@@ -116,10 +116,14 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         subprocesso.setDataLimiteEtapa1(processo.getDataLimite());
         subprocesso = subprocessoRepo.save(subprocesso);
 
+        mapa.setSubprocesso(subprocesso);
+        mapaRepo.save(mapa);
+
         // Atividades e Conhecimentos
         Atividade atividade1 = AtividadeFixture.atividadePadrao(mapa);
         atividade1.setDescricao("Analisar documentação");
         atividade1 = atividadeRepo.save(atividade1);
+        mapa.getAtividades().add(atividade1);
 
         Conhecimento conhecimento1 = Conhecimento.builder().atividade(atividade1)
                 .descricao("Interpretação de textos técnicos").build();
@@ -128,6 +132,7 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         Atividade atividade2 = AtividadeFixture.atividadePadrao(mapa);
         atividade2.setDescricao("Elaborar relatórios");
         atividade2 = atividadeRepo.save(atividade2);
+        mapa.getAtividades().add(atividade2);
 
         Conhecimento conhecimento2a = Conhecimento.builder().atividade(atividade2).descricao("Escrita clara e concisa")
                 .build();
@@ -206,6 +211,9 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
             subprocessoSemAtividades.setMapa(mapaVazio);
             subprocessoSemAtividades = subprocessoRepo.save(subprocessoSemAtividades);
 
+            mapaVazio.setSubprocesso(subprocessoSemAtividades);
+            mapaRepo.save(mapaVazio);
+
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocessoSemAtividades.getCodigo())
                             .header("Authorization", "Bearer " + tokenAdmin))
                     .andExpect(status().isOk())
@@ -226,9 +234,13 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
             subprocessoAtividadeSemConhecimento.setMapa(mapaNovo);
             subprocessoAtividadeSemConhecimento = subprocessoRepo.save(subprocessoAtividadeSemConhecimento);
 
+            mapaNovo.setSubprocesso(subprocessoAtividadeSemConhecimento);
+            mapaRepo.save(mapaNovo);
+
             Atividade atividadeSemConhecimento = AtividadeFixture.atividadePadrao(mapaNovo);
             atividadeSemConhecimento.setDescricao("Atividade sem conhecimento");
-            atividadeRepo.save(atividadeSemConhecimento);
+            atividadeSemConhecimento = atividadeRepo.save(atividadeSemConhecimento);
+            mapaNovo.getAtividades().add(atividadeSemConhecimento);
 
             mockMvc.perform(
                             get(API_SUBPROCESSOS_ID_CADASTRO, subprocessoAtividadeSemConhecimento.getCodigo())

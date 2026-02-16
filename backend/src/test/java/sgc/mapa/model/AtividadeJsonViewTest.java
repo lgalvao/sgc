@@ -37,8 +37,7 @@ class AtividadeJsonViewTest {
                 // Agora conhecimentos são incluídos na Publica
                 .contains("\"conhecimentos\"")
                 .contains("\"descricao\":\"K1\"")
-                // Relacionamentos ignorados
-                .doesNotContain("\"competencias\"")
+                .contains("\"competencias\"")
                 .doesNotContain("\"mapa\":");
     }
 

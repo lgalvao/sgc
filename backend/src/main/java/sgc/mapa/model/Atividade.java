@@ -1,6 +1,7 @@
 package sgc.mapa.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
@@ -47,12 +48,13 @@ public class Atividade extends EntidadeBase {
             joinColumns = @JoinColumn(name = "atividade_codigo"),
             inverseJoinColumns = @JoinColumn(name = "competencia_codigo"))
     @Builder.Default
-    @JsonIgnore
+    @JsonView(MapaViews.Publica.class)
+    @JsonIgnoreProperties("atividades")
     private Set<Competencia> competencias = new HashSet<>();
 
     @JsonView(MapaViews.Publica.class)
     @JsonProperty("mapaCodigo")
     public Long getMapaCodigo() {
-        return mapa.getCodigo();
+        return mapa != null ? mapa.getCodigo() : null;
     }
 }

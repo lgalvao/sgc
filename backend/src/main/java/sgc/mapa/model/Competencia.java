@@ -1,6 +1,7 @@
 package sgc.mapa.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -32,5 +33,6 @@ public class Competencia extends EntidadeBase {
     @ManyToMany(mappedBy = "competencias")
     @Builder.Default
     @JsonView(MapaViews.Publica.class)
+    @JsonIgnoreProperties("competencias")
     private Set<Atividade> atividades = new HashSet<>();
 }
