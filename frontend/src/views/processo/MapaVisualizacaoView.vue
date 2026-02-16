@@ -232,11 +232,8 @@ import {useAnalisesStore} from "@/stores/analises";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useFeedbackStore} from "@/stores/feedback";
 import {usePerfil} from "@/composables/usePerfil";
-import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 import {TipoProcesso} from "@/types/tipos";
 import logger from "@/utils/logger";
-
-type Analise = AnaliseCadastro | AnaliseValidacao;
 
 const route = useRoute();
 const router = useRouter();

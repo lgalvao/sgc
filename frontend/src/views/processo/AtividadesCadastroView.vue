@@ -182,8 +182,6 @@ import {useAnalisesStore} from "@/stores/analises";
 import {useFeedbackStore} from "@/stores/feedback";
 import {usePerfil} from "@/composables/usePerfil";
 import type {
-  AnaliseCadastro,
-  AnaliseValidacao,
   Atividade,
   Conhecimento,
   CriarConhecimentoRequest,
@@ -192,7 +190,6 @@ import type {
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import logger from "@/utils/logger";
 
-type Analise = AnaliseCadastro | AnaliseValidacao;
 type DadosRemocao = {tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number} | null;
 
 const props = defineProps<{
