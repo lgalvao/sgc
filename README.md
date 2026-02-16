@@ -32,8 +32,19 @@ A documentação técnica foi desacoplada deste README para facilitar a manuten�
   padrões de projeto e regras fundamentais.
 * **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
 * **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
+
+**Simplificação Arquitetural:**
+
+* **[GUIA-MIGRACAO-SIMPLIFICACAO.md](GUIA-MIGRACAO-SIMPLIFICACAO.md)**: Guia prático para desenvolvedores sobre mudanças de simplificação (Fases 1 e 2).
 * **[simplification-plan.md](simplification-plan.md)**: Plano consolidado de simplificação com detalhes, contexto e passos de implementação.
 * **[simplification-tracking.md](simplification-tracking.md)**: Rastreamento de progresso da simplificação (métricas e status).
+
+**Decisões Arquiteturais (ADRs):**
+
+* **[ADR-001: Facade Pattern](backend/etc/docs/adr/ADR-001-facade-pattern.md)**: Padrão de uso de Facades como fronteira de módulos.
+* **[ADR-003: Security Architecture](backend/etc/docs/adr/ADR-003-security-architecture.md)**: Arquitetura centralizada de controle de acesso.
+* **[ADR-004: DTO Pattern](backend/etc/docs/adr/ADR-004-dto-pattern.md)**: Padrão de DTOs obrigatórios e uso de @JsonView.
+* **[ADR-008: Simplification Decisions](backend/etc/docs/adr/ADR-008-simplification-decisions.md)**: Decisões e lições do processo de simplificação.
 
 ---
 

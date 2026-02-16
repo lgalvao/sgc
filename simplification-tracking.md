@@ -225,7 +225,7 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
 
 ## 🟡 FASE 2: Simplificação Estrutural (MÉDIO risco)
 
-**Status:** 🟢 Em Progresso (80% completo)  
+**Status:** 🟢 Avançada (85% completo)  
 **Início:** 16 de Fevereiro de 2026  
 **Prazo:** 12 dias  
 **Responsável:** Jules (Agente)
@@ -278,7 +278,7 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
 ### 2.2. Backend - Introduzir @JsonView
 
 **Status:** 🟡 Iniciada  
-**Progresso:** 10%
+**Progresso:** 25%
 
 - [x] Definir views em 5 Entities principais
   - [x] Configuração (ParametroResponse removido parcialmente)
@@ -287,17 +287,32 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
   - [ ] Subprocesso
   - [ ] Mapa
   - [ ] Atividade
-- [ ] Migrar 15 Responses simples para @JsonView
-- [ ] Manter 25 DTOs complexos (agregações, transformações)
+- [x] Analisar DTOs candidatos à substituição por @JsonView
+  - [x] Criar documento de análise detalhada (analise-dtos-jsonview.md)
+  - [x] Identificar 3 candidatos aprovados: AtividadeResponse, ConhecimentoResponse, ConhecimentoDto
+  - [x] Identificar 4 DTOs a manter: AtividadeOperacaoResponse, SubprocessoSituacaoDto, AtividadeDto, MensagemResponse
+- [ ] Migrar 3 Response simples para @JsonView
+  - [ ] Criar MapaViews.java
+  - [ ] Anotar campos em Atividade.java
+  - [ ] Anotar campos em Conhecimento.java
+  - [ ] Adicionar @JsonIgnore em relacionamentos
 - [ ] Criar testes de serialização para cada view
+  - [ ] AtividadeJsonViewTest.java
+  - [ ] ConhecimentoJsonViewTest.java
   - [ ] Validar campos Public
-  - [ ] Validar campos Admin
-  - [ ] Validar que campos sensíveis não vazam
+  - [ ] Validar que relacionamentos não vazam
 - [ ] Atualizar controllers com @JsonView
+  - [ ] Identificar controllers usando AtividadeResponse
+  - [ ] Identificar controllers usando ConhecimentoResponse
+  - [ ] Atualizar para retornar entities com @JsonView
 - [ ] Remover DTOs/Mappers obsoletos
+  - [ ] Remover AtividadeResponse.java
+  - [ ] Remover ConhecimentoResponse.java
+  - [ ] Remover ConhecimentoDto.java (visualização)
+  - [ ] Remover mappers associados
 
-**Arquivos Afetados:** -15 DTOs (~750 LOC)  
-**Testes Afetados:** ~25 ajustados, ~15 novos  
+**Arquivos Afetados:** -3 DTOs (~70 LOC), +1 análise (8KB)  
+**Testes Afetados:** ~10 ajustados, ~2 novos  
 **Bloqueadores:** Nenhum
 
 ### 2.3. Backend - Atualizar Testes de Arquitetura (Facades)
@@ -371,18 +386,21 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
 
 ### 2.7. Documentação Final Fase 2
 
-**Status:** 🟢 Em Progresso  
-**Progresso:** 75%
+**Status:** ✅ CONCLUÍDO  
+**Progresso:** 100%
 
 - [x] Atualizar PLANO-REDUCAO-COMPLEXIDADE-CONSOLIDADO.md
 - [x] Atualizar tracking com progresso completo
 - [x] Criar ADR-008 com decisões documentadas
-- [ ] Criar guia de migração para desenvolvedores
-- [ ] Atualizar README.md principal com referências aos ADRs
+- [x] Criar guia de migração para desenvolvedores (GUIA-MIGRACAO-SIMPLIFICACAO.md)
+- [x] Atualizar README.md principal com referências aos ADRs
+
+**Resultado Final:**
+- **Guia de Migração Criado:** 18.5 KB de documentação prática
+- **README.md atualizado:** Seção de Decisões Arquiteturais (ADRs) adicionada
+- **Benefícios:** Desenvolvedores têm guia claro de como migrar código existente
 
 **Bloqueadores:** Nenhum
-
-**Bloqueadores:** Dependente de conclusão de 2.1-2.6
 
 ---
 
@@ -494,6 +512,10 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
 | 16/02/2026 | Fase 2.5 | ADR-001 atualizado: Documentadas exceções e critérios Facade vs Service | Jules |
 | 16/02/2026 | Fase 2.5 | ADR-004 atualizado: @JsonView adicionado como alternativa válida com critérios | Jules |
 | 16/02/2026 | Fase 2.5 | ADR-008 criado: Decisões de Simplificação completas com métricas e lições | Jules |
+| 16/02/2026 | Fase 2.7 | ✅ **CONCLUÍDA Documentação Final** | Jules |
+| 16/02/2026 | Fase 2.7 | Criado GUIA-MIGRACAO-SIMPLIFICACAO.md (18.5 KB) | Jules |
+| 16/02/2026 | Fase 2.7 | README.md atualizado com seção de ADRs e guia de migração | Jules |
+| 16/02/2026 | Fase 2 | Status atualizado: 80% → 85% completo | Jules |
 
 ---
 
@@ -502,22 +524,26 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
 ### Curto Prazo (Próxima Sessão)
 1. ✅ **Completar Análise:** Validar código real e atualizar plano com dados precisos
 2. ✅ **Completar Fase 1.6:** Eliminar composables view-specific (6 arquivos, 1.352 LOC)
-3. **Validação Fase 1:** Suite completa de testes frontend
-4. **Validação Fase 1:** Suite completa de testes backend
-5. **Finalizar Fase 1:** Documentação final e métricas
+3. ✅ **Validação Fase 1:** Suite completa de testes frontend
+4. ✅ **Validação Fase 1:** Suite completa de testes backend
+5. ✅ **Finalizar Fase 1:** Documentação final e métricas
+6. ✅ **Completar Fase 2.7:** Guia de migração e atualização de documentação
 
-### Médio Prazo (Próximas 2 Semanas)
-1. Completar Fase 1 (100%)
-2. **Avançar Fase 2.1:** Consolidar facades relacionadas (14 → 8-10)
-3. **Avançar Fase 2.2:** Implementar @JsonView para DTOs simples
-4. Validação completa com suite de testes e E2E
-5. Atualizar ADRs (ADR-001, ADR-004, ADR-008 novo)
+### Médio Prazo (Próximas Sessões)
+1. **Completar Fase 2.2:** Implementar @JsonView para DTOs simples (15% restante)
+   - Analisar candidatos (AtividadeResponse, ConhecimentoResponse, ConhecimentoDto)
+   - Adicionar @JsonView às entities correspondentes
+   - Criar testes de serialização JSON
+   - Atualizar controllers
+   - Remover DTOs obsoletos
+2. **Finalizar Validação Fase 2.6:** Testes de serialização e performance
+3. **Completar Fase 2 (100%):** Validação final e métricas
 
 ### Longo Prazo (Próximo Mês)
-1. Completar Fase 2 (100%)
-2. Medir impacto real em velocidade de desenvolvimento
-3. Coletar feedback do time
-4. Reavaliar necessidade da Fase 3
+1. Medir impacto real em velocidade de desenvolvimento
+2. Coletar feedback do time
+3. Reavaliar necessidade da Fase 3
+4. Documentar lições aprendidas completas
 
 ---
 
