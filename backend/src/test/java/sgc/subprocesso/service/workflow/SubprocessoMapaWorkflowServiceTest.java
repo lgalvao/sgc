@@ -185,18 +185,118 @@ class SubprocessoMapaWorkflowServiceTest {
         }
 
         @Test
-        @DisplayName("Deve atualizar competência com sucesso")
-        void deveAtualizarCompetencia() {
+        @DisplayName("Deve mudar para REVISAO_MAPA_AJUSTADO ao adicionar competência se era vazio e REVISAO_CADASTRO_HOMOLOGADA")
+        void deveMudarParaAjustadoAoAdicionarCompRevisao() {
             Subprocesso sp = mockSubprocesso(1L);
-            when(sp.getSituacao()).thenReturn(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            when(sp.getSituacao()).thenReturn(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+            doCallRealMethod().when(sp).setSituacao(any());
+
             Mapa mapa = mock(Mapa.class);
             when(mapa.getCodigo()).thenReturn(10L);
             when(sp.getMapa()).thenReturn(mapa);
+            when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
 
-            CompetenciaRequest req = CompetenciaRequest.builder().descricao("U").atividadesIds(List.of(1L)).build();
-            service.atualizarCompetencia(1L, 50L, req);
+            CompetenciaRequest req = CompetenciaRequest.builder().descricao("D").atividadesIds(List.of(1L)).build();
+            service.adicionarCompetencia(1L, req);
 
-            verify(mapaManutencaoService).atualizarCompetencia(50L, "U", List.of(1L));
+            verify(sp).setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            verify(subprocessoRepo).save(sp);
+        }
+
+        @Test
+        @DisplayName("Deve mudar para REVISAO_CADASTRO_HOMOLOGADA ao remover se ficou vazio e REVISAO_MAPA_AJUSTADO")
+        void deveVoltarRevisaoHomologadaAoRemover() {
+            Subprocesso sp = mockSubprocesso(1L);
+            when(sp.getSituacao()).thenReturn(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            doCallRealMethod().when(sp).setSituacao(any());
+
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+            when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
+
+            service.removerCompetencia(1L, 5L);
+
+            verify(sp).setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+            verify(subprocessoRepo).save(sp);
+        }
+
+        @Test
+        @DisplayName("Deve mudar para REVISAO_MAPA_AJUSTADO ao salvar se era vazio e REVISAO_CADASTRO_HOMOLOGADA (via salvarMapaSubprocesso)")
+        void deveMudarParaAjustadoAoSalvarRevisao() {
+            Subprocesso sp = mockSubprocesso(1L);
+            when(sp.getSituacao()).thenReturn(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+            doCallRealMethod().when(sp).setSituacao(any());
+
+            Mapa mapa = mock(Mapa.class);
+            when(mapa.getCodigo()).thenReturn(10L);
+            when(sp.getMapa()).thenReturn(mapa);
+            when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
+
+            SalvarMapaRequest req = SalvarMapaRequest.builder()
+                    .competencias(List.of(SalvarMapaRequest.CompetenciaRequest.builder().build()))
+                    .build();
+
+            service.salvarMapaSubprocesso(1L, req);
+
+            verify(sp).setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            verify(subprocessoRepo).save(sp);
+        }
+    }
+
+    @Nested
+    @DisplayName("Workflow de Validação - Casos REVISAO")
+    class WorkflowValidacaoRevisao {
+        @Test
+        @DisplayName("Deve validar mapa REVISAO")
+        void deveValidarMapaRevisao() {
+            Subprocesso sp = mockSubprocesso(1L);
+            Processo p = new Processo();
+            p.setTipo(TipoProcesso.REVISAO);
+            when(sp.getProcesso()).thenReturn(p);
+
+            Unidade u = mock(Unidade.class);
+            when(sp.getUnidade()).thenReturn(u);
+            when(u.getUnidadeSuperior()).thenReturn(null);
+
+            service.validarMapa(1L, new Usuario());
+
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_VALIDADO);
+        }
+
+        @Test
+        @DisplayName("Deve devolver validação REVISAO")
+        void deveDevolverValidacaoRevisao() {
+            Subprocesso sp = mockSubprocesso(1L);
+            Processo p = new Processo();
+            p.setTipo(TipoProcesso.REVISAO);
+            when(sp.getProcesso()).thenReturn(p);
+
+            Unidade u = mock(Unidade.class);
+            when(sp.getUnidade()).thenReturn(u);
+            when(u.getUnidadeSuperior()).thenReturn(null);
+
+            service.devolverValidacao(1L, "J", new Usuario());
+
+            verify(transicaoService).registrarAnaliseETransicao(argThat(req -> req.novaSituacao() == SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO));
+        }
+
+        @Test
+        @DisplayName("Deve aceitar validação e homologar REVISAO se não tem proxima unidade")
+        void deveAceitarEHomologarRevisaoSeNaoProxima() {
+            Subprocesso sp = mockSubprocesso(1L);
+            Processo p = new Processo();
+            p.setTipo(TipoProcesso.REVISAO);
+            when(sp.getProcesso()).thenReturn(p);
+
+            Unidade u = mock(Unidade.class);
+            when(u.getSigla()).thenReturn("U1");
+            when(sp.getUnidade()).thenReturn(u);
+            when(u.getUnidadeSuperior()).thenReturn(null); 
+
+            service.aceitarValidacao(1L, new Usuario());
+
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
         }
     }
 

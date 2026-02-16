@@ -10,3 +10,19 @@ Reusing configuration cache.
 > Task :backend:classes UP-TO-DATE
 > Task :backend:compileTestJava
 > Task :backend:testClasses
+> Task :backend:test
+  Resultado: SUCCESS
+  Total:     1312 testes executados
+  ✓ Passou:   1312
+  ✗ Falhou:   0
+  ○ Ignorado: 0
+  Tempo:     41.159s
+
+> Task :backend:jacocoTestReport
+
+BUILD SUCCESSFUL in 48s
+6 actionable tasks: 3 executed, 3 up-to-date
+Configuration cache entry reused.
+
+📍 Etapa 2: Analisar cobertura atual (visão detalhada)
+─────────────────────────────────────────
