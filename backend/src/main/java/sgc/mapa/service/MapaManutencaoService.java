@@ -13,7 +13,6 @@ import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.*;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service

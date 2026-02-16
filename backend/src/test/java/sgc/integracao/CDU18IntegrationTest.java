@@ -93,7 +93,13 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
         // Configurar relacionamento bidirecional no lado owning (Atividade)
         atividade1.getCompetencias().add(competencia1);
         atividade2.getCompetencias().add(competencia2);
+        
+        // Configurar o lado inverso para garantir consistência no teste transacional
+        competencia1.getAtividades().add(atividade1);
+        competencia2.getAtividades().add(atividade2);
+        
         atividadeRepo.saveAll(List.of(atividade1, atividade2));
+        competenciaRepo.saveAll(List.of(competencia1, competencia2));
     }
 
     @Test
@@ -109,44 +115,44 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
                 .andExpect(
                         jsonPath(
                                 "$.competencias[?(@.descricao == 'Competência"
-                                        + " 1')].atividades.length()")
+                                        + " 1')][0].atividades.length()")
                                 .value(1))
                 .andExpect(
                         jsonPath(
                                 "$.competencias[?(@.descricao == 'Competência"
-                                        + " 1')].atividades[?(@.descricao == 'Atividade"
-                                        + " 1')].conhecimentos.length()")
+                                        + " 1')][0].atividades[?(@.descricao == 'Atividade"
+                                        + " 1')][0].conhecimentos.length()")
                                 .value(2))
                 .andExpect(
                         jsonPath(
                                 "$.competencias[?(@.descricao == 'Competência"
-                                        + " 1')].atividades[?(@.descricao == 'Atividade"
-                                        + " 1')].conhecimentos[?(@.descricao == 'Conhecimento"
+                                        + " 1')][0].atividades[?(@.descricao == 'Atividade"
+                                        + " 1')][0].conhecimentos[?(@.descricao == 'Conhecimento"
                                         + " 1.1')]")
                                 .exists())
                 .andExpect(
                         jsonPath(
                                 "$.competencias[?(@.descricao == 'Competência"
-                                        + " 1')].atividades[?(@.descricao == 'Atividade"
-                                        + " 1')].conhecimentos[?(@.descricao == 'Conhecimento"
+                                        + " 1')][0].atividades[?(@.descricao == 'Atividade"
+                                        + " 1')][0].conhecimentos[?(@.descricao == 'Conhecimento"
                                         + " 1.2')]")
                                 .exists())
                 .andExpect(
                         jsonPath(
                                 "$.competencias[?(@.descricao == 'Competência"
-                                        + " 2')].atividades.length()")
+                                        + " 2')][0].atividades.length()")
                                 .value(1))
                 .andExpect(
                         jsonPath(
                                 "$.competencias[?(@.descricao == 'Competência"
-                                        + " 2')].atividades[?(@.descricao == 'Atividade"
-                                        + " 2')].conhecimentos.length()")
+                                        + " 2')][0].atividades[?(@.descricao == 'Atividade"
+                                        + " 2')][0].conhecimentos.length()")
                                 .value(1))
                 .andExpect(
                         jsonPath(
                                 "$.competencias[?(@.descricao == 'Competência"
-                                        + " 2')].atividades[?(@.descricao == 'Atividade"
-                                        + " 2')].conhecimentos[?(@.descricao == 'Conhecimento"
+                                        + " 2')][0].atividades[?(@.descricao == 'Atividade"
+                                        + " 2')][0].conhecimentos[?(@.descricao == 'Conhecimento"
                                         + " 2.1')]")
                                 .exists());
     }

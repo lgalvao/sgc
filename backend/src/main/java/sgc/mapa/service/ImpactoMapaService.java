@@ -195,8 +195,8 @@ public class ImpactoMapaService {
             if (vigentesMap.containsKey(atual.getDescricao())) {
                 Atividade vigente = vigentesMap.get(atual.getDescricao());
 
-                List<Conhecimento> conhecimentosAtuais = atual.getConhecimentos();
-                List<Conhecimento> conhecimentosVigentes = vigente.getConhecimentos();
+                Collection<Conhecimento> conhecimentosAtuais = atual.getConhecimentos();
+                Collection<Conhecimento> conhecimentosVigentes = vigente.getConhecimentos();
 
                 if (conhecimentosDiferentes(conhecimentosAtuais, conhecimentosVigentes)) {
                     alteradas.add(
@@ -226,7 +226,7 @@ public class ImpactoMapaService {
         ));
     }
 
-    private boolean conhecimentosDiferentes(List<Conhecimento> lista1, List<Conhecimento> lista2) {
+    private boolean conhecimentosDiferentes(Collection<Conhecimento> lista1, Collection<Conhecimento> lista2) {
         if (lista1.size() != lista2.size()) return true;
 
         if (lista1.isEmpty()) return false;

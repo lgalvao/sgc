@@ -12,8 +12,8 @@ import sgc.comum.model.EntidadeBase;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "MAPA", schema = "sgc")
@@ -47,5 +47,5 @@ public class Mapa extends EntidadeBase {
     @OneToMany(mappedBy = "mapa", cascade = CascadeType.ALL, orphanRemoval = true)
     @lombok.Builder.Default
     @JsonView(MapaViews.Publica.class)
-    private List<Atividade> atividades = new ArrayList<>();
+    private Set<Atividade> atividades = new LinkedHashSet<>();
 }

@@ -46,6 +46,7 @@ public class SubprocessoMapaController {
      */
     @GetMapping("/{codigo}/impactos-mapa")
     @PreAuthorize("isAuthenticated()")
+    @JsonView(MapaViews.Publica.class)
     public ImpactoMapaResponse verificarImpactos(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codigo);
         return mapaFacade.verificarImpactos(subprocesso, usuario);
@@ -79,6 +80,7 @@ public class SubprocessoMapaController {
     @GetMapping("/{codigo}/mapa-visualizacao")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém o mapa formatado para visualização")
+    @JsonView(MapaViews.Publica.class)
     public MapaVisualizacaoResponse obterMapaParaVisualizacao(@PathVariable Long codigo) {
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codigo);
         return mapaFacade.obterMapaParaVisualizacao(subprocesso);

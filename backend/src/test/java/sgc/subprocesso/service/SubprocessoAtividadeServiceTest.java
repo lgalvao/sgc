@@ -27,7 +27,6 @@ import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -437,7 +436,7 @@ class SubprocessoAtividadeServiceTest {
         return Atividade.builder()
                 .codigo(codigo)
                 .descricao(descricao)
-                .conhecimentos(new ArrayList<>(conhecimentos))
+                .conhecimentos(new java.util.LinkedHashSet<>(conhecimentos))
                 .build();
     }
 }

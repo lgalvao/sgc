@@ -8,19 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/**
- * Repositório JPA para a entidade Atividade.
- * 
- * <h2>Padrões de Consulta</h2>
- * Este repositório oferece métodos especializados para diferentes cenários de carga:
- * 
- * <ul>
- * <li>{@link #findAll()} - Carrega todas atividades com mapa (EntityGraph)</li>
- * <li>{@link #findByMapa_Codigo(Long)} - Atividades com competências</li>
- * <li>{@link #findWithConhecimentosByMapa_Codigo(Long)} - Atividades com conhecimentos</li>
- * <li>{@link #findByMapa_CodigoSemFetch(Long)} - Sem relacionamentos</li>
- * </ul>
- */
 @Repository
 public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
     /**

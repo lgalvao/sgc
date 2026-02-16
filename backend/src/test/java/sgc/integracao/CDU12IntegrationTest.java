@@ -57,8 +57,8 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
             "/api/subprocessos/{codigo}/impactos-mapa";
     private static final String CHEFE_TITULO = "121212121212";
     private static final String TEM_IMPACTOS_JSON_PATH = "$.temImpactos";
-    private static final String TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH = "$.atividadesInseridas.length()";
-    private static final String TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH = "$.atividadesRemovidas.length()";
+    private static final String TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH = "$.inseridas.length()";
+    private static final String TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH = "$.removidas.length()";
 
     // Repositories
     @Autowired
@@ -201,7 +201,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
                     .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(1)))
-                    .andExpect(jsonPath("$.atividadesInseridas[0].descricao", is("Realizar auditorias internas.")));
+                    .andExpect(jsonPath("$.inseridas[0].descricao", is("Realizar auditorias internas.")));
         }
 
         @Test
@@ -216,7 +216,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
                     .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(1)))
-                    .andExpect(jsonPath("$.atividadesRemovidas[0].descricao", is(atividadeVigente2.getDescricao())));
+                    .andExpect(jsonPath("$.removidas[0].descricao", is(atividadeVigente2.getDescricao())));
         }
 
         @Test

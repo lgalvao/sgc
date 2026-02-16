@@ -105,7 +105,7 @@ class RelatorioFacadeTest {
 
         Conhecimento k = new Conhecimento();
         k.setDescricao("Conh 1");
-        a.setConhecimentos(List.of(k));
+        a.setConhecimentos(Set.of(k));
         c.setAtividades(Set.of(a));
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
@@ -196,7 +196,7 @@ class RelatorioFacadeTest {
         c.setDescricao("Comp 1");
         Atividade a = new Atividade();
         a.setDescricao("Ativ 1");
-        a.setConhecimentos(List.of()); // Conhecimentos vazios
+        a.setConhecimentos(Set.of()); // Conhecimentos vazios
         c.setAtividades(Set.of(a));
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);

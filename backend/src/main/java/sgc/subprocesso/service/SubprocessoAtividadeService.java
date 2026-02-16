@@ -9,7 +9,6 @@ import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.eventos.EventoImportacaoAtividades;
 import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -137,7 +136,7 @@ class SubprocessoAtividadeService {
         return AtividadeDto.builder()
                 .codigo(atividade.getCodigo())
                 .descricao(atividade.getDescricao())
-                .conhecimentos(atividade.getConhecimentos())
+                .conhecimentos(new java.util.ArrayList<>(atividade.getConhecimentos()))
                 .build();
     }
 }

@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
@@ -25,24 +23,23 @@ class AtividadeJsonViewTest {
                 .codigo(1L)
                 .descricao("Atividade Teste")
                 .mapa(mapa)
-                .conhecimentos(List.of(Conhecimento.builder().codigo(100L).descricao("K1").build()))
+                .conhecimentos(java.util.Set.of(Conhecimento.builder().codigo(100L).descricao("K1").build()))
                 .build();
 
         String json = objectMapper
                 .writerWithView(MapaViews.Publica.class)
                 .writeValueAsString(atividade);
 
-        assertThat(json).contains("\"codigo\":1");
-        assertThat(json).contains("\"descricao\":\"Atividade Teste\"");
-        assertThat(json).contains("\"mapaCodigo\":10");
-        
-        // Agora conhecimentos são incluídos na Publica
-        assertThat(json).contains("\"conhecimentos\"");
-        assertThat(json).contains("\"descricao\":\"K1\"");
-
-        // Relacionamentos ignorados
-        assertThat(json).doesNotContain("\"competencias\"");
-        assertThat(json).doesNotContain("\"mapa\":");
+        assertThat(json)
+                .contains("\"codigo\":1")
+                .contains("\"descricao\":\"Atividade Teste\"")
+                .contains("\"mapaCodigo\":10")
+                // Agora conhecimentos são incluídos na Publica
+                .contains("\"conhecimentos\"")
+                .contains("\"descricao\":\"K1\"")
+                // Relacionamentos ignorados
+                .doesNotContain("\"competencias\"")
+                .doesNotContain("\"mapa\":");
     }
 
     @Test
@@ -51,14 +48,15 @@ class AtividadeJsonViewTest {
         Atividade atividade = Atividade.builder()
                 .codigo(1L)
                 .descricao("Atividade Teste")
-                .conhecimentos(List.of(Conhecimento.builder().codigo(100L).descricao("K1").build()))
+                .conhecimentos(java.util.Set.of(Conhecimento.builder().codigo(100L).descricao("K1").build()))
                 .build();
 
         String json = objectMapper
                 .writerWithView(MapaViews.Minimal.class)
                 .writeValueAsString(atividade);
 
-        assertThat(json).contains("\"codigo\":1");
-        assertThat(json).doesNotContain("\"conhecimentos\"");
+        assertThat(json)
+                .contains("\"codigo\":1")
+                .doesNotContain("\"conhecimentos\"");
     }
 }

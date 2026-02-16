@@ -11,9 +11,8 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sgc.comum.model.EntidadeBase;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -39,7 +38,7 @@ public class Atividade extends EntidadeBase {
     @OneToMany(mappedBy = "atividade", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @JsonView(MapaViews.Publica.class)
-    private List<Conhecimento> conhecimentos = new ArrayList<>();
+    private Set<Conhecimento> conhecimentos = new LinkedHashSet<>();
 
     @ManyToMany
     @JoinTable(
@@ -54,6 +53,6 @@ public class Atividade extends EntidadeBase {
     @JsonView(MapaViews.Publica.class)
     @JsonProperty("mapaCodigo")
     public Long getMapaCodigo() {
-        return mapa != null ? mapa.getCodigo() : null;
+        return mapa.getCodigo();
     }
 }

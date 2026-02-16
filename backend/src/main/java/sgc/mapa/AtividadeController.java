@@ -20,13 +20,6 @@ import java.util.List;
 
 /**
  * Controlador REST para gerenciar Atividades e seus Conhecimentos associados.
- *
- * <p>
- * <b>Padrão Arquitetural:</b> Este controller usa APENAS
- * {@link AtividadeFacade}.
- * Nunca acessa AtividadeService ou ConhecimentoService diretamente, seguindo o
- * padrão Facade
- * para manter a separação de responsabilidades e encapsulamento.
  */
 @RestController
 @RequestMapping("/api/atividades")

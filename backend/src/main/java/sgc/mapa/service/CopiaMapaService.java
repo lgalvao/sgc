@@ -98,7 +98,7 @@ public class CopiaMapaService {
                 .mapa(mapaDestino)
                 .build();
 
-        List<Conhecimento> conhecimentosFonte = atividadeFonte.getConhecimentos();
+        Set<Conhecimento> conhecimentosFonte = atividadeFonte.getConhecimentos();
         if (!conhecimentosFonte.isEmpty()) {
             for (Conhecimento conhecimentoFonte : conhecimentosFonte) {
                 Conhecimento novoConhecimento = Conhecimento.builder()

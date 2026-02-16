@@ -50,7 +50,7 @@ class MapaVisualizacaoServiceTest {
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
-        mapa.setAtividades(List.of(ativ1, ativ2));
+        mapa.setAtividades(Set.of(ativ1, ativ2));
         sub.setMapa(mapa);
 
         Competencia comp1 = new Competencia();
@@ -84,11 +84,11 @@ class MapaVisualizacaoServiceTest {
                 .codigo(100L)
                 .descricao("K1")
                 .build();
-        ativ.setConhecimentos(List.of(k));
+        ativ.setConhecimentos(Set.of(k));
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
-        mapa.setAtividades(List.of(ativ));
+        mapa.setAtividades(Set.of(ativ));
         sub.setMapa(mapa);
 
         when(mapaRepo.findFullBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapa));
@@ -97,6 +97,6 @@ class MapaVisualizacaoServiceTest {
         MapaVisualizacaoResponse response = service.obterMapaParaVisualizacao(sub);
 
         assertThat(response.atividadesSemCompetencia().getFirst().getConhecimentos()).hasSize(1);
-        assertThat(response.atividadesSemCompetencia().getFirst().getConhecimentos().getFirst().getDescricao()).isEqualTo("K1");
+        assertThat(response.atividadesSemCompetencia().getFirst().getConhecimentos().stream().findFirst().get().getDescricao()).isEqualTo("K1");
     }
 }

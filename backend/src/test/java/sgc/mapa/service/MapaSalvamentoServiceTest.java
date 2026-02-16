@@ -115,6 +115,7 @@ class MapaSalvamentoServiceTest {
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
         when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
         when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
+        when(competenciaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
 
         assertThatThrownBy(() -> mapaSalvamentoService.salvarMapaCompleto(codMapa, request))
                 .isInstanceOf(ErroValidacao.class)

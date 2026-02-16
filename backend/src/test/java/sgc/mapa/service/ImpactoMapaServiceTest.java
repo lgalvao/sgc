@@ -83,7 +83,7 @@ class ImpactoMapaServiceTest {
         Atividade nova = new Atividade();
         nova.setCodigo(1L);
         nova.setDescricao("Nova");
-        nova.setConhecimentos(Collections.emptyList());
+        nova.setConhecimentos(Collections.emptySet());
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L)).thenReturn(Collections.singletonList(nova));
 
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
@@ -116,7 +116,7 @@ class ImpactoMapaServiceTest {
         Atividade antiga = new Atividade();
         antiga.setCodigo(1L);
         antiga.setDescricao("Antiga");
-        antiga.setConhecimentos(Collections.emptyList());
+        antiga.setConhecimentos(Collections.emptySet());
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L)).thenReturn(Collections.singletonList(antiga));
         
         // Atual: vazio (foi removida)
@@ -162,7 +162,7 @@ class ImpactoMapaServiceTest {
         ativVigente.setDescricao("Ativ A");
         Conhecimento c1 = new Conhecimento();
         c1.setDescricao("C1");
-        ativVigente.setConhecimentos(Collections.singletonList(c1));
+        ativVigente.setConhecimentos(Set.of(c1));
         
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L)).thenReturn(Collections.singletonList(ativVigente));
         
@@ -172,7 +172,7 @@ class ImpactoMapaServiceTest {
         ativAtual.setDescricao("Ativ A");
         Conhecimento c2 = new Conhecimento();
         c2.setDescricao("C2");
-        ativAtual.setConhecimentos(Collections.singletonList(c2));
+        ativAtual.setConhecimentos(Set.of(c2));
         
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L)).thenReturn(Collections.singletonList(ativAtual));
 
@@ -195,13 +195,13 @@ class ImpactoMapaServiceTest {
         Atividade ativVigente = Atividade.builder()
                 .codigo(1L)
                 .descricao("Ativ A")
-                .conhecimentos(List.of())
+                .conhecimentos(Set.of())
                 .build();
 
         Atividade ativAtual = Atividade.builder()
                 .codigo(2L)
                 .descricao("Ativ A")
-                .conhecimentos(List.of())
+                .conhecimentos(Set.of())
                 .build();
 
         when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
@@ -232,13 +232,13 @@ class ImpactoMapaServiceTest {
         Atividade ativVigente = Atividade.builder()
                 .codigo(1L)
                 .descricao("Ativ Teste")
-                .conhecimentos(List.of(c1))
+                .conhecimentos(Set.of(c1))
                 .build();
 
         Atividade ativAtual = Atividade.builder()
                 .codigo(2L)
                 .descricao("Ativ Teste")
-                .conhecimentos(List.of(c2, c3))
+                .conhecimentos(Set.of(c2, c3))
                 .build();
 
         when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
@@ -347,12 +347,12 @@ class ImpactoMapaServiceTest {
             Atividade aVigente = new Atividade();
             aVigente.setCodigo(10L);
             aVigente.setDescricao("Ativ 1");
-            aVigente.setConhecimentos(List.of(new Conhecimento()));
+            aVigente.setConhecimentos(Set.of(new Conhecimento()));
 
             Atividade aAtual = new Atividade();
             aAtual.setCodigo(10L);
             aAtual.setDescricao("Ativ 1");
-            aAtual.setConhecimentos(List.of());
+            aAtual.setConhecimentos(Set.of());
 
             when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(20L))
                     .thenReturn(List.of(aVigente));

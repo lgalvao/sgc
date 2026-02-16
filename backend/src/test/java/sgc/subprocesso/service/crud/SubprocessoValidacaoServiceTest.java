@@ -72,9 +72,9 @@ class SubprocessoValidacaoServiceTest {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
         Atividade a1 = new Atividade();
-        a1.setConhecimentos(List.of(new Conhecimento()));
+        a1.setConhecimentos(Set.of(new Conhecimento()));
         Atividade a2 = new Atividade();
-        a2.setConhecimentos(List.of()); // Sem
+        a2.setConhecimentos(Set.of()); // Sem
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1, a2));
 
         assertThat(service.obterAtividadesSemConhecimento(mapa)).containsExactly(a2);
@@ -103,7 +103,7 @@ class SubprocessoValidacaoServiceTest {
         m.setCodigo(1L);
         sp.setMapa(m);
         Atividade a = new Atividade();
-        a.setConhecimentos(List.of());
+        a.setConhecimentos(Set.of());
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
@@ -182,7 +182,7 @@ class SubprocessoValidacaoServiceTest {
         sp.setMapa(m);
         Atividade a = new Atividade();
         a.setCodigo(10L);
-        a.setConhecimentos(List.of());
+        a.setConhecimentos(Set.of());
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
@@ -200,7 +200,7 @@ class SubprocessoValidacaoServiceTest {
         m.setCodigo(1L);
         sp.setMapa(m);
         Atividade a = new Atividade();
-        a.setConhecimentos(List.of(new Conhecimento()));
+        a.setConhecimentos(Set.of(new Conhecimento()));
 
         when(crudService.buscarSubprocesso(1L)).thenReturn(sp);
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));

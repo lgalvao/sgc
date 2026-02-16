@@ -1,7 +1,6 @@
 package sgc.integracao;
 
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -72,10 +71,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     private NotificacaoEmailService notificacaoEmailService;
 
     private final Long SP_CODIGO = 60000L; // SEDESENV (Unidade 8) no data.sql
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     @WithMockChefe("3") // Fernanda Oliveira - Chefe da Unidade 8 no data.sql

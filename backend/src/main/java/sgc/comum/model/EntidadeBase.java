@@ -29,4 +29,16 @@ public abstract class EntidadeBase implements Serializable {
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof EntidadeBase that)) return false;
+        return codigo != null && codigo.equals(that.codigo);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31;
+    }
 }

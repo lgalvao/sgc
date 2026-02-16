@@ -1,6 +1,5 @@
 package sgc.subprocesso.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
@@ -28,16 +27,16 @@ import java.util.List;
 public class Subprocesso extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "processo_codigo", nullable = false)
-    @JsonIgnore
+    @JsonView(SubprocessoViews.Publica.class)
     private Processo processo;
 
     @ManyToOne
     @JoinColumn(name = "unidade_codigo", nullable = false)
-    @JsonIgnore
+    @JsonView(SubprocessoViews.Publica.class)
     private Unidade unidade;
 
     @OneToOne(mappedBy = "subprocesso")
-    @JsonIgnore
+    @JsonView(SubprocessoViews.Publica.class)
     private Mapa mapa;
 
     @JsonView(sgc.comum.model.ComumViews.Publica.class)
@@ -63,8 +62,8 @@ public class Subprocesso extends EntidadeBase {
     private SituacaoSubprocesso situacao = SituacaoSubprocesso.NAO_INICIADO;
 
     @JsonView(sgc.comum.model.ComumViews.Publica.class)
-    public List<sgc.mapa.model.Atividade> getAtividades() {
-        return mapa != null ? mapa.getAtividades() : List.of();
+    public java.util.Set<sgc.mapa.model.Atividade> getAtividades() {
+        return mapa != null ? mapa.getAtividades() : java.util.Collections.emptySet();
     }
 
     @JsonView(sgc.comum.model.ComumViews.Publica.class)

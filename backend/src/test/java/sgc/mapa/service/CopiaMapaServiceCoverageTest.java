@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -76,7 +75,7 @@ class CopiaMapaServiceCoverageTest {
         
         Atividade ativOrigem = Atividade.builder()
                 .descricao("Nova Atividade")
-                .conhecimentos(new ArrayList<>())
+                .conhecimentos(new java.util.HashSet<>())
                 .build();
         
         when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));

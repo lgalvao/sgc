@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -55,7 +54,7 @@ class CopiaMapaServiceTest {
         atividadeOrigem.setDescricao("Atividade 1");
         Conhecimento conhecimentoOrigem = new Conhecimento();
         conhecimentoOrigem.setDescricao("Conhecimento 1");
-        atividadeOrigem.setConhecimentos(new ArrayList<>(List.of(conhecimentoOrigem))); // Mutable list
+        atividadeOrigem.setConhecimentos(new java.util.LinkedHashSet<>(java.util.Set.of(conhecimentoOrigem))); // Mutable set
 
         Competencia competenciaOrigem = new Competencia();
         competenciaOrigem.setDescricao("Competencia 1");
@@ -126,7 +125,7 @@ class CopiaMapaServiceTest {
 
         Atividade atividadeOrigem = new Atividade();
         atividadeOrigem.setCodigo(10L);
-        atividadeOrigem.setConhecimentos(List.of()); // Empty list
+        atividadeOrigem.setConhecimentos(Set.of()); // Empty set
 
         when(repo.buscar(Mapa.class, origemId)).thenReturn(mapaOrigem);
         when(mapaRepo.save(any(Mapa.class))).thenReturn(new Mapa());

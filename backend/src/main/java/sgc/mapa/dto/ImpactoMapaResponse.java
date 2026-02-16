@@ -14,6 +14,7 @@ import java.util.List;
  */
 @Builder
 public record ImpactoMapaResponse(
+    @JsonView(MapaViews.Publica.class)
     boolean temImpactos,
     
     @JsonView(MapaViews.Publica.class)
