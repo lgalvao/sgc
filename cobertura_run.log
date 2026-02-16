@@ -2,27 +2,38 @@
 
 📍 Etapa 1: Executar testes e gerar relatório JaCoCo
 ─────────────────────────────────────────
-Starting a Gradle Daemon, 1 busy and 1 incompatible Daemons could not be reused, use --status for details
 Reusing configuration cache.
-> Task :backend:processTestResources UP-TO-DATE
 > Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
 > Task :backend:compileJava UP-TO-DATE
 > Task :backend:classes UP-TO-DATE
-> Task :backend:compileTestJava
-> Task :backend:testClasses
-> Task :backend:test
-  Resultado: SUCCESS
-  Total:     1312 testes executados
-  ✓ Passou:   1312
-  ✗ Falhou:   0
-  ○ Ignorado: 0
-  Tempo:     41.159s
 
-> Task :backend:jacocoTestReport
+> Task :backend:compileTestJava FAILED
+/Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/SubprocessoCrudControllerTest.java:76: error: cannot find symbol
+        when(subprocessoFacade.obterDetalhes(1L)).thenReturn(SubprocessoDetalheResponse.builder().build());
+                                                                                       ^
+  symbol:   method builder()
+  location: class SubprocessoDetalheResponse
+1 error
 
-BUILD SUCCESSFUL in 48s
-6 actionable tasks: 3 executed, 3 up-to-date
+[Incubating] Problems report is available at: file:///Users/leonardo/sgc/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:compileTestJava'.
+> Compilation failed; see the compiler output below.
+  /Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/SubprocessoCrudControllerTest.java:76: error: cannot find symbol
+          when(subprocessoFacade.obterDetalhes(1L)).thenReturn(SubprocessoDetalheResponse.builder().build());
+                                                                                         ^
+    symbol:   method builder()
+    location: class SubprocessoDetalheResponse
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 1s
+4 actionable tasks: 1 executed, 3 up-to-date
 Configuration cache entry reused.
-
-📍 Etapa 2: Analisar cobertura atual (visão detalhada)
-─────────────────────────────────────────

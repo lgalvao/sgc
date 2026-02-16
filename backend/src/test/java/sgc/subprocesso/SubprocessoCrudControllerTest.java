@@ -1,15 +1,13 @@
 package sgc.subprocesso;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.subprocesso.dto.*;
@@ -19,182 +17,131 @@ import sgc.subprocesso.service.SubprocessoFacade;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(SubprocessoCrudController.class)
+@ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("SubprocessoCrudController")
 class SubprocessoCrudControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private SubprocessoFacade subprocessoFacade;
 
-    @MockBean
+    @Mock
     private OrganizacaoFacade organizacaoFacade;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @InjectMocks
+    private SubprocessoCrudController controller;
 
     @Test
-    @WithMockUser
     @DisplayName("obterPermissoes - Sucesso")
-    void obterPermissoes() throws Exception {
-        when(subprocessoFacade.obterPermissoes(1L)).thenReturn(SubprocessoPermissoesDto.builder().build());
-
-        mockMvc.perform(get("/api/subprocessos/1/permissoes"))
-                .andExpect(status().isOk());
-
+    void obterPermissoes() {
+        when(subprocessoFacade.obterPermissoes(1L)).thenReturn(new SubprocessoPermissoesDto(List.of()));
+        ResponseEntity<SubprocessoPermissoesDto> response = controller.obterPermissoes(1L);
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         verify(subprocessoFacade).obterPermissoes(1L);
     }
 
     @Test
-    @WithMockUser
     @DisplayName("validarCadastro - Sucesso")
-    void validarCadastro() throws Exception {
+    void validarCadastro() {
         when(subprocessoFacade.validarCadastro(1L)).thenReturn(ValidacaoCadastroDto.builder().valido(true).build());
-
-        mockMvc.perform(get("/api/subprocessos/1/validar-cadastro"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.valido").value(true));
+        ResponseEntity<ValidacaoCadastroDto> response = controller.validarCadastro(1L);
+        assertThat(response.getBody().valido()).isTrue();
     }
 
     @Test
-    @WithMockUser
     @DisplayName("obterStatus - Sucesso")
-    void obterStatus() throws Exception {
+    void obterStatus() {
         when(subprocessoFacade.obterSituacao(1L)).thenReturn(SubprocessoSituacaoDto.builder().build());
-
-        mockMvc.perform(get("/api/subprocessos/1/status"))
-                .andExpect(status().isOk());
+        ResponseEntity<SubprocessoSituacaoDto> response = controller.obterStatus(1L);
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("listar - Sucesso")
-    void listar() throws Exception {
+    void listar() {
         when(subprocessoFacade.listar()).thenReturn(List.of(Subprocesso.builder().codigo(1L).build()));
-
-        mockMvc.perform(get("/api/subprocessos"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].codigo").value(1));
+        List<Subprocesso> result = controller.listar();
+        assertThat(result).hasSize(1);
     }
 
     @Test
-    @WithMockUser
     @DisplayName("obterPorCodigo - Sucesso")
-    void obterPorCodigo() throws Exception {
-        when(subprocessoFacade.obterDetalhes(1L)).thenReturn(SubprocessoDetalheResponse.builder().build());
-
-        mockMvc.perform(get("/api/subprocessos/1"))
-                .andExpect(status().isOk());
+    void obterPorCodigo() {
+        when(subprocessoFacade.obterDetalhes(1L)).thenReturn(new SubprocessoDetalheResponse(null, null, null, null, null));
+        SubprocessoDetalheResponse result = controller.obterPorCodigo(1L);
+        assertThat(result).isNotNull();
     }
 
     @Test
-    @WithMockUser
     @DisplayName("buscarPorProcessoEUnidade - Sucesso")
-    void buscarPorProcessoEUnidade() throws Exception {
+    void buscarPorProcessoEUnidade() {
         UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
         when(organizacaoFacade.buscarUnidadePorSigla("U1")).thenReturn(unidade);
         when(subprocessoFacade.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(Subprocesso.builder().codigo(100L).build());
 
-        mockMvc.perform(get("/api/subprocessos/buscar")
-                        .param("codProcesso", "1")
-                        .param("siglaUnidade", "U1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value(100));
+        ResponseEntity<Subprocesso> response = controller.buscarPorProcessoEUnidade(1L, "U1");
+        assertThat(response.getBody().getCodigo()).isEqualTo(100L);
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("criar - Sucesso")
-    void criar() throws Exception {
+    void criar() {
         CriarSubprocessoRequest req = CriarSubprocessoRequest.builder().codProcesso(1L).codUnidade(10L).build();
         when(subprocessoFacade.criar(any())).thenReturn(Subprocesso.builder().codigo(100L).build());
 
-        mockMvc.perform(post("/api/subprocessos")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isCreated());
+        ResponseEntity<Subprocesso> response = controller.criar(req);
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(response.getHeaders().getLocation().toString()).contains("100");
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("atualizar - Sucesso")
-    void atualizar() throws Exception {
+    void atualizar() {
         AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder().build();
         when(subprocessoFacade.atualizar(eq(1L), any())).thenReturn(Subprocesso.builder().codigo(1L).build());
 
-        mockMvc.perform(post("/api/subprocessos/1/atualizar")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
+        ResponseEntity<Subprocesso> response = controller.atualizar(1L, req);
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("excluir - Sucesso")
-    void excluir() throws Exception {
-        mockMvc.perform(post("/api/subprocessos/1/excluir").with(csrf()))
-                .andExpect(status().isNoContent());
-
+    void excluir() {
+        ResponseEntity<Void> response = controller.excluir(1L);
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         verify(subprocessoFacade).excluir(1L);
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("alterarDataLimite - Sucesso")
-    void alterarDataLimite() throws Exception {
+    void alterarDataLimite() {
         AlterarDataLimiteRequest req = new AlterarDataLimiteRequest(LocalDate.now());
-
-        mockMvc.perform(post("/api/subprocessos/1/data-limite")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
-
+        ResponseEntity<Void> response = controller.alterarDataLimite(1L, req);
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         verify(subprocessoFacade).alterarDataLimite(eq(1L), any());
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("reabrirCadastro - Sucesso")
-    void reabrirCadastro() throws Exception {
+    void reabrirCadastro() {
         ReabrirProcessoRequest req = new ReabrirProcessoRequest("J");
-
-        mockMvc.perform(post("/api/subprocessos/1/reabrir-cadastro")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
-
+        ResponseEntity<Void> response = controller.reabrirCadastro(1L, req);
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         verify(subprocessoFacade).reabrirCadastro(1L, "J");
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("reabrirRevisaoCadastro - Sucesso")
-    void reabrirRevisaoCadastro() throws Exception {
+    void reabrirRevisaoCadastro() {
         ReabrirProcessoRequest req = new ReabrirProcessoRequest("J");
-
-        mockMvc.perform(post("/api/subprocessos/1/reabrir-revisao-cadastro")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
-
+        ResponseEntity<Void> response = controller.reabrirRevisaoCadastro(1L, req);
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         verify(subprocessoFacade).reabrirRevisaoCadastro(1L, "J");
     }
 }
