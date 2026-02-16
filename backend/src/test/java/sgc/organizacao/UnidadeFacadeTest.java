@@ -35,15 +35,13 @@ import static org.mockito.Mockito.*;
 class UnidadeFacadeTest {
 
     @Mock
-    private UnidadeConsultaService unidadeConsultaService;
+    private UnidadeService unidadeService;
     @Mock
-    private UsuarioConsultaService usuarioConsultaService;
+    private UsuarioService usuarioService;
     @Mock
     private UsuarioMapper usuarioMapper;
     @Mock
     private UnidadeHierarquiaService hierarquiaService;
-    @Mock
-    private UnidadeMapaService mapaService;
     @Mock
     private UnidadeResponsavelService responsavelService;
 
@@ -107,7 +105,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve buscar unidade por sigla")
         void deveBuscarPorSigla() {
             // Arrange
-            when(unidadeConsultaService.buscarPorSigla("U1")).thenReturn(new Unidade());
+            when(unidadeService.buscarPorSigla("U1")).thenReturn(new Unidade());
             when(usuarioMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
 
             // Act & Assert
@@ -120,7 +118,7 @@ class UnidadeFacadeTest {
             // Arrange
             Unidade unidade = new Unidade();
             unidade.setSituacao(SituacaoUnidade.ATIVA);
-            when(unidadeConsultaService.buscarPorId(1L)).thenReturn(unidade);
+            when(unidadeService.buscarPorId(1L)).thenReturn(unidade);
             when(usuarioMapper.toUnidadeDto(any(), eq(false))).thenReturn(UnidadeDto.builder().build());
 
             // Act & Assert
@@ -240,7 +238,7 @@ class UnidadeFacadeTest {
         void deveBuscarArvoreComElegibilidadeComMapa() {
             // Arrange
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(1L));
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
             // Act
@@ -248,7 +246,7 @@ class UnidadeFacadeTest {
 
             // Assert
             assertThat(result).hasSize(1);
-            verify(mapaService).buscarTodosCodigosUnidades();
+            verify(unidadeService).buscarTodosCodigosUnidadesComMapa();
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
         }
 
@@ -257,7 +255,7 @@ class UnidadeFacadeTest {
         void deveSerIneligivelParaRevisaoSeSemMapa() {
             // Arrange
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
-            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(2L));
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(2L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
             // Act
@@ -265,7 +263,7 @@ class UnidadeFacadeTest {
 
             // Assert
             assertThat(result).hasSize(1);
-            verify(mapaService).buscarTodosCodigosUnidades();
+            verify(unidadeService).buscarTodosCodigosUnidadesComMapa();
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
         }
 
@@ -288,11 +286,11 @@ class UnidadeFacadeTest {
         @DisplayName("Deve verificar se tem mapa vigente")
         void deveVerificarMapaVigente() {
             // Arrange
-            when(mapaService.verificarMapaVigente(1L)).thenReturn(true);
+            when(unidadeService.verificarMapaVigente(1L)).thenReturn(true);
 
             // Act & Assert
             assertThat(service.verificarMapaVigente(1L)).isTrue();
-            verify(mapaService).verificarMapaVigente(1L);
+            verify(unidadeService).verificarMapaVigente(1L);
         }
     }
 
@@ -357,7 +355,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve buscar usuários por unidade")
         void deveBuscarUsuariosPorUnidade() {
             // Arrange
-            when(usuarioConsultaService.buscarPorUnidadeLotacao(1L)).thenReturn(List.of(new Usuario()));
+            when(usuarioService.buscarPorUnidadeLotacao(1L)).thenReturn(List.of(new Usuario()));
 
             // Act & Assert
             assertThat(service.buscarUsuariosPorUnidade(1L)).hasSize(1);
@@ -400,21 +398,21 @@ class UnidadeFacadeTest {
         @DisplayName("Buscar entidades por IDs")
         void buscarEntidadesPorIds() {
             service.buscarEntidadesPorIds(List.of(1L));
-            verify(unidadeConsultaService).buscarEntidadesPorIds(any());
+            verify(unidadeService).buscarEntidadesPorIds(any());
         }
 
         @Test
         @DisplayName("Buscar todas entidades com hierarquia (cache)")
         void buscarTodasEntidadesComHierarquia() {
             service.buscarTodasEntidadesComHierarquia();
-            verify(unidadeConsultaService).buscarTodasEntidadesComHierarquia();
+            verify(unidadeService).buscarTodasEntidadesComHierarquia();
         }
 
         @Test
         @DisplayName("Buscar siglas por IDs")
         void buscarSiglasPorIds() {
             service.buscarSiglasPorIds(List.of(1L));
-            verify(unidadeConsultaService).buscarSiglasPorIds(any());
+            verify(unidadeService).buscarSiglasPorIds(any());
         }
 
         @Test
@@ -424,7 +422,7 @@ class UnidadeFacadeTest {
             service.verificarMapaVigente(1L);
 
             // Assert
-            verify(mapaService).verificarMapaVigente(1L);
+            verify(unidadeService).verificarMapaVigente(1L);
         }
 
         @Test
@@ -437,13 +435,13 @@ class UnidadeFacadeTest {
             service.definirMapaVigente(1L, mapa);
 
             // Assert
-            verify(mapaService).definirMapaVigente(1L, mapa);
+            verify(unidadeService).definirMapaVigente(1L, mapa);
         }
 
         @Test
         @DisplayName("Deve falhar ao buscar entidade por ID inexistente")
         void deveFalharAoBuscarEntidadePorIdInexistente() {
-            when(unidadeConsultaService.buscarPorId(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 999L));
+            when(unidadeService.buscarPorId(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 999L));
             assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(999L)));
         }
 
@@ -504,7 +502,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve lançar exceção se unidade inativa ao buscar por ID")
         void deveLancarExcecaoSeUnidadeInativa() {
             // Arrange
-            when(unidadeConsultaService.buscarPorId(1L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 1L));
+            when(unidadeService.buscarPorId(1L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 1L));
 
             // Act & Assert
             assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(1L)));
@@ -672,7 +670,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve incluir apenas unidades com mapa vigente quando requerido")
         void deveIncluirApenasUnidadesComMapaQuandoRequerido() {
             // Arrange
-            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(1L, 2L));
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L, 2L));
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
             when(hierarquiaService.buscarArvoreComElegibilidade(any()))
                 .thenReturn(List.of(dto));
@@ -682,7 +680,7 @@ class UnidadeFacadeTest {
 
             // Assert
             assertThat(resultado).isNotEmpty();
-            verify(mapaService).buscarTodosCodigosUnidades();
+            verify(unidadeService).buscarTodosCodigosUnidadesComMapa();
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
         }
         
@@ -699,7 +697,7 @@ class UnidadeFacadeTest {
 
             // Assert
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
-            verify(mapaService, never()).buscarTodosCodigosUnidades();
+            verify(unidadeService, never()).buscarTodosCodigosUnidadesComMapa();
         }
     }
 

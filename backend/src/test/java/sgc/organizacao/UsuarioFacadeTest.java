@@ -21,11 +21,8 @@ import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.AdministradorService;
-import sgc.organizacao.service.UnidadeConsultaService;
 import sgc.organizacao.service.UnidadeResponsavelService;
-import sgc.organizacao.service.UsuarioConsultaService;
-import sgc.organizacao.service.UsuarioPerfilService;
+import sgc.organizacao.service.UsuarioService;
 
 import java.util.*;
 
@@ -39,16 +36,7 @@ import static org.mockito.Mockito.*;
 class UsuarioFacadeTest {
 
     @Mock
-    private UsuarioConsultaService usuarioConsultaService;
-    
-    @Mock
-    private UsuarioPerfilService usuarioPerfilService;
-    
-    @Mock
-    private AdministradorService administradorService;
-    
-    @Mock
-    private UnidadeConsultaService unidadeConsultaService;
+    private UsuarioService usuarioService;
     
     @Mock
     private UnidadeResponsavelService unidadeResponsavelService;
@@ -68,7 +56,7 @@ class UsuarioFacadeTest {
             Usuario usuario = criarUsuario(titulo);
             
             configurarAutenticacao(titulo);
-            when(usuarioConsultaService.buscarPorIdComAtribuicoes(titulo)).thenReturn(usuario);
+            when(usuarioService.buscarPorIdComAtribuicoes(titulo)).thenReturn(usuario);
 
             // Act
             Usuario resultado = facade.obterUsuarioAutenticado();
@@ -76,7 +64,7 @@ class UsuarioFacadeTest {
             // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo(titulo);
-            verify(usuarioPerfilService).carregarAuthorities(usuario);
+            verify(usuarioService).carregarAuthorities(usuario);
         }
 
         @Test
@@ -95,7 +83,7 @@ class UsuarioFacadeTest {
 
             // Assert
             assertThat(resultado).isSameAs(usuario);
-            verifyNoInteractions(usuarioConsultaService);
+            verifyNoInteractions(usuarioService);
             SecurityContextHolder.clearContext();
         }
 
@@ -109,9 +97,9 @@ class UsuarioFacadeTest {
             unidadeInativa.setSituacao(SituacaoUnidade.INATIVA);
             UsuarioPerfil atribuicao = criarAtribuicao(usuario, unidadeInativa, Perfil.CHEFE);
 
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional(titulo))
                     .thenReturn(Optional.of(usuario));
-            when(usuarioPerfilService.buscarPorUsuario(titulo))
+            when(usuarioService.buscarPerfis(titulo))
                     .thenReturn(List.of(atribuicao));
 
             // Act
@@ -208,7 +196,7 @@ class UsuarioFacadeTest {
             Usuario usuario = criarUsuario(titulo);
             
             configurarAutenticacao(titulo);
-            when(usuarioConsultaService.buscarPorIdComAtribuicoes(titulo)).thenReturn(usuario);
+            when(usuarioService.buscarPorIdComAtribuicoes(titulo)).thenReturn(usuario);
 
             // Act
             Usuario resultado = facade.obterUsuarioAutenticadoOuNull();
@@ -230,7 +218,7 @@ class UsuarioFacadeTest {
             String titulo = "123456";
             Usuario usuario = criarUsuario(titulo);
             
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional(titulo))
                     .thenReturn(Optional.of(usuario));
 
             // Act
@@ -239,7 +227,7 @@ class UsuarioFacadeTest {
             // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo(titulo);
-            verify(usuarioPerfilService).carregarAuthorities(usuario);
+            verify(usuarioService).carregarAuthorities(usuario);
         }
 
         @Test
@@ -247,7 +235,7 @@ class UsuarioFacadeTest {
         void deveRetornarNullQuandoUsuarioNaoEncontrado() {
             // Arrange
             String titulo = "inexistente";
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional(titulo))
                     .thenReturn(Optional.empty());
 
             // Act
@@ -255,7 +243,7 @@ class UsuarioFacadeTest {
 
             // Assert
             assertThat(resultado).isNull();
-            verify(usuarioPerfilService, never()).carregarAuthorities(any());
+            verify(usuarioService, never()).carregarAuthorities(any());
         }
     }
 
@@ -366,8 +354,8 @@ class UsuarioFacadeTest {
             Administrador admin = new Administrador();
             admin.setUsuarioTitulo(titulo);
 
-            when(administradorService.listarTodos()).thenReturn(List.of(admin));
-            when(usuarioConsultaService.buscarPorIdOpcional(titulo)).thenReturn(Optional.of(usuario));
+            when(usuarioService.listarAdministradores()).thenReturn(List.of(admin));
+            when(usuarioService.buscarPorIdOpcional(titulo)).thenReturn(Optional.of(usuario));
 
             // Act
             List<AdministradorDto> resultado = facade.listarAdministradores();
@@ -394,7 +382,7 @@ class UsuarioFacadeTest {
             String titulo = "123456";
             Usuario usuario = criarUsuario(titulo);
 
-            when(usuarioConsultaService.buscarPorId(titulo)).thenReturn(usuario);
+            when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
 
             // Act
             AdministradorDto resultado = facade.adicionarAdministrador(titulo);
@@ -408,7 +396,7 @@ class UsuarioFacadeTest {
                         assertThat(r.unidadeCodigo()).isEqualTo(usuario.getUnidadeLotacao().getCodigo());
                         assertThat(r.unidadeSigla()).isEqualTo(usuario.getUnidadeLotacao().getSigla());
                     });
-            verify(administradorService).adicionar(titulo);
+            verify(usuarioService).adicionarAdministrador(titulo);
         }
 
 
@@ -424,7 +412,7 @@ class UsuarioFacadeTest {
             facade.removerAdministrador(tituloRemover, tituloAtual);
 
             // Assert
-            verify(administradorService).remover(tituloRemover);
+            verify(usuarioService).removerAdministrador(tituloRemover);
         }
 
         @Test
@@ -438,7 +426,7 @@ class UsuarioFacadeTest {
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining("Não é permitido remover a si mesmo como administrador");
             
-            verify(administradorService, never()).remover(any());
+            verify(usuarioService, never()).removerAdministrador(any());
         }
 
         @Test
@@ -446,7 +434,7 @@ class UsuarioFacadeTest {
         void deveVerificarSeEhAdministrador() {
             // Arrange
             String titulo = "123456";
-            when(administradorService.isAdministrador(titulo)).thenReturn(true);
+            when(usuarioService.isAdministrador(titulo)).thenReturn(true);
 
             // Act
             boolean resultado = facade.isAdministrador(titulo);
@@ -542,9 +530,9 @@ class UsuarioFacadeTest {
             Unidade unidade = criarUnidade(1L, "UNID1");
             UsuarioPerfil atribuicao = criarAtribuicao(usuario, unidade, Perfil.CHEFE);
 
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional(titulo))
                     .thenReturn(Optional.of(usuario));
-            when(usuarioPerfilService.buscarPorUsuario(titulo))
+            when(usuarioService.buscarPerfis(titulo))
                     .thenReturn(List.of(atribuicao));
 
             // Act
@@ -569,7 +557,7 @@ class UsuarioFacadeTest {
         void deveRetornarListaVaziaQuandoUsuarioNaoEncontrado() {
             // Arrange
             String titulo = "inexistente";
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional(titulo))
                     .thenReturn(Optional.empty());
 
             // Act
@@ -604,9 +592,9 @@ class UsuarioFacadeTest {
             Unidade unidade = criarUnidade(1L, "UNID1");
             UsuarioPerfil atribuicao = criarAtribuicao(usuario, unidade, Perfil.CHEFE);
 
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional(titulo))
                     .thenReturn(Optional.of(usuario));
-            when(usuarioPerfilService.buscarPorUsuario(titulo))
+            when(usuarioService.buscarPerfis(titulo))
                     .thenReturn(List.of(atribuicao));
 
             // Act
@@ -621,7 +609,7 @@ class UsuarioFacadeTest {
         void deveRetornarFalseQuandoUsuarioNaoTemPerfil() {
             // Arrange
             String titulo = "123456";
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional(titulo))
                     .thenReturn(Optional.empty());
 
             // Act
@@ -640,9 +628,9 @@ class UsuarioFacadeTest {
             Unidade unidade = criarUnidade(1L, "UNID1");
             UsuarioPerfil atribuicao = criarAtribuicao(usuario, unidade, Perfil.SERVIDOR);
 
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional(titulo))
                     .thenReturn(Optional.of(usuario));
-            when(usuarioPerfilService.buscarPorUsuario(titulo))
+            when(usuarioService.buscarPerfis(titulo))
                     .thenReturn(List.of(atribuicao));
 
             // Act
@@ -658,9 +646,9 @@ class UsuarioFacadeTest {
             // Arrange
             String titulo = "123456";
             Usuario usuario = criarUsuario(titulo);
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional(titulo))
                     .thenReturn(Optional.of(usuario));
-            when(usuarioPerfilService.buscarPorUsuario(titulo))
+            when(usuarioService.buscarPerfis(titulo))
                     .thenReturn(Collections.emptyList());
 
             // Act
@@ -681,9 +669,9 @@ class UsuarioFacadeTest {
 
             UsuarioPerfil atribuicao = criarAtribuicao(usuario, unidadeInativa, Perfil.CHEFE);
 
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional(titulo))
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional(titulo))
                     .thenReturn(Optional.of(usuario));
-            when(usuarioPerfilService.buscarPorUsuario(titulo))
+            when(usuarioService.buscarPerfis(titulo))
                     .thenReturn(List.of(atribuicao));
 
             // Act
@@ -705,7 +693,7 @@ class UsuarioFacadeTest {
             String titulo = "123456";
             Usuario usuario = criarUsuario(titulo);
 
-            when(usuarioConsultaService.buscarPorIdOpcional(titulo))
+            when(usuarioService.buscarPorIdOpcional(titulo))
                     .thenReturn(Optional.of(usuario));
 
             // Act
@@ -724,7 +712,7 @@ class UsuarioFacadeTest {
             Usuario usuario = criarUsuario("123456");
             usuario.setEmail(email);
 
-            when(usuarioConsultaService.buscarPorEmail(email))
+            when(usuarioService.buscarPorEmail(email))
                     .thenReturn(Optional.of(usuario));
 
             // Act
@@ -742,7 +730,7 @@ class UsuarioFacadeTest {
             Long codigoUnidade = 1L;
             Usuario usuario = criarUsuario("123456");
 
-            when(usuarioConsultaService.buscarPorUnidadeLotacao(codigoUnidade))
+            when(usuarioService.buscarPorUnidadeLotacao(codigoUnidade))
                     .thenReturn(List.of(usuario));
 
             // Act
@@ -758,7 +746,7 @@ class UsuarioFacadeTest {
             // Arrange
             Usuario usuario = criarUsuario("123456");
 
-            when(usuarioConsultaService.buscarTodos())
+            when(usuarioService.buscarTodos())
                     .thenReturn(List.of(usuario));
 
             // Act
@@ -776,7 +764,7 @@ class UsuarioFacadeTest {
             Usuario usuario1 = criarUsuario("111111");
             Usuario usuario2 = criarUsuario("222222");
 
-            when(usuarioConsultaService.buscarTodosPorIds(titulos))
+            when(usuarioService.buscarTodosPorIds(titulos))
                     .thenReturn(List.of(usuario1, usuario2));
 
             // Act
@@ -801,7 +789,7 @@ class UsuarioFacadeTest {
             Usuario usuario1 = criarUsuario("111111");
             
             // O repo retorna 2 com o mesmo ID
-            when(usuarioConsultaService.buscarTodosPorIds(titulos)).thenReturn(List.of(usuario1, usuario1));
+            when(usuarioService.buscarTodosPorIds(titulos)).thenReturn(List.of(usuario1, usuario1));
 
             // Act
             Map<String, UsuarioDto> resultado = facade.buscarUsuariosPorTitulos(titulos);
@@ -816,7 +804,7 @@ class UsuarioFacadeTest {
         void deveGarantirMapaNaoNuloParaListaVazia() {
             // Arrange
             List<String> titulos = Collections.emptyList();
-            when(usuarioConsultaService.buscarTodosPorIds(titulos)).thenReturn(Collections.emptyList());
+            when(usuarioService.buscarTodosPorIds(titulos)).thenReturn(Collections.emptyList());
 
             // Act
             Map<String, UsuarioDto> resultado = facade.buscarUsuariosPorTitulos(titulos);
@@ -832,7 +820,7 @@ class UsuarioFacadeTest {
             String titulo = "123456";
             Usuario usuario = criarUsuario(titulo);
 
-            when(usuarioConsultaService.buscarPorId(titulo)).thenReturn(usuario);
+            when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
 
             // Act
             Usuario resultado = facade.buscarPorId(titulo);
@@ -849,7 +837,7 @@ class UsuarioFacadeTest {
             String login = "123456";
             Usuario usuario = criarUsuario(login);
 
-            when(usuarioConsultaService.buscarPorIdComAtribuicoes(login)).thenReturn(usuario);
+            when(usuarioService.buscarPorIdComAtribuicoes(login)).thenReturn(usuario);
 
             // Act
             Usuario resultado = facade.buscarPorLogin(login);
@@ -857,7 +845,7 @@ class UsuarioFacadeTest {
             // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo(login);
-            verify(usuarioPerfilService).carregarAuthorities(usuario);
+            verify(usuarioService).carregarAuthorities(usuario);
         }
 
         @Test
