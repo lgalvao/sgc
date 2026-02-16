@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeMapaService;
+import sgc.organizacao.service.UnidadeService;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -44,7 +44,7 @@ class UnidadeFacadeElegibilidadePredicateTest {
     private UnidadeHierarquiaService hierarquiaService;
     
     @Mock
-    private UnidadeMapaService mapaService;
+    private UnidadeService unidadeService;
 
     @InjectMocks
     private UnidadeFacade facade;
@@ -125,7 +125,7 @@ class UnidadeFacadeElegibilidadePredicateTest {
         @DisplayName("Se mapa REQUERIDO e unidade TEM mapa: deve aceitar")
         void comMapaRequerido_UnidadeComMapa_DeveAceitar() {
             // Arrange
-            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(1L, 2L));
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L, 2L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
             
             // Act
@@ -146,7 +146,7 @@ class UnidadeFacadeElegibilidadePredicateTest {
         @DisplayName("Se mapa REQUERIDO e unidade NÃO TEM mapa: deve rejeitar")
         void comMapaRequerido_UnidadeSemMapa_DeveRejeitar() {
             // Arrange
-            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(2L, 3L));
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(2L, 3L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
             
             // Act
@@ -225,7 +225,7 @@ class UnidadeFacadeElegibilidadePredicateTest {
         @DisplayName("Todas condições verdadeiras: mapa requerido + tem mapa + não bloqueada + FINAL")
         void todasCondicoesVerdadeiras() {
             // Arrange
-            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(1L));
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
             
             // Act
@@ -246,7 +246,7 @@ class UnidadeFacadeElegibilidadePredicateTest {
         @DisplayName("Unidade FINAL + mapa requerido + sem mapa + não bloqueada = FALSO")
         void finalComMapaRequeridoSemMapa() {
             // Arrange
-            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(2L));
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(2L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
             
             // Act
@@ -290,7 +290,7 @@ class UnidadeFacadeElegibilidadePredicateTest {
         @DisplayName("Unidade INTERMEDIARIA (todas outras condições OK) = FALSO")
         void intermediariaSempreRejeitada() {
             // Arrange
-            when(mapaService.buscarTodosCodigosUnidades()).thenReturn(List.of(1L));
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
             
             // Act

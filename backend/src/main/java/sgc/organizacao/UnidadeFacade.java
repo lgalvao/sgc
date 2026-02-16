@@ -18,8 +18,8 @@ import java.util.*;
  *
  * <p>Este facade delega operações para serviços especializados
  * <ul>
+ *   <li>{@link UnidadeService} - Consultas básicas e mapas vigentes</li>
  *   <li>{@link UnidadeHierarquiaService} - Hierarquia e navegação</li>
- *   <li>{@link UnidadeMapaService} - Mapas vigentes</li>
  *   <li>{@link UnidadeResponsavelService} - Responsáveis e atribuições</li>
  * </ul>
  *
@@ -28,11 +28,10 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class UnidadeFacade {
-    private final UnidadeConsultaService unidadeConsultaService;
-    private final UsuarioConsultaService usuarioConsultaService;
+    private final UnidadeService unidadeService;
+    private final UsuarioService usuarioService;
     private final UsuarioMapper usuarioMapper;
     private final UnidadeHierarquiaService hierarquiaService;
-    private final UnidadeMapaService mapaService;
     private final UnidadeResponsavelService responsavelService;
 
     public List<UnidadeDto> buscarArvoreHierarquica() {
@@ -46,7 +45,7 @@ public class UnidadeFacade {
     public List<UnidadeDto> buscarArvoreComElegibilidade(
             boolean requerMapaVigente, Set<Long> unidadesBloqueadas) {
         Set<Long> unidadesComMapa = requerMapaVigente
-                ? new HashSet<>(mapaService.buscarTodosCodigosUnidades())
+                ? new HashSet<>(unidadeService.buscarTodosCodigosUnidadesComMapa())
                 : Collections.emptySet();
 
         return hierarquiaService.buscarArvoreComElegibilidade(u ->
@@ -85,12 +84,12 @@ public class UnidadeFacade {
     }
 
     public boolean verificarMapaVigente(Long codigoUnidade) {
-        return mapaService.verificarMapaVigente(codigoUnidade);
+        return unidadeService.verificarMapaVigente(codigoUnidade);
     }
 
     @Transactional
     public void definirMapaVigente(Long codigoUnidade, Mapa mapa) {
-        mapaService.definirMapaVigente(codigoUnidade, mapa);
+        unidadeService.definirMapaVigente(codigoUnidade, mapa);
     }
 
     public List<AtribuicaoTemporariaDto> buscarTodasAtribuicoes() {
@@ -121,7 +120,7 @@ public class UnidadeFacade {
     }
 
     public Unidade buscarEntidadePorSigla(String sigla) {
-        return unidadeConsultaService.buscarPorSigla(sigla);
+        return unidadeService.buscarPorSigla(sigla);
     }
 
     public UnidadeDto buscarPorCodigo(Long codigo) {
@@ -130,23 +129,23 @@ public class UnidadeFacade {
     }
 
     public Unidade buscarEntidadePorId(Long codigo) {
-        return unidadeConsultaService.buscarPorId(codigo);
+        return unidadeService.buscarPorId(codigo);
     }
 
     public List<Unidade> buscarEntidadesPorIds(List<Long> codigos) {
-        return unidadeConsultaService.buscarEntidadesPorIds(codigos);
+        return unidadeService.buscarEntidadesPorIds(codigos);
     }
 
     public List<Unidade> buscarTodasEntidadesComHierarquia() {
-        return unidadeConsultaService.buscarTodasEntidadesComHierarquia();
+        return unidadeService.buscarTodasEntidadesComHierarquia();
     }
 
     public List<String> buscarSiglasPorIds(List<Long> codigos) {
-        return unidadeConsultaService.buscarSiglasPorIds(codigos);
+        return unidadeService.buscarSiglasPorIds(codigos);
     }
 
     public List<UsuarioDto> buscarUsuariosPorUnidade(Long codigoUnidade) {
-        return usuarioConsultaService.buscarPorUnidadeLotacao(codigoUnidade).stream()
+        return usuarioService.buscarPorUnidadeLotacao(codigoUnidade).stream()
                 .map(usuarioMapper::toUsuarioDto)
                 .toList();
     }
