@@ -32,7 +32,8 @@ A documentação técnica foi desacoplada deste README para facilitar a manuten�
   padrões de projeto e regras fundamentais.
 * **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
 * **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
-* **[PLANO-REDUCAO-COMPLEXIDADE-CONSOLIDADO.md](PLANO-REDUCAO-COMPLEXIDADE-CONSOLIDADO.md)**: Plano consolidado de simplificação e redução de complexidade (incluindo impacto em testes e documentação).
+* **[simplification-plan.md](simplification-plan.md)**: Plano consolidado de simplificação com detalhes, contexto e passos de implementação.
+* **[simplification-tracking.md](simplification-tracking.md)**: Rastreamento de progresso da simplificação (métricas e status).
 
 ---
 
