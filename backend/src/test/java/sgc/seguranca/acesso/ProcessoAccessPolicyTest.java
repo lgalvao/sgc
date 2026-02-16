@@ -26,7 +26,6 @@ import static sgc.organizacao.model.Perfil.GESTOR;
 import static sgc.seguranca.acesso.Acao.*;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 @Tag("unit")
 @DisplayName("ProcessoAccessPolicyTest")
 class ProcessoAccessPolicyTest {
@@ -40,6 +39,8 @@ class ProcessoAccessPolicyTest {
     private Usuario usuarioAdmin;
     private Usuario usuarioGestor;
     private Processo processo;
+    private List<UsuarioPerfil> atribuicoesAdmin;
+    private List<UsuarioPerfil> atribuicoesGestor;
 
     @BeforeEach
     void setUp() {
@@ -48,14 +49,11 @@ class ProcessoAccessPolicyTest {
 
         usuarioAdmin = criarUsuario("1", "Admin");
         usuarioAdmin.setPerfilAtivo(ADMIN);
-        List<UsuarioPerfil> atribuicoesAdmin = adicionarAtribuicao(usuarioAdmin, ADMIN);
+        atribuicoesAdmin = adicionarAtribuicao(usuarioAdmin, ADMIN);
 
         usuarioGestor = criarUsuario("2", "Gestor");
         usuarioGestor.setPerfilAtivo(GESTOR);
-        List<UsuarioPerfil> atribuicoesGestor = adicionarAtribuicao(usuarioGestor, GESTOR);
-        
-        when(usuarioPerfilRepo.findByUsuarioTitulo("1")).thenReturn(atribuicoesAdmin);
-        when(usuarioPerfilRepo.findByUsuarioTitulo("2")).thenReturn(atribuicoesGestor);
+        atribuicoesGestor = adicionarAtribuicao(usuarioGestor, GESTOR);
     }
 
     @Test

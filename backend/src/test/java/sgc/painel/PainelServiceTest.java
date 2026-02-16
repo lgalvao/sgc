@@ -210,7 +210,6 @@ class PainelServiceTest {
             p.adicionarParticipantes(Set.of(u));
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
-            // Usamos lenient para atingir indiretamente o fluxo de segurança/null checks se houver
             lenient().when(unidadeService.buscarEntidadePorId(999L)).thenReturn(null);
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));

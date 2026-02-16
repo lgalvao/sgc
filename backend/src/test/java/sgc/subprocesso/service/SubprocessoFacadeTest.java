@@ -36,7 +36,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 @Tag("unit")
 @DisplayName("SubprocessoFacade - Testes Consolidados")
 class SubprocessoFacadeTest {

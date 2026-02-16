@@ -27,7 +27,6 @@ import static sgc.seguranca.acesso.Acao.CRIAR_ATIVIDADE;
 import static sgc.seguranca.acesso.Acao.LISTAR_SUBPROCESSOS;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 @Tag("unit")
 @DisplayName("AtividadeAccessPolicyTest")
 class AtividadeAccessPolicyTest {
@@ -42,6 +41,8 @@ class AtividadeAccessPolicyTest {
     private Usuario usuarioServidor;
     private Atividade atividade;
     private Unidade unidade;
+    private List<UsuarioPerfil> atribuicoesChefe;
+    private List<UsuarioPerfil> atribuicoesServidor;
 
     @BeforeEach
     void setUp() {
@@ -53,14 +54,11 @@ class AtividadeAccessPolicyTest {
 
         usuarioChefe = criarUsuario("123", "Chefe");
         usuarioChefe.setPerfilAtivo(CHEFE);
-        List<UsuarioPerfil> atribuicoesChefe = adicionarAtribuicao(usuarioChefe, CHEFE, unidade);
+        atribuicoesChefe = adicionarAtribuicao(usuarioChefe, CHEFE, unidade);
 
         usuarioServidor = criarUsuario("456", "Servidor");
         usuarioServidor.setPerfilAtivo(SERVIDOR);
-        List<UsuarioPerfil> atribuicoesServidor = adicionarAtribuicao(usuarioServidor, SERVIDOR, unidade);
-        
-        when(usuarioPerfilRepo.findByUsuarioTitulo("123")).thenReturn(atribuicoesChefe);
-        when(usuarioPerfilRepo.findByUsuarioTitulo("456")).thenReturn(atribuicoesServidor);
+        atribuicoesServidor = adicionarAtribuicao(usuarioServidor, SERVIDOR, unidade);
 
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(unidade);

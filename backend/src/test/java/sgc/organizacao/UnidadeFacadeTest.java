@@ -13,7 +13,6 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;

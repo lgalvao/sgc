@@ -40,7 +40,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 @Tag("unit")
 @DisplayName("Testes do EventoProcessoListener")
 class EventoProcessoListenerTest {
@@ -69,9 +68,11 @@ class EventoProcessoListenerTest {
     @Mock
     private AlertaFacade servicoAlertas;
 
-    @BeforeEach
-    void setup() {
+    private void stubTemplatesIniciado() {
         lenient().when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
+    }
+
+    private void stubTemplatesFinalizado() {
         lenient().when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
         lenient().when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any())).thenReturn("corpo");
     }
@@ -96,6 +97,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve disparar e-mails ao iniciar processo")
     void deveDispararEmailsAoIniciar() {
+        stubTemplatesIniciado();
         Processo processo = criarProcesso(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
@@ -141,6 +143,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve cobrir exceções de tipo de unidade no início")
     void deveCobrirExcecaoTipoUnidadeInvalido() {
+        stubTemplatesIniciado();
         Processo processo = criarProcesso(1L);
         Subprocesso s = new Subprocesso();
         Unidade u = criarUnidade(1L, TipoUnidade.SEM_EQUIPE);
@@ -167,6 +170,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve cobrir branches de substitutos")
     void deveCobrirBranchesSubstitutos() {
+        stubTemplatesIniciado();
         Processo processo = criarProcesso(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
@@ -200,6 +204,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve cobrir branches na finalização de processo")
     void deveCobrirBranchesFinalizacao() {
+        stubTemplatesFinalizado();
         Processo processo = criarProcesso(2L);
         when(processoFacade.buscarEntidadePorId(2L)).thenReturn(processo);
 
@@ -253,6 +258,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve cobrir exceção para unidade SEM_EQUIPE no envio de email")
     void deveCobrirExcecaoSemEquipe() {
+        stubTemplatesIniciado();
         Processo processo = criarProcesso(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
@@ -274,6 +280,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve cobrir else implícito na finalização (tipo desconhecido)")
     void deveCobrirElseImplicitoFinalizacao() {
+        stubTemplatesFinalizado();
         Processo processo = criarProcesso(2L);
         when(processoFacade.buscarEntidadePorId(2L)).thenReturn(processo);
 
@@ -322,6 +329,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve capturar exceção no catch interno do loop de e-mails")
     void deveCapturarExcecaoNoCatchInterno() {
+        stubTemplatesIniciado();
         Processo processo = criarProcesso(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
@@ -345,6 +353,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve ignorar participante sem responsável ou titular ao finalizar")
     void deveIgnorarParticipanteSemResponsavelOuTitularAoFinalizar() {
+        stubTemplatesFinalizado();
         Processo processo = criarProcesso(3L);
         when(processoFacade.buscarEntidadePorId(3L)).thenReturn(processo);
 
@@ -380,6 +389,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve ignorar e-mail se titular inválido ao iniciar")
     void deveIgnorarEmailSeTitularInvalidoAoIniciar() {
+        stubTemplatesIniciado();
         Processo processo = criarProcesso(1L);
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
 
@@ -420,6 +430,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve cobrir tipo INTEROPERACIONAL na finalização")
     void deveCobrirTipoInteroperacionalNaFinalizacao() {
+        stubTemplatesFinalizado();
         Processo processo = criarProcesso(5L);
         when(processoFacade.buscarEntidadePorId(5L)).thenReturn(processo);
 
@@ -444,6 +455,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve cobrir exceção ao enviar email para unidade intermediária")
     void deveCobrirExcecaoAoEnviarEmailUnidadeIntermediaria() {
+        stubTemplatesFinalizado();
         Processo processo = criarProcesso(6L);
         when(processoFacade.buscarEntidadePorId(6L)).thenReturn(processo);
 
@@ -480,6 +492,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve cobrir substituto com email null")
     void deveCobrirSubstitutoComEmailNull() {
+        stubTemplatesIniciado();
         Processo processo = criarProcesso(7L);
         when(processoFacade.buscarEntidadePorId(7L)).thenReturn(processo);
 
@@ -513,6 +526,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve cobrir responsáveis sem titulares na finalização")
     void deveCobrirResponsaveisSemTitularesNaFinalizacao() {
+        stubTemplatesFinalizado();
         Processo processo = criarProcesso(8L);
         when(processoFacade.buscarEntidadePorId(8L)).thenReturn(processo);
 
@@ -538,6 +552,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve cobrir catch de exceção durante envio de email")
     void deveCobrirCatchExcecaoDuranteEnvioEmail() {
+        stubTemplatesIniciado();
         Processo processo = criarProcesso(9L);
         when(processoFacade.buscarEntidadePorId(9L)).thenReturn(processo);
 
@@ -568,6 +583,7 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve cobrir intermediária sem subordinadas diretas filtradas")
     void deveCobrirIntermediariaSemSubordinadasFiltradas() {
+        stubTemplatesFinalizado();
         Processo processo = criarProcesso(10L);
         when(processoFacade.buscarEntidadePorId(10L)).thenReturn(processo);
 
@@ -615,6 +631,7 @@ class EventoProcessoListenerTest {
         @Test
         @DisplayName("aoIniciarProcesso com unidade INTERMEDIARIA envia email apenas para titular se substituto ausente")
         void aoIniciarProcesso_Intermediaria() {
+            stubTemplatesIniciado();
             Long codProcesso = 1L;
             EventoProcessoIniciado evento = EventoProcessoIniciado.builder()
                     .codProcesso(codProcesso)

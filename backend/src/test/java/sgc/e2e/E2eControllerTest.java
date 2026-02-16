@@ -416,7 +416,7 @@ class E2eControllerTest {
             try (Connection conn = mock(Connection.class);
                  Statement stmt = mock(Statement.class)) {
                 
-                lenient().when(stmt.execute(anyString())).thenReturn(true);
+                when(stmt.execute(anyString())).thenReturn(true);
                 doThrow(new SQLException("Erro H2")).when(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
 
                 DataSource ds = mock(DataSource.class);

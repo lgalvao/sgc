@@ -41,7 +41,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 @Tag("unit")
 class SubprocessoCadastroWorkflowServiceTest {
     @Mock
@@ -205,15 +204,109 @@ class SubprocessoCadastroWorkflowServiceTest {
     }
 
     @Test
-    @DisplayName("disponibilizar falha quando existem atividades sem conhecimento")
-    void disponibilizar_FalhaAtividadesSemConhecimento() {
-        Long id = 1L;
+    @DisplayName("reabrirRevisaoCadastro - Sucesso")
+    void reabrirRevisaoCadastro() {
+        Long codigo = 1L;
+        Unidade u = criarUnidade("U1");
         Subprocesso sp = new Subprocesso();
-        sp.setUnidade(criarUnidade("U1"));
-        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
-        when(validacaoService.obterAtividadesSemConhecimento(id)).thenReturn(List.of(1L));
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        sp.setUnidade(u);
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.disponibilizarCadastro(id, new Usuario()))
-                .isInstanceOf(ErroValidacao.class);
+        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(criarUnidade("ADMIN"));
+
+        service.reabrirRevisaoCadastro(codigo, "J");
+
+        verify(alertaService).criarAlertaReaberturaRevisao(any(), eq(u), eq("J"));
+    }
+
+    @Test
+    @DisplayName("disponibilizarRevisao - Sucesso")
+    void disponibilizarRevisao() {
+        Long id = 1L;
+        Usuario user = new Usuario();
+        Unidade u = criarUnidade("U1");
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+
+        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
+        when(validacaoService.obterAtividadesSemConhecimento(id)).thenReturn(Collections.emptyList());
+
+        service.disponibilizarRevisao(id, user);
+
+        verify(subprocessoRepo).save(sp);
+    }
+
+    @Test
+    @DisplayName("devolverRevisaoCadastro - Sucesso")
+    void devolverRevisaoCadastro() {
+        Long id = 1L;
+        Usuario user = new Usuario();
+        Unidade u = criarUnidade("U1");
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+
+        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
+
+        service.devolverRevisaoCadastro(id, user, "obs");
+
+        verify(transicaoService).registrarAnaliseETransicao(any());
+    }
+
+    @Test
+    @DisplayName("homologarRevisaoCadastro - Com Impactos")
+    void homologarRevisaoCadastro_ComImpactos() {
+        Long id = 1L;
+        Usuario user = new Usuario();
+        Subprocesso sp = new Subprocesso();
+        
+        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
+        ImpactoMapaResponse impacts = ImpactoMapaResponse.builder().temImpactos(true).build();
+        when(impactoMapaService.verificarImpactos(sp, user)).thenReturn(impacts);
+        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(criarUnidade("ADMIN"));
+
+        service.homologarRevisaoCadastro(id, user, "obs");
+
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        verify(subprocessoRepo).save(sp);
+    }
+
+    @Test
+    @DisplayName("homologarRevisaoCadastro - Sem Impactos")
+    void homologarRevisaoCadastro_SemImpactos() {
+        Long id = 1L;
+        Usuario user = new Usuario();
+        Subprocesso sp = new Subprocesso();
+        
+        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
+        ImpactoMapaResponse impacts = ImpactoMapaResponse.builder().temImpactos(false).build();
+        when(impactoMapaService.verificarImpactos(sp, user)).thenReturn(impacts);
+
+        service.homologarRevisaoCadastro(id, user, "obs");
+
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
+        verify(subprocessoRepo).save(sp);
+    }
+
+    @Test
+    @DisplayName("aceitarRevisaoCadastro - Com Unidade Superior da Analise")
+    void aceitarRevisaoCadastro_ComSuperiorAnalise() {
+        Long id = 1L;
+        Usuario user = new Usuario();
+        Unidade u = criarUnidade("U1");
+        Unidade sup = criarUnidade("SUP");
+        Unidade supSup = criarUnidade("SUPSUP");
+        u.setUnidadeSuperior(sup);
+        sup.setUnidadeSuperior(supSup);
+        
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+
+        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
+
+        service.aceitarRevisaoCadastro(id, user, "obs");
+
+        verify(transicaoService).registrarAnaliseETransicao(argThat(req -> req.unidadeDestinoTransicao().equals(supSup)));
     }
 }
+

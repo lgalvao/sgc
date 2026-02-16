@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("NotificacaoEmailAsyncExecutor")
 class NotificacaoEmailAsyncExecutorTest {
 
