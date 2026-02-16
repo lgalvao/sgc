@@ -278,7 +278,7 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
 ### 2.2. Backend - Introduzir @JsonView
 
 **Status:** 🟡 Iniciada  
-**Progresso:** 10%
+**Progresso:** 25%
 
 - [x] Definir views em 5 Entities principais
   - [x] Configuração (ParametroResponse removido parcialmente)
@@ -287,17 +287,32 @@ Após análise detalhada dos 9 services de organização, identificamos que algu
   - [ ] Subprocesso
   - [ ] Mapa
   - [ ] Atividade
-- [ ] Migrar 15 Responses simples para @JsonView
-- [ ] Manter 25 DTOs complexos (agregações, transformações)
+- [x] Analisar DTOs candidatos à substituição por @JsonView
+  - [x] Criar documento de análise detalhada (analise-dtos-jsonview.md)
+  - [x] Identificar 3 candidatos aprovados: AtividadeResponse, ConhecimentoResponse, ConhecimentoDto
+  - [x] Identificar 4 DTOs a manter: AtividadeOperacaoResponse, SubprocessoSituacaoDto, AtividadeDto, MensagemResponse
+- [ ] Migrar 3 Response simples para @JsonView
+  - [ ] Criar MapaViews.java
+  - [ ] Anotar campos em Atividade.java
+  - [ ] Anotar campos em Conhecimento.java
+  - [ ] Adicionar @JsonIgnore em relacionamentos
 - [ ] Criar testes de serialização para cada view
+  - [ ] AtividadeJsonViewTest.java
+  - [ ] ConhecimentoJsonViewTest.java
   - [ ] Validar campos Public
-  - [ ] Validar campos Admin
-  - [ ] Validar que campos sensíveis não vazam
+  - [ ] Validar que relacionamentos não vazam
 - [ ] Atualizar controllers com @JsonView
+  - [ ] Identificar controllers usando AtividadeResponse
+  - [ ] Identificar controllers usando ConhecimentoResponse
+  - [ ] Atualizar para retornar entities com @JsonView
 - [ ] Remover DTOs/Mappers obsoletos
+  - [ ] Remover AtividadeResponse.java
+  - [ ] Remover ConhecimentoResponse.java
+  - [ ] Remover ConhecimentoDto.java (visualização)
+  - [ ] Remover mappers associados
 
-**Arquivos Afetados:** -15 DTOs (~750 LOC)  
-**Testes Afetados:** ~25 ajustados, ~15 novos  
+**Arquivos Afetados:** -3 DTOs (~70 LOC), +1 análise (8KB)  
+**Testes Afetados:** ~10 ajustados, ~2 novos  
 **Bloqueadores:** Nenhum
 
 ### 2.3. Backend - Atualizar Testes de Arquitetura (Facades)
