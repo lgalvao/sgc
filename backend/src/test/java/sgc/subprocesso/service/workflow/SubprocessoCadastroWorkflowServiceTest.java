@@ -1,0 +1,219 @@
+package sgc.subprocesso.service.workflow;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import sgc.alerta.AlertaFacade;
+import sgc.analise.AnaliseFacade;
+import sgc.comum.erros.ErroValidacao;
+import sgc.comum.repo.ComumRepo;
+import sgc.mapa.dto.ImpactoMapaResponse;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.service.ImpactoMapaService;
+import sgc.mapa.service.MapaFacade;
+import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.SituacaoUnidade;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.seguranca.acesso.AccessControlService;
+import sgc.subprocesso.eventos.TipoTransicao;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
+import sgc.testutils.UnidadeTestBuilder;
+import sgc.testutils.UsuarioTestBuilder;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+@Tag("unit")
+class SubprocessoCadastroWorkflowServiceTest {
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private SubprocessoTransicaoService transicaoService;
+    @Mock
+    private UnidadeFacade unidadeService;
+    @Mock
+    private AnaliseFacade analiseFacade;
+    @Mock
+    private SubprocessoValidacaoService validacaoService;
+    @Mock
+    private ImpactoMapaService impactoMapaService;
+    @Mock
+    private AccessControlService accessControlService;
+    @Mock
+    private ComumRepo repo;
+    @Mock
+    private SubprocessoCrudService crudService;
+    @Mock
+    private AlertaFacade alertaService;
+    @Mock
+    private MovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private MapaFacade mapaFacade;
+    @Mock
+    private UsuarioFacade usuarioServiceFacade;
+
+    @InjectMocks
+    private SubprocessoCadastroWorkflowService service;
+
+    private Unidade criarUnidade(String sigla) {
+        Unidade u = new Unidade();
+        u.setSigla(sigla);
+        u.setSituacao(SituacaoUnidade.ATIVA);
+        return u;
+    }
+
+    @Test
+    @DisplayName("reabrirCadastro - Sucesso com loop de alertas")
+    void reabrirCadastro_LoopAlertas() {
+        Long codigo = 1L;
+        Unidade u = criarUnidade("U1");
+        Unidade sup = criarUnidade("SUP");
+        u.setUnidadeSuperior(sup);
+        
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        sp.setUnidade(u);
+
+        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(criarUnidade("ADMIN"));
+
+        service.reabrirCadastro(codigo, "J");
+
+        verify(alertaService).criarAlertaReaberturaCadastro(any(), eq(u), eq("J"));
+        verify(alertaService).criarAlertaReaberturaCadastroSuperior(any(), eq(sup), eq(u));
+    }
+
+    @Test
+    @DisplayName("disponibilizarCadastro quando unidade superior é null")
+    void disponibilizarCadastro_SuperiorNull() {
+        Long id = 1L;
+        Usuario user = new Usuario();
+        Unidade u = criarUnidade("U1");
+        u.setUnidadeSuperior(null);
+        
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(id);
+        sp.setUnidade(u);
+
+        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
+        when(validacaoService.obterAtividadesSemConhecimento(id)).thenReturn(Collections.emptyList());
+
+        service.disponibilizarCadastro(id, user);
+
+        verify(transicaoService).registrar(argThat(cmd -> cmd.destino().equals(u)));
+    }
+
+    @Test
+    @DisplayName("devolverCadastro quando unidade superior é null")
+    void devolverCadastro_SuperiorNull() {
+        Long id = 1L;
+        Usuario user = new Usuario();
+        Unidade u = criarUnidade("U1");
+        u.setUnidadeSuperior(null);
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+
+        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
+
+        service.devolverCadastro(id, user, "obs");
+
+        verify(transicaoService).registrarAnaliseETransicao(argThat(req -> req.unidadeAnalise().equals(u)));
+    }
+
+    @Test
+    @DisplayName("aceitarCadastro quando unidade superior é null")
+    void aceitarCadastro_SuperiorNull() {
+        Long id = 1L;
+        Usuario user = new Usuario();
+        Unidade u = criarUnidade("U1");
+        u.setUnidadeSuperior(null);
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+
+        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
+
+        service.aceitarCadastro(id, user, "obs");
+
+        verify(transicaoService).registrarAnaliseETransicao(argThat(req -> req.unidadeDestinoTransicao().equals(u)));
+    }
+
+    @Test
+    @DisplayName("aceitarRevisaoCadastro quando superior da analise é null")
+    void aceitarRevisaoCadastro_SuperiorAnaliseNull() {
+        Long id = 1L;
+        Usuario user = new Usuario();
+        Unidade u = criarUnidade("U1");
+        u.setUnidadeSuperior(null);
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+
+        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
+
+        service.aceitarRevisaoCadastro(id, user, "obs");
+
+        verify(transicaoService).registrarAnaliseETransicao(argThat(req -> req.unidadeDestinoTransicao().equals(u)));
+    }
+
+    @Test
+    @DisplayName("aceitarCadastroEmBloco - Sucesso")
+    void aceitarCadastroEmBloco() {
+        Long id = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(criarUnidade("U1"));
+        Usuario user = new Usuario();
+
+        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
+
+        service.aceitarCadastroEmBloco(List.of(id), user);
+
+        verify(transicaoService).registrarAnaliseETransicao(any());
+    }
+
+    @Test
+    @DisplayName("homologarCadastroEmBloco - Sucesso")
+    void homologarCadastroEmBloco() {
+        Long id = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        Usuario user = new Usuario();
+
+        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
+        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(criarUnidade("ADMIN"));
+
+        service.homologarCadastroEmBloco(List.of(id), user);
+
+        verify(subprocessoRepo).save(sp);
+    }
+
+    @Test
+    @DisplayName("disponibilizar falha quando existem atividades sem conhecimento")
+    void disponibilizar_FalhaAtividadesSemConhecimento() {
+        Long id = 1L;
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(criarUnidade("U1"));
+        when(crudService.buscarSubprocesso(id)).thenReturn(sp);
+        when(validacaoService.obterAtividadesSemConhecimento(id)).thenReturn(List.of(1L));
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.disponibilizarCadastro(id, new Usuario()))
+                .isInstanceOf(ErroValidacao.class);
+    }
+}
