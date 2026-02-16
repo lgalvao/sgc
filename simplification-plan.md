@@ -122,42 +122,36 @@ organizacao/service/
 - Regras ArchUnit: Nenhuma
 
 ##### 1.2. Consolidar SubprocessoServices (1 dia)
-**Estado Atual:** 8 services (1.624 LOC total)
+**Estado Atual (REAL VERIFICADO):** 3 services (496 LOC total)
 ```
 subprocesso/service/
-├── crud/
-│   ├── SubprocessoCrudService.java (156 LOC)
-│   └── SubprocessoValidacaoService.java (226 LOC)
-├── workflow/
-│   ├── SubprocessoMapaWorkflowService.java (422 LOC)
-│   ├── SubprocessoCadastroWorkflowService.java (338 LOC)
-│   ├── SubprocessoAdminWorkflowService.java (106 LOC)
-│   └── SubprocessoTransicaoService.java (111 LOC)
-├── query/
-│   └── ConsultasSubprocessoService.java (118 LOC)
-└── notificacao/
-    └── SubprocessoEmailService.java (147 LOC) ← WRAPPER
+├── SubprocessoAjusteMapaService.java (172 LOC, 8 métodos)
+├── SubprocessoAtividadeService.java (151 LOC, 7 métodos)
+└── SubprocessoContextoService.java (173 LOC, 6 métodos)
 ```
 
-**Estado Desejado:** 3 services (~1.400 LOC total)
+**NOTA:** A estrutura real difere significativamente do plano original. O módulo de subprocesso possui apenas 3 services especializados, não os 8 previstos. A lógica de workflow, CRUD, validação e notificações já está consolidada em outros componentes (SubprocessoFacade e services especializados).
+
+**Estado Desejado:** Manter estrutura atual
 ```
 subprocesso/service/
-├── SubprocessoService.java (~350 LOC)
-│   // CRUD + Consultas + Validação
-├── SubprocessoWorkflowService.java (~900 LOC)
-│   // Todas as transições de estado (complexidade legítima)
-└── (SubprocessoEmailService eliminado → NotificacaoService global)
+├── SubprocessoAjusteMapaService.java (manter - responsabilidade específica)
+├── SubprocessoAtividadeService.java (manter - responsabilidade específica)
+└── SubprocessoContextoService.java (manter - responsabilidade específica)
 ```
 
-**Justificativa:**
-- ✅ Elimina separação CQRS desnecessária (sistema sem carga para justificar)
-- ✅ Elimina wrapper de notificação (lógica já está em NotificacaoService)
-- ✅ WorkflowService com 900 LOC é justificado (18 estados, transições complexas)
-- ✅ Validação como métodos privados, não service separado
+**Justificativa para NÃO consolidar:**
+- ✅ Services já possuem alta coesão e responsabilidades bem definidas
+- ✅ Tamanhos adequados (150-173 LOC cada)
+- ✅ Sem wrappers ou pass-through identificados
+- ✅ Complexidade de workflow já gerenciada adequadamente
+- ⚠️ Consolidação forçada aumentaria complexidade sem benefício real
+
+**DECISÃO:** ⏸️ POSTERGAR esta consolidação. A estrutura atual já está otimizada.
 
 **Impacto:**
-- Redução: -5 arquivos, -224 LOC
-- Testes afetados: ~12
+- Redução: 0 arquivos (estrutura já adequada)
+- Testes afetados: 0
 - Regras ArchUnit: Nenhuma
 
 ##### 1.3. Atualizar Testes de Arquitetura (0.5 dia)
@@ -226,34 +220,38 @@ stores/
 - Testes afetados: ~8
 
 ##### 1.6. Eliminar Composables View-Specific (1 dia)
-**Composables a eliminar (10 arquivos):**
-- `useProcessoView.ts` → lógica para ProcessoView.vue
-- `useUnidadeView.ts` → lógica para UnidadeView.vue
-- `useVisAtividades.ts` → lógica para view
-- `useVisMapa.ts` → lógica para view
-- `useAtividadeForm.ts` → lógica para form component
-- `useProcessoForm.ts` → lógica para form component
-- `useCadAtividades.ts` → lógica para view
-- `useModalManager.ts` → substituir por useModal genérico
-- `useLoadingManager.ts` → usar reactive do Vue
-- `useApi.ts` → desnecessário
+**Composables a eliminar (6 arquivos, REAL VERIFICADO):**
+- `useCadAtividades.ts` (377 LOC) → lógica para CadAtividades.vue
+- `useVisMapa.ts` (300 LOC) → lógica para VisMapa.vue
+- `useVisAtividades.ts` (285 LOC) → lógica para VisAtividades.vue
+- `useProcessoView.ts` (187 LOC) → lógica para ProcessoView.vue
+- `useRelatorios.ts` (96 LOC) → lógica para Relatorios.vue
+- `useUnidadeView.ts` (80 LOC) → lógica para UnidadeView.vue
 
-**Composables GENÉRICOS a manter/criar (6 arquivos):**
-- `useForm.ts` - Validação + submit genérico
-- `useModal.ts` - Gerenciamento de modais
-- `usePagination.ts` - Paginação reutilizável
-- `useLocalStorage.ts` - Persistência
-- `useValidation.ts` - Validações comuns
-- `useBreadcrumbs.ts` - Navegação
+**Composables GENÉRICOS a manter (13 arquivos, já existem):**
+- ✅ `useLoadingManager.ts` (156 LOC) - Gerenciamento de loading states
+- ✅ `useModalManager.ts` (116 LOC) - Gerenciamento de modais
+- ✅ `useBreadcrumbs.ts` (122 LOC) - Navegação breadcrumb
+- ✅ `useProcessoForm.ts` (78 LOC) - Validação de formulário de processo
+- ✅ `useAtividadeForm.ts` (34 LOC) - Formulário de atividade
+- ✅ `useLocalStorage.ts` (64 LOC) - Persistência localStorage
+- ✅ `useErrorHandler.ts` (45 LOC) - Tratamento de erros
+- ✅ `usePerfil.ts` (45 LOC) - Utilitários de perfil
+- ✅ `useApi.ts` (29 LOC) - Wrapper de chamadas API
+- ✅ `useFormErrors.ts` (31 LOC) - Gerenciamento de erros de formulário
+- ✅ `useValidacao.ts` (13 LOC) - Validações comuns
+- ✅ `useProximaAcao.ts` (21 LOC) - Contexto de próxima ação
 
 **Justificativa:**
-- ✅ View-specific composables são anti-padrão
-- ✅ Lógica deve estar na View onde é usada
+- ✅ View-specific composables são anti-padrão (lógica deve estar na View)
 - ✅ Composables devem ser reutilizáveis entre múltiplas views
+- ✅ Reduz abstração desnecessária (1.325 LOC de view-specific code)
+- ✅ Melhora navegação (lógica no mesmo arquivo que template)
 
 **Impacto:**
-- Redução: -10 arquivos
-- Testes afetados: ~10
+- Redução: -6 arquivos view-specific (~1.325 LOC)
+- Testes afetados: ~6
+- Composables genéricos mantidos: 13
 
 #### Validação Fase 1 (1 dia)
 - [ ] Suite completa de testes backend passa
@@ -469,32 +467,32 @@ classes()
 ## 📊 Métricas e Resultados Esperados
 
 ### Antes da Simplificação
-| Métrica | Valor Atual |
+| Métrica | Valor Atual (Real) |
 |---------|-------------|
-| Arquivos Java | 250 |
-| Arquivos TS/Vue | 180 |
-| Services | 35 |
-| Facades | 12 |
-| DTOs | 78 |
-| Stores | 16 |
-| Composables | 18 |
+| Arquivos Java | 383+ |
+| Arquivos TS/Vue | 350+ |
+| Services | 17 (*Service.java) |
+| Facades | 14 |
+| DTOs | 86 |
+| Stores | 13 |
+| Composables | 19 |
 | Tempo adicionar campo | 15-17 arquivos |
 | Tempo onboarding | 2-3 semanas |
 | Camadas stack trace | 7 |
 
-### Após Fases 1+2 (Meta)
+### Após Fases 1+2 (Meta Revisada)
 | Métrica | Valor Alvo | Melhoria |
 |---------|------------|----------|
-| Arquivos Java | ~210 | **-16%** |
-| Arquivos TS/Vue | ~160 | **-11%** |
-| Services | ~20 | **-43%** |
-| Facades | 4-6 | **-50%** |
-| DTOs | ~25 | **-68%** |
-| Stores | 15 | **-6%** |
-| Composables | 6 | **-67%** |
-| Tempo adicionar campo | 5-7 arquivos | **-65%** ⭐ |
-| Tempo onboarding | 1 semana | **-60%** ⭐ |
-| Camadas stack trace | 4 | **-43%** ⭐ |
+| Arquivos Java | ~360 | **-6%** (reduzido: DTOs e services consolidados) |
+| Arquivos TS/Vue | ~330 | **-6%** (reduzido: composables view-specific) |
+| Services | 17 | **0%** (já otimizado após Fase 1.1) |
+| Facades | 8-10 | **-29%** (consolidar módulos relacionados) |
+| DTOs | ~70 | **-19%** (@JsonView para DTOs simples) |
+| Stores | 13 | **0%** (já consolidadas após Fase 1.5) |
+| Composables | 13 | **-32%** (eliminar 6 view-specific) |
+| Tempo adicionar campo | 8-10 arquivos | **-40%** ⭐ |
+| Tempo onboarding | 1-2 semanas | **-33%** ⭐ |
+| Camadas stack trace | 5-6 | **-20%** ⭐ |
 
 ### KPIs de Qualidade (Não podem degradar)
 - ✅ Cobertura de testes: manter ≥70%
