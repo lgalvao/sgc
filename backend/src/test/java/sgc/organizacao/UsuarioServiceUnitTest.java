@@ -13,10 +13,8 @@ import sgc.organizacao.model.Administrador;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.AdministradorService;
 import sgc.organizacao.service.UnidadeResponsavelService;
-import sgc.organizacao.service.UsuarioConsultaService;
-import sgc.organizacao.service.UsuarioPerfilService;
+import sgc.organizacao.service.UsuarioService;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,14 +33,7 @@ class UsuarioServiceUnitTest {
     private UsuarioFacade service;
     
     @Mock
-    private UsuarioConsultaService usuarioConsultaService;
-    
-    @Mock
-    private UsuarioPerfilService usuarioPerfilService;
-    
-    @Mock
-    private AdministradorService administradorService;
-    
+    private UsuarioService usuarioService;
 
     @Mock
     private UnidadeResponsavelService unidadeResponsavelService;
@@ -50,9 +41,7 @@ class UsuarioServiceUnitTest {
     @BeforeEach
     void setUp() {
         service = new UsuarioFacade(
-            usuarioConsultaService,
-            usuarioPerfilService,
-            administradorService,
+            usuarioService,
             unidadeResponsavelService
         );
     }
@@ -66,7 +55,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar nulo se usuário não encontrado ao carregar para autenticação")
         void deveRetornarNuloQuandoUsuarioNaoEncontrado() {
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional("user")).thenReturn(Optional.empty());
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional("user")).thenReturn(Optional.empty());
 
             assertThat(service.carregarUsuarioParaAutenticacao("user")).isNull();
         }
@@ -75,12 +64,12 @@ class UsuarioServiceUnitTest {
         @DisplayName("Deve carregar atribuições se usuário encontrado")
         void deveCarregarAtribuicoesQuandoEncontrado() {
             Usuario usuario = mock(Usuario.class);
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional("user")).thenReturn(Optional.of(usuario));
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional("user")).thenReturn(Optional.of(usuario));
 
             Usuario result = service.carregarUsuarioParaAutenticacao("user");
 
             assertThat(result).isNotNull();
-            verify(usuarioPerfilService).carregarAuthorities(usuario);
+            verify(usuarioService).carregarAuthorities(usuario);
         }
     }
 
@@ -91,7 +80,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar empty se usuário não encontrado por título")
         void deveRetornarEmptyQuandoNaoEncontradoPorTitulo() {
-            when(usuarioConsultaService.buscarPorIdOpcional("user")).thenReturn(Optional.empty());
+            when(usuarioService.buscarPorIdOpcional("user")).thenReturn(Optional.empty());
 
             assertThat(service.buscarUsuarioPorTitulo("user")).isEmpty();
         }
@@ -104,7 +93,7 @@ class UsuarioServiceUnitTest {
             Unidade lotacao = Unidade.builder().build();
             lotacao.setCodigo(1L);
             u.setUnidadeLotacao(lotacao);
-            when(usuarioConsultaService.buscarPorIdOpcional("user")).thenReturn(Optional.of(u));
+            when(usuarioService.buscarPorIdOpcional("user")).thenReturn(Optional.of(u));
 
             Optional<UsuarioDto> res = service.buscarUsuarioPorTitulo("user");
 
@@ -115,7 +104,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar lista vazia se não há usuários na unidade")
         void deveRetornarListaVaziaSeNaoHaUsuariosNaUnidade() {
-            when(usuarioConsultaService.buscarPorUnidadeLotacao(1L)).thenReturn(Collections.emptyList());
+            when(usuarioService.buscarPorUnidadeLotacao(1L)).thenReturn(Collections.emptyList());
 
             assertThat(service.buscarUsuariosPorUnidade(1L)).isEmpty();
         }
@@ -123,7 +112,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve lançar erro se usuário não encontrado por ID")
         void deveLancarErroSeUsuarioNaoEncontradoPorId() {
-            when(usuarioConsultaService.buscarPorId("user")).thenThrow(new ErroEntidadeNaoEncontrada("Usuário", "user"));
+            when(usuarioService.buscarPorId("user")).thenThrow(new ErroEntidadeNaoEncontrada("Usuário", "user"));
 
             assertThatThrownBy(() -> service.buscarPorId("user"))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -132,7 +121,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve lançar erro se usuário não encontrado por login")
         void deveLancarErroSeUsuarioNaoEncontradoPorLogin() {
-            when(usuarioConsultaService.buscarPorIdComAtribuicoes("user")).thenThrow(new ErroEntidadeNaoEncontrada("Usuário", "user"));
+            when(usuarioService.buscarPorIdComAtribuicoes("user")).thenThrow(new ErroEntidadeNaoEncontrada("Usuário", "user"));
 
             assertThatThrownBy(() -> service.buscarPorLogin("user"))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -143,7 +132,7 @@ class UsuarioServiceUnitTest {
         void deveBuscarUsuarioPorLoginComSucesso() {
             Usuario u = new Usuario();
             u.setTituloEleitoral("user");
-            when(usuarioConsultaService.buscarPorIdComAtribuicoes("user")).thenReturn(u);
+            when(usuarioService.buscarPorIdComAtribuicoes("user")).thenReturn(u);
 
             Usuario res = service.buscarPorLogin("user");
 
@@ -153,7 +142,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar empty se usuário não encontrado por email")
         void deveRetornarEmptySeUsuarioNaoEncontradoPorEmail() {
-            when(usuarioConsultaService.buscarPorEmail("email")).thenReturn(Optional.empty());
+            when(usuarioService.buscarPorEmail("email")).thenReturn(Optional.empty());
 
             assertThat(service.buscarUsuarioPorEmail("email")).isEmpty();
         }
@@ -161,7 +150,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar lista vazia se não há usuários ativos")
         void deveRetornarListaVaziaSeNaoHaUsuariosAtivos() {
-            when(usuarioConsultaService.buscarTodos()).thenReturn(Collections.emptyList());
+            when(usuarioService.buscarTodos()).thenReturn(Collections.emptyList());
 
             assertThat(service.buscarUsuariosAtivos()).isEmpty();
         }
@@ -174,7 +163,7 @@ class UsuarioServiceUnitTest {
             Unidade lotacao = new Unidade();
             lotacao.setCodigo(1L);
             u.setUnidadeLotacao(lotacao);
-            when(usuarioConsultaService.buscarTodosPorIds(anyList())).thenReturn(List.of(u));
+            when(usuarioService.buscarTodosPorIds(anyList())).thenReturn(List.of(u));
 
             var map = service.buscarUsuariosPorTitulos(List.of("u"));
 
@@ -192,7 +181,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar lista vazia se usuário não encontrado ao buscar unidades por perfil")
         void deveRetornarListaVaziaSeUsuarioNaoEncontradoAoBuscarUnidadesPorPerfil() {
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional("user")).thenReturn(Optional.empty());
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional("user")).thenReturn(Optional.empty());
 
             assertThat(service.buscarUnidadesPorPerfil("user", String.valueOf(Perfil.GESTOR))).isEmpty();
         }
@@ -200,7 +189,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar false se usuário não encontrado ao verificar perfil")
         void deveRetornarFalseSeUsuarioNaoEncontradoAoVerificarPerfil() {
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional("user")).thenReturn(Optional.empty());
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional("user")).thenReturn(Optional.empty());
 
             assertThat(service.usuarioTemPerfil("user", String.valueOf(Perfil.GESTOR), 1L)).isFalse();
         }
@@ -208,7 +197,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve retornar empty se usuário não encontrado ao buscar perfis")
         void deveRetornarEmptySeUsuarioNaoEncontradoAoBuscarPerfis() {
-            when(usuarioConsultaService.buscarPorIdComAtribuicoesOpcional("user")).thenReturn(Optional.empty());
+            when(usuarioService.buscarPorIdComAtribuicoesOpcional("user")).thenReturn(Optional.empty());
 
             assertThat(service.buscarPerfisUsuario("user")).isEmpty();
         }
@@ -225,8 +214,8 @@ class UsuarioServiceUnitTest {
         @DisplayName("Deve ignorar administradores inexistentes ao listar")
         void deveIgnorarAdministradoresInexistentesAoListar() {
             Administrador admin = Administrador.builder().usuarioTitulo("user").build();
-            when(administradorService.listarTodos()).thenReturn(List.of(admin));
-            when(usuarioConsultaService.buscarPorIdOpcional("user")).thenReturn(Optional.empty());
+            when(usuarioService.listarAdministradores()).thenReturn(List.of(admin));
+            when(usuarioService.buscarPorIdOpcional("user")).thenReturn(Optional.empty());
 
             assertThat(service.listarAdministradores()).isEmpty();
         }
@@ -236,8 +225,8 @@ class UsuarioServiceUnitTest {
         void deveLancarErroAoAdicionarAdministradorQueJaExiste() {
             Usuario u = new Usuario();
             u.setTituloEleitoral("user");
-            when(usuarioConsultaService.buscarPorId("user")).thenReturn(u);
-            doThrow(new ErroValidacao("Já existe")).when(administradorService).adicionar("user");
+            when(usuarioService.buscarPorId("user")).thenReturn(u);
+            doThrow(new ErroValidacao("Já existe")).when(usuarioService).adicionarAdministrador("user");
 
             assertThatThrownBy(() -> service.adicionarAdministrador("user"))
                     .isInstanceOf(ErroValidacao.class);
@@ -252,17 +241,17 @@ class UsuarioServiceUnitTest {
             unidade.setCodigo(1L);
             u.setUnidadeLotacao(unidade);
 
-            when(usuarioConsultaService.buscarPorId("user")).thenReturn(u);
+            when(usuarioService.buscarPorId("user")).thenReturn(u);
 
             service.adicionarAdministrador("user");
 
-            verify(administradorService).adicionar("user");
+            verify(usuarioService).adicionarAdministrador("user");
         }
 
         @Test
         @DisplayName("Deve lançar erro ao remover não-administrador")
         void deveLancarErroAoRemoverNaoAdministrador() {
-            doThrow(new ErroValidacao("Não é admin")).when(administradorService).remover("user");
+            doThrow(new ErroValidacao("Não é admin")).when(usuarioService).removerAdministrador("user");
 
             assertThatThrownBy(() -> service.removerAdministrador("user", "other"))
                     .isInstanceOf(ErroValidacao.class);
@@ -278,7 +267,7 @@ class UsuarioServiceUnitTest {
         @Test
         @DisplayName("Deve lançar erro ao remover único administrador")
         void deveLancarErroAoRemoverUnicoAdministrador() {
-            doThrow(new ErroValidacao("Único admin")).when(administradorService).remover("user");
+            doThrow(new ErroValidacao("Único admin")).when(usuarioService).removerAdministrador("user");
 
             assertThatThrownBy(() -> service.removerAdministrador("user", "other"))
                     .isInstanceOf(ErroValidacao.class);
@@ -289,13 +278,13 @@ class UsuarioServiceUnitTest {
         void deveRemoverAdministradorComSucesso() {
             service.removerAdministrador("user", "other");
 
-            verify(administradorService).remover("user");
+            verify(usuarioService).removerAdministrador("user");
         }
 
         @Test
         @DisplayName("Deve verificar se é administrador")
         void deveVerificarSeEhAdministrador() {
-            when(administradorService.isAdministrador("user")).thenReturn(true);
+            when(usuarioService.isAdministrador("user")).thenReturn(true);
 
             assertThat(service.isAdministrador("user")).isTrue();
         }

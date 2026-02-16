@@ -15,7 +15,7 @@ import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.service.UsuarioPerfilService;
+import sgc.organizacao.service.UsuarioService;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
 
@@ -33,7 +33,7 @@ public class LoginFacade {
     private final @Nullable ClienteAcessoAd clienteAcessoAd;
     private final UnidadeFacade unidadeService;
     private final UsuarioMapper usuarioMapper;
-    private final UsuarioPerfilService usuarioPerfilService;
+    private final UsuarioService usuarioServiceInterno;
 
     @Value("${aplicacao.ambiente-testes:true}")
     private boolean ambienteTestes;
@@ -43,13 +43,13 @@ public class LoginFacade {
             @Autowired(required = false) @Nullable ClienteAcessoAd clienteAcessoAd,
             UnidadeFacade unidadeService,
             UsuarioMapper usuarioMapper,
-            UsuarioPerfilService usuarioPerfilService) {
+            UsuarioService usuarioServiceInterno) {
         this.usuarioService = usuarioService;
         this.gerenciadorJwt = gerenciadorJwt;
         this.clienteAcessoAd = clienteAcessoAd;
         this.unidadeService = unidadeService;
         this.usuarioMapper = usuarioMapper;
-        this.usuarioPerfilService = usuarioPerfilService;
+        this.usuarioServiceInterno = usuarioServiceInterno;
     }
 
     /**
@@ -136,7 +136,7 @@ public class LoginFacade {
             throw new ErroAutenticacao("Credenciais inválidas");
         }
 
-        List<UsuarioPerfil> atribuicoes = usuarioPerfilService.buscarPorUsuario(usuario.getTituloEleitoral());
+        List<UsuarioPerfil> atribuicoes = usuarioServiceInterno.buscarPerfis(usuario.getTituloEleitoral());
         return atribuicoes.stream()
                 .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                 .map(atribuicao -> new PerfilUnidadeDto(

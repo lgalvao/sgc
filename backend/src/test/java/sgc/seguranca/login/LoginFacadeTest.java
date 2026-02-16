@@ -19,7 +19,7 @@ import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.service.UsuarioPerfilService;
+import sgc.organizacao.service.UsuarioService;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
 
@@ -42,7 +42,7 @@ class LoginFacadeTest {
     @Mock private ClienteAcessoAd clienteAcessoAd;
     @Mock private UnidadeFacade unidadeService;
     @Mock private UsuarioMapper usuarioMapper;
-    @Mock private UsuarioPerfilService usuarioPerfilService;
+    @Mock private UsuarioService usuarioServiceInterno;
 
     @InjectMocks
     private LoginFacade loginFacade;
@@ -87,7 +87,7 @@ class LoginFacadeTest {
     @Test
     @DisplayName("Deve retornar false quando ClienteAcessoAd é nulo em produção")
     void deveRetornarFalseQuandoClienteAdNulo() {
-        LoginFacade localFacade = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper, usuarioPerfilService);
+        LoginFacade localFacade = new LoginFacade(usuarioService, gerenciadorJwt, null, unidadeService, usuarioMapper, usuarioServiceInterno);
         ReflectionTestUtils.setField(localFacade, "ambienteTestes", false);
 
         boolean resultado = localFacade.autenticar("123", "senha");
@@ -118,7 +118,7 @@ class LoginFacadeTest {
         up.setUsuario(usuario);
 
         when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
-        when(usuarioPerfilService.buscarPorUsuario("123")).thenReturn(List.of(up));
+        when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
         
         when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(unidade))
             .thenReturn(UnidadeDto.builder().codigo(1L).build());
@@ -149,7 +149,7 @@ class LoginFacadeTest {
         up.setUsuario(usuario);
 
         when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
-        when(usuarioPerfilService.buscarPorUsuario("123")).thenReturn(List.of(up));
+        when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
         when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(unidade))
             .thenReturn(UnidadeDto.builder().codigo(2L).build());
         when(gerenciadorJwt.gerarToken(anyString(), any(Perfil.class), anyLong()))
@@ -182,7 +182,7 @@ class LoginFacadeTest {
         up.setUsuario(usuario);
 
         when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
-        when(usuarioPerfilService.buscarPorUsuario("123")).thenReturn(List.of(up));
+        when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
 
         when(usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(unidade))
             .thenReturn(UnidadeDto.builder().codigo(2L).build());
@@ -210,7 +210,7 @@ class LoginFacadeTest {
         up.setUsuario(usuario);
 
         when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
-        when(usuarioPerfilService.buscarPorUsuario("123")).thenReturn(List.of(up));
+        when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
 
         // A lista filtrada será vazia, logo authorized=false
         assertThatThrownBy(() -> loginFacade.entrar(req))
@@ -225,7 +225,7 @@ class LoginFacadeTest {
         usuario.setTituloEleitoral("123");
 
         when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
-        when(usuarioPerfilService.buscarPorUsuario(anyString())).thenReturn(Collections.emptyList());
+        when(usuarioServiceInterno.buscarPerfis(anyString())).thenReturn(Collections.emptyList());
 
         assertThatThrownBy(() -> loginFacade.entrar(req))
                 .isInstanceOf(ErroAcessoNegado.class);
@@ -259,7 +259,7 @@ class LoginFacadeTest {
         up.setUsuario(usuario);
 
         when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(usuario);
-        when(usuarioPerfilService.buscarPorUsuario("123")).thenReturn(List.of(up));
+        when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
 
         List<PerfilUnidadeDto> resultado = loginFacade.autorizar("123");
 

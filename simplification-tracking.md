@@ -39,27 +39,42 @@
 
 ### 1.1. Backend - Consolidar OrganizacaoServices
 
-**Status:** ⏳ Não Iniciado  
-**Progresso:** 0%
+**Status:** 🟡 Em Análise Detalhada  
+**Progresso:** 10%
 
-- [ ] Criar `OrganizacaoService.java`
-  - [ ] Consolidar métodos de UnidadeConsultaService
-  - [ ] Consolidar métodos de UnidadeHierarquiaService
-  - [ ] Consolidar métodos de HierarquiaService
+**DECISÃO APÓS ANÁLISE:** 
+Após análise detalhada dos 9 services de organização, identificamos que alguns já possuem responsabilidades bem definidas e separação justificada:
+
+- **HierarquiaService** (60 LOC): Lógica pura de verificação de hierarquia - MANTER separado (reutilizável)
+- **UnidadeHierarquiaService** (253 LOC): Algoritmos complexos de árvore hierárquica - MANTER separado (alta coesão)
+- **ValidadorDadosOrgService** (170 LOC): ApplicationRunner com validações de startup - MANTER separado (responsabilidade específica)
+- **UnidadeMapaService** (64 LOC): Gerenciamento de mapas vigentes - CANDIDATO à consolidação
+- **UnidadeConsultaService** (40 LOC): Wrapper puro - CONSOLIDAR
+- **UsuarioConsultaService** (51 LOC): Wrapper puro - CONSOLIDAR
+- **AdministradorService** (52 LOC): CRUD simples - CANDIDATO à consolidação
+- **UsuarioPerfilService** (32 LOC): Apenas 2 métodos - CANDIDATO à consolidação
+
+**PLANO REVISADO:**
+- [ ] Criar `UnidadeService.java` (~150 LOC)
+  - [ ] Consolidar métodos de UnidadeConsultaService (wrapper eliminado)
   - [ ] Consolidar métodos de UnidadeMapaService
-  - [ ] Consolidar métodos de ValidadorDadosOrgService
-- [ ] Criar `GestaoUsuariosService.java`
-  - [ ] Consolidar métodos de UsuarioConsultaService
+  - [ ] Adicionar métodos de CRUD básico
+- [ ] Criar `UsuarioService.java` (~150 LOC)
+  - [ ] Consolidar métodos de UsuarioConsultaService (wrapper eliminado)
   - [ ] Consolidar métodos de UsuarioPerfilService
   - [ ] Consolidar métodos de AdministradorService
-- [ ] Renomear `UnidadeResponsavelService` → `ResponsabilidadeService`
-- [ ] Atualizar Facades que usam esses services
-- [ ] Migrar testes unitários
+- [ ] MANTER separados (justificados):
+  - [ ] HierarquiaService (reutilizável, lógica pura)
+  - [ ] UnidadeHierarquiaService (algoritmos complexos)
+  - [ ] ValidadorDadosOrgService (ApplicationRunner)
+  - [ ] UnidadeResponsavelService (já tem nome apropriado)
+- [ ] Atualizar UnidadeFacade e UsuarioFacade
+- [ ] Migrar testes unitários (~10 testes)
 - [ ] Validar testes passam
-- [ ] Remover services antigos
+- [ ] Remover services consolidados (4 arquivos)
 
-**Arquivos Afetados:** 9 → 3 (-6)  
-**Testes Afetados:** ~15  
+**Arquivos Afetados:** 9 → 7 (-2 net, mais focado)  
+**Testes Afetados:** ~10  
 **Bloqueadores:** Nenhum
 
 ### 1.2. Backend - Consolidar SubprocessoServices
