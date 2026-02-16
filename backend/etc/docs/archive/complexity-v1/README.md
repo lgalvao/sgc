@@ -1,15 +1,17 @@
-# Arquivo: Análises de Complexidade v1
+# Arquivo: Análises de Complexidade v1 e v2
 
-**Data de Arquivamento:** 15 de Fevereiro de 2026  
-**Motivo:** Substituídas por análise consolidada
+**Data de Arquivamento:** 16 de Fevereiro de 2026  
+**Motivo:** Substituídas por plano consolidado na raiz
 
 ---
 
 ## 📦 Conteúdo
 
-Este diretório contém as **primeiras análises de complexidade** do SGC (versão 1), que foram **consolidadas e superadas** pelo plano atual.
+Este diretório contém as **análises de complexidade v1 e v2** do SGC, que foram **consolidadas** nos novos documentos na raiz do repositório.
 
 ### Arquivos Arquivados
+
+**Versão 1 (Análise Inicial):**
 
 1. **LEIA-ME-COMPLEXIDADE.md** (5.7 KB)
    - Análise inicial de complexidade
@@ -23,28 +25,52 @@ Este diretório contém as **primeiras análises de complexidade** do SGC (vers�
    - Comparação entre v1 e v2
    - **Status:** Histórico, não mais relevante após consolidação
 
+**Versão 2 (Análise Revisada):**
+
+4. **LEIA-ME-COMPLEXIDADE-V2.md** (23.9 KB)
+   - Reanálise com viés para simplificação prática
+   - Baseada em requisitos reais (6.104 linhas de especificações)
+   - **Status:** Base principal para consolidação
+
+5. **DECISOES-SIMPLIFICACAO.md** (13.4 KB)
+   - Registro de decisões técnicas
+   - O que manter vs remover vs adaptar
+   - **Status:** Integrado no plano consolidado
+
+6. **guia-implementacao-simplificacao-v2.md** (21.6 KB)
+   - Guia prático de implementação
+   - Exemplos de código e comandos
+   - **Status:** Integrado no plano consolidado
+
+7. **PLANO-REDUCAO-COMPLEXIDADE-CONSOLIDADO.md** (34.5 KB)
+   - Plano completo com análise de impacto em testes e documentação
+   - **Status:** Substituído pelos novos documentos consolidados na raiz
+
 ---
 
 ## 🔍 Por que foram arquivados?
 
 ### Problema com Múltiplas Versões
 
-Antes da consolidação, existiam **8 documentos** sobre complexidade:
-- 3 na raiz (v1, v2, comparison)
-- 2 summaries (txt)
-- 1 guia de implementação
-- 1 índice
-- 1 relatório detalhado
+Antes da consolidação, existiam **4 documentos** sobre complexidade/simplificação na raiz:
+- LEIA-ME-COMPLEXIDADE-V2.md (análise completa)
+- DECISOES-SIMPLIFICACAO.md (decisões)
+- guia-implementacao-simplificacao-v2.md (guia prático)
+- PLANO-REDUCAO-COMPLEXIDADE-CONSOLIDADO.md (plano completo)
 
-**Resultado:** Confusão sobre qual versão seguir, informações contraditórias, manutenção duplicada.
+**Resultado:** Informação espalhada em múltiplos arquivos, duplicação de conteúdo, difícil navegação.
 
 ### Solução: Consolidação
 
-✅ **Um único documento consolidado** na raiz:
-- `PLANO-REDUCAO-COMPLEXIDADE-CONSOLIDADO.md`
-- Integra TODAS as análises (v1 + v2)
-- Adiciona análise de impacto (testes + documentação)
-- Decisões finais sobre cada ponto
+✅ **Dois documentos consolidados** na raiz:
+- `simplification-plan.md` - Plano completo com detalhes, contexto e passos
+- `simplification-tracking.md` - Rastreamento de progresso e métricas
+
+**Benefícios:**
+- Única fonte da verdade
+- Separação clara: planejamento vs execução
+- Informação consolidada e organizada
+- Fácil manutenção e atualização
 
 ---
 
@@ -52,9 +78,10 @@ Antes da consolidação, existiam **8 documentos** sobre complexidade:
 
 Se precisar entender **por que** certas decisões foram tomadas:
 
-1. **Leia primeiro:** [PLANO-REDUCAO-COMPLEXIDADE-CONSOLIDADO.md](../../../../PLANO-REDUCAO-COMPLEXIDADE-CONSOLIDADO.md)
-2. **Se quiser detalhes históricos:** Consulte os arquivos deste diretório
-3. **Para implementação:** Siga o plano consolidado, não os arquivos arquivados
+1. **Leia primeiro:** [simplification-plan.md](../../../../../simplification-plan.md) na raiz
+2. **Para progresso:** [simplification-tracking.md](../../../../../simplification-tracking.md) na raiz
+3. **Se quiser detalhes históricos:** Consulte os arquivos deste diretório
+4. **Para implementação:** Siga os planos consolidados na raiz, não os arquivos arquivados
 
 ---
 
@@ -71,5 +98,6 @@ Estes arquivos estão aqui apenas para:
 
 ---
 
-**Data de Arquivamento:** 15/02/2026  
-**Arquivado por:** Agente de Consolidação de Complexidade
+**Data de Arquivamento:** 16/02/2026  
+**Arquivado por:** Agente de Consolidação de Complexidade  
+**Localização Atual:** `/backend/etc/docs/archive/complexity-v1/`
