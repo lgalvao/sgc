@@ -635,14 +635,99 @@ sgc/
 - **Contras**: Todos os problemas listados no Contexto
 - **Motivo da Rejeição**: Inseguro, não escalável
 
-### Alternativa 2: JsonView (❌ Rejeitada)
+### Alternativa 2: @JsonView (✅ USO LIMITADO - Atualizado 2026-02-16)
 
-- **Prós**: Controle de serialização sem DTOs
+**Status:** Aceito para casos específicos após revisão arquitetural.
+
+- **Prós**: 
+    - Reduz duplicação para DTOs simples (estrutura 1:1 com entidade)
+    - Menos arquivos para manter
+    - Padrão Spring bem testado
+    - Controle fino de serialização
 - **Contras**:
-    - Polui entidades com anotações de API
-    - Difícil manter múltiplas views
-    - Não resolve mass assignment
-- **Motivo da Rejeição**: Acoplamento alto
+    - Anotações de API nas entidades (acoplamento moderado)
+    - Não resolve mass assignment (DTOs de Request ainda necessários)
+    - Dificulta testes de contrato isolados
+    - Requer testes de serialização específicos
+- **Decisão Atualizada**: 
+    - ✅ **PERMITIDO** para DTOs de Response simples (estrutura 1:1)
+    - ❌ **PROIBIDO** para DTOs de Request (usar DTOs dedicados)
+    - ❌ **PROIBIDO** para agregações ou transformações (usar DTOs)
+    - ⚠️ **REQUER** testes de serialização para validar segurança
+
+**Quando Usar @JsonView:**
+
+```java
+// ✅ BOM: Entity simples com @JsonView
+@Entity
+public class Parametro {
+    public static class Views {
+        public interface Public {}
+        public interface Admin extends Public {}
+    }
+    
+    @JsonView(Views.Public.class)
+    @Id private Long codigo;
+    
+    @JsonView(Views.Public.class)
+    private String chave;
+    
+    @JsonView(Views.Public.class)
+    private String valor;
+    
+    @JsonView(Views.Admin.class)  // Apenas admin
+    private String valorInterno;
+}
+
+// Controller usa @JsonView
+@GetMapping("/{codigo}")
+@JsonView(Parametro.Views.Public.class)
+public Parametro buscar(@PathVariable Long codigo) {
+    return service.buscar(codigo);
+}
+```
+
+**Quando NÃO Usar @JsonView (usar DTOs):**
+
+```java
+// ❌ RUIM: Agregação - USAR DTO
+@Entity
+public class Subprocesso {
+    // ... muitos relacionamentos complexos
+    @OneToMany private List<Atividade> atividades;
+    @ManyToOne private Unidade unidade;
+    // @JsonView não consegue controlar agregação complexa
+}
+
+// ✅ BOM: Usar DTO de agregação
+public record SubprocessoDetalheDto(
+    Long codigo,
+    String descricao,
+    List<AtividadeDto> atividades,  // Agregação controlada
+    UnidadeDto unidade
+) {}
+```
+
+**Critérios de Decisão @JsonView vs DTO:**
+
+| Critério | @JsonView | DTO Dedicado |
+|----------|-----------|--------------|
+| Estrutura 1:1 com entidade | ✅ Sim | ⚠️ Opcional |
+| Agregação de múltiplas entities | ❌ Não | ✅ Sim |
+| Campos calculados/derivados | ❌ Não | ✅ Sim |
+| Request com validações complexas | ❌ Não | ✅ Sim |
+| Response simples sem lógica | ✅ Sim | ⚠️ Opcional |
+| Dados sensíveis a ocultar | ✅ Sim (Views) | ✅ Sim |
+
+**Regras de Enforcement:**
+
+1. **ArchUnit Atualizado:** Controllers podem retornar entities se anotadas com @JsonView
+2. **Testes de Serialização:** Obrigatórios para cada view definida
+3. **Code Review:** Verificar se @JsonView é apropriado para o caso
+
+**Motivo da Atualização:** Simplificação arquitetural identificou que DTOs simples (15 arquivos, ~750 LOC) duplicam desnecessariamente estrutura de entities. @JsonView é adequado para estes casos específicos, mantendo DTOs dedicados para casos complexos.
+
+**Ver:** ADR-008 (Simplification Decisions) para contexto completo desta mudança.
 
 ### Alternativa 3: GraphQL (❌ Não Aplicável)
 

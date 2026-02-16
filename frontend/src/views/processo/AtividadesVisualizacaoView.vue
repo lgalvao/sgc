@@ -134,17 +134,12 @@ import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import type {
   AceitarCadastroRequest,
-  AnaliseCadastro,
-  AnaliseValidacao,
-  Atividade,
   DevolverCadastroRequest,
   HomologarCadastroRequest,
   Unidade,
   UnidadeParticipante,
 } from "@/types/tipos";
 import {TipoProcesso} from "@/types/tipos";
-
-type Analise = AnaliseCadastro | AnaliseValidacao;
 
 const props = defineProps<{
   codProcesso: number | string;
