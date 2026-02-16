@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import sgc.acompanhamento.AcompanhamentoFacade;
+import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.Analise;
@@ -48,7 +48,7 @@ class SubprocessoCadastroControllerTest {
     private SubprocessoFacade subprocessoFacade;
 
     @MockitoBean
-    private AcompanhamentoFacade acompanhamentoFacade;
+    private AnaliseFacade analiseFacade;
 
     @MockitoBean
     private AnaliseMapper analiseMapper;
@@ -81,7 +81,7 @@ class SubprocessoCadastroControllerTest {
                     .tipo(null)
                     .build();
             
-            when(acompanhamentoFacade.listarAnalisesPorSubprocesso(1L, TipoAnalise.CADASTRO))
+            when(analiseFacade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO))
                     .thenReturn(List.of(analise));
             when(analiseMapper.toAnaliseHistoricoDto(any(Analise.class)))
                     .thenReturn(dto);
@@ -90,7 +90,7 @@ class SubprocessoCadastroControllerTest {
             mockMvc.perform(get("/api/subprocessos/1/historico-cadastro"))
                     .andExpect(status().isOk());
 
-            verify(acompanhamentoFacade).listarAnalisesPorSubprocesso(1L, TipoAnalise.CADASTRO);
+            verify(analiseFacade).listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
         }
     }
 
@@ -442,20 +442,20 @@ class SubprocessoCadastroControllerTest {
         // Manual mocks for isolated testing
         private SubprocessoCadastroController controller;
         private SubprocessoFacade subprocessoFacadeMock;
-        private AcompanhamentoFacade acompanhamentoFacadeMock;
+        private AnaliseFacade analiseFacadeMock;
         private AnaliseMapper analiseMapperMock;
         private OrganizacaoFacade organizacaoFacadeMock;
 
         @BeforeEach
         void setUp() {
             subprocessoFacadeMock = Mockito.mock(SubprocessoFacade.class);
-            acompanhamentoFacadeMock = Mockito.mock(AcompanhamentoFacade.class);
+            analiseFacadeMock = Mockito.mock(AnaliseFacade.class);
             analiseMapperMock = Mockito.mock(AnaliseMapper.class);
             organizacaoFacadeMock = Mockito.mock(OrganizacaoFacade.class);
 
             controller = new SubprocessoCadastroController(
                 subprocessoFacadeMock,
-                acompanhamentoFacadeMock,
+                analiseFacadeMock,
                 analiseMapperMock,
                 organizacaoFacadeMock
             );

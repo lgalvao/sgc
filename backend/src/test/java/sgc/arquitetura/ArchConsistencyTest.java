@@ -138,6 +138,9 @@ public class ArchConsistencyTest {
      * <p>Services especializados (que não são Facades) não devem ser acessados diretamente
      * por Controllers. Toda interação deve passar pela Facade apropriada.
      *
+     * <p><b>Exceções para simplificação (intranet ~10 usuários):</b>
+     * - ConfiguracaoController pode usar ConfiguracaoService diretamente (CRUD simples)
+     *
      * <p><b>Nota:</b> Esta regra substitui verificações anteriores específicas por serviço,
      * criando uma regra geral que se aplica a TODOS os services não-Facade.
      *
@@ -160,8 +163,13 @@ public class ArchConsistencyTest {
 
                         // Verifica se NÃO é um Facade
                         boolean isNotFacade = !targetClass.getSimpleName().endsWith("Facade");
+                        
+                        // Exceções para simplificação (intranet ~10 usuários)
+                        boolean isAllowedException = 
+                            (controller.getSimpleName().equals("ConfiguracaoController") && 
+                             targetClass.getSimpleName().equals("ConfiguracaoService"));
 
-                        if (isService && isNotFacade) {
+                        if (isService && isNotFacade && !isAllowedException) {
                             String message = String.format(
                                     "Controller %s depends on specialized service %s. " +
                                             "Controllers should only use Facades (ADR-001, ADR-006 Phase 2)",
@@ -174,30 +182,14 @@ public class ArchConsistencyTest {
             .because("Controllers should only use Facades (ADR-001, ADR-006 Phase 2) - specialized services must be accessed through Facades");
 
     /**
-     * Garante consistência no módulo consolidado de acompanhamento.
-     * Controllers de análise/alerta/painel devem depender de AcompanhamentoFacade.
+     * REMOVIDO: Facade AcompanhamentoFacade foi eliminada na simplificação agressiva
+     * para sistema intranet com ~10 usuários.
+     * 
+     * Controllers de análise/alerta/painel agora usam facades específicas diretamente
+     * (AlertaFacade, AnaliseFacade, PainelFacade) para reduzir indireção desnecessária.
+     * 
+     * Decisão documentada em simplification-tracking.md
      */
-    @ArchTest
-    static final ArchRule acompanhamento_controllers_should_depend_on_acompanhamento_facade = classes()
-            .that()
-            .haveNameMatching(".*Controller")
-            .and()
-            .resideInAnyPackage("sgc.analise..", "sgc.alerta..", "sgc.painel..")
-            .should(new ArchCondition<>("depend on AcompanhamentoFacade") {
-                @Override
-                public void check(JavaClass controller, ConditionEvents events) {
-                    boolean dependeDaFacade = controller.getDirectDependenciesFromSelf().stream()
-                            .map(Dependency::getTargetClass)
-                            .anyMatch(target -> target.getSimpleName().equals("AcompanhamentoFacade"));
-                    if (!dependeDaFacade) {
-                        String mensagem = String.format(
-                                "Controller %s deve depender de AcompanhamentoFacade no módulo consolidado de acompanhamento",
-                                controller.getSimpleName());
-                        events.add(SimpleConditionEvent.violated(controller, mensagem));
-                    }
-                }
-            })
-            .because("Controllers de analise/alerta/painel devem manter fronteira única via AcompanhamentoFacade");
 
     /**
      * Garante que todas as classes Facade tenham o sufixo "Facade" no nome.

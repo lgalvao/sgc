@@ -10,7 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sgc.acompanhamento.AcompanhamentoFacade;
+import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
@@ -34,7 +34,7 @@ import java.util.Optional;
 public class SubprocessoCadastroController {
 
     private final SubprocessoFacade subprocessoFacade;
-    private final AcompanhamentoFacade acompanhamentoFacade;
+    private final AnaliseFacade analiseFacade;
     private final AnaliseMapper analiseMapper;
     private final OrganizacaoFacade organizacaoFacade;
 
@@ -47,7 +47,7 @@ public class SubprocessoCadastroController {
     @GetMapping("/{codigo}/historico-cadastro")
     @PreAuthorize("isAuthenticated()")
     public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long codigo) {
-        return acompanhamentoFacade.listarAnalisesPorSubprocesso(codigo, TipoAnalise.CADASTRO).stream()
+        return analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.CADASTRO).stream()
                 .map(analiseMapper::toAnaliseHistoricoDto)
                 .toList();
     }
