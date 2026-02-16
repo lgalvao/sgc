@@ -9,7 +9,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import sgc.alerta.dto.AlertaDto;
-import sgc.acompanhamento.AcompanhamentoFacade;
 import sgc.organizacao.model.Usuario;
 
 import java.util.List;
@@ -20,14 +19,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Tag(name = "Alertas", description = "Gerenciamento de alertas para usuários")
 public class AlertaController {
-    private final AcompanhamentoFacade acompanhamentoFacade;
+    private final AlertaFacade alertaFacade;
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista todos os alertas do usuário autenticado")
     public ResponseEntity<List<AlertaDto>> listarAlertas(@AuthenticationPrincipal Object principal) {
         String usuarioTitulo = extractTituloUsuario(principal);
-        List<AlertaDto> alertas = acompanhamentoFacade.listarAlertasPorUsuario(usuarioTitulo);
+        List<AlertaDto> alertas = alertaFacade.listarAlertasPorUsuario(usuarioTitulo);
 
         return ResponseEntity.ok(alertas);
     }
@@ -37,7 +36,7 @@ public class AlertaController {
     @Operation(summary = "Lista alertas não lidos do usuário autenticado")
     public ResponseEntity<List<AlertaDto>> listarNaoLidos(@AuthenticationPrincipal Object principal) {
         String usuarioTitulo = extractTituloUsuario(principal);
-        List<AlertaDto> alertas = acompanhamentoFacade.listarAlertasNaoLidos(usuarioTitulo);
+        List<AlertaDto> alertas = alertaFacade.listarAlertasNaoLidos(usuarioTitulo);
 
         return ResponseEntity.ok(alertas);
     }
@@ -50,7 +49,7 @@ public class AlertaController {
             @AuthenticationPrincipal Object principal) {
 
         String usuarioTitulo = extractTituloUsuario(principal);
-        acompanhamentoFacade.marcarAlertasComoLidos(usuarioTitulo, codigos);
+        alertaFacade.marcarComoLidos(usuarioTitulo, codigos);
         return ResponseEntity.ok(Map.of("message", "Alertas marcados como lidos."));
     }
 

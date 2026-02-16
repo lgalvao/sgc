@@ -41,10 +41,6 @@ public class AlertaFacade {
     private final UsuarioFacade usuarioService;
     private final AlertaMapper alertaMapper;
     private final UnidadeFacade unidadeService;
-    
-    // Lazy supplier para Unidade Raiz - evita cache manual e é thread-safe
-    @Getter(lazy = true)
-    private final Unidade unidadeRaiz = unidadeService.buscarEntidadePorId(1L);
 
     /**
      * Obtém a sigla da unidade para exibição ao usuário.
@@ -58,6 +54,14 @@ public class AlertaFacade {
             return "ADMIN"; // Usuário vê ADMIN em vez de RAIZ
         }
         return unidade.getSigla();
+    }
+    
+    /**
+     * Obtém a unidade raiz (ADMIN) do sistema.
+     * Simplificado: sem cache lazy para sistema intranet com ~10 usuários.
+     */
+    private Unidade getUnidadeRaiz() {
+        return unidadeService.buscarEntidadePorId(1L);
     }
 
 

@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import sgc.configuracao.dto.ParametroRequest;
+import sgc.configuracao.mapper.ParametroMapper;
 import sgc.configuracao.model.ConfiguracaoViews;
 import sgc.configuracao.model.Parametro;
 
@@ -20,14 +21,15 @@ import java.util.List;
 @Tag(name = "Configurações", description = "Gerenciamento de configurações")
 @Validated
 public class ConfiguracaoController {
-    private final ConfiguracaoFacade configuracaoFacade;
+    private final ConfiguracaoService configuracaoService;
+    private final ParametroMapper parametroMapper;
 
     @JsonView(ConfiguracaoViews.Publica.class)
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Listar todas as configurações")
     public List<Parametro> listar() {
-        return configuracaoFacade.buscarTodos();
+        return configuracaoService.buscarTodos();
     }
 
     @JsonView(ConfiguracaoViews.Publica.class)
@@ -35,6 +37,15 @@ public class ConfiguracaoController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualizar configurações em bloco")
     public List<Parametro> atualizar(@RequestBody @Valid List<ParametroRequest> parametros) {
-        return configuracaoFacade.salvar(parametros);
+        // Buscar parâmetros existentes e atualizar com dados das requests
+        List<Parametro> parametrosAtualizados = parametros.stream()
+                .map(request -> {
+                    Parametro parametro = configuracaoService.buscarPorId(request.codigo());
+                    parametroMapper.atualizarEntidade(request, parametro);
+                    return parametro;
+                })
+                .toList();
+        
+        return configuracaoService.salvar(parametrosAtualizados);
     }
 }

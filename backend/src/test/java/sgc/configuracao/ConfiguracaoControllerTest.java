@@ -11,12 +11,14 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.configuracao.dto.ParametroRequest;
+import sgc.configuracao.mapper.ParametroMapper;
 import sgc.configuracao.model.Parametro;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,7 +37,10 @@ class ConfiguracaoControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @MockitoBean
-    private ConfiguracaoFacade configuracaoFacade;
+    private ConfiguracaoService configuracaoService;
+    
+    @MockitoBean
+    private ParametroMapper parametroMapper;
 
     @Test
     @DisplayName("GET /api/configuracoes - Deve listar configurações com sucesso")
@@ -47,7 +52,7 @@ class ConfiguracaoControllerTest {
                 .valor("VALUE")
                 .build();
         
-        when(configuracaoFacade.buscarTodos()).thenReturn(List.of(param));
+        when(configuracaoService.buscarTodos()).thenReturn(List.of(param));
 
         mockMvc.perform(get("/api/configuracoes")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -62,7 +67,7 @@ class ConfiguracaoControllerTest {
     @WithMockUser(roles = "ADMIN")
     void deveRetornarListaVaziaQuandoNaoHaConfiguracoes() throws Exception {
         // Pattern 1: Empty list validation
-        when(configuracaoFacade.buscarTodos()).thenReturn(Collections.emptyList());
+        when(configuracaoService.buscarTodos()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/configuracoes")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -82,7 +87,7 @@ class ConfiguracaoControllerTest {
                 .valor("NEW_VALUE")
                 .build();
         
-        when(configuracaoFacade.salvar(any())).thenReturn(List.of(response));
+        when(configuracaoService.salvar(any())).thenReturn(List.of(response));
 
         mockMvc.perform(post("/api/configuracoes")
                         .with(csrf())
@@ -99,7 +104,7 @@ class ConfiguracaoControllerTest {
     @WithMockUser(roles = "ADMIN")
     void deveRetornarListaVaziaAposAtualizacao() throws Exception {
         // Pattern 1: Empty list validation
-        when(configuracaoFacade.salvar(any())).thenReturn(Collections.emptyList());
+        when(configuracaoService.salvar(any())).thenReturn(Collections.emptyList());
 
         mockMvc.perform(post("/api/configuracoes")
                         .with(csrf())

@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AlertaControllerExtractTituloTest {
 
     @Mock
-    private sgc.acompanhamento.AcompanhamentoFacade acompanhamentoFacade;
+    private AlertaFacade alertaFacade;
 
     @InjectMocks
     private AlertaController controller;

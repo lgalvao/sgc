@@ -13,7 +13,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.alerta.dto.AlertaDto;
 import sgc.organizacao.model.Perfil;
-import sgc.acompanhamento.AcompanhamentoFacade;
+import sgc.painel.PainelFacade;
 import sgc.processo.dto.ProcessoResumoDto;
 
 import java.util.Collections;
@@ -33,14 +33,14 @@ class PainelControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private sgc.acompanhamento.AcompanhamentoFacade acompanhamentoFacade;
+    private PainelFacade painelFacade;
 
     @Test
     @DisplayName("GET /api/painel/processos - Deve listar processos com sucesso")
     @WithMockUser
     void listarProcessos_Sucesso() throws Exception {
         Page<ProcessoResumoDto> page = new PageImpl<>(Collections.emptyList());
-        when(acompanhamentoFacade.listarProcessosPainel(any(Perfil.class), any(), any(Pageable.class))).thenReturn(page);
+        when(painelFacade.listarProcessos(any(Perfil.class), any(), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/painel/processos")
                         .param("perfil", "ADMIN")
@@ -64,7 +64,7 @@ class PainelControllerTest {
     @WithMockUser
     void listarAlertas_Sucesso() throws Exception {
         Page<AlertaDto> page = new PageImpl<>(Collections.emptyList());
-        when(acompanhamentoFacade.listarAlertasPainel(any(), any(), any(Pageable.class))).thenReturn(page);
+        when(painelFacade.listarAlertas(any(), any(), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/painel/alertas")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -78,7 +78,7 @@ class PainelControllerTest {
     @WithMockUser
     void listarAlertas_ComFiltros_Sucesso() throws Exception {
         Page<AlertaDto> page = new PageImpl<>(Collections.emptyList());
-        when(acompanhamentoFacade.listarAlertasPainel(eq("123"), eq(1L), any(Pageable.class))).thenReturn(page);
+        when(painelFacade.listarAlertas(eq("123"), eq(1L), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/painel/alertas")
                         .param("usuarioTitulo", "123")

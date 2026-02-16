@@ -492,8 +492,8 @@ class AlertaFacadeTest {
     @DisplayName("Método: getUnidadeRaiz (Lazy Load)")
     class GetUnidadeRaiz {
     @Test
-        @DisplayName("Deve inicializar unidadeRaiz apenas na primeira chamada (lazy load)")
-        void deveInicializarUnidadeRaizLazyLoad() {
+        @DisplayName("Deve buscar unidadeRaiz para cada operação (sem cache lazy para sistema pequeno)")
+        void deveBuscarUnidadeRaizParaCadaOperacao() {
             Unidade unidadeRaizMock = new Unidade();
             unidadeRaizMock.setSigla("ADMIN");
             unidadeRaizMock.setCodigo(1L);
@@ -505,11 +505,11 @@ class AlertaFacadeTest {
             service.criarAlertaAdmin(new Processo(), new Unidade(), "Teste");
             verify(unidadeService).buscarEntidadePorId(1L);
 
-            // Segunda chamada: não deve buscar novamente (cache)
+            // Segunda chamada: busca novamente (sem cache lazy - simplificação para sistema pequeno)
             service.criarAlertaAdmin(new Processo(), new Unidade(), "Teste 2");
             // No mockito, verify acumula as chamadas, mas como é lazy, a segunda chamada não deve invocar o metodo no service.
             // Então verify(times(1)) deve ser correto para o total.
-            verify(unidadeService, times(1)).buscarEntidadePorId(1L);
+            verify(unidadeService, times(2)).buscarEntidadePorId(1L);
         }
     }
 }

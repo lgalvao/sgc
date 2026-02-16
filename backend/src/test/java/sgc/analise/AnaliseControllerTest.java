@@ -14,7 +14,7 @@ import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.acompanhamento.AcompanhamentoFacade;
+import sgc.analise.AnaliseFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,7 +48,7 @@ class AnaliseControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private sgc.acompanhamento.AcompanhamentoFacade acompanhamentoFacade;
+    private AnaliseFacade analiseFacade;
 
     @MockitoBean
     private SubprocessoFacade subprocessoFacade;
@@ -84,7 +84,7 @@ class AnaliseControllerTest {
             AnaliseHistoricoDto dto2 = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_2).build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(acompanhamentoFacade.listarAnalisesPorSubprocesso(1L, TipoAnalise.CADASTRO))
+            when(analiseFacade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO))
                     .thenReturn(Arrays.asList(analise1, analise2));
             when(analiseMapper.toAnaliseHistoricoDto(analise1)).thenReturn(dto1);
             when(analiseMapper.toAnaliseHistoricoDto(analise2)).thenReturn(dto2);
@@ -101,7 +101,7 @@ class AnaliseControllerTest {
         @WithMockUser
         void deveRetornarListaVaziaDeAnalisesCadastro() throws Exception {
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(acompanhamentoFacade.listarAnalisesPorSubprocesso(1L, TipoAnalise.CADASTRO))
+            when(analiseFacade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO))
                     .thenReturn(Collections.emptyList());
 
             mockMvc.perform(get(API_SUBPROCESSOS_1_ANALISES_CADASTRO))
@@ -124,7 +124,7 @@ class AnaliseControllerTest {
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes(NOVA_ANALISE_DE_CADASTRO).build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(acompanhamentoFacade.criarAnalise(any(), any())).thenReturn(analise);
+            when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
             when(analiseMapper.toAnaliseHistoricoDto(analise)).thenReturn(dto);
 
             mockMvc.perform(
@@ -145,7 +145,7 @@ class AnaliseControllerTest {
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes("").build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(acompanhamentoFacade.criarAnalise(any(), any())).thenReturn(analise);
+            when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
             when(analiseMapper.toAnaliseHistoricoDto(analise)).thenReturn(dto);
 
             mockMvc.perform(
@@ -165,7 +165,7 @@ class AnaliseControllerTest {
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(acompanhamentoFacade.criarAnalise(any(), any())).thenReturn(analise);
+            when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
             when(analiseMapper.toAnaliseHistoricoDto(analise)).thenReturn(dto);
 
             mockMvc.perform(
@@ -183,7 +183,7 @@ class AnaliseControllerTest {
             CriarAnaliseRequest request = new CriarAnaliseRequest("123456789012", ANALISE_INVALIDA, "S", "M");
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(acompanhamentoFacade.criarAnalise(any(), any()))
+            when(analiseFacade.criarAnalise(any(), any()))
                     .thenThrow(new IllegalArgumentException("Parâmetro inválido"));
 
             mockMvc.perform(
@@ -207,7 +207,7 @@ class AnaliseControllerTest {
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_1).build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(acompanhamentoFacade.listarAnalisesPorSubprocesso(1L, TipoAnalise.VALIDACAO))
+            when(analiseFacade.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO))
                     .thenReturn(Collections.singletonList(analise));
             when(analiseMapper.toAnaliseHistoricoDto(analise)).thenReturn(dto);
 
@@ -221,7 +221,7 @@ class AnaliseControllerTest {
         @WithMockUser
         void deveRetornarListaVaziaDeAnalisesValidacao() throws Exception {
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(acompanhamentoFacade.listarAnalisesPorSubprocesso(1L, TipoAnalise.VALIDACAO))
+            when(analiseFacade.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO))
                     .thenReturn(Collections.emptyList());
 
             mockMvc.perform(get(API_SUBPROCESSOS_1_ANALISES_VALIDACAO))
@@ -243,7 +243,7 @@ class AnaliseControllerTest {
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes(NOVA_ANALISE_DE_VALIDACAO).build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(acompanhamentoFacade.criarAnalise(any(), any())).thenReturn(analise);
+            when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
             when(analiseMapper.toAnaliseHistoricoDto(analise)).thenReturn(dto);
 
             mockMvc.perform(
