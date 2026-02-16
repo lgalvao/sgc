@@ -10,7 +10,7 @@ import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.mapper.UsuarioMapper;
+import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Usuario;
@@ -32,7 +32,6 @@ public class LoginFacade {
     private final GerenciadorJwt gerenciadorJwt;
     private final @Nullable ClienteAcessoAd clienteAcessoAd;
     private final UnidadeFacade unidadeService;
-    private final UsuarioMapper usuarioMapper;
     private final UsuarioService usuarioServiceInterno;
 
     @Value("${aplicacao.ambiente-testes:true}")
@@ -42,13 +41,11 @@ public class LoginFacade {
             GerenciadorJwt gerenciadorJwt,
             @Autowired(required = false) @Nullable ClienteAcessoAd clienteAcessoAd,
             UnidadeFacade unidadeService,
-            UsuarioMapper usuarioMapper,
             UsuarioService usuarioServiceInterno) {
         this.usuarioService = usuarioService;
         this.gerenciadorJwt = gerenciadorJwt;
         this.clienteAcessoAd = clienteAcessoAd;
         this.unidadeService = unidadeService;
-        this.usuarioMapper = usuarioMapper;
         this.usuarioServiceInterno = usuarioServiceInterno;
     }
 
@@ -141,7 +138,7 @@ public class LoginFacade {
                 .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                 .map(atribuicao -> new PerfilUnidadeDto(
                         atribuicao.getPerfil(),
-                        usuarioMapper.toUnidadeDtoComElegibilidadeCalculada(atribuicao.getUnidade())))
+                        UnidadeDto.fromEntity(atribuicao.getUnidade())))
                 .toList();
     }
 

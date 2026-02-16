@@ -1,5 +1,8 @@
 package sgc.subprocesso.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,31 +28,62 @@ import java.util.List;
 public class Subprocesso extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "processo_codigo", nullable = false)
+    @JsonIgnore
     private Processo processo;
 
     @ManyToOne
     @JoinColumn(name = "unidade_codigo", nullable = false)
+    @JsonIgnore
     private Unidade unidade;
 
     @OneToOne(mappedBy = "subprocesso")
+    @JsonIgnore
     private Mapa mapa;
 
+    @JsonView(sgc.comum.model.ComumViews.Publica.class)
     @Column(name = "data_limite_etapa1", nullable = false)
     private LocalDateTime dataLimiteEtapa1;
 
+    @JsonView(sgc.comum.model.ComumViews.Publica.class)
     @Column(name = "data_fim_etapa1")
     private LocalDateTime dataFimEtapa1;
 
+    @JsonView(sgc.comum.model.ComumViews.Publica.class)
     @Column(name = "data_limite_etapa2")
     private LocalDateTime dataLimiteEtapa2;
 
+    @JsonView(sgc.comum.model.ComumViews.Publica.class)
     @Column(name = "data_fim_etapa2")
     private LocalDateTime dataFimEtapa2;
 
+    @JsonView(sgc.comum.model.ComumViews.Publica.class)
     @Enumerated(EnumType.STRING)
     @Column(name = "situacao", length = 50, nullable = false)
     @lombok.Builder.Default
     private SituacaoSubprocesso situacao = SituacaoSubprocesso.NAO_INICIADO;
+
+    @JsonView(sgc.comum.model.ComumViews.Publica.class)
+    public List<sgc.mapa.model.Atividade> getAtividades() {
+        return mapa != null ? mapa.getAtividades() : List.of();
+    }
+
+    @JsonView(sgc.comum.model.ComumViews.Publica.class)
+    @JsonProperty("codProcesso")
+    public Long getCodProcesso() {
+        return processo != null ? processo.getCodigo() : null;
+    }
+
+    @JsonView(sgc.comum.model.ComumViews.Publica.class)
+    @JsonProperty("codUnidade")
+    public Long getCodUnidade() {
+        return unidade != null ? unidade.getCodigo() : null;
+    }
+
+    @JsonView(sgc.comum.model.ComumViews.Publica.class)
+    @JsonProperty("codMapa")
+    public Long getCodMapa() {
+        return mapa != null ? mapa.getCodigo() : null;
+    }
 
     public void setSituacao(SituacaoSubprocesso novaSituacao) {
         if (processo != null && situacao != null && situacao != novaSituacao && !situacao.podeTransicionarPara(novaSituacao, processo.getTipo())) {
@@ -60,10 +94,6 @@ public class Subprocesso extends EntidadeBase {
         situacao = novaSituacao;
     }
 
-    /**
-     * Define a situação ignorando as regras de transição.
-     * USO EXCLUSIVO PARA TESTES E SETUP DE DADOS.
-     */
     public void setSituacaoForcada(SituacaoSubprocesso novaSituacao) {
         this.situacao = novaSituacao;
     }

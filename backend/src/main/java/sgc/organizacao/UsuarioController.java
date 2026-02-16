@@ -10,7 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sgc.organizacao.dto.AdministradorDto;
-import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.OrganizacaoViews;
 import sgc.organizacao.model.Usuario;
 
@@ -27,8 +26,8 @@ public class UsuarioController {
 
     @JsonView(OrganizacaoViews.Publica.class)
     @GetMapping("/{titulo}")
-    public ResponseEntity<UsuarioDto> buscarUsuarioPorTitulo(@PathVariable String titulo) {
-        return usuarioService.buscarUsuarioPorTitulo(titulo)
+    public ResponseEntity<Usuario> buscarUsuarioPorTitulo(@PathVariable String titulo) {
+        return usuarioService.buscarEntidadeUsuarioPorTitulo(titulo)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

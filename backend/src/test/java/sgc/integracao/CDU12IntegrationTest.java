@@ -57,8 +57,8 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
             "/api/subprocessos/{codigo}/impactos-mapa";
     private static final String CHEFE_TITULO = "121212121212";
     private static final String TEM_IMPACTOS_JSON_PATH = "$.temImpactos";
-    private static final String TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH = "$.totalAtividadesInseridas";
-    private static final String TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH = "$.totalAtividadesRemovidas";
+    private static final String TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH = "$.atividadesInseridas.length()";
+    private static final String TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH = "$.atividadesRemovidas.length()";
 
     // Repositories
     @Autowired
@@ -247,7 +247,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.totalCompetenciasImpactadas", is(1)));
+                    .andExpect(jsonPath("$.competenciasImpactadas.length()", is(1)));
         }
     }
 

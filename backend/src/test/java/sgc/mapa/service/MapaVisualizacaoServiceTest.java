@@ -7,20 +7,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.dto.MapaVisualizacaoResponse;
+import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import sgc.mapa.model.Conhecimento;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -29,7 +26,7 @@ class MapaVisualizacaoServiceTest {
     @Mock
     private CompetenciaRepo competenciaRepo;
     @Mock
-    private AtividadeRepo atividadeRepo;
+    private MapaRepo mapaRepo;
     @InjectMocks
     private MapaVisualizacaoService service;
 
@@ -38,10 +35,6 @@ class MapaVisualizacaoServiceTest {
     void deveObterMapaParaVisualizacao() {
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(1L);
-
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(10L);
-        sub.setMapa(mapa);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(100L);
@@ -55,44 +48,32 @@ class MapaVisualizacaoServiceTest {
         ativ2.setCodigo(2L);
         ativ2.setDescricao("A2");
 
-        List<Object[]> projectionResult = new ArrayList<>();
-        projectionResult.add(new Object[]{50L, "C1", 1L});
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
+        mapa.setAtividades(List.of(ativ1, ativ2));
+        sub.setMapa(mapa);
 
-        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(10L)).thenReturn(List.of(ativ1, ativ2));
-        when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(10L)).thenReturn(projectionResult);
+        Competencia comp1 = new Competencia();
+        comp1.setCodigo(50L);
+        comp1.setDescricao("C1");
+        comp1.setAtividades(Set.of(ativ1));
 
-        MapaVisualizacaoDto dto = service.obterMapaParaVisualizacao(sub);
+        when(mapaRepo.findFullBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapa));
+        when(competenciaRepo.findByMapa_Codigo(10L)).thenReturn(List.of(comp1));
 
-        assertThat(dto).isNotNull();
-        assertThat(dto.competencias()).hasSize(1);
-        assertThat(dto.atividadesSemCompetencia()).hasSize(1);
-        assertThat(dto.atividadesSemCompetencia().getFirst().codigo()).isEqualTo(2L);
-    }
-    @Test
-    @DisplayName("Deve ignorar atividade não encontrada nos tuples de competência")
-    void deveIgnorarAtividadeNaoEncontrada() {
-        Subprocesso sub = new Subprocesso();
-        sub.setMapa(new Mapa());
-        sub.getMapa().setCodigo(10L);
-        sub.setUnidade(new Unidade());
+        MapaVisualizacaoResponse response = service.obterMapaParaVisualizacao(sub);
 
-        List<Object[]> projectionResult = new ArrayList<>();
-        projectionResult.add(new Object[]{50L, "C1", 999L}); // 999L não existe nas atividades
-
-        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(10L)).thenReturn(List.of());
-        when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(10L)).thenReturn(projectionResult);
-
-        MapaVisualizacaoDto dto = service.obterMapaParaVisualizacao(sub);
-
-        assertThat(dto.competencias().getFirst().getAtividades()).isEmpty();
+        assertThat(response).isNotNull();
+        assertThat(response.competencias()).hasSize(1);
+        assertThat(response.atividadesSemCompetencia()).hasSize(1);
+        assertThat(response.atividadesSemCompetencia().getFirst().getCodigo()).isEqualTo(2L);
     }
 
     @Test
     @DisplayName("Deve mapear conhecimentos das atividades")
     void deveMapearConhecimentos() {
         Subprocesso sub = new Subprocesso();
-        sub.setMapa(new Mapa());
-        sub.getMapa().setCodigo(10L);
+        sub.setCodigo(1L);
         sub.setUnidade(new Unidade());
 
         Atividade ativ = new Atividade();
@@ -105,12 +86,17 @@ class MapaVisualizacaoServiceTest {
                 .build();
         ativ.setConhecimentos(List.of(k));
 
-        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(10L)).thenReturn(List.of(ativ));
-        when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(10L)).thenReturn(List.of());
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
+        mapa.setAtividades(List.of(ativ));
+        sub.setMapa(mapa);
 
-        MapaVisualizacaoDto dto = service.obterMapaParaVisualizacao(sub);
+        when(mapaRepo.findFullBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapa));
+        when(competenciaRepo.findByMapa_Codigo(10L)).thenReturn(List.of());
 
-        assertThat(dto.atividadesSemCompetencia().getFirst().conhecimentos()).hasSize(1);
-        assertThat(dto.atividadesSemCompetencia().getFirst().conhecimentos().getFirst().getDescricao()).isEqualTo("K1");
+        MapaVisualizacaoResponse response = service.obterMapaParaVisualizacao(sub);
+
+        assertThat(response.atividadesSemCompetencia().getFirst().getConhecimentos()).hasSize(1);
+        assertThat(response.atividadesSemCompetencia().getFirst().getConhecimentos().getFirst().getDescricao()).isEqualTo("K1");
     }
 }

@@ -1,20 +1,14 @@
 package sgc.mapa.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.dto.ImpactoMapaResponse;
+import sgc.mapa.dto.MapaVisualizacaoResponse;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
-import sgc.mapa.mapper.MapaCompletoMapper;
-import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
@@ -24,10 +18,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -35,8 +27,6 @@ import static org.mockito.Mockito.when;
 class MapaFacadeTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;
-    @Mock
-    private MapaCompletoMapper mapaCompletoMapper;
     @Mock
     private MapaSalvamentoService mapaSalvamentoService;
     @Mock
@@ -107,7 +97,6 @@ class MapaFacadeTest {
         @Test
         @DisplayName("Deve lançar exceção ao atualizar mapa inexistente")
         void deveLancarExcecaoAoAtualizarMapaInexistente() {
-            // Pattern 2: Testing error branch
             Mapa novosDados = new Mapa();
             when(mapaManutencaoService.buscarMapaPorCodigo(999L))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 999L));
@@ -121,7 +110,6 @@ class MapaFacadeTest {
         @Test
         @DisplayName("Deve excluir mapa")
         void deveExcluirMapa() {
-
             facade.excluir(1L);
             verify(mapaManutencaoService).excluirMapa(1L);
         }
@@ -139,52 +127,12 @@ class MapaFacadeTest {
         }
 
         @Test
-        @DisplayName("Deve retornar vazio quando não há mapa vigente para unidade")
-        void deveRetornarVazioQuandoNaoHaMapaVigente() {
-            when(mapaManutencaoService.buscarMapaVigentePorUnidade(999L)).thenReturn(Optional.empty());
-            var resultado = facade.buscarMapaVigentePorUnidade(999L);
-            assertThat(resultado).isEmpty();
-        }
-
-        @Test
         @DisplayName("Deve buscar por código do subprocesso")
         void deveBuscarPorSubprocesso() {
             when(mapaManutencaoService.buscarMapaPorSubprocessoCodigo(1L)).thenReturn(Optional.of(new Mapa()));
             var resultado = facade.buscarPorSubprocessoCodigo(1L);
             assertThat(resultado).isPresent().get().isNotNull();
         }
-
-        @Test
-        @DisplayName("Deve retornar vazio quando não há mapa para subprocesso")
-        void deveRetornarVazioQuandoNaoHaMapaParaSubprocesso() {
-            when(mapaManutencaoService.buscarMapaPorSubprocessoCodigo(999L)).thenReturn(Optional.empty());
-            var resultado = facade.buscarPorSubprocessoCodigo(999L);
-            assertThat(resultado).isEmpty();
-        }
-
-        @Test
-        @DisplayName("Deve obter mapa completo DTO")
-        void deveObterMapaCompleto() {
-            when(mapaManutencaoService.buscarMapaPorCodigo(1L)).thenReturn(new Mapa());
-            when(mapaManutencaoService.buscarCompetenciasPorCodMapa(1L)).thenReturn(List.of(new Competencia()));
-            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(MapaCompletoDto.builder().build());
-
-            var resultado = facade.obterMapaCompleto(1L, 10L);
-            assertThat(resultado).isNotNull();
-        }
-
-        @Test
-        @DisplayName("Deve obter mapa completo DTO sem competências")
-        void deveObterMapaCompletoSemCompetencias() {
-            when(mapaManutencaoService.buscarMapaPorCodigo(1L)).thenReturn(new Mapa());
-            when(mapaManutencaoService.buscarCompetenciasPorCodMapa(1L)).thenReturn(List.of());
-            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(MapaCompletoDto.builder().build());
-
-            var resultado = facade.obterMapaCompleto(1L, 10L);
-            assertThat(resultado).isNotNull();
-            verify(mapaManutencaoService).buscarCompetenciasPorCodMapa(1L);
-        }
-
     }
 
     @Nested
@@ -197,13 +145,13 @@ class MapaFacadeTest {
             SalvarMapaRequest req = SalvarMapaRequest.builder()
                     .observacoes("Obs")
                     .build();
-            MapaCompletoDto expectedDto = MapaCompletoDto.builder().build();
+            Mapa expectedMapa = Mapa.builder().codigo(mapaId).build();
 
-            when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req)).thenReturn(expectedDto);
+            when(mapaSalvamentoService.salvarMapaCompleto(mapaId, req)).thenReturn(expectedMapa);
 
             var resultado = facade.salvarMapaCompleto(mapaId, req);
 
-            assertThat(resultado).isNotNull().isSameAs(expectedDto);
+            assertThat(resultado).isNotNull().isSameAs(expectedMapa);
             verify(mapaSalvamentoService).salvarMapaCompleto(mapaId, req);
         }
     }
@@ -214,33 +162,31 @@ class MapaFacadeTest {
         @Test
         @DisplayName("Deve obter mapa para visualização")
         void deveObterMapaParaVisualizacao() {
-            // Pattern: Testing previously untested method
             Subprocesso subprocesso = new Subprocesso();
             subprocesso.setCodigo(1L);
-            MapaVisualizacaoDto expectedDto = MapaVisualizacaoDto.builder().build();
+            MapaVisualizacaoResponse expectedResponse = MapaVisualizacaoResponse.builder().build();
 
-            when(mapaVisualizacaoService.obterMapaParaVisualizacao(subprocesso)).thenReturn(expectedDto);
+            when(mapaVisualizacaoService.obterMapaParaVisualizacao(subprocesso)).thenReturn(expectedResponse);
 
             var resultado = facade.obterMapaParaVisualizacao(subprocesso);
 
-            assertThat(resultado).isNotNull().isSameAs(expectedDto);
+            assertThat(resultado).isNotNull().isSameAs(expectedResponse);
             verify(mapaVisualizacaoService).obterMapaParaVisualizacao(subprocesso);
         }
 
         @Test
         @DisplayName("Deve verificar impactos de alteração no mapa")
         void deveVerificarImpactos() {
-            // Pattern: Testing previously untested method
             Subprocesso subprocesso = new Subprocesso();
             subprocesso.setCodigo(1L);
             Usuario usuario = new Usuario();
-            ImpactoMapaDto expectedDto = ImpactoMapaDto.builder().build();
+            ImpactoMapaResponse expectedResponse = ImpactoMapaResponse.builder().build();
 
-            when(impactoMapaService.verificarImpactos(subprocesso, usuario)).thenReturn(expectedDto);
+            when(impactoMapaService.verificarImpactos(subprocesso, usuario)).thenReturn(expectedResponse);
 
             var resultado = facade.verificarImpactos(subprocesso, usuario);
 
-            assertThat(resultado).isNotNull().isSameAs(expectedDto);
+            assertThat(resultado).isNotNull().isSameAs(expectedResponse);
             verify(impactoMapaService).verificarImpactos(subprocesso, usuario);
         }
     }

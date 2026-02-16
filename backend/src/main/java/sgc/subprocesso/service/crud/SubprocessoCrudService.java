@@ -8,9 +8,7 @@ import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
-import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
-import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.factory.SubprocessoFactory;
@@ -18,7 +16,6 @@ import sgc.subprocesso.service.factory.SubprocessoFactory;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 import java.util.Map;
 
 /**
@@ -44,18 +41,18 @@ import java.util.Map;
 public class SubprocessoCrudService {
     private final SubprocessoRepo subprocessoRepo;
     private final ComumRepo repositorioComum;
-    private final SubprocessoMapper subprocessoMapper;
     private final SubprocessoFactory subprocessoFactory;
 
     public Subprocesso buscarSubprocesso(Long codigo) {
-        return repositorioComum.buscar(Subprocesso.class, codigo);
+        return subprocessoRepo.findByIdWithMapaAndAtividades(codigo)
+                .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada("Subprocesso", codigo));
     }
 
     /**
      * Busca subprocesso e seu mapa associado.
      */
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
-        return repositorioComum.buscar(Subprocesso.class, codigo);
+        return buscarSubprocesso(codigo);
     }
 
     @Transactional(readOnly = true)
@@ -76,19 +73,6 @@ public class SubprocessoCrudService {
     @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
         return repositorioComum.buscar(Subprocesso.class, "mapa.codigo", codMapa);
-    }
-
-    public SubprocessoDto criar(CriarSubprocessoRequest request) {
-        Subprocesso salvo = subprocessoFactory.criar(request);
-        return subprocessoMapper.toDto(salvo);
-    }
-
-    public SubprocessoDto atualizar(Long codigo, AtualizarSubprocessoRequest request) {
-        Subprocesso subprocesso = buscarSubprocesso(codigo);
-        processarAlteracoes(subprocesso, request);
-
-        Subprocesso salvo = subprocessoRepo.save(subprocesso);
-        return subprocessoMapper.toDto(salvo);
     }
 
     private void processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
@@ -121,21 +105,29 @@ public class SubprocessoCrudService {
     }
 
     @Transactional(readOnly = true)
-    public List<SubprocessoDto> listar() {
-        return subprocessoRepo.findAllComFetch().stream()
-                .flatMap(s -> Stream.ofNullable(subprocessoMapper.toDto(s)))
-                .toList();
+    public List<Subprocesso> listarEntidades() {
+        return subprocessoRepo.findAllComFetch();
     }
 
     @Transactional(readOnly = true)
-    public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
-        // Substituído por repo.buscar para centralizar tratamento de exceção (evitar explicit throw)
+    public Subprocesso obterEntidadePorProcessoEUnidade(Long codProcesso, Long codUnidade) {
         Map<String, Object> filtros = Map.of(
                 "processo.codigo", codProcesso,
                 "unidade.codigo", codUnidade
         );
-        Subprocesso sp = repositorioComum.buscar(Subprocesso.class, filtros);
-        return subprocessoMapper.toDto(sp);
+        return repositorioComum.buscar(Subprocesso.class, filtros);
+    }
+
+    @Transactional
+    public Subprocesso criarEntidade(CriarSubprocessoRequest request) {
+        return subprocessoFactory.criar(request);
+    }
+
+    @Transactional
+    public Subprocesso atualizarEntidade(Long codigo, AtualizarSubprocessoRequest request) {
+        Subprocesso subprocesso = buscarSubprocesso(codigo);
+        processarAlteracoes(subprocesso, request);
+        return subprocessoRepo.save(subprocesso);
     }
 
     @Transactional(readOnly = true)
@@ -144,13 +136,10 @@ public class SubprocessoCrudService {
     }
 
     @Transactional(readOnly = true)
-    public List<SubprocessoDto> listarPorProcessoEUnidades(Long codProcesso, @Nullable List<Long> codUnidades) {
+    public List<Subprocesso> listarEntidadesPorProcessoEUnidades(Long codProcesso, @Nullable List<Long> codUnidades) {
         if (codUnidades == null || codUnidades.isEmpty()) {
             return List.of();
         }
-        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(codProcesso, codUnidades)
-                .stream()
-                .flatMap(s -> Stream.ofNullable(subprocessoMapper.toDto(s)))
-                .toList();
+        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(codProcesso, codUnidades);
     }
 }

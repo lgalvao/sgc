@@ -1,5 +1,6 @@
 package sgc.subprocesso;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -7,263 +8,279 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.dto.MapaCompletoDto;
+import sgc.analise.AnaliseFacade;
+import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
+import sgc.analise.mapper.AnaliseMapper;
+import sgc.analise.model.TipoAnalise;
+import sgc.mapa.dto.ImpactoMapaResponse;
+import sgc.mapa.dto.MapaVisualizacaoResponse;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaViews;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * Controller para operações relacionadas ao Mapa de Competências dentro do workflow de Subprocesso.
+ */
 @RestController
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
-@Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
+@Tag(name = "Subprocesso Mapa", description = "Endpoints para workflow do mapa de competências")
 public class SubprocessoMapaController {
+
     private final SubprocessoFacade subprocessoFacade;
     private final MapaFacade mapaFacade;
-    private final OrganizacaoFacade organizacaoFacade;
+    private final AnaliseFacade analiseFacade;
+    private final AnaliseMapper analiseMapper;
 
     /**
-     * Obtém o contexto completo para edição de mapa (BFF).
-     *
-     * @param codigo O código do subprocesso.
-     * @param perfil O perfil do usuário (opcional).
-     * @return O {@link ContextoEdicaoDto} com todos os dados necessários.
-     */
-    @GetMapping("/{codigo}/contexto-edicao")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Obtém o contexto completo para edição de mapa (BFF)")
-    public ContextoEdicaoDto obterContextoEdicao(
-            @PathVariable Long codigo,
-            @RequestParam(required = false) Perfil perfil) {
-        return subprocessoFacade.obterContextoEdicao(codigo);
-    }
-
-    /**
-     * Analisa e retorna os impactos de uma revisão de mapa de competências.
-     *
-     * <p>
-     * Compara o mapa em elaboração no subprocesso com o mapa vigente da unidade
-     * para identificar
-     * atividades inseridas, removidas ou alteradas, e as competências afetadas.
-     *
-     * @param codigo O código do subprocesso em revisão.
-     * @return Um {@link ImpactoMapaDto} com o detalhamento dos impactos.
+     * Verifica os impactos que a disponibilização do mapa atual causará.
      */
     @GetMapping("/{codigo}/impactos-mapa")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
-    public ImpactoMapaDto verificarImpactos(@PathVariable Long codigo) {
-        Usuario usuario = organizacaoFacade.obterUsuarioAutenticado();
+    public ImpactoMapaResponse verificarImpactos(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codigo);
         return mapaFacade.verificarImpactos(subprocesso, usuario);
     }
 
     /**
-     * Obtém a estrutura completa de um mapa associado a um subprocesso.
-     *
-     * @param codigo O código do subprocesso.
-     * @return Um {@link MapaCompletoDto} com as competências e atividades do mapa.
+     * Obtém o mapa associado ao subprocesso.
      */
     @GetMapping("/{codigo}/mapa")
     @PreAuthorize("isAuthenticated()")
-    public MapaCompletoDto obterMapa(@PathVariable Long codigo) {
-        Subprocesso subprocesso = subprocessoFacade.buscarSubprocessoComMapa(codigo);
-        return mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
+    @JsonView(MapaViews.Publica.class)
+    public Mapa obterMapa(@PathVariable Long codigo) {
+        Subprocesso sp = subprocessoFacade.buscarSubprocessoComMapa(codigo);
+        return sp.getMapa();
     }
 
     /**
-     * Obtém uma representação aninhada e formatada do mapa de um subprocesso, ideal
-     * para telas de
-     * visualização.
-     *
-     * @param codSubprocesso O código do subprocesso.
-     * @return Um {@link MapaVisualizacaoDto} com a estrutura hierárquica completa
-     *         do mapa.
+     * Disponibiliza o mapa para validação.
      */
+    @PostMapping("/{codigo}/disponibilizar-mapa")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Disponibiliza o mapa para validação")
+    public ResponseEntity<MensagemResponse> disponibilizarMapa(
+            @PathVariable Long codigo,
+            @Valid @RequestBody DisponibilizarMapaRequest request,
+            @AuthenticationPrincipal Usuario usuario) {
+        subprocessoFacade.disponibilizarMapa(codigo, request, usuario);
+        return ResponseEntity.ok(new MensagemResponse("Mapa de competências disponibilizado."));
+    }
+
     @GetMapping("/{codigo}/mapa-visualizacao")
     @PreAuthorize("isAuthenticated()")
-    public MapaVisualizacaoDto obterMapaVisualizacao(@PathVariable("codigo") Long codSubprocesso) {
-        Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codSubprocesso);
+    @Operation(summary = "Obtém o mapa formatado para visualização")
+    public MapaVisualizacaoResponse obterMapaParaVisualizacao(@PathVariable Long codigo) {
+        Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codigo);
         return mapaFacade.obterMapaParaVisualizacao(subprocesso);
     }
 
     /**
-     * Lista todas as atividades de um subprocesso com seus conhecimentos.
-     *
-     * <p>
-     * Retorna uma lista plana de atividades (sem agrupamento por competências),
-     * ideal para uso em stores e componentes que precisam apenas da lista de
-     * atividades.
-     *
-     * @param codSubprocesso O código do subprocesso.
-     * @return Uma lista de {@link AtividadeDto} com as atividades e
-     *         conhecimentos.
+     * Salva as alterações feitas no mapa de competências.
      */
-    @GetMapping("/{codSubprocesso}/atividades")
+    @PostMapping("/{codigo}/mapa")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Lista todas as atividades de um subprocesso")
-    public ResponseEntity<List<AtividadeDto>> listarAtividades(
-            @PathVariable Long codSubprocesso) {
-        List<AtividadeDto> atividades = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
-        return ResponseEntity.ok(atividades);
-    }
-
-    /**
-     * Salva as alterações feitas no mapa de um subprocesso.
-     *
-     * @param codigo  O código do subprocesso.
-     * @param request O DTO contendo as alterações do mapa.
-     * @return O {@link MapaCompletoDto} representando o estado atualizado do mapa.
-     */
-    @PostMapping("/{codigo}/mapa/atualizar")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Transactional
-    public MapaCompletoDto salvarMapa(
+    @Operation(summary = "Salva as alterações do mapa")
+    @JsonView(MapaViews.Publica.class)
+    public Mapa salvarMapa(
             @PathVariable Long codigo,
-            @RequestBody @Valid SalvarMapaRequest request,
-            @AuthenticationPrincipal Object principal) {
-        return subprocessoFacade.salvarMapaSubprocesso(
-                codigo, request);
+            @Valid @RequestBody SalvarMapaRequest request) {
+        return subprocessoFacade.salvarMapaSubprocesso(codigo, request);
     }
 
     /**
-     * Obtém os dados de um mapa para a tela de ajuste pós-validação.
-     *
-     * @param codigo O código do subprocesso.
-     * @return Um {@link MapaAjusteDto} com os dados necessários para o ajuste.
-     */
-    @GetMapping("/{codigo}/mapa-ajuste")
-    @PreAuthorize("hasRole('ADMIN')")
-    public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long codigo) {
-        return subprocessoFacade.obterMapaParaAjuste(codigo);
-    }
-
-    /**
-     * Salva os ajustes realizados em um mapa após a fase de validação.
-     *
-     * @param codigo  O código do subprocesso.
-     * @param request O DTO contendo as competências ajustadas.
-     */
-    @PostMapping("/{codigo}/mapa-ajuste/atualizar")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Transactional
-    public void salvarAjustesMapa(
-            @PathVariable Long codigo,
-            @RequestBody @Valid SalvarAjustesRequest request,
-            @AuthenticationPrincipal Object principal) {
-        subprocessoFacade.salvarAjustesMapa(
-                codigo, request.competencias());
-    }
-
-    /**
-     * Obtém a estrutura completa de um mapa, incluindo competências e as atividades
-     * associadas a
-     * cada uma.
-     *
-     * @param codigo código do subprocesso.
-     * @return Um {@link ResponseEntity} com o {@link MapaCompletoDto}.
+     * Obtém o mapa completo associado ao subprocesso para visualização ou edição.
      */
     @GetMapping("/{codigo}/mapa-completo")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Obtém um mapa completo com competências e atividades (CDU-15)")
-    public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long codigo) {
+    @Operation(summary = "Obtém o mapa completo para edição/visualização")
+    @JsonView(MapaViews.Publica.class)
+    public ResponseEntity<Mapa> obterMapaCompleto(@PathVariable Long codigo) {
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocessoComMapa(codigo);
-        MapaCompletoDto mapa = mapaFacade.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
+        Mapa mapa = mapaFacade.obterPorCodigo(subprocesso.getMapa().getCodigo());
         return ResponseEntity.ok(mapa);
     }
 
     /**
-     * Salva a estrutura completa de um mapa, incluindo a criação/edição de
-     * competências e a
-     * atualização de seus vínculos com atividades.
-     *
-     * @param codigo  O código do subprocesso.
-     * @param request O DTO com a estrutura completa do mapa a ser salvo.
-     * @return Um {@link ResponseEntity} com o {@link MapaCompletoDto} atualizado.
+     * Salva o mapa completo em uma única operação.
      */
-    @PostMapping("/{codigo}/mapa-completo/atualizar")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Transactional
-    @Operation(summary = "Salva um mapa completo com competências e atividades")
-    public ResponseEntity<MapaCompletoDto> salvarMapaCompleto(
+    @PostMapping("/{codigo}/mapa-completo")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Salva o mapa completo (batch)")
+    @JsonView(MapaViews.Publica.class)
+    public ResponseEntity<Mapa> salvarMapaCompleto(
             @PathVariable Long codigo,
-            @RequestBody @Valid SalvarMapaRequest request,
-            @AuthenticationPrincipal Object principal) {
+            @Valid @RequestBody SalvarMapaRequest request) {
 
-        MapaCompletoDto mapa = subprocessoFacade.salvarMapaSubprocesso(
-                codigo, request);
-
+        Mapa mapa = subprocessoFacade.salvarMapaSubprocesso(codigo, request);
         return ResponseEntity.ok(mapa);
     }
 
     /**
-     * Disponibiliza mapas de competências de múltiplas unidades em bloco.
-     * (CDU-24)
+     * Permite que um usuário apresente sugestões de melhoria para um mapa de competências.
      */
+    @PostMapping("/{codigo}/apresentar-sugestoes")
+    @PreAuthorize("hasRole('CHEFE')")
+    @Operation(summary = "Apresenta sugestões de melhoria para o mapa")
+    public void apresentarSugestoes(
+            @PathVariable Long codigo,
+            @RequestBody @Valid ApresentarSugestoesRequest request,
+            @AuthenticationPrincipal Usuario usuario) {
+        subprocessoFacade.apresentarSugestoes(codigo, request.sugestoes(), usuario);
+    }
+
+    /**
+     * Obtém as sugestões de melhoria que foram apresentadas para o mapa de um subprocesso.
+     */
+    @GetMapping("/{codigo}/sugestoes")
+    @PreAuthorize("isAuthenticated()")
+    public Map<String, Object> obterSugestoes(@PathVariable Long codigo) {
+        return subprocessoFacade.obterSugestoes(codigo);
+    }
+
+    /**
+     * Obtém o histórico de análises da fase de validação de um subprocesso.
+     */
+    @GetMapping("/{codigo}/historico-validacao")
+    @PreAuthorize("isAuthenticated()")
+    public List<AnaliseValidacaoHistoricoDto> obterHistoricoValidacao(@PathVariable Long codigo) {
+        return analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.VALIDACAO).stream()
+                .map(analiseMapper::toAnaliseValidacaoHistoricoDto)
+                .toList();
+    }
+
+    @PostMapping("/{codigo}/validar-mapa")
+    @PreAuthorize("hasRole('CHEFE')")
+    @Operation(summary = "Valida o mapa de competências da unidade")
+    public ResponseEntity<Void> validarMapa(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
+        subprocessoFacade.validarMapa(codigo, usuario);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{codigo}/devolver-validacao")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
+    @Operation(summary = "Devolve o mapa para ajuste (pelo chefe/gestor)")
+    public ResponseEntity<Void> devolverValidacao(
+            @PathVariable Long codigo,
+            @RequestBody @Valid DevolverValidacaoRequest request,
+            @AuthenticationPrincipal Usuario usuario) {
+        subprocessoFacade.devolverValidacao(codigo, request.justificativa(), usuario);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{codigo}/aceitar-validacao")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
+    @Operation(summary = "Aceita a validação (pelo gestor)")
+    public ResponseEntity<Void> aceitarValidacao(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
+        subprocessoFacade.aceitarValidacao(codigo, usuario);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{codigo}/homologar-validacao")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Homologa a validação")
+    public ResponseEntity<Void> homologarValidacao(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
+        subprocessoFacade.homologarValidacao(codigo, usuario);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{codigo}/submeter-mapa-ajustado")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Submete o mapa após ajustes solicitados")
+    public ResponseEntity<Void> submeterMapaAjustado(
+            @PathVariable Long codigo,
+            @Valid @RequestBody SubmeterMapaAjustadoRequest request,
+            @AuthenticationPrincipal Usuario usuario) {
+        subprocessoFacade.submeterMapaAjustado(codigo, request, usuario);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{codigo}/aceitar-validacao-bloco")
+    @PreAuthorize("hasRole('GESTOR')")
+    @Operation(summary = "Aceita validação de mapas em bloco")
+    public void aceitarValidacaoEmBloco(@PathVariable Long codigo,
+            @RequestBody @Valid ProcessarEmBlocoRequest request,
+            @AuthenticationPrincipal Usuario usuario) {
+        subprocessoFacade.aceitarValidacaoEmBloco(request.subprocessos(), codigo, usuario);
+    }
+
+    @PostMapping("/{codigo}/homologar-validacao-bloco")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Homologa validação de mapas em bloco")
+    public void homologarValidacaoEmBloco(@PathVariable Long codigo,
+            @RequestBody @Valid ProcessarEmBlocoRequest request,
+            @AuthenticationPrincipal Usuario usuario) {
+        subprocessoFacade.homologarValidacaoEmBloco(request.subprocessos(), codigo, usuario);
+    }
+
     @PostMapping("/{codigo}/disponibilizar-mapa-bloco")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Disponibiliza mapas em bloco")
     public void disponibilizarMapaEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        DisponibilizarMapaRequest serviceRequest = DisponibilizarMapaRequest.builder()
-                .dataLimite(request.dataLimite() != null ? request.dataLimite() : LocalDate.now().plusDays(15))
+        DisponibilizarMapaRequest dispoReq = DisponibilizarMapaRequest.builder()
+                .dataLimite(request.dataLimite())
                 .build();
-        subprocessoFacade.disponibilizarMapaEmBloco(request.subprocessos(), codigo, serviceRequest, usuario);
+        subprocessoFacade.disponibilizarMapaEmBloco(request.subprocessos(), codigo, dispoReq, usuario);
     }
 
-    @PostMapping("/{codigo}/competencias")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Transactional
-    @Operation(summary = "Adiciona uma nova competência a um mapa")
-    public ResponseEntity<MapaCompletoDto> adicionarCompetencia(
+    @GetMapping("/{codigo}/mapa-ajuste")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Obtém dados do mapa preparados para ajuste")
+    public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long codigo) {
+        return subprocessoFacade.obterMapaParaAjuste(codigo);
+    }
+
+    @PostMapping("/{codigo}/mapa-ajuste/atualizar")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Salva os ajustes feitos no mapa")
+    public void salvarAjustesMapa(
             @PathVariable Long codigo,
-            @RequestBody @Valid CompetenciaRequest request,
-            @AuthenticationPrincipal Object principal) {
-        MapaCompletoDto mapa = subprocessoFacade.adicionarCompetencia(
-                codigo, request);
+            @RequestBody @Valid SalvarAjustesRequest request) {
+        subprocessoFacade.salvarAjustesMapa(codigo, request.competencias());
+    }
+
+    @PostMapping("/{codigo}/competencia")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Adiciona uma competência ao mapa")
+    @JsonView(MapaViews.Publica.class)
+    public ResponseEntity<Mapa> adicionarCompetencia(
+            @PathVariable Long codigo,
+            @Valid @RequestBody CompetenciaRequest request) {
+        Mapa mapa = subprocessoFacade.adicionarCompetencia(codigo, request);
         return ResponseEntity.ok(mapa);
     }
 
-    @PostMapping("/{codigo}/competencias/{codCompetencia}/atualizar")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Transactional
-    @Operation(summary = "Atualiza uma competência existente em um mapa")
-    public ResponseEntity<MapaCompletoDto> atualizarCompetencia(
+    @PostMapping("/{codigo}/competencia/{codCompetencia}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Atualiza uma competência do mapa")
+    @JsonView(MapaViews.Publica.class)
+    public ResponseEntity<Mapa> atualizarCompetencia(
             @PathVariable Long codigo,
             @PathVariable Long codCompetencia,
-            @RequestBody @Valid CompetenciaRequest request,
-            @AuthenticationPrincipal Object principal) {
-
-        MapaCompletoDto mapa = subprocessoFacade.atualizarCompetencia(
-                codigo, codCompetencia, request);
-
+            @Valid @RequestBody CompetenciaRequest request) {
+        Mapa mapa = subprocessoFacade.atualizarCompetencia(codigo, codCompetencia, request);
         return ResponseEntity.ok(mapa);
     }
 
-    @PostMapping("/{codigo}/competencias/{codCompetencia}/remover")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Transactional
-    @Operation(summary = "Remove uma competência de um mapa")
-    public ResponseEntity<MapaCompletoDto> removerCompetencia(
+    @PostMapping("/{codigo}/competencia/{codCompetencia}/remover")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Remove uma competência do mapa")
+    @JsonView(MapaViews.Publica.class)
+    public ResponseEntity<Mapa> removerCompetencia(
             @PathVariable Long codigo,
-            @PathVariable Long codCompetencia,
-            @AuthenticationPrincipal Object principal) {
-        MapaCompletoDto mapa = subprocessoFacade.removerCompetencia(
-                codigo, codCompetencia);
-
+            @PathVariable Long codCompetencia) {
+        Mapa mapa = subprocessoFacade.removerCompetencia(codigo, codCompetencia);
         return ResponseEntity.ok(mapa);
     }
 }

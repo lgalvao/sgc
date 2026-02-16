@@ -8,7 +8,8 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 @Builder
 public class SubprocessoElegivelDto {
 
-    Long codSubprocesso;
+    Long codigo;
+    Long unidadeCodigo;
     String unidadeNome;
     String unidadeSigla;
     SituacaoSubprocesso situacao;

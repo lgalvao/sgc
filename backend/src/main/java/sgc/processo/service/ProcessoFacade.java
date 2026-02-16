@@ -19,9 +19,8 @@ import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
-import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.time.format.DateTimeFormatter;
@@ -46,7 +45,6 @@ public class ProcessoFacade {
     private final SubprocessoFacade subprocessoFacade;
     private final ProcessoMapper processoMapper;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
-    private final SubprocessoMapper subprocessoMapper;
     private final UsuarioFacade usuarioService;
     private final ProcessoInicializador processoInicializador;
     private final AlertaFacade alertaService;
@@ -182,7 +180,7 @@ public class ProcessoFacade {
                 "Por favor, acesse o sistema para concluir suas pendências: /painel.%n")
                 .formatted(unidade.getSigla(), processo.getDescricao(), dataLimite);
 
-        SubprocessoDto subprocesso = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, unidadeCodigo);
+        Subprocesso subprocesso = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, unidadeCodigo);
         subprocessoFacade.registrarMovimentacaoLembrete(subprocesso.getCodigo());
         notificacaoEmailService.enviarEmail(unidade.getSigla(), assunto, corpo);
 
@@ -204,10 +202,13 @@ public class ProcessoFacade {
     }
 
     @Transactional(readOnly = true)
-    public List<SubprocessoDto> listarTodosSubprocessos(Long codProcesso) {
-        return subprocessoFacade.listarEntidadesPorProcesso(codProcesso).stream()
-                .map(subprocessoMapper::toDto)
-                .toList();
+    public List<Subprocesso> listarTodosSubprocessos(Long codProcesso) {
+        return subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Subprocesso> listarEntidadesSubprocessos(Long codProcesso) {
+        return subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
     }
 
     @Transactional
@@ -236,20 +237,20 @@ public class ProcessoFacade {
             return;
         }
 
-        List<SubprocessoDto> subprocessos = subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
+        List<Subprocesso> subprocessos = subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
 
-        for (SubprocessoDto spDto : subprocessos) {
-            categorizarUnidadePorAcao(req, spDto, unidadesAceitarCadastro, unidadesAceitarValidacao, unidadesHomologarCadastro, unidadesHomologarValidacao);
+        for (Subprocesso sp : subprocessos) {
+            categorizarUnidadePorAcao(req, sp, unidadesAceitarCadastro, unidadesAceitarValidacao, unidadesHomologarCadastro, unidadesHomologarValidacao);
         }
 
         executarAcoesBatch(codProcesso, usuario, unidadesAceitarCadastro, unidadesAceitarValidacao, unidadesHomologarCadastro, unidadesHomologarValidacao);
     }
 
-    private void categorizarUnidadePorAcao(AcaoEmBlocoRequest req, SubprocessoDto spDto,
+    private void categorizarUnidadePorAcao(AcaoEmBlocoRequest req, Subprocesso sp,
                                            List<Long> unitsAceitarCad, List<Long> unitsAceitarVal,
                                            List<Long> unitsHomolCad, List<Long> unitsHomolVal) {
-        Long codUnidade = spDto.getCodUnidade();
-        boolean isCadastro = isSituacaoCadastro(spDto.getSituacao());
+        Long codUnidade = sp.getCodUnidade();
+        boolean isCadastro = isSituacaoCadastro(sp.getSituacao());
 
         if (req.acao() == ACEITAR) {
             if (isCadastro) {

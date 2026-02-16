@@ -13,7 +13,6 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
-import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -41,14 +40,16 @@ public class UsuarioFacade {
         return usuario;
     }
 
-    public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
-        return usuarioService.buscarPorIdOpcional(titulo).map(this::toUsuarioDto);
+    public Optional<Usuario> buscarUsuarioPorTitulo(String titulo) {
+        return usuarioService.buscarPorIdOpcional(titulo);
     }
 
-    public List<UsuarioDto> buscarUsuariosPorUnidade(Long codigoUnidade) {
-        return usuarioService.buscarPorUnidadeLotacao(codigoUnidade).stream()
-                .map(this::toUsuarioDto)
-                .toList();
+    public Optional<Usuario> buscarEntidadeUsuarioPorTitulo(String titulo) {
+        return usuarioService.buscarPorIdOpcional(titulo);
+    }
+
+    public List<Usuario> buscarUsuariosPorUnidade(Long codigoUnidade) {
+        return usuarioService.buscarPorUnidadeLotacao(codigoUnidade);
     }
 
     @Transactional(readOnly = true)
@@ -115,12 +116,12 @@ public class UsuarioFacade {
         usuarioService.carregarAuthorities(usuario);
     }
 
-    public Optional<UsuarioDto> buscarUsuarioPorEmail(String email) {
-        return usuarioService.buscarPorEmail(email).map(this::toUsuarioDto);
+    public Optional<Usuario> buscarUsuarioPorEmail(String email) {
+        return usuarioService.buscarPorEmail(email);
     }
 
-    public List<UsuarioDto> buscarUsuariosAtivos() {
-        return usuarioService.buscarTodos().stream().map(this::toUsuarioDto).toList();
+    public List<Usuario> buscarUsuariosAtivos() {
+        return usuarioService.buscarTodos();
     }
 
     public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
@@ -135,9 +136,9 @@ public class UsuarioFacade {
         return unidadeResponsavelService.buscarResponsaveisUnidades(unidadesCodigos);
     }
 
-    public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
+    public Map<String, Usuario> buscarUsuariosPorTitulos(List<String> titulos) {
         return usuarioService.buscarTodosPorIds(titulos).stream()
-                .collect(toMap(Usuario::getTituloEleitoral, this::toUsuarioDto, (u1, u2) -> u1));
+                .collect(toMap(Usuario::getTituloEleitoral, u -> u, (u1, u2) -> u1));
     }
 
     @Transactional(readOnly = true)
@@ -170,17 +171,6 @@ public class UsuarioFacade {
                             .toList();
                 })
                 .orElse(Collections.emptyList());
-    }
-
-    private UsuarioDto toUsuarioDto(Usuario usuario) {
-        Unidade lotacao = usuario.getUnidadeLotacao();
-        return UsuarioDto.builder()
-                .tituloEleitoral(usuario.getTituloEleitoral())
-                .nome(usuario.getNome())
-                .email(usuario.getEmail())
-                .matricula(usuario.getMatricula())
-                .unidadeCodigo(lotacao.getCodigo())
-                .build();
     }
 
 

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 
@@ -15,22 +14,12 @@ import java.util.function.Predicate;
 
 /**
  * Serviço especializado para gerenciar a hierarquia de unidades organizacionais.
- *
- * <p>Responsabilidades:
- * <ul>
- *   <li>Montagem de árvore hierárquica de unidades</li>
- *   <li>Navegação na hierarquia (busca por código/sigla)</li>
- *   <li>Cálculo de descendentes e subordinadas</li>
- *   <li>Algoritmos recursivos de hierarquia</li>
- * </ul>
- *
  */
 @Service
 @RequiredArgsConstructor
 public class UnidadeHierarquiaService {
     private final UnidadeRepo unidadeRepo;
     private final ComumRepo repo;
-    private final UsuarioMapper usuarioMapper;
 
     /**
      * Busca a árvore hierárquica completa de unidades.
@@ -107,14 +96,7 @@ public class UnidadeHierarquiaService {
             return found.get();
         }
         Unidade u = repo.buscar(Unidade.class, codigo);
-        // Mapeamento manual simples para evitar retorno nulo
-        UnidadeDto dto = new UnidadeDto();
-        dto.setCodigo(u.getCodigo());
-        dto.setNome(u.getNome());
-        dto.setSigla(u.getSigla());
-        dto.setTipo(u.getTipo().name());
-        dto.setSubunidades(new ArrayList<>());
-        return dto;
+        return UnidadeDto.fromEntity(u);
     }
 
     /**
@@ -159,7 +141,7 @@ public class UnidadeHierarquiaService {
      */
     public List<UnidadeDto> buscarSubordinadas(Long codUnidade) {
         return unidadeRepo.findByUnidadeSuperiorCodigo(codUnidade).stream()
-                .map(u -> usuarioMapper.toUnidadeDto(u, true))
+                .map(UnidadeDto::fromEntity)
                 .toList();
     }
 
@@ -174,7 +156,8 @@ public class UnidadeHierarquiaService {
 
         for (Unidade u : unidades) {
             boolean isElegivel = elegibilidadeChecker == null || elegibilidadeChecker.test(u);
-            UnidadeDto dto = usuarioMapper.toUnidadeDto(u, isElegivel);
+            UnidadeDto dto = UnidadeDto.fromEntity(u);
+            dto.setElegivel(isElegivel);
 
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());

@@ -20,6 +20,7 @@ import sgc.mapa.model.Atividade;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 import tools.jackson.databind.ObjectMapper;
 
@@ -190,17 +191,17 @@ class SubprocessoCadastroControllerTest {
         @WithMockUser
         void deveObterCadastro() throws Exception {
             // Arrange
-            SubprocessoCadastroDto dto = SubprocessoCadastroDto.builder()
-                    .subprocessoCodigo(1L)
+            Subprocesso sp = Subprocesso.builder()
+                    .codigo(1L)
                     .build();
-            when(subprocessoFacade.obterCadastro(1L)).thenReturn(dto);
+            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(sp);
 
             // Act & Assert
             mockMvc.perform(get("/api/subprocessos/1/cadastro"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.subprocessoCodigo").value(1));
+                    .andExpect(jsonPath("$.codigo").value(1));
 
-            verify(subprocessoFacade).obterCadastro(1L);
+            verify(subprocessoFacade).buscarSubprocesso(1L);
         }
     }
 

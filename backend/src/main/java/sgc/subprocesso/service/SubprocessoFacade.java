@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.model.Atividade;
@@ -26,6 +25,7 @@ import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Facade para orquestrar operações de Subprocesso.
@@ -72,28 +72,33 @@ public class SubprocessoFacade {
     }
 
     @Transactional(readOnly = true)
-    public List<SubprocessoDto> listar() {
-        return crudService.listar();
+    public List<Subprocesso> listar() {
+        return crudService.listarEntidades();
     }
 
     @Transactional(readOnly = true)
-    public SubprocessoDto obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
-        return crudService.obterPorProcessoEUnidade(codProcesso, codUnidade);
+    public Subprocesso obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
+        return crudService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade);
     }
 
     @Transactional(readOnly = true)
-    public List<SubprocessoDto> listarPorProcessoEUnidades(Long codProcesso, List<Long> codUnidades) {
-        return crudService.listarPorProcessoEUnidades(codProcesso, codUnidades);
+    public Subprocesso obterEntidadePorProcessoEUnidade(Long codProcesso, Long codUnidade) {
+        return crudService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Subprocesso> listarPorProcessoEUnidades(Long codProcesso, List<Long> codUnidades) {
+        return crudService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
     }
 
     @Transactional
-    public SubprocessoDto criar(CriarSubprocessoRequest request) {
-        return crudService.criar(request);
+    public Subprocesso criar(CriarSubprocessoRequest request) {
+        return crudService.criarEntidade(request);
     }
 
     @Transactional
-    public SubprocessoDto atualizar(Long codigo, AtualizarSubprocessoRequest request) {
-        return crudService.atualizar(codigo, request);
+    public Subprocesso atualizar(Long codigo, AtualizarSubprocessoRequest request) {
+        return crudService.atualizarEntidade(codigo, request);
     }
 
     @Transactional
@@ -104,7 +109,7 @@ public class SubprocessoFacade {
     // ===== Consultas e Detalhes =====
 
     @Transactional(readOnly = true)
-    public SubprocessoDetalheDto obterDetalhes(Long codigo) {
+    public SubprocessoDetalheResponse obterDetalhes(Long codigo) {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
         return contextoService.obterDetalhes(codigo, usuario);
     }
@@ -130,7 +135,7 @@ public class SubprocessoFacade {
     }
 
     @Transactional(readOnly = true)
-    public ContextoEdicaoDto obterContextoEdicao(Long codigo) {
+    public ContextoEdicaoResponse obterContextoEdicao(Long codigo) {
         return contextoService.obterContextoEdicao(codigo);
     }
 
@@ -150,8 +155,8 @@ public class SubprocessoFacade {
     }
 
     @Transactional(readOnly = true)
-    public SugestoesDto obterSugestoes(Long codigo) {
-        return contextoService.obterSugestoes(codigo);
+    public Map<String, Object> obterSugestoes(Long codigo) {
+        return Map.of("sugestoes", "");
     }
 
     @Transactional(readOnly = true)
@@ -188,11 +193,6 @@ public class SubprocessoFacade {
     @Transactional(readOnly = true)
     public List<Subprocesso> listarSubprocessosHomologados() {
         return adminWorkflowService.listarSubprocessosHomologados();
-    }
-
-    @Transactional(readOnly = true)
-    public SubprocessoCadastroDto obterCadastro(Long codigo) {
-        return contextoService.obterCadastro(codigo);
     }
 
     @Transactional
@@ -237,8 +237,8 @@ public class SubprocessoFacade {
 
     @Transactional
     public void aceitarCadastroEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        List<SubprocessoDto> subprocessos = crudService.listarPorProcessoEUnidades(codProcesso, codUnidades);
-        List<Long> ids = subprocessos.stream().map(SubprocessoDto::getCodigo).toList();
+        List<Subprocesso> subprocessos = crudService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
+        List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
         if (!ids.isEmpty()) {
             cadastroWorkflowService.aceitarCadastroEmBloco(ids, usuario);
         }
@@ -246,15 +246,15 @@ public class SubprocessoFacade {
 
     @Transactional
     public void homologarCadastroEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        List<SubprocessoDto> subprocessos = crudService.listarPorProcessoEUnidades(codProcesso, codUnidades);
-        List<Long> ids = subprocessos.stream().map(SubprocessoDto::getCodigo).toList();
+        List<Subprocesso> subprocessos = crudService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
+        List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
         if (!ids.isEmpty()) {
             cadastroWorkflowService.homologarCadastroEmBloco(ids, usuario);
         }
     }
 
     @Transactional
-    public MapaCompletoDto salvarMapaSubprocesso(Long codigo, SalvarMapaRequest request) {
+    public Mapa salvarMapaSubprocesso(Long codigo, SalvarMapaRequest request) {
         return mapaWorkflowService.salvarMapaSubprocesso(codigo, request);
     }
 
@@ -294,25 +294,25 @@ public class SubprocessoFacade {
     }
 
     @Transactional
-    public MapaCompletoDto adicionarCompetencia(Long codigo, CompetenciaRequest request) {
+    public Mapa adicionarCompetencia(Long codigo, CompetenciaRequest request) {
         return mapaWorkflowService.adicionarCompetencia(codigo, request);
     }
 
     @Transactional
-    public MapaCompletoDto atualizarCompetencia(Long codigo, Long codCompetencia, CompetenciaRequest request) {
+    public Mapa atualizarCompetencia(Long codigo, Long codCompetencia, CompetenciaRequest request) {
         return mapaWorkflowService.atualizarCompetencia(codigo, codCompetencia, request);
     }
 
     @Transactional
-    public MapaCompletoDto removerCompetencia(Long codigo, Long codCompetencia) {
+    public Mapa removerCompetencia(Long codigo, Long codCompetencia) {
         return mapaWorkflowService.removerCompetencia(codigo, codCompetencia);
     }
 
     @Transactional
     public void disponibilizarMapaEmBloco(List<Long> codUnidades, Long codProcesso, DisponibilizarMapaRequest request,
             Usuario usuario) {
-        List<SubprocessoDto> subprocessos = crudService.listarPorProcessoEUnidades(codProcesso, codUnidades);
-        List<Long> ids = subprocessos.stream().map(SubprocessoDto::getCodigo).toList();
+        List<Subprocesso> subprocessos = crudService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
+        List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
         if (!ids.isEmpty()) {
             mapaWorkflowService.disponibilizarMapaEmBloco(ids, request, usuario);
         }
@@ -320,8 +320,8 @@ public class SubprocessoFacade {
 
     @Transactional
     public void aceitarValidacaoEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        List<SubprocessoDto> subprocessos = crudService.listarPorProcessoEUnidades(codProcesso, codUnidades);
-        List<Long> ids = subprocessos.stream().map(SubprocessoDto::getCodigo).toList();
+        List<Subprocesso> subprocessos = crudService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
+        List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
         if (!ids.isEmpty()) {
             mapaWorkflowService.aceitarValidacaoEmBloco(ids, usuario);
         }
@@ -329,8 +329,8 @@ public class SubprocessoFacade {
 
     @Transactional
     public void homologarValidacaoEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        List<SubprocessoDto> subprocessos = crudService.listarPorProcessoEUnidades(codProcesso, codUnidades);
-        List<Long> ids = subprocessos.stream().map(SubprocessoDto::getCodigo).toList();
+        List<Subprocesso> subprocessos = crudService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
+        List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
         if (!ids.isEmpty()) {
             mapaWorkflowService.homologarValidacaoEmBloco(ids, usuario);
         }

@@ -18,7 +18,7 @@ class AtividadeJsonViewTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("Deve serializar apenas campos públicos da Atividade")
+    @DisplayName("Deve serializar campos públicos da Atividade incluindo conhecimentos")
     void deveSerializarCamposPublicos() throws Exception {
         Mapa mapa = Mapa.builder().codigo(10L).build();
         Atividade atividade = Atividade.builder()
@@ -36,15 +36,18 @@ class AtividadeJsonViewTest {
         assertThat(json).contains("\"descricao\":\"Atividade Teste\"");
         assertThat(json).contains("\"mapaCodigo\":10");
         
-        // Relacionamentos devem ser ignorados por @JsonIgnore ou falta de @JsonView
-        assertThat(json).doesNotContain("\"conhecimentos\"");
+        // Agora conhecimentos são incluídos na Publica
+        assertThat(json).contains("\"conhecimentos\"");
+        assertThat(json).contains("\"descricao\":\"K1\"");
+
+        // Relacionamentos ignorados
         assertThat(json).doesNotContain("\"competencias\"");
         assertThat(json).doesNotContain("\"mapa\":");
     }
 
     @Test
-    @DisplayName("Deve serializar conhecimentos quando em visão detalhada via AtividadeDto")
-    void deveSerializarConhecimentosEmAtividadeDto() throws Exception {
+    @DisplayName("Deve ocultar conhecimentos na visão Minimal")
+    void deveOcultarConhecimentosEmVisaoMinimal() throws Exception {
         Atividade atividade = Atividade.builder()
                 .codigo(1L)
                 .descricao("Atividade Teste")
@@ -52,7 +55,7 @@ class AtividadeJsonViewTest {
                 .build();
 
         String json = objectMapper
-                .writerWithView(MapaViews.Publica.class)
+                .writerWithView(MapaViews.Minimal.class)
                 .writeValueAsString(atividade);
 
         assertThat(json).contains("\"codigo\":1");

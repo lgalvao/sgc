@@ -4,15 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.mapa.dto.visualizacao.CompetenciaDto;
-import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
+import sgc.mapa.dto.MapaVisualizacaoResponse;
 import sgc.mapa.model.*;
-import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Service especializado para visualização de mapas de competências.
@@ -22,71 +18,39 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class MapaVisualizacaoService {
+    private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
-    private final AtividadeRepo atividadeRepo;
 
-    public MapaVisualizacaoDto obterMapaParaVisualizacao(Subprocesso subprocesso) {
-        Mapa mapa = subprocesso.getMapa();
+    public MapaVisualizacaoResponse obterMapaParaVisualizacao(Subprocesso subprocesso) {
+        Mapa mapa = mapaRepo.findFullBySubprocessoCodigo(subprocesso.getCodigo())
+                .orElse(subprocesso.getMapa());
 
-        Unidade unidade = subprocesso.getUnidade();
-        var unidadeDto = MapaVisualizacaoDto.UnidadeDto.builder()
-                .codigo(unidade.getCodigo())
-                .sigla(unidade.getSigla())
-                .nome(unidade.getNome())
-                .build();
+        if (mapa == null) {
+            return MapaVisualizacaoResponse.builder()
+                    .unidade(subprocesso.getUnidade())
+                    .competencias(List.of())
+                    .atividadesSemCompetencia(List.of())
+                    .build();
+        }
 
-        List<Atividade> atividadesComConhecimentos =
-                atividadeRepo.findWithConhecimentosByMapa_Codigo(mapa.getCodigo());
-
-        Map<Long, AtividadeDto> atividadeDtoMap = atividadesComConhecimentos.stream()
-                .collect(Collectors.toMap(Atividade::getCodigo, this::mapAtividadeToDto));
-
-        List<Object[]> tuples = competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(mapa.getCodigo());
-        Map<Long, CompetenciaDto> compMap = new LinkedHashMap<>();
+        List<Competencia> competencias = competenciaRepo.findByMapa_Codigo(mapa.getCodigo());
+        
         Set<Long> atividadesComCompetenciaIds = new HashSet<>();
-
-        for (Object[] t : tuples) {
-            Long compId = (Long) t[0];
-            String compDesc = (String) t[1];
-            Long ativId = (Long) t[2];
-
-            compMap.computeIfAbsent(compId, k -> CompetenciaDto.builder()
-                    .codigo(compId)
-                    .descricao(compDesc)
-                    .atividades(new ArrayList<>())
-                    .build());
-
-            atividadesComCompetenciaIds.add(ativId);
-            AtividadeDto ativDto = atividadeDtoMap.get(ativId);
-
-            // Só adiciona se a atividade existir no mapa de atividades do subprocesso
-            if (ativDto != null) {
-                compMap.get(compId).getAtividades().add(ativDto);
+        for (Competencia comp : competencias) {
+            for (Atividade ativ : comp.getAtividades()) {
+                atividadesComCompetenciaIds.add(ativ.getCodigo());
             }
         }
 
-        List<CompetenciaDto> competenciasDto = new ArrayList<>(compMap.values());
+        List<Atividade> atividadesSemCompetencia = mapa.getAtividades().stream()
+                .filter(a -> !atividadesComCompetenciaIds.contains(a.getCodigo()))
+                .toList();
 
-        // Buscar atividades sem competência (órfãs)
-        List<AtividadeDto> atividadesSemCompetencia =
-                atividadesComConhecimentos.stream()
-                        .filter(a -> !atividadesComCompetenciaIds.contains(a.getCodigo()))
-                        .map(a -> atividadeDtoMap.get(a.getCodigo()))
-                        .toList();
-
-        return MapaVisualizacaoDto.builder()
-                .unidade(unidadeDto)
-                .competencias(competenciasDto)
+        return MapaVisualizacaoResponse.builder()
+                .unidade(subprocesso.getUnidade())
+                .competencias(competencias)
                 .atividadesSemCompetencia(atividadesSemCompetencia)
                 .sugestoes(mapa.getSugestoes())
-                .build();
-    }
-
-    private AtividadeDto mapAtividadeToDto(Atividade atividade) {
-        return AtividadeDto.builder()
-                .codigo(atividade.getCodigo())
-                .descricao(atividade.getDescricao())
-                .conhecimentos(atividade.getConhecimentos())
                 .build();
     }
 }

@@ -1,5 +1,8 @@
 package sgc.organizacao.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,37 +26,53 @@ import java.util.Set;
 @SuperBuilder
 public class Usuario implements UserDetails {
     @Transient
+    @JsonIgnore
     private @Nullable Set<GrantedAuthority> authorities;
 
     @Transient
+    @JsonIgnore
     private Perfil perfilAtivo;
 
     @Transient
+    @JsonIgnore
     private Long unidadeAtivaCodigo;
 
     @Id
+    @JsonView(OrganizacaoViews.Publica.class)
     @Column(name = "titulo", length = 12, nullable = false)
     private String tituloEleitoral;
 
+    @JsonView(OrganizacaoViews.Publica.class)
     @Column(name = "matricula", length = 8, nullable = false)
     private String matricula;
 
+    @JsonView(OrganizacaoViews.Publica.class)
     @Column(name = "nome", nullable = false)
     private String nome;
 
+    @JsonView(OrganizacaoViews.Publica.class)
     @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "ramal", length = 20, nullable = false)
+    @JsonIgnore
     private String ramal;
 
     @ManyToOne
     @JoinColumn(name = "unidade_lot_codigo", nullable = false)
+    @JsonIgnore
     private Unidade unidadeLotacao;
 
     @ManyToOne
     @JoinColumn(name = "unidade_comp_codigo")
+    @JsonIgnore
     private Unidade unidadeCompetencia;
+
+    @JsonView(OrganizacaoViews.Publica.class)
+    @JsonProperty("unidadeCodigo")
+    public Long getUnidadeCodigo() {
+        return unidadeLotacao != null ? unidadeLotacao.getCodigo() : null;
+    }
 
     @Override
     public boolean equals(Object obj) {

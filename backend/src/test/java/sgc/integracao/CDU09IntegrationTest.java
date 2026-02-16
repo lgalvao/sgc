@@ -98,8 +98,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(get("/api/subprocessos/{id}", SP_CODIGO))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.unidade.sigla", is("SEDESENV")))
-                .andExpect(jsonPath("$.situacao", is(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name())));
+                .andExpect(jsonPath("$.subprocesso.codUnidade", is(8)))
+                .andExpect(jsonPath("$.subprocesso.situacao", is(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name())));
 
         mockMvc.perform(get("/api/subprocessos/{id}/analises-cadastro", SP_CODIGO))
                 .andExpect(status().isOk())

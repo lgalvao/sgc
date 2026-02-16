@@ -12,7 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.dto.*;
+import sgc.organizacao.dto.AdministradorDto;
+import sgc.organizacao.dto.PerfilDto;
+import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 
@@ -52,12 +55,12 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar usuário por título")
         void deveBuscarUsuarioPorTitulo() {
             // Act
-            Optional<UsuarioDto> result = usuarioService.buscarUsuarioPorTitulo(TITULO_ADMIN);
+            Optional<Usuario> result = usuarioService.buscarUsuarioPorTitulo(TITULO_ADMIN);
 
             // Assert
             assertTrue(result.isPresent());
-            assertEquals(TITULO_ADMIN, result.get().tituloEleitoral());
-            assertEquals(NOME_ADMIN, result.get().nome());
+            assertEquals(TITULO_ADMIN, result.get().getTituloEleitoral());
+            assertEquals(NOME_ADMIN, result.get().getNome());
         }
 
         @Test
@@ -75,19 +78,19 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar usuário por email")
         void deveBuscarUsuarioPorEmail() {
             // Act
-            Optional<UsuarioDto> result = usuarioService.buscarUsuarioPorEmail(EMAIL_ADMIN);
+            Optional<Usuario> result = usuarioService.buscarUsuarioPorEmail(EMAIL_ADMIN);
 
             // Assert
             assertTrue(result.isPresent());
-            assertEquals(TITULO_ADMIN, result.get().tituloEleitoral());
-            assertEquals(EMAIL_ADMIN, result.get().email());
+            assertEquals(TITULO_ADMIN, result.get().getTituloEleitoral());
+            assertEquals(EMAIL_ADMIN, result.get().getEmail());
         }
 
         @Test
         @DisplayName("Deve buscar usuários ativos")
         void deveBuscarUsuariosAtivos() {
             // Act
-            List<UsuarioDto> result = usuarioService.buscarUsuariosAtivos();
+            List<Usuario> result = usuarioService.buscarUsuariosAtivos();
 
             // Assert
             assertNotNull(result);
@@ -102,7 +105,7 @@ class UsuarioServiceTest {
             List<String> titulos = List.of(TITULO_CHEFE_UNIT2, TITULO_ADMIN);
 
             // Act
-            Map<String, UsuarioDto> result = usuarioService.buscarUsuariosPorTitulos(titulos);
+            Map<String, Usuario> result = usuarioService.buscarUsuariosPorTitulos(titulos);
 
             // Assert
             assertNotNull(result);
@@ -176,7 +179,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar usuários por unidade de lotação")
         void deveBuscarPorUnidadeLotacao() {
             // Unidade 2 tem usuários no data.sql
-            List<UsuarioDto> res = unidadeService.buscarUsuariosPorUnidade(2L);
+            List<Usuario> res = unidadeService.buscarUsuariosPorUnidade(2L);
             assertFalse(res.isEmpty());
         }
 

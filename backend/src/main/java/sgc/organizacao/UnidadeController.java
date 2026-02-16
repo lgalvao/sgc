@@ -13,8 +13,8 @@ import org.springframework.web.util.HtmlUtils;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.OrganizacaoViews;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
@@ -119,8 +119,8 @@ public class UnidadeController {
     @GetMapping("/{codUnidade}/usuarios")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @JsonView(OrganizacaoViews.Publica.class)
-    public ResponseEntity<List<UsuarioDto>> buscarUsuariosPorUnidade(@PathVariable Long codUnidade) {
-        List<UsuarioDto> usuarios = unidadeService.buscarUsuariosPorUnidade(codUnidade);
+    public ResponseEntity<List<Usuario>> buscarUsuariosPorUnidade(@PathVariable Long codUnidade) {
+        List<Usuario> usuarios = unidadeService.buscarEntidadesUsuariosPorUnidade(codUnidade);
         return ResponseEntity.ok(usuarios);
     }
 

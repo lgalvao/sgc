@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.ComumRepo;
-import sgc.mapa.dto.CompetenciaMapaDto;
-import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.*;
 import sgc.seguranca.sanitizacao.UtilSanitizacao;
 
@@ -19,13 +16,6 @@ import java.util.stream.Collectors;
 
 /**
  * Serviço especializado para salvar o mapa completo de competências.
- * Responsável por processar requisições de salvamento que incluem:
- * <ul>
- * <li>Atualização das observações do mapa</li>
- * <li>Criação, atualização e remoção de competências</li>
- * <li>Atualização das associações entre atividades e competências</li>
- * <li>Validação de integridade do mapa</li>
- * </ul>
  */
 @Service
 @Transactional
@@ -36,12 +26,11 @@ public class MapaSalvamentoService {
     private final CompetenciaRepo competenciaRepo;
     private final AtividadeRepo atividadeRepo;
     private final ComumRepo repo;
-    private final MapaCompletoMapper mapaCompletoMapper;
 
     /**
-     * Salva o mapa completo with todas as competências e suas associações.
+     * Salva o mapa completo com todas as competências e suas associações.
      */
-    public MapaCompletoDto salvarMapaCompleto(Long codMapa, SalvarMapaRequest request) {
+    public Mapa salvarMapaCompleto(Long codMapa, SalvarMapaRequest request) {
         Mapa mapa = repo.buscar(Mapa.class, codMapa);
 
         String observacoes = request.observacoes();
@@ -54,7 +43,7 @@ public class MapaSalvamentoService {
         atualizarAssociacoesAtividades(contexto, competenciasSalvas);
         validarIntegridadeMapa(codMapa, contexto.atividadesAtuais, competenciasSalvas);
 
-        return mapaCompletoMapper.toDto(mapa, null, competenciasSalvas);
+        return mapa;
     }
 
     private void atualizarObservacoes(Mapa mapa, @Nullable String observacoes) {
@@ -72,10 +61,11 @@ public class MapaSalvamentoService {
                 .collect(Collectors.toSet());
 
         Set<Long> codigosNovos = request.competencias().stream()
-                .map(CompetenciaMapaDto::codigo)
+                .map(SalvarMapaRequest.CompetenciaRequest::codigo)
                 .collect(Collectors.toSet());
 
         return new ContextoSalvamento(
+                codMapa,
                 competenciasAtuais,
                 atividadesAtuais,
                 atividadesDoMapaIds,
@@ -103,7 +93,7 @@ public class MapaSalvamentoService {
 
         List<Competencia> competenciasParaSalvar = new ArrayList<>();
 
-        for (CompetenciaMapaDto compDto : contexto.request.competencias()) {
+        for (SalvarMapaRequest.CompetenciaRequest compDto : contexto.request.competencias()) {
             Competencia competencia = processarCompetenciaDto(compDto, mapaCompetenciasExistentes, mapa);
             competenciasParaSalvar.add(competencia);
         }
@@ -112,7 +102,7 @@ public class MapaSalvamentoService {
     }
 
     private Competencia processarCompetenciaDto(
-            CompetenciaMapaDto compDto,
+            SalvarMapaRequest.CompetenciaRequest compDto,
             Map<Long, Competencia> mapaCompetenciasExistentes,
             Mapa mapa) {
 
@@ -134,15 +124,8 @@ public class MapaSalvamentoService {
     }
 
     private void atualizarAssociacoesAtividades(ContextoSalvamento contexto, List<Competencia> competenciasSalvas) {
-        Long codMapa = null;
-        if (!contexto.atividadesAtuais.isEmpty()) {
-            var primeiraAtividade = contexto.atividadesAtuais.getFirst();
-            var mapa = primeiraAtividade.getMapa();
-            codMapa = mapa.getCodigo();
-        }
-
         Map<Long, Set<Competencia>> mapAtividadeCompetencias = construirMapaAssociacoes(
-                contexto, competenciasSalvas, codMapa);
+                contexto, competenciasSalvas);
 
         aplicarAssociacoes(contexto.atividadesAtuais, mapAtividadeCompetencias);
         atividadeRepo.saveAll(contexto.atividadesAtuais);
@@ -150,21 +133,20 @@ public class MapaSalvamentoService {
 
     private Map<Long, Set<Competencia>> construirMapaAssociacoes(
             ContextoSalvamento contexto,
-            List<Competencia> competenciasSalvas,
-            @Nullable Long codMapa) {
+            List<Competencia> competenciasSalvas) {
 
         Map<Long, Set<Competencia>> mapAtividadeCompetencias = new HashMap<>();
         for (Long ativId : contexto.atividadesDoMapaIds) {
             mapAtividadeCompetencias.put(ativId, new HashSet<>());
         }
 
-        List<CompetenciaMapaDto> competenciasDto = contexto.request.competencias();
-        for (int i = 0; i < competenciasDto.size(); i++) {
-            CompetenciaMapaDto dto = competenciasDto.get(i);
-            Competencia competencia = competenciasSalvas.get(i);
+        Iterator<Competencia> itSalvas = competenciasSalvas.iterator();
+        for (SalvarMapaRequest.CompetenciaRequest dto : contexto.request.competencias()) {
+            if (!itSalvas.hasNext()) break;
+            Competencia competencia = itSalvas.next();
 
             for (Long ativId : dto.atividadesCodigos()) {
-                validarAtividadePertenceAoMapa(ativId, contexto.atividadesDoMapaIds, codMapa);
+                validarAtividadePertenceAoMapa(ativId, contexto.atividadesDoMapaIds, contexto.codMapa);
                 mapAtividadeCompetencias.get(ativId).add(competencia);
             }
         }
@@ -204,6 +186,7 @@ public class MapaSalvamentoService {
     }
 
     private record ContextoSalvamento(
+            Long codMapa,
             List<Competencia> competenciasAtuais,
             List<Atividade> atividadesAtuais,
             Set<Long> atividadesDoMapaIds,

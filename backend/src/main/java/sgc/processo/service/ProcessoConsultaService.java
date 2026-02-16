@@ -15,8 +15,8 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.mapper.SubprocessoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.query.ConsultasSubprocessoService;
 
 import java.util.*;
@@ -33,7 +33,6 @@ public class ProcessoConsultaService {
     private final ComumRepo repo;
     private final ConsultasSubprocessoService servicoConsultas;
     private final UsuarioFacade usuarioService;
-    private final SubprocessoMapper subprocessoMapper;
 
     public Processo buscarProcessoCodigo(Long codigo) {
         return repo.buscar(Processo.class, codigo);
@@ -87,7 +86,7 @@ public class ProcessoConsultaService {
                                     SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
                                     SituacaoSubprocesso.REVISAO_MAPA_VALIDADO))
                     .stream()
-                    .map(subprocessoMapper::toElegivelDto)
+                    .map(this::toElegivelDto)
                     .toList();
         }
 
@@ -95,7 +94,17 @@ public class ProcessoConsultaService {
                         List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
                                 SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA))
                 .stream()
-                .map(subprocessoMapper::toElegivelDto)
+                .map(this::toElegivelDto)
                 .toList();
+    }
+
+    private SubprocessoElegivelDto toElegivelDto(Subprocesso sp) {
+        return SubprocessoElegivelDto.builder()
+                .codigo(sp.getCodigo())
+                .unidadeCodigo(sp.getUnidade().getCodigo())
+                .unidadeNome(sp.getUnidade().getNome())
+                .unidadeSigla(sp.getUnidade().getSigla())
+                .situacao(sp.getSituacao())
+                .build();
     }
 }

@@ -1,5 +1,6 @@
 package sgc.subprocesso;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -11,6 +12,8 @@ import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoViews;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.net.URI;
@@ -56,11 +59,12 @@ public class SubprocessoCrudController {
      * <p>
      * Ação restrita a usuários com perfil 'ADMIN'.
      *
-     * @return Uma {@link List} de {@link SubprocessoDto}.
+     * @return Uma {@link List} de {@link Subprocesso}.
      */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public List<SubprocessoDto> listar() {
+    @JsonView(SubprocessoViews.Publica.class)
+    public List<Subprocesso> listar() {
         return subprocessoFacade.listar();
     }
 
@@ -68,17 +72,12 @@ public class SubprocessoCrudController {
      * Obtém os detalhes de um subprocesso específico.
      *
      * @param codigo         O código do subprocesso.
-     * @param perfil         O perfil do usuário que faz a requisição (opcional).
-     * @param unidadeUsuario O código da unidade do usuário (opcional).
-     * @return Um {@link SubprocessoDetalheDto} com os detalhes do subprocesso.
+     * @return Os detalhes do subprocesso.
      */
     @GetMapping("/{codigo}")
     @PreAuthorize("isAuthenticated()")
-    public SubprocessoDetalheDto obterPorCodigo(
-            @PathVariable Long codigo,
-            @RequestParam(required = false) Perfil perfil,
-            @RequestParam(required = false) Long unidadeUsuario) {
-
+    @JsonView(SubprocessoViews.Publica.class)
+    public SubprocessoDetalheResponse obterPorCodigo(@PathVariable Long codigo) {
         return subprocessoFacade.obterDetalhes(codigo);
     }
 
@@ -87,15 +86,16 @@ public class SubprocessoCrudController {
      *
      * @param codProcesso  O código do processo.
      * @param siglaUnidade A sigla da unidade.
-     * @return O {@link SubprocessoDto} encontrado.
+     * @return O {@link Subprocesso} encontrado.
      */
     @GetMapping("/buscar")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<SubprocessoDto> buscarPorProcessoEUnidade(
+    @JsonView(SubprocessoViews.Publica.class)
+    public ResponseEntity<Subprocesso> buscarPorProcessoEUnidade(
             @RequestParam Long codProcesso, @RequestParam String siglaUnidade) {
         UnidadeDto unidade = organizacaoFacade.buscarUnidadePorSigla(siglaUnidade);
-        SubprocessoDto dto = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, unidade.getCodigo());
-        return ResponseEntity.ok(dto);
+        Subprocesso sp = subprocessoFacade.obterEntidadePorProcessoEUnidade(codProcesso, unidade.getCodigo());
+        return ResponseEntity.ok(sp);
     }
 
     /**
@@ -107,11 +107,12 @@ public class SubprocessoCrudController {
      * @param request O DTO com os dados do subprocesso a ser criado.
      * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo
      *         subprocesso e o
-     *         {@link SubprocessoDto} criado no corpo da resposta.
+     *         {@link Subprocesso} criado no corpo da resposta.
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SubprocessoDto> criar(@Valid @RequestBody CriarSubprocessoRequest request) {
+    @JsonView(SubprocessoViews.Publica.class)
+    public ResponseEntity<Subprocesso> criar(@Valid @RequestBody CriarSubprocessoRequest request) {
         var salvo = subprocessoFacade.criar(request);
         URI uri = URI.create("/api/subprocessos/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(salvo);
@@ -126,11 +127,12 @@ public class SubprocessoCrudController {
      * @param codigo  O código do subprocesso a ser atualizado.
      * @param request O DTO com os novos dados do subprocesso.
      * @return Um {@link ResponseEntity} com status 200 OK e o
-     *         {@link SubprocessoDto} atualizado.
+     *         {@link Subprocesso} atualizado.
      */
     @PostMapping("/{codigo}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SubprocessoDto> atualizar(
+    @JsonView(SubprocessoViews.Publica.class)
+    public ResponseEntity<Subprocesso> atualizar(
             @PathVariable Long codigo, @Valid @RequestBody AtualizarSubprocessoRequest request) {
         var atualizado = subprocessoFacade.atualizar(codigo, request);
         return ResponseEntity.ok(atualizado);

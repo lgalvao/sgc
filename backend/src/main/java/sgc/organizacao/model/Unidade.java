@@ -1,5 +1,7 @@
 package sgc.organizacao.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,9 +25,11 @@ import java.util.List;
 @SuperBuilder
 public class Unidade extends EntidadeBase {
     @Column(name = "nome", nullable = false)
+    @JsonView(sgc.comum.model.ComumViews.Publica.class)
     private String nome;
 
     @Column(name = "sigla", length = 20, nullable = false)
+    @JsonView(sgc.comum.model.ComumViews.Publica.class)
     private String sigla;
 
     @Column(name = "matricula_titular", length = 8, nullable = false)
@@ -48,10 +52,12 @@ public class Unidade extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "unidade_superior_codigo")
     @Nullable
+    @JsonIgnore
     private Unidade unidadeSuperior;
 
     @OneToMany(mappedBy = "unidadeSuperior")
     @Builder.Default
+    @JsonIgnore
     private List<Unidade> subunidades = new ArrayList<>();
 
 }

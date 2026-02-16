@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.dto.*;
-import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -15,22 +14,12 @@ import java.util.*;
 
 /**
  * Facade para operações de unidades organizacionais.
- *
- * <p>Este facade delega operações para serviços especializados
- * <ul>
- *   <li>{@link UnidadeService} - Consultas básicas e mapas vigentes</li>
- *   <li>{@link UnidadeHierarquiaService} - Hierarquia e navegação</li>
- *   <li>{@link UnidadeResponsavelService} - Responsáveis e atribuições</li>
- * </ul>
- *
- * <p>A facade também mantém operações básicas de consulta e busca de entidades.
  */
 @Service
 @RequiredArgsConstructor
 public class UnidadeFacade {
     private final UnidadeService unidadeService;
     private final UsuarioService usuarioService;
-    private final UsuarioMapper usuarioMapper;
     private final UnidadeHierarquiaService hierarquiaService;
     private final UnidadeResponsavelService responsavelService;
 
@@ -116,7 +105,7 @@ public class UnidadeFacade {
 
     public UnidadeDto buscarPorSigla(String sigla) {
         Unidade unidade = buscarEntidadePorSigla(sigla);
-        return usuarioMapper.toUnidadeDto(unidade, false);
+        return UnidadeDto.fromEntity(unidade);
     }
 
     public Unidade buscarEntidadePorSigla(String sigla) {
@@ -125,7 +114,7 @@ public class UnidadeFacade {
 
     public UnidadeDto buscarPorCodigo(Long codigo) {
         Unidade unidade = buscarEntidadePorId(codigo);
-        return usuarioMapper.toUnidadeDto(unidade, false);
+        return UnidadeDto.fromEntity(unidade);
     }
 
     public Unidade buscarEntidadePorId(Long codigo) {
@@ -144,9 +133,11 @@ public class UnidadeFacade {
         return unidadeService.buscarSiglasPorIds(codigos);
     }
 
-    public List<UsuarioDto> buscarUsuariosPorUnidade(Long codigoUnidade) {
-        return usuarioService.buscarPorUnidadeLotacao(codigoUnidade).stream()
-                .map(usuarioMapper::toUsuarioDto)
-                .toList();
+    public List<Usuario> buscarUsuariosPorUnidade(Long codigoUnidade) {
+        return usuarioService.buscarPorUnidadeLotacao(codigoUnidade);
+    }
+
+    public List<Usuario> buscarEntidadesUsuariosPorUnidade(Long codigoUnidade) {
+        return usuarioService.buscarPorUnidadeLotacao(codigoUnidade);
     }
 }

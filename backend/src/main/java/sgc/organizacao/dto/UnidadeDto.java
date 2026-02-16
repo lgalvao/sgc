@@ -42,4 +42,16 @@ public class UnidadeDto {
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("isElegivel")
     private boolean isElegivel;
+
+    public static UnidadeDto fromEntity(sgc.organizacao.model.Unidade entity) {
+        if (entity == null) return null;
+        return UnidadeDto.builder()
+                .codigo(entity.getCodigo())
+                .nome(entity.getNome())
+                .sigla(entity.getSigla())
+                .codigoPai(entity.getUnidadeSuperior() != null ? entity.getUnidadeSuperior().getCodigo() : null)
+                .tipo(entity.getTipo().name())
+                .tituloTitular(entity.getTituloTitular())
+                .build();
+    }
 }

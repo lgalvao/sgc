@@ -13,9 +13,9 @@ import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
-import sgc.organizacao.dto.UsuarioDto;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
@@ -32,10 +32,6 @@ import static sgc.organizacao.model.TipoUnidade.*;
 
 /**
  * Listener assíncrono para eventos de processo.
- *
- * <p>
- * Processa eventos de processo iniciado e finalizado, criando alertas e
- * enviando e-mails para as unidades participantes de forma diferenciada, conforme o tipo de unidade.
  */
 @Component
 @RequiredArgsConstructor
@@ -49,26 +45,6 @@ public class EventoProcessoListener {
     private final ProcessoFacade processoFacade;
     private final SubprocessoFacade subprocessoFacade;
 
-    /**
-     * Escuta e processa o evento {@link EventoProcessoIniciado}, disparado quando
-     * um novo processo
-     * de mapeamento ou revisão é iniciado.
-     *
-     * <p>
-     * Este método orquestra a criação de alertas e o envio de emails para todos os
-     * participantes
-     * do processo. A lógica diferencia o conteúdo das notificações com base no tipo
-     * de unidade
-     * (Operacional, Intermediária, etc.), garantindo que cada participante receba
-     * instruções
-     * relevantes para sua função.
-     *
-     * <p>
-     * Executado de forma assíncrona para não bloquear a transação principal do
-     * workflow.
-     *
-     * @param evento O evento contendo os detalhes do processo que foi iniciado.
-     */
     @TransactionalEventListener
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -80,17 +56,6 @@ public class EventoProcessoListener {
         }
     }
 
-    /**
-     * Escuta e processa o evento {@link EventoProcessoFinalizado}, disparado quando
-     * um processo
-     * é concluído.
-     *
-     * <p>
-     * Executado de forma assíncrona para não bloquear a transação principal do
-     * workflow.
-     *
-     * @param evento O evento contendo os detalhes do processo que foi finalizado.
-     */
     @TransactionalEventListener
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -111,13 +76,11 @@ public class EventoProcessoListener {
             return;
         }
 
-        // 1. Criar alertas diferenciados por tipo de unidade
         List<Unidade> unidadesParticipantes = subprocessos.stream()
                 .map(Subprocesso::getUnidade)
                 .toList();
         servicoAlertas.criarAlertasProcessoIniciado(processo, unidadesParticipantes);
 
-        // 2. Pré-carregar responsáveis e usuários para evitar N+1
         List<Long> todosCodigosUnidades = subprocessos.stream()
                 .map(s -> s.getUnidade().getCodigo())
                 .toList();
@@ -131,9 +94,8 @@ public class EventoProcessoListener {
                 todosTitulos.add(r.substitutoTitulo());
         });
 
-        Map<String, UsuarioDto> usuarios = usuarioService.buscarUsuariosPorTitulos(todosTitulos);
+        Map<String, Usuario> usuarios = usuarioService.buscarUsuariosPorTitulos(todosTitulos);
 
-        // 3. Enviar e-mails para cada subprocesso
         for (Subprocesso subprocesso : subprocessos) {
             enviarEmailProcessoIniciado(processo, subprocesso, responsaveis, usuarios);
         }
@@ -155,7 +117,7 @@ public class EventoProcessoListener {
         List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
         Map<Long, UnidadeResponsavelDto> responsaveis = unidadeService.buscarResponsaveisUnidades(todosCodigosUnidades);
 
-        Map<String, UsuarioDto> usuarios = usuarioService.buscarUsuariosPorTitulos(responsaveis.values().stream()
+        Map<String, Usuario> usuarios = usuarioService.buscarUsuariosPorTitulos(responsaveis.values().stream()
                 .map(UnidadeResponsavelDto::titularTitulo)
                 .filter(Objects::nonNull)
                 .distinct()
@@ -168,12 +130,12 @@ public class EventoProcessoListener {
 
     private void enviarNotificacaoFinalizacao(Processo processo, Unidade unidade,
             Map<Long, UnidadeResponsavelDto> responsaveis,
-            Map<String, UsuarioDto> usuarios,
+            Map<String, Usuario> usuarios,
             List<Unidade> subordinadas) {
         try {
             UnidadeResponsavelDto responsavel = responsaveis.get(unidade.getCodigo());
-            UsuarioDto titular = usuarios.get(responsavel.titularTitulo());
-            String emailTitular = titular.email();
+            Usuario titular = usuarios.get(responsavel.titularTitulo());
+            String emailTitular = titular.getEmail();
             TipoUnidade tipoUnidade = unidade.getTipo();
 
             if (tipoUnidade == OPERACIONAL || tipoUnidade == INTEROPERACIONAL || tipoUnidade == RAIZ) {
@@ -224,7 +186,7 @@ public class EventoProcessoListener {
             Processo processo,
             Subprocesso subprocesso,
             Map<Long, UnidadeResponsavelDto> responsaveis,
-            Map<String, UsuarioDto> usuarios) {
+            Map<String, Usuario> usuarios) {
 
         Unidade unidade = subprocesso.getUnidade();
         Long codigoUnidade = unidade.getCodigo();
@@ -232,7 +194,7 @@ public class EventoProcessoListener {
         try {
             UnidadeResponsavelDto responsavel = responsaveis.get(codigoUnidade);
             String nomeUnidade = unidade.getNome();
-            UsuarioDto titular = usuarios.get(responsavel.titularTitulo());
+            Usuario titular = usuarios.get(responsavel.titularTitulo());
             String assunto = switch (unidade.getTipo()) {
                 case OPERACIONAL, INTEROPERACIONAL, RAIZ -> "Processo Iniciado - %s".formatted(processo.getDescricao());
                 case INTERMEDIARIA ->
@@ -242,8 +204,8 @@ public class EventoProcessoListener {
 
             String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
             
-            if (titular != null && titular.email() != null && !titular.email().isBlank()) {
-                notificacaoEmailService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
+            if (titular != null && titular.getEmail() != null && !titular.getEmail().isBlank()) {
+                notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
                 log.info("E-mail enviado a {}", unidade.getSigla());
             } else {
                 log.warn("E-mail não enviado para {}: titular ou e-mail inválido", unidade.getSigla());
@@ -270,12 +232,12 @@ public class EventoProcessoListener {
         };
     }
 
-    void enviarEmailParaSubstituto(String tituloSubstituto, Map<String, UsuarioDto> usuarios, String assunto,
+    void enviarEmailParaSubstituto(String tituloSubstituto, Map<String, Usuario> usuarios, String assunto,
             String corpoHtml, String nomeUnidade) {
         try {
-            UsuarioDto substituto = usuarios.get(tituloSubstituto);
-            if (substituto != null && substituto.email() != null && !substituto.email().isBlank()) {
-                notificacaoEmailService.enviarEmailHtml(substituto.email(), assunto, corpoHtml);
+            Usuario substituto = usuarios.get(tituloSubstituto);
+            if (substituto != null && substituto.getEmail() != null && !substituto.getEmail().isBlank()) {
+                notificacaoEmailService.enviarEmailHtml(substituto.getEmail(), assunto, corpoHtml);
                 log.info("E-mail enviado ao substituto da unidade {}.", nomeUnidade);
             }
         } catch (Exception e) {

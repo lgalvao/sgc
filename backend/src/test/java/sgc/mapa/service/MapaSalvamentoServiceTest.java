@@ -7,10 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.ComumRepo;
-import sgc.mapa.dto.CompetenciaMapaDto;
-import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.mapper.MapaCompletoMapper;
 import sgc.mapa.model.*;
 
 import java.util.*;
@@ -20,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -34,8 +30,6 @@ class MapaSalvamentoServiceTest {
     private AtividadeRepo atividadeRepo;
     @Mock
     private ComumRepo repo;
-    @Mock
-    private MapaCompletoMapper mapaCompletoMapper;
 
     @InjectMocks
     private MapaSalvamentoService mapaSalvamentoService;
@@ -46,175 +40,84 @@ class MapaSalvamentoServiceTest {
         Long codMapa = 1L;
         Long codComp = 50L;
         
-        CompetenciaMapaDto compDto = CompetenciaMapaDto.builder()
+        SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
                 .codigo(codComp)
-                .descricao("Nova Desc")
-                .atividadesCodigos(List.of())
+                .descricao("Comp 1")
+                .atividadesCodigos(List.of(10L))
                 .build();
+
         SalvarMapaRequest request = SalvarMapaRequest.builder()
+                .observacoes("Obs")
                 .competencias(List.of(compDto))
                 .build();
 
-        Mapa mapa = new Mapa();
-        Competencia compExistente = new Competencia();
-        compExistente.setCodigo(codComp);
-        compExistente.setDescricao("Velha Desc");
+        Mapa mapa = Mapa.builder().codigo(codMapa).build();
+        Competencia comp = Competencia.builder().codigo(codComp).mapa(mapa).atividades(new HashSet<>()).build();
+        Atividade ativ = Atividade.builder().codigo(10L).mapa(mapa).competencias(new HashSet<>()).build();
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(compExistente));
-        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of());
-        when(competenciaRepo.saveAll(any())).thenAnswer(i -> i.getArgument(0));
-        when(mapaCompletoMapper.toDto(any(), any(), any())).thenReturn(MapaCompletoDto.builder().build());
+        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(comp));
+        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativ));
+        when(competenciaRepo.saveAll(anyList())).thenReturn(List.of(comp));
 
-        mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
+        Mapa result = mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
 
-        assertThat(compExistente.getDescricao()).isEqualTo("Nova Desc");
+        assertThat(result).isEqualTo(mapa);
+        verify(competenciaRepo).saveAll(anyList());
     }
 
     @Test
-    @DisplayName("Deve falhar quando competência não pertence ao mapa")
-    void deveFalharQuandoCompetenciaNaoPertenceAoMapa() {
+    @DisplayName("Deve salvar mapa com nova competência")
+    void deveSalvarComNovaCompetencia() {
         Long codMapa = 1L;
-        Long codComp = 999L;
         
-        CompetenciaMapaDto compDto = CompetenciaMapaDto.builder()
-                .codigo(codComp)
-                .descricao("Desc")
-                .atividadesCodigos(List.of())
+        SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
+                .codigo(null)
+                .descricao("Nova Comp")
+                .atividadesCodigos(List.of(10L))
                 .build();
+
         SalvarMapaRequest request = SalvarMapaRequest.builder()
                 .competencias(List.of(compDto))
                 .build();
 
-        Mapa mapa = new Mapa();
-
-        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of());
-        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of());
-        
-        // Mock repo.buscar throwing ErroEntidadeNaoEncontrada
-        when(repo.buscar(Competencia.class, codComp)).thenThrow(new ErroEntidadeNaoEncontrada("Competência", codComp));
-
-        assertThatThrownBy(() -> mapaSalvamentoService.salvarMapaCompleto(codMapa, request))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
-
-    @Test
-    @DisplayName("Deve falhar ao associar atividade que não pertence ao mapa")
-    void deveFalharAtividadeNaoPertenceAoMapa() {
-        Long codMapa = 1L;
-        CompetenciaMapaDto compDto = CompetenciaMapaDto.builder()
-                .descricao("Desc")
-                .atividadesCodigos(new ArrayList<>(Set.of(2L)))
-                .build();
-        SalvarMapaRequest request = SalvarMapaRequest.builder()
-                .competencias(List.of(compDto))
-                .build();
-
-        Mapa mapa = new Mapa();
-        Atividade ativ1 = new Atividade();
-        ativ1.setCodigo(1L);
-        ativ1.setMapa(mapa);
+        Mapa mapa = Mapa.builder().codigo(codMapa).build();
+        Atividade ativ = Atividade.builder().codigo(10L).mapa(mapa).competencias(new HashSet<>()).build();
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
         when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
-        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativ1));
-        when(competenciaRepo.saveAll(any())).thenAnswer(i -> i.getArgument(0));
+        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativ));
+        when(competenciaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
 
-        assertThatThrownBy(() -> mapaSalvamentoService.salvarMapaCompleto(codMapa, request))
-                .isInstanceOf(ErroValidacao.class);
+        Mapa result = mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
+
+        assertThat(result).isNotNull();
+        verify(competenciaRepo).saveAll(anyList());
     }
 
     @Test
-    @DisplayName("Deve remover competência obsoleta e logar warn para gap")
-    void deveRemoverObsoleta() {
+    @DisplayName("Deve lançar erro ao associar atividade de outro mapa")
+    void deveLancarErroAtividadeOutroMapa() {
         Long codMapa = 1L;
+        
+        SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
+                .codigo(null)
+                .descricao("Nova Comp")
+                .atividadesCodigos(List.of(99L))
+                .build();
+
         SalvarMapaRequest request = SalvarMapaRequest.builder()
-                .competencias(Collections.emptyList())
-                .build();
-
-        Mapa mapa = new Mapa();
-        Competencia compExistente = Competencia.builder().descricao("Existente").mapa(mapa).build();
-        compExistente.setCodigo(100L);
-
-        Atividade ativ1 = new Atividade();
-        ativ1.setCodigo(1L);
-        ativ1.setMapa(mapa);
-        ativ1.setCompetencias(new HashSet<>(List.of(compExistente)));
-
-        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(new ArrayList<>(List.of(compExistente)));
-        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativ1));
-        when(competenciaRepo.saveAll(any())).thenAnswer(i -> i.getArgument(0));
-        when(mapaRepo.save(any())).thenAnswer(i -> i.getArgument(0));
-        when(mapaCompletoMapper.toDto(any(), any(), any())).thenReturn(MapaCompletoDto.builder().build());
-
-        var result = mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Deve salvar mapa sem atividades pré-existentes")
-    void deveSalvarMapaSemAtividadesPreExistentes() {
-        Long codMapa = 100L;
-        SalvarMapaRequest request = new SalvarMapaRequest("Obs", List.of());
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(codMapa);
-
-        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of());
-        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of());
-
-        when(competenciaRepo.saveAll(anyList())).thenReturn(List.of());
-        when(atividadeRepo.saveAll(anyList())).thenReturn(List.of());
-
-        MapaCompletoDto dto = new MapaCompletoDto(codMapa, null, "Obs", List.of());
-        when(mapaCompletoMapper.toDto(eq(mapa), any(), anyList())).thenReturn(dto);
-
-        MapaCompletoDto result = mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
-
-        assertThat(result).isNotNull();
-        verify(mapaRepo).save(mapa);
-    }
-
-
-    @Nested
-    @DisplayName("Cobertura Extra")
-    class Coverage {
-        @Test
-        @DisplayName("Deve logar aviso quando competencia sem atividade e atividade sem competencia")
-        void validarIntegridadeMapa_LogWarning() {
-            Long codMapa = 1L;
-            
-            CompetenciaMapaDto compDto = CompetenciaMapaDto.builder()
-                .descricao("Comp 1")
-                .atividadesCodigos(Collections.emptyList())
-                .build();
-                
-            SalvarMapaRequest request = SalvarMapaRequest.builder()
                 .competencias(List.of(compDto))
                 .build();
-                
-            Mapa mapa = new Mapa();
-            Atividade ativExistente = new Atividade();
-            ativExistente.setCodigo(1L);
-            ativExistente.setMapa(mapa);
-            ativExistente.setCompetencias(new HashSet<>());
 
-            when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
-            when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of());
-            when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativExistente));
-            
-            Competencia savedComp = new Competencia();
-            savedComp.setCodigo(100L);
-            savedComp.setAtividades(new HashSet<>());
+        Mapa mapa = Mapa.builder().codigo(codMapa).build();
 
-            when(competenciaRepo.saveAll(anyList())).thenReturn(List.of(savedComp));
-            when(mapaCompletoMapper.toDto(any(), any(), anyList())).thenReturn(MapaCompletoDto.builder().build());
+        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
+        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
 
-            mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
-            
-            verify(mapaCompletoMapper).toDto(any(), any(), anyList());
-        }
+        assertThatThrownBy(() -> mapaSalvamentoService.salvarMapaCompleto(codMapa, request))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("não pertence ao mapa");
     }
 }

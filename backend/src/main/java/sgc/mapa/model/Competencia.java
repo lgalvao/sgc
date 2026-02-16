@@ -1,5 +1,7 @@
 package sgc.mapa.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,12 +22,15 @@ import java.util.Set;
 public class Competencia extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "mapa_codigo", nullable = false)
+    @JsonIgnore
     private Mapa mapa;
 
     @Column(name = "descricao", nullable = false)
+    @JsonView(MapaViews.Publica.class)
     private String descricao;
 
     @ManyToMany(mappedBy = "competencias")
     @Builder.Default
+    @JsonView(MapaViews.Publica.class)
     private Set<Atividade> atividades = new HashSet<>();
 }

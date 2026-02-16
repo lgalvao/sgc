@@ -1,6 +1,7 @@
 package sgc.mapa.dto;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import org.jspecify.annotations.Nullable;
@@ -14,5 +15,12 @@ import java.util.List;
 @Builder
 public record SalvarMapaRequest(
         @Nullable @Size(max = 1000, message = "As observações devem ter no máximo 1000 caracteres") @SanitizarHtml String observacoes,
-        @Valid List<CompetenciaMapaDto> competencias) {
+        @Valid List<CompetenciaRequest> competencias) {
+
+    @Builder
+    public record CompetenciaRequest(
+            @Nullable Long codigo,
+            @NotBlank(message = "A descrição da competência é obrigatória") String descricao,
+            List<Long> atividadesCodigos
+    ) {}
 }

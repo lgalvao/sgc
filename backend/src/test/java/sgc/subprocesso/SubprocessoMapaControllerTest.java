@@ -1,393 +1,108 @@
 package sgc.subprocesso;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import sgc.comum.erros.RestExceptionHandler;
-import sgc.mapa.dto.CompetenciaMapaDto;
-import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
-import sgc.mapa.model.Mapa;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+import sgc.analise.AnaliseFacade;
+import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
+import sgc.analise.mapper.AnaliseMapper;
+import sgc.analise.model.TipoAnalise;
 import sgc.mapa.service.MapaFacade;
-import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
-import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
-import tools.jackson.databind.ObjectMapper;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(SubprocessoMapaController.class)
-@Import(RestExceptionHandler.class)
+@ExtendWith(MockitoExtension.class)
+@Tag("unit")
+@DisplayName("Testes de Cobertura para SubprocessoMapaController")
 class SubprocessoMapaControllerTest {
-        @MockitoBean
-        private SubprocessoFacade subprocessoFacade;
 
-        @MockitoBean
-        private MapaFacade mapaFacade;
+    @InjectMocks
+    private SubprocessoMapaController controller;
 
-        @MockitoBean
-        private OrganizacaoFacade organizacaoFacade;
+    @Mock
+    private SubprocessoFacade subprocessoFacade;
 
-        @Autowired
-        private MockMvc mockMvc;
-        private ObjectMapper objectMapper;
+    @Mock
+    private MapaFacade mapaFacade;
 
-        @BeforeEach
-            void setUp() {
-                objectMapper = new ObjectMapper();
-        }
+    @Mock
+    private AnaliseFacade analiseFacade;
 
-        @Test
-        @DisplayName("verificarImpactos")
-        @WithMockUser
-        void verificarImpactos() throws Exception {
-                when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-                when(mapaFacade.verificarImpactos(any(Subprocesso.class), any()))
-                                .thenReturn(ImpactoMapaDto.semImpacto());
-
-                mockMvc.perform(get("/api/subprocessos/1/impactos-mapa")).andExpect(status().isOk());
-        }
-
-        @Test
-        @DisplayName("obterMapa")
-        @WithMockUser
-        void obterMapa() throws Exception {
-                Subprocesso sp = new Subprocesso();
-                sp.setMapa(new Mapa());
-                sp.getMapa().setCodigo(10L);
-
-                when(subprocessoFacade.buscarSubprocessoComMapa(1L)).thenReturn(sp);
-                when(mapaFacade.obterMapaCompleto(10L, 1L)).thenReturn(MapaCompletoDto.builder().build());
-
-                mockMvc.perform(get("/api/subprocessos/1/mapa")).andExpect(status().isOk());
-        }
-
-        @Test
-        @DisplayName("obterMapaVisualizacao")
-        @WithMockUser
-        void obterMapaVisualizacao() throws Exception {
-                when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-                when(mapaFacade.obterMapaParaVisualizacao(any(Subprocesso.class)))
-                                .thenReturn(MapaVisualizacaoDto.builder().build());
-
-                mockMvc.perform(get("/api/subprocessos/1/mapa-visualizacao")).andExpect(status().isOk());
-        }
-
-        @Test
-        @DisplayName("salvarMapa")
-        @WithMockUser
-        void salvarMapa() throws Exception {
-                SalvarMapaRequest req = SalvarMapaRequest.builder()
-                                .observacoes("obs")
-                                .competencias(List.of(CompetenciaMapaDto.builder().descricao("Comp 1")
-                                                .atividadesCodigos(List.of(1L)).build()))
-                                .build();
-
-                when(subprocessoFacade.salvarMapaSubprocesso(eq(1L), any()))
-                                .thenReturn(MapaCompletoDto.builder().build());
-
-                mockMvc.perform(
-                                post("/api/subprocessos/1/mapa/atualizar")
-                                                .with(csrf())
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(req)))
-                                .andExpect(status().isOk());
-        }
-
-        @Test
-        @DisplayName("obterMapaParaAjuste")
-        @WithMockUser
-        void obterMapaParaAjuste() throws Exception {
-                when(subprocessoFacade.obterMapaParaAjuste(1L))
-                                .thenReturn(MapaAjusteDto.builder().build());
-
-                mockMvc.perform(get("/api/subprocessos/1/mapa-ajuste")).andExpect(status().isOk());
-        }
+    @Mock
+    private AnaliseMapper analiseMapper;
 
     @Test
-    @DisplayName("salvarAjustesMapa")
-    @WithMockUser
-    void salvarAjustesMapa() throws Exception {
-        CompetenciaAjusteDto comp = CompetenciaAjusteDto.builder()
-                .codCompetencia(1L)
-                .nome("Competencia Teste")
-                .atividades(List.of())
-                .build();
+    @DisplayName("Deve disponibilizar mapa")
+    void deveDisponibilizarMapa() {
+        Long codigo = 1L;
+        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(null, "Obs");
+        Usuario usuario = new Usuario();
 
-        SalvarAjustesRequest req = SalvarAjustesRequest.builder()
-                .competencias(List.of(comp))
-                .build();
+        ResponseEntity<MensagemResponse> response = controller.disponibilizarMapa(codigo, req, usuario);
 
-        mockMvc.perform(
-                        post("/api/subprocessos/1/mapa-ajuste/atualizar")
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
+        verify(subprocessoFacade).disponibilizarMapa(eq(codigo), any(DisponibilizarMapaRequest.class), eq(usuario));
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().mensagem()).isEqualTo("Mapa de competências disponibilizado.");
     }
 
-        @Test
-        @DisplayName("obterMapaCompleto")
-        @WithMockUser
-        void obterMapaCompleto() throws Exception {
-                Subprocesso sp = new Subprocesso();
-                sp.setMapa(new Mapa());
-                sp.getMapa().setCodigo(10L);
+    @Test
+    @DisplayName("Deve apresentar sugestões")
+    void deveApresentarSugestoes() {
+        Long codigo = 1L;
+        ApresentarSugestoesRequest req = new ApresentarSugestoesRequest("Sugestão");
+        Usuario usuario = new Usuario();
 
-                when(subprocessoFacade.buscarSubprocessoComMapa(1L)).thenReturn(sp);
-                when(mapaFacade.obterMapaCompleto(10L, 1L)).thenReturn(MapaCompletoDto.builder().build());
+        controller.apresentarSugestoes(codigo, req, usuario);
 
-                mockMvc.perform(get("/api/subprocessos/1/mapa-completo")).andExpect(status().isOk());
-        }
+        verify(subprocessoFacade).apresentarSugestoes(codigo, "Sugestão", usuario);
+    }
 
-        @Test
-        @DisplayName("salvarMapaCompleto")
-        @WithMockUser
-        void salvarMapaCompleto() throws Exception {
-                SalvarMapaRequest req = SalvarMapaRequest.builder()
-                                .observacoes("obs")
-                                .competencias(List.of(CompetenciaMapaDto.builder().descricao("Comp 1")
-                                                .atividadesCodigos(List.of(1L)).build()))
-                                .build();
+    @Test
+    @DisplayName("Deve validar mapa")
+    void deveValidarMapa() {
+        Long codigo = 1L;
+        Usuario usuario = new Usuario();
 
-                when(subprocessoFacade.salvarMapaSubprocesso(eq(1L), any()))
-                                .thenReturn(MapaCompletoDto.builder().build());
+        controller.validarMapa(codigo, usuario);
 
-                mockMvc.perform(
-                                post("/api/subprocessos/1/mapa-completo/atualizar")
-                                                .with(csrf())
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(req)))
-                                .andExpect(status().isOk());
-        }
+        verify(subprocessoFacade).validarMapa(codigo, usuario);
+    }
 
-        @Test
-        @DisplayName("adicionarCompetencia")
-        @WithMockUser
-        void adicionarCompetencia() throws Exception {
-                CompetenciaRequest req = CompetenciaRequest.builder()
-                                .descricao("Comp")
-                                .atividadesIds(List.of(1L, 2L)) // Corrigido: lista não pode ser vazia
-                                .build();
+    @Test
+    @DisplayName("Deve obter sugestões")
+    void deveObterSugestoes() {
+        Long codigo = 1L;
+        Map<String, Object> dto = Map.of("sugestoes", "Texto");
+        when(subprocessoFacade.obterSugestoes(codigo)).thenReturn(dto);
 
-                when(subprocessoFacade.adicionarCompetencia(eq(1L), any()))
-                                .thenReturn(MapaCompletoDto.builder().build());
+        Map<String, Object> result = controller.obterSugestoes(codigo);
 
-                mockMvc.perform(
-                                post("/api/subprocessos/1/competencias")
-                                                .with(csrf())
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(req)))
-                                .andExpect(status().isOk());
-        }
+        assertThat(result).isEqualTo(dto);
+    }
 
-        @Test
-        @DisplayName("adicionarCompetencia - deve retornar 400 quando descrição está vazia")
-        @WithMockUser
-        void adicionarCompetencia_DeveRetornar400QuandoDescricaoVazia() throws Exception {
-                CompetenciaRequest req = CompetenciaRequest.builder()
-                                .descricao("") // Descrição vazia - deve falhar
-                                .atividadesIds(List.of(1L))
-                                .build();
+    @Test
+    @DisplayName("Deve obter histórico de validação")
+    void deveObterHistoricoValidacao() {
+        Long codigo = 1L;
+        when(analiseFacade.listarPorSubprocesso(eq(codigo), eq(TipoAnalise.VALIDACAO))).thenReturn(List.of());
 
-                mockMvc.perform(
-                                post("/api/subprocessos/1/competencias")
-                                                .with(csrf())
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(req)))
-                                .andExpect(status().isBadRequest());
-        }
+        List<AnaliseValidacaoHistoricoDto> result = controller.obterHistoricoValidacao(codigo);
 
-        @Test
-        @DisplayName("adicionarCompetencia - deve retornar 400 quando lista de atividades está vazia")
-        @WithMockUser
-        void adicionarCompetencia_DeveRetornar400QuandoAtividadesVazio() throws Exception {
-                CompetenciaRequest req = CompetenciaRequest.builder()
-                                .descricao("Competência válida")
-                                .atividadesIds(List.of()) // Lista vazia - deve falhar
-                                .build();
-
-                mockMvc.perform(
-                                post("/api/subprocessos/1/competencias")
-                                                .with(csrf())
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(req)))
-                                .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("adicionarCompetencia - deve retornar 400 quando lista de atividades é null")
-        @WithMockUser
-        void adicionarCompetencia_DeveRetornar400QuandoAtividadesNull() throws Exception {
-                CompetenciaRequest req = CompetenciaRequest.builder()
-                                .descricao("Competência válida")
-                                .atividadesIds(null) // Null - deve falhar
-                                .build();
-
-                mockMvc.perform(
-                                post("/api/subprocessos/1/competencias")
-                                                .with(csrf())
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(req)))
-                                .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("atualizarCompetencia")
-        @WithMockUser
-        void atualizarCompetencia() throws Exception {
-                CompetenciaRequest req = CompetenciaRequest.builder()
-                                .descricao("Comp")
-                                .atividadesIds(List.of(1L)) // Corrigido: lista não pode ser vazia
-                                .build();
-
-                when(subprocessoFacade.atualizarCompetencia(eq(1L), eq(10L), any()))
-                                .thenReturn(MapaCompletoDto.builder().build());
-
-                mockMvc.perform(
-                                post("/api/subprocessos/1/competencias/10/atualizar")
-                                                .with(csrf())
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(req)))
-                                .andExpect(status().isOk());
-        }
-
-        @Test
-        @DisplayName("removerCompetencia")
-        @WithMockUser
-        void removerCompetencia() throws Exception {
-                when(subprocessoFacade.removerCompetencia(1L, 10L))
-                                .thenReturn(MapaCompletoDto.builder().build());
-
-                mockMvc.perform(post("/api/subprocessos/1/competencias/10/remover").with(csrf()))
-                                .andExpect(status().isOk());
-        }
-
-        @Test
-        @DisplayName("obterContextoEdicao - sem perfil")
-        @WithMockUser
-        void obterContextoEdicaoSemPerfil() throws Exception {
-                ContextoEdicaoDto dto = ContextoEdicaoDto.builder().build();
-                when(subprocessoFacade.obterContextoEdicao(1L)).thenReturn(dto);
-
-                mockMvc.perform(get("/api/subprocessos/1/contexto-edicao"))
-                                .andExpect(status().isOk());
-
-                verify(subprocessoFacade).obterContextoEdicao(1L);
-        }
-
-        @Test
-        @DisplayName("obterContextoEdicao - com perfil")
-        @WithMockUser
-        void obterContextoEdicaoComPerfil() throws Exception {
-                ContextoEdicaoDto dto = ContextoEdicaoDto.builder().build();
-                when(subprocessoFacade.obterContextoEdicao(1L)).thenReturn(dto);
-
-                mockMvc.perform(get("/api/subprocessos/1/contexto-edicao")
-                                .param("perfil", "ADMIN"))
-                                .andExpect(status().isOk());
-
-                verify(subprocessoFacade).obterContextoEdicao(1L);
-        }
-
-        @Test
-        @DisplayName("listarAtividades")
-        @WithMockUser
-        void listarAtividades() throws Exception {
-                List<AtividadeDto> atividades = List.of(
-                                AtividadeDto.builder().codigo(1L).descricao("Atividade 1").build());
-                when(subprocessoFacade.listarAtividadesSubprocesso(1L)).thenReturn(atividades);
-
-                mockMvc.perform(get("/api/subprocessos/1/atividades"))
-                                .andExpect(status().isOk());
-
-                verify(subprocessoFacade).listarAtividadesSubprocesso(1L);
-        }
-
-        @Test
-        @DisplayName("listarAtividades - deve retornar lista vazia quando subprocesso não tem atividades")
-        @WithMockUser
-        void listarAtividades_DeveRetornarListaVaziaQuandoNaoHaAtividades() throws Exception {
-                // Pattern 1: Empty list validation
-                when(subprocessoFacade.listarAtividadesSubprocesso(1L)).thenReturn(List.of());
-
-                mockMvc.perform(get("/api/subprocessos/1/atividades"))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$").isArray())
-                                .andExpect(jsonPath("$").isEmpty());
-
-                verify(subprocessoFacade).listarAtividadesSubprocesso(1L);
-        }
-
-        @Test
-        @DisplayName("disponibilizarMapaEmBloco - com dataLimite")
-        @WithMockUser(roles = "ADMIN")
-        void disponibilizarMapaEmBlocoComDataLimite() throws Exception {
-                ProcessarEmBlocoRequest req = ProcessarEmBlocoRequest.builder()
-                                .acao("DISPONIBILIZAR")
-                                .subprocessos(List.of(1L, 2L, 3L))
-                                .dataLimite(LocalDate.now().plusDays(20))
-                                .build();
-
-                mockMvc.perform(
-                                post("/api/subprocessos/100/disponibilizar-mapa-bloco")
-                                                .with(csrf())
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(req)))
-                                .andExpect(status().isOk());
-
-                verify(subprocessoFacade).disponibilizarMapaEmBloco(
-                                eq(List.of(1L, 2L, 3L)),
-                                eq(100L),
-                                any(),
-                                any(Usuario.class));
-        }
-
-        @Test
-        @DisplayName("disponibilizarMapaEmBloco - sem dataLimite (usa padrão +15 dias)")
-        @WithMockUser(roles = "ADMIN")
-        void disponibilizarMapaEmBlocoSemDataLimite() throws Exception {
-                ProcessarEmBlocoRequest req = ProcessarEmBlocoRequest.builder()
-                                .acao("DISPONIBILIZAR")
-                                .subprocessos(List.of(1L))
-                                .dataLimite(null)
-                                .build();
-
-                mockMvc.perform(
-                                post("/api/subprocessos/100/disponibilizar-mapa-bloco")
-                                                .with(csrf())
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(objectMapper.writeValueAsString(req)))
-                                .andExpect(status().isOk());
-
-                verify(subprocessoFacade).disponibilizarMapaEmBloco(
-                                eq(List.of(1L)),
-                                eq(100L),
-                                any(),
-                                any(Usuario.class));
-        }
-
+        assertThat(result).isEmpty();
+    }
 }

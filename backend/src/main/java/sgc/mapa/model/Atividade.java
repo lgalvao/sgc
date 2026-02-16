@@ -38,7 +38,7 @@ public class Atividade extends EntidadeBase {
 
     @OneToMany(mappedBy = "atividade", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @JsonIgnore
+    @JsonView(MapaViews.Publica.class)
     private List<Conhecimento> conhecimentos = new ArrayList<>();
 
     @ManyToMany

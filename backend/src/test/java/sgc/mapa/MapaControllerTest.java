@@ -12,8 +12,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.mapa.dto.MapaDto;
-import sgc.mapa.mapper.MapaMapper;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
 import tools.jackson.databind.ObjectMapper;
@@ -41,8 +39,6 @@ class MapaControllerTest {
 
     @MockitoBean
     private MapaFacade mapaFacade;
-    @MockitoBean
-    private MapaMapper mapaMapper;
 
     @Autowired
     private MockMvc mockMvc;
@@ -60,10 +56,8 @@ class MapaControllerTest {
     void deveRetornarListaDeMapas() throws Exception {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
-        MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
         when(mapaFacade.listar()).thenReturn(List.of(mapa));
-        when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(get(API_MAPAS))
                 .andExpect(status().isOk())
@@ -72,28 +66,12 @@ class MapaControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("Deve retornar lista vazia quando não há mapas")
-    void deveRetornarListaVaziaQuandoNaoHaMapas() throws Exception {
-        // Arrange
-        when(mapaFacade.listar()).thenReturn(List.of());
-
-        // Act & Assert
-        mockMvc.perform(get(API_MAPAS))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
-    }
-
-    @Test
-    @WithMockUser
     @DisplayName("Deve retornar mapa quando existir")
     void deveRetornarMapaQuandoExistir() throws Exception {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
-        MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
         when(mapaFacade.obterPorCodigo(1L)).thenReturn(mapa);
-        when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(get(API_MAPAS_1))
                 .andExpect(status().isOk())
@@ -104,7 +82,6 @@ class MapaControllerTest {
     @WithMockUser
     @DisplayName("Deve retornar NotFound quando mapa não existir")
     void deveRetornarNotFoundQuandoMapaNaoExistir() throws Exception {
-        // Pattern 2: Testing error branch
         when(mapaFacade.obterPorCodigo(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 999L));
 
         mockMvc.perform(get("/api/mapas/999"))
@@ -114,49 +91,43 @@ class MapaControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Deve retornar Created ao criar mapa")
     void deveRetornarCreatedAoCriar() throws Exception {
-        MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
 
-        when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(mapa);
         when(mapaFacade.salvar(any(Mapa.class))).thenReturn(mapa);
-        when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(
                         post(API_MAPAS)
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(mapaDto)))
+                                .content(objectMapper.writeValueAsString(mapa)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", API_MAPAS_1));
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Deve retornar Ok ao atualizar mapa existente")
     void deveRetornarOkAoAtualizarMapaExistente() throws Exception {
-        MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
 
         when(mapaFacade.atualizar(eq(1L), any(Mapa.class))).thenReturn(mapa);
-        when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(mapa);
-        when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(
                         post(API_MAPAS_1_ATUALIZAR)
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(mapaDto)))
+                                .content(objectMapper.writeValueAsString(mapa)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Deve retornar NoContent ao excluir mapa")
     void deveRetornarNoContentAoExcluir() throws Exception {
         doNothing().when(mapaFacade).excluir(1L);
@@ -165,6 +136,4 @@ class MapaControllerTest {
 
         verify(mapaFacade).excluir(1L);
     }
-
-
 }

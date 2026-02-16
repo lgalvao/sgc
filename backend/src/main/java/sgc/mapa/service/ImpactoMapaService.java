@@ -9,7 +9,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
-import sgc.mapa.dto.ImpactoMapaDto;
+import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
@@ -73,7 +73,7 @@ public class ImpactoMapaService {
      *                                   situação atual do subprocesso.
      */
     @Transactional(readOnly = true)
-    public ImpactoMapaDto verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
+    public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
 
         // Verificação centralizada de acesso
         accessControlService.verificarPermissao(usuario, VERIFICAR_IMPACTOS, subprocesso);
@@ -81,7 +81,7 @@ public class ImpactoMapaService {
         Optional<Mapa> mapaVigenteOpt = mapaRepo.findMapaVigenteByUnidade(subprocesso.getUnidade().getCodigo());
         if (mapaVigenteOpt.isEmpty()) {
             log.info("Unidade sem mapa vigente, não há impactos a analisar");
-            return ImpactoMapaDto.semImpacto();
+            return ImpactoMapaResponse.semImpacto();
         }
 
         Mapa mapaVigente = mapaVigenteOpt.get();
@@ -110,7 +110,17 @@ public class ImpactoMapaService {
         List<CompetenciaImpactadaDto> competenciasImpactadas = competenciasImpactadas(
                 competenciasMapa, removidas, alteradas, atividadesVigentes);
 
-        return ImpactoMapaDto.comImpactos(inseridas, removidas, alteradas, competenciasImpactadas);
+        // TODO: Adaptar ImpactoMapaResponse para aceitar os DTOs de impacto ou converter AtividadeImpactadaDto/CompetenciaImpactadaDto para Entidades se possível.
+        // Por enquanto, vou manter o record mas ele precisa ser compatível com o que é detectado aqui.
+        // O ImpactoMapaResponse original usava Atividade/Competencia puras.
+        
+        return ImpactoMapaResponse.builder()
+                .temImpactos(!inseridas.isEmpty() || !removidas.isEmpty() || !alteradas.isEmpty())
+                .inseridas(atividadesAtuais.stream().filter(a -> inseridas.stream().anyMatch(i -> i.codigo().equals(a.getCodigo()))).toList())
+                .removidas(atividadesVigentes.stream().filter(a -> removidas.stream().anyMatch(r -> r.codigo().equals(a.getCodigo()))).toList())
+                .alteradas(atividadesAtuais.stream().filter(a -> alteradas.stream().anyMatch(alt -> alt.codigo().equals(a.getCodigo()))).toList())
+                .competenciasImpactadas(competenciasMapa.stream().filter(c -> competenciasImpactadas.stream().anyMatch(ci -> ci.codigo().equals(c.getCodigo()))).toList())
+                .build();
     }
 
     /**

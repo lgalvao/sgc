@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 })
 class CDU11IntegrationTest extends BaseIntegrationTest {
     private static final String API_SUBPROCESSOS_ID_CADASTRO = "/api/subprocessos/{codigo}/cadastro";
-    private static final String UNIDADE_SIGLA_JSON_PATH = "$.unidadeSigla";
+    private static final String UNIDADE_SIGLA_JSON_PATH = "$.unidade.sigla";
 
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
@@ -123,8 +123,6 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
 
         Conhecimento conhecimento1 = Conhecimento.builder().atividade(atividade1)
                 .descricao("Interpretação de textos técnicos").build();
-        // Verificando uso de builder se construtor foi removido:
-        // Conhecimento.builder().atividade(atividade1).descricao("...").build()
         conhecimentoRepo.save(conhecimento1);
 
         Atividade atividade2 = AtividadeFixture.atividadePadrao(mapa);
@@ -140,6 +138,10 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         conhecimentoRepo.save(conhecimento2b);
     }
 
+    protected void beforeTest() {
+        // Clear any state if needed
+    }
+
     @Nested
     @DisplayName("Testes de Cenário de Sucesso")
     class Sucesso {
@@ -149,7 +151,7 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo())
                             .header("Authorization", "Bearer " + tokenChefe))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.subprocessoCodigo", is(subprocesso.getCodigo().intValue())))
+                    .andExpect(jsonPath("$.codigo", is(subprocesso.getCodigo().intValue())))
                     .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("SENIC")))
                     .andExpect(jsonPath("$.atividades", hasSize(2)))
                     .andExpect(jsonPath("$.atividades[*].descricao",
@@ -209,7 +211,7 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(
                             jsonPath(
-                                    "$.subprocessoCodigo",
+                                    "$.codigo",
                                     is(subprocessoSemAtividades.getCodigo().intValue())))
                     .andExpect(jsonPath("$.atividades", hasSize(0)));
         }
@@ -233,7 +235,7 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
                                     .header("Authorization", "Bearer " + tokenAdmin))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(
-                            "$.subprocessoCodigo",
+                            "$.codigo",
                             is(subprocessoAtividadeSemConhecimento.getCodigo().intValue())))
                     .andExpect(jsonPath("$.atividades", hasSize(1)))
                     .andExpect(

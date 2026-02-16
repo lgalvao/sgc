@@ -9,7 +9,6 @@ import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.dto.AtribuicaoTemporariaDto;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
-import sgc.organizacao.mapper.UsuarioMapper;
 import sgc.organizacao.model.*;
 
 import java.time.LocalDate;
@@ -37,7 +36,6 @@ public class UnidadeResponsavelService {
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final ResponsabilidadeRepo responsabilidadeRepo;
-    private final UsuarioMapper usuarioMapper;
     private final ComumRepo repo;
 
     /**
@@ -47,8 +45,21 @@ public class UnidadeResponsavelService {
      */
     public List<AtribuicaoTemporariaDto> buscarTodasAtribuicoes() {
         return atribuicaoTemporariaRepo.findAll().stream()
-                .map(usuarioMapper::toAtribuicaoTemporariaDto)
+                .map(this::toAtribuicaoTemporariaDto)
                 .toList();
+    }
+
+    private AtribuicaoTemporariaDto toAtribuicaoTemporariaDto(AtribuicaoTemporaria a) {
+        Usuario usuario = repo.buscar(Usuario.class, a.getUsuarioTitulo());
+        return AtribuicaoTemporariaDto.builder()
+                .codigo(a.getCodigo())
+                .unidadeCodigo(a.getUnidade().getCodigo())
+                .unidadeSigla(a.getUnidade().getSigla())
+                .usuario(usuario)
+                .dataInicio(a.getDataInicio())
+                .dataTermino(a.getDataTermino())
+                .justificativa(a.getJustificativa())
+                .build();
     }
 
     /**

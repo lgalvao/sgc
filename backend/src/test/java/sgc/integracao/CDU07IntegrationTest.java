@@ -35,8 +35,8 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
                         get("/api/subprocessos/{id}", 60000L)
                                 .param("perfil", "ADMIN"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.unidade.sigla").value("SEDESENV"))
-                .andExpect(jsonPath("$.situacao").value(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name()));
+                .andExpect(jsonPath("$.subprocesso.codUnidade").value(8))
+                .andExpect(jsonPath("$.subprocesso.situacao").value(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name()));
     }
 
     @Test
@@ -48,7 +48,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
                                 .param("perfil", "CHEFE")
                                 .param("unidadeUsuario", "8"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.unidade.sigla").value("SEDESENV"));
+                .andExpect(jsonPath("$.subprocesso.codUnidade").value(8));
     }
 
     @Test

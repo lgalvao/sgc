@@ -12,7 +12,9 @@ import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
-import sgc.subprocesso.dto.SubprocessoDto;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoViews;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import java.net.URI;
 import java.util.List;
@@ -246,8 +248,9 @@ public class ProcessoController {
      */
     @GetMapping("/{codigo}/subprocessos")
     @Operation(summary = "Lista todos os subprocessos de um processo")
-    public ResponseEntity<List<SubprocessoDto>> listarSubprocessos(@PathVariable Long codigo) {
-        List<SubprocessoDto> subprocessos = processoFacade.listarTodosSubprocessos(codigo);
+    @JsonView(SubprocessoViews.Publica.class)
+    public ResponseEntity<List<Subprocesso>> listarSubprocessos(@PathVariable Long codigo) {
+        List<Subprocesso> subprocessos = processoFacade.listarEntidadesSubprocessos(codigo);
         return ResponseEntity.ok(subprocessos);
     }
 

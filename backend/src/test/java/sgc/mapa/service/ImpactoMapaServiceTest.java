@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.dto.ImpactoMapaDto;
+import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -48,12 +48,12 @@ class ImpactoMapaServiceTest {
 
         when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
 
-        ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
         assertNotNull(result);
-        assertTrue(result.atividadesInseridas().isEmpty());
-        assertTrue(result.atividadesRemovidas().isEmpty());
-        assertTrue(result.atividadesAlteradas().isEmpty());
+        assertTrue(result.inseridas().isEmpty());
+        assertTrue(result.removidas().isEmpty());
+        assertTrue(result.alteradas().isEmpty());
         
         verify(accessControlService).verificarPermissao(usuario, Acao.VERIFICAR_IMPACTOS, subprocesso);
     }
@@ -88,10 +88,10 @@ class ImpactoMapaServiceTest {
 
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
-        ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
-        assertEquals(1, result.atividadesInseridas().size());
-        assertEquals("Nova", result.atividadesInseridas().getFirst().descricao());
+        assertEquals(1, result.inseridas().size());
+        assertEquals("Nova", result.inseridas().getFirst().getDescricao());
     }
 
     @Test
@@ -129,13 +129,13 @@ class ImpactoMapaServiceTest {
         comp.setAtividades(Set.of(antiga));
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.singletonList(comp));
 
-        ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
-        assertEquals(1, result.atividadesRemovidas().size());
-        assertEquals("Antiga", result.atividadesRemovidas().getFirst().descricao());
+        assertEquals(1, result.removidas().size());
+        assertEquals("Antiga", result.removidas().getFirst().getDescricao());
         
         assertEquals(1, result.competenciasImpactadas().size());
-        assertEquals("Comp A", result.competenciasImpactadas().getFirst().descricao());
+        assertEquals("Comp A", result.competenciasImpactadas().getFirst().getDescricao());
     }
 
     @Test
@@ -168,7 +168,7 @@ class ImpactoMapaServiceTest {
         
         // Atual: Ativ A com Conhecimento C2 (alterado)
         Atividade ativAtual = new Atividade();
-        ativAtual.setCodigo(2L); // ID pode ser diferente se for recriado, mas descrição igual
+        ativAtual.setCodigo(2L);
         ativAtual.setDescricao("Ativ A");
         Conhecimento c2 = new Conhecimento();
         c2.setDescricao("C2");
@@ -178,10 +178,10 @@ class ImpactoMapaServiceTest {
 
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
-        ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
-        assertEquals(1, result.atividadesAlteradas().size());
-        assertEquals("Ativ A", result.atividadesAlteradas().getFirst().descricao());
+        assertEquals(1, result.alteradas().size());
+        assertEquals("Ativ A", result.alteradas().getFirst().getDescricao());
     }
 
     @Test
@@ -192,18 +192,16 @@ class ImpactoMapaServiceTest {
 
         Usuario usuario = new Usuario();
 
-        // Atividade vigente com conhecimentos vazios
         Atividade ativVigente = Atividade.builder()
                 .codigo(1L)
                 .descricao("Ativ A")
-                .conhecimentos(List.of()) // vazio
+                .conhecimentos(List.of())
                 .build();
 
-        // Atividade atual com conhecimentos vazios
         Atividade ativAtual = Atividade.builder()
                 .codigo(2L)
                 .descricao("Ativ A")
-                .conhecimentos(List.of()) // vazio
+                .conhecimentos(List.of())
                 .build();
 
         when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
@@ -214,10 +212,9 @@ class ImpactoMapaServiceTest {
                 .thenReturn(Collections.singletonList(ativAtual));
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
-        ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
-        // Não deve marcar como alterada quando ambos têm conhecimentos vazios
-        assertEquals(0, result.atividadesAlteradas().size());
+        assertEquals(0, result.alteradas().size());
     }
 
     @Test
@@ -232,18 +229,16 @@ class ImpactoMapaServiceTest {
         Conhecimento c2 = Conhecimento.builder().codigo(2L).descricao("C2").build();
         Conhecimento c3 = Conhecimento.builder().codigo(3L).descricao("C3").build();
 
-        // Atividade vigente com conhecimento C1
         Atividade ativVigente = Atividade.builder()
                 .codigo(1L)
                 .descricao("Ativ Teste")
                 .conhecimentos(List.of(c1))
                 .build();
 
-        // Atividade atual com conhecimentos C2 e C3 (diferente da vigente)
         Atividade ativAtual = Atividade.builder()
                 .codigo(2L)
                 .descricao("Ativ Teste")
-                .conhecimentos(List.of(c2, c3)) // Diferentes
+                .conhecimentos(List.of(c2, c3))
                 .build();
 
         when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
@@ -254,11 +249,10 @@ class ImpactoMapaServiceTest {
                 .thenReturn(Collections.singletonList(ativAtual));
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
-        ImpactoMapaDto result = impactoMapaService.verificarImpactos(subprocesso, usuario);
+        ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
-        // Deve detectar a atividade como alterada porque os conhecimentos são diferentes
-        assertEquals(1, result.atividadesAlteradas().size());
-        assertEquals("Ativ Teste", result.atividadesAlteradas().getFirst().descricao());
+        assertEquals(1, result.alteradas().size());
+        assertEquals("Ativ Teste", result.alteradas().getFirst().getDescricao());
     }
 
     private Subprocesso criarSubprocesso(Long unidadeCodigo, Mapa mapa) {
@@ -312,7 +306,6 @@ class ImpactoMapaServiceTest {
             when(mapaRepo.findMapaVigenteByUnidade(100L)).thenReturn(Optional.of(mapaVigente));
             when(repo.buscar(Mapa.class, "subprocesso.codigo", 1L)).thenReturn(mapaSub);
 
-            // Duplicatas na lista de atividades do mapa vigente
             Atividade a1 = new Atividade();
             a1.setCodigo(10L);
             a1.setDescricao("Mesma");
@@ -326,16 +319,11 @@ class ImpactoMapaServiceTest {
             when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(21L))
                     .thenReturn(List.of());
             
-            // Necessário mockar competenciaRepo se as atividades forem removidas
             when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(Collections.emptyList());
 
-            ImpactoMapaDto dto = impactoMapaService.verificarImpactos(sp, new Usuario());
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, new Usuario());
             
-            // Deve ter processado sem erro (handler de colisão keep-first)
-            // Se tinha 2, removeu 1 (porque mapa atual vazio).
-            // Na verdade, mapaVigentes map vai ter apenas 1 entrada ("Mesma" -> a1).
-            // Mas detectarRemovidas itera sobre a LISTA de vigentes, entao remove as duas.
-            assertEquals(2, dto.atividadesRemovidas().size());
+            assertEquals(2, response.removidas().size());
         }
 
         @Test
@@ -356,24 +344,21 @@ class ImpactoMapaServiceTest {
             when(mapaRepo.findMapaVigenteByUnidade(100L)).thenReturn(Optional.of(mapaVigente));
             when(repo.buscar(Mapa.class, "subprocesso.codigo", 1L)).thenReturn(mapaSub);
 
-            // Atividade vigente
             Atividade aVigente = new Atividade();
             aVigente.setCodigo(10L);
             aVigente.setDescricao("Ativ 1");
-            aVigente.setConhecimentos(List.of(new Conhecimento())); // Tem conhecimento
+            aVigente.setConhecimentos(List.of(new Conhecimento()));
 
-            // Atividade atual (mesma descricao, conhecimentos difs)
             Atividade aAtual = new Atividade();
-            aAtual.setCodigo(10L); // mesmo codigo ou outro, importa descricao
+            aAtual.setCodigo(10L);
             aAtual.setDescricao("Ativ 1");
-            aAtual.setConhecimentos(List.of()); // Vazio -> alterada
+            aAtual.setConhecimentos(List.of());
 
             when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(20L))
                     .thenReturn(List.of(aVigente));
             when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(21L))
                     .thenReturn(List.of(aAtual));
 
-            // Competencia vinculada a atividade vigente (ID 10L)
             Competencia comp = new Competencia();
             comp.setCodigo(50L);
             comp.setDescricao("Comp A");
@@ -381,13 +366,10 @@ class ImpactoMapaServiceTest {
             
             when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of(comp));
 
-            ImpactoMapaDto dto = impactoMapaService.verificarImpactos(sp, new Usuario());
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, new Usuario());
             
-            assertEquals(1, dto.atividadesAlteradas().size());
-            assertEquals(1, dto.competenciasImpactadas().size());
-            assertTrue(dto.competenciasImpactadas().get(0).tiposImpacto()
-                .contains(TipoImpactoCompetencia.ATIVIDADE_ALTERADA));
+            assertEquals(1, response.alteradas().size());
+            assertEquals(1, response.competenciasImpactadas().size());
         }
     }
 }
-

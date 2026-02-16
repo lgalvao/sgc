@@ -4,12 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
-import sgc.mapa.mapper.MapaCompletoMapper;
-import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
@@ -22,7 +18,6 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class MapaFacade {
-    private final MapaCompletoMapper mapaCompletoMapper;
     private final MapaSalvamentoService mapaSalvamentoService;
     private final MapaManutencaoService mapaManutencaoService;
     private final MapaVisualizacaoService mapaVisualizacaoService;
@@ -48,13 +43,6 @@ public class MapaFacade {
         return mapaManutencaoService.buscarMapaPorSubprocessoCodigo(codSubprocesso);
     }
 
-    @Transactional(readOnly = true)
-    public MapaCompletoDto obterMapaCompleto(Long codMapa, Long codSubprocesso) {
-        Mapa mapa = mapaManutencaoService.buscarMapaPorCodigo(codMapa);
-        List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapa(codMapa);
-        return mapaCompletoMapper.toDto(mapa, codSubprocesso, competencias);
-    }
-
     public Mapa salvar(Mapa mapa) {
         return mapaManutencaoService.salvarMapa(mapa);
     }
@@ -71,17 +59,17 @@ public class MapaFacade {
         mapaManutencaoService.excluirMapa(codigo);
     }
 
-    public MapaCompletoDto salvarMapaCompleto(Long codMapa, SalvarMapaRequest request) {
+    public Mapa salvarMapaCompleto(Long codMapa, SalvarMapaRequest request) {
         return mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
     }
 
     @Transactional(readOnly = true)
-    public MapaVisualizacaoDto obterMapaParaVisualizacao(Subprocesso subprocesso) {
+    public sgc.mapa.dto.MapaVisualizacaoResponse obterMapaParaVisualizacao(Subprocesso subprocesso) {
         return mapaVisualizacaoService.obterMapaParaVisualizacao(subprocesso);
     }
 
     @Transactional(readOnly = true)
-    public ImpactoMapaDto verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
+    public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
         return impactoMapaService.verificarImpactos(subprocesso, usuario);
     }
 }

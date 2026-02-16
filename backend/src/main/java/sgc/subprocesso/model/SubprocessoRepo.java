@@ -51,6 +51,15 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
             @Param("situacoes") List<SituacaoSubprocesso> situacoes);
 
     @Query("""
+            SELECT s FROM Subprocesso s 
+            JOIN FETCH s.unidade u 
+            LEFT JOIN FETCH s.mapa m 
+            LEFT JOIN FETCH m.atividades a 
+            WHERE s.codigo = :codigo
+            """)
+    Optional<Subprocesso> findByIdWithMapaAndAtividades(@Param("codigo") Long codigo);
+
+    @Query("""
             SELECT s FROM Subprocesso s JOIN FETCH s.processo JOIN FETCH s.unidade LEFT JOIN FETCH s.mapa
             """)
     List<Subprocesso> findAllComFetch();

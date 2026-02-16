@@ -23,6 +23,7 @@ import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.sanitizacao.UtilSanitizacao;
 import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
@@ -132,13 +133,13 @@ public class SubprocessoCadastroController {
      * Obtém os dados de cadastro de um subprocesso.
      *
      * @param codigo O código do subprocesso.
-     * @return Um {@link SubprocessoCadastroDto} com os dados do cadastro.
+     * @return O {@link Subprocesso} com os dados do cadastro.
      */
     @JsonView(MapaViews.Publica.class)
     @GetMapping("/{codigo}/cadastro")
     @PreAuthorize("isAuthenticated()")
-    public SubprocessoCadastroDto obterCadastro(@PathVariable Long codigo) {
-        return subprocessoFacade.obterCadastro(codigo);
+    public Subprocesso obterCadastro(@PathVariable Long codigo) {
+        return subprocessoFacade.buscarSubprocesso(codigo);
     }
 
     /**
