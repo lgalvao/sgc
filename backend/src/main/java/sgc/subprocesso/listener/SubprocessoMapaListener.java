@@ -9,12 +9,6 @@ import sgc.subprocesso.service.SubprocessoFacade;
 
 /**
  * Listener assíncrono para eventos do módulo mapa.
- *
- * <p>Responsável por atualizar a situação do subprocesso quando o mapa é alterado,
- * mantendo o desacoplamento entre os módulos via eventos.
- *
- * <p><b>Fase 3 (ADR-002):</b> Tornado assíncrono para desacoplamento completo
- * entre módulos mapa e subprocesso.
  */
 @Component
 @Slf4j
@@ -26,7 +20,9 @@ public class SubprocessoMapaListener {
     /**
      * Processa evento de mapa alterado de forma assíncrona.
      *
-     * <p>Atualiza a situação do subprocesso para "Em Andamento" quando o mapa é modificado.
+     * <p>
+     * Atualiza a situação do subprocesso para "Em Andamento" quando o mapa é
+     * modificado.
      *
      * @param evento Evento contendo o código do mapa alterado
      */

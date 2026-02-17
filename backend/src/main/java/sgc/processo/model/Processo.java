@@ -1,5 +1,7 @@
 package sgc.processo.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,23 +32,29 @@ public class Processo extends EntidadeBase {
     
     @Builder.Default
     @Column(name = "data_criacao", nullable = false)
+    @JsonView(ProcessoViews.Publica.class)
     private LocalDateTime dataCriacao = LocalDateTime.now();
 
     @Column(name = "data_finalizacao")
+    @JsonView(ProcessoViews.Publica.class)
     private LocalDateTime dataFinalizacao;
 
     @Column(name = "data_limite", nullable = false)
+    @JsonView(ProcessoViews.Publica.class)
     private LocalDateTime dataLimite;
 
     @Column(name = "descricao", nullable = false)
+    @JsonView(ProcessoViews.Publica.class)
     private String descricao;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "situacao", length = 20, nullable = false)
+    @JsonView(ProcessoViews.Publica.class)
     private SituacaoProcesso situacao;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20, nullable = false)
+    @JsonView(ProcessoViews.Publica.class)
     private TipoProcesso tipo;
 
     /**
@@ -57,6 +65,12 @@ public class Processo extends EntidadeBase {
     @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<UnidadeProcesso> participantes = new ArrayList<>();
+
+    @Override
+    @JsonView(ProcessoViews.Publica.class)
+    public Long getCodigo() {
+        return super.getCodigo();
+    }
 
     /**
      * Adiciona unidades participantes criando snapshots do estado atual.
@@ -105,6 +119,8 @@ public class Processo extends EntidadeBase {
     /**
      * Retorna as siglas das unidades participantes.
      */
+    @JsonView(ProcessoViews.Publica.class)
+    @JsonProperty("unidadesParticipantes")
     public String getSiglasParticipantes() {
         if (participantes == null) return null;
         return participantes.stream()

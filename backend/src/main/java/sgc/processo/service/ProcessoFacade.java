@@ -65,15 +65,13 @@ public class ProcessoFacade {
     }
 
     @Transactional
-    public ProcessoDto criar(CriarProcessoRequest req) {
-        Processo processoSalvo = processoManutencaoService.criar(req);
-        return processoMapper.toDto(processoSalvo);
+    public Processo criar(CriarProcessoRequest req) {
+        return processoManutencaoService.criar(req);
     }
 
     @Transactional
-    public ProcessoDto atualizar(Long codigo, AtualizarProcessoRequest requisicao) {
-        Processo processoAtualizado = processoManutencaoService.atualizar(codigo, requisicao);
-        return processoMapper.toDto(processoAtualizado);
+    public Processo atualizar(Long codigo, AtualizarProcessoRequest requisicao) {
+        return processoManutencaoService.atualizar(codigo, requisicao);
     }
 
     @Transactional
@@ -82,13 +80,13 @@ public class ProcessoFacade {
     }
 
     @Transactional(readOnly = true)
-    public Optional<ProcessoDto> obterPorId(Long codigo) {
-        return processoConsultaService.buscarProcessoCodigoOpt(codigo).map(processoMapper::toDto);
+    public Optional<Processo> obterPorId(Long codigo) {
+        return processoConsultaService.buscarProcessoCodigoOpt(codigo);
     }
 
     @Transactional(readOnly = true)
-    public ProcessoDto obterDtoPorId(Long codigo) {
-        return processoMapper.toDto(buscarPorId(codigo));
+    public Processo obterEntidadePorId(Long codigo) {
+        return buscarPorId(codigo);
     }
 
     @Transactional(readOnly = true)
@@ -113,17 +111,13 @@ public class ProcessoFacade {
     }
 
     @Transactional(readOnly = true)
-    public List<ProcessoDto> listarFinalizados() {
-        return processoConsultaService.processosFinalizados().stream()
-                .flatMap(p -> Stream.ofNullable(processoMapper.toDto(p)))
-                .toList();
+    public List<Processo> listarFinalizados() {
+        return processoConsultaService.processosFinalizados();
     }
 
     @Transactional(readOnly = true)
-    public List<ProcessoDto> listarAtivos() {
-        return processoConsultaService.processosAndamento().stream()
-                .flatMap(p -> Stream.ofNullable(processoMapper.toDto(p)))
-                .toList();
+    public List<Processo> listarAtivos() {
+        return processoConsultaService.processosAndamento();
     }
 
     public Page<Processo> listarTodos(Pageable pageable) {
