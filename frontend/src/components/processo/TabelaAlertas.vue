@@ -56,7 +56,7 @@ const emit = defineEmits<{
 }>();
 
 const fields = [
-  {key: "dataHora", label: "Data/Hora", sortable: true, formatter: (value: unknown) => formatDateBR(value as string)},
+  {key: "dataHora", label: "Data/Hora", sortable: true, formatter: (v: any) => formatDateBR(v)},
   {key: "mensagem", label: "Descrição"},
   {key: "processo", label: "Processo", sortable: true},
   {key: "origem", label: "Origem"},

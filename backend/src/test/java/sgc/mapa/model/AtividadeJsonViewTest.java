@@ -43,7 +43,6 @@ class AtividadeJsonViewTest {
                 .contains("\"codigo\":1")
                 .contains("\"descricao\":\"Atividade Teste\"")
                 .contains("\"mapaCodigo\":10")
-                // Agora conhecimentos são incluídos na Publica
                 .contains("\"conhecimentos\"")
                 .contains("\"descricao\":\"K1\"")
                 .contains("\"competencias\"")

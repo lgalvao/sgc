@@ -236,8 +236,8 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("Deve falhar ao importar para subprocesso em estado inválido")
-        void deveFalharAoImportarParaSubprocessoEmEstadoInvalido() throws Exception {
+        @DisplayName("Deve importar mesmo se subprocesso já estiver disponiblizado")
+        void deveImportarMesmoSeSubprocessoJaEstiverDisponibilizado() throws Exception {
             subprocessoDestino.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             subprocessoRepo.save(subprocessoDestino);
 
@@ -251,7 +251,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnprocessableContent());
+                    .andExpect(status().isOk());
         }
 
         @Test
