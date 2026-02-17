@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import sgc.analise.AnaliseFacade;
-import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
+import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.dto.MapaVisualizacaoResponse;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -181,7 +181,7 @@ class SubprocessoMapaControllerTest {
         Long codigo = 1L;
         when(analiseFacade.listarHistoricoValidacao(codigo)).thenReturn(List.of());
 
-        List<AnaliseValidacaoHistoricoDto> result = controller.obterHistoricoValidacao(codigo);
+        List<AnaliseHistoricoDto> result = controller.obterHistoricoValidacao(codigo);
 
         assertThat(result).isEmpty();
     }

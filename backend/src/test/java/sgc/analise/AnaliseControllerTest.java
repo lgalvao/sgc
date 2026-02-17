@@ -10,7 +10,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.analise.dto.AnaliseHistoricoDto;
-import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAcaoAnalise;
@@ -213,7 +212,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar lista de análises de validação com status 200 OK")
         @WithMockUser
         void deveRetornarListaDeAnalisesValidacao() throws Exception {
-            AnaliseValidacaoHistoricoDto vDto = AnaliseValidacaoHistoricoDto.builder().observacoes(OBSERVACAO_1).build();
+            AnaliseHistoricoDto vDto = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_1).build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.listarHistoricoValidacao(1L))

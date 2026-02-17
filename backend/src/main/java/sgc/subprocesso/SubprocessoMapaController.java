@@ -10,7 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.AnaliseFacade;
-import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
+import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.dto.MapaVisualizacaoResponse;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -153,7 +153,7 @@ public class SubprocessoMapaController {
      */
     @GetMapping("/{codigo}/historico-validacao")
     @PreAuthorize("isAuthenticated()")
-    public List<AnaliseValidacaoHistoricoDto> obterHistoricoValidacao(@PathVariable Long codigo) {
+    public List<AnaliseHistoricoDto> obterHistoricoValidacao(@PathVariable Long codigo) {
         return analiseFacade.listarHistoricoValidacao(codigo);
     }
 

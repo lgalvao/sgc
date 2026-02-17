@@ -11,7 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
-import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
+import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
@@ -129,7 +129,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
-        List<AnaliseValidacaoHistoricoDto> historicoDevolucao =
+        List<AnaliseHistoricoDto> historicoDevolucao =
                 objectMapper.readValue(responseDevolucao, new TypeReference<>() {
                 });
 
@@ -183,7 +183,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
-        List<AnaliseValidacaoHistoricoDto> historicoAceite =
+        List<AnaliseHistoricoDto> historicoAceite =
                 objectMapper.readValue(responseAceite, new TypeReference<>() {
                 });
 

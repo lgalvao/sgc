@@ -78,18 +78,7 @@ public class AnaliseController {
     @Operation(summary = "Lista o histórico de análises de validação")
     public List<AnaliseHistoricoDto> listarAnalisesValidacao(@PathVariable Long codSubprocesso) {
         subprocessoFacade.buscarSubprocesso(codSubprocesso);
-        return analiseFacade.listarHistoricoValidacao(codSubprocesso).stream()
-                .map(v -> AnaliseHistoricoDto.builder()
-                        .dataHora(v.dataHora())
-                        .observacoes(v.observacoes())
-                        .acao(v.acao())
-                        .unidadeSigla(v.unidadeSigla())
-                        .unidadeNome(null)
-                        .analistaUsuarioTitulo(v.analistaUsuarioTitulo())
-                        .motivo(v.motivo())
-                        .tipo(v.tipo())
-                        .build())
-                .toList();
+        return analiseFacade.listarHistoricoValidacao(codSubprocesso);
     }
 
     /**

@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.dto.AnaliseHistoricoDto;
-import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
@@ -57,10 +56,10 @@ public class AnaliseFacade {
     }
 
     @Transactional(readOnly = true)
-    public List<AnaliseValidacaoHistoricoDto> listarHistoricoValidacao(Long codSubprocesso) {
+    public List<AnaliseHistoricoDto> listarHistoricoValidacao(Long codSubprocesso) {
         return analiseService.listarPorSubprocesso(codSubprocesso).stream()
                 .filter(a -> a.getTipo() == TipoAnalise.VALIDACAO)
-                .map(this::paraValidacaoHistoricoDto)
+                .map(this::paraHistoricoDto)
                 .toList();
     }
 
@@ -78,18 +77,6 @@ public class AnaliseFacade {
                 .build();
     }
 
-    public AnaliseValidacaoHistoricoDto paraValidacaoHistoricoDto(Analise analise) {
-        UnidadeDto unidade = unidadeService.buscarPorCodigo(analise.getUnidadeCodigo());
-        return AnaliseValidacaoHistoricoDto.builder()
-                .dataHora(analise.getDataHora())
-                .observacoes(analise.getObservacoes())
-                .acao(analise.getAcao())
-                .unidadeSigla(unidade.getSigla())
-                .analistaUsuarioTitulo(analise.getUsuarioTitulo())
-                .motivo(analise.getMotivo())
-                .tipo(analise.getTipo())
-                .build();
-    }
 
     /**
      * Cria e persiste uma análise com base nos dados fornecidos.
