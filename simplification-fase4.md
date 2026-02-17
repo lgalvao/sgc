@@ -1,7 +1,7 @@
 # 🚀 Plano de Simplificação - Fase 4: Consolidação de DTOs e Mappers
 
 **Data:** 17 de Fevereiro de 2026  
-**Status:** 📝 Proposta  
+**Status:** 🏗️ Em Andamento  
 **Alvo:** Redução de ~30% no volume de DTOs e ~50% de Mappers.
 
 ---
@@ -94,10 +94,4 @@ Ainda manteremos DTOs nos seguintes casos:
 - [ ] Redução mínima de 15 arquivos de DTO.
 - [ ] Remoção de pelo menos 4 Mappers MapStruct.
 - [ ] Todos os testes de integração (E2E e Integration) passando.
-- [ ] Zero lógica de `DateTimeFormatter` ou labels manuais em controllers/services.
-
----
-
-**Aprovação Necessária:**
-- [ ] Desenvolvedor Responsável
-- [ ] Revisão de Arquitetura
+- [ ] Zero lógica de `DateTimeFormatter` ou labels manuais em controllers/services do backend.
