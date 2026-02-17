@@ -127,4 +127,4 @@ subprocesso/service/
 3. **Etapa 3 — Sub-pacotes** (refatoração mecânica, baixo risco)
 4. **Etapa 4 — Erros** (menor prioridade, pode quebrar muitos testes)
 
-> Após cada etapa: rodar `./gradlew test` para garantir que nada quebrou.
+> Após cada etapa: rodar `./gradlew :backend:test` para garantir que nada quebrou.
