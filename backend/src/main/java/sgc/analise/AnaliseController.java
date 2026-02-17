@@ -79,18 +79,16 @@ public class AnaliseController {
     public List<AnaliseHistoricoDto> listarAnalisesValidacao(@PathVariable Long codSubprocesso) {
         subprocessoFacade.buscarSubprocesso(codSubprocesso);
         return analiseFacade.listarHistoricoValidacao(codSubprocesso).stream()
-                .map(v -> {
-                    // TODO usar Builder para construir o dto.
-                    return new AnaliseHistoricoDto(
-                            v.dataHora(),
-                            v.observacoes(),
-                            v.acao(),
-                            v.unidadeSigla(),
-                            null,
-                            v.analistaUsuarioTitulo(),
-                            v.motivo(),
-                            v.tipo());
-                })
+                .map(v -> AnaliseHistoricoDto.builder()
+                        .dataHora(v.dataHora())
+                        .observacoes(v.observacoes())
+                        .acao(v.acao())
+                        .unidadeSigla(v.unidadeSigla())
+                        .unidadeNome(null)
+                        .analistaUsuarioTitulo(v.analistaUsuarioTitulo())
+                        .motivo(v.motivo())
+                        .tipo(v.tipo())
+                        .build())
                 .toList();
     }
 
@@ -119,12 +117,11 @@ public class AnaliseController {
         Subprocesso sp = subprocessoFacade.buscarSubprocesso(codSubprocesso);
         String obs = StringUtils.stripToEmpty(request.observacoes());
 
-        // TODO estranho essa acao nula!
         CriarAnaliseCommand criarAnaliseCommand = CriarAnaliseCommand.builder()
                 .codSubprocesso(codSubprocesso)
                 .observacoes(obs)
                 .tipo(tipo)
-                .acao(null)
+                .acao(request.acao())
                 .siglaUnidade(request.siglaUnidade())
                 .tituloUsuario(request.tituloUsuario())
                 .motivo(request.motivo())

@@ -3,6 +3,7 @@ package sgc.analise.dto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
+import sgc.analise.model.TipoAcaoAnalise;
 import sgc.comum.validacao.TituloEleitoral;
 
 @Builder
@@ -18,6 +19,9 @@ public record CriarAnaliseRequest(
         String siglaUnidade,
 
         @Size(max = 200, message = "Motivo deve ter no máximo 200 caracteres")
-        String motivo
+        String motivo,
+
+        @NotNull(message = "A ação é obrigatória")
+        TipoAcaoAnalise acao
 ) {
 }

@@ -10,7 +10,6 @@ import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.Collections;
@@ -127,11 +126,8 @@ class AnaliseFacadeTest {
             String sigla = "UNIDADE";
             UnidadeDto unidadeDto = new UnidadeDto();
             unidadeDto.setCodigo(1L);
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(1L);
 
             when(unidadeService.buscarPorSigla(sigla)).thenReturn(unidadeDto);
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidade);
             when(analiseService.salvar(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
             Analise resultado = facade.criarAnalise(
@@ -159,11 +155,8 @@ class AnaliseFacadeTest {
             String sigla = "UNIDADE";
             UnidadeDto unidadeDto = new UnidadeDto();
             unidadeDto.setCodigo(1L);
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(1L);
 
             when(unidadeService.buscarPorSigla(sigla)).thenReturn(unidadeDto);
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidade);
             when(analiseService.salvar(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
             Analise resultado = facade.criarAnalise(
@@ -191,11 +184,7 @@ class AnaliseFacadeTest {
             String sigla = "UNIDADE1";
             UnidadeDto unidadeDto = new UnidadeDto();
             unidadeDto.setCodigo(10L);
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(10L);
-
             when(unidadeService.buscarPorSigla(sigla)).thenReturn(unidadeDto);
-            when(unidadeService.buscarEntidadePorId(10L)).thenReturn(unidade);
             when(analiseService.salvar(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
             Analise resultado = facade.criarAnalise(
@@ -207,7 +196,6 @@ class AnaliseFacadeTest {
 
             assertThat(resultado.getUnidadeCodigo()).isEqualTo(10L);
             verify(unidadeService).buscarPorSigla(sigla);
-            verify(unidadeService).buscarEntidadePorId(10L);
         }
 
 

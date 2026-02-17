@@ -13,6 +13,7 @@ import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
+import sgc.analise.model.TipoAcaoAnalise;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -112,7 +113,13 @@ class AnaliseControllerTest {
         @DisplayName("Deve criar uma análise de cadastro e retornar 201 Created")
         @WithMockUser(roles = "GESTOR")
         void deveCriarAnaliseCadastro() throws Exception {
-            CriarAnaliseRequest request = new CriarAnaliseRequest("123456789012", NOVA_ANALISE_DE_CADASTRO, "SIGLA", "MOTIVO");
+            CriarAnaliseRequest request = CriarAnaliseRequest.builder()
+                    .tituloUsuario("123456789012")
+                    .observacoes(NOVA_ANALISE_DE_CADASTRO)
+                    .siglaUnidade("SIGLA")
+                    .motivo("MOTIVO")
+                    .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                    .build();
             Analise analise = new Analise();
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes(NOVA_ANALISE_DE_CADASTRO).build();
 
@@ -133,7 +140,13 @@ class AnaliseControllerTest {
         @DisplayName("Deve criar uma análise de cadastro com observações vazias e retornar 201 Created")
         @WithMockUser(roles = "GESTOR")
         void deveCriarAnaliseCadastroComObservacoesVazias() throws Exception {
-            CriarAnaliseRequest request = new CriarAnaliseRequest("123456789012", "", "SIGLA", "MOTIVO");
+            CriarAnaliseRequest request = CriarAnaliseRequest.builder()
+                    .tituloUsuario("123456789012")
+                    .observacoes("")
+                    .siglaUnidade("SIGLA")
+                    .motivo("MOTIVO")
+                    .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                    .build();
             Analise analise = new Analise();
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes("").build();
 
@@ -163,7 +176,7 @@ class AnaliseControllerTest {
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content("{\"tituloUsuario\":\"123456789012\", \"siglaUnidade\":\"SIGLA\"}"))
+                                    .content("{\"tituloUsuario\":\"123456789012\", \"siglaUnidade\":\"SIGLA\", \"acao\":\"ACEITE_MAPEAMENTO\"}"))
                     .andExpect(status().isCreated());
         }
 
@@ -171,7 +184,13 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar 400 Bad Request para parâmetro inválido")
         @WithMockUser(roles = "GESTOR")
         void deveRetornarBadRequestParaParametroInvalido() throws Exception {
-            CriarAnaliseRequest request = new CriarAnaliseRequest("123456789012", ANALISE_INVALIDA, "S", "M");
+            CriarAnaliseRequest request = CriarAnaliseRequest.builder()
+                    .tituloUsuario("123456789012")
+                    .observacoes(ANALISE_INVALIDA)
+                    .siglaUnidade("S")
+                    .motivo("M")
+                    .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                    .build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any()))
@@ -227,7 +246,13 @@ class AnaliseControllerTest {
         @DisplayName("Deve criar uma análise de validação e retornar 201 Created")
         @WithMockUser(roles = "ADMIN")
         void deveCriarAnaliseValidacao() throws Exception {
-            CriarAnaliseRequest request = new CriarAnaliseRequest("123456789012", NOVA_ANALISE_DE_VALIDACAO, "S", "M");
+            CriarAnaliseRequest request = CriarAnaliseRequest.builder()
+                    .tituloUsuario("123456789012")
+                    .observacoes(NOVA_ANALISE_DE_VALIDACAO)
+                    .siglaUnidade("S")
+                    .motivo("M")
+                    .acao(TipoAcaoAnalise.ACEITE_REVISAO)
+                    .build();
             Analise analise = new Analise();
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes(NOVA_ANALISE_DE_VALIDACAO).build();
 

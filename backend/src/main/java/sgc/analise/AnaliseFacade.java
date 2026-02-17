@@ -11,7 +11,6 @@ import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDateTime;
@@ -65,7 +64,6 @@ public class AnaliseFacade {
                 .toList();
     }
 
-    // TODO usar um mapper, ou se aplicavel, eliminar o dto e usar Jsonview
     public AnaliseHistoricoDto paraHistoricoDto(Analise analise) {
         UnidadeDto unidade = unidadeService.buscarPorCodigo(analise.getUnidadeCodigo());
         return AnaliseHistoricoDto.builder()
@@ -80,7 +78,6 @@ public class AnaliseFacade {
                 .build();
     }
 
-    // TODO usar um mapper, ou se aplicavel, eliminar o dto e usar Jsonview
     public AnaliseValidacaoHistoricoDto paraValidacaoHistoricoDto(Analise analise) {
         UnidadeDto unidade = unidadeService.buscarPorCodigo(analise.getUnidadeCodigo());
         return AnaliseValidacaoHistoricoDto.builder()
@@ -103,9 +100,7 @@ public class AnaliseFacade {
      */
     @Transactional
     public Analise criarAnalise(Subprocesso subprocesso, CriarAnaliseCommand command) {
-        // TODO me parecem inuteis esses dois passos!
         UnidadeDto unidadeDto = unidadeService.buscarPorSigla(command.siglaUnidade());
-        Unidade unidade = unidadeService.buscarEntidadePorId(unidadeDto.getCodigo());
 
         Analise analise = Analise.builder()
                 .subprocesso(subprocesso)
@@ -113,7 +108,7 @@ public class AnaliseFacade {
                 .observacoes(command.observacoes())
                 .tipo(command.tipo())
                 .acao(command.acao())
-                .unidadeCodigo(unidade.getCodigo())
+                .unidadeCodigo(unidadeDto.getCodigo())
                 .usuarioTitulo(command.tituloUsuario())
                 .motivo(command.motivo())
                 .build();
@@ -131,7 +126,7 @@ public class AnaliseFacade {
      *
      * @param codSubprocesso O código do subprocesso cujas análises serão removidas.
      */
-    // TODO nao deveria ser Transactional?
+    @Transactional
     public void removerPorSubprocesso(Long codSubprocesso) {
         analiseService.removerPorSubprocesso(codSubprocesso);
     }
