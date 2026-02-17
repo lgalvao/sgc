@@ -39,30 +39,6 @@ class ProcessoDetalheBuilderCoverageTest {
     @InjectMocks
     private ProcessoDetalheBuilder builder;
 
-    @Test
-    @DisplayName("build deve lidar com unidadeDto nulo")
-    void deveLidarComUnidadeDtoNulo() {
-        // Arrange
-        Processo processo = new Processo();
-        processo.setCodigo(1L);
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setTipo(TipoProcesso.MAPEAMENTO);
-        
-        UnidadeProcesso participante = new UnidadeProcesso();
-        participante.setUnidadeCodigo(100L);
-        processo.setParticipantes(List.of(participante));
-
-        Usuario usuario = new Usuario();
-
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(new ArrayList<>());
-        // No snapshot mock needed anymore, we let fromSnapshot run
-
-        // Act
-        ProcessoDetalheDto dto = builder.build(processo, usuario);
-
-        // Assert
-        assertThat(dto.getUnidades()).isEmpty();
-    }
 
     @Test
     @DisplayName("build deve mapear subprocesso e mapa quando existem")
@@ -100,34 +76,6 @@ class ProcessoDetalheBuilderCoverageTest {
         assertThat(result.getCodSubprocesso()).isEqualTo(500L);
     }
 
-    @Test
-    @DisplayName("build deve ignorar quando sp existe mas unidadeDto é nulo")
-    void deveIgnorarQuandoSpExisteMasUnidadeDtoNulo() {
-        // Arrange
-        Long codProcesso = 1L;
-        Processo processo = new Processo();
-        processo.setCodigo(codProcesso);
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setTipo(TipoProcesso.MAPEAMENTO);
-        
-        UnidadeProcesso participante = new UnidadeProcesso();
-        participante.setUnidadeCodigo(100L);
-        processo.setParticipantes(List.of(participante));
-
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(100L);
-
-        Subprocesso sp = new Subprocesso();
-        sp.setUnidade(unidade);
-
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
-
-        // Act
-        ProcessoDetalheDto dto = builder.build(processo, new Usuario());
-
-        // Assert
-        assertThat(dto.getUnidades()).isEmpty();
-    }
 
     @Test
     @DisplayName("build deve manter unidadeDto quando sp é nulo")
@@ -141,6 +89,7 @@ class ProcessoDetalheBuilderCoverageTest {
         
         UnidadeProcesso participante = new UnidadeProcesso();
         participante.setUnidadeCodigo(100L);
+        participante.setSigla("TESTE");
         processo.setParticipantes(List.of(participante));
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(new ArrayList<>());

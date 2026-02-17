@@ -297,7 +297,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                         .with(csrf())
                                         .with(user(admin))
                                         .contentType(APPLICATION_JSON)
-                                        .content("{\"observacoes\": \"Homologado com impacto\"}"))
+                                        .content("{\"texto\": \"Homologado com impacto\"}"))
                                         .andExpect(status().isOk());
 
                         sp = subprocessoRepo.findById(subprocessoId).orElseThrow();

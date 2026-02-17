@@ -19,6 +19,7 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.UnidadeFixture;
 import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -67,6 +68,8 @@ class ProcessoFacadeTest {
     private AlertaFacade alertaService;
     @Mock
     private NotificacaoEmailService notificacaoEmailService;
+    @Mock
+    private NotificacaoModelosService notificacaoModelosService;
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock
@@ -131,12 +134,13 @@ class ProcessoFacadeTest {
             when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(unidade);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
             when(subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
+            when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
 
             processoFacade.enviarLembrete(codProcesso, codUnidade);
 
             verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("N/A"));
             verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
-            verify(notificacaoEmailService).enviarEmail(eq(unidade.getSigla()), contains("SGC: Lembrete de prazo"), contains("encerra em N/A"));
+            verify(notificacaoEmailService).enviarEmailHtml(eq(unidade.getSigla()), contains("SGC: Lembrete de prazo"), anyString());
         }
 
         @Test
@@ -157,15 +161,16 @@ class ProcessoFacadeTest {
             when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(unidade);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
             when(subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
+            when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
 
             processoFacade.enviarLembrete(codProcesso, codUnidade);
 
             verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("15/03/2026"));
             verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
-            verify(notificacaoEmailService).enviarEmail(
+            verify(notificacaoEmailService).enviarEmailHtml(
                 eq(unidade.getSigla()), 
                 contains("SGC: Lembrete de prazo"), 
-                contains("encerra em 15/03/2026")
+                anyString()
             );
         }
 
@@ -208,11 +213,6 @@ class ProcessoFacadeTest {
 
             when(subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
                 .thenReturn(List.of(sub));
-
-            // We need to test the logic in categorizarUnidadePorAcao
-            // If we want to test "ignoring null action", we'd need to mock req.acao() to return null 
-            // but the controller validation would usually prevent this.
-            // In ProcessoFacade, if req.acao() is null, categorization won't match anything.
             
             AcaoEmBlocoRequest reqNull = new AcaoEmBlocoRequest(List.of(10L), null, LocalDate.now());
             processoFacade.executarAcaoEmBloco(codProcesso, reqNull);
@@ -328,11 +328,12 @@ class ProcessoFacadeTest {
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
             when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
+            when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
 
             processoFacade.enviarLembrete(1L, 10L);
             verify(alertaService).criarAlertaAdmin(eq(p), eq(u), anyString());
             verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
-            verify(notificacaoEmailService).enviarEmail(eq(u.getSigla()), contains("SGC: Lembrete de prazo"), contains(p.getDescricao()));
+            verify(notificacaoEmailService).enviarEmailHtml(eq(u.getSigla()), contains("SGC: Lembrete de prazo"), contains(p.getDescricao()));
         }
 
         @Test

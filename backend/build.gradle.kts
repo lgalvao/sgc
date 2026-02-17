@@ -130,7 +130,7 @@ tasks.withType<Test> {
 
     testLogging {
         events(TestLogEvent.SKIPPED, TestLogEvent.FAILED, TestLogEvent.STANDARD_ERROR)
-        exceptionFormat = TestExceptionFormat.FULL
+        exceptionFormat = TestExceptionFormat.SHORT
         showStackTraces = true
         showCauses = true
         showStandardStreams = false
@@ -232,7 +232,7 @@ tasks.jacocoTestReport {
     reports {
         xml.required.set(true)
         csv.required.set(true)
-        html.required.set(true)
+        html.required.set(false)
     }
 
     classDirectories.setFrom(

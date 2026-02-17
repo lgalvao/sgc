@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
-import sgc.analise.model.TipoAnalise;
 import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.dto.MapaVisualizacaoResponse;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -180,7 +179,7 @@ class SubprocessoMapaControllerTest {
     @DisplayName("Deve obter histórico de validação")
     void deveObterHistoricoValidacao() {
         Long codigo = 1L;
-        when(analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.VALIDACAO)).thenReturn(List.of());
+        when(analiseFacade.listarHistoricoValidacao(codigo)).thenReturn(List.of());
 
         List<AnaliseValidacaoHistoricoDto> result = controller.obterHistoricoValidacao(codigo);
 
@@ -286,7 +285,7 @@ class SubprocessoMapaControllerTest {
 
         controller.disponibilizarMapaEmBloco(codigo, req, usuario);
 
-        verify(subprocessoFacade).disponibilizarMapaEmBloco(subprocessos, codigo, any(DisponibilizarMapaRequest.class), usuario);
+        verify(subprocessoFacade).disponibilizarMapaEmBloco(eq(subprocessos), eq(codigo), any(DisponibilizarMapaRequest.class), eq(usuario));
     }
 
     @Test

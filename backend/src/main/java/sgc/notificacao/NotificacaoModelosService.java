@@ -168,7 +168,8 @@ public class NotificacaoModelosService {
         context.setVariable(VAR_TITULO, TITULO_LEMBRETE_PRAZO + nomeProcesso);
         context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
-        context.setVariable(VAR_DATA_LIMITE, dataLimite.format(FORMATADOR));
+        String dataLimiteText = dataLimite != null ? dataLimite.format(FORMATADOR) : "N/A";
+        context.setVariable(VAR_DATA_LIMITE, dataLimiteText);
 
         return templateEngine.process("email/lembrete-prazo", context);
     }

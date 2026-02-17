@@ -96,7 +96,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
                                     subprocesso.getCodigo())
                                     .with(csrf())
                                     .contentType("application/json")
-                                    .content("{\"sugestoes\": \"" + sugestoes + "\"}"))
+                                    .content("{\"texto\": \"" + sugestoes + "\"}"))
                     .andExpect(status().isOk());
 
             Subprocesso subprocessoAtualizado =
