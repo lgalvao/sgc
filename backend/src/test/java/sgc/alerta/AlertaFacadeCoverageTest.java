@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.alerta.mapper.AlertaMapper;
+
 import sgc.alerta.model.Alerta;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
@@ -27,8 +27,7 @@ class AlertaFacadeCoverageTest {
     private AlertaService alertaService;
     @Mock
     private UsuarioFacade usuarioService;
-    @Mock
-    private AlertaMapper alertaMapper;
+
     @Mock
     private UnidadeFacade unidadeService;
 

@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import sgc.alerta.AlertaFacade;
-import sgc.alerta.dto.AlertaDto;
+
 import sgc.alerta.model.Alerta;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
@@ -358,7 +358,7 @@ class PainelServiceTest {
                     .thenReturn(new PageImpl<>(List.of(alerta)));
             when(alertaService.obterDataHoraLeitura(any(), any())).thenReturn(Optional.empty());
 
-            Page<AlertaDto> result = painelService.listarAlertas("123456", 1L, PageRequest.of(0, 10));
+            Page<Alerta> result = painelService.listarAlertas("123456", 1L, PageRequest.of(0, 10));
 
             assertThat(result.getContent()).hasSize(1);
             assertThat(result.getContent().getFirst().getDescricao()).isEqualTo("Alerta teste");
@@ -386,7 +386,7 @@ class PainelServiceTest {
 
             when(alertaService.listarPorUnidade(eq(codigoUnidade), any())).thenReturn(new PageImpl<>(List.of(alerta)));
 
-            Page<AlertaDto> result = painelService.listarAlertas(null, codigoUnidade, pageable);
+            Page<Alerta> result = painelService.listarAlertas(null, codigoUnidade, pageable);
 
             assertThat(result.getContent()).isNotEmpty();
             verify(alertaService).listarPorUnidade(eq(codigoUnidade), any());

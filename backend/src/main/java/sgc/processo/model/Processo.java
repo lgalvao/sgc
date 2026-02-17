@@ -96,6 +96,7 @@ public class Processo extends EntidadeBase {
      * Retorna os códigos das unidades participantes.
      */
     public List<Long> getCodigosParticipantes() {
+        if (participantes == null) return List.of();
         return participantes.stream()
                 .map(UnidadeProcesso::getUnidadeCodigo)
                 .toList();
@@ -105,6 +106,7 @@ public class Processo extends EntidadeBase {
      * Retorna as siglas das unidades participantes.
      */
     public String getSiglasParticipantes() {
+        if (participantes == null) return null;
         return participantes.stream()
                 .map(UnidadeProcesso::getSigla)
                 .filter(Objects::nonNull)

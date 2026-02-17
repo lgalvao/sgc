@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import sgc.alerta.AlertaFacade;
-import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Perfil;
@@ -87,7 +86,8 @@ class PainelFacadeTest {
         when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class))).thenReturn(page);
         when(unidadeFacade.buscarPorCodigo(100L)).thenThrow(new RuntimeException("Erro"));
 
-        assertThatThrownBy(() -> painelFacade.listarProcessos(Perfil.CHEFE, 100L, PageRequest.of(0, 10)))
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        assertThatThrownBy(() -> painelFacade.listarProcessos(Perfil.CHEFE, 100L, pageRequest))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Erro");
     }
@@ -111,12 +111,12 @@ class PainelFacadeTest {
         when(alertaFacade.listarPorUnidade(eq(100L), any(Pageable.class))).thenReturn(page);
         when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));
 
-        Page<AlertaDto> result = painelFacade.listarAlertas("123", 100L, Pageable.unpaged());
+        Page<Alerta> result = painelFacade.listarAlertas("123", 100L, Pageable.unpaged());
 
         assertThat(result).hasSize(1);
         assertThat(result.getContent().getFirst().getDataHoraLeitura()).isNotNull();
-        assertThat(result.getContent().getFirst().getMensagem()).contains("Lembrete");
-        assertThat(result.getContent().getFirst().getProcesso()).isEqualTo("Processo teste");
+        assertThat(result.getContent().getFirst().getDescricao()).contains("Lembrete");
+        assertThat(result.getContent().getFirst().getProcesso().getDescricao()).isEqualTo("Processo teste");
     }
 
     @Test
@@ -142,7 +142,7 @@ class PainelFacadeTest {
         when(alertaFacade.listarPorUnidade(100L, sorted)).thenReturn(page);
         when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));
 
-        Page<AlertaDto> result = painelFacade.listarAlertas("123", 100L, sorted);
+        Page<Alerta> result = painelFacade.listarAlertas("123", 100L, sorted);
 
         assertThat(result).hasSize(1);
     }
@@ -174,7 +174,7 @@ class PainelFacadeTest {
 
         when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));
 
-        Page<AlertaDto> result = painelFacade.listarAlertas("123", 100L, unsortedPaged);
+        Page<Alerta> result = painelFacade.listarAlertas("123", 100L, unsortedPaged);
 
         assertThat(result).hasSize(1);
     }

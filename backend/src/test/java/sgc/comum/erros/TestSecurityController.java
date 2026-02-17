@@ -12,6 +12,7 @@ public class TestSecurityController {
     @SuppressWarnings("EmptyMethod")
     @PostMapping("/test/validacao")
     void teste(@Valid @RequestBody TestDto dto) {
+        // Implementação vazia pois a validação ocorre antes da execução do método
     }
 
     static class TestDto {

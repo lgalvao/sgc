@@ -16,10 +16,6 @@ import java.time.LocalDateTime;
 /**
  * Entidade que representa a associação entre um Processo e uma Unidade participante,
  * armazenando um snapshot dos dados da unidade no momento em que o processo foi iniciado.
- * 
- * <p>Conforme os requisitos CDU-04 e CDU-05, ao iniciar um processo, o sistema deve
- * armazenar uma cópia da árvore de unidades participantes para preservar a representação
- * hierárquica vigente no momento do início do processo.
  */
 @Entity
 @Table(name = "UNIDADE_PROCESSO", schema = "sgc")
@@ -31,7 +27,6 @@ public class UnidadeProcesso implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @EmbeddedId
-
     private UnidadeProcessoId id = new UnidadeProcessoId();
     
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,24 +34,16 @@ public class UnidadeProcesso implements Serializable {
     @JoinColumn(name = "processo_codigo")
     private Processo processo;
     
-    /**
-     * Getter de conveniência para unidadeCodigo.
-     */
     public Long getUnidadeCodigo() {
         return id != null ? id.getUnidadeCodigo() : null;
     }
 
-    /**
-     * Setter de conveniência para unidadeCodigo.
-     */
     public void setUnidadeCodigo(Long unidadeCodigo) {
         if (id == null) {
             id = new UnidadeProcessoId();
         }
         id.setUnidadeCodigo(unidadeCodigo);
     }
-    
-    // ========== Colunas de Snapshot ==========
     
     @Column(name = "nome")
     private String nome;
@@ -82,8 +69,6 @@ public class UnidadeProcesso implements Serializable {
     
     @Column(name = "unidade_superior_codigo")
     private @Nullable Long unidadeSuperiorCodigo;
-    
-    // ========== Factory Method ==========
     
     /**
      * Cria um snapshot de uma unidade para um processo.

@@ -41,9 +41,8 @@ class DeserializadorHtmlSanitizadoTest {
         String resultado = deserializador.deserialize(parser, context);
 
         // Assert
-        assertThat(resultado).doesNotContain("<script>");
-        assertThat(resultado).doesNotContain("alert");
-        assertThat(resultado).contains("Texto limpo");
+        assertThat(resultado).doesNotContain("<script>", "alert")
+                .contains("Texto limpo");
     }
 
     @Test
@@ -57,8 +56,7 @@ class DeserializadorHtmlSanitizadoTest {
         String resultado = deserializador.deserialize(parser, context);
 
         // Assert
-        assertThat(resultado).doesNotContain("onerror");
-        assertThat(resultado).doesNotContain("alert");
+        assertThat(resultado).doesNotContain("onerror", "alert");
     }
 
     @Test
@@ -117,8 +115,7 @@ class DeserializadorHtmlSanitizadoTest {
         String resultado = deserializador.deserialize(parser, context);
 
         // Assert
-        assertThat(resultado).doesNotContain("javascript:");
-        assertThat(resultado).doesNotContain("alert");
+        assertThat(resultado).doesNotContain("javascript:", "alert");
     }
 
     @SuppressWarnings("HttpUrlsUsage")
@@ -133,8 +130,8 @@ class DeserializadorHtmlSanitizadoTest {
         String resultado = deserializador.deserialize(parser, context);
 
         // Assert
-        assertThat(resultado).doesNotContain("<iframe");
-        assertThat(resultado).doesNotContain("malicious.com");
-        assertThat(resultado).contains("Texto");
+        assertThat(resultado)
+                .doesNotContain("<iframe", "malicious.com")
+                .contains("Texto");
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import sgc.alerta.dto.AlertaDto;
+import sgc.alerta.model.Alerta;
 import sgc.organizacao.model.Perfil;
 import sgc.processo.dto.ProcessoResumoDto;
 
@@ -62,11 +62,12 @@ class PainelControllerTest {
     @DisplayName("GET /api/painel/alertas - Deve listar alertas com sucesso")
     @WithMockUser
     void listarAlertas_Sucesso() throws Exception {
-        Page<AlertaDto> page = new PageImpl<>(Collections.emptyList());
+        Page<Alerta> page = new PageImpl<>(Collections.emptyList());
         when(painelFacade.listarAlertas(any(), any(), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/painel/alertas")
                         .contentType(MediaType.APPLICATION_JSON))
+                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content").isEmpty()); // Pattern 1: Empty list validation
@@ -76,7 +77,7 @@ class PainelControllerTest {
     @DisplayName("GET /api/painel/alertas - Deve listar alertas com filtros")
     @WithMockUser
     void listarAlertas_ComFiltros_Sucesso() throws Exception {
-        Page<AlertaDto> page = new PageImpl<>(Collections.emptyList());
+        Page<Alerta> page = new PageImpl<>(Collections.emptyList());
         when(painelFacade.listarAlertas(eq("123"), eq(1L), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/painel/alertas")

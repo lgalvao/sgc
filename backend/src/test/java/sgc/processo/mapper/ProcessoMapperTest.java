@@ -45,7 +45,7 @@ class ProcessoMapperTest {
             assertThat(dto.getCodigo()).isEqualTo(1L);
             assertThat(dto.getDescricao()).isEqualTo("Mapeamento 2026");
             assertThat(dto.getTipo()).isEqualTo(TipoProcesso.MAPEAMENTO.name());
-            assertThat(dto.getSituacao()).isEqualTo(SituacaoProcesso.CRIADO);
+            assertThat(dto.getSituacao()).isEqualTo(SituacaoProcesso.CRIADO.name());
         }
 
         @Test
@@ -159,11 +159,11 @@ class ProcessoMapperTest {
             ProcessoDto dto = mapper.toDto(processo);
 
             assertThat(dto).isNotNull();
-            assertThat(dto.getDataCriacaoFormatada()).isNull();
-            assertThat(dto.getDataFinalizacaoFormatada()).isNull();
-            assertThat(dto.getDataLimiteFormatada()).isNull();
-            assertThat(dto.getSituacaoLabel()).isNull();
-            assertThat(dto.getTipoLabel()).isNull();
+            assertThat(dto.getDataCriacao()).isNull();
+            assertThat(dto.getDataFinalizacao()).isNull();
+            assertThat(dto.getDataLimite()).isNull();
+            assertThat(dto.getSituacao()).isNull();
+            assertThat(dto.getTipo()).isNull();
         }
 
         @Test
@@ -189,7 +189,7 @@ class ProcessoMapperTest {
                     .codigo(1L)
                     .descricao("Mapeamento 2026")
                     .tipo(TipoProcesso.MAPEAMENTO.name())
-                    .situacao(SituacaoProcesso.CRIADO)
+                    .situacao(SituacaoProcesso.CRIADO.name())
                     .build();
 
             Processo processo = mapper.toEntity(dto);
@@ -221,7 +221,7 @@ class ProcessoMapperTest {
                     .codigo(1L)
                     .descricao("Mapeamento 2026")
                     .tipo(TipoProcesso.MAPEAMENTO.name())
-                    .situacao(SituacaoProcesso.CRIADO)
+                    .situacao(SituacaoProcesso.CRIADO.name())
                     .unidadesParticipantes("SEDIA, COSIS")
                     .build();
 

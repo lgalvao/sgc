@@ -98,7 +98,7 @@ class ProcessoControllerTest {
                             .codigo(1L)
                             .dataCriacao(LocalDateTime.now())
                             .descricao(NOVO_PROCESSO)
-                            .situacao(SituacaoProcesso.CRIADO)
+                            .situacao(SituacaoProcesso.CRIADO.name())
                             .tipo(TipoProcesso.MAPEAMENTO.name())
                             .build();
 
@@ -152,7 +152,7 @@ class ProcessoControllerTest {
                             .codigo(1L)
                             .dataCriacao(LocalDateTime.now())
                             .descricao("Processo Teste")
-                            .situacao(SituacaoProcesso.CRIADO)
+                            .situacao(SituacaoProcesso.CRIADO.name())
                             .tipo(TipoProcesso.MAPEAMENTO.name())
                             .build();
 
@@ -238,7 +238,7 @@ class ProcessoControllerTest {
                             .codigo(1L)
                             .dataCriacao(LocalDateTime.now())
                             .descricao(PROCESSO_ATUALIZADO)
-                            .situacao(SituacaoProcesso.CRIADO)
+                            .situacao(SituacaoProcesso.CRIADO.name())
                             .tipo(TipoProcesso.REVISAO.name())
                             .build();
 

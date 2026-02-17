@@ -11,8 +11,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import sgc.alerta.dto.AlertaDto;
-import sgc.alerta.mapper.AlertaMapper;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaUsuario;
 import sgc.organizacao.UnidadeFacade;
@@ -45,9 +43,6 @@ class AlertaFacadeTest {
 
     @Mock
     private UsuarioFacade usuarioService;
-
-    @Mock
-    private AlertaMapper alertaMapper;
 
     @Mock
     private UnidadeFacade unidadeService;
@@ -277,13 +272,13 @@ class AlertaFacadeTest {
             when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
             when(alertaService.buscarPorUnidadeDestino(codUnidade)).thenReturn(List.of(alerta));
             when(alertaService.buscarPorUsuarioEAlertas(eq(usuarioTitulo), anyList())).thenReturn(List.of());
-            when(alertaMapper.toDto(eq(alerta), any())).thenReturn(AlertaDto.builder().codigo(100L).build());
 
             // When
-            List<AlertaDto> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
+            List<Alerta> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
 
             // Then
             assertThat(resultado).hasSize(1);
+            assertThat(resultado.getFirst().getCodigo()).isEqualTo(100L);
             // Não deve salvar pois listar agora é somente leitura
             verify(alertaService, never()).salvarAlertaUsuario(any());
         }
@@ -313,13 +308,13 @@ class AlertaFacadeTest {
             when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
             when(alertaService.buscarPorUnidadeDestino(codUnidade)).thenReturn(List.of(alerta));
             when(alertaService.buscarPorUsuarioEAlertas(eq(usuarioTitulo), anyList())).thenReturn(List.of(alertaUsuarioExistente));
-            when(alertaMapper.toDto(eq(alerta), any())).thenReturn(AlertaDto.builder().codigo(100L).build());
 
             // When
-            List<AlertaDto> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
+            List<Alerta> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
 
             // Then
             assertThat(resultado).hasSize(1);
+            assertThat(resultado.getFirst().getDataHoraLeitura()).isNotNull();
             verify(alertaService, never()).salvarAlertaUsuario(any());
         }
 
@@ -339,7 +334,7 @@ class AlertaFacadeTest {
             when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
             when(alertaService.buscarPorUnidadeDestino(codUnidade)).thenReturn(List.of());
 
-            List<AlertaDto> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
+            List<Alerta> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
 
             assertThat(resultado).isEmpty();
         }
@@ -474,14 +469,7 @@ class AlertaFacadeTest {
             au1.setDataHoraLeitura(LocalDateTime.now());
             when(alertaService.buscarPorUsuarioEAlertas(eq(titulo), anyList())).thenReturn(List.of(au1));
 
-            // Mocks do mapper
-            AlertaDto dto1 = AlertaDto.builder().codigo(1L).dataHoraLeitura(LocalDateTime.now()).build();
-            AlertaDto dto2 = AlertaDto.builder().codigo(2L).dataHoraLeitura(null).build();
-
-            when(alertaMapper.toDto(eq(a1), any())).thenReturn(dto1);
-            when(alertaMapper.toDto(eq(a2), any())).thenReturn(dto2);
-
-            List<AlertaDto> result = service.listarAlertasNaoLidos(titulo);
+            List<Alerta> result = service.listarAlertasNaoLidos(titulo);
 
             assertThat(result).hasSize(1);
             assertThat(result.getFirst().getCodigo()).isEqualTo(2L);

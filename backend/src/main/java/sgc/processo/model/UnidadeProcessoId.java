@@ -21,7 +21,6 @@ public class UnidadeProcessoId implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @Column(name = "processo_codigo")
-
     private Long processoCodigo;
     
     @Column(name = "unidade_codigo")
