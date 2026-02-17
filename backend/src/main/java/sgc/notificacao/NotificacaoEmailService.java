@@ -72,7 +72,7 @@ public class NotificacaoEmailService {
             emailExecutor.enviarEmailAssincrono(para, assunto, corpo, html)
                     .thenAccept(
                             sucesso -> {
-                                if (sucesso) {
+                                if (Boolean.TRUE.equals(sucesso)) {
                                     log.info("E-mail para {} enviado.", para);
                                 } else {
                                     log.error(

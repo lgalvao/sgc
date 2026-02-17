@@ -27,6 +27,7 @@ public class NotificacaoModelosService {
     private static final String TITULO_MAPA_VALIDADO = "Mapa de Competências validado";
     private static final String TITULO_PROCESSO_FINALIZADO = "Processo finalizado - Mapas Vigentes";
     private static final String TITULO_PROCESSO_CONCLUSAO_SGC = "Conclusão do processo ";
+    private static final String TITULO_LEMBRETE_PRAZO = "SGC: Lembrete de prazo - ";
 
     private final SpringTemplateEngine templateEngine;
 
@@ -205,5 +206,24 @@ public class NotificacaoModelosService {
         context.setVariable("siglasUnidadesSubordinadas", siglasUnidadesSubordinadas);
 
         return templateEngine.process("processo-finalizado-unidades-subordinadas", context);
+    }
+
+    /**
+     * Gera o conteúdo HTML para o email de lembrete de prazo.
+     *
+     * @param siglaUnidade  A sigla da unidade notificada.
+     * @param nomeProcesso O nome do processo.
+     * @param dataLimite   A data limite.
+     * @return O conteúdo HTML do email.
+     */
+    // TODO a data limite nunca pode ser nula.
+    public String criarEmailLembretePrazo(String siglaUnidade, String nomeProcesso, LocalDateTime dataLimite) {
+        Context context = new Context();
+        context.setVariable("titulo", TITULO_LEMBRETE_PRAZO + nomeProcesso);
+        context.setVariable("siglaUnidade", siglaUnidade);
+        context.setVariable("nomeProcesso", nomeProcesso);
+        context.setVariable("dataLimite", dataLimite != null ? dataLimite.format(FORMATADOR) : "N/A");
+
+        return templateEngine.process("email/lembrete-prazo", context);
     }
 }

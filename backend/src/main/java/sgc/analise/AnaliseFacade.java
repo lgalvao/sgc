@@ -36,8 +36,18 @@ public class AnaliseFacade {
      * Lista todas as análises de um determinado tipoAnalise para um subprocesso específico.
      *
      * @param codSubprocesso O código do subprocesso.
-     * @param tipoAnalise    O tipoAnalise de análise a ser filtrada (e.g., CADASTRO, VALIDACAO).
+     * @param tipoAnalise    O tipo de análise a ser filtrada (e.g., CADASTRO, VALIDACAO).
      * @return Uma lista de {@link Analise} ordenada pela data e hora em ordem decrescente.
+     */
+    @Transactional(readOnly = true)
+    public List<Analise> listarPorSubprocesso(Long codSubprocesso, TipoAnalise tipoAnalise) {
+        return analiseService.listarPorSubprocesso(codSubprocesso).stream()
+                .filter(a -> a.getTipo() == tipoAnalise)
+                .toList();
+    }
+
+    /**
+     * Lista o histórico de análises de cadastro para um subprocesso.
      */
     @Transactional(readOnly = true)
     public List<AnaliseHistoricoDto> listarHistoricoCadastro(Long codSubprocesso) {

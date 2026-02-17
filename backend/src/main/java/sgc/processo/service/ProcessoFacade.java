@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
 import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -48,6 +49,7 @@ public class ProcessoFacade {
     private final NotificacaoEmailService notificacaoEmailService;
     private final ProcessoAcessoService processoAcessoService;
     private final ProcessoFinalizador processoFinalizador;
+    private final NotificacaoModelosService notificacaoModelosService;
 
     /**
      * Busca um processo por ID ou lança exceção se não encontrado.
@@ -149,7 +151,6 @@ public class ProcessoFacade {
         processoFinalizador.finalizar(codigo);
     }
 
-    // TODO o envio de email aqui deveria usar um template e nao montar tudo aqui
     @Transactional
     public void enviarLembrete(Long codProcesso, Long unidadeCodigo) {
         Processo processo = buscarEntidadePorId(codProcesso);
@@ -160,20 +161,20 @@ public class ProcessoFacade {
             throw new ErroProcesso("Unidade não participa deste processo.");
         }
 
-        String dataLimite = processo.getDataLimite() != null 
+        String dataLimiteText = processo.getDataLimite() != null
                 ? processo.getDataLimite().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                 : "N/A";
+
         String descricao = "Lembrete: Prazo do processo %s encerra em %s"
-                .formatted(processo.getDescricao(), dataLimite);
+                .formatted(processo.getDescricao(), dataLimiteText);
         String assunto = "SGC: Lembrete de prazo - %s".formatted(processo.getDescricao());
-        String corpo = ("Prezado(a) responsável pela %s," + "%n%n" +
-                "Este é um lembrete de que o prazo para a conclusão da etapa atual do processo %s encerra em %s." + "%n%n" +
-                "Por favor, acesse o sistema para concluir suas pendências: /painel.%n")
-                .formatted(unidade.getSigla(), processo.getDescricao(), dataLimite);
+
+        String corpoHtml = notificacaoModelosService.criarEmailLembretePrazo(
+                unidade.getSigla(), processo.getDescricao(), processo.getDataLimite());
 
         Subprocesso subprocesso = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, unidadeCodigo);
         subprocessoFacade.registrarMovimentacaoLembrete(subprocesso.getCodigo());
-        notificacaoEmailService.enviarEmail(unidade.getSigla(), assunto, corpo);
+        notificacaoEmailService.enviarEmailHtml(unidade.getSigla(), assunto, corpoHtml);
 
         alertaService.criarAlertaAdmin(processo, unidade, descricao);
     }
