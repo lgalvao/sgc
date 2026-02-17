@@ -31,9 +31,6 @@ import java.util.Set;
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
-/**
- * Orquestra operações de Processo.
- */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -51,9 +48,6 @@ public class ProcessoFacade {
     private final ProcessoFinalizador processoFinalizador;
     private final NotificacaoModelosService notificacaoModelosService;
 
-    /**
-     * Busca um processo por ID ou lança exceção se não encontrado.
-     */
     private Processo buscarPorId(Long id) {
         return processoConsultaService.buscarProcessoCodigo(id);
     }

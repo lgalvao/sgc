@@ -42,14 +42,6 @@ public class ProcessoController {
                 TipoProcesso.DIAGNOSTICO, processoFacade::iniciarProcessoDiagnostico);
     }
 
-    /**
-     * Cria um novo processo.
-     *
-     * @param requisicao O DTO com os dados para a criação do processo.
-     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo
-     *         processo e o {@link
-     *         Processo} criado no corpo da resposta.
-     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @JsonView(ProcessoViews.Publica.class)
@@ -59,14 +51,6 @@ public class ProcessoController {
         return ResponseEntity.created(uri).body(criado);
     }
 
-    /**
-     * Retorna códigos de unidades que já participam de processos ativos do tipo
-     * especificado ou de um processo específico.
-     *
-     * @param tipo        Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
-     * @param codProcesso Código opcional do processo a ser considerado
-     * @return Objeto contendo lista de unidades desabilitadas
-     */
     @GetMapping("/status-unidades")
     @Operation(summary = "Retorna unidades desabilitadas por tipo e processo")
     public ResponseEntity<Map<String, List<Long>>> obterStatusUnidades(
@@ -75,13 +59,6 @@ public class ProcessoController {
         return ResponseEntity.ok(Map.of("unidadesDesabilitadas", unidadesDesabilitadas));
     }
 
-    /**
-     * Busca e retorna um processo pelo seu código.
-     *
-     * @param codigo O código do processo a ser buscado.
-     * @return Um {@link ResponseEntity} contendo o {@link ProcessoDto} ou status
-     *         404 Not Found.
-     */
     @GetMapping("/{codigo}")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @JsonView(ProcessoViews.Publica.class)
@@ -92,14 +69,6 @@ public class ProcessoController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /**
-     * Atualiza um processo existente.
-     *
-     * @param codigo     O código do processo a ser atualizado.
-     * @param requisicao O DTO com os novos dados do processo.
-     * @return Um {@link ResponseEntity} com status 200 OK e o {@link ProcessoDto}
-     *         atualizado.
-     */
     @PostMapping("/{codigo}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
     @JsonView(ProcessoViews.Publica.class)
@@ -109,12 +78,6 @@ public class ProcessoController {
         return ResponseEntity.ok(atualizado);
     }
 
-    /**
-     * Exclui um processo.
-     *
-     * @param codigo O código do processo a ser excluído.
-     * @return Um {@link ResponseEntity} com status 204 No Content.
-     */
     @PostMapping("/{codigo}/excluir")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> excluir(@PathVariable Long codigo) {
@@ -122,12 +85,6 @@ public class ProcessoController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Lista todos os processos que estão com a situação 'FINALIZADO'.
-     *
-     * @return Um {@link ResponseEntity} com a lista de {@link ProcessoDto}
-     *         finalizados.
-     */
     @GetMapping("/finalizados")
     @Operation(summary = "Lista todos os processos com situação FINALIZADO")
     @JsonView(ProcessoViews.Publica.class)
@@ -135,11 +92,6 @@ public class ProcessoController {
         return ResponseEntity.ok(processoFacade.listarFinalizados());
     }
 
-    /**
-     * Lista todos os processos que estão com a situação 'EM_ANDAMENTO'.
-     *
-     * @return Um {@link ResponseEntity} com a lista de {@link ProcessoDto} ativos.
-     */
     @GetMapping("/ativos")
     @Operation(summary = "Lista todos os processos com situação EM_ANDAMENTO")
     @JsonView(ProcessoViews.Publica.class)
@@ -147,15 +99,6 @@ public class ProcessoController {
         return ResponseEntity.ok(processoFacade.listarAtivos());
     }
 
-    /**
-     * Retorna os detalhes completos de um processo, incluindo as unidades
-     * participantes e o resumo
-     * de seus respectivos subprocessos.
-     *
-     * @param codigo O código do processo a ser detalhado.
-     * @param usuario Usuário autenticado (injetado automaticamente).
-     * @return Um {@link ResponseEntity} com o {@link ProcessoDetalheDto}.
-     */
     @GetMapping("/{codigo}/detalhes")
     @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
     public ResponseEntity<ProcessoDetalheDto> obterDetalhes(
@@ -174,12 +117,6 @@ public class ProcessoController {
         return ResponseEntity.ok(processoFacade.obterContextoCompleto(codigo, usuario));
     }
 
-    /**
-     * Inicia um processo, disparando a criação dos subprocessos e notificações.
-     *
-     * @param codigo O código do processo a ser iniciado.
-     * @return Um {@link ResponseEntity} com status 200 OK.
-     */
     @PostMapping("/{codigo}/iniciar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Inicia um processo")
@@ -198,14 +135,6 @@ public class ProcessoController {
         return ResponseEntity.ok(processoAtualizado);
     }
 
-    /**
-     * Finaliza um processo, tornando os mapas de seus subprocessos homologados como
-     * os novos mapas
-     * vigentes para as respectivas unidades.
-     *
-     * @param codigo O código do processo a ser finalizado.
-     * @return Um {@link ResponseEntity} com status 200 OK.
-     */
     @PostMapping("/{codigo}/finalizar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Finaliza um processo (CDU-21)")
@@ -214,14 +143,6 @@ public class ProcessoController {
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * Retorna códigos de unidades que já participam de processos ativos do tipo
-     * especificado. Útil
-     * para desabilitar checkboxes no frontend durante criação/edição de processos.
-     *
-     * @param tipo Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
-     * @return Lista de códigos de unidades bloqueadas
-     */
     @GetMapping("/unidades-bloqueadas")
     @Operation(summary = "Lista unidades que já participam de processos ativos por tipo")
     public ResponseEntity<List<Long>> listarUnidadesBloqueadas(@RequestParam String tipo) {
@@ -229,14 +150,6 @@ public class ProcessoController {
         return ResponseEntity.ok(unidadesBloqueadas);
     }
 
-    /**
-     * Retorna uma lista de subprocessos elegíveis para ações em bloco
-     * (aceite/homologação) para o
-     * usuário autenticado.
-     *
-     * @param codigo O código do processo.
-     * @return Lista de DTOs representando os subprocessos elegíveis.
-     */
     @GetMapping("/{codigo}/subprocessos-elegiveis")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @Operation(summary = "Lista subprocessos elegíveis para ações em bloco")
@@ -246,14 +159,6 @@ public class ProcessoController {
         return ResponseEntity.ok(elegiveis);
     }
 
-    /**
-     * Retorna todos os subprocessos de um processo. Utilizado pelo frontend para
-     * exibir a árvore de
-     * unidades e seus subprocessos.
-     *
-     * @param codigo O código do processo.
-     * @return Lista de subprocessos do processo.
-     */
     @GetMapping("/{codigo}/subprocessos")
     @Operation(summary = "Lista todos os subprocessos de um processo")
     @JsonView(SubprocessoViews.Publica.class)
@@ -262,9 +167,6 @@ public class ProcessoController {
         return ResponseEntity.ok(subprocessos);
     }
 
-    /**
-     * Envia um lembrete de prazo para uma unidade.
-     */
     @PostMapping("/{codigo}/enviar-lembrete")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Envia lembrete de prazo para unidade")
@@ -273,14 +175,6 @@ public class ProcessoController {
             @RequestBody @Valid EnviarLembreteRequest request) {
         processoFacade.enviarLembrete(codigo, request.unidadeCodigo());
     }
-    /**
-     * Executa uma ação em bloco (aceitar, homologar, disponibilizar) para múltiplas unidades
-     * de um processo.
-     *
-     * @param codigo O código do processo.
-     * @param request O DTO com a lista de unidades e a ação.
-     * @return Um {@link ResponseEntity} com status 200 OK.
-     */
     @PostMapping("/{codigo}/acao-em-bloco")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Executa ação em bloco para um processo")

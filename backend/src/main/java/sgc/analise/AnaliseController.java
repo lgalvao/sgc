@@ -18,12 +18,6 @@ import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
 
-/**
- * Controlador REST para gerenciar as análises de subprocessos.
- *
- * <p>Fornece endpoints para criar e listar análises relacionadas às fases de cadastro e validação
- * de um subprocesso.
- */
 @RestController
 @RequestMapping("/api/subprocessos/{codSubprocesso}")
 @RequiredArgsConstructor
@@ -32,12 +26,6 @@ public class AnaliseController {
     private final AnaliseFacade analiseFacade;
     private final SubprocessoFacade subprocessoFacade;
 
-    /**
-     * Recupera o histórico de análises associadas à fase de cadastro de um subprocesso.
-     *
-     * @param codigo O código do subprocesso.
-     * @return Uma lista de {@link AnaliseHistoricoDto} contendo o histórico de análises de cadastro.
-     */
     @GetMapping("/analises-cadastro")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista o histórico de análises de cadastro")
@@ -46,17 +34,6 @@ public class AnaliseController {
         return analiseFacade.listarHistoricoCadastro(codigo);
     }
 
-    /**
-     * Registra uma nova análise para a fase de cadastro de um subprocesso.
-     *
-     * <p>Este endpoint recebe os dados da análise a partir de um corpo estruturado. A análise é
-     * associada ao subprocesso identificado pelo código na URL.
-     *
-     * @param codSubprocesso O código do subprocesso ao qual a análise pertence.
-     * @param request        O DTO contendo os dados da análise. Campos esperados incluem 'observacoes',
-     *                       'siglaUnidade', 'tituloUsuario' e 'motivo'.
-     * @return O DTO {@link AnaliseHistoricoDto} recém-criado.
-     */
     @PostMapping("/analises-cadastro")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @ResponseStatus(HttpStatus.CREATED)
@@ -67,12 +44,6 @@ public class AnaliseController {
         return criarAnalise(codSubprocesso, request, TipoAnalise.CADASTRO);
     }
 
-    /**
-     * Recupera o histórico de análises associadas à fase de validação de um subprocesso.
-     *
-     * @param codSubprocesso O código do subprocesso.
-     * @return Uma lista de {@link AnaliseHistoricoDto} contendo o histórico de análises de validação.
-     */
     @GetMapping("/analises-validacao")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista o histórico de análises de validação")
@@ -83,17 +54,6 @@ public class AnaliseController {
                 .toList();
     }
 
-    /**
-     * Registra uma nova análise para a fase de validação de um subprocesso.
-     *
-     * <p>Assim como na análise de cadastro, este endpoint recebe os dados da análise a partir de um
-     * corpo estruturado e a associa ao subprocesso correspondente.
-     *
-     * @param codSubprocesso O código do subprocesso ao qual a análise pertence.
-     * @param request        O DTO contendo os dados da análise. Campos esperados incluem 'observacoes',
-     *                       'siglaUnidade', 'tituloUsuario' e 'motivo'.
-     * @return O DTO {@link AnaliseHistoricoDto} recém-criado.
-     */
     @PostMapping("/analises-validacao")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @ResponseStatus(HttpStatus.CREATED)

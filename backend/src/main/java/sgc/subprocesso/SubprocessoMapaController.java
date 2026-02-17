@@ -40,9 +40,6 @@ public class SubprocessoMapaController {
     private final MapaFacade mapaFacade;
     private final AnaliseFacade analiseFacade;
 
-    /**
-     * Verifica os impactos que a disponibilização do mapa atual causará.
-     */
     @GetMapping("/{codigo}/impactos-mapa")
     @PreAuthorize("isAuthenticated()")
     @JsonView(MapaViews.Publica.class)
@@ -51,9 +48,6 @@ public class SubprocessoMapaController {
         return mapaFacade.verificarImpactos(subprocesso, usuario);
     }
 
-    /**
-     * Obtém o mapa associado ao subprocesso.
-     */
     @GetMapping("/{codigo}/mapa")
     @PreAuthorize("isAuthenticated()")
     @JsonView(MapaViews.Publica.class)
@@ -62,9 +56,6 @@ public class SubprocessoMapaController {
         return sp.getMapa();
     }
 
-    /**
-     * Disponibiliza o mapa para validação.
-     */
     @PostMapping("/{codigo}/disponibilizar-mapa")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Disponibiliza o mapa para validação")
@@ -85,9 +76,6 @@ public class SubprocessoMapaController {
         return mapaFacade.obterMapaParaVisualizacao(subprocesso);
     }
 
-    /**
-     * Salva as alterações feitas no mapa de competências.
-     */
     @PostMapping("/{codigo}/mapa")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Salva as alterações do mapa")
@@ -98,9 +86,6 @@ public class SubprocessoMapaController {
         return subprocessoFacade.salvarMapaSubprocesso(codigo, request);
     }
 
-    /**
-     * Obtém o mapa completo associado ao subprocesso para visualização ou edição.
-     */
     @GetMapping("/{codigo}/mapa-completo")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém o mapa completo para edição/visualização")
@@ -111,9 +96,6 @@ public class SubprocessoMapaController {
         return ResponseEntity.ok(mapa);
     }
 
-    /**
-     * Salva o mapa completo em uma única operação.
-     */
     @PostMapping("/{codigo}/mapa-completo")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Salva o mapa completo (batch)")
@@ -126,9 +108,6 @@ public class SubprocessoMapaController {
         return ResponseEntity.ok(mapa);
     }
 
-    /**
-     * Permite que um usuário apresente sugestões de melhoria para um mapa de competências.
-     */
     @PostMapping("/{codigo}/apresentar-sugestoes")
     @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Apresenta sugestões de melhoria para o mapa")
@@ -139,18 +118,12 @@ public class SubprocessoMapaController {
         subprocessoFacade.apresentarSugestoes(codigo, request.texto(), usuario);
     }
 
-    /**
-     * Obtém as sugestões de melhoria que foram apresentadas para o mapa de um subprocesso.
-     */
     @GetMapping("/{codigo}/sugestoes")
     @PreAuthorize("isAuthenticated()")
     public Map<String, Object> obterSugestoes(@PathVariable Long codigo) {
         return subprocessoFacade.obterSugestoes(codigo);
     }
 
-    /**
-     * Obtém o histórico de análises da fase de validação de um subprocesso.
-     */
     @GetMapping("/{codigo}/historico-validacao")
     @PreAuthorize("isAuthenticated()")
     public List<AnaliseValidacaoHistoricoDto> obterHistoricoValidacao(@PathVariable Long codigo) {
