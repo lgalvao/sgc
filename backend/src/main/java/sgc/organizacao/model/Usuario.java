@@ -71,7 +71,7 @@ public class Usuario implements UserDetails {
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("unidadeCodigo")
     public Long getUnidadeCodigo() {
-        return unidadeLotacao != null ? unidadeLotacao.getCodigo() : null;
+        return unidadeLotacao.getCodigo();
     }
 
     @Override

@@ -9,15 +9,6 @@ import sgc.configuracao.model.ParametroRepo;
 
 import java.util.List;
 
-/**
- * Service responsável pelas operações de persistência de parâmetros de configuração.
- *
- * <p>Este service encapsula o acesso ao {@link ParametroRepo}, permitindo que
- * {@link ConfiguracaoFacade} delegue operações de dados sem acessar repositórios diretamente.
- *
- * @see ConfiguracaoFacade
- * @see ParametroRepo
- */
 @Service
 @RequiredArgsConstructor
 public class ConfiguracaoService {

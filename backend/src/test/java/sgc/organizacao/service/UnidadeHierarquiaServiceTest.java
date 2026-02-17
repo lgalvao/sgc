@@ -18,6 +18,7 @@ import java.util.function.Predicate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
+import sgc.organizacao.model.TipoUnidade;
 
 /**
  * Testes unitários para {@link UnidadeHierarquiaService}.
@@ -126,7 +127,7 @@ class UnidadeHierarquiaServiceTest {
         Unidade extra = Unidade.builder()
                 .codigo(99L)
                 .sigla("EXTRA")
-                .tipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL)
+                .tipo(TipoUnidade.OPERACIONAL)
                 .build();
         when(repo.buscar(Unidade.class, 99L)).thenReturn(extra);
 
@@ -142,7 +143,7 @@ class UnidadeHierarquiaServiceTest {
         Unidade extra = Unidade.builder()
                 .codigo(100L)
                 .sigla("INEXISTENTE")
-                .tipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL)
+                .tipo(TipoUnidade.OPERACIONAL)
                 .build();
         when(repo.buscarPorSigla(Unidade.class, "INEXISTENTE")).thenReturn(extra);
 

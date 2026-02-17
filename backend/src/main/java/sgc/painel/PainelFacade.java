@@ -17,12 +17,12 @@ import sgc.organizacao.model.Perfil;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.UnidadeProcesso;
 import sgc.processo.service.ProcessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import sgc.processo.model.UnidadeProcesso;
 
 @Service
 @RequiredArgsConstructor
@@ -114,13 +114,13 @@ public class PainelFacade {
         List<Long> alertasNaoLidosVisualizados = new ArrayList<>();
         Page<AlertaDto> resultado = alertasPage.map(alerta -> {
             LocalDateTime dataHoraLeitura = alertaService.obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo).orElse(null);
-            if (usuarioTitulo != null && dataHoraLeitura == null) {
+            if (dataHoraLeitura == null) {
                 alertasNaoLidosVisualizados.add(alerta.getCodigo());
             }
             return paraAlertaDto(alerta, dataHoraLeitura);
         });
 
-        if (usuarioTitulo != null && !alertasNaoLidosVisualizados.isEmpty()) {
+        if (!alertasNaoLidosVisualizados.isEmpty()) {
             alertaService.marcarComoLidos(usuarioTitulo, alertasNaoLidosVisualizados);
         }
 

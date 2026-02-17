@@ -27,6 +27,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import sgc.organizacao.model.TipoUnidade;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -106,7 +107,7 @@ class LoginFacadeTest {
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         unidade.setSituacao(SituacaoUnidade.ATIVA);
-        unidade.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
         
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.ADMIN);
@@ -142,7 +143,7 @@ class LoginFacadeTest {
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         unidade.setSituacao(SituacaoUnidade.ATIVA);
-        unidade.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
         
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.GESTOR);
@@ -165,7 +166,7 @@ class LoginFacadeTest {
         Unidade unidade = new Unidade();
         unidade.setCodigo(2L);
         unidade.setSituacao(SituacaoUnidade.ATIVA);
-        unidade.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
         
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.GESTOR);
@@ -189,7 +190,7 @@ class LoginFacadeTest {
         unidade.setCodigo(1L);
         unidade.setSigla("U1");
         unidade.setSituacao(SituacaoUnidade.ATIVA);
-        unidade.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
         
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.GESTOR);

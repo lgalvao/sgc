@@ -9,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -18,6 +19,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @SuperBuilder
 public abstract class EntidadeBase implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

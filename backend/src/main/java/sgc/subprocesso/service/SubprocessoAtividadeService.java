@@ -18,6 +18,7 @@ import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Service responsável por operações relacionadas a atividades de subprocessos.
@@ -136,7 +137,7 @@ class SubprocessoAtividadeService {
         return AtividadeDto.builder()
                 .codigo(atividade.getCodigo())
                 .descricao(atividade.getDescricao())
-                .conhecimentos(new java.util.ArrayList<>(atividade.getConhecimentos()))
+                .conhecimentos(new ArrayList<>(atividade.getConhecimentos()))
                 .build();
     }
 }

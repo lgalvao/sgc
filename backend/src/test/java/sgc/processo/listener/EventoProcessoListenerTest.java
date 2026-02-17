@@ -38,6 +38,7 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
+import sgc.organizacao.model.SituacaoUnidade;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -90,7 +91,7 @@ class EventoProcessoListenerTest {
         return Unidade.builder()
                 .codigo(codigo)
                 .tipo(tipo)
-                .situacao(sgc.organizacao.model.SituacaoUnidade.ATIVA)
+                .situacao(SituacaoUnidade.ATIVA)
                 .build();
     }
 
@@ -644,7 +645,7 @@ class EventoProcessoListenerTest {
             Unidade unidade = new Unidade();
             unidade.setCodigo(11L);
             unidade.setTipo(TipoUnidade.INTERMEDIARIA);
-            unidade.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+            unidade.setSituacao(SituacaoUnidade.ATIVA);
             unidade.setNome("Unidade Inter");
             unidade.setSigla("UI");
 
@@ -686,7 +687,7 @@ class EventoProcessoListenerTest {
             Unidade unidade = new Unidade();
             unidade.setCodigo(11L);
             unidade.setTipo(TipoUnidade.OPERACIONAL);
-            unidade.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+            unidade.setSituacao(SituacaoUnidade.ATIVA);
             unidade.setNome("Unidade");
 
             Subprocesso subprocesso = new Subprocesso();
@@ -729,7 +730,7 @@ class EventoProcessoListenerTest {
 
             Subprocesso subprocesso = new Subprocesso();
             Unidade unidade = criarUnidade(99L, TipoUnidade.OPERACIONAL);
-            unidade.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+            unidade.setSituacao(SituacaoUnidade.ATIVA);
             unidade.setSigla("U99");
             subprocesso.setUnidade(unidade);
             subprocesso.setCodigo(201L);
@@ -758,14 +759,14 @@ class EventoProcessoListenerTest {
             processo.setDescricao("Processo");
 
             Unidade uInter = Unidade.builder().codigo(1L).tipo(TipoUnidade.INTERMEDIARIA)
-                    .situacao(sgc.organizacao.model.SituacaoUnidade.ATIVA).build();
+                    .situacao(SituacaoUnidade.ATIVA).build();
             uInter.setSigla("UI");
 
             Unidade uSuperiorDiferente = Unidade.builder().codigo(9L).tipo(TipoUnidade.OPERACIONAL)
-                    .situacao(sgc.organizacao.model.SituacaoUnidade.ATIVA).build();
+                    .situacao(SituacaoUnidade.ATIVA).build();
 
             Unidade uSubordinadaInvalida = Unidade.builder().codigo(2L).tipo(TipoUnidade.OPERACIONAL)
-                    .situacao(sgc.organizacao.model.SituacaoUnidade.ATIVA).build();
+                    .situacao(SituacaoUnidade.ATIVA).build();
             uSubordinadaInvalida.setUnidadeSuperior(uSuperiorDiferente);
 
             processo.adicionarParticipantes(Set.of(uInter, uSubordinadaInvalida));

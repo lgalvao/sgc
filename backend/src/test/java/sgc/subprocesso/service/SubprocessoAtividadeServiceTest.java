@@ -32,6 +32,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import java.util.LinkedHashSet;
 
 /**
  * Testes unitários para SubprocessoAtividadeService.
@@ -436,7 +437,7 @@ class SubprocessoAtividadeServiceTest {
         return Atividade.builder()
                 .codigo(codigo)
                 .descricao(descricao)
-                .conhecimentos(new java.util.LinkedHashSet<>(conhecimentos))
+                .conhecimentos(new LinkedHashSet<>(conhecimentos))
                 .build();
     }
 }

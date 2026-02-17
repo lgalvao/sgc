@@ -63,9 +63,6 @@ public class ImpactoMapaService {
      * de trabalho.
      *
      * @param usuario O usuário autenticado que realiza a operação.
-     * @return Um {@link ImpactoMapaDto} que encapsula todos os impactos
-     *         encontrados. Retorna um DTO
-     *         sem impactos se a unidade não possuir um mapa vigente.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso ou seu mapa não forem
      *                                   encontrados.
      * @throws ErroAcessoNegado         se o usuário não tiver permissão para

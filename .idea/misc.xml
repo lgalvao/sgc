@@ -4,6 +4,523 @@
     <option name="sdkName" value="Python 3.14 (sgc)" />
   </component>
   <component name="EntryPointsManager">
+    <entry_points version="2.0">
+      <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise acao" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.ImpactoMapaService accessControlService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoDetalheBuilder accessControlService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService accessControlService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService accessControlService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService accessControlService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoPermissaoCalculator accessControlService" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao acessoAd" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.ClienteAcessoAd acessoAdRestClient" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioService administradorRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade adminWorkflowService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade ajusteMapaService" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.AlertaUsuario alerta" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.AlertaUsuario.Chave alertaCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaController alertaFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaFacade alertaMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaService alertaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaFacade alertaService" />
+      <entry_point TYPE="field" FQNAME="sgc.painel.PainelFacade alertaService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade alertaService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService alertaService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService alertaService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.notificacao.SubprocessoComunicacaoListener alertaService" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaService alertaUsuarioRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao ambienteTestes" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController ambienteTestes" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginFacade ambienteTestes" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.AnaliseController analiseFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAjusteMapaService analiseFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoCadastroController analiseFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService analiseFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoMapaController analiseFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService analiseFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoTransicaoService analiseFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.AnaliseController analiseMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoCadastroController analiseMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoMapaController analiseMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.AnaliseService analiseRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.AnaliseFacade analiseService" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao.Email assuntoPrefixo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Conhecimento atividade" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AccessControlService atividadeAccessPolicy" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeController atividadeFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService atividadeMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.CopiaMapaService atividadeRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService atividadeRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaSalvamentoService atividadeRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Competencia atividades" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.CompetenciaAjusteDto atividades" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa atividades" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService atividadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade atividadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeResponsavelService atribuicaoTemporariaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AccessControlService auditService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario authorities" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade cadastroWorkflowService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.service.ErroRelatorio causa" />
+      <entry_point TYPE="field" FQNAME="sgc.configuracao.model.Parametro chave" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.CompetenciaAjusteDto codCompetencia" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi code" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroNegocioBase code" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto codigo" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.model.EntidadeBase codigo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto codigo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto codigo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto codigo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto codigo" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd.LotacaoAd codigo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.eventos.EventoImportacaoAtividades codigoMapaDestino" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.eventos.EventoImportacaoAtividades codigoMapaOrigem" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto codigoPai" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.eventos.EventoImportacaoAtividades codigoSubprocesso" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.MapaAjusteDto codMapa" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto codProcesso" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.eventos.EventoProcessoFinalizado codProcesso" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.eventos.EventoProcessoIniciado codProcesso" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto codSubprocesso" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto codUnidade" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.eventos.EventoProcessoIniciado codUnidades" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto codUnidadeSuperior" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.CopiaMapaService competenciaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.ImpactoMapaService competenciaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService competenciaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaSalvamentoService competenciaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaVisualizacaoService competenciaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Atividade competencias" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa competencias" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.MapaAjusteDto competencias" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigOpenApi config" />
+      <entry_point TYPE="field" FQNAME="sgc.notificacao.NotificacaoEmailAsyncExecutor config" />
+      <entry_point TYPE="field" FQNAME="sgc.configuracao.ConfiguracaoController configuracaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService conhecimentoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService conhecimentoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Atividade conhecimentos" />
+      <entry_point TYPE="field" FQNAME="sgc.notificacao.model.Notificacao conteudo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade contextoService" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaImportacaoListener copiaMapaService" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao cors" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService crudService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAjusteMapaService crudService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAtividadeService crudService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService crudService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService crudService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade crudService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService crudService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoPermissaoCalculator crudService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.crud.SubprocessoValidacaoService crudService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo dataCriacao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto dataCriacao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto dataCriacao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto dataCriacaoFormatada" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto dataCriacaoFormatada" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade dataFim" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso dataFimEtapa1" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso dataFimEtapa2" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo dataFinalizacao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto dataFinalizacao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto dataFinalizacao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto dataFinalizacaoFormatada" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto dataFinalizacaoFormatada" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta dataHora" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto dataHora" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise dataHora" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Movimentacao dataHora" />
+      <entry_point TYPE="field" FQNAME="sgc.notificacao.model.Notificacao dataHora" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa dataHoraDisponibilizado" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.eventos.EventoProcessoFinalizado dataHoraFinalizacao" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto dataHoraFormatada" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa dataHoraHomologado" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.eventos.EventoProcessoIniciado dataHoraInicio" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto dataHoraLeitura" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.AlertaUsuario dataHoraLeitura" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria dataInicio" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade dataInicio" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade dataInicioTitularidade" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso dataInicioTitularidade" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo dataLimite" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto dataLimite" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto dataLimite" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto dataLimite" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso dataLimiteEtapa1" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso dataLimiteEtapa2" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto dataLimiteFormatada" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto dataLimiteFormatada" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto dataLimiteFormatada" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria dataTermino" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.VinculacaoUnidade demaisUnidadesHistoricas" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.Acao descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Atividade descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Competencia descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Conhecimento descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Movimentacao descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.configuracao.model.Parametro descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.SituacaoSubprocesso descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.TipoTransicao descricaoMovimentacao" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao.OpenApi description" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi details" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroNegocioBase details" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto elegiveis" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao email" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario email" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd email" />
+      <entry_point TYPE="field" FQNAME="sgc.notificacao.NotificacaoEmailService emailExecutor" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.notificacao.SubprocessoComunicacaoListener emailService" />
+      <entry_point TYPE="field" FQNAME="sgc.notificacao.NotificacaoEmailAsyncExecutor enviadorDeEmail" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.GerenciadorJwt environment" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService eventPublisher" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAtividadeService eventPublisher" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoTransicaoService eventPublisher" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto filhos" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.FiltroJwt gerenciadorJwt" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController gerenciadorJwt" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AbstractAccessPolicy hierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeFacade hierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.AlertaUsuario id" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso id" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaFacade impactoMapaService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService impactoMapaService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.SituacaoUnidade INATIVA" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto isElegivel" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria justificativa" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.MapaAjusteDto justificativaDevolucao" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao jwt" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.GerenciadorJwt jwtProperties" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.SituacaoProcesso label" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.TipoProcesso label" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController limitadorTentativasLogin" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd login" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController loginFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd lotacao" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Atividade mapa" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Competencia mapa" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso mapa" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AccessControlService mapaAccessPolicy" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAjusteMapaService mapaAjusteMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto mapaCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.MapaController mapaFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService mapaFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoMapaController mapaFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService mapaFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.ImpactoMapaService mapaManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaFacade mapaManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.service.RelatorioFacade mapaManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAjusteMapaService mapaManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAtividadeService mapaManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService mapaManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService mapaManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.crud.SubprocessoValidacaoService mapaManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.CopiaMapaService mapaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.ImpactoMapaService mapaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService mapaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaSalvamentoService mapaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaVisualizacaoService mapaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.factory.SubprocessoFactory mapaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaFacade mapaSalvamentoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UnidadeMapa mapaVigente" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaFacade mapaVisualizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade mapaWorkflowService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario matricula" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade matriculaTitular" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso matriculaTitular" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto mensagem" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi message" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise motivo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService movimentacaoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAtividadeService movimentacaoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService movimentacaoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.factory.SubprocessoFactory movimentacaoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoTransicaoService movimentacaoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd nivel" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.CompetenciaAjusteDto nome" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto nome" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade nome" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto nome" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso nome" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario nome" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd nome" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd.LotacaoAd nome" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd nomeNivel" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.listener.EventoProcessoListener notificacaoEmailService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade notificacaoEmailService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService notificacaoEmailService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.notificacao.SubprocessoEmailService notificacaoEmailService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.listener.EventoProcessoListener notificacaoModelosService" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise observacoes" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.EventoTransicaoSubprocesso observacoes" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa observacoesDisponibilizacao" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao openapi" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController organizacaoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoCadastroController organizacaoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoCrudController organizacaoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto origem" />
+      <entry_point TYPE="field" FQNAME="sgc.painel.PainelController painelFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.configuracao.ConfiguracaoController parametroMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.configuracao.ConfiguracaoService parametroRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo participantes" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.service.RelatorioFacade pdfFactory" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria perfil" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfil perfil" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfilId perfil" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario perfilAtivo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService permissaoCalculator" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade permissaoCalculator" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto podeAceitarCadastroBloco" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto podeDisponibilizarMapaBloco" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto podeFinalizar" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto podeHomologarCadastro" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto podeHomologarMapa" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta processo" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto processo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso processo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso processo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.TipoTransicao PROCESSO_INICIADO" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AccessControlService processoAccessPolicy" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade processoAcessoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcessoId processoCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade processoConsultaService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoManutencaoService processoConsultaService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade processoDetalheBuilder" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoDetalheBuilder processoDetalheMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.listener.EventoProcessoListener processoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.painel.PainelFacade processoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoController processoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.service.RelatorioFacade processoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeController processoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade processoFinalizador" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade processoInicializador" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade processoManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade processoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoConsultaService processoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFinalizador processoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador processoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoManutencaoService processoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFinalizador processoValidador" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador processoValidador" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoManutencaoService processoValidador" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.ConfiguracaoAcessoAd properties" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFinalizador publicadorEventos" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador publicadorEventos" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoAcessoService queryService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFinalizador queryService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoValidador queryService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario ramal" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.controller.RelatorioController relatorioService" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao.Email remetente" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao.Email remetenteNome" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.CopiaMapaService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.ImpactoMapaService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaSalvamentoService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoConsultaService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFinalizador repo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador repo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAjusteMapaService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAtividadeService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeHierarquiaService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeResponsavelService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.crud.SubprocessoCrudService repositorioComum" />
+      <entry_point TYPE="field" FQNAME="sgc.notificacao.NotificacaoEmailService repositorioNotificacao" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeResponsavelService responsabilidadeRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ValidadorDadosOrgService responsabilidadeRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeFacade responsavelService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto resumoSubprocessos" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.model.EntidadeBase serialVersionUID" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo serialVersionUID" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso serialVersionUID" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcessoId serialVersionUID" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.listener.EventoProcessoListener servicoAlertas" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoConsultaService servicoConsultas" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.factory.SubprocessoFactory servicoDeCopiaDeMapa" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto sigla" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade sigla" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto sigla" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso sigla" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd.LotacaoAd sigla" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo situacao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto situacao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto situacao" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso situacao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto situacao" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade situacao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso situacao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto situacaoLabel" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto situacaoLabel" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto situacaoLabel" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto situacaoSubprocesso" />
+      <entry_point TYPE="field" FQNAME="sgc.notificacao.NotificacaoEmailAsyncExecutor sleeper" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi status" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroNegocioBase status" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise subprocesso" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.EventoTransicaoSubprocesso subprocesso" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa subprocesso" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Movimentacao subprocesso" />
+      <entry_point TYPE="field" FQNAME="sgc.notificacao.model.Notificacao subprocesso" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AccessControlService subprocessoAccessPolicy" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.AnaliseController subprocessoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.listener.EventoProcessoListener subprocessoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade subprocessoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador subprocessoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.service.RelatorioFacade subprocessoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoCadastroController subprocessoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoCrudController subprocessoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoMapaController subprocessoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.listener.SubprocessoMapaListener subprocessoFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.crud.SubprocessoCrudService subprocessoFactory" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade subprocessoFactory" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.query.ConsultasSubprocessoService subprocessoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoDetalheBuilder subprocessoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService subprocessoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAjusteMapaService subprocessoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAtividadeService subprocessoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService subprocessoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.crud.SubprocessoCrudService subprocessoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.factory.SubprocessoFactory subprocessoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService subprocessoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade subunidades" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto subunidades" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa sugestoes" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.TipoTransicao templateAlerta" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.TipoTransicao templateEmail" />
+      <entry_point TYPE="field" FQNAME="sgc.notificacao.NotificacaoModelosService templateEngine" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.notificacao.SubprocessoEmailService templateEngine" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi timestamp" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise tipo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.eventos.EventoProcessoIniciado tipo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.EventoTransicaoSubprocesso tipo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo tipo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto tipo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto tipo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade tipo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade tipo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto tipo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso tipo" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd tipo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto tipoLabel" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto tipoLabel" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao.OpenApi title" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario tituloEleitoral" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade tituloTitular" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto tituloTitular" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso tituloTitular" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi traceId" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService transicaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService transicaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria unidade" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade unidade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso unidade" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfil unidade" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.VinculacaoUnidade unidadeAnteriorCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario unidadeAtivaCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.VinculacaoUnidade unidadeAtualCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise unidadeCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade unidadeCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto unidadeCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UnidadeMapa unidadeCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcessoId unidadeCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfil unidadeCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfilId unidadeCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario unidadeCompetencia" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta unidadeDestino" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto unidadeDestino" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.EventoTransicaoSubprocesso unidadeDestino" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Movimentacao unidadeDestino" />
+      <entry_point TYPE="field" FQNAME="sgc.notificacao.model.Notificacao unidadeDestino" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.OrganizacaoFacade unidadeFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService unidadeFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario unidadeLotacao" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador unidadeMapaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeService unidadeMapaRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.MapaAjusteDto unidadeNome" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto unidadeNome" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta unidadeOrigem" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto unidadeOrigem" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.EventoTransicaoSubprocesso unidadeOrigem" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Movimentacao unidadeOrigem" />
+      <entry_point TYPE="field" FQNAME="sgc.notificacao.model.Notificacao unidadeOrigem" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.mapper.AnaliseMapper unidadeRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador unidadeRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeHierarquiaService unidadeRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeService unidadeRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ValidadorDadosOrgService unidadeRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioFacade unidadeResponsavelService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto unidades" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaFacade unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.AnaliseFacade unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.listener.EventoProcessoListener unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.painel.PainelFacade unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoAcessoService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFinalizador unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoManutencaoService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoValidador unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.service.RelatorioFacade unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeController unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeFacade unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto unidadeSigla" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto unidadesParticipantes" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade unidadeSuperior" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso unidadeSuperiorCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao urlAcessoHom" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao urlAcessoProd" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.AlertaUsuario usuario" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria usuario" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.EventoTransicaoSubprocesso usuario" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Movimentacao usuario" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade usuario" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfil usuario" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta usuarioDestino" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.OrganizacaoFacade usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoTransicaoService usuarioFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria usuarioMatricula" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade usuarioMatricula" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AbstractAccessPolicy usuarioPerfilRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeResponsavelService usuarioPerfilRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioService usuarioPerfilRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeResponsavelService usuarioRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioService usuarioRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ValidadorDadosOrgService usuarioRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaFacade usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.listener.EventoProcessoListener usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.FiltroJwt usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoAcessoService usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoConsultaService usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAtividadeService usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeFacade usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioController usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioFacade usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService usuarioServiceFacade" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Administrador usuarioTitulo" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.model.AlertaUsuario.Chave usuarioTitulo" />
+      <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise usuarioTitulo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria usuarioTitulo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade usuarioTitulo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfil usuarioTitulo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfilId usuarioTitulo" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService validacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade validacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService validacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.configuracao.model.Parametro valor" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao.OpenApi version" />
+    </entry_points>
     <list size="2">
       <item index="0" class="java.lang.String" itemvalue="com.tngtech.archunit.junit.ArchTest" />
       <item index="1" class="java.lang.String" itemvalue="lombok.Setter" />
@@ -88,6 +605,481 @@
     <pattern value="sgc.mapa.service.MapaFacade" />
     <pattern value="sgc.subprocesso.model.SubprocessoRepo" method="findByMapaCodigo" />
     <pattern value="sgc.subprocesso.model.SubprocessoRepo" method="findByProcessoCodigoAndUnidadeCodigo" />
+    <pattern value="sgc.analise.dto.AnaliseValidacaoHistoricoDto" method="AnaliseValidacaoHistoricoDto" />
+    <pattern value="sgc.seguranca.acesso.AbstractAccessPolicy" />
+    <pattern value="sgc.seguranca.acesso.Acao" />
+    <pattern value="sgc.processo.dto.AcaoEmBlocoRequest" />
+    <pattern value="sgc.seguranca.acesso.AccessAuditService" />
+    <pattern value="sgc.seguranca.acesso.AccessControlService" />
+    <pattern value="sgc.seguranca.acesso.AccessPolicy" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" method="aceitarCadastro" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" method="aceitarCadastroEmBloco" />
+    <pattern value="sgc.subprocesso.dto.AceitarCadastroRequest" />
+    <pattern value="sgc.subprocesso.dto.AceitarCadastroRequest" method="AceitarCadastroRequest" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" method="aceitarRevisaoCadastro" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="aceitarValidacao" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="aceitarValidacaoEmBloco" />
+    <pattern value="sgc.seguranca.login.ConfiguracaoAcessoAd" method="acessoAdRestClient" />
+    <pattern value="sgc.organizacao.UsuarioController" method="adicionarAdministrador" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="adicionarCompetencia" />
+    <pattern value="sgc.organizacao.model.Administrador" />
+    <pattern value="sgc.organizacao.dto.AdministradorDto" />
+    <pattern value="sgc.alerta.model.Alerta" />
+    <pattern value="sgc.alerta.AlertaController" />
+    <pattern value="sgc.alerta.dto.AlertaDto" />
+    <pattern value="sgc.alerta.AlertaFacade" />
+    <pattern value="sgc.alerta.mapper.AlertaMapper" />
+    <pattern value="sgc.alerta.model.AlertaRepo" />
+    <pattern value="sgc.alerta.AlertaService" />
+    <pattern value="sgc.alerta.model.AlertaUsuario" />
+    <pattern value="sgc.subprocesso.SubprocessoCrudController" method="alterarDataLimite" />
+    <pattern value="sgc.subprocesso.dto.AlterarDataLimiteRequest" />
+    <pattern value="sgc.analise.model.Analise" />
+    <pattern value="sgc.analise.AnaliseController" />
+    <pattern value="sgc.analise.AnaliseFacade" />
+    <pattern value="sgc.analise.dto.AnaliseHistoricoDto" />
+    <pattern value="sgc.analise.mapper.AnaliseMapper" />
+    <pattern value="sgc.analise.AnaliseService" />
+    <pattern value="sgc.processo.listener.EventoProcessoListener" method="aoFinalizarProcesso" />
+    <pattern value="sgc.mapa.service.MapaImportacaoListener" method="aoImportarAtividades" />
+    <pattern value="sgc.processo.listener.EventoProcessoListener" method="aoIniciarProcesso" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="apresentarSugestoes" />
+    <pattern value="sgc.subprocesso.dto.ApresentarSugestoesRequest" />
+    <pattern value="sgc.subprocesso.dto.ApresentarSugestoesRequest" method="ApresentarSugestoesRequest" />
+    <pattern value="sgc.mapa.model.Atividade" />
+    <pattern value="sgc.seguranca.acesso.AtividadeAccessPolicy" />
+    <pattern value="sgc.seguranca.acesso.AtividadeAccessPolicy" method="AtividadeAccessPolicy" />
+    <pattern value="sgc.subprocesso.dto.AtividadeAjusteDto" />
+    <pattern value="sgc.subprocesso.dto.AtividadeAjusteDto" method="AtividadeAjusteDto" />
+    <pattern value="sgc.mapa.AtividadeController" />
+    <pattern value="sgc.mapa.dto.visualizacao.AtividadeDto" />
+    <pattern value="sgc.mapa.dto.visualizacao.AtividadeDto" method="AtividadeDto" />
+    <pattern value="sgc.mapa.service.AtividadeFacade" />
+    <pattern value="sgc.mapa.service.AtividadeFacade" method="AtividadeFacade" />
+    <pattern value="sgc.mapa.mapper.AtividadeMapper" />
+    <pattern value="sgc.organizacao.model.AtribuicaoTemporaria" />
+    <pattern value="sgc.organizacao.model.AtribuicaoTemporariaRepo" />
+    <pattern value="sgc.configuracao.ConfiguracaoController" method="atualizar" />
+    <pattern value="sgc.mapa.AtividadeController" method="atualizar" />
+    <pattern value="sgc.processo.ProcessoController" method="atualizar" />
+    <pattern value="sgc.subprocesso.SubprocessoCrudController" method="atualizar" />
+    <pattern value="sgc.mapa.MapaController" method="atualizar" />
+    <pattern value="sgc.configuracao.ConfiguracaoService" method="atualizar" />
+    <pattern value="sgc.mapa.dto.AtualizarAtividadeRequest" />
+    <pattern value="sgc.mapa.dto.AtualizarAtividadeRequest" method="AtualizarAtividadeRequest" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="atualizarCompetencia" />
+    <pattern value="sgc.mapa.AtividadeController" method="atualizarConhecimento" />
+    <pattern value="sgc.mapa.dto.AtualizarConhecimentoRequest" />
+    <pattern value="sgc.mapa.dto.AtualizarConhecimentoRequest" method="AtualizarConhecimentoRequest" />
+    <pattern value="sgc.processo.dto.AtualizarProcessoRequest" />
+    <pattern value="sgc.processo.dto.AtualizarProcessoRequest" method="AtualizarProcessoRequest" />
+    <pattern value="sgc.seguranca.login.LoginController" method="autenticar" />
+    <pattern value="sgc.seguranca.login.LoginController" method="autorizar" />
+    <pattern value="sgc.processo.service.ProcessoDetalheBuilder" method="build" />
+    <pattern value="sgc.organizacao.UnidadeController" method="buscarArvoreComElegibilidade" />
+    <pattern value="sgc.organizacao.UnidadeFacade" method="buscarArvoreHierarquica" />
+    <pattern value="sgc.organizacao.UnidadeController" method="buscarArvoreUnidade" />
+    <pattern value="sgc.processo.service.ProcessoAcessoService" method="buscarCodigosDescendentes" />
+    <pattern value="sgc.mapa.service.MapaManutencaoService" method="buscarCompetenciaPorCodigo" />
+    <pattern value="sgc.organizacao.UnidadeFacade" method="buscarIdsDescendentes" />
+    <pattern value="sgc.mapa.service.MapaFacade" method="buscarMapaVigentePorUnidade" />
+    <pattern value="sgc.subprocesso.SubprocessoCrudController" method="buscarPorProcessoEUnidade" />
+    <pattern value="sgc.mapa.service.MapaFacade" method="buscarPorSubprocessoCodigo" />
+    <pattern value="sgc.organizacao.UsuarioFacade" method="buscarResponsaveisUnidades" />
+    <pattern value="sgc.organizacao.UnidadeFacade" method="buscarResponsavelAtual" />
+    <pattern value="sgc.organizacao.UnidadeController" method="buscarSiglasSubordinadas" />
+    <pattern value="sgc.organizacao.UnidadeController" method="buscarSiglaSuperior" />
+    <pattern value="sgc.organizacao.UnidadeFacade" method="buscarSubordinadas" />
+    <pattern value="sgc.organizacao.UnidadeController" method="buscarTodasAtribuicoes" />
+    <pattern value="sgc.organizacao.UnidadeController" method="buscarTodasUnidades" />
+    <pattern value="sgc.organizacao.UnidadeController" method="buscarUnidadePorCodigo" />
+    <pattern value="sgc.organizacao.UnidadeController" method="buscarUnidadePorSigla" />
+    <pattern value="sgc.organizacao.UsuarioFacade" method="buscarUnidadesOndeEhResponsavel" />
+    <pattern value="sgc.organizacao.UsuarioFacade" method="buscarUnidadesPorPerfil" />
+    <pattern value="sgc.organizacao.UsuarioFacade" method="buscarUsuarioPorEmail" />
+    <pattern value="sgc.organizacao.UsuarioController" method="buscarUsuarioPorTitulo" />
+    <pattern value="sgc.organizacao.UsuarioFacade" method="buscarUsuarioPorTitulo" />
+    <pattern value="sgc.organizacao.UsuarioFacade" method="buscarUsuariosAtivos" />
+    <pattern value="sgc.organizacao.UnidadeController" method="buscarUsuariosPorUnidade" />
+    <pattern value="sgc.organizacao.UnidadeFacade" method="buscarUsuariosPorUnidade" />
+    <pattern value="sgc.organizacao.UsuarioFacade" method="buscarUsuariosPorUnidade" />
+    <pattern value="sgc.alerta.model.AlertaUsuario.Chave" />
+    <pattern value="sgc.processo.service.ProcessoFacade" method="checarAcesso" />
+    <pattern value="sgc.seguranca.login.ClienteAcessoAd" />
+    <pattern value="sgc.comum.config.Config" method="clock" />
+    <pattern value="sgc.mapa.model.Competencia" />
+    <pattern value="sgc.subprocesso.dto.CompetenciaAjusteDto" />
+    <pattern value="sgc.mapa.model.CompetenciaRepo" />
+    <pattern value="sgc.comum.repo.ComumRepo" />
+    <pattern value="sgc.comum.model.ComumViews" />
+    <pattern value="sgc.comum.config.Config" />
+    <pattern value="sgc.comum.config.ConfigAplicacao" />
+    <pattern value="sgc.seguranca.config.ConfigCors" />
+    <pattern value="sgc.seguranca.config.ConfigCors" method="ConfigCors" />
+    <pattern value="sgc.seguranca.config.ConfigCorsProperties" />
+    <pattern value="sgc.seguranca.config.ConfigCorsProperties" method="ConfigCorsProperties" />
+    <pattern value="sgc.comum.config.ConfigOpenApi" />
+    <pattern value="sgc.seguranca.config.ConfigSeguranca" />
+    <pattern value="sgc.comum.config.ConfigThymeleaf" />
+    <pattern value="sgc.seguranca.login.ConfiguracaoAcessoAd" />
+    <pattern value="sgc.configuracao.ConfiguracaoController" />
+    <pattern value="sgc.configuracao.ConfiguracaoService" />
+    <pattern value="sgc.configuracao.model.ConfiguracaoViews" />
+    <pattern value="sgc.mapa.model.Conhecimento" />
+    <pattern value="sgc.mapa.mapper.ConhecimentoMapper" />
+    <pattern value="sgc.mapa.model.ConhecimentoRepo" />
+    <pattern value="sgc.subprocesso.service.query.ConsultasSubprocessoService" />
+    <pattern value="sgc.mapa.service.CopiaMapaService" />
+    <pattern value="sgc.seguranca.config.ConfigCors" method="corsConfigurationSource" />
+    <pattern value="sgc.mapa.AtividadeController" method="criar" />
+    <pattern value="sgc.processo.ProcessoController" method="criar" />
+    <pattern value="sgc.subprocesso.SubprocessoCrudController" method="criar" />
+    <pattern value="sgc.mapa.MapaController" method="criar" />
+    <pattern value="sgc.alerta.AlertaFacade" method="criarAlertaCadastroDevolvido" />
+    <pattern value="sgc.alerta.AlertaFacade" method="criarAlertaCadastroDisponibilizado" />
+    <pattern value="sgc.analise.AnaliseController" method="criarAnaliseCadastro" />
+    <pattern value="sgc.analise.dto.CriarAnaliseRequest" />
+    <pattern value="sgc.analise.dto.CriarAnaliseRequest" method="CriarAnaliseRequest" />
+    <pattern value="sgc.analise.AnaliseController" method="criarAnaliseValidacao" />
+    <pattern value="sgc.mapa.dto.CriarAtividadeRequest" />
+    <pattern value="sgc.mapa.dto.CriarAtividadeRequest" method="CriarAtividadeRequest" />
+    <pattern value="sgc.organizacao.UnidadeController" method="criarAtribuicaoTemporaria" />
+    <pattern value="sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest" />
+    <pattern value="sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest" method="CriarAtribuicaoTemporariaRequest" />
+    <pattern value="sgc.mapa.AtividadeController" method="criarConhecimento" />
+    <pattern value="sgc.mapa.dto.CriarConhecimentoRequest" />
+    <pattern value="sgc.mapa.dto.CriarConhecimentoRequest" method="CriarConhecimentoRequest" />
+    <pattern value="sgc.notificacao.NotificacaoModelosService" method="criarEmailCadastroDevolvido" />
+    <pattern value="sgc.notificacao.NotificacaoModelosService" method="criarEmailCadastroDisponibilizado" />
+    <pattern value="sgc.notificacao.NotificacaoModelosService" method="criarEmailMapaDisponibilizado" />
+    <pattern value="sgc.notificacao.NotificacaoModelosService" method="criarEmailMapaValidado" />
+    <pattern value="sgc.notificacao.NotificacaoModelosService" method="criarEmailProcessoFinalizado" />
+    <pattern value="sgc.e2e.E2eController" method="criarProcessoMapeamento" />
+    <pattern value="sgc.processo.dto.CriarProcessoRequest" />
+    <pattern value="sgc.processo.dto.CriarProcessoRequest" method="CriarProcessoRequest" />
+    <pattern value="sgc.e2e.E2eController" method="criarProcessoRevisao" />
+    <pattern value="sgc.subprocesso.dto.CriarSubprocessoRequest" />
+    <pattern value="sgc.subprocesso.dto.CriarSubprocessoRequest" method="CriarSubprocessoRequest" />
+    <pattern value="sgc.comum.config.ConfigOpenApi" method="customOpenAPI" />
+    <pattern value="sgc.mapa.model.CompetenciaRepo" method="deleteByMapa_Codigo" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" method="devolverCadastro" />
+    <pattern value="sgc.subprocesso.dto.DevolverCadastroRequest" />
+    <pattern value="sgc.subprocesso.dto.DevolverCadastroRequest" method="DevolverCadastroRequest" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" method="devolverRevisaoCadastro" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="devolverValidacao" />
+    <pattern value="sgc.subprocesso.dto.DevolverValidacaoRequest" />
+    <pattern value="sgc.subprocesso.dto.DevolverValidacaoRequest" method="DevolverValidacaoRequest" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" method="disponibilizarCadastro" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="disponibilizarMapa" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="disponibilizarMapaEmBloco" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" method="disponibilizarRevisao" />
+    <pattern value="sgc.e2e.E2eController" />
+    <pattern value="sgc.e2e.E2eController" method="E2eController" />
+    <pattern value="sgc.e2e.E2eSecurityConfig" />
+    <pattern value="sgc.e2e.E2eSecurityConfig" method="e2eSecurityFilterChain" />
+    <pattern value="sgc.comum.config.ConfigAplicacao.Email" />
+    <pattern value="sgc.comum.model.EntidadeBase" />
+    <pattern value="sgc.seguranca.login.LoginController" method="entrar" />
+    <pattern value="sgc.seguranca.login.dto.EntrarRequest" />
+    <pattern value="sgc.seguranca.login.dto.EntrarRequest" method="EntrarRequest" />
+    <pattern value="sgc.processo.ProcessoController" method="enviarLembrete" />
+    <pattern value="sgc.comum.erros.ErroEntidadeNaoEncontrada" />
+    <pattern value="sgc.comum.erros.ErroEntidadeNaoEncontrada" method="ErroEntidadeNaoEncontrada" />
+    <pattern value="sgc.subprocesso.erros.ErroMapaNaoAssociado" />
+    <pattern value="sgc.subprocesso.erros.ErroMapaNaoAssociado" method="ErroMapaNaoAssociado" />
+    <pattern value="sgc.comum.erros.ErroNegocioBase" />
+    <pattern value="sgc.painel.erros.ErroParametroPainelInvalido" />
+    <pattern value="sgc.painel.erros.ErroParametroPainelInvalido" method="ErroParametroPainelInvalido" />
+    <pattern value="sgc.relatorio.service.ErroRelatorio" />
+    <pattern value="sgc.mapa.eventos.EventoImportacaoAtividades" />
+    <pattern value="sgc.processo.eventos.EventoProcessoFinalizado" />
+    <pattern value="sgc.processo.eventos.EventoProcessoIniciado" />
+    <pattern value="sgc.processo.listener.EventoProcessoListener" />
+    <pattern value="sgc.subprocesso.eventos.EventoTransicaoSubprocesso" />
+    <pattern value="sgc.mapa.AtividadeController" method="excluir" />
+    <pattern value="sgc.mapa.MapaController" method="excluir" />
+    <pattern value="sgc.processo.ProcessoController" method="excluir" />
+    <pattern value="sgc.subprocesso.SubprocessoCrudController" method="excluir" />
+    <pattern value="sgc.mapa.AtividadeController" method="excluirConhecimento" />
+    <pattern value="sgc.processo.ProcessoController" method="executarAcaoEmBloco" />
+    <pattern value="sgc.seguranca.login.FiltroJwt" />
+    <pattern value="sgc.seguranca.config.ConfigSeguranca" method="filtroJwt" />
+    <pattern value="sgc.e2e.E2eSecurityConfig" method="filtroJwt" />
+    <pattern value="sgc.processo.ProcessoController" method="finalizar" />
+    <pattern value="sgc.subprocesso.model.SubprocessoRepo" method="findByProcessoCodigo" />
+    <pattern value="sgc.organizacao.model.UnidadeRepo" method="findBySigla" />
+    <pattern value="sgc.subprocesso.model.MovimentacaoRepo" method="findBySubprocessoCodigo" />
+    <pattern value="sgc.organizacao.model.UnidadeRepo" method="findByTituloTitular" />
+    <pattern value="sgc.alerta.mapper.AlertaMapper" method="formatDataHora" />
+    <pattern value="sgc.processo.mapper.ProcessoDetalheMapper" method="fromUnidade" />
+    <pattern value="sgc.relatorio.controller.RelatorioController" method="gerarRelatorioAndamento" />
+    <pattern value="sgc.relatorio.controller.RelatorioController" method="gerarRelatorioMapas" />
+    <pattern value="sgc.seguranca.login.GerenciadorJwt" />
+    <pattern value="sgc.subprocesso.model.Subprocesso" method="getAtividades" />
+    <pattern value="sgc.seguranca.login.LimitadorTentativasLogin" method="getCacheSize" />
+    <pattern value="sgc.comum.erros.ErroNegocio" method="getCode" />
+    <pattern value="sgc.mapa.model.Conhecimento" method="getCodigoAtividade" />
+    <pattern value="sgc.subprocesso.model.Subprocesso" method="getCodMapa" />
+    <pattern value="sgc.subprocesso.model.Subprocesso" method="getCodProcesso" />
+    <pattern value="sgc.subprocesso.model.Subprocesso" method="getCodUnidade" />
+    <pattern value="sgc.comum.erros.ErroNegocio" method="getDetails" />
+    <pattern value="sgc.subprocesso.model.Subprocesso" method="getEtapaAtual" />
+    <pattern value="sgc.mapa.model.Atividade" method="getMapaCodigo" />
+    <pattern value="sgc.comum.erros.ErroNegocio" method="getStatus" />
+    <pattern value="sgc.organizacao.model.Usuario" method="getUnidadeCodigo" />
+    <pattern value="sgc.analise.mapper.AnaliseMapper" method="getUnidadeNome" />
+    <pattern value="sgc.analise.mapper.AnaliseMapper" method="getUnidadeSigla" />
+    <pattern value="sgc.comum.validacao.TituloEleitoral" method="groups" />
+    <pattern value="sgc.subprocesso.service.notificacao.SubprocessoComunicacaoListener" method="handle" />
+    <pattern value="sgc.comum.erros.RestExceptionHandler" method="handleAccessDenied" />
+    <pattern value="sgc.comum.erros.RestExceptionHandler" method="handleConstraintViolationException" />
+    <pattern value="sgc.comum.erros.RestExceptionHandler" method="handleErroAutenticacao" />
+    <pattern value="sgc.comum.erros.RestExceptionHandler" method="handleErroInterno" />
+    <pattern value="sgc.comum.erros.RestExceptionHandler" method="handleErroNegocio" />
+    <pattern value="sgc.comum.erros.RestExceptionHandler" method="handleGenericException" />
+    <pattern value="sgc.comum.erros.RestExceptionHandler" method="handleIllegalArgumentException" />
+    <pattern value="sgc.comum.erros.RestExceptionHandler" method="handleIllegalStateException" />
+    <pattern value="sgc.subprocesso.listener.SubprocessoMapaListener" method="handleMapaAlterado" />
+    <pattern value="sgc.organizacao.service.HierarquiaService" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" method="homologarCadastro" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" method="homologarCadastroEmBloco" />
+    <pattern value="sgc.subprocesso.dto.HomologarCadastroRequest" />
+    <pattern value="sgc.subprocesso.dto.HomologarCadastroRequest" method="HomologarCadastroRequest" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" method="homologarRevisaoCadastro" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="homologarValidacao" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="homologarValidacaoEmBloco" />
+    <pattern value="sgc.mapa.dto.ImpactoMapaResponse" />
+    <pattern value="sgc.mapa.dto.ImpactoMapaResponse" method="ImpactoMapaResponse" />
+    <pattern value="sgc.mapa.service.ImpactoMapaService" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" method="importarAtividades" />
+    <pattern value="sgc.subprocesso.dto.ImportarAtividadesRequest" />
+    <pattern value="sgc.subprocesso.dto.ImportarAtividadesRequest" method="ImportarAtividadesRequest" />
+    <pattern value="sgc.processo.ProcessoController" method="iniciar" />
+    <pattern value="sgc.processo.dto.IniciarProcessoRequest" />
+    <pattern value="sgc.processo.dto.IniciarProcessoRequest" method="IniciarProcessoRequest" />
+    <pattern value="sgc.organizacao.UsuarioFacade" method="isAdministrador" />
+    <pattern value="sgc.subprocesso.model.Subprocesso" method="isEmAndamento" />
+    <pattern value="sgc.organizacao.service.HierarquiaService" method="isMesmaOuSubordinada" />
+    <pattern value="sgc.seguranca.config.JwtProperties" />
+    <pattern value="sgc.seguranca.config.JwtProperties" method="JwtProperties" />
+    <pattern value="sgc.seguranca.login.LimitadorTentativasLogin" />
+    <pattern value="sgc.seguranca.login.LimitadorTentativasLogin" method="LimitadorTentativasLogin" />
+    <pattern value="sgc.seguranca.login.LimitadorTentativasLogin" method="limparCachePeriodico" />
+    <pattern value="sgc.e2e.E2eController" method="limparProcessoComDependentes" />
+    <pattern value="sgc.configuracao.ConfiguracaoController" method="listar" />
+    <pattern value="sgc.mapa.MapaController" method="listar" />
+    <pattern value="sgc.subprocesso.SubprocessoCrudController" method="listar" />
+    <pattern value="sgc.organizacao.UsuarioController" method="listarAdministradores" />
+    <pattern value="sgc.alerta.AlertaController" method="listarAlertas" />
+    <pattern value="sgc.painel.PainelController" method="listarAlertas" />
+    <pattern value="sgc.analise.AnaliseController" method="listarAnalisesCadastro" />
+    <pattern value="sgc.analise.AnaliseController" method="listarAnalisesValidacao" />
+    <pattern value="sgc.mapa.service.MapaManutencaoService" method="listarAtividades" />
+    <pattern value="sgc.processo.ProcessoController" method="listarAtivos" />
+    <pattern value="sgc.mapa.AtividadeController" method="listarConhecimentos" />
+    <pattern value="sgc.mapa.service.MapaManutencaoService" method="listarConhecimentosEntidadesPorAtividade" />
+    <pattern value="sgc.processo.ProcessoController" method="listarFinalizados" />
+    <pattern value="sgc.alerta.AlertaController" method="listarNaoLidos" />
+    <pattern value="sgc.painel.PainelController" method="listarProcessos" />
+    <pattern value="sgc.processo.ProcessoController" method="listarSubprocessos" />
+    <pattern value="sgc.processo.ProcessoController" method="listarSubprocessosElegiveis" />
+    <pattern value="sgc.subprocesso.service.SubprocessoFacade" method="listarSubprocessosHomologados" />
+    <pattern value="sgc.processo.service.ProcessoFacade" method="listarTodosSubprocessos" />
+    <pattern value="sgc.processo.ProcessoController" method="listarUnidadesBloqueadas" />
+    <pattern value="sgc.seguranca.login.LoginController" />
+    <pattern value="sgc.seguranca.login.LoginFacade" />
+    <pattern value="sgc.seguranca.login.LoginFacade" method="LoginFacade" />
+    <pattern value="sgc.seguranca.login.dto.UsuarioAcessoAd.LotacaoAd" />
+    <pattern value="sgc.Sgc" method="main" />
+    <pattern value="sgc.mapa.model.Mapa" />
+    <pattern value="sgc.seguranca.acesso.MapaAccessPolicy" />
+    <pattern value="sgc.seguranca.acesso.MapaAccessPolicy" method="MapaAccessPolicy" />
+    <pattern value="sgc.subprocesso.dto.MapaAjusteDto" />
+    <pattern value="sgc.subprocesso.mapper.MapaAjusteMapper" />
+    <pattern value="sgc.mapa.MapaController" />
+    <pattern value="sgc.mapa.service.MapaManutencaoService" method="mapaExiste" />
+    <pattern value="sgc.processo.mapper.ProcessoMapper" method="mapAfterMapping" />
+    <pattern value="sgc.mapa.service.MapaImportacaoListener" />
+    <pattern value="sgc.mapa.service.MapaManutencaoService" />
+    <pattern value="sgc.mapa.model.MapaRepo" />
+    <pattern value="sgc.mapa.service.MapaSalvamentoService" />
+    <pattern value="sgc.mapa.model.MapaViews" />
+    <pattern value="sgc.mapa.dto.MapaVisualizacaoResponse" />
+    <pattern value="sgc.mapa.dto.MapaVisualizacaoResponse" method="MapaVisualizacaoResponse" />
+    <pattern value="sgc.mapa.service.MapaVisualizacaoService" />
+    <pattern value="sgc.subprocesso.mapper.MapaAjusteMapper" method="mapCompetencias" />
+    <pattern value="sgc.subprocesso.mapper.MovimentacaoMapper" method="mapUnidadeSiglaParaUsuario" />
+    <pattern value="sgc.alerta.AlertaController" method="marcarComoLidos" />
+    <pattern value="sgc.comum.validacao.TituloEleitoral" method="message" />
+    <pattern value="sgc.comum.util.MonitoramentoAspect" />
+    <pattern value="sgc.comum.util.MonitoramentoAspect" method="monitorarExecucao" />
+    <pattern value="sgc.subprocesso.model.Movimentacao" />
+    <pattern value="sgc.subprocesso.dto.MovimentacaoDto" />
+    <pattern value="sgc.subprocesso.mapper.MovimentacaoMapper" />
+    <pattern value="sgc.subprocesso.model.MovimentacaoRepo" />
+    <pattern value="sgc.notificacao.model.Notificacao" />
+    <pattern value="sgc.notificacao.NotificacaoEmailAsyncExecutor" />
+    <pattern value="sgc.notificacao.NotificacaoEmailService" />
+    <pattern value="sgc.e2e.mock.NotificacaoEmailServiceMock" />
+    <pattern value="sgc.e2e.mock.NotificacaoEmailServiceMock" method="NotificacaoEmailServiceMock" />
+    <pattern value="sgc.notificacao.NotificacaoModelosService" />
+    <pattern value="sgc.notificacao.model.NotificacaoRepo" />
+    <pattern value="sgc.subprocesso.service.SubprocessoFacade" method="obterAtividadesSemConhecimento" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" method="obterCadastro" />
+    <pattern value="sgc.processo.ProcessoController" method="obterContextoCompleto" />
+    <pattern value="sgc.subprocesso.service.SubprocessoFacade" method="obterContextoEdicao" />
+    <pattern value="sgc.processo.ProcessoController" method="obterDetalhes" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="obterHistoricoValidacao" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="obterMapa" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="obterMapaCompleto" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="obterMapaParaAjuste" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="obterMapaParaVisualizacao" />
+    <pattern value="sgc.subprocesso.SubprocessoCrudController" method="obterPermissoes" />
+    <pattern value="sgc.subprocesso.SubprocessoCrudController" method="obterPorCodigo" />
+    <pattern value="sgc.mapa.AtividadeController" method="obterPorId" />
+    <pattern value="sgc.mapa.MapaController" method="obterPorId" />
+    <pattern value="sgc.processo.ProcessoController" method="obterPorId" />
+    <pattern value="sgc.subprocesso.SubprocessoCrudController" method="obterStatus" />
+    <pattern value="sgc.processo.ProcessoController" method="obterStatusUnidades" />
+    <pattern value="sgc.subprocesso.service.SubprocessoFacade" method="obterSugestoes" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="obterSugestoes" />
+    <pattern value="sgc.organizacao.OrganizacaoFacade" method="obterUsuarioAutenticado" />
+    <pattern value="sgc.subprocesso.dto.MapaAjusteDto" method="of" />
+    <pattern value="sgc.comum.config.ConfigAplicacao.OpenApi" />
+    <pattern value="sgc.organizacao.OrganizacaoFacade" />
+    <pattern value="sgc.organizacao.model.OrganizacaoViews" />
+    <pattern value="sgc.painel.PainelController" />
+    <pattern value="sgc.painel.PainelFacade" />
+    <pattern value="sgc.configuracao.model.Parametro" />
+    <pattern value="sgc.configuracao.mapper.ParametroMapper" />
+    <pattern value="sgc.configuracao.model.ParametroRepo" />
+    <pattern value="sgc.configuracao.dto.ParametroRequest" />
+    <pattern value="sgc.configuracao.dto.ParametroRequest" method="ParametroRequest" />
+    <pattern value="sgc.comum.validacao.TituloEleitoral" method="payload" />
+    <pattern value="sgc.relatorio.service.PdfFactory" />
+    <pattern value="sgc.processo.model.Processo" />
+    <pattern value="sgc.seguranca.acesso.ProcessoAccessPolicy" />
+    <pattern value="sgc.seguranca.acesso.ProcessoAccessPolicy" method="ProcessoAccessPolicy" />
+    <pattern value="sgc.processo.service.ProcessoAcessoService" />
+    <pattern value="sgc.processo.service.ProcessoConsultaService" />
+    <pattern value="sgc.processo.ProcessoController" />
+    <pattern value="sgc.processo.service.ProcessoDetalheBuilder" />
+    <pattern value="sgc.processo.dto.ProcessoDetalheDto" />
+    <pattern value="sgc.processo.mapper.ProcessoDetalheMapper" />
+    <pattern value="sgc.processo.dto.ProcessoDto" />
+    <pattern value="sgc.processo.service.ProcessoFacade" />
+    <pattern value="sgc.processo.service.ProcessoFinalizador" />
+    <pattern value="sgc.e2e.E2eController.ProcessoFixtureRequest" />
+    <pattern value="sgc.e2e.E2eController.ProcessoFixtureRequest" method="ProcessoFixtureRequest" />
+    <pattern value="sgc.processo.service.ProcessoInicializador" />
+    <pattern value="sgc.processo.service.ProcessoManutencaoService" />
+    <pattern value="sgc.processo.mapper.ProcessoMapper" />
+    <pattern value="sgc.processo.model.ProcessoRepo" />
+    <pattern value="sgc.processo.service.ProcessoValidador" />
+    <pattern value="sgc.subprocesso.SubprocessoCrudController" method="reabrirCadastro" />
+    <pattern value="sgc.subprocesso.dto.ReabrirProcessoRequest" />
+    <pattern value="sgc.subprocesso.dto.ReabrirProcessoRequest" method="ReabrirProcessoRequest" />
+    <pattern value="sgc.subprocesso.SubprocessoCrudController" method="reabrirRevisaoCadastro" />
+    <pattern value="sgc.seguranca.acesso.SubprocessoAccessPolicy.RegrasAcao" />
+    <pattern value="sgc.seguranca.acesso.SubprocessoAccessPolicy.RegrasAcao" method="RegrasAcao" />
+    <pattern value="sgc.relatorio.controller.RelatorioController" />
+    <pattern value="sgc.relatorio.service.RelatorioFacade" />
+    <pattern value="sgc.organizacao.UsuarioController" method="removerAdministrador" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="removerCompetencia" />
+    <pattern value="sgc.e2e.E2eController" method="resetDatabase" />
+    <pattern value="sgc.organizacao.model.Responsabilidade" />
+    <pattern value="sgc.organizacao.model.ResponsabilidadeRepo" />
+    <pattern value="sgc.comum.erros.RestExceptionHandler" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="salvarAjustesMapa" />
+    <pattern value="sgc.subprocesso.dto.SalvarAjustesRequest" />
+    <pattern value="sgc.subprocesso.dto.SalvarAjustesRequest" method="SalvarAjustesRequest" />
+    <pattern value="sgc.mapa.service.MapaManutencaoService" method="salvarCompetencia" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="salvarMapa" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="salvarMapaCompleto" />
+    <pattern value="sgc.seguranca.config.ConfigSeguranca" method="securityFilterChain" />
+    <pattern value="sgc.subprocesso.model.Subprocesso" method="setSituacaoForcada" />
+    <pattern value="sgc.Sgc" />
+    <pattern value="sgc.processo.model.SituacaoProcesso" />
+    <pattern value="sgc.subprocesso.model.SituacaoSubprocesso" />
+    <pattern value="sgc.organizacao.model.SituacaoUnidade" />
+    <pattern value="sgc.comum.util.Sleeper" />
+    <pattern value="sgc.comum.config.ConfigThymeleaf" method="springTemplateEngine" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="submeterMapaAjustado" />
+    <pattern value="sgc.subprocesso.dto.SubmeterMapaAjustadoRequest" />
+    <pattern value="sgc.subprocesso.dto.SubmeterMapaAjustadoRequest" method="SubmeterMapaAjustadoRequest" />
+    <pattern value="sgc.subprocesso.model.Subprocesso" />
+    <pattern value="sgc.seguranca.acesso.SubprocessoAccessPolicy" />
+    <pattern value="sgc.seguranca.acesso.SubprocessoAccessPolicy" method="SubprocessoAccessPolicy" />
+    <pattern value="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService" />
+    <pattern value="sgc.subprocesso.service.SubprocessoAjusteMapaService" />
+    <pattern value="sgc.subprocesso.service.SubprocessoAtividadeService" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" />
+    <pattern value="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService" />
+    <pattern value="sgc.subprocesso.service.notificacao.SubprocessoComunicacaoListener" />
+    <pattern value="sgc.subprocesso.service.SubprocessoContextoService" />
+    <pattern value="sgc.subprocesso.SubprocessoCrudController" />
+    <pattern value="sgc.subprocesso.service.crud.SubprocessoCrudService" />
+    <pattern value="sgc.processo.dto.SubprocessoElegivelDto" />
+    <pattern value="sgc.subprocesso.service.notificacao.SubprocessoEmailService" />
+    <pattern value="sgc.subprocesso.service.SubprocessoFacade" />
+    <pattern value="sgc.subprocesso.service.factory.SubprocessoFactory" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" />
+    <pattern value="sgc.subprocesso.listener.SubprocessoMapaListener" />
+    <pattern value="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService" />
+    <pattern value="sgc.subprocesso.service.SubprocessoPermissaoCalculator" />
+    <pattern value="sgc.subprocesso.model.SubprocessoRepo" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoSituacaoDto" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoSituacaoDto" method="SubprocessoSituacaoDto" />
+    <pattern value="sgc.subprocesso.service.workflow.SubprocessoTransicaoService" />
+    <pattern value="sgc.subprocesso.service.crud.SubprocessoValidacaoService" />
+    <pattern value="sgc.subprocesso.model.SubprocessoViews" />
+    <pattern value="sgc.comum.config.ConfigThymeleaf" method="templateResolver" />
+    <pattern value="sgc.processo.model.TipoProcesso" />
+    <pattern value="sgc.subprocesso.eventos.TipoTransicao" />
+    <pattern value="sgc.comum.validacao.TituloEleitoral" />
+    <pattern value="sgc.subprocesso.mapper.MovimentacaoMapper" method="toDto" />
+    <pattern value="sgc.processo.mapper.ProcessoMapper" method="toEntity" />
+    <pattern value="sgc.organizacao.model.Unidade" />
+    <pattern value="sgc.organizacao.UnidadeController" />
+    <pattern value="sgc.organizacao.dto.UnidadeDto" />
+    <pattern value="sgc.organizacao.UnidadeFacade" />
+    <pattern value="sgc.organizacao.service.UnidadeHierarquiaService" />
+    <pattern value="sgc.organizacao.model.UnidadeMapa" />
+    <pattern value="sgc.organizacao.model.UnidadeMapaRepo" />
+    <pattern value="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto" />
+    <pattern value="sgc.processo.model.UnidadeProcesso" />
+    <pattern value="sgc.processo.model.UnidadeProcessoId" />
+    <pattern value="sgc.organizacao.model.UnidadeRepo" />
+    <pattern value="sgc.organizacao.service.UnidadeResponsavelService" />
+    <pattern value="sgc.organizacao.service.UnidadeService" />
+    <pattern value="sgc.organizacao.model.Usuario" />
+    <pattern value="sgc.seguranca.login.dto.UsuarioAcessoAd" />
+    <pattern value="sgc.organizacao.UsuarioController" />
+    <pattern value="sgc.organizacao.UsuarioFacade" />
+    <pattern value="sgc.organizacao.model.UsuarioPerfil" />
+    <pattern value="sgc.organizacao.model.UsuarioPerfilId" />
+    <pattern value="sgc.organizacao.model.UsuarioRepo" />
+    <pattern value="sgc.organizacao.service.UsuarioService" />
+    <pattern value="sgc.organizacao.UsuarioFacade" method="usuarioTemPerfil" />
+    <pattern value="sgc.organizacao.service.ValidadorDadosOrgService" />
+    <pattern value="sgc.subprocesso.service.SubprocessoFacade" method="validarAssociacoesMapa" />
+    <pattern value="sgc.subprocesso.SubprocessoCrudController" method="validarCadastro" />
+    <pattern value="sgc.subprocesso.service.SubprocessoFacade" method="validarExistenciaAtividades" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="validarMapa" />
+    <pattern value="sgc.subprocesso.service.crud.SubprocessoValidacaoService" method="validarSituacaoMinima" />
+    <pattern value="sgc.subprocesso.service.crud.SubprocessoValidacaoService" method="validarSituacaoPermitida" />
+    <pattern value="sgc.subprocesso.service.SubprocessoFacade" method="verificarAcessoUnidadeAoProcesso" />
+    <pattern value="sgc.subprocesso.SubprocessoMapaController" method="verificarImpactos" />
+    <pattern value="sgc.organizacao.UnidadeController" method="verificarMapaVigente" />
+    <pattern value="sgc.seguranca.login.GerenciadorJwt" method="verificarSegurancaChave" />
+    <pattern value="sgc.organizacao.model.VinculacaoUnidade" />
+    <pattern value="sgc.comum.model.ComumViews" method="ComumViews" />
+    <pattern value="sgc.configuracao.model.ConfiguracaoViews" method="ConfiguracaoViews" />
+    <pattern value="sgc.comum.erros.ErroNegocioBase" method="ErroNegocioBase" />
+    <pattern value="sgc.mapa.model.MapaViews" method="MapaViews" />
+    <pattern value="sgc.subprocesso.SubprocessoCadastroController" method="obterHistoricoCadastro" />
+    <pattern value="sgc.organizacao.model.OrganizacaoViews" method="OrganizacaoViews" />
+    <pattern value="sgc.subprocesso.model.SubprocessoViews" method="SubprocessoViews" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">

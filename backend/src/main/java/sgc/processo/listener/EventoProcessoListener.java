@@ -204,7 +204,7 @@ public class EventoProcessoListener {
 
             String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
             
-            if (titular != null && titular.getEmail() != null && !titular.getEmail().isBlank()) {
+            if (titular != null && !titular.getEmail().isBlank()) {
                 notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
                 log.info("E-mail enviado a {}", unidade.getSigla());
             } else {
@@ -236,7 +236,7 @@ public class EventoProcessoListener {
             String corpoHtml, String nomeUnidade) {
         try {
             Usuario substituto = usuarios.get(tituloSubstituto);
-            if (substituto != null && substituto.getEmail() != null && !substituto.getEmail().isBlank()) {
+            if (substituto != null && !substituto.getEmail().isBlank()) {
                 notificacaoEmailService.enviarEmailHtml(substituto.getEmail(), assunto, corpoHtml);
                 log.info("E-mail enviado ao substituto da unidade {}.", nomeUnidade);
             }

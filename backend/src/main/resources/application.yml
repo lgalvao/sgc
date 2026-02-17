@@ -1,11 +1,10 @@
 spring:
   main.banner-mode: off
-  test.mockmvc.print: none
   task:
     execution:
       pool:
-        core-size: 5
-        max-size: 10
+        core-size: 4
+        max-size: 16
         queue-capacity: 25
       thread-name-prefix: sgc-async-
   datasource:

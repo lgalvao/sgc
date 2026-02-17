@@ -18,7 +18,7 @@ import java.util.List;
  * <ul>
  * <li>{@link #findByMapa_Codigo(Long)} - Carrega competências com atividades (EntityGraph)</li>
  * <li>{@link #findCompetenciaAndAtividadeIdsByMapaCodigo(Long)} - Projeção SQL otimizada</li>
- * <li>{@link #findByMapa_CodigoSemFetch(Long)} - Sem relacionamentos (mais leve)</li>
+ * <li> - Sem relacionamentos (mais leve)</li>
  * </ul>
  * 
  */

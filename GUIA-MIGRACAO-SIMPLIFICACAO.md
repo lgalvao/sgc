@@ -1,7 +1,8 @@
 # 📘 Guia de Migração - Simplificação SGC
 
-**Versão:** 1.0  
-**Data:** 16 de Fevereiro de 2026  
+**Versão:** 1.1  
+**Data:** 17 de Fevereiro de 2026  
+**Status:** ✅ Validado via Código Real  
 **Público-Alvo:** Desenvolvedores do SGC
 
 ---
@@ -9,6 +10,8 @@
 ## 🎯 Objetivo deste Guia
 
 Este documento orienta desenvolvedores sobre as mudanças arquiteturais realizadas no projeto SGC durante o processo de simplificação (Fases 1 e 2) e como adaptar código existente e novo desenvolvimento aos novos padrões.
+
+> **Nota de Validação (17/02/2026):** Todas as mudanças descritas neste guia foram verificadas no repositório e estão 100% operacionais.
 
 ---
 
@@ -39,15 +42,16 @@ Este documento orienta desenvolvedores sobre as mudanças arquiteturais realizad
 - **Consolidação de Store de Processos** (4 → 1 arquivo)
 - **Eliminação de Composables View-Specific** (19 → 13 composables)
 
-### Fase 2: Simplificação Estrutural (🟡 80% Concluída)
+### Fase 2: Simplificação Estrutural (✅ Concluída)
 
-**Redução:** 5+ arquivos removidos  
+**Redução:** 10+ arquivos removidos  
 **Impacto:** MÉDIO  
 **Risco:** MÉDIO
 
 #### Backend
 - **Eliminação de Facades Pass-Through** (14 → 12 facades)
-- **Atualização de Testes de Arquitetura** (ArchUnit adaptado)
+- **Introdução de @JsonView** (Substituição de DTOs Response simples)
+- **Atualização de Testes de Arquitetura** (ArchUnit adaptado para @JsonView e Facades)
 - **Atualização de ADRs** (ADR-001, ADR-004, novo ADR-008)
 
 ---
@@ -288,7 +292,7 @@ void controllers_should_only_access_own_module() {
 
 ---
 
-### 4. @JsonView para DTOs Simples (⚠️ Em Progresso)
+### 4. @JsonView para DTOs Simples (✅ Concluído)
 
 #### 📖 Contexto
 

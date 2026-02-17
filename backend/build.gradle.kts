@@ -1,7 +1,7 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import info.solidsoft.gradle.pitest.PitestTask
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
-import info.solidsoft.gradle.pitest.PitestTask
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
 plugins {
     java
@@ -437,11 +437,8 @@ tasks.register("mutationTestModulo") {
     
     doFirst {
         val targetModule = project.findProperty("targetModule")?.toString()
-        
-        if (targetModule == null) {
-            throw GradleException("Especifique o módulo com -PtargetModule=<modulo> (ex: processo, subprocesso, mapa)")
-        }
-        
+            ?: throw GradleException("Especifique o módulo com -PtargetModule=<modulo> (ex: processo, subprocesso, mapa)")
+
         println("🎯 Analisando módulo: sgc.$targetModule.*")
         
         tasks.named<PitestTask>("pitest") {

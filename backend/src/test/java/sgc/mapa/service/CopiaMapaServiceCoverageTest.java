@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.mockito.Mockito.*;
+import java.util.HashSet;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -75,7 +76,7 @@ class CopiaMapaServiceCoverageTest {
         
         Atividade ativOrigem = Atividade.builder()
                 .descricao("Nova Atividade")
-                .conhecimentos(new java.util.HashSet<>())
+                .conhecimentos(new HashSet<>())
                 .build();
         
         when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));

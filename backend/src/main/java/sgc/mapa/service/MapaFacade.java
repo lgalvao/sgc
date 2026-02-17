@@ -12,6 +12,7 @@ import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 import java.util.Optional;
+import sgc.mapa.dto.MapaVisualizacaoResponse;
 
 @Service
 @Transactional
@@ -64,7 +65,7 @@ public class MapaFacade {
     }
 
     @Transactional(readOnly = true)
-    public sgc.mapa.dto.MapaVisualizacaoResponse obterMapaParaVisualizacao(Subprocesso subprocesso) {
+    public MapaVisualizacaoResponse obterMapaParaVisualizacao(Subprocesso subprocesso) {
         return mapaVisualizacaoService.obterMapaParaVisualizacao(subprocesso);
     }
 

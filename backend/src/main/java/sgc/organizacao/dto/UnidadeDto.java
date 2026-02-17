@@ -7,6 +7,7 @@ import sgc.organizacao.model.OrganizacaoViews;
 
 import java.util.ArrayList;
 import java.util.List;
+import sgc.organizacao.model.Unidade;
 
 /**
  * DTO para dados de unidade do SGRH. Suporta estrutura hierárquica com subunidades.
@@ -43,7 +44,7 @@ public class UnidadeDto {
     @JsonProperty("isElegivel")
     private boolean isElegivel;
 
-    public static UnidadeDto fromEntity(sgc.organizacao.model.Unidade entity) {
+    public static UnidadeDto fromEntity(Unidade entity) {
         if (entity == null) return null;
         return UnidadeDto.builder()
                 .codigo(entity.getCodigo())

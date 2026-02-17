@@ -17,6 +17,11 @@ import sgc.subprocesso.erros.ErroTransicaoInvalida;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
+import java.util.Set;
+import sgc.comum.model.ComumViews;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.MapaViews;
 
 @Entity
 @Table(name = "SUBPROCESSO", schema = "sgc")
@@ -27,58 +32,58 @@ import java.util.List;
 public class Subprocesso extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "processo_codigo", nullable = false)
-    @JsonView({sgc.comum.model.ComumViews.Publica.class, sgc.mapa.model.MapaViews.Publica.class})
+    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     private Processo processo;
 
     @ManyToOne
     @JoinColumn(name = "unidade_codigo", nullable = false)
-    @JsonView({sgc.comum.model.ComumViews.Publica.class, sgc.mapa.model.MapaViews.Publica.class})
+    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     private Unidade unidade;
 
     @OneToOne(mappedBy = "subprocesso")
-    @JsonView({sgc.comum.model.ComumViews.Publica.class, sgc.mapa.model.MapaViews.Publica.class})
+    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     private Mapa mapa;
 
-    @JsonView({sgc.comum.model.ComumViews.Publica.class, sgc.mapa.model.MapaViews.Publica.class})
+    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Column(name = "data_limite_etapa1", nullable = false)
     private LocalDateTime dataLimiteEtapa1;
 
-    @JsonView({sgc.comum.model.ComumViews.Publica.class, sgc.mapa.model.MapaViews.Publica.class})
+    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Column(name = "data_fim_etapa1")
     private LocalDateTime dataFimEtapa1;
 
-    @JsonView({sgc.comum.model.ComumViews.Publica.class, sgc.mapa.model.MapaViews.Publica.class})
+    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Column(name = "data_limite_etapa2")
     private LocalDateTime dataLimiteEtapa2;
 
-    @JsonView({sgc.comum.model.ComumViews.Publica.class, sgc.mapa.model.MapaViews.Publica.class})
+    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Column(name = "data_fim_etapa2")
     private LocalDateTime dataFimEtapa2;
 
-    @JsonView({sgc.comum.model.ComumViews.Publica.class, sgc.mapa.model.MapaViews.Publica.class})
+    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Enumerated(EnumType.STRING)
     @Column(name = "situacao", length = 50, nullable = false)
     @lombok.Builder.Default
     private SituacaoSubprocesso situacao = SituacaoSubprocesso.NAO_INICIADO;
 
-    @JsonView({sgc.comum.model.ComumViews.Publica.class, SubprocessoViews.Publica.class, sgc.mapa.model.MapaViews.Publica.class})
-    public java.util.Set<sgc.mapa.model.Atividade> getAtividades() {
-        return mapa != null ? mapa.getAtividades() : java.util.Collections.emptySet();
+    @JsonView({ComumViews.Publica.class, SubprocessoViews.Publica.class, MapaViews.Publica.class})
+    public Set<Atividade> getAtividades() {
+        return mapa != null ? mapa.getAtividades() : Collections.emptySet();
     }
 
-    @JsonView(sgc.comum.model.ComumViews.Publica.class)
+    @JsonView(ComumViews.Publica.class)
     @JsonProperty("codProcesso")
     public Long getCodProcesso() {
         return processo != null ? processo.getCodigo() : null;
     }
 
-    @JsonView(sgc.comum.model.ComumViews.Publica.class)
+    @JsonView(ComumViews.Publica.class)
     @JsonProperty("codUnidade")
     public Long getCodUnidade() {
         return unidade != null ? unidade.getCodigo() : null;
     }
 
-    @JsonView(sgc.comum.model.ComumViews.Publica.class)
+    @JsonView(ComumViews.Publica.class)
     @JsonProperty("codMapa")
     public Long getCodMapa() {
         return mapa != null ? mapa.getCodigo() : null;

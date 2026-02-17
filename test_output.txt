@@ -1,47 +1,28 @@
 Reusing configuration cache.
-> Task :frontend:processResources NO-SOURCE
-> Task :frontend:processTestResources NO-SOURCE
 > Task :frontend:compileJava NO-SOURCE
+> Task :frontend:processTestResources NO-SOURCE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :frontend:processResources NO-SOURCE
+> Task :backend:processResources UP-TO-DATE
 > Task :frontend:classes UP-TO-DATE
 > Task :frontend:compileTestJava NO-SOURCE
 > Task :frontend:testClasses UP-TO-DATE
 > Task :frontend:test NO-SOURCE
-> Task :backend:processTestResources
-> Task :backend:processResources
-> Task :backend:compileJava
-> Task :backend:classes
-> Task :backend:compileTestJava
-> Task :backend:testClasses
-
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
 > Task :backend:test
-
-CDU-18: Visualizar Mapa de Competências > Deve retornar o mapa de competências formatado para visualização FAILED
-    java.lang.AssertionError: Status expected:<200> but was:<500>
-        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
-        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
-        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
-        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
-        at sgc.integracao.CDU18IntegrationTest.deveRetornarMapaParaVisualizacao(CDU18IntegrationTest.java:104)
-  Resultado: FAILURE
-  Total:     2 testes executados
-  ✓ Passou:   1
-  ✗ Falhou:   1
+  Resultado: SUCCESS
+  Total:     1382 testes executados
+  ✓ Passou:   1382
+  ✗ Falhou:   0
   ○ Ignorado: 0
-  Tempo:     9.966s
+  Tempo:     50.339s
 
-2 tests completed, 1 failed
+Testes mais lentos (>2s):
+  - 2694ms: sgc.arquitetura.ArchConsistencyTest > controllers_should_not_access_repositories
 
-> Task :backend:test FAILED
-
-FAILURE: Build failed with an exception.
-
-* What went wrong:
-Execution failed for task ':backend:test'.
-> There were failing tests. See the report at: file:///Users/leonardo/sgc/backend/build/reports/tests/test/index.html
-
-* Try:
-> Run with --scan to get full insights from a Build Scan (powered by Develocity).
-
-BUILD FAILED in 14s
-5 actionable tasks: 5 executed
+BUILD SUCCESSFUL in 52s
+5 actionable tasks: 1 executed, 4 up-to-date
 Configuration cache entry reused.

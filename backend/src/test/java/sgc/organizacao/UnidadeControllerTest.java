@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import sgc.organizacao.model.Unidade;
 
 @WebMvcTest(UnidadeController.class)
 @Import(RestExceptionHandler.class)
@@ -114,7 +115,12 @@ class UnidadeControllerTest {
     @WithMockUser(roles = "CHEFE")
     void deveRetornarListaDeUsuariosPorUnidade() throws Exception {
         // Arrange
-        when(unidadeService.buscarEntidadesUsuariosPorUnidade(1L)).thenReturn(List.of(new Usuario()));
+        Usuario usuario = Usuario.builder()
+                .tituloEleitoral("123")
+                .nome("Teste")
+                .unidadeLotacao(Unidade.builder().codigo(1L).build())
+                .build();
+        when(unidadeService.buscarEntidadesUsuariosPorUnidade(1L)).thenReturn(List.of(usuario));
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/1/usuarios")).andExpect(status().isOk());

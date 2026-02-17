@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Set;
 
 @JsonTest
 @DisplayName("Testes de Serialização @JsonView - Atividade")
@@ -23,8 +24,15 @@ class AtividadeJsonViewTest {
                 .codigo(1L)
                 .descricao("Atividade Teste")
                 .mapa(mapa)
-                .conhecimentos(java.util.Set.of(Conhecimento.builder().codigo(100L).descricao("K1").build()))
                 .build();
+        
+        Conhecimento conhecimento = Conhecimento.builder()
+                .codigo(100L)
+                .descricao("K1")
+                .atividade(atividade)
+                .build();
+        
+        atividade.setConhecimentos(Set.of(conhecimento));
 
         String json = objectMapper
                 .writerWithView(MapaViews.Publica.class)
@@ -47,7 +55,7 @@ class AtividadeJsonViewTest {
         Atividade atividade = Atividade.builder()
                 .codigo(1L)
                 .descricao("Atividade Teste")
-                .conhecimentos(java.util.Set.of(Conhecimento.builder().codigo(100L).descricao("K1").build()))
+                .conhecimentos(Set.of(Conhecimento.builder().codigo(100L).descricao("K1").build()))
                 .build();
 
         String json = objectMapper

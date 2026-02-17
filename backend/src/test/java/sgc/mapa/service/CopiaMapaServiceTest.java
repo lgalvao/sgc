@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 import sgc.comum.repo.ComumRepo;
+import java.util.LinkedHashSet;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -54,7 +55,7 @@ class CopiaMapaServiceTest {
         atividadeOrigem.setDescricao("Atividade 1");
         Conhecimento conhecimentoOrigem = new Conhecimento();
         conhecimentoOrigem.setDescricao("Conhecimento 1");
-        atividadeOrigem.setConhecimentos(new java.util.LinkedHashSet<>(java.util.Set.of(conhecimentoOrigem))); // Mutable set
+        atividadeOrigem.setConhecimentos(new LinkedHashSet<>(Set.of(conhecimentoOrigem))); // Mutable set
 
         Competencia competenciaOrigem = new Competencia();
         competenciaOrigem.setDescricao("Competencia 1");

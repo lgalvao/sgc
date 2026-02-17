@@ -109,9 +109,11 @@ public class MapaSalvamentoService {
         Long codigo = compDto.codigo();
         Competencia competencia;
 
-        if (codigo == null) {
-            competencia = new Competencia();
-            competencia.setMapa(mapa);
+        if (codigo == null || codigo == 0) {
+            competencia = Competencia.builder()
+                    .mapa(mapa)
+                    .atividades(new HashSet<>())
+                    .build();
         } else {
             competencia = mapaCompetenciasExistentes.get(codigo);
             if (competencia == null) {

@@ -8,6 +8,7 @@ import org.jspecify.annotations.Nullable;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class UnidadeProcesso implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     
     @EmbeddedId

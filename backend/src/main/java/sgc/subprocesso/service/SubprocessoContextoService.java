@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.MapaFacade;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UnidadeFacade;
@@ -15,16 +13,15 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.Acao;
 import sgc.seguranca.acesso.AccessControlService;
-import sgc.subprocesso.dto.*;
+import sgc.subprocesso.dto.ContextoEdicaoResponse;
+import sgc.subprocesso.dto.SubprocessoDetalheResponse;
+import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Service responsável por preparar contextos de visualização de subprocessos.

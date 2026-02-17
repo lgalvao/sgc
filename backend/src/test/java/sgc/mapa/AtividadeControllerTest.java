@@ -32,6 +32,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import sgc.mapa.model.Mapa;
 
 @WebMvcTest(AtividadeController.class)
 @Import({ TestSecurityConfig.class, RestExceptionHandler.class })
@@ -53,10 +57,15 @@ class AtividadeControllerTest {
         void deveObterPorId() throws Exception {
             Atividade response = Atividade.builder()
                     .codigo(1L)
+                    .descricao("Atividade Teste")
+                    .mapa(Mapa.builder().codigo(10L).build())
+                    .conhecimentos(new LinkedHashSet<>())
+                    .competencias(new HashSet<>())
                     .build();
             Mockito.when(atividadeFacade.obterAtividadePorId(1L)).thenReturn(response);
 
             mockMvc.perform(get("/api/atividades/1").with(user("123")))
+                    .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.codigo").value(1));
         }

@@ -1,6 +1,5 @@
 package sgc.subprocesso.dto;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonView;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.model.Movimentacao;

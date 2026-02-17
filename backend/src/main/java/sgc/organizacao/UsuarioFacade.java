@@ -20,7 +20,10 @@ import sgc.organizacao.model.UsuarioPerfil;
 import sgc.organizacao.service.UnidadeResponsavelService;
 import sgc.organizacao.service.UsuarioService;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -124,6 +127,7 @@ public class UsuarioFacade {
         return usuarioService.buscarTodos();
     }
 
+    @SuppressWarnings("unused")
     public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
         return unidadeResponsavelService.buscarResponsavelUnidade(unidadeCodigo);
     }

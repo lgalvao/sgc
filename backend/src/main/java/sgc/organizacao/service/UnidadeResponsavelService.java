@@ -104,9 +104,8 @@ public class UnidadeResponsavelService {
         Unidade unidade = repo.buscarPorSigla(Unidade.class, siglaUnidade);
 
         Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigo());
-        Usuario usuarioCompleto = repo.buscar(Usuario.class, resp.getUsuarioTitulo());
 
-        return usuarioCompleto;
+        return repo.buscar(Usuario.class, resp.getUsuarioTitulo());
     }
 
     /**

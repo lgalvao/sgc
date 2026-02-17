@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Map;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 /**
  * Serviço especializado para operações CRUD básicas de Subprocesso.
@@ -45,7 +46,7 @@ public class SubprocessoCrudService {
 
     public Subprocesso buscarSubprocesso(Long codigo) {
         return subprocessoRepo.findByIdWithMapaAndAtividades(codigo)
-                .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada("Subprocesso", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codigo));
     }
 
     /**

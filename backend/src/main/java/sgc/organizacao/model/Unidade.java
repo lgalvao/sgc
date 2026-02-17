@@ -15,6 +15,7 @@ import sgc.comum.model.EntidadeBase;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import sgc.comum.model.ComumViews;
 
 @Entity
 @Immutable
@@ -25,11 +26,11 @@ import java.util.List;
 @SuperBuilder
 public class Unidade extends EntidadeBase {
     @Column(name = "nome", nullable = false)
-    @JsonView(sgc.comum.model.ComumViews.Publica.class)
+    @JsonView(ComumViews.Publica.class)
     private String nome;
 
     @Column(name = "sigla", length = 20, nullable = false)
-    @JsonView(sgc.comum.model.ComumViews.Publica.class)
+    @JsonView(ComumViews.Publica.class)
     private String sigla;
 
     @Column(name = "matricula_titular", length = 8, nullable = false)

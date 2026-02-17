@@ -51,10 +51,10 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
             @Param("situacoes") List<SituacaoSubprocesso> situacoes);
 
     @Query("""
-            SELECT DISTINCT s FROM Subprocesso s 
-            JOIN FETCH s.unidade u 
-            LEFT JOIN FETCH s.mapa m 
-            LEFT JOIN FETCH m.atividades a 
+            SELECT DISTINCT s FROM Subprocesso s
+            JOIN FETCH s.unidade u
+            LEFT JOIN FETCH s.mapa m
+            LEFT JOIN FETCH m.atividades a
             WHERE s.codigo = :codigo
             """)
     Optional<Subprocesso> findByIdWithMapaAndAtividades(@Param("codigo") Long codigo);
@@ -66,6 +66,7 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
 
     List<Subprocesso> findByProcessoCodigo(Long processoCodigo);
 
+    @SuppressWarnings("unused")
     Optional<Subprocesso> findByMapa_Codigo(Long mapaCodigo);
 
     Optional<Subprocesso> findByProcessoCodigoAndUnidadeCodigo(Long processoCodigo, Long unidadeCodigo);

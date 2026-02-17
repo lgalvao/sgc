@@ -29,6 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import sgc.organizacao.model.Unidade;
 
 @WebMvcTest(UsuarioController.class)
 @Import(RestExceptionHandler.class)
@@ -48,6 +49,7 @@ class UsuarioControllerTest {
         Usuario entity = new Usuario();
         entity.setTituloEleitoral("123");
         entity.setNome("Teste");
+        entity.setUnidadeLotacao(Unidade.builder().codigo(1L).build());
         when(usuarioService.buscarEntidadeUsuarioPorTitulo("123")).thenReturn(Optional.of(entity));
 
         mockMvc.perform(get("/api/usuarios/123"))
