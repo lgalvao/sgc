@@ -2,12 +2,12 @@ package sgc.subprocesso.service.notificacao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
 import java.time.format.DateTimeFormatter;
@@ -26,17 +26,17 @@ public class SubprocessoEmailService {
     private final NotificacaoEmailService notificacaoEmailService;
     private final TemplateEngine templateEngine;
 
-    public void enviarEmailTransicao(EventoTransicaoSubprocesso evento) {
-        TipoTransicao tipo = evento.getTipo();
+    /**
+     * Envia e-mail de transição diretamente (sem evento assíncrono).
+     */
+    public void enviarEmailTransicaoDireta(Subprocesso sp, TipoTransicao tipo,
+                                            Unidade unidadeOrigem, Unidade unidadeDestino,
+                                            String observacoes) {
         if (!tipo.enviaEmail())
             return;
 
-        Subprocesso sp = evento.getSubprocesso();
-        Unidade unidadeOrigem = evento.getUnidadeOrigem();
-        Unidade unidadeDestino = evento.getUnidadeDestino();
-
         try {
-            Map<String, Object> variaveis = criarVariaveisTemplate(sp, evento);
+            Map<String, Object> variaveis = criarVariaveisTemplateDireto(sp, tipo, observacoes);
             String assunto = criarAssunto(tipo, sp);
             String corpo = processarTemplate(tipo.getTemplateEmail(), variaveis);
 
@@ -52,7 +52,7 @@ public class SubprocessoEmailService {
         }
     }
 
-    private Map<String, Object> criarVariaveisTemplate(Subprocesso sp, EventoTransicaoSubprocesso evento) {
+    private Map<String, Object> criarVariaveisTemplateDireto(Subprocesso sp, TipoTransicao tipo, String observacoes) {
         Map<String, Object> variaveis = new HashMap<>();
 
         Unidade unidade = sp.getUnidade();
@@ -70,9 +70,9 @@ public class SubprocessoEmailService {
             variaveis.put("dataLimiteEtapa2", sp.getDataLimiteEtapa2().format(DATE_FORMATTER));
         }
 
-        if (evento.getObservacoes() != null) {
-            variaveis.put("observacoes", evento.getObservacoes());
-            variaveis.put("motivo", evento.getObservacoes());
+        if (observacoes != null) {
+            variaveis.put("observacoes", observacoes);
+            variaveis.put("motivo", observacoes);
         }
 
         return variaveis;

@@ -63,7 +63,7 @@ class SubprocessoContextoServiceTest {
         when(usuarioService.buscarResponsavelAtual("U1")).thenReturn(new Usuario());
         when(usuarioService.buscarPorLogin("T1")).thenReturn(new Usuario());
         when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(id)).thenReturn(List.of());
-        when(permissaoCalculator.calcularPermissoes(eq(sp), eq(user))).thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(permissaoCalculator.calcularPermissoes(sp, user)).thenReturn(SubprocessoPermissoesDto.builder().build());
 
         SubprocessoDetalheResponse result = service.obterDetalhes(id, user);
 
@@ -84,7 +84,7 @@ class SubprocessoContextoServiceTest {
         when(usuarioService.buscarResponsavelAtual("U1")).thenReturn(new Usuario());
         when(usuarioService.buscarPorLogin("T1")).thenThrow(new RuntimeException("Erro"));
         when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(id)).thenReturn(List.of());
-        when(permissaoCalculator.calcularPermissoes(eq(sp), eq(user))).thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(permissaoCalculator.calcularPermissoes(sp, user)).thenReturn(SubprocessoPermissoesDto.builder().build());
 
         SubprocessoDetalheResponse result = service.obterDetalhes(sp, user);
 
@@ -94,7 +94,7 @@ class SubprocessoContextoServiceTest {
 
     @Test
     @DisplayName("obterContextoEdicao - Sucesso")
-    void obterContextoEdicao() throws Exception {
+    void obterContextoEdicao() {
         Long id = 1L;
         Usuario user = new Usuario();
         Unidade u = new Unidade();
@@ -109,7 +109,7 @@ class SubprocessoContextoServiceTest {
         when(usuarioService.buscarResponsavelAtual("U1")).thenReturn(new Usuario());
         when(usuarioService.buscarPorLogin("T1")).thenReturn(new Usuario());
         when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(id)).thenReturn(List.of());
-        when(permissaoCalculator.calcularPermissoes(eq(sp), eq(user))).thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(permissaoCalculator.calcularPermissoes(sp, user)).thenReturn(SubprocessoPermissoesDto.builder().build());
         when(atividadeService.listarAtividadesSubprocesso(id)).thenReturn(List.of());
         when(mapaFacade.obterPorCodigo(10L)).thenReturn(new Mapa());
 

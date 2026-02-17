@@ -10,10 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.thymeleaf.TemplateEngine;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -38,29 +36,15 @@ class SubprocessoEmailServiceTest {
     @Test
     @DisplayName("Envia email para unidade destino")
     void enviaEmailDestino() {
-        Subprocesso sp = new Subprocesso();
-        sp.setProcesso(new Processo());
-        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setUnidade(new Unidade());
-        sp.getUnidade().setSigla("U1");
-        sp.getUnidade().setNome("Unidade 1");
+        Subprocesso sp = criarSubprocesso();
         sp.setDataLimiteEtapa1(LocalDateTime.now());
 
         Unidade dest = new Unidade();
         dest.setSigla("DEST");
 
-        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-                .subprocesso(sp)
-                .tipo(TipoTransicao.CADASTRO_DEVOLVIDO)
-                .usuario(new Usuario())
-                .unidadeOrigem(new Unidade())
-                .unidadeDestino(dest)
-                .observacoes("Motivo")
-                .build();
-
         when(templateEngine.process(anyString(), any())).thenReturn("html");
 
-        service.enviarEmailTransicao(evento);
+        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DEVOLVIDO, new Unidade(), dest, "Motivo");
 
         verify(notificacaoEmailService).enviarEmail(eq("DEST"), anyString(), eq("html"));
     }
@@ -68,11 +52,7 @@ class SubprocessoEmailServiceTest {
     @Test
     @DisplayName("Notifica hierarquia")
     void notificaHierarquia() {
-        Subprocesso sp = new Subprocesso();
-        sp.setProcesso(new Processo());
-        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setUnidade(new Unidade());
-        sp.getUnidade().setSigla("U1");
+        Subprocesso sp = criarSubprocesso();
 
         Unidade origem = new Unidade();
         origem.setSigla("ORIG");
@@ -80,17 +60,9 @@ class SubprocessoEmailServiceTest {
         superior.setSigla("SUP");
         origem.setUnidadeSuperior(superior);
 
-        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-                .subprocesso(sp)
-                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
-                .usuario(new Usuario())
-                .unidadeOrigem(origem)
-                .unidadeDestino(new Unidade())
-                .build();
-
         when(templateEngine.process(anyString(), any())).thenReturn("html");
 
-        service.enviarEmailTransicao(evento);
+        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, origem, new Unidade(), null);
 
         // Verifica envio para superior
         verify(notificacaoEmailService).enviarEmail(eq("SUP"), anyString(), eq("html"));
@@ -99,33 +71,19 @@ class SubprocessoEmailServiceTest {
     @Test
     @DisplayName("Lida com exceção ao enviar email")
     void lidaComExcecao() {
-        Subprocesso sp = new Subprocesso();
-        sp.setProcesso(new Processo());
-        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setUnidade(new Unidade());
-
-        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-                .subprocesso(sp)
-                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
-                .usuario(new Usuario())
-                .unidadeDestino(new Unidade())
-                .build();
+        Subprocesso sp = criarSubprocesso();
 
         when(templateEngine.process(anyString(), any())).thenThrow(new RuntimeException("Template error"));
 
         // Should not throw
-        assertThatCode(() -> service.enviarEmailTransicao(evento))
+        assertThatCode(() -> service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, null, new Unidade(), null))
                 .doesNotThrowAnyException();
     }
 
     @Test
     @DisplayName("Não envia email se tipo de transição não exige")
     void naoEnviaSeTipoNaoExige() {
-        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-                .tipo(TipoTransicao.CADASTRO_HOMOLOGADO) // enviaEmail() == false
-                .build();
-
-        service.enviarEmailTransicao(evento);
+        service.enviarEmailTransicaoDireta(null, TipoTransicao.CADASTRO_HOMOLOGADO, null, null, null);
 
         verifyNoInteractions(notificacaoEmailService);
         verifyNoInteractions(templateEngine);
@@ -134,20 +92,11 @@ class SubprocessoEmailServiceTest {
     @Test
     @DisplayName("Não envia email se destinatário nulo")
     void naoEnviaSeDestinoNulo() {
-        Subprocesso sp = new Subprocesso();
-        sp.setProcesso(new Processo());
-        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setUnidade(new Unidade());
-
-        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-                .subprocesso(sp)
-                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO) // enviaEmail() == true
-                .unidadeDestino(null) // DESTINO NULO
-                .build();
+        Subprocesso sp = criarSubprocesso();
 
         when(templateEngine.process(anyString(), any())).thenReturn("html");
 
-        service.enviarEmailTransicao(evento);
+        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, null, null, null);
 
         verify(notificacaoEmailService, never()).enviarEmail(any(), any(), any());
     }
@@ -155,21 +104,13 @@ class SubprocessoEmailServiceTest {
     @Test
     @DisplayName("Não notifica hierarquia se origem nula")
     void naoNotificaHierarquiaSemOrigem() {
-        Subprocesso sp = new Subprocesso();
-        sp.setProcesso(new Processo());
-        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setUnidade(new Unidade());
-
-        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-                .subprocesso(sp)
-                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO) // Notifica hierarquia
-                .unidadeOrigem(null) // SEM ORIGEM
-                .unidadeDestino(new Unidade()) // Com destino normal
-                .build();
+        Subprocesso sp = criarSubprocesso();
+        Unidade destino = new Unidade();
+        destino.setSigla("DEST");
 
         when(templateEngine.process(anyString(), any())).thenReturn("html");
 
-        service.enviarEmailTransicao(evento);
+        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, null, destino, null);
 
         // Envia para destino normal
         verify(notificacaoEmailService, times(1)).enviarEmail(any(), any(), any());
@@ -178,11 +119,8 @@ class SubprocessoEmailServiceTest {
     @Test
     @DisplayName("Trata exceção ao notificar hierarquia")
     void trataExcecaoHierarquia() {
-        Subprocesso sp = new Subprocesso();
-        sp.setProcesso(new Processo());
-        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setUnidade(new Unidade());
-        sp.getUnidade().setSigla("U1"); // Pra evitar null no assunto
+        Subprocesso sp = criarSubprocesso();
+        sp.getUnidade().setSigla("U1");
 
         Unidade origem = new Unidade();
         origem.setSigla("ORIG");
@@ -193,20 +131,12 @@ class SubprocessoEmailServiceTest {
         Unidade destino = new Unidade();
         destino.setSigla("DEST");
 
-        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-                .subprocesso(sp)
-                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
-                .unidadeOrigem(origem)
-                .unidadeDestino(destino)
-                .build();
-
         when(templateEngine.process(anyString(), any())).thenReturn("html");
 
-        // Configura mocks explicites para cada chamada
         doNothing().when(notificacaoEmailService).enviarEmail(eq("DEST"), anyString(), any());
         doThrow(new RuntimeException("Fail")).when(notificacaoEmailService).enviarEmail(eq("SUP"), anyString(), any());
 
-        service.enviarEmailTransicao(evento);
+        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, origem, destino, null);
 
         verify(notificacaoEmailService).enviarEmail(eq("SUP"), anyString(), any());
         verify(notificacaoEmailService).enviarEmail(eq("DEST"), anyString(), any());
@@ -215,49 +145,24 @@ class SubprocessoEmailServiceTest {
     @Test
     @DisplayName("Cria variáveis sem datas nem observações")
     void deveCriarVariaveisSemDatasNemObservacoes() {
-        Subprocesso sp = new Subprocesso();
-        sp.setProcesso(new Processo());
-        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setUnidade(new Unidade());
-        sp.getUnidade().setSigla("U1");
-
+        Subprocesso sp = criarSubprocesso();
         sp.setDataLimiteEtapa1(null);
         sp.setDataLimiteEtapa2(null);
 
-        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-                .subprocesso(sp)
-                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
-                .unidadeOrigem(new Unidade())
-                .unidadeDestino(new Unidade())
-                .observacoes(null) // Sem observações
-                .build();
-
-
         when(templateEngine.process(anyString(), any())).thenReturn("html");
-        service.enviarEmailTransicao(evento);
+        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), new Unidade(), null);
         verify(notificacaoEmailService).enviarEmail(any(), any(), any());
     }
 
     @Test
     @DisplayName("Deve incluir DataLimiteEtapa2 nas variáveis")
     void deveIncluirDataLimiteEtapa2NasVariaveis() {
-        Subprocesso sp = new Subprocesso();
-        sp.setProcesso(new Processo());
-        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setUnidade(new Unidade());
-        sp.getUnidade().setSigla("U1");
+        Subprocesso sp = criarSubprocesso();
         sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
-
-        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-                .subprocesso(sp)
-                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
-                .unidadeOrigem(new Unidade())
-                .unidadeDestino(new Unidade())
-                .build();
 
         when(templateEngine.process(anyString(), any())).thenReturn("html");
 
-        service.enviarEmailTransicao(evento);
+        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), new Unidade(), null);
 
         verify(templateEngine).process(anyString(), argThat(ctx ->
                 ctx.getVariable("dataLimiteEtapa2") != null
@@ -267,23 +172,11 @@ class SubprocessoEmailServiceTest {
     @Test
     @DisplayName("Deve incluir Observações nas variáveis")
     void deveIncluirObservacoesNasVariaveis() {
-        Subprocesso sp = new Subprocesso();
-        sp.setProcesso(new Processo());
-        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setUnidade(new Unidade());
-        sp.getUnidade().setSigla("U1");
-
-        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-                .subprocesso(sp)
-                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
-                .unidadeOrigem(new Unidade())
-                .unidadeDestino(new Unidade())
-                .observacoes("Minha Observação")
-                .build();
+        Subprocesso sp = criarSubprocesso();
 
         when(templateEngine.process(anyString(), any())).thenReturn("html");
 
-        service.enviarEmailTransicao(evento);
+        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), new Unidade(), "Minha Observação");
 
         verify(templateEngine).process(anyString(), argThat(ctx ->
                 "Minha Observação".equals(ctx.getVariable("observacoes"))
@@ -293,26 +186,29 @@ class SubprocessoEmailServiceTest {
     @Test
     @DisplayName("Deve lidar com tipo processo iniciado (switch default)")
     void deveLidarComTipoProcessoIniciado() {
-        Subprocesso sp = new Subprocesso();
-        sp.setProcesso(new Processo());
-        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setUnidade(new Unidade());
-        sp.getUnidade().setSigla("U1");
-
-        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-                .subprocesso(sp)
-                .tipo(TipoTransicao.PROCESSO_INICIADO)
-                .unidadeOrigem(new Unidade())
-                .unidadeDestino(new Unidade())
-                .build();
+        Subprocesso sp = criarSubprocesso();
 
         when(templateEngine.process(anyString(), any())).thenReturn("html");
 
-        service.enviarEmailTransicao(evento);
+        service.enviarEmailTransicaoDireta(sp, TipoTransicao.PROCESSO_INICIADO, new Unidade(), new Unidade(), null);
 
         // Verifica que enviou email com assunto formatado pelo default do switch
         verify(notificacaoEmailService).enviarEmail(any(),
                 argThat(s -> s.contains("SGC: Notificação - Processo iniciado")),
                 any());
+    }
+
+    // ============================================================================================
+    // MÉTODO AUXILIAR
+    // ============================================================================================
+
+    private Subprocesso criarSubprocesso() {
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(new Processo());
+        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
+        sp.setUnidade(new Unidade());
+        sp.getUnidade().setSigla("U1");
+        sp.getUnidade().setNome("Unidade 1");
+        return sp;
     }
 }

@@ -1,12 +1,9 @@
-package sgc.processo.listener;
+package sgc.processo.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionalEventListener;
 import sgc.alerta.AlertaFacade;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
@@ -16,10 +13,7 @@ import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.processo.eventos.EventoProcessoFinalizado;
-import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
-import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 
@@ -31,12 +25,13 @@ import java.util.Objects;
 import static sgc.organizacao.model.TipoUnidade.*;
 
 /**
- * Listener assíncrono para eventos de processo.
+ * Serviço de notificação para eventos de processo.
+ * Chamado diretamente por ProcessoInicializador e ProcessoFinalizador.
  */
-@Component
+@Service
 @RequiredArgsConstructor
 @Slf4j
-public class EventoProcessoListener {
+public class ProcessoNotificacaoService {
     private final AlertaFacade servicoAlertas;
     private final NotificacaoEmailService notificacaoEmailService;
     private final NotificacaoModelosService notificacaoModelosService;
@@ -45,34 +40,36 @@ public class EventoProcessoListener {
     private final ProcessoFacade processoFacade;
     private final SubprocessoFacade subprocessoFacade;
 
-    @TransactionalEventListener
-    @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void aoIniciarProcesso(EventoProcessoIniciado evento) {
+    /**
+     * Notifica sobre o início de um processo (alertas + e-mails).
+     */
+    @Transactional
+    public void notificarInicioProcesso(Long codProcesso, List<Long> codUnidades) {
         try {
-            processarInicioProcesso(evento);
+            processarInicioProcesso(codProcesso);
         } catch (Exception e) {
-            log.error("Erro ao processar evento de processo iniciado: {}", e.getClass().getSimpleName(), e);
+            log.error("Erro ao processar notificação de processo iniciado: {}", e.getClass().getSimpleName(), e);
         }
     }
 
-    @TransactionalEventListener
-    @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void aoFinalizarProcesso(EventoProcessoFinalizado evento) {
+    /**
+     * Notifica sobre a finalização de um processo (alertas + e-mails).
+     */
+    @Transactional
+    public void notificarFinalizacaoProcesso(Long codProcesso) {
         try {
-            processarFinalizacaoProcesso(evento);
+            processarFinalizacaoProcesso(codProcesso);
         } catch (Exception e) {
-            log.error("Erro ao processar evento de processo finalizado: {}", e.getClass().getSimpleName(), e);
+            log.error("Erro ao processar notificação de processo finalizado: {}", e.getClass().getSimpleName(), e);
         }
     }
 
-    private void processarInicioProcesso(EventoProcessoIniciado evento) {
-        Processo processo = processoFacade.buscarEntidadePorId(evento.getCodProcesso());
-        List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(evento.getCodProcesso());
+    private void processarInicioProcesso(Long codProcesso) {
+        Processo processo = processoFacade.buscarEntidadePorId(codProcesso);
+        List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
 
         if (subprocessos.isEmpty()) {
-            log.warn("Nenhum subprocesso encontrado para o processo {}", evento.getCodProcesso());
+            log.warn("Nenhum subprocesso encontrado para o processo {}", codProcesso);
             return;
         }
 
@@ -101,8 +98,8 @@ public class EventoProcessoListener {
         }
     }
 
-    private void processarFinalizacaoProcesso(EventoProcessoFinalizado evento) {
-        Processo processo = processoFacade.buscarEntidadePorId(evento.getCodProcesso());
+    private void processarFinalizacaoProcesso(Long codProcesso) {
+        Processo processo = processoFacade.buscarEntidadePorId(codProcesso);
 
         List<Long> codigosParticipantes = processo.getCodigosParticipantes();
 

@@ -8,18 +8,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
+import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
-import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.notificacao.SubprocessoEmailService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -33,10 +32,10 @@ class SubprocessoTransicaoServiceTest {
     private MovimentacaoRepo movimentacaoRepo;
 
     @Mock
-    private SubprocessoRepo subprocessoRepo;
+    private AlertaFacade alertaService;
 
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private SubprocessoEmailService emailService;
 
     @Mock
     private UsuarioFacade usuarioFacade;
@@ -45,10 +44,10 @@ class SubprocessoTransicaoServiceTest {
     private SubprocessoTransicaoService service;
 
     @Test
-    @DisplayName("Deve registrar transição com observações e publicar evento")
+    @DisplayName("Deve registrar transição com observações e notificar via alerta/email")
     void deveRegistrarComObservacoes() {
         // Arrange
-        Subprocesso subprocesso = mock(Subprocesso.class);
+        Subprocesso subprocesso = criarSubprocessoMock();
         Unidade origem = mock(Unidade.class);
         Unidade destino = mock(Unidade.class);
         Usuario usuario = new Usuario();
@@ -65,14 +64,15 @@ class SubprocessoTransicaoServiceTest {
 
         // Assert
         verify(movimentacaoRepo).save(any(Movimentacao.class));
-        verify(eventPublisher).publishEvent(any(EventoTransicaoSubprocesso.class));
+        verify(alertaService).criarAlertaTransicao(any(), anyString(), any(), any());
+        verify(emailService).enviarEmailTransicaoDireta(any(), any(), any(), any(), any());
     }
 
     @Test
     @DisplayName("Deve registrar transição sem observações")
     void deveRegistrarSemObservacoes() {
         // Arrange
-        Subprocesso subprocesso = mock(Subprocesso.class);
+        Subprocesso subprocesso = criarSubprocessoMock();
         Unidade origem = mock(Unidade.class);
         Unidade destino = mock(Unidade.class);
         Usuario usuario = new Usuario();
@@ -88,14 +88,14 @@ class SubprocessoTransicaoServiceTest {
 
         // Assert
         verify(movimentacaoRepo).save(any(Movimentacao.class));
-        verify(eventPublisher).publishEvent(any(EventoTransicaoSubprocesso.class));
+        verify(alertaService).criarAlertaTransicao(any(), anyString(), any(), any());
     }
 
     @Test
     @DisplayName("Deve buscar usuário da facade quando não fornecido no comando")
     void deveBuscarUsuarioDaFacadeQuandoNaoFornecido() {
         // Arrange
-        Subprocesso subprocesso = mock(Subprocesso.class);
+        Subprocesso subprocesso = criarSubprocessoMock();
         Usuario usuarioAutenticado = new Usuario();
         when(usuarioFacade.obterUsuarioAutenticado()).thenReturn(usuarioAutenticado);
 
@@ -132,7 +132,7 @@ class SubprocessoTransicaoServiceTest {
     @DisplayName("Deve lidar com unidades nulas")
     void deveLidarComUnidadesNulas() {
         // Arrange
-        Subprocesso subprocesso = mock(Subprocesso.class);
+        Subprocesso subprocesso = criarSubprocessoMock();
         Usuario usuario = new Usuario();
 
         // Act
@@ -144,6 +144,34 @@ class SubprocessoTransicaoServiceTest {
 
         // Assert
         verify(movimentacaoRepo).save(any(Movimentacao.class));
-        verify(eventPublisher).publishEvent(any(EventoTransicaoSubprocesso.class));
+    }
+
+    @Test
+    @DisplayName("Não deve enviar alerta/email quando tipo não exige")
+    void naoDeveNotificarQuandoTipoNaoExige() {
+        // Arrange
+        Subprocesso subprocesso = criarSubprocessoMock();
+        Usuario usuario = new Usuario();
+
+        // CADASTRO_HOMOLOGADO: geraAlerta=false, enviaEmail=false
+        service.registrar(RegistrarTransicaoCommand.builder()
+                .sp(subprocesso)
+                .tipo(TipoTransicao.CADASTRO_HOMOLOGADO)
+                .usuario(usuario)
+                .build());
+
+        // Assert
+        verify(movimentacaoRepo).save(any(Movimentacao.class));
+        verifyNoInteractions(alertaService);
+        verifyNoInteractions(emailService);
+    }
+
+    private Subprocesso criarSubprocessoMock() {
+        Subprocesso sp = mock(Subprocesso.class);
+        Unidade unidade = mock(Unidade.class);
+        when(unidade.getSigla()).thenReturn("U1");
+        when(sp.getUnidade()).thenReturn(unidade);
+        when(sp.getProcesso()).thenReturn(mock(sgc.processo.model.Processo.class));
+        return sp;
     }
 }

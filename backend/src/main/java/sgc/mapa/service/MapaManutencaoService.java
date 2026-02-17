@@ -2,7 +2,6 @@ package sgc.mapa.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.repo.ComumRepo;
@@ -10,10 +9,10 @@ import sgc.mapa.dto.AtualizarAtividadeRequest;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;
 import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.dto.CriarConhecimentoRequest;
-import sgc.mapa.eventos.EventoMapaAlterado;
 import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.*;
+import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
 
 import java.util.*;
 
@@ -29,7 +28,7 @@ public class MapaManutencaoService {
     private final ComumRepo repo;
     private final AtividadeMapper atividadeMapper;
     private final ConhecimentoMapper conhecimentoMapper;
-    private final ApplicationEventPublisher eventPublisher;
+    private final SubprocessoAdminWorkflowService subprocessoAdminService;
 
     @Transactional(readOnly = true)
     public List<Atividade> listarAtividades() {
@@ -249,7 +248,7 @@ public class MapaManutencaoService {
     }
 
     private void notificarAlteracaoMapa(Long mapaCodigo) {
-        eventPublisher.publishEvent(new EventoMapaAlterado(mapaCodigo));
+        subprocessoAdminService.atualizarParaEmAndamento(mapaCodigo);
     }
 
     @Transactional(readOnly = true)

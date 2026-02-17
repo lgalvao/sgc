@@ -9,14 +9,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.mapa.eventos.EventoImportacaoAtividades;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
+import sgc.mapa.service.CopiaMapaService;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -52,7 +51,7 @@ class SubprocessoAtividadeServiceTest {
     private MapaManutencaoService mapaManutencaoService;
 
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private CopiaMapaService copiaMapaService;
 
     @Mock
     private MovimentacaoRepo movimentacaoRepo;
@@ -86,7 +85,7 @@ class SubprocessoAtividadeServiceTest {
                     .hasMessageContaining("1");
 
             verify(repo).buscar(Subprocesso.class, codDestino);
-            verifyNoInteractions(eventPublisher);
+            verifyNoInteractions(copiaMapaService);
         }
 
 
@@ -111,7 +110,7 @@ class SubprocessoAtividadeServiceTest {
 
             verify(repo).buscar(Subprocesso.class, codDestino);
             verify(repo).buscar(Subprocesso.class, codOrigem);
-            verifyNoInteractions(eventPublisher);
+            verifyNoInteractions(copiaMapaService);
         }
 
         @Test
@@ -136,13 +135,7 @@ class SubprocessoAtividadeServiceTest {
             service.importarAtividades(codDestino, codOrigem);
 
             // Assert
-            ArgumentCaptor<EventoImportacaoAtividades> eventoCaptor = ArgumentCaptor.forClass(EventoImportacaoAtividades.class);
-            verify(eventPublisher).publishEvent(eventoCaptor.capture());
-
-            EventoImportacaoAtividades evento = eventoCaptor.getValue();
-            assertThat(evento.getCodigoMapaOrigem()).isEqualTo(10L);
-            assertThat(evento.getCodigoMapaDestino()).isEqualTo(20L);
-            assertThat(evento.getCodigoSubprocesso()).isEqualTo(codDestino);
+            verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
 
             verify(movimentacaoRepo).save(any(Movimentacao.class));
             verify(subprocessoRepo, never()).save(any(Subprocesso.class)); // Não deve salvar pois já está em cadastro
@@ -179,7 +172,7 @@ class SubprocessoAtividadeServiceTest {
             assertThat(subprocessoSalvo.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
             verify(usuarioService).obterUsuarioAutenticado();
-            verify(eventPublisher).publishEvent(any(EventoImportacaoAtividades.class));
+            verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
             verify(movimentacaoRepo).save(any(Movimentacao.class));
         }
 
@@ -214,7 +207,7 @@ class SubprocessoAtividadeServiceTest {
             assertThat(subprocessoSalvo.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
             verify(usuarioService).obterUsuarioAutenticado();
-            verify(eventPublisher).publishEvent(any(EventoImportacaoAtividades.class));
+            verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
             verify(movimentacaoRepo).save(any(Movimentacao.class));
         }
 
@@ -244,7 +237,7 @@ class SubprocessoAtividadeServiceTest {
             // Assert
             verify(subprocessoRepo).save(spDestino);
             assertThat(spDestino.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO); // Não muda no default
-            verify(eventPublisher).publishEvent(any(EventoImportacaoAtividades.class));
+            verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
         }
 
         @Test
@@ -269,7 +262,7 @@ class SubprocessoAtividadeServiceTest {
             service.importarAtividades(codDestino, codOrigem);
 
             // Assert
-            verify(eventPublisher).publishEvent(any(EventoImportacaoAtividades.class));
+            verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
             verify(movimentacaoRepo).save(any(Movimentacao.class));
             verify(subprocessoRepo, never()).save(any(Subprocesso.class)); // Não deve salvar
         }

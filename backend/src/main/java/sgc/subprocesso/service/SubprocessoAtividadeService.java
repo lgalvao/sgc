@@ -2,13 +2,12 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.mapa.eventos.EventoImportacaoAtividades;
 import sgc.mapa.model.Atividade;
+import sgc.mapa.service.CopiaMapaService;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -39,7 +38,7 @@ class SubprocessoAtividadeService {
     private final ComumRepo repo;
     private final SubprocessoCrudService crudService;
     private final MapaManutencaoService mapaManutencaoService;
-    private final ApplicationEventPublisher eventPublisher;
+    private final CopiaMapaService copiaMapaService;
     private final MovimentacaoRepo movimentacaoRepo;
     private final UsuarioFacade usuarioService;
 
@@ -63,12 +62,10 @@ class SubprocessoAtividadeService {
         final Subprocesso spDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
         Subprocesso spOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);
 
-        // Publica evento para importação assíncrona (desacoplamento do módulo mapa)
-        eventPublisher.publishEvent(EventoImportacaoAtividades.builder()
-                .codigoMapaOrigem(spOrigem.getMapa().getCodigo())
-                .codigoMapaDestino(spDestino.getMapa().getCodigo())
-                .codigoSubprocesso(codSubprocessoDestino)
-                .build());
+        // Importar atividades diretamente (sem evento assíncrono)
+        copiaMapaService.importarAtividadesDeOutroMapa(
+                spOrigem.getMapa().getCodigo(),
+                spDestino.getMapa().getCodigo());
 
         if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             var tipoProcesso = spDestino.getProcesso().getTipo();

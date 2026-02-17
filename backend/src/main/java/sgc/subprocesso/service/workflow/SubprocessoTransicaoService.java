@@ -2,19 +2,20 @@ package sgc.subprocesso.service.workflow;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.alerta.AlertaFacade;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
-import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
+import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.notificacao.SubprocessoEmailService;
 
 /**
  * Serviço consolidado para gerenciar transições e workflows de subprocessos.
@@ -35,7 +36,8 @@ import sgc.subprocesso.model.Subprocesso;
 @Slf4j
 public class SubprocessoTransicaoService {
     private final MovimentacaoRepo movimentacaoRepo;
-    private final ApplicationEventPublisher eventPublisher;
+    private final AlertaFacade alertaService;
+    private final SubprocessoEmailService emailService;
     private final AnaliseFacade analiseFacade;
     private final UsuarioFacade usuarioFacade;
 
@@ -58,17 +60,8 @@ public class SubprocessoTransicaoService {
                 .build();
         movimentacaoRepo.save(movimentacao);
 
-        // 2. Publicar evento para comunicação (alertas/emails)
-        EventoTransicaoSubprocesso evento = EventoTransicaoSubprocesso.builder()
-                .subprocesso(cmd.sp())
-                .tipo(cmd.tipo())
-                .usuario(usuario)
-                .unidadeOrigem(cmd.origem())
-                .unidadeDestino(cmd.destino())
-                .observacoes(cmd.observacoes())
-                .build();
-
-        eventPublisher.publishEvent(evento);
+        // 2. Notificar via alerta e e-mail (chamada direta, sem evento assíncrono)
+        notificarTransicao(cmd.sp(), cmd.tipo(), cmd.origem(), cmd.destino(), cmd.observacoes());
     }
 
     /**
@@ -107,5 +100,24 @@ public class SubprocessoTransicaoService {
                 .build());
 
         log.info("Workflow SP{}: {} -> {}", sp.getCodigo(), cmd.novaSituacao(), cmd.tipoTransicao());
+    }
+
+    private void notificarTransicao(Subprocesso sp, TipoTransicao tipo,
+                                     sgc.organizacao.model.Unidade origem,
+                                     sgc.organizacao.model.Unidade destino,
+                                     String observacoes) {
+        try {
+            if (tipo.geraAlerta()) {
+                String sigla = sp.getUnidade().getSigla();
+                String descricao = tipo.formatarAlerta(sigla);
+                alertaService.criarAlertaTransicao(sp.getProcesso(), descricao, origem, destino);
+            }
+
+            if (tipo.enviaEmail()) {
+                emailService.enviarEmailTransicaoDireta(sp, tipo, origem, destino, observacoes);
+            }
+        } catch (Exception e) {
+            log.error("Falha ao enviar notificação de transição {}: {}", tipo, e.getMessage(), e);
+        }
     }
 }

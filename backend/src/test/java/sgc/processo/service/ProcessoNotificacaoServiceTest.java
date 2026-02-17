@@ -1,4 +1,4 @@
-package sgc.processo.listener;
+package sgc.processo.service;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -19,11 +19,10 @@ import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.processo.eventos.EventoProcessoFinalizado;
-import sgc.processo.eventos.EventoProcessoIniciado;
+
+
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 
@@ -35,11 +34,11 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("Testes do EventoProcessoListener")
-class EventoProcessoListenerTest {
+@DisplayName("Testes do ProcessoNotificacaoService")
+class ProcessoNotificacaoServiceTest {
 
     @InjectMocks
-    private EventoProcessoListener listener;
+    private ProcessoNotificacaoService service;
 
     @Mock
     private ProcessoFacade processoFacade;
@@ -115,8 +114,7 @@ class EventoProcessoListenerTest {
         Usuario substituto = Usuario.builder().tituloEleitoral("222").email("s@s.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("111", titular, "222", substituto));
 
-        EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(1L).build();
-        listener.aoIniciarProcesso(evento);
+        service.notificarInicioProcesso(1L, List.of());
 
         verify(notificacaoEmailService).enviarEmailHtml(eq("t@t.com"), anyString(), any());
         verify(notificacaoEmailService).enviarEmailHtml(eq("s@s.com"), anyString(), any());
@@ -129,7 +127,7 @@ class EventoProcessoListenerTest {
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(processo);
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
 
-        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
+        service.notificarInicioProcesso(1L, List.of());
 
         verify(servicoAlertas, never()).criarAlertasProcessoIniciado(any(), any());
     }
@@ -144,11 +142,11 @@ class EventoProcessoListenerTest {
         s.setUnidade(u);
 
         // Testa exceção ao criar corpo para tipo não suportado
-        assertThatThrownBy(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, processo, s))
+        assertThatThrownBy(() -> service.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, processo, s))
                 .isInstanceOf(IllegalArgumentException.class);
 
         // Testa que RAIZ não joga exceção
-        assertThatCode(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.RAIZ, processo, s))
+        assertThatCode(() -> service.criarCorpoEmailPorTipo(TipoUnidade.RAIZ, processo, s))
                 .doesNotThrowAnyException();
 
         // Testa catch no fluxo principal para tipo não suportado (ex: SEM_EQUIPE)
@@ -157,7 +155,7 @@ class EventoProcessoListenerTest {
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularTitulo("T").build()));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", Usuario.builder().build()));
 
-        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
+        service.notificarInicioProcesso(1L, List.of());
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
 
@@ -180,16 +178,16 @@ class EventoProcessoListenerTest {
 
         // 1. Substituto null no mapa de usuários
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", titular));
-        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
+        service.notificarInicioProcesso(1L, List.of());
 
         // 2. Substituto com email null ou blank
         Usuario subEmailNull = Usuario.builder().tituloEleitoral("S").email(null).build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", titular, "S", subEmailNull));
-        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
+        service.notificarInicioProcesso(1L, List.of());
 
         Usuario subEmailBlank = Usuario.builder().tituloEleitoral("S").email("  ").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", titular, "S", subEmailBlank));
-        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
+        service.notificarInicioProcesso(1L, List.of());
 
         verify(notificacaoEmailService, times(3)).enviarEmailHtml(eq("t@mail.com"), anyString(), anyString());
         verify(notificacaoEmailService, never()).enviarEmailHtml(eq(null), anyString(), anyString());
@@ -222,7 +220,7 @@ class EventoProcessoListenerTest {
         when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(operacional, intermediaria));
         
         // 1. Intermediária sem subordinadas (log.warn)
-        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(2L).build());
+        service.notificarFinalizacaoProcesso(2L);
         verify(notificacaoEmailService, times(1)).enviarEmailHtml(eq("op@mail.com"), anyString(), any());
         verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
 
@@ -245,7 +243,7 @@ class EventoProcessoListenerTest {
 
         when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(operacional, intermediaria, sub));
 
-        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(2L).build());
+        service.notificarFinalizacaoProcesso(2L);
         verify(notificacaoEmailService).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
     }
 
@@ -266,7 +264,7 @@ class EventoProcessoListenerTest {
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", Usuario.builder().email("t@mail.com").build()));
 
-        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
+        service.notificarInicioProcesso(1L, List.of());
 
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
@@ -292,7 +290,7 @@ class EventoProcessoListenerTest {
         ));
         when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(semEquipe));
 
-        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(2L).build());
+        service.notificarFinalizacaoProcesso(2L);
 
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
@@ -302,9 +300,9 @@ class EventoProcessoListenerTest {
     void deveCapturarExcecaoAsyncGeral() {
         when(processoFacade.buscarEntidadePorId(anyLong())).thenThrow(new RuntimeException("Crash"));
 
-        assertThatCode(() -> listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build()))
+        assertThatCode(() -> service.notificarInicioProcesso(1L, List.of()))
                 .doesNotThrowAnyException();
-        assertThatCode(() -> listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build()))
+        assertThatCode(() -> service.notificarFinalizacaoProcesso(1L))
                 .doesNotThrowAnyException();
     }
 
@@ -315,7 +313,7 @@ class EventoProcessoListenerTest {
         p.setParticipantes(new ArrayList<>());
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
 
-        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(1L).build());
+        service.notificarFinalizacaoProcesso(1L);
 
         verify(unidadeService, never()).buscarResponsaveisUnidades(anyList());
     }
@@ -339,7 +337,7 @@ class EventoProcessoListenerTest {
         // Quando buscar usuário por titulo retornar null, o try interno vai estourar NPE
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Collections.emptyMap());
 
-        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
+        service.notificarInicioProcesso(1L, List.of());
 
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
@@ -363,7 +361,7 @@ class EventoProcessoListenerTest {
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(2L, r2));
         when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(u1, u2));
 
-        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(3L).build());
+        service.notificarFinalizacaoProcesso(3L);
 
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
@@ -376,7 +374,7 @@ class EventoProcessoListenerTest {
         Unidade u = criarUnidade(1L, TipoUnidade.SEM_EQUIPE);
         s.setUnidade(u);
 
-        assertThatThrownBy(() -> listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, processo, s))
+        assertThatThrownBy(() -> service.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, processo, s))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -416,7 +414,7 @@ class EventoProcessoListenerTest {
         // T1 ausente no map
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T2", user2, "T3", user3));
 
-        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(1L).build());
+        service.notificarInicioProcesso(1L, List.of());
 
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
@@ -441,7 +439,7 @@ class EventoProcessoListenerTest {
         ));
         when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(interoperacional));
 
-        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(5L).build());
+        service.notificarFinalizacaoProcesso(5L);
 
         verify(notificacaoEmailService).enviarEmailHtml(eq("inter@mail.com"), anyString(), any());
     }
@@ -476,7 +474,7 @@ class EventoProcessoListenerTest {
                 .thenThrow(new RuntimeException("Erro ao criar template"));
         when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(intermediaria, sub));
 
-        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(6L).build());
+        service.notificarFinalizacaoProcesso(6L);
 
         // Deve ter tentado enviar para operacional (sucesso) mas não para intermediária (exceção)
         verify(notificacaoEmailService).enviarEmailHtml(eq("sub@mail.com"), anyString(), any());
@@ -511,7 +509,7 @@ class EventoProcessoListenerTest {
 
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", titular, "S1", substituto));
 
-        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(7L).build());
+        service.notificarInicioProcesso(7L, List.of());
 
         verify(notificacaoEmailService).enviarEmailHtml(eq("t@mail.com"), anyString(), any());
         verify(notificacaoEmailService, never()).enviarEmailHtml(eq(null), anyString(), anyString());
@@ -538,7 +536,7 @@ class EventoProcessoListenerTest {
         // Stream vazio leva a buscarUsuariosPorTitulos com lista vazia
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Collections.emptyMap());
 
-        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(8L).build());
+        service.notificarFinalizacaoProcesso(8L);
 
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
@@ -568,7 +566,7 @@ class EventoProcessoListenerTest {
         Usuario titular = Usuario.builder().tituloEleitoral("T1").email("t@mail.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", titular));
 
-        listener.aoIniciarProcesso(EventoProcessoIniciado.builder().codProcesso(9L).build());
+        service.notificarInicioProcesso(9L, List.of());
 
         // Não deve enviar email pois exceção foi capturada
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
@@ -609,7 +607,7 @@ class EventoProcessoListenerTest {
         ));
         when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(intermediaria, outra, comOutroSuperior));
 
-        listener.aoFinalizarProcesso(EventoProcessoFinalizado.builder().codProcesso(10L).build());
+        service.notificarFinalizacaoProcesso(10L);
 
         // Deve enviar para operacionais
         verify(notificacaoEmailService).enviarEmailHtml(eq("out@mail.com"), anyString(), any());
@@ -627,9 +625,6 @@ class EventoProcessoListenerTest {
         void aoIniciarProcesso_Intermediaria() {
             stubTemplatesIniciado();
             Long codProcesso = 1L;
-            EventoProcessoIniciado evento = EventoProcessoIniciado.builder()
-                    .codProcesso(codProcesso)
-                    .build();
 
             Processo processo = new Processo();
             processo.setDescricao("Processo Teste");
@@ -663,7 +658,7 @@ class EventoProcessoListenerTest {
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(11L, resp));
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("TITULAR", usuarioTitular));
             
-            listener.aoIniciarProcesso(evento);
+            service.notificarInicioProcesso(codProcesso, List.of());
 
             verify(notificacaoEmailService).enviarEmailHtml(eq("email@test.com"), anyString(), anyString());
         }
@@ -672,7 +667,6 @@ class EventoProcessoListenerTest {
         @DisplayName("aoIniciarProcesso deve capturar exceção ao enviar e-mail para substituto")
         void aoIniciarProcesso_ErroEmailSubstituto() {
             Long codProcesso = 1L;
-            EventoProcessoIniciado evento = EventoProcessoIniciado.builder().codProcesso(codProcesso).build();
 
             Processo processo = new Processo();
             processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -698,14 +692,14 @@ class EventoProcessoListenerTest {
             
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(null);
             
-            Assertions.assertThatCode(() -> listener.aoIniciarProcesso(evento)).doesNotThrowAnyException();
+            Assertions.assertThatCode(() -> service.notificarInicioProcesso(codProcesso, List.of())).doesNotThrowAnyException();
         }
 
         @Test
         @DisplayName("enviarEmailParaSubstituto deve capturar exceção")
         void enviarEmailParaSubstituto_CatchException() {
             Assertions.assertThatCode(() -> 
-                listener.enviarEmailParaSubstituto("TIT", null, "assunto", "corpo", "unidade")
+                service.enviarEmailParaSubstituto("TIT", null, "assunto", "corpo", "unidade")
             ).doesNotThrowAnyException();
         }
 
@@ -713,9 +707,6 @@ class EventoProcessoListenerTest {
         @DisplayName("aoIniciarProcesso quando responsavel da unidade nao encontrado deve retornar early")
         void aoIniciarProcesso_ResponsavelNaoEncontrado() {
             Long codProcesso = 1L;
-            EventoProcessoIniciado evento = EventoProcessoIniciado.builder()
-                    .codProcesso(codProcesso)
-                    .build();
 
             Processo processo = new Processo();
             processo.setDescricao("Processo");
@@ -734,7 +725,7 @@ class EventoProcessoListenerTest {
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of());
 
-            listener.aoIniciarProcesso(evento);
+            service.notificarInicioProcesso(codProcesso, List.of());
 
             verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
         }
@@ -743,9 +734,6 @@ class EventoProcessoListenerTest {
         @DisplayName("aoFinalizarProcesso deve tratar unidades sem superiores ou superiores diferentes")
         void aoFinalizarProcesso_FiltragemSubordinadas() {
             Long codProcesso = 1L;
-            EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder()
-                    .codProcesso(codProcesso)
-                    .build();
 
             Processo processo = new Processo();
             processo.setCodigo(codProcesso);
@@ -773,7 +761,7 @@ class EventoProcessoListenerTest {
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1));
             when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(uInter, uSubordinadaInvalida));
 
-            listener.aoFinalizarProcesso(evento);
+            service.notificarFinalizacaoProcesso(codProcesso);
 
             verify(notificacaoEmailService, never()).enviarEmailHtml(eq("t1@test.com"), anyString(), anyString());
         }
@@ -782,13 +770,10 @@ class EventoProcessoListenerTest {
         @DisplayName("aoFinalizarProcesso deve capturar exceção genérica no loop de envio")
         void aoFinalizarProcesso_ErroNoLoop() {
             Long codProcesso = 33L;
-            EventoProcessoFinalizado evento = EventoProcessoFinalizado.builder()
-                    .codProcesso(codProcesso)
-                    .build();
 
             when(processoFacade.buscarEntidadePorId(codProcesso)).thenThrow(new RuntimeException("Erro inesperado"));
 
-            Assertions.assertThatCode(() -> listener.aoFinalizarProcesso(evento)).doesNotThrowAnyException();
+            Assertions.assertThatCode(() -> service.notificarFinalizacaoProcesso(codProcesso)).doesNotThrowAnyException();
         }
 
         @Test
@@ -797,7 +782,7 @@ class EventoProcessoListenerTest {
             Processo p = new Processo();
             Subprocesso s = new Subprocesso();
             Assertions.assertThatThrownBy(() -> 
-                listener.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, p, s)
+                service.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, p, s)
             ).isInstanceOf(IllegalArgumentException.class);
         }
     }

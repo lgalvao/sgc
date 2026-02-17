@@ -2,29 +2,22 @@ package sgc.processo.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.model.*;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.erros.ErroUnidadesNaoDefinidas;
-import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static sgc.processo.model.SituacaoProcesso.CRIADO;
 
-/**
- * Serviço responsável pela inicialização de processos.
- * Consolidando lógica comum dos métodos iniciarProcessoMapeamento, iniciarProcessoRevisao e iniciarProcessoDiagnostico.
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -34,7 +27,7 @@ public class ProcessoInicializador {
     private final ComumRepo repo;
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
-    private final ApplicationEventPublisher publicadorEventos;
+    private final ProcessoNotificacaoService notificacaoService;
     private final SubprocessoFacade subprocessoFacade;
     private final ProcessoValidador processoValidador;
 
@@ -96,14 +89,8 @@ public class ProcessoInicializador {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processoRepo.save(processo);
 
-        // Publicar evento
-        publicadorEventos.publishEvent(
-                EventoProcessoIniciado.builder()
-                        .codProcesso(processo.getCodigo())
-                        .tipo(processo.getTipo().name())
-                        .dataHoraInicio(LocalDateTime.now())
-                        .codUnidades(codigosUnidades)
-                        .build());
+        // Notificar diretamente (sem evento assíncrono)
+        notificacaoService.notificarInicioProcesso(processo.getCodigo(), codigosUnidades);
 
         log.info("Processo de {} {} iniciado para {} unidade(s).",
                 tipo.name().toLowerCase(), codigo, codigosUnidades.size());

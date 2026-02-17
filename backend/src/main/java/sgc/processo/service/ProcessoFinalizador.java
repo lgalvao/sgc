@@ -2,7 +2,6 @@ package sgc.processo.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.repo.ComumRepo;
@@ -10,7 +9,6 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
-import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -44,7 +42,7 @@ class ProcessoFinalizador {
     private final UnidadeFacade unidadeService;
     private final ConsultasSubprocessoService queryService;
     private final ProcessoValidador processoValidador;
-    private final ApplicationEventPublisher publicadorEventos;
+    private final ProcessoNotificacaoService notificacaoService;
 
 
     /**
@@ -67,11 +65,9 @@ class ProcessoFinalizador {
         processo.setDataFinalizacao(LocalDateTime.now());
 
         processoRepo.save(processo);
-        publicadorEventos.publishEvent(
-                EventoProcessoFinalizado.builder()
-                        .codProcesso(processo.getCodigo())
-                        .dataHoraFinalizacao(LocalDateTime.now())
-                        .build());
+
+        // Notificar diretamente (sem evento assíncrono)
+        notificacaoService.notificarFinalizacaoProcesso(processo.getCodigo());
 
         log.info("Processo {} finalizado", codigo);
     }
