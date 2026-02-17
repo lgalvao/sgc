@@ -20,15 +20,6 @@ import java.util.*;
 
 /**
  * Facade para gerenciamento de alertas do sistema.
- *
- * <p>Responsável por criar alertas para unidades participantes de processos
- * e gerenciar a visualização/leitura de alertas por usuários. Delega operações
- * de persistência para {@link AlertaService}.
- *
- * <p><b>Refatoração v3.0:</b> Removido @Lazy - não há ciclo de dependência real
- * com UnidadeFacade. Mantido @Getter(lazy=true) para cache de SEDOC.</p>
- *
- * @see AlertaService
  */
 @Service
 @Slf4j
@@ -40,26 +31,20 @@ public class AlertaFacade {
 
     /**
      * Obtém a sigla da unidade para exibição ao usuário.
-     * A unidade RAIZ (id=1, sigla='ADMIN') é substituída por "ADMIN" para clareza.
-     * 
-     * @param unidade a unidade
-     * @return a sigla para apresentação ao usuário
      */
     private String obterSiglaParaUsuario(Unidade unidade) {
         if (Long.valueOf(1L).equals(unidade.getCodigo())) {
-            return "ADMIN"; // Usuário vê ADMIN em vez de RAIZ
+            return "ADMIN";
         }
         return unidade.getSigla();
     }
     
     /**
      * Obtém a unidade raiz (ADMIN) do sistema.
-     * Simplificado: sem cache lazy para sistema intranet com ~10 usuários.
      */
     private Unidade getUnidadeRaiz() {
         return unidadeService.buscarEntidadePorId(1L);
     }
-
 
     /**
      * Criar e persistir um alerta.
@@ -86,12 +71,6 @@ public class AlertaFacade {
     /**
      * Cria um alerta a partir de uma transição de subprocesso.
      * Usado pelo SubprocessoComunicacaoListener para processar eventos de transição.
-     *
-     * @param processo  Processo associado ao alerta
-     * @param descricao Descrição do alerta (formatada)
-     * @param origem    Unidade de origem da transição
-     * @param destino   Unidade de destino (receberá o alerta)
-     * @return O alerta criado
      */
     @Transactional
     public Alerta criarAlertaTransicao(Processo processo, String descricao, Unidade origem, Unidade destino) {
@@ -207,7 +186,6 @@ public class AlertaFacade {
 
     /**
      * Lista alertas para o usuário baseado na sua unidade de lotação.
-     * Apenas leitura, sem efeitos colaterais.
      */
     @Transactional(readOnly = true)
     public List<Alerta> listarAlertasPorUsuario(String usuarioTitulo) {
@@ -222,7 +200,6 @@ public class AlertaFacade {
 
         List<Long> alertaCodigos = alertasUnidade.stream().map(Alerta::getCodigo).toList();
 
-        // Fetch all read statuses in a single query to avoid N+1 problem (Optimization)
         List<AlertaUsuario> leituras = alertaService.buscarPorUsuarioEAlertas(usuarioTitulo, alertaCodigos);
 
         Map<Long, LocalDateTime> mapaLeitura = new HashMap<>();

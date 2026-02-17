@@ -134,13 +134,18 @@ class ProcessoFacadeTest {
             when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(unidade);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
             when(subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
+            unidade.setTituloTitular("T1");
+            Usuario titular = new Usuario();
+            titular.setEmail("titular@teste.com");
+            when(usuarioService.buscarPorLogin("T1")).thenReturn(titular);
+            
             when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
 
             processoFacade.enviarLembrete(codProcesso, codUnidade);
 
             verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("N/A"));
             verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
-            verify(notificacaoEmailService).enviarEmailHtml(eq(unidade.getSigla()), contains("SGC: Lembrete de prazo"), anyString());
+            verify(notificacaoEmailService).enviarEmailHtml(eq("titular@teste.com"), contains("SGC: Lembrete de prazo"), anyString());
         }
 
         @Test
@@ -161,6 +166,11 @@ class ProcessoFacadeTest {
             when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(unidade);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
             when(subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
+            unidade.setTituloTitular("T1");
+            Usuario titular = new Usuario();
+            titular.setEmail("titular@teste.com");
+            when(usuarioService.buscarPorLogin("T1")).thenReturn(titular);
+            
             when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
 
             processoFacade.enviarLembrete(codProcesso, codUnidade);
@@ -168,7 +178,7 @@ class ProcessoFacadeTest {
             verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("15/03/2026"));
             verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
             verify(notificacaoEmailService).enviarEmailHtml(
-                eq(unidade.getSigla()), 
+                eq("titular@teste.com"), 
                 contains("SGC: Lembrete de prazo"), 
                 anyString()
             );
@@ -328,12 +338,15 @@ class ProcessoFacadeTest {
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
             when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
-            when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
+            u.setTituloTitular("T10");
+            Usuario titular = new Usuario();
+            titular.setEmail("u10@teste.com");
+            when(usuarioService.buscarPorLogin("T10")).thenReturn(titular);
 
             processoFacade.enviarLembrete(1L, 10L);
             verify(alertaService).criarAlertaAdmin(eq(p), eq(u), anyString());
             verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
-            verify(notificacaoEmailService).enviarEmailHtml(eq(u.getSigla()), contains(p.getDescricao()), anyString());
+            verify(notificacaoEmailService).enviarEmailHtml(eq("u10@teste.com"), contains(p.getDescricao()), anyString());
         }
 
         @Test
