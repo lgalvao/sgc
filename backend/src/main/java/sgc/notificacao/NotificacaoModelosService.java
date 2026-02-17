@@ -17,30 +17,28 @@ import java.util.List;
 public class NotificacaoModelosService {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    // Constantes para títulos de e-mail
     private static final String TITULO_PROCESSO_INICIADO = "Processo iniciado - ";
-    private static final String TITULO_CADASTRO_DISPONIBILIZADO =
-            "Cadastro disponibilizado para análise";
+    private static final String TITULO_CADASTRO_DISPONIBILIZADO = "Cadastro disponibilizado para análise";
     private static final String TITULO_CADASTRO_DEVOLVIDO = "Cadastro devolvido para ajustes";
-    private static final String TITULO_MAPA_DISPONIBILIZADO =
-            "Mapa de Competências disponibilizado";
+    private static final String TITULO_MAPA_DISPONIBILIZADO = "Mapa de Competências disponibilizado";
     private static final String TITULO_MAPA_VALIDADO = "Mapa de Competências validado";
     private static final String TITULO_PROCESSO_FINALIZADO = "Processo finalizado - Mapas Vigentes";
     private static final String TITULO_PROCESSO_CONCLUSAO_SGC = "Conclusão do processo ";
     private static final String TITULO_LEMBRETE_PRAZO = "SGC: Lembrete de prazo - ";
 
+    private static final String VAR_TITULO = "titulo";
+    private static final String VAR_NOME_UNIDADE = "nomeUnidade";
+    private static final String VAR_NOME_PROCESSO = "nomeProcesso";
+    private static final String VAR_SIGLA_UNIDADE = "siglaUnidade";
+    private static final String VAR_DATA_LIMITE = "dataLimite";
+    private static final String VAR_TIPO_PROCESSO = "tipoProcesso";
+    private static final String VAR_MOTIVO = "motivo";
+    private static final String VAR_OBSERVACOES = "observacoes";
+
     private final SpringTemplateEngine templateEngine;
 
     /**
      * Gera o conteúdo HTML para o email de notificação de início de processo.
-     *
-     * <p>Corresponde aos casos de uso CDU-04 e CDU-05.
-     *
-     * @param nomeUnidade  O nome da unidade notificada.
-     * @param nomeProcesso O nome do processo iniciado.
-     * @param tipoProcesso O tipo do processo (e.g., MAPEAMENTO, REVISAO).
-     * @param dataLimite   A data limite para a conclusão da primeira etapa.
-     * @return O conteúdo HTML do email renderizado pelo Thymeleaf.
      */
     public String criarEmailProcessoIniciado(
             String nomeUnidade,
@@ -49,32 +47,25 @@ public class NotificacaoModelosService {
             LocalDateTime dataLimite) {
 
         Context context = new Context();
-        context.setVariable("titulo", TITULO_PROCESSO_INICIADO + tipoProcesso);
-        context.setVariable("nomeUnidade", nomeUnidade);
-        context.setVariable("nomeProcesso", nomeProcesso);
-        context.setVariable("tipoProcesso", tipoProcesso);
-        context.setVariable("dataLimite", dataLimite.format(FORMATADOR));
+        context.setVariable(VAR_TITULO, TITULO_PROCESSO_INICIADO + tipoProcesso);
+        context.setVariable(VAR_NOME_UNIDADE, nomeUnidade);
+        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        context.setVariable(VAR_TIPO_PROCESSO, tipoProcesso);
+        context.setVariable(VAR_DATA_LIMITE, dataLimite.format(FORMATADOR));
 
         return templateEngine.process("processo-iniciado", context);
     }
 
     /**
-     * Gera o conteúdo HTML para o email que notifica a disponibilização de um cadastro para
-     * análise.
-     *
-     * <p>Corresponde aos casos de uso CDU-09 e CDU-10.
-     *
-     * @param nomeUnidade          O nome da unidade que disponibilizou o cadastro.
-     * @param nomeProcesso         O nome do processo associado.
-     * @param quantidadeAtividades O número de atividades registradas.
+     * Gera o conteúdo HTML para o email que notifica a disponibilização de um cadastro para análise.
      */
     public void criarEmailCadastroDisponibilizado(
             String nomeUnidade, String nomeProcesso, int quantidadeAtividades) {
 
         Context context = new Context();
-        context.setVariable("titulo", TITULO_CADASTRO_DISPONIBILIZADO);
-        context.setVariable("nomeUnidade", nomeUnidade);
-        context.setVariable("nomeProcesso", nomeProcesso);
+        context.setVariable(VAR_TITULO, TITULO_CADASTRO_DISPONIBILIZADO);
+        context.setVariable(VAR_NOME_UNIDADE, nomeUnidade);
+        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         context.setVariable("quantidadeAtividades", quantidadeAtividades);
 
         templateEngine.process("cadastro-disponibilizado", context);
@@ -82,43 +73,30 @@ public class NotificacaoModelosService {
 
     /**
      * Gera o conteúdo HTML para o email que notifica a devolução de um cadastro para ajustes.
-     *
-     * <p>Corresponde ao caso de uso CDU-13.
-     *
-     * @param nomeUnidade  O nome da unidade que receberá a notificação.
-     * @param nomeProcesso O nome do processo associado.
-     * @param motivo       O motivo da devolução.
-     * @param observacoes  Detalhes ou observações adicionais.
      */
     public void criarEmailCadastroDevolvido(
             String nomeUnidade, String nomeProcesso, String motivo, String observacoes) {
 
         Context context = new Context();
-        context.setVariable("titulo", TITULO_CADASTRO_DEVOLVIDO);
-        context.setVariable("nomeUnidade", nomeUnidade);
-        context.setVariable("nomeProcesso", nomeProcesso);
-        context.setVariable("motivo", motivo);
-        context.setVariable("observacoes", observacoes);
+        context.setVariable(VAR_TITULO, TITULO_CADASTRO_DEVOLVIDO);
+        context.setVariable(VAR_NOME_UNIDADE, nomeUnidade);
+        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        context.setVariable(VAR_MOTIVO, motivo);
+        context.setVariable(VAR_OBSERVACOES, observacoes);
 
         templateEngine.process("cadastro-devolvido", context);
     }
 
     /**
      * Gera o conteúdo HTML para o email que notifica a disponibilização de um mapa para validação.
-     *
-     * <p>Corresponde ao caso de uso CDU-17.
-     *
-     * @param nomeUnidade         O nome da unidade que disponibilizou o mapa.
-     * @param nomeProcesso        O nome do processo associado.
-     * @param dataLimiteValidacao A data limite para a validação do mapa.
      */
     public void criarEmailMapaDisponibilizado(
             String nomeUnidade, String nomeProcesso, LocalDateTime dataLimiteValidacao) {
 
         Context context = new Context();
-        context.setVariable("titulo", TITULO_MAPA_DISPONIBILIZADO);
-        context.setVariable("nomeUnidade", nomeUnidade);
-        context.setVariable("nomeProcesso", nomeProcesso);
+        context.setVariable(VAR_TITULO, TITULO_MAPA_DISPONIBILIZADO);
+        context.setVariable(VAR_NOME_UNIDADE, nomeUnidade);
+        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         context.setVariable("dataLimiteValidacao", dataLimiteValidacao.format(FORMATADOR));
 
         templateEngine.process("mapa-disponibilizado", context);
@@ -126,35 +104,24 @@ public class NotificacaoModelosService {
 
     /**
      * Gera o conteúdo HTML para o email que notifica a validação de um mapa.
-     *
-     * <p>Corresponde ao caso de uso CDU-18.
-     *
-     * @param nomeUnidade  O nome da unidade que validou o mapa.
-     * @param nomeProcesso O nome do processo associado.
      */
     public void criarEmailMapaValidado(String nomeUnidade, String nomeProcesso) {
         Context context = new Context();
-        context.setVariable("titulo", TITULO_MAPA_VALIDADO);
-        context.setVariable("nomeUnidade", nomeUnidade);
-        context.setVariable("nomeProcesso", nomeProcesso);
+        context.setVariable(VAR_TITULO, TITULO_MAPA_VALIDADO);
+        context.setVariable(VAR_NOME_UNIDADE, nomeUnidade);
+        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
 
         templateEngine.process("mapa-validado", context);
     }
 
     /**
      * Gera o conteúdo HTML para o email que notifica a finalização de um processo.
-     *
-     * <p>Corresponde ao caso de uso CDU-21.
-     *
-     * @param nomeProcesso    O nome do processo finalizado.
-     * @param dataFinalizacao A data em que o processo foi finalizado.
-     * @param quantidadeMapas O número de mapas que se tornaram vigentes.
      */
     public void criarEmailProcessoFinalizado(
             String nomeProcesso, LocalDateTime dataFinalizacao, int quantidadeMapas) {
         Context context = new Context();
-        context.setVariable("titulo", TITULO_PROCESSO_FINALIZADO);
-        context.setVariable("nomeProcesso", nomeProcesso);
+        context.setVariable(VAR_TITULO, TITULO_PROCESSO_FINALIZADO);
+        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         context.setVariable("dataFinalizacao", dataFinalizacao.format(FORMATADOR));
         context.setVariable("quantidadeMapas", quantidadeMapas);
 
@@ -163,20 +130,13 @@ public class NotificacaoModelosService {
 
     /**
      * Gera o conteúdo HTML para o email que notifica a conclusão de um processo para uma unidade
-     * específica.
-     *
-     * <p>Corresponde ao caso de uso CDU-21.
-     *
-     * @param siglaUnidade A sigla da unidade notificada.
-     * @param nomeProcesso O nome do processo concluído.
-     * @return O conteúdo HTML do email.
      */
     public String criarEmailProcessoFinalizadoPorUnidade(String siglaUnidade, String nomeProcesso) {
         Context context = new Context();
         context.setVariable(
-                "titulo", "%s%s".formatted(TITULO_PROCESSO_CONCLUSAO_SGC, nomeProcesso));
-        context.setVariable("siglaUnidade", siglaUnidade);
-        context.setVariable("nomeProcesso", nomeProcesso);
+                VAR_TITULO, "%s%s".formatted(TITULO_PROCESSO_CONCLUSAO_SGC, nomeProcesso));
+        context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
+        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
 
         return templateEngine.process("processo-finalizado-por-unidade", context);
     }
@@ -184,25 +144,17 @@ public class NotificacaoModelosService {
     /**
      * Gera o conteúdo HTML para o email que notifica uma unidade intermediária sobre a conclusão de
      * um processo em suas unidades subordinadas.
-     *
-     * <p>Corresponde ao caso de uso CDU-21.
-     *
-     * @param siglaUnidade               A sigla da unidade intermediária notificada.
-     * @param nomeProcesso               O nome do processo concluído.
-     * @param siglasUnidadesSubordinadas A lista de siglas das unidades subordinadas que
-     *                                   participaram do processo.
-     * @return O conteúdo HTML do email.
      */
     public String criarEmailProcessoFinalizadoUnidadesSubordinadas(
             String siglaUnidade, String nomeProcesso, List<String> siglasUnidadesSubordinadas) {
 
         Context context = new Context();
         context.setVariable(
-                "titulo",
+                VAR_TITULO,
                 "%s%s em unidades subordinadas"
                         .formatted(TITULO_PROCESSO_CONCLUSAO_SGC, nomeProcesso));
-        context.setVariable("siglaUnidade", siglaUnidade);
-        context.setVariable("nomeProcesso", nomeProcesso);
+        context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
+        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         context.setVariable("siglasUnidadesSubordinadas", siglasUnidadesSubordinadas);
 
         return templateEngine.process("processo-finalizado-unidades-subordinadas", context);
@@ -210,19 +162,13 @@ public class NotificacaoModelosService {
 
     /**
      * Gera o conteúdo HTML para o email de lembrete de prazo.
-     *
-     * @param siglaUnidade  A sigla da unidade notificada.
-     * @param nomeProcesso O nome do processo.
-     * @param dataLimite   A data limite.
-     * @return O conteúdo HTML do email.
      */
-    // TODO a data limite nunca pode ser nula.
     public String criarEmailLembretePrazo(String siglaUnidade, String nomeProcesso, LocalDateTime dataLimite) {
         Context context = new Context();
-        context.setVariable("titulo", TITULO_LEMBRETE_PRAZO + nomeProcesso);
-        context.setVariable("siglaUnidade", siglaUnidade);
-        context.setVariable("nomeProcesso", nomeProcesso);
-        context.setVariable("dataLimite", dataLimite != null ? dataLimite.format(FORMATADOR) : "N/A");
+        context.setVariable(VAR_TITULO, TITULO_LEMBRETE_PRAZO + nomeProcesso);
+        context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
+        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        context.setVariable(VAR_DATA_LIMITE, dataLimite.format(FORMATADOR));
 
         return templateEngine.process("email/lembrete-prazo", context);
     }
