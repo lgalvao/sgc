@@ -6,8 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.dto.AlertaDto;
-import sgc.alerta.mapper.AlertaMapper;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaUsuario;
 import sgc.organizacao.UnidadeFacade;
@@ -38,7 +36,6 @@ import java.util.*;
 public class AlertaFacade {
     private final AlertaService alertaService;
     private final UsuarioFacade usuarioService;
-    private final AlertaMapper alertaMapper;
     private final UnidadeFacade unidadeService;
 
     /**
@@ -213,7 +210,7 @@ public class AlertaFacade {
      * Apenas leitura, sem efeitos colaterais.
      */
     @Transactional(readOnly = true)
-    public List<AlertaDto> listarAlertasPorUsuario(String usuarioTitulo) {
+    public List<Alerta> listarAlertasPorUsuario(String usuarioTitulo) {
         Usuario usuario = usuarioService.buscarPorId(usuarioTitulo);
         Unidade lotacao = usuario.getUnidadeLotacao();
 
@@ -233,20 +230,21 @@ public class AlertaFacade {
             mapaLeitura.put(au.getId().getAlertaCodigo(), au.getDataHoraLeitura());
         }
 
-        // Maps alerts to DTOs with read timestamps
-        return alertasUnidade.stream().map(alerta -> {
-            LocalDateTime dataHoraLeitura = mapaLeitura.get(alerta.getCodigo());
-            return alertaMapper.toDto(alerta, dataHoraLeitura);
-        }).toList();
+        // Preenche campos transientes nas entidades
+        for (Alerta alerta : alertasUnidade) {
+            alerta.setDataHoraLeitura(mapaLeitura.get(alerta.getCodigo()));
+        }
+
+        return alertasUnidade;
     }
 
     /**
      * Lista apenas alertas não lidos para o usuário.
      */
     @Transactional(readOnly = true)
-    public List<AlertaDto> listarAlertasNaoLidos(String usuarioTitulo) {
+    public List<Alerta> listarAlertasNaoLidos(String usuarioTitulo) {
         return listarAlertasPorUsuario(usuarioTitulo).stream()
-                .filter(dto -> dto.getDataHoraLeitura() == null)
+                .filter(alerta -> alerta.getDataHoraLeitura() == null)
                 .toList();
     }
 

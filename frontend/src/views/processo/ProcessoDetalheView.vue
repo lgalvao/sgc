@@ -7,7 +7,7 @@
     <div v-if="processo">
       <PageHeader
           :title="processo.descricao"
-          :etapa="`Etapa atual: ${processo.situacaoLabel || processo.situacao}`"
+          :etapa="`Etapa atual: ${formatSituacaoProcesso(processo.situacao)}`"
           :proxima-acao="proximaAcaoProcesso"
           title-test-id="processo-info"
       >
@@ -18,9 +18,7 @@
 
           <ProcessoInfo
               :tipo="processo.tipo"
-              :tipo-label="processo.tipoLabel"
               :situacao="processo.situacao"
-              :situacao-label="processo.situacaoLabel"
               :show-data-limite="false"/>
         </template>
 
@@ -110,6 +108,7 @@ import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
 import {SituacaoSubprocesso} from "@/types/tipos";
+import {formatSituacaoProcesso} from "@/utils/formatters";
 
 function flattenUnidades(unidades: any[]): any[] {
   let result: any[] = [];
@@ -234,7 +233,7 @@ const mensagemSucessoAcaoBloco = computed(() => {
 
 const proximaAcaoProcesso = computed(() => obterProximaAcao({
   perfil: perfilStore.perfilSelecionado,
-  situacao: processo.value?.situacaoLabel || processo.value?.situacao,
+  situacao: processo.value?.situacao,
   podeFinalizar: podeFinalizar.value,
 }));
 

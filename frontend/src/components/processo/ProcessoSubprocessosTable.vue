@@ -11,6 +11,7 @@
 import {computed} from "vue";
 import TreeTable from "@/components/comum/TreeTable.vue";
 import type {UnidadeParticipante} from "@/types/tipos";
+import {formatSituacaoSubprocesso, formatDate} from "@/utils/formatters";
 
 const props = defineProps<{
   participantesHierarquia: UnidadeParticipante[];
@@ -22,8 +23,8 @@ defineEmits<{
 
 const colunas = [
   { key: "unidadeAtual", label: "Unidade", width: "40%" },
-  { key: "situacaoLabel", label: "Situação", width: "30%" },
-  { key: "dataLimiteFormatada", label: "Data Limite", width: "30%" },
+  { key: "situacao", label: "Situação", width: "30%" },
+  { key: "dataLimite", label: "Data Limite", width: "30%" },
 ];
 
 const mapeamentoHierarquia = computed(() => {
@@ -36,8 +37,8 @@ function mapUnidades(unidades: UnidadeParticipante[]): any[] {
     codigo: u.codUnidade,
     unidadeAtual: `${u.sigla} - ${u.nome}`,
     sigla: u.sigla,
-    situacaoLabel: u.situacaoLabel || u.situacaoSubprocesso,
-    dataLimiteFormatada: u.dataLimiteFormatada || u.dataLimite,
+    situacao: formatSituacaoSubprocesso(u.situacaoSubprocesso),
+    dataLimite: formatDate(u.dataLimite, false),
     children: u.filhos ? mapUnidades(u.filhos) : [],
     expanded: true,
     clickable: true

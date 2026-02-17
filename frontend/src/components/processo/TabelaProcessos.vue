@@ -4,6 +4,7 @@ import {computed} from "vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import BadgeSituacao from "@/components/comum/BadgeSituacao.vue";
 import type {ProcessoResumo} from "@/types/tipos";
+import {formatSituacaoProcesso, formatTipoProcesso, formatDate} from "@/utils/formatters";
 
 const props = defineProps<{
   processos: ProcessoResumo[];
@@ -32,7 +33,7 @@ const fields = computed(() => {
 
   if (props.showDataFinalizacao) {
     baseFields.push({
-      key: "dataFinalizacaoFormatada",
+      key: "dataFinalizacao",
       label: "Finalizado em",
       sortable: true,
     });
@@ -112,12 +113,16 @@ defineExpose({ fields });
         </EmptyState>
       </template>
 
+      <template #cell(dataFinalizacao)="{ item }">
+        {{ formatDate(item.dataFinalizacao) }}
+      </template>
+
       <template #cell(situacao)="{ item }">
-        <BadgeSituacao :situacao="item.situacao" :texto="item.situacaoLabel" />
+        <BadgeSituacao :situacao="item.situacao" :texto="formatSituacaoProcesso(item.situacao)" />
       </template>
 
       <template #cell(tipo)="{ item }">
-        {{ item.tipoLabel }}
+        {{ formatTipoProcesso(item.tipo) }}
       </template>
     </BTable>
   </div>

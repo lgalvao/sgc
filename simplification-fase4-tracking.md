@@ -10,7 +10,7 @@
 
 | Tarefa | Status | Progresso | Responsável |
 | :--- | :--- | :--- | :--- |
-| **4.1. Limpeza de Campos de Formatação** | ⚪ Pendente | 0% | Agente |
+| **4.1. Limpeza de Campos de Formatação** | ✅ Concluída | 100% | Agente |
 | **4.2. Migração de DTOs de Leitura (@JsonView)** | ⚪ Pendente | 0% | Agente |
 | **4.3. Consolidação de Requests (Subprocesso)** | ⚪ Pendente | 0% | Agente |
 | **4.4. Extinção de Mappers MapStruct** | ⚪ Pendente | 0% | Agente |

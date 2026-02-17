@@ -31,7 +31,6 @@ específicas** do projeto que diferem dos padrões genéricos.
     * `POST` para criação.
     * `POST` com sufixo semanticamente claro para atualizações, ações de workflow e exclusão (ex:
       `/api/processos/{id}/iniciar`, `/api/processos/{id}/excluir`).
-* **DTOs:** NUNCA exponha entidades JPA. Use DTOs e Mappers (MapStruct).
 * **Persistence:** Tabelas em `UPPER_CASE`, colunas em `snake_case`. Enums como `STRING`.
 * **Controle de Acesso (Security):**
     * **SEMPRE** use a arquitetura centralizada: `Controller → AccessControlService → Services`
@@ -42,25 +41,18 @@ específicas** do projeto que diferem dos padrões genéricos.
     * **Ações:** Use enum `Acao` do pacote `sgc.seguranca.acesso`
     * **Hierarquia:** Use `HierarchyService` para verificações de hierarquia de unidades
     * **Auditoria:** Todas as decisões de acesso são automaticamente logadas por `AccessAuditService`
-    * **Documentação completa:** Ver [`SECURITY-REFACTORING-COMPLETE.md`](/backend/etc/docs/SECURITY-REFACTORING-COMPLETE.md)
 
 ## 3. Frontend (Vue 3.5 / TypeScript)
 
 * **Padrão de componentes:** Use `<script setup lang="ts">` e **BootstrapVueNext**.
 * **Estado:** **Pinia** utilizando "Setup Stores" (com `ref` e `computed`).
-* **Camadas:** `View -> Store -> Service -> API`. Views são inteligentes; Componentes são majoritariamente
-  apresentacionais (Props/Emits).
+* **Camadas:** `View -> Store -> Service -> API`. 
 * **Erros:** Use `normalizeError` em services/stores. Componentes decidem como exibir (preferencialmente `BAlert` inline
   para erros de negócio).
 * **Roteamento:** Modularizado (cada módulo tem seu arquivo `.routes.ts`).
 * **Logging:**
     * **NAO** use `console.log`, `console.warn`, ou `console.debug` em código de produção
     * **USE** o logger estruturado: `import { logger } from '@/utils'`
-    * **Métodos disponíveis:**
-        * `logger.info(message, ...args)` - Informações gerais (apenas em desenvolvimento)
-        * `logger.warn(message, ...args)` - Avisos importantes
-        * `logger.error(message, ...args)` - Erros críticos
-        * `logger.debug(message, ...args)` - Debug detalhado (apenas em desenvolvimento)
     * **ESLint:** Configurado para bloquear `console.*` (exceto `console.error` para casos extremos)
     * **Exemplo:**
       ```typescript
@@ -76,11 +68,6 @@ específicas** do projeto que diferem dos padrões genéricos.
 * **Backend:** `./gradlew :backend:test` (JUnit 5 + Mockito + H2).
 * **Frontend:** `npm run typecheck`, `npm run lint`, `npm run test:unit` (Vitest).
 * **E2E:** Playwright (consulte `/e2e/README.md`).
-* **Cobertura de Testes:**
-    * **Plano de Restauração:** Ver [`test-coverage-plan.md`](/test-coverage-plan.md) - Plano completo para restaurar cobertura >90%
-    * **Rastreamento:** Ver [`coverage-tracking.md`](/coverage-tracking.md) - Progresso e métricas
-    * **Scripts Úteis:** `/backend/etc/scripts/` contém ferramentas de análise de cobertura
-    * **Guia de Qualidade:** Ver [`GUIA-MELHORIAS-TESTES.md`](/backend/etc/docs/GUIA-MELHORIAS-TESTES.md)
 
 ## 5. Padrões Arquiteturais (ADRs)
 
@@ -105,8 +92,6 @@ O SGC segue padrões arquiteturais bem definidos, documentados em ADRs (Architec
     * **CRÍTICO:** Services NUNCA fazem verificações de acesso diretas
 
 * **[ADR-004: DTO Pattern](/backend/etc/docs/adr/ADR-004-dto-pattern.md)**
-    * DTOs obrigatórios em TODAS as APIs REST
-    * Entidades JPA NUNCA são expostas diretamente
     * Mappers implementados com MapStruct para conversão Entidade ↔ DTO
     * **Taxonomia de DTOs:**
         * `*Request` - Entrada de API (com Bean Validation)
@@ -141,27 +126,7 @@ Para detalhes técnicos e exemplos de código, consulte:
     * [Regras para execução de testes e2e e correção de bugs](/frontend/etc/regras/guia-correcao-e2e.md)
 
 * **Arquitetura e Decisões:**
-    * [ARCHITECTURE.md](/backend/etc/docs/ARCHITECTURE.md) - Visão geral da arquitetura
     * [ADRs](/backend/etc/docs/adr/) - Decisões arquiteturais documentadas
 
 * **Módulo-Específico:**
     * `README.md` de cada módulo e diretório para responsabilidades específicas
-    * `package-info.java` em cada pacote para documentação detalhada
-
-## 7. Habilidades do Agente (Skills)
-
-Este projeto utiliza um sistema de **Skills** para o agente Jules, permitindo a execução de tarefas complexas de auditoria e manutenção de forma padronizada.
-
-As definições de skills estão em `.jules/skills/`:
-* **[Auditoria de Qualidade Backend](/.jules/skills/audit-qualidade-backend.md)**: Cobertura, complexidade e null-checks.
-* **[Auditoria de Qualidade Frontend](/.jules/skills/audit-qualidade-frontend.md)**: Cobertura, acessibilidade e validações.
-* **[Gestão de Testes](/.jules/skills/gestao-testes.md)**: Análise e priorização de testes unitários.
-* **[Utilitários e Ambiente](/.jules/skills/utilitarios.md)**: Screenshots, manutenção e correções de ambiente.
-
-## 8. Navegação da Documentação
-
-Para um índice completo e organizado de toda a documentação do projeto, consulte:
-
-* **[DOCUMENTACAO.md](/DOCUMENTACAO.md)** - Índice centralizado com todos os documentos por categoria
-
-Este índice facilita a navegação entre documentos de arquitetura, padrões, testes, ADRs e guias específicos.

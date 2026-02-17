@@ -52,7 +52,6 @@ export interface AlertaDto {
     unidadeDestino: string;
     dataHoraLeitura?: string;
     mensagem: string;
-    dataHoraFormatada: string;
     origem: string;
     processo: string;
 }
@@ -117,7 +116,6 @@ export interface LoginResponseDto {
 export interface SubprocessoSituacaoDto {
     codigo: number;
     situacao: SituacaoSubprocesso;
-    situacaoLabel: string | null;
 }
 
 /**

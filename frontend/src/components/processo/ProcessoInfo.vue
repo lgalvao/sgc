@@ -1,13 +1,13 @@
 <template>
   <div class="process-info mb-4">
-    <div v-if="showTipo && tipoLabel" class="mb-2">
-      <strong>Tipo:</strong> {{ tipoLabel }}
+    <div v-if="showTipo && tipo" class="mb-2">
+      <strong>Tipo:</strong> {{ formatTipoProcesso(tipo) }}
     </div>
-    <div v-if="showSituacao && situacaoLabel" class="mb-2">
-      <strong>Situação:</strong> {{ situacaoLabel }}
+    <div v-if="showSituacao && situacao" class="mb-2">
+      <strong>Situação:</strong> {{ formatSituacaoProcesso(situacao) }}
     </div>
     <div v-if="showDataLimite && dataLimite" class="mb-2">
-      <strong>Data Limite:</strong> {{ formatarData(dataLimite) }}
+      <strong>Data Limite:</strong> {{ formatDate(dataLimite, false) }}
     </div>
     <div v-if="showUnidades && numUnidades !== undefined" class="mb-2">
       <strong>Unidades participantes:</strong> {{ numUnidades }}
@@ -16,10 +16,12 @@
 </template>
 
 <script lang="ts" setup>
+import { formatDate, formatSituacaoProcesso, formatTipoProcesso } from '@/utils/formatters';
+
 withDefaults(
   defineProps<{
-    tipoLabel?: string;
-    situacaoLabel?: string;
+    tipo?: string;
+    situacao?: string;
     dataLimite?: string;
     numUnidades?: number;
     showTipo?: boolean;
@@ -28,8 +30,8 @@ withDefaults(
     showUnidades?: boolean;
   }>(),
   {
-    tipoLabel: '',
-    situacaoLabel: '',
+    tipo: '',
+    situacao: '',
     dataLimite: '',
     numUnidades: 0,
     showTipo: true,
@@ -38,11 +40,4 @@ withDefaults(
     showUnidades: false
   }
 );
-
-function formatarData(data?: string): string {
-  if (!data) return '';
-  const date = new Date(data);
-  return date.toLocaleDateString('pt-BR');
-}
-defineExpose({ formatarData });
 </script>

@@ -138,26 +138,16 @@ export interface Processo {
     podeDisponibilizarMapaBloco?: boolean;
     unidades: UnidadeParticipante[];
     resumoSubprocessos: ProcessoResumo[];
-    // Campos formatados do backend
-    dataLimiteFormatada?: string;
-    dataCriacaoFormatada?: string;
-    dataFinalizacaoFormatada?: string;
-    situacaoLabel?: string;
-    tipoLabel?: string;
 }
 
 export interface ProcessoResumo {
     codigo: number;
     descricao: string;
     situacao: SituacaoProcesso;
-    situacaoLabel: string;
     tipo: TipoProcesso;
-    tipoLabel: string;
     dataLimite: string;
-    dataLimiteFormatada: string;
     dataCriacao: string;
     dataFinalizacao?: string;
-    dataFinalizacaoFormatada?: string;
     linkDestino?: string;
     unidadeCodigo: number;
     unidadeNome: string;
@@ -193,7 +183,6 @@ export interface Alerta {
     dataHora: string;
     dataHoraLeitura: string | null;
     mensagem: string;
-    dataHoraFormatada: string;
     origem: string;
     processo: string;
 }
@@ -202,7 +191,6 @@ export interface Movimentacao {
     codigo: number;
     subprocesso: Subprocesso;
     dataHora: string;
-    dataHoraFormatada?: string;
     unidadeOrigem: Unidade;
     unidadeDestino: Unidade;
     descricao: string;
@@ -212,7 +200,6 @@ export interface Movimentacao {
 export interface AnaliseValidacao {
     codigo: number;
     dataHora: string;
-    dataHoraFormatada?: string;
     analista: string;
     unidade: string;
     acao: string;
@@ -224,7 +211,6 @@ export interface AnaliseValidacao {
 export interface AnaliseCadastro {
     codigo: number;
     dataHora: string;
-    dataHoraFormatada?: string;
     analista: string;
     unidadeSigla: string;
     acao: string;
@@ -283,9 +269,6 @@ export interface UnidadeParticipante {
     dataLimite: string;
     mapaCodigo?: number;
     filhos: UnidadeParticipante[];
-    // Campos formatados do backend
-    dataLimiteFormatada?: string;
-    situacaoLabel?: string;
 }
 
 export interface SubprocessoPermissoes {
@@ -318,7 +301,6 @@ export interface SubprocessoDetalhe {
     titular: Usuario;
     responsavel: Usuario;
     situacao: SituacaoSubprocesso;
-    situacaoLabel: string | null;
     localizacaoAtual: string;
     processoDescricao: string;
     tipoProcesso: TipoProcesso;
@@ -424,7 +406,6 @@ export interface ValidacaoCadastro {
 export interface SubprocessoStatus {
     codigo: number;
     situacao: SituacaoSubprocesso;
-    situacaoLabel: string | null;
 }
 
 /**

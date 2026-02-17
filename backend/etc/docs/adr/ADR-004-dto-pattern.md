@@ -745,6 +745,43 @@ public record SubprocessoDetalheDto(
 - **Motivo da Escolha**: Melhor práticas da indústria
 
 
+## Padrões de Conteúdo
+
+### 1. Separação de Responsabilidades de Apresentação (Novo - 2026-02-17)
+
+**O Backend NÃO deve realizar formatação de dados para exibição.**
+
+Campos como `dataCriacaoFormatada` ou `situacaoLabel` são **proibidos** nos DTOs. O backend deve fornecer os dados em seu estado bruto e o frontend é responsável pela lógica de apresentação.
+
+**Diretrizes:**
+- **Datas:** Enviar apenas objetos `LocalDateTime`, `LocalDate` ou strings no formato ISO-8601.
+- **Enums:** Enviar o valor bruto do Enum (ex: `CRIADO`). O frontend deve mapear este valor para o label amigável (ex: "Criado") usando i18n ou formatadores locais.
+- **Valores Monetários/Numéricos:** Enviar valores numéricos brutos. O frontend aplica a máscara de moeda ou precisão decimal.
+
+**Benefícios:**
+- Redução drástica de boilerplate em Mappers e DTOs.
+- Flexibilidade na UI: a mesma data pode ser exibida de formas diferentes em telas distintas sem alteração no backend.
+- Facilidade de internacionalização (i18n).
+- Redução do tamanho do payload JSON.
+
+**Exemplo:**
+
+```java
+// ❌ RUIM: Backend formatando dados
+public record ProcessoDto(
+    Long codigo,
+    String dataCriacaoFormatada, // ❌ Proibido
+    String situacaoLabel         // ❌ Proibido
+) {}
+
+// ✅ BOM: Backend enviando dados brutos
+public record ProcessoDto(
+    Long codigo,
+    LocalDateTime dataCriacao,   // ✅ Bruto
+    SituacaoProcesso situacao    // ✅ Enum
+) {}
+```
+
 ## Referências
 
 ### Documentos Relacionados

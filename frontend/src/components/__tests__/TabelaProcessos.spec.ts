@@ -13,14 +13,11 @@ const mockProcessos: ProcessoResumo[] = [
         codigo: 1,
         descricao: "Processo Alpha",
         tipo: TipoProcesso.MAPEAMENTO,
-        tipoLabel: "Mapeamento",
         unidadeCodigo: 1,
         unidadeNome: "UNID1, UNID2",
         unidadesParticipantes: "UNID1, UNID2",
         situacao: SituacaoProcesso.EM_ANDAMENTO,
-        situacaoLabel: "Em andamento",
-        dataLimite: new Date().toISOString(),
-        dataLimiteFormatada: "15/10/2023",
+        dataLimite: "2023-10-15T10:00:00Z",
         dataCriacao: new Date().toISOString(),
         dataFinalizacao: undefined,
     },
@@ -28,17 +25,13 @@ const mockProcessos: ProcessoResumo[] = [
         codigo: 2,
         descricao: "Processo Beta",
         tipo: TipoProcesso.REVISAO,
-        tipoLabel: "Revisão",
         unidadeCodigo: 3,
         unidadeNome: "UNID3",
         unidadesParticipantes: "UNID3",
         situacao: SituacaoProcesso.FINALIZADO,
-        situacaoLabel: "Finalizado",
-        dataLimite: new Date().toISOString(),
-        dataLimiteFormatada: "20/11/2023",
+        dataLimite: "2023-11-20T10:00:00Z",
         dataCriacao: new Date().toISOString(),
-        dataFinalizacao: new Date("2024-08-26").toISOString(),
-        dataFinalizacaoFormatada: "26/08/2024",
+        dataFinalizacao: "2024-08-26T21:00:00Z",
     },
 ];
 
@@ -204,17 +197,13 @@ describe("TabelaProcessos.vue", () => {
                 ...mockProcessos[0],
                 codigo: 3,
                 situacao: SituacaoProcesso.CRIADO,
-                situacaoLabel: "Criado",
                 tipo: TipoProcesso.DIAGNOSTICO,
-                tipoLabel: "Diagnóstico"
             },
             {
                 ...mockProcessos[0],
                 codigo: 4,
-                situacao: "DESCONHECIDO" as any,
-                situacaoLabel: "DESCONHECIDO",
-                tipo: "OUTRO" as any,
-                tipoLabel: "OUTRO"
+                situacao: "OUTRA_SITUACAO" as any,
+                tipo: "OUTRO_TIPO" as any,
             }
         ];
 
@@ -232,11 +221,11 @@ describe("TabelaProcessos.vue", () => {
 
         const cells3 = rows[0].findAll("td");
         expect(cells3[1].text()).toBe("Diagnóstico");
-        expect(cells3[3].text()).toBe("Criado");
+        expect(cells3[3].text()).toContain("Criado");
 
         const cells4 = rows[1].findAll("td");
-        expect(cells4[1].text()).toBe("OUTRO");
-        expect(cells4[3].text()).toBe("DESCONHECIDO");
+        expect(cells4[1].text()).toBe("OUTRO_TIPO");
+        expect(cells4[3].text()).toContain("OUTRA_SITUACAO");
     });
 
     it("deve aplicar atributos nas linhas", async () => {

@@ -1,5 +1,6 @@
 package sgc.alerta;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +9,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import sgc.alerta.dto.AlertaDto;
+import sgc.alerta.model.Alerta;
+import sgc.comum.model.ComumViews;
 import sgc.organizacao.model.Usuario;
 
 import java.util.List;
@@ -23,20 +25,22 @@ public class AlertaController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
+    @JsonView(ComumViews.Publica.class)
     @Operation(summary = "Lista todos os alertas do usuário autenticado")
-    public ResponseEntity<List<AlertaDto>> listarAlertas(@AuthenticationPrincipal Object principal) {
+    public ResponseEntity<List<Alerta>> listarAlertas(@AuthenticationPrincipal Object principal) {
         String usuarioTitulo = extractTituloUsuario(principal);
-        List<AlertaDto> alertas = alertaFacade.listarAlertasPorUsuario(usuarioTitulo);
+        List<Alerta> alertas = alertaFacade.listarAlertasPorUsuario(usuarioTitulo);
 
         return ResponseEntity.ok(alertas);
     }
 
     @GetMapping("/nao-lidos")
     @PreAuthorize("isAuthenticated()")
+    @JsonView(ComumViews.Publica.class)
     @Operation(summary = "Lista alertas não lidos do usuário autenticado")
-    public ResponseEntity<List<AlertaDto>> listarNaoLidos(@AuthenticationPrincipal Object principal) {
+    public ResponseEntity<List<Alerta>> listarNaoLidos(@AuthenticationPrincipal Object principal) {
         String usuarioTitulo = extractTituloUsuario(principal);
-        List<AlertaDto> alertas = alertaFacade.listarAlertasNaoLidos(usuarioTitulo);
+        List<Alerta> alertas = alertaFacade.listarAlertasNaoLidos(usuarioTitulo);
 
         return ResponseEntity.ok(alertas);
     }
