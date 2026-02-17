@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.mapper.ProcessoDetalheMapper;
+import sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.UnidadeProcesso;
 import sgc.seguranca.acesso.Acao;
@@ -19,7 +19,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ProcessoDetalheBuilder {
     private final SubprocessoRepo subprocessoRepo;
-    private final ProcessoDetalheMapper processoDetalheMapper;
     private final AccessControlService accessControlService;
 
     @Transactional(readOnly = true)
@@ -49,7 +48,7 @@ public class ProcessoDetalheBuilder {
 
     private void montarHierarquiaUnidades(
             ProcessoDetalheDto dto, Processo processo, List<Subprocesso> subprocessos) {
-        Map<Long, ProcessoDetalheDto.UnidadeParticipanteDto> mapaUnidades = new HashMap<>();
+        Map<Long, UnidadeParticipanteDto> mapaUnidades = new HashMap<>();
         Map<Long, Subprocesso> mapaSubprocessos = new HashMap<>();
 
         // Criar índice de subprocessos por unidade para lookup O(1)
@@ -59,7 +58,7 @@ public class ProcessoDetalheBuilder {
 
         // Loop 1 consolidado: Mapear participantes (snapshots) E preencher dados dos subprocessos
         for (UnidadeProcesso participante : processo.getParticipantes()) {
-            ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto = processoDetalheMapper.fromSnapshot(participante);
+            UnidadeParticipanteDto unidadeDto = UnidadeParticipanteDto.fromSnapshot(participante);
             
             // Preencher dados do subprocesso se existir
             Subprocesso sp = mapaSubprocessos.get(participante.getUnidadeCodigo());
@@ -78,9 +77,9 @@ public class ProcessoDetalheBuilder {
         }
 
         // Loop 2 consolidado: Montar hierarquia E adicionar raízes
-        for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
+        for (UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
             Long codUnidadeSuperior = unidadeDto.getCodUnidadeSuperior();
-            ProcessoDetalheDto.UnidadeParticipanteDto pai = mapaUnidades.get(codUnidadeSuperior);
+            UnidadeParticipanteDto pai = mapaUnidades.get(codUnidadeSuperior);
             
             if (pai != null) {
                 // Tem pai participando do processo: adicionar como filho
@@ -92,12 +91,12 @@ public class ProcessoDetalheBuilder {
         }
 
         // Ordenação
-        Comparator<ProcessoDetalheDto.UnidadeParticipanteDto> comparator =
-                Comparator.comparing(ProcessoDetalheDto.UnidadeParticipanteDto::getSigla);
+        Comparator<UnidadeParticipanteDto> comparator =
+                Comparator.comparing(UnidadeParticipanteDto::getSigla);
 
         dto.getUnidades().sort(comparator);
 
-        for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
+        for (UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
             unidadeDto.getFilhos().sort(comparator);
         }
     }

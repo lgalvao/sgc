@@ -1,6 +1,8 @@
 package sgc.processo.dto;
 
 import lombok.*;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.UnidadeProcesso;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
@@ -55,6 +57,27 @@ public class ProcessoDetalheDto {
         private Long codSubprocesso;
 
 
+        public static UnidadeParticipanteDto fromUnidade(Unidade unidade) {
+            if (unidade == null) return null;
+            return UnidadeParticipanteDto.builder()
+                    .nome(unidade.getNome())
+                    .sigla(unidade.getSigla())
+                    .codUnidade(unidade.getCodigo())
+                    .codUnidadeSuperior(unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null)
+                    .filhos(new ArrayList<>())
+                    .build();
+        }
+
+        public static UnidadeParticipanteDto fromSnapshot(UnidadeProcesso snapshot) {
+            if (snapshot == null) return null;
+            return UnidadeParticipanteDto.builder()
+                    .nome(snapshot.getNome())
+                    .sigla(snapshot.getSigla())
+                    .codUnidade(snapshot.getUnidadeCodigo())
+                    .codUnidadeSuperior(snapshot.getUnidadeSuperiorCodigo())
+                    .filhos(new ArrayList<>())
+                    .build();
+        }
     }
 }
 

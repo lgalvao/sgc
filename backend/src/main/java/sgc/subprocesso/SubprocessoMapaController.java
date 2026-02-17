@@ -11,8 +11,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
-import sgc.analise.mapper.AnaliseMapper;
-import sgc.analise.model.TipoAnalise;
 import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.dto.MapaVisualizacaoResponse;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -20,6 +18,8 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaViews;
 import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.model.Usuario;
+import sgc.comum.dto.ComumDtos.JustificativaRequest;
+import sgc.comum.dto.ComumDtos.TextoRequest;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -39,7 +39,6 @@ public class SubprocessoMapaController {
     private final SubprocessoFacade subprocessoFacade;
     private final MapaFacade mapaFacade;
     private final AnaliseFacade analiseFacade;
-    private final AnaliseMapper analiseMapper;
 
     /**
      * Verifica os impactos que a disponibilização do mapa atual causará.
@@ -135,9 +134,9 @@ public class SubprocessoMapaController {
     @Operation(summary = "Apresenta sugestões de melhoria para o mapa")
     public void apresentarSugestoes(
             @PathVariable Long codigo,
-            @RequestBody @Valid ApresentarSugestoesRequest request,
+            @RequestBody @Valid TextoRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        subprocessoFacade.apresentarSugestoes(codigo, request.sugestoes(), usuario);
+        subprocessoFacade.apresentarSugestoes(codigo, request.texto(), usuario);
     }
 
     /**
@@ -155,9 +154,7 @@ public class SubprocessoMapaController {
     @GetMapping("/{codigo}/historico-validacao")
     @PreAuthorize("isAuthenticated()")
     public List<AnaliseValidacaoHistoricoDto> obterHistoricoValidacao(@PathVariable Long codigo) {
-        return analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.VALIDACAO).stream()
-                .map(analiseMapper::toAnaliseValidacaoHistoricoDto)
-                .toList();
+        return analiseFacade.listarHistoricoValidacao(codigo);
     }
 
     @PostMapping("/{codigo}/validar-mapa")
@@ -173,7 +170,7 @@ public class SubprocessoMapaController {
     @Operation(summary = "Devolve o mapa para ajuste (pelo chefe/gestor)")
     public ResponseEntity<Void> devolverValidacao(
             @PathVariable Long codigo,
-            @RequestBody @Valid DevolverValidacaoRequest request,
+            @RequestBody @Valid JustificativaRequest request,
             @AuthenticationPrincipal Usuario usuario) {
         subprocessoFacade.devolverValidacao(codigo, request.justificativa(), usuario);
         return ResponseEntity.ok().build();

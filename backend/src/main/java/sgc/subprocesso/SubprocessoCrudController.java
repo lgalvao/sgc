@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
+import sgc.comum.dto.ComumDtos.DataRequest;
+import sgc.comum.dto.ComumDtos.JustificativaRequest;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoViews;
@@ -55,8 +57,6 @@ public class SubprocessoCrudController {
 
     /**
      * Lista todos os subprocessos.
-     * <p>
-     * Ação restrita a usuários com perfil 'ADMIN'.
      *
      * @return Uma {@link List} de {@link Subprocesso}.
      */
@@ -70,7 +70,7 @@ public class SubprocessoCrudController {
     /**
      * Obtém os detalhes de um subprocesso específico.
      *
-     * @param codigo         O código do subprocesso.
+     * @param codigo O código do subprocesso.
      * @return Os detalhes do subprocesso.
      */
     @GetMapping("/{codigo}")
@@ -100,9 +100,6 @@ public class SubprocessoCrudController {
     /**
      * Cria um novo subprocesso.
      *
-     * <p>
-     * Ação restrita a usuários com perfil 'ADMIN'.
-     *
      * @param request O DTO com os dados do subprocesso a ser criado.
      * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo
      *         subprocesso e o
@@ -119,9 +116,6 @@ public class SubprocessoCrudController {
 
     /**
      * Atualiza um subprocesso existente.
-     *
-     * <p>
-     * Ação restrita a usuários com perfil 'ADMIN'.
      *
      * @param codigo  O código do subprocesso a ser atualizado.
      * @param request O DTO com os novos dados do subprocesso.
@@ -140,9 +134,6 @@ public class SubprocessoCrudController {
     /**
      * Exclui um subprocesso.
      *
-     * <p>
-     * Ação restrita a usuários com perfil 'ADMIN'.
-     *
      * @param codigo O código do subprocesso a ser excluído.
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
@@ -155,41 +146,38 @@ public class SubprocessoCrudController {
 
     /**
      * Altera a data limite de um subprocesso.
-     * (CDU-27)
      */
     @PostMapping("/{codigo}/data-limite")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> alterarDataLimite(
             @PathVariable Long codigo,
-            @RequestBody @Valid AlterarDataLimiteRequest request) {
-        subprocessoFacade.alterarDataLimite(codigo, request.novaDataLimite());
+            @RequestBody @Valid DataRequest request) {
+        subprocessoFacade.alterarDataLimite(codigo, request.data());
         return ResponseEntity.ok().build();
     }
 
     /**
      * Reabre o cadastro de um subprocesso.
-     * (CDU-32)
      */
     @PostMapping("/{codigo}/reabrir-cadastro")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Reabre o cadastro de um subprocesso")
     public ResponseEntity<Void> reabrirCadastro(
             @PathVariable Long codigo,
-            @RequestBody @Valid ReabrirProcessoRequest request) {
+            @RequestBody @Valid JustificativaRequest request) {
         subprocessoFacade.reabrirCadastro(codigo, request.justificativa());
         return ResponseEntity.ok().build();
     }
 
     /**
      * Reabre a revisão de cadastro de um subprocesso.
-     * (CDU-33)
      */
     @PostMapping("/{codigo}/reabrir-revisao-cadastro")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Reabre a revisão de cadastro de um subprocesso")
     public ResponseEntity<Void> reabrirRevisaoCadastro(
             @PathVariable Long codigo,
-            @RequestBody @Valid ReabrirProcessoRequest request) {
+            @RequestBody @Valid JustificativaRequest request) {
         subprocessoFacade.reabrirRevisaoCadastro(codigo, request.justificativa());
         return ResponseEntity.ok().build();
     }

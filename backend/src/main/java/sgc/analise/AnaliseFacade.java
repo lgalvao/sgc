@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.analise.dto.AnaliseHistoricoDto;
+import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -37,10 +40,46 @@ public class AnaliseFacade {
      * @return Uma lista de {@link Analise} ordenada pela data e hora em ordem decrescente.
      */
     @Transactional(readOnly = true)
-    public List<Analise> listarPorSubprocesso(Long codSubprocesso, TipoAnalise tipoAnalise) {
+    public List<AnaliseHistoricoDto> listarHistoricoCadastro(Long codSubprocesso) {
         return analiseService.listarPorSubprocesso(codSubprocesso).stream()
-                .filter(analise -> analise.getTipo() == tipoAnalise)
+                .filter(a -> a.getTipo() == TipoAnalise.CADASTRO)
+                .map(this::paraHistoricoDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<AnaliseValidacaoHistoricoDto> listarHistoricoValidacao(Long codSubprocesso) {
+        return analiseService.listarPorSubprocesso(codSubprocesso).stream()
+                .filter(a -> a.getTipo() == TipoAnalise.VALIDACAO)
+                .map(this::paraValidacaoHistoricoDto)
+                .toList();
+    }
+
+    private AnaliseHistoricoDto paraHistoricoDto(Analise analise) {
+        UnidadeDto unidade = unidadeService.buscarPorCodigo(analise.getUnidadeCodigo());
+        return AnaliseHistoricoDto.builder()
+                .dataHora(analise.getDataHora())
+                .observacoes(analise.getObservacoes())
+                .acao(analise.getAcao())
+                .unidadeSigla(unidade.getSigla())
+                .unidadeNome(unidade.getNome())
+                .analistaUsuarioTitulo(analise.getUsuarioTitulo())
+                .motivo(analise.getMotivo())
+                .tipo(analise.getTipo())
+                .build();
+    }
+
+    private AnaliseValidacaoHistoricoDto paraValidacaoHistoricoDto(Analise analise) {
+        UnidadeDto unidade = unidadeService.buscarPorCodigo(analise.getUnidadeCodigo());
+        return AnaliseValidacaoHistoricoDto.builder()
+                .dataHora(analise.getDataHora())
+                .observacoes(analise.getObservacoes())
+                .acao(analise.getAcao())
+                .unidadeSigla(unidade.getSigla())
+                .analistaUsuarioTitulo(analise.getUsuarioTitulo())
+                .motivo(analise.getMotivo())
+                .tipo(analise.getTipo())
+                .build();
     }
 
     /**
