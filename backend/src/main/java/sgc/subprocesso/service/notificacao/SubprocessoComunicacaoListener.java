@@ -13,12 +13,6 @@ import sgc.subprocesso.model.Subprocesso;
 
 /**
  * Listener assíncrono para eventos de transição de subprocesso.
- *
- * <p>Responsável por processar comunicações (alertas e e-mails) de forma assíncrona,
- * desacoplando essas operações da transação principal do workflow.
- *
- * <p><b>Fase 3 (ADR-002):</b> Tornado assíncrono para desacoplamento completo entre
- * workflow principal e comunicação/notificação.
  */
 @Component
 @RequiredArgsConstructor
@@ -30,10 +24,11 @@ public class SubprocessoComunicacaoListener {
     /**
      * Processa evento de transição de forma assíncrona.
      *
-     * <p>Este método é executado em uma thread separada da transação principal,
+     * Este método é executado em uma thread separada da transação principal,
      * permitindo que falhas na comunicação não afetem o workflow do subprocesso.
      *
-     * @param evento Evento de transição contendo dados do subprocesso e da transição
+     * @param evento Evento de transição contendo dados do subprocesso e da
+     *               transição
      */
     @EventListener
     @Async
@@ -42,8 +37,11 @@ public class SubprocessoComunicacaoListener {
         Subprocesso sp = evento.getSubprocesso();
         TipoTransicao tipo = evento.getTipo();
 
-        if (tipo.geraAlerta()) criarAlerta(sp, evento);
-        if (tipo.enviaEmail()) emailService.enviarEmailTransicao(evento);
+        if (tipo.geraAlerta())
+            criarAlerta(sp, evento);
+
+        if (tipo.enviaEmail())
+            emailService.enviarEmailTransicao(evento);
     }
 
     private void criarAlerta(Subprocesso sp, EventoTransicaoSubprocesso evento) {
@@ -55,7 +53,6 @@ public class SubprocessoComunicacaoListener {
                 sp.getProcesso(),
                 descricao,
                 evento.getUnidadeOrigem(),
-                evento.getUnidadeDestino()
-        );
+                evento.getUnidadeDestino());
     }
 }
