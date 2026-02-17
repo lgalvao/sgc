@@ -44,6 +44,7 @@
 import {BButton, BTable} from "bootstrap-vue-next";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import type {Alerta} from "@/types/tipos";
+import {formatDateBR} from "@/utils";
 
 defineProps<{
   alertas: Alerta[];
@@ -55,7 +56,7 @@ const emit = defineEmits<{
 }>();
 
 const fields = [
-  {key: "dataHoraFormatada", label: "Data/Hora", sortable: true},
+  {key: "dataHora", label: "Data/Hora", sortable: true, formatter: (value: unknown) => formatDateBR(value as string)},
   {key: "mensagem", label: "Descrição"},
   {key: "processo", label: "Processo", sortable: true},
   {key: "origem", label: "Origem"},
@@ -67,7 +68,7 @@ const rowClass = (item: Alerta | null) => {
 };
 
 const handleSortChange = (ctx: any) => {
-  if (ctx.sortBy === "dataHoraFormatada") {
+  if (ctx.sortBy === "dataHora") {
     emit("ordenar", "data");
   } else if (ctx.sortBy === "processo") {
     emit("ordenar", "processo");

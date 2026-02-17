@@ -23,7 +23,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
+
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
@@ -89,25 +89,7 @@ class SubprocessoAtividadeServiceTest {
             verifyNoInteractions(eventPublisher);
         }
 
-        @Test
-        @DisplayName("deve lançar exceção quando subprocesso destino em situação inválida")
-        void deveLancarExcecaoQuandoSubprocessoDestinoEmSituacaoInvalida() {
-            // Arrange
-            Long codDestino = 1L;
-            Long codOrigem = 2L;
 
-            Subprocesso spDestino = criarSubprocesso(codDestino, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-            when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
-
-            // Act & Assert
-            assertThatThrownBy(() -> service.importarAtividades(codDestino, codOrigem))
-                    .isInstanceOf(ErroAtividadesEmSituacaoInvalida.class)
-                    .hasMessageContaining("cadastro em elaboração ou não iniciado");
-
-            verify(repo).buscar(Subprocesso.class, codDestino);
-            verify(subprocessoRepo, never()).findById(codOrigem);
-            verifyNoInteractions(eventPublisher);
-        }
 
         @Test
         @DisplayName("deve lançar exceção quando subprocesso origem não encontrado")

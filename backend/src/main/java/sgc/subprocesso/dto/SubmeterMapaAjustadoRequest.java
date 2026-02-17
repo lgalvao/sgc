@@ -8,7 +8,6 @@ import org.jspecify.annotations.Nullable;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,11 +26,4 @@ public record SubmeterMapaAjustadoRequest(
         @Valid
         List<CompetenciaAjusteDto> competencias) {
 
-    /**
-     * Construtor para compatibilidade com testes legados.
-     */
-    // TODO remover sempre coisas legadas!
-    public SubmeterMapaAjustadoRequest(String justificativa, LocalDateTime dataLimiteEtapa2) {
-        this(justificativa, dataLimiteEtapa2, Collections.emptyList());
-    }
 }

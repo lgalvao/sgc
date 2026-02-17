@@ -38,13 +38,13 @@ describe('atividades mappers', () => {
 
   it('mapSubprocessoSituacaoToModel maps correctly', () => {
     const dto = { codigo: 1, situacao: SituacaoSubprocesso.NAO_INICIADO, situacaoLabel: 'L1' };
-    expect(mapSubprocessoSituacaoToModel(dto)).toEqual(dto);
+    expect(mapSubprocessoSituacaoToModel(dto)).toEqual({ codigo: 1, situacao: SituacaoSubprocesso.NAO_INICIADO });
   });
 
   it('mapAtividadeOperacaoResponseToModel maps correctly', () => {
     const dto = {
       atividade: { codigo: 1, descricao: 'A1', conhecimentos: [] },
-      subprocesso: { codigo: 1, situacao: SituacaoSubprocesso.NAO_INICIADO, situacaoLabel: 'L1' },
+      subprocesso: { codigo: 1, situacao: SituacaoSubprocesso.NAO_INICIADO },
       atividadesAtualizadas: [{ codigo: 2, descricao: 'A2', conhecimentos: [] }]
     };
     const model = mapAtividadeOperacaoResponseToModel(dto as any);
@@ -56,7 +56,7 @@ describe('atividades mappers', () => {
   it('mapAtividadeOperacaoResponseToModel handles null atividade', () => {
     const dto = {
       atividade: null,
-      subprocesso: { codigo: 1, situacao: SituacaoSubprocesso.NAO_INICIADO, situacaoLabel: 'L1' },
+      subprocesso: { codigo: 1, situacao: SituacaoSubprocesso.NAO_INICIADO },
       atividadesAtualizadas: []
     };
     const model = mapAtividadeOperacaoResponseToModel(dto as any);
@@ -101,7 +101,7 @@ describe('atividades mappers', () => {
   it('mapAtividadeOperacaoResponseToModel filters out null atividadesAtualizadas', () => {
     const dto = {
       atividade: null,
-      subprocesso: { codigo: 1, situacao: SituacaoSubprocesso.NAO_INICIADO, situacaoLabel: 'L1' },
+      subprocesso: { codigo: 1, situacao: SituacaoSubprocesso.NAO_INICIADO },
       atividadesAtualizadas: [null, { codigo: 1, descricao: 'A1', conhecimentos: [] }]
     };
     const model = mapAtividadeOperacaoResponseToModel(dto as any);

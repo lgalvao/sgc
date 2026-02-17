@@ -111,9 +111,10 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve submeter o mapa ajustado e alterar a situação do subprocesso")
     void deveSubmeterMapaAjustadoComSucesso() throws Exception {
         var request =
-                new SubmeterMapaAjustadoRequest(
-                        "Ajustes realizados conforme solicitado.",
-                        LocalDateTime.now().plusDays(10));
+                SubmeterMapaAjustadoRequest.builder()
+                        .justificativa("Ajustes realizados conforme solicitado.")
+                        .dataLimiteEtapa2(LocalDateTime.now().plusDays(10))
+                        .build();
 
         mockMvc.perform(
                         post(

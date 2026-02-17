@@ -5,7 +5,6 @@ import {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 import {useProcessosStore} from "../processos";
 import {normalizeError} from "@/utils/apiError";
 
-// Mocks
 vi.mock("@/services/painelService");
 vi.mock("@/services/processoService");
 vi.mock("../unidades", () => ({ useUnidadesStore: vi.fn(() => ({})) }));
