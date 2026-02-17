@@ -15,7 +15,6 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
 import sgc.processo.erros.ErroProcesso;
-import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
@@ -28,8 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
-
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
@@ -44,7 +41,6 @@ public class ProcessoFacade {
     private final ProcessoManutencaoService processoManutencaoService;
     private final UnidadeFacade unidadeService;
     private final SubprocessoFacade subprocessoFacade;
-    private final ProcessoMapper processoMapper;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final UsuarioFacade usuarioService;
     private final ProcessoInicializador processoInicializador;
@@ -153,6 +149,7 @@ public class ProcessoFacade {
         processoFinalizador.finalizar(codigo);
     }
 
+    // TODO o envio de email aqui deveria usar um template e nao montar tudo aqui
     @Transactional
     public void enviarLembrete(Long codProcesso, Long unidadeCodigo) {
         Processo processo = buscarEntidadePorId(codProcesso);

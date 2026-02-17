@@ -15,6 +15,8 @@ import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoViews;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoViews;
 
 import java.net.URI;
 import java.util.List;
@@ -46,12 +48,13 @@ public class ProcessoController {
      * @param requisicao O DTO com os dados para a criação do processo.
      * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo
      *         processo e o {@link
-     *         ProcessoDto} criado no corpo da resposta.
+     *         Processo} criado no corpo da resposta.
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ProcessoDto> criar(@Valid @RequestBody CriarProcessoRequest requisicao) {
-        ProcessoDto criado = processoFacade.criar(requisicao);
+    @JsonView(ProcessoViews.Publica.class)
+    public ResponseEntity<Processo> criar(@Valid @RequestBody CriarProcessoRequest requisicao) {
+        Processo criado = processoFacade.criar(requisicao);
         URI uri = URI.create("/api/processos/%d".formatted(criado.getCodigo()));
         return ResponseEntity.created(uri).body(criado);
     }
@@ -81,7 +84,8 @@ public class ProcessoController {
      */
     @GetMapping("/{codigo}")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
-    public ResponseEntity<ProcessoDto> obterPorId(@PathVariable Long codigo) {
+    @JsonView(ProcessoViews.Publica.class)
+    public ResponseEntity<Processo> obterPorId(@PathVariable Long codigo) {
         return processoFacade
                 .obterPorId(codigo)
                 .map(ResponseEntity::ok)
@@ -98,9 +102,10 @@ public class ProcessoController {
      */
     @PostMapping("/{codigo}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ProcessoDto> atualizar(
+    @JsonView(ProcessoViews.Publica.class)
+    public ResponseEntity<Processo> atualizar(
             @PathVariable Long codigo, @Valid @RequestBody AtualizarProcessoRequest requisicao) {
-        ProcessoDto atualizado = processoFacade.atualizar(codigo, requisicao);
+        Processo atualizado = processoFacade.atualizar(codigo, requisicao);
         return ResponseEntity.ok(atualizado);
     }
 
@@ -125,7 +130,8 @@ public class ProcessoController {
      */
     @GetMapping("/finalizados")
     @Operation(summary = "Lista todos os processos com situação FINALIZADO")
-    public ResponseEntity<List<ProcessoDto>> listarFinalizados() {
+    @JsonView(ProcessoViews.Publica.class)
+    public ResponseEntity<List<Processo>> listarFinalizados() {
         return ResponseEntity.ok(processoFacade.listarFinalizados());
     }
 
@@ -136,7 +142,8 @@ public class ProcessoController {
      */
     @GetMapping("/ativos")
     @Operation(summary = "Lista todos os processos com situação EM_ANDAMENTO")
-    public ResponseEntity<List<ProcessoDto>> listarAtivos() {
+    @JsonView(ProcessoViews.Publica.class)
+    public ResponseEntity<List<Processo>> listarAtivos() {
         return ResponseEntity.ok(processoFacade.listarAtivos());
     }
 
@@ -176,17 +183,18 @@ public class ProcessoController {
     @PostMapping("/{codigo}/iniciar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Inicia um processo")
-    public ResponseEntity<Object> iniciar(
+    @JsonView(ProcessoViews.Publica.class)
+    public ResponseEntity<Processo> iniciar(
             @PathVariable Long codigo, @Valid @RequestBody IniciarProcessoRequest req) {
 
         var processador = getProcessadoresInicio().get(req.tipo());
 
         List<String> erros = processador.apply(codigo, req.unidades());
         if (!erros.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("erros", erros));
+            return ResponseEntity.badRequest().build();
         }
 
-        ProcessoDto processoAtualizado = processoFacade.obterDtoPorId(codigo);
+        Processo processoAtualizado = processoFacade.obterEntidadePorId(codigo);
         return ResponseEntity.ok(processoAtualizado);
     }
 

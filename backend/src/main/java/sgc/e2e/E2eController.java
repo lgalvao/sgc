@@ -18,7 +18,7 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
-import sgc.processo.dto.ProcessoDto;
+import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
@@ -167,7 +167,7 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-mapeamento")
     @Transactional
-    public ProcessoDto criarProcessoMapeamento(@RequestBody ProcessoFixtureRequest request) {
+    public Processo criarProcessoMapeamento(@RequestBody ProcessoFixtureRequest request) {
         return executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.MAPEAMENTO));
     }
 
@@ -176,7 +176,7 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-revisao")
     @Transactional
-    public ProcessoDto criarProcessoRevisao(@RequestBody ProcessoFixtureRequest request) {
+    public Processo criarProcessoRevisao(@RequestBody ProcessoFixtureRequest request) {
         return executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.REVISAO));
     }
 
@@ -201,7 +201,7 @@ public class E2eController {
     /**
      * Método auxiliar para criar processos fixtures.
      */
-    private ProcessoDto criarProcessoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
+    private Processo criarProcessoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
         // Validar entrada
         if (request.unidadeSigla().isBlank()) {
             throw new ErroValidacao("Unidade é obrigatória");
@@ -230,7 +230,7 @@ public class E2eController {
                 .build();
 
         // Criar processo
-        ProcessoDto processo = processoFacade.criar(criarReq);
+        Processo processo = processoFacade.criar(criarReq);
 
         // Iniciar se solicitado
         if (Boolean.TRUE.equals(request.iniciar())) {
@@ -250,7 +250,7 @@ public class E2eController {
             }
 
             // Recarregar processo após iniciar
-            processo = processoFacade.obterDtoPorId(processoCodigo);
+            processo = processoFacade.obterEntidadePorId(processoCodigo);
         }
 
         return processo;
