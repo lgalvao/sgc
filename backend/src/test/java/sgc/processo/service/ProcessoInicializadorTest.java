@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.model.*;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
@@ -41,7 +40,7 @@ class ProcessoInicializadorTest {
     @Mock
     private UnidadeMapaRepo unidadeMapaRepo;
     @Mock
-    private ApplicationEventPublisher publicadorEventos;
+    private ProcessoNotificacaoService notificacaoService;
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock
@@ -118,7 +117,7 @@ class ProcessoInicializadorTest {
 
         assertThat(erros).isEmpty();
         verify(subprocessoFacade).criarParaMapeamento(eq(p), any(), eq(admin), eq(usuario));
-        verify(publicadorEventos).publishEvent(any(Object.class));
+        verify(notificacaoService).notificarInicioProcesso(eq(1L), anyList());
         assertThat(p.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
     }
 
@@ -186,6 +185,7 @@ class ProcessoInicializadorTest {
         assertThat(erros).isEmpty();
         verify(unidadeMapaRepo).findAllById(anyList());
         verify(subprocessoFacade).criarParaRevisao(p, u, um, admin, usuario);
+        verify(notificacaoService).notificarInicioProcesso(eq(1L), anyList());
     }
 
     @Test
@@ -213,5 +213,6 @@ class ProcessoInicializadorTest {
 
         assertThat(erros).isEmpty();
         verify(subprocessoFacade).criarParaDiagnostico(eq(p), any(), any(), eq(admin), eq(usuario));
+        verify(notificacaoService).notificarInicioProcesso(eq(1L), anyList());
     }
 }

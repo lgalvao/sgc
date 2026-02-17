@@ -129,25 +129,6 @@ public class ArchConsistencyTest {
             })
             .because("Controllers e Services devem estar em pacotes @NullMarked para garantir null-safety");
 
-    /**
-     * Garante que Controllers usem apenas Facades, nunca services especializados.
-     * Isso força o padrão Facade (ADR-001) e garante encapsulamento adequado.
-     *
-     * <p><b>Implementado como parte da Fase 2 da proposta de arquitetura (ADR-006).</b>
-     *
-     * <p>Services especializados (que não são Facades) não devem ser acessados diretamente
-     * por Controllers. Toda interação deve passar pela Facade apropriada.
-     *
-     * <p><b>Exceções para simplificação (intranet ~10 usuários):</b>
-     * - ConfiguracaoController pode usar ConfiguracaoService diretamente (CRUD simples)
-     *
-     * <p><b>Nota:</b> Esta regra substitui verificações anteriores específicas por serviço,
-     * criando uma regra geral que se aplica a TODOS os services não-Facade.
-     *
-     * @see <a href="/proposta-arquitetura.md">Proposta de Arquitetura - Fase 2</a>
-     * @see <a href="/docs/adr/ADR-001-facade-pattern.md">ADR-001: Facade Pattern</a>
-     * @see <a href="/docs/adr/ADR-006-domain-aggregates-organization.md">ADR-006</a>
-     */
     @ArchTest
     static final ArchRule controllers_should_only_use_facades_not_specialized_services = classes()
             .that()
@@ -181,20 +162,6 @@ public class ArchConsistencyTest {
             })
             .because("Controllers should only use Facades (ADR-001, ADR-006 Phase 2) - specialized services must be accessed through Facades");
 
-    /**
-     * REMOVIDO: Facade AcompanhamentoFacade foi eliminada na simplificação agressiva
-     * para sistema intranet com ~10 usuários.
-     * 
-     * Controllers de análise/alerta/painel agora usam facades específicas diretamente
-     * (AlertaFacade, AnaliseFacade, PainelFacade) para reduzir indireção desnecessária.
-     * 
-     * Decisão documentada em simplification-tracking.md
-     */
-
-    /**
-     * Garante que todas as classes Facade tenham o sufixo "Facade" no nome.
-     * Isso melhora a consistência e clareza arquitetural.
-     */
     @ArchTest
     static final ArchRule facades_should_have_facade_suffix = classes()
             .that()
@@ -207,10 +174,6 @@ public class ArchConsistencyTest {
             .haveSimpleNameEndingWith("Facade")
             .because("Facade classes should have 'Facade' as suffix for consistency");
 
-    /**
-     * Garante que DTOs não sejam entidades JPA.
-     * Entidades JPA nunca devem ser expostas diretamente nas APIs.
-     */
     @ArchTest
     static final ArchRule dtos_should_not_be_jpa_entities = noClasses()
             .that()
@@ -310,14 +273,21 @@ public class ArchConsistencyTest {
             .resideInAPackage("..eventos..")
             .or()
             .resideInAPackage("..evento..")
-            .and()
-            .areNotEnums()
-            .and()
-            .haveSimpleNameNotContaining("package-info")
-            .and()
-            .haveSimpleNameNotEndingWith("Listener")
-            .should()
-            .haveSimpleNameStartingWith("Evento")
+            .should(new ArchCondition<>("start with 'Evento' (unless it's an Enum, Listener or package-info)") {
+                @Override
+                public void check(JavaClass item, ConditionEvents events) {
+                    boolean isEnum = item.isEnum();
+                    boolean isListener = item.getSimpleName().endsWith("Listener");
+                    boolean isPackageInfo = item.getSimpleName().contains("package-info");
+                    boolean startsWithEvento = item.getSimpleName().startsWith("Evento");
+
+                    if (!isEnum && !isListener && !isPackageInfo && !startsWithEvento) {
+                        String message = String.format("Class %s resides in event package but doesn't start with 'Evento'", 
+                                item.getName());
+                        events.add(SimpleConditionEvent.violated(item, message));
+                    }
+                }
+            })
             .because("Domain events should start with 'Evento' prefix for consistency");
 
     /**

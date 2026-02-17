@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.UnidadeFacade;
 import sgc.processo.erros.ErroProcesso;
@@ -38,7 +37,7 @@ class ProcessoFinalizadorCoverageTest {
     @Mock
     private ProcessoValidador processoValidador;
     @Mock
-    private ApplicationEventPublisher publicadorEventos;
+    private ProcessoNotificacaoService notificacaoService;
 
     @InjectMocks
     private ProcessoFinalizador finalizador;
@@ -60,6 +59,7 @@ class ProcessoFinalizadorCoverageTest {
         // Assert
         verify(queryService, never()).listarEntidadesPorProcesso(any());
         verify(processoRepo).save(processo);
+        verify(notificacaoService).notificarFinalizacaoProcesso(codigo);
     }
 
     @Test
