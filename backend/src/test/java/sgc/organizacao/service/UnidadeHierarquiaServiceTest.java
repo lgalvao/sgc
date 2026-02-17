@@ -96,24 +96,59 @@ class UnidadeHierarquiaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve buscar árvore por código")
+    @DisplayName("Deve buscar árvore por código (nível profundo)")
     void deveBuscarArvorePorCodigo() {
         when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
 
-        UnidadeDto resultado = service.buscarArvore(2L);
+        UnidadeDto resultado = service.buscarArvore(3L);
 
-        assertThat(resultado.getSigla()).isEqualTo(unidadeIntermediaria.getSigla());
-        assertThat(resultado.getSubunidades()).hasSize(1);
+        assertThat(resultado.getSigla()).isEqualTo(unidadeOperacional.getSigla());
     }
 
     @Test
-    @DisplayName("Deve buscar siglas subordinadas")
+    @DisplayName("Deve buscar siglas subordinadas (a partir da raiz)")
     void deveBuscarSiglasSubordinadas() {
         when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
 
-        List<String> siglas = service.buscarSiglasSubordinadas(unidadeIntermediaria.getSigla());
+        List<String> siglas = service.buscarSiglasSubordinadas(unidadeRaiz.getSigla());
 
-        assertThat(siglas).containsExactlyInAnyOrder(unidadeIntermediaria.getSigla(), unidadeOperacional.getSigla());
+        assertThat(siglas).containsExactlyInAnyOrder(
+                unidadeRaiz.getSigla(),
+                unidadeIntermediaria.getSigla(),
+                unidadeOperacional.getSigla()
+        );
+    }
+
+    @Test
+    @DisplayName("buscarArvore deve buscar no repo se não encontrar na hierarquia")
+    void buscarArvore_DeveBuscarNoRepoSeNaoEncontrarNaHierarquia() {
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz));
+        Unidade extra = Unidade.builder()
+                .codigo(99L)
+                .sigla("EXTRA")
+                .tipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL)
+                .build();
+        when(repo.buscar(Unidade.class, 99L)).thenReturn(extra);
+
+        UnidadeDto resultado = service.buscarArvore(99L);
+
+        assertThat(resultado.getSigla()).isEqualTo("EXTRA");
+    }
+
+    @Test
+    @DisplayName("buscarSiglasSubordinadas deve retornar vazio se não encontrar sigla")
+    void buscarSiglasSubordinadas_DeveRetornarVazioSeNaoEncontrar() {
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz));
+        Unidade extra = Unidade.builder()
+                .codigo(100L)
+                .sigla("INEXISTENTE")
+                .tipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL)
+                .build();
+        when(repo.buscarPorSigla(Unidade.class, "INEXISTENTE")).thenReturn(extra);
+
+        List<String> resultado = service.buscarSiglasSubordinadas("INEXISTENTE");
+
+        assertThat(resultado).isEmpty();
     }
 
     @Test

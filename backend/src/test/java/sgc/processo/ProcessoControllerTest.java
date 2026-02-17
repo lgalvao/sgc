@@ -339,6 +339,85 @@ class ProcessoControllerTest {
     }
 
     @Nested
+    @DisplayName("Novas Listagens e Status")
+    class NovasListagens {
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        @DisplayName("obterStatusUnidades deve retornar unidades desabilitadas")
+        void deveObterStatusUnidades() throws Exception {
+            when(processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO")).thenReturn(List.of(1L, 2L));
+
+            mockMvc.perform(get("/api/processos/status-unidades")
+                            .param("tipo", "MAPEAMENTO"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.unidadesDesabilitadas").isArray())
+                    .andExpect(jsonPath("$.unidadesDesabilitadas[0]").value(1L));
+        }
+
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        @DisplayName("listarAtivos deve retornar processos em andamento")
+        void deveListarAtivos() throws Exception {
+            when(processoFacade.listarAtivos()).thenReturn(List.of(ProcessoDto.builder().codigo(1L).build()));
+
+            mockMvc.perform(get("/api/processos/ativos"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].codigo").value(1L));
+        }
+
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        @DisplayName("obterContextoCompleto deve retornar detalhes do processo")
+        void deveObterContextoCompleto() throws Exception {
+            ProcessoDetalheDto dto = ProcessoDetalheDto.builder().codigo(1L).build();
+            when(processoFacade.obterContextoCompleto(eq(1L), any())).thenReturn(dto);
+
+            mockMvc.perform(get("/api/processos/1/contexto-completo"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.codigo").value(1L));
+        }
+
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        @DisplayName("listarUnidadesBloqueadas deve retornar lista")
+        void deveListarUnidadesBloqueadas() throws Exception {
+            when(processoFacade.listarUnidadesBloqueadasPorTipo("REVISAO")).thenReturn(List.of(10L));
+
+            mockMvc.perform(get("/api/processos/unidades-bloqueadas")
+                            .param("tipo", "REVISAO"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0]").value(10L));
+        }
+
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        @DisplayName("listarSubprocessosElegiveis deve retornar lista")
+        void deveListarSubprocessosElegiveis() throws Exception {
+            SubprocessoElegivelDto dto = SubprocessoElegivelDto.builder().codigo(1L).build();
+            when(processoFacade.listarSubprocessosElegiveis(1L)).thenReturn(List.of(dto));
+
+            mockMvc.perform(get("/api/processos/1/subprocessos-elegiveis"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].codigo").value(1L));
+        }
+
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        @DisplayName("enviarLembrete deve chamar facade")
+        void deveEnviarLembrete() throws Exception {
+            EnviarLembreteRequest req = new EnviarLembreteRequest(10L);
+            
+            mockMvc.perform(post("/api/processos/1/enviar-lembrete")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(req)))
+                    .andExpect(status().isOk());
+
+            verify(processoFacade).enviarLembrete(1L, 10L);
+        }
+    }
+
+    @Nested
     @DisplayName("Cobertura Extra")
     class CoberturaExtra {
         

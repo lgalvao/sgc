@@ -173,12 +173,19 @@ class UsuarioFacadeTest {
             assertThat(resultado).hasSize(1);
             assertThat(resultado.get(codigoUnidade).titularTitulo()).isEqualTo(titulo);
         }
+
+        @Test
+        @DisplayName("buscarResponsaveisUnidades deve retornar mapa vazio se lista vazia")
+        void deveRetornarMapaVazioSeListaVazia() {
+            Map<Long, UnidadeResponsavelDto> resultado = facade.buscarResponsaveisUnidades(List.of());
+            assertThat(resultado).isEmpty();
+            verifyNoInteractions(unidadeResponsavelService);
+        }
     }
 
     @Nested
     @DisplayName("Gestão de Administradores")
     class GestaoAdministradores {
-
         @Test
         @DisplayName("Deve listar administradores com sucesso")
         void deveListarAdministradores() {
@@ -228,6 +235,20 @@ class UsuarioFacadeTest {
 
             // Assert
             verify(usuarioService).removerAdministrador(tituloRemover);
+        }
+
+        @Test
+        @DisplayName("removerAdministrador deve falhar ao remover a si mesmo")
+        void deveFalharAoRemoverSiMesmo() {
+            assertThatThrownBy(() -> facade.removerAdministrador("111", "111"))
+                    .isInstanceOf(ErroValidacao.class);
+        }
+
+        @Test
+        @DisplayName("Deve verificar se é administrador")
+        void deveVerificarSeAdministrador() {
+            when(usuarioService.isAdministrador("111")).thenReturn(true);
+            assertThat(facade.isAdministrador("111")).isTrue();
         }
     }
 
@@ -303,6 +324,16 @@ class UsuarioFacadeTest {
             // Assert
             assertThat(resultado).hasSize(2).containsKeys("111111", "222222");
         }
+    }
+
+    @Test
+    @DisplayName("extrairTituloUsuario deve lidar com tipos diferentes")
+    void deveExtrairTituloUsuario() {
+        assertThat(facade.extrairTituloUsuario("123")).isEqualTo("123");
+        Usuario u = new Usuario(); u.setTituloEleitoral("456");
+        assertThat(facade.extrairTituloUsuario(u)).isEqualTo("456");
+        assertThat(facade.extrairTituloUsuario(123L)).isEqualTo("123");
+        assertThat(facade.extrairTituloUsuario(null)).isNull();
     }
 
     // Métodos auxiliares
