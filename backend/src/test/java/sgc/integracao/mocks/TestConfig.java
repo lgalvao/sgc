@@ -35,11 +35,6 @@ public class TestConfig implements AsyncConfigurer {
 
     /**
      * Configuração para executar métodos @Async de forma síncrona em testes.
-     *
-     * <p>Isso permite que os testes verifiquem o comportamento dos listeners de eventos
-     * imediatamente após publicar eventos, sem precisar aguardar threads assíncronas.
-     *
-     * <p>Fase 3: Necessário após tornar listeners assíncronos com @Async.
      */
     @Override
     @Bean(name = "taskExecutor")

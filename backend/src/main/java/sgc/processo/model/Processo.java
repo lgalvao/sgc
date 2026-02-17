@@ -60,7 +60,6 @@ public class Processo extends EntidadeBase {
     /**
      * Snapshots das unidades participantes.
      * Captura a hierarquia vigente no momento da inicialização do processo
-     * conforme CDU-04 e CDU-05.
      */
     @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -74,8 +73,6 @@ public class Processo extends EntidadeBase {
 
     /**
      * Adiciona unidades participantes criando snapshots do estado atual.
-     * 
-     * @param unidades as unidades a serem adicionadas
      */
     public void adicionarParticipantes(Set<Unidade> unidades) {
         for (Unidade unidade : unidades) {
@@ -91,8 +88,6 @@ public class Processo extends EntidadeBase {
     /**
      * Sincroniza as unidades participantes, mantendo snapshosts existentes 
      * e adicionando novos apenas para unidades que ainda não participam.
-     * 
-     * @param novasUnidades o conjunto atualizado de unidades participantes
      */
     public void sincronizarParticipantes(Set<Unidade> novasUnidades) {
         // 1. Remover quem não está mais na nova lista
@@ -106,9 +101,6 @@ public class Processo extends EntidadeBase {
         adicionarParticipantes(novasUnidades);
     }
 
-    /**
-     * Retorna os códigos das unidades participantes.
-     */
     public List<Long> getCodigosParticipantes() {
         if (participantes == null) return List.of();
         return participantes.stream()
@@ -116,9 +108,6 @@ public class Processo extends EntidadeBase {
                 .toList();
     }
 
-    /**
-     * Retorna as siglas das unidades participantes.
-     */
     @JsonView(ProcessoViews.Publica.class)
     @JsonProperty("unidadesParticipantes")
     public String getSiglasParticipantes() {

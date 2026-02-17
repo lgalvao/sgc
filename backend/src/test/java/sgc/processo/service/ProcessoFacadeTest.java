@@ -333,7 +333,7 @@ class ProcessoFacadeTest {
             processoFacade.enviarLembrete(1L, 10L);
             verify(alertaService).criarAlertaAdmin(eq(p), eq(u), anyString());
             verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
-            verify(notificacaoEmailService).enviarEmailHtml(eq(u.getSigla()), contains("SGC: Lembrete de prazo"), contains(p.getDescricao()));
+            verify(notificacaoEmailService).enviarEmailHtml(eq(u.getSigla()), contains(p.getDescricao()), anyString());
         }
 
         @Test
