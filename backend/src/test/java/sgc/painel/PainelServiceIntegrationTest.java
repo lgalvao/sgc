@@ -12,7 +12,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.organizacao.model.Perfil;
 import sgc.processo.dto.CriarProcessoRequest;
-import sgc.processo.dto.ProcessoDto;
+import sgc.processo.model.Processo;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
@@ -57,8 +57,8 @@ class PainelServiceIntegrationTest {
                     LocalDateTime.now().plusDays(30),
                     List.of(10L) // SESEL
             );
-            var processoRevisaoDto = processoFacade.criar(reqRevisao);
-            Long codigoProcessoRevisao = processoRevisaoDto.getCodigo();
+            Processo processoRevisao = processoFacade.criar(reqRevisao);
+            Long codigoProcessoRevisao = processoRevisao.getCodigo();
 
             // Act: Listar processos como ADMIN
             Page<ProcessoResumoDto> processos = painelService.listarProcessos(
@@ -80,16 +80,16 @@ class PainelServiceIntegrationTest {
                     .isTrue();
 
             // Verificar que o linkDestino está correto
-            ProcessoResumoDto processoRevisao = listaProcessos.stream()
+            ProcessoResumoDto pResumo = listaProcessos.stream()
                     .filter(p -> p.descricao().equals("Processo Revisão Teste"))
                     .findFirst()
                     .orElse(null);
 
-            assertThat(processoRevisao).isNotNull();
-            assertThat(processoRevisao.linkDestino())
+            assertThat(pResumo).isNotNull();
+            assertThat(pResumo.linkDestino())
                     .withFailMessage("LinkDestino incorreto para processo " + codigoProcessoRevisao +
                             ". Esperado: /processo/cadastro?codProcesso=" + codigoProcessoRevisao +
-                            ", Obtido: " + processoRevisao.linkDestino())
+                            ", Obtido: " + pResumo.linkDestino())
                     .isEqualTo("/processo/cadastro?codProcesso=" + codigoProcessoRevisao);
         }
 
@@ -133,7 +133,7 @@ class PainelServiceIntegrationTest {
                     LocalDateTime.now().plusDays(30),
                     List.of(10L)
             );
-            ProcessoDto processoSeed = processoFacade.criar(reqSeedLike);
+            Processo processoSeed = processoFacade.criar(reqSeedLike);
 
             // Criar processo de Revisão (Alvo do teste)
             CriarProcessoRequest reqRevisao = new CriarProcessoRequest(
@@ -142,7 +142,7 @@ class PainelServiceIntegrationTest {
                     LocalDateTime.now().plusDays(30),
                     List.of(10L)
             );
-            ProcessoDto processoRevisao = processoFacade.criar(reqRevisao);
+            Processo processoRevisao = processoFacade.criar(reqRevisao);
 
             // Act: Buscar processos
             Page<ProcessoResumoDto> page = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 50));

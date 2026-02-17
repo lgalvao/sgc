@@ -10,10 +10,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.analise.dto.AnaliseHistoricoDto;
+import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.dto.CriarAnaliseRequest;
-import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.Analise;
-import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -52,9 +51,6 @@ class AnaliseControllerTest {
     @MockitoBean
     private SubprocessoFacade subprocessoFacade;
 
-    @MockitoBean
-    private AnaliseMapper analiseMapper;
-
     private Subprocesso subprocesso;
 
     @BeforeEach
@@ -83,10 +79,8 @@ class AnaliseControllerTest {
             AnaliseHistoricoDto dto2 = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_2).build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(analiseFacade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO))
-                    .thenReturn(Arrays.asList(analise1, analise2));
-            when(analiseMapper.toAnaliseHistoricoDto(analise1)).thenReturn(dto1);
-            when(analiseMapper.toAnaliseHistoricoDto(analise2)).thenReturn(dto2);
+            when(analiseFacade.listarHistoricoCadastro(1L))
+                    .thenReturn(Arrays.asList(dto1, dto2));
 
             mockMvc.perform(get(API_SUBPROCESSOS_1_ANALISES_CADASTRO))
                     .andExpect(status().isOk())
@@ -100,7 +94,7 @@ class AnaliseControllerTest {
         @WithMockUser
         void deveRetornarListaVaziaDeAnalisesCadastro() throws Exception {
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(analiseFacade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO))
+            when(analiseFacade.listarHistoricoCadastro(1L))
                     .thenReturn(Collections.emptyList());
 
             mockMvc.perform(get(API_SUBPROCESSOS_1_ANALISES_CADASTRO))
@@ -124,7 +118,7 @@ class AnaliseControllerTest {
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
-            when(analiseMapper.toAnaliseHistoricoDto(analise)).thenReturn(dto);
+            when(analiseFacade.paraHistoricoDto(analise)).thenReturn(dto);
 
             mockMvc.perform(
                             post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
@@ -145,7 +139,7 @@ class AnaliseControllerTest {
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
-            when(analiseMapper.toAnaliseHistoricoDto(analise)).thenReturn(dto);
+            when(analiseFacade.paraHistoricoDto(analise)).thenReturn(dto);
 
             mockMvc.perform(
                             post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
@@ -165,7 +159,7 @@ class AnaliseControllerTest {
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
-            when(analiseMapper.toAnaliseHistoricoDto(analise)).thenReturn(dto);
+            when(analiseFacade.paraHistoricoDto(analise)).thenReturn(dto);
 
             mockMvc.perform(
                             post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
@@ -202,13 +196,12 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar lista de análises de validação com status 200 OK")
         @WithMockUser
         void deveRetornarListaDeAnalisesValidacao() throws Exception {
-            Analise analise = new Analise();
-            AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_1).build();
+            AnaliseValidacaoHistoricoDto vDto = AnaliseValidacaoHistoricoDto.builder().observacoes(OBSERVACAO_1).build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(analiseFacade.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO))
-                    .thenReturn(Collections.singletonList(analise));
-            when(analiseMapper.toAnaliseHistoricoDto(analise)).thenReturn(dto);
+            // listarHistoricoValidacao já retorna DTOs, então não precisamos mapear no controller
+            when(analiseFacade.listarHistoricoValidacao(1L))
+                    .thenReturn(Collections.singletonList(vDto));
 
             mockMvc.perform(get(API_SUBPROCESSOS_1_ANALISES_VALIDACAO))
                     .andExpect(status().isOk())
@@ -220,7 +213,7 @@ class AnaliseControllerTest {
         @WithMockUser
         void deveRetornarListaVaziaDeAnalisesValidacao() throws Exception {
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            when(analiseFacade.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO))
+            when(analiseFacade.listarHistoricoValidacao(1L))
                     .thenReturn(Collections.emptyList());
 
             mockMvc.perform(get(API_SUBPROCESSOS_1_ANALISES_VALIDACAO))
@@ -243,7 +236,7 @@ class AnaliseControllerTest {
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
-            when(analiseMapper.toAnaliseHistoricoDto(analise)).thenReturn(dto);
+            when(analiseFacade.paraHistoricoDto(analise)).thenReturn(dto);
 
             mockMvc.perform(
                             post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO)

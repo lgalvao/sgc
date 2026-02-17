@@ -1,5 +1,6 @@
 package sgc.e2e;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Profile;
@@ -167,6 +168,7 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-mapeamento")
     @Transactional
+    @JsonView(sgc.processo.model.ProcessoViews.Publica.class)
     public Processo criarProcessoMapeamento(@RequestBody ProcessoFixtureRequest request) {
         return executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.MAPEAMENTO));
     }
@@ -176,6 +178,7 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-revisao")
     @Transactional
+    @JsonView(sgc.processo.model.ProcessoViews.Publica.class)
     public Processo criarProcessoRevisao(@RequestBody ProcessoFixtureRequest request) {
         return executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.REVISAO));
     }

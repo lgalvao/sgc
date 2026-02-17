@@ -20,7 +20,7 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
-import sgc.processo.dto.ProcessoDto;
+import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
@@ -248,12 +248,12 @@ class E2eControllerTest {
         un.setCodigo(1L);
         when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
 
-        ProcessoDto proc = new ProcessoDto();
+        Processo proc = new Processo();
         proc.setCodigo(100L);
         when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
 
         // Act
-        ProcessoDto result = controller.criarProcessoMapeamento(req);
+        Processo result = controller.criarProcessoMapeamento(req);
 
         // Assert
         assertEquals(100L, result.getCodigo());
@@ -271,13 +271,13 @@ class E2eControllerTest {
         un.setCodigo(1L);
         when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
 
-        ProcessoDto proc = new ProcessoDto();
+        Processo proc = new Processo();
         proc.setCodigo(100L);
         when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
-        when(processoFacade.obterDtoPorId(100L)).thenReturn(proc);
+        when(processoFacade.obterEntidadePorId(100L)).thenReturn(proc);
 
         // Act
-        ProcessoDto result = controller.criarProcessoRevisao(req);
+        Processo result = controller.criarProcessoRevisao(req);
 
         // Assert
         assertEquals(100L, result.getCodigo());
@@ -295,13 +295,13 @@ class E2eControllerTest {
         un.setCodigo(1L);
         when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
 
-        ProcessoDto proc = new ProcessoDto();
+        Processo proc = new Processo();
         proc.setCodigo(100L);
         when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
-        when(processoFacade.obterDtoPorId(100L)).thenReturn(proc);
+        when(processoFacade.obterEntidadePorId(100L)).thenReturn(proc);
 
         // Act
-        ProcessoDto result = controller.criarProcessoMapeamento(req);
+        Processo result = controller.criarProcessoMapeamento(req);
 
         // Assert
         assertEquals(100L, result.getCodigo());
@@ -343,10 +343,10 @@ class E2eControllerTest {
         un.setCodigo(1L);
         when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
 
-        ProcessoDto proc = new ProcessoDto();
+        Processo proc = new Processo();
         proc.setCodigo(100L);
         when(processoFacade.criar(any())).thenReturn(proc);
-        when(processoFacade.obterDtoPorId(100L)).thenReturn(proc);
+        when(processoFacade.obterEntidadePorId(100L)).thenReturn(proc);
 
         // Use reflection to call private method
         var method = E2eController.class.getDeclaredMethod("criarProcessoFixture",
@@ -372,10 +372,10 @@ class E2eControllerTest {
         un.setCodigo(1L);
         when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
 
-        ProcessoDto proc = new ProcessoDto();
+        Processo proc = new Processo();
         proc.setCodigo(100L);
         when(processoFacade.criar(any())).thenReturn(proc);
-        when(processoFacade.obterDtoPorId(100L)).thenReturn(proc);
+        when(processoFacade.obterEntidadePorId(100L)).thenReturn(proc);
 
         // Simular retorno de erros vazio (sucesso)
         when(processoFacade.iniciarProcessoMapeamento(anyLong(), anyList())).thenReturn(List.of());
@@ -454,7 +454,7 @@ class E2eControllerTest {
             UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
             when(organizacaoFacadeMock.buscarUnidadePorSigla("SIGLA")).thenReturn(unidade);
             
-            ProcessoDto dto = ProcessoDto.builder().codigo(100L).build();
+            Processo dto = Processo.builder().codigo(100L).build();
             when(processoFacadeMock.criar(any())).thenReturn(dto);
             
             when(processoFacadeMock.iniciarProcessoMapeamento(100L, List.of(10L)))
@@ -473,13 +473,13 @@ class E2eControllerTest {
             UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
             when(organizacaoFacadeMock.buscarUnidadePorSigla("SIGLA")).thenReturn(unidade);
             
-            ProcessoDto dto = ProcessoDto.builder().codigo(100L).build();
+            Processo dto = Processo.builder().codigo(100L).build();
             when(processoFacadeMock.criar(any())).thenReturn(dto);
             
             when(processoFacadeMock.iniciarProcessoMapeamento(100L, List.of(10L)))
                 .thenReturn(List.of()); // Sucesso
                 
-            when(processoFacadeMock.obterDtoPorId(100L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 100L)); // Falha ao recarregar
+            when(processoFacadeMock.obterEntidadePorId(100L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 100L)); // Falha ao recarregar
 
             assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);

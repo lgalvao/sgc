@@ -11,11 +11,9 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.mapper.ProcessoDetalheMapper;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.model.UnidadeProcesso;
 import sgc.seguranca.acesso.Acao;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -40,8 +38,6 @@ class ProcessoDetalheBuilderTest {
     @Mock
     private SubprocessoRepo subprocessoRepo;
 
-    @Mock
-    private ProcessoDetalheMapper processoDetalheMapper;
 
     @Mock
     private AccessControlService accessControlService;
@@ -63,27 +59,11 @@ class ProcessoDetalheBuilderTest {
         return usuario;
     }
 
-    /**
-     * Configura o mock do mapper para retornar DTOs corretamente mapeados.
-     * Chamado apenas nos testes que usam participantes.
-     */
-    private void configurarMockDoMapper() {
-        when(processoDetalheMapper.fromSnapshot(any(UnidadeProcesso.class))).thenAnswer(invocation -> {
-            UnidadeProcesso u = invocation.getArgument(0);
-            ProcessoDetalheDto.UnidadeParticipanteDto dto = new ProcessoDetalheDto.UnidadeParticipanteDto();
-            dto.setCodUnidade(u.getUnidadeCodigo());
-            dto.setNome(u.getNome());
-            dto.setSigla(u.getSigla());
-            dto.setCodUnidadeSuperior(u.getUnidadeSuperiorCodigo()); // UnidadeProcesso usa getUnidadeSuperiorCodigo
-            return dto;
-        });
-    }
 
     @Test
     @DisplayName("Deve construir DTO com dados básicos e unidades quando dados válidos")
     void deveConstruirDtoQuandoDadosValidos() {
         // Arrange
-        configurarMockDoMapper();
         Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -165,7 +145,6 @@ class ProcessoDetalheBuilderTest {
     @DisplayName("Deve verificar ordenação das unidades")
     void deveVerificarOrdenacaoDasUnidades() {
         // Arrange
-        configurarMockDoMapper();
         Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -191,7 +170,6 @@ class ProcessoDetalheBuilderTest {
     @DisplayName("Deve construir DTO com hierarquia de participantes")
     void deveConstruirDtoComHierarquiaParticipantes() {
         // Arrange
-        configurarMockDoMapper();
         Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -254,7 +232,6 @@ class ProcessoDetalheBuilderTest {
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        configurarMockDoMapper();
         Unidade u1 = criarUnidade(1L, "U1", "U1");
         processo.adicionarParticipantes(Set.of(u1));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
@@ -279,7 +256,6 @@ class ProcessoDetalheBuilderTest {
         filho.setUnidadeSuperior(pai);
 
         // Apenas filho participa
-        configurarMockDoMapper();
         processo.adicionarParticipantes(Set.of(filho));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
@@ -294,7 +270,6 @@ class ProcessoDetalheBuilderTest {
     @DisplayName("Deve lidar com subprocesso sem mapa")
     void deveLidarComSubprocessoSemMapa() {
         // Arrange
-        configurarMockDoMapper();
         Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);

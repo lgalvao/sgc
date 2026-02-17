@@ -142,8 +142,8 @@ public class NotificacaoModelosService {
     }
 
     /**
-     * Gera o conteúdo HTML para o email que notifica uma unidade intermediária sobre a conclusão de
-     * um processo em suas unidades subordinadas.
+     * Gera o conteúdo HTML para o email notificando unidade intermediária sobre conclusão de
+     * processo em suas unidades subordinadas.
      */
     public String criarEmailProcessoFinalizadoUnidadesSubordinadas(
             String siglaUnidade, String nomeProcesso, List<String> siglasUnidadesSubordinadas) {

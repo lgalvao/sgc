@@ -11,7 +11,6 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.mapper.ProcessoDetalheMapper;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
@@ -35,8 +34,6 @@ class ProcessoDetalheBuilderCoverageTest {
     @Mock
     private SubprocessoRepo subprocessoRepo;
     @Mock
-    private ProcessoDetalheMapper processoDetalheMapper;
-    @Mock
     private AccessControlService accessControlService;
 
     @InjectMocks
@@ -58,8 +55,7 @@ class ProcessoDetalheBuilderCoverageTest {
         Usuario usuario = new Usuario();
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(new ArrayList<>());
-        // Simular que o mapper retorna null para o snapshot (cobertura da linha 83)
-        when(processoDetalheMapper.fromSnapshot(participante)).thenReturn(null);
+        // No snapshot mock needed anymore, we let fromSnapshot run
 
         // Act
         ProcessoDetalheDto dto = builder.build(processo, usuario);
@@ -93,9 +89,7 @@ class ProcessoDetalheBuilderCoverageTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
         
-        ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto = new ProcessoDetalheDto.UnidadeParticipanteDto();
-        unidadeDto.setCodUnidade(100L);
-        when(processoDetalheMapper.fromSnapshot(participante)).thenReturn(unidadeDto);
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
 
         // Act
         ProcessoDetalheDto dto = builder.build(processo, new Usuario());
@@ -127,7 +121,6 @@ class ProcessoDetalheBuilderCoverageTest {
         sp.setUnidade(unidade);
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
-        when(processoDetalheMapper.fromSnapshot(participante)).thenReturn(null);
 
         // Act
         ProcessoDetalheDto dto = builder.build(processo, new Usuario());
@@ -152,10 +145,7 @@ class ProcessoDetalheBuilderCoverageTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(new ArrayList<>());
         
-        ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto = new ProcessoDetalheDto.UnidadeParticipanteDto();
-        unidadeDto.setCodUnidade(100L);
-        unidadeDto.setSigla("TESTE");
-        when(processoDetalheMapper.fromSnapshot(participante)).thenReturn(unidadeDto);
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(new ArrayList<>());
 
         // Act
         ProcessoDetalheDto dto = builder.build(processo, new Usuario());

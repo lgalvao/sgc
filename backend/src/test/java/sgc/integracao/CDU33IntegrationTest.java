@@ -26,7 +26,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.ReabrirProcessoRequest;
+import sgc.comum.dto.ComumDtos.JustificativaRequest;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -111,7 +111,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void reabrirRevisaoCadastro_comoAdmin_sucesso() throws Exception {
         // Given
-        ReabrirProcessoRequest request = new ReabrirProcessoRequest(
+        JustificativaRequest request = new JustificativaRequest(
                 "Necessário corrigir erros identificados na revisão");
 
         // When
@@ -155,7 +155,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
     @WithMockUser(roles = "GESTOR")
     void reabrirRevisaoCadastro_semPermissao_proibido() throws Exception {
         // Given
-        ReabrirProcessoRequest request = new ReabrirProcessoRequest("Tentativa sem permissão");
+        JustificativaRequest request = new JustificativaRequest("Tentativa sem permissão");
 
         // When/Then
         mockMvc.perform(
@@ -171,7 +171,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void reabrirRevisaoCadastro_semJustificativa_erro() throws Exception {
         // Given
-        ReabrirProcessoRequest request = new ReabrirProcessoRequest("");
+        JustificativaRequest request = new JustificativaRequest("");
 
         // When/Then
         mockMvc.perform(

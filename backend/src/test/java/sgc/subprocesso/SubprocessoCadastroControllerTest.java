@@ -11,9 +11,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
-import sgc.analise.mapper.AnaliseMapper;
-import sgc.analise.model.Analise;
-import sgc.analise.model.TipoAnalise;
+import sgc.comum.dto.ComumDtos.*;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.model.Atividade;
@@ -48,9 +46,6 @@ class SubprocessoCadastroControllerTest {
     private AnaliseFacade analiseFacade;
 
     @MockitoBean
-    private AnaliseMapper analiseMapper;
-
-    @MockitoBean
     private OrganizacaoFacade organizacaoFacade;
 
     @Autowired
@@ -67,7 +62,6 @@ class SubprocessoCadastroControllerTest {
         @WithMockUser
         void deveObterHistoricoCadastro() throws Exception {
             // Arrange
-            Analise analise = new Analise();
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder()
                     .dataHora(null)
                     .observacoes("Observação")
@@ -78,16 +72,14 @@ class SubprocessoCadastroControllerTest {
                     .tipo(null)
                     .build();
             
-            when(analiseFacade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO))
-                    .thenReturn(List.of(analise));
-            when(analiseMapper.toAnaliseHistoricoDto(any(Analise.class)))
-                    .thenReturn(dto);
+            when(analiseFacade.listarHistoricoCadastro(1L))
+                    .thenReturn(List.of(dto));
 
             // Act & Assert
             mockMvc.perform(get("/api/subprocessos/1/historico-cadastro"))
                     .andExpect(status().isOk());
 
-            verify(analiseFacade).listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
+            verify(analiseFacade).listarHistoricoCadastro(1L);
         }
     }
 
@@ -213,7 +205,7 @@ class SubprocessoCadastroControllerTest {
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
-            DevolverCadastroRequest request = new DevolverCadastroRequest(
+            JustificativaRequest request = new JustificativaRequest(
                     "Precisa de ajustes");
 
             // Act & Assert
@@ -239,7 +231,7 @@ class SubprocessoCadastroControllerTest {
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
-            AceitarCadastroRequest request = new AceitarCadastroRequest("Aprovado");
+            TextoRequest request = new TextoRequest("Aprovado");
 
             // Act & Assert
             mockMvc.perform(post("/api/subprocessos/1/aceitar-cadastro")
@@ -264,7 +256,7 @@ class SubprocessoCadastroControllerTest {
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
-            HomologarCadastroRequest request = new HomologarCadastroRequest("Homologado");
+            TextoRequest request = new TextoRequest("Homologado");
 
             // Act & Assert
             mockMvc.perform(post("/api/subprocessos/1/homologar-cadastro")
@@ -289,7 +281,7 @@ class SubprocessoCadastroControllerTest {
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
-            DevolverCadastroRequest request = new DevolverCadastroRequest("Revisar");
+            JustificativaRequest request = new JustificativaRequest("Revisar");
 
             // Act & Assert
             mockMvc.perform(post("/api/subprocessos/1/devolver-revisao-cadastro")
@@ -314,7 +306,7 @@ class SubprocessoCadastroControllerTest {
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
-            AceitarCadastroRequest request = new AceitarCadastroRequest("Revisão aceita");
+            TextoRequest request = new TextoRequest("Revisão aceita");
 
             // Act & Assert
             mockMvc.perform(post("/api/subprocessos/1/aceitar-revisao-cadastro")
@@ -339,7 +331,7 @@ class SubprocessoCadastroControllerTest {
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
-            HomologarCadastroRequest request = new HomologarCadastroRequest("Homologado");
+            TextoRequest request = new TextoRequest("Homologado");
 
             // Act & Assert
             mockMvc.perform(post("/api/subprocessos/1/homologar-revisao-cadastro")
@@ -440,20 +432,17 @@ class SubprocessoCadastroControllerTest {
         private SubprocessoCadastroController controller;
         private SubprocessoFacade subprocessoFacadeMock;
         private AnaliseFacade analiseFacadeMock;
-        private AnaliseMapper analiseMapperMock;
         private OrganizacaoFacade organizacaoFacadeMock;
 
         @BeforeEach
         void setUp() {
             subprocessoFacadeMock = Mockito.mock(SubprocessoFacade.class);
             analiseFacadeMock = Mockito.mock(AnaliseFacade.class);
-            analiseMapperMock = Mockito.mock(AnaliseMapper.class);
             organizacaoFacadeMock = Mockito.mock(OrganizacaoFacade.class);
 
             controller = new SubprocessoCadastroController(
                 subprocessoFacadeMock,
                 analiseFacadeMock,
-                analiseMapperMock,
                 organizacaoFacadeMock
             );
         }

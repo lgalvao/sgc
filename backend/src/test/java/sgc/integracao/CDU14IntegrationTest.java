@@ -19,7 +19,7 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.processo.dto.ProcessoDto;
+import sgc.processo.model.Processo;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -55,7 +55,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         private static final String API_SUBPROCESSOS_ID_DISPONIBILIZAR = "/api/subprocessos/{id}/disponibilizar-revisao";
         private static final String API_SUBPROCESSOS_ID_ACEITAR = "/api/subprocessos/{id}/aceitar-revisao-cadastro";
         private static final String API_SUBPROCESSOS_ID_HOMOLOGAR = "/api/subprocessos/{id}/homologar-revisao-cadastro";
-        private static final String JSON_OBS_OK = "{\"observacoes\": \"OK\"}";
+        private static final String JSON_TEXTO_OK = "{\"texto\": \"OK\"}";
 
         @Autowired
         private UsuarioFacade usuarioService;
@@ -134,9 +134,9 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         }
 
         private Long criarEComecarProcessoDeRevisao() throws Exception {
-                ProcessoDto processoDto = criarEIniciarProcessoDeRevisao();
+                Processo processo = criarEIniciarProcessoDeRevisao();
 
-                Subprocesso sp = subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream()
+                Subprocesso sp = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream()
                                 .findFirst()
                                 .orElseThrow();
                 sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -144,7 +144,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                 return sp.getCodigo();
         }
 
-        private ProcessoDto criarEIniciarProcessoDeRevisao() throws Exception {
+        private Processo criarEIniciarProcessoDeRevisao() throws Exception {
                 Map<String, Object> criarReqMap = Map.of(
                                 "descricao",
                                 "Processo Revisão CDU-14",
@@ -169,14 +169,14 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                 .getResponse()
                                 .getContentAsString();
 
-                ProcessoDto processoDto = objectMapper.readValue(resJson, ProcessoDto.class);
+                Processo processo = objectMapper.readValue(resJson, Processo.class);
 
                 Map<String, Object> iniciarReqMap = Map.of("tipo", "REVISAO", "unidades",
                                 List.of(unidadeChefe.getCodigo()));
                 String iniciarReqJson = objectMapper.writeValueAsString(iniciarReqMap);
 
                 mockMvc.perform(
-                                post("/api/processos/{codigo}/iniciar", processoDto.getCodigo())
+                                post("/api/processos/{codigo}/iniciar", processo.getCodigo())
                                                 .with(csrf())
                                                 .with(user(admin))
                                                 .contentType(APPLICATION_JSON)
@@ -185,7 +185,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
                 entityManager.flush();
 
-                return processoDto;
+                return processo;
         }
 
         @Nested
@@ -206,7 +206,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                                         .with(user(gestor))
                                                         .contentType(APPLICATION_JSON)
                                                         .content(
-                                                                        "{\"motivo\": \"Teste\", \"observacoes\":"
+                                                                        "{\"motivo\": \"Teste\", \"justificativa\":"
                                                                                         + " \"Ajustar\"}"))
                                         .andExpect(status().isOk());
 
@@ -235,7 +235,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                                         .with(csrf())
                                                         .with(user(gestor))
                                                         .contentType(APPLICATION_JSON)
-                                                        .content(JSON_OBS_OK))
+                                                        .content(JSON_TEXTO_OK))
                                         .andExpect(status().isOk());
 
                         Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
@@ -264,7 +264,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                                         .with(csrf())
                                                         .with(user(gestor))
                                                         .contentType(APPLICATION_JSON)
-                                                        .content(JSON_OBS_OK))
+                                                        .content(JSON_TEXTO_OK))
                                         .andExpect(status().isOk());
                 }
 
@@ -275,7 +275,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                         .with(csrf())
                                         .with(user(admin))
                                         .contentType(APPLICATION_JSON)
-                                        .content("{\"observacoes\": \"Homologado\"}"))
+                                        .content("{\"texto\": \"Homologado\"}"))
                                         .andExpect(status().isOk());
 
                         Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
@@ -324,7 +324,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                                         .with(user(gestor))
                                                         .contentType(APPLICATION_JSON)
                                                         .content(
-                                                                        "{\"motivo\": \"Teste Histórico\", \"observacoes\":"
+                                                                        "{\"motivo\": \"Teste Histórico\", \"justificativa\":"
                                                                                         + " \"Registrando análise\"}"))
                                         .andExpect(status().isOk());
 
@@ -377,7 +377,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                                         .with(csrf())
                                                         .with(user(gestor))
                                                         .contentType(APPLICATION_JSON)
-                                                        .content(JSON_OBS_OK))
+                                                        .content(JSON_TEXTO_OK))
                                         .andExpect(status().isOk());
 
                         mockMvc.perform(
@@ -385,7 +385,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                                         .with(csrf())
                                                         .with(user(chefe))
                                                         .contentType(APPLICATION_JSON)
-                                                        .content("{\"observacoes\": \"Tudo certo por mim\"}"))
+                                                        .content("{\"texto\": \"Tudo certo por mim\"}"))
                                         .andExpect(status().isForbidden());
                 }
 
@@ -404,7 +404,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                                         .with(csrf())
                                                         .with(user(admin))
                                                         .contentType(APPLICATION_JSON)
-                                                        .content("{\"observacoes\": \"Homologado fora de hora\"}"))
+                                                        .content("{\"texto\": \"Homologado fora de hora\"}"))
                                         .andExpect(status().isForbidden());
                 }
         }

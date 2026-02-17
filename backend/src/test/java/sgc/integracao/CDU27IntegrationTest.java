@@ -23,7 +23,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.AlterarDataLimiteRequest;
+import sgc.comum.dto.ComumDtos.DataRequest;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -84,9 +84,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
     void alterarDataLimite_comoAdmin_sucesso() throws Exception {
         // Given
         LocalDate novaData = LocalDate.now().plusDays(20);
-        AlterarDataLimiteRequest request = AlterarDataLimiteRequest.builder()
-                .novaDataLimite(novaData)
-                .build();
+        DataRequest request = new DataRequest(novaData);
 
         // When
         mockMvc.perform(
@@ -117,9 +115,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
     void alterarDataLimite_semPermissao_proibido() throws Exception {
         // Given
         LocalDate novaData = LocalDate.now().plusDays(20);
-        AlterarDataLimiteRequest request = AlterarDataLimiteRequest.builder()
-                .novaDataLimite(novaData)
-                .build();
+        DataRequest request = new DataRequest(novaData);
 
         // When/Then
         mockMvc.perform(

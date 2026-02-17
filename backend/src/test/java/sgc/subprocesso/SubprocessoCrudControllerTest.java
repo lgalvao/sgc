@@ -10,6 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
+import sgc.comum.dto.ComumDtos.JustificativaRequest;
+import sgc.comum.dto.ComumDtos.DataRequest;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -121,7 +123,7 @@ class SubprocessoCrudControllerTest {
     @Test
     @DisplayName("alterarDataLimite - Sucesso")
     void alterarDataLimite() {
-        AlterarDataLimiteRequest req = new AlterarDataLimiteRequest(LocalDate.now());
+        DataRequest req = new DataRequest(LocalDate.now());
         ResponseEntity<Void> response = controller.alterarDataLimite(1L, req);
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         verify(subprocessoFacade).alterarDataLimite(eq(1L), any());
@@ -130,7 +132,7 @@ class SubprocessoCrudControllerTest {
     @Test
     @DisplayName("reabrirCadastro - Sucesso")
     void reabrirCadastro() {
-        ReabrirProcessoRequest req = new ReabrirProcessoRequest("J");
+        JustificativaRequest req = new JustificativaRequest("J");
         ResponseEntity<Void> response = controller.reabrirCadastro(1L, req);
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         verify(subprocessoFacade).reabrirCadastro(1L, "J");
@@ -139,7 +141,7 @@ class SubprocessoCrudControllerTest {
     @Test
     @DisplayName("reabrirRevisaoCadastro - Sucesso")
     void reabrirRevisaoCadastro() {
-        ReabrirProcessoRequest req = new ReabrirProcessoRequest("J");
+        JustificativaRequest req = new JustificativaRequest("J");
         ResponseEntity<Void> response = controller.reabrirRevisaoCadastro(1L, req);
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         verify(subprocessoFacade).reabrirRevisaoCadastro(1L, "J");

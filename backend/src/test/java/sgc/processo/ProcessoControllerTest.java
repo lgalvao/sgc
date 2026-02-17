@@ -22,6 +22,7 @@ import sgc.processo.model.AcaoProcesso;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
+import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDate;
@@ -93,16 +94,16 @@ class ProcessoControllerTest {
                             TipoProcesso.MAPEAMENTO,
                             LocalDateTime.now().plusDays(30),
                             List.of(1L));
-            var dto =
-                    ProcessoDto.builder()
+            var processo =
+                    Processo.builder()
                             .codigo(1L)
                             .dataCriacao(LocalDateTime.now())
                             .descricao(NOVO_PROCESSO)
-                            .situacao(SituacaoProcesso.CRIADO.name())
-                            .tipo(TipoProcesso.MAPEAMENTO.name())
+                            .situacao(SituacaoProcesso.CRIADO)
+                            .tipo(TipoProcesso.MAPEAMENTO)
                             .build();
 
-            when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(dto);
+            when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(processo);
 
             // Act & Assert
             mockMvc.perform(
@@ -147,16 +148,16 @@ class ProcessoControllerTest {
         @DisplayName("Deve retornar 200 OK quando processo existe")
         void deveRetornarOkQuandoProcessoExiste() throws Exception {
             // Arrange
-            var dto =
-                    ProcessoDto.builder()
+            var processo =
+                    Processo.builder()
                             .codigo(1L)
                             .dataCriacao(LocalDateTime.now())
                             .descricao("Processo Teste")
-                            .situacao(SituacaoProcesso.CRIADO.name())
-                            .tipo(TipoProcesso.MAPEAMENTO.name())
+                            .situacao(SituacaoProcesso.CRIADO)
+                            .tipo(TipoProcesso.MAPEAMENTO)
                             .build();
 
-            when(processoFacade.obterPorId(1L)).thenReturn(Optional.of(dto));
+            when(processoFacade.obterPorId(1L)).thenReturn(Optional.of(processo));
 
             // Act & Assert
             mockMvc.perform(get(API_PROCESSOS_1))
@@ -233,16 +234,16 @@ class ProcessoControllerTest {
                             TipoProcesso.REVISAO,
                             LocalDateTime.now().plusDays(45),
                             List.of(1L));
-            var dto =
-                    ProcessoDto.builder()
+            var processo =
+                    Processo.builder()
                             .codigo(1L)
                             .dataCriacao(LocalDateTime.now())
                             .descricao(PROCESSO_ATUALIZADO)
-                            .situacao(SituacaoProcesso.CRIADO.name())
-                            .tipo(TipoProcesso.REVISAO.name())
+                            .situacao(SituacaoProcesso.CRIADO)
+                            .tipo(TipoProcesso.REVISAO)
                             .build();
 
-            when(processoFacade.atualizar(eq(1L), any(AtualizarProcessoRequest.class))).thenReturn(dto);
+            when(processoFacade.atualizar(eq(1L), any(AtualizarProcessoRequest.class))).thenReturn(processo);
 
             // Act & Assert
             mockMvc.perform(
@@ -269,9 +270,9 @@ class ProcessoControllerTest {
         void deveRetornarOkAoIniciarMapeamentoQuandoValido() throws Exception {
             // Arrange
             var req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
-            var processo = ProcessoDto.builder().codigo(1L).descricao("Processo Teste").build();
+            var processo = Processo.builder().codigo(1L).descricao("Processo Teste").build();
 
-            when(processoFacade.obterDtoPorId(1L)).thenReturn(processo);
+            when(processoFacade.obterEntidadePorId(1L)).thenReturn(processo);
             when(processoFacade.iniciarProcessoMapeamento(eq(1L), anyList())).thenReturn(List.of());
 
             // Act & Assert
@@ -310,7 +311,7 @@ class ProcessoControllerTest {
         void deveRetornarListaDeProcessosFinalizados() throws Exception {
             // Arrange
             when(processoFacade.listarFinalizados())
-                    .thenReturn(List.of(ProcessoDto.builder().codigo(1L).build()));
+                    .thenReturn(List.of(Processo.builder().codigo(1L).build()));
 
             // Act & Assert
             mockMvc.perform(get("/api/processos/finalizados"))
@@ -356,7 +357,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("listarAtivos deve retornar processos em andamento")
         void deveListarAtivos() throws Exception {
-            when(processoFacade.listarAtivos()).thenReturn(List.of(ProcessoDto.builder().codigo(1L).build()));
+            when(processoFacade.listarAtivos()).thenReturn(List.of(Processo.builder().codigo(1L).build()));
 
             mockMvc.perform(get("/api/processos/ativos"))
                     .andExpect(status().isOk())
@@ -436,7 +437,7 @@ class ProcessoControllerTest {
             when(processoFacadeMock.iniciarProcessoMapeamento(anyLong(), anyList()))
                 .thenReturn(List.of("erro"));
 
-            ResponseEntity<Object> response = controller.iniciar(1L, req);
+            ResponseEntity<?> response = controller.iniciar(1L, req);
             assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         }
 

@@ -26,9 +26,7 @@ import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.AcaoEmBlocoRequest;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.ProcessoDto;
 import sgc.processo.erros.ErroProcesso;
-import sgc.processo.mapper.ProcessoMapper;
 import sgc.processo.model.*;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -59,8 +57,6 @@ class ProcessoFacadeTest {
 
     @Mock
     private ProcessoManutencaoService processoManutencaoService;
-    @Mock
-    private ProcessoMapper processoMapper;
     @Mock
     private ProcessoInicializador processoInicializador;
     @Mock
@@ -377,10 +373,8 @@ class ProcessoFacadeTest {
                         p.setSituacao(SituacaoProcesso.CRIADO);
                         return p;
                     });
-            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
-
             // Act
-            ProcessoDto resultado = processoFacade.criar(req);
+            Processo resultado = processoFacade.criar(req);
 
             // Assert
             assertThat(resultado).isNotNull();
@@ -448,9 +442,8 @@ class ProcessoFacadeTest {
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
             when(processoConsultaService.buscarProcessoCodigoOpt(id)).thenReturn(Optional.of(processo));
-            when(processoMapper.toDto(processo)).thenReturn(ProcessoDto.builder().build());
 
-            Optional<ProcessoDto> res = processoFacade.obterPorId(id);
+            Optional<Processo> res = processoFacade.obterPorId(id);
             assertThat(res).isPresent();
         }
 
@@ -462,8 +455,6 @@ class ProcessoFacadeTest {
                     .thenReturn(List.of(ProcessoFixture.processoPadrao()));
             when(processoConsultaService.processosAndamento())
                     .thenReturn(List.of(ProcessoFixture.processoPadrao()));
-            when(processoMapper.toDto(any())).thenReturn(ProcessoDto.builder().build());
-
             // Act & Assert
             assertThat(processoFacade.listarFinalizados()).hasSize(1);
             assertThat(processoFacade.listarAtivos()).hasSize(1);

@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
-import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.TipoAnalise;
 import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.dto.MapaVisualizacaoResponse;
@@ -18,6 +17,7 @@ import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.model.Usuario;
+import sgc.comum.dto.ComumDtos.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -48,9 +48,6 @@ class SubprocessoMapaControllerTest {
 
     @Mock
     private AnaliseFacade analiseFacade;
-
-    @Mock
-    private AnaliseMapper analiseMapper;
 
     @Test
     @DisplayName("Deve verificar impactos")
@@ -159,7 +156,7 @@ class SubprocessoMapaControllerTest {
     @DisplayName("Deve apresentar sugestões")
     void deveApresentarSugestoes() {
         Long codigo = 1L;
-        ApresentarSugestoesRequest req = new ApresentarSugestoesRequest("Sugestão");
+        TextoRequest req = new TextoRequest("Sugestão");
         Usuario usuario = new Usuario();
 
         controller.apresentarSugestoes(codigo, req, usuario);
@@ -183,7 +180,7 @@ class SubprocessoMapaControllerTest {
     @DisplayName("Deve obter histórico de validação")
     void deveObterHistoricoValidacao() {
         Long codigo = 1L;
-        when(analiseFacade.listarPorSubprocesso(eq(codigo), eq(TipoAnalise.VALIDACAO))).thenReturn(List.of());
+        when(analiseFacade.listarPorSubprocesso(codigo, TipoAnalise.VALIDACAO)).thenReturn(List.of());
 
         List<AnaliseValidacaoHistoricoDto> result = controller.obterHistoricoValidacao(codigo);
 
@@ -206,7 +203,7 @@ class SubprocessoMapaControllerTest {
     @DisplayName("Deve devolver validação")
     void deveDevolverValidacao() {
         Long codigo = 1L;
-        DevolverValidacaoRequest req = new DevolverValidacaoRequest("Justificativa");
+        JustificativaRequest req = new JustificativaRequest("Justificativa");
         Usuario usuario = new Usuario();
 
         ResponseEntity<Void> response = controller.devolverValidacao(codigo, req, usuario);
@@ -289,7 +286,7 @@ class SubprocessoMapaControllerTest {
 
         controller.disponibilizarMapaEmBloco(codigo, req, usuario);
 
-        verify(subprocessoFacade).disponibilizarMapaEmBloco(eq(subprocessos), eq(codigo), any(DisponibilizarMapaRequest.class), eq(usuario));
+        verify(subprocessoFacade).disponibilizarMapaEmBloco(subprocessos, codigo, any(DisponibilizarMapaRequest.class), usuario);
     }
 
     @Test

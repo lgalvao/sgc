@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.analise.dto.AnaliseHistoricoDto;
+import sgc.comum.dto.ComumDtos.JustificativaRequest;
+import sgc.comum.dto.ComumDtos.TextoRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAcaoAnalise;
@@ -29,9 +31,6 @@ import sgc.organizacao.model.UsuarioRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.AceitarCadastroRequest;
-import sgc.subprocesso.dto.DevolverCadastroRequest;
-import sgc.subprocesso.dto.HomologarCadastroRequest;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -161,7 +160,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
 
         String observacoes = "Favor revisar a atividade X e Y.";
-        DevolverCadastroRequest requestBody = new DevolverCadastroRequest(observacoes);
+        JustificativaRequest requestBody = new JustificativaRequest(observacoes);
 
         // When
         mockMvc.perform(
@@ -210,7 +209,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
 
         String observacoes = "Cadastro parece OK.";
-        AceitarCadastroRequest requestBody = new AceitarCadastroRequest(observacoes);
+        TextoRequest requestBody = new TextoRequest(observacoes);
 
         mockMvc.perform(
                         post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
@@ -253,7 +252,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         admin.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo()); // Or default admin unit
         admin.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
  
-        HomologarCadastroRequest requestBody = new HomologarCadastroRequest("Homologado via teste.");
+        TextoRequest requestBody = new TextoRequest("Homologado via teste.");
  
         mockMvc.perform(
                         post(
@@ -293,7 +292,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
 
         String obsDevolucao = "Falta atividade Z";
-        DevolverCadastroRequest devolverReq = new DevolverCadastroRequest(obsDevolucao);
+        JustificativaRequest devolverReq = new JustificativaRequest(obsDevolucao);
 
         mockMvc.perform(post("/api/subprocessos/{id}/devolver-cadastro", subprocesso.getCodigo())
                         .with(csrf())
@@ -307,7 +306,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         subprocessoRepo.saveAndFlush(subprocesso);
 
         String obsAceite = "Agora sim, completo.";
-        AceitarCadastroRequest aceitarReq = new AceitarCadastroRequest(obsAceite);
+        TextoRequest aceitarReq = new TextoRequest(obsAceite);
         mockMvc.perform(post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
                         .with(csrf())
                         .with(user(gestor))
