@@ -7,7 +7,6 @@ import {usePerfilStore} from "../perfil";
 
 vi.mock("@/services/usuarioService");
 
-// Mock localStorage globally
 const mockLocalStorage = (() => {
     let store: { [key: string]: string } = {};
     return {
@@ -24,10 +23,9 @@ const mockLocalStorage = (() => {
     };
 })();
 
-Object.defineProperty(window, "localStorage", { value: mockLocalStorage });
+Object.defineProperty(globalThis, "localStorage", { value: mockLocalStorage });
 
 describe("usePerfilStore", () => {
-    // Setup localStorage BEFORE the store is initialized
     beforeEach(() => {
         mockLocalStorage.clear();
         mockLocalStorage.setItem("usuarioCodigo", JSON.stringify("9")); // Set default for initial state
@@ -47,7 +45,6 @@ describe("usePerfilStore", () => {
         mockLocalStorage.setItem("unidadeSelecionada", JSON.stringify(123));
         mockLocalStorage.setItem("unidadeSelecionadaSigla", JSON.stringify("U10"));
 
-        // Re-initialize store to pick up new localStorage values
         setActivePinia(createPinia());
         const newPerfilStore = usePerfilStore();
 
@@ -63,7 +60,6 @@ describe("usePerfilStore", () => {
         it("definirUsuarioCodigo deve atualizar usuarioCodigo e armazená-lo no localStorage", () => {
             context.store.definirUsuarioCodigo("15");
             expect(context.store.usuarioCodigo).toBe("15");
-            // useLocalStorage sincroniza automaticamente com localStorage
         });
 
         it("definirPerfilUnidade deve atualizar perfilSelecionado e unidadeSelecionada e armazená-los no localStorage", () => {
@@ -75,7 +71,6 @@ describe("usePerfilStore", () => {
             expect(context.store.perfilSelecionado).toBe(Perfil.ADMIN);
             expect(context.store.unidadeSelecionada).toBe(unidadeCodigo);
             expect(context.store.unidadeSelecionadaSigla).toBe(unidadeSigla);
-            // useLocalStorage sincroniza automaticamente com localStorage
             
             context.store.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla, "Nome Teste");
             expect(context.store.usuarioNome).toBe("Nome Teste");
@@ -198,7 +193,6 @@ describe("usePerfilStore", () => {
             expect(context.store.usuarioCodigo).toBeNull();
             expect(context.store.perfilSelecionado).toBeNull();
             expect(context.store.unidadeSelecionada).toBeNull();
-            // useLocalStorage sincroniza automaticamente - apenas jwtToken é removido manualmente
             expect(mockLocalStorage.removeItem).toHaveBeenCalledWith("jwtToken");
         });
 

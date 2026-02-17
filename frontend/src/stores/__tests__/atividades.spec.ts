@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from "vitest";
+import {describe, expect, it, vi} from "vitest";
 import * as atividadeService from "@/services/atividadeService";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useAtividadesStore} from "../atividades";
@@ -9,13 +9,6 @@ vi.mock("@/services/subprocessoService");
 
 describe("useAtividadesStore", () => {
     const context = setupStoreTest(useAtividadesStore);
-
-    beforeEach(() => {
-        // Mocks específicos precisam ser limpos ou configurados,
-        // mas o setupStoreTest já chama vi.clearAllMocks().
-        // Como estamos usando vi.mock no topo, os métodos são vi.fn().
-        // Mocks de retorno precisam ser definidos em cada teste ou num beforeEach se comum.
-    });
 
     describe("buscarAtividadesParaSubprocesso", () => {
         it("deve buscar e mapear as atividades", async () => {
@@ -81,7 +74,6 @@ describe("useAtividadesStore", () => {
                 subprocesso: {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
-                    situacaoLabel: "CADASTRO_EM_ANDAMENTO"
                 },
                 atividadesAtualizadas: []
             });
@@ -116,7 +108,6 @@ describe("useAtividadesStore", () => {
                 subprocesso: {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
-                    situacaoLabel: "CADASTRO_EM_ANDAMENTO"
                 },
                 atividadesAtualizadas: [atividadeComConhecimento]
             });
@@ -162,7 +153,6 @@ describe("useAtividadesStore", () => {
                 subprocesso: {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
-                    situacaoLabel: "CADASTRO_EM_ANDAMENTO"
                 },
                 atividadesAtualizadas: [atividadeSemConhecimento]
             });
@@ -220,7 +210,6 @@ describe("useAtividadesStore", () => {
                 subprocesso: {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
-                    situacaoLabel: "CADASTRO_EM_ANDAMENTO"
                 },
                 atividadesAtualizadas: [atividadeAtualizada]
             });
@@ -274,7 +263,6 @@ describe("useAtividadesStore", () => {
                 subprocesso: {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
-                    situacaoLabel: "CADASTRO_EM_ANDAMENTO"
                 },
                 atividadesAtualizadas: [atividadeComConhecimentoAtualizado]
             });

@@ -12,10 +12,8 @@ vi.mock("../unidades", () => ({ useUnidadesStore: vi.fn(() => ({})) }));
 vi.mock("../alertas", () => ({ useAlertasStore: vi.fn(() => ({})) }));
 
 describe("useProcessosStore", () => {
-    // Usando o helper centralizado
     const context = setupStoreTest(useProcessosStore);
 
-    // Services mocks precisam ser carregados
     let painelService: Mocked<typeof import("@/services/painelService")>;
     let processoService: Mocked<typeof import("@/services/processoService")>;
 
@@ -31,7 +29,6 @@ describe("useProcessosStore", () => {
         resumoSubprocessos: [],
     };
 
-    // Setup específico dos services que não cabe no setup genérico
     beforeEach(async () => {
         vi.clearAllMocks();
         painelService = (await import("@/services/painelService")) as Mocked<
@@ -48,7 +45,6 @@ describe("useProcessosStore", () => {
     });
 
     it("deve limpar o erro com clearError", async () => {
-        // Trigger an error via action
         painelService.listarProcessos.mockRejectedValue(MOCK_ERROR);
         try {
             await context.store.buscarProcessosPainel("perfil", 1, 0, 10);

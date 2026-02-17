@@ -3,7 +3,6 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useConfiguracoesStore} from '../configuracoes';
 import * as configuracaoService from '@/services/configuracaoService';
 
-// Mock configuracaoService
 vi.mock('@/services/configuracaoService', () => ({
     buscarConfiguracoes: vi.fn(),
     salvarConfiguracoes: vi.fn()

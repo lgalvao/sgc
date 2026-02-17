@@ -55,7 +55,7 @@
                   {{ proc.tipo }}
                 </span>
               </td>
-              <td>{{ formatDate(proc.dataFinalizacao) }}</td>
+              <td>{{ formatDateBR(proc.dataFinalizacao) }}</td>
             </tr>
           </tbody>
         </table>
@@ -72,7 +72,7 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {useProcessosStore} from '@/stores/processos';
-import {formatDate, logger} from '@/utils';
+import {formatDateBR, logger} from '@/utils';
 
 const router = useRouter();
 const processosStore = useProcessosStore();
