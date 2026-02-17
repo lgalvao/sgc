@@ -101,6 +101,7 @@ class ProcessoInicializadorTest {
     @DisplayName("Iniciar sucesso (Mapeamento)")
     void iniciarSucessoMapeamento() {
         Processo p = new Processo();
+        p.setCodigo(1L);
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
         Unidade u = criarUnidade(1L, "U1");
@@ -163,6 +164,7 @@ class ProcessoInicializadorTest {
     @DisplayName("Iniciar sucesso (Revisão)")
     void iniciarSucessoRevisao() {
         Processo p = new Processo();
+        p.setCodigo(1L);
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.REVISAO);
 
@@ -192,6 +194,7 @@ class ProcessoInicializadorTest {
     @DisplayName("Iniciar sucesso (Diagnóstico)")
     void iniciarSucessoDiagnostico() {
         Processo p = new Processo();
+        p.setCodigo(1L);
         p.setSituacao(SituacaoProcesso.CRIADO);
         p.setTipo(TipoProcesso.DIAGNOSTICO);
         Unidade u = criarUnidade(1L, "U1");
