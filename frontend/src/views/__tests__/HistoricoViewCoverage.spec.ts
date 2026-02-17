@@ -27,7 +27,7 @@ describe("HistoricoView Coverage", () => {
             createSpy: vi.fn,
             stubActions: true,
             initialState: {
-              "processos-core": {
+              "processos": {
                 processosFinalizados: [
                   {
                     codigo: 1,
