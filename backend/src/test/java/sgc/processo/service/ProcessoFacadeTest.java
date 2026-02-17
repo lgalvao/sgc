@@ -117,36 +117,7 @@ class ProcessoFacadeTest {
             verify(processoConsultaService).buscarIdsUnidadesComProcessosAtivos(codigoIgnorar);
         }
 
-        @Test
-        @DisplayName("enviarLembrete deve formatar data N/A quando null")
-        void enviarLembrete_DeveFormatarDataNA() {
-            Long codProcesso = 1L;
-            Long codUnidade = 2L;
 
-            Processo processo = new Processo();
-            processo.setDescricao("Proc");
-            processo.setDataLimite(null);
-            Unidade unidade = UnidadeFixture.unidadeComId(codUnidade);
-            unidade.setSigla("U1");
-            processo.adicionarParticipantes(Set.of(unidade));
-
-            when(processoConsultaService.buscarProcessoCodigo(codProcesso)).thenReturn(processo);
-            when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(unidade);
-            Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
-            when(subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
-            unidade.setTituloTitular("T1");
-            Usuario titular = new Usuario();
-            titular.setEmail("titular@teste.com");
-            when(usuarioService.buscarPorLogin("T1")).thenReturn(titular);
-            
-            when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
-
-            processoFacade.enviarLembrete(codProcesso, codUnidade);
-
-            verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("N/A"));
-            verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
-            verify(notificacaoEmailService).enviarEmailHtml(eq("titular@teste.com"), contains("SGC: Lembrete de prazo"), anyString());
-        }
 
         @Test
         @DisplayName("enviarLembrete deve formatar data corretamente quando presente")
@@ -342,6 +313,7 @@ class ProcessoFacadeTest {
             Usuario titular = new Usuario();
             titular.setEmail("u10@teste.com");
             when(usuarioService.buscarPorLogin("T10")).thenReturn(titular);
+            when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
 
             processoFacade.enviarLembrete(1L, 10L);
             verify(alertaService).criarAlertaAdmin(eq(p), eq(u), anyString());

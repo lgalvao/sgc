@@ -39,10 +39,11 @@ public class AnaliseController {
      * @return Uma lista de {@link AnaliseHistoricoDto} contendo o histórico de análises de cadastro.
      */
     @GetMapping("/analises-cadastro")
+    // TODO protecao esta errada aqui. Apenas os perfis ADMIN, GESTOR e CHEFE podem ver
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista o histórico de análises de cadastro")
     public List<AnaliseHistoricoDto> listarAnalisesCadastro(@PathVariable("codSubprocesso") Long codigo) {
-        subprocessoFacade.buscarSubprocesso(codigo); // Valida existência (lança 404 se não existir)
+        subprocessoFacade.buscarSubprocesso(codigo);
         return analiseFacade.listarHistoricoCadastro(codigo);
     }
 
@@ -62,7 +63,7 @@ public class AnaliseController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de cadastro")
     public AnaliseHistoricoDto criarAnaliseCadastro(@PathVariable Long codSubprocesso,
-                                        @RequestBody @Valid CriarAnaliseRequest request) {
+                                                    @RequestBody @Valid CriarAnaliseRequest request) {
 
         return criarAnalise(codSubprocesso, request, TipoAnalise.CADASTRO);
     }
@@ -79,7 +80,19 @@ public class AnaliseController {
     public List<AnaliseHistoricoDto> listarAnalisesValidacao(@PathVariable Long codSubprocesso) {
         subprocessoFacade.buscarSubprocesso(codSubprocesso);
         return analiseFacade.listarHistoricoValidacao(codSubprocesso).stream()
-                .map(v -> new AnaliseHistoricoDto(v.dataHora(), v.observacoes(), v.acao(), v.unidadeSigla(), null, v.analistaUsuarioTitulo(), v.motivo(), v.tipo()))
+                .map(v -> {
+                    // TODO usar Builder para construir o dto.
+                    AnaliseHistoricoDto analiseHistoricoDto = new AnaliseHistoricoDto(
+                            v.dataHora(),
+                            v.observacoes(),
+                            v.acao(),
+                            v.unidadeSigla(),
+                            null,
+                            v.analistaUsuarioTitulo(),
+                            v.motivo(),
+                            v.tipo());
+                    return analiseHistoricoDto;
+                })
                 .toList();
     }
 
@@ -98,17 +111,20 @@ public class AnaliseController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de validação")
-    public AnaliseHistoricoDto criarAnaliseValidacao(@PathVariable Long codSubprocesso, @RequestBody @Valid CriarAnaliseRequest request) {
+    public AnaliseHistoricoDto criarAnaliseValidacao(@PathVariable Long codSubprocesso,
+                                                     @RequestBody @Valid CriarAnaliseRequest request) {
+
         return criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO);
     }
 
     private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {
-        Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codSubprocesso);
-        String observacoes = StringUtils.stripToEmpty(request.observacoes());
+        Subprocesso sp = subprocessoFacade.buscarSubprocesso(codSubprocesso);
+        String obs = StringUtils.stripToEmpty(request.observacoes());
 
-        CriarAnaliseCommand command = CriarAnaliseCommand.builder()
+        // TODO estranho essa acao nula!
+        CriarAnaliseCommand criarAnaliseCommand = CriarAnaliseCommand.builder()
                 .codSubprocesso(codSubprocesso)
-                .observacoes(observacoes)
+                .observacoes(obs)
                 .tipo(tipo)
                 .acao(null)
                 .siglaUnidade(request.siglaUnidade())
@@ -116,7 +132,7 @@ public class AnaliseController {
                 .motivo(request.motivo())
                 .build();
 
-        Analise analise = analiseFacade.criarAnalise(subprocesso, command);
+        Analise analise = analiseFacade.criarAnalise(sp, criarAnaliseCommand);
         return analiseFacade.paraHistoricoDto(analise);
     }
 }

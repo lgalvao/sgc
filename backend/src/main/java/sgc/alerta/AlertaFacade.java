@@ -30,16 +30,6 @@ public class AlertaFacade {
     private final UnidadeFacade unidadeService;
 
     /**
-     * Obtém a sigla da unidade para exibição ao usuário.
-     */
-    private String obterSiglaParaUsuario(Unidade unidade) {
-        if (Long.valueOf(1L).equals(unidade.getCodigo())) {
-            return "ADMIN";
-        }
-        return unidade.getSigla();
-    }
-    
-    /**
      * Obtém a unidade raiz (ADMIN) do sistema.
      */
     private Unidade getUnidadeRaiz() {
@@ -47,21 +37,8 @@ public class AlertaFacade {
     }
 
     /**
-     * Criar e persistir um alerta.
-     */
-    private Alerta criarAlerta(Processo processo, Unidade origem, Unidade destino, String descricao) {
-        Alerta alerta = Alerta.builder()
-                .processo(processo)
-                .dataHora(LocalDateTime.now())
-                .unidadeOrigem(origem)
-                .unidadeDestino(destino)
-                .descricao(descricao)
-                .build();
-        return alertaService.salvar(alerta);
-    }
-
-    /**
-     * Cria e persistir alerta com origem ADMIN (unidade raiz)
+     * Cria e persiste alerta com origem ADMIN (unidade raiz).
+     * Atalho para {@link #criarAlerta} quando a origem é o sistema.
      */
     @Transactional
     public Alerta criarAlertaAdmin(Processo processo, Unidade destino, String descricao) {
@@ -79,18 +56,22 @@ public class AlertaFacade {
 
     /**
      * Cria alertas para todas as unidades participantes quando um processo é iniciado.
-     * - Operacional: "Início do processo"
-     * - Intermediária: "Início do processo em unidade(s) subordinada(s)"
-     * - Interoperacional: Recebe os dois alertas
+     * <ul>
+     *   <li>Operacional: "Início do processo"</li>
+     *   <li>Intermediária: "Início do processo em unidade(s) subordinada(s)"</li>
+     *   <li>Interoperacional: Recebe os dois alertas</li>
+     * </ul>
      */
     @Transactional
     public List<Alerta> criarAlertasProcessoIniciado(Processo processo, List<Unidade> unidadesParticipantes) {
-        Set<Unidade> unidadesOperacionais = new HashSet<>();
+        // Ambas usam Map<Long, Unidade> para deduplicar por código,
+        // independentemente da implementação de equals/hashCode da entidade.
+        Map<Long, Unidade> unidadesOperacionais = new HashMap<>();
         Map<Long, Unidade> unidadesIntermediarias = new HashMap<>();
 
         for (Unidade unidade : unidadesParticipantes) {
             // Unidades participantes sempre recebem o alerta operacional
-            unidadesOperacionais.add(unidade);
+            unidadesOperacionais.put(unidade.getCodigo(), unidade);
 
             // Se for Interoperacional, também recebe o de intermediária
             if (unidade.getTipo() == TipoUnidade.INTEROPERACIONAL) {
@@ -108,7 +89,7 @@ public class AlertaFacade {
         List<Alerta> alertasCriados = new ArrayList<>();
 
         // Alertas operacionais
-        for (Unidade unidade : unidadesOperacionais) {
+        for (Unidade unidade : unidadesOperacionais.values()) {
             alertasCriados.add(criarAlertaAdmin(processo, unidade, "Início do processo"));
         }
 
@@ -126,8 +107,8 @@ public class AlertaFacade {
      */
     @Transactional
     public void criarAlertaCadastroDisponibilizado(Processo processo, Unidade unidadeOrigem, Unidade unidadeDestino) {
-        String desc = "Cadastro disponibilizado pela unidade %s no processo '%s'. Realize a análise do cadastro."
-                .formatted(obterSiglaParaUsuario(unidadeOrigem), processo.getDescricao());
+        String desc = "Cadastro disponibilizado pela unidade %s no processo '%s'."
+                .formatted(unidadeOrigem.getSigla(), processo.getDescricao());
 
         criarAlerta(processo, unidadeOrigem, unidadeDestino, desc);
     }
@@ -137,7 +118,7 @@ public class AlertaFacade {
      */
     @Transactional
     public void criarAlertaCadastroDevolvido(Processo processo, Unidade unidadeDestino, String motivo) {
-        String desc = "Cadastro devolvido no processo '%s'. Motivo: %s. Realize os ajustes necessários."
+        String desc = "Cadastro devolvido no processo '%s'. Motivo: %s."
                 .formatted(processo.getDescricao(), motivo);
 
         criarAlerta(processo, getUnidadeRaiz(), unidadeDestino, desc);
@@ -147,6 +128,20 @@ public class AlertaFacade {
     public void criarAlertaAlteracaoDataLimite(Processo processo, Unidade unidadeDestino, String novaData, int etapa) {
         String desc = "Data limite da etapa %d alterada para %s".formatted(etapa, novaData);
         criarAlerta(processo, getUnidadeRaiz(), unidadeDestino, desc);
+    }
+
+    /**
+     * Criar e persistir um alerta.
+     */
+    private Alerta criarAlerta(Processo processo, Unidade origem, Unidade destino, String descricao) {
+        Alerta alerta = Alerta.builder()
+                .processo(processo)
+                .dataHora(LocalDateTime.now())
+                .unidadeOrigem(origem)
+                .unidadeDestino(destino)
+                .descricao(descricao)
+                .build();
+        return alertaService.salvar(alerta);
     }
 
     /**

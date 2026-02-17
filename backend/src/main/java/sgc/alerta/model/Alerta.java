@@ -11,7 +11,6 @@ import lombok.experimental.SuperBuilder;
 import sgc.comum.model.ComumViews;
 import sgc.comum.model.EntidadeBase;
 import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 
 import java.time.LocalDateTime;
@@ -41,20 +40,13 @@ public class Alerta extends EntidadeBase {
     private Unidade unidadeOrigem;
 
     @ManyToOne
-    @JoinColumn(name = "unidade_destino_codigo")
+    @JoinColumn(name = "unidade_destino_codigo", nullable = false)
     @JsonIgnore
     private Unidade unidadeDestino;
-
-    @ManyToOne
-    @JoinColumn(name = "usuario_destino_titulo")
-    @JsonIgnore
-    private Usuario usuarioDestino;
 
     @JsonView(ComumViews.Publica.class)
     @Column(name = "descricao", nullable = false)
     private String descricao;
-
-    // ========== Campos Transientes para API (Flattening) ==========
 
     @Transient
     @JsonView(ComumViews.Publica.class)
@@ -63,32 +55,25 @@ public class Alerta extends EntidadeBase {
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("codProcesso")
     public Long getCodProcessoSintetico() {
-        return processo != null ? processo.getCodigo() : null;
+        return processo.getCodigo();
     }
 
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("processo")
     public String getProcessoDescricaoSintetica() {
-        return processo != null ? processo.getDescricao() : null;
+        return processo.getDescricao();
     }
 
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("origem")
     public String getOrigemSiglaSintetica() {
-        if (unidadeOrigem == null) return null;
-        return Long.valueOf(1L).equals(unidadeOrigem.getCodigo()) ? "ADMIN" : unidadeOrigem.getSigla();
-    }
-
-    @JsonView(ComumViews.Publica.class)
-    @JsonProperty("unidadeOrigem")
-    public String getUnidadeOrigemSigla() {
-        return getOrigemSiglaSintetica();
+        return unidadeOrigem.getSigla();
     }
 
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("unidadeDestino")
     public String getUnidadeDestinoSigla() {
-        return unidadeDestino != null ? unidadeDestino.getSigla() : null;
+        return unidadeDestino.getSigla();
     }
 
     @JsonView(ComumViews.Publica.class)

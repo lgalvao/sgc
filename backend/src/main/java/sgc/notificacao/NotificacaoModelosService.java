@@ -3,6 +3,7 @@ package sgc.notificacao;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -163,7 +164,7 @@ public class NotificacaoModelosService {
     /**
      * Gera o conteúdo HTML para o email de lembrete de prazo.
      */
-    public String criarEmailLembretePrazo(String siglaUnidade, String nomeProcesso, LocalDateTime dataLimite) {
+    public String criarEmailLembretePrazo(String siglaUnidade, String nomeProcesso, @Nullable LocalDateTime dataLimite) {
         Context context = new Context();
         context.setVariable(VAR_TITULO, TITULO_LEMBRETE_PRAZO + nomeProcesso);
         context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);

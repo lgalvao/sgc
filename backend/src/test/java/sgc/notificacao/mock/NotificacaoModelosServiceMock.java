@@ -63,4 +63,8 @@ public class NotificacaoModelosServiceMock extends NotificacaoModelosService {
             @NonNull String siglaUnidade, @NonNull String nomeProcesso, @NonNull List<String> siglasUnidadesSubordinadas) {
         return "<html><body>Mock Email de Processo Finalizado Unidades Subordinadas</body></html>";
     }
+    @Override
+    public String criarEmailLembretePrazo(String siglaUnidade, String nomeProcesso, LocalDateTime dataLimite) {
+        return "<html><body>Mock Email de Lembrete de Prazo</body></html>";
+    }
 }

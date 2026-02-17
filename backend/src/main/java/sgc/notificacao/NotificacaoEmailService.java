@@ -32,7 +32,7 @@ public class NotificacaoEmailService {
     }
 
     /**
-     * Envia um email com conteúdo HTML.
+     * Envia um email com HTML.
      */
     @Transactional
     public void enviarEmailHtml(String para, String assunto, String corpoHtml) {

@@ -170,8 +170,8 @@ CREATE TABLE ALERTA
     processo_codigo        NUMBER NOT NULL,
     data_hora              TIMESTAMP NOT NULL,
     unidade_origem_codigo  NUMBER NOT NULL,
-    unidade_destino_codigo NUMBER NULL,
-    usuario_destino_titulo VARCHAR2(12)  NULL,
+    unidade_destino_codigo NUMBER NOT NULL,
+    usuario_destino_titulo VARCHAR2(12)  NULL,  -- legado: associação alerta-usuário agora via ALERTA_USUARIO
     descricao              VARCHAR2(255) NOT NULL,
     CONSTRAINT pk_alerta PRIMARY KEY (codigo),
     CONSTRAINT fk_alerta_processo FOREIGN KEY (processo_codigo) REFERENCES PROCESSO (codigo)

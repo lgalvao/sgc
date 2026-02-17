@@ -14,21 +14,10 @@ import java.util.List;
  */
 @Repository
 public interface AlertaRepo extends JpaRepository<Alerta, Long> {
-    /**
-     * Busca todos os alertas associados a um processo específico.
-     *
-     * @param codProcesso O código do processo.
-     * @return Uma lista de alertas.
-     */
     List<Alerta> findByProcessoCodigo(Long codProcesso);
 
     /**
-     * Busca alertas destinados a uma unidade específica.
-     * Carrega eagerly as entidades relacionadas para evitar LazyInitializationException.
-     * Usa INNER JOIN para garantir que apenas alertas com processos válidos sejam retornados.
-     *
-     * @param codUnidade O código da unidade.
-     * @return Lista de alertas para a unidade.
+     * Carrega eagerly as entidades relacionadas (JOIN FETCH) para evitar LazyInitializationException.
      */
     @Query("""
         SELECT DISTINCT a FROM Alerta a
@@ -40,13 +29,7 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
     List<Alerta> findByUnidadeDestino_Codigo(@Param("codUnidade") Long codUnidade);
 
     /**
-     * Busca alertas destinados a uma unidade específica, de forma paginada.
-     * Carrega eagerly as entidades relacionadas para evitar LazyInitializationException.
-     * Usa INNER JOIN para garantir que apenas alertas com processos válidos sejam retornados.
-     *
-     * @param codUnidade O código da unidade.
-     * @param pageable   Informações de paginação.
-     * @return Uma página de alertas.
+     * Versão paginada. JOIN FETCH para evitar LazyInitializationException.
      */
     @Query(value = """
         SELECT DISTINCT a FROM Alerta a

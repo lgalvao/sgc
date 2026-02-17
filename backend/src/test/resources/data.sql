@@ -322,22 +322,22 @@ INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo)
 VALUES ('50000', 'Processo Teste A', 'EM_ANDAMENTO', CURRENT_TIMESTAMP, 'MAPEAMENTO');
 INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
 VALUES ('50000', 8, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 'ATIVA', 6, '3', '00000003', CURRENT_TIMESTAMP);
-INSERT INTO SGC.ALERTA (codigo, processo_codigo, usuario_destino_titulo, descricao, data_hora)
-VALUES ('70000', 50000, 50001, 'Alerta de teste para processo A', CURRENT_TIMESTAMP);
+INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_destino_titulo, descricao, data_hora)
+VALUES ('70000', 50000, 1, 8, 50001, 'Alerta de teste para processo A', CURRENT_TIMESTAMP);
 
 INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo)
 VALUES ('50001', 'Processo Teste B', 'FINALIZADO', CURRENT_TIMESTAMP, 'MAPEAMENTO');
 INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
 VALUES ('50001', 9, 'Seção de Dados e Inteligência Artificial', 'SEDIA', 'OPERACIONAL', 'ATIVA', 6, '333333333333', '33333333', CURRENT_TIMESTAMP);
-INSERT INTO SGC.ALERTA (codigo, processo_codigo, usuario_destino_titulo, descricao, data_hora)
-VALUES ('70001', 50001, 50003, 'Alerta de teste para processo B', CURRENT_TIMESTAMP);
+INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_destino_titulo, descricao, data_hora)
+VALUES ('70001', 50001, 1, 9, 50003, 'Alerta de teste para processo B', CURRENT_TIMESTAMP);
 
 -- Alertas específicos para CDU-02
-INSERT INTO SGC.ALERTA (codigo, processo_codigo, usuario_destino_titulo, descricao, data_hora)
-VALUES ('70002', 50000, '8', 'Alerta para Gestor', CURRENT_TIMESTAMP);
+INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_destino_titulo, descricao, data_hora)
+VALUES ('70002', 50000, 1, 8, '8', 'Alerta para Gestor', CURRENT_TIMESTAMP);
 
-INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_destino_codigo, descricao, data_hora)
-VALUES ('70003', 50000, 6, 'Alerta para Unidade Filha 1', CURRENT_TIMESTAMP);
+INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, descricao, data_hora)
+VALUES ('70003', 50000, 1, 6, 'Alerta para Unidade Filha 1', CURRENT_TIMESTAMP);
 
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
 VALUES ('60000', 50000, 8, 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO', CURRENT_TIMESTAMP);

@@ -10,20 +10,12 @@ import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
-
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
- * Serviço responsável pela comunicação relacionada a subprocessos via email.
- *
- * <p>Utiliza templates de email para notificar sobre eventos relacionados
- * ao workflow de subprocessos.
- *
- * <p><b>Nota arquitetural:</b> Uso deveria ser via {@link SubprocessoFacade}.
+ * Comunicação relacionada a subprocessos via email.
  */
 @Service
 @RequiredArgsConstructor
@@ -34,23 +26,10 @@ public class SubprocessoEmailService {
     private final NotificacaoEmailService notificacaoEmailService;
     private final TemplateEngine templateEngine;
 
-    /**
-     * Obtém a sigla da unidade para exibição ao usuário.
-     * A unidade RAIZ (id=1, sigla='ADMIN') é substituída por "SEDOC" para clareza.
-     *
-     * @param unidade a unidade
-     * @return a sigla para apresentação ao usuário
-     */
-    private String obterSiglaParaUsuario(Unidade unidade) {
-        if (Objects.equals(unidade.getCodigo(), 1L)) {
-            return "ADMIN"; // Usuário vê ADMIN em vez de RAIZ
-        }
-        return unidade.getSigla();
-    }
-
     public void enviarEmailTransicao(EventoTransicaoSubprocesso evento) {
         TipoTransicao tipo = evento.getTipo();
-        if (!tipo.enviaEmail()) return;
+        if (!tipo.enviaEmail())
+            return;
 
         Subprocesso sp = evento.getSubprocesso();
         Unidade unidadeOrigem = evento.getUnidadeOrigem();
@@ -59,11 +38,10 @@ public class SubprocessoEmailService {
         try {
             Map<String, Object> variaveis = criarVariaveisTemplate(sp, evento);
             String assunto = criarAssunto(tipo, sp);
-            @SuppressWarnings("ConstantConditions")
             String corpo = processarTemplate(tipo.getTemplateEmail(), variaveis);
 
             notificacaoEmailService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
-            log.info("E-mail enviado para {} - Transição: {}", obterSiglaParaUsuario(unidadeDestino), tipo);
+            log.info("E-mail enviado para {} - Transição: {}", unidadeDestino.getSigla(), tipo);
 
             if (deveNotificarHierarquia(tipo)) {
                 notificarHierarquia(unidadeOrigem, assunto, corpo);
@@ -78,7 +56,7 @@ public class SubprocessoEmailService {
         Map<String, Object> variaveis = new HashMap<>();
 
         Unidade unidade = sp.getUnidade();
-        variaveis.put("siglaUnidade", obterSiglaParaUsuario(unidade));
+        variaveis.put("siglaUnidade", unidade.getSigla());
         variaveis.put("nomeUnidade", unidade.getNome());
 
         variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
@@ -101,21 +79,21 @@ public class SubprocessoEmailService {
     }
 
     private String criarAssunto(TipoTransicao tipo, Subprocesso sp) {
-        String siglaUnidade = obterSiglaParaUsuario(sp.getUnidade());
+        String siglaUnidade = sp.getUnidade().getSigla();
 
         return switch (tipo) {
             case CADASTRO_DISPONIBILIZADO, REVISAO_CADASTRO_DISPONIBILIZADA ->
-                    String.format("SGC: Cadastro de atividades da unidade %s disponibilizado", siglaUnidade);
+                String.format("SGC: Cadastro de atividades da unidade %s disponibilizado", siglaUnidade);
             case CADASTRO_DEVOLVIDO, REVISAO_CADASTRO_DEVOLVIDA ->
-                    String.format("SGC: Cadastro de atividades da unidade %s devolvido para ajustes", siglaUnidade);
+                String.format("SGC: Cadastro de atividades da unidade %s devolvido para ajustes", siglaUnidade);
             case CADASTRO_ACEITO, REVISAO_CADASTRO_ACEITA ->
-                    String.format("SGC: Cadastro de atividades da unidade %s aceito", siglaUnidade);
+                String.format("SGC: Cadastro de atividades da unidade %s aceito", siglaUnidade);
             case MAPA_DISPONIBILIZADO ->
-                    String.format("SGC: Mapa de competências da unidade %s disponibilizado", siglaUnidade);
+                String.format("SGC: Mapa de competências da unidade %s disponibilizado", siglaUnidade);
             case MAPA_SUGESTOES_APRESENTADAS -> String.format("SGC: Sugestões para o mapa da unidade %s", siglaUnidade);
             case MAPA_VALIDADO -> String.format("SGC: Mapa de competências da unidade %s validado", siglaUnidade);
             case MAPA_VALIDACAO_DEVOLVIDA ->
-                    String.format("SGC: Validação do mapa da unidade %s devolvida", siglaUnidade);
+                String.format("SGC: Validação do mapa da unidade %s devolvida", siglaUnidade);
             case MAPA_VALIDACAO_ACEITA -> String.format("SGC: Validação do mapa da unidade %s aceita", siglaUnidade);
             default -> String.format("SGC: Notificação - %s", tipo.getDescricaoMovimentacao());
         };
@@ -139,7 +117,7 @@ public class SubprocessoEmailService {
             try {
                 notificacaoEmailService.enviarEmail(superior.getSigla(), assunto, corpo);
             } catch (Exception e) {
-                log.warn("Falha ao enviar e-mail para {}: {}", obterSiglaParaUsuario(superior), e.getMessage());
+                log.warn("Falha ao enviar e-mail para {}: {}", superior.getSigla(), e.getMessage());
             }
             superior = superior.getUnidadeSuperior();
         }

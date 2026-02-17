@@ -12,6 +12,12 @@ import java.util.List;
  */
 @Repository
 public interface AlertaUsuarioRepo extends JpaRepository<AlertaUsuario, AlertaUsuario.Chave> {
-    @Query("SELECT au FROM AlertaUsuario au WHERE au.id.usuarioTitulo = :usuarioTitulo AND au.id.alertaCodigo IN :alertaCodigos")
-    List<AlertaUsuario> findByUsuarioAndAlertas(@Param("usuarioTitulo") String usuarioTitulo, @Param("alertaCodigos") List<Long> alertaCodigos);
+    @Query("""
+             SELECT au FROM AlertaUsuario au
+             WHERE au.id.usuarioTitulo = :usuarioTitulo AND
+                   au.id.alertaCodigo IN :alertaCodigos
+            """)
+    List<AlertaUsuario> findByUsuarioAndAlertas(
+            @Param("usuarioTitulo") String usuarioTitulo,
+            @Param("alertaCodigos") List<Long> alertaCodigos);
 }

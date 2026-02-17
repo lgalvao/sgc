@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -14,6 +15,7 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,15 +37,15 @@ class AlertaFacadeCoverageTest {
     private AlertaFacade alertaFacade;
 
     @Test
-    @DisplayName("criarAlertaCadastroDisponibilizado deve usar ADMIN como sigla se unidade de origem for RAIZ")
-    void deveUsarAdminSeUnidadeOrigemForRaiz() {
+    @DisplayName("criarAlertaCadastroDisponibilizado deve usar sigla da unidade de origem na descrição")
+    void deveUsarSiglaDaUnidadeOrigemNaDescricao() {
         // Arrange
         Processo processo = Processo.builder().codigo(10L).descricao("Processo Teste").build();
-        
-        Unidade unidadeRaiz = new Unidade();
-        unidadeRaiz.setCodigo(1L);
-        unidadeRaiz.setSigla("RAIZ"); // Sigla real no banco, mas usuário deve ver ADMIN
-        
+
+        Unidade unidadeOrigem = new Unidade();
+        unidadeOrigem.setCodigo(1L);
+        unidadeOrigem.setSigla("ADMIN");
+
         Unidade unidadeDestino = new Unidade();
         unidadeDestino.setCodigo(2L);
         unidadeDestino.setSigla("UNIT");
@@ -51,11 +53,11 @@ class AlertaFacadeCoverageTest {
         when(alertaService.salvar(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        alertaFacade.criarAlertaCadastroDisponibilizado(processo, unidadeRaiz, unidadeDestino);
+        alertaFacade.criarAlertaCadastroDisponibilizado(processo, unidadeOrigem, unidadeDestino);
 
         // Assert
-        verify(alertaService).salvar(any(Alerta.class));
-        // A descrição deve conter "pela unidade ADMIN" (cobertura da linha 58)
-        // O método obterSiglaParaUsuario foi chamado via String.formatted
+        ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+        verify(alertaService).salvar(captor.capture());
+        assertThat(captor.getValue().getDescricao()).contains("pela unidade ADMIN");
     }
 }

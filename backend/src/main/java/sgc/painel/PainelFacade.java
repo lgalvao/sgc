@@ -41,7 +41,7 @@ public class PainelFacade {
      * - Processos no estado 'CRIADO' são omitidos para perfis não-ADMIN
      *
      * @param perfil        O perfil do usuário (obrigatório).
-     * @param codigoUnidade O código da unidade do usuário (necessário para perfis não-ADMIN).
+     * @param codigoUnidade O código da unidade do usuário (obrigatório).
      * @param pageable      As informações de paginação.
      * @return Uma página {@link Page} de {@link ProcessoResumoDto}.
      * @throws IllegalArgumentException se o perfil for nulo or em branco.
@@ -85,11 +85,11 @@ public class PainelFacade {
     /**
      * Lista alertas com base no usuário ou na unidade.
      *
-     * <p>A busca prioriza o título do usuário. Se não for fornecido, busca pela unidade e suas
-     * subordinadas. Se nenhum dos dois for fornecido, retorna todos os alertas.
+     * <p>Os alertas são filtrados pela unidade fornecida.
+     * O título do usuário é utilizado para verificar o status de leitura.
      *
-     * @param usuarioTitulo Título de eleitor do usuário.
-     * @param codigoUnidade Código da unidade.
+     * @param usuarioTitulo Título de eleitor do usuário (opcional).
+     * @param codigoUnidade Código da unidade (obrigatório).
      * @param pageable      As informações de paginação.
      * @return Uma página {@link Page} de {@link Alerta}.
      */
@@ -104,11 +104,8 @@ public class PainelFacade {
                     Sort.by(Sort.Direction.DESC, "dataHora"));
         }
 
-        Page<Alerta> alertasPage;
-
         // Alertas são filtrados pela unidade do usuário (sem subordinadas)
-        alertasPage = alertaService.listarPorUnidade(codigoUnidade, sortedPageable);
-
+        Page<Alerta> alertasPage = alertaService.listarPorUnidade(codigoUnidade, sortedPageable);
         List<Long> alertasNaoLidosVisualizados = new ArrayList<>();
         alertasPage.forEach(alerta -> {
             LocalDateTime dataHoraLeitura = alertaService.obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo).orElse(null);

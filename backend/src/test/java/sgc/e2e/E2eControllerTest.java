@@ -128,8 +128,8 @@ class E2eControllerTest {
                 "INSERT INTO sgc.competencia (codigo, mapa_codigo, descricao) VALUES (450, 200,"
                         + " 'Competencia Teste')");
         jdbcTemplate.execute(
-                "INSERT INTO sgc.alerta (codigo, processo_codigo, unidade_destino_codigo,"
-                        + " usuario_destino_titulo) VALUES (500, 100, 999, '123')");
+                "INSERT INTO sgc.alerta (codigo, processo_codigo, unidade_origem_codigo, unidade_destino_codigo,"
+                        + " descricao, data_hora) VALUES (500, 100, 999, 999, 'Alerta teste', CURRENT_TIMESTAMP)");
         jdbcTemplate.execute(
                 "INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo) VALUES"
                         + " (500, '123')");

@@ -65,6 +65,7 @@ public class AnaliseFacade {
                 .toList();
     }
 
+    // TODO usar um mapper, ou se aplicavel, eliminar o dto e usar Jsonview
     public AnaliseHistoricoDto paraHistoricoDto(Analise analise) {
         UnidadeDto unidade = unidadeService.buscarPorCodigo(analise.getUnidadeCodigo());
         return AnaliseHistoricoDto.builder()
@@ -79,6 +80,7 @@ public class AnaliseFacade {
                 .build();
     }
 
+    // TODO usar um mapper, ou se aplicavel, eliminar o dto e usar Jsonview
     public AnaliseValidacaoHistoricoDto paraValidacaoHistoricoDto(Analise analise) {
         UnidadeDto unidade = unidadeService.buscarPorCodigo(analise.getUnidadeCodigo());
         return AnaliseValidacaoHistoricoDto.builder()
@@ -101,18 +103,9 @@ public class AnaliseFacade {
      */
     @Transactional
     public Analise criarAnalise(Subprocesso subprocesso, CriarAnaliseCommand command) {
-        Unidade unidade;
-        if (command.siglaUnidade() != null) {
-            var unidadeDto = unidadeService.buscarPorSigla(command.siglaUnidade());
-            unidade = unidadeService.buscarEntidadePorId(unidadeDto.getCodigo());
-        } else {
-            // Se não veio sigla, tentamos pegar a unidade do subprocesso se fizer sentido,
-            // ou lançamos erro.
-            // Pela regra "Unidade is not null anywhere", vamos exigir.
-            // Mas o command pode ter vindo de um contexto onde a unidade é implicita?
-            // O controller pega do request body.
-            throw new IllegalArgumentException("Sigla da unidade é obrigatória para criar análise.");
-        }
+        // TODO me parecem inuteis esses dois passos!
+        UnidadeDto unidadeDto = unidadeService.buscarPorSigla(command.siglaUnidade());
+        Unidade unidade = unidadeService.buscarEntidadePorId(unidadeDto.getCodigo());
 
         Analise analise = Analise.builder()
                 .subprocesso(subprocesso)
@@ -138,6 +131,7 @@ public class AnaliseFacade {
      *
      * @param codSubprocesso O código do subprocesso cujas análises serão removidas.
      */
+    // TODO nao deveria ser Transactional?
     public void removerPorSubprocesso(Long codSubprocesso) {
         analiseService.removerPorSubprocesso(codSubprocesso);
     }

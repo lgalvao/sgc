@@ -20,6 +20,7 @@ import java.util.Map;
 @RequestMapping("/api/alertas")
 @RequiredArgsConstructor
 @Tag(name = "Alertas", description = "Gerenciamento de alertas para usuários")
+// Autorização por autenticação é suficiente: cada endpoint filtra pela lotação/título do próprio usuário.
 public class AlertaController {
     private final AlertaFacade alertaFacade;
 
@@ -57,7 +58,7 @@ public class AlertaController {
         return ResponseEntity.ok(Map.of("message", "Alertas marcados como lidos."));
     }
 
-    private String extractTituloUsuario(Object principal) {
+    String extractTituloUsuario(Object principal) {
         return switch (principal) {
             case String string -> string;
             case Usuario usuario -> usuario.getTituloEleitoral();

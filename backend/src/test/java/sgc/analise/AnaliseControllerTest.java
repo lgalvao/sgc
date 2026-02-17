@@ -141,8 +141,7 @@ class AnaliseControllerTest {
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
             when(analiseFacade.paraHistoricoDto(analise)).thenReturn(dto);
 
-            mockMvc.perform(
-                            post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
+            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
@@ -161,8 +160,7 @@ class AnaliseControllerTest {
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
             when(analiseFacade.paraHistoricoDto(analise)).thenReturn(dto);
 
-            mockMvc.perform(
-                            post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
+            mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO)
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content("{\"tituloUsuario\":\"123456789012\", \"siglaUnidade\":\"SIGLA\"}"))
@@ -199,7 +197,6 @@ class AnaliseControllerTest {
             AnaliseValidacaoHistoricoDto vDto = AnaliseValidacaoHistoricoDto.builder().observacoes(OBSERVACAO_1).build();
 
             when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
-            // listarHistoricoValidacao já retorna DTOs, então não precisamos mapear no controller
             when(analiseFacade.listarHistoricoValidacao(1L))
                     .thenReturn(Collections.singletonList(vDto));
 
