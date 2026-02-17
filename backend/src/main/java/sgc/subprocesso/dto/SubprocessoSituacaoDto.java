@@ -1,7 +1,7 @@
 package sgc.subprocesso.dto;
 
 import lombok.Builder;
-import org.jspecify.annotations.Nullable;
+
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
 /**
@@ -13,7 +13,6 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 @Builder
 public record SubprocessoSituacaoDto(
         Long codigo,
-        SituacaoSubprocesso situacao,
-        @Nullable String situacaoLabel
+        SituacaoSubprocesso situacao
 ) {
 }

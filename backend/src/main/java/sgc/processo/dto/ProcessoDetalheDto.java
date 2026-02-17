@@ -34,12 +34,7 @@ public class ProcessoDetalheDto {
     private boolean podeAceitarCadastroBloco;
     private boolean podeDisponibilizarMapaBloco;
 
-    // Campos formatados para apresentação
-    private String dataLimiteFormatada;
-    private String dataCriacaoFormatada;
-    private String dataFinalizacaoFormatada;
-    private String situacaoLabel;
-    private String tipoLabel;
+
 
     @Getter
     @Setter
@@ -59,9 +54,7 @@ public class ProcessoDetalheDto {
         private Long mapaCodigo;
         private Long codSubprocesso;
 
-        // Campos formatados para apresentação
-        private String dataLimiteFormatada;
-        private String situacaoLabel;
+
     }
 }
 

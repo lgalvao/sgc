@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public record MovimentacaoDto(
         Long codigo,
         LocalDateTime dataHora,
-        String dataHoraFormatada,
+
         Long unidadeOrigemCodigo,
         String unidadeOrigemSigla,
         String unidadeOrigemNome,

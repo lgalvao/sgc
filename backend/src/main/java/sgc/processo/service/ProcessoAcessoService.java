@@ -18,11 +18,8 @@ import java.util.stream.Collectors;
 /**
  * Serviço responsável pelo controle de acesso a processos.
  *
- * <p>
  * Implementa a lógica de verificação hierárquica de acesso baseada
  * em unidades organizacionais e perfis de usuário.
- * </p>
- *
  */
 @Service
 @Slf4j

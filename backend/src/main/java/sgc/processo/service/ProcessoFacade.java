@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+
 /**
  * Orquestra operações de Processo.
  */
@@ -49,7 +50,6 @@ public class ProcessoFacade {
     private final ProcessoInicializador processoInicializador;
     private final AlertaFacade alertaService;
     private final NotificacaoEmailService notificacaoEmailService;
-
     private final ProcessoAcessoService processoAcessoService;
     private final ProcessoFinalizador processoFinalizador;
 

@@ -5,7 +5,7 @@
         <div class="fs-5">
           {{ unidade?.sigla }} - {{ unidade?.nome }}
           <span class="ms-3" data-testid="txt-badge-situacao">{{
-              subprocessosStore.subprocessoDetalhe?.situacaoLabel
+              formatSituacaoSubprocesso(subprocessosStore.subprocessoDetalhe?.situacao)
             }}</span>
         </div>
       </template>
@@ -104,6 +104,7 @@ import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
 import type {Atividade, Competencia} from "@/types/tipos";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
+import {formatSituacaoSubprocesso} from "@/utils/formatters";
 
 // Lazy loading de componentes pesados ou modais
 const ImpactoMapaModal = defineAsyncComponent(() => import("@/components/mapa/ImpactoMapaModal.vue"));

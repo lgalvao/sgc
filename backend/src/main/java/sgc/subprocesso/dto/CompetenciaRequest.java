@@ -12,7 +12,9 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Builder
 public record CompetenciaRequest(
-        @NotBlank(message = "A descrição da competência é obrigatória") String descricao,
+        @NotBlank(message = "A descrição da competência é obrigatória")
+        String descricao,
 
-        @NotEmpty(message = "A competência deve ter pelo menos uma atividade associada") List<Long> atividadesIds) {
+        @NotEmpty(message = "A competência deve ter pelo menos uma atividade associada")
+        List<Long> atividadesIds) {
 }

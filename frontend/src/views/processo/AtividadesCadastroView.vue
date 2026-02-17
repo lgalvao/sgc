@@ -19,7 +19,7 @@
               :class="badgeClass(subprocesso.situacao)"
               class="badge fs-6"
               data-testid="cad-atividades__txt-badge-situacao"
-          >{{ subprocesso.situacaoLabel }}</span>
+          >{{ formatSituacaoSubprocesso(subprocesso.situacao) }}</span>
         </div>
       </template>
       <template #actions>
@@ -184,6 +184,7 @@ import {usePerfil} from "@/composables/usePerfil";
 import type {Atividade, Conhecimento, CriarConhecimentoRequest, ErroValidacao,} from "@/types/tipos";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import logger from "@/utils/logger";
+import {formatSituacaoSubprocesso} from "@/utils/formatters";
 
 type DadosRemocao = {tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number} | null;
 

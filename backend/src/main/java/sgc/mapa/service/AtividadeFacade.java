@@ -58,7 +58,6 @@ public class AtividadeFacade {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
         Mapa mapa = mapaFacade.obterPorCodigo(mapaCodigo);
 
-        // Cria atividade temporária para verificação de acesso
         Atividade atividadeTemp = Atividade.builder().mapa(mapa).build();
         accessControlService.verificarPermissao(usuario, CRIAR_ATIVIDADE, atividadeTemp);
 

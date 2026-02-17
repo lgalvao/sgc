@@ -50,7 +50,6 @@ describe("useAtividadesStore", () => {
                 subprocesso: {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
-                    situacaoLabel: "CADASTRO_EM_ANDAMENTO"
                 },
                 atividadesAtualizadas: [novaAtividade]
             });

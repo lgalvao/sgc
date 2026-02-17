@@ -6,10 +6,10 @@ import lombok.Builder;
 import java.util.List;
 
 /**
- * Request para salvar os ajustes feitos no mapa de competências (CDU-16 item
- * 5).
+ * Request para salvar os ajustes feitos no mapa de competências.
  */
 @Builder
 public record SalvarAjustesRequest(
-        @NotEmpty(message = "A lista de competências não pode ser vazia") List<CompetenciaAjusteDto> competencias) {
+        @NotEmpty(message = "A lista de competências não pode ser vazia") 
+        List<CompetenciaAjusteDto> competencias) {
 }

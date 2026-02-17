@@ -3,7 +3,6 @@ package sgc.processo.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.util.FormatadorData;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.mapper.ProcessoDetalheMapper;
@@ -38,11 +37,7 @@ public class ProcessoDetalheBuilder {
                 .podeHomologarMapa(accessControlService.podeExecutar(usuario, Acao.HOMOLOGAR_MAPA_EM_BLOCO, processo))
                 .podeAceitarCadastroBloco(accessControlService.podeExecutar(usuario, Acao.ACEITAR_CADASTRO_EM_BLOCO, processo))
                 .podeDisponibilizarMapaBloco(accessControlService.podeExecutar(usuario, Acao.DISPONIBILIZAR_MAPA_EM_BLOCO, processo))
-                .dataCriacaoFormatada(FormatadorData.formatarData(processo.getDataCriacao()))
-                .dataFinalizacaoFormatada(FormatadorData.formatarData(processo.getDataFinalizacao()))
-                .dataLimiteFormatada(FormatadorData.formatarData(processo.getDataLimite()))
-                .situacaoLabel(processo.getSituacao().getLabel())
-                .tipoLabel(processo.getTipo().getLabel())
+
                 .unidades(new ArrayList<>())
                 .build();
 
@@ -75,9 +70,6 @@ public class ProcessoDetalheBuilder {
                 if (sp.getMapa() != null) {
                     unidadeDto.setMapaCodigo(sp.getMapa().getCodigo());
                 }
-                unidadeDto.setDataLimiteFormatada(
-                        FormatadorData.formatarData(sp.getDataLimiteEtapa1()));
-                unidadeDto.setSituacaoLabel(sp.getSituacao().getDescricao());
             }
 
             if (unidadeDto != null) {

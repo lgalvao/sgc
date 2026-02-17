@@ -36,7 +36,6 @@ describe("mappers/alertas", () => {
             dataHoraLeitura: undefined,
             linkDestino: "/test",
             mensagem: "Test Message",
-            dataHoraFormatada: "18/10/2025 10:00",
             origem: "UO",
             processo: "Test Process",
         };
@@ -50,7 +49,6 @@ describe("mappers/alertas", () => {
         expect(mapped.unidadeOrigem).toBe("UO");
         expect(mapped.unidadeDestino).toBe("UD");
         expect(mapped.mensagem).toBe("Test Message");
-        expect(mapped.dataHoraFormatada).toBe("18/10/2025 10:00");
         expect(mapped.origem).toBe("UO");
         expect(mapped.processo).toBe("Test Process");
     });
@@ -117,7 +115,7 @@ describe("mappers/mapas", () => {
             ],
         };
         const model = mapMapaCompletoDtoToModel(dto);
-        expect(model.competencias[0].atividades[0].conhecimentos![0].codigo).toBe(
+        expect(model.competencias[0].atividades[0].conhecimentos[0].codigo).toBe(
             1000,
         );
     });
@@ -159,7 +157,7 @@ describe("mappers/processos", () => {
             unidades: [{codUnidade: 10, filhos: [{codUnidade: 11}]}],
         };
         const model = mapProcessoDetalheDtoToFrontend(dto);
-        expect(model.unidades[0].filhos![0].codUnidade).toBe(11);
+        expect(model.unidades[0].filhos[0].codUnidade).toBe(11);
     });
 });
 

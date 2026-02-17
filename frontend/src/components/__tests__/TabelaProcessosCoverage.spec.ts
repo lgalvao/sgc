@@ -10,13 +10,10 @@ describe('TabelaProcessos Coverage', () => {
             codigo: 1,
             descricao: "Processo Teste",
             tipo: TipoProcesso.MAPEAMENTO,
-            tipoLabel: "Mapeamento",
             unidadeCodigo: 1,
             unidadeNome: "U1",
             situacao: SituacaoProcesso.EM_ANDAMENTO,
-            situacaoLabel: "Em andamento",
             dataLimite: new Date().toISOString(),
-            dataLimiteFormatada: "31/12/2023",
             dataCriacao: new Date().toISOString()
         })
     ];

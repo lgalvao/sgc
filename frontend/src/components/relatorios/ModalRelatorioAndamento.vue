@@ -36,7 +36,7 @@
           <td>{{ processo.descricao }}</td>
           <td>{{ processo.tipo }}</td>
           <td>{{ processo.situacao }}</td>
-          <td>{{ processo.dataLimiteFormatada }}</td>
+          <td>{{ formatDate(processo.dataLimite) }}</td>
           <td>{{ processo.unidadeNome }}</td>
           <td>{{ calcularPercentualConcluido() }}%</td>
         </tr>
@@ -52,6 +52,7 @@ import {computed} from "vue";
 import {downloadCSV, gerarCSV} from "@/utils/csv";
 import type {ProcessoResumo} from "@/types/tipos";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
+import {formatDate} from "@/utils/formatters";
 
 const props = defineProps<{
   modelValue: boolean;
@@ -78,7 +79,7 @@ function exportar() {
     Descricao: processo.descricao,
     Tipo: processo.tipo,
     Situacao: processo.situacao,
-    "Data Limite": processo.dataLimiteFormatada,
+    "Data Limite": formatDate(processo.dataLimite),
     Unidade: processo.unidadeNome,
     "% Concluido": calcularPercentualConcluido(),
   }));

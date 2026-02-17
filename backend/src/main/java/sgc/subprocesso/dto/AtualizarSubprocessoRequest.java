@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
  */
 @Builder
 public record AtualizarSubprocessoRequest(
-        @Nullable Long codUnidade,
-        @Nullable Long codMapa,
-        @Nullable LocalDateTime dataLimiteEtapa1,
+        Long codUnidade,
+        Long codMapa,
+        LocalDateTime dataLimiteEtapa1,
         @Nullable LocalDateTime dataFimEtapa1,
         @Nullable LocalDateTime dataLimiteEtapa2,
         @Nullable LocalDateTime dataFimEtapa2) {

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public record AnaliseHistoricoDto(
         LocalDateTime dataHora,
-        String dataHoraFormatada,
+
         String observacoes,
         TipoAcaoAnalise acao,
         String unidadeSigla,

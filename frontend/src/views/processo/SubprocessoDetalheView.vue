@@ -4,7 +4,7 @@
       <PageHeader
           :title="`Subprocesso - ${subprocesso.unidade.sigla}`"
           :subtitle="subprocesso.processoDescricao"
-          :etapa="`Etapa atual: ${subprocesso.situacaoLabel || subprocesso.situacao}`"
+          :etapa="`Etapa atual: ${formatSituacaoSubprocesso(subprocesso.situacao)}`"
           :proxima-acao="proximaAcaoSubprocesso"
       />
 
@@ -17,7 +17,7 @@
           :responsavel-email="subprocesso.responsavel?.email || ''"
           :responsavel-nome="subprocesso.responsavel?.nome || ''"
           :responsavel-ramal="subprocesso.responsavel?.ramal || ''"
-          :situacao="subprocesso.situacaoLabel"
+          :situacao="formatSituacaoSubprocesso(subprocesso.situacao)"
           :titular-email="subprocesso.titular?.email || ''"
           :titular-nome="subprocesso.titular?.nome || ''"
           :titular-ramal="subprocesso.titular?.ramal || ''"
@@ -121,6 +121,7 @@ import {useLoadingManager} from "@/composables/useLoadingManager";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useProcessosStore} from "@/stores/processos";
 import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso,} from "@/types/tipos";
+import {formatSituacaoSubprocesso} from "@/utils/formatters";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
@@ -155,7 +156,7 @@ const dataLimite = computed(() =>
 const {obterProximaAcao} = useProximaAcao();
 const proximaAcaoSubprocesso = computed(() => obterProximaAcao({
   perfil: perfilStore.perfilSelecionado,
-  situacao: subprocesso.value?.situacaoLabel || subprocesso.value?.situacao,
+  situacao: formatSituacaoSubprocesso(subprocesso.value?.situacao),
   podeDisponibilizarCadastro: subprocesso.value?.permissoes?.podeDisponibilizarCadastro,
   podeEditarCadastro: subprocesso.value?.permissoes?.podeEditarCadastro,
 }));

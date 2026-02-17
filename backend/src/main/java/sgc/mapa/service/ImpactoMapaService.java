@@ -107,10 +107,6 @@ public class ImpactoMapaService {
         List<CompetenciaImpactadaDto> competenciasImpactadas = competenciasImpactadas(
                 competenciasMapa, removidas, alteradas, atividadesVigentes);
 
-        // TODO: Adaptar ImpactoMapaResponse para aceitar os DTOs de impacto ou converter AtividadeImpactadaDto/CompetenciaImpactadaDto para Entidades se possível.
-        // Por enquanto, vou manter o record mas ele precisa ser compatível com o que é detectado aqui.
-        // O ImpactoMapaResponse original usava Atividade/Competencia puras.
-        
         return ImpactoMapaResponse.builder()
                 .temImpactos(!inseridas.isEmpty() || !removidas.isEmpty() || !alteradas.isEmpty())
                 .inseridas(atividadesAtuais.stream().filter(a -> inseridas.stream().anyMatch(i -> i.codigo().equals(a.getCodigo()))).toList())

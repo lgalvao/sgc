@@ -21,7 +21,7 @@ public interface MovimentacaoMapper {
     @Mapping(source = "unidadeDestino.codigo", target = "unidadeDestinoCodigo")
     @Mapping(source = "unidadeDestino", target = "unidadeDestinoSigla")
     @Mapping(source = "unidadeDestino.nome", target = "unidadeDestinoNome")
-    @Mapping(target = "dataHoraFormatada", expression = "java(FormatadorData.formatarDataHora(movimentacao.getDataHora()))")
+
     MovimentacaoDto toDto(Movimentacao movimentacao);
 
     /**

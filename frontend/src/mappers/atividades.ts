@@ -36,7 +36,6 @@ export function mapSubprocessoSituacaoToModel(dto: SubprocessoSituacaoDto): Subp
     return {
         codigo: dto.codigo,
         situacao: dto.situacao,
-        situacaoLabel: dto.situacaoLabel,
     };
 }
 

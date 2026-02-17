@@ -13,7 +13,6 @@ const mockAlertas: Alerta[] = [
         mensagem: "Alerta 1",
         processo: "Proc 1",
         origem: "Origem 1",
-        dataHoraFormatada: "01/01/2024",
         dataHoraLeitura: null, // Não lido
         dataHora: "2024-01-01T00:00:00Z",
         codProcesso: 101,
@@ -26,7 +25,6 @@ const mockAlertas: Alerta[] = [
         mensagem: "Alerta 2",
         processo: "Proc 2",
         origem: "Origem 2",
-        dataHoraFormatada: "02/01/2024",
         dataHoraLeitura: "2024-01-02T10:00:00Z", // Lido
         dataHora: "2024-01-02T00:00:00Z",
         codProcesso: 102,
@@ -107,7 +105,7 @@ describe("TabelaAlertas.vue", () => {
 
         const bTable = wrapper.findComponent(_BTable as any) as unknown as VueWrapper<any>;
 
-        await bTable.vm.$emit("sort-changed", {sortBy: "dataHoraFormatada"});
+        await bTable.vm.$emit("sort-changed", {sortBy: "dataHora"});
         expect(wrapper.emitted("ordenar")?.[0]).toEqual(["data"]);
 
         await bTable.vm.$emit("sort-changed", {sortBy: "processo"});

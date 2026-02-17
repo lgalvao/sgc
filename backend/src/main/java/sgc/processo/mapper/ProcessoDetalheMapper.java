@@ -22,9 +22,7 @@ public interface ProcessoDetalheMapper {
     @Mapping(target = "codUnidadeSuperior", source = "unidadeSuperior.codigo")
     @Mapping(target = "filhos", expression = "java(new java.util.ArrayList<>())")
     @Mapping(target = "situacaoSubprocesso", ignore = true)
-    @Mapping(target = "situacaoLabel", ignore = true)
     @Mapping(target = "dataLimite", ignore = true)
-    @Mapping(target = "dataLimiteFormatada", ignore = true)
     @Mapping(target = "codSubprocesso", ignore = true)
     @Mapping(target = "mapaCodigo", ignore = true)
     ProcessoDetalheDto.@Nullable UnidadeParticipanteDto fromUnidade(@Nullable Unidade unidade);
@@ -36,9 +34,7 @@ public interface ProcessoDetalheMapper {
     @Mapping(target = "codUnidadeSuperior", source = "unidadeSuperiorCodigo")
     @Mapping(target = "filhos", expression = "java(new java.util.ArrayList<>())")
     @Mapping(target = "situacaoSubprocesso", ignore = true)
-    @Mapping(target = "situacaoLabel", ignore = true)
     @Mapping(target = "dataLimite", ignore = true)
-    @Mapping(target = "dataLimiteFormatada", ignore = true)
     @Mapping(target = "codSubprocesso", ignore = true)
     @Mapping(target = "mapaCodigo", ignore = true)
     ProcessoDetalheDto.@Nullable UnidadeParticipanteDto fromSnapshot(@Nullable UnidadeProcesso snapshot);

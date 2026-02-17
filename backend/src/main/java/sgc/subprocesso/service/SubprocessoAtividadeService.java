@@ -13,7 +13,6 @@ import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
@@ -62,16 +61,6 @@ class SubprocessoAtividadeService {
     @Transactional
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
         final Subprocesso spDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
-
-        if (spDestino.getSituacao() != SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
-                && spDestino.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-                && spDestino.getSituacao() != SituacaoSubprocesso.NAO_INICIADO) {
-
-            throw new ErroAtividadesEmSituacaoInvalida("""
-                    Atividades só podem ser importadas para um subprocesso
-                    com cadastro em elaboração ou não iniciado.""");
-        }
-
         Subprocesso spOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);
 
         // Publica evento para importação assíncrona (desacoplamento do módulo mapa)

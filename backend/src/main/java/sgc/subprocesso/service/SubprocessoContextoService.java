@@ -6,8 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.service.MapaFacade;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -33,9 +31,7 @@ class SubprocessoContextoService {
 
     private final SubprocessoCrudService crudService;
     private final UsuarioFacade usuarioService;
-    private final UnidadeFacade unidadeFacade;
     private final MapaFacade mapaFacade;
-    private final MapaManutencaoService mapaManutencaoService;
     private final MovimentacaoRepo movimentacaoRepo;
     private final AccessControlService accessControlService;
     private final SubprocessoAtividadeService atividadeService;

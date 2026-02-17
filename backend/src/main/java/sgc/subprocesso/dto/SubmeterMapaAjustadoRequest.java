@@ -30,6 +30,7 @@ public record SubmeterMapaAjustadoRequest(
     /**
      * Construtor para compatibilidade com testes legados.
      */
+    // TODO remover sempre coisas legadas!
     public SubmeterMapaAjustadoRequest(String justificativa, LocalDateTime dataLimiteEtapa2) {
         this(justificativa, dataLimiteEtapa2, Collections.emptyList());
     }

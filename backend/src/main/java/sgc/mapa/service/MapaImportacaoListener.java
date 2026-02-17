@@ -10,9 +10,6 @@ import sgc.mapa.eventos.EventoImportacaoAtividades;
 
 /**
  * Listener responsável por processar eventos de importação de atividades entre mapas.
- *
- * <p>Este componente escuta {@link EventoImportacaoAtividades} e delega a operação concreta
- * para {@link CopiaMapaService}, eliminando a dependência direta do módulo subprocesso no módulo mapa.
  */
 @Slf4j
 @Component

@@ -5,9 +5,9 @@ import lombok.Builder;
 
 /**
  * DTO para a requisição de importação de atividades de outro subprocesso.
- * CDU-08
  */
 @Builder
 public record ImportarAtividadesRequest(
-        @NotNull(message = "O código do subprocesso de origem é obrigatório") Long codSubprocessoOrigem) {
+        @NotNull(message = "O código do subprocesso de origem é obrigatório") 
+        Long codSubprocessoOrigem) {
 }

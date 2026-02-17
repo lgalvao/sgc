@@ -108,7 +108,7 @@ import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
 import {SituacaoSubprocesso} from "@/types/tipos";
-import {formatSituacaoProcesso} from "@/utils/formatters";
+import {formatSituacaoProcesso, formatSituacaoSubprocesso} from "@/utils/formatters";
 
 function flattenUnidades(unidades: any[]): any[] {
   let result: any[] = [];
@@ -189,7 +189,7 @@ const unidadesElegiveis = computed(() => {
     codigo: u.codUnidade,
     sigla: u.sigla,
     nome: u.nome,
-    situacao: u.situacaoLabel || u.situacaoSubprocesso
+    situacao: formatSituacaoSubprocesso(u.situacaoSubprocesso)
   }));
 });
 

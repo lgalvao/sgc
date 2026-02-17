@@ -17,15 +17,6 @@ import java.util.Optional;
 
 /**
  * Serviço responsável pelas validações de regras de negócio de Processo.
- *
- * <p>Centraliza todas as validações complexas relacionadas a processos,
- * incluindo validação de unidades, subprocessos e regras de finalização.</p>
- *
- * <p><b>Refatoração v3.0:</b> Removido uso de @Lazy e dependência circular.
- * Agora utiliza {@link ConsultasSubprocessoService} para queries de leitura,
- * eliminando acoplamento bidirecional com SubprocessoFacade.</p>
- *
- * @since 3.0.0 - Removido @Lazy, introduzido Query Service Pattern
  */
 @Service
 @Slf4j
@@ -76,9 +67,6 @@ class ProcessoValidador {
 
     /**
      * Valida se todos os subprocessos de um processo estão homologados.
-     *
-     * <p>Utiliza query otimizada ao invés de carregar todas as entidades Subprocesso,
-     * melhorando performance e reduzindo consumo de memória.</p>
      *
      * @param processo processo a validar
      * @throws ErroProcesso se algum subprocesso não estiver homologado

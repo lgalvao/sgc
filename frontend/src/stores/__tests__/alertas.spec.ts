@@ -31,7 +31,6 @@ describe("useAlertasStore", () => {
         dataHora: "2025-01-01T10:00:00",
         dataHoraLeitura: null,
         mensagem: "Mensagem Teste",
-        dataHoraFormatada: "01/01/2025 10:00",
         origem: "Origem",
         processo: "Processo Teste",
     };
@@ -108,7 +107,7 @@ describe("useAlertasStore", () => {
         describe("marcarAlertaComoLido", () => {
             it("deve realizar update otimista e chamar alertaService sem recarregar tudo", async () => {
                 // Setup initial state
-                context.store.alertas = [JSON.parse(JSON.stringify(mockAlerta))];
+                context.store.alertas = [structuredClone(mockAlerta)];
                 alertaService.marcarComoLido.mockResolvedValue();
 
                 const result = await context.store.marcarAlertaComoLido(1);
@@ -124,7 +123,7 @@ describe("useAlertasStore", () => {
 
             it("deve reverter estado em caso de falha do serviço", async () => {
                 // Setup initial state
-                context.store.alertas = [JSON.parse(JSON.stringify(mockAlerta))];
+                context.store.alertas = [structuredClone(mockAlerta)];
 
                 alertaService.marcarComoLido.mockRejectedValue(
                     new Error("Falha no serviço"),

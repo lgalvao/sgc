@@ -52,10 +52,10 @@
               </td>
               <td>
                 <span :class="['badge', getBadgeClass(proc.tipo)]">
-                  {{ proc.tipoLabel }}
+                  {{ proc.tipo }}
                 </span>
               </td>
-              <td>{{ proc.dataFinalizacaoFormatada }}</td>
+              <td>{{ formatDate(proc.dataFinalizacao) }}</td>
             </tr>
           </tbody>
         </table>
@@ -72,7 +72,7 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {useProcessosStore} from '@/stores/processos';
-import {logger} from '@/utils';
+import {formatDate, logger} from '@/utils';
 
 const router = useRouter();
 const processosStore = useProcessosStore();
