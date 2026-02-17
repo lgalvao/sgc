@@ -43,6 +43,7 @@ class PainelControllerTest {
 
         mockMvc.perform(get("/api/painel/processos")
                         .param("perfil", "ADMIN")
+                        .param("unidade", "1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
@@ -66,6 +67,7 @@ class PainelControllerTest {
         when(painelFacade.listarAlertas(any(), any(), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/painel/alertas")
+                        .param("unidade", "1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                 .andExpect(status().isOk())

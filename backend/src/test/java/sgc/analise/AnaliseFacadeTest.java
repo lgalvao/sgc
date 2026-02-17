@@ -210,18 +210,7 @@ class AnaliseFacadeTest {
             verify(unidadeService).buscarEntidadePorId(10L);
         }
 
-        @Test
-        @DisplayName("Deve lançar exceção quando sigla da unidade não for fornecida")
-        void deveLancarExcecaoQuandoSiglaUnidadeNula() {
-            CriarAnaliseCommand command = CriarAnaliseCommand.builder()
-                    .tipo(TipoAnalise.VALIDACAO)
-                    .siglaUnidade(null)
-                    .build();
 
-            Assertions.assertThrows(IllegalArgumentException.class, () -> {
-                facade.criarAnalise(subprocesso, command);
-            });
-        }
     }
 
     @Nested

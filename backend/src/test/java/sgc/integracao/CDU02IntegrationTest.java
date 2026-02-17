@@ -177,7 +177,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         @DisplayName("ADMIN deve ver todos os processos, incluindo os com status 'Criado'")
         void testListarProcessosAdminVeTodos() throws Exception {
             // Admin vê tudo, inclusive os 3 criados no setup
-            mockMvc.perform(get(API_PAINEL_PROCESSOS).param(PERFIL, "ADMIN"))
+            mockMvc.perform(get(API_PAINEL_PROCESSOS).param(PERFIL, "ADMIN").param(UNIDADE, "1"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(PROCESSO_RAIZ_JSON_PATH).exists())
                     .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
