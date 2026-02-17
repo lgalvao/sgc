@@ -7,9 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.*;
+import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,7 +29,7 @@ class MapaManutencaoServiceCoverageTest {
     @Mock
     private CompetenciaRepo competenciaRepo;
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private SubprocessoAdminWorkflowService subprocessoAdminWorkflowService;
 
     @InjectMocks
     private MapaManutencaoService service;
@@ -42,7 +42,10 @@ class MapaManutencaoServiceCoverageTest {
         Atividade atividade = new Atividade();
         atividade.setCodigo(codAtiv);
         atividade.setDescricao("Antiga");
-        atividade.setMapa(new Mapa());
+        
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
+        atividade.setMapa(mapa);
 
         when(atividadeRepo.findAllById(any())).thenReturn(List.of(atividade));
 

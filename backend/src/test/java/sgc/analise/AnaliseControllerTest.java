@@ -164,7 +164,6 @@ class AnaliseControllerTest {
         @DisplayName("Deve criar uma análise de cadastro sem payload e retornar 201 Created")
         @WithMockUser(roles = "ADMIN")
         void deveCriarAnaliseCadastroSemPayload() throws Exception {
-            // Need a valid request object for required fields if any, or just empty JSON if allowed
             Analise analise = new Analise();
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().build();
 
