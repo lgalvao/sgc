@@ -24,10 +24,9 @@ public final class ComumDtos {
         LocalDate data
     ) {}
 
-    // TODO Nao usamos ID no sistema, Usamos 'codigo'
-    public record IdRequest(
-        @NotNull(message = "O ID é obrigatório")
-        Long id
+    public record CodigoRequest(
+        @NotNull(message = "O código é obrigatório")
+        Long codigo
     ) {}
 
     private ComumDtos() {}

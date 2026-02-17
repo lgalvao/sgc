@@ -55,7 +55,7 @@ public class AnaliseFacade {
                 .toList();
     }
 
-    private AnaliseHistoricoDto paraHistoricoDto(Analise analise) {
+    public AnaliseHistoricoDto paraHistoricoDto(Analise analise) {
         UnidadeDto unidade = unidadeService.buscarPorCodigo(analise.getUnidadeCodigo());
         return AnaliseHistoricoDto.builder()
                 .dataHora(analise.getDataHora())
@@ -69,7 +69,7 @@ public class AnaliseFacade {
                 .build();
     }
 
-    private AnaliseValidacaoHistoricoDto paraValidacaoHistoricoDto(Analise analise) {
+    public AnaliseValidacaoHistoricoDto paraValidacaoHistoricoDto(Analise analise) {
         UnidadeDto unidade = unidadeService.buscarPorCodigo(analise.getUnidadeCodigo());
         return AnaliseValidacaoHistoricoDto.builder()
                 .dataHora(analise.getDataHora())

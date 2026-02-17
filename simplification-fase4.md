@@ -1,7 +1,7 @@
 # 🚀 Plano de Simplificação - Fase 4: Consolidação de DTOs e Mappers
 
 **Data:** 17 de Fevereiro de 2026  
-**Status:** 🏗️ Em Andamento  
+**Status:** ✅ Concluído  
 **Alvo:** Redução de ~30% no volume de DTOs e ~50% de Mappers.
 
 ---
@@ -50,23 +50,23 @@ Substituir múltiplos records por tipos genéricos reutilizáveis no pacote `sgc
 ## 📋 Cronograma de Tarefas
 
 ### Tarefa 4.1: Limpeza de Campos de Formatação (2 dias)
-- [ ] Identificar todos os campos `*Formatada` e `*Label` nos DTOs (especialmente no módulo `processo`).
-- [ ] Atualizar componentes Vue para formatar datas/enums localmente.
-- [ ] Remover campos e lógica de formatação dos Mappers e DTOs Java.
+- [x] Identificar todos os campos `*Formatada` e `*Label` nos DTOs (especialmente no módulo `processo`).
+- [x] Atualizar componentes Vue para formatar datas/enums localmente.
+- [x] Remover campos e lógica de formatação dos Mappers e DTOs Java.
 
 ### Tarefa 4.2: Migração de DTOs de Leitura (3 dias)
-- [ ] **Módulo Alerta:** Eliminar `AlertaDto` e `AlertaMapper`. Usar a entidade `Alerta` com `@JsonView`.
-- [ ] **Módulo Configuração:** Eliminar DTOs de resposta de parâmetros (usar entidade `Parametro`).
-- [ ] **Módulo Processo:** Simplificar `ProcessoResumoDto` e `ProcessoDto` para usar a entidade diretamente onde possível via `@JsonView`.
+- [x] **Módulo Alerta:** Eliminar `AlertaDto` e `AlertaMapper`. Usar a entidade `Alerta` com `@JsonView`.
+- [x] **Módulo Configuração:** Eliminar DTOs de resposta de parâmetros (usar entidade `Parametro`).
+- [x] **Módulo Processo:** Simplificar `ProcessoResumoDto` e `ProcessoDto` para usar a entidade diretamente onde possível via `@JsonView`.
 
 ### Tarefa 4.3: Consolidação de Requests no Subprocesso (2 dias)
-- [ ] Criar DTOs comuns em `sgc.comum.dto`: `TextoRequest`, `DataRequest`, `IdRequest`.
-- [ ] Refatorar os endpoints do `SubprocessoController` para usar os tipos comuns.
-- [ ] Remover arquivos de request redundantes do sistema de arquivos.
+- [x] Criar DTOs comuns em `sgc.comum.dto`: `TextoRequest`, `DataRequest`, `IdRequest`.
+- [x] Refatorar os endpoints do `SubprocessoController` para usar os tipos comuns.
+- [x] Remover arquivos de request redundantes do sistema de arquivos.
 
 ### Tarefa 4.4: Extinção de Mappers MapStruct (1 dia)
-- [ ] Converter mappers complexos (como `ProcessoDetalheMapper`) para lógica manual ou métodos `fromEntity` dentro do próprio DTO.
-- [ ] Remover a dependência do MapStruct em módulos onde ele se tornou trivial ou desnecessário.
+- [x] Converter mappers complexos (como `ProcessoDetalheMapper`) para lógica manual ou métodos `fromEntity` dentro do próprio DTO.
+- [x] Remover a dependência do MapStruct em módulos onde ele se tornou trivial ou desnecessário.
 
 ---
 
@@ -91,7 +91,7 @@ Ainda manteremos DTOs nos seguintes casos:
 ---
 
 ## ✅ Critérios de Aceite
-- [ ] Redução mínima de 15 arquivos de DTO.
-- [ ] Remoção de pelo menos 4 Mappers MapStruct.
-- [ ] Todos os testes de integração (E2E e Integration) passando.
-- [ ] Zero lógica de `DateTimeFormatter` ou labels manuais em controllers/services do backend.
+- [x] Redução mínima de 15 arquivos de DTO.
+- [x] Remoção de pelo menos 4 Mappers MapStruct.
+- [x] Todos os testes de integração (E2E e Integration) passando.
+- [x] Zero lógica de `DateTimeFormatter` ou labels manuais em controllers/services do backend.
