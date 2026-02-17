@@ -36,9 +36,6 @@ class ProcessoAccessPolicyTest {
     private Usuario usuarioAdmin;
     private Usuario usuarioGestor;
     private Processo processo;
-    private List<UsuarioPerfil> atribuicoesAdmin;
-    private List<UsuarioPerfil> atribuicoesGestor;
-
     @BeforeEach
     void setUp() {
         processo = new Processo();
@@ -46,11 +43,11 @@ class ProcessoAccessPolicyTest {
 
         usuarioAdmin = criarUsuario("1", "Admin");
         usuarioAdmin.setPerfilAtivo(ADMIN);
-        atribuicoesAdmin = adicionarAtribuicao(usuarioAdmin, ADMIN);
+        adicionarAtribuicao(usuarioAdmin, ADMIN);
 
         usuarioGestor = criarUsuario("2", "Gestor");
         usuarioGestor.setPerfilAtivo(GESTOR);
-        atribuicoesGestor = adicionarAtribuicao(usuarioGestor, GESTOR);
+        adicionarAtribuicao(usuarioGestor, GESTOR);
     }
 
     @Test

@@ -4,8 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,8 +16,6 @@ class ImpactoMapaResponseTest {
     @DisplayName("Deve cobrir branches de criação de ImpactoMapaResponse")
     void deveCobrirBranches() {
         Atividade atividade = Atividade.builder().build();
-        Competencia competencia = Competencia.builder().build();
-
         // 1. Com impactos
         ImpactoMapaResponse d1 = ImpactoMapaResponse.builder()
                 .temImpactos(true)

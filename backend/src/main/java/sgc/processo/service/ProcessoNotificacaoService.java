@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
 import sgc.organizacao.UnidadeFacade;
@@ -14,6 +15,7 @@ import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 
@@ -37,7 +39,7 @@ public class ProcessoNotificacaoService {
     private final NotificacaoModelosService notificacaoModelosService;
     private final UnidadeFacade unidadeService;
     private final UsuarioFacade usuarioService;
-    private final ProcessoFacade processoFacade;
+    private final ProcessoRepo processoRepo;
     private final SubprocessoFacade subprocessoFacade;
 
     /**
@@ -65,7 +67,8 @@ public class ProcessoNotificacaoService {
     }
 
     private void processarInicioProcesso(Long codProcesso) {
-        Processo processo = processoFacade.buscarEntidadePorId(codProcesso);
+        Processo processo = processoRepo.findById(codProcesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
         List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
 
         if (subprocessos.isEmpty()) {
@@ -99,7 +102,8 @@ public class ProcessoNotificacaoService {
     }
 
     private void processarFinalizacaoProcesso(Long codProcesso) {
-        Processo processo = processoFacade.buscarEntidadePorId(codProcesso);
+        Processo processo = processoRepo.findById(codProcesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
 
         List<Long> codigosParticipantes = processo.getCodigosParticipantes();
 

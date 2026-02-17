@@ -38,9 +38,6 @@ class AtividadeAccessPolicyTest {
     private Usuario usuarioServidor;
     private Atividade atividade;
     private Unidade unidade;
-    private List<UsuarioPerfil> atribuicoesChefe;
-    private List<UsuarioPerfil> atribuicoesServidor;
-
     @BeforeEach
     void setUp() {
         unidade = UnidadeTestBuilder.umaDe()
@@ -51,11 +48,11 @@ class AtividadeAccessPolicyTest {
 
         usuarioChefe = criarUsuario("123", "Chefe");
         usuarioChefe.setPerfilAtivo(CHEFE);
-        atribuicoesChefe = adicionarAtribuicao(usuarioChefe, CHEFE, unidade);
+        adicionarAtribuicao(usuarioChefe, CHEFE, unidade);
 
         usuarioServidor = criarUsuario("456", "Servidor");
         usuarioServidor.setPerfilAtivo(SERVIDOR);
-        atribuicoesServidor = adicionarAtribuicao(usuarioServidor, SERVIDOR, unidade);
+        adicionarAtribuicao(usuarioServidor, SERVIDOR, unidade);
 
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(unidade);

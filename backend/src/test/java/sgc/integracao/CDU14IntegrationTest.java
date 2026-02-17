@@ -11,7 +11,6 @@ import sgc.Sgc;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.AnaliseRepo;
 import sgc.fixture.MapaFixture;
-import sgc.integracao.mocks.TestEventConfig;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.mapa.model.*;
@@ -47,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({
                 TestSecurityConfig.class,
                 TestThymeleafConfig.class,
-                TestEventConfig.class
+
 })
 @Transactional
 class CDU14IntegrationTest extends BaseIntegrationTest {
@@ -212,7 +211,10 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
                         Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
                         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-                        assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
+                        List<sgc.analise.model.Analise> analises = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
+                        System.out.println("DEBUG: Analises found for subprocesso " + subprocessoId + ": " + analises.size());
+                        analiseRepo.findAll().forEach(a -> System.out.println("DEBUG: Analise in DB: " + a.getCodigo() + " subprocesso: " + a.getSubprocesso().getCodigo() + " tipo: " + a.getTipo()));
+                        assertThat(analises).hasSize(1);
                         assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(2);
                         assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
                 }

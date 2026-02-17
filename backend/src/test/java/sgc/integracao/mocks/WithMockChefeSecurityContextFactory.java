@@ -20,9 +20,6 @@ public class WithMockChefeSecurityContextFactory
     private UsuarioRepo usuarioRepo;
 
     @Autowired(required = false)
-    private UnidadeRepo unidadeRepo;
-
-    @Autowired(required = false)
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Override

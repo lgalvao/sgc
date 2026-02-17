@@ -27,25 +27,6 @@ class SubprocessoAccessPolicyTest {
     @Mock
     private HierarquiaService hierarquiaService;
     
-    private void stubPadraoHierarquia() {
-        // Mock: Unidade RAIZ (id=1) é superior a todas as unidades
-        when(hierarquiaService.isSubordinada(any(), any())).thenAnswer(inv -> {
-            Unidade target = inv.getArgument(0);
-            Unidade superior = inv.getArgument(1);
-            if (superior == null || target == null) return false;
-            if (superior.getCodigo().equals(1L) && !target.getCodigo().equals(1L)) return true;
-            if (target.getCodigo().equals(2L) && superior.getCodigo().equals(1L)) return true;
-            return false;
-        });
-        
-        when(hierarquiaService.isSuperiorImediata(any(), any())).thenAnswer(inv -> {
-            Unidade target = inv.getArgument(0);
-            Unidade superior = inv.getArgument(1);
-            if (superior == null || target == null) return false;
-            return target.getCodigo().equals(2L) && superior.getCodigo().equals(1L);
-        });
-    }
-    
     @Test
     @DisplayName("canExecute - VERIFICAR_IMPACTOS - Chefe Mesma Unidade")
     void canExecute_VerificarImpactos_ChefeMesmaUnidade() {

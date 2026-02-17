@@ -47,7 +47,12 @@ class SubprocessoTransicaoServiceTest {
     @DisplayName("Deve registrar transição com observações e notificar via alerta/email")
     void deveRegistrarComObservacoes() {
         // Arrange
-        Subprocesso subprocesso = criarSubprocessoMock();
+        Subprocesso subprocesso = mock(Subprocesso.class);
+        Unidade unidade = mock(Unidade.class);
+        when(unidade.getSigla()).thenReturn("U1");
+        when(subprocesso.getUnidade()).thenReturn(unidade);
+        when(subprocesso.getProcesso()).thenReturn(mock(sgc.processo.model.Processo.class));
+
         Unidade origem = mock(Unidade.class);
         Unidade destino = mock(Unidade.class);
         Usuario usuario = new Usuario();
@@ -72,7 +77,12 @@ class SubprocessoTransicaoServiceTest {
     @DisplayName("Deve registrar transição sem observações")
     void deveRegistrarSemObservacoes() {
         // Arrange
-        Subprocesso subprocesso = criarSubprocessoMock();
+        Subprocesso subprocesso = mock(Subprocesso.class);
+        Unidade unidade = mock(Unidade.class);
+        when(unidade.getSigla()).thenReturn("U1");
+        when(subprocesso.getUnidade()).thenReturn(unidade);
+        when(subprocesso.getProcesso()).thenReturn(mock(sgc.processo.model.Processo.class));
+
         Unidade origem = mock(Unidade.class);
         Unidade destino = mock(Unidade.class);
         Usuario usuario = new Usuario();
@@ -95,7 +105,12 @@ class SubprocessoTransicaoServiceTest {
     @DisplayName("Deve buscar usuário da facade quando não fornecido no comando")
     void deveBuscarUsuarioDaFacadeQuandoNaoFornecido() {
         // Arrange
-        Subprocesso subprocesso = criarSubprocessoMock();
+        Subprocesso subprocesso = mock(Subprocesso.class);
+        Unidade unidade = mock(Unidade.class);
+        when(unidade.getSigla()).thenReturn("U1");
+        when(subprocesso.getUnidade()).thenReturn(unidade);
+        when(subprocesso.getProcesso()).thenReturn(mock(sgc.processo.model.Processo.class));
+
         Usuario usuarioAutenticado = new Usuario();
         when(usuarioFacade.obterUsuarioAutenticado()).thenReturn(usuarioAutenticado);
 
@@ -132,7 +147,12 @@ class SubprocessoTransicaoServiceTest {
     @DisplayName("Deve lidar com unidades nulas")
     void deveLidarComUnidadesNulas() {
         // Arrange
-        Subprocesso subprocesso = criarSubprocessoMock();
+        Subprocesso subprocesso = mock(Subprocesso.class);
+        Unidade unidade = mock(Unidade.class);
+        when(unidade.getSigla()).thenReturn("U1");
+        when(subprocesso.getUnidade()).thenReturn(unidade);
+        when(subprocesso.getProcesso()).thenReturn(mock(sgc.processo.model.Processo.class));
+
         Usuario usuario = new Usuario();
 
         // Act
@@ -150,7 +170,7 @@ class SubprocessoTransicaoServiceTest {
     @DisplayName("Não deve enviar alerta/email quando tipo não exige")
     void naoDeveNotificarQuandoTipoNaoExige() {
         // Arrange
-        Subprocesso subprocesso = criarSubprocessoMock();
+        Subprocesso subprocesso = mock(Subprocesso.class);
         Usuario usuario = new Usuario();
 
         // CADASTRO_HOMOLOGADO: geraAlerta=false, enviaEmail=false
@@ -166,12 +186,5 @@ class SubprocessoTransicaoServiceTest {
         verifyNoInteractions(emailService);
     }
 
-    private Subprocesso criarSubprocessoMock() {
-        Subprocesso sp = mock(Subprocesso.class);
-        Unidade unidade = mock(Unidade.class);
-        when(unidade.getSigla()).thenReturn("U1");
-        when(sp.getUnidade()).thenReturn(unidade);
-        when(sp.getProcesso()).thenReturn(mock(sgc.processo.model.Processo.class));
-        return sp;
-    }
+
 }

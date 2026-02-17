@@ -4,18 +4,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
-import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -48,7 +45,7 @@ class ProcessoFinalizadorTest {
     @Mock
     private ProcessoValidador processoValidador;
     @Mock
-    private ApplicationEventPublisher publicadorEventos;
+    private ProcessoNotificacaoService processoNotificacaoService;
 
     @Test
     @DisplayName("Deve finalizar processo com sucesso")
@@ -75,9 +72,7 @@ class ProcessoFinalizadorTest {
         verify(unidadeService).definirMapaVigente(100L, m);
         verify(processoRepo).save(p);
 
-        ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
-        verify(publicadorEventos).publishEvent(captor.capture());
-        assertThat(captor.getValue()).isInstanceOf(EventoProcessoFinalizado.class);
+        verify(processoNotificacaoService).notificarFinalizacaoProcesso(codigo);
     }
 
     @Test

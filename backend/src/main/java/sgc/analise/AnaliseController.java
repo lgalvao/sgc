@@ -39,7 +39,6 @@ public class AnaliseController {
      * @return Uma lista de {@link AnaliseHistoricoDto} contendo o histórico de análises de cadastro.
      */
     @GetMapping("/analises-cadastro")
-    // TODO protecao esta errada aqui. Apenas os perfis ADMIN, GESTOR e CHEFE podem ver
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista o histórico de análises de cadastro")
     public List<AnaliseHistoricoDto> listarAnalisesCadastro(@PathVariable("codSubprocesso") Long codigo) {
@@ -82,7 +81,7 @@ public class AnaliseController {
         return analiseFacade.listarHistoricoValidacao(codSubprocesso).stream()
                 .map(v -> {
                     // TODO usar Builder para construir o dto.
-                    AnaliseHistoricoDto analiseHistoricoDto = new AnaliseHistoricoDto(
+                    return new AnaliseHistoricoDto(
                             v.dataHora(),
                             v.observacoes(),
                             v.acao(),
@@ -91,7 +90,6 @@ public class AnaliseController {
                             v.analistaUsuarioTitulo(),
                             v.motivo(),
                             v.tipo());
-                    return analiseHistoricoDto;
                 })
                 .toList();
     }

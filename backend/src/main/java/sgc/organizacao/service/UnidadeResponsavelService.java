@@ -33,7 +33,6 @@ import static java.util.stream.Collectors.toMap;
 @RequiredArgsConstructor
 public class UnidadeResponsavelService {
     private final UsuarioRepo usuarioRepo;
-    private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final ResponsabilidadeRepo responsabilidadeRepo;
     private final ComumRepo repo;
