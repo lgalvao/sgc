@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/complete-fixtures.js';
+import {test} from './fixtures/complete-fixtures.js';
 import {criarProcesso, verificarDetalhesSubprocesso} from './helpers/helpers-processos.js';
 
 test.describe('Verificação de Situações e Labels', () => {

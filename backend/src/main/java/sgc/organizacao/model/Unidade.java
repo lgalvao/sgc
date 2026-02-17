@@ -10,12 +10,12 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Immutable;
 import org.jspecify.annotations.Nullable;
+import sgc.comum.model.ComumViews;
 import sgc.comum.model.EntidadeBase;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import sgc.comum.model.ComumViews;
 
 @Entity
 @Immutable

@@ -9,19 +9,19 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.ComumRepo;
-import sgc.organizacao.dto.*;
+import sgc.organizacao.dto.AtribuicaoTemporariaDto;
+import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

@@ -1,4 +1,10 @@
-import type {Atividade, AtividadeOperacaoResponse, Conhecimento, CriarConhecimentoRequest, SubprocessoStatus,} from "@/types/tipos";
+import type {
+    Atividade,
+    AtividadeOperacaoResponse,
+    Conhecimento,
+    CriarConhecimentoRequest,
+    SubprocessoStatus,
+} from "@/types/tipos";
 import type {AtividadeDto, AtividadeOperacaoResponseDto, ConhecimentoDto, SubprocessoSituacaoDto} from "@/types/dtos";
 
 export function mapAtividadeToModel(dto: AtividadeDto | null | undefined): Atividade | null {

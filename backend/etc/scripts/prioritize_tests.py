@@ -1,6 +1,7 @@
-import re
 import argparse
 import os
+import re
+
 
 def prioritize(input_file, output_file):
     p1_patterns = [

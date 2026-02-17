@@ -1,16 +1,18 @@
 package sgc.seguranca.login;
 
 import jakarta.servlet.http.Cookie;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
@@ -29,12 +31,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Nested;
-import org.springframework.test.util.ReflectionTestUtils;
-import sgc.comum.erros.ErroAutenticacao;
 
 @WebMvcTest(LoginController.class)
 @Import(RestExceptionHandler.class)

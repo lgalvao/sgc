@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.eventos.EventoImportacaoAtividades;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("MapaImportacaoListener Suite")

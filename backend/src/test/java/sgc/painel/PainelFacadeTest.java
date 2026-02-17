@@ -18,6 +18,7 @@ import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.processo.model.UnidadeProcesso;
 import sgc.processo.service.ProcessoFacade;
 import sgc.testutils.UnidadeTestBuilder;
 
@@ -27,7 +28,6 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-import sgc.processo.model.UnidadeProcesso;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

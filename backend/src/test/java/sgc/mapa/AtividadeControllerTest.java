@@ -12,17 +12,20 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.service.AtividadeFacade;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -32,10 +35,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import sgc.mapa.model.Mapa;
 
 @WebMvcTest(AtividadeController.class)
 @Import({ TestSecurityConfig.class, RestExceptionHandler.class })

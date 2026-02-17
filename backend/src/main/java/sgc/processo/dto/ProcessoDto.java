@@ -22,14 +22,8 @@ public class ProcessoDto {
     private LocalDateTime dataFinalizacao;
     private LocalDateTime dataLimite;
     private String descricao;
-    private SituacaoProcesso situacao;
+    private String situacao;
     private String tipo;
 
-    // Campos formatados para apresentação
-    private String dataCriacaoFormatada;
-    private String dataFinalizacaoFormatada;
-    private String dataLimiteFormatada;
-    private String situacaoLabel;
-    private String tipoLabel;
     private String unidadesParticipantes;
 }

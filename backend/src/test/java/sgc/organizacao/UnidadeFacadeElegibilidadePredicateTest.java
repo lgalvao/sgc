@@ -18,7 +18,7 @@ import sgc.organizacao.service.UnidadeService;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.*;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;

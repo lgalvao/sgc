@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {USUARIOS, login} from './helpers/helpers-auth.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import type {Page} from '@playwright/test';

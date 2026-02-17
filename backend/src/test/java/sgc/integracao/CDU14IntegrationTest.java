@@ -16,6 +16,7 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.mapa.model.*;
 import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.ProcessoDto;
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -37,8 +39,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import java.util.Set;
-import sgc.organizacao.model.Perfil;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)

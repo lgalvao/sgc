@@ -8,6 +8,7 @@ import {useMapasStore} from "@/stores/mapas";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {useRouter} from "vue-router";
 import {obterDetalhesProcesso} from "@/services/processoService";
+import {buscarSubprocessoDetalhe} from "@/services/subprocessoService";
 
 // Hoist mocks to avoid ReferenceError
 const { mockApiClient } = vi.hoisted(() => {
@@ -62,8 +63,6 @@ vi.mock("@/services/processoService", () => ({
         }]
     }),
 }));
-
-import { buscarSubprocessoDetalhe } from "@/services/subprocessoService";
 
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoDetalhe: vi.fn().mockImplementation((cod) => Promise.resolve({

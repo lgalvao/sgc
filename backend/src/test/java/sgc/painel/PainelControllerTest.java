@@ -13,7 +13,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.alerta.dto.AlertaDto;
 import sgc.organizacao.model.Perfil;
-import sgc.painel.PainelFacade;
 import sgc.processo.dto.ProcessoResumoDto;
 
 import java.util.Collections;

@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { flattenTree } from '../treeUtils';
+import {describe, expect, it} from 'vitest';
+import {flattenTree} from '../treeUtils';
 
 describe('treeUtils', () => {
   describe('flattenTree', () => {

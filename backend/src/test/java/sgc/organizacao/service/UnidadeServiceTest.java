@@ -9,7 +9,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeMapa;
+import sgc.organizacao.model.UnidadeMapaRepo;
+import sgc.organizacao.model.UnidadeRepo;
 
 import java.util.List;
 import java.util.Optional;

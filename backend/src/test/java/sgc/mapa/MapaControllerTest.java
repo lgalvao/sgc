@@ -11,14 +11,13 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaFacade;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
-
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;

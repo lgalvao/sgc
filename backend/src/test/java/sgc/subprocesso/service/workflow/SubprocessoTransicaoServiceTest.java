@@ -1,5 +1,6 @@
 package sgc.subprocesso.service.workflow;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import sgc.comum.erros.ErroAcessoNegado;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -18,11 +20,9 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.comum.erros.ErroAcessoNegado;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import org.junit.jupiter.api.Assertions;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

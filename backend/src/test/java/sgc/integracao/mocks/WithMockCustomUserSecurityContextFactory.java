@@ -11,10 +11,6 @@ import org.springframework.security.test.context.support.WithSecurityContextFact
 import org.springframework.stereotype.Component;
 import sgc.organizacao.model.*;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 @Slf4j
 @Component
 public class WithMockCustomUserSecurityContextFactory

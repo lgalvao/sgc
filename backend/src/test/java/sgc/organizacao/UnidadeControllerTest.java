@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.service.ProcessoFacade;
 
@@ -28,7 +29,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import sgc.organizacao.model.Unidade;
 
 @WebMvcTest(UnidadeController.class)
 @Import(RestExceptionHandler.class)

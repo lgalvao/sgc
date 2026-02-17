@@ -1,7 +1,10 @@
 package sgc.seguranca.acesso;
 
 import lombok.RequiredArgsConstructor;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.organizacao.service.HierarquiaService;
 
 import java.util.EnumSet;

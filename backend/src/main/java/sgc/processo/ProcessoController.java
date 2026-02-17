@@ -1,5 +1,6 @@
 package sgc.processo;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -14,7 +15,6 @@ import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoViews;
-import com.fasterxml.jackson.annotation.JsonView;
 
 import java.net.URI;
 import java.util.List;

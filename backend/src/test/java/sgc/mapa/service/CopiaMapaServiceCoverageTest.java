@@ -10,11 +10,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static org.mockito.Mockito.*;
-import java.util.HashSet;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

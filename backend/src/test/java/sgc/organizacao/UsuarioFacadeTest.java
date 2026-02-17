@@ -8,22 +8,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import sgc.comum.erros.ErroAcessoNegado;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.AdministradorDto;
-import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.UnidadeResponsavelService;
 import sgc.organizacao.service.UsuarioService;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

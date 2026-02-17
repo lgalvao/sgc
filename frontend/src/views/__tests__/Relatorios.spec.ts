@@ -1,10 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { flushPromises, mount } from "@vue/test-utils";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {flushPromises, mount} from "@vue/test-utils";
 import Relatorios from "@/views/RelatoriosView.vue";
-import { createTestingPinia } from "@pinia/testing";
-import { useProcessosStore } from "@/stores/processos";
-import { useMapasStore } from "@/stores/mapas";
-import { nextTick } from "vue";
+import {createTestingPinia} from "@pinia/testing";
+import {useProcessosStore} from "@/stores/processos";
+import {useMapasStore} from "@/stores/mapas";
+import {nextTick} from "vue";
 
 // Stubs
 const PageHeaderStub = {

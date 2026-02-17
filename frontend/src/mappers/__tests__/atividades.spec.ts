@@ -1,14 +1,14 @@
-import { describe, it, expect } from 'vitest';
-import { SituacaoSubprocesso } from '@/types/tipos';
+import {describe, expect, it} from 'vitest';
+import {SituacaoSubprocesso} from '@/types/tipos';
 import {
-  mapAtividadeToModel,
-  mapConhecimentoToModel,
-  mapSubprocessoSituacaoToModel,
-  mapAtividadeOperacaoResponseToModel,
-  mapCriarAtividadeRequestToDto,
-  mapAtualizarAtividadeToDto,
-  mapCriarConhecimentoRequestToDto,
-  mapAtualizarConhecimentoToDto
+    mapAtividadeOperacaoResponseToModel,
+    mapAtividadeToModel,
+    mapAtualizarAtividadeToDto,
+    mapAtualizarConhecimentoToDto,
+    mapConhecimentoToModel,
+    mapCriarAtividadeRequestToDto,
+    mapCriarConhecimentoRequestToDto,
+    mapSubprocessoSituacaoToModel
 } from '../atividades';
 
 describe('atividades mappers', () => {

@@ -7,10 +7,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.organizacao.service.HierarquiaService;
 
 import java.util.EnumSet;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)

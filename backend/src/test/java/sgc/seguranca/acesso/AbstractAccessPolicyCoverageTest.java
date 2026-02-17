@@ -7,7 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.organizacao.service.HierarquiaService;
 
 import static org.assertj.core.api.Assertions.assertThat;

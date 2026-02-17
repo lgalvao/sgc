@@ -4,8 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
-import sgc.processo.model.Processo;
 import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
 
 import java.time.LocalDateTime;
 

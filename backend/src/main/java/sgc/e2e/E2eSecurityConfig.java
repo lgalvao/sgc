@@ -12,12 +12,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import sgc.organizacao.UsuarioFacade;
 import sgc.seguranca.login.FiltroJwt;
+import sgc.seguranca.login.GerenciadorJwt;
 
 import java.util.List;
-
-import sgc.seguranca.login.GerenciadorJwt;
-import sgc.organizacao.UsuarioFacade;
 
 /**
  * Configuração de segurança específica para testes E2E.

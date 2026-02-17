@@ -12,12 +12,7 @@ import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.SituacaoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
+import sgc.organizacao.model.*;
 import sgc.organizacao.service.UsuarioService;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.PerfilUnidadeDto;
@@ -26,8 +21,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
-import sgc.organizacao.model.TipoUnidade;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

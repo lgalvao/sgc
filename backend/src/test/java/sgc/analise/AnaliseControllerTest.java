@@ -1,5 +1,6 @@
 package sgc.analise;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -14,10 +15,8 @@ import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.analise.AnaliseFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.Collections;

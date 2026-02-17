@@ -6,7 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
@@ -17,7 +16,8 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.ConhecimentoRepo;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;

@@ -13,7 +13,7 @@ import sgc.subprocesso.model.Subprocesso;
 import java.util.EnumSet;
 import java.util.Map;
 
-import static sgc.organizacao.model.Perfil.*;
+import static sgc.organizacao.model.Perfil.CHEFE;
 import static sgc.seguranca.acesso.Acao.*;
 
 /**

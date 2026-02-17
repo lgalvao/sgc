@@ -11,7 +11,6 @@ import {
 import {acessarSubprocessoChefeDireto, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {abrirModalCriarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));

@@ -9,16 +9,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.*;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-import sgc.comum.repo.ComumRepo;
-import java.util.LinkedHashSet;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

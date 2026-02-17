@@ -7,12 +7,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.mapper.ProcessoDetalheMapper;
 import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 import sgc.processo.model.UnidadeProcesso;
 import sgc.seguranca.acesso.AccessControlService;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.ArrayList;
@@ -20,12 +26,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

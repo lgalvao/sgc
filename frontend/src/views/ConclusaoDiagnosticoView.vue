@@ -59,14 +59,7 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
-import {
-  BButton,
-  BCard,
-  BFormGroup,
-  BFormInvalidFeedback,
-  BFormTextarea,
-  BSpinner
-} from 'bootstrap-vue-next';
+import {BButton, BCard, BFormGroup, BFormInvalidFeedback, BFormTextarea, BSpinner} from 'bootstrap-vue-next';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import {useFeedbackStore} from '@/stores/feedback';
 import {useDiagnosticosStore} from '@/stores/diagnosticos';

@@ -1,9 +1,9 @@
 package sgc.subprocesso.dto;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaViews;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoViews;

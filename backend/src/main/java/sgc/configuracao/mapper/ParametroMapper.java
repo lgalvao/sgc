@@ -1,10 +1,9 @@
 package sgc.configuracao.mapper;
 
-import sgc.comum.config.CentralMapperConfig;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import sgc.comum.config.CentralMapperConfig;
 import sgc.configuracao.dto.ParametroRequest;
 import sgc.configuracao.model.Parametro;
 

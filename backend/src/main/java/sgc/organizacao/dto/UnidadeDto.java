@@ -1,13 +1,13 @@
 package sgc.organizacao.dto;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.*;
 import sgc.organizacao.model.OrganizacaoViews;
+import sgc.organizacao.model.Unidade;
 
 import java.util.ArrayList;
 import java.util.List;
-import sgc.organizacao.model.Unidade;
 
 /**
  * DTO para dados de unidade do SGRH. Suporta estrutura hierárquica com subunidades.

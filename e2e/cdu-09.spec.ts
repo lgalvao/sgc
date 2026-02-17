@@ -2,7 +2,12 @@ import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
+import {
+    adicionarAtividade,
+    adicionarConhecimento,
+    navegarParaAtividades,
+    navegarParaAtividadesVisualizacao
+} from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
     acessarSubprocessoAdmin,

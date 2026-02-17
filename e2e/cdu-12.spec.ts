@@ -16,7 +16,6 @@ import {
 import {fazerLogout, limparNotificacoes, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_211';

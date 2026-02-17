@@ -1,10 +1,9 @@
 package sgc.processo.mapper;
 
-import sgc.comum.config.CentralMapperConfig;
-
 import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import sgc.comum.config.CentralMapperConfig;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.model.UnidadeProcesso;

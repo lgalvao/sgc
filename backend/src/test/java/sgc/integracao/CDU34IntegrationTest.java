@@ -24,12 +24,13 @@ import sgc.processo.dto.EnviarLembreteRequest;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.MovimentacaoRepo;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

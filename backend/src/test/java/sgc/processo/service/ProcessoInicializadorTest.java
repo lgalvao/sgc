@@ -8,11 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapa;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UnidadeMapaRepo;
-import sgc.organizacao.model.UnidadeRepo;
+import sgc.comum.repo.ComumRepo;
+import sgc.organizacao.model.*;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.erros.ErroUnidadesNaoDefinidas;
 import sgc.processo.model.Processo;
@@ -20,20 +17,15 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.service.SubprocessoFacade;
-import sgc.comum.repo.ComumRepo;
 import sgc.testutils.UnidadeTestBuilder;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import java.util.ArrayList;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

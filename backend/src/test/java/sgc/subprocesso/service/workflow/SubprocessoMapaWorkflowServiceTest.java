@@ -10,8 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
 import sgc.analise.AnaliseFacade;
-import sgc.analise.model.TipoAcaoAnalise;
-import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -43,7 +41,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

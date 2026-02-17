@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, onMounted } from "vue";
+import {computed, onMounted, ref} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ModalMapasVigentes from "@/components/relatorios/ModalMapasVigentes.vue";
@@ -46,11 +46,11 @@ import ModalDiagnosticosGaps from "@/components/relatorios/ModalDiagnosticosGaps
 import ModalRelatorioAndamento from "@/components/relatorios/ModalRelatorioAndamento.vue";
 import RelatorioFiltrosSection from "@/components/relatorios/RelatorioFiltrosSection.vue";
 import RelatorioCardsSection from "@/components/relatorios/RelatorioCardsSection.vue";
-import { useProcessosStore } from "@/stores/processos";
-import { useMapasStore } from "@/stores/mapas";
-import { usePerfilStore } from "@/stores/perfil";
-import { isWithinInterval, parseISO, startOfDay, endOfDay } from "date-fns";
-import { TipoProcesso } from "@/types/tipos";
+import {useProcessosStore} from "@/stores/processos";
+import {useMapasStore} from "@/stores/mapas";
+import {usePerfilStore} from "@/stores/perfil";
+import {endOfDay, isWithinInterval, parseISO, startOfDay} from "date-fns";
+import {TipoProcesso} from "@/types/tipos";
 
 const processosStore = useProcessosStore();
 const mapasStore = useMapasStore();

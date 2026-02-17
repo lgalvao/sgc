@@ -1,6 +1,7 @@
 package sgc.integracao;
 
 import jakarta.persistence.EntityManager;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -20,11 +21,13 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.model.*;
+import sgc.notificacao.NotificacaoEmailService;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,9 +42,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import java.time.Duration;
-import org.awaitility.Awaitility;
-import sgc.notificacao.NotificacaoEmailService;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)

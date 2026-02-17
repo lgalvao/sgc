@@ -12,11 +12,13 @@ import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.dto.*;
+import sgc.seguranca.acesso.AccessControlService;
+import sgc.subprocesso.dto.ContextoEdicaoResponse;
+import sgc.subprocesso.dto.SubprocessoDetalheResponse;
+import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
-import sgc.seguranca.acesso.AccessControlService;
 
 import java.util.List;
 

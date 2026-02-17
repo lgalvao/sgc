@@ -8,20 +8,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.jspecify.annotations.NonNull;
+import sgc.comum.model.ComumViews;
 import sgc.comum.model.EntidadeBase;
+import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaViews;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.erros.ErroTransicaoInvalida;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
-import sgc.comum.model.ComumViews;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.MapaViews;
 
 @Entity
 @Table(name = "SUBPROCESSO", schema = "sgc")

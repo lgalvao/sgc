@@ -1,5 +1,6 @@
 package sgc.integracao;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,10 +25,7 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
+import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
@@ -43,10 +42,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import jakarta.persistence.EntityManager;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.model.UsuarioPerfilRepo;
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)

@@ -1,12 +1,11 @@
 package sgc.analise.dto;
 
 import lombok.Builder;
+import org.hibernate.validator.constraints.br.TituloEleitoral;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
 
 import java.time.LocalDateTime;
-
-import org.hibernate.validator.constraints.br.TituloEleitoral;
 
 @Builder
 public record AnaliseHistoricoDto(

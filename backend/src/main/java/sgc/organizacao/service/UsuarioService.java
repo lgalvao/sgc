@@ -7,12 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.ComumRepo;
-import sgc.organizacao.model.Administrador;
-import sgc.organizacao.model.AdministradorRepo;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.model.UsuarioPerfilRepo;
-import sgc.organizacao.model.UsuarioRepo;
+import sgc.organizacao.model.*;
 
 import java.util.List;
 import java.util.Optional;

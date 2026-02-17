@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 import apiClient from '@/axios-setup';
-import { buscarConfiguracoes, salvarConfiguracoes } from '../configuracaoService';
+import {buscarConfiguracoes, salvarConfiguracoes} from '../configuracaoService';
 
 vi.mock('@/axios-setup', () => ({
     default: {

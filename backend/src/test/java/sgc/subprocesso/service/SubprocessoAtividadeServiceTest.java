@@ -12,27 +12,27 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
-import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Usuario;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.eventos.EventoImportacaoAtividades;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaManutencaoService;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
 
 /**
  * Testes unitários para SubprocessoAtividadeService.

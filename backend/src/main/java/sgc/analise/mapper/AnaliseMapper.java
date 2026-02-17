@@ -1,13 +1,12 @@
 package sgc.analise.mapper;
 
-import sgc.comum.config.CentralMapperConfig;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.model.Analise;
+import sgc.comum.config.CentralMapperConfig;
 import sgc.comum.util.FormatadorData;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;

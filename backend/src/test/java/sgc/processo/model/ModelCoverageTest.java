@@ -3,6 +3,7 @@ package sgc.processo.model;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Unidade;
 
 import java.lang.reflect.Field;
@@ -11,7 +12,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import sgc.organizacao.model.SituacaoUnidade;
 
 @Tag("unit")
 @DisplayName("Modelos - Cobertura de Casos de Borda")

@@ -106,7 +106,8 @@ import {
   BFormInvalidFeedback,
   BFormSelect,
   BFormSelectOption,
-  BFormTextarea} from "bootstrap-vue-next";
+  BFormTextarea
+} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {logger} from "@/utils";

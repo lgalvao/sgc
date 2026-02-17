@@ -6,8 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import tools.jackson.databind.ObjectMapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
 @DisplayName("Testes de Serialização @JsonView - Atividade")

@@ -1,12 +1,11 @@
 package sgc.alerta.mapper;
 
-import sgc.comum.config.CentralMapperConfig;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
+import sgc.comum.config.CentralMapperConfig;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

@@ -3,11 +3,13 @@ package sgc.seguranca.login;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
@@ -21,8 +23,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import org.junit.jupiter.api.Nested;
-import org.mockito.Mockito;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

@@ -2,10 +2,10 @@ package sgc.subprocesso.service.workflow;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import sgc.processo.model.TipoProcesso;
 
 @DisplayName("Auditoria do Fluxo de Mapeamento")
 class AuditoriaFluxoMapeamentoTest {

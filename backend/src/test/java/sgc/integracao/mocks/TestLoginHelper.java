@@ -1,5 +1,6 @@
 package sgc.integracao.mocks;
 
+import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -10,9 +11,7 @@ import sgc.seguranca.login.dto.AutenticarRequest;
 import sgc.seguranca.login.dto.AutorizarRequest;
 import sgc.seguranca.login.dto.EntrarRequest;
 import sgc.seguranca.login.dto.EntrarResponse;
-
 import tools.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.Cookie;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

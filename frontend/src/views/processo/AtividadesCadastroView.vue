@@ -181,12 +181,7 @@ import {useUnidadesStore} from "@/stores/unidades";
 import {useAnalisesStore} from "@/stores/analises";
 import {useFeedbackStore} from "@/stores/feedback";
 import {usePerfil} from "@/composables/usePerfil";
-import type {
-  Atividade,
-  Conhecimento,
-  CriarConhecimentoRequest,
-  ErroValidacao,
-} from "@/types/tipos";
+import type {Atividade, Conhecimento, CriarConhecimentoRequest, ErroValidacao,} from "@/types/tipos";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import logger from "@/utils/logger";
 

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.dto.ImpactoMapaResponse;
+import sgc.mapa.dto.MapaVisualizacaoResponse;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
@@ -12,7 +13,6 @@ import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 import java.util.Optional;
-import sgc.mapa.dto.MapaVisualizacaoResponse;
 
 @Service
 @Transactional

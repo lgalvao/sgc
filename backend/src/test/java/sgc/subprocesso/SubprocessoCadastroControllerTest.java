@@ -1,8 +1,7 @@
 package sgc.subprocesso;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -15,6 +14,7 @@ import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.mapper.AnaliseMapper;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
+import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.model.Atividade;
 import sgc.organizacao.OrganizacaoFacade;
@@ -35,10 +35,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.mockito.Mockito;
-import sgc.comum.erros.ErroAutenticacao;
 
 @WebMvcTest(SubprocessoCadastroController.class)
 @Import(RestExceptionHandler.class)

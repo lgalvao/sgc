@@ -4,7 +4,6 @@ import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
     await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Component;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+
 import java.util.Map;
 
 /**

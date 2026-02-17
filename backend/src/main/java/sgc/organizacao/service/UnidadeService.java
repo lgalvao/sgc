@@ -5,11 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.SituacaoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapa;
-import sgc.organizacao.model.UnidadeMapaRepo;
-import sgc.organizacao.model.UnidadeRepo;
+import sgc.organizacao.model.*;
 
 import java.util.List;
 import java.util.Map;

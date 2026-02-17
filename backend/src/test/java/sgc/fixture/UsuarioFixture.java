@@ -3,10 +3,6 @@ package sgc.fixture;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfil;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class UsuarioFixture {
 

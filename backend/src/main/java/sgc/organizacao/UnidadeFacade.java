@@ -4,11 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.dto.*;
+import sgc.organizacao.dto.AtribuicaoTemporariaDto;
+import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.*;
+import sgc.organizacao.service.UnidadeHierarquiaService;
+import sgc.organizacao.service.UnidadeResponsavelService;
+import sgc.organizacao.service.UnidadeService;
+import sgc.organizacao.service.UsuarioService;
 
 import java.util.*;
 

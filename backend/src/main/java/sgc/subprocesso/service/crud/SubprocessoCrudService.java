@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
@@ -14,10 +15,9 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.factory.SubprocessoFactory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Map;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 /**
  * Serviço especializado para operações CRUD básicas de Subprocesso.

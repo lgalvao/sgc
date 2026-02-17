@@ -13,7 +13,6 @@ import {
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));

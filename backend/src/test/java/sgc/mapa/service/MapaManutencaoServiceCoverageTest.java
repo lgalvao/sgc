@@ -8,16 +8,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.*;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import sgc.comum.repo.ComumRepo;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

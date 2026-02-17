@@ -1,10 +1,10 @@
-import { mount, flushPromises } from "@vue/test-utils";
-import { describe, it, expect, vi } from "vitest";
-import { createTestingPinia } from "@pinia/testing";
+import {flushPromises, mount} from "@vue/test-utils";
+import {describe, expect, it, vi} from "vitest";
+import {createTestingPinia} from "@pinia/testing";
 import HistoricoView from "@/views/HistoricoView.vue";
-import { useProcessosStore } from "@/stores/processos";
-import { createRouter, createMemoryHistory } from "vue-router";
-import { TipoProcesso, SituacaoProcesso } from "@/types/tipos";
+import {useProcessosStore} from "@/stores/processos";
+import {createMemoryHistory, createRouter} from "vue-router";
+import {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 
 describe("HistoricoView Coverage", () => {
   it("renders correctly and rows are accessible", async () => {

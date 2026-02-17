@@ -1,24 +1,26 @@
 package sgc.organizacao.service;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.testutils.UnidadeTestBuilder;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
-import sgc.organizacao.model.TipoUnidade;
 
 /**
  * Testes unitários para {@link UnidadeHierarquiaService}.

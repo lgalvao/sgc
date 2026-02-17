@@ -1,13 +1,13 @@
 package sgc.subprocesso.model;
 
-import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
+import sgc.comum.model.ComumViews;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
-import sgc.comum.model.ComumViews;
+import tools.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

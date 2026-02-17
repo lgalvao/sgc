@@ -9,7 +9,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.integracao.mocks.TestLoginHelper;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.organizacao.model.Perfil;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

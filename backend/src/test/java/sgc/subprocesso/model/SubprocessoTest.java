@@ -8,13 +8,13 @@ import org.junit.jupiter.params.provider.EnumSource;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.erros.ErroTransicaoInvalida;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import sgc.subprocesso.erros.ErroTransicaoInvalida;
-import sgc.processo.model.TipoProcesso;
 
 @Tag("unit")
 @DisplayName("Entidade: Subprocesso")

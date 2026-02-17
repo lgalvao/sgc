@@ -8,7 +8,9 @@ import sgc.mapa.dto.MapaVisualizacaoResponse;
 import sgc.mapa.model.*;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Service especializado para visualização de mapas de competências.

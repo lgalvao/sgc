@@ -18,6 +18,7 @@ import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
@@ -31,6 +32,7 @@ import sgc.subprocesso.model.Subprocesso;
 import tools.jackson.core.type.TypeReference;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -38,8 +40,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import java.util.Set;
-import sgc.organizacao.model.Perfil;
 
 @Tag("integration")
 @SpringBootTest

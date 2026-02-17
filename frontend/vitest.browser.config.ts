@@ -1,7 +1,7 @@
-import { defineConfig } from 'vitest/config';
+import {defineConfig} from 'vitest/config';
 import vue from '@vitejs/plugin-vue';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { playwright } from '@vitest/browser-playwright';
+import {playwright} from '@vitest/browser-playwright';
 
 export default defineConfig({
   plugins: [vue() as any, tsconfigPaths() as any],

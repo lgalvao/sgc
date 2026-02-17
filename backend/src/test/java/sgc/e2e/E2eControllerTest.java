@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Propagation;
@@ -21,22 +22,20 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.model.TipoProcesso;
+import sgc.processo.service.ProcessoFacade;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import java.sql.SQLException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Nested;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import sgc.processo.service.ProcessoFacade;
 
 @Tag("integration")
 @SpringBootTest

@@ -25,11 +25,7 @@ import {
     homologarCadastro,
     homologarRevisaoCadastro,
 } from '@/services/cadastroService';
-import {
-    alterarDataLimiteSubprocesso,
-    reabrirCadastro,
-    reabrirRevisaoCadastro,
-} from '@/services/processoService';
+import {alterarDataLimiteSubprocesso, reabrirCadastro, reabrirRevisaoCadastro,} from '@/services/processoService';
 
 // Mock Dependencies
 vi.mock('@/services/subprocessoService', () => ({
