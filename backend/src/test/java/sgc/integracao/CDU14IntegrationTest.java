@@ -5,14 +5,12 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.AnaliseRepo;
 import sgc.fixture.MapaFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.mapa.model.*;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
@@ -41,11 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
-@ActiveProfiles("test")
-@DisplayName("CDU-14: Analisar revisão de cadastro de atividades e conhecimentos")
 @Import({
-                TestSecurityConfig.class,
-                TestThymeleafConfig.class
+                TestSecurityConfig.class
 })
 @Transactional
 class CDU14IntegrationTest extends BaseIntegrationTest {
@@ -241,6 +236,11 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                         assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
                         assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(6);
                         assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
+
+                        // Assert: Verificar envio de e-mail (GreenMail herdado de BaseIntegrationTest)
+                        // Esperamos pelo menos 2 e-mails: Início de Processo e Disponibilização/Aceite
+                        assertThat(greenMail.waitForIncomingEmail(5000, 2)).isTrue();
+                        assertThat(algumEmailContem("disponibilizado")).isTrue();
                 }
         }
 

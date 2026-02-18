@@ -21,10 +21,14 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 
 @SpringBootTest
 @Transactional
-@Import(TestConfig.class)
+@Import({TestConfig.class, sgc.integracao.config.EmailTestConfig.class})
 @AutoConfigureMockMvc
+@org.springframework.test.context.ActiveProfiles({"test", "email-test"})
 public abstract class BaseIntegrationTest {
     protected MockMvc mockMvc;
+    
+    @Autowired(required = false)
+    protected com.icegreen.greenmail.util.GreenMail greenMail;
     @Autowired
     protected ObjectMapper objectMapper;
     @Autowired
@@ -43,5 +47,33 @@ public abstract class BaseIntegrationTest {
     @BeforeEach
     void setupMockMvc() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        if (greenMail != null) {
+            greenMail.reset();
+        }
+    }
+
+    protected boolean algumEmailContem(String busca) throws Exception {
+        var mensagens = greenMail.getReceivedMessages();
+        for (var msg : mensagens) {
+            String html = extrairHtmlDaMensagem(msg);
+            if (html != null && html.contains(busca)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String extrairHtmlDaMensagem(jakarta.mail.Part part) throws Exception {
+        if (part.isMimeType("text/html") && part.getContent() instanceof String s) {
+            return s;
+        }
+        if (part.isMimeType("multipart/*")) {
+            jakarta.mail.Multipart mp = (jakarta.mail.Multipart) part.getContent();
+            for (int i = 0; i < mp.getCount(); i++) {
+                String s = extrairHtmlDaMensagem(mp.getBodyPart(i));
+                if (s != null) return s;
+            }
+        }
+        return null;
     }
 }

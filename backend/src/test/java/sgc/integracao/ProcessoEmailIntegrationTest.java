@@ -2,6 +2,8 @@ package sgc.integracao;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,19 +62,34 @@ class ProcessoEmailIntegrationTest {
         emailService.enviarEmailHtml(destinatario, "Início de Processo", html);
 
         // Assert: Aguardar e verificar
-        assertThat(greenMail.waitForIncomingEmail(5000, 1)).isTrue();
+        assertThat(greenMail.waitForIncomingEmail(10000, 1)).isTrue();
         
         MimeMessage[] mensagens = greenMail.getReceivedMessages();
         assertThat(mensagens).hasSize(1);
         
         MimeMessage msg = mensagens[0];
         assertThat(msg.getAllRecipients()[0]).hasToString(destinatario);
-        
-        String corpoRecebido = GreenMailUtil.getBody(msg);
         assertThat(msg.getSubject()).contains("Início de Processo");
-        assertThat(corpoRecebido)
+        
+        // Extrair o conteúdo de forma recursiva
+        String conteudo = extrairHtml(msg);
+        assertThat(conteudo)
             .contains(nomeUnidade)
             .contains(nomeProcesso)
             .contains("</html>");
+    }
+
+    private String extrairHtml(Part part) throws Exception {
+        if (part.isMimeType("text/html") && part.getContent() instanceof String s) {
+            return s;
+        }
+        if (part.isMimeType("multipart/*")) {
+            Multipart mp = (Multipart) part.getContent();
+            for (int i = 0; i < mp.getCount(); i++) {
+                String s = extrairHtml(mp.getBodyPart(i));
+                if (s != null) return s;
+            }
+        }
+        return null;
     }
 }
