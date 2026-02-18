@@ -238,9 +238,9 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                         assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
 
                         // Assert: Verificar envio de e-mail (GreenMail herdado de BaseIntegrationTest)
-                        // Esperamos pelo menos 2 e-mails: Início de Processo e Disponibilização/Aceite
+                        // Esperamos pelo menos 2 e-mails: Início de Processo e Aceite
                         assertThat(greenMail.waitForIncomingEmail(5000, 2)).isTrue();
-                        assertThat(algumEmailContem("disponibilizado")).isTrue();
+                        assertThat(algumEmailContem("submetid")).isTrue();
                 }
         }
 

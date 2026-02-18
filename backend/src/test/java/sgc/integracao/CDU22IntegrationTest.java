@@ -18,7 +18,6 @@ import sgc.analise.model.TipoAcaoAnalise;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
@@ -41,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class})
 @Transactional
 @DisplayName("CDU-22: Aceitar cadastros em bloco")
 class CDU22IntegrationTest extends BaseIntegrationTest {

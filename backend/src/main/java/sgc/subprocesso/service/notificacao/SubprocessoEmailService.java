@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import sgc.notificacao.NotificacaoEmailService;
+import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
@@ -25,6 +28,8 @@ public class SubprocessoEmailService {
 
     private final NotificacaoEmailService notificacaoEmailService;
     private final TemplateEngine templateEngine;
+    private final UnidadeFacade unidadeFacade;
+    private final UsuarioFacade usuarioFacade;
 
     /**
      * Envia e-mail de transição diretamente (sem evento assíncrono).
@@ -36,12 +41,17 @@ public class SubprocessoEmailService {
             return;
 
         try {
-            Map<String, Object> variaveis = criarVariaveisTemplateDireto(sp, tipo, observacoes);
+            Map<String, Object> variaveis = criarVariaveisTemplateDireto(sp, tipo, unidadeOrigem, unidadeDestino, observacoes);
             String assunto = criarAssunto(tipo, sp);
             String corpo = processarTemplate(tipo.getTemplateEmail(), variaveis);
 
-            notificacaoEmailService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
-            log.info("E-mail enviado para {} - Transição: {}", unidadeDestino.getSigla(), tipo);
+            // 1. Enviar para o e-mail da unidade (ex: sesel@tre-pe.jus.br)
+            String emailUnidade = String.format("%s@tre-pe.jus.br", unidadeDestino.getSigla().toLowerCase());
+            notificacaoEmailService.enviarEmailHtml(emailUnidade, assunto, corpo);
+            log.info("E-mail enviado para unidade {} ({}) - Transição: {}", unidadeDestino.getSigla(), emailUnidade, tipo);
+
+            // 2. Enviar para o responsável atual (substituto ou titular se solicitado)
+            notificarResponsaveisPessoais(unidadeDestino, assunto, corpo);
 
             if (deveNotificarHierarquia(tipo)) {
                 notificarHierarquia(unidadeOrigem, assunto, corpo);
@@ -52,12 +62,34 @@ public class SubprocessoEmailService {
         }
     }
 
-    private Map<String, Object> criarVariaveisTemplateDireto(Subprocesso sp, TipoTransicao tipo, String observacoes) {
+    private void notificarResponsaveisPessoais(Unidade unidade, String assunto, String corpo) {
+        UnidadeResponsavelDto responsavel = unidadeFacade.buscarResponsavelUnidade(unidade.getCodigo());
+        if (responsavel == null) return;
+
+        // Se houver substituto, ele é o responsável atual e deve receber no seu e-mail pessoal
+        if (responsavel.substitutoTitulo() != null) {
+            usuarioFacade.buscarUsuarioPorTitulo(responsavel.substitutoTitulo())
+                .ifPresent(u -> {
+                    if (u.getEmail() != null && !u.getEmail().isBlank()) {
+                        notificacaoEmailService.enviarEmailHtml(u.getEmail(), assunto, corpo);
+                        log.info("E-mail pessoal enviado para substituto da unidade {}: {}", unidade.getSigla(), u.getEmail());
+                    }
+                });
+        }
+    }
+
+    private Map<String, Object> criarVariaveisTemplateDireto(Subprocesso sp, TipoTransicao tipo, 
+                                                            Unidade unidadeOrigem, Unidade unidadeDestino, 
+                                                            String observacoes) {
         Map<String, Object> variaveis = new HashMap<>();
 
-        Unidade unidade = sp.getUnidade();
-        variaveis.put("siglaUnidade", unidade.getSigla());
-        variaveis.put("nomeUnidade", unidade.getNome());
+        variaveis.put("siglaUnidade", sp.getUnidade().getSigla());
+        variaveis.put("nomeUnidade", sp.getUnidade().getNome());
+        
+        variaveis.put("siglaUnidadeOrigem", unidadeOrigem.getSigla());
+        variaveis.put("nomeUnidadeOrigem", unidadeOrigem.getNome());
+        variaveis.put("siglaUnidadeDestino", unidadeDestino.getSigla());
+        variaveis.put("nomeUnidadeDestino", unidadeDestino.getNome());
 
         variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
         variaveis.put("tipoProcesso", sp.getProcesso().getTipo().name());
@@ -86,8 +118,10 @@ public class SubprocessoEmailService {
                 String.format("SGC: Cadastro de atividades da unidade %s disponibilizado", siglaUnidade);
             case CADASTRO_DEVOLVIDO, REVISAO_CADASTRO_DEVOLVIDA ->
                 String.format("SGC: Cadastro de atividades da unidade %s devolvido para ajustes", siglaUnidade);
-            case CADASTRO_ACEITO, REVISAO_CADASTRO_ACEITA ->
+            case CADASTRO_ACEITO ->
                 String.format("SGC: Cadastro de atividades da unidade %s aceito", siglaUnidade);
+            case REVISAO_CADASTRO_ACEITA ->
+                String.format("SGC: Revisão do cadastro de atividades e conhecimentos da %s submetido para análise", siglaUnidade);
             case MAPA_DISPONIBILIZADO ->
                 String.format("SGC: Mapa de competências da unidade %s disponibilizado", siglaUnidade);
             case MAPA_SUGESTOES_APRESENTADAS -> String.format("SGC: Sugestões para o mapa da unidade %s", siglaUnidade);
@@ -115,7 +149,9 @@ public class SubprocessoEmailService {
         Unidade superior = unidadeOrigem.getUnidadeSuperior();
         while (superior != null) {
             try {
-                notificacaoEmailService.enviarEmail(superior.getSigla(), assunto, corpo);
+                String emailSuperior = String.format("%s@tre-pe.jus.br", superior.getSigla().toLowerCase());
+                notificacaoEmailService.enviarEmailHtml(emailSuperior, assunto, corpo);
+                log.info("E-mail enviado para unidade superior {} ({})", superior.getSigla(), emailSuperior);
             } catch (Exception e) {
                 log.warn("Falha ao enviar e-mail para {}: {}", superior.getSigla(), e.getMessage());
             }

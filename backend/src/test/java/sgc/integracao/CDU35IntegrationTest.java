@@ -16,7 +16,6 @@ import sgc.Sgc;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
@@ -39,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class})
 @Transactional
 @DisplayName("CDU-35: Gerar relatório de andamento")
 class CDU35IntegrationTest extends BaseIntegrationTest {

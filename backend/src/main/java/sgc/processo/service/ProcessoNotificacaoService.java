@@ -207,10 +207,13 @@ public class ProcessoNotificacaoService {
             
             if (titular != null && !titular.getEmail().isBlank()) {
                 notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
-                log.info("E-mail enviado a {}", unidade.getSigla());
-            } else {
-                log.warn("E-mail não enviado para {}: titular ou e-mail inválido", unidade.getSigla());
+                log.info("E-mail pessoal enviado a titular {} ({})", unidade.getSigla(), titular.getEmail());
             }
+
+            // Enviar para o e-mail da unidade (Novo requisito)
+            String emailUnidade = String.format("%s@tre-pe.jus.br", unidade.getSigla().toLowerCase());
+            notificacaoEmailService.enviarEmailHtml(emailUnidade, assunto, corpoHtml);
+            log.info("E-mail enviado para unidade {} ({})", unidade.getSigla(), emailUnidade);
 
             if (responsavel.substitutoTitulo() != null) {
                 enviarEmailParaSubstituto(responsavel.substitutoTitulo(), usuarios, assunto, corpoHtml, nomeUnidade);

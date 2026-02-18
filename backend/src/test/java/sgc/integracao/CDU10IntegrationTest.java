@@ -24,7 +24,6 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.fixture.*;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Conhecimento;
@@ -56,7 +55,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({
         TestSecurityConfig.class,
         WithMockChefeSecurityContextFactory.class,
-        TestThymeleafConfig.class
+        
 })
 @Transactional
 @DisplayName("CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos")

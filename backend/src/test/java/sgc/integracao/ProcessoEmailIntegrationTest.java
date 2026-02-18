@@ -1,22 +1,16 @@
 package sgc.integracao;
 
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.GreenMailUtil;
 import jakarta.mail.Multipart;
 import jakarta.mail.Part;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 import sgc.Sgc;
-import sgc.integracao.config.EmailTestConfig;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
 
@@ -25,11 +19,9 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = Sgc.class)
-@ActiveProfiles({"test", "email-test"})
-@Import({EmailTestConfig.class, TestSecurityConfig.class, TestThymeleafConfig.class})
-@Tag("integration")
+@Import({TestSecurityConfig.class})
 @DisplayName("Integração: Notificações de Processo com GreenMail")
-class ProcessoEmailIntegrationTest {
+class ProcessoEmailIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private NotificacaoEmailService emailService;
@@ -37,11 +29,8 @@ class ProcessoEmailIntegrationTest {
     @Autowired
     private NotificacaoModelosService modelosService;
 
-    @Autowired
-    private GreenMail greenMail;
-
     @BeforeEach
-    void setup() {
+    void setupChild() {
         greenMail.reset();
     }
 

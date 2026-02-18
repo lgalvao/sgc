@@ -15,7 +15,6 @@ import sgc.Sgc;
 import sgc.configuracao.model.Parametro;
 import sgc.configuracao.model.ParametroRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import tools.jackson.databind.ObjectMapper;
 
@@ -30,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class})
 @Transactional
 @DisplayName("CDU-31: Configurar sistema")
 class CDU31IntegrationTest extends BaseIntegrationTest {

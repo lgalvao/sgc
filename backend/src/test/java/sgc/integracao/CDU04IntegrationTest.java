@@ -18,7 +18,6 @@ import sgc.alerta.model.AlertaRepo;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
@@ -43,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
 @WithMockAdmin
-@Import({ TestSecurityConfig.class, TestThymeleafConfig.class })
+@Import({ TestSecurityConfig.class })
 @Transactional
 @DisplayName("CDU-04: Iniciar processo de mapeamento")
 class CDU04IntegrationTest extends BaseIntegrationTest {

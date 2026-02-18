@@ -12,7 +12,6 @@ import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.fixture.UnidadeFixture;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
@@ -38,7 +37,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class, TestThymeleafConfig.class})
+@SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class})
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-16: Ajustar mapa de competências")

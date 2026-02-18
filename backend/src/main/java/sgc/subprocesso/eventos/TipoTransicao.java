@@ -44,7 +44,7 @@ public enum TipoTransicao {
     CADASTRO_REABERTO(
             "Reabertura de cadastro de atividades",
             "Cadastro de atividades da unidade %s reaberto para ajustes",
-            "cadastro-reaberto"
+            "email/cadastro-reaberto"
     ),
 
     REVISAO_CADASTRO_DISPONIBILIZADA(
@@ -74,7 +74,7 @@ public enum TipoTransicao {
     REVISAO_CADASTRO_REABERTA(
             "Reabertura de revisão de cadastro de atividades",
             "Revisão do cadastro da unidade %s reaberta para ajustes",
-            "revisao-cadastro-reaberta"
+            "email/revisao-cadastro-reaberta"
     ),
 
     MAPA_DISPONIBILIZADO(

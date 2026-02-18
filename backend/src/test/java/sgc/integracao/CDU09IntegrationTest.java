@@ -18,7 +18,6 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.model.*;
 import sgc.notificacao.NotificacaoEmailService;
@@ -48,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Import({
         TestSecurityConfig.class,
-        TestThymeleafConfig.class
+        
 })
 @Transactional
 @DisplayName("CDU-09: Fluxo Completo de Disponibilização")

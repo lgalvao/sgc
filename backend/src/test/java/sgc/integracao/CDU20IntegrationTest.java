@@ -15,7 +15,6 @@ import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
@@ -46,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-20: Analisar validação de mapa de competências")
-@Import(TestThymeleafConfig.class)
+
 class CDU20IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UsuarioFacade usuarioService;

@@ -134,7 +134,7 @@ tasks.withType<Test> {
         exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
-        showStandardStreams = false
+        showStandardStreams = true
     }
 
     val slowTests = mutableListOf<Pair<String, Long>>()
