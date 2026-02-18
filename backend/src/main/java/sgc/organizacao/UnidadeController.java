@@ -25,9 +25,6 @@ import java.util.Set;
 import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
 import static sgc.processo.model.TipoProcesso.REVISAO;
 
-/**
- * Controle para operações relacionadas a unidades organizacionais
- */
 @RestController
 @RequestMapping("/api/unidades")
 @RequiredArgsConstructor
@@ -36,13 +33,6 @@ public class UnidadeController {
     private final UnidadeFacade unidadeService;
     private final ProcessoFacade processoFacade;
 
-    /**
-     * Cria uma nova atribuição temporária para um usuário em uma unidade.
-     *
-     * @param codUnidade O Código da unidade.
-     * @param request    Os dados da atribuição.
-     * @return Resposta vazia com status 201 (Created).
-     */
     @PostMapping("/{codUnidade}/atribuicoes-temporarias")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> criarAtribuicaoTemporaria(
@@ -52,21 +42,12 @@ public class UnidadeController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    /**
-     * Busca todas as atribuições temporárias.
-     *
-     * @return Lista de atribuições temporárias.
-     */
     @GetMapping("/atribuicoes")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AtribuicaoTemporariaDto>> buscarTodasAtribuicoes() {
         return ResponseEntity.ok(unidadeService.buscarTodasAtribuicoes());
     }
 
-    /**
-     * Busca todas as unidades em estrutura hierárquica Endpoint usado pela tela de cadastro de
-     * processo para selecionar unidades participantes
-     */
     @GetMapping
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<List<UnidadeDto>> buscarTodasUnidades() {
@@ -74,14 +55,6 @@ public class UnidadeController {
         return ResponseEntity.ok(hierarquia);
     }
 
-    /**
-     * Busca a árvore de unidades indicando a elegibilidade de cada uma para participar de um
-     * processo.
-     *
-     * @param tipoProcesso O tipo de processo a ser criado.
-     * @param codProcesso  O código do processo (opcional, para edição).
-     * @return A lista de unidades raiz com a árvore de filhas e a elegibilidade.
-     */
     @GetMapping("/arvore-com-elegibilidade")
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<List<UnidadeDto>> buscarArvoreComElegibilidade(
@@ -97,25 +70,12 @@ public class UnidadeController {
         return ResponseEntity.ok(arvore);
     }
 
-    /**
-     * Verifica se a unidade possui mapa de competências vigente Usado pelo frontend para determinar
-     * se deve exibir opções de revisão
-     *
-     * @param codUnidade O código da unidade
-     * @return Um objeto com o campo temMapaVigente (boolean)
-     */
     @GetMapping("/{codUnidade}/mapa-vigente")
     public ResponseEntity<Map<String, Boolean>> verificarMapaVigente(@PathVariable Long codUnidade) {
         boolean temMapaVigente = unidadeService.verificarMapaVigente(codUnidade);
         return ResponseEntity.ok(Map.of("temMapaVigente", temMapaVigente));
     }
 
-    /**
-     * Busca usuários de uma unidade específica.
-     *
-     * @param codUnidade O código da unidade
-     * @return Lista de usuários da unidade
-     */
     @GetMapping("/{codUnidade}/usuarios")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @JsonView(OrganizacaoViews.Publica.class)
@@ -124,12 +84,6 @@ public class UnidadeController {
         return ResponseEntity.ok(usuarios);
     }
 
-    /**
-     * Busca uma unidade específica pela sua sigla.
-     *
-     * @param siglaUnidade A sigla da unidade.
-     * @return Os dados da unidade.
-     */
     @GetMapping("/sigla/{siglaUnidade}")
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarUnidadePorSigla(
@@ -138,12 +92,6 @@ public class UnidadeController {
         return ResponseEntity.ok(unidade);
     }
 
-    /**
-     * Busca uma unidade específica pelo seu código.
-     *
-     * @param codigo O código da unidade.
-     * @return Os dados da unidade.
-     */
     @GetMapping("/{codigo}")
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarUnidadePorCodigo(@PathVariable Long codigo) {
@@ -151,24 +99,12 @@ public class UnidadeController {
         return ResponseEntity.ok(unidade);
     }
 
-    /**
-     * Busca a árvore de uma unidade específica (incluindo subunidades).
-     *
-     * @param codigo O código da unidade.
-     * @return A unidade com sua árvore de subunidades.
-     */
     @GetMapping("/{codigo}/arvore")
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarArvoreUnidade(@PathVariable Long codigo) {
         return ResponseEntity.ok(unidadeService.buscarArvore(codigo));
     }
 
-    /**
-     * Busca as siglas de todas as unidades subordinadas (diretas e indiretas) e a própria unidade.
-     *
-     * @param sigla A sigla da unidade raiz.
-     * @return Lista de siglas.
-     */
     @GetMapping("/sigla/{sigla}/subordinadas")
     public ResponseEntity<List<String>> buscarSiglasSubordinadas(
             @PathVariable @Pattern(regexp = "^[a-zA-Z0-9_.-]+$") String sigla) {
@@ -176,12 +112,6 @@ public class UnidadeController {
         return ResponseEntity.ok(siglas);
     }
 
-    /**
-     * Busca a sigla da unidade superior imediata.
-     *
-     * @param sigla A sigla da unidade.
-     * @return A sigla da unidade superior ou 204 se não houver.
-     */
     @GetMapping("/sigla/{sigla}/superior")
     public ResponseEntity<String> buscarSiglaSuperior(@PathVariable @Pattern(regexp = "^[a-zA-Z0-9_.-]+$") String sigla) {
         return unidadeService

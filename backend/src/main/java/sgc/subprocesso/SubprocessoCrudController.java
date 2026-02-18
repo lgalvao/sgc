@@ -28,12 +28,6 @@ public class SubprocessoCrudController {
     private final SubprocessoFacade subprocessoFacade;
     private final OrganizacaoFacade organizacaoFacade;
 
-    /**
-     * Obtém as permissões do usuário para um subprocesso.
-     *
-     * @param codigo O código do subprocesso.
-     * @return DTO com as permissões calculadas.
-     */
     @GetMapping("/{codigo}/permissoes")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<SubprocessoPermissoesDto> obterPermissoes(@PathVariable Long codigo) {
@@ -55,11 +49,6 @@ public class SubprocessoCrudController {
         return ResponseEntity.ok(subprocessoFacade.obterSituacao(codigo));
     }
 
-    /**
-     * Lista todos os subprocessos.
-     *
-     * @return Uma {@link List} de {@link Subprocesso}.
-     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     @JsonView(SubprocessoViews.Publica.class)
@@ -67,12 +56,6 @@ public class SubprocessoCrudController {
         return subprocessoFacade.listar();
     }
 
-    /**
-     * Obtém os detalhes de um subprocesso específico.
-     *
-     * @param codigo O código do subprocesso.
-     * @return Os detalhes do subprocesso.
-     */
     @GetMapping("/{codigo}")
     @PreAuthorize("isAuthenticated()")
     @JsonView(SubprocessoViews.Publica.class)
@@ -80,13 +63,6 @@ public class SubprocessoCrudController {
         return subprocessoFacade.obterDetalhes(codigo);
     }
 
-    /**
-     * Busca um subprocesso por código do processo e sigla da unidade.
-     *
-     * @param codProcesso  O código do processo.
-     * @param siglaUnidade A sigla da unidade.
-     * @return O {@link Subprocesso} encontrado.
-     */
     @GetMapping("/buscar")
     @PreAuthorize("isAuthenticated()")
     @JsonView(SubprocessoViews.Publica.class)
@@ -97,14 +73,6 @@ public class SubprocessoCrudController {
         return ResponseEntity.ok(sp);
     }
 
-    /**
-     * Cria um novo subprocesso.
-     *
-     * @param request O DTO com os dados do subprocesso a ser criado.
-     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo
-     *         subprocesso e o
-     *         {@link Subprocesso} criado no corpo da resposta.
-     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @JsonView(SubprocessoViews.Publica.class)
@@ -114,14 +82,6 @@ public class SubprocessoCrudController {
         return ResponseEntity.created(uri).body(salvo);
     }
 
-    /**
-     * Atualiza um subprocesso existente.
-     *
-     * @param codigo  O código do subprocesso a ser atualizado.
-     * @param request O DTO com os novos dados do subprocesso.
-     * @return Um {@link ResponseEntity} com status 200 OK e o
-     *         {@link Subprocesso} atualizado.
-     */
     @PostMapping("/{codigo}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
     @JsonView(SubprocessoViews.Publica.class)
@@ -131,12 +91,6 @@ public class SubprocessoCrudController {
         return ResponseEntity.ok(atualizado);
     }
 
-    /**
-     * Exclui um subprocesso.
-     *
-     * @param codigo O código do subprocesso a ser excluído.
-     * @return Um {@link ResponseEntity} com status 204 No Content.
-     */
     @PostMapping("/{codigo}/excluir")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> excluir(@PathVariable Long codigo) {
@@ -144,9 +98,6 @@ public class SubprocessoCrudController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Altera a data limite de um subprocesso.
-     */
     @PostMapping("/{codigo}/data-limite")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> alterarDataLimite(
@@ -156,9 +107,6 @@ public class SubprocessoCrudController {
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * Reabre o cadastro de um subprocesso.
-     */
     @PostMapping("/{codigo}/reabrir-cadastro")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Reabre o cadastro de um subprocesso")
@@ -169,9 +117,6 @@ public class SubprocessoCrudController {
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * Reabre a revisão de cadastro de um subprocesso.
-     */
     @PostMapping("/{codigo}/reabrir-revisao-cadastro")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Reabre a revisão de cadastro de um subprocesso")
