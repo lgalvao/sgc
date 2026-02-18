@@ -161,4 +161,65 @@ describe('ArvoreUnidades Property-Based Tests', () => {
         })
       );
   });
+
+  it('should satisfy Eligibility Invariant: Only eligible units can be selected', () => {
+    // Generate base structure
+    const treeStructure = generateTree(3, 2, 0); // ~14 nodes
+    const allNodesStructure = flatten(treeStructure);
+
+    // We need as many random properties as nodes
+    const numNodes = allNodesStructure.length;
+
+    fc.assert(
+      fc.property(
+        fc.array(fc.record({
+          isElegivel: fc.boolean(),
+          tipo: fc.constantFrom('OPERACIONAL', 'INTERMEDIARIA', 'INTEROPERACIONAL')
+        }), { minLength: numNodes, maxLength: numNodes }),
+        fc.array(fc.nat({ max: numNodes - 1 })), // User interactions (toggles)
+        (randomProps, indicesToToggle) => {
+          // Clone tree structure to avoid mutation across runs
+          const tree = JSON.parse(JSON.stringify(treeStructure));
+          const allNodes = flatten(tree);
+
+          // Apply random properties
+          allNodes.forEach((node, i) => {
+             const props = randomProps[i];
+             node.tipo = props.tipo as any;
+             node.isElegivel = props.isElegivel;
+
+             // Enforce domain rule: INTERMEDIARIA is never eligible
+             if (node.tipo === 'INTERMEDIARIA') {
+                 node.isElegivel = false;
+             }
+          });
+
+          const wrapper = mount(ArvoreUnidades, {
+            props: {
+              unidades: tree,
+              modelValue: []
+            }
+          });
+          const vm = wrapper.vm as any;
+
+          // Perform interactions
+          indicesToToggle.forEach(idx => {
+             const node = allNodes[idx];
+             // Toggle state (simulate check/uncheck)
+             const isSelected = vm.isChecked(node.codigo);
+             vm.toggle(node, !isSelected);
+          });
+
+          // Assert Invariant: All selected units must be eligible
+          const selectedNodes = allNodes.filter(n => vm.isChecked(n.codigo));
+
+          selectedNodes.forEach(node => {
+              expect(node.isElegivel).toBe(true);
+              // Implicitly checks INTERMEDIARIA is not selected because we forced isElegivel=false for them.
+              expect(node.tipo).not.toBe('INTERMEDIARIA');
+          });
+        }
+      )
+    );
+  });
 });

@@ -10,7 +10,7 @@ This file tracks the implementation progress of Property-Based Tests (PBT) based
 
 ## 1. Unit Selection Tree (Árvore de Seleção de Unidades)
 - [x] Invariant: Selection State (3-State Logic) (Frontend PBT)
-- [ ] Invariant: Eligibility
+- [x] Invariant: Eligibility (Frontend PBT)
 - [ ] Invariant: Submission (Backend validation)
 - [x] Property: Monotonicity (Frontend PBT)
 - [ ] Property: Idempotence
