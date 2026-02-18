@@ -1,5 +1,6 @@
 package sgc.integracao;
 
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +18,9 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.Duration;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 @SpringBootTest
@@ -29,6 +33,9 @@ public abstract class BaseIntegrationTest {
     
     @Autowired(required = false)
     protected com.icegreen.greenmail.util.GreenMail greenMail;
+    @Autowired(required = false)
+    protected org.springframework.mail.javamail.JavaMailSender javaMailSender;
+
     @Autowired
     protected ObjectMapper objectMapper;
     @Autowired
@@ -49,10 +56,25 @@ public abstract class BaseIntegrationTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
         if (greenMail != null) {
             greenMail.reset();
+            // Sync port to avoid mismatches if GreenMail restarted/context reloaded
+            if (javaMailSender instanceof org.springframework.mail.javamail.JavaMailSenderImpl impl && impl.getPort() != greenMail.getSmtp().getPort()) {
+                impl.setPort(greenMail.getSmtp().getPort());
+            }
         }
     }
 
+    protected void aguardarEmail(int quantidade) {
+        if (greenMail == null) return;
+        Awaitility.await()
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(100))
+                .untilAsserted(() -> 
+                    assertThat(greenMail.getReceivedMessages()).hasSizeGreaterThanOrEqualTo(quantidade)
+                );
+    }
+
     protected boolean algumEmailContem(String busca) throws Exception {
+        if (greenMail == null) return false;
         var mensagens = greenMail.getReceivedMessages();
         for (var msg : mensagens) {
             String html = extrairHtmlDaMensagem(msg);

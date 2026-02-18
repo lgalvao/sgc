@@ -24,7 +24,11 @@ class EmailIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setupChild() {
-        if (greenMail != null) greenMail.reset();
+        if (greenMail != null) {
+            greenMail.reset();
+            // Sync port to avoid mismatches if GreenMail restarted
+            javaMailSender.setPort(greenMail.getSmtp().getPort());
+        }
     }
 
     @Test
@@ -45,7 +49,7 @@ class EmailIntegrationTest extends BaseIntegrationTest {
 
         // Assert: GreenMail capturou a mensagem
         // Aguarda até 5s pela chegada de 1 email
-        assertThat(greenMail.waitForIncomingEmail(5000, 1)).isTrue();
+        aguardarEmail(1);
         
         MimeMessage[] mensagens = greenMail.getReceivedMessages();
         assertThat(mensagens).hasSize(1);

@@ -239,7 +239,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
                         // Assert: Verificar envio de e-mail (GreenMail herdado de BaseIntegrationTest)
                         // Esperamos pelo menos 2 e-mails: Início de Processo e Aceite
-                        assertThat(greenMail.waitForIncomingEmail(5000, 2)).isTrue();
+                        aguardarEmail(2);
                         assertThat(algumEmailContem("submetid")).isTrue();
                 }
         }
