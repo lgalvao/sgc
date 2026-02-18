@@ -29,6 +29,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
+// TODO muitas verificações de nulo nessa classe nao fazem sentido algum. A garantia de nulidade vem antes e ja teria quebrado ao chegar aqui.
 public class Subprocesso extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "processo_codigo", nullable = false)

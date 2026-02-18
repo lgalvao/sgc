@@ -1,11 +1,7 @@
 package sgc.integracao.config;
 
-import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.ServerSetupTest;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import jakarta.mail.internet.MimeMessage;
+import com.icegreen.greenmail.util.ServerSetup;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,31 +12,20 @@ import java.util.Properties;
 @TestConfiguration
 public class EmailTestConfig {
 
-    private GreenMail greenMail;
-
-    @PostConstruct
-    public void startGreenMail() {
-        greenMail = new GreenMail(ServerSetupTest.SMTP);
-        greenMail.start();
-    }
-
-    @PreDestroy
-    public void stopGreenMail() {
-        if (greenMail != null) {
-            greenMail.stop();
-        }
-    }
-
-    @Bean
+    @Bean(destroyMethod = "stop")
     public GreenMail greenMail() {
-        return greenMail;
+        // Usa porta dinâmica (0) para evitar conflitos entre contextos de teste
+        ServerSetup setup = new ServerSetup(0, null, ServerSetup.PROTOCOL_SMTP);
+        GreenMail gm = new GreenMail(setup);
+        gm.start();
+        return gm;
     }
 
     @Bean
-    public JavaMailSender javaMailSender() {
+    public JavaMailSender javaMailSender(GreenMail greenMail) {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("localhost");
-        mailSender.setPort(ServerSetupTest.SMTP.getPort());
+        mailSender.setPort(greenMail.getSmtp().getPort());
         mailSender.setProtocol("smtp");
 
         Properties props = mailSender.getJavaMailProperties();
@@ -49,23 +34,5 @@ public class EmailTestConfig {
         props.put("mail.debug", "false");
 
         return mailSender;
-    }
-
-    /**
-     * Helper para limpar as mensagens recebidas entre os testes.
-     */
-    public void limparMensagens() {
-        try {
-            greenMail.purgeEmailFromAllMailboxes();
-        } catch (FolderException e) {
-            throw new RuntimeException("Falha ao limpar e-mails do GreenMail", e);
-        }
-    }
-
-    /**
-     * Retorna as mensagens recebidas.
-     */
-    public MimeMessage[] getMensagensRecebidas() {
-        return greenMail.getReceivedMessages();
     }
 }

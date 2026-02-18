@@ -163,9 +163,6 @@ class GerenciadorJwtTest {
         // Simular NPE ao acessar o segredo durante a validação
         when(jwtProperties.secret()).thenReturn(null);
 
-        // O token pode ser qualquer string, pois o erro vai ocorrer ao tentar obter a chave (antes do parse)
-        // ou durante o parse se o mock for chamado lá.
-        // O método validarToken chama getSigningKey() -> jwtProperties.secret().
 
         Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken("any.token");
 
@@ -233,10 +230,6 @@ class GerenciadorJwtTest {
         }
 
         private GerenciadorJwt criarService() {
-            // Reusing the fields from outer class would be cleaner but they are mocks.
-            // The gap test mocked properties manually.
-            // Here we can use the Mockito mocks but we need to configure them for this "new" instance logic
-            // Or just create new mocks to be safe and isolated like the original test.
             JwtProperties props = Mockito.mock(JwtProperties.class);
             when(props.secret()).thenReturn(SECRET);
             return new GerenciadorJwt(props, Mockito.mock(Environment.class));

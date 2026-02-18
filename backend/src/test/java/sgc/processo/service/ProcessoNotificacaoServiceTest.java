@@ -62,14 +62,7 @@ class ProcessoNotificacaoServiceTest {
     @Mock
     private AlertaFacade servicoAlertas;
 
-    private void stubTemplatesIniciado() {
-        lenient().when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
-    }
 
-    private void stubTemplatesFinalizado() {
-        lenient().when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
-        lenient().when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any())).thenReturn("corpo");
-    }
 
     private Processo criarProcesso(Long codigo) {
         Processo p = new Processo();
@@ -84,6 +77,7 @@ class ProcessoNotificacaoServiceTest {
         return Unidade.builder()
                 .codigo(codigo)
                 .tipo(tipo)
+                .sigla("U" + codigo)
                 .situacao(SituacaoUnidade.ATIVA)
                 .build();
     }
@@ -91,7 +85,7 @@ class ProcessoNotificacaoServiceTest {
     @Test
     @DisplayName("Deve disparar e-mails ao iniciar processo")
     void deveDispararEmailsAoIniciar() {
-        stubTemplatesIniciado();
+        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(1L);
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
 
@@ -117,7 +111,7 @@ class ProcessoNotificacaoServiceTest {
 
         service.notificarInicioProcesso(1L, List.of());
 
-        verify(notificacaoEmailService).enviarEmailHtml(eq("t@t.com"), anyString(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("u1@tre-pe.jus.br"), anyString(), any());
         verify(notificacaoEmailService).enviarEmailHtml(eq("s@s.com"), anyString(), any());
     }
 
@@ -136,7 +130,6 @@ class ProcessoNotificacaoServiceTest {
     @Test
     @DisplayName("Deve cobrir exceções de tipo de unidade no início")
     void deveCobrirExcecaoTipoUnidadeInvalido() {
-        stubTemplatesIniciado();
         Processo processo = criarProcesso(1L);
         Subprocesso s = new Subprocesso();
         Unidade u = criarUnidade(1L, TipoUnidade.SEM_EQUIPE);
@@ -163,7 +156,7 @@ class ProcessoNotificacaoServiceTest {
     @Test
     @DisplayName("Deve cobrir branches de substitutos")
     void deveCobrirBranchesSubstitutos() {
-        stubTemplatesIniciado();
+        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(1L);
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
 
@@ -190,14 +183,14 @@ class ProcessoNotificacaoServiceTest {
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", titular, "S", subEmailBlank));
         service.notificarInicioProcesso(1L, List.of());
 
-        verify(notificacaoEmailService, times(3)).enviarEmailHtml(eq("t@mail.com"), anyString(), anyString());
-        verify(notificacaoEmailService, never()).enviarEmailHtml(eq(null), anyString(), anyString());
+        verify(notificacaoEmailService, times(3)).enviarEmailHtml(contains("@tre-pe.jus.br"), anyString(), anyString());
+        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("t@mail.com"), anyString(), anyString());
     }
 
     @Test
     @DisplayName("Deve cobrir branches na finalização de processo")
     void deveCobrirBranchesFinalizacao() {
-        stubTemplatesFinalizado();
+        when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(2L);
         when(processoRepo.findById(2L)).thenReturn(Optional.of(processo));
 
@@ -222,8 +215,10 @@ class ProcessoNotificacaoServiceTest {
         
         // 1. Intermediária sem subordinadas (log.warn)
         service.notificarFinalizacaoProcesso(2L);
-        verify(notificacaoEmailService, times(1)).enviarEmailHtml(eq("op@mail.com"), anyString(), any());
+        // Operacional recebe (unit email), Intermediaria não (não tem subordinadas válidas no teste)
+        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("op@mail.com"), anyString(), any());
         verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("op@tre-pe.jus.br"), anyString(), any());
 
         // 2. Intermediária com subordinadas (sucesso)
         Unidade sub = criarUnidade(21L, TipoUnidade.OPERACIONAL);
@@ -245,13 +240,15 @@ class ProcessoNotificacaoServiceTest {
         when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(operacional, intermediaria, sub));
 
         service.notificarFinalizacaoProcesso(2L);
-        verify(notificacaoEmailService).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
+
+        // Unit emails: op@ is sent in BOTH calls (part 1 and 2), int@ only in part 2
+        verify(notificacaoEmailService, times(2)).enviarEmailHtml(eq("op@tre-pe.jus.br"), anyString(), any());
+        verify(notificacaoEmailService, times(1)).enviarEmailHtml(eq("int@tre-pe.jus.br"), anyString(), any());
     }
 
     @Test
     @DisplayName("Deve cobrir exceção para unidade SEM_EQUIPE no envio de email")
     void deveCobrirExcecaoSemEquipe() {
-        stubTemplatesIniciado();
         Processo processo = criarProcesso(1L);
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
 
@@ -267,13 +264,15 @@ class ProcessoNotificacaoServiceTest {
 
         service.notificarInicioProcesso(1L, List.of());
 
+        service.notificarInicioProcesso(1L, List.of());
+
+        // Deve logar erro e não enviar
         verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
     @DisplayName("Deve cobrir else implícito na finalização (tipo desconhecido)")
     void deveCobrirElseImplicitoFinalizacao() {
-        stubTemplatesFinalizado();
         Processo processo = criarProcesso(2L);
         when(processoRepo.findById(2L)).thenReturn(Optional.of(processo));
 
@@ -322,7 +321,7 @@ class ProcessoNotificacaoServiceTest {
     @Test
     @DisplayName("Deve capturar exceção no catch interno do loop de e-mails")
     void deveCapturarExcecaoNoCatchInterno() {
-        stubTemplatesIniciado();
+        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(1L);
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
 
@@ -340,13 +339,14 @@ class ProcessoNotificacaoServiceTest {
 
         service.notificarInicioProcesso(1L, List.of());
 
-        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("u10@tre-pe.jus.br"), anyString(), any());
     }
 
+    // Teste de defesa: garante que se não houver responsável (situação anômala), o envio é ignorado sem erro
+    // TODO me parece um teste de situacao impossivel!
     @Test
     @DisplayName("Deve ignorar participante sem responsável ou titular ao finalizar")
     void deveIgnorarParticipanteSemResponsavelOuTitularAoFinalizar() {
-        stubTemplatesFinalizado();
         Processo processo = criarProcesso(3L);
         when(processoRepo.findById(3L)).thenReturn(Optional.of(processo));
 
@@ -364,7 +364,8 @@ class ProcessoNotificacaoServiceTest {
 
         service.notificarFinalizacaoProcesso(3L);
 
-        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("u1@tre-pe.jus.br"), anyString(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("u2@tre-pe.jus.br"), anyString(), any());
     }
 
     @Test
@@ -382,7 +383,7 @@ class ProcessoNotificacaoServiceTest {
     @Test
     @DisplayName("Deve ignorar e-mail se titular inválido ao iniciar")
     void deveIgnorarEmailSeTitularInvalidoAoIniciar() {
-        stubTemplatesIniciado();
+        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(1L);
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
 
@@ -417,13 +418,16 @@ class ProcessoNotificacaoServiceTest {
 
         service.notificarInicioProcesso(1L, List.of());
 
-        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+        // Deve enviar para os e-mails das 3 unidades
+        verify(notificacaoEmailService).enviarEmailHtml(eq("u1@tre-pe.jus.br"), anyString(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("u2@tre-pe.jus.br"), anyString(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("u3@tre-pe.jus.br"), anyString(), any());
     }
 
     @Test
     @DisplayName("Deve cobrir tipo INTEROPERACIONAL na finalização")
     void deveCobrirTipoInteroperacionalNaFinalizacao() {
-        stubTemplatesFinalizado();
+        when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(5L);
         when(processoRepo.findById(5L)).thenReturn(Optional.of(processo));
 
@@ -442,13 +446,14 @@ class ProcessoNotificacaoServiceTest {
 
         service.notificarFinalizacaoProcesso(5L);
 
-        verify(notificacaoEmailService).enviarEmailHtml(eq("inter@mail.com"), anyString(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("inter@tre-pe.jus.br"), anyString(), any());
     }
 
     @Test
     @DisplayName("Deve cobrir exceção ao enviar email para unidade intermediária")
     void deveCobrirExcecaoAoEnviarEmailUnidadeIntermediaria() {
-        stubTemplatesFinalizado();
+        when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
+        when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(6L);
         when(processoRepo.findById(6L)).thenReturn(Optional.of(processo));
 
@@ -478,14 +483,14 @@ class ProcessoNotificacaoServiceTest {
         service.notificarFinalizacaoProcesso(6L);
 
         // Deve ter tentado enviar para operacional (sucesso) mas não para intermediária (exceção)
-        verify(notificacaoEmailService).enviarEmailHtml(eq("sub@mail.com"), anyString(), any());
-        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("sub@tre-pe.jus.br"), anyString(), any());
+        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@tre-pe.jus.br"), anyString(), any());
     }
 
     @Test
     @DisplayName("Deve cobrir substituto com email null")
     void deveCobrirSubstitutoComEmailNull() {
-        stubTemplatesIniciado();
+        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(7L);
         when(processoRepo.findById(7L)).thenReturn(Optional.of(processo));
 
@@ -512,14 +517,13 @@ class ProcessoNotificacaoServiceTest {
 
         service.notificarInicioProcesso(7L, List.of());
 
-        verify(notificacaoEmailService).enviarEmailHtml(eq("t@mail.com"), anyString(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("u1@tre-pe.jus.br"), anyString(), any());
         verify(notificacaoEmailService, never()).enviarEmailHtml(eq(null), anyString(), anyString());
     }
 
     @Test
     @DisplayName("Deve cobrir responsáveis sem titulares na finalização")
     void deveCobrirResponsaveisSemTitularesNaFinalizacao() {
-        stubTemplatesFinalizado();
         Processo processo = criarProcesso(8L);
         when(processoRepo.findById(8L)).thenReturn(Optional.of(processo));
 
@@ -545,14 +549,13 @@ class ProcessoNotificacaoServiceTest {
     @Test
     @DisplayName("Deve cobrir catch de exceção durante envio de email")
     void deveCobrirCatchExcecaoDuranteEnvioEmail() {
-        stubTemplatesIniciado();
+        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(9L);
         when(processoRepo.findById(9L)).thenReturn(Optional.of(processo));
 
-        // SEM_EQUIPE lançará exceção em criarCorpoEmailPorTipo
-        Unidade u = criarUnidade(1L, TipoUnidade.SEM_EQUIPE);
-        u.setSigla("SEM_EQUIPE");
-        u.setNome("Unidade Sem Equipe");
+        Unidade u = criarUnidade(1L, TipoUnidade.OPERACIONAL);
+        u.setSigla("OP");
+        u.setNome("Unidade Op");
         Subprocesso s = new Subprocesso();
         s.setUnidade(u);
 
@@ -567,16 +570,18 @@ class ProcessoNotificacaoServiceTest {
         Usuario titular = Usuario.builder().tituloEleitoral("T1").email("t@mail.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", titular));
 
+        // Força erro no envio
+        doThrow(new RuntimeException("Fail")).when(notificacaoEmailService).enviarEmailHtml(eq("op@tre-pe.jus.br"), anyString(), anyString());
+
         service.notificarInicioProcesso(9L, List.of());
 
-        // Não deve enviar email pois exceção foi capturada
-        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+        // Verifica que o catch capturou a exceção e logou, mas tentou enviar
+        verify(notificacaoEmailService).enviarEmailHtml(eq("op@tre-pe.jus.br"), anyString(), anyString());
     }
 
     @Test
     @DisplayName("Deve cobrir intermediária sem subordinadas diretas filtradas")
     void deveCobrirIntermediariaSemSubordinadasFiltradas() {
-        stubTemplatesFinalizado();
         Processo processo = criarProcesso(10L);
         when(processoRepo.findById(10L)).thenReturn(Optional.of(processo));
 
@@ -611,11 +616,11 @@ class ProcessoNotificacaoServiceTest {
         service.notificarFinalizacaoProcesso(10L);
 
         // Deve enviar para operacionais
-        verify(notificacaoEmailService).enviarEmailHtml(eq("out@mail.com"), anyString(), any());
-        verify(notificacaoEmailService).enviarEmailHtml(eq("outro_sup@mail.com"), anyString(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("outra@tre-pe.jus.br"), anyString(), any());
+        verify(notificacaoEmailService).enviarEmailHtml(eq("outro_sup@tre-pe.jus.br"), anyString(), any());
 
         // Não deve enviar para intermediária pois não há subordinada que tenha ela como superior imediata
-        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
+        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@tre-pe.jus.br"), anyString(), any());
     }
     @Nested
     @DisplayName("Cobertura Extra Isolada")
@@ -624,7 +629,7 @@ class ProcessoNotificacaoServiceTest {
         @Test
         @DisplayName("aoIniciarProcesso com unidade INTERMEDIARIA envia email apenas para titular se substituto ausente")
         void aoIniciarProcesso_Intermediaria() {
-            stubTemplatesIniciado();
+            when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
             Long codProcesso = 1L;
 
             Processo processo = new Processo();
@@ -661,7 +666,7 @@ class ProcessoNotificacaoServiceTest {
             
             service.notificarInicioProcesso(codProcesso, List.of());
 
-            verify(notificacaoEmailService).enviarEmailHtml(eq("email@test.com"), anyString(), anyString());
+            verify(notificacaoEmailService).enviarEmailHtml(eq("ui@tre-pe.jus.br"), anyString(), anyString());
         }
 
         @Test
@@ -728,7 +733,8 @@ class ProcessoNotificacaoServiceTest {
 
             service.notificarInicioProcesso(codProcesso, List.of());
 
-            verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+            // Unidade criada acima com id 99 e sigla U99
+            verify(notificacaoEmailService).enviarEmailHtml(eq("u99@tre-pe.jus.br"), anyString(), any());
         }
 
         @Test
@@ -764,7 +770,7 @@ class ProcessoNotificacaoServiceTest {
 
             service.notificarFinalizacaoProcesso(codProcesso);
 
-            verify(notificacaoEmailService, never()).enviarEmailHtml(eq("t1@test.com"), anyString(), anyString());
+            verify(notificacaoEmailService, never()).enviarEmailHtml(eq("ui@tre-pe.jus.br"), anyString(), anyString());
         }
 
         @Test

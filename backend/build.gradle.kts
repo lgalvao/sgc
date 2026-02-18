@@ -131,10 +131,10 @@ tasks.withType<Test> {
 
     testLogging {
         events(TestLogEvent.SKIPPED, TestLogEvent.FAILED, TestLogEvent.STANDARD_ERROR)
-        exceptionFormat = TestExceptionFormat.FULL
+        exceptionFormat = TestExceptionFormat.SHORT
         showStackTraces = true
         showCauses = true
-        showStandardStreams = true
+        showStandardStreams = false
     }
 
     val slowTests = mutableListOf<Pair<String, Long>>()
@@ -318,18 +318,14 @@ pitest {
         "sgc.config.*",              // Configurações Spring
         "sgc.*Exception",            // Classes de exceção
         "sgc.*Erro*",                // Todas as classes de erro
-        "sgc.*Mapper",               // Mappers MapStruct (gerados)
         "sgc.*MapperImpl",           // Mappers MapStruct (gerados)
-        "sgc.*.dto.*",               // DTOs (baixa lógica)
         "sgc.*Request",              // Request DTOs
         "sgc.*Response",             // Response DTOs
         "sgc.*Query",                // Query objects
         "sgc.*Command",              // Command objects
         "sgc.*View",                 // View objects
-        "sgc.*Event*",               // Event classes (domain events)
+        "sgc.*Evento*",               // Event classes (domain events)
         "sgc.Sgc",                   // Classe main
-        "sgc.SgcTest",               // Classe de teste da main
-        "sgc.arquitetura.*"          // Architecture tests
     ))
     
     // Métodos ignorados (getters/setters já são excluídos por padrão)
@@ -344,7 +340,6 @@ pitest {
     timestampedReports.set(false)
     threads.set(Runtime.getRuntime().availableProcessors())
     timeoutFactor.set(BigDecimal("5.0"))
-    // timeoutConstant.set(10000)
     verbose.set(true)
     failWhenNoMutations.set(false)
     

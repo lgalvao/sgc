@@ -108,8 +108,6 @@ public class UnidadeTestBuilder {
 
     public Unidade build() {
         Unidade unidade = new Unidade();
-        // Try to set numeric id if codigo is numeric; otherwise prefer leaving id null
-        // and rely on sigla to identify the unit in tests that use human codes like "ADMIN".
         if (codigo != null) {
             try {
                 Long codigoLong = Long.parseLong(codigo);

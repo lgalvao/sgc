@@ -3,6 +3,7 @@ package sgc.subprocesso.service.notificacao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -64,6 +65,7 @@ public class SubprocessoEmailService {
 
     private void notificarResponsaveisPessoais(Unidade unidade, String assunto, String corpo) {
         UnidadeResponsavelDto responsavel = unidadeFacade.buscarResponsavelUnidade(unidade.getCodigo());
+        // TODO responsavel nunca pode ser nulo. É invariante do sistema, garantido pelas views.
         if (responsavel == null) return;
 
         // Se houver substituto, ele é o responsável atual e deve receber no seu e-mail pessoal
@@ -80,7 +82,7 @@ public class SubprocessoEmailService {
 
     private Map<String, Object> criarVariaveisTemplateDireto(Subprocesso sp, 
                                                             Unidade unidadeOrigem, Unidade unidadeDestino, 
-                                                            String observacoes) {
+                                                            @Nullable String observacoes) {
         Map<String, Object> variaveis = new HashMap<>();
 
         variaveis.put("siglaUnidade", sp.getUnidade().getSigla());

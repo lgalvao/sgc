@@ -172,8 +172,10 @@ public class ProcessoFacade {
         // Enviar para o titular da unidade
         try {
             String tituloTitular = unidade.getTituloTitular();
+            // TODO titulo do titular (na verdade de nenhum usuario, pode ser nulo: é invariante!)
             if (tituloTitular != null) {
                 Usuario titular = usuarioService.buscarPorLogin(tituloTitular);
+                // TODO titulo de nenhuma unidade pode ser nulo. Invariante!
                 if (titular != null && titular.getEmail() != null && !titular.getEmail().isBlank()) {
                     notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
                 } else {
@@ -235,10 +237,8 @@ public class ProcessoFacade {
         List<Long> unidadesHomologarCadastro = new ArrayList<>();
         List<Long> unidadesHomologarValidacao = new ArrayList<>();
 
-        if (req.unidadeCodigos().isEmpty()) {
-            return;
-        }
-
+        if (req.unidadeCodigos().isEmpty()) return;
+        
         List<Subprocesso> subprocessos = subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
 
         for (Subprocesso sp : subprocessos) {

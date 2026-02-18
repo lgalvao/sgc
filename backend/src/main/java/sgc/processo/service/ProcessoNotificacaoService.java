@@ -135,14 +135,29 @@ public class ProcessoNotificacaoService {
             List<Unidade> subordinadas) {
         try {
             UnidadeResponsavelDto responsavel = responsaveis.get(unidade.getCodigo());
-            Usuario titular = usuarios.get(responsavel.titularTitulo());
-            String emailTitular = titular.getEmail();
+            // TODO nem responsavel nem sigla podem ser nulos nunca. É invariante do sistema!
+            if (responsavel == null || unidade.getSigla() == null) {
+                return;
+            }
+
             TipoUnidade tipoUnidade = unidade.getTipo();
+            String emailUnidade = String.format("%s@tre-pe.jus.br", unidade.getSigla().toLowerCase());
 
             if (tipoUnidade == OPERACIONAL || tipoUnidade == INTEROPERACIONAL || tipoUnidade == RAIZ) {
-                enviarEmailUnidadeFinal(processo, unidade, emailTitular);
+                enviarEmailUnidadeFinal(processo, unidade, emailUnidade);
             } else if (tipoUnidade == INTERMEDIARIA) {
-                enviarEmailUnidadeIntermediaria(processo, unidade, emailTitular, subordinadas);
+                enviarEmailUnidadeIntermediaria(processo, unidade, emailUnidade, subordinadas);
+            }
+
+            // TODO estranho isso. O responsavel é será definido pela view. Ele pode ser o titular, uma pesssoa substituta ou uma pesoa designaca numa atribuição temporaria. Sempre vai ser preenchido. Entao o titulo nunca pode ser nulo!
+            if (responsavel.substitutoTitulo() != null) {
+                String assunto = String.format("SGC: Finalização do processo %s", processo.getDescricao());
+
+                // Simplesmente reusa a lógica de corpo se for operacional
+                String html = notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(
+                        unidade.getSigla(),
+                        processo.getDescricao());
+                enviarEmailParaSubstituto(responsavel.substitutoTitulo(), usuarios, assunto, html, unidade.getNome());
             }
         } catch (Exception e) {
             log.error("Falha ao preparar notificação para unidade {} no processo {}: {}",
@@ -152,15 +167,21 @@ public class ProcessoNotificacaoService {
 
     private void enviarEmailUnidadeFinal(Processo processo, Unidade unidade, String email) {
         String assunto = String.format("SGC: Finalização do processo %s", processo.getDescricao());
+
         String html = notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(
                 unidade.getSigla(),
                 processo.getDescricao());
+
         notificacaoEmailService.enviarEmailHtml(email, assunto, html);
         log.info("E-mail de finalização enviado para {}", unidade.getSigla());
     }
 
-    private void enviarEmailUnidadeIntermediaria(Processo processo, Unidade unidade, String email,
+    private void enviarEmailUnidadeIntermediaria(
+            Processo processo, 
+            Unidade unidade, 
+            String email,
             List<Unidade> subordinadas) {
+
         List<String> siglasSubordinadas = subordinadas.stream()
                 .filter(u -> u.getUnidadeSuperior() != null
                         && u.getUnidadeSuperior().getCodigo().equals(unidade.getCodigo()))
@@ -168,6 +189,7 @@ public class ProcessoNotificacaoService {
                 .sorted()
                 .toList();
 
+        // TODO nenhuma sentido isso: se uma unidade é intermediaria TEM que ter subordinadas! Invariante. Nao era para ter chegado inconsistente aqui!
         if (siglasSubordinadas.isEmpty()) {
             log.warn("Nenhuma unidade subordinada encontrada para notificar a unidade intermediária {}",
                     unidade.getSigla());
@@ -176,6 +198,7 @@ public class ProcessoNotificacaoService {
 
         String assunto = String.format("SGC: Finalização do processo %s em unidades subordinadas",
                 processo.getDescricao());
+
         String html = notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(unidade.getSigla(),
                 processo.getDescricao(), siglasSubordinadas);
 
@@ -204,7 +227,6 @@ public class ProcessoNotificacaoService {
 
             String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
 
-            // Enviar para o e-mail da unidade (Novo requisito)
             String emailUnidade = String.format("%s@tre-pe.jus.br", unidade.getSigla().toLowerCase());
             notificacaoEmailService.enviarEmailHtml(emailUnidade, assunto, corpoHtml);
             log.info("E-mail enviado para unidade {} ({})", unidade.getSigla(), emailUnidade);

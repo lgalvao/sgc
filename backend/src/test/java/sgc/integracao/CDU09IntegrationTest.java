@@ -147,7 +147,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         assertThat(movs.getFirst().getUnidadeDestino().getSigla()).isEqualTo("COSIS");
 
         // 12. Notificação por E-mail (Superior da 8 é COSIS)
-        verify(notificacaoEmailService, atLeastOnce()).enviarEmail(any(), any(), any());
+        verify(notificacaoEmailService, atLeastOnce()).enviarEmailHtml(any(), any(), any());
 
         // 13. Criação de Alerta para Unidade Superior (Async)
         final Long processoCodigo = spEtapa3.getProcesso().getCodigo();

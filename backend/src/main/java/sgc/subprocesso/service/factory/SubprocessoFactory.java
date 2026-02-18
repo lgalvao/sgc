@@ -29,10 +29,6 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
  *
  * <p>Encapsula a lógica de construção de novos subprocessos com suas
  * dependências e configurações iniciais.
- *
- * <p><b>Nota arquitetural:</b> Mantido público temporariamente devido a uso em
- * {@link sgc.processo.service.ProcessoInicializador}. Considerar refatorar
- * para expor via Facade no futuro.
  */
 @Service
 @RequiredArgsConstructor
