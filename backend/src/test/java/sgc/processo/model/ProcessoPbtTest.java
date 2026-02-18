@@ -6,11 +6,8 @@ import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ProcessoPbtTest {

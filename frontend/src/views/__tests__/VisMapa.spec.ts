@@ -15,10 +15,30 @@ vi.mock("@/services/unidadeService", () => ({
     buscarUnidadePorSigla: vi.fn().mockResolvedValue({ sigla: 'TEST', nome: 'Unidade' }),
 }));
 vi.mock("@/services/processoService", () => ({
-    obterDetalhesProcesso: vi.fn().mockResolvedValue({ unidades: [] }),
+    obterDetalhesProcesso: vi.fn().mockResolvedValue({ 
+        codigo: 1,
+        unidades: [
+            {
+                sigla: 'TEST',
+                codUnidade: 10,
+                codSubprocesso: 10,
+                situacaoSubprocesso: 'MAPEAMENTO_MAPA_DISPONIBILIZADO',
+            }
+        ]
+    }),
 }));
 vi.mock("@/services/subprocessoService", () => ({
-    buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({ permissoes: {} }),
+    buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({ 
+        permissoes: {
+            podeValidarMapa: true,
+            podeApresentarSugestoes: true,
+            podeAceitarMapa: true,
+            podeDevolverMapa: true,
+            podeHomologarMapa: true,
+            podeVerPagina: true,
+            podeVisualizarMapa: true,
+        }
+    }),
 }));
 vi.mock("@/services/mapaService", () => ({
     obterMapaVisualizacao: vi.fn().mockResolvedValue({ competencias: [] }),
@@ -418,10 +438,10 @@ describe("VisMapa.vue", () => {
 
         // Verificar que o modal pode ser aberto (teste básico)
         await btn.trigger("click");
-        await wrapper.vm.$nextTick();
+        await flushPromises();
 
         // O modal abre mesmo sem análises (mostra mensagem "Nenhuma análise")
-        expect(wrapper.text()).toContain("Fechar");
+        expect(wrapper.vm.mostrarModalHistorico).toBe(true);
     });
 
     it("view suggestions (GESTOR)", async () => {
@@ -630,6 +650,7 @@ describe("VisMapa.vue", () => {
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-mapa-historico-gestor"]').trigger("click");
+        await flushPromises();
         expect(wrapper.vm.mostrarModalHistorico).toBe(true);
 
         const modal = wrapper.findComponent({ name: 'HistoricoAnaliseModal' });

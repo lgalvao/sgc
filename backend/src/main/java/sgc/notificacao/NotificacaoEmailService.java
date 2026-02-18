@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 @Primary
 @RequiredArgsConstructor
 @Slf4j
-@Profile("!test & !e2e")
+@Profile({"!test&!e2e", "email-test"})
 public class NotificacaoEmailService {
     private static final Pattern PADRAO_EMAIL = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 

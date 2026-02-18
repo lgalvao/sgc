@@ -71,6 +71,7 @@ dependencies {
     testImplementation("nl.jqno.equalsverifier:equalsverifier:4.3.1")
     testImplementation("io.rest-assured:rest-assured-all:6.0.0")
     testImplementation("org.apache.groovy:groovy-all:5.0.4")
+    testImplementation("com.icegreen:greenmail-junit5:2.1.3")
     
     // Testes de Mutação
     testImplementation("org.pitest:pitest-junit5-plugin:1.2.3")
@@ -130,7 +131,7 @@ tasks.withType<Test> {
 
     testLogging {
         events(TestLogEvent.SKIPPED, TestLogEvent.FAILED, TestLogEvent.STANDARD_ERROR)
-        exceptionFormat = TestExceptionFormat.SHORT
+        exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
         showStandardStreams = false

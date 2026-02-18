@@ -31,7 +31,7 @@ public class TestSecurityConfig {
     @Bean
     @Primary
     @Profile({"test"})
-    public SecurityFilterChain testFilterChain(HttpSecurity http, @Autowired(required = false) FiltroJwt filtroJwt) throws Exception {
+    public SecurityFilterChain testFilterChain(HttpSecurity http, @Autowired(required = false) FiltroJwt filtroJwt) {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/usuarios/autenticar", "/api/usuarios/autorizar", "/api/usuarios/entrar").permitAll()

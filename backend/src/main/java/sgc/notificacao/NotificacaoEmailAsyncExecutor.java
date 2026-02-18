@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Profile("!test & !e2e & !secure-test")
+@Profile({"!test&!e2e&!secure-test", "email-test"})
 public class NotificacaoEmailAsyncExecutor {
     private static final int MAX_TENTATIVAS = 3;
     private static final long ESPERA_ENTRE_TENTATIVAS_MS = 1000;

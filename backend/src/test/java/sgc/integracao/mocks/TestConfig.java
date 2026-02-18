@@ -17,6 +17,7 @@ import java.util.concurrent.Executor;
 @Configuration
 public class TestConfig implements AsyncConfigurer {
     @Bean
+    @Profile("!email-test")
     public JavaMailSender javaMailSender() {
         return Mockito.mock(JavaMailSender.class);
     }
@@ -28,7 +29,7 @@ public class TestConfig implements AsyncConfigurer {
 
     @Bean
     @Primary
-    @Profile({"test", "e2e", "secure-test"})
+    @Profile({"test&!email-test", "e2e&!email-test", "secure-test&!email-test"})
     public NotificacaoEmailAsyncExecutor notificacaoEmailAsyncExecutor() {
         return Mockito.mock(NotificacaoEmailAsyncExecutor.class);
     }
@@ -38,7 +39,7 @@ public class TestConfig implements AsyncConfigurer {
      */
     @Override
     @Bean(name = "taskExecutor")
-    @Profile({"test", "e2e", "secure-test"})
+    @Profile({"test", "e2e", "secure-test", "email-test"})
     public Executor getAsyncExecutor() {
         return new SyncTaskExecutor();
     }

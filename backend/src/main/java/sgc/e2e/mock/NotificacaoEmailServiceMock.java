@@ -13,7 +13,7 @@ import sgc.notificacao.NotificacaoEmailService;
  */
 @Service
 @Primary
-@Profile({"test", "e2e"})
+@Profile({"test&!email-test", "e2e&!email-test"})
 @Slf4j
 public class NotificacaoEmailServiceMock extends NotificacaoEmailService {
     @SuppressWarnings("ConstantConditions")
@@ -24,9 +24,11 @@ public class NotificacaoEmailServiceMock extends NotificacaoEmailService {
 
     @Override
     public void enviarEmail(@NonNull String para, @NonNull String assunto, @NonNull String corpo) {
+      // TODO document why this method is empty
     }
 
     @Override
     public void enviarEmailHtml(@NonNull String para, @NonNull String assunto, @NonNull String corpoHtml) {
+      // TODO document why this method is empty
     }
 }
