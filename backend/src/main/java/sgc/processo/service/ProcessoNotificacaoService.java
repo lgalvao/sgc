@@ -195,7 +195,6 @@ public class ProcessoNotificacaoService {
         try {
             UnidadeResponsavelDto responsavel = responsaveis.get(codigoUnidade);
             String nomeUnidade = unidade.getNome();
-            Usuario titular = usuarios.get(responsavel.titularTitulo());
             String assunto = switch (unidade.getTipo()) {
                 case OPERACIONAL, INTEROPERACIONAL, RAIZ -> "Processo Iniciado - %s".formatted(processo.getDescricao());
                 case INTERMEDIARIA ->
@@ -204,11 +203,6 @@ public class ProcessoNotificacaoService {
             };
 
             String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
-            
-            if (titular != null && !titular.getEmail().isBlank()) {
-                notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
-                log.info("E-mail pessoal enviado a titular {} ({})", unidade.getSigla(), titular.getEmail());
-            }
 
             // Enviar para o e-mail da unidade (Novo requisito)
             String emailUnidade = String.format("%s@tre-pe.jus.br", unidade.getSigla().toLowerCase());

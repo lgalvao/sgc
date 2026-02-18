@@ -60,11 +60,6 @@ public abstract class BaseIntegrationTest {
                 return true;
             }
         }
-        System.out.println("DEBUG: Email não encontrado contendo: " + busca);
-        System.out.println("DEBUG: Emails recebidos: " + mensagens.length);
-        for (var msg : mensagens) {
-            System.out.println("DEBUG: Subject: " + msg.getSubject());
-        }
         return false;
     }
 

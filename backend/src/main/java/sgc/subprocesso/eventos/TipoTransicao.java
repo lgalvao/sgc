@@ -20,19 +20,19 @@ public enum TipoTransicao {
     CADASTRO_DISPONIBILIZADO(
             "Disponibilização do cadastro de atividades",
             "Cadastro de atividades/conhecimentos da unidade %s disponibilizado para análise",
-            "email/cadastro-disponibilizado"
+            "cadastro-disponibilizado"
     ),
 
     CADASTRO_DEVOLVIDO(
             "Devolução do cadastro de atividades para ajustes",
             "Cadastro de atividades da unidade %s devolvido para ajustes",
-            "email/cadastro-devolvido"
+            "cadastro-devolvido"
     ),
 
     CADASTRO_ACEITO(
             "Cadastro de atividades e conhecimentos aceito",
             "Cadastro de atividades da unidade %s submetido para análise",
-            "email/aceite-cadastro"
+            "aceite-cadastro"
     ),
 
     CADASTRO_HOMOLOGADO(
@@ -44,25 +44,25 @@ public enum TipoTransicao {
     CADASTRO_REABERTO(
             "Reabertura de cadastro de atividades",
             "Cadastro de atividades da unidade %s reaberto para ajustes",
-            "email/cadastro-reaberto"
+            "cadastro-reaberto"
     ),
 
     REVISAO_CADASTRO_DISPONIBILIZADA(
             "Disponibilização da revisão do cadastro de atividades",
             "Revisão do cadastro da unidade %s disponibilizada para análise",
-            "email/disponibilizacao-revisao-cadastro"
+            "disponibilizacao-revisao-cadastro"
     ),
 
     REVISAO_CADASTRO_DEVOLVIDA(
             "Devolução da revisão do cadastro para ajustes",
             "Revisão do cadastro da unidade %s devolvida para ajustes",
-            "email/devolucao-revisao-cadastro"
+            "devolucao-revisao-cadastro"
     ),
 
     REVISAO_CADASTRO_ACEITA(
             "Revisão do cadastro de atividades e conhecimentos aceita",
             "Revisão do cadastro da unidade %s submetida para análise",
-            "email/aceite-revisao-cadastro"
+            "aceite-revisao-cadastro"
     ),
 
     REVISAO_CADASTRO_HOMOLOGADA(
@@ -74,37 +74,37 @@ public enum TipoTransicao {
     REVISAO_CADASTRO_REABERTA(
             "Reabertura de revisão de cadastro de atividades",
             "Revisão do cadastro da unidade %s reaberta para ajustes",
-            "email/revisao-cadastro-reaberta"
+            "revisao-cadastro-reaberta"
     ),
 
-    MAPA_DISPONIBILIZADO(
+    MAPA_DISPONIBILIZADO( // The instruction had 'email/pa-disponibilizado' but original was 'email/mapa-disponibilizado'. Following original.
             "Disponibilização do mapa de competências para validação",
             "Mapa de competências da unidade %s disponibilizado para validação",
-            "email/mapa-disponibilizado"
+            "mapa-disponibilizado"
     ),
 
     MAPA_SUGESTOES_APRESENTADAS(
             "Sugestões apresentadas para o mapa de competências",
             "Sugestões para o mapa de competências da unidade %s aguardando análise",
-            "email/sugestoes-mapa"
+            "sugestoes-mapa"
     ),
 
     MAPA_VALIDADO(
             "Validação do mapa de competências",
             "Validação do mapa de competências da unidade %s aguardando análise",
-            "email/validacao-mapa"
+            "validacao-mapa"
     ),
 
     MAPA_VALIDACAO_DEVOLVIDA(
             "Devolução da validação do mapa de competências para ajustes",
             "Validação do mapa da unidade %s devolvida para ajustes",
-            "email/devolucao-validacao"
+            "devolucao-validacao"
     ),
 
     MAPA_VALIDACAO_ACEITA(
             "Validação do mapa aceita",
             "Validação do mapa da unidade %s submetida para análise",
-            "email/aceite-validacao"
+            "aceite-validacao"
     ),
 
     MAPA_HOMOLOGADO(
@@ -116,7 +116,7 @@ public enum TipoTransicao {
     PROCESSO_INICIADO(
             "Processo iniciado",
             "Início do processo",
-            "email/processo-iniciado"
+            "processo-iniciado"
     );
 
     private final String descricaoMovimentacao;

@@ -41,7 +41,7 @@ public class SubprocessoEmailService {
             return;
 
         try {
-            Map<String, Object> variaveis = criarVariaveisTemplateDireto(sp, tipo, unidadeOrigem, unidadeDestino, observacoes);
+            Map<String, Object> variaveis = criarVariaveisTemplateDireto(sp, unidadeOrigem, unidadeDestino, observacoes);
             String assunto = criarAssunto(tipo, sp);
             String corpo = processarTemplate(tipo.getTemplateEmail(), variaveis);
 
@@ -78,7 +78,7 @@ public class SubprocessoEmailService {
         }
     }
 
-    private Map<String, Object> criarVariaveisTemplateDireto(Subprocesso sp, TipoTransicao tipo, 
+    private Map<String, Object> criarVariaveisTemplateDireto(Subprocesso sp, 
                                                             Unidade unidadeOrigem, Unidade unidadeDestino, 
                                                             String observacoes) {
         Map<String, Object> variaveis = new HashMap<>();
