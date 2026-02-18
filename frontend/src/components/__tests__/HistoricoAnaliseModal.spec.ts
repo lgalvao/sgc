@@ -8,14 +8,22 @@ const mockAnalises: any[] = [
     {
         dataHora: "2024-01-01T12:00:00Z",
         unidadeSigla: "TEST",
-        resultado: "APROVADO",
+        unidadeNome: "Unidade Teste",
+        acao: "ACEITE_MAPEAMENTO",
+        analistaUsuarioTitulo: "123456",
         observacoes: "Tudo certo.",
+        motivo: "",
+        tipo: "CADASTRO"
     },
     {
         dataHora: "2024-01-02T14:30:00Z",
-        unidade: "TEST2",
-        resultado: "REPROVADO",
+        unidadeSigla: "TEST2",
+        unidadeNome: "Unidade Teste 2",
+        acao: "DEVOLUCAO_MAPEAMENTO",
+        analistaUsuarioTitulo: "654321",
         observacoes: "Faltou informação.",
+        motivo: "Incompleto",
+        tipo: "CADASTRO"
     },
 ];
 
@@ -63,7 +71,8 @@ describe("HistoricoAnaliseModal", () => {
         const expectedDate = formatDateBR(new Date(mockAnalises[0].dataHora));
         expect(rows[0].text()).toContain(expectedDate);
         expect(rows[0].text()).toContain("TEST");
-        expect(rows[0].text()).toContain("APROVADO");
+        expect(rows[0].text()).toContain("ACEITE_MAPEAMENTO");
+        expect(rows[0].text()).toContain("123456");
         expect(rows[0].text()).toContain("Tudo certo.");
     });
 

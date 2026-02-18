@@ -207,58 +207,58 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         reabrirCadastro,
         reabrirRevisaoCadastro,
         buscarPermissoes,
-        disponibilizarCadastro: (codSubrocesso: number) =>
+        disponibilizarCadastro: (codSubprocesso: number) =>
             _executarAcao(
-                () => disponibilizarCadastro(codSubrocesso),
+                () => disponibilizarCadastro(codSubprocesso),
                 "Cadastro de atividades disponibilizado",
                 "Erro ao disponibilizar",
             ),
-        disponibilizarRevisaoCadastro: (codSubrocesso: number) =>
+        disponibilizarRevisaoCadastro: (codSubprocesso: number) =>
             _executarAcao(
-                () => disponibilizarRevisaoCadastro(codSubrocesso),
+                () => disponibilizarRevisaoCadastro(codSubprocesso),
                 "Revisão do cadastro de atividades disponibilizada",
                 "Erro ao disponibilizar",
             ),
-        devolverCadastro: (codSubrocesso: number, req: DevolverCadastroRequest) =>
+        devolverCadastro: (codSubprocesso: number, req: DevolverCadastroRequest) =>
             _executarAcao(
-                () => devolverCadastro(codSubrocesso, req),
+                () => devolverCadastro(codSubprocesso, req),
                 "Cadastro devolvido",
                 "Erro ao devolver",
             ),
-        aceitarCadastro: (codSubrocesso: number, req: AceitarCadastroRequest) =>
+        aceitarCadastro: (codSubprocesso: number, req: AceitarCadastroRequest) =>
             _executarAcao(
-                () => aceitarCadastro(codSubrocesso, req),
+                () => aceitarCadastro(codSubprocesso, req),
                 "Cadastro aceito",
                 "Erro ao aceitar",
             ),
-        homologarCadastro: async (codSubrocesso: number, req: HomologarCadastroRequest) => {
+        homologarCadastro: async (codSubprocesso: number, req: HomologarCadastroRequest) => {
             const ok = await _executarAcao(
-                () => homologarCadastro(codSubrocesso, req),
+                () => homologarCadastro(codSubprocesso, req),
                 "Cadastro homologado",
                 "Erro ao homologar",
             );
-            if (ok) await buscarSubprocessoDetalhe(codSubrocesso);
+            if (ok) await buscarSubprocessoDetalhe(codSubprocesso);
             return ok;
         },
-        devolverRevisaoCadastro: (codSubrocesso: number, req: DevolverCadastroRequest) =>
+        devolverRevisaoCadastro: (codSubprocesso: number, req: DevolverCadastroRequest) =>
             _executarAcao(
-                () => devolverRevisaoCadastro(codSubrocesso, req),
+                () => devolverRevisaoCadastro(codSubprocesso, req),
                 "Revisão devolvida",
                 "Erro ao devolver",
             ),
-        aceitarRevisaoCadastro: (codSubrocesso: number, req: AceitarCadastroRequest) =>
+        aceitarRevisaoCadastro: (codSubprocesso: number, req: AceitarCadastroRequest) =>
             _executarAcao(
-                () => aceitarRevisaoCadastro(codSubrocesso, req),
+                () => aceitarRevisaoCadastro(codSubprocesso, req),
                 "Revisão aceita",
                 "Erro ao aceitar",
             ),
-        homologarRevisaoCadastro: async (codSubrocesso: number, req: HomologarCadastroRequest) => {
+        homologarRevisaoCadastro: async (codSubprocesso: number, req: HomologarCadastroRequest) => {
             const ok = await _executarAcao(
-                () => homologarRevisaoCadastro(codSubrocesso, req),
+                () => homologarRevisaoCadastro(codSubprocesso, req),
                 "Revisão homologada",
                 "Erro ao homologar",
             );
-            if (ok) await buscarSubprocessoDetalhe(codSubrocesso);
+            if (ok) await buscarSubprocessoDetalhe(codSubprocesso);
             return ok;
         },
     };

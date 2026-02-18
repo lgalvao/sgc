@@ -197,27 +197,19 @@ export interface Movimentacao {
     usuario: Usuario;
 }
 
-export interface AnaliseValidacao {
-    codigo: number;
+export interface Analise {
     dataHora: string;
-    analista: string;
-    unidade: string;
-    acao: string;
     observacoes: string;
-    resultado: string;
-    codSubrocesso: number;
+    acao: string;
+    unidadeSigla: string;
+    unidadeNome: string;
+    analistaUsuarioTitulo: string;
+    motivo: string;
+    tipo: string;
 }
 
-export interface AnaliseCadastro {
-    codigo: number;
-    dataHora: string;
-    analista: string;
-    unidadeSigla: string;
-    acao: string;
-    observacoes: string;
-    resultado: string;
-    codSubrocesso: number;
-}
+export type AnaliseValidacao = Analise;
+export type AnaliseCadastro = Analise;
 
 export interface AtribuicaoTemporaria {
     codigo: number;

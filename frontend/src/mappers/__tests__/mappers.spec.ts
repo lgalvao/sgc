@@ -75,7 +75,7 @@ describe("mappers/atividades", () => {
         expect(model!.descricao).toBe("Conhecimento Teste");
     });
 
-    it("mapCriarAtividadeRequestToDto deve adicionar codSubrocesso", () => {
+    it("mapCriarAtividadeRequestToDto deve adicionar codSubprocesso", () => {
         const request = {descricao: "Nova Atividade"};
         const dto = mapCriarAtividadeRequestToDto(request, 123);
         expect(dto.descricao).toBe("Nova Atividade");
