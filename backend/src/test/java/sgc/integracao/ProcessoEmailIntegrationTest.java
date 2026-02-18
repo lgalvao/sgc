@@ -51,7 +51,7 @@ class ProcessoEmailIntegrationTest extends BaseIntegrationTest {
         emailService.enviarEmailHtml(destinatario, "Início de Processo", html);
 
         // Assert: Aguardar e verificar
-        assertThat(greenMail.waitForIncomingEmail(10000, 1)).isTrue();
+        aguardarEmail(1);
         
         MimeMessage[] mensagens = greenMail.getReceivedMessages();
         assertThat(mensagens).hasSize(1);
