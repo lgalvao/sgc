@@ -39,12 +39,6 @@ public class PainelFacade {
      * - GESTOR: vê processos da unidade e de todas as subordinadas (recursivamente)
      * - CHEFE e SERVIDOR: veem processos APENAS da própria unidade
      * - Processos no estado 'CRIADO' são omitidos para perfis não-ADMIN
-     *
-     * @param perfil        O perfil do usuário (obrigatório).
-     * @param codigoUnidade O código da unidade do usuário (obrigatório).
-     * @param pageable      As informações de paginação.
-     * @return Uma página {@link Page} de {@link ProcessoResumoDto}.
-     * @throws IllegalArgumentException se o perfil for nulo or em branco.
      */
     public Page<ProcessoResumoDto> listarProcessos(Perfil perfil, Long codigoUnidade, Pageable pageable) {
         Pageable sortedPageable = garantirOrdenacaoPadrao(pageable);
@@ -87,11 +81,6 @@ public class PainelFacade {
      *
      * <p>Os alertas são filtrados pela unidade fornecida.
      * O título do usuário é utilizado para verificar o status de leitura.
-     *
-     * @param usuarioTitulo Título de eleitor do usuário (opcional).
-     * @param codigoUnidade Código da unidade (obrigatório).
-     * @param pageable      As informações de paginação.
-     * @return Uma página {@link Page} de {@link Alerta}.
      */
     @Transactional
     public Page<Alerta> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
