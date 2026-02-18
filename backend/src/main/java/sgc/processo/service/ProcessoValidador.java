@@ -6,6 +6,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
@@ -81,5 +82,29 @@ class ProcessoValidador {
         }
 
         log.info("Todos os subprocessos do processo {} estão homologados", processo.getCodigo());
+    }
+
+    /**
+     * Valida se as unidades participantes são elegíveis (não são INTERMEDIARIA).
+     *
+     * @param unidades lista de unidades a validar
+     * @return Optional com mensagem de erro se houver unidade inválida
+     */
+    public Optional<String> validarTiposUnidades(List<Unidade> unidades) {
+        if (unidades == null || unidades.isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<String> unidadesInvalidas = unidades.stream()
+                .filter(u -> u.getTipo() == TipoUnidade.INTERMEDIARIA)
+                .map(Unidade::getSigla)
+                .toList();
+
+        if (!unidadesInvalidas.isEmpty()) {
+            return Optional.of("Unidades do tipo INTERMEDIARIA não podem participar de processos: "
+                    + String.join(", ", unidadesInvalidas));
+        }
+
+        return Optional.empty();
     }
 }
