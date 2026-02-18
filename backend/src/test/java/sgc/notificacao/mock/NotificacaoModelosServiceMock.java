@@ -12,7 +12,7 @@ import java.util.List;
 
 @Service
 @Primary
-@Profile("test")
+@Profile("test&!email-test")
 @Slf4j
 public class NotificacaoModelosServiceMock extends NotificacaoModelosService {
     public NotificacaoModelosServiceMock() {
@@ -30,27 +30,32 @@ public class NotificacaoModelosServiceMock extends NotificacaoModelosService {
     }
 
     @Override
-    public void criarEmailCadastroDisponibilizado(
+    public String criarEmailCadastroDisponibilizado(
             @NonNull String nomeUnidade, @NonNull String nomeProcesso, int quantidadeAtividades) {
+        return "<html><body>Mock Email de Cadastro Disponibilizado</body></html>";
     }
 
     @Override
-    public void criarEmailCadastroDevolvido(
+    public String criarEmailCadastroDevolvido(
             @NonNull String nomeUnidade, @NonNull String nomeProcesso, @NonNull String motivo, @NonNull String observacoes) {
+        return "<html><body>Mock Email de Cadastro Devolvido</body></html>";
     }
 
     @Override
-    public void criarEmailMapaDisponibilizado(
+    public String criarEmailMapaDisponibilizado(
             @NonNull String nomeUnidade, @NonNull String nomeProcesso, @NonNull LocalDateTime dataLimiteValidacao) {
+        return "<html><body>Mock Email de Mapa Disponibilizado</body></html>";
     }
 
     @Override
-    public void criarEmailMapaValidado(@NonNull String nomeUnidade, @NonNull String nomeProcesso) {
+    public String criarEmailMapaValidado(@NonNull String nomeUnidade, @NonNull String nomeProcesso) {
+        return "<html><body>Mock Email de Mapa Validado</body></html>";
     }
 
     @Override
-    public void criarEmailProcessoFinalizado(
+    public String criarEmailProcessoFinalizado(
             @NonNull String nomeProcesso, @NonNull LocalDateTime dataFinalizacao, int quantidadeMapas) {
+        return "<html><body>Mock Email de Processo Finalizado</body></html>";
     }
 
     @Override

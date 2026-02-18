@@ -60,7 +60,7 @@ public class NotificacaoModelosService {
     /**
      * Gera o conteúdo HTML para o email que notifica a disponibilização de um cadastro para análise.
      */
-    public void criarEmailCadastroDisponibilizado(
+    public String criarEmailCadastroDisponibilizado(
             String nomeUnidade, String nomeProcesso, int quantidadeAtividades) {
 
         Context context = new Context();
@@ -69,13 +69,13 @@ public class NotificacaoModelosService {
         context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         context.setVariable("quantidadeAtividades", quantidadeAtividades);
 
-        templateEngine.process("cadastro-disponibilizado", context);
+        return templateEngine.process("cadastro-disponibilizado", context);
     }
 
     /**
      * Gera o conteúdo HTML para o email que notifica a devolução de um cadastro para ajustes.
      */
-    public void criarEmailCadastroDevolvido(
+    public String criarEmailCadastroDevolvido(
             String nomeUnidade, String nomeProcesso, String motivo, String observacoes) {
 
         Context context = new Context();
@@ -85,13 +85,13 @@ public class NotificacaoModelosService {
         context.setVariable(VAR_MOTIVO, motivo);
         context.setVariable(VAR_OBSERVACOES, observacoes);
 
-        templateEngine.process("cadastro-devolvido", context);
+        return templateEngine.process("cadastro-devolvido", context);
     }
 
     /**
      * Gera o conteúdo HTML para o email que notifica a disponibilização de um mapa para validação.
      */
-    public void criarEmailMapaDisponibilizado(
+    public String criarEmailMapaDisponibilizado(
             String nomeUnidade, String nomeProcesso, LocalDateTime dataLimiteValidacao) {
 
         Context context = new Context();
@@ -100,25 +100,25 @@ public class NotificacaoModelosService {
         context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         context.setVariable("dataLimiteValidacao", dataLimiteValidacao.format(FORMATADOR));
 
-        templateEngine.process("mapa-disponibilizado", context);
+        return templateEngine.process("mapa-disponibilizado", context);
     }
 
     /**
      * Gera o conteúdo HTML para o email que notifica a validação de um mapa.
      */
-    public void criarEmailMapaValidado(String nomeUnidade, String nomeProcesso) {
+    public String criarEmailMapaValidado(String nomeUnidade, String nomeProcesso) {
         Context context = new Context();
         context.setVariable(VAR_TITULO, TITULO_MAPA_VALIDADO);
         context.setVariable(VAR_NOME_UNIDADE, nomeUnidade);
         context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
 
-        templateEngine.process("mapa-validado", context);
+        return templateEngine.process("mapa-validado", context);
     }
 
     /**
      * Gera o conteúdo HTML para o email que notifica a finalização de um processo.
      */
-    public void criarEmailProcessoFinalizado(
+    public String criarEmailProcessoFinalizado(
             String nomeProcesso, LocalDateTime dataFinalizacao, int quantidadeMapas) {
         Context context = new Context();
         context.setVariable(VAR_TITULO, TITULO_PROCESSO_FINALIZADO);
@@ -126,7 +126,7 @@ public class NotificacaoModelosService {
         context.setVariable("dataFinalizacao", dataFinalizacao.format(FORMATADOR));
         context.setVariable("quantidadeMapas", quantidadeMapas);
 
-        templateEngine.process("processo-finalizado", context);
+        return templateEngine.process("processo-finalizado", context);
     }
 
     /**

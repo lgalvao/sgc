@@ -24,11 +24,11 @@ public class NotificacaoEmailServiceMock extends NotificacaoEmailService {
 
     @Override
     public void enviarEmail(@NonNull String para, @NonNull String assunto, @NonNull String corpo) {
-      // TODO document why this method is empty
+        // Intencionalmente vazio para evitar o envio real de e-mails durante os testes
     }
 
     @Override
     public void enviarEmailHtml(@NonNull String para, @NonNull String assunto, @NonNull String corpoHtml) {
-      // TODO document why this method is empty
+        // Intencionalmente vazio para evitar o envio real de e-mails durante os testes
     }
 }
