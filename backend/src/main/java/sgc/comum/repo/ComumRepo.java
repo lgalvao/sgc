@@ -19,12 +19,6 @@ public class ComumRepo {
 
     /**
      * Busca uma entidade pelo seu ID.
-     *
-     * @param <T>    Tipo da entidade
-     * @param classe Classe da entidade
-     * @param id     Identificador único
-     * @return A entidade encontrada
-     * @throws ErroEntidadeNaoEncontrada se a entidade não existir
      */
     public <T> T buscar(Class<T> classe, Object id) {
         T entidade = em.find(classe, id);
@@ -36,13 +30,6 @@ public class ComumRepo {
 
     /**
      * Busca uma única entidade por um campo específico.
-     *
-     * @param <T>    Tipo da entidade
-     * @param classe Classe da entidade
-     * @param campo  Nome do campo
-     * @param valor  Valor do campo
-     * @return A entidade encontrada
-     * @throws ErroEntidadeNaoEncontrada se a entidade não existir
      */
     public <T> T buscar(Class<T> classe, String campo, Object valor) {
         try {
@@ -56,12 +43,6 @@ public class ComumRepo {
 
     /**
      * Busca uma única entidade por múltiplos campos.
-     *
-     * @param <T>     Tipo da entidade
-     * @param classe  Classe da entidade
-     * @param filtros Mapa de campo -> valor
-     * @return A entidade encontrada
-     * @throws ErroEntidadeNaoEncontrada se a entidade não existir ou não atender aos critérios
      */
     public <T> T buscar(Class<T> classe, Map<String, Object> filtros) {
         StringBuilder jpql = new StringBuilder("SELECT e FROM " + classe.getSimpleName() + " e WHERE 1=1");
@@ -78,12 +59,6 @@ public class ComumRepo {
 
     /**
      * Busca uma entidade pela sua sigla.
-     *
-     * @param <T>    Tipo da entidade
-     * @param classe Classe da entidade
-     * @param sigla  Sigla da entidade
-     * @return A entidade encontrada
-     * @throws ErroEntidadeNaoEncontrada se a entidade não existir
      */
     public <T> T buscarPorSigla(Class<T> classe, String sigla) {
         return buscar(classe, "sigla", sigla);

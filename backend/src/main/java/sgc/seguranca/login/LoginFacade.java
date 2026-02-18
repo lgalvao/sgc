@@ -51,10 +51,6 @@ public class LoginFacade {
 
     /**
      * Autentica um usuário com título de eleitor e senha.
-     *
-     * @param tituloEleitoral Título de eleitor do usuário
-     * @param senha           Senha do usuário
-     * @return true se a autenticação for bem-sucedida
      */
     public boolean autenticar(String tituloEleitoral, String senha) {
         if (ambienteTestes) {
@@ -76,9 +72,6 @@ public class LoginFacade {
     /**
      * Retorna os perfis e unidades que o usuário pode acessar.
      * Requer autenticação prévia.
-     *
-     * @param tituloEleitoral Título de eleitor do usuário
-     * @return Lista de perfis e unidades disponíveis
      */
     @Transactional(readOnly = true)
     public List<PerfilUnidadeDto> autorizar(String tituloEleitoral) {
@@ -87,9 +80,6 @@ public class LoginFacade {
 
     /**
      * Finaliza o login gerando um token JWT para o perfil e unidade escolhidos.
-     *
-     * @param request Dados da requisição de entrada
-     * @return Token JWT
      */
     @Transactional(readOnly = true)
     public String entrar(EntrarRequest request) {
