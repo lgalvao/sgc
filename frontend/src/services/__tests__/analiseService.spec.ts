@@ -10,14 +10,14 @@ describe("analiseService", () => {
         const subprocessoId = 1;
         const responseData: AnaliseCadastro[] = [
             {
-                codigo: 1,
                 dataHora: new Date().toISOString(),
                 observacoes: "Obs",
-                acao: "ACEITE",
+                acao: "ACEITE_MAPEAMENTO",
                 unidadeSigla: "Unidade",
-                analista: "Usuario",
-                resultado: "APROVADO",
-                codSubrocesso: 1,
+                unidadeNome: "Unidade Nome",
+                analistaUsuarioTitulo: "123456",
+                motivo: "",
+                tipo: "CADASTRO"
             },
         ];
 
@@ -34,14 +34,14 @@ describe("analiseService", () => {
         const subprocessoId = 1;
         const responseData: AnaliseValidacao[] = [
             {
-                codigo: 1,
                 dataHora: new Date().toISOString(),
                 observacoes: "Obs",
-                acao: "DEVOLUCAO",
-                unidade: "Unidade",
-                analista: "Usuario",
-                resultado: "REPROVADO",
-                codSubrocesso: 1,
+                acao: "DEVOLUCAO_MAPEAMENTO",
+                unidadeSigla: "Unidade",
+                unidadeNome: "Unidade Nome",
+                analistaUsuarioTitulo: "123456",
+                motivo: "Motivo",
+                tipo: "VALIDACAO"
             },
         ];
 

@@ -36,14 +36,14 @@
                 {{ formatDateTimeBR((item as Analise).dataHora) }}
               </span>
             </template>
-            <template #cell(unidade)="{ item, index }">
-              <span :data-testid="`cell-unidade-${index}`">
-                {{ (item as AnaliseValidacao).unidade || (item as AnaliseCadastro).unidadeSigla }}
+            <template #cell(unidadeSigla)="{ item, index }">
+              <span :data-testid="`cell-unidade-${index}`" :title="(item as Analise).unidadeNome">
+                {{ (item as Analise).unidadeSigla }}
               </span>
             </template>
-            <template #cell(resultado)="{ item, index }">
+            <template #cell(acao)="{ item, index }">
               <span :data-testid="`cell-resultado-${index}`">
-                {{ (item as Analise).acao || (item as Analise).resultado }}
+                {{ (item as Analise).acao }}
               </span>
             </template>
             <template #cell(observacoes)="{ item, index }">
@@ -84,8 +84,9 @@ const emit = defineEmits(["fechar"]);
 
 const fields = [
   {key: "dataHora", label: "Data/Hora"},
-  {key: "unidade", label: "Unidade"},
-  {key: "resultado", label: "Resultado"},
+  {key: "unidadeSigla", label: "Unidade"},
+  {key: "acao", label: "Resultado"},
+  {key: "analistaUsuarioTitulo", label: "Analista"},
   {key: "observacoes", label: "Observação"},
 ];
 

@@ -23,7 +23,7 @@ vi.mock("@/services/subprocessoService", () => ({
 
 describe("useMapasStore", () => {
     const context = setupStoreTest(useMapasStore);
-    const codSubrocesso = 1;
+    const codSubprocesso = 1;
 
     it("deve inicializar com valores nulos", () => {
         expect(context.store.mapaCompleto).toBeNull();
@@ -51,9 +51,9 @@ describe("useMapasStore", () => {
             };
             vi.mocked(mapaService.obterMapaCompleto).mockResolvedValue(mockMapa);
 
-            await context.store.buscarMapaCompleto(codSubrocesso);
+            await context.store.buscarMapaCompleto(codSubprocesso);
 
-            expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(codSubrocesso);
+            expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(codSubprocesso);
             expect(context.store.mapaCompleto).toEqual(mockMapa);
         });
 
@@ -63,7 +63,7 @@ describe("useMapasStore", () => {
             );
             context.store.mapaCompleto = {} as any; // Pre-set state
 
-            await expect(context.store.buscarMapaCompleto(codSubrocesso)).rejects.toThrow("Failed");
+            await expect(context.store.buscarMapaCompleto(codSubprocesso)).rejects.toThrow("Failed");
 
             expect(context.store.mapaCompleto).toBeNull();
         });
@@ -88,10 +88,10 @@ describe("useMapasStore", () => {
             };
             vi.mocked(mapaService.salvarMapaCompleto).mockResolvedValue(mockResponse);
 
-            await context.store.salvarMapa(codSubrocesso, request);
+            await context.store.salvarMapa(codSubprocesso, request);
 
             expect(mapaService.salvarMapaCompleto).toHaveBeenCalledWith(
-                codSubrocesso,
+                codSubprocesso,
                 request,
             );
             expect(context.store.mapaCompleto).toEqual(mockResponse);
@@ -101,7 +101,7 @@ describe("useMapasStore", () => {
             const request = { competencias: [] };
             vi.mocked(mapaService.salvarMapaCompleto).mockRejectedValue(new Error("Fail"));
 
-            await expect(context.store.salvarMapa(codSubrocesso, request)).rejects.toThrow("Fail");
+            await expect(context.store.salvarMapa(codSubprocesso, request)).rejects.toThrow("Fail");
         });
     });
 
@@ -114,9 +114,9 @@ describe("useMapasStore", () => {
             };
             vi.mocked(mapaService.obterMapaAjuste).mockResolvedValue(mockMapa);
 
-            await context.store.buscarMapaAjuste(codSubrocesso);
+            await context.store.buscarMapaAjuste(codSubprocesso);
 
-            expect(mapaService.obterMapaAjuste).toHaveBeenCalledWith(codSubrocesso);
+            expect(mapaService.obterMapaAjuste).toHaveBeenCalledWith(codSubprocesso);
             expect(context.store.mapaAjuste).toEqual(mockMapa);
         });
 
@@ -124,7 +124,7 @@ describe("useMapasStore", () => {
             vi.mocked(mapaService.obterMapaAjuste).mockRejectedValue(new Error("Fail"));
             context.store.mapaAjuste = {} as any;
 
-            await expect(context.store.buscarMapaAjuste(codSubrocesso)).rejects.toThrow("Fail");
+            await expect(context.store.buscarMapaAjuste(codSubprocesso)).rejects.toThrow("Fail");
             expect(context.store.mapaAjuste).toBeNull();
         });
     });
@@ -134,10 +134,10 @@ describe("useMapasStore", () => {
             const request = { competencias: [], atividades: [], sugestoes: "" };
             vi.mocked(mapaService.salvarMapaAjuste).mockResolvedValue(undefined);
 
-            await context.store.salvarAjustes(codSubrocesso, request);
+            await context.store.salvarAjustes(codSubprocesso, request);
 
             expect(mapaService.salvarMapaAjuste).toHaveBeenCalledWith(
-                codSubrocesso,
+                codSubprocesso,
                 request,
             );
         });
@@ -146,7 +146,7 @@ describe("useMapasStore", () => {
             const request = { competencias: [], atividades: [], sugestoes: "" };
             vi.mocked(mapaService.salvarMapaAjuste).mockRejectedValue(new Error("Fail"));
 
-            await expect(context.store.salvarAjustes(codSubrocesso, request)).rejects.toThrow("Fail");
+            await expect(context.store.salvarAjustes(codSubprocesso, request)).rejects.toThrow("Fail");
         });
     });
 
@@ -167,10 +167,10 @@ describe("useMapasStore", () => {
                 mockImpacto,
             );
 
-            await context.store.buscarImpactoMapa(codSubrocesso);
+            await context.store.buscarImpactoMapa(codSubprocesso);
 
             expect(mapaService.verificarImpactosMapa).toHaveBeenCalledWith(
-                codSubrocesso,
+                codSubprocesso,
             );
             expect(context.store.impactoMapa).toEqual(mockImpacto);
         });
@@ -179,7 +179,7 @@ describe("useMapasStore", () => {
             vi.mocked(mapaService.verificarImpactosMapa).mockRejectedValue(new Error("Fail"));
             context.store.impactoMapa = {} as any;
 
-            await expect(context.store.buscarImpactoMapa(codSubrocesso)).rejects.toThrow("Fail");
+            await expect(context.store.buscarImpactoMapa(codSubprocesso)).rejects.toThrow("Fail");
             expect(context.store.impactoMapa).toBeNull();
         });
     });
@@ -210,10 +210,10 @@ describe("useMapasStore", () => {
                 mockResponse,
             );
 
-            await context.store.adicionarCompetencia(codSubrocesso, competencia);
+            await context.store.adicionarCompetencia(codSubprocesso, competencia);
 
             expect(subprocessoService.adicionarCompetencia).toHaveBeenCalledWith(
-                codSubrocesso,
+                codSubprocesso,
                 competencia,
             );
             expect(context.store.mapaCompleto).toEqual(mockResponse);
@@ -228,7 +228,7 @@ describe("useMapasStore", () => {
             };
             vi.mocked(subprocessoService.adicionarCompetencia).mockRejectedValue(new Error("Fail"));
 
-            await expect(context.store.adicionarCompetencia(codSubrocesso, competencia)).rejects.toThrow("Fail");
+            await expect(context.store.adicionarCompetencia(codSubprocesso, competencia)).rejects.toThrow("Fail");
         });
     });
 
@@ -258,10 +258,10 @@ describe("useMapasStore", () => {
                 mockResponse,
             );
 
-            await context.store.atualizarCompetencia(codSubrocesso, competencia);
+            await context.store.atualizarCompetencia(codSubprocesso, competencia);
 
             expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(
-                codSubrocesso,
+                codSubprocesso,
                 competencia,
             );
             expect(context.store.mapaCompleto).toEqual(mockResponse);
@@ -275,7 +275,7 @@ describe("useMapasStore", () => {
                 atividadesAssociadas: [],
             };
 
-            await expect(context.store.atualizarCompetencia(codSubrocesso, competencia))
+            await expect(context.store.atualizarCompetencia(codSubprocesso, competencia))
                 .rejects.toThrow("Código da competência inválido");
 
             expect(subprocessoService.atualizarCompetencia).not.toHaveBeenCalled();
@@ -290,7 +290,7 @@ describe("useMapasStore", () => {
             };
             vi.mocked(subprocessoService.atualizarCompetencia).mockRejectedValue(new Error("Fail"));
 
-            await expect(context.store.atualizarCompetencia(codSubrocesso, competencia)).rejects.toThrow("Fail");
+            await expect(context.store.atualizarCompetencia(codSubprocesso, competencia)).rejects.toThrow("Fail");
         });
     });
 
@@ -315,17 +315,17 @@ describe("useMapasStore", () => {
                 mockResponse,
             );
 
-            await context.store.removerCompetencia(codSubrocesso, idCompetencia);
+            await context.store.removerCompetencia(codSubprocesso, idCompetencia);
 
             expect(subprocessoService.removerCompetencia).toHaveBeenCalledWith(
-                codSubrocesso,
+                codSubprocesso,
                 idCompetencia,
             );
             expect(context.store.mapaCompleto).toEqual(mockResponse);
         });
 
         it("deve validar ID da competência antes de remover", async () => {
-            await expect(context.store.removerCompetencia(codSubrocesso, 0))
+            await expect(context.store.removerCompetencia(codSubprocesso, 0))
                 .rejects.toThrow("Código da competência inválido");
 
             expect(subprocessoService.removerCompetencia).not.toHaveBeenCalled();
@@ -335,7 +335,7 @@ describe("useMapasStore", () => {
             const idCompetencia = 1;
             vi.mocked(subprocessoService.removerCompetencia).mockRejectedValue(new Error("Fail"));
 
-            await expect(context.store.removerCompetencia(codSubrocesso, idCompetencia)).rejects.toThrow("Fail");
+            await expect(context.store.removerCompetencia(codSubprocesso, idCompetencia)).rejects.toThrow("Fail");
         });
     });
 
@@ -357,10 +357,10 @@ describe("useMapasStore", () => {
             };
             vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(mockMapa);
 
-            await context.store.buscarMapaVisualizacao(codSubrocesso);
+            await context.store.buscarMapaVisualizacao(codSubprocesso);
 
             expect(mapaService.obterMapaVisualizacao).toHaveBeenCalledWith(
-                codSubrocesso,
+                codSubprocesso,
             );
             expect(context.store.mapaVisualizacao).toEqual(mockMapa);
         });
@@ -371,7 +371,7 @@ describe("useMapasStore", () => {
             );
             context.store.mapaVisualizacao = {} as any; // Pre-set state
 
-            await expect(context.store.buscarMapaVisualizacao(codSubrocesso)).rejects.toThrow("Failed");
+            await expect(context.store.buscarMapaVisualizacao(codSubprocesso)).rejects.toThrow("Failed");
 
             expect(context.store.mapaVisualizacao).toBeNull();
         });
@@ -382,10 +382,10 @@ describe("useMapasStore", () => {
             const request = { observacoes: "teste", dataLimite: "2025-12-31" };
             vi.mocked(mapaService.disponibilizarMapa).mockResolvedValue(undefined);
 
-            await context.store.disponibilizarMapa(codSubrocesso, request);
+            await context.store.disponibilizarMapa(codSubprocesso, request);
 
             expect(mapaService.disponibilizarMapa).toHaveBeenCalledWith(
-                codSubrocesso,
+                codSubprocesso,
                 request,
             );
         });
@@ -396,7 +396,7 @@ describe("useMapasStore", () => {
             vi.mocked(mapaService.disponibilizarMapa).mockRejectedValue(error);
 
             await expect(
-                context.store.disponibilizarMapa(codSubrocesso, request),
+                context.store.disponibilizarMapa(codSubprocesso, request),
             ).rejects.toThrow();
         });
     });

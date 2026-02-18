@@ -28,58 +28,58 @@ describe("useAnalisesStore", () => {
         it("obterAnalisesPorSubprocesso deve retornar as análises corretas para um dado subprocesso", () => {
             const mockAnalises: (AnaliseCadastro | AnaliseValidacao)[] = [
                 {
-                    codigo: 1,
                     dataHora: "2023-01-01T12:00:00Z",
                     observacoes: "Obs 1",
-                    acao: "ACEITE",
+                    acao: "ACEITE_MAPEAMENTO",
                     unidadeSigla: "ABC",
-                    analista: "Analista 1",
-                    resultado: "APROVADO",
-                    codSubrocesso: 123,
+                    unidadeNome: "Unidade ABC",
+                    analistaUsuarioTitulo: "123456",
+                    motivo: "Motivo 1",
+                    tipo: "CADASTRO"
                 },
                 {
-                    codigo: 2,
                     dataHora: "2023-01-02T12:00:00Z",
                     observacoes: "Obs 2",
-                    acao: "DEVOLUCAO",
-                    unidade: "DEF",
-                    analista: "Analista 2",
-                    resultado: "REPROVADO",
-                    codSubrocesso: 123,
+                    acao: "DEVOLUCAO_MAPEAMENTO",
+                    unidadeSigla: "DEF",
+                    unidadeNome: "Unidade DEF",
+                    analistaUsuarioTitulo: "654321",
+                    motivo: "Motivo 2",
+                    tipo: "CADASTRO"
                 },
             ];
-            const codSubrocesso = 123;
-            context.store.analisesPorSubprocesso.set(codSubrocesso, mockAnalises);
+            const codSubprocesso = 123;
+            context.store.analisesPorSubprocesso.set(codSubprocesso, mockAnalises);
 
-            const result = context.store.obterAnalisesPorSubprocesso(codSubrocesso);
+            const result = context.store.obterAnalisesPorSubprocesso(codSubprocesso);
             expect(result).toEqual(mockAnalises);
         });
     });
 
     describe("actions", () => {
-        const codSubrocesso = 123;
+        const codSubprocesso = 123;
         const mockAnalisesCadastro: AnaliseCadastro[] = [
             {
-                codigo: 1,
                 dataHora: "2023-01-01T10:00:00Z",
                 observacoes: "Cadastro 1",
-                acao: "ACEITE",
+                acao: "ACEITE_MAPEAMENTO",
                 unidadeSigla: "ABC",
-                analista: "Analista 1",
-                resultado: "APROVADO",
-                codSubrocesso: 123,
+                unidadeNome: "Unidade ABC",
+                analistaUsuarioTitulo: "123456",
+                motivo: "",
+                tipo: "CADASTRO"
             },
         ];
         const mockAnalisesValidacao: AnaliseValidacao[] = [
             {
-                codigo: 2,
                 dataHora: "2023-01-02T10:00:00Z",
                 observacoes: "Validacao 1",
-                acao: "DEVOLUCAO",
-                unidade: "DEF",
-                analista: "Analista 2",
-                resultado: "REPROVADO",
-                codSubrocesso: 123,
+                acao: "DEVOLUCAO_MAPEAMENTO",
+                unidadeSigla: "DEF",
+                unidadeNome: "Unidade DEF",
+                analistaUsuarioTitulo: "654321",
+                motivo: "Motivo",
+                tipo: "VALIDACAO"
             },
         ];
 
@@ -88,12 +88,12 @@ describe("useAnalisesStore", () => {
                 mockAnalisesCadastro,
             );
 
-            await context.store.buscarAnalisesCadastro(codSubrocesso);
+            await context.store.buscarAnalisesCadastro(codSubprocesso);
 
             expect(analiseService.listarAnalisesCadastro).toHaveBeenCalledWith(
-                codSubrocesso,
+                codSubprocesso,
             );
-            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
+            expect(context.store.obterAnalisesPorSubprocesso(codSubprocesso)).toEqual(
                 mockAnalisesCadastro,
             );
         });
@@ -103,12 +103,12 @@ describe("useAnalisesStore", () => {
                 mockAnalisesValidacao,
             );
 
-            await context.store.buscarAnalisesValidacao(codSubrocesso);
+            await context.store.buscarAnalisesValidacao(codSubprocesso);
 
             expect(analiseService.listarAnalisesValidacao).toHaveBeenCalledWith(
-                codSubrocesso,
+                codSubprocesso,
             );
-            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
+            expect(context.store.obterAnalisesPorSubprocesso(codSubprocesso)).toEqual(
                 mockAnalisesValidacao,
             );
         });
@@ -122,19 +122,19 @@ describe("useAnalisesStore", () => {
             );
 
             // Fetch cadastro first
-            await context.store.buscarAnalisesCadastro(codSubrocesso);
-            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
+            await context.store.buscarAnalisesCadastro(codSubprocesso);
+            expect(context.store.obterAnalisesPorSubprocesso(codSubprocesso)).toEqual(
                 mockAnalisesCadastro,
             );
 
             // Then fetch validacao
-            await context.store.buscarAnalisesValidacao(codSubrocesso);
+            await context.store.buscarAnalisesValidacao(codSubprocesso);
 
             const expected = [...mockAnalisesCadastro, ...mockAnalisesValidacao];
-            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual(
+            expect(context.store.obterAnalisesPorSubprocesso(codSubprocesso)).toEqual(
                 expect.arrayContaining(expected),
             );
-            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso).length).toBe(2);
+            expect(context.store.obterAnalisesPorSubprocesso(codSubprocesso).length).toBe(2);
         });
 
         it("deve lidar com erro em buscarAnalisesCadastro", async () => {
@@ -142,10 +142,10 @@ describe("useAnalisesStore", () => {
                 new Error("Fail"),
             );
             await expect(
-                context.store.buscarAnalisesCadastro(codSubrocesso),
+                context.store.buscarAnalisesCadastro(codSubprocesso),
             ).rejects.toThrow("Fail");
             // Verifica se o estado permanece limpo ou inalterado em caso de erro inicial
-            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);
+            expect(context.store.obterAnalisesPorSubprocesso(codSubprocesso)).toEqual([]);
         });
 
         it("deve lidar com erro em buscarAnalisesValidacao", async () => {
@@ -153,9 +153,9 @@ describe("useAnalisesStore", () => {
                 new Error("Fail"),
             );
             await expect(
-                context.store.buscarAnalisesValidacao(codSubrocesso),
+                context.store.buscarAnalisesValidacao(codSubprocesso),
             ).rejects.toThrow("Fail");
-            expect(context.store.obterAnalisesPorSubprocesso(codSubrocesso)).toEqual([]);
+            expect(context.store.obterAnalisesPorSubprocesso(codSubprocesso)).toEqual([]);
         });
     });
 });

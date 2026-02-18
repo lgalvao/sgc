@@ -13,33 +13,33 @@ export const useAnalisesStore = defineStore("analises", () => {
     const { lastError, clearError, withErrorHandling } = useErrorHandler();
     const loading = useSingleLoading();
 
-    function obterAnalisesPorSubprocesso(codSubrocesso: number): Analise[] {
-        return analisesPorSubprocesso.value.get(codSubrocesso) || [];
+    function obterAnalisesPorSubprocesso(codSubprocesso: number): Analise[] {
+        return analisesPorSubprocesso.value.get(codSubprocesso) || [];
     }
 
-    async function buscarAnalisesCadastro(codSubrocesso: number) {
+    async function buscarAnalisesCadastro(codSubprocesso: number) {
         if (loading.isLoading.value) return; // Previne race conditions
         
         await loading.withLoading(async () => {
             await withErrorHandling(async () => {
-                const analises = await analiseService.listarAnalisesCadastro(codSubrocesso);
-                const atuais = analisesPorSubprocesso.value.get(codSubrocesso) || [];
-                const outras = atuais.filter((a) => !("unidadeSigla" in a));
-                analisesPorSubprocesso.value.set(codSubrocesso, [...outras, ...analises]);
+                const analises = await analiseService.listarAnalisesCadastro(codSubprocesso);
+                const atuais = analisesPorSubprocesso.value.get(codSubprocesso) || [];
+                const outras = atuais.filter((a) => a.tipo !== "CADASTRO");
+                analisesPorSubprocesso.value.set(codSubprocesso, [...outras, ...analises]);
             });
         });
     }
 
-    async function buscarAnalisesValidacao(codSubrocesso: number) {
+    async function buscarAnalisesValidacao(codSubprocesso: number) {
         if (loading.isLoading.value) return; // Previne race conditions
         
         await loading.withLoading(async () => {
             await withErrorHandling(async () => {
                 const analises =
-                    await analiseService.listarAnalisesValidacao(codSubrocesso);
-                const atuais = analisesPorSubprocesso.value.get(codSubrocesso) || [];
-                const outras = atuais.filter((a) => !("unidade" in a));
-                analisesPorSubprocesso.value.set(codSubrocesso, [...outras, ...analises]);
+                    await analiseService.listarAnalisesValidacao(codSubprocesso);
+                const atuais = analisesPorSubprocesso.value.get(codSubprocesso) || [];
+                const outras = atuais.filter((a) => a.tipo !== "VALIDACAO");
+                analisesPorSubprocesso.value.set(codSubprocesso, [...outras, ...analises]);
             });
         });
     }

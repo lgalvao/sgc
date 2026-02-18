@@ -1,5 +1,6 @@
 import apiClient from "@/axios-setup";
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
+import {mapAnalisesArray} from "@/mappers/analises";
 
 export const listarAnalisesCadastro = async (
     codSubprocesso: number,
@@ -7,7 +8,7 @@ export const listarAnalisesCadastro = async (
     const response = await apiClient.get(
         `/subprocessos/${codSubprocesso}/historico-cadastro`,
     );
-    return response.data;
+    return mapAnalisesArray(response.data);
 };
 
 export const listarAnalisesValidacao = async (
@@ -16,5 +17,5 @@ export const listarAnalisesValidacao = async (
     const response = await apiClient.get(
         `/subprocessos/${codSubprocesso}/historico-validacao`,
     );
-    return response.data;
+    return mapAnalisesArray(response.data);
 };
