@@ -222,4 +222,37 @@ describe('ArvoreUnidades Property-Based Tests', () => {
       )
     );
   });
+
+  it('should satisfy Idempotence: Selecting an already selected unit (or tree) should result in the same state', () => {
+    fc.assert(
+      fc.property(fc.nat({ max: 100 }), (seed) => { // Using seed to generate deterministic tree
+         // Generate tree
+         const tree = generateTree(3, 2, seed);
+         const allNodes = flatten(tree);
+         if (allNodes.length === 0) return;
+
+         const wrapper = mount(ArvoreUnidades, {
+            props: {
+              unidades: tree,
+              modelValue: []
+            }
+         });
+         const vm = wrapper.vm as any;
+
+         // Pick a random node
+         const nodeIndex = seed % allNodes.length;
+         const node = allNodes[nodeIndex];
+
+         // Select it once
+         vm.toggle(node, true);
+         const stateAfterFirst = [...vm.modelValue].sort((a: number, b: number) => a - b);
+
+         // Select it again
+         vm.toggle(node, true);
+         const stateAfterSecond = [...vm.modelValue].sort((a: number, b: number) => a - b);
+
+         expect(stateAfterFirst).toEqual(stateAfterSecond);
+      })
+    );
+  });
 });

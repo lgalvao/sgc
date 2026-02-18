@@ -40,6 +40,11 @@ public class ProcessoManutencaoService {
             participantes.add(unidade);
         }
 
+        processoValidador.validarTiposUnidades(new ArrayList<>(participantes))
+                .ifPresent(msg -> {
+                    throw new ErroProcesso(msg);
+                });
+
         TipoProcesso tipoProcesso = req.tipo();
 
         if (tipoProcesso == REVISAO || tipoProcesso == DIAGNOSTICO) {
@@ -93,6 +98,11 @@ public class ProcessoManutencaoService {
         for (Long codigoUnidade : requisicao.unidades()) {
             participantes.add(unidadeService.buscarEntidadePorId(codigoUnidade));
         }
+
+        processoValidador.validarTiposUnidades(new ArrayList<>(participantes))
+                .ifPresent(msg -> {
+                    throw new ErroProcesso(msg);
+                });
 
         processo.sincronizarParticipantes(participantes);
 
