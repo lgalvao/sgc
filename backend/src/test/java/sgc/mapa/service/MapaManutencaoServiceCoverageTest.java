@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.model.*;
-import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
+import sgc.subprocesso.service.SubprocessoStatusService;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,7 +29,7 @@ class MapaManutencaoServiceCoverageTest {
     @Mock
     private CompetenciaRepo competenciaRepo;
     @Mock
-    private SubprocessoAdminWorkflowService subprocessoAdminWorkflowService;
+    private SubprocessoStatusService subprocessoStatusService;
 
     @InjectMocks
     private MapaManutencaoService service;

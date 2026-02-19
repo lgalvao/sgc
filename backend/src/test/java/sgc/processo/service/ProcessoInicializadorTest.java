@@ -15,7 +15,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 import sgc.testutils.UnidadeTestBuilder;
 
 import java.util.*;
@@ -42,7 +42,7 @@ class ProcessoInicializadorTest {
     @Mock
     private ProcessoNotificacaoService notificacaoService;
     @Mock
-    private SubprocessoFacade subprocessoFacade;
+    private SubprocessoService subprocessoService;
     @Mock
     private ProcessoValidador processoValidador;
 
@@ -117,7 +117,7 @@ class ProcessoInicializadorTest {
         List<String> erros = inicializador.iniciar(1L, null, usuario);
 
         assertThat(erros).isEmpty();
-        verify(subprocessoFacade).criarParaMapeamento(eq(p), any(), eq(admin), eq(usuario));
+        verify(subprocessoService).criarParaMapeamento(eq(p), any(), eq(admin), eq(usuario));
         verify(notificacaoService).notificarInicioProcesso(eq(1L), anyList());
         assertThat(p.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
     }
@@ -186,7 +186,7 @@ class ProcessoInicializadorTest {
 
         assertThat(erros).isEmpty();
         verify(unidadeMapaRepo).findAllById(anyList());
-        verify(subprocessoFacade).criarParaRevisao(p, u, um, admin, usuario);
+        verify(subprocessoService).criarParaRevisao(p, u, um, admin, usuario);
         verify(notificacaoService).notificarInicioProcesso(eq(1L), anyList());
     }
 
@@ -215,7 +215,7 @@ class ProcessoInicializadorTest {
         List<String> erros = inicializador.iniciar(1L, null, usuario);
 
         assertThat(erros).isEmpty();
-        verify(subprocessoFacade).criarParaDiagnostico(eq(p), any(), any(), eq(admin), eq(usuario));
+        verify(subprocessoService).criarParaDiagnostico(eq(p), any(), any(), eq(admin), eq(usuario));
         verify(notificacaoService).notificarInicioProcesso(eq(1L), anyList());
     }
 }

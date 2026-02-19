@@ -11,7 +11,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,7 +28,7 @@ public class ProcessoInicializador {
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
     private final ProcessoNotificacaoService notificacaoService;
-    private final SubprocessoFacade subprocessoFacade;
+    private final SubprocessoService subprocessoService;
     private final ProcessoValidador processoValidador;
 
     /**
@@ -126,19 +126,19 @@ public class ProcessoInicializador {
                 .collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigo, m -> m));
 
         switch (tipo) {
-          case TipoProcesso.MAPEAMENTO -> subprocessoFacade.criarParaMapeamento(processo, unidadesParaProcessar, admin, usuario);
+          case TipoProcesso.MAPEAMENTO -> subprocessoService.criarParaMapeamento(processo, unidadesParaProcessar, admin, usuario);
           case TipoProcesso.REVISAO -> {
               for (Long codUnidade : codigosUnidades) {
                   Unidade unidade = repo.buscar(Unidade.class, codUnidade);
                   UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
-                  subprocessoFacade.criarParaRevisao(processo, unidade, um, admin, usuario);
+                  subprocessoService.criarParaRevisao(processo, unidade, um, admin, usuario);
               }
           }
           default -> {
               // Caso DIAGNOSTICO
               for (Unidade unidade : unidadesParaProcessar) {
                   UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
-                  subprocessoFacade.criarParaDiagnostico(processo, unidade, um, admin, usuario);
+                  subprocessoService.criarParaDiagnostico(processo, unidade, um, admin, usuario);
               }
           }
         }

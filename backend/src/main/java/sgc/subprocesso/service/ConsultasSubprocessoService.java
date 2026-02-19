@@ -1,4 +1,4 @@
-package sgc.subprocesso.service.query;
+package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;

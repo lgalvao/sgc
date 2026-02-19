@@ -1,4 +1,4 @@
-package sgc.subprocesso.service.notificacao;
+package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -12,7 +12,7 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.eventos.TipoTransicao;
+import sgc.subprocesso.model.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDateTime;

@@ -24,7 +24,8 @@ import sgc.comum.dto.ComumDtos.JustificativaRequest;
 import sgc.comum.dto.ComumDtos.TextoRequest;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoWorkflowService;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,8 @@ import java.util.Optional;
 @Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoCadastroController {
 
-    private final SubprocessoFacade subprocessoFacade;
+    private final SubprocessoService subprocessoService;
+    private final SubprocessoWorkflowService subprocessoWorkflowService;
     private final AnaliseFacade analiseFacade;
     private final OrganizacaoFacade organizacaoFacade;
 
@@ -53,7 +55,7 @@ public class SubprocessoCadastroController {
             @PathVariable("codigo") Long codSubprocesso,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        List<Atividade> faltando = subprocessoFacade.obterAtividadesSemConhecimento(codSubprocesso);
+        List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codSubprocesso);
         if (!faltando.isEmpty()) {
             var lista = faltando.stream()
                     .map(
@@ -68,7 +70,7 @@ public class SubprocessoCadastroController {
                     Map.of("atividadesSemConhecimento", lista));
         }
 
-        subprocessoFacade.disponibilizarCadastro(codSubprocesso, usuario);
+        subprocessoWorkflowService.disponibilizarCadastro(codSubprocesso, usuario);
         return ResponseEntity.ok(new MensagemResponse("Cadastro de atividades disponibilizado"));
     }
 
@@ -78,7 +80,7 @@ public class SubprocessoCadastroController {
     public ResponseEntity<MensagemResponse> disponibilizarRevisao(
             @PathVariable Long codigo, @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        List<Atividade> faltando = subprocessoFacade.obterAtividadesSemConhecimento(codigo);
+        List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codigo);
         if (!faltando.isEmpty()) {
             var lista = faltando.stream()
                     .map(a -> Map.of("codigo", a.getCodigo(), "descricao", a.getDescricao()))
@@ -89,7 +91,7 @@ public class SubprocessoCadastroController {
                     Map.of("atividadesSemConhecimento", lista));
         }
 
-        subprocessoFacade.disponibilizarRevisao(codigo, usuario);
+        subprocessoWorkflowService.disponibilizarRevisao(codigo, usuario);
 
         return ResponseEntity.ok(new MensagemResponse("Revisão do cadastro de atividades disponibilizada"));
     }
@@ -98,7 +100,7 @@ public class SubprocessoCadastroController {
     @GetMapping("/{codigo}/cadastro")
     @PreAuthorize("isAuthenticated()")
     public Subprocesso obterCadastro(@PathVariable Long codigo) {
-        return subprocessoFacade.buscarSubprocesso(codigo);
+        return subprocessoService.buscarSubprocesso(codigo);
     }
 
     @PostMapping("/{codigo}/devolver-cadastro")
@@ -113,7 +115,7 @@ public class SubprocessoCadastroController {
         String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.justificativa()))
                 .orElse("");
 
-        subprocessoFacade.devolverCadastro(codigo, sanitizedObservacoes, usuario);
+        subprocessoWorkflowService.devolverCadastro(codigo, usuario, sanitizedObservacoes);
     }
 
     @PostMapping("/{codigo}/aceitar-cadastro")
@@ -127,7 +129,7 @@ public class SubprocessoCadastroController {
         String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.texto()))
                 .orElse("");
 
-        subprocessoFacade.aceitarCadastro(codigo, sanitizedObservacoes, usuario);
+        subprocessoWorkflowService.aceitarCadastro(codigo, usuario, sanitizedObservacoes);
     }
 
     @PostMapping("/{codigo}/homologar-cadastro")
@@ -141,7 +143,7 @@ public class SubprocessoCadastroController {
         String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.texto()))
                 .orElse("");
 
-        subprocessoFacade.homologarCadastro(codigo, sanitizedObservacoes, usuario);
+        subprocessoWorkflowService.homologarCadastro(codigo, usuario, sanitizedObservacoes);
     }
 
     @PostMapping("/{codigo}/devolver-revisao-cadastro")
@@ -155,7 +157,7 @@ public class SubprocessoCadastroController {
         String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.justificativa()))
                 .orElse("");
 
-        subprocessoFacade.devolverRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
+        subprocessoWorkflowService.devolverRevisaoCadastro(codigo, usuario, sanitizedObservacoes);
     }
 
     @PostMapping("/{codigo}/aceitar-revisao-cadastro")
@@ -169,7 +171,7 @@ public class SubprocessoCadastroController {
         String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.texto()))
                 .orElse("");
 
-        subprocessoFacade.aceitarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
+        subprocessoWorkflowService.aceitarRevisaoCadastro(codigo, usuario, sanitizedObservacoes);
     }
 
     @PostMapping("/{codigo}/homologar-revisao-cadastro")
@@ -183,7 +185,7 @@ public class SubprocessoCadastroController {
         String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.texto()))
                 .orElse("");
 
-        subprocessoFacade.homologarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
+        subprocessoWorkflowService.homologarRevisaoCadastro(codigo, usuario, sanitizedObservacoes);
     }
 
     @PostMapping("/{codigo}/importar-atividades")
@@ -192,7 +194,7 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Importa atividades de outro subprocesso")
     public Map<String, String> importarAtividades(
             @PathVariable Long codigo, @RequestBody @Valid ImportarAtividadesRequest request) {
-        subprocessoFacade.importarAtividades(codigo, request.codSubprocessoOrigem());
+        subprocessoService.importarAtividades(codigo, request.codSubprocessoOrigem());
         return Map.of("message", "Atividades importadas.");
     }
 
@@ -203,7 +205,7 @@ public class SubprocessoCadastroController {
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        subprocessoFacade.aceitarCadastroEmBloco(request.subprocessos(), codigo, usuario);
+        subprocessoWorkflowService.aceitarCadastroEmBloco(request.subprocessos(), usuario);
     }
 
     @PostMapping("/{codigo}/homologar-cadastro-bloco")
@@ -213,7 +215,7 @@ public class SubprocessoCadastroController {
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        subprocessoFacade.homologarCadastroEmBloco(request.subprocessos(), codigo, usuario);
+        subprocessoWorkflowService.homologarCadastroEmBloco(request.subprocessos(), usuario);
     }
 
     private Usuario obterUsuarioAutenticado(@Nullable Object principal) {

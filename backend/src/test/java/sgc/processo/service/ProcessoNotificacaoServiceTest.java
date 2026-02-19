@@ -25,7 +25,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.*;
 
@@ -45,7 +45,7 @@ class ProcessoNotificacaoServiceTest {
     private ProcessoRepo processoRepo;
 
     @Mock
-    private SubprocessoFacade subprocessoFacade;
+    private SubprocessoService subprocessoService;
 
     @Mock
     private UsuarioFacade usuarioService;
@@ -102,7 +102,7 @@ class ProcessoNotificacaoServiceTest {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(100L);
         subprocesso.setUnidade(unidade);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
 
         UnidadeResponsavelDto responsavel = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(10L)
@@ -126,7 +126,7 @@ class ProcessoNotificacaoServiceTest {
     void deveIgnorarProcessamentoSeNaoHouverSubprocessosAoIniciar() {
         Processo processo = criarProcesso(1L);
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
 
         service.notificarInicioProcesso(1L, List.of());
 
@@ -152,7 +152,7 @@ class ProcessoNotificacaoServiceTest {
 
         // Testa catch no fluxo principal para tipo não suportado (ex: SEM_EQUIPE)
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularTitulo("T").build()));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", Usuario.builder().build()));
 
@@ -170,7 +170,7 @@ class ProcessoNotificacaoServiceTest {
         Unidade u = criarUnidade(10L, TipoUnidade.OPERACIONAL);
         Subprocesso s = new Subprocesso();
         s.setUnidade(u);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
 
         UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").substitutoTitulo("S").build();
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r));
@@ -259,7 +259,7 @@ class ProcessoNotificacaoServiceTest {
         Unidade u = criarUnidade(1L, TipoUnidade.SEM_EQUIPE);
         s.setUnidade(u);
 
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
 
         UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T").build();
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r));
@@ -330,7 +330,7 @@ class ProcessoNotificacaoServiceTest {
         Subprocesso s = new Subprocesso();
         s.setCodigo(100L);
         s.setUnidade(u);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
 
         UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(10L).titularTitulo("T").build();
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, r));
@@ -401,7 +401,7 @@ class ProcessoNotificacaoServiceTest {
         Subprocesso s3 = new Subprocesso();
         s3.setUnidade(u3);
 
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1, s2, s3));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1, s2, s3));
 
         UnidadeResponsavelDto r1 = UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build();
         UnidadeResponsavelDto r2 = UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build();
@@ -495,7 +495,7 @@ class ProcessoNotificacaoServiceTest {
         Subprocesso s = new Subprocesso();
         s.setUnidade(u);
 
-        when(subprocessoFacade.listarEntidadesPorProcesso(7L)).thenReturn(List.of(s));
+        when(subprocessoService.listarEntidadesPorProcesso(7L)).thenReturn(List.of(s));
 
         UnidadeResponsavelDto r = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(1L)
@@ -556,7 +556,7 @@ class ProcessoNotificacaoServiceTest {
         Subprocesso s = new Subprocesso();
         s.setUnidade(u);
 
-        when(subprocessoFacade.listarEntidadesPorProcesso(9L)).thenReturn(List.of(s));
+        when(subprocessoService.listarEntidadesPorProcesso(9L)).thenReturn(List.of(s));
 
         UnidadeResponsavelDto r = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(1L)
@@ -655,7 +655,7 @@ class ProcessoNotificacaoServiceTest {
                     .build();
 
             when(processoRepo.findById(codProcesso)).thenReturn(Optional.of(processo));
-            when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
+            when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(11L, resp));
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("TITULAR", usuarioTitular));
             
@@ -688,7 +688,7 @@ class ProcessoNotificacaoServiceTest {
                     .build();
             
             when(processoRepo.findById(codProcesso)).thenReturn(Optional.of(processo));
-            when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
+            when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(11L, resp));
             
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(null);
@@ -721,7 +721,7 @@ class ProcessoNotificacaoServiceTest {
             subprocesso.setCodigo(201L);
 
             when(processoRepo.findById(codProcesso)).thenReturn(Optional.of(processo));
-            when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
+            when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
 
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of());

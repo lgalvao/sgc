@@ -12,7 +12,7 @@ import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.*;
-import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
+import sgc.subprocesso.service.SubprocessoStatusService;
 
 import java.util.*;
 
@@ -28,7 +28,7 @@ public class MapaManutencaoService {
     private final ComumRepo repo;
     private final AtividadeMapper atividadeMapper;
     private final ConhecimentoMapper conhecimentoMapper;
-    private final SubprocessoAdminWorkflowService subprocessoAdminService;
+    private final SubprocessoStatusService subprocessoStatusService;
 
     @Transactional(readOnly = true)
     public List<Atividade> listarAtividades() {
@@ -248,7 +248,7 @@ public class MapaManutencaoService {
     }
 
     private void notificarAlteracaoMapa(Long mapaCodigo) {
-        subprocessoAdminService.atualizarParaEmAndamento(mapaCodigo);
+        subprocessoStatusService.atualizarParaEmAndamento(mapaCodigo);
     }
 
     @Transactional(readOnly = true)

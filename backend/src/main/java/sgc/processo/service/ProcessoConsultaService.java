@@ -17,7 +17,7 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.query.ConsultasSubprocessoService;
+import sgc.subprocesso.service.ConsultasSubprocessoService;
 
 import java.util.*;
 

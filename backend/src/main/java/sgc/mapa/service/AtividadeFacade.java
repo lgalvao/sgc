@@ -14,7 +14,7 @@ import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;
 
@@ -24,20 +24,20 @@ import static sgc.seguranca.acesso.Acao.*;
 @Transactional
 public class AtividadeFacade {
     private final MapaManutencaoService mapaManutencaoService;
-    private final SubprocessoFacade subprocessoFacade;
+    private final SubprocessoService subprocessoService;
     private final AccessControlService accessControlService;
     private final UsuarioFacade usuarioService;
     private final MapaFacade mapaFacade;
 
     public AtividadeFacade(
             MapaManutencaoService mapaManutencaoService,
-            @Lazy SubprocessoFacade subprocessoFacade,
+            @Lazy SubprocessoService subprocessoService,
             AccessControlService accessControlService,
             UsuarioFacade usuarioService,
             MapaFacade mapaFacade) {
 
         this.mapaManutencaoService = mapaManutencaoService;
-        this.subprocessoFacade = subprocessoFacade;
+        this.subprocessoService = subprocessoService;
         this.accessControlService = accessControlService;
         this.usuarioService = usuarioService;
         this.mapaFacade = mapaFacade;
@@ -128,7 +128,7 @@ public class AtividadeFacade {
     }
 
     private Long obterCodigoSubprocessoPorMapa(Long codMapa) {
-        Subprocesso subprocesso = subprocessoFacade.obterEntidadePorCodigoMapa(codMapa);
+        Subprocesso subprocesso = subprocessoService.obterEntidadePorCodigoMapa(codMapa);
         return subprocesso.getCodigo();
     }
 
@@ -140,8 +140,8 @@ public class AtividadeFacade {
     }
 
     private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
-        SubprocessoSituacaoDto situacaoDto = subprocessoFacade.obterSituacao(codSubprocesso);
-        List<AtividadeDto> todasAtividades = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
+        SubprocessoSituacaoDto situacaoDto = subprocessoService.obterStatus(codSubprocesso);
+        List<AtividadeDto> todasAtividades = subprocessoService.listarAtividadesSubprocesso(codSubprocesso);
 
         AtividadeDto atividadeVis = null;
         if (incluirAtividade) {

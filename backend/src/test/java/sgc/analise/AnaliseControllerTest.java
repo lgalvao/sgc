@@ -15,7 +15,7 @@ import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,7 +49,7 @@ class AnaliseControllerTest {
     private AnaliseFacade analiseFacade;
 
     @MockitoBean
-    private SubprocessoFacade subprocessoFacade;
+    private SubprocessoService subprocessoService;
 
     private Subprocesso subprocesso;
 
@@ -78,7 +78,7 @@ class AnaliseControllerTest {
             AnaliseHistoricoDto dto1 = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_1).build();
             AnaliseHistoricoDto dto2 = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_2).build();
 
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.listarHistoricoCadastro(1L))
                     .thenReturn(Arrays.asList(dto1, dto2));
 
@@ -93,7 +93,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar lista vazia de análises de cadastro com status 200 OK")
         @WithMockUser
         void deveRetornarListaVaziaDeAnalisesCadastro() throws Exception {
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.listarHistoricoCadastro(1L))
                     .thenReturn(Collections.emptyList());
 
@@ -122,7 +122,7 @@ class AnaliseControllerTest {
             Analise analise = new Analise();
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes(NOVA_ANALISE_DE_CADASTRO).build();
 
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
             when(analiseFacade.paraHistoricoDto(analise)).thenReturn(dto);
 
@@ -149,7 +149,7 @@ class AnaliseControllerTest {
             Analise analise = new Analise();
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes("").build();
 
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
             when(analiseFacade.paraHistoricoDto(analise)).thenReturn(dto);
 
@@ -167,7 +167,7 @@ class AnaliseControllerTest {
             Analise analise = new Analise();
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().build();
 
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
             when(analiseFacade.paraHistoricoDto(analise)).thenReturn(dto);
 
@@ -190,7 +190,7 @@ class AnaliseControllerTest {
                     .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
                     .build();
 
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any()))
                     .thenThrow(new IllegalArgumentException("Parâmetro inválido"));
 
@@ -213,7 +213,7 @@ class AnaliseControllerTest {
         void deveRetornarListaDeAnalisesValidacao() throws Exception {
             AnaliseHistoricoDto vDto = AnaliseHistoricoDto.builder().observacoes(OBSERVACAO_1).build();
 
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.listarHistoricoValidacao(1L))
                     .thenReturn(Collections.singletonList(vDto));
 
@@ -226,7 +226,7 @@ class AnaliseControllerTest {
         @DisplayName("Deve retornar lista vazia de análises de validação com status 200 OK")
         @WithMockUser
         void deveRetornarListaVaziaDeAnalisesValidacao() throws Exception {
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.listarHistoricoValidacao(1L))
                     .thenReturn(Collections.emptyList());
 
@@ -254,7 +254,7 @@ class AnaliseControllerTest {
             Analise analise = new Analise();
             AnaliseHistoricoDto dto = AnaliseHistoricoDto.builder().observacoes(NOVA_ANALISE_DE_VALIDACAO).build();
 
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(analiseFacade.criarAnalise(any(), any())).thenReturn(analise);
             when(analiseFacade.paraHistoricoDto(analise)).thenReturn(dto);
 

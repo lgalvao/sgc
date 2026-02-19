@@ -13,7 +13,7 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.service.query.ConsultasSubprocessoService;
+import sgc.subprocesso.service.ConsultasSubprocessoService;
 import sgc.testutils.UnidadeTestBuilder;
 
 import java.util.List;

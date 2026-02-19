@@ -11,7 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
-import sgc.subprocesso.service.query.ConsultasSubprocessoService;
+import sgc.subprocesso.service.ConsultasSubprocessoService;
 
 import java.util.Collections;
 import java.util.List;

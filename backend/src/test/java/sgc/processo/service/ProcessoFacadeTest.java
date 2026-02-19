@@ -32,7 +32,8 @@ import sgc.processo.model.*;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoWorkflowService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -71,7 +72,9 @@ class ProcessoFacadeTest {
     @Mock
     private NotificacaoModelosService notificacaoModelosService;
     @Mock
-    private SubprocessoFacade subprocessoFacade;
+    private SubprocessoService subprocessoService;
+    @Mock
+    private SubprocessoWorkflowService subprocessoWorkflowService;
     @Mock
     private UsuarioFacade usuarioService;
     @Mock
@@ -136,7 +139,7 @@ class ProcessoFacadeTest {
             when(processoConsultaService.buscarProcessoCodigo(codProcesso)).thenReturn(processo);
             when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(unidade);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
-            when(subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
+            when(subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
             unidade.setTituloTitular("T1");
             Usuario titular = new Usuario();
             titular.setEmail("titular@teste.com");
@@ -147,7 +150,7 @@ class ProcessoFacadeTest {
             processoFacade.enviarLembrete(codProcesso, codUnidade);
 
             verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("15/03/2026"));
-            verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
+            verify(subprocessoWorkflowService).registrarMovimentacaoLembrete(99L);
             verify(notificacaoEmailService).enviarEmailHtml(
                 eq("titular@teste.com"), 
                 contains("SGC: Lembrete de prazo"), 
@@ -192,14 +195,14 @@ class ProcessoFacadeTest {
                     .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                     .build();
 
-            when(subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
+            when(subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
                 .thenReturn(List.of(sub));
             
             AcaoEmBlocoRequest reqNull = new AcaoEmBlocoRequest(List.of(10L), null, LocalDate.now());
             processoFacade.executarAcaoEmBloco(codProcesso, reqNull);
 
-            verify(subprocessoFacade, never()).aceitarCadastroEmBloco(any(), any(), any());
-            verify(subprocessoFacade, never()).homologarCadastroEmBloco(any(), any(), any());
+            verify(subprocessoWorkflowService, never()).aceitarCadastroEmBloco(any(), any());
+            verify(subprocessoWorkflowService, never()).homologarCadastroEmBloco(any(), any());
         }
     }
 
@@ -308,7 +311,7 @@ class ProcessoFacadeTest {
             when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
             when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
-            when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
+            when(subprocessoService.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
             u.setTituloTitular("T10");
             Usuario titular = new Usuario();
             titular.setEmail("u10@teste.com");
@@ -317,7 +320,7 @@ class ProcessoFacadeTest {
 
             processoFacade.enviarLembrete(1L, 10L);
             verify(alertaService).criarAlertaAdmin(eq(p), eq(u), anyString());
-            verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
+            verify(subprocessoWorkflowService).registrarMovimentacaoLembrete(99L);
             verify(notificacaoEmailService).enviarEmailHtml(eq("u10@teste.com"), contains(p.getDescricao()), anyString());
         }
 
@@ -515,15 +518,21 @@ class ProcessoFacadeTest {
                     dataLimite
                 );
 
+                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(1L, 2L, 3L)))
+                    .thenReturn(List.of(
+                        Subprocesso.builder().codigo(10L).build(),
+                        Subprocesso.builder().codigo(20L).build(),
+                        Subprocesso.builder().codigo(30L).build()
+                    ));
+
                 // Act
                 processoFacade.executarAcaoEmBloco(100L, req);
 
                 // Assert
                 ArgumentCaptor<DisponibilizarMapaRequest> captor = 
                     ArgumentCaptor.forClass(DisponibilizarMapaRequest.class);
-                verify(subprocessoFacade).disponibilizarMapaEmBloco(
-                    eq(List.of(1L, 2L, 3L)),
-                    eq(100L),
+                verify(subprocessoWorkflowService).disponibilizarMapaEmBloco(
+                    eq(List.of(10L, 20L, 30L)), // Expecting Subprocess IDs
                     captor.capture(),
                     eq(usuario)
                 );
@@ -555,7 +564,7 @@ class ProcessoFacadeTest {
                     .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                     .build();
 
-                when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(10L, 20L))).thenReturn(List.of(sp1, sp2));
+                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L, 20L))).thenReturn(List.of(sp1, sp2));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                     List.of(10L, 20L),
@@ -567,7 +576,8 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
                 // Assert
-                verify(subprocessoFacade).aceitarCadastroEmBloco(List.of(10L, 20L), 100L, usuario);
+                // Expecting Subprocess IDs 1L and 2L, not Unit IDs
+                verify(subprocessoWorkflowService).aceitarCadastroEmBloco(List.of(1L, 2L), usuario);
             }
 
             @Test
@@ -583,7 +593,7 @@ class ProcessoFacadeTest {
                     .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO)
                     .build();
 
-                when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
+                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                     List.of(10L),
@@ -595,7 +605,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
                 // Assert
-                verify(subprocessoFacade).aceitarValidacaoEmBloco(List.of(10L), 100L, usuario);
+                verify(subprocessoWorkflowService).aceitarValidacaoEmBloco(List.of(1L), usuario);
             }
         }
 
@@ -615,7 +625,7 @@ class ProcessoFacadeTest {
                     .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA)
                     .build();
 
-                when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
+                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                     List.of(10L),
@@ -627,7 +637,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
                 // Assert
-                verify(subprocessoFacade).homologarCadastroEmBloco(List.of(10L), 100L, usuario);
+                verify(subprocessoWorkflowService).homologarCadastroEmBloco(List.of(1L), usuario);
             }
         }
     }

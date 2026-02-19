@@ -14,7 +14,7 @@ import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;
 
@@ -24,13 +24,13 @@ import java.util.List;
 @Tag(name = "Análises", description = "Endpoints para gerenciar as análises de cadastro e validação de subprocessos")
 public class AnaliseController {
     private final AnaliseFacade analiseFacade;
-    private final SubprocessoFacade subprocessoFacade;
+    private final SubprocessoService subprocessoService;
 
     @GetMapping("/analises-cadastro")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista o histórico de análises de cadastro")
     public List<AnaliseHistoricoDto> listarAnalisesCadastro(@PathVariable("codSubprocesso") Long codigo) {
-        subprocessoFacade.buscarSubprocesso(codigo);
+        subprocessoService.buscarSubprocesso(codigo);
         return analiseFacade.listarHistoricoCadastro(codigo);
     }
 
@@ -48,7 +48,7 @@ public class AnaliseController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista o histórico de análises de validação")
     public List<AnaliseHistoricoDto> listarAnalisesValidacao(@PathVariable Long codSubprocesso) {
-        subprocessoFacade.buscarSubprocesso(codSubprocesso);
+        subprocessoService.buscarSubprocesso(codSubprocesso);
         return analiseFacade.listarHistoricoValidacao(codSubprocesso);
     }
 
@@ -63,7 +63,7 @@ public class AnaliseController {
     }
 
     private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {
-        Subprocesso sp = subprocessoFacade.buscarSubprocesso(codSubprocesso);
+        Subprocesso sp = subprocessoService.buscarSubprocesso(codSubprocesso);
         String obs = StringUtils.stripToEmpty(request.observacoes());
 
         CriarAnaliseCommand criarAnaliseCommand = CriarAnaliseCommand.builder()

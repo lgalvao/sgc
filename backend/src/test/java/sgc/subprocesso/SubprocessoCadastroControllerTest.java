@@ -19,7 +19,8 @@ import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoWorkflowService;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
@@ -40,7 +41,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class SubprocessoCadastroControllerTest {
 
     @MockitoBean
-    private SubprocessoFacade subprocessoFacade;
+    private SubprocessoService subprocessoService;
+
+    @MockitoBean
+    private SubprocessoWorkflowService subprocessoWorkflowService;
 
     @MockitoBean
     private AnaliseFacade analiseFacade;
@@ -94,7 +98,7 @@ class SubprocessoCadastroControllerTest {
             Usuario usuario = new Usuario();
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
-            when(subprocessoFacade.obterAtividadesSemConhecimento(1L))
+            when(subprocessoService.obterAtividadesSemConhecimento(1L))
                     .thenReturn(Collections.emptyList());
 
             // Act & Assert
@@ -103,7 +107,7 @@ class SubprocessoCadastroControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mensagem").value("Cadastro de atividades disponibilizado"));
 
-            verify(subprocessoFacade).disponibilizarCadastro(1L, usuario);
+            verify(subprocessoWorkflowService).disponibilizarCadastro(1L, usuario);
         }
 
         @Test
@@ -117,7 +121,7 @@ class SubprocessoCadastroControllerTest {
             
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(new Usuario());
-            when(subprocessoFacade.obterAtividadesSemConhecimento(1L))
+            when(subprocessoService.obterAtividadesSemConhecimento(1L))
                     .thenReturn(List.of(atividade));
 
             // Act & Assert
@@ -138,7 +142,7 @@ class SubprocessoCadastroControllerTest {
             Usuario usuario = new Usuario();
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
-            when(subprocessoFacade.obterAtividadesSemConhecimento(1L))
+            when(subprocessoService.obterAtividadesSemConhecimento(1L))
                     .thenReturn(Collections.emptyList());
 
             // Act & Assert
@@ -147,7 +151,7 @@ class SubprocessoCadastroControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mensagem").value("Revisão do cadastro de atividades disponibilizada"));
 
-            verify(subprocessoFacade).disponibilizarRevisao(1L, usuario);
+            verify(subprocessoWorkflowService).disponibilizarRevisao(1L, usuario);
         }
 
         @Test
@@ -161,7 +165,7 @@ class SubprocessoCadastroControllerTest {
             
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(new Usuario());
-            when(subprocessoFacade.obterAtividadesSemConhecimento(1L))
+            when(subprocessoService.obterAtividadesSemConhecimento(1L))
                     .thenReturn(List.of(atividade));
 
             // Act & Assert
@@ -182,14 +186,14 @@ class SubprocessoCadastroControllerTest {
             Subprocesso sp = Subprocesso.builder()
                     .codigo(1L)
                     .build();
-            when(subprocessoFacade.buscarSubprocesso(1L)).thenReturn(sp);
+            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
 
             // Act & Assert
             mockMvc.perform(get("/api/subprocessos/1/cadastro"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.codigo").value(1));
 
-            verify(subprocessoFacade).buscarSubprocesso(1L);
+            verify(subprocessoService).buscarSubprocesso(1L);
         }
     }
 
@@ -215,7 +219,8 @@ class SubprocessoCadastroControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoFacade).devolverCadastro(eq(1L), anyString(), eq(usuario));
+            // Args order fixed in controller: (Long, Usuario, String)
+            verify(subprocessoWorkflowService).devolverCadastro(eq(1L), eq(usuario), anyString());
         }
     }
 
@@ -240,7 +245,8 @@ class SubprocessoCadastroControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoFacade).aceitarCadastro(eq(1L), anyString(), eq(usuario));
+            // Args order fixed in controller: (Long, Usuario, String)
+            verify(subprocessoWorkflowService).aceitarCadastro(eq(1L), eq(usuario), anyString());
         }
     }
 
@@ -265,7 +271,8 @@ class SubprocessoCadastroControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoFacade).homologarCadastro(eq(1L), anyString(), eq(usuario));
+            // Args order fixed in controller: (Long, Usuario, String)
+            verify(subprocessoWorkflowService).homologarCadastro(eq(1L), eq(usuario), anyString());
         }
     }
 
@@ -290,7 +297,8 @@ class SubprocessoCadastroControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoFacade).devolverRevisaoCadastro(eq(1L), anyString(), eq(usuario));
+            // Args order fixed in controller: (Long, Usuario, String)
+            verify(subprocessoWorkflowService).devolverRevisaoCadastro(eq(1L), eq(usuario), anyString());
         }
     }
 
@@ -315,7 +323,8 @@ class SubprocessoCadastroControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoFacade).aceitarRevisaoCadastro(eq(1L), anyString(), eq(usuario));
+            // Args order fixed in controller: (Long, Usuario, String)
+            verify(subprocessoWorkflowService).aceitarRevisaoCadastro(eq(1L), eq(usuario), anyString());
         }
     }
 
@@ -340,7 +349,8 @@ class SubprocessoCadastroControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoFacade).homologarRevisaoCadastro(eq(1L), anyString(), eq(usuario));
+            // Args order fixed in controller: (Long, Usuario, String)
+            verify(subprocessoWorkflowService).homologarRevisaoCadastro(eq(1L), eq(usuario), anyString());
         }
     }
 
@@ -362,7 +372,7 @@ class SubprocessoCadastroControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value("Atividades importadas."));
 
-            verify(subprocessoFacade).importarAtividades(1L, 2L);
+            verify(subprocessoService).importarAtividades(1L, 2L);
         }
     }
 
@@ -391,8 +401,8 @@ class SubprocessoCadastroControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoFacade).aceitarCadastroEmBloco(
-                    List.of(1L, 2L, 3L), 100L, usuario);
+            verify(subprocessoWorkflowService).aceitarCadastroEmBloco(
+                    List.of(1L, 2L, 3L), usuario);
         }
     }
 
@@ -421,8 +431,8 @@ class SubprocessoCadastroControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoFacade).homologarCadastroEmBloco(
-                    List.of(1L, 2L), 100L, usuario);
+            verify(subprocessoWorkflowService).homologarCadastroEmBloco(
+                    List.of(1L, 2L), usuario);
         }
     @Nested
     @DisplayName("Testes Unitários Isolados")
@@ -430,18 +440,21 @@ class SubprocessoCadastroControllerTest {
         
         // Manual mocks for isolated testing
         private SubprocessoCadastroController controller;
-        private SubprocessoFacade subprocessoFacadeMock;
+        private SubprocessoService subprocessoServiceMock;
+        private SubprocessoWorkflowService subprocessoWorkflowServiceMock;
         private AnaliseFacade analiseFacadeMock;
         private OrganizacaoFacade organizacaoFacadeMock;
 
         @BeforeEach
         void setUp() {
-            subprocessoFacadeMock = Mockito.mock(SubprocessoFacade.class);
+            subprocessoServiceMock = Mockito.mock(SubprocessoService.class);
+            subprocessoWorkflowServiceMock = Mockito.mock(SubprocessoWorkflowService.class);
             analiseFacadeMock = Mockito.mock(AnaliseFacade.class);
             organizacaoFacadeMock = Mockito.mock(OrganizacaoFacade.class);
 
             controller = new SubprocessoCadastroController(
-                subprocessoFacadeMock,
+                subprocessoServiceMock,
+                subprocessoWorkflowServiceMock,
                 analiseFacadeMock,
                 organizacaoFacadeMock
             );

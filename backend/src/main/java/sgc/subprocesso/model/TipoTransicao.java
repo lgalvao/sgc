@@ -1,4 +1,4 @@
-package sgc.subprocesso.eventos;
+package sgc.subprocesso.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

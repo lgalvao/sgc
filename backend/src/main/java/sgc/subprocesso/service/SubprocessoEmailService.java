@@ -1,4 +1,4 @@
-package sgc.subprocesso.service.notificacao;
+package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +8,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.eventos.TipoTransicao;
+import sgc.subprocesso.model.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;

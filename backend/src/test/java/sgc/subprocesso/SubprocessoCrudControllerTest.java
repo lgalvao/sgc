@@ -10,11 +10,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
+import sgc.organizacao.model.Usuario;
 import sgc.comum.dto.ComumDtos.JustificativaRequest;
 import sgc.comum.dto.ComumDtos.DataRequest;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoWorkflowService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,7 +33,10 @@ import static org.mockito.Mockito.when;
 class SubprocessoCrudControllerTest {
 
     @Mock
-    private SubprocessoFacade subprocessoFacade;
+    private SubprocessoService subprocessoService;
+
+    @Mock
+    private SubprocessoWorkflowService subprocessoWorkflowService;
 
     @Mock
     private OrganizacaoFacade organizacaoFacade;
@@ -42,16 +47,17 @@ class SubprocessoCrudControllerTest {
     @Test
     @DisplayName("obterPermissoes - Sucesso")
     void obterPermissoes() {
-        when(subprocessoFacade.obterPermissoes(1L)).thenReturn(SubprocessoPermissoesDto.builder().build());
+        when(organizacaoFacade.obterUsuarioAutenticado()).thenReturn(new Usuario());
+        when(subprocessoService.obterPermissoes(eq(1L), any())).thenReturn(SubprocessoPermissoesDto.builder().build());
         ResponseEntity<SubprocessoPermissoesDto> response = controller.obterPermissoes(1L);
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-        verify(subprocessoFacade).obterPermissoes(1L);
+        verify(subprocessoService).obterPermissoes(eq(1L), any());
     }
 
     @Test
     @DisplayName("validarCadastro - Sucesso")
     void validarCadastro() {
-        when(subprocessoFacade.validarCadastro(1L)).thenReturn(ValidacaoCadastroDto.builder().valido(true).build());
+        when(subprocessoService.validarCadastro(1L)).thenReturn(ValidacaoCadastroDto.builder().valido(true).build());
         ResponseEntity<ValidacaoCadastroDto> response = controller.validarCadastro(1L);
         assertThat(response.getBody().valido()).isTrue();
     }
@@ -59,7 +65,7 @@ class SubprocessoCrudControllerTest {
     @Test
     @DisplayName("obterStatus - Sucesso")
     void obterStatus() {
-        when(subprocessoFacade.obterSituacao(1L)).thenReturn(SubprocessoSituacaoDto.builder().build());
+        when(subprocessoService.obterStatus(1L)).thenReturn(SubprocessoSituacaoDto.builder().build());
         ResponseEntity<SubprocessoSituacaoDto> response = controller.obterStatus(1L);
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
     }
@@ -67,7 +73,7 @@ class SubprocessoCrudControllerTest {
     @Test
     @DisplayName("listar - Sucesso")
     void listar() {
-        when(subprocessoFacade.listar()).thenReturn(List.of(Subprocesso.builder().codigo(1L).build()));
+        when(subprocessoService.listarEntidades()).thenReturn(List.of(Subprocesso.builder().codigo(1L).build()));
         List<Subprocesso> result = controller.listar();
         assertThat(result).hasSize(1);
     }
@@ -75,7 +81,8 @@ class SubprocessoCrudControllerTest {
     @Test
     @DisplayName("obterPorCodigo - Sucesso")
     void obterPorCodigo() {
-        when(subprocessoFacade.obterDetalhes(1L)).thenReturn(new SubprocessoDetalheResponse(null, null, null, null, null));
+        when(organizacaoFacade.obterUsuarioAutenticado()).thenReturn(new Usuario());
+        when(subprocessoService.obterDetalhes(eq(1L), any())).thenReturn(new SubprocessoDetalheResponse(null, null, null, null, null));
         SubprocessoDetalheResponse result = controller.obterPorCodigo(1L);
         assertThat(result).isNotNull();
     }
@@ -85,7 +92,7 @@ class SubprocessoCrudControllerTest {
     void buscarPorProcessoEUnidade() {
         UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
         when(organizacaoFacade.buscarUnidadePorSigla("U1")).thenReturn(unidade);
-        when(subprocessoFacade.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(Subprocesso.builder().codigo(100L).build());
+        when(subprocessoService.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(Subprocesso.builder().codigo(100L).build());
 
         ResponseEntity<Subprocesso> response = controller.buscarPorProcessoEUnidade(1L, "U1");
         assertThat(response.getBody().getCodigo()).isEqualTo(100L);
@@ -95,7 +102,7 @@ class SubprocessoCrudControllerTest {
     @DisplayName("criar - Sucesso")
     void criar() {
         CriarSubprocessoRequest req = CriarSubprocessoRequest.builder().codProcesso(1L).codUnidade(10L).build();
-        when(subprocessoFacade.criar(any())).thenReturn(Subprocesso.builder().codigo(100L).build());
+        when(subprocessoService.criar(any())).thenReturn(Subprocesso.builder().codigo(100L).build());
 
         ResponseEntity<Subprocesso> response = controller.criar(req);
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -106,7 +113,7 @@ class SubprocessoCrudControllerTest {
     @DisplayName("atualizar - Sucesso")
     void atualizar() {
         AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder().build();
-        when(subprocessoFacade.atualizar(eq(1L), any())).thenReturn(Subprocesso.builder().codigo(1L).build());
+        when(subprocessoService.atualizarEntidade(eq(1L), any())).thenReturn(Subprocesso.builder().codigo(1L).build());
 
         ResponseEntity<Subprocesso> response = controller.atualizar(1L, req);
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -117,7 +124,7 @@ class SubprocessoCrudControllerTest {
     void excluir() {
         ResponseEntity<Void> response = controller.excluir(1L);
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-        verify(subprocessoFacade).excluir(1L);
+        verify(subprocessoService).excluir(1L);
     }
 
     @Test
@@ -126,7 +133,7 @@ class SubprocessoCrudControllerTest {
         DataRequest req = new DataRequest(LocalDate.now());
         ResponseEntity<Void> response = controller.alterarDataLimite(1L, req);
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-        verify(subprocessoFacade).alterarDataLimite(eq(1L), any());
+        verify(subprocessoWorkflowService).alterarDataLimite(eq(1L), any());
     }
 
     @Test
@@ -135,7 +142,7 @@ class SubprocessoCrudControllerTest {
         JustificativaRequest req = new JustificativaRequest("J");
         ResponseEntity<Void> response = controller.reabrirCadastro(1L, req);
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-        verify(subprocessoFacade).reabrirCadastro(1L, "J");
+        verify(subprocessoWorkflowService).reabrirCadastro(1L, "J");
     }
 
     @Test
@@ -144,6 +151,6 @@ class SubprocessoCrudControllerTest {
         JustificativaRequest req = new JustificativaRequest("J");
         ResponseEntity<Void> response = controller.reabrirRevisaoCadastro(1L, req);
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-        verify(subprocessoFacade).reabrirRevisaoCadastro(1L, "J");
+        verify(subprocessoWorkflowService).reabrirRevisaoCadastro(1L, "J");
     }
 }

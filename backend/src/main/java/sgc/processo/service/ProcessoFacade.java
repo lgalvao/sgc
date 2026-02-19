@@ -21,7 +21,8 @@ import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoWorkflowService;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -38,7 +39,8 @@ public class ProcessoFacade {
     private final ProcessoConsultaService processoConsultaService;
     private final ProcessoManutencaoService processoManutencaoService;
     private final UnidadeFacade unidadeService;
-    private final SubprocessoFacade subprocessoFacade;
+    private final SubprocessoService subprocessoService;
+    private final SubprocessoWorkflowService subprocessoWorkflowService;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final UsuarioFacade usuarioService;
     private final ProcessoInicializador processoInicializador;
@@ -166,8 +168,8 @@ public class ProcessoFacade {
         String corpoHtml = notificacaoModelosService.criarEmailLembretePrazo(
                 unidade.getSigla(), processo.getDescricao(), processo.getDataLimite());
 
-        Subprocesso subprocesso = subprocessoFacade.obterPorProcessoEUnidade(codProcesso, unidadeCodigo);
-        subprocessoFacade.registrarMovimentacaoLembrete(subprocesso.getCodigo());
+        Subprocesso subprocesso = subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, unidadeCodigo);
+        subprocessoWorkflowService.registrarMovimentacaoLembrete(subprocesso.getCodigo());
 
         // Enviar para o titular da unidade
         try {
@@ -205,12 +207,12 @@ public class ProcessoFacade {
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarTodosSubprocessos(Long codProcesso) {
-        return subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
+        return subprocessoService.listarEntidadesPorProcesso(codProcesso);
     }
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarEntidadesSubprocessos(Long codProcesso) {
-        return subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
+        return subprocessoService.listarEntidadesPorProcesso(codProcesso);
     }
 
     @Transactional
@@ -222,7 +224,11 @@ public class ProcessoFacade {
                     req.dataLimite(),
                     "Disponibilização em bloco"
             );
-            subprocessoFacade.disponibilizarMapaEmBloco(req.unidadeCodigos(), codProcesso, dispReq, usuario);
+            List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
+            List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
+            if (!ids.isEmpty()) {
+                subprocessoWorkflowService.disponibilizarMapaEmBloco(ids, dispReq, usuario);
+            }
             return;
         }
 
@@ -230,63 +236,62 @@ public class ProcessoFacade {
     }
 
     private void processarAcoesAceiteHomologacao(Long codProcesso, AcaoEmBlocoRequest req, Usuario usuario) {
-        List<Long> unidadesAceitarCadastro = new ArrayList<>();
-        List<Long> unidadesAceitarValidacao = new ArrayList<>();
-        List<Long> unidadesHomologarCadastro = new ArrayList<>();
-        List<Long> unidadesHomologarValidacao = new ArrayList<>();
+        List<Long> subprocessosAceitarCadastro = new ArrayList<>();
+        List<Long> subprocessosAceitarValidacao = new ArrayList<>();
+        List<Long> subprocessosHomologarCadastro = new ArrayList<>();
+        List<Long> subprocessosHomologarValidacao = new ArrayList<>();
 
         if (req.unidadeCodigos().isEmpty()) {
             return;
         }
 
-        List<Subprocesso> subprocessos = subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
+        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
 
         for (Subprocesso sp : subprocessos) {
-            categorizarUnidadePorAcao(req, sp, unidadesAceitarCadastro, unidadesAceitarValidacao, unidadesHomologarCadastro, unidadesHomologarValidacao);
+            categorizarSubprocessoPorAcao(req, sp, subprocessosAceitarCadastro, subprocessosAceitarValidacao, subprocessosHomologarCadastro, subprocessosHomologarValidacao);
         }
 
-        executarAcoesBatch(codProcesso, usuario, unidadesAceitarCadastro, unidadesAceitarValidacao, unidadesHomologarCadastro, unidadesHomologarValidacao);
+        executarAcoesBatch(usuario, subprocessosAceitarCadastro, subprocessosAceitarValidacao, subprocessosHomologarCadastro, subprocessosHomologarValidacao);
     }
 
-    private void categorizarUnidadePorAcao(AcaoEmBlocoRequest req, Subprocesso sp,
-                                           List<Long> unitsAceitarCad, List<Long> unitsAceitarVal,
-                                           List<Long> unitsHomolCad, List<Long> unitsHomolVal) {
-        Long codUnidade = sp.getCodUnidade();
+    private void categorizarSubprocessoPorAcao(AcaoEmBlocoRequest req, Subprocesso sp,
+                                           List<Long> spAceitarCad, List<Long> spAceitarVal,
+                                           List<Long> spHomolCad, List<Long> spHomolVal) {
+        Long codSubprocesso = sp.getCodigo();
         boolean isCadastro = isSituacaoCadastro(sp.getSituacao());
 
         if (req.acao() == ACEITAR) {
             if (isCadastro) {
-                unitsAceitarCad.add(codUnidade);
+                spAceitarCad.add(codSubprocesso);
             } else {
-                unitsAceitarVal.add(codUnidade);
+                spAceitarVal.add(codSubprocesso);
             }
         } else if (req.acao() == HOMOLOGAR) {
             if (isCadastro) {
-                unitsHomolCad.add(codUnidade);
+                spHomolCad.add(codSubprocesso);
             } else {
-                unitsHomolVal.add(codUnidade);
+                spHomolVal.add(codSubprocesso);
             }
         }
     }
 
-    private void executarAcoesBatch(Long codProcesso,
-                                    Usuario usuario,
-                                    List<Long> unidadesAceitarCadastro,
-                                    List<Long> unidadesAceitarValidacao,
-                                    List<Long> unidadesHomologarCadastro,
-                                    List<Long> unidadesHomologarValidacao) {
+    private void executarAcoesBatch(Usuario usuario,
+                                    List<Long> subprocessosAceitarCadastro,
+                                    List<Long> subprocessosAceitarValidacao,
+                                    List<Long> subprocessosHomologarCadastro,
+                                    List<Long> subprocessosHomologarValidacao) {
 
-        if (!unidadesAceitarCadastro.isEmpty()) {
-            subprocessoFacade.aceitarCadastroEmBloco(unidadesAceitarCadastro, codProcesso, usuario);
+        if (!subprocessosAceitarCadastro.isEmpty()) {
+            subprocessoWorkflowService.aceitarCadastroEmBloco(subprocessosAceitarCadastro, usuario);
         }
-        if (!unidadesAceitarValidacao.isEmpty()) {
-            subprocessoFacade.aceitarValidacaoEmBloco(unidadesAceitarValidacao, codProcesso, usuario);
+        if (!subprocessosAceitarValidacao.isEmpty()) {
+            subprocessoWorkflowService.aceitarValidacaoEmBloco(subprocessosAceitarValidacao, usuario);
         }
-        if (!unidadesHomologarCadastro.isEmpty()) {
-            subprocessoFacade.homologarCadastroEmBloco(unidadesHomologarCadastro, codProcesso, usuario);
+        if (!subprocessosHomologarCadastro.isEmpty()) {
+            subprocessoWorkflowService.homologarCadastroEmBloco(subprocessosHomologarCadastro, usuario);
         }
-        if (!unidadesHomologarValidacao.isEmpty()) {
-            subprocessoFacade.homologarValidacaoEmBloco(unidadesHomologarValidacao, codProcesso, usuario);
+        if (!subprocessosHomologarValidacao.isEmpty()) {
+            subprocessoWorkflowService.homologarValidacaoEmBloco(subprocessosHomologarValidacao, usuario);
         }
     }
 

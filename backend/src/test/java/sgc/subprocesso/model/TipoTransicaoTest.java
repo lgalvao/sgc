@@ -1,4 +1,4 @@
-package sgc.subprocesso.eventos;
+package sgc.subprocesso.model;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;

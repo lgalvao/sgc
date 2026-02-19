@@ -21,7 +21,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -39,7 +39,7 @@ class RelatorioFacadeTest {
     @Mock
     private ProcessoFacade processoFacade;
     @Mock
-    private SubprocessoFacade subprocessoFacade;
+    private SubprocessoService subprocessoService;
     @Mock
     private UnidadeFacade unidadeService;
     @Mock
@@ -71,7 +71,7 @@ class RelatorioFacadeTest {
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(unidadeService.buscarResponsavelUnidade(1L)).thenReturn(UnidadeResponsavelDto.builder().titularNome("Resp").build());
 
         OutputStream out = new ByteArrayOutputStream();
@@ -109,7 +109,7 @@ class RelatorioFacadeTest {
         c.setAtividades(Set.of(a));
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -141,7 +141,7 @@ class RelatorioFacadeTest {
         sp2.getMapa().setCodigo(20L);
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
         when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
 
         OutputStream out = new ByteArrayOutputStream();
@@ -170,7 +170,7 @@ class RelatorioFacadeTest {
         c.setAtividades(Set.of()); // Atividades vazias
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -200,7 +200,7 @@ class RelatorioFacadeTest {
         c.setAtividades(Set.of(a));
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -213,7 +213,7 @@ class RelatorioFacadeTest {
     @DisplayName("Deve cobrir erro ao gerar PDF")
     void deveCobrirErroGerarPdf() throws DocumentException {
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(new Processo());
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
         when(pdfFactory.createDocument()).thenReturn(document);
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 
@@ -227,7 +227,7 @@ class RelatorioFacadeTest {
     @DisplayName("Deve cobrir erro ao gerar PDF de mapas")
     void deveCobrirErroGerarPdfMapas() throws DocumentException {
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(new Processo());
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
         when(pdfFactory.createDocument()).thenReturn(document);
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 
