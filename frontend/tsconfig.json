@@ -43,7 +43,8 @@
     "vitest.setup.ts",
     "vite.config.ts",
     "vitest.config.ts",
-    "vitest.browser.config.ts"
+    "vitest.browser.config.ts",
+    ".storybook/*.ts"
   ],
   "exclude": [
     "node_modules",
