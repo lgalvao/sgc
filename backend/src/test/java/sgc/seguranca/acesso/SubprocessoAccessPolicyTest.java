@@ -93,6 +93,8 @@ class SubprocessoAccessPolicyTest {
         
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 1L);
         sp.getUnidade().setTituloTitular("123");
+
+        when(hierarquiaService.isResponsavel(sp.getUnidade(), u)).thenReturn(true);
  
         assertTrue(policy.canExecute(u, Acao.DISPONIBILIZAR_CADASTRO, sp));
     }
@@ -241,9 +243,11 @@ class SubprocessoAccessPolicyTest {
         assertFalse(policy.canExecute(uGestor, Acao.ACEITAR_CADASTRO, sp));
 
         // TITULAR_UNIDADE -> False
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         Usuario uChefe = criarUsuario(Perfil.CHEFE, 1L);
         uChefe.setTituloEleitoral("OUTRO");
         // DISPONIBILIZAR_CADASTRO requer TITULAR_UNIDADE
+        when(hierarquiaService.isResponsavel(sp.getUnidade(), uChefe)).thenReturn(false);
         assertFalse(policy.canExecute(uChefe, Acao.DISPONIBILIZAR_CADASTRO, sp));
     }
 

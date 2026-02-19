@@ -12,6 +12,9 @@ import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.processo.model.TipoProcesso;
+import sgc.seguranca.acesso.Acao;
+import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
@@ -41,6 +44,7 @@ class SubprocessoAtividadeService {
     private final CopiaMapaService copiaMapaService;
     private final MovimentacaoRepo movimentacaoRepo;
     private final UsuarioFacade usuarioService;
+    private final AccessControlService accessControlService;
 
     /**
      * Importa atividades de um subprocesso de origem para um subprocesso de destino.
@@ -58,6 +62,15 @@ class SubprocessoAtividadeService {
     @Transactional
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
         final Subprocesso spDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
+
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+
+        Acao acao = spDestino.getProcesso().getTipo() == TipoProcesso.REVISAO
+                ? Acao.EDITAR_REVISAO_CADASTRO
+                : Acao.EDITAR_CADASTRO;
+
+        accessControlService.verificarPermissao(usuario, acao, spDestino);
+
         Subprocesso spOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);
 
         // Importar atividades diretamente (sem evento assíncrono)
@@ -82,8 +95,6 @@ class SubprocessoAtividadeService {
         String descMovimentacao = String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
                 spOrigem.getCodigo(),
                 unidadeOrigem.getSigla());
-
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
 
         movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(spDestino)

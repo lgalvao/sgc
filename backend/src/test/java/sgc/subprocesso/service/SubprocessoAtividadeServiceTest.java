@@ -22,6 +22,8 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
+import sgc.seguranca.acesso.Acao;
+import sgc.seguranca.acesso.AccessControlService;
 
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
@@ -61,6 +63,9 @@ class SubprocessoAtividadeServiceTest {
 
     @Mock
     private ComumRepo repo;
+
+    @Mock
+    private AccessControlService accessControlService;
 
     @InjectMocks
     private SubprocessoAtividadeService service;
@@ -137,6 +142,7 @@ class SubprocessoAtividadeServiceTest {
             // Assert
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
 
+            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_CADASTRO), eq(spDestino));
             verify(movimentacaoRepo).save(any(Movimentacao.class));
             verify(subprocessoRepo, never()).save(any(Subprocesso.class)); // Não deve salvar pois já está em cadastro
         }
@@ -172,6 +178,7 @@ class SubprocessoAtividadeServiceTest {
             assertThat(subprocessoSalvo.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
             verify(usuarioService).obterUsuarioAutenticado();
+            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_CADASTRO), eq(spDestino));
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
             verify(movimentacaoRepo).save(any(Movimentacao.class));
         }
@@ -236,6 +243,7 @@ class SubprocessoAtividadeServiceTest {
 
             // Assert
             verify(subprocessoRepo).save(spDestino);
+            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_CADASTRO), eq(spDestino));
             assertThat(spDestino.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO); // Não muda no default
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
         }
@@ -250,7 +258,8 @@ class SubprocessoAtividadeServiceTest {
             Mapa mapaOrigem = criarMapa(10L);
             Mapa mapaDestino = criarMapa(20L);
 
-            Subprocesso spDestino = criarSubprocessoComMapa(codDestino, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, mapaDestino);
+            Processo processoRevisao = criarProcesso(TipoProcesso.REVISAO);
+            Subprocesso spDestino = criarSubprocessoComMapaEProcesso(codDestino, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, mapaDestino, processoRevisao);
             Subprocesso spOrigem = criarSubprocessoComMapa(codOrigem, SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO, mapaOrigem);
 
             when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
@@ -262,6 +271,7 @@ class SubprocessoAtividadeServiceTest {
             service.importarAtividades(codDestino, codOrigem);
 
             // Assert
+            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_REVISAO_CADASTRO), eq(spDestino));
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
             verify(movimentacaoRepo).save(any(Movimentacao.class));
             verify(subprocessoRepo, never()).save(any(Subprocesso.class)); // Não deve salvar
@@ -353,6 +363,7 @@ class SubprocessoAtividadeServiceTest {
         return Subprocesso.builder()
                 .codigo(codigo)
                 .situacao(situacao)
+                .processo(criarProcesso(TipoProcesso.MAPEAMENTO))
                 .unidade(unidade)
                 .build();
     }
@@ -367,6 +378,7 @@ class SubprocessoAtividadeServiceTest {
         return Subprocesso.builder()
                 .codigo(codigo)
                 .situacao(situacao)
+                .processo(criarProcesso(TipoProcesso.MAPEAMENTO))
                 .mapa(mapa)
                 .unidade(unidade)
                 .build();
