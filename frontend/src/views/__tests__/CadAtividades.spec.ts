@@ -459,7 +459,7 @@ describe("CadAtividades.vue", () => {
 
         // Dropdown actions
         await wrapper.find('[data-testid="btn-mais-acoes"]').trigger("click");
-        await wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]').trigger("click");
+        await wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa-edicao"]').trigger("click");
 
         await flushPromises();
         expect((wrapper.vm as any).mostrarModalImpacto).toBe(true);

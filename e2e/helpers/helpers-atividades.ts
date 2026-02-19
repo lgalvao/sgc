@@ -135,17 +135,19 @@ export async function verificarBotaoImpactoDropdown(page: Page) {
     const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
     await expect(btnMaisAcoes).toBeVisible();
     await btnMaisAcoes.click();
-    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa')).toBeVisible();
+    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-edicao')).toBeVisible();
     // Fechar clicando novamente ou fora
     await btnMaisAcoes.click();
 }
 
 export async function verificarBotaoImpactoDireto(page: Page) {
-    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa')).toBeVisible();
+    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-visualizacao')).toBeVisible();
 }
 
 export async function verificarBotaoImpactoAusente(page: Page) {
-    const btnImpacto = page.getByTestId('cad-atividades__btn-impactos-mapa');
+    const btnImpactoEdicao = page.getByTestId('cad-atividades__btn-impactos-mapa-edicao');
+    const btnImpactoVis = page.getByTestId('cad-atividades__btn-impactos-mapa-visualizacao');
+    const btnImpacto = btnImpactoEdicao.or(btnImpactoVis);
     
     const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
     if (await btnMaisAcoes.isVisible()) {
@@ -162,8 +164,10 @@ export async function abrirModalImpacto(page: Page) {
     const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
     if (await btnMaisAcoes.isVisible()) {
         await btnMaisAcoes.click();
+        await page.getByTestId('cad-atividades__btn-impactos-mapa-edicao').click();
+    } else {
+        await page.getByTestId('cad-atividades__btn-impactos-mapa-visualizacao').click();
     }
-    await page.getByTestId('cad-atividades__btn-impactos-mapa').click();
     await expect(page.getByRole('dialog')).toBeVisible();
 }
 

@@ -2,8 +2,8 @@ import {expect, type Page} from '@playwright/test';
 import {calcularDataLimite} from './helpers-processos.js';
 
 async function garantirContextoSubprocesso(page: Page) {
-    const cardMapa = page.getByTestId('card-subprocesso-mapa');
-    if (await cardMapa.isVisible()) {
+    const cardMapa = page.getByTestId('card-subprocesso-mapa-edicao').or(page.getByTestId('card-subprocesso-mapa-visualizacao'));
+    if (await cardMapa.first().isVisible()) {
         return;
     }
 
@@ -23,10 +23,13 @@ export async function navegarParaMapa(page: Page) {
         return;
     }
 
-    const testId = 'card-subprocesso-mapa';
     await garantirContextoSubprocesso(page);
-    await expect(page.getByTestId(testId)).toBeVisible();
-    await page.getByTestId(testId).click();
+    const cardEdicao = page.getByTestId('card-subprocesso-mapa-edicao');
+    const cardVisualizacao = page.getByTestId('card-subprocesso-mapa-visualizacao');
+    const cardAlvo = (await cardEdicao.isVisible()) ? cardEdicao : cardVisualizacao;
+
+    await expect(cardAlvo).toBeVisible();
+    await cardAlvo.click();
     await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
 }
 
