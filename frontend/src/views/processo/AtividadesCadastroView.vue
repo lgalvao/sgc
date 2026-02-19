@@ -32,7 +32,7 @@
         >
           <BDropdownItem
               v-if="podeVerImpacto"
-              data-testid="cad-atividades__btn-impactos-mapa"
+              data-testid="cad-atividades__btn-impactos-mapa-edicao"
               @click="abrirModalImpacto"
           >
             <i aria-hidden="true" class="bi bi-arrow-right-circle me-2"/> Impacto no mapa

@@ -269,7 +269,7 @@ describe("VisAtividades.vue", () => {
     it("deve abrir modal de impacto ao clicar no botão", async () => {
         const wrapper = mount(VisAtividades, mountOptions());
         // Force button visibility
-        const btn = wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]');
+        const btn = wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa-visualizacao"]');
         await btn.trigger("click");
 
         await flushPromises();
@@ -402,7 +402,7 @@ describe("VisAtividades.vue", () => {
 
         it("deve mostrar texto correto no botão de impacto", async () => {
             const wrapper = mount(VisAtividades, mountOptionsMapeamento());
-            const btn = wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa"]');
+            const btn = wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa-visualizacao"]');
             expect(btn.text()).toContain("Impacto no mapa");
         });
 

@@ -42,7 +42,7 @@ describe('SubprocessoCards.vue', () => {
         });
 
         expect(wrapper.find('[data-testid="card-subprocesso-atividades"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="card-subprocesso-mapa"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').exists()).toBe(true);
 
         // Click action
         await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('click');
@@ -70,7 +70,7 @@ describe('SubprocessoCards.vue', () => {
         // Mapa Card Actions
         // Click
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('click');
+        await wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoMapa',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
@@ -78,7 +78,7 @@ describe('SubprocessoCards.vue', () => {
 
         // Enter
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown', { key: 'Enter' });
+        await wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').trigger('keydown', { key: 'Enter' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoMapa',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
@@ -86,7 +86,7 @@ describe('SubprocessoCards.vue', () => {
 
         // Space
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown', { key: ' ' });
+        await wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').trigger('keydown', { key: ' ' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoMapa',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
@@ -130,21 +130,21 @@ describe('SubprocessoCards.vue', () => {
 
          // Mapa vis Actions
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('click');
+        await wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoVisMapa',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown', { key: 'Enter' });
+        await wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').trigger('keydown', { key: 'Enter' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoVisMapa',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
         });
 
         pushMock.mockClear();
-        await wrapper.find('[data-testid="card-subprocesso-mapa"]').trigger('keydown', { key: ' ' });
+        await wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').trigger('keydown', { key: ' ' });
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoVisMapa',
             params: { codProcesso: 1, siglaUnidade: 'TESTE' }
@@ -242,7 +242,7 @@ describe('SubprocessoCards.vue', () => {
             }
         });
 
-        const card = wrapper.find('[data-testid="card-subprocesso-mapa"]');
+        const card = wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]');
         expect(card.exists()).toBe(true);
         expect(card.classes()).toContain('disabled-card');
         expect(card.attributes('aria-disabled')).toBe('true');
@@ -272,7 +272,7 @@ describe('SubprocessoCards.vue', () => {
             }
         });
 
-        const card = wrapper.find('[data-testid="card-subprocesso-mapa"]');
+        const card = wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]');
         expect(card.classes()).toContain('disabled-card');
 
         pushMock.mockClear();

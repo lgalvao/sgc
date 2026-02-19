@@ -10,7 +10,7 @@
       <template #actions>
         <BButton
             v-if="podeVerImpacto"
-            data-testid="cad-atividades__btn-impactos-mapa"
+            data-testid="cad-atividades__btn-impactos-mapa-visualizacao"
             variant="outline-secondary"
             @click="abrirModalImpacto"
         >
