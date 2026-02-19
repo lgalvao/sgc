@@ -332,6 +332,7 @@ async function confirmarIniciarProcesso() {
     mostrarModalConfirmacao.value = false;
     feedbackStore.show("Processo iniciado", "O processo foi iniciado com sucesso.", "success");
   } catch (error) {
+    console.error("Erro ao iniciar processo:", error);
     mostrarModalConfirmacao.value = false;
     handleApiErrors(error, "Erro ao iniciar processo", "Não foi possível iniciar o processo. Tente novamente.");
   } finally {

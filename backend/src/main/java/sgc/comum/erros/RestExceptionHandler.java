@@ -2,7 +2,6 @@ package sgc.comum.erros;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -31,8 +30,7 @@ import java.util.UUID;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private String sanitizar(@Nullable String texto) {
-        if (texto == null) return "";
+    private String sanitizar(String texto) {
         return UtilSanitizacao.sanitizar(texto);
     }
 
@@ -86,7 +84,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request) {
 
-        log.info("Erro de validação de argumento");
+        log.warn("Erro de validação de argumento", ex);
 
         String message = "A requisição contém dados de entrada inválidos.";
         var subErrors = ex.getBindingResult().getFieldErrors().stream().map(
@@ -94,6 +92,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                 error.getField(),
                                 sanitizar(error.getDefaultMessage())))
                 .toList();
+
+        subErrors.forEach(err -> log.info("Falha de validação: campo '{}' - {}", err.field(), err.message()));
 
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }

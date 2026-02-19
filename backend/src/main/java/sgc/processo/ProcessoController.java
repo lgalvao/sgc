@@ -128,7 +128,7 @@ public class ProcessoController {
 
         List<String> erros = processador.apply(codigo, req.unidades());
         if (!erros.isEmpty()) {
-            return ResponseEntity.badRequest().build();
+            throw new sgc.processo.erros.ErroProcesso(String.join(". ", erros));
         }
 
         Processo processoAtualizado = processoFacade.obterEntidadePorId(codigo);

@@ -32,6 +32,7 @@ public class UnidadeProcesso implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("processoCodigo")
     @JoinColumn(name = "processo_codigo")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Processo processo;
     
     public Long getUnidadeCodigo() {
