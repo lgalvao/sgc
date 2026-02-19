@@ -6,16 +6,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
@@ -36,9 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest(classes = Sgc.class)
-@ActiveProfiles("test")
-@Import({TestSecurityConfig.class})
+@SpringBootTest
 @Transactional
 @DisplayName("CDU-35: Gerar relatório de andamento")
 class CDU35IntegrationTest extends BaseIntegrationTest {

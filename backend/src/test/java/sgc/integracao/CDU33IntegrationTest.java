@@ -6,18 +6,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.TipoUnidade;
@@ -40,9 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest(classes = Sgc.class)
-@ActiveProfiles("test")
-@Import({TestSecurityConfig.class})
+@SpringBootTest
 @Transactional
 @DisplayName("CDU-33: Reabrir revisão de cadastro")
 class CDU33IntegrationTest extends BaseIntegrationTest {

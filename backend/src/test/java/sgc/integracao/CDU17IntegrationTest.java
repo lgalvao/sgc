@@ -3,14 +3,11 @@ package sgc.integracao;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.Analise;
@@ -19,7 +16,6 @@ import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.fixture.UnidadeFixture;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.mapa.model.Atividade;
@@ -45,11 +41,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest(classes = Sgc.class)
-@ActiveProfiles("test")
+@SpringBootTest
 @Transactional
 @DisplayName("CDU-17: Disponibilizar Mapa de Competências")
-@Import({TestSecurityConfig.class})
 class CDU17IntegrationTest extends BaseIntegrationTest {
     private static final String API_URL = "/api/subprocessos/{codigo}/disponibilizar-mapa";
     private static final String OBS_LITERAL = "Obs";

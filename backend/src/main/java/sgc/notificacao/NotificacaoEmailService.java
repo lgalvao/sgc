@@ -2,8 +2,6 @@ package sgc.notificacao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.notificacao.model.Notificacao;
@@ -13,10 +11,8 @@ import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
 @Service
-@Primary
 @RequiredArgsConstructor
 @Slf4j
-@Profile({"!test&!e2e", "email-test"})
 public class NotificacaoEmailService {
     private static final Pattern PADRAO_EMAIL = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 

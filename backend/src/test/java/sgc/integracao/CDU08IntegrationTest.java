@@ -3,16 +3,13 @@ package sgc.integracao;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
@@ -41,8 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @SpringBootTest
 @Transactional
-@ActiveProfiles("test")
-@Import({TestSecurityConfig.class})
 @DisplayName("CDU-08: Manter cadastro de atividades e conhecimentos")
 class CDU08IntegrationTest extends BaseIntegrationTest {
     @Autowired

@@ -3,7 +3,6 @@ package sgc.integracao;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,16 +12,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.fixture.AlertaFixture;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
@@ -38,11 +34,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest(classes = Sgc.class)
-@ActiveProfiles("test")
+@SpringBootTest
 @Transactional
 @DisplayName("CDU-02: Visualizar Painel")
-@Import(TestSecurityConfig.class)
 @Slf4j
 class CDU02IntegrationTest extends BaseIntegrationTest {
     private static final String API_PAINEL_PROCESSOS = "/api/painel/processos";

@@ -3,12 +3,8 @@ package sgc.integracao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockCustomUser;
@@ -19,9 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest(classes = Sgc.class)
-@ActiveProfiles("test")
-@Import(TestSecurityConfig.class)
+@SpringBootTest
 @Transactional
 @DisplayName("CDU-07: Detalhar Subprocesso")
 class CDU07IntegrationTest extends BaseIntegrationTest {

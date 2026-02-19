@@ -4,16 +4,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -31,9 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @SpringBootTest
-@ActiveProfiles("test")
 @Transactional
-@Import(TestSecurityConfig.class)
 @DisplayName("CDU-01: Realizar Login")
 class CDU01IntegrationTest extends BaseIntegrationTest {
     private static final String BASE_URL = "/api/usuarios";

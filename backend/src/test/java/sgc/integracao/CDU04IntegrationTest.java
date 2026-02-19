@@ -5,23 +5,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
 import sgc.alerta.model.AlertaRepo;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
-import sgc.notificacao.NotificacaoEmailService;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.IniciarProcessoRequest;
@@ -39,10 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest(classes = Sgc.class)
-@ActiveProfiles("test")
 @WithMockAdmin
-@Import({ TestSecurityConfig.class })
 @Transactional
 @DisplayName("CDU-04: Iniciar processo de mapeamento")
 class CDU04IntegrationTest extends BaseIntegrationTest {
@@ -60,9 +50,6 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @MockitoBean
-    private NotificacaoEmailService notificacaoEmailService;
 
     private Unidade unidadeLivre;
 

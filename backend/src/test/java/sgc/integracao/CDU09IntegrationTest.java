@@ -6,21 +6,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.model.*;
-import sgc.notificacao.NotificacaoEmailService;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -33,9 +26,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -43,31 +33,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest(classes = Sgc.class)
-@ActiveProfiles("test")
-@Import({
-        TestSecurityConfig.class,
-        
-})
 @Transactional
 @DisplayName("CDU-09: Fluxo Completo de Disponibilização")
 class CDU09IntegrationTest extends BaseIntegrationTest {
 
-    @Autowired
-    private CompetenciaRepo competenciaRepo;
-    @Autowired
-    private MovimentacaoRepo movimentacaoRepo;
-    @Autowired
-    private ConhecimentoRepo conhecimentoRepo;
-    @Autowired
-    private AlertaRepo alertaRepo;
-    @Autowired
-    private AnaliseRepo analiseRepo;
-    @Autowired
-    private EntityManager entityManager;
-
-    @MockitoBean
-    private NotificacaoEmailService notificacaoEmailService;
+    @Autowired private CompetenciaRepo competenciaRepo;
+    @Autowired private MovimentacaoRepo movimentacaoRepo;
+    @Autowired private ConhecimentoRepo conhecimentoRepo;
+    @Autowired private AlertaRepo alertaRepo;
+    @Autowired private AnaliseRepo analiseRepo;
+    @Autowired private EntityManager entityManager;
 
     private final Long SP_CODIGO = 60000L; // SEDESENV (Unidade 8) no data.sql
 
@@ -147,7 +122,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         assertThat(movs.getFirst().getUnidadeDestino().getSigla()).isEqualTo("COSIS");
 
         // 12. Notificação por E-mail (Superior da 8 é COSIS)
-        verify(notificacaoEmailService, atLeastOnce()).enviarEmailHtml(any(), any(), any());
+        aguardarEmail(1);
 
         // 13. Criação de Alerta para Unidade Superior (Async)
         final Long processoCodigo = spEtapa3.getProcesso().getCodigo();

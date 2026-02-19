@@ -6,18 +6,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
@@ -38,9 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest(classes = Sgc.class)
-@ActiveProfiles("test")
-@Import({TestSecurityConfig.class})
+@SpringBootTest
 @Transactional
 @DisplayName("CDU-22: Aceitar cadastros em bloco")
 class CDU22IntegrationTest extends BaseIntegrationTest {

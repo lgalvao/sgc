@@ -3,14 +3,11 @@ package sgc.integracao;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.model.AnaliseRepo;
 import sgc.fixture.MapaFixture;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.model.*;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
@@ -38,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest(classes = Sgc.class)
+@SpringBootTest
 @Import({
                 TestSecurityConfig.class
 })

@@ -5,7 +5,6 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -24,7 +23,6 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Profile({"!test&!e2e&!secure-test", "email-test"})
 public class NotificacaoEmailAsyncExecutor {
     private static final int MAX_TENTATIVAS = 3;
     private static final long ESPERA_ENTRE_TENTATIVAS_MS = 1000;

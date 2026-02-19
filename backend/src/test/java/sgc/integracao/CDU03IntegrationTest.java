@@ -5,16 +5,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.fixture.UnidadeFixture;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.AtualizarProcessoRequest;
@@ -38,11 +35,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @SpringBootTest
-@ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-03: Manter processo")
 @WithMockAdmin
-@Import(TestSecurityConfig.class)
 class CDU03IntegrationTest extends BaseIntegrationTest {
         private static final String API_PROCESSOS = "/api/processos";
         private static final String API_PROCESSOS_ID = "/api/processos/{codigo}";

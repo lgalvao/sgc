@@ -6,14 +6,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.comum.dto.ComumDtos.JustificativaRequest;
 import sgc.comum.dto.ComumDtos.TextoRequest;
@@ -22,7 +19,6 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.analise.model.TipoAcaoAnalise;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -47,9 +43,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest(classes = Sgc.class)
-@ActiveProfiles("test")
-@Import({TestSecurityConfig.class})
+@SpringBootTest
 @Transactional
 @DisplayName("CDU-13: Analisar cadastro de atividades e conhecimentos")
 class CDU13IntegrationTest extends BaseIntegrationTest {

@@ -34,7 +34,7 @@ class EmailIntegrationTest extends BaseIntegrationTest {
         assertThat(mensagens).hasSize(1);
 
         MimeMessage msg = mensagens[0];
-        assertThat(msg.getAllRecipients()[0].toString()).isEqualTo(destinatario);
+        assertThat(msg.getAllRecipients()[0]).hasToString(destinatario);
         assertThat(msg.getSubject()).contains(assunto);
 
         String corpoRecebido = com.icegreen.greenmail.util.GreenMailUtil.getBody(msg);
