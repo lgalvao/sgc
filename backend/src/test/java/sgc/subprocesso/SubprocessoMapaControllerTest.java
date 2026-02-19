@@ -127,10 +127,8 @@ class SubprocessoMapaControllerTest {
         Long codigo = 1L;
         Mapa mapa = new Mapa();
         mapa.setCodigo(100L);
-        Subprocesso sp = Subprocesso.builder().mapa(mapa).build();
         
-        when(subprocessoFacade.buscarSubprocessoComMapa(codigo)).thenReturn(sp);
-        when(mapaFacade.obterPorCodigo(100L)).thenReturn(mapa);
+        when(mapaFacade.obterMapaCompletoPorSubprocesso(codigo)).thenReturn(mapa);
 
         ResponseEntity<Mapa> response = controller.obterMapaCompleto(codigo);
 

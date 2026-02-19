@@ -188,7 +188,7 @@ class SubprocessoCrudServiceTest {
     @DisplayName("Deve obter subprocesso por processo e unidade")
     void deveObterPorProcessoEUnidade() {
         Subprocesso sp = new Subprocesso();
-        when(repositorioComum.buscar(eq(Subprocesso.class), anyMap())).thenReturn(sp);
+        when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoWithFetch(1L, 2L)).thenReturn(Optional.of(sp));
 
         assertThat(service.obterEntidadePorProcessoEUnidade(1L, 2L)).isNotNull();
     }

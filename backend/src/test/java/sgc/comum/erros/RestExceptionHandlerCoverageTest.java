@@ -27,7 +27,7 @@ class RestExceptionHandlerCoverageTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         ErroApi body = (ErroApi) response.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.getMessage()).contains("Erro interno do sistema");
+        assertThat(body.getMessage()).contains("ERRO INTERNO: Messagem interna de teste");
         assertThat(body.getCode()).isEqualTo("ERRO_INTERNO");
         assertThat(body.getTraceId()).isNotNull();
     }

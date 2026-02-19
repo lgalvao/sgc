@@ -73,7 +73,7 @@ class RestExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"campo\": \"valor\"}"))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("Operação não pôde ser realizada."));
+                .andExpect(jsonPath("$.message").value("ACESSO NEGADO: Acesso negado"));
     }
 
     @Test
@@ -99,7 +99,7 @@ class RestExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"campo\": \"valor\"}"))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("A operação não pode ser executada no estado atual do recurso."));
+                .andExpect(jsonPath("$.message").value("ESTADO ILEGAL: Estado inválido"));
     }
 
     @Test
@@ -112,7 +112,7 @@ class RestExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"campo\": \"valor\"}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("A requisição contém um argumento inválido ou malformado."));
+                .andExpect(jsonPath("$.message").value("ARGUMENTO INVÁLIDO: Argumento inválido"));
     }
 
     @Test
@@ -125,7 +125,7 @@ class RestExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"campo\": \"valor\"}"))
                 .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value("Erro inesperado"));
+                .andExpect(jsonPath("$.message").value("ERRO INESPERADO: Erro inesperado"));
     }
 
     @Test
