@@ -27,6 +27,7 @@ import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.AcaoEmBlocoRequest;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDetalheDto;
+import sgc.processo.dto.SubprocessoElegivelDto;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.*;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
@@ -337,6 +338,54 @@ class ProcessoFacadeTest {
                     .isInstanceOf(ErroProcesso.class)
                     .hasMessageContaining("não participa");
         }
+
+        @Test
+        @DisplayName("Deve apenas logar aviso quando unidade não tem titular definido")
+        void deveLogarAvisoQuandoUnidadeSemTitular() {
+            Processo p = ProcessoFixture.processoEmAndamento();
+            Unidade u = UnidadeFixture.unidadeComId(10L);
+            u.setTituloTitular(null); // Sem titular
+            p.adicionarParticipantes(Set.of(u));
+
+            when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
+            when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
+            when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L))
+                    .thenReturn(Subprocesso.builder().codigo(99L).build());
+            when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any()))
+                    .thenReturn("HTML");
+
+            processoFacade.enviarLembrete(1L, 10L);
+
+            verify(alertaService).criarAlertaAdmin(any(), any(), any());
+            verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
+            verifyNoInteractions(notificacaoEmailService);
+        }
+
+        @Test
+        @DisplayName("Deve apenas logar aviso quando titular não tem email")
+        void deveLogarAvisoQuandoTitularSemEmail() {
+            Processo p = ProcessoFixture.processoEmAndamento();
+            Unidade u = UnidadeFixture.unidadeComId(10L);
+            u.setTituloTitular("T10");
+            p.adicionarParticipantes(Set.of(u));
+
+            when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
+            when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
+            when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L))
+                    .thenReturn(Subprocesso.builder().codigo(99L).build());
+            when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any()))
+                    .thenReturn("HTML");
+
+            Usuario titular = new Usuario();
+            titular.setEmail(null); // Sem email
+            when(usuarioService.buscarPorLogin("T10")).thenReturn(titular);
+
+            processoFacade.enviarLembrete(1L, 10L);
+
+            verify(alertaService).criarAlertaAdmin(any(), any(), any());
+            verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
+            verifyNoInteractions(notificacaoEmailService);
+        }
     }
 
     @Nested
@@ -492,6 +541,40 @@ class ProcessoFacadeTest {
                 .isNotNull()
                 .isEqualTo(detalhes);
         }
+
+        @Test
+        @DisplayName("Deve listar subprocessos elegíveis delegando para service")
+        void deveListarSubprocessosElegiveisDelegandoParaService() {
+            Long codProcesso = 1L;
+            List<SubprocessoElegivelDto> lista = List.of(SubprocessoElegivelDto.builder().build());
+            when(processoConsultaService.subprocessosElegiveis(codProcesso)).thenReturn(lista);
+
+            var res = processoFacade.listarSubprocessosElegiveis(codProcesso);
+            assertThat(res).isSameAs(lista);
+            verify(processoConsultaService).subprocessosElegiveis(codProcesso);
+        }
+
+        @Test
+        @DisplayName("Deve listar todos os subprocessos delegando para facade")
+        void deveListarTodosSubprocessosDelegandoParaFacade() {
+            Long codProcesso = 1L;
+            List<Subprocesso> lista = List.of(Subprocesso.builder().build());
+            when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(lista);
+
+            var res = processoFacade.listarTodosSubprocessos(codProcesso);
+            assertThat(res).isSameAs(lista);
+        }
+
+        @Test
+        @DisplayName("Deve listar entidades subprocessos delegando para facade")
+        void deveListarEntidadesSubprocessosDelegandoParaFacade() {
+            Long codProcesso = 1L;
+            List<Subprocesso> lista = List.of(Subprocesso.builder().build());
+            when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(lista);
+
+            var res = processoFacade.listarEntidadesSubprocessos(codProcesso);
+            assertThat(res).isSameAs(lista);
+        }
     }
 
     @Nested
@@ -628,6 +711,34 @@ class ProcessoFacadeTest {
 
                 // Assert
                 verify(subprocessoFacade).homologarCadastroEmBloco(List.of(10L), 100L, usuario);
+            }
+
+            @Test
+            @DisplayName("Deve homologar validação quando subprocessos estão em validação")
+            void deveHomologarValidacaoQuandoValidacao() {
+                // Arrange
+                Usuario usuario = new Usuario();
+                when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+
+                Subprocesso sp1 = Subprocesso.builder()
+                        .codigo(1L)
+                        .unidade(Unidade.builder().codigo(10L).build())
+                        .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO) // Situação que não é cadastro
+                        .build();
+
+                when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
+
+                AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
+                        List.of(10L),
+                        HOMOLOGAR,
+                        null
+                );
+
+                // Act
+                processoFacade.executarAcaoEmBloco(100L, req);
+
+                // Assert
+                verify(subprocessoFacade).homologarValidacaoEmBloco(List.of(10L), 100L, usuario);
             }
         }
     }

@@ -397,6 +397,45 @@ class SubprocessoFacadeTest {
             facade.salvarMapaSubprocesso(1L, request);
             verify(mapaWorkflowService).salvarMapaSubprocesso(1L, request);
         }
+
+        @Test
+        @DisplayName("Deve adicionar competencia")
+        void deveAdicionarCompetencia() {
+            CompetenciaRequest req = CompetenciaRequest.builder().build();
+            facade.adicionarCompetencia(1L, req);
+            verify(mapaWorkflowService).adicionarCompetencia(1L, req);
+        }
+
+        @Test
+        @DisplayName("Deve atualizar competencia")
+        void deveAtualizarCompetencia() {
+            CompetenciaRequest req = CompetenciaRequest.builder().build();
+            facade.atualizarCompetencia(1L, 100L, req);
+            verify(mapaWorkflowService).atualizarCompetencia(1L, 100L, req);
+        }
+
+        @Test
+        @DisplayName("Deve remover competencia")
+        void deveRemoverCompetencia() {
+            facade.removerCompetencia(1L, 100L);
+            verify(mapaWorkflowService).removerCompetencia(1L, 100L);
+        }
+
+        @Test
+        @DisplayName("Deve submeter mapa ajustado")
+        void deveSubmeterMapaAjustado() {
+            SubmeterMapaAjustadoRequest req = SubmeterMapaAjustadoRequest.builder().build();
+            Usuario usuario = new Usuario();
+            facade.submeterMapaAjustado(1L, req, usuario);
+            verify(mapaWorkflowService).submeterMapaAjustado(1L, req, usuario);
+        }
+
+        @Test
+        @DisplayName("Deve registrar movimentação de lembrete")
+        void deveRegistrarMovimentacaoLembrete() {
+            facade.registrarMovimentacaoLembrete(1L);
+            verify(adminWorkflowService).registrarMovimentacaoLembrete(1L);
+        }
     }
 
     @Nested

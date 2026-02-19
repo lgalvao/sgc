@@ -9,13 +9,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.thymeleaf.TemplateEngine;
 import sgc.notificacao.NotificacaoEmailService;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.*;
@@ -207,6 +210,75 @@ class SubprocessoEmailServiceTest {
         verify(notificacaoEmailService).enviarEmailHtml(any(),
                 argThat(s -> s != null && s.contains("SGC: Notificação - Processo iniciado")),
                 any());
+    }
+
+    @Test
+    @DisplayName("Deve enviar email para substituto se houver")
+    void deveEnviarEmailParaSubstitutoSeHouver() {
+        Subprocesso sp = criarSubprocesso();
+        Unidade dest = new Unidade();
+        dest.setCodigo(1L);
+        dest.setSigla("DEST");
+
+        when(templateEngine.process(anyString(), any())).thenReturn("html");
+
+        UnidadeResponsavelDto resp = UnidadeResponsavelDto.builder()
+                .unidadeCodigo(1L)
+                .substitutoTitulo("123456")
+                .build();
+        when(unidadeFacade.buscarResponsavelUnidade(1L)).thenReturn(resp);
+
+        Usuario substituto = new Usuario();
+        substituto.setEmail("sub@teste.com");
+        when(usuarioFacade.buscarUsuarioPorTitulo("123456")).thenReturn(Optional.of(substituto));
+
+        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
+
+        verify(notificacaoEmailService).enviarEmailHtml(eq("sub@teste.com"), anyString(), eq("html"));
+    }
+
+    @Test
+    @DisplayName("Não deve enviar email para substituto se email vazio")
+    void naoDeveEnviarEmailParaSubstitutoSeEmailVazio() {
+        Subprocesso sp = criarSubprocesso();
+        Unidade dest = new Unidade();
+        dest.setCodigo(1L);
+        dest.setSigla("DEST");
+
+        when(templateEngine.process(anyString(), any())).thenReturn("html");
+
+        UnidadeResponsavelDto resp = UnidadeResponsavelDto.builder()
+                .unidadeCodigo(1L)
+                .substitutoTitulo("123456")
+                .build();
+        when(unidadeFacade.buscarResponsavelUnidade(1L)).thenReturn(resp);
+
+        Usuario substituto = new Usuario();
+        substituto.setEmail(""); // Email vazio
+        when(usuarioFacade.buscarUsuarioPorTitulo("123456")).thenReturn(Optional.of(substituto));
+
+        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
+
+        // Verifica envio para a unidade (padrão), mas NÃO para o substituto
+        verify(notificacaoEmailService, times(1)).enviarEmailHtml(anyString(), anyString(), anyString());
+        verify(notificacaoEmailService, never()).enviarEmailHtml(eq(""), anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("Não deve enviar email pessoal se responsavel for null")
+    void naoDeveEnviarEmailPessoalSeResponsavelNull() {
+        Subprocesso sp = criarSubprocesso();
+        Unidade dest = new Unidade();
+        dest.setCodigo(1L);
+        dest.setSigla("DEST");
+
+        when(templateEngine.process(anyString(), any())).thenReturn("html");
+        when(unidadeFacade.buscarResponsavelUnidade(1L)).thenReturn(null);
+
+        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
+
+        // Apenas o email da unidade deve ser enviado
+        verify(notificacaoEmailService, times(1)).enviarEmailHtml(anyString(), anyString(), anyString());
     }
 
     private Subprocesso criarSubprocesso() {

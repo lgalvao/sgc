@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
@@ -121,5 +122,36 @@ class ProcessoValidadorTest {
         assertThatThrownBy(() -> validador.validarTodosSubprocessosHomologados(p))
                 .isInstanceOf(ErroProcesso.class)
                 .hasMessage("Erro de validação");
+    }
+
+    @Test
+    @DisplayName("validarTiposUnidades deve retornar vazio se lista nula ou vazia")
+    void validarTiposUnidadesVazio() {
+        assertThat(validador.validarTiposUnidades(null)).isEmpty();
+        assertThat(validador.validarTiposUnidades(Collections.emptyList())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("validarTiposUnidades deve retornar erro para unidade INTERMEDIARIA")
+    void validarTiposUnidadesErro() {
+        Unidade u1 = new Unidade();
+        u1.setTipo(TipoUnidade.INTERMEDIARIA);
+        u1.setSigla("U1");
+
+        Unidade u2 = new Unidade();
+        u2.setTipo(TipoUnidade.OPERACIONAL);
+        u2.setSigla("U2");
+
+        Optional<String> msg = validador.validarTiposUnidades(List.of(u1, u2));
+        assertThat(msg).isPresent()
+                .get().asString().contains("INTERMEDIARIA").contains("U1");
+    }
+
+    @Test
+    @DisplayName("validarTiposUnidades deve retornar vazio se todas validas")
+    void validarTiposUnidadesSucesso() {
+        Unidade u = new Unidade();
+        u.setTipo(TipoUnidade.OPERACIONAL);
+        assertThat(validador.validarTiposUnidades(List.of(u))).isEmpty();
     }
 }
