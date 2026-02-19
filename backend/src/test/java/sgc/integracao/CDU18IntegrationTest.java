@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest
 @Transactional
 @DisplayName("CDU-18: Visualizar Mapa de Competências")
 class CDU18IntegrationTest extends BaseIntegrationTest {

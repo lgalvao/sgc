@@ -29,10 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest
 @Transactional
 @Import({
-        TestSecurityConfig.class,
         WithMockChefeSecurityContextFactory.class,
         WithMockAdminSecurityContextFactory.class,
         WithMockGestorSecurityContextFactory.class,

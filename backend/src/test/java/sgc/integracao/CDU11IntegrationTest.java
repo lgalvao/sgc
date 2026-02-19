@@ -26,11 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest
 @Transactional
 @DisplayName("CDU-11: Visualizar cadastro de atividades e conhecimentos")
 @Import({
-        TestSecurityConfig.class,
         TestLoginHelper.class,
         UnidadeFixture.class,
         ProcessoFixture.class,

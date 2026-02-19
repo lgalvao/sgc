@@ -41,7 +41,7 @@ class ProcessoEmailIntegrationTest extends BaseIntegrationTest {
         String html = modelosService.criarEmailProcessoIniciado(
                 nomeUnidade, nomeProcesso, "REVISAO", dataLimite);
         
-        // Enviar via serviço real (conectado ao GreenMail pelo perfil email-test)
+        // Enviar via serviço real (conectado ao GreenMail via TestConfig)
         emailService.enviarEmailHtml(destinatario, "Início de Processo", html);
 
         // Assert: Aguardar e verificar

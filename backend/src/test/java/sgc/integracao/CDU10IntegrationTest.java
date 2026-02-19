@@ -1,6 +1,5 @@
 package sgc.integracao;
 
-import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,12 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.model.Analise;
 import sgc.analise.model.AnaliseRepo;
@@ -41,17 +38,12 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
-@SpringBootTest
 @Import({
-        TestSecurityConfig.class,
         WithMockChefeSecurityContextFactory.class,
-        
 })
 @Transactional
 @DisplayName("CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos")
@@ -69,15 +61,12 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    @MockitoBean
-    private JavaMailSender javaMailSender;
 
     private Unidade unidadeSuperior;
     private Subprocesso subprocessoRevisao;
 
     @BeforeEach
     void setUp() {
-        when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
 
         // Reset sequence to avoid collision
         try {
