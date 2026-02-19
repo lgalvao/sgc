@@ -73,6 +73,8 @@ class SubprocessoAtividadeService {
 
         Subprocesso spOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);
 
+        accessControlService.verificarPermissao(usuario, Acao.VISUALIZAR_SUBPROCESSO, spOrigem);
+
         // Importar atividades diretamente (sem evento assíncrono)
         copiaMapaService.importarAtividadesDeOutroMapa(
                 spOrigem.getMapa().getCodigo(),
