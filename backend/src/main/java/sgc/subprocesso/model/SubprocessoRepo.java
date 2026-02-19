@@ -16,6 +16,7 @@ import java.util.Optional;
 public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
     @Query("""
             select s from Subprocesso s
+              join fetch s.processo p
               join fetch s.unidade u
               left join fetch s.mapa m
             where s.processo.codigo = :codProcesso""")
@@ -52,6 +53,7 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
 
     @Query("""
             SELECT DISTINCT s FROM Subprocesso s
+            JOIN FETCH s.processo p
             JOIN FETCH s.unidade u
             LEFT JOIN FETCH s.mapa m
             LEFT JOIN FETCH m.atividades a
