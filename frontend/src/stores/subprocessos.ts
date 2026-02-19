@@ -104,10 +104,8 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
                 codUnidade as number,
             );
             subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(dto);
-            console.log(`[SubprocessosStore] Detalhes do subprocesso ${codigo} mapeados com sucesso:`, subprocessoDetalhe.value);
-            console.log(`[SubprocessosStore] Detalhes do subprocesso ${codigo} carregados com sucesso`);
         }, (err) => {
-            console.error(`[SubprocessosStore] Erro ao buscar detalhes do subprocesso ${codigo}:`, err);
+            console.error(`Erro ao buscar detalhes do subprocesso ${codigo}:`, err);
             subprocessoDetalhe.value = null;
         });
     }
@@ -116,15 +114,13 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         codProcesso: number,
         siglaUnidade: string,
     ): Promise<number | null> {
-        console.log(`[SubprocessosStore] Buscando ID do subprocesso para Processo=${codProcesso}, Unidade=${siglaUnidade}`);
         try {
             return await withErrorHandling(async () => {
                 const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
-                console.log(`[SubprocessosStore] ID encontrado: ${dto.codigo}`);
                 return dto.codigo;
             });
         } catch (err) {
-            console.error(`[SubprocessosStore] Erro ao buscar ID do subprocesso:`, err);
+            console.error(`Erro ao buscar ID do subprocesso:`, err);
             return null;
         }
     }
