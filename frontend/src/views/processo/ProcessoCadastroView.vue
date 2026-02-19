@@ -9,6 +9,7 @@
           :title="alertState.title"
           :body="alertState.body"
           :errors="alertState.errors"
+          :stack-trace="alertState.stackTrace"
       />
 
       <ProcessoFormFields
@@ -168,6 +169,7 @@ interface AlertState {
   title: string;
   body: string;
   errors?: string[];
+  stackTrace?: string;
 }
 
 const alertState = ref<AlertState>({
@@ -175,16 +177,18 @@ const alertState = ref<AlertState>({
   variant: 'info',
   title: '',
   body: '',
-  errors: []
+  errors: [],
+  stackTrace: ''
 });
 
-function mostrarAlerta(variant: AlertState['variant'], title: string, body: string, errors: string[] = []) {
+function mostrarAlerta(variant: AlertState['variant'], title: string, body: string, errors: string[] = [], stackTrace: string = '') {
   alertState.value = {
     show: true,
     variant,
     title,
     body,
-    errors
+    errors,
+    stackTrace
   };
   window.scrollTo(0, 0);
 }
@@ -252,7 +256,7 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
     const genericErrors = lastError.subErrors?.filter(e => !e.field).map(e => e.message || '') || [];
 
     if (!hasFieldErrors || genericErrors.length > 0) {
-      mostrarAlerta('danger', title, lastError.message || defaultMsg, genericErrors as string[]);
+      mostrarAlerta('danger', title, lastError.message || defaultMsg, genericErrors as string[], lastError.stackTrace);
     } else if (hasFieldErrors) {
       // Focus on first invalid field
       nextTick(() => {
@@ -263,7 +267,7 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
       });
     }
   } else {
-    mostrarAlerta('danger', title, defaultMsg, []);
+    mostrarAlerta('danger', title, defaultMsg, [], (error as any)?.stack || '');
     logger.error(title + ":", error);
   }
   logger.error(title + ":", error);

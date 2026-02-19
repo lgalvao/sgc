@@ -2,6 +2,7 @@ package sgc.comum.erros;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -15,6 +16,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import sgc.seguranca.sanitizacao.UtilSanitizacao;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.UUID;
 
 /**
@@ -34,8 +37,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return UtilSanitizacao.sanitizar(texto);
     }
 
-    private ResponseEntity<Object> buildResponseEntity(ErroApi erroApi) {
+    private ResponseEntity<ErroApi> buildResponseEntity(ErroApi erroApi) {
         return new ResponseEntity<>(erroApi, HttpStatus.valueOf(erroApi.getStatus()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private ResponseEntity<Object> buildResponseEntityObject(ErroApi erroApi) {
+        return (ResponseEntity<Object>) (Object) buildResponseEntity(erroApi);
+    }
+
+    private String getStackTrace(Throwable ex) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ex.printStackTrace(pw);
+        return sw.toString();
     }
 
     /**
@@ -43,7 +58,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      * O status HTTP e código de erro são definidos na própria exceção.
      */
     @ExceptionHandler(ErroNegocioBase.class)
-    protected ResponseEntity<?> handleErroNegocio(ErroNegocioBase ex) {
+    protected ResponseEntity<ErroApi> handleErroNegocio(ErroNegocioBase ex) {
         String traceId = UUID.randomUUID().toString();
 
         if (ex.getStatus().is4xxClientError()) {
@@ -57,6 +72,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 sanitizar(ex.getMessage()),
                 ex.getCode(),
                 traceId);
+        erroApi.setStackTrace(getStackTrace(ex));
 
         if (!ex.getDetails().isEmpty()) {
             erroApi.setDetails(ex.getDetails());
@@ -66,23 +82,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+    protected @Nullable ResponseEntity<Object> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex,
-            HttpHeaders headers,
+            @Nullable HttpHeaders headers,
             HttpStatusCode status,
-            WebRequest request) {
+            @Nullable WebRequest request) {
 
         log.warn("Erro de mensagem HTTP não legível: {}", ex.getMessage());
         String error = "Requisição JSON malformada";
-        return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, error));
+        return buildResponseEntityObject(new ErroApi(HttpStatus.BAD_REQUEST, error));
     }
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+    protected @Nullable ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
-            HttpHeaders headers,
+            @Nullable HttpHeaders headers,
             HttpStatusCode status,
-            WebRequest request) {
+            @Nullable WebRequest request) {
 
         log.warn("Erro de validação de argumento", ex);
 
@@ -95,11 +111,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         subErrors.forEach(err -> log.info("Falha de validação: campo '{}' - {}", err.field(), err.message()));
 
-        return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
+        return buildResponseEntityObject(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    protected ResponseEntity<?> handleConstraintViolationException(
+    protected ResponseEntity<ErroApi> handleConstraintViolationException(
             ConstraintViolationException ex) {
         String traceId = UUID.randomUUID().toString();
         log.error("[{}] Erro de constraint de banco de dados: {}", traceId, ex.getMessage(), ex);
@@ -116,14 +132,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    protected ResponseEntity<?> handleAccessDenied(AccessDeniedException ex) {
+    protected ResponseEntity<ErroApi> handleAccessDenied(AccessDeniedException ex) {
         log.debug("Acesso negado via Spring Security: {}", ex.getMessage());
         ErroApi erroApi = new ErroApi(HttpStatus.FORBIDDEN, "Operação não pôde ser realizada.");
         return buildResponseEntity(erroApi);
     }
 
     @ExceptionHandler(ErroAutenticacao.class)
-    protected ResponseEntity<?> handleErroAutenticacao(ErroAutenticacao ex) {
+    protected ResponseEntity<ErroApi> handleErroAutenticacao(ErroAutenticacao ex) {
         log.warn("Erro de autenticação: {}", ex.getMessage());
         return buildResponseEntity(new ErroApi(HttpStatus.UNAUTHORIZED, sanitizar(ex.getMessage()), "NAO_AUTORIZADO",
                 UUID.randomUUID().toString()));
@@ -136,7 +152,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      * corretamente.
      */
     @ExceptionHandler(ErroInterno.class)
-    protected ResponseEntity<?> handleErroInterno(ErroInterno ex) {
+    protected ResponseEntity<ErroApi> handleErroInterno(ErroInterno ex) {
         String traceId = UUID.randomUUID().toString();
         log.error("[{}] ERRO INTERNO - Isso indica um bug que precisa ser corrigido: {}",
                 traceId, ex.getMessage(), ex);
@@ -144,31 +160,37 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         // Não expor detalhes internos ao usuário
         String mensagemUsuario = "Erro interno do sistema. Por favor, contate o suporte informando o código: "
                 + traceId;
-        return buildResponseEntity(
-                new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, mensagemUsuario, "ERRO_INTERNO", traceId));
+        ErroApi erroApi = new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, mensagemUsuario, "ERRO_INTERNO", traceId);
+        erroApi.setStackTrace(getStackTrace(ex));
+        return buildResponseEntity(erroApi);
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    protected ResponseEntity<?> handleIllegalStateException(IllegalStateException ex) {
+    protected ResponseEntity<ErroApi> handleIllegalStateException(IllegalStateException ex) {
         String traceId = UUID.randomUUID().toString();
         log.warn("[{}] Estado ilegal da aplicação: {}", traceId, ex.getMessage());
         String message = "A operação não pode ser executada no estado atual do recurso.";
-        return buildResponseEntity(new ErroApi(HttpStatus.CONFLICT, message, "ESTADO_ILEGAL", traceId));
+        ErroApi erroApi = new ErroApi(HttpStatus.CONFLICT, message, "ESTADO_ILEGAL", traceId);
+        erroApi.setStackTrace(getStackTrace(ex));
+        return buildResponseEntity(erroApi);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    protected ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException ex) {
+    protected ResponseEntity<ErroApi> handleIllegalArgumentException(IllegalArgumentException ex) {
         String traceId = UUID.randomUUID().toString();
         log.error("[{}] Argumento ilegal fornecido: {}", traceId, ex.getMessage(), ex);
         String message = "A requisição contém um argumento inválido ou malformado.";
-        return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, "ARGUMENTO_INVALIDO", traceId));
+        ErroApi erroApi = new ErroApi(HttpStatus.BAD_REQUEST, message, "ARGUMENTO_INVALIDO", traceId);
+        erroApi.setStackTrace(getStackTrace(ex));
+        return buildResponseEntity(erroApi);
     }
 
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<?> handleGenericException(Exception ex) {
+    protected ResponseEntity<ErroApi> handleGenericException(Exception ex) {
         String traceId = UUID.randomUUID().toString();
         log.error("[{}] Erro inesperado na aplicação", traceId, ex);
-        return buildResponseEntity(
-                new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, "Erro inesperado", "ERRO_INTERNO", traceId));
+        ErroApi erroApi = new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, "Erro inesperado", "ERRO_INTERNO", traceId);
+        erroApi.setStackTrace(getStackTrace(ex));
+        return buildResponseEntity(erroApi);
     }
 }

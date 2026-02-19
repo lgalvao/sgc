@@ -10,6 +10,7 @@ export interface ApiErrorPayload {
   code?: string;
   details?: Record<string, any>;
   traceId?: string;
+  stackTrace?: string;
   subErrors?: Array<{
     object?: string;
     field?: string;
@@ -41,6 +42,7 @@ export interface NormalizedError {
   details?: Record<string, any>;
   subErrors?: Array<{ message?: string; field?: string; }>;
   traceId?: string;
+  stackTrace?: string;
   originalError?: unknown;
 }
 
@@ -71,6 +73,7 @@ export function normalizeError(err: unknown): NormalizedError {
       details: payload?.details,
       subErrors: payload?.subErrors,
       traceId: payload?.traceId,
+      stackTrace: payload?.stackTrace,
       originalError: err
     };
   }

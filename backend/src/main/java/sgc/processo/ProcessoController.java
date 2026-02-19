@@ -15,6 +15,7 @@ import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoViews;
+import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoViews;
 
@@ -128,7 +129,7 @@ public class ProcessoController {
 
         List<String> erros = processador.apply(codigo, req.unidades());
         if (!erros.isEmpty()) {
-            throw new sgc.processo.erros.ErroProcesso(String.join(". ", erros));
+            throw new ErroProcesso(String.join(". ", erros));
         }
 
         Processo processoAtualizado = processoFacade.obterEntidadePorId(codigo);

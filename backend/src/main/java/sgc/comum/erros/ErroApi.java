@@ -23,14 +23,18 @@ public class ErroApi {
     private String code;
     @Setter
     private @Nullable String traceId;
+    @Setter
+    private @Nullable String stackTrace;
     private @Nullable List<ErroSubApi> subErrors;
 
     @Setter
-    private Map<String, ?> details;
+    private @Nullable Map<String, ?> details;
 
     private ErroApi() {
         this.timestamp = LocalDateTime.now();
         this.message = "";
+        this.code = "";
+        this.details = new java.util.HashMap<>();
     }
 
     public ErroApi(HttpStatusCode status, String message) {
