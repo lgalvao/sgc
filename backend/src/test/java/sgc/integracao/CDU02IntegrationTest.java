@@ -3,9 +3,6 @@ package sgc.integracao;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -51,8 +48,9 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     private UsuarioRepo usuarioRepo;
     @Autowired
     private AlertaRepo alertaRepo;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+
+    // Removido: JdbcTemplate não é necessário pois @Transactional garante isolamento
+    // e os testes usam IDs dinâmicos.
 
     private Unidade unidadeRaiz;
     private Unidade unidadeFilha1;
@@ -62,16 +60,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setup() {
-        // Ajusta sequências para evitar conflito com data.sql
-        try {
-            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 20000");
-            jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 80000");
-            jdbcTemplate.execute("ALTER TABLE SGC.ALERTA ALTER COLUMN CODIGO RESTART WITH 90000");
-        } catch (DataAccessException e) {
-            // Ignora se o DB não suportar (H2 suporta)
-            log.warn("Aviso: Não foi possível reiniciar sequências: {}", e.getMessage());
-        }
-
         // Setup Programático - Não depende do data.sql
 
         // 1. Criar Unidades (Hierarquia)
@@ -135,17 +123,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
         }
 
-        // Insere na tabela de join simulada se necessário (H2 specific for View)
-        for (String perfilStr : perfis) {
-            try {
-                jdbcTemplate.update(
-                        "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                        usuario.getTituloEleitoral(), unidade.getCodigo(), perfilStr);
-            } catch (DataAccessException ignored) {
-                // Ignora se já existe
-            }
-        }
-
         // Define authorities como apenas o perfil selecionado para simular o comportamento do FiltroJwt
         Set<GrantedAuthority> authorities = Collections.emptySet();
         if (perfis.length > 0) {
@@ -163,14 +140,16 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     }
 
     @Nested
-    @DisplayName("Testes de Visibilidade de Processos")
+    @DisplayName("Testes de Visibilidade de Processos (CDU-02)")
     class VisibilidadeProcessosTestes {
         @Test
         @WithMockAdmin
-        @DisplayName("ADMIN deve ver todos os processos, incluindo os com status 'Criado'")
+        @DisplayName("CDU-02: ADMIN deve ver todos os processos, incluindo os com status 'Criado'")
         void testListarProcessosAdminVeTodos() throws Exception {
-            // Admin vê tudo, inclusive os 3 criados no setup
-            mockMvc.perform(get(API_PAINEL_PROCESSOS).param(PERFIL, "ADMIN").param(UNIDADE, "1"))
+            // Requisito CDU-02: Processos na situação 'Criado' deverão ser listados apenas se o usuário estiver logado com o perfil ADMIN.
+            mockMvc.perform(get(API_PAINEL_PROCESSOS)
+                            .param(PERFIL, "ADMIN")
+                            .param(UNIDADE, unidadeRaiz.getCodigo().toString())) // Uso de ID dinâmico
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(PROCESSO_RAIZ_JSON_PATH).exists())
                     .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
@@ -178,7 +157,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("GESTOR da unidade raiz deve ver todos os processos da sua unidade e de todas as subordinadas")
+        @DisplayName("CDU-02: GESTOR da unidade raiz deve ver processos subordinados, mas NÃO os 'Criado'")
         @WithMockUser(username = "99001")
         void testListarProcessosGestorRaizVeTodos() throws Exception {
             setupSecurityContext("99001", unidadeRaiz, GESTOR);
@@ -188,7 +167,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
                             .param(PERFIL, GESTOR)
                             .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    // Deve ver o da Raiz e o da Filha
+                    // Deve ver o da Raiz e o da Filha (CDU-02: Processos ... que incluam entre as unidades participantes a unidade do usuário e/ou suas unidades subordinadas)
                     .andExpect(jsonPath(PROCESSO_RAIZ_JSON_PATH).exists())
                     .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
                     // GESTOR não vê processos com status CRIADO (regra confirmada)
@@ -196,7 +175,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("CHEFE da unidade Filha 2 não deve ver processos de outras unidades")
+        @DisplayName("CDU-02: CHEFE da unidade Filha 2 não deve ver processos de outras unidades")
         @WithMockUser(username = "99002")
         void testListarProcessosChefeUnidadeFilha2NaoVeProcessosDeOutros() throws Exception {
             setupSecurityContext("99002", unidadeFilha2, CHEFE);
@@ -212,7 +191,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("Nenhum perfil, exceto ADMIN, deve ver processos com status 'Criado' (Exceto da própria unidade)")
+        @DisplayName("CDU-02: Nenhum perfil (GESTOR), exceto ADMIN, deve ver processos com status 'Criado'")
         @WithMockUser(username = "99003")
         void testListarProcessosNaoAdminNaoVeProcessosCriados() throws Exception {
             setupSecurityContext("99003", unidadeRaiz, GESTOR);
@@ -231,16 +210,16 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk())
                     // Deve ver Raiz e Filha (Em Andamento)
                     .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
-                    // NÃO deve ver Criado Filha (Se a regra for essa)
+                    // NÃO deve ver Criado Filha
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Criado Filha')]").doesNotExist());
         }
     }
 
     @Nested
-    @DisplayName("Testes de Visibilidade de Alertas")
+    @DisplayName("Testes de Visibilidade de Alertas (CDU-02)")
     class VisibilidadeAlertasTestes {
         @Test
-        @DisplayName("Usuário deve ver alertas direcionados a ele")
+        @DisplayName("CDU-02: Usuário deve ver alertas direcionados a ele")
         @WithMockUser(username = "99004")
         void testListarAlertasUsuarioVeSeusAlertas() throws Exception {
             Usuario usuario = setupSecurityContext("99004", unidadeRaiz, GESTOR);
@@ -258,7 +237,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("Usuário deve ver alertas direcionados à sua unidade e às suas subordinadas")
+        @DisplayName("CDU-02: Usuário deve ver alertas direcionados à sua unidade")
         @WithMockUser(username = "99005")
         void testListarAlertasUsuarioVeAlertasDaSuaUnidade() throws Exception {
             setupSecurityContext("99005", unidadeRaiz, GESTOR);
@@ -276,7 +255,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("Usuário não deve ver alertas de outros usuários ou unidades")
+        @DisplayName("CDU-02: Usuário não deve ver alertas de outros usuários ou unidades")
         @WithMockUser(username = "99006")
         void testListarAlertasUsuarioNaoVeAlertasDeOutros() throws Exception {
             Usuario usuario = setupSecurityContext("99006", unidadeFilha2, CHEFE);
