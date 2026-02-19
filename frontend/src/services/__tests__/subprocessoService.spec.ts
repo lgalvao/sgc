@@ -25,9 +25,9 @@ describe("subprocessoService", () => {
     });
 
     it("listarAtividades chama o endpoint correto", async () => {
-        vi.mocked(apiClient.get).mockResolvedValue({ data: [] });
+        vi.mocked(apiClient.get).mockResolvedValue({ data: { atividadesDisponiveis: [] } });
         await service.listarAtividades(1);
-        expect(apiClient.get).toHaveBeenCalledWith("/subprocessos/1/atividades");
+        expect(apiClient.get).toHaveBeenCalledWith("/subprocessos/1/contexto-edicao");
     });
 
     it("obterPermissoes chama o endpoint correto", async () => {
@@ -67,7 +67,7 @@ describe("subprocessoService", () => {
     it("adicionarCompetencia chama o endpoint correto", async () => {
         vi.mocked(apiClient.post).mockResolvedValue({ data: {} });
         await service.adicionarCompetencia(1, { descricao: "D", atividadesAssociadas: [10] } as any);
-        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/competencias", {
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/competencia", {
             descricao: "D",
             atividadesIds: [10]
         });
@@ -76,7 +76,7 @@ describe("subprocessoService", () => {
     it("removerCompetencia chama o endpoint correto", async () => {
         vi.mocked(apiClient.post).mockResolvedValue({ data: {} });
         await service.removerCompetencia(1, 50);
-        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/competencias/50/remover");
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/competencia/50/remover");
     });
 
     it("buscarContextoEdicao chama o endpoint correto", async () => {
@@ -90,7 +90,7 @@ describe("subprocessoService", () => {
     it("atualizarCompetencia chama o endpoint correto", async () => {
         vi.mocked(apiClient.post).mockResolvedValue({ data: {} });
         await service.atualizarCompetencia(1, { codigo: 50, descricao: "D2", atividadesAssociadas: [20] } as any);
-        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/competencias/50/atualizar", {
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/competencia/50", {
             descricao: "D2",
             atividadesIds: [20]
         });
