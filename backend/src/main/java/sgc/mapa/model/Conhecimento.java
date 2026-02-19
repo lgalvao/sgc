@@ -1,6 +1,7 @@
 package sgc.mapa.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
@@ -20,15 +21,16 @@ public class Conhecimento extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "atividade_codigo", nullable = false)
     @JsonIgnore
+    @JsonIgnoreProperties("conhecimentos")
     private Atividade atividade;
 
-    @JsonView(MapaViews.Minimal.class)
+    @JsonView({MapaViews.Minimal.class, MapaViews.Publica.class})
     @Column(name = "descricao", nullable = false)
     private String descricao;
 
     @JsonView(MapaViews.Publica.class)
     @JsonProperty("atividadeCodigo")
     public Long getCodigoAtividade() {
-        return atividade.getCodigo();
+        return atividade != null ? atividade.getCodigo() : null;
     }
 }

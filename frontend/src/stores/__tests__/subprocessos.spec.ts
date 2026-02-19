@@ -164,7 +164,7 @@ describe('Subprocessos Store', () => {
             await store.buscarSubprocessoDetalhe(1);
 
             expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(1, 'ADMIN', null);
-            expect(store.subprocessoDetalhe).toEqual({ codigo: 1, situacao: 'CRIADO' });
+            expect(store.subprocessoDetalhe).toMatchObject({ codigo: 1, situacao: 'CRIADO' });
             expect(store.lastError).toBeNull();
         });
 
@@ -234,7 +234,7 @@ describe('Subprocessos Store', () => {
 
             await store.buscarContextoEdicao(1);
 
-            expect(store.subprocessoDetalhe).toEqual(mockData.subprocesso);
+            expect(store.subprocessoDetalhe).toMatchObject(mockData.subprocesso);
             expect(mockUnidadesStore.unidade).toEqual(mockData.unidade);
             // Verifica mapper
             expect(mockMapasStore.mapaCompleto).toEqual({ id: 5, mapped: true });

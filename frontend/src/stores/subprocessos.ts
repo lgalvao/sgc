@@ -30,6 +30,7 @@ import {useMapasStore} from "@/stores/mapas";
 import {useAtividadesStore} from "@/stores/atividades";
 import {mapMapaCompletoDtoToModel} from "@/mappers/mapas";
 import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";
+import {mapSubprocessoDetalheDtoToModel} from "@/mappers/subprocessos";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,
@@ -97,11 +98,13 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         }
 
         await withErrorHandling(async () => {
-            subprocessoDetalhe.value = await serviceFetchSubprocessoDetalhe(
+            const dto = await serviceFetchSubprocessoDetalhe(
                 codigo,
                 perfil,
                 codUnidade as number,
             );
+            subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(dto);
+            console.log(`[SubprocessosStore] Detalhes do subprocesso ${codigo} mapeados com sucesso:`, subprocessoDetalhe.value);
             console.log(`[SubprocessosStore] Detalhes do subprocesso ${codigo} carregados com sucesso`);
         }, (err) => {
             console.error(`[SubprocessosStore] Erro ao buscar detalhes do subprocesso ${codigo}:`, err);
@@ -145,7 +148,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         return withErrorHandling(async () => {
             const data = await serviceBuscarContextoEdicao(codigo, perfil, codUnidade as number);
 
-            subprocessoDetalhe.value = data.subprocesso;
+            subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(data.detalhes || data);
 
             const unidadesStore = useUnidadesStore();
             unidadesStore.unidade = data.unidade;

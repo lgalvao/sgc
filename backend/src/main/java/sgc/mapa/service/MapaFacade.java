@@ -35,6 +35,11 @@ public class MapaFacade {
     }
 
     @Transactional(readOnly = true)
+    public Mapa obterMapaCompletoPorSubprocesso(Long codSubprocesso) {
+        return mapaManutencaoService.buscarMapaCompletoPorSubprocesso(codSubprocesso);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<Mapa> buscarMapaVigentePorUnidade(Long codigoUnidade) {
         return mapaManutencaoService.buscarMapaVigentePorUnidade(codigoUnidade);
     }

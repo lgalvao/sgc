@@ -62,9 +62,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String traceId = UUID.randomUUID().toString();
 
         if (ex.getStatus().is4xxClientError()) {
-            log.warn("Erro de negócio ({}): {}", ex.getCode(), ex.getMessage());
+            log.warn("[{}] Erro de negócio ({}): {}", traceId, ex.getCode(), ex.getMessage());
         } else {
-            log.error("Erro de negócio ({}): {}", ex.getCode(), ex.getMessage(), ex);
+            log.error("[{}] Erro de negócio crítico ({}): {}", traceId, ex.getCode(), ex.getMessage(), ex);
         }
 
         ErroApi erroApi = new ErroApi(
@@ -154,7 +154,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ErroInterno.class)
     protected ResponseEntity<ErroApi> handleErroInterno(ErroInterno ex) {
         String traceId = UUID.randomUUID().toString();
-        log.error("[{}] ERRO INTERNO - Isso indica um bug que precisa ser corrigido: {}",
+        log.error("[{}] ERRO INTERNO DO SISTEMA - BUG DETECTADO: {}",
                 traceId, ex.getMessage(), ex);
 
         String mensagemUsuario = "ERRO INTERNO: " + ex.getMessage();
@@ -186,7 +186,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErroApi> handleGenericException(Exception ex) {
         String traceId = UUID.randomUUID().toString();
-        log.error("[{}] Erro inesperado na aplicação", traceId, ex);
+        log.error("[{}] ERRO NÃO TRATADO DETECTADO: {}", traceId, ex.getMessage(), ex);
+        
         String message = "ERRO INESPERADO: " + (ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName());
         ErroApi erroApi = new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, message, "ERRO_INTERNO", traceId);
         erroApi.setStackTrace(getStackTrace(ex));

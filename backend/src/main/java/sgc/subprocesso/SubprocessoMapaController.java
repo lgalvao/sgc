@@ -5,9 +5,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
@@ -34,11 +36,13 @@ import java.util.Map;
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
 @Tag(name = "Subprocesso Mapa", description = "Endpoints para workflow do mapa de competências")
+@Slf4j
 public class SubprocessoMapaController {
 
     private final SubprocessoFacade subprocessoFacade;
     private final MapaFacade mapaFacade;
     private final AnaliseFacade analiseFacade;
+    private final sgc.comum.repo.ComumRepo repo;
 
     @GetMapping("/{codigo}/impactos-mapa")
     @PreAuthorize("isAuthenticated()")
@@ -90,10 +94,17 @@ public class SubprocessoMapaController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém o mapa completo para edição/visualização")
     @JsonView(MapaViews.Publica.class)
+    @Transactional(readOnly = true)
     public ResponseEntity<Mapa> obterMapaCompleto(@PathVariable Long codigo) {
-        Subprocesso subprocesso = subprocessoFacade.buscarSubprocessoComMapa(codigo);
-        Mapa mapa = mapaFacade.obterPorCodigo(subprocesso.getMapa().getCodigo());
-        return ResponseEntity.ok(mapa);
+        log.info("[SubprocessoMapaController] Buscando mapa completo para subprocesso: {}", codigo);
+        try {
+            Mapa mapa = mapaFacade.obterMapaCompletoPorSubprocesso(codigo);
+            log.info("[SubprocessoMapaController] Mapa completo encontrado: {}", mapa.getCodigo());
+            return ResponseEntity.ok(mapa);
+        } catch (Exception e) {
+            log.error("[SubprocessoMapaController] Erro ao buscar mapa completo para subprocesso {}: {}", codigo, e.getMessage(), e);
+            throw e;
+        }
     }
 
     @PostMapping("/{codigo}/mapa-completo")

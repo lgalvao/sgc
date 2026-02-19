@@ -278,6 +278,12 @@ public class MapaManutencaoService {
     }
 
     @Transactional(readOnly = true)
+    public Mapa buscarMapaCompletoPorSubprocesso(Long subprocessoCodigo) {
+        return mapaRepo.findFullBySubprocessoCodigo(subprocessoCodigo)
+                .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada("Mapa", "S:" + subprocessoCodigo));
+    }
+
+    @Transactional(readOnly = true)
     public Mapa buscarMapaPorCodigo(Long codigo) {
         return repo.buscar(Mapa.class, codigo);
     }

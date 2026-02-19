@@ -62,11 +62,8 @@ const LOG_FILTERS = [
     /➜ {2}Local:/,
     /➜ {2}Network:/,
     /use --host to expose/, 
-    /[vite] connecting/,
-    /[vite] connected/,
-    /connecting/, 
-    /connected/, 
-    /vite/,
+    /\[vite\] {2}connecting/,
+    /\[vite\] {2}connected/,
     /debug:/,
 
     // Logs de serviços mockados

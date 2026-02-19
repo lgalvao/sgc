@@ -5,6 +5,9 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
     plugins: [vue(), tsconfigPaths()],
     server: {
+        watch: {
+            usePolling: true,
+        },
         proxy: {
             "/api": {
                 target: "http://localhost:10000",

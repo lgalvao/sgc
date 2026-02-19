@@ -178,8 +178,9 @@ onMounted(async () => {
     } else {
       console.warn(`[SubprocessoDetalheView] Subprocesso não encontrado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
     }
-  } catch (error) {
-    console.error(`[SubprocessoDetalheView] Erro ao carregar detalhes do subprocesso:`, error);
+  } catch (error: any) {
+    const errorBody = error.response?.data || error.message;
+    console.error(`[SubprocessoDetalheView] Erro ao carregar detalhes do subprocesso:`, error, errorBody);
   }
 });
 

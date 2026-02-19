@@ -1,6 +1,7 @@
 package sgc.mapa.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -47,10 +48,12 @@ public class Mapa extends EntidadeBase {
     @OneToMany(mappedBy = "mapa", cascade = CascadeType.ALL, orphanRemoval = true)
     @lombok.Builder.Default
     @JsonView(MapaViews.Publica.class)
+    @JsonIgnoreProperties("mapa")
     private Set<Atividade> atividades = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "mapa", cascade = CascadeType.ALL, orphanRemoval = true)
     @lombok.Builder.Default
     @JsonView(MapaViews.Publica.class)
+    @JsonIgnoreProperties("mapa")
     private Set<Competencia> competencias = new LinkedHashSet<>();
 }
