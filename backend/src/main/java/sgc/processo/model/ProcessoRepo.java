@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProcessoRepo extends JpaRepository<Processo, Long> {
@@ -78,4 +79,7 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
     List<Long> findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
             @Param("situacoes") List<SituacaoProcesso> situacoes,
             @Param("idIgnorado") Long idIgnorado);
+
+    @Query("SELECT p FROM Processo p LEFT JOIN FETCH p.participantes WHERE p.codigo = :codigo")
+    Optional<Processo> findByIdComParticipantes(@Param("codigo") Long codigo);
 }

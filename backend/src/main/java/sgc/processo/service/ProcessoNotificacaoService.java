@@ -67,7 +67,7 @@ public class ProcessoNotificacaoService {
     }
 
     private void processarInicioProcesso(Long codProcesso) {
-        Processo processo = processoRepo.findById(codProcesso)
+        Processo processo = processoRepo.findByIdComParticipantes(codProcesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
         List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
 
@@ -102,7 +102,7 @@ public class ProcessoNotificacaoService {
     }
 
     private void processarFinalizacaoProcesso(Long codProcesso) {
-        Processo processo = processoRepo.findById(codProcesso)
+        Processo processo = processoRepo.findByIdComParticipantes(codProcesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
 
         List<Long> codigosParticipantes = processo.getCodigosParticipantes();

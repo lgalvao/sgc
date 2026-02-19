@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
@@ -36,6 +37,11 @@ public class ProcessoConsultaService {
 
     public Processo buscarProcessoCodigo(Long codigo) {
         return repo.buscar(Processo.class, codigo);
+    }
+
+    public Processo buscarProcessoComParticipantes(Long codigo) {
+        return processoRepo.findByIdComParticipantes(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
     }
 
     public Optional<Processo> buscarProcessoCodigoOpt(Long id) {

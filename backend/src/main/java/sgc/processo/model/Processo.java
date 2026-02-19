@@ -118,4 +118,16 @@ public class Processo extends EntidadeBase {
                 .sorted()
                 .collect(Collectors.joining(", "));
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Processo processo)) return false;
+        return getCodigo() != null && getCodigo().equals(processo.getCodigo());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCodigo());
+    }
 }

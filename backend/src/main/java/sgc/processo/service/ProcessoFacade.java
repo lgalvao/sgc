@@ -78,7 +78,7 @@ public class ProcessoFacade {
 
     @Transactional(readOnly = true)
     public Processo obterEntidadePorId(Long codigo) {
-        return buscarPorId(codigo);
+        return processoConsultaService.buscarProcessoComParticipantes(codigo);
     }
 
     @Transactional(readOnly = true)
