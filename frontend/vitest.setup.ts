@@ -1,4 +1,4 @@
-import {config} from "@vue/test-utils";
+import {config, RouterLinkStub} from "@vue/test-utils";
 import {createBootstrap} from "bootstrap-vue-next";
 import {expect, vi} from "vitest";
 import * as matchers from "vitest-axe/matchers";
@@ -40,6 +40,9 @@ config.global.stubs["b-modal"] = {
     </div>
   `,
 };
+
+config.global.stubs["RouterLink"] = RouterLinkStub;
+config.global.stubs["router-link"] = RouterLinkStub;
 
 config.global.directives = {
     "b-tooltip": {},
