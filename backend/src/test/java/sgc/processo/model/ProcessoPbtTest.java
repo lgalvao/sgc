@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Tag("PBT")
 class ProcessoPbtTest {
 
     @Property

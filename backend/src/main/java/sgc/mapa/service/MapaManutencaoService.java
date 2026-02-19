@@ -296,7 +296,7 @@ public class MapaManutencaoService {
     }
 
     private void validarDescricaoAtividadeUnica(Long mapaCodigo, String descricao) {
-        boolean existe = buscarAtividadesPorMapaCodigoSemRelacionamentos(mapaCodigo).stream()
+        boolean existe = atividadeRepo.findByMapaCodigoSemFetch(mapaCodigo).stream()
                 .anyMatch(a -> a.getDescricao().equalsIgnoreCase(descricao));
         if (existe) {
             throw new ErroValidacao("Já existe uma atividade com esta descrição neste mapa.");

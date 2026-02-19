@@ -17,9 +17,9 @@ This file tracks the implementation progress of Property-Based Tests (PBT) based
 
 ## 2. Process Management (Gerenciamento de Processos)
 - [x] Invariant: Creation Validity (Partial - Backend Logic tested)
-- [x] Invariant: Immutability after Start (Tested `ProcessoManutencaoService`)
-- [ ] Invariant: State Transitions
-- [x] Invariant: Subprocess Creation (Validated via flow)
+- [x] Invariant: Immutability after Start (Tested in `ProcessoWorkflowPbtTest`)
+- [x] Invariant: State Transitions (Verified situation progression in `ProcessoWorkflowPbtTest`)
+- [x] Invariant: Subprocess Creation (Verified mapping and diagnostic creation in `ProcessoWorkflowPbtTest`)
 - [x] Property: Participant Synchronization (tested `Processo.sincronizarParticipantes`)
 
 ## 3. Subprocess Workflow & State Machine
@@ -28,7 +28,7 @@ This file tracks the implementation progress of Property-Based Tests (PBT) based
 
 ## 4. Cadastro de Atividades e Conhecimentos (Activities & Knowledge)
 - [x] Invariant: Completeness (Tested `SubprocessoValidacaoService.validarExistenciaAtividades`)
-- [ ] Invariant: Uniqueness
+- [x] Invariant: Uniqueness (Tested in `MapaManutencaoServicePbtTest`)
 - [x] Invariant: Association (Tested via linking properties)
 
 ## 5. Mapa de Competências (Competence Map)
@@ -36,8 +36,8 @@ This file tracks the implementation progress of Property-Based Tests (PBT) based
 - [x] Invariant: Completeness (Map Availability) (Tested `SubprocessoValidacaoService.validarAssociacoesMapa`)
 
 ## 6. Bulk Operations (Operações em Bloco)
-- [ ] Property: Atomicity
-- [ ] Property: Consistency
+- [x] Property: Atomicity (Tested in `SubprocessoBulkOperationsPbtTest`)
+- [x] Property: Consistency (Verified side-effects consistency in `SubprocessoBulkOperationsPbtTest`)
 
 ## 7. Notifications & Alerts (Notificações e Alertas)
 - [x] Invariant: Triggering (Tested in `SubprocessoTransicaoServicePbtTest`)

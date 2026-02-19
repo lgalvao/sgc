@@ -3,6 +3,7 @@ package sgc.mapa.service;
 import net.jqwik.api.*;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.CriarAtividadeRequest;
+import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.mapper.AtividadeMapper;
 import sgc.mapa.mapper.ConhecimentoMapper;
 import sgc.mapa.model.*;
@@ -13,6 +14,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
+@Tag("PBT")
 class MapaManutencaoServicePbtTest {
 
     @Property
@@ -43,13 +45,43 @@ class MapaManutencaoServicePbtTest {
         // Simular que já existe uma atividade com a mesma descrição
         Atividade existente = new Atividade();
         existente.setDescricao(descricoes[0]);
-        when(atividadeRepo.findByMapa_Codigo(mapaCodigo)).thenReturn(List.of(existente));
+        when(atividadeRepo.findByMapaCodigoSemFetch(mapaCodigo)).thenReturn(List.of(existente));
 
         CriarAtividadeRequest request = new CriarAtividadeRequest(mapaCodigo, descricoes[1]);
         
-        // Se descricoes[0].equalsIgnoreCase(descricoes[1]), deve falhar
         assertThatThrownBy(() -> service.criarAtividade(request))
-                .as("Deveria falhar por descrição duplicada (case-insensitive): " + descricoes[0] + " vs " + descricoes[1])
+                .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
+    }
+
+    @Property
+    void criarConhecimento_deveFalharSeDescricaoDuplicadaNaAtividade(@ForAll("descricoesIguais") String[] descricoes) {
+        AtividadeRepo atividadeRepo = mock(AtividadeRepo.class);
+        CompetenciaRepo competenciaRepo = mock(CompetenciaRepo.class);
+        ConhecimentoRepo conhecimentoRepo = mock(ConhecimentoRepo.class);
+        MapaRepo mapaRepo = mock(MapaRepo.class);
+        ComumRepo repo = mock(ComumRepo.class);
+        AtividadeMapper atividadeMapper = mock(AtividadeMapper.class);
+        ConhecimentoMapper conhecimentoMapper = mock(ConhecimentoMapper.class);
+        SubprocessoAdminWorkflowService subprocessoAdminService = mock(SubprocessoAdminWorkflowService.class);
+
+        MapaManutencaoService service = new MapaManutencaoService(
+                atividadeRepo, competenciaRepo, conhecimentoRepo, mapaRepo, repo,
+                atividadeMapper, conhecimentoMapper, subprocessoAdminService
+        );
+
+        Long ativCodigo = 10L;
+        Atividade atividade = new Atividade();
+        atividade.setCodigo(ativCodigo);
+        atividade.setMapa(Mapa.builder().codigo(1L).build());
+        when(repo.buscar(Atividade.class, ativCodigo)).thenReturn(atividade);
+
+        Conhecimento existente = new Conhecimento();
+        existente.setDescricao(descricoes[0]);
+        when(conhecimentoRepo.findByAtividade_Codigo(ativCodigo)).thenReturn(List.of(existente));
+
+        CriarConhecimentoRequest request = new CriarConhecimentoRequest(ativCodigo, descricoes[1]);
+        
+        assertThatThrownBy(() -> service.criarConhecimento(ativCodigo, request))
                 .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
     }
 
