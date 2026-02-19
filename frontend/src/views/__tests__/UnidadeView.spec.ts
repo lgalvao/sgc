@@ -1,12 +1,15 @@
 import {describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import Unidade from '@/views/unidade/UnidadeDetalheView.vue';
+import EmptyState from '@/components/comum/EmptyState.vue';
+import ErrorAlert from '@/components/comum/ErrorAlert.vue';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes';
 import {usePerfilStore} from '@/stores/perfil';
 import {useUsuariosStore} from '@/stores/usuarios';
 import {useMapasStore} from '@/stores/mapas';
 import {buscarUsuarioPorTitulo} from '@/services/usuarioService';
+import {buscarArvoreUnidade} from '@/services/unidadeService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {logger} from "@/utils";
 
@@ -88,6 +91,7 @@ describe('Unidade.vue', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        (buscarArvoreUnidade as any).mockResolvedValue(mockUnidadeData);
     });
 
     let unidadesStore: any;
@@ -286,7 +290,14 @@ describe('Unidade.vue', () => {
         unidadesStore.lastError = { message: 'Erro ao carregar unidade' };
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find('.alert').text()).toContain('Erro ao carregar unidade');
+        const alert = wrapper.findComponent(ErrorAlert);
+        expect(alert.exists()).toBe(true);
+        expect(alert.props('error')).toEqual({ message: 'Erro ao carregar unidade' });
+
+        // Test dismiss
+        vi.spyOn(unidadesStore, 'clearError');
+        await alert.vm.$emit('dismiss');
+        expect(unidadesStore.clearError).toHaveBeenCalled();
     });
 
     it('logs error when fetching titular fails', async () => {
@@ -331,5 +342,68 @@ describe('Unidade.vue', () => {
         expect(emailLink.exists()).toBe(true);
         expect(emailLink.text()).toBe('test@example.com');
         expect(emailLink.attributes('aria-label')).toBe('Enviar e-mail para test@example.com');
+    });
+
+    it('calculates dynamic responsible person using dataFim (legacy format)', async () => {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        const mockAtribuicao = {
+            usuario: { ...mockUsuarioResponsavel, unidade: { codigo: 1 } },
+            unidade: { ...mockUnidade },
+            dataInicio: yesterday.toISOString(),
+            dataFim: tomorrow.toISOString(), // Legacy field
+        };
+
+        const { wrapper, atribuicaoStore } = createWrapper({
+            unidades: {
+                unidade: mockUnidade
+            },
+            atribuicoes: {
+                atribuicoes: [mockAtribuicao]
+            }
+        });
+
+        vi.spyOn(atribuicaoStore, 'obterAtribuicoesPorUnidade').mockReturnValue([mockAtribuicao]);
+
+        await wrapper.vm.$nextTick();
+        await flushPromises();
+
+        expect(wrapper.text()).toContain('Responsável: Responsavel Teste');
+    });
+
+    it('handles unit with no children safely', async () => {
+        const mockUnidadeSemFilhas = {
+            ...mockUnidade,
+            filhas: []
+        };
+        (buscarArvoreUnidade as any).mockResolvedValue(mockUnidadeSemFilhas);
+
+        const { wrapper, unidadesStore } = createWrapper();
+        await wrapper.vm.$nextTick();
+        await flushPromises();
+
+        expect(unidadesStore.unidade.filhas).toHaveLength(0);
+
+        // Access computed property explicitly to ensure coverage
+        expect((wrapper.vm as any).dadosFormatadosSubordinadas).toEqual([]);
+
+        // Should check that TreeTable is not rendered or data is empty
+        const treeTable = wrapper.findComponent(TreeTableStub);
+        expect(treeTable.exists()).toBe(false);
+    });
+
+    it('handles null unit gracefully', async () => {
+        (buscarArvoreUnidade as any).mockResolvedValue(null);
+        const { wrapper, unidadesStore } = createWrapper();
+        await wrapper.vm.$nextTick();
+        await flushPromises();
+
+        expect(unidadesStore.unidade).toBeNull();
+
+        expect(wrapper.findComponent(EmptyState).exists()).toBe(true);
     });
 });

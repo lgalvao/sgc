@@ -112,6 +112,34 @@ describe("TabelaAlertas.vue", () => {
         expect(wrapper.emitted("ordenar")?.[1]).toEqual(["processo"]);
     });
 
+    it("deve tratar item nulo em rowClass", () => {
+        const wrapper = mount(TabelaAlertas, {
+            props: {alertas: mockAlertas},
+            global: {stubs: {BTable: true}}
+        });
+
+        const bTable = wrapper.findComponent(_BTable as any) as unknown as VueWrapper<any>;
+        const rowClassFn = bTable.props("tbodyTrClass");
+
+        expect(rowClassFn(null)).toBe("");
+    });
+
+    it("deve emitir 'recarregar' ao clicar no botão de atualizar no estado vazio", async () => {
+        const wrapper = mount(TabelaAlertas, {
+            props: {alertas: []},
+            global: {
+                components: { EmptyState }
+            }
+        });
+
+        const btn = wrapper.find('[data-testid="btn-empty-state-alertas-atualizar"]');
+        expect(btn.exists()).toBe(true);
+
+        await btn.trigger('click');
+        expect(wrapper.emitted('recarregar')).toBeTruthy();
+        expect(wrapper.emitted('recarregar')).toHaveLength(1);
+    });
+
     it("deve ser acessível", async () => {
         const wrapper = mount(TabelaAlertas, {
             props: {alertas: mockAlertas},
