@@ -2,7 +2,9 @@ package sgc.organizacao.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import sgc.organizacao.model.ResponsabilidadeRepo;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 
 import java.util.Objects;
 
@@ -13,6 +15,21 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class HierarquiaService {
+    private final ResponsabilidadeRepo responsabilidadeRepo;
+
+    /**
+     * Verifica se o usuário é o responsável pela unidade (Titular, Substituto ou Atribuição Temporária).
+     *
+     * @param unidade A unidade
+     * @param usuario O usuário
+     * @return true se o usuário é o responsável
+     */
+    public boolean isResponsavel(Unidade unidade, Usuario usuario) {
+        return responsabilidadeRepo.findById(unidade.getCodigo())
+                .map(resp -> Objects.equals(resp.getUsuarioTitulo(), usuario.getTituloEleitoral()))
+                .orElse(false);
+    }
+
     /**
      * Verifica se uma unidade é subordinada a outra na hierarquia.
      *

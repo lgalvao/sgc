@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.HierarquiaService;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.testutils.UnidadeTestBuilder;
 
@@ -33,6 +34,9 @@ class AtividadeAccessPolicyTest {
     
     @Mock
     private UsuarioPerfilRepo usuarioPerfilRepo;
+
+    @Mock
+    private HierarquiaService hierarquiaService;
 
     private Usuario usuarioChefe;
     private Usuario usuarioServidor;
@@ -67,6 +71,7 @@ class AtividadeAccessPolicyTest {
     @Test
     @DisplayName("Deve permitir CHEFE criar atividade se for titular")
     void devePermitirChefeCriarAtividade() {
+        org.mockito.Mockito.when(hierarquiaService.isResponsavel(unidade, usuarioChefe)).thenReturn(true);
         boolean resultado = policy.canExecute(usuarioChefe, CRIAR_ATIVIDADE, atividade);
         assertThat(resultado).isTrue();
     }
@@ -83,6 +88,7 @@ class AtividadeAccessPolicyTest {
     @DisplayName("Deve negar CHEFE se não for titular da unidade")
     void deveNegarChefeSeNaoForTitular() {
         unidade.setTituloTitular("999"); // Muda o titular
+        org.mockito.Mockito.when(hierarquiaService.isResponsavel(unidade, usuarioChefe)).thenReturn(false);
         boolean resultado = policy.canExecute(usuarioChefe, CRIAR_ATIVIDADE, atividade);
         assertThat(resultado).isFalse();
         assertThat(policy.getMotivoNegacao()).contains("não é o titular da unidade");

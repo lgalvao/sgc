@@ -94,10 +94,7 @@ public abstract class AbstractAccessPolicy<T> implements AccessPolicy<T> {
             case SUPERIOR_IMEDIATA -> hierarquiaService.isSuperiorImediata(unidade,
                         Unidade.builder().codigo(codUnidadeUsuario).build());
 
-            case TITULAR_UNIDADE -> {
-                String tituloTitular = unidade.getTituloTitular();
-                yield tituloTitular != null && tituloTitular.equals(usuario.getTituloEleitoral());
-            }
+            case TITULAR_UNIDADE -> hierarquiaService.isResponsavel(unidade, usuario);
         };
     }
 

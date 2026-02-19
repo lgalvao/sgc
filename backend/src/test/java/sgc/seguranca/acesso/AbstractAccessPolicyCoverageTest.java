@@ -89,9 +89,10 @@ class AbstractAccessPolicyCoverageTest {
         unidade.setTituloTitular("222222"); // Outro titular
 
         // Act & Assert
+        org.mockito.Mockito.when(hierarquiaService.isResponsavel(unidade, admin)).thenReturn(false);
         assertThat(policy.callVerificaHierarquia(admin, unidade, AbstractAccessPolicy.RequisitoHierarquia.TITULAR_UNIDADE)).isFalse();
         
-        unidade.setTituloTitular("111111"); // Próprio ADMIN
+        org.mockito.Mockito.when(hierarquiaService.isResponsavel(unidade, admin)).thenReturn(true);
         assertThat(policy.callVerificaHierarquia(admin, unidade, AbstractAccessPolicy.RequisitoHierarquia.TITULAR_UNIDADE)).isTrue();
     }
 }

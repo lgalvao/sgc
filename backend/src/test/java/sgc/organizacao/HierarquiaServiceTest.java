@@ -5,20 +5,71 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.organizacao.model.Responsabilidade;
+import sgc.organizacao.model.ResponsabilidadeRepo;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.HierarquiaService;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 @DisplayName("Testes do HierarquiaService")
 class HierarquiaServiceTest {
 
+    @Mock
+    private ResponsabilidadeRepo responsabilidadeRepo;
+
     @InjectMocks
     private HierarquiaService hierarquiaService;
 
+
+    @Test
+    @DisplayName("Deve retornar true se usuario é responsavel")
+    void deveRetornarTrueSeUsuarioResponsavel() {
+        Unidade unidade = Unidade.builder().codigo(1L).build();
+        Usuario usuario = Usuario.builder().tituloEleitoral("123456789012").build();
+        Responsabilidade responsabilidade = Responsabilidade.builder()
+                .unidadeCodigo(1L)
+                .usuarioTitulo("123456789012")
+                .build();
+
+        when(responsabilidadeRepo.findById(1L)).thenReturn(Optional.of(responsabilidade));
+
+        assertThat(hierarquiaService.isResponsavel(unidade, usuario)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve retornar false se usuario não é responsavel")
+    void deveRetornarFalseSeUsuarioNaoResponsavel() {
+        Unidade unidade = Unidade.builder().codigo(1L).build();
+        Usuario usuario = Usuario.builder().tituloEleitoral("123456789012").build();
+        Responsabilidade responsabilidade = Responsabilidade.builder()
+                .unidadeCodigo(1L)
+                .usuarioTitulo("000000000000") // Outro usuário
+                .build();
+
+        when(responsabilidadeRepo.findById(1L)).thenReturn(Optional.of(responsabilidade));
+
+        assertThat(hierarquiaService.isResponsavel(unidade, usuario)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve retornar false se unidade não tem responsavel")
+    void deveRetornarFalseSeUnidadeSemResponsavel() {
+        Unidade unidade = Unidade.builder().codigo(1L).build();
+        Usuario usuario = Usuario.builder().tituloEleitoral("123456789012").build();
+
+        when(responsabilidadeRepo.findById(1L)).thenReturn(Optional.empty());
+
+        assertThat(hierarquiaService.isResponsavel(unidade, usuario)).isFalse();
+    }
 
     @Test
     @DisplayName("Deve retornar false quando unidade alvo não tem superior")
