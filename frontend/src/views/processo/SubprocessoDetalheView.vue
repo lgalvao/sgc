@@ -162,15 +162,24 @@ const proximaAcaoSubprocesso = computed(() => obterProximaAcao({
 }));
 
 onMounted(async () => {
-  const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
-      props.codProcesso,
-      props.siglaUnidade,
-  );
+  try {
+    console.log(`[SubprocessoDetalheView] Carregando detalhes para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
+    const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+        props.codProcesso,
+        props.siglaUnidade,
+    );
 
-  if (id) {
-    codSubprocesso.value = id;
-    await subprocessosStore.buscarSubprocessoDetalhe(id);
-    await mapaStore.buscarMapaCompleto(id);
+    if (id) {
+      console.log(`[SubprocessoDetalheView] ID do subprocesso encontrado: ${id}`);
+      codSubprocesso.value = id;
+      await subprocessosStore.buscarSubprocessoDetalhe(id);
+      await mapaStore.buscarMapaCompleto(id);
+      console.log(`[SubprocessoDetalheView] Carregamento concluído com sucesso`);
+    } else {
+      console.warn(`[SubprocessoDetalheView] Subprocesso não encontrado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
+    }
+  } catch (error) {
+    console.error(`[SubprocessoDetalheView] Erro ao carregar detalhes do subprocesso:`, error);
   }
 });
 

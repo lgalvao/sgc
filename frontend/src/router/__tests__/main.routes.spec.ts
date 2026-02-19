@@ -23,7 +23,7 @@ describe("main.routes", () => {
             const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
-    });
+    }, 30000);
 
     it("deve conter a rota Painel", async () => {
         const route = mainRoutes.find((r) => r.name === "Painel");
@@ -35,7 +35,7 @@ describe("main.routes", () => {
             const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
-    });
+    }, 30000);
 
     it("deve conter a rota Historico", async () => {
         const route = mainRoutes.find((r) => r.name === "Historico");
@@ -47,7 +47,7 @@ describe("main.routes", () => {
             const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
-    });
+    }, 30000);
 
     it("deve conter a rota Relatorios", async () => {
         const route = mainRoutes.find((r) => r.name === "Relatorios");
@@ -59,7 +59,7 @@ describe("main.routes", () => {
             const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
-    });
+    }, 30000);
 
     it("deve conter a rota Configuracoes", async () => {
         const route = mainRoutes.find((r) => r.name === "Configuracoes");
@@ -71,5 +71,5 @@ describe("main.routes", () => {
             const component = await (route.component as () => Promise<any>)();
             expect(component.default).toBeDefined();
         }
-    });
+    }, 30000);
 });

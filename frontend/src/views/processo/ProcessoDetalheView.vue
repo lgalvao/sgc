@@ -238,15 +238,23 @@ const proximaAcaoProcesso = computed(() => obterProximaAcao({
 }));
 
 async function abrirDetalhesUnidade(row: any) {
-  if (!row.clickable) return;
+  if (!row.clickable) {
+    console.log(`[ProcessoDetalheView] Unidade ${row.sigla} não é clicável`);
+    return;
+  }
 
-  await router.push({
-    name: "Subprocesso",
-    params: {
-      codProcesso: codProcesso.toString(),
-      siglaUnidade: row.sigla
-    }
-  });
+  console.log(`[ProcessoDetalheView] Navegando para detalhes da unidade: ${row.sigla} no processo ${codProcesso}`);
+  try {
+    await router.push({
+      name: "Subprocesso",
+      params: {
+        codProcesso: codProcesso.toString(),
+        siglaUnidade: row.sigla
+      }
+    });
+  } catch (error) {
+    console.error(`[ProcessoDetalheView] Erro ao navegar para detalhes da unidade ${row.sigla}:`, error);
+  }
 }
 
 function finalizarProcesso() {

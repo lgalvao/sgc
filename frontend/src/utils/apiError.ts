@@ -88,6 +88,7 @@ export function normalizeError(err: unknown): NormalizedError {
   }
 
   // Fallback
+  console.error("[normalizeError] Erro não mapeado:", err);
   return {
     kind: 'unexpected',
     message: 'Erro desconhecido.',

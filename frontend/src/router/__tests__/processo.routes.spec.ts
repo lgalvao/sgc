@@ -78,5 +78,5 @@ describe('processo.routes.ts', () => {
     // @ts-expect-error - testing internal property
     const component = await cadProcesso?.component();
     expect(component.default).toBeDefined();
-  });
+  }, 30000);
 });

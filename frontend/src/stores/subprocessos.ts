@@ -74,10 +74,13 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     }
 
     async function buscarSubprocessoDetalhe(codigo: number) {
+        console.log(`[SubprocessosStore] Buscando detalhes do subprocesso ${codigo}`);
         subprocessoDetalhe.value = null; // Limpa estado anterior
         const perfilStore = usePerfilStore();
         const perfil = perfilStore.perfilSelecionado;
         const codUnidade = perfilStore.unidadeAtual;
+
+        console.log(`[SubprocessosStore] Contexto: Perfil=${perfil}, UnidadeAtual=${codUnidade}`);
 
         // Perfis ADMIN e GESTOR são globais e podem acessar qualquer subprocesso
         // sem necessidade de codUnidade específico
@@ -86,6 +89,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         // Validação pré-condição: não lança exceção, apenas popula lastError
         // Mantido padrão original para compatibilidade com testes
         if (!perfil || (!perfilGlobal && codUnidade === null)) {
+            console.error(`[SubprocessosStore] Erro de pré-condição: Perfil ou unidade não disponíveis`);
             const err = new Error("Informações de perfil ou unidade não disponíveis.");
             lastError.value = normalizeError(err);
             subprocessoDetalhe.value = null;
@@ -98,7 +102,9 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
                 perfil,
                 codUnidade as number,
             );
-        }, () => {
+            console.log(`[SubprocessosStore] Detalhes do subprocesso ${codigo} carregados com sucesso`);
+        }, (err) => {
+            console.error(`[SubprocessosStore] Erro ao buscar detalhes do subprocesso ${codigo}:`, err);
             subprocessoDetalhe.value = null;
         });
     }
@@ -107,12 +113,15 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         codProcesso: number,
         siglaUnidade: string,
     ): Promise<number | null> {
+        console.log(`[SubprocessosStore] Buscando ID do subprocesso para Processo=${codProcesso}, Unidade=${siglaUnidade}`);
         try {
             return await withErrorHandling(async () => {
                 const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
+                console.log(`[SubprocessosStore] ID encontrado: ${dto.codigo}`);
                 return dto.codigo;
             });
-        } catch {
+        } catch (err) {
+            console.error(`[SubprocessosStore] Erro ao buscar ID do subprocesso:`, err);
             return null;
         }
     }

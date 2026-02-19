@@ -100,6 +100,10 @@ describe('CadProcesso.vue Coverage', () => {
         vi.spyOn(console, 'error').mockImplementation(() => {});
     });
 
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
     it('handles mixed errors (field + generic) correctly in handleApiErrors', async () => {
         const { wrapper, processosStore } = createWrapper();
 

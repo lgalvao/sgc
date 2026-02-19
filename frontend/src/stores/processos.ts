@@ -205,11 +205,15 @@ export const useProcessosStore = defineStore("processos", () => {
     }
 
     async function buscarContextoCompleto(codigoProcesso: number) {
+        console.log(`[ProcessosStore] Buscando contexto completo para processo ${codigoProcesso}`);
         return withErrorHandling(async () => {
             setProcessoDetalhe(null);
             const data = await processoService.buscarContextoCompleto(codigoProcesso);
+            console.log(`[ProcessosStore] Contexto completo carregado com sucesso para processo ${codigoProcesso}`);
             setProcessoDetalhe(data);
             subprocessosElegiveis.value = data.elegiveis;
+        }, (err) => {
+            console.error(`[ProcessosStore] Erro ao buscar contexto completo para processo ${codigoProcesso}:`, err);
         });
     }
 

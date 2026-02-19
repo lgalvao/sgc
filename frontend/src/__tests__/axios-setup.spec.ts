@@ -57,7 +57,8 @@ describe("axios-setup", () => {
 
     beforeAll(async () => {
         // Import axios-setup AFTER mocking its dependencies
-        await import("../axios-setup"); // Use dynamic import
+        const {setRouter} = await import("../axios-setup"); // Use dynamic import
+        setRouter(router as any);
 
         // Access interceptors from the hoisted mock instance
         const requestUseCalls = mockInstance.interceptors.request.use.mock.calls;
