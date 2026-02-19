@@ -7,10 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import sgc.Sgc;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
 
@@ -18,8 +14,6 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = Sgc.class)
-@Import({TestSecurityConfig.class})
 @DisplayName("Integração: Notificações de Processo com GreenMail")
 class ProcessoEmailIntegrationTest extends BaseIntegrationTest {
 

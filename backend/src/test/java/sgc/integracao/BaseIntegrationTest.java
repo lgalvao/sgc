@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import sgc.integracao.mocks.TestConfig;
+import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.model.AtividadeRepo;
 import sgc.mapa.model.MapaRepo;
 import sgc.organizacao.model.UnidadeRepo;
@@ -25,16 +26,14 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 
 @SpringBootTest
 @Transactional
-@Import({TestConfig.class, sgc.integracao.config.EmailTestConfig.class})
+@Import({TestConfig.class, TestSecurityConfig.class})
 @AutoConfigureMockMvc
-@org.springframework.test.context.ActiveProfiles({"test", "email-test"})
+@org.springframework.test.context.ActiveProfiles({"test"})
 public abstract class BaseIntegrationTest {
     protected MockMvc mockMvc;
     
     @Autowired(required = false)
     protected com.icegreen.greenmail.util.GreenMail greenMail;
-    @Autowired(required = false)
-    protected org.springframework.mail.javamail.JavaMailSender javaMailSender;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -56,10 +55,6 @@ public abstract class BaseIntegrationTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
         if (greenMail != null) {
             greenMail.reset();
-            // Sync port to avoid mismatches if GreenMail restarted/context reloaded
-            if (javaMailSender instanceof org.springframework.mail.javamail.JavaMailSenderImpl impl && impl.getPort() != greenMail.getSmtp().getPort()) {
-                impl.setPort(greenMail.getSmtp().getPort());
-            }
         }
     }
 
