@@ -82,10 +82,12 @@ vi.mock('../feedback', () => ({
 }));
 
 // Mock API Client
-const mockApiClient = {
-    post: vi.fn().mockResolvedValue({ data: {} }),
-    get: vi.fn().mockResolvedValue({ data: {} })
-};
+const { mockApiClient } = vi.hoisted(() => ({
+    mockApiClient: {
+        post: vi.fn().mockResolvedValue({ data: {} }),
+        get: vi.fn().mockResolvedValue({ data: {} })
+    }
+}));
 
 vi.mock('@/axios-setup', () => ({
     default: mockApiClient,

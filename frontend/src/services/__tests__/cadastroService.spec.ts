@@ -22,62 +22,62 @@ describe("cadastroService", () => {
     });
 
     describe("devolverCadastro", () => {
-        const payload = { observacoes: "teste" };
+        const input = { observacoes: "teste" };
         testPostEndpoint(
-            () => cadastroService.devolverCadastro(1, payload),
+            () => cadastroService.devolverCadastro(1, input),
             "/subprocessos/1/devolver-cadastro",
-            payload
+            { justificativa: "teste" }
         );
-        testErrorHandling(() => cadastroService.devolverCadastro(1, payload), 'post');
+        testErrorHandling(() => cadastroService.devolverCadastro(1, input), 'post');
     });
 
     describe("aceitarCadastro", () => {
-        const payload = { observacoes: "teste" };
+        const input = { observacoes: "teste" };
         testPostEndpoint(
-            () => cadastroService.aceitarCadastro(1, payload),
+            () => cadastroService.aceitarCadastro(1, input),
             "/subprocessos/1/aceitar-cadastro",
-            payload
+            { texto: "teste" }
         );
-        testErrorHandling(() => cadastroService.aceitarCadastro(1, payload), 'post');
+        testErrorHandling(() => cadastroService.aceitarCadastro(1, input), 'post');
     });
 
     describe("homologarCadastro", () => {
-        const payload = { observacoes: "teste" };
+        const input = { observacoes: "teste" };
         testPostEndpoint(
-            () => cadastroService.homologarCadastro(1, payload),
+            () => cadastroService.homologarCadastro(1, input),
             "/subprocessos/1/homologar-cadastro",
-            payload
+            { texto: "teste" }
         );
-        testErrorHandling(() => cadastroService.homologarCadastro(1, payload), 'post');
+        testErrorHandling(() => cadastroService.homologarCadastro(1, input), 'post');
     });
 
     describe("devolverRevisaoCadastro", () => {
-        const payload = { observacoes: "teste" };
+        const input = { observacoes: "teste" };
         testPostEndpoint(
-            () => cadastroService.devolverRevisaoCadastro(1, payload),
+            () => cadastroService.devolverRevisaoCadastro(1, input),
             "/subprocessos/1/devolver-revisao-cadastro",
-            payload
+            { justificativa: "teste" }
         );
-        testErrorHandling(() => cadastroService.devolverRevisaoCadastro(1, payload), 'post');
+        testErrorHandling(() => cadastroService.devolverRevisaoCadastro(1, input), 'post');
     });
 
     describe("aceitarRevisaoCadastro", () => {
-        const payload = { observacoes: "teste" };
+        const input = { observacoes: "teste" };
         testPostEndpoint(
-            () => cadastroService.aceitarRevisaoCadastro(1, payload),
+            () => cadastroService.aceitarRevisaoCadastro(1, input),
             "/subprocessos/1/aceitar-revisao-cadastro",
-            payload
+            { texto: "teste" }
         );
-        testErrorHandling(() => cadastroService.aceitarRevisaoCadastro(1, payload), 'post');
+        testErrorHandling(() => cadastroService.aceitarRevisaoCadastro(1, input), 'post');
     });
 
     describe("homologarRevisaoCadastro", () => {
-        const payload = { observacoes: "teste" };
+        const input = { observacoes: "teste" };
         testPostEndpoint(
-            () => cadastroService.homologarRevisaoCadastro(1, payload),
+            () => cadastroService.homologarRevisaoCadastro(1, input),
             "/subprocessos/1/homologar-revisao-cadastro",
-            payload
+            { texto: "teste" }
         );
-        testErrorHandling(() => cadastroService.homologarRevisaoCadastro(1, payload), 'post');
+        testErrorHandling(() => cadastroService.homologarRevisaoCadastro(1, input), 'post');
     });
 });

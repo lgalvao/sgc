@@ -5,7 +5,7 @@ import {createConsola} from "consola";
 // Produção: WARN (3) - mostra apenas warn e error
 // Teste: ERROR (1) - mostra apenas error
 export const getLogLevel = (envMode?: string) => {
-    const mode = (envMode !== undefined) ? envMode : (import.meta.env?.MODE || (typeof process !== "undefined" && process.env?.VITEST ? "test" : "development"));
+    const mode = (envMode !== undefined) ? envMode : ((import.meta as any).env?.MODE || (typeof process !== "undefined" && process.env?.VITEST ? "test" : "development"));
     
     if (mode === "test") {
         return 1; // ERROR only
