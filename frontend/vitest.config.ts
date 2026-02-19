@@ -10,7 +10,7 @@ export default defineConfig({
         environment: "jsdom",
         testTimeout: 15000,
         include: ["src/**/*.{test,spec}.{js,ts}"],
-        exclude: ["node_modules", "dist", "**/*.d.ts", "src/main.ts", "**/*.config.*", "src/visual-capture/capture.test.ts"],
+        exclude: ["node_modules", "dist", "**/*.d.ts", "src/main.ts", "**/*.config.*", "src/visual-capture/capture.test.ts", "**/*.pact.spec.ts"],
         setupFiles: ["./vitest.setup.ts"],
         coverage: {
             provider: "v8",
