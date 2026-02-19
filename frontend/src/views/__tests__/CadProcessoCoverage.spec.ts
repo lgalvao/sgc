@@ -96,6 +96,8 @@ describe('CadProcesso.vue Coverage', () => {
         vi.clearAllMocks();
         mockRoute.query = {};
         window.scrollTo = vi.fn();
+        // Silenciar console.error para evitar ruído nos testes que disparam erros esperados
+        vi.spyOn(console, 'error').mockImplementation(() => {});
     });
 
     it('handles mixed errors (field + generic) correctly in handleApiErrors', async () => {
