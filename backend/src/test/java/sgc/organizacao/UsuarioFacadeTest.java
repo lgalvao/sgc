@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
@@ -64,6 +65,14 @@ class UsuarioFacadeTest {
             assertThat(resultado.getTituloEleitoral()).isEqualTo(titulo);
             verify(usuarioService).carregarAuthorities(usuario);
             SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        @DisplayName("Deve lançar ErroAcessoNegado se não autenticado")
+        void deveLancarErroAcessoNegadoSeNaoAutenticado() {
+            SecurityContextHolder.clearContext();
+            assertThatThrownBy(() -> facade.obterUsuarioAutenticado())
+                    .isInstanceOf(ErroAcessoNegado.class);
         }
 
         @Test

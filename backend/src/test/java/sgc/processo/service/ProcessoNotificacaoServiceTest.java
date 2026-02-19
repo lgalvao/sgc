@@ -792,5 +792,33 @@ class ProcessoNotificacaoServiceTest {
                 service.criarCorpoEmailPorTipo(TipoUnidade.SEM_EQUIPE, p, s)
             ).isInstanceOf(IllegalArgumentException.class);
         }
+
+    @Test
+    @DisplayName("Deve notificar substituto na finalização do processo")
+    void deveNotificarSubstitutoNaFinalizacao() {
+        when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
+        Processo processo = criarProcesso(11L);
+        when(processoRepo.findById(11L)).thenReturn(Optional.of(processo));
+
+        Unidade u = criarUnidade(1L, TipoUnidade.OPERACIONAL);
+        u.setSigla("OP");
+        processo.adicionarParticipantes(Set.of(u));
+
+        UnidadeResponsavelDto r = UnidadeResponsavelDto.builder()
+                .unidadeCodigo(1L)
+                .titularTitulo("T1")
+                .substitutoTitulo("S1")
+                .build();
+
+        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r));
+
+        Usuario substituto = Usuario.builder().tituloEleitoral("S1").email("sub@mail.com").build();
+        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", Usuario.builder().build(), "S1", substituto));
+        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(u));
+
+        service.notificarFinalizacaoProcesso(11L);
+
+        verify(notificacaoEmailService).enviarEmailHtml(eq("sub@mail.com"), anyString(), anyString());
+    }
     }
 }
