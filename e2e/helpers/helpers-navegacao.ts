@@ -71,7 +71,7 @@ export async function verificarPaginaPainel(page: Page): Promise<void> {
 
 /**
  * Navega para um subprocesso clicando na célula da unidade na tabela TreeTable.
- * Este é o padrão correto para navegar: clicar na célula, não na linha.
+ * Se já estiver na página do subprocesso (redirecionamento direto), apenas valida.
  * 
  * @param page - Instância da página do Playwright
  * @param siglaUnidade - Sigla da unidade a clicar (ex: 'SECAO_221')
@@ -80,8 +80,24 @@ export async function navegarParaSubprocesso(
     page: Page,
     siglaUnidade: string
 ): Promise<void> {
+    const urlSubprocesso = new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`);
+    
+    // Se já estivermos na URL do subprocesso, não precisamos navegar
+    if (urlSubprocesso.test(page.url())) {
+        return;
+    }
+
     // Aguardar o cabeçalho do processo (v-if="processo") para garantir carregamento inicial
     await expect(page.getByText('Carregando detalhes do processo...').first()).toBeHidden();
+    
+    // Se ainda não estivermos na URL, verificamos se o redirecionamento está em curso
+    try {
+        await page.waitForURL(urlSubprocesso, { timeout: 1000 });
+        return;
+    } catch (e) {
+        // Se não redirecionou em 1s, prossegue com clique manual
+    }
+
     await expect(page.getByTestId('processo-info')).toBeVisible();
 
     const tabela = page.getByTestId('tbl-tree');
@@ -91,5 +107,5 @@ export async function navegarParaSubprocesso(
     await expect(celula).toBeVisible();
     await celula.click();
     
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
+    await expect(page).toHaveURL(urlSubprocesso);
 }

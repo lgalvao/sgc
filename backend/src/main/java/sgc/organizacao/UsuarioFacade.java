@@ -17,7 +17,7 @@ import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
-import sgc.organizacao.service.UnidadeResponsavelService;
+import sgc.organizacao.service.ResponsavelUnidadeService;
 import sgc.organizacao.service.UsuarioService;
 
 import java.util.Collections;
@@ -32,7 +32,7 @@ import static java.util.stream.Collectors.toMap;
 @RequiredArgsConstructor
 public class UsuarioFacade {
     private final UsuarioService usuarioService;
-    private final UnidadeResponsavelService unidadeResponsavelService;
+    private final ResponsavelUnidadeService responsavelUnidadeService;
 
     @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
@@ -99,7 +99,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String sigla) {
-        return unidadeResponsavelService.buscarResponsavelAtual(sigla);
+        return responsavelUnidadeService.buscarResponsavelAtual(sigla);
     }
 
     @Transactional(readOnly = true)
@@ -119,17 +119,13 @@ public class UsuarioFacade {
         usuarioService.carregarAuthorities(usuario);
     }
 
-    public Optional<Usuario> buscarUsuarioPorEmail(String email) {
-        return usuarioService.buscarPorEmail(email);
-    }
-
     public List<Usuario> buscarUsuariosAtivos() {
         return usuarioService.buscarTodos();
     }
 
     @SuppressWarnings("unused")
     public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
-        return unidadeResponsavelService.buscarResponsavelUnidade(unidadeCodigo);
+        return responsavelUnidadeService.buscarResponsavelUnidade(unidadeCodigo);
     }
 
     @Transactional(readOnly = true)
@@ -137,7 +133,7 @@ public class UsuarioFacade {
         if (unidadesCodigos.isEmpty()) {
             return Collections.emptyMap();
         }
-        return unidadeResponsavelService.buscarResponsaveisUnidades(unidadesCodigos);
+        return responsavelUnidadeService.buscarResponsaveisUnidades(unidadesCodigos);
     }
 
     public Map<String, Usuario> buscarUsuariosPorTitulos(List<String> titulos) {
@@ -147,7 +143,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
-        return unidadeResponsavelService.buscarUnidadesOndeEhResponsavel(titulo);
+        return responsavelUnidadeService.buscarUnidadesOndeEhResponsavel(titulo);
     }
 
     @Transactional(readOnly = true)

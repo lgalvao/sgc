@@ -12,7 +12,7 @@ import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeResponsavelService;
+import sgc.organizacao.service.ResponsavelUnidadeService;
 import sgc.organizacao.service.UnidadeService;
 import sgc.organizacao.service.UsuarioService;
 
@@ -27,7 +27,7 @@ public class UnidadeFacade {
     private final UnidadeService unidadeService;
     private final UsuarioService usuarioService;
     private final UnidadeHierarquiaService hierarquiaService;
-    private final UnidadeResponsavelService responsavelService;
+    private final ResponsavelUnidadeService responsavelService;
 
     public List<UnidadeDto> buscarArvoreHierarquica() {
         return hierarquiaService.buscarArvoreHierarquica();

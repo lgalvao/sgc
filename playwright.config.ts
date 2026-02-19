@@ -7,7 +7,7 @@ export default defineConfig({
     timeout: 15_000,
     workers: 1,
     expect: {timeout: 3_000},
-    reporter: 'line',
+    reporter: 'list',
     use: {
         baseURL: 'http://localhost:5173',
         trace: 'on-first-retry',
@@ -18,8 +18,8 @@ export default defineConfig({
         url: 'http://localhost:5173',
         reuseExistingServer: true,
         timeout: 100 * 1000,
-        stdout: 'inherit',
-        stderr: 'inherit',
+        stdout: 'pipe',
+        stderr: 'pipe',
     },
     projects: [{name: 'chromium', use: {...devices['Desktop Chrome'], channel: 'chromium-headless-shell'}}],
 });

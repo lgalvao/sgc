@@ -9,30 +9,49 @@ import {SMTPServer} from 'smtp-server';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Suprimir o DeprecationWarning DEP0190 - é necessário usar shell: true no Windows para .bat/.cmd
-process.removeAllListeners('warning');
-process.on('warning', (warning) => {
-    if (warning.name === 'DeprecationWarning' && warning.code === 'DEP0190') return;
-    console.warn(warning.name, warning.message);
-});
-
 const BACKEND_DIR = path.resolve(__dirname, '../backend');
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
 const BACKEND_PORT = 10000;
 const FRONTEND_PORT = 5173;
 const SMTP_PORT = 1025;
 
+let backendProcess;
+let frontendProcess;
+let smtpServer;
+
 // Criar/limpar arquivo de log ao iniciar
 const LOG_FILE = path.resolve(__dirname, 'server.log');
+
+// Local lightweight logger for this lifecycle script.
+// Writes to console and appends to LOG_FILE.
+const lifecycleLogger = {
+    info: (msg) => {
+        try { console.log(msg); } catch {}
+        try { fs.appendFileSync(LOG_FILE, `[INFO] ${msg}\n`); } catch {}
+    },
+    warn: (msg) => {
+        try { console.warn(msg); } catch {}
+        try { fs.appendFileSync(LOG_FILE, `[WARN] ${msg}\n`); } catch {}
+    },
+    error: (msg) => {
+        try { console.error(msg); } catch {}
+        try { fs.appendFileSync(LOG_FILE, `[ERROR] ${msg}\n`); } catch {}
+    }
+};
+
 try {
     fs.writeFileSync(LOG_FILE, '');
 } catch (e) {
-    console.error('Não foi possível criar o arquivo de log:', e.message);
+    // If LOG_FILE creation fails, fallback to console
+    console.error('Não foi possível criar o arquivo de log:', e && e.message ? e.message : e);
 }
 
-let backendProcess = null;
-let frontendProcess = null;
-let smtpServer = null;
+// Suprimir o DeprecationWarning DEP0190 - é necessário usar shell: true no Windows para .bat/.cmd
+process.removeAllListeners('warning');
+process.on('warning', (warning) => {
+    if (warning.name === 'DeprecationWarning' && warning.code === 'DEP0190') return;
+    lifecycleLogger.warn(`${warning.name} ${warning.message}`);
+});
 
 const LOG_FILTERS = [
     // Warnings do Lombok
@@ -89,8 +108,8 @@ function log(prefix, data) {
     lines.forEach(line => {
         const trimmed = line.trim();
         if (trimmed && !shouldFilterLog(line)) {
-            console.log(line);
-            fs.appendFileSync(LOG_FILE, `[${prefix}] ${line}\n`);
+            // Use lifecycleLogger to keep console + file in sync
+            lifecycleLogger.info(`[${prefix}] ${line}`);
         }
     });
 }
@@ -119,7 +138,7 @@ function startBackend() {
 
     backendProcess.on('exit', code => {
         if (code !== 0 && code !== null) {
-            console.error(`Backend exited with code ${code}`);
+            lifecycleLogger.error(`Backend exited with code ${code}`);
             process.exit(code);
         }
     });
@@ -141,7 +160,7 @@ function startFrontend() {
 
     frontendProcess.on('exit', code => {
         if (code !== 0 && code !== null) {
-            console.error(`Frontend exited with code ${code}`);
+            lifecycleLogger.error(`Frontend exited with code ${code}`);
             process.exit(code);
         }
     });
@@ -164,7 +183,7 @@ function startSmtpServer() {
     });
 
     smtpServer.on('error', err => {
-        console.error('Erro no servidor SMTP:', err.message);
+        lifecycleLogger.error(`Erro no servidor SMTP: ${err && err.message ? err.message : err}`);
     });
 
     smtpServer.listen(SMTP_PORT, '0.0.0.0', () => {
@@ -244,9 +263,9 @@ try {
     await checkBackendHealth();
     startFrontend();
     await checkFrontendHealth();
-    console.log('>>> Frontend, Backend e SMTP no ar!');
+    lifecycleLogger.info('>>> Frontend, Backend e SMTP no ar!');
 } catch (error) {
-    console.error('Erro ao iniciar infraestrutura de testes:', error.message);
+    lifecycleLogger.error(`Erro ao iniciar infraestrutura de testes: ${error && error.message ? error.message : error}`);
     process.exit(1);
 }
 

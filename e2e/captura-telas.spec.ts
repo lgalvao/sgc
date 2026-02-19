@@ -1,7 +1,9 @@
 import type {Locator, Page} from '@playwright/test';
 import {expect, test} from './fixtures/base.js';
+import logger from '../frontend/src/utils/logger.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
+import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
@@ -304,6 +306,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Acessar subprocesso
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+            await navegarParaSubprocesso(page, UNIDADE_ALVO);
             await capturarTela(page, '04-subprocesso', '01-dashboard-subprocesso', {fullPage: true});
 
             // Entrar em atividades
@@ -371,6 +374,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+            await navegarParaSubprocesso(page, UNIDADE_ALVO);
             await navegarParaAtividades(page);
 
             // Capturar tela inicial vazia com label "Conhecimentos *"
@@ -447,8 +451,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     test.describe('05 - Mapa de Competências', () => {
         test('Captura fluxo de mapa de competências', async ({page}) => {
             page.on('console', msg => {
-                if (msg.type() === 'error' || msg.type() === 'warning' || msg.text().includes('NAVEGACAO')) {
-                    console.log(`[Browser Console] ${msg.type()}: ${msg.text()}`);
+                const type = String(msg.type());
+                const text = msg.text();
+                if (type === 'error' || type === 'warning' || text.includes('NAVEGACAO')) {
+                    if (type === 'error') logger.error(`[Browser Console] ${type}: ${text}`);
+                    else if (type === 'warning' || type === 'warn') logger.warn(`[Browser Console] ${type}: ${text}`);
+                    else logger.info(`[Browser Console] ${type}: ${text}`);
                 }
             });
 
@@ -681,6 +689,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+            await navegarParaSubprocesso(page, 'SECAO_111');
             await expect(page).toHaveURL(/processo\/\d+/);
             
             // Capturar ID para cleanup (após navegar para o subprocesso)

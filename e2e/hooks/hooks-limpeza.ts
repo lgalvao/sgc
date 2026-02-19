@@ -1,4 +1,5 @@
 import type {APIRequestContext} from '@playwright/test';
+import logger from '../../frontend/src/utils/logger.js';
 
 /**
  * Hook para gerenciar cleanup automático de processos criados durante testes E2E.
@@ -42,7 +43,7 @@ export function useProcessoCleanup() {
                 try {
                     await request.post(`/e2e/processo/${codigo}/limpar`);
                 } catch (error) {
-                    console.warn(`Falha ao limpar processo ${codigo}:`, error);
+                    logger.warn(`Falha ao limpar processo ${codigo}: ${error}`);
                 }
             }
             processosParaLimpar.length = 0;

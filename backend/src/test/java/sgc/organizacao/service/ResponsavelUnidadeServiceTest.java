@@ -25,8 +25,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("UnidadeResponsavelService")
-class UnidadeResponsavelServiceTest {
+@DisplayName("ResponsavelUnidadeService")
+class ResponsavelUnidadeServiceTest {
 
     @Mock
     private UsuarioRepo usuarioRepo;
@@ -41,7 +41,7 @@ class UnidadeResponsavelServiceTest {
     private ComumRepo repo;
 
     @InjectMocks
-    private UnidadeResponsavelService service;
+    private ResponsavelUnidadeService service;
 
     @Nested
     @DisplayName("Buscar Atribuições")

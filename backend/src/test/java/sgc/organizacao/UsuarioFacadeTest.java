@@ -17,7 +17,7 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.UnidadeResponsavelService;
+import sgc.organizacao.service.ResponsavelUnidadeService;
 import sgc.organizacao.service.UsuarioService;
 
 import java.util.Collections;
@@ -38,7 +38,7 @@ class UsuarioFacadeTest {
     private UsuarioService usuarioService;
     
     @Mock
-    private UnidadeResponsavelService unidadeResponsavelService;
+    private ResponsavelUnidadeService responsavelUnidadeService;
     
     @InjectMocks
     private UsuarioFacade facade;
@@ -171,7 +171,7 @@ class UsuarioFacadeTest {
                     .titularTitulo(titulo)
                     .build();
 
-            when(unidadeResponsavelService.buscarResponsaveisUnidades(List.of(codigoUnidade)))
+            when(responsavelUnidadeService.buscarResponsaveisUnidades(List.of(codigoUnidade)))
                     .thenReturn(Map.of(codigoUnidade, dto));
 
             // Act
@@ -187,7 +187,7 @@ class UsuarioFacadeTest {
         void deveRetornarMapaVazioSeListaVazia() {
             Map<Long, UnidadeResponsavelDto> resultado = facade.buscarResponsaveisUnidades(List.of());
             assertThat(resultado).isEmpty();
-            verifyNoInteractions(unidadeResponsavelService);
+            verifyNoInteractions(responsavelUnidadeService);
         }
     }
 

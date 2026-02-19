@@ -19,6 +19,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
+// TODO essa classe deveria ser consolidada com a AnaliseFacade. Tem muito pouca coisa aqui!
 public class AnaliseService {
 
     private final AnaliseRepo analiseRepo;

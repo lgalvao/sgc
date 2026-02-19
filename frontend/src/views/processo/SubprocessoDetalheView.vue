@@ -122,6 +122,7 @@ import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useProcessosStore} from "@/stores/processos";
 import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso,} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
+import {logger} from "@/utils";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
@@ -163,24 +164,21 @@ const proximaAcaoSubprocesso = computed(() => obterProximaAcao({
 
 onMounted(async () => {
   try {
-    console.log(`[SubprocessoDetalheView] Carregando detalhes para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
     const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
         props.codProcesso,
         props.siglaUnidade,
     );
 
     if (id) {
-      console.log(`[SubprocessoDetalheView] ID do subprocesso encontrado: ${id}`);
       codSubprocesso.value = id;
       await subprocessosStore.buscarSubprocessoDetalhe(id);
       await mapaStore.buscarMapaCompleto(id);
-      console.log(`[SubprocessoDetalheView] Carregamento concluído com sucesso`);
     } else {
-      console.warn(`[SubprocessoDetalheView] Subprocesso não encontrado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
+      logger.warn(`Subprocesso não encontrado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
     }
   } catch (error: any) {
     const errorBody = error.response?.data || error.message;
-    console.error(`[SubprocessoDetalheView] Erro ao carregar detalhes do subprocesso:`, error, errorBody);
+    logger.error(`Erro ao carregar detalhes do subprocesso:`, error, errorBody);
   }
 });
 

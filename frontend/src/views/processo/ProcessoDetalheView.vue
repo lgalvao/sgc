@@ -109,6 +109,7 @@ import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
 import {SituacaoSubprocesso} from "@/types/tipos";
 import {formatSituacaoProcesso, formatSituacaoSubprocesso} from "@/utils/formatters";
+import { logger } from "@/utils";
 
 function flattenUnidades(unidades: any[]): any[] {
   let result: any[] = [];
@@ -239,11 +240,9 @@ const proximaAcaoProcesso = computed(() => obterProximaAcao({
 
 async function abrirDetalhesUnidade(row: any) {
   if (!row.clickable) {
-    console.log(`[ProcessoDetalheView] Unidade ${row.sigla} não é clicável`);
     return;
   }
 
-  console.log(`[ProcessoDetalheView] Navegando para detalhes da unidade: ${row.sigla} no processo ${codProcesso}`);
   try {
     await router.push({
       name: "Subprocesso",
@@ -253,7 +252,7 @@ async function abrirDetalhesUnidade(row: any) {
       }
     });
   } catch (error) {
-    console.error(`[ProcessoDetalheView] Erro ao navegar para detalhes da unidade ${row.sigla}:`, error);
+    logger.error(`Erro ao navegar para detalhes da unidade ${row.sigla}:`, error);
   }
 }
 

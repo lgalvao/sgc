@@ -3,17 +3,15 @@ import {expect, type Page} from '@playwright/test';
 async function garantirContextoSubprocesso(page: Page) {
     const cardEdicao = page.getByTestId('card-subprocesso-atividades');
     const cardVisualizacao = page.getByTestId('card-subprocesso-atividades-vis');
+    
+    // Se algum dos cards já está visível, estamos no contexto correto
     if (await cardEdicao.or(cardVisualizacao).first().isVisible()) {
         return;
     }
 
-    if (/\/processo\/\d+$/.test(page.url())) {
-        const linhaUnidade = page.getByRole('row')
-            .filter({has: page.getByRole('cell')})
-            .first();
-        if (await linhaUnidade.isVisible().catch(() => false)) {
-            await linhaUnidade.click();
-        }
+    // Se não estiver em um subprocesso (URL com sigla no final), avisar ou falhar
+    if (!/\/processo\/\d+\/[A-Z0-9_]+$/.test(page.url())) {
+        console.warn(`[Aviso] navegarParaAtividades chamado fora de um contexto de subprocesso: ${page.url()}`);
     }
 }
 

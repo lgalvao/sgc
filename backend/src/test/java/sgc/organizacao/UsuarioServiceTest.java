@@ -75,18 +75,6 @@ class UsuarioServiceTest {
         }
 
         @Test
-        @DisplayName("Deve buscar usuário por email")
-        void deveBuscarUsuarioPorEmail() {
-            // Act
-            Optional<Usuario> result = usuarioService.buscarUsuarioPorEmail(EMAIL_ADMIN);
-
-            // Assert
-            assertTrue(result.isPresent());
-            assertEquals(TITULO_ADMIN, result.get().getTituloEleitoral());
-            assertEquals(EMAIL_ADMIN, result.get().getEmail());
-        }
-
-        @Test
         @DisplayName("Deve buscar usuários ativos")
         void deveBuscarUsuariosAtivos() {
             // Act

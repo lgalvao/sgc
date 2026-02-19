@@ -45,8 +45,12 @@ public class ComumRepo {
      * Busca uma única entidade por múltiplos campos.
      */
     public <T> T buscar(Class<T> classe, Map<String, Object> filtros) {
-        StringBuilder jpql = new StringBuilder("SELECT e FROM " + classe.getSimpleName() + " e WHERE 1=1");
-        filtros.keySet().forEach(campo -> jpql.append(" AND e.").append(campo).append(" = :").append(campo.replace(".", "_")));
+        StringBuilder jpql = new StringBuilder("SELECT e FROM %s e WHERE 1=1".formatted(classe.getSimpleName()));
+        filtros.keySet().forEach(campo -> jpql.append(" AND e.")
+                .append(campo)
+                .append(" = :")
+                .append(campo.replace(".", "_"))
+        );
         
         try {
             var query = em.createQuery(jpql.toString(), classe);

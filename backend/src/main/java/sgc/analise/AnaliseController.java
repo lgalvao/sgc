@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/subprocessos/{codSubprocesso}")
 @RequiredArgsConstructor
-@Tag(name = "Análises", description = "Endpoints para gerenciar as análises de cadastro e validação de subprocessos")
+@Tag(name = "Análises", description = "Gerenciamento de análises de cadastro e validação")
 public class AnaliseController {
     private final AnaliseFacade analiseFacade;
     private final SubprocessoFacade subprocessoFacade;
@@ -40,7 +40,6 @@ public class AnaliseController {
     @Operation(summary = "Cria uma análise de cadastro")
     public AnaliseHistoricoDto criarAnaliseCadastro(@PathVariable Long codSubprocesso,
                                                     @RequestBody @Valid CriarAnaliseRequest request) {
-
         return criarAnalise(codSubprocesso, request, TipoAnalise.CADASTRO);
     }
 
@@ -58,10 +57,10 @@ public class AnaliseController {
     @Operation(summary = "Cria uma análise de validação")
     public AnaliseHistoricoDto criarAnaliseValidacao(@PathVariable Long codSubprocesso,
                                                      @RequestBody @Valid CriarAnaliseRequest request) {
-
         return criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO);
     }
 
+    // TODO essa logica deveria estar no facade o service! Inclusive ja tem um quase igual la.
     private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {
         Subprocesso sp = subprocessoFacade.buscarSubprocesso(codSubprocesso);
         String obs = StringUtils.stripToEmpty(request.observacoes());

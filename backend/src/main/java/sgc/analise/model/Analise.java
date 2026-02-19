@@ -23,30 +23,30 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @NoArgsConstructor
 public class Analise extends EntidadeBase {
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", length = 20, nullable = false)
+    private TipoAnalise tipo;
+
     @ManyToOne
     @JoinColumn(name = "subprocesso_codigo", nullable = false)
     private Subprocesso subprocesso;
-
-    @Column(name = "data_hora", nullable = false)
-    private LocalDateTime dataHora;
-
-    @Column(name = "observacoes", length = 500)
-    private String observacoes;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "acao", length = 20, nullable = false)
     private TipoAcaoAnalise acao;
 
+    @Column(name = "data_hora", nullable = false)
+    private LocalDateTime dataHora;
+
     @Column(name = "unidade_codigo", nullable = false)
     private Long unidadeCodigo;
 
-    @Column(name = "usuario_titulo", length = 12)
+    @Column(name = "usuario_titulo", length = 12, nullable = false)
     private String usuarioTitulo;
 
     @Column(name = "motivo", length = 200)
     private String motivo;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo", length = 20, nullable = false)
-    private TipoAnalise tipo;
+    @Column(name = "observacoes", length = 500)
+    private String observacoes;
 }

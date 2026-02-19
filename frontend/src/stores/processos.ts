@@ -13,33 +13,20 @@ import type {
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import * as processoService from "@/services/processoService";
 import {useFeedbackStore} from "@/stores/feedback";
+import {logger} from "@/utils";
 
 /**
  * Store consolidado de processos
  * Consolida core, workflow e context em um único arquivo para simplificar navegação.
  */
 export const useProcessosStore = defineStore("processos", () => {
-    // ======================
-    // ESTADO (Core)
-    // ======================
     const processosPainel = ref<ProcessoResumo[]>([]);
     const processosPainelPage = ref<Page<ProcessoResumo>>({} as Page<ProcessoResumo>);
     const processoDetalhe = ref<Processo | null>(null);
     const processosFinalizados = ref<ProcessoResumo[]>([]);
-    
-    // ======================
-    // ESTADO (Context)
-    // ======================
     const subprocessosElegiveis = ref<SubprocessoElegivel[]>([]);
-    
-    // ======================
-    // ERROR HANDLING
-    // ======================
-    const { lastError, clearError, withErrorHandling } = useErrorHandler();
+    const {lastError, clearError, withErrorHandling} = useErrorHandler();
 
-    // ======================
-    // AÇÕES CORE
-    // ======================
     async function buscarProcessosPainel(
         perfil: string,
         unidade: number,
@@ -94,14 +81,11 @@ export const useProcessosStore = defineStore("processos", () => {
             await processoService.excluirProcesso(codigoProcesso);
         });
     }
-    
+
     function setProcessoDetalhe(processo: Processo | null) {
         processoDetalhe.value = processo;
     }
 
-    // ======================
-    // AÇÕES WORKFLOW
-    // ======================
     const feedbackStore = useFeedbackStore();
 
     async function iniciarProcesso(codigoProcesso: number, tipo: TipoProcesso, unidadesIds: number[]) {
@@ -194,9 +178,6 @@ export const useProcessosStore = defineStore("processos", () => {
         });
     }
 
-    // ======================
-    // AÇÕES CONTEXT
-    // ======================
     function obterUnidadesDoProcesso(codigoProcesso: number): ProcessoResumo[] {
         if (processoDetalhe.value && processoDetalhe.value.codigo === codigoProcesso) {
             return processoDetalhe.value.resumoSubprocessos;
@@ -205,15 +186,13 @@ export const useProcessosStore = defineStore("processos", () => {
     }
 
     async function buscarContextoCompleto(codigoProcesso: number) {
-        console.log(`[ProcessosStore] Buscando contexto completo para processo ${codigoProcesso}`);
         return withErrorHandling(async () => {
             setProcessoDetalhe(null);
             const data = await processoService.buscarContextoCompleto(codigoProcesso);
-            console.log(`[ProcessosStore] Contexto completo carregado com sucesso para processo ${codigoProcesso}`);
             setProcessoDetalhe(data);
             subprocessosElegiveis.value = data.elegiveis;
         }, (err) => {
-            console.error(`[ProcessosStore] Erro ao buscar contexto completo para processo ${codigoProcesso}:`, err);
+            logger.error(`Erro ao buscar contexto completo para processo ${codigoProcesso}:`, err);
         });
     }
 
@@ -224,25 +203,17 @@ export const useProcessosStore = defineStore("processos", () => {
         });
     }
 
-    // ======================
-    // RETORNO
-    // ======================
     return {
-        // Estado Core
         processosPainel,
         processosPainelPage,
         processoDetalhe,
         processosFinalizados,
-        
-        // Ações Core
         buscarProcessosPainel,
         buscarProcessosFinalizados,
         buscarProcessoDetalhe,
         criarProcesso,
         atualizarProcesso,
         removerProcesso,
-
-        // Ações Workflow
         iniciarProcesso,
         finalizarProcesso,
         processarCadastroBloco,
@@ -253,14 +224,10 @@ export const useProcessosStore = defineStore("processos", () => {
         aceitarValidacao,
         executarAcaoBloco,
         enviarLembrete,
-
-        // Estado e Ações Context
         subprocessosElegiveis,
         obterUnidadesDoProcesso,
         buscarContextoCompleto,
         buscarSubprocessosElegiveis,
-
-        // Erro
         lastError,
         clearError,
     };

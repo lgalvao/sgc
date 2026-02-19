@@ -31,7 +31,7 @@ import static java.util.stream.Collectors.toMap;
  */
 @Service
 @RequiredArgsConstructor
-public class UnidadeResponsavelService {
+public class ResponsavelUnidadeService {
     private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final ResponsabilidadeRepo responsabilidadeRepo;

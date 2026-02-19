@@ -2,6 +2,7 @@ import type {Page} from '@playwright/test';
 import {test as base} from './auth-fixtures.js';
 import {criarProcesso} from '../helpers/helpers-processos.js';
 import {useProcessoCleanup} from '../hooks/hooks-limpeza.js';
+import logger from "../../frontend/src/utils/logger.js";
 
 /**
  * Contexto de fixture com processo criado automaticamente
@@ -70,10 +71,10 @@ export const test = base.extend<ProcessoContext>({
         try {
             const response = await page.request.post(`/e2e/processo/${codigo}/limpar`);
             if (!response.ok()) {
-                console.warn(`Falha no cleanup do processo ${codigo}: ${response.status()}`);
+                logger.warn(`Falha no cleanup do processo ${codigo}: ${response.status()}`);
             }
         } catch (error) {
-            console.warn(`Erro no cleanup do processo ${codigo}:`, error);
+            logger.warn(`Erro no cleanup do processo ${codigo}: ${error}`);
         }
     },
 

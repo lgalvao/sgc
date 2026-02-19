@@ -469,7 +469,7 @@ class AlertaFacadeTest {
             au1.setDataHoraLeitura(LocalDateTime.now());
             when(alertaService.buscarPorUsuarioEAlertas(eq(titulo), anyList())).thenReturn(List.of(au1));
 
-            List<Alerta> result = service.listarAlertasNaoLidos(titulo);
+            List<Alerta> result = service.listarNaoLidos(titulo);
 
             assertThat(result).hasSize(1);
             assertThat(result.getFirst().getCodigo()).isEqualTo(2L);

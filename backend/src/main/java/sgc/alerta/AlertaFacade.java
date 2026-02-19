@@ -171,7 +171,6 @@ public class AlertaFacade {
                         return novo;
                     });
 
-            // Persists read timestamp if alert was unread
             if (alertaUsuario != null && alertaUsuario.getDataHoraLeitura() == null) {
                 alertaUsuario.setDataHoraLeitura(agora);
                 alertaService.salvarAlertaUsuario(alertaUsuario);
@@ -194,7 +193,6 @@ public class AlertaFacade {
         }
 
         List<Long> alertaCodigos = alertasUnidade.stream().map(Alerta::getCodigo).toList();
-
         List<AlertaUsuario> leituras = alertaService.buscarPorUsuarioEAlertas(usuarioTitulo, alertaCodigos);
 
         Map<Long, LocalDateTime> mapaLeitura = new HashMap<>();
@@ -214,7 +212,7 @@ public class AlertaFacade {
      * Lista apenas alertas não lidos para o usuário.
      */
     @Transactional(readOnly = true)
-    public List<Alerta> listarAlertasNaoLidos(String usuarioTitulo) {
+    public List<Alerta> listarNaoLidos(String usuarioTitulo) {
         return listarAlertasPorUsuario(usuarioTitulo).stream()
                 .filter(alerta -> alerta.getDataHoraLeitura() == null)
                 .toList();

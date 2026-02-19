@@ -38,7 +38,6 @@ import java.util.Map;
 @Tag(name = "Subprocesso Mapa", description = "Endpoints para workflow do mapa de competências")
 @Slf4j
 public class SubprocessoMapaController {
-
     private final SubprocessoFacade subprocessoFacade;
     private final MapaFacade mapaFacade;
     private final AnaliseFacade analiseFacade;
@@ -96,13 +95,11 @@ public class SubprocessoMapaController {
     @JsonView(MapaViews.Publica.class)
     @Transactional(readOnly = true)
     public ResponseEntity<Mapa> obterMapaCompleto(@PathVariable Long codigo) {
-        log.info("[SubprocessoMapaController] Buscando mapa completo para subprocesso: {}", codigo);
         try {
             Mapa mapa = mapaFacade.obterMapaCompletoPorSubprocesso(codigo);
-            log.info("[SubprocessoMapaController] Mapa completo encontrado: {}", mapa.getCodigo());
             return ResponseEntity.ok(mapa);
         } catch (Exception e) {
-            log.error("[SubprocessoMapaController] Erro ao buscar mapa completo para subprocesso {}: {}", codigo, e.getMessage(), e);
+            log.error("Erro ao buscar mapa completo para subprocesso {}: {}", codigo, e.getMessage(), e);
             throw e;
         }
     }
@@ -226,6 +223,7 @@ public class SubprocessoMapaController {
 
     @PostMapping("/{codigo}/mapa-ajuste/atualizar")
     @PreAuthorize("isAuthenticated()")
+    // TODO aqui acho que deveria ser so ADMIN. Confirmar
     @Operation(summary = "Salva os ajustes feitos no mapa")
     public void salvarAjustesMapa(
             @PathVariable Long codigo,

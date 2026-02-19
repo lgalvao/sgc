@@ -1,4 +1,6 @@
 import {test as base} from '@playwright/test';
+// Use the project's centralized logger for consistent formatting
+import logger from '../../frontend/src/utils/logger.js';
 
 export const test = base.extend({
     page: async ({ page }, use) => {
@@ -10,7 +12,7 @@ export const test = base.extend({
                 return;
             }
 
-            const type = msg.type();
+            const type = String(msg.type());
 
             // Tenta expandir argumentos se forem objetos (ex: AxiosError)
             let expandedArgs: string;
@@ -36,12 +38,19 @@ export const test = base.extend({
                 expandedArgs = text; // Fallback
             }
 
-            console.log(`[BROWSER ${type.toUpperCase()}] ${expandedArgs || text}`);
+            // Map Playwright console types to logger methods
+            if (type === 'error') {
+                logger.error(`[BROWSER ${type.toUpperCase()}] ${expandedArgs || text}`);
+            } else if (type === 'warning' || type === 'warn') {
+                logger.warn(`[BROWSER ${type.toUpperCase()}] ${expandedArgs || text}`);
+            } else {
+                logger.info(`[BROWSER ${type.toUpperCase()}] ${expandedArgs || text}`);
+            }
         });
 
         // Listener para erros não tratados da página
         page.on('pageerror', error => {
-            console.error(`[BROWSER UNCAUGHT ERROR]`, error);
+            logger.error(`[BROWSER UNCAUGHT ERROR] ${error && error.stack ? error.stack : error}`);
         });
 
         // Listener para falhas de rede (4xx, 5xx)
@@ -54,11 +63,11 @@ export const test = base.extend({
                     body = '[Erro ao ler corpo]';
                 }
 
-                console.log(`[NETWORK ERROR] ${response.status()} ${response.request().method()} ${response.url()}`);
+                logger.warn(`[NETWORK ERROR] ${response.status()} ${response.request().method()} ${response.url()}`);
                 if (body && body.length < 2000) {
-                    console.log(`[NETWORK BODY] ${body}`);
+                    logger.info(`[NETWORK BODY] ${body}`);
                 } else if (body) {
-                    console.log(`[NETWORK BODY] ${body.substring(0, 500)}...`);
+                    logger.info(`[NETWORK BODY] ${body.substring(0, 500)}...`);
                 }
             }
         });

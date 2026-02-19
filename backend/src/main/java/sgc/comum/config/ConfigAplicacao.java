@@ -22,15 +22,12 @@ public class ConfigAplicacao {
     private String urlAcessoHom;
     private String urlAcessoProd;
     
-    // Propriedades OpenAPI (CDU-01)
     @NestedConfigurationProperty
     private final OpenApi openapi = new OpenApi();
     
-    // Propriedades de E-mail (CDU-18)
     @NestedConfigurationProperty
     private final Email email = new Email();
 
-    // Propriedades de Segurança (CDU-10)
     @NestedConfigurationProperty
     private JwtProperties jwt;
 

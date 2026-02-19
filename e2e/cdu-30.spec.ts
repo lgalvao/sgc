@@ -1,4 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
+import logger from '../frontend/src/utils/logger.js';
 
 /**
  * CDU-30 - Manter Administradores
@@ -52,7 +53,7 @@ test.describe.serial('CDU-30 - Manter Administradores', () => {
             const temLink = await linkAdmins.isVisible().catch(() => false);
             
             // Log para debug - teste passa se qualquer opção existe
-            console.log('Seção Administradores encontrada:', temTab || temLink);
+            logger.info(`Seção Administradores encontrada: ${temTab || temLink}`);
         }
     });
 

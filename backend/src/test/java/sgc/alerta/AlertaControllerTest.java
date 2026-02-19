@@ -91,7 +91,7 @@ class AlertaControllerTest {
         @Test
         @DisplayName("Deve retornar lista de alertas não lidos com sucesso")
         void listarNaoLidos_quandoSucesso_deveRetornarListaDeAlertas() throws Exception {
-            when(alertaFacade.listarAlertasNaoLidos(TITULO_TESTE))
+            when(alertaFacade.listarNaoLidos(TITULO_TESTE))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/api/alertas/nao-lidos")
@@ -101,7 +101,7 @@ class AlertaControllerTest {
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$").isEmpty());
 
-            verify(alertaFacade).listarAlertasNaoLidos(TITULO_TESTE);
+            verify(alertaFacade).listarNaoLidos(TITULO_TESTE);
         }
     }
 
@@ -135,7 +135,7 @@ class AlertaControllerTest {
                     .authorities("ROLE_USER")
                     .build();
             
-            when(alertaFacade.listarAlertasNaoLidos("98765432100"))
+            when(alertaFacade.listarNaoLidos("98765432100"))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/api/alertas/nao-lidos")
@@ -143,7 +143,7 @@ class AlertaControllerTest {
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk());
 
-            verify(alertaFacade).listarAlertasNaoLidos("98765432100");
+            verify(alertaFacade).listarNaoLidos("98765432100");
         }
     }
 }

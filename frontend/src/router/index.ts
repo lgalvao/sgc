@@ -11,8 +11,10 @@ const routes: RouteRecordRaw[] = [
     ...unidadeRoutes
 ];
 
+const isTest = import.meta.env?.VITEST || (typeof process !== "undefined" && process.env?.VITEST);
+
 const router = createRouter({
-    history: import.meta.env.VITEST
+    history: isTest
         ? createMemoryHistory()
         : createWebHistory(),
     routes,

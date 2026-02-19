@@ -41,7 +41,7 @@ public class AlertaController {
     @Operation(summary = "Lista alertas não lidos do usuário autenticado")
     public ResponseEntity<List<Alerta>> listarNaoLidos(@AuthenticationPrincipal Object principal) {
         String usuarioTitulo = extractTituloUsuario(principal);
-        List<Alerta> alertas = alertaFacade.listarAlertasNaoLidos(usuarioTitulo);
+        List<Alerta> alertas = alertaFacade.listarNaoLidos(usuarioTitulo);
 
         return ResponseEntity.ok(alertas);
     }

@@ -17,8 +17,6 @@ package sgc.comum.erros;
  * <p>Geralmente detectada durante a inicialização da aplicação ou primeiro uso de um componente.
  */
 public class ErroConfiguracao extends ErroInterno {
-
-
     public ErroConfiguracao(String message) {
         super(message);
     }
