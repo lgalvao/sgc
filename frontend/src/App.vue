@@ -85,3 +85,14 @@ const shouldShowNavBarExtras = computed(() => {
     </footer>
   </div>
 </template>
+
+<style>
+/* Garante que quebras de linha no corpo do toast (stack traces) sejam respeitadas */
+.toast-body {
+  white-space: pre-wrap;
+  font-family: var(--bs-font-monospace);
+  font-size: 0.85rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+</style>

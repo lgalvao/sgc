@@ -55,6 +55,7 @@ export function normalizeError(err: unknown): NormalizedError {
     return {
       kind: 'network',
       message: 'Não foi possível conectar ao servidor. Verifique sua conexão.',
+      stackTrace: (err as any).stack,
       originalError: err
     };
   }
@@ -67,13 +68,13 @@ export function normalizeError(err: unknown): NormalizedError {
 
     return {
       kind: mapStatusToKind(status),
-      message: payload?.message || 'Erro desconhecido.',
+      message: payload?.message || `Erro ${status}: O servidor não retornou uma mensagem detalhada.`,
       code: payload?.code,
       status: status,
       details: payload?.details,
       subErrors: payload?.subErrors,
       traceId: payload?.traceId,
-      stackTrace: payload?.stackTrace,
+      stackTrace: payload?.stackTrace || (err as any).stack,
       originalError: err
     };
   }
@@ -83,6 +84,7 @@ export function normalizeError(err: unknown): NormalizedError {
     return {
       kind: 'unexpected',
       message: err.message || 'Erro inesperado.',
+      stackTrace: err.stack,
       originalError: err
     };
   }
@@ -91,7 +93,8 @@ export function normalizeError(err: unknown): NormalizedError {
   console.error("[normalizeError] Erro não mapeado:", err);
   return {
     kind: 'unexpected',
-    message: 'Erro desconhecido.',
+    message: 'Erro desconhecido ou não mapeado pela aplicação.',
+    stackTrace: (err as any)?.stack || String(err),
     originalError: err
   };
 }
@@ -140,7 +143,18 @@ export function notifyError(normalized: NormalizedError): void {
   };
 
   const title = titles[normalized.kind];
-  feedbackStore.show(title, normalized.message, 'danger');
+  
+  let fullMessage = normalized.message;
+  if (normalized.stackTrace) {
+    fullMessage += '\n\n--- DETALHES TÉCNICOS (Stack Trace) ---\n' + normalized.stackTrace;
+  } else if (normalized.traceId) {
+    fullMessage += '\n\nTrace ID: ' + normalized.traceId;
+  }
+
+  // Aumentar o tempo de exibição para permitir leitura de detalhes técnicos (60s se tiver stacktrace)
+  const autoHideDelay = normalized.stackTrace ? 60000 : 7000;
+  
+  feedbackStore.show(title, fullMessage, 'danger', autoHideDelay);
 }
 
 /**

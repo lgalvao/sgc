@@ -48,7 +48,7 @@ describe('apiError utils', () => {
             };
             const normalized = normalizeError(err);
             expect(normalized.kind).toBe('unexpected');
-            expect(normalized.message).toBe('Erro desconhecido.');
+            expect(normalized.message).toBe('Erro 500: O servidor não retornou uma mensagem detalhada.');
         });
 
         it('deve normalizar erro genérico do JS', () => {
@@ -56,12 +56,13 @@ describe('apiError utils', () => {
             const normalized = normalizeError(err);
             expect(normalized.kind).toBe('unexpected');
             expect(normalized.message).toBe('Erro custom');
+            expect(normalized.stackTrace).toBeDefined();
         });
 
         it('deve normalizar erro desconhecido (string)', () => {
             const normalized = normalizeError('string error');
             expect(normalized.kind).toBe('unexpected');
-            expect(normalized.message).toBe('Erro desconhecido.');
+            expect(normalized.message).toBe('Erro desconhecido ou não mapeado pela aplicação.');
         });
 
         it('mapeia outros status corretamente', () => {
@@ -86,7 +87,7 @@ describe('apiError utils', () => {
 
         notifyError({ kind: 'notFound', message: 'Op' } as any);
 
-        expect(feedbackStore.show).toHaveBeenCalledWith('Não Encontrado', 'Op', 'danger');
+        expect(feedbackStore.show).toHaveBeenCalledWith('Não Encontrado', 'Op', 'danger', 7000);
     });
 
     describe('helper functions', () => {

@@ -132,10 +132,11 @@ describe("axios-setup", () => {
         const error = {
             isAxiosError: true,
             response: {status: 500, data: {message: "Server Error"}},
+            stack: 'stack'
         };
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         // Title changed to "Erro Inesperado" in apiError.ts
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", "Server Error", "danger");
+        expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", expect.stringContaining("Server Error"), "danger", 60000);
     });
 
     it("interceptor de erro de resposta deve mostrar erro genérico para 500 sem mensagem", async () => {
@@ -145,12 +146,14 @@ describe("axios-setup", () => {
         const error = {
             isAxiosError: true,
             response: {status: 500, data: {}},
+            stack: 'stack'
         };
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(feedbackStore.show).toHaveBeenCalledWith(
             "Erro Inesperado",
-            "Erro desconhecido.", // Updated expectation
-            "danger"
+            expect.stringContaining("Erro 500: O servidor não retornou uma mensagem detalhada."),
+            "danger",
+            60000
         );
     });
 
@@ -164,7 +167,8 @@ describe("axios-setup", () => {
         expect(feedbackStore.show).toHaveBeenCalledWith(
             "Erro de Rede",
             expect.stringContaining("Não foi possível conectar"),
-            "danger"
+            "danger",
+            7000
         );
     });
 
@@ -174,7 +178,7 @@ describe("axios-setup", () => {
 
         const error = new Error("Generic failure");
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", "Generic failure", "danger");
+        expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", expect.stringContaining("Generic failure"), "danger", 60000);
     });
 
     // Keeping this test but I need to update axios-setup.ts to handle the exception if I want it to pass.
@@ -193,6 +197,6 @@ describe("axios-setup", () => {
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
 
         // Verificar que tentou exibir o erro (e falhou)
-        expect(feedbackStore.show).toHaveBeenCalled();
+        expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", expect.stringContaining("Generic failure"), "danger", 60000);
     });
 });

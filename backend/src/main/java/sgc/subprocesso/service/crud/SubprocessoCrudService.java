@@ -112,11 +112,8 @@ public class SubprocessoCrudService {
 
     @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorProcessoEUnidade(Long codProcesso, Long codUnidade) {
-        Map<String, Object> filtros = Map.of(
-                "processo.codigo", codProcesso,
-                "unidade.codigo", codUnidade
-        );
-        return repositorioComum.buscar(Subprocesso.class, filtros);
+        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoWithFetch(codProcesso, codUnidade)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", "P:%d U:%d".formatted(codProcesso, codUnidade)));
     }
 
     @Transactional
