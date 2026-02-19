@@ -27,8 +27,8 @@ export async function importarAtividades(
 }
 
 export async function listarAtividades(codSubprocesso: number): Promise<Atividade[]> {
-    const response = await apiClient.get<AtividadeDto[]>(`/subprocessos/${codSubprocesso}/atividades`);
-    return response.data.map(mapAtividadeVisualizacaoToModel).filter((a): a is Atividade => a !== null);
+    const response = await apiClient.get<any>(`/subprocessos/${codSubprocesso}/contexto-edicao`);
+    return (response.data.atividadesDisponiveis || []).map(mapAtividadeVisualizacaoToModel).filter((a): a is Atividade => a !== null);
 }
 
 export async function obterPermissoes(codSubprocesso: number): Promise<SubprocessoPermissoes> {
@@ -87,7 +87,7 @@ export async function adicionarCompetencia(
         atividadesIds: competencia.atividadesAssociadas,
     };
     const response = await apiClient.post(
-        `/subprocessos/${codSubprocesso}/competencias`,
+        `/subprocessos/${codSubprocesso}/competencia`,
         requestBody,
     );
     return mapMapaCompletoDtoToModel(response.data);
@@ -102,7 +102,7 @@ export async function atualizarCompetencia(
         atividadesIds: competencia.atividadesAssociadas,
     };
     const response = await apiClient.post(
-        `/subprocessos/${codSubprocesso}/competencias/${competencia.codigo}/atualizar`,
+        `/subprocessos/${codSubprocesso}/competencia/${competencia.codigo}`,
         requestBody,
     );
     return mapMapaCompletoDtoToModel(response.data);
@@ -113,7 +113,7 @@ export async function removerCompetencia(
     codCompetencia: number,
 ): Promise<MapaCompleto> {
     const response = await apiClient.post(
-        `/subprocessos/${codSubprocesso}/competencias/${codCompetencia}/remover`,
+        `/subprocessos/${codSubprocesso}/competencia/${codCompetencia}/remover`,
     );
     return mapMapaCompletoDtoToModel(response.data);
 }

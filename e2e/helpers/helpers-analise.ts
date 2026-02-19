@@ -86,17 +86,18 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
     await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
 
     const headingUnidades = page.getByRole('heading', {name: /Unidades participantes/i});
-    if (await headingUnidades.isVisible().catch(() => false)) {
-        await page.locator('tr').filter({hasText: new RegExp(String.raw`^\s*${siglaUnidade}(?:\s+-\s+|\b)`, 'i')}).first().click();
-    } else if (/\/processo\/\d+$/.test(page.url())) {
-        const primeiraLinha = page.locator('tbody tr').first();
-        if (await primeiraLinha.isVisible().catch(() => false)) {
-            await primeiraLinha.click();
-        }
-    }
+    await expect(headingUnidades).toBeVisible();
+
+    const row = page.locator('tr').filter({hasText: new RegExp(String.raw`^\s*${siglaUnidade}(?:\s+-\s+|\b)`, 'i')}).first();
+    await expect(row).toBeVisible();
+    await row.click({force: true});
 
     // Aguardar navegação para detalhes ou subprocesso.
-    await expect(page).toHaveURL(/\/processo\/\d+(?:\/\w+)?$/);
+    if (siglaUnidade) {
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
+    } else {
+        await expect(page).toHaveURL(/\/processo\/\d+(?:\/\w+)?$/);
+    }
 }
 
 // ============================================================================
