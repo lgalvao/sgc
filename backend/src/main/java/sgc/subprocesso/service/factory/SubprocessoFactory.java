@@ -22,7 +22,9 @@ import java.util.Collection;
 import java.util.List;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
 import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
 
 /**
  * Factory para criação de entidades Subprocesso.
@@ -85,7 +87,7 @@ public class SubprocessoFactory {
                         .processo(processo)
                         .unidade(unidade)
                         .mapa(null)
-                        .situacao(NAO_INICIADO)
+                        .situacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
                         .dataLimiteEtapa1(processo.getDataLimite())
                         .build())
                 .map(Subprocesso.class::cast)
@@ -127,7 +129,7 @@ public class SubprocessoFactory {
                 .processo(processo)
                 .unidade(unidade)
                 .mapa(null)
-                .situacao(NAO_INICIADO)
+                .situacao(REVISAO_CADASTRO_EM_ANDAMENTO)
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build();
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);

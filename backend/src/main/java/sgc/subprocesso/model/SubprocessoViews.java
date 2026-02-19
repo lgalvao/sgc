@@ -1,11 +1,11 @@
 package sgc.subprocesso.model;
 
-import sgc.comum.model.ComumViews;
+import sgc.mapa.model.MapaViews;
 
 public final class SubprocessoViews {
     private SubprocessoViews() {
     }
 
-    public interface Publica extends ComumViews.Publica {
+    public interface Publica extends MapaViews.Publica {
     }
 }

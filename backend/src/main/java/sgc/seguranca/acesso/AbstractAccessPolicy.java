@@ -96,7 +96,7 @@ public abstract class AbstractAccessPolicy<T> implements AccessPolicy<T> {
 
             case TITULAR_UNIDADE -> {
                 String tituloTitular = unidade.getTituloTitular();
-                yield tituloTitular.equals(usuario.getTituloEleitoral());
+                yield tituloTitular != null && tituloTitular.equals(usuario.getTituloEleitoral());
             }
         };
     }

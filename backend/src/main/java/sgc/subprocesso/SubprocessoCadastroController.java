@@ -24,6 +24,7 @@ import sgc.comum.dto.ComumDtos.JustificativaRequest;
 import sgc.comum.dto.ComumDtos.TextoRequest;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoViews;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
@@ -44,6 +45,13 @@ public class SubprocessoCadastroController {
     @PreAuthorize("isAuthenticated()")
     public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long codigo) {
         return analiseFacade.listarHistoricoCadastro(codigo);
+    }
+
+    @GetMapping("/{codigo}/contexto-edicao")
+    @PreAuthorize("isAuthenticated()")
+    @JsonView(SubprocessoViews.Publica.class)
+    public ResponseEntity<ContextoEdicaoResponse> obterContextoEdicao(@PathVariable Long codigo) {
+        return ResponseEntity.ok(subprocessoFacade.obterContextoEdicao(codigo));
     }
 
     @PostMapping("/{codigo}/cadastro/disponibilizar")

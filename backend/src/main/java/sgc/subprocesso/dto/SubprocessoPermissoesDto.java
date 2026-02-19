@@ -1,11 +1,14 @@
 package sgc.subprocesso.dto;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Builder;
+import sgc.subprocesso.model.SubprocessoViews;
 
 /**
  * DTO de resposta contendo as permissões do usuário sobre um subprocesso.
  */
 @Builder
+@JsonView(SubprocessoViews.Publica.class)
 public record SubprocessoPermissoesDto(
         boolean podeVerPagina,
         boolean podeEditarMapa,
