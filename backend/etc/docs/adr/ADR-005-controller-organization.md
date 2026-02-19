@@ -1,5 +1,7 @@
 # ADR-005: Organização de Controllers por Workflow Phase
 
+**Status:** ✅ Ativo
+
 ---
 
 ## Contexto e Problema

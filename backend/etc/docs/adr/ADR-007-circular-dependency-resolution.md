@@ -1,5 +1,7 @@
 # ADR-007: Resolução de Dependências Circulares
 
+**Status:** ✅ Ativo
+
 ---
 
 ## Contexto e Problema
