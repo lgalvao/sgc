@@ -33,5 +33,6 @@ public class Competencia extends EntidadeBase {
     @ManyToMany(mappedBy = "competencias")
     @Builder.Default
     @JsonIgnoreProperties("competencias")
+    @JsonView(MapaViews.Publica.class)
     private Set<Atividade> atividades = new HashSet<>();
 }

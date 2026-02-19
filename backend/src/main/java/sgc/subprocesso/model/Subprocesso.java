@@ -118,7 +118,7 @@ public class Subprocesso extends EntidadeBase {
                         SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
                         SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
-        return !situacoesFinalizadas.contains(this.situacao);
+        return !situacoesFinalizadas.contains(this.situacao) && !SituacaoSubprocesso.NAO_INICIADO.equals(this.situacao);
     }
 
     public Integer getEtapaAtual() {
