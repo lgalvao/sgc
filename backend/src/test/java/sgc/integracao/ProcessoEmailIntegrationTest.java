@@ -3,7 +3,6 @@ package sgc.integracao;
 import jakarta.mail.Multipart;
 import jakarta.mail.Part;
 import jakarta.mail.internet.MimeMessage;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +21,6 @@ class ProcessoEmailIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private NotificacaoModelosService modelosService;
-
-    @BeforeEach
-    void setupChild() {
-        greenMail.reset();
-    }
 
     @Test
     @DisplayName("Deve enviar e-mail HTML real usando template e verificar no GreenMail")

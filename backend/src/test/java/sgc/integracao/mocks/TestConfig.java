@@ -6,12 +6,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
+
+import sgc.comum.util.Sleeper;
 
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -57,12 +59,29 @@ public class TestConfig implements AsyncConfigurer {
     }
 
     /**
-     * Executa métodos @Async de forma síncrona em testes.
+     * Usa SimpleAsyncTaskExecutor para suporte correto de @Async com CompletableFuture.
+     * SyncTaskExecutor não implementa AsyncTaskExecutor, causando fallback para thread pool real.
      */
     @Override
     @Bean(name = "taskExecutor")
     @Profile({"test", "e2e", "secure-test"})
     public Executor getAsyncExecutor() {
-        return new SyncTaskExecutor();
+        var executor = new SimpleAsyncTaskExecutor();
+        executor.setConcurrencyLimit(1);
+        return executor;
+    }
+
+    /**
+     * No-op Sleeper para testes: elimina esperas reais entre tentativas de reenvio.
+     */
+    @Bean
+    @Primary
+    public Sleeper sleeper() {
+        return new Sleeper() {
+            @Override
+            public void sleep(long millis) {
+                // não dorme em testes
+            }
+        };
     }
 }

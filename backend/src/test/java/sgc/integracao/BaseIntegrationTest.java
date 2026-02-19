@@ -54,7 +54,11 @@ public abstract class BaseIntegrationTest {
     void setupMockMvc() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
         if (greenMail != null) {
-            greenMail.reset();
+            try {
+                greenMail.purgeEmailFromAllMailboxes();
+            } catch (com.icegreen.greenmail.store.FolderException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

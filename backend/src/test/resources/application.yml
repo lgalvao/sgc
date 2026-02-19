@@ -3,6 +3,9 @@ spring:
     active: test
   main:
     banner-mode: off
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration
   security:
     user:
       password: password
@@ -18,7 +21,7 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        format_sql: false
+        "[format_sql]": false
   sql:
     init:
       mode: always
@@ -47,14 +50,15 @@ sgc:
 logging:
   level:
     root: INFO
-    org.hibernate: WARN
-    org.hibernate.SQL: WARN
-    org.hibernate.type.descriptor.sql.BasicBinder: WARN
-    org.springframework.orm.jpa: WARN
-    org.springframework.jdbc: WARN
-    com.zaxxer.hikari: WARN
-    org.springframework.boot.autoconfigure.orm.jpa: WARN
-    org.springframework: WARN
-    org.hibernate.tool.schema.internal.SchemaDropperImpl: WARN
+    "[org.hibernate]": WARN
+    "[org.hibernate.SQL]": WARN
+    "[org.hibernate.type.descriptor.sql.BasicBinder]": WARN
+    "[org.springframework.orm.jpa]": WARN
+    "[org.springframework.jdbc]": WARN
+    "[com.zaxxer.hikari]": WARN
+    "[org.springframework.boot.autoconfigure.orm.jpa]": WARN
+    "[org.springframework]": WARN
+    "[org.hibernate.tool.schema.internal.SchemaDropperImpl]": WARN
     sgc: INFO
-    sgc.infraestrutura.monitoramento: WARN
+    "[sgc.notificacao]": DEBUG
+    "[sgc.infraestrutura.monitoramento]": WARN

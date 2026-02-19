@@ -172,6 +172,6 @@ public class NotificacaoModelosService {
         String dataLimiteText = dataLimite != null ? dataLimite.format(FORMATADOR) : "N/A";
         context.setVariable(VAR_DATA_LIMITE, dataLimiteText);
 
-        return templateEngine.process("email/lembrete-prazo", context);
+        return templateEngine.process("lembrete-prazo", context);
     }
 }
