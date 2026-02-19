@@ -53,8 +53,6 @@ class SubprocessoAtividadeService {
      *   <li>Publica evento {@link EventoImportacaoAtividades} para desacoplar do módulo mapa</li>
      * </ul>
      * 
-     * @param codSubprocessoDestino código do subprocesso de destino
-     * @param codSubprocessoOrigem código do subprocesso de origem
      * @throws ErroAtividadesEmSituacaoInvalida se destino está em situação inválida
      */
     @Transactional
@@ -101,9 +99,6 @@ class SubprocessoAtividadeService {
 
     /**
      * Lista todas as atividades de um subprocesso para visualização.
-     * 
-     * @param codSubprocesso código do subprocesso
-     * @return lista de atividades com seus conhecimentos
      */
     @Transactional(readOnly = true)
     public List<AtividadeDto> listarAtividadesSubprocesso(Long codSubprocesso) {
@@ -115,9 +110,6 @@ class SubprocessoAtividadeService {
 
     /**
      * Transforma uma atividade em DTO para visualização.
-     * 
-     * @param atividade atividade a transformar
-     * @return DTO com dados da atividade e seus conhecimentos
      */
     private AtividadeDto mapAtividadeToDto(Atividade atividade) {
         return AtividadeDto.builder()

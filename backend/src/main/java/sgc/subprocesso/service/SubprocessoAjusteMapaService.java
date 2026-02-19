@@ -54,8 +54,6 @@ class SubprocessoAjusteMapaService {
     /**
      * Salva ajustes feitos no mapa de um subprocesso.
      * 
-     * @param codSubprocesso código do subprocesso
-     * @param competencias lista de competências ajustadas
      * @throws sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida se situação não permite ajuste
      */
     @Transactional
@@ -72,9 +70,6 @@ class SubprocessoAjusteMapaService {
 
     /**
      * Obtém mapa preparado para ajuste.
-     * 
-     * @param codSubprocesso código do subprocesso
-     * @return DTO com dados do mapa para ajuste
      */
     @Transactional(readOnly = true)
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
@@ -97,7 +92,6 @@ class SubprocessoAjusteMapaService {
     /**
      * Valida se a situação do subprocesso permite ajuste de mapa.
      * 
-     * @param sp subprocesso a validar
      * @throws sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida se situação inválida
      */
     private void validarSituacaoParaAjuste(Subprocesso sp) {
@@ -111,8 +105,6 @@ class SubprocessoAjusteMapaService {
 
     /**
      * Atualiza descrições de atividades em lote.
-     * 
-     * @param competencias competências com atividades a atualizar
      */
     private void atualizarDescricoesAtividades(List<CompetenciaAjusteDto> competencias) {
         Map<Long, String> atividadeDescricoes = new HashMap<>();
@@ -128,8 +120,6 @@ class SubprocessoAjusteMapaService {
 
     /**
      * Atualiza competências e suas associações com atividades.
-     * 
-     * @param competencias competências com dados atualizados
      */
     private void atualizarCompetenciasEAssociacoes(List<CompetenciaAjusteDto> competencias) {
         // Carregar todas as competências envolvidas
