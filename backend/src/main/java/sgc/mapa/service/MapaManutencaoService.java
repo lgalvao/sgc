@@ -1,5 +1,7 @@
 package sgc.mapa.service;
 
+import sgc.comum.erros.ErroValidacao;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,6 +48,7 @@ public class MapaManutencaoService {
     }
 
     public Atividade criarAtividade(CriarAtividadeRequest request) {
+        validarDescricaoAtividadeUnica(request.mapaCodigo(), request.descricao());
         Mapa mapa = repo.buscar(Mapa.class, request.mapaCodigo());
         notificarAlteracaoMapa(request.mapaCodigo());
 
@@ -57,6 +60,9 @@ public class MapaManutencaoService {
 
     public void atualizarAtividade(Long codigo, AtualizarAtividadeRequest request) {
         Atividade existente = repo.buscar(Atividade.class, codigo);
+        if (!existente.getDescricao().equalsIgnoreCase(request.descricao())) {
+            validarDescricaoAtividadeUnica(existente.getMapa().getCodigo(), request.descricao());
+        }
         notificarAlteracaoMapa(existente.getMapa().getCodigo());
 
         var entidadeParaAtualizar = atividadeMapper.toEntity(request);
@@ -214,6 +220,7 @@ public class MapaManutencaoService {
     }
 
     public Conhecimento criarConhecimento(Long codAtividade, CriarConhecimentoRequest request) {
+        validarDescricaoConhecimentoUnica(codAtividade, request.descricao());
         var atividade = repo.buscar(Atividade.class, codAtividade);
         var mapa = atividade.getMapa();
         notificarAlteracaoMapa(mapa.getCodigo());
@@ -226,6 +233,10 @@ public class MapaManutencaoService {
 
     public void atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
         var existente = repo.buscar(Conhecimento.class, Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade));
+
+        if (!existente.getDescricao().equalsIgnoreCase(request.descricao())) {
+            validarDescricaoConhecimentoUnica(codAtividade, request.descricao());
+        }
 
         var mapa = existente.getAtividade().getMapa();
         notificarAlteracaoMapa(mapa.getCodigo());
@@ -282,5 +293,21 @@ public class MapaManutencaoService {
 
     public void excluirMapa(Long codigo) {
         mapaRepo.deleteById(codigo);
+    }
+
+    private void validarDescricaoAtividadeUnica(Long mapaCodigo, String descricao) {
+        boolean existe = buscarAtividadesPorMapaCodigoSemRelacionamentos(mapaCodigo).stream()
+                .anyMatch(a -> a.getDescricao().equalsIgnoreCase(descricao));
+        if (existe) {
+            throw new ErroValidacao("Já existe uma atividade com esta descrição neste mapa.");
+        }
+    }
+
+    private void validarDescricaoConhecimentoUnica(Long codAtividade, String descricao) {
+        boolean existe = conhecimentoRepo.findByAtividade_Codigo(codAtividade).stream()
+                .anyMatch(c -> c.getDescricao().equalsIgnoreCase(descricao));
+        if (existe) {
+            throw new ErroValidacao("Já existe um conhecimento com esta descrição nesta atividade.");
+        }
     }
 }

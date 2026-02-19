@@ -5,10 +5,13 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
+import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.erros.ErroProcesso;
+import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 
 import java.time.LocalDateTime;
@@ -74,6 +77,76 @@ class ProcessoManutencaoServicePbtTest {
 
         // Assert
         verify(processoRepo).saveAndFlush(any(Processo.class));
+    }
+
+    @Property
+    void atualizar_rejeitaSeNaoForCriado(@ForAll("situacaoNaoCriada") SituacaoProcesso situacao,
+                                        @ForAll("requisicaoValidaAtualizar") AtualizarProcessoRequest req) {
+        // Mock dependencies
+        ProcessoRepo processoRepo = mock(ProcessoRepo.class);
+        UnidadeFacade unidadeService = mock(UnidadeFacade.class);
+        ProcessoValidador processoValidador = mock(ProcessoValidador.class);
+        ProcessoConsultaService processoConsultaService = mock(ProcessoConsultaService.class);
+
+        ProcessoManutencaoService service = new ProcessoManutencaoService(
+            processoRepo, unidadeService, processoValidador, processoConsultaService
+        );
+
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setSituacao(situacao);
+
+        when(processoConsultaService.buscarProcessoCodigo(anyLong())).thenReturn(processo);
+
+        // Act & Assert
+        assertThatThrownBy(() -> service.atualizar(1L, req))
+                .isInstanceOf(ErroProcessoEmSituacaoInvalida.class)
+                .hasMessage("Apenas processos na situação 'CRIADO' podem ser editados.");
+    }
+
+    @Property
+    void apagar_rejeitaSeNaoForCriado(@ForAll("situacaoNaoCriada") SituacaoProcesso situacao) {
+        // Mock dependencies
+        ProcessoRepo processoRepo = mock(ProcessoRepo.class);
+        UnidadeFacade unidadeService = mock(UnidadeFacade.class);
+        ProcessoValidador processoValidador = mock(ProcessoValidador.class);
+        ProcessoConsultaService processoConsultaService = mock(ProcessoConsultaService.class);
+
+        ProcessoManutencaoService service = new ProcessoManutencaoService(
+            processoRepo, unidadeService, processoValidador, processoConsultaService
+        );
+
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setSituacao(situacao);
+
+        when(processoConsultaService.buscarProcessoCodigo(anyLong())).thenReturn(processo);
+
+        // Act & Assert
+        assertThatThrownBy(() -> service.apagar(1L))
+                .isInstanceOf(ErroProcessoEmSituacaoInvalida.class)
+                .hasMessage("Apenas processos na situação 'CRIADO' podem ser removidos.");
+    }
+
+    @Provide
+    Arbitrary<SituacaoProcesso> situacaoNaoCriada() {
+        return Arbitraries.of(SituacaoProcesso.EM_ANDAMENTO, SituacaoProcesso.FINALIZADO);
+    }
+
+    @Provide
+    Arbitrary<AtualizarProcessoRequest> requisicaoValidaAtualizar() {
+        return Arbitraries.strings().alpha().ofMinLength(5).flatMap(descricao ->
+            Arbitraries.of(TipoProcesso.values()).flatMap(tipo ->
+                Arbitraries.longs().between(1, 100).list().ofMinSize(1).map(unidades ->
+                    AtualizarProcessoRequest.builder()
+                        .descricao(descricao)
+                        .tipo(tipo)
+                        .dataLimiteEtapa1(LocalDateTime.now().plusDays(1))
+                        .unidades(unidades)
+                        .build()
+                )
+            )
+        );
     }
 
     @Provide

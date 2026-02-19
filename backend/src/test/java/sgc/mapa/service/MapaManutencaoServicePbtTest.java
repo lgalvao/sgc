@@ -1,0 +1,66 @@
+package sgc.mapa.service;
+
+import net.jqwik.api.*;
+import sgc.comum.repo.ComumRepo;
+import sgc.mapa.dto.CriarAtividadeRequest;
+import sgc.mapa.mapper.AtividadeMapper;
+import sgc.mapa.mapper.ConhecimentoMapper;
+import sgc.mapa.model.*;
+import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
+
+class MapaManutencaoServicePbtTest {
+
+    @Property
+    void criarAtividade_deveFalharSeDescricaoDuplicadaNoMapa(@ForAll("descricoesIguais") String[] descricoes) {
+        // Mock dependencies
+        AtividadeRepo atividadeRepo = mock(AtividadeRepo.class);
+        CompetenciaRepo competenciaRepo = mock(CompetenciaRepo.class);
+        ConhecimentoRepo conhecimentoRepo = mock(ConhecimentoRepo.class);
+        MapaRepo mapaRepo = mock(MapaRepo.class);
+        ComumRepo repo = mock(ComumRepo.class);
+        AtividadeMapper atividadeMapper = mock(AtividadeMapper.class);
+        ConhecimentoMapper conhecimentoMapper = mock(ConhecimentoMapper.class);
+        SubprocessoAdminWorkflowService subprocessoAdminService = mock(SubprocessoAdminWorkflowService.class);
+
+        MapaManutencaoService service = new MapaManutencaoService(
+                atividadeRepo, competenciaRepo, conhecimentoRepo, mapaRepo, repo,
+                atividadeMapper, conhecimentoMapper, subprocessoAdminService
+        );
+
+        Long mapaCodigo = 1L;
+        Mapa mapa = Mapa.builder().codigo(mapaCodigo).build();
+        when(repo.buscar(Mapa.class, mapaCodigo)).thenReturn(mapa);
+        
+        Atividade novaAtiv = new Atividade();
+        novaAtiv.setDescricao(descricoes[1]);
+        when(atividadeMapper.toEntity(any(CriarAtividadeRequest.class))).thenReturn(novaAtiv);
+
+        // Simular que já existe uma atividade com a mesma descrição
+        Atividade existente = new Atividade();
+        existente.setDescricao(descricoes[0]);
+        when(atividadeRepo.findByMapa_Codigo(mapaCodigo)).thenReturn(List.of(existente));
+
+        CriarAtividadeRequest request = new CriarAtividadeRequest(mapaCodigo, descricoes[1]);
+        
+        // Se descricoes[0].equalsIgnoreCase(descricoes[1]), deve falhar
+        assertThatThrownBy(() -> service.criarAtividade(request))
+                .as("Deveria falhar por descrição duplicada (case-insensitive): " + descricoes[0] + " vs " + descricoes[1])
+                .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
+    }
+
+    @Provide
+    Arbitrary<String[]> descricoesIguais() {
+        return Arbitraries.strings().alpha().ofMinLength(3).flatMap(s ->
+            Arbitraries.of(
+                new String[]{s.toLowerCase(), s.toUpperCase()},
+                new String[]{s, s},
+                new String[]{s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase(), s.toLowerCase()}
+            )
+        );
+    }
+}
