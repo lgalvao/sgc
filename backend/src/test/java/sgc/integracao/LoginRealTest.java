@@ -9,9 +9,8 @@ import sgc.integracao.mocks.TestLoginHelper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
 @Transactional
-@Import({TestSecurityConfig.class, TestLoginHelper.class})
+@Import({TestLoginHelper.class})
 @DisplayName("Teste de Login Real")
 class LoginRealTest extends BaseIntegrationTest {
 
