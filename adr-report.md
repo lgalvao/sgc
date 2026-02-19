@@ -28,10 +28,9 @@ As seguintes ADRs foram revisadas:
 ### Discrepâncias Identificadas e Corrigidas
 
 1.  **ADR-002 (Eventos Unificados)**
-    - **Problema:** O código utilizava chamadas diretas para notificação (`alertaService`, `emailService`) e o registro `EventoTransicaoSubprocesso` mencionado na ADR não existia.
-    - **Correção:**
-        - Criado o record `sgc.subprocesso.eventos.EventoTransicaoSubprocesso`.
-        - Atualizado `SubprocessoTransicaoService` para publicar este evento usando `ApplicationEventPublisher`.
+    - **Problema:** O código utilizava chamadas diretas para notificação, violando a ADR que previa eventos.
+    - **Resolução:** Em vez de adicionar complexidade para seguir a ADR, optou-se por **Descontinuar a ADR-002**.
+    - **Motivo:** A complexidade de eventos não se justifica para o escopo atual. A abordagem direta (Simplicidade) foi mantida e documentada como padrão.
 
 2.  **ADR-005 (Organização de Controllers)**
     - **Problema:** A ADR descrevia a existência de `SubprocessoValidacaoController`, mas este arquivo não existia. As funcionalidades de validação estavam misturadas em `SubprocessoMapaController`.

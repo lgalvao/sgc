@@ -1,6 +1,6 @@
 # ADR-002: Eventos de Domínio Unificados
 
-**Status:** ✅ Ativo
+**Status:** ❌ Descontinuado (Substituído por Orquestração Direta)
 
 ---
 
@@ -26,7 +26,29 @@ Subprocessos têm múltiplas transições de estado diferentes entre situações
 
 ---
 
-## Decisão
+## Decisão (Descontinuada)
+
+Esta ADR previa usar **Evento Unificado** para desacoplar notificações de transições.
+
+**Motivo da Descontinuação (17/02/2026):**
+Em favor da **Simplicidade**, optou-se por realizar as notificações (Alerta, Email) diretamente no Service de Transição (`SubprocessoTransicaoService`), sem a indireção de eventos.
+A complexidade de manter listeners, publishers e objetos de evento não se justificou para o tamanho atual da aplicação.
+
+**Abordagem Atual:**
+Chamadas diretas e explícitas no service:
+```java
+// SubprocessoTransicaoService.java
+public void registrar(...) {
+    // ... persistência da movimentação ...
+
+    // Notificação direta (Simples e Explícito)
+    notificarTransicao(sp, tipo, origem, destino, observacoes);
+}
+```
+
+---
+
+## Decisão Original (Histórico)
 
 Usar **Evento Unificado** com enum de tipos para transições similares.
 
