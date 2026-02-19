@@ -9,3 +9,5 @@ dist
 .DS_Store
 /screenshots/
 # /coverage/
+storybook-static
+storybook.log
