@@ -1,8 +1,14 @@
 import axios from "axios";
-import router from "./router";
+import type {Router} from "vue-router";
 import {useFeedbackStore} from "@/stores/feedback";
 import {normalizeError, notifyError, shouldNotifyGlobally} from '@/utils/apiError';
 import {logger} from "@/utils";
+
+let routerInstance: Router | null = null;
+
+export function setRouter(router: Router) {
+    routerInstance = router;
+}
 
 export const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:10000/api",
@@ -20,13 +26,14 @@ const handleResponseError = (error: any) => {
 
     // Caso especial: 401 - redirecionar para login
     if (normalized.kind === 'unauthorized') {
-        if (router.currentRoute?.value?.path !== '/login') {
+        const currentPath = routerInstance?.currentRoute?.value?.path;
+        if (currentPath !== '/login') {
             feedbackStore.show(
                 'Não Autorizado',
                 'Sua sessão expirou ou você não está autenticado. Faça login novamente.',
                 'danger'
             );
-            router.push('/login').catch(e => logger.error("Erro ao redirecionar:", e));
+            routerInstance?.push('/login').catch(e => logger.error("Erro ao redirecionar:", e));
         }
         return Promise.reject(error);
     }

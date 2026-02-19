@@ -3,6 +3,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import http from 'node:http';
 import {fileURLToPath} from 'node:url';
+import {SMTPServer} from 'smtp-server';
 
 // Recreate __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -19,6 +20,7 @@ const BACKEND_DIR = path.resolve(__dirname, '../backend');
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
 const BACKEND_PORT = 10000;
 const FRONTEND_PORT = 5173;
+const SMTP_PORT = 1025;
 
 // Criar/limpar arquivo de log ao iniciar
 const LOG_FILE = path.resolve(__dirname, 'server.log');
@@ -30,6 +32,7 @@ try {
 
 let backendProcess = null;
 let frontendProcess = null;
+let smtpServer = null;
 
 const LOG_FILTERS = [
     // Warnings do Lombok
@@ -147,6 +150,31 @@ function startFrontend() {
     });
 }
 
+function startSmtpServer() {
+    smtpServer = new SMTPServer({
+        authOptional: true,
+        onData(stream, session, callback) {
+            let buffer = '';
+            stream.on('data', (chunk) => {
+                buffer += chunk;
+            });
+            stream.on('end', () => {
+                log('SMTP', `E-mail recebido de ${session.envelope.mailFrom.address} para ${session.envelope.rcptTo.map(r => r.address).join(', ')}`);
+                // Se precisar do corpo do e-mail para debug futuro, pode logar 'buffer' aqui
+                callback();
+            });
+        }
+    });
+
+    smtpServer.on('error', err => {
+        console.error('Erro no servidor SMTP:', err.message);
+    });
+
+    smtpServer.listen(SMTP_PORT, '0.0.0.0', () => {
+        log('SMTP', `Servidor SMTP rodando na porta ${SMTP_PORT}`);
+    });
+}
+
 function stopProcess(proc, isWindows) {
     if (!proc) return;
     try {
@@ -164,6 +192,9 @@ function cleanup() {
     // Matar apenas processos iniciados, preservando Gradle Daemons
     stopProcess(backendProcess, isWindows);
     stopProcess(frontendProcess, isWindows);
+    if (smtpServer) {
+        smtpServer.close();
+    }
 }
 
 // Handle exit signals
@@ -211,11 +242,12 @@ function checkFrontendHealth() {
 }
 
 startBackend();
+startSmtpServer();
 try {
     await checkBackendHealth();
     startFrontend();
     await checkFrontendHealth();
-    console.log('>>> Frontend e Backend no ar!');
+    console.log('>>> Frontend, Backend e SMTP no ar!');
 } catch (error) {
     console.error('Erro ao iniciar infraestrutura de testes:', error.message);
     process.exit(1);

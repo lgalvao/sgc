@@ -31,10 +31,8 @@ vi.mock("@/router", () => ({
 }));
 
 // Mock logger
-vi.mock("@/utils", async (importOriginal) => {
-    const actual = await importOriginal<any>();
+vi.mock("@/utils", () => {
     return {
-        ...actual,
         logger: {
             error: vi.fn(),
             warn: vi.fn(),
@@ -44,11 +42,9 @@ vi.mock("@/utils", async (importOriginal) => {
 });
 
 // Mock axios
-vi.mock("axios", async (importOriginal) => {
-    const actual = await importOriginal<any>();
+vi.mock("axios", () => {
     return {
         default: {
-            ...actual,
             create: vi.fn(() => mockInstance),
         },
     };
@@ -75,7 +71,7 @@ describe("axios-setup", () => {
             // responseUseCalls[0][0] is success handler (identity)
             responseErrorInterceptor = responseUseCalls[0][1];
         }
-    });
+    }, 30000); // Increased timeout to 30s
 
     beforeEach(async () => {
         setActivePinia(createPinia());

@@ -86,7 +86,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpMessageNotReadableException ex,
             @Nullable HttpHeaders headers,
             HttpStatusCode status,
-            @Nullable WebRequest request) {
+            WebRequest request) {
 
         log.warn("Erro de mensagem HTTP não legível: {}", ex.getMessage());
         String error = "Requisição JSON malformada";
@@ -98,7 +98,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             MethodArgumentNotValidException ex,
             @Nullable HttpHeaders headers,
             HttpStatusCode status,
-            @Nullable WebRequest request) {
+            WebRequest request) {
 
         log.warn("Erro de validação de argumento", ex);
 

@@ -3,6 +3,7 @@
 import {createBootstrap, vBTooltip} from "bootstrap-vue-next"; // Importar createBootstrap e vBTooltip
 import {createPinia} from "pinia";
 import {createApp} from "vue";
+import {setRouter} from "@/axios-setup";
 import App from "./App.vue";
 import router from "./router/index";
 
@@ -31,6 +32,8 @@ app.use(pinia);
 globalThis.pinia = pinia;
 
 app.use(router);
+setRouter(router);
+
 app.use(createBootstrap());
 app.directive('b-tooltip', vBTooltip);
 app.mount("#app");
