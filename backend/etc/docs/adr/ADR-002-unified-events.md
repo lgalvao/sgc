@@ -1,5 +1,7 @@
 # ADR-002: Eventos de Domínio Unificados
 
+**Status:** ✅ Ativo
+
 ---
 
 ## Contexto e Problema

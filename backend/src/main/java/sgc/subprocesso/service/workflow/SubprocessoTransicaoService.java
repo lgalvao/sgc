@@ -2,6 +2,7 @@ package sgc.subprocesso.service.workflow;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
@@ -11,6 +12,7 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
+import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
@@ -40,6 +42,7 @@ public class SubprocessoTransicaoService {
     private final SubprocessoEmailService emailService;
     private final AnaliseFacade analiseFacade;
     private final UsuarioFacade usuarioFacade;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Registra uma transição de subprocesso (auditoria e eventos).
@@ -49,10 +52,11 @@ public class SubprocessoTransicaoService {
     @Transactional
     public void registrar(RegistrarTransicaoCommand cmd) {
         Usuario usuario = cmd.usuario() != null ? cmd.usuario() : usuarioFacade.obterUsuarioAutenticado();
+        Subprocesso sp = cmd.sp();
 
         // 1. Salvar movimentação (trilha de auditoria completa)
         Movimentacao movimentacao = Movimentacao.builder()
-                .subprocesso(cmd.sp())
+                .subprocesso(sp)
                 .unidadeOrigem(cmd.origem())
                 .unidadeDestino(cmd.destino())
                 .descricao(cmd.tipo().getDescricaoMovimentacao())
@@ -60,8 +64,16 @@ public class SubprocessoTransicaoService {
                 .build();
         movimentacaoRepo.save(movimentacao);
 
-        // 2. Notificar via alerta e e-mail (chamada direta, sem evento assíncrono)
-        notificarTransicao(cmd.sp(), cmd.tipo(), cmd.origem(), cmd.destino(), cmd.observacoes());
+        // 2. Publicar Evento Unificado (ADR-002)
+        eventPublisher.publishEvent(new EventoTransicaoSubprocesso(
+                sp.getCodigo(),
+                sp.getSituacao(),
+                cmd.tipo(),
+                usuario.getTituloEleitoral()
+        ));
+
+        // 3. Notificar via alerta e e-mail (chamada direta, sem evento assíncrono)
+        notificarTransicao(sp, cmd.tipo(), cmd.origem(), cmd.destino(), cmd.observacoes());
     }
 
     /**

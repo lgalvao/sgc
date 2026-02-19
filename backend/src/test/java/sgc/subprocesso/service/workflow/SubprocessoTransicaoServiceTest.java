@@ -8,12 +8,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
+import sgc.subprocesso.eventos.EventoTransicaoSubprocesso;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
@@ -39,6 +41,9 @@ class SubprocessoTransicaoServiceTest {
 
     @Mock
     private UsuarioFacade usuarioFacade;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private SubprocessoTransicaoService service;
@@ -69,6 +74,7 @@ class SubprocessoTransicaoServiceTest {
 
         // Assert
         verify(movimentacaoRepo).save(any(Movimentacao.class));
+        verify(eventPublisher).publishEvent(any(EventoTransicaoSubprocesso.class));
         verify(alertaService).criarAlertaTransicao(any(), anyString(), any(), any());
         verify(emailService).enviarEmailTransicaoDireta(any(), any(), any(), any(), any());
     }

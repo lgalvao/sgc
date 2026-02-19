@@ -1,6 +1,7 @@
 package sgc.subprocesso.service.workflow;
 
 import net.jqwik.api.*;
+import org.springframework.context.ApplicationEventPublisher;
 import sgc.alerta.AlertaFacade;
 import sgc.analise.AnaliseFacade;
 import sgc.organizacao.UsuarioFacade;
@@ -27,9 +28,10 @@ class SubprocessoTransicaoServicePbtTest {
         SubprocessoEmailService emailService = mock(SubprocessoEmailService.class);
         AnaliseFacade analiseFacade = mock(AnaliseFacade.class);
         UsuarioFacade usuarioFacade = mock(UsuarioFacade.class);
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
         SubprocessoTransicaoService service = new SubprocessoTransicaoService(
-                movimentacaoRepo, alertaService, emailService, analiseFacade, usuarioFacade
+                movimentacaoRepo, alertaService, emailService, analiseFacade, usuarioFacade, eventPublisher
         );
 
         Unidade unidadeSp = new Unidade();

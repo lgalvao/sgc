@@ -1,5 +1,7 @@
 # ADR-004: Padrão de DTOs Obrigatórios
 
+**Status:** ✅ Ativo
+
 ---
 
 ## Contexto

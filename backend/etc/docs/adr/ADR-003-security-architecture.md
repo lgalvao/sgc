@@ -1,5 +1,7 @@
 # ADR-003: Arquitetura de Controle de Acesso Centralizada
 
+**Status:** ✅ Ativo
+
 ---
 
 ## Contexto

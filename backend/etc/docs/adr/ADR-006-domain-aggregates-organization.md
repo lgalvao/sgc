@@ -1,5 +1,6 @@
 # ADR-006: Organização por Agregados de Domínio vs Outros Critérios
 
+**Status:** ✅ Ativo
 
 ---
 
