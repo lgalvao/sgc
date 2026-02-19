@@ -9,6 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
@@ -119,6 +120,36 @@ class SubprocessoAtividadeServiceTest {
         }
 
         @Test
+        @DisplayName("deve lançar exceção quando sem permissão na origem")
+        void deveLancarExcecaoQuandoSemPermissaoOrigem() {
+            // Arrange
+            Long codDestino = 1L;
+            Long codOrigem = 2L;
+
+            Subprocesso spDestino = criarSubprocesso(codDestino, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            Subprocesso spOrigem = criarSubprocesso(codOrigem, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+
+            when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
+            when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
+            when(usuarioService.obterUsuarioAutenticado()).thenReturn(new Usuario());
+
+            doNothing().when(accessControlService)
+                    .verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_CADASTRO), eq(spDestino));
+
+            doThrow(new ErroAcessoNegado("Sem acesso"))
+                    .when(accessControlService)
+                    .verificarPermissao(any(Usuario.class), eq(Acao.VISUALIZAR_SUBPROCESSO), eq(spOrigem));
+
+            // Act & Assert
+            assertThatThrownBy(() -> service.importarAtividades(codDestino, codOrigem))
+                    .isInstanceOf(ErroAcessoNegado.class);
+
+            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_CADASTRO), eq(spDestino));
+            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.VISUALIZAR_SUBPROCESSO), eq(spOrigem));
+            verifyNoInteractions(copiaMapaService);
+        }
+
+        @Test
         @DisplayName("deve importar atividades com sucesso quando destino em MAPEAMENTO_CADASTRO_EM_ANDAMENTO")
         void deveImportarAtividadesComSucessoQuandoDestinoEmMapeamentoCadastro() {
             // Arrange
@@ -143,6 +174,7 @@ class SubprocessoAtividadeServiceTest {
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
 
             verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_CADASTRO), eq(spDestino));
+            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.VISUALIZAR_SUBPROCESSO), eq(spOrigem));
             verify(movimentacaoRepo).save(any(Movimentacao.class));
             verify(subprocessoRepo, never()).save(any(Subprocesso.class)); // Não deve salvar pois já está em cadastro
         }
@@ -179,6 +211,7 @@ class SubprocessoAtividadeServiceTest {
 
             verify(usuarioService).obterUsuarioAutenticado();
             verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_CADASTRO), eq(spDestino));
+            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.VISUALIZAR_SUBPROCESSO), eq(spOrigem));
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
             verify(movimentacaoRepo).save(any(Movimentacao.class));
         }
@@ -214,6 +247,7 @@ class SubprocessoAtividadeServiceTest {
             assertThat(subprocessoSalvo.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
             verify(usuarioService).obterUsuarioAutenticado();
+            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.VISUALIZAR_SUBPROCESSO), eq(spOrigem));
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
             verify(movimentacaoRepo).save(any(Movimentacao.class));
         }
@@ -244,6 +278,7 @@ class SubprocessoAtividadeServiceTest {
             // Assert
             verify(subprocessoRepo).save(spDestino);
             verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_CADASTRO), eq(spDestino));
+            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.VISUALIZAR_SUBPROCESSO), eq(spOrigem));
             assertThat(spDestino.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO); // Não muda no default
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
         }
@@ -272,6 +307,7 @@ class SubprocessoAtividadeServiceTest {
 
             // Assert
             verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_REVISAO_CADASTRO), eq(spDestino));
+            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.VISUALIZAR_SUBPROCESSO), eq(spOrigem));
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
             verify(movimentacaoRepo).save(any(Movimentacao.class));
             verify(subprocessoRepo, never()).save(any(Subprocesso.class)); // Não deve salvar
