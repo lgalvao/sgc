@@ -5,7 +5,7 @@ node_modules
 dist
 .vscode/*
 !.vscode/extensions.json
-.idea
+/.idea/
 .DS_Store
 /screenshots/
 # /coverage/

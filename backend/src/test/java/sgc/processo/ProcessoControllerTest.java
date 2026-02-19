@@ -19,10 +19,11 @@ import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
 import sgc.processo.model.AcaoProcesso;
+import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
-import sgc.processo.model.Processo;
+import sgc.processo.erros.ErroProcesso;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDate;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -431,14 +433,15 @@ class ProcessoControllerTest {
         }
 
         @Test
-        @DisplayName("Deve retornar bad request quando iniciar processo retorna lista de erros")
-        void deveRetornarBadRequestQuandoIniciarProcessoRetornaErros() {
+        @DisplayName("Deve lançar ErroProcesso com status CONFLICT quando iniciar processo retorna lista de erros")
+        void deveLancarErroProcessoQuandoIniciarProcessoRetornaErros() {
             IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
             when(processoFacadeMock.iniciarProcessoMapeamento(anyLong(), anyList()))
                 .thenReturn(List.of("erro"));
 
-            ResponseEntity<?> response = controller.iniciar(1L, req);
-            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+            ErroProcesso ex = assertThrows(ErroProcesso.class, () -> controller.iniciar(1L, req));
+            assertEquals(HttpStatus.CONFLICT, ex.getStatus());
+            assertEquals("erro", ex.getMessage());
         }
 
         @Test

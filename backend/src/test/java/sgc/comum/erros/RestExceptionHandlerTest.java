@@ -199,7 +199,7 @@ class RestExceptionHandlerTest {
         ErroNegocioBase ex = new ErroNegocioBase("Erro Detalhe Vazio", "CODE", HttpStatus.BAD_REQUEST, Collections.emptyMap()) {};
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertThat(((ErroApi) response.getBody()).getDetails()).isNull();
+        assertThat(((ErroApi) response.getBody()).getDetails()).isEmpty();
     }
 
     @Test

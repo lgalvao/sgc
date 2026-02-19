@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# Hook para garantir que todos os testes do backend passem antes do push
+# Local original: .git/hooks/pre-push
+
+echo "------------------------------------------------------------"
+echo "Iniciando verificação de testes do backend antes do push..."
+echo "------------------------------------------------------------"
+
+# Executa os testes do módulo backend a partir da raiz do projeto
+./gradlew :backend:test
+
+# Captura o código de saída do Gradle
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+    echo ""
+    echo "❌ ERRO: Os testes do backend falharam. O push foi CANCELADO."
+    echo "Resolva os erros de teste antes de tentar o push novamente."
+    echo "------------------------------------------------------------"
+    exit 1
+fi
+
+echo ""
+echo "✅ Todos os testes do backend passaram! Prosseguindo com o push..."
+echo "------------------------------------------------------------"
+exit 0

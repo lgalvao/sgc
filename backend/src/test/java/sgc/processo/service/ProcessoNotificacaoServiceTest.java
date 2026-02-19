@@ -87,7 +87,7 @@ class ProcessoNotificacaoServiceTest {
     void deveDispararEmailsAoIniciar() {
         when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(1L);
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
 
         Unidade unidade = criarUnidade(10L, TipoUnidade.OPERACIONAL);
         unidade.setSigla("U1");
@@ -119,7 +119,7 @@ class ProcessoNotificacaoServiceTest {
     @DisplayName("Deve ignorar processamento se não houver subprocessos ao iniciar")
     void deveIgnorarProcessamentoSeNaoHouverSubprocessosAoIniciar() {
         Processo processo = criarProcesso(1L);
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
 
         service.notificarInicioProcesso(1L, List.of());
@@ -144,7 +144,7 @@ class ProcessoNotificacaoServiceTest {
                 .doesNotThrowAnyException();
 
         // Testa catch no fluxo principal para tipo não suportado (ex: SEM_EQUIPE)
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularTitulo("T").build()));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", Usuario.builder().build()));
@@ -158,7 +158,7 @@ class ProcessoNotificacaoServiceTest {
     void deveCobrirBranchesSubstitutos() {
         when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(1L);
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
 
         Unidade u = criarUnidade(10L, TipoUnidade.OPERACIONAL);
         Subprocesso s = new Subprocesso();
@@ -192,7 +192,7 @@ class ProcessoNotificacaoServiceTest {
     void deveCobrirBranchesFinalizacao() {
         when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(2L);
-        when(processoRepo.findById(2L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(2L)).thenReturn(Optional.of(processo));
 
         Unidade operacional = criarUnidade(1L, TipoUnidade.OPERACIONAL);
         operacional.setSigla("OP");
@@ -250,19 +250,13 @@ class ProcessoNotificacaoServiceTest {
     @DisplayName("Deve cobrir exceção para unidade SEM_EQUIPE no envio de email")
     void deveCobrirExcecaoSemEquipe() {
         Processo processo = criarProcesso(1L);
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
 
         Subprocesso s = new Subprocesso();
         Unidade u = criarUnidade(1L, TipoUnidade.SEM_EQUIPE);
         s.setUnidade(u);
 
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
-
-        UnidadeResponsavelDto r = UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T").build();
-        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r));
-        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", Usuario.builder().email("t@mail.com").build()));
-
-        service.notificarInicioProcesso(1L, List.of());
 
         service.notificarInicioProcesso(1L, List.of());
 
@@ -274,7 +268,7 @@ class ProcessoNotificacaoServiceTest {
     @DisplayName("Deve cobrir else implícito na finalização (tipo desconhecido)")
     void deveCobrirElseImplicitoFinalizacao() {
         Processo processo = criarProcesso(2L);
-        when(processoRepo.findById(2L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(2L)).thenReturn(Optional.of(processo));
 
         // SEM_EQUIPE cai no else implícito de enviarNotificacaoFinalizacao
         Unidade semEquipe = criarUnidade(1L, TipoUnidade.SEM_EQUIPE);
@@ -298,7 +292,7 @@ class ProcessoNotificacaoServiceTest {
     @Test
     @DisplayName("Deve capturar exceção no processamento assíncrono geral")
     void deveCapturarExcecaoAsyncGeral() {
-        when(processoRepo.findById(anyLong())).thenThrow(new RuntimeException("Crash"));
+        when(processoRepo.findByIdComParticipantes(anyLong())).thenThrow(new RuntimeException("Crash"));
 
         assertThatCode(() -> service.notificarInicioProcesso(1L, List.of()))
                 .doesNotThrowAnyException();
@@ -311,7 +305,7 @@ class ProcessoNotificacaoServiceTest {
     void deveLogarWarningSeParticipantesVazio() {
         Processo p = criarProcesso(1L);
         p.setParticipantes(new ArrayList<>());
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
+        when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(p));
 
         service.notificarFinalizacaoProcesso(1L);
 
@@ -323,7 +317,7 @@ class ProcessoNotificacaoServiceTest {
     void deveCapturarExcecaoNoCatchInterno() {
         when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(1L);
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
 
         Unidade u = criarUnidade(10L, TipoUnidade.OPERACIONAL);
         Subprocesso s = new Subprocesso();
@@ -348,7 +342,7 @@ class ProcessoNotificacaoServiceTest {
     @DisplayName("Deve ignorar participante sem responsável ou titular ao finalizar")
     void deveIgnorarParticipanteSemResponsavelOuTitularAoFinalizar() {
         Processo processo = criarProcesso(3L);
-        when(processoRepo.findById(3L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(3L)).thenReturn(Optional.of(processo));
 
         Unidade u1 = criarUnidade(1L, TipoUnidade.OPERACIONAL);
         Unidade u2 = criarUnidade(2L, TipoUnidade.OPERACIONAL);
@@ -385,7 +379,7 @@ class ProcessoNotificacaoServiceTest {
     void deveIgnorarEmailSeTitularInvalidoAoIniciar() {
         when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(1L);
-        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
 
         // Unidade 1: Titular null no mapa
         Unidade u1 = criarUnidade(1L, TipoUnidade.OPERACIONAL);
@@ -429,7 +423,7 @@ class ProcessoNotificacaoServiceTest {
     void deveCobrirTipoInteroperacionalNaFinalizacao() {
         when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(5L);
-        when(processoRepo.findById(5L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(5L)).thenReturn(Optional.of(processo));
 
         Unidade interoperacional = criarUnidade(1L, TipoUnidade.INTEROPERACIONAL);
         interoperacional.setSigla("INTER");
@@ -455,7 +449,7 @@ class ProcessoNotificacaoServiceTest {
         when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
         when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(6L);
-        when(processoRepo.findById(6L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(6L)).thenReturn(Optional.of(processo));
 
         Unidade intermediaria = criarUnidade(1L, TipoUnidade.INTERMEDIARIA);
         intermediaria.setSigla("INT");
@@ -492,7 +486,7 @@ class ProcessoNotificacaoServiceTest {
     void deveCobrirSubstitutoComEmailNull() {
         when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(7L);
-        when(processoRepo.findById(7L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(7L)).thenReturn(Optional.of(processo));
 
         Unidade u = criarUnidade(1L, TipoUnidade.OPERACIONAL);
         u.setSigla("U1");
@@ -525,7 +519,7 @@ class ProcessoNotificacaoServiceTest {
     @DisplayName("Deve cobrir responsáveis sem titulares na finalização")
     void deveCobrirResponsaveisSemTitularesNaFinalizacao() {
         Processo processo = criarProcesso(8L);
-        when(processoRepo.findById(8L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(8L)).thenReturn(Optional.of(processo));
 
         Unidade u1 = criarUnidade(1L, TipoUnidade.OPERACIONAL);
         Unidade u2 = criarUnidade(2L, TipoUnidade.OPERACIONAL);
@@ -551,7 +545,7 @@ class ProcessoNotificacaoServiceTest {
     void deveCobrirCatchExcecaoDuranteEnvioEmail() {
         when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(9L);
-        when(processoRepo.findById(9L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(9L)).thenReturn(Optional.of(processo));
 
         Unidade u = criarUnidade(1L, TipoUnidade.OPERACIONAL);
         u.setSigla("OP");
@@ -583,7 +577,7 @@ class ProcessoNotificacaoServiceTest {
     @DisplayName("Deve cobrir intermediária sem subordinadas diretas filtradas")
     void deveCobrirIntermediariaSemSubordinadasFiltradas() {
         Processo processo = criarProcesso(10L);
-        when(processoRepo.findById(10L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(10L)).thenReturn(Optional.of(processo));
 
         Unidade intermediaria = criarUnidade(1L, TipoUnidade.INTERMEDIARIA);
         intermediaria.setSigla("INT");
@@ -659,7 +653,7 @@ class ProcessoNotificacaoServiceTest {
                     .email("email@test.com")
                     .build();
 
-            when(processoRepo.findById(codProcesso)).thenReturn(Optional.of(processo));
+            when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(processo));
             when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(11L, resp));
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("TITULAR", usuarioTitular));
@@ -692,7 +686,7 @@ class ProcessoNotificacaoServiceTest {
                     .substitutoTitulo("SUB") 
                     .build();
             
-            when(processoRepo.findById(codProcesso)).thenReturn(Optional.of(processo));
+            when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(processo));
             when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(11L, resp));
             
@@ -725,7 +719,7 @@ class ProcessoNotificacaoServiceTest {
             subprocesso.setUnidade(unidade);
             subprocesso.setCodigo(201L);
 
-            when(processoRepo.findById(codProcesso)).thenReturn(Optional.of(processo));
+            when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(processo));
             when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
 
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
@@ -763,7 +757,7 @@ class ProcessoNotificacaoServiceTest {
                     .unidadeCodigo(1L).titularTitulo("T1").build();
             Usuario t1 = Usuario.builder().tituloEleitoral("T1").email("t1@test.com").build();
 
-            when(processoRepo.findById(codProcesso)).thenReturn(Optional.of(processo));
+            when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(processo));
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, rInter));
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1));
             when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(uInter, uSubordinadaInvalida));
@@ -778,7 +772,7 @@ class ProcessoNotificacaoServiceTest {
         void aoFinalizarProcesso_ErroNoLoop() {
             Long codProcesso = 33L;
 
-            when(processoRepo.findById(codProcesso)).thenThrow(new RuntimeException("Erro inesperado"));
+            when(processoRepo.findByIdComParticipantes(codProcesso)).thenThrow(new RuntimeException("Erro inesperado"));
 
             Assertions.assertThatCode(() -> service.notificarFinalizacaoProcesso(codProcesso)).doesNotThrowAnyException();
         }
@@ -798,7 +792,7 @@ class ProcessoNotificacaoServiceTest {
     void deveNotificarSubstitutoNaFinalizacao() {
         when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(11L);
-        when(processoRepo.findById(11L)).thenReturn(Optional.of(processo));
+        when(processoRepo.findByIdComParticipantes(11L)).thenReturn(Optional.of(processo));
 
         Unidade u = criarUnidade(1L, TipoUnidade.OPERACIONAL);
         u.setSigla("OP");

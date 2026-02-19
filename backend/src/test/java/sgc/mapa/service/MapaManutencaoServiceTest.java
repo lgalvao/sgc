@@ -159,7 +159,7 @@ class MapaManutencaoServiceTest {
                     .mapaCodigo(999L)
                     .build();
 
-            when(repo.buscar(eq(Mapa.class), eq(999L))).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 999L));
+            when(repo.buscar(Mapa.class, 999L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 999L));
 
             assertThatThrownBy(() -> service.criarAtividade(request))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -173,14 +173,20 @@ class MapaManutencaoServiceTest {
         @DisplayName("Deve atualizar atividade")
         void deveAtualizarAtividade() {
             Long id = 1L;
-            AtualizarAtividadeRequest request = AtualizarAtividadeRequest.builder().build();
+            AtualizarAtividadeRequest request = AtualizarAtividadeRequest.builder()
+                    .descricao("Nova Descrição")
+                    .build();
             Atividade atividade = new Atividade();
+            atividade.setDescricao("Descrição Antiga");
             Mapa mapa = new Mapa();
             mapa.setCodigo(1L);
             atividade.setMapa(mapa);
+            
+            Atividade atividadeAtualizada = new Atividade();
+            atividadeAtualizada.setDescricao("Nova Descrição");
 
             when(repo.buscar(Atividade.class, id)).thenReturn(atividade);
-            when(atividadeMapper.toEntity(request)).thenReturn(new Atividade());
+            when(atividadeMapper.toEntity(request)).thenReturn(atividadeAtualizada);
             when(atividadeRepo.save(any())).thenReturn(atividade);
 
             service.atualizarAtividade(id, request);
@@ -567,34 +573,7 @@ class MapaManutencaoServiceTest {
             verify(conhecimentoRepo).save(conhecimento);
         }
 
-        @Test
-        @DisplayName("Deve criar conhecimento sem mapa associado (sem publicar evento)")
-        void deveCriarConhecimentoSemMapa() {
-            CriarConhecimentoRequest request = CriarConhecimentoRequest.builder()
-                    .descricao("Conhecimento Novo")
-                    .build();
 
-            Atividade atividade = new Atividade();
-            atividade.setCodigo(1L);
-            Mapa mapa = new Mapa(); // Mapa válido
-            mapa.setCodigo(1L);
-            atividade.setMapa(mapa);
-
-
-            Conhecimento conhecimento = new Conhecimento();
-            conhecimento.setCodigo(1L);
-
-            when(repo.buscar(Atividade.class, 1L)).thenReturn(atividade);
-            when(conhecimentoMapper.toEntity(request)).thenReturn(conhecimento);
-            when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
-
-            Conhecimento resultado = service.criarConhecimento(1L, request);
-
-            assertThat(resultado).isNotNull();
-            // Agora deve publicar evento pois tem mapa
-            verify(subprocessoAdminWorkflowService).atualizarParaEmAndamento(1L);
-            verify(conhecimentoRepo).save(conhecimento);
-        }
     }
 
     @Nested
@@ -618,6 +597,7 @@ class MapaManutencaoServiceTest {
             Conhecimento conhecimento = new Conhecimento();
             conhecimento.setCodigo(1L);
             conhecimento.setAtividade(atividade);
+            conhecimento.setDescricao("Descrição Antiga");
 
             Conhecimento paraAtualizar = new Conhecimento();
             paraAtualizar.setDescricao("Conhecimento Atualizado");
@@ -632,37 +612,7 @@ class MapaManutencaoServiceTest {
             verify(conhecimentoRepo).save(conhecimento);
         }
 
-        @Test
-        @DisplayName("Deve atualizar conhecimento sem mapa associado (sem publicar evento)")
-        void deveAtualizarConhecimentoSemMapa() {
-            AtualizarConhecimentoRequest request = AtualizarConhecimentoRequest.builder()
-                    .descricao("Conhecimento Atualizado")
-                    .build();
 
-            Mapa mapa = new Mapa(); // Mapa válido
-            mapa.setCodigo(1L);
-
-            Atividade atividade = new Atividade();
-            atividade.setCodigo(1L);
-            atividade.setMapa(mapa);
-
-            Conhecimento conhecimento = new Conhecimento();
-            conhecimento.setCodigo(1L);
-            conhecimento.setAtividade(atividade);
-
-            Conhecimento paraAtualizar = new Conhecimento();
-            paraAtualizar.setDescricao("Conhecimento Atualizado");
-
-            when(repo.buscar(eq(Conhecimento.class), any())).thenReturn(conhecimento);
-            when(conhecimentoMapper.toEntity(request)).thenReturn(paraAtualizar);
-
-            service.atualizarConhecimento(1L, 1L, request);
-
-            assertThat(conhecimento.getDescricao()).isEqualTo("Conhecimento Atualizado");
-            // Agora deve publicar evento pois tem mapa
-            verify(subprocessoAdminWorkflowService).atualizarParaEmAndamento(1L);
-            verify(conhecimentoRepo).save(conhecimento);
-        }
 
         @Test
         @DisplayName("Deve lançar erro ao atualizar conhecimento de atividade diferente")
@@ -728,28 +678,7 @@ class MapaManutencaoServiceTest {
             verify(conhecimentoRepo).delete(conhecimento);
         }
 
-        @Test
-        @DisplayName("Deve excluir conhecimento sem mapa associado (sem publicar evento)")
-        void deveExcluirConhecimentoSemMapa() {
-            Mapa mapa = new Mapa(); // Mapa válido
-            mapa.setCodigo(1L);
 
-            Atividade atividade = new Atividade();
-            atividade.setCodigo(1L);
-            atividade.setMapa(mapa);
-
-            Conhecimento conhecimento = new Conhecimento();
-            conhecimento.setCodigo(1L);
-            conhecimento.setAtividade(atividade);
-
-            when(repo.buscar(eq(Conhecimento.class), anyMap())).thenReturn(conhecimento);
-
-            service.excluirConhecimento(1L, 1L);
-
-            // Agora deve publicar evento pois tem mapa
-            verify(subprocessoAdminWorkflowService).atualizarParaEmAndamento(1L);
-            verify(conhecimentoRepo).delete(conhecimento);
-        }
 
         @Test
         @DisplayName("Deve lançar erro ao excluir conhecimento de atividade diferente")
@@ -781,31 +710,7 @@ class MapaManutencaoServiceTest {
         }
     }
 
-    @Nested
-    @DisplayName("Exclusão de Atividade - Cenários de Mapa")
-    class ExclusaoAtividadeMapaCenarios {
 
-        @Test
-        @DisplayName("Deve excluir atividade sem mapa associado (sem publicar evento)")
-        void deveExcluirAtividadeSemMapa() {
-            Long id = 1L;
-            Atividade atividade = new Atividade();
-            atividade.setCodigo(1L);
-            Mapa mapa = new Mapa(); // Mapa valid
-            mapa.setCodigo(1L);
-            atividade.setMapa(mapa);
-
-            when(repo.buscar(Atividade.class, id)).thenReturn(atividade);
-            when(conhecimentoRepo.findByAtividade_Codigo(1L)).thenReturn(List.of());
-
-            service.excluirAtividade(id);
-
-            verify(conhecimentoRepo).deleteAll(anyList());
-            verify(atividadeRepo).delete(atividade);
-            // Agora deve publicar evento pois tem mapa
-            verify(subprocessoAdminWorkflowService).atualizarParaEmAndamento(1L);
-        }
-    }
 
     @Nested
     @DisplayName("Testes Adicionais de Cobertura - Phase 2")

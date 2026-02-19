@@ -52,11 +52,11 @@ A documentação técnica foi desacoplada deste README para facilitar a manuten�
 
 ```text
 sgc/
-├── backend/            # Código-fonte da API REST (Spring Boot)
-├── frontend/           # Código-fonte da aplicação Web (Vue.js)
+├── backend/            # Código da API REST (Spring Boot 4)
+├── frontend/           # Código do frontend Web (Vue.js 3.5)
 ├── e2e/                # Testes End-to-End (Playwright)
 ├── etc/                # Configurações, requisitos e scripts globais
-│   ├── reqs/           # Documentação de requisitos (Casos de Uso)
+│   ├── reqs/           # Especificações de requisitos (Casos de Uso)
 │   └── scripts/        # Scripts utilitários
 └── build.gradle.kts    # Configuração de build raiz
 ```
@@ -120,6 +120,19 @@ Os relatórios são gerados em:
 
 * Backend: `backend/build/reports/`
 * Frontend: `frontend/coverage/`
+
+### Git Hooks (Automação Local)
+
+O projeto utiliza Git Hooks para garantir a qualidade do código antes de operações críticas.
+
+* **Pre-push:** Bloqueia o `git push` caso os testes do backend não passem 100%.
+  * **Arquivo:** `.git/hooks/pre-push`
+  * **Como ignorar (apenas em emergências):** `git push --no-verify`
+  * **Como instalar:** Se você clonar o repositório em uma nova máquina, copie o script de hook:
+    ```bash
+    # Exemplo de criação manual caso não exista
+    cp etc/scripts/git-hooks/pre-push .git/hooks/pre-push
+    ```
 
 ### Guia de Testes JUnit
 

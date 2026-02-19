@@ -68,6 +68,7 @@ específicas** do projeto que diferem dos padrões genéricos.
 * **Backend:** `./gradlew :backend:test` (JUnit 5 + Mockito + H2).
 * **Frontend:** `npm run typecheck`, `npm run lint`, `npm run test:unit` (Vitest).
 * **E2E:** Playwright (consulte `/e2e/README.md`).
+* **Git Hooks:** Existe um hook de `pre-push` local que impede o envio de código se os testes do backend falharem. Agentes de IA devem garantir que os testes passem antes de sugerir ou realizar um push.
 
 ## 5. Padrões Arquiteturais (ADRs)
 
