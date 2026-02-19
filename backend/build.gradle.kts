@@ -72,6 +72,7 @@ dependencies {
     testImplementation("io.rest-assured:rest-assured-all:6.0.0")
     testImplementation("org.apache.groovy:groovy-all:5.0.4")
     testImplementation("com.icegreen:greenmail-junit5:2.1.3")
+    testImplementation("au.com.dius.pact.provider:junit5spring:4.6.17")
     
     // Testes de Mutação
     testImplementation("org.pitest:pitest-junit5-plugin:1.2.3")
