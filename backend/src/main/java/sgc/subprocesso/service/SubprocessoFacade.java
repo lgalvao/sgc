@@ -373,9 +373,6 @@ public class SubprocessoFacade {
      * <p>
      * Este método é usado pelo {@link sgc.processo.service.ProcessoInicializador}
      * durante a inicialização de processos de mapeamento.
-     * 
-     * @param processo o {@link sgc.processo.model.Processo} de mapeamento
-     * @param unidades as {@link sgc.organizacao.model.Unidade}s para as quais criar subprocessos
      */
     @Transactional
     public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
@@ -387,10 +384,6 @@ public class SubprocessoFacade {
      * <p>
      * Este método é usado pelo {@link sgc.processo.service.ProcessoInicializador}
      * durante a inicialização de processos de revisão.
-     * 
-     * @param processo o {@link sgc.processo.model.Processo} de revisão
-     * @param unidade a {@link sgc.organizacao.model.Unidade} para a qual criar o subprocesso
-     * @param unidadeMapa o {@link sgc.organizacao.model.UnidadeMapa} vigente da unidade
      */
     @Transactional
     public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
@@ -402,10 +395,6 @@ public class SubprocessoFacade {
      * <p>
      * Este método é usado pelo {@link sgc.processo.service.ProcessoInicializador}
      * durante a inicialização de processos de diagnóstico.
-     * 
-     * @param processo o {@link sgc.processo.model.Processo} de diagnóstico
-     * @param unidade a {@link sgc.organizacao.model.Unidade} para a qual criar o subprocesso
-     * @param unidadeMapa o {@link sgc.organizacao.model.UnidadeMapa} vigente da unidade
      */
     @Transactional
     public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {

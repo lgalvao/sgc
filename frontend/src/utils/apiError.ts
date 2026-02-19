@@ -1,8 +1,5 @@
 import {useFeedbackStore} from '@/stores/feedback';
 
-/**
- * Payload de erro retornado pela API (backend)
- */
 export interface ApiErrorPayload {
   timestamp?: string;
   status?: number;
@@ -19,9 +16,6 @@ export interface ApiErrorPayload {
   }>;
 }
 
-/**
- * Categorias de erro para decisão de UX
- */
 export type ErrorKind =
   | 'validation'      // 400, 422 - erro de validação de dados
   | 'notFound'        // 404 - recurso não encontrado
@@ -31,9 +25,6 @@ export type ErrorKind =
   | 'network'         // Erro de rede
   | 'unexpected';     // 500 ou erro desconhecido
 
-/**
- * Erro normalizado para consumo pelo frontend
- */
 export interface NormalizedError {
   kind: ErrorKind;
   message: string;
@@ -46,9 +37,6 @@ export interface NormalizedError {
   originalError?: unknown;
 }
 
-/**
- * Normaliza um erro (axios, Error, ou unknown) em uma estrutura previsível
- */
 export function normalizeError(err: unknown): NormalizedError {
   // Erro de rede (sem response)
   if (isAxiosError(err) && !err.response) {
@@ -99,9 +87,6 @@ export function normalizeError(err: unknown): NormalizedError {
   };
 }
 
-/**
- * Mapeia status HTTP para categoria de erro
- */
 function mapStatusToKind(status: number): ErrorKind {
   if (status === 400 || status === 422) return 'validation';
   if (status === 401) return 'unauthorized';
@@ -112,9 +97,6 @@ function mapStatusToKind(status: number): ErrorKind {
   return 'unexpected';
 }
 
-/**
- * Type guard para AxiosError
- */
 export function isAxiosError(error: unknown): error is import('axios').AxiosError {
   return (
     error !== null &&

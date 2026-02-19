@@ -1,11 +1,6 @@
 
 import { SituacaoProcesso, TipoProcesso, SituacaoSubprocesso } from '@/types/tipos';
 
-/**
- * Formata uma string de data ISO ou objeto Date para o formato brasileiro.
- * @param date String ISO ou Date
- * @param includeTime Se deve incluir a hora (padrão: true)
- */
 export function formatDate(date: string | Date | undefined | null, includeTime = true): string {
   if (!date) return '';
   const d = new Date(date);
@@ -25,9 +20,6 @@ export function formatDate(date: string | Date | undefined | null, includeTime =
   return new Intl.DateTimeFormat('pt-BR', options).format(d);
 }
 
-/**
- * Retorna o label amigável para a situação do processo.
- */
 export function formatSituacaoProcesso(situacao: SituacaoProcesso | string | undefined | null): string {
   if (!situacao) return '';
   const labels: Record<string, string> = {
@@ -38,9 +30,6 @@ export function formatSituacaoProcesso(situacao: SituacaoProcesso | string | und
   return labels[situacao] || situacao;
 }
 
-/**
- * Retorna o label amigável para o tipo de processo.
- */
 export function formatTipoProcesso(tipo: TipoProcesso | string | undefined | null): string {
   if (!tipo) return '';
   const labels: Record<string, string> = {
@@ -51,9 +40,6 @@ export function formatTipoProcesso(tipo: TipoProcesso | string | undefined | nul
   return labels[tipo] || tipo;
 }
 
-/**
- * Retorna o label amigável para a situação do subprocesso.
- */
 export function formatSituacaoSubprocesso(situacao: SituacaoSubprocesso | string | undefined | null): string {
   if (!situacao) return '';
   const labels: Record<string, string> = {

@@ -77,7 +77,7 @@ public enum TipoTransicao {
             "revisao-cadastro-reaberta"
     ),
 
-    MAPA_DISPONIBILIZADO( // The instruction had 'email/pa-disponibilizado' but original was 'email/mapa-disponibilizado'. Following original.
+    MAPA_DISPONIBILIZADO(
             "Disponibilização do mapa de competências para validação",
             "Mapa de competências da unidade %s disponibilizado para validação",
             "mapa-disponibilizado"
@@ -125,24 +125,15 @@ public enum TipoTransicao {
 
     /**
      * Formata a descrição do alerta substituindo %s pela sigla da unidade.
-     *
-     * @param siglaUnidade Sigla da unidade para substituir no template
-     * @return Descrição formatada ou null se não gera alerta
      */
     public String formatarAlerta(String siglaUnidade) {
         return templateAlerta != null ? templateAlerta.formatted(siglaUnidade) : "";
     }
 
-    /**
-     * Indica se esta transição gera um alerta interno.
-     */
     public boolean geraAlerta() {
         return templateAlerta != null;
     }
 
-    /**
-     * Indica se esta transição envia e-mail de notificação.
-     */
     public boolean enviaEmail() {
         return templateEmail != null;
     }

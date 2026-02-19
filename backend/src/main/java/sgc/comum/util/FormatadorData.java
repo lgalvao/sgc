@@ -13,16 +13,10 @@ public class FormatadorData {
     private FormatadorData() {
     }
 
-    /**
-     * Formata uma data no padrão brasileiro (dd/MM/yyyy).
-     */
     public static String formatarData(LocalDateTime data) {
         return data == null ? "-" : data.format(FORMATO_BR);
     }
 
-    /**
-     * Formata uma data com hora no padrão brasileiro (dd/MM/yyyy HH:mm).
-     */
     public static String formatarDataHora(LocalDateTime data) {
         return data == null ? "-" : data.format(FORMATO_BR_COM_HORA);
     }
