@@ -1,6 +1,8 @@
 package sgc.mapa.dto;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Builder;
+import sgc.mapa.model.MapaViews;
 import sgc.mapa.model.TipoImpactoCompetencia;
 
 import java.util.List;
@@ -15,11 +17,15 @@ import java.util.List;
  */
 @Builder
 public record CompetenciaImpactadaDto(
+        @JsonView(MapaViews.Publica.class)
         Long codigo,
 
-                String descricao,
+        @JsonView(MapaViews.Publica.class)
+        String descricao,
 
-                List<String> atividadesAfetadas,
+        @JsonView(MapaViews.Publica.class)
+        List<String> atividadesAfetadas,
 
-                List<TipoImpactoCompetencia> tiposImpacto) {
+        @JsonView(MapaViews.Publica.class)
+        List<TipoImpactoCompetencia> tiposImpacto) {
 }

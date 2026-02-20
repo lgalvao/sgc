@@ -109,10 +109,10 @@ public class ImpactoMapaService {
 
         return ImpactoMapaResponse.builder()
                 .temImpactos(!inseridas.isEmpty() || !removidas.isEmpty() || !alteradas.isEmpty())
-                .inseridas(atividadesAtuais.stream().filter(a -> inseridas.stream().anyMatch(i -> i.codigo().equals(a.getCodigo()))).toList())
-                .removidas(atividadesVigentes.stream().filter(a -> removidas.stream().anyMatch(r -> r.codigo().equals(a.getCodigo()))).toList())
-                .alteradas(atividadesAtuais.stream().filter(a -> alteradas.stream().anyMatch(alt -> alt.codigo().equals(a.getCodigo()))).toList())
-                .competenciasImpactadas(competenciasMapa.stream().filter(c -> competenciasImpactadas.stream().anyMatch(ci -> ci.codigo().equals(c.getCodigo()))).toList())
+                .inseridas(inseridas)
+                .removidas(removidas)
+                .alteradas(alteradas)
+                .competenciasImpactadas(competenciasImpactadas)
                 .build();
     }
 

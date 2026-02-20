@@ -27,19 +27,15 @@ export interface AtividadeImpactadaDto {
 export interface CompetenciaImpactadaDto {
     codigo: number;
     descricao: string;
-    atividadesAfetadas?: number[];
-    tipoImpacto: string[];
+    atividadesAfetadas?: string[];
+    tiposImpacto: string[];
 }
 
 export interface ImpactoMapaDto {
     temImpactos: boolean;
-    totalAtividadesInseridas: number;
-    totalAtividadesRemovidas: number;
-    totalAtividadesAlteradas: number;
-    totalCompetenciasImpactadas: number;
-    atividadesInseridas?: AtividadeImpactadaDto[];
-    atividadesRemovidas?: AtividadeImpactadaDto[];
-    atividadesAlteradas?: AtividadeImpactadaDto[];
+    inseridas?: AtividadeImpactadaDto[];
+    removidas?: AtividadeImpactadaDto[];
+    alteradas?: AtividadeImpactadaDto[];
     competenciasImpactadas?: CompetenciaImpactadaDto[];
 }
 
