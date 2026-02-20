@@ -5,6 +5,25 @@ import mainRoutes from '../main.routes';
 import processoRoutes from '../processo.routes';
 import unidadeRoutes from '../unidade.routes';
 
+// Mock views to avoid loading real components
+vi.mock('@/views/processo/ProcessoCadastroView.vue', () => ({ default: { name: 'ProcessoCadastroView' } }));
+vi.mock('@/views/processo/ProcessoDetalheView.vue', () => ({ default: { name: 'ProcessoDetalheView' } }));
+vi.mock('@/views/processo/SubprocessoDetalheView.vue', () => ({ default: { name: 'SubprocessoDetalheView' } }));
+vi.mock('@/views/processo/MapaCadastroView.vue', () => ({ default: { name: 'MapaCadastroView' } }));
+vi.mock('@/views/processo/MapaVisualizacaoView.vue', () => ({ default: { name: 'MapaVisualizacaoView' } }));
+vi.mock('@/views/processo/AtividadesCadastroView.vue', () => ({ default: { name: 'AtividadesCadastroView' } }));
+vi.mock('@/views/processo/AtividadesVisualizacaoView.vue', () => ({ default: { name: 'AtividadesVisualizacaoView' } }));
+vi.mock('@/views/LoginView.vue', () => ({ default: { name: 'LoginView' } }));
+vi.mock('@/views/PainelView.vue', () => ({ default: { name: 'PainelView' } }));
+vi.mock('@/views/HistoricoView.vue', () => ({ default: { name: 'HistoricoView' } }));
+vi.mock('@/views/RelatoriosView.vue', () => ({ default: { name: 'RelatoriosView' } }));
+vi.mock('@/views/ConfiguracoesView.vue', () => ({ default: { name: 'ConfiguracoesView' } }));
+// Mock Unidade views just in case they are transitively imported
+vi.mock("@/views/unidade/UnidadesView.vue", () => ({ default: { name: 'UnidadesView' } }));
+vi.mock("@/views/unidade/UnidadeDetalheView.vue", () => ({ default: { name: 'UnidadeDetalheView' } }));
+vi.mock("@/views/unidade/AtribuicaoTemporariaView.vue", () => ({ default: { name: 'AtribuicaoTemporariaView' } }));
+
+
 vi.mock('@/stores/perfil', () => ({
   usePerfilStore: vi.fn(),
 }));
@@ -27,13 +46,18 @@ describe('Router Guards', () => {
     // Setup Store Mock
     perfilStoreMock = {
       usuarioCodigo: null,
+      perfisUnidades: [],
     };
     (usePerfilStore as any).mockReturnValue(perfilStoreMock);
 
-    // Create fresh router
+    // Create fresh router with mock routes first to avoid loading real components
     router = createRouter({
         history: createMemoryHistory(),
-        routes: routes,
+        routes: [
+            { path: '/login', component: { template: '<div>Login</div>' } }, // Mock login component
+            { path: '/painel', component: { template: '<div>Painel</div>' } }, // Mock painel component
+            ...routes,
+        ],
     });
 
     // Copying logic from router/index.ts for testing

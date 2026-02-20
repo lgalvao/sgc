@@ -99,7 +99,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             );
             subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(dto);
         }, (err) => {
-            console.error(`Erro ao buscar detalhes do subprocesso ${codigo}:`, err);
+            logger.error(`Erro ao buscar detalhes do subprocesso ${codigo}:`, err);
             subprocessoDetalhe.value = null;
         });
     }
@@ -114,7 +114,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
                 return dto.codigo;
             });
         } catch (err) {
-            console.error(`Erro ao buscar ID do subprocesso:`, err);
+            logger.error(`Erro ao buscar ID do subprocesso:`, err);
             return null;
         }
     }

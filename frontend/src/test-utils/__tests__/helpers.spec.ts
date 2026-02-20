@@ -1,5 +1,5 @@
 import {mount} from "@vue/test-utils";
-import {describe, expect, it} from "vitest";
+import {describe, expect, it, vi} from "vitest";
 import {createMemoryHistory, createRouter} from "vue-router";
 import {getMockAtividadesData, initPinia, prepareFreshAtividadesStore,} from "../helpers";
 import {
@@ -11,6 +11,11 @@ import {
     selecionarProcessoEUnidade,
     selectFirstCheckbox,
 } from "../uiHelpers";
+
+// Mock services to avoid side effects/heavy init when loading the store
+vi.mock("@/services/atividadeService", () => ({}));
+vi.mock("@/services/subprocessoService", () => ({}));
+vi.mock("@/stores/subprocessos", () => ({ useSubprocessosStore: vi.fn() }));
 
 describe("test-utils/helpers", () => {
     it("getMockAtividadesData deve retornar um array não vazio", () => {
@@ -27,7 +32,9 @@ describe("test-utils/helpers", () => {
     it("prepareFreshAtividadesStore deve retornar uma store com dados", async () => {
         const store = await prepareFreshAtividadesStore();
         expect(store).toBeDefined();
-        expect(store.atividades.length).toBeGreaterThan(0);
+        // Since we populate with ID 1
+        expect(store.atividadesPorSubprocesso.get(1)).toBeDefined();
+        expect(store.atividadesPorSubprocesso.get(1).length).toBeGreaterThan(0);
     });
 });
 

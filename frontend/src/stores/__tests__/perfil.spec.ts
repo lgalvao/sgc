@@ -204,12 +204,12 @@ describe("usePerfilStore", () => {
 
         it("loginCompleto deve retornar false para erros 401 ou 404", async () => {
             const mockUsuarioService = vi.mocked(usuarioService);
-            mockUsuarioService.autenticar.mockRejectedValue({ response: { status: 401 } });
+            mockUsuarioService.autenticar.mockRejectedValue({ isAxiosError: true, response: { status: 401 } });
 
             const result = await context.store.loginCompleto("123", "pass");
             expect(result).toBe(false);
 
-            mockUsuarioService.autenticar.mockRejectedValue({ response: { status: 404 } });
+            mockUsuarioService.autenticar.mockRejectedValue({ isAxiosError: true, response: { status: 404 } });
             const result2 = await context.store.loginCompleto("123", "pass");
             expect(result2).toBe(false);
 

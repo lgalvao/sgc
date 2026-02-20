@@ -44,17 +44,14 @@ export async function prepareFreshAtividadesStore() {
         };
     const store = useAtividadesStoreActual();
     const initialAtividades = getMockAtividadesData();
-    store.atividades = initialAtividades.map((a: Atividade) => ({
+    
+    // Populate the Map with a dummy subprocess ID (e.g., 1)
+    const mockAtividades = initialAtividades.map((a: Atividade) => ({
         ...a,
         conhecimentos: a.conhecimentos.map((c: any) => ({...c})),
     }));
-    store.nextId =
-        Math.max(
-            ...initialAtividades.flatMap((a: Atividade) => [
-                a.codigo,
-                ...a.conhecimentos.map((c: any) => c.codigo),
-            ]),
-        ) + 1;
+    store.atividadesPorSubprocesso.set(1, mockAtividades);
+    
     return store;
 }
 

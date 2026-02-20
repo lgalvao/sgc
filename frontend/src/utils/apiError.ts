@@ -1,4 +1,5 @@
 import {useFeedbackStore} from '@/stores/feedback';
+import logger from '@/utils/logger';
 
 export interface ApiErrorPayload {
   timestamp?: string;
@@ -78,7 +79,7 @@ export function normalizeError(err: unknown): NormalizedError {
   }
 
   // Fallback
-  console.error("[normalizeError] Erro não mapeado:", err);
+  logger.error("[normalizeError] Erro não mapeado:", err);
   return {
     kind: 'unexpected',
     message: 'Erro desconhecido ou não mapeado pela aplicação.',

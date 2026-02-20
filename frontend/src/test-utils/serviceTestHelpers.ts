@@ -74,12 +74,12 @@ export function testErrorHandling(
     method: 'get' | 'post' | 'put' | 'delete' = 'get'
 ) {
     it(`deve lidar com erro 404`, async () => {
-        mockApi[method].mockRejectedValue({ response: { status: 404 } });
+        mockApi[method].mockRejectedValue({ isAxiosError: true, response: { status: 404 } });
         await expect(action()).rejects.toHaveProperty("response.status", 404);
     });
 
     it(`deve lidar com erro 500`, async () => {
-        mockApi[method].mockRejectedValue({ response: { status: 500 } });
+        mockApi[method].mockRejectedValue({ isAxiosError: true, response: { status: 500 } });
         await expect(action()).rejects.toHaveProperty("response.status", 500);
     });
 

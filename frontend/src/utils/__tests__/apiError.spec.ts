@@ -9,6 +9,7 @@ import {
 } from '@/utils/apiError';
 import {useFeedbackStore} from '@/stores/feedback';
 import {createTestingPinia} from '@pinia/testing';
+import logger from '@/utils/logger';
 
 describe('apiError utils', () => {
     it('isAxiosError deve identificar erros do axios', () => {
@@ -61,6 +62,7 @@ describe('apiError utils', () => {
 
         it('deve normalizar erro desconhecido (string)', () => {
             const normalized = normalizeError('string error');
+            expect(logger.error).toHaveBeenCalledWith("[normalizeError] Erro não mapeado:", "string error");
             expect(normalized.kind).toBe('unexpected');
             expect(normalized.message).toBe('Erro desconhecido ou não mapeado pela aplicação.');
         });

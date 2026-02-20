@@ -26,6 +26,7 @@ import {
     homologarRevisaoCadastro,
 } from '@/services/cadastroService';
 import {alterarDataLimiteSubprocesso, reabrirCadastro, reabrirRevisaoCadastro,} from '@/services/processoService';
+import logger from '@/utils/logger';
 
 // Mock Dependencies
 vi.mock('@/services/subprocessoService', () => ({
@@ -191,6 +192,10 @@ describe('Subprocessos Store', () => {
 
             expect(store.subprocessoDetalhe).toBeNull();
             expect(store.lastError).toBeTruthy();
+            expect(logger.error).toHaveBeenCalledWith(
+                expect.stringContaining("Erro ao buscar detalhes"),
+                expect.objectContaining({ message: "Erro backend" })
+            );
         });
     });
 
@@ -211,6 +216,10 @@ describe('Subprocessos Store', () => {
 
             expect(result).toBeNull();
             expect(store.lastError).toBeTruthy();
+            expect(logger.error).toHaveBeenCalledWith(
+                expect.stringContaining("Erro ao buscar ID"),
+                expect.any(Error) // Here it catches the original error because it's a try/catch block, not withErrorHandling callback
+            );
         });
     });
 

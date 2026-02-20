@@ -392,9 +392,8 @@ describe("useMapasStore", () => {
 
         it("deve lançar erro em caso de falha", async () => {
             const request = { observacoes: "teste", dataLimite: "2025-12-31" };
-            const error = { response: { data: { message: "Error" } } };
+            const error = { isAxiosError: true, response: { data: { message: "Error" } } };
             vi.mocked(mapaService.disponibilizarMapa).mockRejectedValue(error);
-
             await expect(
                 context.store.disponibilizarMapa(codSubprocesso, request),
             ).rejects.toThrow();
