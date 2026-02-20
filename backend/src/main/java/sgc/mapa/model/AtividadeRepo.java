@@ -32,7 +32,7 @@ public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
     /**
      * Busca atividades por código de mapa com conhecimentos carregados.
      */
-    @EntityGraph(attributePaths = {"conhecimentos"})
+    @Query("SELECT DISTINCT a FROM Atividade a LEFT JOIN FETCH a.conhecimentos WHERE a.mapa.codigo = :mapaCodigo")
     List<Atividade> findWithConhecimentosByMapa_Codigo(@Param("mapaCodigo") Long mapaCodigo);
 
     @Query("""
