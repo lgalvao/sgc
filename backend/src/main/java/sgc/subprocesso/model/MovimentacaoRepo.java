@@ -13,13 +13,6 @@ import java.util.List;
  */
 @Repository
 public interface MovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
-    /**
-     * Recupera movimentações vinculadas a um subprocesso, ordenadas por dataHora desc (mais recente
-     * primeiro).
-     *
-     * @param subprocessoCodigo codigo do subprocesso
-     * @return lista de Movimentacao ordenada por dataHora desc
-     */
     @Query("""
             SELECT m FROM Movimentacao m
             LEFT JOIN FETCH m.unidadeOrigem

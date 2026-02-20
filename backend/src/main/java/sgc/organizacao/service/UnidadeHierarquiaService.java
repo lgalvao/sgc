@@ -102,7 +102,6 @@ public class UnidadeHierarquiaService {
     /**
      * Busca todas as siglas de unidades subordinadas a uma unidade.
      *
-     * @param sigla sigla da unidade raiz
      * @return lista de siglas de todas as subordinadas
      * @throws ErroEntidadeNaoEncontrada se a unidade não for encontrada
      */
@@ -123,7 +122,6 @@ public class UnidadeHierarquiaService {
     /**
      * Busca a sigla da unidade superior de uma unidade.
      *
-     * @param sigla sigla da unidade
      * @return Optional com a sigla da unidade superior, ou vazio se não houver
      * @throws ErroEntidadeNaoEncontrada se a unidade não for encontrada
      */

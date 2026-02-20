@@ -34,9 +34,7 @@ public class ProcessoInicializador {
     /**
      * Inicia um processo de qualquer tipo.
      *
-     * @param codigo            Código do processo
      * @param codsUnidadesParam Lista de códigos de unidades (usada apenas para REVISAO)
-     * @param usuario           Usuário que está iniciando o processo
      * @return Lista de erros (vazia se sucesso)
      */
     public List<String> iniciar(Long codigo, List<Long> codsUnidadesParam, Usuario usuario) {

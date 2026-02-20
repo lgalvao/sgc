@@ -55,7 +55,6 @@ class ProcessoValidador {
     /**
      * Valida se o processo pode ser finalizado.
      *
-     * @param processo processo a validar
      * @throws ErroProcesso se o processo não estiver em situação válida para finalização
      */
     @Transactional(readOnly = true)
@@ -69,7 +68,6 @@ class ProcessoValidador {
     /**
      * Valida se todos os subprocessos de um processo estão homologados.
      *
-     * @param processo processo a validar
      * @throws ErroProcesso se algum subprocesso não estiver homologado
      */
     public void validarTodosSubprocessosHomologados(Processo processo) {

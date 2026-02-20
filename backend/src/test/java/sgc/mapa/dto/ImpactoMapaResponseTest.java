@@ -14,9 +14,7 @@ class ImpactoMapaResponseTest {
     @Test
     @DisplayName("Deve cobrir branches de criação de ImpactoMapaResponse")
     void deveCobrirBranches() {
-        AtividadeImpactadaDto dto = AtividadeImpactadaDto.builder()
-                .descricao("Ativ")
-                .build();
+        AtividadeImpactadaDto atividade = AtividadeImpactadaDto.builder().build();
         // 1. Com impactos
         ImpactoMapaResponse d1 = ImpactoMapaResponse.builder()
                 .temImpactos(true)

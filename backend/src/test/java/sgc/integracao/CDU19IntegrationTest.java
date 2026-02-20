@@ -52,7 +52,6 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
         unidade = unidadeRepo.findById(9L)
                 .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
 
-        // Create test process and subprocess
         Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setDescricao("Processo para CDU-19");
