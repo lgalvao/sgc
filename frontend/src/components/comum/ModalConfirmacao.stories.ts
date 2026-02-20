@@ -1,4 +1,4 @@
-import type {Meta, StoryObj} from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import ModalConfirmacao from './ModalConfirmacao.vue';
 import {BButton} from 'bootstrap-vue-next';
 import {ref} from 'vue';

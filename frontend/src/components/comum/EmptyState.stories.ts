@@ -1,4 +1,4 @@
-import type {Meta, StoryObj} from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import EmptyState from './EmptyState.vue';
 import {BButton} from 'bootstrap-vue-next';
 

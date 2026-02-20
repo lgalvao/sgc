@@ -3,13 +3,17 @@ package sgc.seguranca.acesso;
 import net.jqwik.api.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.HierarquiaService;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
+import java.util.Collections;
 import java.util.EnumSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Tag("PBT")
 class SubprocessoAccessPolicyPbtTest {
@@ -18,23 +22,26 @@ class SubprocessoAccessPolicyPbtTest {
         // Mock dependencies
         UsuarioPerfilRepo repo = mock(UsuarioPerfilRepo.class);
         HierarquiaService hierarquiaService = mock(HierarquiaService.class);
+        MovimentacaoRepo movimentacaoRepo = mock(MovimentacaoRepo.class);
+        // Por padrão, sem movimentações (localização = unidade do sp)
+        when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(any())).thenReturn(Collections.emptyList());
         
-        SubprocessoAccessPolicy policy = new SubprocessoAccessPolicy(repo, hierarquiaService);
+        SubprocessoAccessPolicy policy = new SubprocessoAccessPolicy(repo, hierarquiaService, movimentacaoRepo);
         
         Usuario admin = new Usuario();
         admin.setTituloEleitoral("123");
         admin.setPerfilAtivo(Perfil.ADMIN);
+        admin.setUnidadeAtivaCodigo(1L); // Unidade do Admin
         
         Unidade unidade = new Unidade();
-        unidade.setCodigo(1L);
+        unidade.setCodigo(1L); // Unidade do Subprocesso (mesma do Admin p/ passar localização)
         unidade.setTipo(TipoUnidade.OPERACIONAL);
         
         sgc.processo.model.Processo processo = new sgc.processo.model.Processo();
         processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
 
         Subprocesso sp = Subprocesso.builder().situacao(situacao).unidade(unidade).processo(processo).build();
-        
-        // canExecute doesn't call repo.findPerfisByUsuario(admin) directly, it uses getPerfilAtivo()
+        sp.setCodigo(1L);
         
         boolean can = policy.canExecute(admin, acao, sp);
         
@@ -54,7 +61,10 @@ class SubprocessoAccessPolicyPbtTest {
     void canExecute_chefeRespeitaHierarquia(@ForAll("acoesChefe") Acao acao, @ForAll SituacaoSubprocesso situacao) {
         UsuarioPerfilRepo repo = mock(UsuarioPerfilRepo.class);
         HierarquiaService hierarquiaService = mock(HierarquiaService.class);
-        SubprocessoAccessPolicy policy = new SubprocessoAccessPolicy(repo, hierarquiaService);
+        MovimentacaoRepo movimentacaoRepo = mock(MovimentacaoRepo.class);
+        when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(any())).thenReturn(Collections.emptyList());
+
+        SubprocessoAccessPolicy policy = new SubprocessoAccessPolicy(repo, hierarquiaService, movimentacaoRepo);
 
         Usuario chefe = new Usuario();
         chefe.setTituloEleitoral("CHEFE");
@@ -74,6 +84,7 @@ class SubprocessoAccessPolicyPbtTest {
         processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
 
         Subprocesso sp = Subprocesso.builder().situacao(situacao).unidade(unidadeSp).processo(processo).build();
+        sp.setCodigo(1L);
 
         // No canExecute, p.ex. para EDITAR_CADASTRO (CHEFE, [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO], MESMA_UNIDADE)
         // verificaHierarquia(chefe, unidadeSp, MESMA_UNIDADE) deve retornar false pois 100 != 200

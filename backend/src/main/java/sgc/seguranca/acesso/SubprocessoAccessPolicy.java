@@ -3,14 +3,18 @@ package sgc.seguranca.acesso;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.organizacao.service.HierarquiaService;
 import sgc.processo.model.SituacaoProcesso;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 
 import static sgc.organizacao.model.Perfil.*;
@@ -23,11 +27,14 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
  * - Perfil do usuário (ADMIN, GESTOR, CHEFE, SERVIDOR)
  * - Situação do subprocesso
  * - Hierarquia de unidades
+ * - Localização atual do subprocesso (via Movimentação)
  * - Regras específica de cada CDU
  */
 @Component
 @Slf4j
 public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
+
+    private final MovimentacaoRepo movimentacaoRepo;
 
     /**
      * Situações permitidas para ADMIN em VERIFICAR_IMPACTOS.
@@ -105,12 +112,12 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
             Map.entry(DEVOLVER_CADASTRO, new RegrasAcao(
                     EnumSet.of(ADMIN, GESTOR),
                     EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO),
-                    RequisitoHierarquia.SUPERIOR_IMEDIATA)),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
 
             Map.entry(ACEITAR_CADASTRO, new RegrasAcao(
                     EnumSet.of(ADMIN, GESTOR),
                     EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO),
-                    RequisitoHierarquia.SUPERIOR_IMEDIATA)),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
 
             Map.entry(HOMOLOGAR_CADASTRO, new RegrasAcao(
                     EnumSet.of(ADMIN),
@@ -131,12 +138,12 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
             Map.entry(DEVOLVER_REVISAO_CADASTRO, new RegrasAcao(
                     EnumSet.of(ADMIN, GESTOR),
                     EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA),
-                    RequisitoHierarquia.SUPERIOR_IMEDIATA)),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
 
             Map.entry(ACEITAR_REVISAO_CADASTRO, new RegrasAcao(
                     EnumSet.of(ADMIN, GESTOR),
                     EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA),
-                    RequisitoHierarquia.SUPERIOR_IMEDIATA)),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
 
             Map.entry(HOMOLOGAR_REVISAO_CADASTRO, new RegrasAcao(
                     EnumSet.of(ADMIN),
@@ -187,13 +194,13 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                     EnumSet.of(ADMIN, GESTOR),
                     EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
                             REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
-                    RequisitoHierarquia.SUPERIOR_IMEDIATA)),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
 
             Map.entry(ACEITAR_MAPA, new RegrasAcao(
                     EnumSet.of(ADMIN, GESTOR),
                     EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
                             REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
-                    RequisitoHierarquia.SUPERIOR_IMEDIATA)),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
 
             Map.entry(HOMOLOGAR_MAPA, new RegrasAcao(
                     EnumSet.of(ADMIN),
@@ -217,8 +224,9 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                     EnumSet.of(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO),
                     RequisitoHierarquia.MESMA_UNIDADE)));
 
-    public SubprocessoAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo, HierarquiaService hierarquiaService) {
+    public SubprocessoAccessPolicy(UsuarioPerfilRepo usuarioPerfilRepo, HierarquiaService hierarquiaService, MovimentacaoRepo movimentacaoRepo) {
         super(usuarioPerfilRepo, hierarquiaService);
+        this.movimentacaoRepo = movimentacaoRepo;
     }
 
     @Override
@@ -258,6 +266,19 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
             return true;
         }
 
+        // AÇÕES QUE ALTERAM O SISTEMA (Escrita/Análise): Devem ser contra a LOCALIZAÇÃO ATUAL
+        if (isAcaoAnaliseOuEscrita(acao)) {
+            Unidade localizacao = obterUnidadeLocalizacao(sp);
+            if (!verificaHierarquia(usuario, localizacao, regras.requisitoHierarquia)) {
+                String motivo = obterMotivoNegacaoHierarquia(usuario, localizacao, regras.requisitoHierarquia);
+                log.info("Permissão negada por localização para {}: {}", usuario.getTituloEleitoral(), motivo);
+                definirMotivoNegacao(motivo);
+                return false;
+            }
+            return true;
+        }
+
+        // AÇÕES DE LEITURA: Contra a unidade do subprocesso (recursivamente geralmente)
         if (!verificaHierarquia(usuario, sp.getUnidade(), regras.requisitoHierarquia)) {
             String motivo = obterMotivoNegacaoHierarquia(usuario, sp.getUnidade(), regras.requisitoHierarquia);
             log.info("Permissão negada para {}: {}", usuario.getTituloEleitoral(), motivo);
@@ -266,6 +287,27 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
         }
 
         return true;
+    }
+
+    private boolean isAcaoAnaliseOuEscrita(Acao acao) {
+        return EnumSet.of(
+            EDITAR_CADASTRO, DISPONIBILIZAR_CADASTRO, DEVOLVER_CADASTRO, ACEITAR_CADASTRO, HOMOLOGAR_CADASTRO,
+            EDITAR_REVISAO_CADASTRO, DISPONIBILIZAR_REVISAO_CADASTRO, DEVOLVER_REVISAO_CADASTRO, ACEITAR_REVISAO_CADASTRO, HOMOLOGAR_REVISAO_CADASTRO,
+            EDITAR_MAPA, DISPONIBILIZAR_MAPA, APRESENTAR_SUGESTOES, VALIDAR_MAPA, DEVOLVER_MAPA, ACEITAR_MAPA, HOMOLOGAR_MAPA, AJUSTAR_MAPA,
+            REALIZAR_AUTOAVALIACAO
+        ).contains(acao);
+    }
+
+    private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
+        if (sp.getCodigo() == null) {
+            return sp.getUnidade();
+        }
+        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        if (movs.isEmpty()) {
+            return sp.getUnidade();
+        }
+        Unidade destino = movs.get(0).getUnidadeDestino();
+        return (destino != null) ? destino : sp.getUnidade();
     }
 
     /**
@@ -277,27 +319,32 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
      */
     private boolean canExecuteVerificarImpactos(Usuario usuario, Subprocesso sp) {
         SituacaoSubprocesso situacao = sp.getSituacao();
+        Unidade localizacao = obterUnidadeLocalizacao(sp);
 
-        // ADMIN: pode em revisões avançadas
+        // ADMIN: pode em revisões avançadas, mas apenas se estiver na mesma unidade (localização)
         if (temPerfil(usuario, ADMIN) && SITUACOES_VERIFICAR_IMPACTOS_ADMIN.contains(situacao)) {
-            return true;
-        }
-
-        // GESTOR: apenas quando revisão está disponibilizada e o subprocesso for de unidade imediatamente subordinada
-        if (temPerfil(usuario, GESTOR) && situacao == REVISAO_CADASTRO_DISPONIBILIZADA) {
-            if (verificaHierarquia(usuario, sp.getUnidade(), RequisitoHierarquia.SUPERIOR_IMEDIATA)) {
+            if (verificaHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_UNIDADE)) {
                 return true;
             }
-            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, sp.getUnidade(), RequisitoHierarquia.SUPERIOR_IMEDIATA));
+            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_UNIDADE));
             return false;
         }
 
-        // CHEFE: situações iniciais, mas precisa estar na mesma unidade
-        if (temPerfil(usuario, CHEFE) && SITUACOES_VERIFICAR_IMPACTOS_CHEFE.contains(situacao)) {
-            if (verificaHierarquia(usuario, sp.getUnidade(), RequisitoHierarquia.MESMA_UNIDADE)) {
+        // GESTOR: apenas quando revisão está disponibilizada e o subprocesso for de sua unidade (localização)
+        if (temPerfil(usuario, GESTOR) && situacao == REVISAO_CADASTRO_DISPONIBILIZADA) {
+            if (verificaHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_UNIDADE)) {
                 return true;
             }
-            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, sp.getUnidade(), RequisitoHierarquia.MESMA_UNIDADE));
+            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_UNIDADE));
+            return false;
+        }
+
+        // CHEFE: situações iniciais, mas precisa estar na mesma unidade (localização)
+        if (temPerfil(usuario, CHEFE) && SITUACOES_VERIFICAR_IMPACTOS_CHEFE.contains(situacao)) {
+            if (verificaHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_UNIDADE)) {
+                return true;
+            }
+            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_UNIDADE));
             return false;
         }
 

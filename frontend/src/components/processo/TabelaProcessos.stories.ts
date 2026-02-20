@@ -1,4 +1,4 @@
-import type {Meta, StoryObj} from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import TabelaProcessos from './TabelaProcessos.vue';
 import {type ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 

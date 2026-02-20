@@ -1,4 +1,4 @@
-import type {Meta, StoryObj} from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import CampoTexto from './CampoTexto.vue';
 import {ref} from 'vue';
 

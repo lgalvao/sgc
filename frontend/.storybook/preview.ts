@@ -1,4 +1,4 @@
-import {setup} from '@storybook/vue3';
+import {setup} from '@storybook/vue3-vite';
 import {createPinia} from 'pinia';
 import {createBootstrap} from 'bootstrap-vue-next';
 

@@ -1,4 +1,4 @@
-import type {Meta, StoryObj} from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import CompetenciaCard from './CompetenciaCard.vue';
 import type {Atividade, Competencia} from '@/types/tipos';
 
