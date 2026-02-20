@@ -20,6 +20,8 @@ import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
 import sgc.subprocesso.eventos.TipoTransicao;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -39,6 +41,7 @@ public class SubprocessoCadastroWorkflowService {
     private static final String SIGLA_ADMIN = "ADMIN";
 
     private final SubprocessoRepo subprocessoRepo;
+    private final MovimentacaoRepo movimentacaoRepo;
     private final SubprocessoCrudService crudService;
     private final AlertaFacade alertaService;
     private final UnidadeFacade unidadeService;
@@ -200,10 +203,10 @@ public class SubprocessoCadastroWorkflowService {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, ACEITAR_CADASTRO, sp);
 
-        Unidade unidadeOrigem = sp.getUnidade();
-        Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();
+        Unidade unidadeAtual = obterUnidadeLocalizacao(sp);
+        Unidade unidadeDestino = unidadeAtual.getUnidadeSuperior();
         if (unidadeDestino == null) {
-            unidadeDestino = unidadeOrigem;
+            unidadeDestino = unidadeAtual;
         }
 
         transicaoService.registrarAnaliseETransicao(RegistrarWorkflowCommand.builder()
@@ -212,13 +215,25 @@ public class SubprocessoCadastroWorkflowService {
                 .tipoTransicao(TipoTransicao.CADASTRO_ACEITO)
                 .tipoAnalise(TipoAnalise.CADASTRO)
                 .tipoAcaoAnalise(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                .unidadeAnalise(unidadeDestino)
-                .unidadeOrigemTransicao(unidadeOrigem)
+                .unidadeAnalise(unidadeAtual)
+                .unidadeOrigemTransicao(unidadeAtual)
                 .unidadeDestinoTransicao(unidadeDestino)
                 .usuario(usuario)
                 .motivoAnalise(observacoes)
                 .observacoes(observacoes)
                 .build());
+    }
+
+    private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
+        if (sp.getCodigo() == null) {
+            return sp.getUnidade();
+        }
+        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        if (movs.isEmpty()) {
+            return sp.getUnidade();
+        }
+        Unidade destino = movs.get(0).getUnidadeDestino();
+        return (destino != null) ? destino : sp.getUnidade();
     }
 
     @Transactional
@@ -276,14 +291,11 @@ public class SubprocessoCadastroWorkflowService {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, ACEITAR_REVISAO_CADASTRO, sp);
 
-        Unidade unidadeSubprocesso = sp.getUnidade();
-        Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
-        if (unidadeAnalise == null) {
-            unidadeAnalise = unidadeSubprocesso;
+        Unidade unidadeAtual = obterUnidadeLocalizacao(sp);
+        Unidade unidadeDestino = unidadeAtual.getUnidadeSuperior();
+        if (unidadeDestino == null) {
+            unidadeDestino = unidadeAtual;
         }
-
-        Unidade superiorAnalise = unidadeAnalise.getUnidadeSuperior();
-        Unidade unidadeDestino = (superiorAnalise != null) ? superiorAnalise : unidadeAnalise;
 
         transicaoService.registrarAnaliseETransicao(RegistrarWorkflowCommand.builder()
                 .sp(sp)
@@ -291,8 +303,8 @@ public class SubprocessoCadastroWorkflowService {
                 .tipoTransicao(TipoTransicao.REVISAO_CADASTRO_ACEITA)
                 .tipoAnalise(TipoAnalise.CADASTRO)
                 .tipoAcaoAnalise(TipoAcaoAnalise.ACEITE_REVISAO)
-                .unidadeAnalise(unidadeAnalise)
-                .unidadeOrigemTransicao(unidadeAnalise)
+                .unidadeAnalise(unidadeAtual)
+                .unidadeOrigemTransicao(unidadeAtual)
                 .unidadeDestinoTransicao(unidadeDestino)
                 .usuario(usuario)
                 .motivoAnalise(observacoes)

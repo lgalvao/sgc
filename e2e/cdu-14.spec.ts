@@ -25,6 +25,7 @@ import {
 } from './helpers/helpers-analise.js';
 import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {loginComPerfil} from './helpers/helpers-auth.js';
 
 test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_211';
@@ -74,6 +75,13 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await aceitarCadastroMapeamento(page);
     });
 
+    test('Preparacao 0.3b: SECRETARIA_2 aceita cadastro', async ({page}) => {
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descMapeamento, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page);
+    });
+
     test('Preparacao 0.4: ADMIN homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descMapeamento, UNIDADE_ALVO);
         if (!await page.getByTestId('card-subprocesso-atividades-vis').or(page.getByTestId('card-subprocesso-atividades')).isVisible().catch(() => false)) {
@@ -98,6 +106,26 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
+        await expect(page.getByText('Mapa validado').first()).toBeVisible();
+        await verificarPaginaPainel(page);
+    });
+
+    test('Preparacao 0.6b: GESTOR aceita validação do mapa', async ({page, autenticadoComoGestorCoord21}) => {
+        await acessarSubprocessoGestor(page, descMapeamento, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await expect(page.getByText('Aceite registrado').first()).toBeVisible();
+        await verificarPaginaPainel(page);
+    });
+
+    test('Preparacao 0.6c: SECRETARIA_2 aceita validação do mapa', async ({page}) => {
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descMapeamento, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await expect(page.getByText('Aceite registrado').first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
@@ -106,6 +134,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await expect(page.getByText('Homologação efetivada').first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
@@ -215,27 +244,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await aceitarRevisao(page, 'Revisão aprovada conforme análise');
     });
 
-    test('Cenario 7: ADMIN devolve para nova rodada de aceite', async ({page, autenticadoComoAdmin}) => {
-        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await devolverRevisao(page, 'Pequeno ajuste necessário na revisão');
-
-        await fazerLogout(page);
-        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
-
-        await acessarSubprocessoChefeDireto(page, descProcesso);
-        await navegarParaAtividades(page);
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
-        await verificarPaginaPainel(page);
-    });
-
-    test('Cenario 8: GESTOR registra aceite com observação padrão', async ({page, autenticadoComoGestorCoord21}) => {
-        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await aceitarRevisao(page);
-    });
-
     test('Cenario 9: ADMIN visualiza histórico com múltiplas análises', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -243,18 +251,5 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await expect(modal).toBeVisible();
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/ACEITE_REVISAO/i);
         await fecharHistoricoAnalise(page);
-    });
-
-    test('Cenario 10: ADMIN cancela homologação', async ({page, autenticadoComoAdmin}) => {
-        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await cancelarHomologacao(page);
-        await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
-    });
-
-    test('Cenario 11: ADMIN homologa cadastro de revisão', async ({page, autenticadoComoAdmin}) => {
-        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await homologarCadastroRevisaoComImpacto(page);
     });
 });

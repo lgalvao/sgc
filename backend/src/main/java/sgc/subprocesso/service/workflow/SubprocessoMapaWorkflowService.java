@@ -23,6 +23,8 @@ import sgc.processo.model.TipoProcesso;
 import sgc.seguranca.acesso.AccessControlService;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.eventos.TipoTransicao;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -62,6 +64,7 @@ public class SubprocessoMapaWorkflowService {
             TipoProcesso.REVISAO, REVISAO_MAPA_HOMOLOGADO));
 
     private final SubprocessoRepo subprocessoRepo;
+    private final MovimentacaoRepo movimentacaoRepo;
     private final SubprocessoCrudService crudService;
     private final MapaManutencaoService mapaManutencaoService;
     private final MapaFacade mapaFacade;
@@ -317,14 +320,15 @@ public class SubprocessoMapaWorkflowService {
     private void executarAceiteValidacao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, ACEITAR_MAPA, sp);
-        Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
-        Unidade proximaUnidade = unidadeSuperior != null ? unidadeSuperior.getUnidadeSuperior() : null;
+
+        Unidade unidadeAtual = obterUnidadeLocalizacao(sp);
+        Unidade proximaUnidade = unidadeAtual.getUnidadeSuperior();
 
         // Se não tem próxima unidade (é o topo ou estrutura rasa), homologar direto
         if (proximaUnidade == null) {
             // Caso especial: Fim da cadeia de validação (Homologação Implícita?)
-            Unidade sup = sp.getUnidade().getUnidadeSuperior();
-            String siglaUnidade = sup != null ? sup.getSigla() : sp.getUnidade().getSigla();
+            Unidade sup = unidadeAtual.getUnidadeSuperior();
+            String siglaUnidade = sup != null ? sup.getSigla() : unidadeAtual.getSigla();
 
             analiseFacade.criarAnalise(sp, CriarAnaliseCommand.builder()
                     .codSubprocesso(codSubprocesso)
@@ -346,13 +350,22 @@ public class SubprocessoMapaWorkflowService {
                     .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_ACEITA)
                     .tipoAnalise(TipoAnalise.VALIDACAO)
                     .tipoAcaoAnalise(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                    .unidadeAnalise(unidadeSuperior)
-                    .unidadeOrigemTransicao(unidadeSuperior)
+                    .unidadeAnalise(unidadeAtual)
+                    .unidadeOrigemTransicao(unidadeAtual)
                     .unidadeDestinoTransicao(proximaUnidade)
                     .usuario(usuario)
                     .motivoAnalise("Aceite da validação")
                     .build());
         }
+    }
+
+    private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
+        if (sp.getCodigo() == null) {
+            return sp.getUnidade();
+        }
+        return movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
+                .map(m -> m.getUnidadeDestino() != null ? m.getUnidadeDestino() : sp.getUnidade())
+                .orElse(sp.getUnidade());
     }
 
     @Transactional
