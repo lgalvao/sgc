@@ -1,0 +1,268 @@
+Calculating task graph as configuration cache cannot be reused because system property 'idea.io.use.nio2' has changed.
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :frontend:processTestResources NO-SOURCE
+> Task :frontend:compileJava NO-SOURCE
+> Task :frontend:processResources NO-SOURCE
+> Task :frontend:classes UP-TO-DATE
+> Task :frontend:compileTestJava NO-SOURCE
+> Task :frontend:testClasses UP-TO-DATE
+> Task :frontend:test NO-SOURCE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
+
+> Task :backend:test
+
+CDU14IntegrationTest > Endpoints de Consulta STANDARD_OUT
+    2026-02-20 14:53:15,162 INFO  s.i.CDU14IntegrationTest$EndpointsDeConsulta - Starting CDU14IntegrationTest.EndpointsDeConsulta using Java 25.0.1 with PID 31724 (started by 039703250884 in C:\sgc\backend)
+    2026-02-20 14:53:15,171 INFO  s.i.CDU14IntegrationTest$EndpointsDeConsulta - The following 1 profile is active: "test"
+    2026-02-20 14:53:31,159 INFO  s.i.CDU14IntegrationTest$EndpointsDeConsulta - Started CDU14IntegrationTest.EndpointsDeConsulta in 16.54 seconds (process running for 28.798)
+
+CDU14IntegrationTest > Endpoints de Consulta > Deve retornar histórico de análise corretamente STANDARD_OUT
+    2026-02-20 14:53:32,252 INFO  s.p.s.ProcessoManutencaoService - Processo 60000 criado com 1 participantes: [9] - [(60000,9)]
+    2026-02-20 14:53:32,451 INFO  s.s.s.factory.SubprocessoFactory - Subprocesso para revisão criado para unidade SEDIA
+    2026-02-20 14:53:33,014 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1000, Destinatário: sedia@tre-pe.jus.br
+    2026-02-20 14:53:33,021 INFO  s.p.s.ProcessoNotificacaoService - E-mail enviado para unidade SEDIA (sedia@tre-pe.jus.br)
+    2026-02-20 14:53:33,023 WARN  sgc.comum.util.MonitoramentoAspect - EXECUCAO LENTA: sgc.processo.service.ProcessoNotificacaoService.notificarInicioProcesso levou 570 ms
+    2026-02-20 14:53:33,023 INFO  s.p.service.ProcessoInicializador - Processo de revisao 60000 iniciado para 1 unidade(s).
+    2026-02-20 14:53:33,127 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1001, Destinatário: cosis@tre-pe.jus.br
+    2026-02-20 14:53:33,249 INFO  c.i.greenmail.user.UserManager - Created user login sedia@tre-pe.jus.br for address sedia@tre-pe.jus.br with password sedia@tre-pe.jus.br because it didn't exist before.
+    2026-02-20 14:53:33,267 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: sedia@tre-pe.jus.br
+    2026-02-20 14:53:33,268 INFO  s.n.NotificacaoEmailService - E-mail para sedia@tre-pe.jus.br enviado.
+    2026-02-20 14:53:33,268 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade COSIS (cosis@tre-pe.jus.br) - Transição: REVISAO_CADASTRO_DISPONIBILIZADA
+    2026-02-20 14:53:33,273 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1002, Destinatário: cosis@tre-pe.jus.br
+    2026-02-20 14:53:33,278 INFO  c.i.greenmail.user.UserManager - Created user login cosis@tre-pe.jus.br for address cosis@tre-pe.jus.br with password cosis@tre-pe.jus.br because it didn't exist before.
+    2026-02-20 14:53:33,285 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: cosis@tre-pe.jus.br
+    2026-02-20 14:53:33,285 INFO  s.n.NotificacaoEmailService - E-mail para cosis@tre-pe.jus.br enviado.
+    2026-02-20 14:53:33,286 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior COSIS (cosis@tre-pe.jus.br)
+    2026-02-20 14:53:33,288 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1003, Destinatário: stic@tre-pe.jus.br
+    2026-02-20 14:53:33,303 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: cosis@tre-pe.jus.br
+    2026-02-20 14:53:33,303 INFO  s.n.NotificacaoEmailService - E-mail para cosis@tre-pe.jus.br enviado.
+    2026-02-20 14:53:33,304 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior STIC (stic@tre-pe.jus.br)
+    2026-02-20 14:53:33,307 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1004, Destinatário: admin@tre-pe.jus.br
+    2026-02-20 14:53:33,315 INFO  c.i.greenmail.user.UserManager - Created user login stic@tre-pe.jus.br for address stic@tre-pe.jus.br with password stic@tre-pe.jus.br because it didn't exist before.
+    2026-02-20 14:53:33,322 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: stic@tre-pe.jus.br
+    2026-02-20 14:53:33,322 INFO  s.n.NotificacaoEmailService - E-mail para stic@tre-pe.jus.br enviado.
+    2026-02-20 14:53:33,323 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior ADMIN (admin@tre-pe.jus.br)
+    2026-02-20 14:53:33,335 INFO  c.i.greenmail.user.UserManager - Created user login admin@tre-pe.jus.br for address admin@tre-pe.jus.br with password admin@tre-pe.jus.br because it didn't exist before.
+    2026-02-20 14:53:33,341 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: admin@tre-pe.jus.br
+    2026-02-20 14:53:33,341 INFO  s.n.NotificacaoEmailService - E-mail para admin@tre-pe.jus.br enviado.
+    2026-02-20 14:53:33,389 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1005, Destinatário: sedia@tre-pe.jus.br
+    2026-02-20 14:53:33,391 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade SEDIA (sedia@tre-pe.jus.br) - Transição: REVISAO_CADASTRO_DEVOLVIDA
+    2026-02-20 14:53:33,391 INFO  s.s.s.w.SubprocessoTransicaoService - Workflow SP70000: REVISAO_CADASTRO_EM_ANDAMENTO -> REVISAO_CADASTRO_DEVOLVIDA
+    2026-02-20 14:53:33,408 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: sedia@tre-pe.jus.br
+    2026-02-20 14:53:33,409 INFO  s.n.NotificacaoEmailService - E-mail para sedia@tre-pe.jus.br enviado.
+
+CDU14IntegrationTest > Endpoints de Consulta > Deve retornar impactos no mapa corretamente STANDARD_OUT
+    2026-02-20 14:53:33,569 INFO  s.p.s.ProcessoManutencaoService - Processo 60001 criado com 1 participantes: [9] - [(60001,9)]
+    2026-02-20 14:53:33,609 INFO  s.s.s.factory.SubprocessoFactory - Subprocesso para revisão criado para unidade SEDIA
+    2026-02-20 14:53:33,647 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1006, Destinatário: sedia@tre-pe.jus.br
+    2026-02-20 14:53:33,648 INFO  s.p.s.ProcessoNotificacaoService - E-mail enviado para unidade SEDIA (sedia@tre-pe.jus.br)
+    2026-02-20 14:53:33,648 INFO  s.p.service.ProcessoInicializador - Processo de revisao 60001 iniciado para 1 unidade(s).
+    2026-02-20 14:53:33,667 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: sedia@tre-pe.jus.br
+    2026-02-20 14:53:33,667 INFO  s.n.NotificacaoEmailService - E-mail para sedia@tre-pe.jus.br enviado.
+
+CDU14IntegrationTest > Fluxo de Homologação > ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO STANDARD_OUT
+    2026-02-20 14:53:33,796 INFO  s.p.s.ProcessoManutencaoService - Processo 60002 criado com 1 participantes: [9] - [(60002,9)]
+    2026-02-20 14:53:33,828 INFO  s.s.s.factory.SubprocessoFactory - Subprocesso para revisão criado para unidade SEDIA
+    2026-02-20 14:53:33,861 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1007, Destinatário: sedia@tre-pe.jus.br
+    2026-02-20 14:53:33,862 INFO  s.p.s.ProcessoNotificacaoService - E-mail enviado para unidade SEDIA (sedia@tre-pe.jus.br)
+    2026-02-20 14:53:33,862 INFO  s.p.service.ProcessoInicializador - Processo de revisao 60002 iniciado para 1 unidade(s).
+    2026-02-20 14:53:33,883 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: sedia@tre-pe.jus.br
+    2026-02-20 14:53:33,883 INFO  s.n.NotificacaoEmailService - E-mail para sedia@tre-pe.jus.br enviado.
+    2026-02-20 14:53:33,899 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1008, Destinatário: cosis@tre-pe.jus.br
+    2026-02-20 14:53:33,900 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade COSIS (cosis@tre-pe.jus.br) - Transição: REVISAO_CADASTRO_DISPONIBILIZADA
+    2026-02-20 14:53:33,903 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1009, Destinatário: cosis@tre-pe.jus.br
+    2026-02-20 14:53:33,916 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: cosis@tre-pe.jus.br
+    2026-02-20 14:53:33,916 INFO  s.n.NotificacaoEmailService - E-mail para cosis@tre-pe.jus.br enviado.
+    2026-02-20 14:53:33,916 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior COSIS (cosis@tre-pe.jus.br)
+    2026-02-20 14:53:33,919 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1010, Destinatário: stic@tre-pe.jus.br
+    2026-02-20 14:53:33,932 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: cosis@tre-pe.jus.br
+    2026-02-20 14:53:33,933 INFO  s.n.NotificacaoEmailService - E-mail para cosis@tre-pe.jus.br enviado.
+    2026-02-20 14:53:33,934 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior STIC (stic@tre-pe.jus.br)
+    2026-02-20 14:53:33,935 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1011, Destinatário: admin@tre-pe.jus.br
+    2026-02-20 14:53:33,952 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: stic@tre-pe.jus.br
+    2026-02-20 14:53:33,952 INFO  s.n.NotificacaoEmailService - E-mail para stic@tre-pe.jus.br enviado.
+    2026-02-20 14:53:33,953 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior ADMIN (admin@tre-pe.jus.br)
+    2026-02-20 14:53:33,968 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: admin@tre-pe.jus.br
+    2026-02-20 14:53:33,968 INFO  s.n.NotificacaoEmailService - E-mail para admin@tre-pe.jus.br enviado.
+    2026-02-20 14:53:33,982 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1012, Destinatário: stic@tre-pe.jus.br
+    2026-02-20 14:53:33,983 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade STIC (stic@tre-pe.jus.br) - Transição: REVISAO_CADASTRO_ACEITA
+    2026-02-20 14:53:33,985 INFO  s.s.s.w.SubprocessoTransicaoService - Workflow SP70002: REVISAO_CADASTRO_DISPONIBILIZADA -> REVISAO_CADASTRO_ACEITA
+    2026-02-20 14:53:34,002 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: stic@tre-pe.jus.br
+    2026-02-20 14:53:34,002 INFO  s.n.NotificacaoEmailService - E-mail para stic@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,006 WARN  s.comum.erros.RestExceptionHandler - [c3c9bb68-a493-4fa0-9027-52ea808ae23c] Erro de negócio (ACESSO_NEGADO): Usuário '111111111111' não pertence à unidade 'STIC' do recurso
+
+CDU14IntegrationTest > Fluxo de Homologação > ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest$Homologacao.adminHomologaSemImpactos(CDU14IntegrationTest.java:269)
+
+CDU14IntegrationTest > Fluxo de Homologação > ADMIN homologa COM impactos, alterando status e criando movimentação STANDARD_OUT
+    2026-02-20 14:53:34,071 INFO  s.p.s.ProcessoManutencaoService - Processo 60003 criado com 1 participantes: [9] - [(60003,9)]
+    2026-02-20 14:53:34,095 INFO  s.s.s.factory.SubprocessoFactory - Subprocesso para revisão criado para unidade SEDIA
+    2026-02-20 14:53:34,130 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1013, Destinatário: sedia@tre-pe.jus.br
+    2026-02-20 14:53:34,132 INFO  s.p.s.ProcessoNotificacaoService - E-mail enviado para unidade SEDIA (sedia@tre-pe.jus.br)
+    2026-02-20 14:53:34,132 INFO  s.p.service.ProcessoInicializador - Processo de revisao 60003 iniciado para 1 unidade(s).
+    2026-02-20 14:53:34,149 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: sedia@tre-pe.jus.br
+    2026-02-20 14:53:34,149 INFO  s.n.NotificacaoEmailService - E-mail para sedia@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,159 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1014, Destinatário: cosis@tre-pe.jus.br
+    2026-02-20 14:53:34,161 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade COSIS (cosis@tre-pe.jus.br) - Transição: REVISAO_CADASTRO_DISPONIBILIZADA
+    2026-02-20 14:53:34,166 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1015, Destinatário: cosis@tre-pe.jus.br
+    2026-02-20 14:53:34,176 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: cosis@tre-pe.jus.br
+    2026-02-20 14:53:34,176 INFO  s.n.NotificacaoEmailService - E-mail para cosis@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,178 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior COSIS (cosis@tre-pe.jus.br)
+    2026-02-20 14:53:34,179 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1016, Destinatário: stic@tre-pe.jus.br
+    2026-02-20 14:53:34,192 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: cosis@tre-pe.jus.br
+    2026-02-20 14:53:34,192 INFO  s.n.NotificacaoEmailService - E-mail para cosis@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,193 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior STIC (stic@tre-pe.jus.br)
+    2026-02-20 14:53:34,197 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1017, Destinatário: admin@tre-pe.jus.br
+    2026-02-20 14:53:34,209 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: stic@tre-pe.jus.br
+    2026-02-20 14:53:34,209 INFO  s.n.NotificacaoEmailService - E-mail para stic@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,209 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior ADMIN (admin@tre-pe.jus.br)
+    2026-02-20 14:53:34,225 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: admin@tre-pe.jus.br
+    2026-02-20 14:53:34,225 INFO  s.n.NotificacaoEmailService - E-mail para admin@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,232 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1018, Destinatário: stic@tre-pe.jus.br
+    2026-02-20 14:53:34,233 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade STIC (stic@tre-pe.jus.br) - Transição: REVISAO_CADASTRO_ACEITA
+    2026-02-20 14:53:34,235 INFO  s.s.s.w.SubprocessoTransicaoService - Workflow SP70003: REVISAO_CADASTRO_DISPONIBILIZADA -> REVISAO_CADASTRO_ACEITA
+    2026-02-20 14:53:34,252 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: stic@tre-pe.jus.br
+    2026-02-20 14:53:34,252 INFO  s.n.NotificacaoEmailService - E-mail para stic@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,258 WARN  s.comum.erros.RestExceptionHandler - [b0e12df9-0449-42d2-9e36-d4904b5b2872] Erro de negócio (ACESSO_NEGADO): Usuário '111111111111' não pertence à unidade 'STIC' do recurso
+
+CDU14IntegrationTest > Fluxo de Homologação > ADMIN homologa COM impactos, alterando status e criando movimentação FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest$Homologacao.adminHomologaComImpactos(CDU14IntegrationTest.java:291)
+
+CDU14IntegrationTest > Falhas e Segurança > Não pode homologar em estado inválido STANDARD_OUT
+    2026-02-20 14:53:34,320 INFO  s.p.s.ProcessoManutencaoService - Processo 60004 criado com 1 participantes: [9] - [(60004,9)]
+    2026-02-20 14:53:34,346 INFO  s.s.s.factory.SubprocessoFactory - Subprocesso para revisão criado para unidade SEDIA
+    2026-02-20 14:53:34,380 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1019, Destinatário: sedia@tre-pe.jus.br
+    2026-02-20 14:53:34,381 INFO  s.p.s.ProcessoNotificacaoService - E-mail enviado para unidade SEDIA (sedia@tre-pe.jus.br)
+    2026-02-20 14:53:34,381 INFO  s.p.service.ProcessoInicializador - Processo de revisao 60004 iniciado para 1 unidade(s).
+    2026-02-20 14:53:34,395 WARN  s.comum.erros.RestExceptionHandler - [5c40000c-e62b-4f4a-96b3-c24265ef58d2] Erro de negócio (ACESSO_NEGADO): Ação 'Homologar revisão de cadastro' não pode ser executada com o sp na situação 'Revisão de cadastro em andamento'. Situações permitidas: Revisão de cadastro disponibilizada
+    2026-02-20 14:53:34,397 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: sedia@tre-pe.jus.br
+    2026-02-20 14:53:34,397 INFO  s.n.NotificacaoEmailService - E-mail para sedia@tre-pe.jus.br enviado.
+
+CDU14IntegrationTest > Falhas e Segurança > CHEFE não pode homologar revisão STANDARD_OUT
+    2026-02-20 14:53:34,448 INFO  s.p.s.ProcessoManutencaoService - Processo 60005 criado com 1 participantes: [9] - [(60005,9)]
+    2026-02-20 14:53:34,483 INFO  s.s.s.factory.SubprocessoFactory - Subprocesso para revisão criado para unidade SEDIA
+    2026-02-20 14:53:34,509 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1020, Destinatário: sedia@tre-pe.jus.br
+    2026-02-20 14:53:34,509 INFO  s.p.s.ProcessoNotificacaoService - E-mail enviado para unidade SEDIA (sedia@tre-pe.jus.br)
+    2026-02-20 14:53:34,509 INFO  s.p.service.ProcessoInicializador - Processo de revisao 60005 iniciado para 1 unidade(s).
+    2026-02-20 14:53:34,525 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: sedia@tre-pe.jus.br
+    2026-02-20 14:53:34,526 INFO  s.n.NotificacaoEmailService - E-mail para sedia@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,539 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1021, Destinatário: cosis@tre-pe.jus.br
+    2026-02-20 14:53:34,539 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade COSIS (cosis@tre-pe.jus.br) - Transição: REVISAO_CADASTRO_DISPONIBILIZADA
+    2026-02-20 14:53:34,544 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1022, Destinatário: cosis@tre-pe.jus.br
+    2026-02-20 14:53:34,556 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: cosis@tre-pe.jus.br
+    2026-02-20 14:53:34,556 INFO  s.n.NotificacaoEmailService - E-mail para cosis@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,557 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior COSIS (cosis@tre-pe.jus.br)
+    2026-02-20 14:53:34,559 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1023, Destinatário: stic@tre-pe.jus.br
+    2026-02-20 14:53:34,573 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: cosis@tre-pe.jus.br
+    2026-02-20 14:53:34,573 INFO  s.n.NotificacaoEmailService - E-mail para cosis@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,573 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior STIC (stic@tre-pe.jus.br)
+    2026-02-20 14:53:34,575 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1024, Destinatário: admin@tre-pe.jus.br
+    2026-02-20 14:53:34,589 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: stic@tre-pe.jus.br
+    2026-02-20 14:53:34,592 INFO  s.n.NotificacaoEmailService - E-mail para stic@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,592 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior ADMIN (admin@tre-pe.jus.br)
+    2026-02-20 14:53:34,606 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: admin@tre-pe.jus.br
+    2026-02-20 14:53:34,607 INFO  s.n.NotificacaoEmailService - E-mail para admin@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,609 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1025, Destinatário: stic@tre-pe.jus.br
+    2026-02-20 14:53:34,609 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade STIC (stic@tre-pe.jus.br) - Transição: REVISAO_CADASTRO_ACEITA
+    2026-02-20 14:53:34,613 INFO  s.s.s.w.SubprocessoTransicaoService - Workflow SP70005: REVISAO_CADASTRO_DISPONIBILIZADA -> REVISAO_CADASTRO_ACEITA
+    2026-02-20 14:53:34,625 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: stic@tre-pe.jus.br
+    2026-02-20 14:53:34,627 INFO  s.n.NotificacaoEmailService - E-mail para stic@tre-pe.jus.br enviado.
+
+CDU14IntegrationTest > Fluxo de Aceite > GESTOR deve aceitar, alterando status e criando todos os registros STANDARD_OUT
+    2026-02-20 14:53:34,672 INFO  s.p.s.ProcessoManutencaoService - Processo 60006 criado com 1 participantes: [9] - [(60006,9)]
+    2026-02-20 14:53:34,699 INFO  s.s.s.factory.SubprocessoFactory - Subprocesso para revisão criado para unidade SEDIA
+    2026-02-20 14:53:34,719 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1026, Destinatário: sedia@tre-pe.jus.br
+    2026-02-20 14:53:34,720 INFO  s.p.s.ProcessoNotificacaoService - E-mail enviado para unidade SEDIA (sedia@tre-pe.jus.br)
+    2026-02-20 14:53:34,720 INFO  s.p.service.ProcessoInicializador - Processo de revisao 60006 iniciado para 1 unidade(s).
+    2026-02-20 14:53:34,735 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: sedia@tre-pe.jus.br
+    2026-02-20 14:53:34,735 INFO  s.n.NotificacaoEmailService - E-mail para sedia@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,750 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1027, Destinatário: cosis@tre-pe.jus.br
+    2026-02-20 14:53:34,751 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade COSIS (cosis@tre-pe.jus.br) - Transição: REVISAO_CADASTRO_DISPONIBILIZADA
+    2026-02-20 14:53:34,755 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1028, Destinatário: cosis@tre-pe.jus.br
+    2026-02-20 14:53:34,770 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: cosis@tre-pe.jus.br
+    2026-02-20 14:53:34,770 INFO  s.n.NotificacaoEmailService - E-mail para cosis@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,771 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior COSIS (cosis@tre-pe.jus.br)
+    2026-02-20 14:53:34,771 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1029, Destinatário: stic@tre-pe.jus.br
+    2026-02-20 14:53:34,783 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: cosis@tre-pe.jus.br
+    2026-02-20 14:53:34,783 INFO  s.n.NotificacaoEmailService - E-mail para cosis@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,783 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior STIC (stic@tre-pe.jus.br)
+    2026-02-20 14:53:34,786 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1030, Destinatário: admin@tre-pe.jus.br
+    2026-02-20 14:53:34,793 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: stic@tre-pe.jus.br
+    2026-02-20 14:53:34,794 INFO  s.n.NotificacaoEmailService - E-mail para stic@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,794 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior ADMIN (admin@tre-pe.jus.br)
+    2026-02-20 14:53:34,808 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: admin@tre-pe.jus.br
+    2026-02-20 14:53:34,809 INFO  s.n.NotificacaoEmailService - E-mail para admin@tre-pe.jus.br enviado.
+    2026-02-20 14:53:34,811 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1031, Destinatário: stic@tre-pe.jus.br
+    2026-02-20 14:53:34,812 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade STIC (stic@tre-pe.jus.br) - Transição: REVISAO_CADASTRO_ACEITA
+    2026-02-20 14:53:34,814 INFO  s.s.s.w.SubprocessoTransicaoService - Workflow SP70006: REVISAO_CADASTRO_DISPONIBILIZADA -> REVISAO_CADASTRO_ACEITA
+    2026-02-20 14:53:34,828 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: stic@tre-pe.jus.br
+    2026-02-20 14:53:34,828 INFO  s.n.NotificacaoEmailService - E-mail para stic@tre-pe.jus.br enviado.
+
+CDU14IntegrationTest > Fluxo de Devolução > GESTOR deve devolver, alterando status e criando registros STANDARD_OUT
+    2026-02-20 14:53:35,183 INFO  s.p.s.ProcessoManutencaoService - Processo 60007 criado com 1 participantes: [9] - [(60007,9)]
+    2026-02-20 14:53:35,205 INFO  s.s.s.factory.SubprocessoFactory - Subprocesso para revisão criado para unidade SEDIA
+    2026-02-20 14:53:35,221 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1032, Destinatário: sedia@tre-pe.jus.br
+    2026-02-20 14:53:35,223 INFO  s.p.s.ProcessoNotificacaoService - E-mail enviado para unidade SEDIA (sedia@tre-pe.jus.br)
+    2026-02-20 14:53:35,223 INFO  s.p.service.ProcessoInicializador - Processo de revisao 60007 iniciado para 1 unidade(s).
+    2026-02-20 14:53:35,238 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: sedia@tre-pe.jus.br
+    2026-02-20 14:53:35,238 INFO  s.n.NotificacaoEmailService - E-mail para sedia@tre-pe.jus.br enviado.
+    2026-02-20 14:53:35,245 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1033, Destinatário: cosis@tre-pe.jus.br
+    2026-02-20 14:53:35,246 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade COSIS (cosis@tre-pe.jus.br) - Transição: REVISAO_CADASTRO_DISPONIBILIZADA
+    2026-02-20 14:53:35,251 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1034, Destinatário: cosis@tre-pe.jus.br
+    2026-02-20 14:53:35,259 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: cosis@tre-pe.jus.br
+    2026-02-20 14:53:35,259 INFO  s.n.NotificacaoEmailService - E-mail para cosis@tre-pe.jus.br enviado.
+    2026-02-20 14:53:35,260 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior COSIS (cosis@tre-pe.jus.br)
+    2026-02-20 14:53:35,262 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1035, Destinatário: stic@tre-pe.jus.br
+    2026-02-20 14:53:35,273 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: cosis@tre-pe.jus.br
+    2026-02-20 14:53:35,273 INFO  s.n.NotificacaoEmailService - E-mail para cosis@tre-pe.jus.br enviado.
+    2026-02-20 14:53:35,274 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior STIC (stic@tre-pe.jus.br)
+    2026-02-20 14:53:35,276 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1036, Destinatário: admin@tre-pe.jus.br
+    2026-02-20 14:53:35,288 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: stic@tre-pe.jus.br
+    2026-02-20 14:53:35,288 INFO  s.n.NotificacaoEmailService - E-mail para stic@tre-pe.jus.br enviado.
+    2026-02-20 14:53:35,288 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade superior ADMIN (admin@tre-pe.jus.br)
+    2026-02-20 14:53:35,302 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: admin@tre-pe.jus.br
+    2026-02-20 14:53:35,302 INFO  s.n.NotificacaoEmailService - E-mail para admin@tre-pe.jus.br enviado.
+    2026-02-20 14:53:35,304 INFO  s.n.NotificacaoEmailService - Notificação persistida no banco - Código: 1037, Destinatário: sedia@tre-pe.jus.br
+    2026-02-20 14:53:35,306 INFO  s.s.s.n.SubprocessoEmailService - E-mail enviado para unidade SEDIA (sedia@tre-pe.jus.br) - Transição: REVISAO_CADASTRO_DEVOLVIDA
+    2026-02-20 14:53:35,306 INFO  s.s.s.w.SubprocessoTransicaoService - Workflow SP70007: REVISAO_CADASTRO_EM_ANDAMENTO -> REVISAO_CADASTRO_DEVOLVIDA
+
+Gradle Test Executor 3 STANDARD_OUT
+    2026-02-20 14:53:35,319 INFO  s.n.NotificacaoEmailAsyncExecutor - E-mail enviado a: sedia@tre-pe.jus.br
+    2026-02-20 14:53:35,319 INFO  s.n.NotificacaoEmailService - E-mail para sedia@tre-pe.jus.br enviado.
+  Resultado: FAILURE
+  Total:     24 testes executados
+  ✓ Passou:   22
+  ✗ Falhou:   2
+  ○ Ignorado: 0
+  Tempo:     33.814s
+
+24 tests completed, 2 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///C:/sgc/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 39s
+5 actionable tasks: 1 executed, 4 up-to-date
+Configuration cache entry stored.
