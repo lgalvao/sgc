@@ -1,0 +1,1651 @@
+File: ./frontend/eslint.config.js
+  Line 4: Short comment? -> // eslint.config.js
+File: ./frontend/vitest.setup.ts
+  Line 24: Short comment? -> // Mock dispose method
+  Line 49: Short comment? -> // Mock localStorage
+  Line 73: Short comment? -> // Mock window.location
+File: ./frontend/etc/scripts/verificar-acessibilidade.js
+  Line 63: Redundant comment? -> // Check if the candidate path actually exists
+File: ./frontend/src/constants/situacoes.ts
+  Line 33: Short comment? -> // Situações de mapa
+  Line 41: Short comment? -> // Labels para exibição
+File: ./frontend/src/views/__tests__/ProcessoViewCoverage.spec.ts
+  Line 10: Short comment? -> // Mocks
+  Line 201: Short comment? -> // Abre unidade 10
+  Line 225: Short comment? -> // Trigger action
+File: ./frontend/src/views/__tests__/CadMapaCoverage.spec.ts
+  Line 8: Short comment? -> // Mock router
+  Line 58: Short comment? -> // Call with invalid ID
+  Line 87: Short comment? -> // Trigger
+  Line 112: Short comment? -> // Trigger
+  Line 141: Short comment? -> // Call
+File: ./frontend/src/views/__tests__/SubprocessoView.spec.ts
+  Line 12: Short comment? -> // Mock child components
+  Line 32: Short comment? -> // Mock Services
+  Line 127: Short comment? -> // Mock implementations
+  Line 241: Short comment? -> // Open modal
+  Line 245: Short comment? -> // Confirm
+  Line 273: Short comment? -> // Trigger Reabertura
+  Line 285: Short comment? -> // Confirmar
+File: ./frontend/src/views/__tests__/ConfiguracoesView.spec.ts
+  Line 8: Short comment? -> // Mock dependencies
+File: ./frontend/src/views/__tests__/SubprocessoViewCoverage.spec.ts
+  Line 113: Short comment? -> // Trigger manually
+File: ./frontend/src/views/__tests__/CadMapa.spec.ts
+  Line 372: Short comment? -> // cleanup
+  Line 420: Short comment? -> // We simulate the flow.
+File: ./frontend/src/views/__tests__/CadAtividadesCoverage.spec.ts
+  Line 12: Short comment? -> // Mock router
+  Line 89: Short comment? -> // Mock return values
+  Line 106: Short comment? -> // Confirm removal
+File: ./frontend/src/views/__tests__/ProcessoView.spec.ts
+  Line 11: Short comment? -> // Define mocks first
+  Line 16: Short comment? -> // Mock router
+  Line 45: Short comment? -> // Stubs definition
+  Line 227: Redundant comment? -> // Check if buttons exist directly as the container class might have changed
+  Line 232: Short comment? -> // Homologar
+  Line 236: Short comment? -> // Disponibilizar
+  Line 365: Short comment? -> // ID 104 -> Mapa Criado
+  Line 414: Short comment? -> // ID inexistente
+  Line 485: Short comment? -> // --- Finalização ---
+File: ./frontend/src/views/__tests__/CadProcesso.spec.ts
+  Line 10: Short comment? -> // Mock processoService
+  Line 17: Short comment? -> // Mock router
+  Line 42: Short comment? -> // Mock child components
+  Line 112: Short comment? -> // Mock window.scrollTo
+  Line 136: Short comment? -> // Fill description
+  Line 140: Short comment? -> // Fill date
+  Line 151: Short comment? -> // Select type
+  Line 505: Short comment? -> // Mock slow promise
+File: ./frontend/src/views/__tests__/MonitoramentoDiagnostico.spec.ts
+  Line 7: Short comment? -> // Mocks
+File: ./frontend/src/views/__tests__/Relatorios.spec.ts
+  Line 9: Short comment? -> // Stubs
+  Line 85: Short comment? -> // Trigger onMounted
+File: ./frontend/src/views/__tests__/ConclusaoDiagnostico.spec.ts
+  Line 7: Short comment? -> // Mocks
+  Line 114: Short comment? -> // Justificativa válida
+File: ./frontend/src/views/__tests__/AutoavaliacaoDiagnostico.spec.ts
+  Line 7: Short comment? -> // Mocks dos services
+  Line 24: Short comment? -> // Mocks do router
+File: ./frontend/src/views/__tests__/CadAtividades.spec.ts
+  Line 14: Short comment? -> // Mocks
+  Line 41: Short comment? -> // Stubs
+  Line 103: Short comment? -> // Mock route
+  Line 158: Short comment? -> // Actions
+  Line 247: Redundant comment? -> // Check if value was cleared (indicating success flow completed)
+  Line 358: Short comment? -> // Change state
+  Line 460: Short comment? -> // Dropdown actions
+  Line 486: Short comment? -> // Open modal
+  Line 506: Short comment? -> // Force errors
+File: ./frontend/src/views/__tests__/OcupacoesCriticasDiagnostico.spec.ts
+  Line 8: Short comment? -> // Mocks
+  Line 124: Short comment? -> // Simulate selection
+File: ./frontend/src/views/__tests__/VisMapa.spec.ts
+  Line 13: Short comment? -> // Mocks for services
+File: ./frontend/src/views/__tests__/UnidadeView.spec.ts
+  Line 16: Short comment? -> // Mocks
+  Line 235: Short comment? -> // Force re-computation
+  Line 297: Short comment? -> // Test dismiss
+  Line 334: Redundant comment? -> // Check Ramal Link
+  Line 334: Short comment? -> // Check Ramal Link
+  Line 340: Redundant comment? -> // Check Email Link
+  Line 340: Short comment? -> // Check Email Link
+File: ./frontend/src/views/__tests__/VisAtividades.spec.ts
+  Line 24: Short comment? -> // Mock router
+  Line 43: Short comment? -> // Mock services
+  Line 93: Short comment? -> // Mock child components
+  Line 190: Short comment? -> // Mock success response
+  Line 193: Short comment? -> // Open modal
+  Line 196: Short comment? -> // Confirm
+  Line 255: Short comment? -> // Fill observation
+  Line 516: Short comment? -> // Chama confirmar
+File: ./frontend/src/views/__tests__/CadAtribuicao.spec.ts
+  Line 7: Short comment? -> // Mocks
+  Line 127: Short comment? -> // Preencher formulário
+  Line 162: Short comment? -> // Preencher formulário
+  Line 185: Short comment? -> // Sem usuario
+File: ./frontend/src/views/__tests__/HistoricoViewCoverage.spec.ts
+  Line 53: Short comment? -> // Find the row
+  Line 58: Redundant comment? -> // Check accessibility attributes (expecting failure)
+File: ./frontend/src/views/__tests__/VisAtividadesCoverage.spec.ts
+  Line 11: Short comment? -> // Hoist mocks
+  Line 55: Short comment? -> // Components stubs
+  Line 186: Short comment? -> // Mock throwing error
+  Line 192: Short comment? -> // Trigger validation
+  Line 245: Short comment? -> // Erro esperado
+File: ./frontend/src/views/__tests__/CadProcessoCoverage.spec.ts
+  Line 9: Short comment? -> // Mock router
+  Line 34: Short comment? -> // Components stubs
+  Line 110: Short comment? -> // Setup state for error
+  Line 127: Short comment? -> // Call method directly
+  Line 154: Short comment? -> // Confirm initiation
+  Line 199: Short comment? -> // Open modal
+  Line 203: Short comment? -> // Confirm removal
+File: ./frontend/src/views/processo/MapaVisualizacaoView.vue
+  Line 280: Short comment? -> // Modais
+  Line 291: Short comment? -> // Loading
+  Line 294: Short comment? -> // Refs para foco
+File: ./frontend/src/views/processo/AtividadesVisualizacaoView.vue
+  Line 219: Short comment? -> // Modais
+File: ./frontend/src/views/processo/AtividadesCadastroView.vue
+  Line 229: Short comment? -> // Modais
+  Line 238: Short comment? -> // Validação
+File: ./frontend/src/views/processo/ProcessoCadastroView.vue
+  Line 308: Short comment? -> // Limpa erros
+File: ./frontend/src/router/__tests__/router.spec.ts
+  Line 46: Short comment? -> // Setup Store Mock
+  Line 53: Redundant comment? -> // Create fresh router with mock routes first to avoid loading real components
+File: ./frontend/src/mappers/__tests__/unidades.spec.ts
+  Line 71: Short comment? -> // missing name
+  Line 73: Short comment? -> // missing email
+  Line 74: Short comment? -> // missing ramal
+  Line 78: Short comment? -> // missing tipo
+  Line 80: Short comment? -> // missing dataFim
+File: ./frontend/src/mappers/__tests__/processos.spec.ts
+  Line 9: Short comment? -> // filhos is undefined
+File: ./frontend/src/mappers/__tests__/usuarios.spec.ts
+  Line 12: Short comment? -> // codigo priority
+File: ./frontend/src/stores/usuarios.ts
+  Line 18: Short comment? -> // Maps para lookup O(1)
+File: ./frontend/src/stores/feedback.ts
+  Line 66: Short comment? -> // No-op
+File: ./frontend/src/stores/alertas.ts
+  Line 48: Short comment? -> // 3. Call API
+File: ./frontend/src/stores/__tests__/configuracoes.spec.ts
+  Line 81: Short comment? -> // Caso padrão
+  Line 84: Short comment? -> // Caso configurado
+  Line 90: Short comment? -> // Caso inválido
+  Line 98: Short comment? -> // Caso padrão
+  Line 101: Short comment? -> // Caso configurado
+  Line 107: Short comment? -> // Caso inválido
+File: ./frontend/src/stores/__tests__/atribuicoes.spec.ts
+  Line 43: Short comment? -> // Mock logger
+File: ./frontend/src/stores/__tests__/processos.spec.ts
+  Line 51: Short comment? -> // Ignore expected error
+File: ./frontend/src/stores/__tests__/analises.spec.ts
+  Line 7: Short comment? -> // Mock do service
+  Line 124: Short comment? -> // Fetch cadastro first
+  Line 130: Short comment? -> // Then fetch validacao
+File: ./frontend/src/stores/__tests__/alertas.spec.ts
+  Line 7: Short comment? -> // Mock dos serviços
+  Line 50: Short comment? -> // Reset calls
+  Line 109: Short comment? -> // Setup initial state
+  Line 116: Redundant comment? -> // Check optimistic update: dataHoraLeitura should be set (it was null in mockAlerta)
+  Line 120: Short comment? -> // Should NOT reload
+  Line 125: Short comment? -> // Setup initial state
+File: ./frontend/src/stores/__tests__/subprocessos.spec.ts
+  Line 31: Short comment? -> // Mock Dependencies
+  Line 65: Short comment? -> // Mock Stores
+  Line 85: Short comment? -> // Mock API Client
+  Line 128: Short comment? -> // Reset mocks
+  Line 250: Short comment? -> // Verifica mapper
+File: ./frontend/src/stores/__tests__/perfil.spec.ts
+  Line 31: Redundant comment? -> mockLocalStorage.setItem("usuarioCodigo", JSON.stringify("9")); // Set default for initial state
+File: ./frontend/src/stores/__tests__/feedback.spec.ts
+  Line 45: Short comment? -> // Chamada antes do init
+  Line 51: Short comment? -> // Inicializa
+  Line 84: Short comment? -> // Primeiro toast
+File: ./frontend/src/stores/__tests__/diagnosticos.spec.ts
+  Line 43: Short comment? -> // expected
+  Line 116: Short comment? -> // Adiciona
+  Line 120: Short comment? -> // Atualiza
+File: ./frontend/src/utils/apiError.ts
+  Line 81: Short comment? -> // Fallback
+File: ./frontend/src/utils/index.ts
+  Line 1: Short comment? -> // ===== EXPORTS =====
+File: ./frontend/src/utils/dateUtils.ts
+  Line 10: Short comment? -> // ISO Date/DateTime
+  Line 14: Short comment? -> // DD/MM/YYYY
+  Line 19: Short comment? -> // ignore
+  Line 22: Short comment? -> // Numeric string
+File: ./frontend/src/utils/apiUtils.ts
+  Line 22: Redundant @param -> * @param url URL relativa da API
+  Line 40: Redundant @param -> * @param url URL relativa da API
+File: ./frontend/src/utils/__tests__/csv.spec.ts
+  Line 36: Short comment? -> // First line is header
+File: ./frontend/src/components/relatorios/__tests__/ModalAndamentoGeral.spec.ts
+  Line 7: Short comment? -> // Mock dependencies
+File: ./frontend/src/components/relatorios/__tests__/ModalMapasVigentes.spec.ts
+  Line 6: Short comment? -> // Mock dependencies
+File: ./frontend/src/components/relatorios/__tests__/ModalDiagnosticosGaps.spec.ts
+  Line 6: Short comment? -> // Mock dependencies
+  Line 97: Short comment? -> // Pendente -> bg-danger
+File: ./frontend/src/components/atividades/AtividadeItem.vue
+  Line 160: Short comment? -> // Novo Conhecimento
+File: ./frontend/src/components/__tests__/SubprocessoCards.spec.ts
+  Line 46: Short comment? -> // Click action
+  Line 53: Short comment? -> // Keydown Enter action
+  Line 61: Short comment? -> // Keydown Space action
+  Line 69: Short comment? -> // Mapa Card Actions
+  Line 70: Short comment? -> // Click
+  Line 78: Short comment? -> // Enter
+  Line 86: Short comment? -> // Space
+  Line 130: Short comment? -> // Mapa vis Actions
+File: ./frontend/src/components/__tests__/MainNavbarCoverage.spec.ts
+  Line 8: Short comment? -> // Mock usePerfil
+  Line 11: Short comment? -> // Mock vue-router
+  Line 40: Short comment? -> // Mount component
+  Line 62: Short comment? -> // Resize to mobile
+File: ./frontend/src/components/__tests__/ArvoreUnidades.spec.ts
+  Line 7: Short comment? -> // Mock data
+  Line 87: Short comment? -> // Toggle again
+  Line 96: Short comment? -> // 10 is checked
+  Line 98: Short comment? -> // 20 is not
+  Line 174: Short comment? -> // Selected: 21.
+  Line 248: Short comment? -> // Deselect child
+  Line 255: Short comment? -> // Child should be gone
+  Line 296: Short comment? -> // filhas undefined
+File: ./frontend/src/components/__tests__/ModalAcaoBloco.spec.ts
+  Line 48: Short comment? -> // Wait for onMounted
+  Line 60: Short comment? -> // Checking DOM:
+  Line 99: Redundant comment? -> // Set date
+  Line 99: Short comment? -> // Set date
+File: ./frontend/src/components/__tests__/MainNavbar.spec.ts
+  Line 8: Short comment? -> // Mock usePerfil
+  Line 32: Short comment? -> // Setup cleanup
+File: ./frontend/src/components/__tests__/TabelaProcessosCoverage.spec.ts
+  Line 53: Short comment? -> // Trigger space key
+  Line 90: Redundant comment? -> // Check class results
+  Line 90: Short comment? -> // Check class results
+  Line 97: Redundant comment? -> // Check attr results
+  Line 97: Short comment? -> // Check attr results
+File: ./frontend/src/components/__tests__/UnidadeTreeNode.spec.ts
+  Line 193: Redundant comment? -> // Check prop on stub
+  Line 193: Short comment? -> // Check prop on stub
+File: ./frontend/src/components/__tests__/ArvoreUnidades.visual.spec.ts
+  Line 217: Short comment? -> // Antes de desmarcar
+  Line 332: Short comment? -> // Selecionar COORD_11
+  Line 341: Short comment? -> // Filhas devem estar
+File: ./frontend/src/components/__tests__/ImportarAtividadesModal.spec.ts
+  Line 119: Redundant comment? -> // Check if reset
+  Line 119: Short comment? -> // Check if reset
+  Line 124: Short comment? -> // Setup selection
+  Line 145: Redundant comment? -> // Check if wrapper.vm.processoSelecionadoId is 1 or "1" depends on implementation and bootstrap-vue-next
+File: ./frontend/src/components/__tests__/AtividadeItem.spec.ts
+  Line 42: Redundant comment? -> // Check if input appeared (meaning we are in edit mode)
+File: ./frontend/src/components/__tests__/ArvoreUnidadesPbt.spec.ts
+  Line 18: Short comment? -> // Depth 3, Breadth 2
+  Line 19: Short comment? -> // Level 1: 1, 2
+  Line 39: Short comment? -> // Flatten tree to list
+  Line 67: Short comment? -> // Reset selection
+  Line 72: Short comment? -> // Act: Toggle On
+  Line 107: Short comment? -> // Reset
+  Line 110: Short comment? -> // Select random nodes
+  Line 130: Short comment? -> // Component logic:
+  Line 205: Short comment? -> // Perform interactions
+  Line 229: Short comment? -> // Generate tree
+  Line 242: Short comment? -> // Pick a random node
+  Line 246: Short comment? -> // Select it once
+  Line 250: Short comment? -> // Select it again
+File: ./frontend/src/components/__tests__/ImportarAtividadesModalCoverage.spec.ts
+  Line 39: Short comment? -> // No unit selected
+File: ./frontend/src/components/__tests__/BarraNavegacao.spec.ts
+  Line 9: Short comment? -> // Mock vue-router
+File: ./frontend/src/components/__tests__/ArvoreUnidadesCoverage.spec.ts
+  Line 20: Short comment? -> // Initial state
+  Line 23: Short comment? -> // Update prop
+  Line 28: Short comment? -> // Watcher should run
+  Line 51: Short comment? -> // Watcher should run
+File: ./frontend/src/components/__tests__/DisponibilizarMapaModal.spec.ts
+  Line 153: Redundant comment? -> // Set values while hidden (simulating state persistence if it wasn't reset)
+  Line 157: Short comment? -> // 1. Show modal
+  Line 158: Short comment? -> // 2. Set values
+  Line 171: Short comment? -> // Hide
+  Line 174: Short comment? -> // Show again
+File: ./frontend/src/test-utils/uiHelpers.ts
+  Line 76: Short comment? -> // Home + expectedLabels
+File: ./frontend/src/test-utils/serviceTestHelpers.ts
+  Line 4: Short comment? -> // Mock padrão do axios
+File: ./frontend/src/__tests__/App.spec.ts
+  Line 1: Short comment? -> // Mock de package.json
+  Line 12: Short comment? -> // Mock de components
+  Line 24: Short comment? -> // Mock do router
+File: ./frontend/src/__tests__/router.spec.ts
+  Line 111: Short comment? -> // Test props function
+File: ./frontend/src/__tests__/axios-setup.spec.ts
+  Line 23: Short comment? -> // Mock router
+  Line 33: Short comment? -> // Mock logger
+  Line 44: Short comment? -> // Mock axios
+File: ./frontend/src/__tests__/views/ConfiguracoesView.spec.ts
+  Line 7: Short comment? -> // Mock dependencies
+File: ./frontend/src/__tests__/views/PainelViewCoverage.spec.ts
+  Line 9: Short comment? -> // Mock router
+  Line 73: Short comment? -> // Wait for onMounted
+File: ./frontend/src/__tests__/views/HistoricoView.spec.ts
+  Line 7: Short comment? -> // Mock router
+File: ./frontend/src/__tests__/views/PainelView.spec.ts
+  Line 9: Short comment? -> // Mock router
+  Line 121: Short comment? -> // Admin
+  Line 127: Short comment? -> // Not Admin
+File: ./frontend/src/__tests__/views/LoginView.spec.ts
+  Line 10: Short comment? -> // Mocks
+  Line 163: Short comment? -> // Passo 1
+  Line 168: Short comment? -> // Passo 2
+  Line 239: Short comment? -> // Passo 1
+  Line 266: Short comment? -> // Passo 1
+File: ./frontend/src/__tests__/components/ArvoreUnidades.spec.ts
+  Line 243: Short comment? -> // Selecionar CHILD1
+  Line 269: Short comment? -> // Deselecionar CHILD1
+File: ./frontend/src/__tests__/components/BarraNavegacao.spec.ts
+  Line 9: Short comment? -> // Mocks
+File: ./frontend/src/composables/useProcessoForm.ts
+  Line 72: Short comment? -> // State
+  Line 79: Short comment? -> // Computed
+  Line 82: Short comment? -> // Actions
+File: ./frontend/src/composables/__tests__/useApi.spec.ts
+  Line 38: Short comment? -> // Ignora erro esperado
+  Line 53: Short comment? -> // Ignora erro esperado
+File: ./frontend/src/services/__tests__/ProcessoService.pact.spec.ts
+  Line 14: Short comment? -> // Mock localStorage
+  Line 24: Redundant comment? -> // Create a new PactV3 instance
+File: ./e2e/cdu-33.spec.ts
+  Line 33: Short comment? -> // PREPARAÇÃO
+  Line 80: Short comment? -> // TESTES PRINCIPAIS
+File: ./e2e/cdu-02.spec.ts
+  Line 132: Short comment? -> // Salva o processo
+File: ./e2e/cdu-10.spec.ts
+  Line 92: Short comment? -> // Chefe valida mapa
+File: ./e2e/cdu-31.spec.ts
+  Line 21: Short comment? -> // CDU-31: Passos 1-2
+  Line 56: Short comment? -> // CDU-31: Passos 3-4
+  Line 69: Short comment? -> // Clicar em Salvar
+File: ./e2e/cdu-13.spec.ts
+  Line 33: Short comment? -> // PREPARAÇÃO
+  Line 45: Short comment? -> // Iniciar processo
+  Line 82: Short comment? -> // CENÁRIOS DE TESTE
+  Line 89: Short comment? -> // Abrir histórico
+  Line 109: Short comment? -> // Verificar situação
+  Line 133: Short comment? -> // Cancelar devolução
+  Line 186: Short comment? -> // Abrir histórico
+  Line 203: Short comment? -> // Cancelar homologação
+  Line 214: Short comment? -> // Homologar
+File: ./e2e/cdu-35.spec.ts
+  Line 20: Short comment? -> // TESTES PRINCIPAIS
+File: ./e2e/cdu-30.spec.ts
+  Line 27: Short comment? -> // Acessar configurações
+File: ./e2e/cdu-20.spec.ts
+  Line 107: Short comment? -> // Validar mapa
+File: ./e2e/cdu-14.spec.ts
+  Line 38: Short comment? -> // PREPARAÇÃO
+  Line 165: Short comment? -> // CENÁRIOS DE TESTE
+  Line 172: Short comment? -> // Abrir histórico
+File: ./e2e/cdu-11.spec.ts
+  Line 59: Short comment? -> // Iniciar processo
+  Line 180: Short comment? -> // Aceitar cadastro
+  Line 227: Short comment? -> // Chefe valida mapa
+  Line 281: Short comment? -> // Visualizar atividades
+File: ./e2e/cdu-36.spec.ts
+  Line 20: Short comment? -> // TESTES PRINCIPAIS
+File: ./e2e/cdu-25.spec.ts
+  Line 43: Short comment? -> // PREPARAÇÃO
+  Line 116: Short comment? -> // TESTES PRINCIPAIS
+File: ./e2e/captura-telas.spec.ts
+  Line 74: Short comment? -> // Tela de login inicial
+  Line 105: Short comment? -> // Painel inicial vazio
+  Line 139: Short comment? -> // Salvar processo
+  Line 283: Short comment? -> // Admin cria processo
+  Line 307: Short comment? -> // Acessar subprocesso
+  Line 312: Short comment? -> // Entrar em atividades
+  Line 316: Short comment? -> // Adicionar atividade
+  Line 491: Short comment? -> // Adicionar atividades
+  Line 515: Short comment? -> // Homologar cadastro
+  Line 521: Short comment? -> // Navegar para mapa
+  Line 525: Short comment? -> // Criar competência
+  Line 534: Short comment? -> // Selecionar atividades
+  Line 545: Short comment? -> // Hover na competência
+  Line 551: Short comment? -> // Disponibilizar mapa
+  Line 573: Short comment? -> // Menu principal
+  Line 587: Short comment? -> // Seção Relatórios
+  Line 592: Short comment? -> // Seção Histórico
+  Line 598: Short comment? -> // Rodapé
+  Line 609: Short comment? -> // Processo CRIADO
+  Line 627: Short comment? -> // Processo EM_ANDAMENTO
+  Line 657: Short comment? -> // Tablet (768x1024)
+  Line 661: Short comment? -> // Mobile (375x667)
+  Line 792: Short comment? -> // Acessar subprocesso
+  Line 897: Short comment? -> // Acessar configurações
+  Line 934: Short comment? -> // Acessar relatórios
+  Line 952: Short comment? -> // Verificar filtros
+File: ./e2e/cdu-05.spec.ts
+  Line 58: Short comment? -> // Iniciar processo
+  Line 73: Short comment? -> // TESTE PRINCIPAL
+  Line 149: Short comment? -> // Login as Admin
+File: ./e2e/lifecycle.js
+  Line 57: Short comment? -> // Warnings do Lombok
+  Line 60: Short comment? -> // Gradle
+  Line 77: Short comment? -> // Vite - Inicialização
+  Line 92: Short comment? -> // Linhas vazias
+  Line 216: Short comment? -> // Handle exit signals
+  Line 272: Short comment? -> // Keep alive
+File: ./e2e/cdu-26.spec.ts
+  Line 41: Short comment? -> // PREPARAÇÃO
+  Line 112: Short comment? -> // TESTES PRINCIPAIS
+File: ./e2e/cdu-23.spec.ts
+  Line 34: Short comment? -> // PREPARAÇÃO
+  Line 76: Short comment? -> // TESTES PRINCIPAIS
+File: ./e2e/cdu-16.spec.ts
+  Line 146: Short comment? -> // Finalizar processo
+  Line 231: Short comment? -> // CDU-16: Passo 1-6
+  Line 261: Short comment? -> // CDU-16: Passo 7-8
+  Line 288: Short comment? -> // Fechar modal
+  Line 315: Short comment? -> // Cancelar edição
+File: ./e2e/cdu-27.spec.ts
+  Line 28: Short comment? -> // PREPARAÇÃO
+  Line 55: Short comment? -> // TESTES PRINCIPAIS
+  Line 59: Short comment? -> // CDU-27: Passos 1-2
+File: ./e2e/cdu-12.spec.ts
+  Line 66: Short comment? -> // Atividade 1
+  Line 117: Short comment? -> // Disponibilizar Mapa
+  Line 144: Short comment? -> // Finalizar Processo
+  Line 174: Short comment? -> // TESTES CDU-12
+  Line 187: Short comment? -> // 2. Abrir modal
+  Line 202: Short comment? -> // Verificar impacto
+  Line 224: Short comment? -> // Verificar impacto
+  Line 248: Short comment? -> // Verificar impacto
+  Line 272: Short comment? -> // Admin acessa
+  Line 281: Short comment? -> // Acessar visualização
+  Line 291: Short comment? -> // Inserida
+File: ./e2e/cdu-21.spec.ts
+  Line 154: Short comment? -> // CDU-21: Passos 1-2
+  Line 169: Short comment? -> // CDU-21: Passo 6.1
+  Line 182: Short comment? -> // Passo 6.1: Cancelar
+  Line 191: Short comment? -> // CDU-21: Passos 7-10
+File: ./e2e/cdu-34.spec.ts
+  Line 27: Short comment? -> // PREPARAÇÃO
+  Line 51: Short comment? -> // TESTES PRINCIPAIS
+File: ./e2e/cdu-03.spec.ts
+  Line 65: Short comment? -> // Modifica o processo
+File: ./e2e/cdu-04.spec.ts
+  Line 17: Short comment? -> // 2. Entra na edição
+  Line 28: Short comment? -> // 3. Clica em Iniciar
+  Line 31: Short comment? -> // 4. Verifica Modal
+  Line 36: Short comment? -> // 5. Cancela
+File: ./e2e/cdu-32.spec.ts
+  Line 32: Short comment? -> // PREPARAÇÃO
+  Line 81: Short comment? -> // TESTES PRINCIPAIS
+File: ./e2e/cdu-29.spec.ts
+  Line 21: Short comment? -> // CDU-29: Passos 1-2
+File: ./e2e/cdu-22.spec.ts
+  Line 33: Short comment? -> // PREPARAÇÃO
+  Line 75: Short comment? -> // TESTES PRINCIPAIS
+File: ./e2e/cdu-24.spec.ts
+  Line 87: Short comment? -> // Criar competências
+File: ./e2e/cdu-15.spec.ts
+  Line 74: Short comment? -> // 3. Gestor aceita
+  Line 81: Short comment? -> // 4. Admin homologa
+  Line 99: Short comment? -> // Verificar título
+File: ./e2e/cdu-09.spec.ts
+  Line 39: Short comment? -> // Iniciar processo
+  Line 54: Short comment? -> // Login como Chefe
+  Line 62: Short comment? -> // Entrar em Atividades
+  Line 69: Short comment? -> // Tentar Disponibilizar
+  Line 99: Short comment? -> // Disponibilizar
+  Line 103: Short comment? -> // Validar sucesso
+  Line 119: Short comment? -> // Devolver cadastro
+  Line 148: Short comment? -> // Fechar modal
+  Line 155: Short comment? -> // Validar sucesso
+File: ./e2e/cdu-01.spec.ts
+  Line 56: Short comment? -> // Verifica Logout
+  Line 64: Short comment? -> // Verifica Rodapé
+File: ./e2e/cdu-19.spec.ts
+  Line 88: Short comment? -> // Disponibilizar mapa
+  Line 100: Short comment? -> // CDU-19: Passos 1-2
+  Line 123: Short comment? -> // CDU-19: Passo 5.1.1
+  Line 129: Short comment? -> // Clicar em Validar
+  Line 159: Short comment? -> // Passo 5.2: Confirmar
+File: ./e2e/ui-consistency.spec.ts
+  Line 7: Short comment? -> // Navigate to login
+  Line 8: Short comment? -> // Login as Admin
+  Line 31: Redundant comment? -> // Check parent structure: h2 -> div -> div.d-flex...mb-3...
+  Line 47: Redundant comment? -> // Check if the focused element is valid
+File: ./e2e/cdu-17.spec.ts
+  Line 52: Short comment? -> // Acessar subprocesso
+File: ./e2e/helpers/helpers-mapas.ts
+  Line 70: Short comment? -> // Verify creation
+File: ./e2e/helpers/helpers-atividades.ts
+  Line 86: Short comment? -> // Confirmar no modal
+  Line 113: Short comment? -> // Confirmar no modal
+File: ./e2e/helpers/helpers-analise.ts
+  Line 12: Short comment? -> // Funções de Navegação
+  Line 167: Short comment? -> // Funções de Devolução
+File: ./e2e/helpers/helpers-navegacao.ts
+  Line 11: Short comment? -> // Funções de Logout
+  Line 69: Short comment? -> // Funções de Navegação
+File: ./e2e/fixtures/complete-fixtures.ts
+  Line 46: Short comment? -> // Use
+File: ./e2e/fixtures/processo-fixtures.ts
+  Line 67: Short comment? -> // Use fixture
+File: ./e2e/setup/fixtures.ts
+  Line 29: Short comment? -> // Listen to page errors
+File: ./backend/src/test/java/sgc/painel/PainelServiceTest.java
+  Line 372: Short comment? -> // Setup obrigatorio
+File: ./backend/src/test/java/sgc/painel/PainelFacadeTest.java
+  Line 125: Short comment? -> // Caso 2: Sorted.
+  Line 153: Short comment? -> // Paged e Unsorted
+  Line 199: Short comment? -> // Arrange
+  Line 219: Short comment? -> // Act
+  Line 222: Short comment? -> // Assert
+  Line 229: Short comment? -> // Arrange
+  Line 253: Short comment? -> // Act
+  Line 256: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/painel/PainelServiceIntegrationTest.java
+  Line 147: Short comment? -> // Act: Buscar processos
+File: ./backend/src/test/java/sgc/comum/config/ConfigOpenApiCoverageTest.java
+  Line 19: Short comment? -> // Arrange
+  Line 28: Short comment? -> // Act
+  Line 31: Short comment? -> // Assert
+  Line 40: Short comment? -> // Arrange
+  Line 51: Short comment? -> // Act
+  Line 54: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/comum/erros/RestExceptionHandlerCoverageTest.java
+  Line 20: Short comment? -> // Arrange
+  Line 23: Short comment? -> // Act
+  Line 26: Short comment? -> // Assert
+  Line 38: Short comment? -> // Arrange
+  Line 46: Short comment? -> // Act
+  Line 49: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/comum/json/DeserializadorHtmlSanitizadoTest.java
+  Line 36: Short comment? -> // Arrange
+  Line 40: Short comment? -> // Act
+  Line 43: Short comment? -> // Assert
+  Line 51: Short comment? -> // Arrange
+  Line 55: Short comment? -> // Act
+  Line 58: Short comment? -> // Assert
+  Line 65: Short comment? -> // Arrange
+  Line 69: Short comment? -> // Act
+  Line 72: Short comment? -> // Assert
+  Line 81: Short comment? -> // Arrange
+  Line 84: Short comment? -> // Act
+  Line 87: Short comment? -> // Assert
+  Line 94: Short comment? -> // Arrange
+  Line 98: Short comment? -> // Act
+  Line 101: Short comment? -> // Assert
+  Line 110: Short comment? -> // Arrange
+  Line 114: Short comment? -> // Act
+  Line 117: Short comment? -> // Assert
+  Line 125: Short comment? -> // Arrange
+  Line 129: Short comment? -> // Act
+  Line 132: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/e2e/E2eFixtureEndpointTest.java
+  Line 48: Short comment? -> // Preparar requisição
+  Line 53: Short comment? -> // Executar e Validar
+  Line 67: Short comment? -> // Preparar requisição
+  Line 75: Short comment? -> // Executar e Validar
+  Line 94: Short comment? -> // Executar e Validar
+  Line 112: Short comment? -> // Executar e Validar
+File: ./backend/src/test/java/sgc/e2e/E2eControllerTest.java
+  Line 95: Short comment? -> // Arrange
+  Line 151: Short comment? -> // Act
+  Line 154: Short comment? -> // Assert
+  Line 173: Short comment? -> // Arrange
+  Line 185: Short comment? -> // Act
+  Line 193: Short comment? -> // Assert
+  Line 243: Short comment? -> // Arrange
+  Line 255: Short comment? -> // Act
+  Line 258: Short comment? -> // Assert
+  Line 266: Short comment? -> // Arrange
+  Line 279: Short comment? -> // Act
+  Line 282: Short comment? -> // Assert
+  Line 290: Short comment? -> // Arrange
+  Line 303: Short comment? -> // Act
+  Line 306: Short comment? -> // Assert
+  Line 327: Redundant comment? -> // Create only process, no subprocess/mapa
+  Line 338: Short comment? -> // Arrange
+  Line 356: Short comment? -> // Act
+  Line 359: Short comment? -> // Assert
+  Line 367: Short comment? -> // Arrange
+  Line 387: Short comment? -> // Act
+  Line 390: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/e2e/E2eControllerCoverageTest.java
+  Line 47: Short comment? -> // Arrange
+  Line 50: Short comment? -> // Act
+  Line 60: Short comment? -> // Arrange
+File: ./backend/src/test/java/sgc/subprocesso/SubprocessoBuscarIntegracaoTest.java
+  Line 41: Short comment? -> // Arrange
+  Line 53: Short comment? -> // Act & Assert
+File: ./backend/src/test/java/sgc/subprocesso/SubprocessoCadastroControllerTest.java
+  Line 66: Short comment? -> // Arrange
+  Line 80: Short comment? -> // Act & Assert
+  Line 95: Short comment? -> // Arrange
+  Line 102: Short comment? -> // Act & Assert
+  Line 115: Short comment? -> // Arrange
+  Line 125: Short comment? -> // Act & Assert
+  Line 139: Short comment? -> // Arrange
+  Line 146: Short comment? -> // Act & Assert
+  Line 159: Short comment? -> // Arrange
+  Line 169: Short comment? -> // Act & Assert
+  Line 183: Short comment? -> // Arrange
+  Line 189: Short comment? -> // Act & Assert
+  Line 205: Short comment? -> // Arrange
+  Line 213: Short comment? -> // Act & Assert
+  Line 231: Short comment? -> // Arrange
+  Line 238: Short comment? -> // Act & Assert
+  Line 256: Short comment? -> // Arrange
+  Line 263: Short comment? -> // Act & Assert
+  Line 281: Short comment? -> // Arrange
+  Line 288: Short comment? -> // Act & Assert
+  Line 306: Short comment? -> // Arrange
+  Line 313: Short comment? -> // Act & Assert
+  Line 331: Short comment? -> // Arrange
+  Line 338: Short comment? -> // Act & Assert
+  Line 356: Short comment? -> // Arrange
+  Line 359: Short comment? -> // Act & Assert
+  Line 378: Short comment? -> // Arrange
+  Line 389: Short comment? -> // Act & Assert
+  Line 408: Short comment? -> // Arrange
+  Line 419: Short comment? -> // Act & Assert
+File: ./backend/src/test/java/sgc/subprocesso/dto/MapaAjusteDtoTest.java
+  Line 71: Short comment? -> // Setup
+  Line 86: Short comment? -> // Execute
+  Line 92: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/subprocesso/mapper/MapaAjusteMapperTest.java
+  Line 55: Short comment? -> // Linkar
+File: ./backend/src/test/java/sgc/subprocesso/service/SubprocessoAtividadeServiceTest.java
+  Line 81: Short comment? -> // Arrange
+  Line 87: Short comment? -> // Act & Assert
+  Line 102: Short comment? -> // Arrange
+  Line 111: Short comment? -> // Act & Assert
+  Line 125: Short comment? -> // Arrange
+  Line 143: Short comment? -> // Act & Assert
+  Line 155: Short comment? -> // Arrange
+  Line 170: Short comment? -> // Act
+  Line 173: Short comment? -> // Assert
+  Line 185: Short comment? -> // Arrange
+  Line 202: Short comment? -> // Act
+  Line 205: Short comment? -> // Assert
+  Line 222: Short comment? -> // Arrange
+  Line 239: Short comment? -> // Act
+  Line 242: Short comment? -> // Assert
+  Line 258: Short comment? -> // Arrange
+  Line 275: Short comment? -> // Act
+  Line 278: Short comment? -> // Assert
+  Line 289: Short comment? -> // Arrange
+  Line 305: Short comment? -> // Act
+  Line 308: Short comment? -> // Assert
+  Line 324: Short comment? -> // Arrange
+  Line 341: Short comment? -> // Act
+  Line 344: Short comment? -> // Assert
+  Line 367: Short comment? -> // Arrange
+  Line 378: Short comment? -> // Act
+  Line 381: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/subprocesso/service/SubprocessoPermissaoCalculatorTest.java
+  Line 60: Short comment? -> // Arrange
+  Line 64: Short comment? -> // Act
+  Line 67: Short comment? -> // Assert
+  Line 74: Short comment? -> // Arrange
+  Line 78: Short comment? -> // Act
+  Line 81: Short comment? -> // Assert
+  Line 93: Short comment? -> // Arrange
+  Line 98: Short comment? -> // Act
+  Line 101: Short comment? -> // Assert
+  Line 114: Short comment? -> // Arrange
+  Line 129: Short comment? -> // Act
+  Line 132: Short comment? -> // Assert
+  Line 142: Short comment? -> // Arrange
+  Line 157: Short comment? -> // Act
+  Line 160: Short comment? -> // Assert
+  Line 170: Short comment? -> // Arrange
+  Line 174: Short comment? -> // Act
+  Line 177: Short comment? -> // Assert
+  Line 204: Short comment? -> // Arrange
+  Line 208: Short comment? -> // Act
+  Line 211: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/subprocesso/service/SubprocessoAjusteMapaServiceTest.java
+  Line 77: Short comment? -> // Arrange
+  Line 111: Short comment? -> // Act
+  Line 114: Short comment? -> // Assert
+  Line 124: Short comment? -> // Arrange
+  Line 146: Short comment? -> // Act
+  Line 149: Short comment? -> // Assert
+  Line 156: Short comment? -> // Arrange
+  Line 161: Short comment? -> // Act & Assert
+  Line 172: Short comment? -> // Arrange
+  Line 182: Short comment? -> // Act & Assert
+  Line 192: Short comment? -> // Arrange
+  Line 202: Short comment? -> // Act
+  Line 205: Short comment? -> // Assert
+  Line 218: Short comment? -> // Arrange
+  Line 252: Short comment? -> // Act
+  Line 255: Short comment? -> // Assert
+  Line 263: Short comment? -> // Arrange
+  Line 287: Short comment? -> // Act
+  Line 290: Short comment? -> // Assert
+  Line 302: Short comment? -> // Arrange
+  Line 315: Redundant comment? -> // Return empty list for competencies to trigger (competencia == null)
+  Line 319: Short comment? -> // Act
+  Line 322: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/subprocesso/service/query/ConsultasSubprocessoServiceTest.java
+  Line 41: Short comment? -> // Arrange
+  Line 47: Short comment? -> // Act
+  Line 50: Short comment? -> // Assert
+  Line 58: Short comment? -> // Arrange
+  Line 64: Short comment? -> // Act
+  Line 67: Short comment? -> // Assert
+  Line 74: Short comment? -> // Act
+  Line 77: Short comment? -> // Assert
+  Line 90: Short comment? -> // Arrange
+  Line 99: Short comment? -> // Act
+  Line 102: Short comment? -> // Assert
+  Line 110: Short comment? -> // Arrange
+  Line 116: Short comment? -> // Act
+  Line 119: Short comment? -> // Assert
+  Line 129: Short comment? -> // Arrange
+  Line 133: Short comment? -> // Act
+  Line 136: Short comment? -> // Assert
+  Line 146: Short comment? -> // Arrange
+  Line 152: Short comment? -> // Act
+  Line 155: Short comment? -> // Assert
+  Line 203: Short comment? -> // Act
+  Line 206: Short comment? -> // Assert
+  Line 214: Short comment? -> // Arrange
+  Line 217: Short comment? -> // Act
+  Line 220: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoTransicaoServicePbtTest.java
+  Line 24: Short comment? -> // Mock dependencies
+  Line 56: Short comment? -> // Act
+  Line 59: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/subprocesso/service/workflow/AuditoriaFluxoMapeamentoTest.java
+  Line 32: Short comment? -> // Cadastro
+  Line 37: Short comment? -> // Mapa
+File: ./backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoAdminWorkflowServiceTest.java
+  Line 149: Short comment? -> // Não deve salvar
+File: ./backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoTransicaoServiceTest.java
+  Line 49: Short comment? -> // Arrange
+  Line 60: Short comment? -> // Act
+  Line 70: Short comment? -> // Assert
+  Line 79: Short comment? -> // Arrange
+  Line 90: Short comment? -> // Act
+  Line 99: Short comment? -> // Assert
+  Line 107: Short comment? -> // Arrange
+  Line 117: Short comment? -> // Act
+  Line 123: Short comment? -> // Assert
+  Line 131: Short comment? -> // Arrange
+  Line 140: Short comment? -> // Act & Assert
+  Line 149: Short comment? -> // Arrange
+  Line 158: Short comment? -> // Act
+  Line 165: Short comment? -> // Assert
+  Line 172: Short comment? -> // Arrange
+  Line 183: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/subprocesso/service/workflow/SubprocessoBulkOperationsPbtTest.java
+  Line 30: Short comment? -> // Mock dependencies
+  Line 73: Short comment? -> // Sucesso geral
+File: ./backend/src/test/java/sgc/subprocesso/service/crud/SubprocessoValidacaoServicePbtTest.java
+  Line 27: Short comment? -> // Mock dependencies
+  Line 55: Short comment? -> // Mock dependencies
+File: ./backend/src/test/java/sgc/subprocesso/service/factory/SubprocessoFactoryTest.java
+  Line 55: Short comment? -> // Arrange
+  Line 80: Short comment? -> // Act
+  Line 83: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/subprocesso/model/SituacaoSubprocessoTest.java
+  Line 26: Short comment? -> // --- MAPEAMENTO ---
+  Line 44: Short comment? -> // --- REVISAO ---
+  Line 63: Short comment? -> // --- DIAGNOSTICO ---
+  Line 167: Short comment? -> // MAPEAMENTO
+  Line 171: Short comment? -> // REVISAO
+  Line 175: Short comment? -> // DIAGNOSTICO
+  Line 179: Short comment? -> // Tipo nulo
+File: ./backend/src/test/java/sgc/subprocesso/model/MovimentacaoRepoPerformanceTest.java
+  Line 42: Short comment? -> // Given
+  Line 83: Short comment? -> // When
+  Line 86: Short comment? -> // Then
+File: ./backend/src/test/java/sgc/alerta/AlertaFacadeCoverageTest.java
+  Line 42: Short comment? -> // Arrange
+  Line 55: Short comment? -> // Act
+  Line 58: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/alerta/AlertaFacadeTest.java
+  Line 66: Short comment? -> // Given
+  Line 76: Short comment? -> // When
+  Line 79: Short comment? -> // Then
+  Line 91: Short comment? -> // Given
+  Line 101: Short comment? -> // When
+  Line 104: Short comment? -> // Then
+  Line 111: Short comment? -> // Given
+  Line 124: Short comment? -> // When
+  Line 127: Short comment? -> // Then
+  Line 140: Short comment? -> // Given
+  Line 148: Short comment? -> // When
+  Line 151: Short comment? -> // Then
+  Line 163: Short comment? -> // Given
+  Line 172: Short comment? -> // When
+  Line 175: Short comment? -> // Then
+  Line 182: Short comment? -> // Given
+  Line 190: Short comment? -> // When
+  Line 193: Short comment? -> // Then
+  Line 258: Short comment? -> // Given
+  Line 276: Short comment? -> // When
+  Line 279: Short comment? -> // Then
+  Line 289: Short comment? -> // Given
+  Line 312: Short comment? -> // When
+  Line 315: Short comment? -> // Then
+  Line 466: Short comment? -> // a1 lido, a2 nao lido
+File: ./backend/src/test/java/sgc/relatorio/service/RelatorioFacadeTest.java
+  Line 148: Short comment? -> // Filtra pela unidade 1
+File: ./backend/src/test/java/sgc/arquitetura/ArchConsistencyTest.java
+  Line 88: Redundant comment? -> // Check if dependency is in a recognized module and if it matches the item's
+  Line 89: Short comment? -> // module
+File: ./backend/src/test/java/sgc/processo/ProcessoControllerTest.java
+  Line 92: Short comment? -> // Arrange
+  Line 110: Short comment? -> // Act & Assert
+  Line 130: Short comment? -> // Arrange
+  Line 135: Short comment? -> // Act & Assert
+  Line 152: Short comment? -> // Arrange
+  Line 164: Short comment? -> // Act & Assert
+  Line 177: Short comment? -> // Arrange
+  Line 189: Short comment? -> // Act & Assert
+  Line 202: Short comment? -> // Arrange
+  Line 205: Short comment? -> // Act & Assert
+  Line 213: Short comment? -> // Arrange
+  Line 216: Short comment? -> // Act & Assert
+  Line 231: Short comment? -> // Arrange
+  Line 250: Short comment? -> // Act & Assert
+  Line 273: Short comment? -> // Arrange
+  Line 280: Short comment? -> // Act & Assert
+  Line 297: Short comment? -> // Arrange
+  Line 300: Short comment? -> // Act & Assert
+  Line 314: Short comment? -> // Arrange
+  Line 318: Short comment? -> // Act & Assert
+  Line 329: Short comment? -> // Arrange
+  Line 334: Short comment? -> // Act & Assert
+File: ./backend/src/test/java/sgc/processo/service/ProcessoInicializadorPbtTest.java
+  Line 23: Short comment? -> // Mock dependencies
+  Line 60: Short comment? -> // Act
+  Line 63: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/processo/service/ProcessoDetalheBuilderTest.java
+  Line 66: Short comment? -> // Arrange
+  Line 89: Short comment? -> // Act
+  Line 92: Short comment? -> // Assert
+  Line 107: Short comment? -> // Arrange
+  Line 117: Short comment? -> // Act
+  Line 120: Short comment? -> // Assert
+  Line 127: Short comment? -> // Arrange
+  Line 137: Short comment? -> // Act
+  Line 140: Short comment? -> // Assert
+  Line 147: Short comment? -> // Arrange
+  Line 160: Short comment? -> // Act
+  Line 163: Short comment? -> // Assert
+  Line 172: Short comment? -> // Arrange
+  Line 199: Short comment? -> // Act
+  Line 202: Short comment? -> // Assert
+  Line 272: Short comment? -> // Arrange
+  Line 294: Short comment? -> // Act
+  Line 297: Short comment? -> // Assert
+  Line 305: Short comment? -> // Arrange
+  Line 324: Short comment? -> // Act
+  Line 327: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/processo/service/ProcessoManutencaoServiceValidationTest.java
+  Line 45: Short comment? -> // Given
+  Line 62: Short comment? -> // When/Then
+File: ./backend/src/test/java/sgc/processo/service/ProcessoManutencaoServiceTest.java
+  Line 57: Short comment? -> // Given
+  Line 85: Short comment? -> // When
+  Line 88: Short comment? -> // Then
+  Line 106: Short comment? -> // Given
+  Line 126: Short comment? -> // When
+  Line 129: Short comment? -> // Then
+  Line 144: Short comment? -> // Given
+  Line 163: Short comment? -> // When
+  Line 166: Short comment? -> // Then
+  Line 176: Short comment? -> // Given
+  Line 191: Short comment? -> // When/Then
+  Line 203: Short comment? -> // Given
+  Line 220: Short comment? -> // When/Then
+  Line 237: Short comment? -> // Given
+  Line 267: Short comment? -> // When
+  Line 270: Short comment? -> // Then
+  Line 283: Short comment? -> // Given
+  Line 301: Short comment? -> // When/Then
+  Line 313: Short comment? -> // Given
+  Line 331: Short comment? -> // When/Then
+  Line 343: Short comment? -> // Given
+  Line 366: Short comment? -> // When
+  Line 369: Short comment? -> // Then
+  Line 378: Short comment? -> // Given
+  Line 403: Short comment? -> // When
+  Line 406: Short comment? -> // Then
+  Line 416: Short comment? -> // Given
+  Line 436: Short comment? -> // When/Then
+  Line 448: Short comment? -> // Given
+  Line 469: Short comment? -> // When/Then
+  Line 481: Short comment? -> // Given
+  Line 503: Short comment? -> // When
+  Line 506: Short comment? -> // Then
+  Line 520: Short comment? -> // Given
+  Line 529: Short comment? -> // When
+  Line 532: Short comment? -> // Then
+  Line 540: Short comment? -> // Given
+  Line 549: Short comment? -> // When/Then
+  Line 561: Short comment? -> // Given
+  Line 570: Short comment? -> // When/Then
+File: ./backend/src/test/java/sgc/processo/service/ProcessoAcessoServiceTest.java
+  Line 154: Short comment? -> // U1 -> U2 -> U1
+  Line 189: Short comment? -> // Mock verification:
+File: ./backend/src/test/java/sgc/processo/service/ProcessoNotificacaoServiceTest.java
+  Line 410: Short comment? -> // T1 ausente no map
+  Line 567: Short comment? -> // Força erro no envio
+File: ./backend/src/test/java/sgc/processo/service/ProcessoConsultaServiceTest.java
+  Line 66: Short comment? -> // Arrange
+  Line 74: Short comment? -> // Act
+  Line 77: Short comment? -> // Assert
+  Line 89: Short comment? -> // Arrange
+  Line 96: Short comment? -> // Act
+  Line 99: Short comment? -> // Assert
+  Line 117: Short comment? -> // Arrange
+  Line 121: Short comment? -> // Act
+  Line 124: Short comment? -> // Assert
+  Line 185: Short comment? -> // Arrange
+  Line 188: Short comment? -> // Act
+  Line 191: Short comment? -> // Assert
+  Line 199: Short comment? -> // Arrange
+  Line 203: Short comment? -> // Act
+  Line 206: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/processo/service/ProcessoFacadeTest.java
+  Line 213: Short comment? -> // Arrange
+  Line 218: Short comment? -> // Act & Assert
+  Line 397: Short comment? -> // Arrange
+  Line 411: Short comment? -> // Act
+  Line 414: Short comment? -> // Assert
+  Line 422: Short comment? -> // Arrange
+  Line 429: Short comment? -> // Act & Assert
+  Line 449: Short comment? -> // Arrange
+  Line 456: Short comment? -> // Act
+  Line 459: Short comment? -> // Assert
+  Line 488: Short comment? -> // Arrange
+  Line 493: Short comment? -> // Act & Assert
+  Line 511: Short comment? -> // Arrange
+  Line 515: Short comment? -> // Act
+  Line 518: Short comment? -> // Assert
+  Line 525: Short comment? -> // Arrange
+  Line 536: Short comment? -> // Act
+  Line 539: Short comment? -> // Assert
+  Line 589: Short comment? -> // Arrange
+  Line 601: Short comment? -> // Act
+  Line 604: Short comment? -> // Assert
+  Line 626: Short comment? -> // Arrange
+  Line 649: Short comment? -> // Act
+  Line 652: Short comment? -> // Assert
+  Line 659: Short comment? -> // Arrange
+  Line 677: Short comment? -> // Act
+  Line 680: Short comment? -> // Assert
+  Line 691: Short comment? -> // Arrange
+  Line 709: Short comment? -> // Act
+  Line 712: Short comment? -> // Assert
+  Line 719: Short comment? -> // Arrange
+  Line 737: Short comment? -> // Act
+  Line 740: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/processo/service/ProcessoManutencaoServicePbtTest.java
+  Line 29: Short comment? -> // Mock dependencies
+  Line 48: Short comment? -> // Act & Assert
+  Line 56: Short comment? -> // Mock dependencies
+  Line 76: Short comment? -> // Act
+  Line 79: Short comment? -> // Assert
+  Line 86: Short comment? -> // Mock dependencies
+  Line 102: Short comment? -> // Act & Assert
+  Line 110: Short comment? -> // Mock dependencies
+  Line 126: Short comment? -> // Act & Assert
+File: ./backend/src/test/java/sgc/processo/service/ProcessoDetalheBuilderCoverageTest.java
+  Line 46: Short comment? -> // Arrange
+  Line 70: Short comment? -> // Act
+  Line 73: Short comment? -> // Assert
+  Line 83: Short comment? -> // Arrange
+  Line 99: Short comment? -> // Act
+  Line 102: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/processo/service/ProcessoFinalizadorCoverageTest.java
+  Line 48: Short comment? -> // Arrange
+  Line 56: Short comment? -> // Act
+  Line 59: Short comment? -> // Assert
+  Line 68: Short comment? -> // Arrange
+File: ./backend/src/test/java/sgc/processo/model/ProcessoRepoPerformanceTest.java
+  Line 34: Short comment? -> // Arrange
+  Line 52: Short comment? -> // Act
+  Line 55: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/processo/model/ModelCoverageTest.java
+  Line 58: Short comment? -> // Adiciona 1 e 2
+File: ./backend/src/test/java/sgc/processo/model/ProcessoRepoTest.java
+  Line 69: Short comment? -> // Arrange
+  Line 77: Short comment? -> // Act
+  Line 84: Short comment? -> // Assert
+  Line 98: Short comment? -> // Arrange
+  Line 108: Short comment? -> // Act
+  Line 115: Short comment? -> // Assert
+  Line 125: Short comment? -> // Arrange
+  Line 134: Short comment? -> // Act
+  Line 141: Short comment? -> // Assert
+  Line 151: Short comment? -> // Arrange
+  Line 167: Short comment? -> // Assert
+  Line 176: Short comment? -> // Arrange
+  Line 185: Short comment? -> // Act
+  Line 192: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/processo/model/ProcessoTest.java
+  Line 30: Short comment? -> // Arrange
+  Line 37: Short comment? -> // Act
+  Line 46: Short comment? -> // Assert
+  Line 57: Short comment? -> // Arrange
+  Line 63: Short comment? -> // Act
+  Line 71: Short comment? -> // Assert
+  Line 82: Short comment? -> // Arrange
+  Line 91: Short comment? -> // Act
+  Line 102: Short comment? -> // Assert
+  Line 120: Short comment? -> // Act
+  Line 123: Short comment? -> // Assert
+  Line 132: Short comment? -> // Arrange
+  Line 141: Short comment? -> // Act
+  Line 145: Short comment? -> // Assert
+  Line 158: Short comment? -> // Arrange
+  Line 167: Short comment? -> // Act
+  Line 170: Short comment? -> // Assert
+  Line 183: Short comment? -> // Arrange
+  Line 186: Short comment? -> // Act
+  Line 189: Short comment? -> // Assert
+  Line 198: Short comment? -> // Arrange
+  Line 201: Short comment? -> // Act
+  Line 204: Short comment? -> // Assert
+  Line 211: Short comment? -> // Arrange
+  Line 214: Short comment? -> // Act
+  Line 217: Short comment? -> // Assert
+  Line 229: Short comment? -> // Act
+  Line 232: Short comment? -> // Assert
+  Line 239: Short comment? -> // Act
+  Line 242: Short comment? -> // Assert
+  Line 273: Short comment? -> // Arrange
+  Line 276: Short comment? -> // Act
+  Line 279: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/processo/model/ProcessoPbtTest.java
+  Line 19: Short comment? -> // Arrange
+  Line 24: Short comment? -> // Act
+  Line 27: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/seguranca/login/LoginControllerCoverageTest.java
+  Line 43: Short comment? -> // Arrange
+  Line 48: Short comment? -> // Act
+  Line 51: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/seguranca/login/ClienteAcessoAdTest.java
+  Line 105: Short comment? -> // Valida Predicate
+  Line 111: Short comment? -> // Valida ErrorHandler
+File: ./backend/src/test/java/sgc/seguranca/login/GerenciadorJwtTest.java
+  Line 134: Short comment? -> // Missing perfil
+  Line 151: Short comment? -> // Missing unidade
+File: ./backend/src/test/java/sgc/seguranca/login/LimitadorTentativasLoginTest.java
+  Line 64: Short comment? -> // Bloqueia ip1
+  Line 127: Short comment? -> // (clear)
+  Line 136: Short comment? -> // Cache minúsculo
+  Line 140: Short comment? -> // Enche o cache
+  Line 160: Short comment? -> // Enche o cache
+  Line 190: Short comment? -> // Consome 5
+  Line 192: Short comment? -> // 6ª falha
+File: ./backend/src/test/java/sgc/seguranca/login/GerenciadorJwtSecurityTest.java
+  Line 36: Short comment? -> // Given
+  Line 39: Short comment? -> // seguros)
+  Line 42: Short comment? -> // When & Then
+File: ./backend/src/test/java/sgc/seguranca/login/LoginControllerTest.java
+  Line 381: Short comment? -> // No cookies
+File: ./backend/src/test/java/sgc/seguranca/login/dto/AutenticarReqValidationTest.java
+  Line 38: Short comment? -> // Arrange
+  Line 44: Short comment? -> // Act
+  Line 47: Short comment? -> // Assert
+  Line 59: Short comment? -> // Arrange
+  Line 68: Short comment? -> // Act
+  Line 71: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/seguranca/acesso/AbstractAccessPolicyCoverageTest.java
+  Line 54: Short comment? -> // Arrange
+  Line 61: Short comment? -> // Act & Assert
+  Line 68: Short comment? -> // Arrange
+  Line 75: Short comment? -> // Act & Assert
+  Line 82: Short comment? -> // Arrange
+  Line 91: Short comment? -> // Act & Assert
+File: ./backend/src/test/java/sgc/seguranca/acesso/SubprocessoAccessPolicyPbtTest.java
+  Line 22: Short comment? -> // Mock dependencies
+File: ./backend/src/test/java/sgc/organizacao/UnidadeFacadeTest.java
+  Line 53: Short comment? -> // Arrange
+  Line 57: Short comment? -> // Act
+  Line 60: Short comment? -> // Assert
+  Line 71: Short comment? -> // Arrange
+  Line 75: Short comment? -> // Act
+  Line 78: Short comment? -> // Assert
+  Line 86: Short comment? -> // Arrange
+  Line 90: Short comment? -> // Act & Assert
+  Line 97: Short comment? -> // Arrange
+  Line 101: Short comment? -> // Act & Assert
+  Line 108: Short comment? -> // Arrange
+  Line 112: Short comment? -> // Act & Assert
+  Line 120: Short comment? -> // Arrange
+  Line 123: Short comment? -> // Act
+  Line 126: Short comment? -> // Assert
+  Line 134: Short comment? -> // Arrange
+  Line 137: Short comment? -> // Act & Assert
+  Line 149: Short comment? -> // Arrange
+  Line 153: Short comment? -> // Act
+  Line 156: Short comment? -> // Assert
+  Line 164: Short comment? -> // Arrange
+  Line 169: Short comment? -> // Act
+  Line 172: Short comment? -> // Assert
+  Line 181: Short comment? -> // Arrange
+  Line 184: Short comment? -> // Act & Assert
+  Line 196: Short comment? -> // Arrange
+  Line 200: Short comment? -> // Act
+  Line 203: Short comment? -> // Assert
+  Line 210: Short comment? -> // Arrange
+  Line 213: Short comment? -> // Act & Assert
+  Line 220: Short comment? -> // Arrange
+  Line 224: Short comment? -> // Act
+  Line 227: Short comment? -> // Assert
+  Line 239: Short comment? -> // Arrange
+  Line 242: Short comment? -> // Act
+  Line 245: Short comment? -> // Assert
+  Line 260: Short comment? -> // Arrange
+  Line 263: Short comment? -> // Act
+  Line 266: Short comment? -> // Assert
+  Line 285: Short comment? -> // Arrange
+  Line 293: Short comment? -> // Act
+  Line 296: Short comment? -> // Assert
+  Line 304: Short comment? -> // Arrange
+  Line 310: Short comment? -> // Act
+  Line 313: Short comment? -> // Assert
+  Line 321: Short comment? -> // Arrange
+  Line 329: Short comment? -> // Act
+  Line 332: Short comment? -> // Assert
+  Line 345: Short comment? -> // Arrange
+  Line 352: Short comment? -> // Act
+  Line 355: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/organizacao/ModelExtraTest.java
+  Line 34: Short comment? -> // Prepare
+File: ./backend/src/test/java/sgc/organizacao/UsuarioServiceTest.java
+  Line 57: Short comment? -> // Act
+  Line 60: Short comment? -> // Assert
+  Line 69: Short comment? -> // Act
+  Line 72: Short comment? -> // Assert
+  Line 80: Short comment? -> // Act
+  Line 83: Short comment? -> // Assert
+  Line 92: Short comment? -> // Arrange
+  Line 95: Short comment? -> // Act
+  Line 98: Short comment? -> // Assert
+  Line 112: Short comment? -> // Act
+  Line 115: Short comment? -> // Assert
+  Line 124: Short comment? -> // Act
+  Line 127: Short comment? -> // Assert
+  Line 136: Short comment? -> // Act
+  Line 139: Short comment? -> // Assert
+  Line 150: Short comment? -> // Act
+  Line 153: Short comment? -> // Assert
+  Line 188: Short comment? -> // Act
+  Line 191: Short comment? -> // Assert
+  Line 200: Short comment? -> // Act
+  Line 203: Short comment? -> // Assert
+  Line 212: Short comment? -> // Arrange
+  Line 215: Short comment? -> // Act
+  Line 218: Short comment? -> // Assert
+  Line 233: Short comment? -> // Act
+  Line 236: Short comment? -> // Assert
+  Line 246: Short comment? -> // Act & Assert
+  Line 254: Short comment? -> // Act
+  Line 257: Short comment? -> // Assert
+  Line 268: Short comment? -> // Limpa contexto
+  Line 319: Short comment? -> // Adicionar
+  Line 323: Short comment? -> // Listar
+  Line 331: Short comment? -> // Remover
+File: ./backend/src/test/java/sgc/organizacao/UsuarioFacadeTest.java
+  Line 53: Short comment? -> // Arrange
+  Line 60: Short comment? -> // Act
+  Line 63: Short comment? -> // Assert
+  Line 81: Short comment? -> // Arrange
+  Line 89: Short comment? -> // Act
+  Line 92: Short comment? -> // Assert
+  Line 101: Short comment? -> // Arrange
+  Line 113: Short comment? -> // Act
+  Line 117: Short comment? -> // Assert
+  Line 125: Short comment? -> // Arrange
+  Line 128: Short comment? -> // Act
+  Line 131: Short comment? -> // Assert
+  Line 142: Short comment? -> // Arrange
+  Line 149: Short comment? -> // Act
+  Line 152: Short comment? -> // Assert
+  Line 166: Short comment? -> // Arrange
+  Line 177: Short comment? -> // Act
+  Line 180: Short comment? -> // Assert
+  Line 200: Short comment? -> // Arrange
+  Line 209: Short comment? -> // Act
+  Line 212: Short comment? -> // Assert
+  Line 220: Short comment? -> // Arrange
+  Line 226: Short comment? -> // Act
+  Line 229: Short comment? -> // Assert
+  Line 237: Short comment? -> // Arrange
+  Line 241: Short comment? -> // Act
+  Line 244: Short comment? -> // Assert
+  Line 270: Short comment? -> // Arrange
+  Line 277: Short comment? -> // Act
+  Line 280: Short comment? -> // Assert
+  Line 288: Short comment? -> // Arrange
+  Line 295: Short comment? -> // Act
+  Line 298: Short comment? -> // Assert
+  Line 305: Short comment? -> // Arrange
+  Line 311: Short comment? -> // Act
+  Line 314: Short comment? -> // Assert
+  Line 321: Short comment? -> // Arrange
+  Line 329: Short comment? -> // Act
+  Line 332: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/organizacao/ValidadorDadosOrgServiceTest.java
+  Line 64: Short comment? -> // Arrange
+  Line 74: Short comment? -> // Act & Assert
+  Line 81: Short comment? -> // Arrange
+  Line 89: Short comment? -> // Act & Assert
+  Line 96: Short comment? -> // Arrange
+  Line 105: Short comment? -> // Act & Assert
+  Line 112: Short comment? -> // Arrange
+  Line 128: Short comment? -> // Act & Assert
+  Line 135: Short comment? -> // Arrange
+  Line 146: Short comment? -> // Act & Assert
+  Line 154: Short comment? -> // Arrange
+  Line 165: Short comment? -> // Act & Assert
+  Line 178: Short comment? -> // Arrange
+  Line 188: Short comment? -> // Act & Assert
+  Line 197: Short comment? -> // Arrange
+  Line 208: Short comment? -> // Act & Assert
+  Line 217: Short comment? -> // Arrange
+  Line 230: Short comment? -> // Act & Assert
+  Line 238: Short comment? -> // Arrange
+  Line 248: Short comment? -> // Act & Assert
+  Line 257: Short comment? -> // Arrange
+  Line 268: Short comment? -> // Act & Assert
+  Line 295: Short comment? -> // Arrange
+  Line 307: Short comment? -> // Act & Assert
+  Line 316: Short comment? -> // Arrange
+  Line 331: Short comment? -> // Act & Assert
+  Line 342: Short comment? -> // Arrange
+  Line 356: Short comment? -> // Act & Assert
+  Line 364: Short comment? -> // Arrange
+  Line 374: Short comment? -> // Act & Assert
+File: ./backend/src/test/java/sgc/organizacao/UnidadeControllerTest.java
+  Line 52: Short comment? -> // Act & Assert
+  Line 74: Short comment? -> // Arrange
+  Line 77: Short comment? -> // Act & Assert
+  Line 88: Short comment? -> // Arrange
+  Line 94: Short comment? -> // Act & Assert
+  Line 104: Short comment? -> // Arrange
+  Line 107: Short comment? -> // Act & Assert
+  Line 117: Short comment? -> // Arrange
+  Line 125: Short comment? -> // Act & Assert
+  Line 133: Short comment? -> // Arrange
+  Line 136: Short comment? -> // Act & Assert
+  Line 144: Short comment? -> // Arrange
+  Line 147: Short comment? -> // Act & Assert
+  Line 155: Short comment? -> // Arrange
+  Line 158: Short comment? -> // Act & Assert
+  Line 167: Short comment? -> // Arrange
+  Line 170: Short comment? -> // Act & Assert
+  Line 179: Short comment? -> // Arrange
+  Line 182: Short comment? -> // Act & Assert
+  Line 191: Short comment? -> // Arrange
+  Line 194: Short comment? -> // Act & Assert
+File: ./backend/src/test/java/sgc/organizacao/UnidadeFacadeElegibilidadePredicateTest.java
+  Line 62: Short comment? -> // Arrange
+  Line 65: Short comment? -> // Act
+  Line 68: Short comment? -> // Assert
+  Line 82: Short comment? -> // Arrange
+  Line 85: Short comment? -> // Act
+  Line 88: Short comment? -> // Assert
+  Line 107: Short comment? -> // Arrange
+  Line 110: Short comment? -> // Act
+  Line 113: Short comment? -> // Assert
+  Line 127: Short comment? -> // Arrange
+  Line 131: Short comment? -> // Act
+  Line 134: Short comment? -> // Assert
+  Line 148: Short comment? -> // Arrange
+  Line 152: Short comment? -> // Act
+  Line 155: Short comment? -> // Assert
+  Line 174: Short comment? -> // Arrange
+  Line 181: Short comment? -> // Act
+  Line 184: Short comment? -> // Assert
+  Line 198: Short comment? -> // Arrange
+  Line 205: Short comment? -> // Act
+  Line 208: Short comment? -> // Assert
+  Line 227: Short comment? -> // Arrange
+  Line 231: Short comment? -> // Act
+  Line 234: Short comment? -> // Assert
+  Line 248: Short comment? -> // Arrange
+  Line 252: Short comment? -> // Act
+  Line 255: Short comment? -> // Assert
+  Line 269: Short comment? -> // Arrange
+  Line 275: Short comment? -> // Act
+  Line 278: Short comment? -> // Assert
+  Line 292: Short comment? -> // Arrange
+  Line 296: Short comment? -> // Act
+  Line 299: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/organizacao/UnidadeFacadeHierarchyTest.java
+  Line 43: Short comment? -> // Hierarquia:
+  Line 44: Short comment? -> // Raiz (1)
+  Line 45: Short comment? -> //   -> Filho 1 (2)
+  Line 46: Short comment? -> //      -> Neto 1 (3)
+  Line 47: Short comment? -> //   -> Filho 2 (4)
+  Line 72: Short comment? -> // Arvore A: 1 -> 2
+  Line 73: Short comment? -> // Arvore B: 10 -> 11
+File: ./backend/src/test/java/sgc/organizacao/service/ResponsavelUnidadeServiceTest.java
+  Line 53: Short comment? -> // Given
+  Line 72: Short comment? -> // When
+  Line 75: Short comment? -> // Then
+  Line 89: Short comment? -> // Given
+  Line 111: Short comment? -> // When
+  Line 114: Short comment? -> // Then
+  Line 135: Short comment? -> // Given
+  Line 154: Short comment? -> // When
+  Line 157: Short comment? -> // Then
+  Line 170: Short comment? -> // Given
+  Line 194: Short comment? -> // When
+  Line 197: Short comment? -> // Then
+File: ./backend/src/test/java/sgc/organizacao/model/UnidadeTest.java
+  Line 15: Short comment? -> // Arrange
+  Line 21: Short comment? -> // Act
+  Line 25: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/notificacao/NotificacaoEmailAsyncExecutorTest.java
+  Line 59: Short comment? -> // Arrange
+  Line 64: Short comment? -> // Act
+  Line 68: Short comment? -> // Assert
+  Line 76: Short comment? -> // Arrange
+  Line 86: Short comment? -> // Act
+  Line 90: Short comment? -> // Assert
+  Line 98: Short comment? -> // Arrange
+  Line 103: Short comment? -> // Falha sempre
+  Line 106: Short comment? -> // Act
+  Line 110: Short comment? -> // Assert
+  Line 112: Short comment? -> // MAX_TENTATIVAS = 3
+  Line 119: Short comment? -> // Arrange
+  Line 130: Short comment? -> // Act
+  Line 134: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/notificacao/NotificacaoModelosServiceTest.java
+  Line 50: Short comment? -> // Given
+  Line 56: Short comment? -> // When
+  Line 60: Short comment? -> // Then
+  Line 77: Short comment? -> // Given
+  Line 82: Short comment? -> // When
+  Line 86: Short comment? -> // Then
+  Line 98: Short comment? -> // Given
+  Line 104: Short comment? -> // When
+  Line 108: Short comment? -> // Then
+  Line 125: Short comment? -> // Given
+  Line 130: Short comment? -> // When
+  Line 134: Short comment? -> // Then
+  Line 146: Short comment? -> // Given
+  Line 150: Short comment? -> // When
+  Line 153: Short comment? -> // Then
+  Line 168: Short comment? -> // Given
+  Line 173: Short comment? -> // When
+  Line 177: Short comment? -> // Then
+  Line 189: Short comment? -> // Given
+  Line 193: Short comment? -> // When
+  Line 197: Short comment? -> // Then
+  Line 208: Short comment? -> // Given
+  Line 213: Short comment? -> // When
+  Line 217: Short comment? -> // Then
+File: ./backend/src/test/java/sgc/notificacao/NotificacaoEmailServiceTest.java
+  Line 69: Short comment? -> // Arrange
+  Line 77: Short comment? -> // Act
+  Line 80: Short comment? -> // Assert
+  Line 89: Short comment? -> // Arrange
+  Line 94: Short comment? -> // Act
+  Line 97: Short comment? -> // Assert
+  Line 105: Short comment? -> // Arrange
+  Line 112: Short comment? -> // Act
+  Line 115: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/integracao/CDU36IntegrationTest.java
+  Line 43: Short comment? -> // Obter Unidade
+  Line 46: Short comment? -> // Criar Processo
+  Line 54: Short comment? -> // Criar Subprocesso
+  Line 97: Short comment? -> // When/Then
+  Line 106: Short comment? -> // When/Then
+File: ./backend/src/test/java/sgc/integracao/CDU03IntegrationTest.java
+  Line 46: Redundant comment? -> // Create fixtures using saveAndFlush to ensure visibility
+  Line 90: Short comment? -> // 'Criado'
+  Line 110: Short comment? -> // validação
+  Line 169: Short comment? -> // 2. Editar o processo
+  Line 234: Short comment? -> // 2. Remover o processo
+File: ./backend/src/test/java/sgc/integracao/CDU02IntegrationTest.java
+  Line 66: Short comment? -> // Raiz
+  Line 72: Short comment? -> // Filha 1 -> Raiz
+  Line 79: Short comment? -> // Filha 2 -> Raiz
+File: ./backend/src/test/java/sgc/integracao/CDU27IntegrationTest.java
+  Line 47: Short comment? -> // Obter Unidade
+  Line 50: Short comment? -> // Criar Processo
+  Line 58: Short comment? -> // Criar Subprocesso
+  Line 68: Short comment? -> // Reload to attach
+  Line 76: Short comment? -> // Given
+  Line 80: Short comment? -> // When
+  Line 88: Short comment? -> // Then
+  Line 95: Short comment? -> // Verify Alerta
+  Line 107: Short comment? -> // Given
+  Line 111: Short comment? -> // When/Then
+File: ./backend/src/test/java/sgc/integracao/CDU17IntegrationTest.java
+  Line 90: Short comment? -> // Criar Mapa
+  Line 139: Short comment? -> // Print error if 500
+File: ./backend/src/test/java/sgc/integracao/CDU05IntegrationTest.java
+  Line 56: Short comment? -> // 1. Criar unidade
+File: ./backend/src/test/java/sgc/integracao/CDU23IntegrationTest.java
+  Line 61: Short comment? -> // Criar Unidades
+  Line 75: Short comment? -> // Criar Usuário
+  Line 80: Short comment? -> // Criar Processo
+  Line 88: Short comment? -> // Criar Subprocessos
+  Line 113: Short comment? -> // Given
+  Line 122: Short comment? -> // When
+  Line 130: Short comment? -> // Then
+  Line 134: Short comment? -> // Verify Subprocesso 1
+  Line 142: Short comment? -> // Verify Subprocesso 2
+File: ./backend/src/test/java/sgc/integracao/CDU25IntegrationTest.java
+  Line 70: Redundant comment? -> // Create test process
+  Line 70: Short comment? -> // Create test process
+  Line 78: Redundant comment? -> // Create subprocesses in MAPEAMENTO_MAPA_VALIDADO state
+  Line 102: Short comment? -> // Given
+  Line 111: Short comment? -> // When
+  Line 119: Short comment? -> // Then
+  Line 123: Redundant comment? -> // Check Subprocesso 1
+  Line 123: Short comment? -> // Check Subprocesso 1
+  Line 133: Redundant comment? -> // Check Subprocesso 2
+  Line 133: Short comment? -> // Check Subprocesso 2
+File: ./backend/src/test/java/sgc/integracao/CDU10IntegrationTest.java
+  Line 80: Short comment? -> // 2. Criar Usuários
+  Line 114: Short comment? -> // 5. Autenticar
+  Line 207: Short comment? -> // 4. Simular devolução
+File: ./backend/src/test/java/sgc/integracao/CDU26IntegrationTest.java
+  Line 107: Short comment? -> // Given
+  Line 116: Short comment? -> // When
+  Line 124: Short comment? -> // Then
+  Line 128: Redundant comment? -> // Check Subprocesso 1
+  Line 128: Short comment? -> // Check Subprocesso 1
+  Line 137: Redundant comment? -> // Check Subprocesso 2
+  Line 137: Short comment? -> // Check Subprocesso 2
+File: ./backend/src/test/java/sgc/integracao/CDU22IntegrationTest.java
+  Line 69: Redundant comment? -> // Create test process
+  Line 69: Short comment? -> // Create test process
+  Line 77: Redundant comment? -> // Create subprocesses for both units
+  Line 93: Short comment? -> // Reload to attach
+  Line 105: Short comment? -> // Given
+  Line 114: Short comment? -> // When
+  Line 122: Short comment? -> // Then
+  Line 126: Short comment? -> // Verify Subprocesso 1
+  Line 138: Short comment? -> // Verify Subprocesso 2
+File: ./backend/src/test/java/sgc/integracao/CDU08IntegrationTest.java
+  Line 156: Short comment? -> // Recarregar objetos
+File: ./backend/src/test/java/sgc/integracao/CDU24IntegrationTest.java
+  Line 67: Redundant comment? -> // Create test process
+  Line 67: Short comment? -> // Create test process
+  Line 75: Redundant comment? -> // Create subprocesses with complete maps (Status: MAPEAMENTO_MAPA_CRIADO)
+  Line 94: Short comment? -> // Criar Mapa
+  Line 103: Short comment? -> // Criar Atividade
+  Line 107: Short comment? -> // Criar Competência
+  Line 111: Short comment? -> // Associar (ManyToMany)
+  Line 122: Short comment? -> // Given
+  Line 132: Short comment? -> // When
+  Line 140: Short comment? -> // Then
+File: ./backend/src/test/java/sgc/integracao/CDU34IntegrationTest.java
+  Line 50: Short comment? -> // Obter Unidade
+  Line 53: Short comment? -> // Criar Processo
+  Line 72: Short comment? -> // Reload to attach
+  Line 80: Short comment? -> // Given
+  Line 85: Short comment? -> // When
+  Line 94: Short comment? -> // Then
+  Line 116: Short comment? -> // Given
+  Line 121: Short comment? -> // When/Then
+  Line 134: Short comment? -> // Given
+  Line 139: Short comment? -> // When/Then
+File: ./backend/src/test/java/sgc/integracao/CDU16IntegrationTest.java
+  Line 98: Short comment? -> // Salvar associações
+File: ./backend/src/test/java/sgc/integracao/CDU31IntegrationTest.java
+  Line 60: Short comment? -> // Listar
+  Line 70: Short comment? -> // Atualizar
+File: ./backend/src/test/java/sgc/integracao/CDU06IntegrationTest.java
+  Line 71: Short comment? -> // Cria processo
+File: ./backend/src/test/java/sgc/integracao/CDU11IntegrationTest.java
+  Line 61: Short comment? -> // Unidade
+  Line 68: Short comment? -> // Chefe (User 3)
+  Line 72: Short comment? -> // Servidor (User 1)
+  Line 83: Short comment? -> // Processo
+  Line 91: Short comment? -> // Mapa e Subprocesso
+File: ./backend/src/test/java/sgc/integracao/CDU19IntegrationTest.java
+  Line 55: Redundant comment? -> // Create test process and subprocess
+  Line 81: Short comment? -> // CHEFE of unit 9
+  Line 125: Short comment? -> // CHEFE of unit 9
+File: ./backend/src/test/java/sgc/integracao/CDU12IntegrationTest.java
+  Line 53: Short comment? -> // Repositories
+File: ./backend/src/test/java/sgc/integracao/CDU01IntegrationTest.java
+  Line 53: Short comment? -> // Setup Unidade Admin
+  Line 60: Short comment? -> // Setup Usuario Admin
+  Line 71: Short comment? -> // Setup Unidade Gestor
+  Line 78: Short comment? -> // Setup Usuario Gestor
+  Line 85: Short comment? -> // unidadeGestor)
+  Line 194: Short comment? -> // Arrange
+  Line 199: Short comment? -> // Act & Assert
+  Line 215: Short comment? -> // Arrange
+  Line 236: Short comment? -> // Act & Assert
+File: ./backend/src/test/java/sgc/integracao/PermissaoSubprocessoIntegrationTest.java
+  Line 83: Short comment? -> // 5. Validar hipótese
+File: ./backend/src/test/java/sgc/integracao/CDU33IntegrationTest.java
+  Line 66: Short comment? -> // Obter Unidade
+  Line 96: Short comment? -> // Reload to attach
+  Line 104: Short comment? -> // Given
+  Line 108: Short comment? -> // When
+  Line 116: Short comment? -> // Then
+  Line 148: Short comment? -> // Given
+  Line 151: Short comment? -> // When/Then
+  Line 164: Short comment? -> // Given
+  Line 167: Short comment? -> // When/Then
+File: ./backend/src/test/java/sgc/integracao/CDU13IntegrationTest.java
+  Line 87: Short comment? -> // Carregar via Repo
+  Line 125: Short comment? -> // Movimentação inicial
+  Line 138: Short comment? -> // Reload entities
+  Line 147: Short comment? -> // Given
+  Line 156: Short comment? -> // When
+  Line 167: Short comment? -> // Then
+  Line 272: Short comment? -> // (unidadeSuperior).
+File: ./backend/src/test/java/sgc/integracao/CDU32IntegrationTest.java
+  Line 66: Short comment? -> // Obter Unidade
+  Line 77: Short comment? -> // Criar Processo
+  Line 96: Short comment? -> // Reload to attach
+  Line 104: Short comment? -> // Given
+  Line 108: Short comment? -> // When
+  Line 116: Short comment? -> // Then
+  Line 148: Short comment? -> // Given
+  Line 151: Short comment? -> // When/Then
+  Line 164: Short comment? -> // Given
+  Line 167: Short comment? -> // When/Then
+File: ./backend/src/test/java/sgc/integracao/ProcessoEmailIntegrationTest.java
+  Line 28: Short comment? -> // Arrange
+File: ./backend/src/test/java/sgc/integracao/CDU28IntegrationTest.java
+  Line 59: Short comment? -> // Given
+  Line 67: Short comment? -> // When
+  Line 75: Short comment? -> // Then
+  Line 109: Short comment? -> // When/Then
+File: ./backend/src/test/java/sgc/integracao/CDU20IntegrationTest.java
+  Line 89: Redundant comment? -> // Create test process and subprocess
+  Line 97: Redundant comment? -> // Create subprocess in MAPEAMENTO_MAPA_VALIDADO state for unit 9
+  Line 235: Short comment? -> // Ação
+  Line 241: Short comment? -> // Verificações
+File: ./backend/src/test/java/sgc/integracao/CDU35IntegrationTest.java
+  Line 49: Short comment? -> // Obter Unidade
+  Line 57: Short comment? -> // Criar Processo
+  Line 65: Short comment? -> // Criar Subprocesso
+  Line 80: Short comment? -> // When/Then
+  Line 93: Short comment? -> // When/Then
+  Line 104: Short comment? -> // When/Then
+File: ./backend/src/test/java/sgc/integracao/EmailIntegrationTest.java
+  Line 22: Short comment? -> // Arrange
+  Line 27: Short comment? -> // Act
+File: ./backend/src/test/java/sgc/integracao/CDU14IntegrationTest.java
+  Line 69: Short comment? -> // SEDIA)
+  Line 71: Short comment? -> // unit 9)
+  Line 388: Short comment? -> // AccessControlService
+File: ./backend/src/test/java/sgc/integracao/mocks/TestLoginHelper.java
+  Line 36: Redundant @param -> * @param mockMvc MockMvc configurado
+  Line 36: Redundant @param -> * @param perfil Perfil desejado
+  Line 38: Short comment? -> // 1. Autenticar
+File: ./backend/src/test/java/sgc/integracao/mocks/TestConfig.java
+  Line 54: Short comment? -> // --- ObjectMapper ---
+  Line 82: Short comment? -> // não dorme em testes
+File: ./backend/src/test/java/sgc/mapa/dto/ImpactoMapaResponseTest.java
+  Line 19: Short comment? -> // 1. Com impactos
+File: ./backend/src/test/java/sgc/mapa/service/ImpactoMapaServiceTest.java
+  Line 79: Short comment? -> // Vigente: vazio
+  Line 82: Short comment? -> // Atual: 1 atividade
+File: ./backend/src/test/java/sgc/mapa/service/MapaManutencaoServicePbtTest.java
+  Line 22: Short comment? -> // Mock dependencies
+File: ./backend/src/test/java/sgc/mapa/service/CopiaMapaServiceCoverageTest.java
+  Line 39: Short comment? -> // Arrange
+  Line 63: Short comment? -> // Act
+  Line 66: Short comment? -> // Assert
+  Line 73: Short comment? -> // Arrange
+  Line 86: Short comment? -> // Act
+  Line 89: Short comment? -> // Assert
+  Line 96: Short comment? -> // Arrange
+  Line 107: Short comment? -> // Act
+  Line 110: Short comment? -> // Assert
+File: ./backend/src/test/java/sgc/mapa/service/MapaManutencaoServiceCoverageTest.java
+  Line 40: Short comment? -> // Arrange
+  Line 52: Short comment? -> // Act
+  Line 58: Short comment? -> // Assert
+  Line 123: Short comment? -> // Arrange
+  Line 135: Short comment? -> // Act
+  Line 138: Short comment? -> // Assert
+File: ./backend/src/main/java/sgc/e2e/E2eController.java
+  Line 209: Short comment? -> // Validar entrada
+  Line 216: Short comment? -> // Calcular data limite
+  Line 236: Short comment? -> // Criar processo
+  Line 239: Short comment? -> // Iniciar se solicitado
+File: ./backend/src/main/java/sgc/subprocesso/service/query/ConsultasSubprocessoService.java
+  Line 94: Redundant @param -> * @param mensagem mensagem de erro (presente apenas se inválido)
+File: ./backend/src/main/java/sgc/subprocesso/service/workflow/SubprocessoTransicaoService.java
+  Line 89: Short comment? -> // 2. Atualizar Estado
+File: ./backend/src/main/java/sgc/subprocesso/service/crud/SubprocessoValidacaoService.java
+  Line 131: Redundant @param -> * @param subprocesso Subprocesso a validar (não pode ser null)
+  Line 157: Redundant @param -> * @param subprocesso Subprocesso a validar (não pode ser null)
+  Line 173: Redundant @param -> * @param subprocesso Subprocesso a validar (garantido não-null por @NonNull)
+  Line 173: Redundant @param -> * @param mensagem Mensagem customizada de erro
+  Line 195: Redundant @param -> * @param subprocesso Subprocesso a validar (garantido não-null por @NonNull)
+  Line 216: Redundant @param -> * @param subprocesso Subprocesso a validar (garantido não-null por @NonNull)
+  Line 216: Redundant @param -> * @param mensagem Mensagem customizada de erro
+File: ./backend/src/main/java/sgc/subprocesso/model/SituacaoSubprocesso.java
+  Line 12: Short comment? -> // Mapeamento
+  Line 22: Short comment? -> // Revisão
+  Line 32: Short comment? -> // Diagnóstico
+File: ./backend/src/main/java/sgc/alerta/AlertaFacade.java
+  Line 91: Short comment? -> // Alertas operacionais
+File: ./backend/src/main/java/sgc/processo/service/ProcessoValidador.java
+  Line 60: Redundant @param -> * @param processo processo a validar
+  Line 74: Redundant @param -> * @param processo processo a validar
+File: ./backend/src/main/java/sgc/processo/service/ProcessoInicializador.java
+  Line 85: Short comment? -> // Criar subprocessos
+  Line 138: Short comment? -> // Caso DIAGNOSTICO
+File: ./backend/src/main/java/sgc/processo/service/ProcessoDetalheBuilder.java
+  Line 93: Short comment? -> // Ordenação
+File: ./backend/src/main/java/sgc/processo/service/ProcessoFinalizador.java
+  Line 80: Redundant @param -> * @param processo processo cujos mapas serão tornados vigentes
+File: ./backend/src/main/java/sgc/seguranca/login/ClienteAcessoAd.java
+  Line 30: Redundant @param -> * @param senha  Senha do usuário
+File: ./backend/src/main/java/sgc/seguranca/acesso/SubprocessoAccessPolicy.java
+  Line 244: Short comment? -> // 1. Verifica perfil
+File: ./backend/src/main/java/sgc/organizacao/service/UnidadeService.java
+  Line 84: Redundant @param -> * @param mapa          mapa a ser definido como vigente
+File: ./backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java
+  Line 108: Redundant @param -> * @param sigla sigla da unidade raiz
+  Line 129: Redundant @param -> * @param sigla sigla da unidade
+File: ./etc/scripts/qualidade.js
+  Line 43: Short comment? -> // Remove cores ANSI
+  Line 223: Short comment? -> // Collect stats
+  Line 259: Short comment? -> // Status Table
+  Line 270: Short comment? -> // Statistics Table
+File: ./etc/scripts/gerar_arvore_linhas.js
+  Line 181: Short comment? -> // Execução

@@ -88,20 +88,7 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
 
     List<Subprocesso> findBySituacao(SituacaoSubprocesso situacao);
 
-    /**
-     * Conta o total de subprocessos de um processo.
-     *
-     * @param processoCodigo código do processo
-     * @return quantidade de subprocessos
-     */
     long countByProcessoCodigo(Long processoCodigo);
 
-    /**
-     * Conta quantos subprocessos de um processo estão nas situações especificadas.
-     *
-     * @param processoCodigo código do processo
-     * @param situacoes      situações a verificar
-     * @return quantidade de subprocessos nas situações
-     */
     long countByProcessoCodigoAndSituacaoIn(Long processoCodigo, List<SituacaoSubprocesso> situacoes);
 }

@@ -28,7 +28,6 @@ public class TestLoginHelper {
     /**
      * Realiza login completo e retorna o token JWT.
      *
-     * @param mockMvc MockMvc configurado
      * @param titulo Título eleitoral do usuário
      * @param perfil Perfil desejado
      * @param unidadeCodigo Código da unidade

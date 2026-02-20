@@ -206,18 +206,15 @@ public class E2eController {
      * Método auxiliar para criar processos fixtures.
      */
     private Processo criarProcessoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
-        // Validar entrada
         if (request.unidadeSigla().isBlank()) {
             throw new ErroValidacao("Unidade é obrigatória");
         }
 
         UnidadeDto unidade = organizacaoFacade.buscarUnidadePorSigla(request.unidadeSigla());
 
-        // Calcular data limite
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
         LocalDateTime dataLimite = LocalDate.now().plusDays(diasLimite).atStartOfDay();
 
-        // Criar requisição de processo
         String descricao;
         String descReq = request.descricao();
         if (descReq != null && !descReq.isBlank()) {
@@ -233,10 +230,8 @@ public class E2eController {
                 .unidades(List.of(unidade.getCodigo()))
                 .build();
 
-        // Criar processo
         Processo processo = processoFacade.criar(criarReq);
 
-        // Iniciar se solicitado
         if (Boolean.TRUE.equals(request.iniciar())) {
             List<Long> unidades = List.of(unidade.getCodigo());
             Long processoCodigo = processo.getCodigo();

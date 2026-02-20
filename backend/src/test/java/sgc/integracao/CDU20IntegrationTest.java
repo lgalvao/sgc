@@ -86,7 +86,6 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         usuarioChefe.setUnidadeAtivaCodigo(9L);
         usuarioChefe.setAuthorities(Set.of(Perfil.CHEFE.toGrantedAuthority()));
 
-        // Create test process and subprocess
         Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setDescricao("Processo de Teste");
@@ -94,7 +93,6 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
 
-        // Create subprocess in MAPEAMENTO_MAPA_VALIDADO state for unit 9
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
