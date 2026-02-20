@@ -323,10 +323,10 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
 
         // ADMIN: pode em revisões avançadas - GLOBAL (Apenas precisa estar na mesma unidade de localização como exigido para leitura/escrita)
         if (temPerfil(usuario, ADMIN) && SITUACOES_VERIFICAR_IMPACTOS_ADMIN.contains(situacao)) {
-            if (verificaHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_UNIDADE)) {
+            if (verificaHierarquia(usuario, localizacao, RequisitoHierarquia.NENHUM)) {
                  return true;
             }
-            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_UNIDADE));
+            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, localizacao, RequisitoHierarquia.NENHUM));
             return false;
         }
 
