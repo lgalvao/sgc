@@ -230,6 +230,22 @@ class SubprocessoAccessPolicyTest {
         assertTrue(policy.canExecute(uAdmin, Acao.VERIFICAR_IMPACTOS, spRevHom));
     }
 
+    @Test
+    @DisplayName("canExecute - Admin Devolver Cadastro - Deve Respeitar Hierarquia")
+    void canExecute_AdminDevolverCadastro_DeveRespeitarHierarquia() {
+        Usuario u = criarUsuario(Perfil.ADMIN, 99L); // Admin na unidade 99
+        Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, 1L); // SP na unidade 1
+
+        mockLocalizacao(sp, 1L); // SP está fisicamente na unidade 1
+
+        // Admin (99) tentando Devolver Cadastro (localizado em 1) -> DEVE SER FALSE
+        assertFalse(policy.canExecute(u, Acao.DEVOLVER_CADASTRO, sp));
+
+        // Admin (1) tentando Devolver Cadastro (localizado em 1) -> DEVE SER TRUE
+        Usuario uAdmin1 = criarUsuario(Perfil.ADMIN, 1L);
+        assertTrue(policy.canExecute(uAdmin1, Acao.DEVOLVER_CADASTRO, sp));
+    }
+
     private int contadorUsuarios = 0;
     
     private Usuario criarUsuario(Perfil perfil, Long codUnidade) {
