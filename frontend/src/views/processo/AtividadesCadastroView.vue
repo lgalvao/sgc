@@ -9,7 +9,7 @@
               data-testid="btn-cad-atividades-voltar"
               title="Voltar"
               variant="link"
-              @click="() => { router.push(`/processo/${props.codProcesso}/${props.sigla}`); }"
+              @click="() => { router.push({ name: 'Subprocesso', params: { codProcesso: props.codProcesso, siglaUnidade: props.sigla } }); }"
           >
             <i aria-hidden="true" class="bi bi-arrow-left"/>
           </BButton>
