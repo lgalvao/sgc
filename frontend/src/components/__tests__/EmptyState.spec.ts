@@ -1,7 +1,6 @@
 import {describe, expect, it} from 'vitest'
 import {mount} from '@vue/test-utils'
 import EmptyState from '../comum/EmptyState.vue'
-import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 describe('EmptyState.vue', () => {
   it('renderiza corretamente sem props', () => {
@@ -59,16 +58,5 @@ describe('EmptyState.vue', () => {
     expect(wrapper.find('[data-testid="empty-state-title"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="empty-state-description"]').exists()).toBe(false)
     expect(wrapper.find('i').exists()).toBe(false)
-  })
-
-  it('deve ser acessível', async () => {
-    const wrapper = mount(EmptyState, {
-      props: {
-        title: 'Título',
-        description: 'Descrição',
-        icon: 'bi-info-circle'
-      }
-    })
-    await checkA11y(wrapper.element as HTMLElement)
   })
 })

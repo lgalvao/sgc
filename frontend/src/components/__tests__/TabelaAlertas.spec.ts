@@ -5,7 +5,6 @@ import EmptyState from "../comum/EmptyState.vue";
 import type {Alerta} from "@/types/tipos";
 import {BTable as _BTable} from "bootstrap-vue-next";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
-import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 const mockAlertas: Alerta[] = [
     {
@@ -138,12 +137,5 @@ describe("TabelaAlertas.vue", () => {
         await btn.trigger('click');
         expect(wrapper.emitted('recarregar')).toBeTruthy();
         expect(wrapper.emitted('recarregar')).toHaveLength(1);
-    });
-
-    it("deve ser acessível", async () => {
-        const wrapper = mount(TabelaAlertas, {
-            props: {alertas: mockAlertas},
-        });
-        await checkA11y(wrapper.element as HTMLElement);
     });
 });

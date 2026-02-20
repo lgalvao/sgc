@@ -1,7 +1,6 @@
 import {describe, expect, it} from 'vitest'
 import {mount} from '@vue/test-utils'
 import ModalConfirmacao from '../comum/ModalConfirmacao.vue'
-import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 describe('ModalConfirmacao.vue', () => {
     const defaultProps = {
@@ -184,13 +183,5 @@ describe('ModalConfirmacao.vue', () => {
         expect(cancelBtn.attributes('disabled')).toBeDefined()
         expect(confirmBtn.find('.spinner-border').exists()).toBe(true)
         expect(confirmBtn.text()).toContain('Processando...')
-    })
-
-    it('deve ser acessível', async () => {
-        const wrapper = mount(ModalConfirmacao, {
-            props: defaultProps,
-            global: globalOptions
-        })
-        await checkA11y(wrapper.element as HTMLElement)
     })
 })

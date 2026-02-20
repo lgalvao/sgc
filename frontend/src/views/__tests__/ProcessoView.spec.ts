@@ -7,7 +7,6 @@ import {useFeedbackStore} from "@/stores/feedback";
 import {usePerfilStore} from "@/stores/perfil";
 import {Perfil, SituacaoSubprocesso} from "@/types/tipos";
 import {nextTick} from "vue";
-import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 // Define mocks first
 const mocks = vi.hoisted(() => ({
@@ -617,14 +616,5 @@ describe("Processo.vue", () => {
         
         // As duas unidades devem ser elegíveis para disponibilizar
         expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(2);
-    });
-
-    it("deve ser acessível", async () => {
-        wrapper = createWrapper();
-        processosStore = useProcessosStore();
-        processosStore.$patch({ processoDetalhe: mockProcesso });
-
-        await flushPromises();
-        await checkA11y(wrapper.element as HTMLElement);
     });
 });

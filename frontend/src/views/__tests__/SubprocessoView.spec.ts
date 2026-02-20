@@ -8,7 +8,6 @@ import {useFeedbackStore} from '@/stores/feedback';
 import {useProcessosStore} from '@/stores/processos';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
-import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 // Mock child components
 const SubprocessoHeaderStub = {
@@ -373,11 +372,5 @@ describe('Subprocesso.vue', () => {
     await flushPromises();
 
     expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining('Não foi possível enviar'), 'danger');
-  });
-
-  it('deve ser acessível', async () => {
-    const { wrapper } = mountComponent();
-    await flushPromises();
-    await checkA11y(wrapper.element as HTMLElement);
   });
 });

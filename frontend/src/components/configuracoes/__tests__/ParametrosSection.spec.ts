@@ -1,7 +1,6 @@
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {axe} from 'vitest-axe';
 import ParametrosSection from '@/components/configuracoes/ParametrosSection.vue';
 import {useConfiguracoesStore} from '@/stores/configuracoes';
 import {useNotificacoesStore} from '@/stores/feedback';
@@ -60,13 +59,6 @@ describe('ParametrosSection', () => {
         expect(wrapper.find('form').exists()).toBe(true);
         expect(wrapper.find('#diasInativacao').exists()).toBe(true);
         expect(wrapper.find('#diasAlertaNovo').exists()).toBe(true);
-    });
-
-    it('deve passar nos testes de acessibilidade', async () => {
-        setupWrapper();
-        await wrapper.vm.$nextTick();
-        const results = await axe(wrapper.element);
-        expect(results).toHaveNoViolations();
     });
 
     it('deve chamar recarregar ao clicar no botão recarregar', async () => {

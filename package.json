@@ -16,12 +16,12 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
-    "@types/node": "^25.2.2",
-    "@types/smtp-server": "^3.5.10",
+    "@types/node": "^25.3.0",
+    "@types/smtp-server": "^3.5.12",
     "@vitest/browser-preview": "^4.0.18",
     "chrome-launcher": "^1.2.1",
-    "lighthouse": "^13.0.2",
-    "smtp-server": "^3.13.6",
+    "lighthouse": "^13.0.3",
+    "smtp-server": "^3.18.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },

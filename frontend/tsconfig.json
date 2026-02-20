@@ -22,8 +22,7 @@
     "types": [
       "vitest/globals",
       "node",
-      "vite/client",
-      "vitest-axe/extend-expect"
+      "vite/client"
     ],
     "baseUrl": ".",
     "paths": {

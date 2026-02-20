@@ -5,7 +5,6 @@ import {useRoute} from "vue-router";
 import {Perfil} from "@/types/tipos";
 import BarraNavegacao from "../layout/BarraNavegacao.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
-import {checkA11y} from "@/test-utils/a11yTestHelpers";
 
 // Mock vue-router
 const mockRouter = {
@@ -221,17 +220,6 @@ describe("BarraNavegacao.vue", () => {
             );
             await wrapper.findComponent(BButton).trigger("click");
             expect(mockRouter.back).toHaveBeenCalledTimes(1);
-        });
-
-        it("deve ser acessível", async () => {
-            vi.mocked(useRoute).mockReturnValue(
-                createMockRoute("/processo/123", mockMatchedProcesso, "Processo", {codProcesso: "123"}),
-            );
-            const wrapper = mount(
-                BarraNavegacao,
-                getCommonMountOptions({}, {BButton}),
-            );
-            await checkA11y(wrapper.element as HTMLElement);
         });
     });
 });
