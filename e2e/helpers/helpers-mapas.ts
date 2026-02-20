@@ -26,6 +26,9 @@ export async function navegarParaMapa(page: Page) {
     await garantirContextoSubprocesso(page);
     const cardEdicao = page.getByTestId('card-subprocesso-mapa-edicao');
     const cardVisualizacao = page.getByTestId('card-subprocesso-mapa-visualizacao');
+
+    await expect(cardEdicao.or(cardVisualizacao)).toBeVisible();
+
     const cardAlvo = (await cardEdicao.isVisible()) ? cardEdicao : cardVisualizacao;
 
     await expect(cardAlvo).toBeVisible();
