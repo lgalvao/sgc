@@ -270,11 +270,6 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
         if (isAcaoAnaliseOuEscrita(acao)) {
             Unidade localizacao = obterUnidadeLocalizacao(sp);
 
-            // ADMIN: Permissão global para ações de devolução/aceite, ignorando a restrição de MESMA_UNIDADE
-            if (temPerfil(usuario, ADMIN) && isAcaoAdminGlobal(acao)) {
-                return true;
-            }
-
             if (!verificaHierarquia(usuario, localizacao, regras.requisitoHierarquia)) {
                 String motivo = obterMotivoNegacaoHierarquia(usuario, localizacao, regras.requisitoHierarquia);
                 log.info("Permissão negada por localização para {}: {}", usuario.getTituloEleitoral(), motivo);
@@ -301,14 +296,6 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
             EDITAR_REVISAO_CADASTRO, DISPONIBILIZAR_REVISAO_CADASTRO, DEVOLVER_REVISAO_CADASTRO, ACEITAR_REVISAO_CADASTRO, HOMOLOGAR_REVISAO_CADASTRO,
             EDITAR_MAPA, DISPONIBILIZAR_MAPA, APRESENTAR_SUGESTOES, VALIDAR_MAPA, DEVOLVER_MAPA, ACEITAR_MAPA, HOMOLOGAR_MAPA, AJUSTAR_MAPA,
             REALIZAR_AUTOAVALIACAO
-        ).contains(acao);
-    }
-
-    private boolean isAcaoAdminGlobal(Acao acao) {
-        return EnumSet.of(
-            DEVOLVER_CADASTRO, ACEITAR_CADASTRO,
-            DEVOLVER_REVISAO_CADASTRO, ACEITAR_REVISAO_CADASTRO,
-            DEVOLVER_MAPA, ACEITAR_MAPA
         ).contains(acao);
     }
 
