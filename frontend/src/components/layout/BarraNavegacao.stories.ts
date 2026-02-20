@@ -1,7 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import BarraNavegacao from './BarraNavegacao.vue';
-import { createTestingPinia } from '@pinia/testing';
-import { fn } from '@storybook/test';
 
 const meta: Meta<typeof BarraNavegacao> = {
   title: 'Layout/BarraNavegacao',

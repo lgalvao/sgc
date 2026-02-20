@@ -1,6 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import CompetenciasListSection from './CompetenciasListSection.vue';
-import { fn } from '@storybook/test';
 
 const meta: Meta<typeof CompetenciasListSection> = {
   title: 'Mapa/CompetenciasListSection',
@@ -10,7 +9,7 @@ const meta: Meta<typeof CompetenciasListSection> = {
     onCriar: { action: 'criar' },
     onEditar: { action: 'editar' },
     onExcluir: { action: 'excluir' },
-    onRemoverAtividade: { action: 'remover-atividade' },
+    'onRemover-atividade': { action: 'remover-atividade' },
   },
 };
 
@@ -19,8 +18,8 @@ type Story = StoryObj<typeof CompetenciasListSection>;
 
 const mockUnidade = { codigo: 1, nome: 'Unidade Teste', sigla: 'TESTE' };
 const mockAtividades = [
-  { codigo: 101, descricao: 'Atividade 1' },
-  { codigo: 102, descricao: 'Atividade 2' },
+  { codigo: 101, descricao: 'Atividade 1', conhecimentos: [] },
+  { codigo: 102, descricao: 'Atividade 2', conhecimentos: [] },
 ];
 const mockCompetencias = [
   {

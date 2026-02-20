@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import UnidadeTreeNode from './UnidadeTreeNode.vue';
 import { fn } from '@storybook/test';
 
@@ -27,10 +27,10 @@ const mockUnidadeRaiz = {
 };
 
 const mockFunctions = {
-  isChecked: (codigo: number) => codigo === 2,
-  getEstadoSelecao: (unidade: any) => unidade.codigo === 2 ? true : false,
+  isChecked: (codigo: number | string) => codigo === 2,
+  getEstadoSelecao: (unidade: any) => unidade.codigo === 2,
   isExpanded: (unidade: any) => unidade.codigo === 1,
-  isHabilitado: (unidade: any) => true,
+  isHabilitado: (_: any) => true,
   onToggle: fn(),
   onToggleExpand: fn(),
 };

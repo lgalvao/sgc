@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import TreeRowItem from './TreeRowItem.vue';
 
 const meta: Meta<typeof TreeRowItem> = {
@@ -7,7 +7,7 @@ const meta: Meta<typeof TreeRowItem> = {
   tags: ['autodocs'],
   argTypes: {
     onToggle: { action: 'toggle' },
-    onRowClick: { action: 'row-click' },
+    'onRow-click': { action: 'row-click' },
   },
   decorators: [
     () => ({
@@ -23,7 +23,7 @@ const mockColumns = [{ key: 'nome' }, { key: 'valor' }];
 
 export const Raiz: Story = {
   args: {
-    item: { codigo: 1, nome: 'Item Raiz', valor: '100', children: [{}], expanded: false },
+    item: { codigo: 1, nome: 'Item Raiz', valor: '100', children: [{ codigo: 1.1 }], expanded: false },
     level: 0,
     columns: mockColumns,
   },
@@ -47,7 +47,7 @@ export const Nivel2: Story = {
 
 export const Expandido: Story = {
   args: {
-    item: { codigo: 4, nome: 'Item Expandido', valor: '200', children: [{}], expanded: true },
+    item: { codigo: 4, nome: 'Item Expandido', valor: '200', children: [{ codigo: 4.1 }], expanded: true },
     level: 0,
     columns: mockColumns,
   },

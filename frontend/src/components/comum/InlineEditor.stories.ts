@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import InlineEditor from './InlineEditor.vue';
 import { ref } from 'vue';
 import { expect, userEvent, within } from '@storybook/test';

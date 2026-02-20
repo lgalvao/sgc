@@ -1,12 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import ProcessoSubprocessosTable from './ProcessoSubprocessosTable.vue';
+import { SituacaoSubprocesso } from '@/types/tipos';
 
 const meta: Meta<typeof ProcessoSubprocessosTable> = {
   title: 'Processo/ProcessoSubprocessosTable',
   component: ProcessoSubprocessosTable,
   tags: ['autodocs'],
   argTypes: {
-    onRowClick: { action: 'row-click' },
+    'onRow-click': { action: 'row-click' },
   },
 };
 
@@ -16,33 +17,39 @@ type Story = StoryObj<typeof ProcessoSubprocessosTable>;
 const mockParticipantes = [
   {
     codUnidade: 1,
+    codSubprocesso: 101,
     nome: 'Presidência',
     sigla: 'PRES',
-    situacaoSubprocesso: 'EM_ANDAMENTO',
+    situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
     dataLimite: '2025-12-31',
     filhos: [
       {
         codUnidade: 2,
+        codSubprocesso: 102,
         nome: 'Diretoria de Tecnologia',
         sigla: 'DITEC',
-        situacaoSubprocesso: 'CONCLUIDO',
+        situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
         dataLimite: '2025-12-31',
         filhos: [
           {
             codUnidade: 3,
+            codSubprocesso: 103,
             nome: 'Coordenação de Desenvolvimento',
             sigla: 'CODES',
-            situacaoSubprocesso: 'PENDENTE',
+            situacaoSubprocesso: SituacaoSubprocesso.NAO_INICIADO,
             dataLimite: '2025-12-31',
+            filhos: []
           }
         ]
       },
       {
         codUnidade: 4,
+        codSubprocesso: 104,
         nome: 'Diretoria Administrativa',
         sigla: 'DIRAD',
-        situacaoSubprocesso: 'EM_ANDAMENTO',
+        situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
         dataLimite: '2025-12-31',
+        filhos: []
       }
     ]
   }
@@ -59,10 +66,12 @@ export const UnidadeUnica: Story = {
     participantesHierarquia: [
       {
         codUnidade: 5,
+        codSubprocesso: 105,
         nome: 'Auditoria Interna',
         sigla: 'AUDIT',
-        situacaoSubprocesso: 'EM_ANDAMENTO',
+        situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
         dataLimite: '2025-06-30',
+        filhos: []
       }
     ],
   },

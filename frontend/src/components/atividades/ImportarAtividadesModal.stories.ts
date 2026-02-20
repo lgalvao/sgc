@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import { fn } from "@storybook/test";
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import ImportarAtividadesModal from './ImportarAtividadesModal.vue';
 import { createTestingPinia } from '@pinia/testing';
 import { ref } from 'vue';
-import { fn } from '@storybook/test';
 
 const meta: Meta<typeof ImportarAtividadesModal> = {
   title: 'Atividades/ImportarAtividadesModal',

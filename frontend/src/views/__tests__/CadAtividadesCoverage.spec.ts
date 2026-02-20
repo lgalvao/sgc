@@ -380,13 +380,7 @@ describe('CadAtividades.vue Coverage', () => {
     it('navigates back when back button is clicked', async () => {
         const { wrapper } = createWrapper();
         await wrapper.find('[data-testid="btn-cad-atividades-voltar"]').trigger('click');
-        expect(mockPush).toHaveBeenCalledWith({
-            name: 'Subprocesso',
-            params: {
-                codProcesso: 1,
-                siglaUnidade: 'TEST'
-            }
-        });
+        expect(mockPush).toHaveBeenCalledWith('/processo/1/TEST');
     });
 
     it('dismisses global error', async () => {

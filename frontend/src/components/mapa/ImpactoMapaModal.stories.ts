@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import ImpactoMapaModal from './ImpactoMapaModal.vue';
-import { TipoImpactoCompetencia } from '@/types/tipos';
+import { TipoImpactoAtividade, TipoImpactoCompetencia } from '@/types/tipos';
 import { ref } from 'vue';
 
 const meta: Meta<typeof ImpactoMapaModal> = {
@@ -14,14 +14,18 @@ type Story = StoryObj<typeof ImpactoMapaModal>;
 
 const mockImpacto = {
   temImpactos: true,
+  totalAtividadesInseridas: 1,
+  totalAtividadesRemovidas: 1,
+  totalAtividadesAlteradas: 1,
+  totalCompetenciasImpactadas: 2,
   atividadesInseridas: [
-    { codigo: 1, descricao: 'Nova Atividade de Teste', competenciasVinculadas: ['Competência A'] },
+    { codigo: 1, descricao: 'Nova Atividade de Teste', tipoImpacto: TipoImpactoAtividade.INSERIDA, competenciasVinculadas: ['Competência A'] },
   ],
   atividadesRemovidas: [
-    { codigo: 2, descricao: 'Atividade que foi removida' },
+    { codigo: 2, descricao: 'Atividade que foi removida', tipoImpacto: TipoImpactoAtividade.REMOVIDA, competenciasVinculadas: [] },
   ],
   atividadesAlteradas: [
-    { codigo: 3, descricao: 'Atividade Alterada', descricaoAnterior: 'Atividade Anterior' },
+    { codigo: 3, descricao: 'Atividade Alterada', tipoImpacto: TipoImpactoAtividade.ALTERADA, descricaoAnterior: 'Atividade Anterior', competenciasVinculadas: [] },
   ],
   competenciasImpactadas: [
     {
@@ -65,6 +69,10 @@ export const SemImpactos: Story = {
     mostrar: true,
     impacto: {
       temImpactos: false,
+      totalAtividadesInseridas: 0,
+      totalAtividadesRemovidas: 0,
+      totalAtividadesAlteradas: 0,
+      totalCompetenciasImpactadas: 0,
       atividadesInseridas: [],
       atividadesRemovidas: [],
       atividadesAlteradas: [],

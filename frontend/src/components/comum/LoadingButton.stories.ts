@@ -22,7 +22,7 @@ export const Default: Story = {
   args: {
     text: 'Clique aqui',
   },
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button');
     

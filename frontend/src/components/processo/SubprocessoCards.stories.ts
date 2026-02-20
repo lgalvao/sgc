@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import SubprocessoCards from './SubprocessoCards.vue';
 import { TipoProcesso } from '@/types/tipos';
 
@@ -18,13 +18,28 @@ export default meta;
 type Story = StoryObj<typeof SubprocessoCards>;
 
 const mockPermissoesFull = {
+  podeVerPagina: true,
   podeEditarCadastro: true,
   podeVisualizarMapa: true,
   podeEditarMapa: true,
   podeVisualizarDiagnostico: true,
+  podeDisponibilizarMapa: true,
+  podeDisponibilizarCadastro: true,
+  podeDevolverCadastro: true,
+  podeAceitarCadastro: true,
+  podeAlterarDataLimite: true,
+  podeVisualizarImpacto: true,
 };
 
-const mockMapa = { codigo: 1, descricao: 'Mapa Teste' };
+const mockMapa = {
+  codigo: 1,
+  descricao: 'Mapa Teste',
+  unidade: { codigo: 1, nome: 'Unidade Teste', sigla: 'TEST' },
+  codProcesso: 456,
+  competencias: [],
+  situacao: 'CRIADO',
+  dataCriacao: '2025-01-01T00:00:00Z'
+};
 
 export const MapeamentoGestor: Story = {
   args: {
@@ -42,6 +57,7 @@ export const MapeamentoVisualizador: Story = {
     tipoProcesso: TipoProcesso.MAPEAMENTO,
     mapa: mockMapa,
     permissoes: {
+      ...mockPermissoesFull,
       podeEditarCadastro: false,
       podeVisualizarMapa: true,
       podeEditarMapa: false,

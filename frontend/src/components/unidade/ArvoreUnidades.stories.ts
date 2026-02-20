@@ -1,4 +1,4 @@
-import type {Meta, StoryObj} from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import {expect, within} from '@storybook/test';
 import ArvoreUnidades from './ArvoreUnidades.vue';
 import type {Unidade} from '@/types/tipos';

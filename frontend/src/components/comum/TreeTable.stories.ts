@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import TreeTable from './TreeTable.vue';
 
 const meta: Meta<typeof TreeTable> = {
@@ -6,7 +6,7 @@ const meta: Meta<typeof TreeTable> = {
   component: TreeTable,
   tags: ['autodocs'],
   argTypes: {
-    onRowClick: { action: 'row-click' },
+    'onRow-click': { action: 'row-click' },
   },
 };
 

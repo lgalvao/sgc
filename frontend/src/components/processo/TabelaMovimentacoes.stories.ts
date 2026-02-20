@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import TabelaMovimentacoes from './TabelaMovimentacoes.vue';
 
 const meta: Meta<typeof TabelaMovimentacoes> = {
@@ -10,30 +10,42 @@ const meta: Meta<typeof TabelaMovimentacoes> = {
 export default meta;
 type Story = StoryObj<typeof TabelaMovimentacoes>;
 
+const mockUsuario = {
+  codigo: 1,
+  nome: 'Usuário Teste',
+  tituloEleitoral: '123456789012',
+  unidade: { codigo: 1, nome: 'Unidade Teste', sigla: 'TEST' },
+  email: 'teste@teste.com',
+  ramal: '1234'
+};
+
 const mockMovimentacoes = [
   {
     codigo: 1,
     dataHora: '2025-02-20T09:00:00Z',
-    unidadeOrigem: { sigla: 'PRES' },
-    unidadeDestino: { sigla: 'DITEC' },
+    unidadeOrigem: { codigo: 1, nome: 'Presidência', sigla: 'PRES' },
+    unidadeDestino: { codigo: 2, nome: 'Diretoria de Tecnologia', sigla: 'DITEC' },
     descricao: 'Início do processo de mapeamento.',
-    subprocesso: { situacao: 'EM_ANDAMENTO' },
+    subprocesso: { codigo: 101, situacao: 'EM_ANDAMENTO' } as any,
+    usuario: mockUsuario,
   },
   {
     codigo: 2,
     dataHora: '2025-02-21T11:30:00Z',
-    unidadeOrigem: { sigla: 'DITEC' },
-    unidadeDestino: { sigla: 'PRES' },
+    unidadeOrigem: { codigo: 2, nome: 'Diretoria de Tecnologia', sigla: 'DITEC' },
+    unidadeDestino: { codigo: 1, nome: 'Presidência', sigla: 'PRES' },
     descricao: 'Mapeamento concluído e enviado para homologação.',
-    subprocesso: { situacao: 'CONCLUIDO' },
+    subprocesso: { codigo: 101, situacao: 'CONCLUIDO' } as any,
+    usuario: mockUsuario,
   },
   {
     codigo: 3,
     dataHora: '2025-02-22T14:00:00Z',
-    unidadeOrigem: { sigla: 'PRES' },
-    unidadeDestino: null,
+    unidadeOrigem: { codigo: 1, nome: 'Presidência', sigla: 'PRES' },
+    unidadeDestino: { codigo: 1, nome: 'Presidência', sigla: 'PRES' },
     descricao: 'Processo finalizado pelo administrador.',
-    subprocesso: { situacao: 'HOMOLOGADO' },
+    subprocesso: { codigo: 101, situacao: 'HOMOLOGADO' } as any,
+    usuario: mockUsuario,
   },
 ];
 
