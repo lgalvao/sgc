@@ -142,6 +142,7 @@ tasks.withType<Test> {
     }
 
     val slowTests = mutableListOf<Pair<String, Long>>()
+    val showSlowTests = false
 
     addTestListener(object : TestListener {
         override fun beforeSuite(suite: TestDescriptor) {}
@@ -158,7 +159,7 @@ tasks.withType<Test> {
                 """.trimMargin()
                 println(output)
 
-                if (slowTests.isNotEmpty()) {
+                if (showSlowTests && slowTests.isNotEmpty()) {
                     println("\nTestes mais lentos (>2s):")
                     slowTests.sortedByDescending { it.second }
                         .take(10)

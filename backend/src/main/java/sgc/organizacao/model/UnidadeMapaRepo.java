@@ -8,8 +8,6 @@ import java.util.List;
 
 @Repository
 public interface UnidadeMapaRepo extends JpaRepository<UnidadeMapa, Long> {
-    @Query("""
-            SELECT um.unidadeCodigo FROM UnidadeMapa um
-            """)
+    @Query("SELECT um.unidadeCodigo FROM UnidadeMapa um")
     List<Long> findAllUnidadeCodigos();
 }

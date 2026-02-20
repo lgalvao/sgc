@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.fixture.UnidadeFixture;
@@ -44,9 +43,6 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     private Unidade unidade;
     private Mapa mapaOriginal;

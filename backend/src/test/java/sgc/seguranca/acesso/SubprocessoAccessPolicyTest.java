@@ -46,12 +46,25 @@ class SubprocessoAccessPolicyTest {
     }
 
     @Test
-    @DisplayName("canExecute - VERIFICAR_IMPACTOS - Gestor Disponibilizada")
+    @DisplayName("canExecute - VERIFICAR_IMPACTOS - Gestor Disponibilizada (Superior Imediata)")
     void canExecute_VerificarImpactos_GestorDisponibilizada() {
-        Usuario u = criarUsuario(Perfil.GESTOR, 2L); // Unidade doesn't matter for Gestor in this logic
+        Usuario u = criarUsuario(Perfil.GESTOR, 2L);
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, 1L);
 
+        when(hierarquiaService.isSuperiorImediata(any(), any())).thenReturn(true);
+
         assertTrue(policy.canExecute(u, Acao.VERIFICAR_IMPACTOS, sp));
+    }
+
+    @Test
+    @DisplayName("canExecute - VERIFICAR_IMPACTOS - Gestor Disponibilizada (NÃO Superior)")
+    void canExecute_VerificarImpactos_GestorNaoSuperior() {
+        Usuario u = criarUsuario(Perfil.GESTOR, 2L);
+        Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, 1L);
+
+        when(hierarquiaService.isSuperiorImediata(any(), any())).thenReturn(false);
+
+        assertFalse(policy.canExecute(u, Acao.VERIFICAR_IMPACTOS, sp));
     }
 
     @Test
@@ -185,11 +198,13 @@ class SubprocessoAccessPolicyTest {
         assertFalse(policy.canExecute(uChefe, Acao.VERIFICAR_IMPACTOS, spSitInv));
 
         // 4. GESTOR + REVISAO_CADASTRO_DISPONIBILIZADA -> True
-        Usuario uGestor = criarUsuario(Perfil.GESTOR, 99L); // Unidade irrelevante
+        Usuario uGestor = criarUsuario(Perfil.GESTOR, 99L);
         Subprocesso spRevDisp = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, 1L);
+        when(hierarquiaService.isSuperiorImediata(any(), any())).thenReturn(true);
         assertTrue(policy.canExecute(uGestor, Acao.VERIFICAR_IMPACTOS, spRevDisp));
 
         // 5. GESTOR + Situação Inválida -> False
+        // Reset stub for following tests if needed, or rely on specific matchers. For now just keep it true.
         assertFalse(policy.canExecute(uGestor, Acao.VERIFICAR_IMPACTOS, spSitInv));
 
         // 6. ADMIN + REVISAO_CADASTRO_DISPONIBILIZADA -> True

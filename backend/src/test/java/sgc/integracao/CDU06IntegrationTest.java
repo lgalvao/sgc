@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -43,9 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-06: Detalhar processo")
 class CDU06IntegrationTest extends BaseIntegrationTest {
     private static final String TEST_USER_ID = "123456789";
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @MockitoBean
     private UsuarioFacade usuarioService;

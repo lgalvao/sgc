@@ -48,6 +48,8 @@ class SubprocessoContextoService {
         accessControlService.verificarPermissao(usuarioAutenticado, Acao.VISUALIZAR_SUBPROCESSO, sp);
 
         Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
+
+        // TODO aqui já começou errado. O titular nunca pode ser nulo!
         Usuario titular = null;
         try {
             titular = usuarioService.buscarPorLogin(sp.getUnidade().getTituloTitular());

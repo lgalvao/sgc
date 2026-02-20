@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.AlertaRepo;
 import sgc.fixture.UnidadeFixture;
@@ -46,9 +45,6 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private UsuarioPerfilRepo usuarioPerfilRepo;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     private Unidade unidadeLivre;
 

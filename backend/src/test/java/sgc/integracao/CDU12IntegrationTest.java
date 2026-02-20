@@ -45,6 +45,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     private static final String API_SUBPROCESSOS_ID_IMPACTOS_MAPA =
             "/api/subprocessos/{codigo}/impactos-mapa";
     private static final String CHEFE_TITULO = "121212121212";
+    private static final String GESTOR_TITULO = "666666666666";
     private static final String TEM_IMPACTOS_JSON_PATH = "$.temImpactos";
     private static final String TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH = "$.inseridas.length()";
     private static final String TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH = "$.removidas.length()";
@@ -143,6 +144,23 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
         if (auth != null && auth.getPrincipal() instanceof Usuario usuario) {
             usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
+        }
+    }
+
+    private void setupGestorForUnidadeSuperior(String titulo, Unidade unidadeSubordinada) {
+        Unidade unidadeSuperior = UnidadeFixture.unidadeComSigla("SUP_" + unidadeSubordinada.getSigla());
+        unidadeSuperior.setCodigo(null);
+        unidadeSuperior = unidadeRepo.save(unidadeSuperior);
+
+        unidadeSubordinada.setUnidadeSuperior(unidadeSuperior);
+        unidadeRepo.save(unidadeSubordinada);
+
+        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
+                titulo, unidadeSuperior.getCodigo(), Perfil.GESTOR.name());
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof Usuario usuario) {
+            usuario.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo());
         }
     }
 
@@ -273,11 +291,10 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @WithMockGestor
+        @WithMockGestor(GESTOR_TITULO)
         @DisplayName("GESTOR pode acessar se subprocesso está em 'Revisão do cadastro disponibilizada'")
         void gestorPodeAcessar_EmRevisaoDisponibilizada() throws Exception {
-            // Gestor usually has global access or needs setup too.
-            // Assuming MockGestor works globally or we need to link.
+            setupGestorForUnidadeSuperior(GESTOR_TITULO, unidade);
             subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             subprocessoRepo.save(subprocessoRevisao);
 

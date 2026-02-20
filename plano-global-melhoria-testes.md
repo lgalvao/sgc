@@ -48,3 +48,17 @@ Este documento descreve um plano global sistemático elaborado para elevar a rob
 
 ---
 **Nota operacional para você:** Comece pelo Eixo 1 ou pelo primeiro checkbox disponível. Reporte o progresso no chat de forma limpa antes de ir ativamente preencher a marcação com um "x".
+
+---
+## 🚨 Status Atual (Context Restart)
+
+O contexto foi reiniciado enquanto o item **1.2. Blindagem e Auditação de Access Control** estava sendo executado.
+
+**Progresso Realizado:**
+- As classes `AtividadeAccessPolicy` e `SubprocessoAccessPolicy` foram alteradas para aplicar as validações de situação do subprocesso (CDU-08) e de hierarquia estrita para GESTOR na verificação de impacto (CDU-12).
+- Vulnerabilidades mascaradas no código de produção já estão fixadas.
+
+**Problema Atual na Suíte (Bloqueio):**
+- O teste `SubprocessoAccessPolicyTest` está falhando especificamente na execução iterada de parâmetros chamada `canExecute_VerificarImpactos_Combinacoes`.
+- Houve dificuldade de ler o output (HTML/XML) gerado pelo Gradle para decifrar a linha/asserção exata falhando nesse método combinatório.
+- **Próximo passo:** Investigar o código do teste `canExecute_VerificarImpactos_Combinacoes` em `SubprocessoAccessPolicyTest.java`, entender qual combinação de mock para `GESTOR` ou situação do subprocesso está retornando `false` no assert `assertTrue` ou equivalente, e fixar o teste para refletir exatamente as novas restrições de hierarquia inseridas.

@@ -283,9 +283,13 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
             return true;
         }
 
-        // GESTOR: apenas quando revisão está disponibilizada
+        // GESTOR: apenas quando revisão está disponibilizada e o subprocesso for de unidade imediatamente subordinada
         if (temPerfil(usuario, GESTOR) && situacao == REVISAO_CADASTRO_DISPONIBILIZADA) {
-            return true;
+            if (verificaHierarquia(usuario, sp.getUnidade(), RequisitoHierarquia.SUPERIOR_IMEDIATA)) {
+                return true;
+            }
+            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, sp.getUnidade(), RequisitoHierarquia.SUPERIOR_IMEDIATA));
+            return false;
         }
 
         // CHEFE: situações iniciais, mas precisa estar na mesma unidade

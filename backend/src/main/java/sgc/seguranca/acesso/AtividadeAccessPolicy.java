@@ -15,6 +15,7 @@ import java.util.Map;
 
 import static sgc.organizacao.model.Perfil.CHEFE;
 import static sgc.seguranca.acesso.Acao.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**
  * Política de acesso para operações em atividades.
@@ -29,20 +30,27 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
     }
 
     /**
+     * Situações nas quais a manipulação de atividades é permitida pelo responsável (CHEFE)
+     */
+    private static final EnumSet<sgc.subprocesso.model.SituacaoSubprocesso> SITUACOES_PERMITIDAS = EnumSet.of(
+            NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO
+    );
+
+    /**
      * Mapeamento de ações para regras de acesso
      */
     private static final Map<Acao, RegrasAcaoAtividade> REGRAS = Map.ofEntries(
             Map.entry(CRIAR_ATIVIDADE, new RegrasAcaoAtividade(
-                    EnumSet.of(CHEFE)
+                    EnumSet.of(CHEFE), SITUACOES_PERMITIDAS
             )),
             Map.entry(EDITAR_ATIVIDADE, new RegrasAcaoAtividade(
-                    EnumSet.of(CHEFE)
+                    EnumSet.of(CHEFE), SITUACOES_PERMITIDAS
             )),
             Map.entry(EXCLUIR_ATIVIDADE, new RegrasAcaoAtividade(
-                    EnumSet.of(CHEFE)
+                    EnumSet.of(CHEFE), SITUACOES_PERMITIDAS
             )),
             Map.entry(ASSOCIAR_CONHECIMENTOS, new RegrasAcaoAtividade(
-                    EnumSet.of(CHEFE)
+                    EnumSet.of(CHEFE), SITUACOES_PERMITIDAS
             ))
     );
 
@@ -54,17 +62,29 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
             return false;
         }
 
-        // 1. Verifica perfil
+        // 2. Verifica se o usuário tem o perfil permitido para a ação
         if (!temPerfilPermitido(usuario, regras.perfisPermitidos)) {
             definirMotivoNegacao(usuario, regras.perfisPermitidos, acao);
             return false;
         }
 
-        // 2. Verifica se é titular da unidade (obrigatório para todas as ações atuais)
         Mapa mapa = atividade.getMapa();
         Subprocesso subprocesso = mapa.getSubprocesso();
         Unidade unidade = subprocesso.getUnidade();
 
+        // 3. Verifica a situação do subprocesso correspondente ao mapa
+        if (!regras.situacoesPermitidas.contains(subprocesso.getSituacao())) {
+            definirMotivoNegacao(String.format(
+                    "Ação '%s' em atividades não pode ser executada quando o subprocesso está na situação '%s'. " +
+                            "Situações permitidas: %s",
+                    acao.getDescricao(),
+                    subprocesso.getSituacao().getDescricao(),
+                    formatarSituacoes(regras.situacoesPermitidas)
+            ));
+            return false;
+        }
+
+        // 4. Verifica se é responsável pela unidade (obrigatório para as ações atuais)
         if (!verificaHierarquia(usuario, unidade, RequisitoHierarquia.TITULAR_UNIDADE)) {
             definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, unidade, RequisitoHierarquia.TITULAR_UNIDADE));
             return false;
@@ -73,11 +93,19 @@ public class AtividadeAccessPolicy extends AbstractAccessPolicy<Atividade> {
         return true;
     }
 
+    private String formatarSituacoes(EnumSet<sgc.subprocesso.model.SituacaoSubprocesso> situacoes) {
+        return situacoes.stream()
+                .map(sgc.subprocesso.model.SituacaoSubprocesso::getDescricao)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("nenhuma");
+    }
+
     /**
      * Record para regras de ação de atividade
      */
     private record RegrasAcaoAtividade(
-            EnumSet<Perfil> perfisPermitidos
+            EnumSet<Perfil> perfisPermitidos,
+            EnumSet<sgc.subprocesso.model.SituacaoSubprocesso> situacoesPermitidas
     ) {
     }
 }

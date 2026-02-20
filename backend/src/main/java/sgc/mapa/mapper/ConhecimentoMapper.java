@@ -7,7 +7,6 @@ import sgc.mapa.dto.AtualizarConhecimentoRequest;
 import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.model.Conhecimento;
 
-@SuppressWarnings("NullableProblems")
 @Mapper(config = CentralMapperConfig.class)
 public interface ConhecimentoMapper {
 

@@ -24,9 +24,6 @@ public class ConsultasSubprocessoService {
     /**
      * Verifica se todas as unidades especificadas participam do processo através de subprocessos.
      *
-     * @param processoId     código do processo
-     * @param unidadeCodigos códigos das unidades a verificar
-     * @return true se pelo menos uma unidade participa do processo
      */
     public boolean verificarAcessoUnidadeAoProcesso(Long processoId, List<Long> unidadeCodigos) {
         if (unidadeCodigos.isEmpty()) {
@@ -38,7 +35,6 @@ public class ConsultasSubprocessoService {
     /**
      * Valida se todos os subprocessos de um processo estão homologados.
      *
-     * @param processoId código do processo
      * @return resultado da validação com detalhes
      */
     public ValidationResult validarSubprocessosParaFinalizacao(Long processoId) {
@@ -67,10 +63,6 @@ public class ConsultasSubprocessoService {
 
     /**
      * Lista subprocessos por processo e múltiplas situações.
-     *
-     * @param processoId código do processo
-     * @param situacoes  lista de situações
-     * @return lista de subprocessos
      */
     public List<Subprocesso> listarPorProcessoESituacoes(Long processoId, List<SituacaoSubprocesso> situacoes) {
         return subprocessoRepo.findByProcessoCodigoAndSituacaoInWithUnidade(processoId, situacoes);
@@ -79,7 +71,6 @@ public class ConsultasSubprocessoService {
     /**
      * Lista todos os subprocessos de um processo.
      *
-     * @param processoId código do processo
      * @return lista de subprocessos com unidade e mapa carregados
      */
     public List<Subprocesso> listarEntidadesPorProcesso(Long processoId) {
@@ -88,11 +79,6 @@ public class ConsultasSubprocessoService {
 
     /**
      * Lista subprocessos por processo, unidade e situações.
-     *
-     * @param processoId código do processo
-     * @param unidadeId  código da unidade
-     * @param situacoes  situações dos subprocessos
-     * @return lista de subprocessos
      */
     public List<Subprocesso> listarPorProcessoUnidadeESituacoes(
             Long processoId, Long unidadeId, List<SituacaoSubprocesso> situacoes) {

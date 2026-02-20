@@ -22,7 +22,6 @@ import java.util.Map;
 
 /**
  * Controller para operações de validação de subprocessos.
- * Segue ADR-005.
  */
 @RestController
 @RequestMapping("/api/subprocessos")

@@ -60,6 +60,7 @@ class AtividadeAccessPolicyTest {
 
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(unidade);
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO);
 
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(sp);
@@ -92,6 +93,15 @@ class AtividadeAccessPolicyTest {
         boolean resultado = policy.canExecute(usuarioChefe, CRIAR_ATIVIDADE, atividade);
         assertThat(resultado).isFalse();
         assertThat(policy.getMotivoNegacao()).contains("não é o titular da unidade");
+    }
+
+    @Test
+    @DisplayName("Deve negar CHEFE alterar atividade se subprocesso não estiver na situação permitida")
+    void deveNegarChefeForaDaSituacaoPermitida() {
+        atividade.getMapa().getSubprocesso().setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        boolean resultado = policy.canExecute(usuarioChefe, CRIAR_ATIVIDADE, atividade);
+        assertThat(resultado).isFalse();
+        assertThat(policy.getMotivoNegacao()).contains("não pode ser executada quando o subprocesso está na situação");
     }
 
     @Test

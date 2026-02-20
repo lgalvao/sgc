@@ -23,7 +23,7 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 /**
- * Controller para operações relacionadas ao Mapa de Competências dentro do workflow de Subprocesso.
+ * Operações relacionadas ao Mapa de Competências dentro do workflow de Subprocesso.
  */
 @RestController
 @RequestMapping("/api/subprocessos")
