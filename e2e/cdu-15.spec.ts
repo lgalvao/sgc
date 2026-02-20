@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {
     aceitarCadastroMapeamento,
@@ -26,6 +26,7 @@ import {
 } from './helpers/helpers-mapas.js';
 
 test.describe.serial('CDU-15 - Manter mapa de competências', () => {
+    test.setTimeout(60000);
     const UNIDADE_ALVO = 'SECAO_211';
     const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
     const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
@@ -73,6 +74,14 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         // 3. Gestor aceita
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
+
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page);
+
+        // 3.1. Secretaria 2 aceita (nível superior)
+        // Usuário 212121 possui perfis CHEFE e GESTOR na mesma unidade (11), então precisa selecionar
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
 
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
