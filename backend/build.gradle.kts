@@ -203,26 +203,40 @@ tasks.withType<Test> {
 }
 
 tasks.named<Test>("test") {
-    description = "Executa TODOS os testes (Unitários e Integração)."
+    description = "Executa testes Unitários e Integração (exclui PBT)."
+    useJUnitPlatform {
+        excludeTags("PBT")
+    }
 }
 
 tasks.register<Test>("unitTest") {
-    description = "Executa APENAS testes unitários (exclui tag 'integration')."
+    description = "Executa APENAS testes unitários (exclui 'integration' e 'PBT')."
     group = "verification"
     testClassesDirs = sourceSets["test"].output.classesDirs
     classpath = sourceSets["test"].runtimeClasspath
     useJUnitPlatform {
-        excludeTags("integration")
+        excludeTags("integration", "PBT")
     }
 }
 
 tasks.register<Test>("integrationTest") {
-    description = "Executa APENAS testes de integração (tag 'integration')."
+    description = "Executa APENAS testes de integração (exclui 'PBT')."
     group = "verification"
     testClassesDirs = sourceSets["test"].output.classesDirs
     classpath = sourceSets["test"].runtimeClasspath
     useJUnitPlatform {
         includeTags("integration")
+        excludeTags("PBT")
+    }
+}
+
+tasks.register<Test>("pbtTest") {
+    description = "Executa APENAS testes de propriedade (tag 'PBT')."
+    group = "verification"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform {
+        includeTags("PBT")
     }
 }
 
