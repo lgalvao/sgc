@@ -72,12 +72,12 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
                 admin = usuarioService.buscarPorLogin("111111111111");
                 admin.setPerfilAtivo(Perfil.ADMIN);
-                admin.setUnidadeAtivaCodigo(100L);
+                admin.setUnidadeAtivaCodigo(100L); 
                 admin.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
 
                 gestor = usuarioService.buscarPorLogin("666666666666");
                 gestor.setPerfilAtivo(Perfil.GESTOR);
-                gestor.setUnidadeAtivaCodigo(6L);
+                gestor.setUnidadeAtivaCodigo(6L); 
                 gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
 
                 chefe = usuarioService.buscarPorLogin("333333333333");
@@ -261,6 +261,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                 @Test
                 @DisplayName("ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO")
                 void adminHomologaSemImpactos() throws Exception {
+                        admin.setUnidadeAtivaCodigo(2L); // No STIC após aceite do Gestor
                         mockMvc.perform(post(API_SUBPROCESSOS_ID_HOMOLOGAR, subprocessoId)
                                         .with(csrf())
                                         .with(user(admin))
@@ -283,6 +284,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                         atividadeRepo.delete(atividadeExistente);
                         entityManager.flush();
 
+                        admin.setUnidadeAtivaCodigo(2L); // No STIC após aceite do Gestor
                         mockMvc.perform(post(API_SUBPROCESSOS_ID_HOMOLOGAR, subprocessoId)
                                         .with(csrf())
                                         .with(user(admin))
@@ -345,7 +347,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                         .andExpect(jsonPath("$.temImpactos", is(true)))
                                         .andExpect(jsonPath("$.competenciasImpactadas", hasSize(1)))
                                         .andExpect(
-                                                        jsonPath("$.competenciasImpactadas[0].atividades",
+                                                        jsonPath("$.competenciasImpactadas[0].atividadesAfetadas",
                                                                         hasSize(1)));
                 }
         }

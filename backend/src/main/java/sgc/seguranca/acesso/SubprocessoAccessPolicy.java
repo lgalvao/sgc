@@ -313,33 +313,33 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
     /**
      * Verifica se o usuário pode executar VERIFICAR_IMPACTOS.
      * Esta ação tem regras especiais por perfil:
-     * - ADMIN: situações de revisão (DISPONIBILIZADA, HOMOLOGADA, MAPA_AJUSTADO)
-     * - GESTOR: apenas REVISAO_CADASTRO_DISPONIBILIZADA
-     * - CHEFE: NAO_INICIADO e REVISAO_CADASTRO_EM_ANDAMENTO (mesma unidade)
+     * - ADMIN: situações de revisão (DISPONIBILIZADA, HOMOLOGADA, MAPA_AJUSTADO) - GLOBAL
+     * - GESTOR: apenas REVISAO_CADASTRO_DISPONIBILIZADA - RECURSIVO NA LOCALIZAÇÃO
+     * - CHEFE: NAO_INICIADO e REVISAO_CADASTRO_EM_ANDAMENTO - LOCALIZAÇÃO
      */
     private boolean canExecuteVerificarImpactos(Usuario usuario, Subprocesso sp) {
         SituacaoSubprocesso situacao = sp.getSituacao();
         Unidade localizacao = obterUnidadeLocalizacao(sp);
 
-        // ADMIN: pode em revisões avançadas, mas apenas se estiver na mesma unidade (localização)
+        // ADMIN: pode em revisões avançadas - GLOBAL (Apenas precisa estar na mesma unidade de localização como exigido para leitura/escrita)
         if (temPerfil(usuario, ADMIN) && SITUACOES_VERIFICAR_IMPACTOS_ADMIN.contains(situacao)) {
             if (verificaHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_UNIDADE)) {
-                return true;
+                 return true;
             }
             definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_UNIDADE));
             return false;
         }
 
-        // GESTOR: apenas quando revisão está disponibilizada e o subprocesso for de sua unidade (localização)
+        // GESTOR: apenas quando revisão está disponibilizada - RECURSIVO na Localização
         if (temPerfil(usuario, GESTOR) && situacao == REVISAO_CADASTRO_DISPONIBILIZADA) {
-            if (verificaHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_UNIDADE)) {
+            if (verificaHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_OU_SUBORDINADA)) {
                 return true;
             }
-            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_UNIDADE));
+            definirMotivoNegacao(obterMotivoNegacaoHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_OU_SUBORDINADA));
             return false;
         }
 
-        // CHEFE: situações iniciais, mas precisa estar na mesma unidade (localização)
+        // CHEFE: situações iniciais, mas precisa estar na mesma unidade de LOCALIZAÇÃO
         if (temPerfil(usuario, CHEFE) && SITUACOES_VERIFICAR_IMPACTOS_CHEFE.contains(situacao)) {
             if (verificaHierarquia(usuario, localizacao, RequisitoHierarquia.MESMA_UNIDADE)) {
                 return true;

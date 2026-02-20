@@ -91,24 +91,20 @@ describe('mappers/mapas.ts', () => {
         it('mapeia todos os campos de impacto', () => {
             const dto = {
                 temImpactos: true,
-                totalAtividadesInseridas: 5,
-                totalAtividadesRemovidas: 2,
-                totalAtividadesAlteradas: 3,
-                totalCompetenciasImpactadas: 1,
-                atividadesInseridas: [{ codigo: 1, descricao: 'Nova', tipoImpacto: 'INSERIDA' as TipoImpactoAtividade, competenciasVinculadas: [] }],
-                atividadesRemovidas: [{ codigo: 2, descricao: 'Removida', tipoImpacto: 'REMOVIDA' as TipoImpactoAtividade, competenciasVinculadas: [] }],
-                atividadesAlteradas: [{ codigo: 3, descricao: 'Alterada', tipoImpacto: 'ALTERADA' as TipoImpactoAtividade, competenciasVinculadas: [] }],
+                inseridas: [{ codigo: 1, descricao: 'Nova', tipoImpacto: 'INSERIDA' as TipoImpactoAtividade, competenciasVinculadas: [] }],
+                removidas: [{ codigo: 2, descricao: 'Removida', tipoImpacto: 'REMOVIDA' as TipoImpactoAtividade, competenciasVinculadas: [] }],
+                alteradas: [{ codigo: 3, descricao: 'Alterada', tipoImpacto: 'ALTERADA' as TipoImpactoAtividade, competenciasVinculadas: [] }],
                 competenciasImpactadas: [
-                    { codigo: 1, descricao: 'Comp', atividadesAfetadas: [1], tipoImpacto: ['ADICIONADA'] }
+                    { codigo: 1, descricao: 'Comp', atividadesAfetadas: ['Atividade 1'], tiposImpacto: ['ADICIONADA'] }
                 ]
             };
 
-            const result = mapImpactoMapaDtoToModel(dto);
+            const result = mapImpactoMapaDtoToModel(dto as any);
 
             expect(result.temImpactos).toBe(true);
-            expect(result.totalAtividadesInseridas).toBe(5);
-            expect(result.totalAtividadesRemovidas).toBe(2);
-            expect(result.totalAtividadesAlteradas).toBe(3);
+            expect(result.totalAtividadesInseridas).toBe(1);
+            expect(result.totalAtividadesRemovidas).toBe(1);
+            expect(result.totalAtividadesAlteradas).toBe(1);
             expect(result.totalCompetenciasImpactadas).toBe(1);
             expect(result.atividadesInseridas).toHaveLength(1);
             expect(result.atividadesRemovidas).toHaveLength(1);
@@ -119,13 +115,9 @@ describe('mappers/mapas.ts', () => {
 
         it('retorna arrays vazios quando campos são undefined', () => {
             const dto = {
-                temImpactos: false,
-                totalAtividadesInseridas: 0,
-                totalAtividadesRemovidas: 0,
-                totalAtividadesAlteradas: 0,
-                totalCompetenciasImpactadas: 0
+                temImpactos: false
             };
-            const result = mapImpactoMapaDtoToModel(dto);
+            const result = mapImpactoMapaDtoToModel(dto as any);
             expect(result.atividadesInseridas).toEqual([]);
             expect(result.atividadesRemovidas).toEqual([]);
             expect(result.atividadesAlteradas).toEqual([]);

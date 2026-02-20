@@ -131,6 +131,13 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         atividadeRepo.save(atividade);
     }
 
+    private void configurarUnidadeAdministrador(Long unidadeCodigo) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof Usuario usuario) {
+            usuario.setUnidadeAtivaCodigo(unidadeCodigo);
+        }
+    }
+    
     // Helper to insert User/Profile data for security checks that hit the DB (or View)
     private void setupChefeForUnidade(String titulo, Unidade unidade) {
         jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
@@ -306,6 +313,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockAdmin
         @DisplayName("ADMIN pode acessar se subprocesso está em 'Revisão do cadastro homologada'")
         void adminPodeAcessar_EmRevisaoHomologada() throws Exception {
+            configurarUnidadeAdministrador(unidade.getCodigo());
             subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
             subprocessoRepo.save(subprocessoRevisao);
 
@@ -317,6 +325,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockAdmin
         @DisplayName("ADMIN pode acessar se subprocesso está em 'Mapa Ajustado'")
         void adminPodeAcessar_EmMapaAjustado() throws Exception {
+            configurarUnidadeAdministrador(unidade.getCodigo());
             subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
             subprocessoRepo.save(subprocessoRevisao);
 

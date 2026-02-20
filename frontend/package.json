@@ -38,8 +38,10 @@
     "@eslint/js": "^10.0.1",
     "@pact-foundation/pact": "^16.2.0",
     "@pinia/testing": "^1.0.3",
+    "@storybook/addon-docs": "^10.2.10",
     "@storybook/addon-links": "^10.2.10",
-    "@storybook/vue3": "^10.2.10",
+    "@storybook/addon-test": "^0.0.0-pr-30727-sha-fe615277",
+    "@storybook/addon-vitest": "^10.2.10",
     "@storybook/vue3-vite": "^10.2.10",
     "@types/bootstrap": "^5.2.10",
     "@types/node": "^25.3.0",
@@ -59,6 +61,7 @@
     "consola": "^3.4.2",
     "eslint": "^10.0.1",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-storybook": "10.2.10",
     "eslint-plugin-vue": "^10.8.0",
     "eslint-plugin-vuejs-accessibility": "^2.5.0",
     "fast-check": "^4.5.3",
@@ -74,8 +77,6 @@
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.0.0",
     "vue-eslint-parser": "^10.4.0",
-    "vue-tsc": "^3.2.4",
-    "eslint-plugin-storybook": "10.2.10",
-    "@storybook/addon-docs": "^10.2.10"
+    "vue-tsc": "^3.2.4"
   }
 }

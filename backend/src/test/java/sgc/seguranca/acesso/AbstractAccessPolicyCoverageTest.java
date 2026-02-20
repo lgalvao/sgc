@@ -49,17 +49,22 @@ class AbstractAccessPolicyCoverageTest {
     }
 
     @Test
-    @DisplayName("verificaHierarquia deve retornar true para ADMIN quando requisito não é TITULAR_UNIDADE")
+    @DisplayName("verificaHierarquia deve retornar true para ADMIN quando requisito não é TITULAR_UNIDADE nem MESMA_UNIDADE")
     void deveRetornarTrueParaAdmin() {
         // Arrange
         Usuario admin = new Usuario();
         admin.setPerfilAtivo(Perfil.ADMIN);
+        admin.setUnidadeAtivaCodigo(100L);
         
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
 
         // Act & Assert
-        assertThat(policy.callVerificaHierarquia(admin, unidade, AbstractAccessPolicy.RequisitoHierarquia.MESMA_UNIDADE)).isTrue();
+        // MESMA_OU_SUBORDINADA deve ser bypassado pelo ADMIN
+        assertThat(policy.callVerificaHierarquia(admin, unidade, AbstractAccessPolicy.RequisitoHierarquia.MESMA_OU_SUBORDINADA)).isTrue();
+        
+        // MESMA_UNIDADE NÃO deve ser bypassado
+        assertThat(policy.callVerificaHierarquia(admin, unidade, AbstractAccessPolicy.RequisitoHierarquia.MESMA_UNIDADE)).isFalse();
     }
 
     @Test

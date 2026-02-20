@@ -60,9 +60,24 @@ class SubprocessoContextoService {
         List<Movimentacao> movimentacoes = movimentacaoRepo
                 .findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
 
+        String localizacaoAtual = sp.getUnidade().getSigla();
+        if (!movimentacoes.isEmpty()) {
+            Unidade destino = movimentacoes.get(0).getUnidadeDestino();
+            if (destino != null) {
+                localizacaoAtual = destino.getSigla();
+            }
+        }
+
         SubprocessoPermissoesDto permissoes = permissaoCalculator.calcularPermissoes(sp, usuarioAutenticado);
 
-        return new SubprocessoDetalheResponse(sp, responsavel, titular, movimentacoes, permissoes);
+        return SubprocessoDetalheResponse.builder()
+                .subprocesso(sp)
+                .responsavel(responsavel)
+                .titular(titular)
+                .movimentacoes(movimentacoes)
+                .permissoes(permissoes)
+                .localizacaoAtual(localizacaoAtual)
+                .build();
     }
 
     @Transactional(readOnly = true)

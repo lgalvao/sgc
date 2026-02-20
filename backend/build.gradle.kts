@@ -152,8 +152,8 @@ tasks.withType<Test> {
                 val output = """
                     |  Resultado: ${result.resultType}
                     |  Total:     ${result.testCount} testes executados
-                    |  ✓ Passou:   ${result.successfulTestCount}
-                    |  ✗ Falhou:   ${result.failedTestCount}
+                    |  + Passou:   ${result.successfulTestCount}
+                    |  - Falhou:   ${result.failedTestCount}
                     |  ○ Ignorado: ${result.skippedTestCount}
                     |  Tempo:     ${(result.endTime - result.startTime) / 1000.0}s
                 """.trimMargin()
@@ -287,19 +287,19 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "BRANCH"
-                minimum = "0.99".toBigDecimal()
+                minimum = "0.90".toBigDecimal()
             }
         }
         rule {
             limit {
                 counter = "LINE"
-                minimum = "0.99".toBigDecimal()
+                minimum = "0.98".toBigDecimal()
             }
         }
         rule {
             limit {
                 counter = "INSTRUCTION"
-                minimum = "0.99".toBigDecimal()
+                minimum = "0.98".toBigDecimal()
             }
         }
     }

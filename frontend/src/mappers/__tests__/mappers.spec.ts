@@ -123,16 +123,12 @@ describe("mappers/mapas", () => {
     it("mapImpactoMapaDtoToModel deve mapear campos de impacto incluindo mudanças de atividade", () => {
         const dto = {
             temImpactos: true,
-            competenciasImpactadas: [{codigo: 1, descricao: "Comp", atividadesAfetadas: [1], tipoImpacto: ["ADICIONADA"]}],
-            atividadesInseridas: [{codigo: 1, descricao: "New", tipoImpacto: TipoImpactoAtividade.INSERIDA, competenciasVinculadas: []}],
-            atividadesRemovidas: [{codigo: 2, descricao: "Old", tipoImpacto: TipoImpactoAtividade.REMOVIDA, competenciasVinculadas: []}],
-            atividadesAlteradas: [{codigo: 3, descricao: "Changed", tipoImpacto: TipoImpactoAtividade.ALTERADA, competenciasVinculadas: []}],
-            totalAtividadesInseridas: 1,
-            totalAtividadesRemovidas: 1,
-            totalAtividadesAlteradas: 1,
-            totalCompetenciasImpactadas: 1,
+            competenciasImpactadas: [{codigo: 1, descricao: "Comp", atividadesAfetadas: ["Atividade 1"], tipoImpacto: ["ADICIONADA"]}],
+            inseridas: [{codigo: 1, descricao: "New", tipoImpacto: TipoImpactoAtividade.INSERIDA, competenciasVinculadas: []}],
+            removidas: [{codigo: 2, descricao: "Old", tipoImpacto: TipoImpactoAtividade.REMOVIDA, competenciasVinculadas: []}],
+            alteradas: [{codigo: 3, descricao: "Changed", tipoImpacto: TipoImpactoAtividade.ALTERADA, competenciasVinculadas: []}],
         };
-        const model = mapImpactoMapaDtoToModel(dto);
+        const model = mapImpactoMapaDtoToModel(dto as any);
         expect(model.temImpactos).toBe(true);
         expect(model.competenciasImpactadas[0].atividadesAfetadas).toHaveLength(1);
         expect(model.atividadesInseridas).toHaveLength(1);

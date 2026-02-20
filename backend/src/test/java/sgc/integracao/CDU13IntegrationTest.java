@@ -296,6 +296,16 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocessoRepo.saveAndFlush(subprocesso);
 
+        // Ao redisponibilizar, o subprocesso volta para a unidadeSuperior
+        Movimentacao movRedisponibiliza = Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(unidade)
+                .unidadeDestino(unidadeSuperior)
+                .descricao("Redisponibilização após ajustes")
+                .usuario(gestor) // Usando gestor ou qualquer outro aqui
+                .build();
+        movimentacaoRepo.saveAndFlush(movRedisponibiliza);
+
         String obsAceite = "Agora sim, completo.";
         TextoRequest aceitarReq = new TextoRequest(obsAceite);
         mockMvc.perform(post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
