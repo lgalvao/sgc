@@ -13,17 +13,12 @@ import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 /**
- * Service responsável por calcular permissões de acesso a subprocessos.
- * 
- * <p>Extrai lógica de cálculo de permissões que estava em métodos privados de {@link SubprocessoFacade}.
- * Responsabilidades:
+ * Service responsável por calcular permissões de acesso a subprocessos. Responsabilidades:
  * <ul>
  *   <li>Calcular todas as permissões de um usuário em um subprocesso</li>
  *   <li>Verificar se usuário pode executar uma ação específica</li>
  *   <li>Obter permissões de um subprocesso</li>
  * </ul>
- * 
- * <p>Implementa Strategy Pattern para cálculo de permissões baseado no tipo de processo.
  */
 @Service
 @RequiredArgsConstructor
@@ -35,11 +30,6 @@ class SubprocessoPermissaoCalculator {
 
     /**
      * Verifica se usuário pode executar uma ação em um subprocesso.
-     * 
-     * @param usuario usuário a verificar
-     * @param acao ação a executar
-     * @param subprocesso subprocesso alvo
-     * @return true se pode executar, false caso contrário
      */
     public boolean podeExecutar(Usuario usuario, Acao acao, Subprocesso subprocesso) {
         return accessControlService.podeExecutar(usuario, acao, subprocesso);
@@ -47,10 +37,6 @@ class SubprocessoPermissaoCalculator {
 
     /**
      * Obtém permissões de um subprocesso para um usuário.
-     * 
-     * @param codSubprocesso código do subprocesso
-     * @param usuario usuário a verificar
-     * @return DTO com todas as permissões calculadas
      */
     @Transactional(readOnly = true)
     public SubprocessoPermissoesDto obterPermissoes(Long codSubprocesso, Usuario usuario) {
@@ -60,12 +46,6 @@ class SubprocessoPermissaoCalculator {
 
     /**
      * Calcula todas as permissões de um usuário em um subprocesso.
-     * 
-     * <p>Strategy Pattern: ajusta ações de acordo com o tipo de processo (MAPEAMENTO vs REVISAO).
-     * 
-     * @param subprocesso subprocesso alvo
-     * @param usuario usuário a verificar
-     * @return DTO com todas as permissões calculadas
      */
     @Transactional(readOnly = true)
     public SubprocessoPermissoesDto calcularPermissoes(Subprocesso subprocesso, Usuario usuario) {

@@ -1,4 +1,4 @@
-import type { Analise } from "@/types/tipos";
+import type {Analise} from "@/types/tipos";
 
 /**
  * Mapeia um DTO de histórico de análise vindo do backend para o modelo do frontend.

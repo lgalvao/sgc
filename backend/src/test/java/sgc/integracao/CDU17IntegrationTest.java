@@ -3,7 +3,6 @@ package sgc.integracao;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -78,9 +77,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         unidade.setNome("Unidade CDU-17");
         unidade.setSigla("U17");
 
-        // H2 Sequence Reset workaround for Unidade because it is usually inserted via SQL with IDs
-        // Resetting sequence to avoid collision with existing IDs (1..30, 100, 200...)
-        jdbcTemplate.execute("ALTER TABLE sgc.vw_unidade ALTER COLUMN codigo RESTART WITH 1000");
+
 
         unidade = unidadeRepo.save(unidade);
 

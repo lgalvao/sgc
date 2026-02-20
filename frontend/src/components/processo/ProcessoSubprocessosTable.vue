@@ -11,7 +11,7 @@
 import {computed} from "vue";
 import TreeTable from "@/components/comum/TreeTable.vue";
 import type {UnidadeParticipante} from "@/types/tipos";
-import {formatSituacaoSubprocesso, formatDate} from "@/utils/formatters";
+import {formatDate, formatSituacaoSubprocesso} from "@/utils/formatters";
 
 const props = defineProps<{
   participantesHierarquia: UnidadeParticipante[];

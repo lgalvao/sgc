@@ -1,9 +1,9 @@
 package sgc.notificacao;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
-import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

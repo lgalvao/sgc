@@ -3,7 +3,6 @@ package sgc.integracao;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.fixture.*;
@@ -58,16 +57,6 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        // Reset sequence
-        try {
-            jdbcTemplate.execute("ALTER SEQUENCE SGC.VW_UNIDADE_SEQ RESTART WITH 1000");
-        } catch (DataAccessException e) {
-            try {
-                jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN codigo RESTART WITH 1000");
-            } catch (DataAccessException ex) {
-                // Ignore
-            }
-        }
 
         // Unidade
         unidade = UnidadeFixture.unidadeComSigla("SENIC");

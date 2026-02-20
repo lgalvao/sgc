@@ -28,22 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Facade para orquestrar operações de Subprocesso.
- *
- * <p>
- * Implementa o padrão Facade para simplificar a interface de uso e centralizar
- * a coordenação entre múltiplos serviços relacionados a subprocessos.
- *
- * <p>
- * Esta classe é o ponto de entrada único para todas as operações de
- * subprocesso,
- * delegando para serviços especializados internos que são package-private.
- *
- * @see SubprocessoCrudService Para operações CRUD básicas
- * @see SubprocessoValidacaoService Para validações
- * @see SubprocessoCadastroWorkflowService Para workflow de cadastro
- * @see SubprocessoMapaWorkflowService Para workflow de mapa
- * @see SubprocessoAdminWorkflowService Para operações administrativas
+ * Orquestra operações de Subprocesso.
  */
 @Service
 @RequiredArgsConstructor
@@ -311,6 +296,7 @@ public class SubprocessoFacade {
     @Transactional
     public void disponibilizarMapaEmBloco(List<Long> codUnidades, Long codProcesso, DisponibilizarMapaRequest request,
             Usuario usuario) {
+
         List<Subprocesso> subprocessos = crudService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
         List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
         if (!ids.isEmpty()) {
@@ -366,36 +352,16 @@ public class SubprocessoFacade {
         atividadeService.importarAtividades(codSubprocessoDestino, codSubprocessoOrigem);
     }
 
-    // ===== Factory Methods (usados por ProcessoInicializador) =====
-
-    /**
-     * Cria subprocessos para um processo de mapeamento.
-     * <p>
-     * Este método é usado pelo {@link sgc.processo.service.ProcessoInicializador}
-     * durante a inicialização de processos de mapeamento.
-     */
     @Transactional
     public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
         subprocessoFactory.criarParaMapeamento(processo, unidades, unidadeOrigem, usuario);
     }
 
-    /**
-     * Cria um subprocesso para um processo de revisão.
-     * <p>
-     * Este método é usado pelo {@link sgc.processo.service.ProcessoInicializador}
-     * durante a inicialização de processos de revisão.
-     */
     @Transactional
     public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
         subprocessoFactory.criarParaRevisao(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
     }
 
-    /**
-     * Cria um subprocesso para um processo de diagnóstico.
-     * <p>
-     * Este método é usado pelo {@link sgc.processo.service.ProcessoInicializador}
-     * durante a inicialização de processos de diagnóstico.
-     */
     @Transactional
     public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
         subprocessoFactory.criarParaDiagnostico(processo, unidade, unidadeMapa, unidadeOrigem, usuario);

@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3';
 import BadgeSituacao from './BadgeSituacao.vue';
-import { SituacaoProcesso } from '@/types/tipos';
+import {SituacaoProcesso} from '@/types/tipos';
 
 const meta: Meta<typeof BadgeSituacao> = {
   title: 'Comum/BadgeSituacao',

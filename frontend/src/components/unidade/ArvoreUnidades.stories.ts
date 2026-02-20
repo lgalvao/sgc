@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3';
 import ArvoreUnidades from './ArvoreUnidades.vue';
-import type { Unidade } from '@/types/tipos';
-import { ref } from 'vue';
+import type {Unidade} from '@/types/tipos';
+import {ref} from 'vue';
 
 const meta: Meta<typeof ArvoreUnidades> = {
   title: 'Unidade/ArvoreUnidades',

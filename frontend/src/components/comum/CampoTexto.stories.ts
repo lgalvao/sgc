@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3';
 import CampoTexto from './CampoTexto.vue';
-import { ref } from 'vue';
+import {ref} from 'vue';
 
 const meta: Meta<typeof CampoTexto> = {
   title: 'Comum/CampoTexto',

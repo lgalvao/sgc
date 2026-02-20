@@ -57,11 +57,10 @@ class SubprocessoContextoService {
 
         List<Movimentacao> movimentacoes = movimentacaoRepo
                 .findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+
         SubprocessoPermissoesDto permissoes = permissaoCalculator.calcularPermissoes(sp, usuarioAutenticado);
 
-        return new SubprocessoDetalheResponse(
-            sp, responsavel, titular, movimentacoes, permissoes
-        );
+        return new SubprocessoDetalheResponse(sp, responsavel, titular, movimentacoes, permissoes);
     }
 
     @Transactional(readOnly = true)
@@ -73,6 +72,7 @@ class SubprocessoContextoService {
         Unidade unidade = subprocesso.getUnidade();
         List<AtividadeDto> atividades = atividadeService.listarAtividadesSubprocesso(codSubprocesso);
 
+        // TODO deveria usar builder
         return new ContextoEdicaoResponse(
                 unidade,
                 subprocesso,

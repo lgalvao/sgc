@@ -13,7 +13,6 @@ import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.comum.dto.ComumDtos.JustificativaRequest;
 import sgc.comum.dto.ComumDtos.TextoRequest;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.dto.MensagemResponse;
 import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
 import sgc.subprocesso.service.SubprocessoFacade;

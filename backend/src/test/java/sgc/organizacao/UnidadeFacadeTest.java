@@ -17,8 +17,8 @@ import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.ResponsavelUnidadeService;
+import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeService;
 import sgc.organizacao.service.UsuarioService;
 

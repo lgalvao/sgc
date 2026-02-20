@@ -1,6 +1,8 @@
-import { vi, describe, it, expect } from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 import path from 'path';
-import { PactV3, MatchersV3 } from '@pact-foundation/pact';
+import {MatchersV3, PactV3} from '@pact-foundation/pact';
+import {obterProcessoPorCodigo} from '../processoService';
+import apiClient from '../../axios-setup';
 
 // Mock the store before imports to avoid Pinia errors
 vi.mock('@/stores/feedback', () => ({
@@ -18,9 +20,6 @@ vi.stubGlobal('localStorage', {
   length: 0,
   key: vi.fn(),
 });
-
-import { obterProcessoPorCodigo } from '../processoService';
-import apiClient from '../../axios-setup';
 
 // Create a new PactV3 instance
 const provider = new PactV3({

@@ -67,15 +67,6 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Reset sequences
-        try {
-            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 70000");
-            jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 80000");
-            jdbcTemplate.execute("ALTER TABLE SGC.SUBPROCESSO ALTER COLUMN CODIGO RESTART WITH 90000");
-            jdbcTemplate.execute("ALTER TABLE SGC.MAPA ALTER COLUMN CODIGO RESTART WITH 90000");
-        } catch (DataAccessException e) {
-            // Ignorado: falha ao resetar sequências no H2 não deve impedir o teste
-        }
 
         // 1. Criar unidades (DISTINTAS)
         Unidade unidadeOrigem = UnidadeFixture.unidadePadrao();

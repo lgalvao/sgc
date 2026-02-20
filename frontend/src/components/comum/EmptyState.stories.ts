@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3';
 import EmptyState from './EmptyState.vue';
-import { BButton } from 'bootstrap-vue-next';
+import {BButton} from 'bootstrap-vue-next';
 
 const meta: Meta<typeof EmptyState> = {
   title: 'Comum/EmptyState',

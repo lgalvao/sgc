@@ -21,10 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static sgc.subprocesso.model.SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
-import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**
  * Factory para criação de entidades Subprocesso.

@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3';
 import CompetenciaCard from './CompetenciaCard.vue';
-import type { Competencia, Atividade } from '@/types/tipos';
+import type {Atividade, Competencia} from '@/types/tipos';
 
 const meta: Meta<typeof CompetenciaCard> = {
   title: 'Mapa/CompetenciaCard',

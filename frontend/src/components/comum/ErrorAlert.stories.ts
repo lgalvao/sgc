@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3';
 import ErrorAlert from './ErrorAlert.vue';
 
 const meta: Meta<typeof ErrorAlert> = {

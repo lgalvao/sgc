@@ -4,8 +4,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,12 +49,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Reset sequences to avoid conflicts
-        try {
-            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 10000");
-        } catch (DataAccessException ignored) {
-            // Nada a fazer
-        }
 
         // Setup Unidade Admin
         unidadeAdmin = UnidadeFixture.unidadePadrao();

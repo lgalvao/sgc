@@ -2,8 +2,8 @@ package sgc.processo.dto;
 
 import lombok.*;
 import sgc.organizacao.model.Unidade;
-import sgc.processo.model.UnidadeProcesso;
 import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.UnidadeProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
 import java.time.LocalDateTime;

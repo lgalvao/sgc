@@ -5,9 +5,9 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.*;
+import sgc.comum.dto.ComumDtos.DataRequest;
 import sgc.comum.dto.ComumDtos.JustificativaRequest;
 import sgc.comum.dto.ComumDtos.TextoRequest;
-import sgc.comum.dto.ComumDtos.DataRequest;
 
 import java.time.LocalDate;
 import java.util.Set;

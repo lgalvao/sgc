@@ -1,16 +1,12 @@
 package sgc.seguranca.acesso;
 
 import net.jqwik.api.*;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.model.*;
 import sgc.organizacao.service.HierarquiaService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.*;
+import java.util.EnumSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

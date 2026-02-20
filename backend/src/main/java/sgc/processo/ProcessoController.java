@@ -11,13 +11,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
+import sgc.processo.erros.ErroProcesso;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoViews;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoViews;
-import sgc.processo.erros.ErroProcesso;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoViews;
 
 import java.net.URI;
 import java.util.List;

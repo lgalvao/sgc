@@ -1,6 +1,8 @@
 package sgc.subprocesso.model;
 
-import net.jqwik.api.*;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.Tag;
 import sgc.processo.model.TipoProcesso;
 
 import static org.assertj.core.api.Assertions.assertThat;

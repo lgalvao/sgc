@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -65,9 +64,6 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Reset sequences
-        jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 50000");
-        jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 60000");
 
         // Cria unidade programaticamente
         unidade = UnidadeFixture.unidadePadrao();

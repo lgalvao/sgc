@@ -28,16 +28,6 @@ import java.util.stream.Collectors;
 
 /**
  * Service responsável por operações relacionadas a ajustes de mapa em subprocessos.
- * 
- * <p>Extrai lógica de ajuste de mapas que estava em métodos privados de {@link SubprocessoFacade}.
- * Responsabilidades:
- * <ul>
- *   <li>Salvar ajustes de mapa (competências e atividades)</li>
- *   <li>Validar situações permitidas para ajuste</li>
- *   <li>Obter mapa preparado para ajuste</li>
- *   <li>Atualizar descrições de atividades em lote</li>
- *   <li>Atualizar competências e suas associações</li>
- * </ul>
  */
 @Service
 @RequiredArgsConstructor

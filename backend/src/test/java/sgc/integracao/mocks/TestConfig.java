@@ -10,10 +10,9 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
+import sgc.comum.util.Sleeper;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
-
-import sgc.comum.util.Sleeper;
 
 import java.util.Properties;
 import java.util.concurrent.Executor;

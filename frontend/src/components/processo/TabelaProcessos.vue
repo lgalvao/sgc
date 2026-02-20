@@ -4,7 +4,7 @@ import {computed} from "vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import BadgeSituacao from "@/components/comum/BadgeSituacao.vue";
 import type {ProcessoResumo} from "@/types/tipos";
-import {formatSituacaoProcesso, formatTipoProcesso, formatDate} from "@/utils/formatters";
+import {formatDate, formatSituacaoProcesso, formatTipoProcesso} from "@/utils/formatters";
 
 const props = defineProps<{
   processos: ProcessoResumo[];

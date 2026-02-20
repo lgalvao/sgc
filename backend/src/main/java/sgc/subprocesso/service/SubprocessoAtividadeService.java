@@ -22,10 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Service responsável por operações relacionadas a atividades de subprocessos.
- * 
- * <p>Extrai lógica de manipulação de atividades que estava em métodos privados de {@link SubprocessoFacade}.
- * Responsabilidades:
+ * Service responsável por operações relacionadas a atividades de subprocessos. Responsabilidades:
  * <ul>
  *   <li>Importar atividades entre subprocessos (via eventos)</li>
  *   <li>Listar atividades de um subprocesso para visualização</li>
@@ -36,7 +33,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 class SubprocessoAtividadeService {
-
     private final SubprocessoRepo subprocessoRepo;
     private final ComumRepo repo;
     private final SubprocessoCrudService crudService;
@@ -48,16 +44,6 @@ class SubprocessoAtividadeService {
 
     /**
      * Importa atividades de um subprocesso de origem para um subprocesso de destino.
-     * 
-     * <p>Regras:
-     * <ul>
-     *   <li>Destino deve estar em NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO ou REVISAO_CADASTRO_EM_ANDAMENTO</li>
-     *   <li>Se destino está em NAO_INICIADO, atualiza situação para cadastro em andamento</li>
-     *   <li>Registra movimentação da importação</li>
-     *   <li>Publica evento {@link EventoImportacaoAtividades} para desacoplar do módulo mapa</li>
-     * </ul>
-     * 
-     * @throws ErroAtividadesEmSituacaoInvalida se destino está em situação inválida
      */
     @Transactional
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {

@@ -18,12 +18,12 @@ import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.*;
+import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.AcaoProcesso;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
-import sgc.processo.erros.ErroProcesso;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDate;

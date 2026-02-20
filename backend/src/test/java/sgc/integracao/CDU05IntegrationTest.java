@@ -5,8 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MvcResult;
@@ -58,15 +56,6 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Reset sequences
-        try {
-            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 40000");
-            jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 100000");
-            jdbcTemplate.execute("ALTER TABLE SGC.ALERTA ALTER COLUMN CODIGO RESTART WITH 60000");
-            jdbcTemplate.execute("ALTER TABLE SGC.MAPA ALTER COLUMN CODIGO RESTART WITH 70000");
-        } catch (DataAccessException ignored) {
-            // Ignorado: erros ao resetar sequências não devem impedir a execução dos testes
-        }
 
         // 1. Criar unidade
         unidade = UnidadeFixture.unidadePadrao();

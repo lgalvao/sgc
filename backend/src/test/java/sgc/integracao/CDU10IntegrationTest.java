@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -67,17 +66,6 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-
-        // Reset sequence to avoid collision
-        try {
-            jdbcTemplate.execute("ALTER SEQUENCE SGC.VW_UNIDADE_SEQ RESTART WITH 1000");
-        } catch (DataAccessException e) {
-            try {
-                jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN codigo RESTART WITH 1000");
-            } catch (DataAccessException ex) {
-                // Ignore
-            }
-        }
 
         // 1. Criar Unidades (Superior e Chefe)
         unidadeSuperior = UnidadeFixture.unidadeComSigla("COSIS");

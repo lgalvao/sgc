@@ -12,8 +12,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.organizacao.model.Perfil;
 import sgc.processo.dto.CriarProcessoRequest;
-import sgc.processo.model.Processo;
 import sgc.processo.dto.ProcessoResumoDto;
+import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 

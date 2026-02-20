@@ -109,7 +109,7 @@ import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
 import {SituacaoSubprocesso} from "@/types/tipos";
 import {formatSituacaoProcesso, formatSituacaoSubprocesso} from "@/utils/formatters";
-import { logger } from "@/utils";
+import {logger} from "@/utils";
 
 function flattenUnidades(unidades: any[]): any[] {
   let result: any[] = [];

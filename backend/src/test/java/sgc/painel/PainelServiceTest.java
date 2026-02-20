@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import sgc.alerta.AlertaFacade;
-
 import sgc.alerta.model.Alerta;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.dto.UnidadeDto;
@@ -24,11 +23,7 @@ import sgc.processo.service.ProcessoFacade;
 import sgc.testutils.UnidadeTestBuilder;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;

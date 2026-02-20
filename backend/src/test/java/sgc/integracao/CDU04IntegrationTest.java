@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,14 +54,6 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setup() {
-        // Reset sequences
-        try {
-            jdbcTemplate.execute("ALTER TABLE SGC.VW_UNIDADE ALTER COLUMN CODIGO RESTART WITH 30000");
-            jdbcTemplate.execute("ALTER TABLE SGC.PROCESSO ALTER COLUMN CODIGO RESTART WITH 90000");
-            jdbcTemplate.execute("ALTER TABLE SGC.ALERTA ALTER COLUMN CODIGO RESTART WITH 60000");
-        } catch (DataAccessException ignored) {
-            // Ignorado: falha ao resetar sequências no H2 não deve impedir o teste
-        }
 
         // Cria unidade programaticamente
         unidadeLivre = UnidadeFixture.unidadePadrao();

@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
+import sgc.comum.dto.ComumDtos.JustificativaRequest;
+import sgc.comum.dto.ComumDtos.TextoRequest;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
@@ -20,9 +22,10 @@ import sgc.mapa.model.MapaViews;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.sanitizacao.UtilSanitizacao;
-import sgc.comum.dto.ComumDtos.JustificativaRequest;
-import sgc.comum.dto.ComumDtos.TextoRequest;
-import sgc.subprocesso.dto.*;
+import sgc.subprocesso.dto.ContextoEdicaoResponse;
+import sgc.subprocesso.dto.ImportarAtividadesRequest;
+import sgc.subprocesso.dto.MensagemResponse;
+import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoViews;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -35,6 +38,7 @@ import java.util.Optional;
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
 @Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
+// TODO faltando varias documentações do OpenAPI
 public class SubprocessoCadastroController {
 
     private final SubprocessoFacade subprocessoFacade;
@@ -60,17 +64,14 @@ public class SubprocessoCadastroController {
     public ResponseEntity<MensagemResponse> disponibilizarCadastro(
             @PathVariable("codigo") Long codSubprocesso,
             @AuthenticationPrincipal @Nullable Object principal) {
+
         Usuario usuario = obterUsuarioAutenticado(principal);
         List<Atividade> faltando = subprocessoFacade.obterAtividadesSemConhecimento(codSubprocesso);
         if (!faltando.isEmpty()) {
             var lista = faltando.stream()
-                    .map(
-                            a -> Map.of(
-                                    "codigo",
-                                    a.getCodigo(),
-                                    "descricao",
-                                    a.getDescricao()))
+                    .map(a -> Map.of("codigo", a.getCodigo(), "descricao", a.getDescricao()))
                     .toList();
+
             throw new ErroValidacao(
                     "Existem atividades sem conhecimentos associados.",
                     Map.of("atividadesSemConhecimento", lista));
@@ -85,6 +86,7 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
     public ResponseEntity<MensagemResponse> disponibilizarRevisao(
             @PathVariable Long codigo, @AuthenticationPrincipal @Nullable Object principal) {
+
         Usuario usuario = obterUsuarioAutenticado(principal);
         List<Atividade> faltando = subprocessoFacade.obterAtividadesSemConhecimento(codigo);
         if (!faltando.isEmpty()) {
@@ -224,14 +226,18 @@ public class SubprocessoCadastroController {
         subprocessoFacade.homologarCadastroEmBloco(request.subprocessos(), codigo, usuario);
     }
 
+    // TODO achei esse metodo confuso. Melhorar ou pelo menos documentar porque tem esse fallback estraho
     private Usuario obterUsuarioAutenticado(@Nullable Object principal) {
         if (principal instanceof Usuario usuario) {
             return usuario;
         }
+
         String titulo = organizacaoFacade.extrairTituloUsuario(principal);
+        // TODO invariante: titulo nunca poderá ser nulo!
         if (titulo == null) {
             throw new ErroAutenticacao("Usuário não identificado");
         }
+
         return organizacaoFacade.buscarPorLogin(titulo);
     }
 }

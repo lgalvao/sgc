@@ -2,7 +2,6 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;

@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import { formatDate, formatSituacaoProcesso, formatTipoProcesso } from '@/utils/formatters';
+import {formatDate, formatSituacaoProcesso, formatTipoProcesso} from '@/utils/formatters';
 
 withDefaults(
   defineProps<{

@@ -3,7 +3,6 @@ package sgc.processo.service;
 import net.jqwik.api.*;
 import sgc.comum.repo.ComumRepo;
 import sgc.organizacao.model.*;
-import sgc.organizacao.model.Usuario;
 import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.model.Processo;

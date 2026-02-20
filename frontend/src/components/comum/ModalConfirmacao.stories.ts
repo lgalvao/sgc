@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3';
 import ModalConfirmacao from './ModalConfirmacao.vue';
-import { BButton } from 'bootstrap-vue-next';
-import { ref } from 'vue';
+import {BButton} from 'bootstrap-vue-next';
+import {ref} from 'vue';
 
 const meta: Meta<typeof ModalConfirmacao> = {
   title: 'Comum/ModalConfirmacao',

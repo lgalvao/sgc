@@ -4,8 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import sgc.organizacao.model.Unidade;
-import sgc.processo.model.UnidadeProcesso;
 import sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto;
+import sgc.processo.model.UnidadeProcesso;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

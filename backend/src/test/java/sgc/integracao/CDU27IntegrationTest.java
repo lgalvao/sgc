@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.AlertaRepo;
+import sgc.comum.dto.ComumDtos.DataRequest;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.WithMockAdmin;
@@ -17,7 +18,6 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.comum.dto.ComumDtos.DataRequest;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 

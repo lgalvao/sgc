@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import {describe, expect, it} from 'vitest';
 import fc from 'fast-check';
-import { mount } from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import ArvoreUnidades from '../unidade/ArvoreUnidades.vue';
-import type { Unidade } from '@/types/tipos';
+import type {Unidade} from '@/types/tipos';
 
 // Helper to generate a tree of units with unique IDs
 const generateTree = (depth: number, breadth: number, startId = 1): Unidade[] => {

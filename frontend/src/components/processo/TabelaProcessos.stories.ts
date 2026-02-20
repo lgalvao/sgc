@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type {Meta, StoryObj} from '@storybook/vue3';
 import TabelaProcessos from './TabelaProcessos.vue';
-import { SituacaoProcesso, TipoProcesso, type ProcessoResumo } from '@/types/tipos';
+import {type ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
 const meta: Meta<typeof TabelaProcessos> = {
   title: 'Processo/TabelaProcessos',

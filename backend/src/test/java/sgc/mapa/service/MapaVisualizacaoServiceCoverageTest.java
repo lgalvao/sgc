@@ -8,8 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.dto.MapaVisualizacaoResponse;
-import sgc.mapa.model.MapaRepo;
 import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.MapaRepo;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
 

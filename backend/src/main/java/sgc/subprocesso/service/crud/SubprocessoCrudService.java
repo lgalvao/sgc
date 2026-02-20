@@ -15,7 +15,6 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.factory.SubprocessoFactory;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 

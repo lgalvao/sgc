@@ -1,11 +1,10 @@
 package sgc.mapa.service;
 
-import sgc.comum.erros.ErroValidacao;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroValidacao;
 import sgc.comum.repo.ComumRepo;
 import sgc.mapa.dto.AtualizarAtividadeRequest;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;

@@ -9,7 +9,10 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

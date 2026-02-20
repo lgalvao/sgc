@@ -1,7 +1,6 @@
 package sgc.e2e;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import sgc.processo.model.ProcessoViews;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Profile;
@@ -21,6 +20,7 @@ import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoViews;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoFacade;
 
