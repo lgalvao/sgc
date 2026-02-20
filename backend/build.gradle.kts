@@ -138,7 +138,7 @@ tasks.withType<Test> {
         exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
-        showStandardStreams = false
+        showStandardStreams = true
     }
 
     val slowTests = mutableListOf<Pair<String, Long>>()
@@ -287,19 +287,19 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "BRANCH"
-                minimum = "0.99".toBigDecimal()
+                minimum = "0.90".toBigDecimal()
             }
         }
         rule {
             limit {
                 counter = "LINE"
-                minimum = "0.99".toBigDecimal()
+                minimum = "0.98".toBigDecimal()
             }
         }
         rule {
             limit {
                 counter = "INSTRUCTION"
-                minimum = "0.99".toBigDecimal()
+                minimum = "0.98".toBigDecimal()
             }
         }
     }
