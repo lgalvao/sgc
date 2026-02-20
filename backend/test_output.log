@@ -12,3 +12,132 @@ Calculating task graph as configuration cache cannot be reused because system pr
 > Task :backend:classes UP-TO-DATE
 > Task :backend:compileTestJava UP-TO-DATE
 > Task :backend:testClasses UP-TO-DATE
+
+> Task :backend:test
+
+CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos > Deve excluir histórico de análises anteriores quando disponibilizar revisão novamente FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU10IntegrationTest.deveExcluirHistoricoAposNovaDisponibilizacao(CDU10IntegrationTest.java:215)
+
+CDU-12: Verificar impactos no mapa de competências > Testes de Controle de Acesso por Perfil e Situação > ADMIN pode acessar se subprocesso está em 'Mapa Ajustado' FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Acesso.adminPodeAcessar_EmMapaAjustado(CDU12IntegrationTest.java:324)
+
+CDU-12: Verificar impactos no mapa de competências > Testes de Controle de Acesso por Perfil e Situação > ADMIN pode acessar se subprocesso está em 'Revisão do cadastro homologada' FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU12IntegrationTest$Acesso.adminPodeAcessar_EmRevisaoHomologada(CDU12IntegrationTest.java:313)
+
+CDU-13: Analisar cadastro de atividades e conhecimentos > Deve retornar o histórico de devoluções e aceites ordenado FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU13IntegrationTest.getHistorico_deveRetornarAcoesOrdenadas(CDU13IntegrationTest.java:306)
+
+CDU14IntegrationTest > Endpoints de Consulta > Deve retornar histórico de análise corretamente FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest$EndpointsDeConsulta.deveRetornarHistoricoDeAnalise(CDU14IntegrationTest.java:319)
+
+CDU14IntegrationTest > Fluxo de Homologação > ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest$Homologacao.setUpHomologacao(CDU14IntegrationTest.java:258)
+
+CDU14IntegrationTest > Fluxo de Homologação > ADMIN homologa COM impactos, alterando status e criando movimentação FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest$Homologacao.setUpHomologacao(CDU14IntegrationTest.java:258)
+
+CDU14IntegrationTest > Falhas e Segurança > CHEFE não pode homologar revisão FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest$FalhasESeguranca.chefeNaoPodeHomologar(CDU14IntegrationTest.java:371)
+
+CDU14IntegrationTest > Fluxo de Aceite > GESTOR deve aceitar, alterando status e criando todos os registros FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest$Aceite.gestorAceitaRevisao(CDU14IntegrationTest.java:224)
+
+CDU14IntegrationTest > Fluxo de Devolução > GESTOR deve devolver, alterando status e criando registros FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU14IntegrationTest$Devolucao.gestorDevolveRevisao(CDU14IntegrationTest.java:196)
+
+CDU-20: Analisar validação de mapa de competências > Devolução e aceitação da validação do mapa com verificação do histórico FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU20IntegrationTest.devolucaoEAceitacaoComVerificacaoHistorico(CDU20IntegrationTest.java:115)
+
+CDU-22: Aceitar cadastros em bloco > Deve aceitar cadastro de múltiplas unidades em bloco FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU22IntegrationTest.aceitarCadastroEmBloco_deveAceitarTodasSelecionadas(CDU22IntegrationTest.java:120)
+
+CDU-25: Aceitar validação de mapas em bloco > Deve aceitar validação de mapas em bloco FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU25IntegrationTest.aceitarValidacaoEmBloco_deveAceitarSucesso(CDU25IntegrationTest.java:117)
+  Resultado: FAILURE
+  Total:     145 testes executados
+  ✓ Passou:   132
+  ✗ Falhou:   13
+  ○ Ignorado: 0
+  Tempo:     63.602s
+
+145 tests completed, 13 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///C:/sgc/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 1m 9s
+5 actionable tasks: 1 executed, 4 up-to-date
+Configuration cache entry stored.
