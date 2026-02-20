@@ -229,8 +229,6 @@ class PainelServiceTest {
                     .build();
 
             when(unidadeService.buscarMapaHierarquia()).thenReturn(Map.of(1L, List.of(2L)));
-            when(unidadeService.buscarIdsDescendentes(eq(1L), any())).thenReturn(List.of(2L));
-            when(unidadeService.buscarIdsDescendentes(eq(2L), any())).thenReturn(Collections.emptyList());
 
             Processo p = new Processo();
             p.setCodigo(100L);

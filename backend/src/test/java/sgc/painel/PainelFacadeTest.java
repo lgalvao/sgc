@@ -236,11 +236,9 @@ class PainelFacadeTest {
         UnidadeProcesso up1 = mock(UnidadeProcesso.class);
         when(up1.getUnidadeCodigo()).thenReturn(1L);
         when(up1.getSigla()).thenReturn("U1");
-        when(up1.getUnidadeSuperiorCodigo()).thenReturn(null);
 
         UnidadeProcesso up2 = mock(UnidadeProcesso.class);
         when(up2.getUnidadeCodigo()).thenReturn(2L);
-        when(up2.getUnidadeSuperiorCodigo()).thenReturn(1L);
         when(up2.getSigla()).thenReturn("U2");
 
         when(p.getParticipantes()).thenReturn(List.of(up1, up2));
@@ -250,8 +248,6 @@ class PainelFacadeTest {
         hierarquia.put(2L, new ArrayList<>());
 
         when(unidadeFacade.buscarMapaHierarquia()).thenReturn(hierarquia);
-        when(unidadeFacade.buscarIdsDescendentes(eq(1L), anyMap())).thenReturn(List.of(2L));
-        when(unidadeFacade.buscarIdsDescendentes(eq(2L), anyMap())).thenReturn(new ArrayList<>());
         when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
         // Act
