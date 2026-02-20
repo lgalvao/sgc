@@ -270,6 +270,11 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
         if (isAcaoAnaliseOuEscrita(acao)) {
             Unidade localizacao = obterUnidadeLocalizacao(sp);
 
+            // FIX: ADMIN pode executar ações de análise/escrita globalmente, ignorando localização
+            if (temPerfil(usuario, ADMIN)) {
+                return true;
+            }
+
             if (!verificaHierarquia(usuario, localizacao, regras.requisitoHierarquia)) {
                 String motivo = obterMotivoNegacaoHierarquia(usuario, localizacao, regras.requisitoHierarquia);
                 log.info("Permissão negada por localização para {}: {}", usuario.getTituloEleitoral(), motivo);

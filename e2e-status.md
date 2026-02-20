@@ -18,8 +18,23 @@ Este documento registra o status dos testes End-to-End executados e as lições 
 | `cdu-10.spec.ts` | ✅ Passou | 1 | 1 | Disponibilizar revisão do cadastro (Fluxo completo). |
 | `cdu-11.spec.ts` | ✅ Passou | 6 | 6 | Visualizar cadastro de atividades e conhecimentos. |
 | `cdu-12.spec.ts` | ✅ Passou | 7 | 7 | Verificar impactos no mapa de competências. |
+| `cdu-13.spec.ts` | ✅ Passou | 12 | 12 | Analisar cadastro de atividades e conhecimentos. |
+| `cdu-14.spec.ts` | ✅ Passou | 21 | 21 | Analisar revisão de cadastro de atividades e conhecimentos. |
 
 ## Problemas Identificados e Soluções
+
+### CDU-13: Permissão negada para ADMIN ao devolver cadastro
+
+**Problema:**
+O teste `CDU-13` falhava no Cenário 6 (`ADMIN devolve para nova rodada de aceite`), onde o ADMIN tentava devolver um cadastro que estava na unidade superior (`COORD_21`).
+O backend retornava 403 Forbidden, pois a `SubprocessoAccessPolicy` exigia `MESMA_UNIDADE`.
+
+**Causa Raiz:**
+A política de acesso aplicava restrições de hierarquia (`MESMA_UNIDADE`) para ações de análise/escrita (`DEVOLVER_CADASTRO`, etc.) baseada na localização atual do subprocesso.
+Como o ADMIN (unidade `ADMIN`) não estava na unidade do subprocesso (`COORD_21`), o acesso era negado.
+
+**Solução:**
+Alterada a `SubprocessoAccessPolicy` para permitir explicitamente que o perfil `ADMIN` execute ações de análise/escrita globalmente, ignorando a verificação de hierarquia.
 
 ### CDU-12: Permissão negada para ADMIN ao verificar impactos
 

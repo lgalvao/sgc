@@ -1,0 +1,26 @@
+Reusing configuration cache.
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :frontend:compileJava NO-SOURCE
+> Task :frontend:processResources NO-SOURCE
+> Task :frontend:classes UP-TO-DATE
+> Task :frontend:processTestResources NO-SOURCE
+> Task :frontend:compileTestJava NO-SOURCE
+> Task :frontend:testClasses UP-TO-DATE
+> Task :frontend:test NO-SOURCE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+
+> Task :backend:test
+  Resultado: SUCCESS
+  Total:     14 testes executados
+  + Passou:   14
+  - Falhou:   0
+  ○ Ignorado: 0
+  Tempo:     4.277s
+
+BUILD SUCCESSFUL in 9s
+5 actionable tasks: 2 executed, 3 up-to-date
+Configuration cache entry reused.

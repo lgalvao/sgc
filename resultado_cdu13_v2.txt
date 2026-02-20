@@ -1,0 +1,129 @@
+[2m[WebServer] [22m[SMTP] Servidor SMTP rodando na porta 1025
+[2m[WebServer] [22m[BACKEND] INFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+[2m[WebServer] [22m[BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 18 unidades verificadas.
+[2m[WebServer] [22m[FRONTEND]   [32m[1mVITE[22m v6.4.1[39m  [2mready in [0m[1m562[22m[2m[0m ms[22m
+[2m[WebServer] [22m[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[WebServer] [22m>>> Frontend, Backend e SMTP no ar!
+
+Running 12 tests using 1 worker
+
+[2m[WebServer] [22m[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:68 - Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 191919
+[2m[WebServer] [22m[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:67 - Processo 201 criado com 1 participantes: [15] - [(201,15)]
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 1, Destinatário: secao_211@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.p.s.ProcessoNotificacaoService.enviarEmailProcessoIniciado:232 - E-mail enviado para unidade SECAO_211 (secao_211@tre-pe.jus.br)
+[2m[WebServer] [22m[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:93 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para secao_211@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: secao_211@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para secao_211@tre-pe.jus.br enviado.
+  ✓   1 [chromium] › e2e/cdu-13.spec.ts:36:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Preparacao 1: ADMIN cria e inicia processo de mapeamento (5.2s)
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 101010
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 2, Destinatário: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicaoDireta:52 - E-mail enviado para unidade COORD_21 (coord_21@tre-pe.jus.br) - Transição: CADASTRO_DISPONIBILIZADO
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 3, Destinatário: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.notificarHierarquia:155 - E-mail enviado para unidade superior COORD_21 (coord_21@tre-pe.jus.br)
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 4, Destinatário: secretaria_2@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.notificarHierarquia:155 - E-mail enviado para unidade superior SECRETARIA_2 (secretaria_2@tre-pe.jus.br)
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 5, Destinatário: admin@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.notificarHierarquia:155 - E-mail enviado para unidade superior ADMIN (admin@tre-pe.jus.br)
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para admin@tre-pe.jus.br
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para secretaria_2@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para coord_21@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para coord_21@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: admin@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para admin@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: secretaria_2@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para secretaria_2@tre-pe.jus.br enviado.
+  ✓   2 [chromium] › e2e/cdu-13.spec.ts:58:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Preparacao 2: CHEFE preenche atividades e disponibiliza (3.8s)
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 999999
+  ✓   3 [chromium] › e2e/cdu-13.spec.ts:85:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 1: GESTOR visualiza histórico de análise (vazio inicialmente) (2.5s)
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 999999
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 6, Destinatário: secao_211@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicaoDireta:52 - E-mail enviado para unidade SECAO_211 (secao_211@tre-pe.jus.br) - Transição: CADASTRO_DEVOLVIDO
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.w.SubprocessoTransicaoService.registrarAnaliseETransicao:102 - Workflow SP201: MAPEAMENTO_CADASTRO_EM_ANDAMENTO -> CADASTRO_DEVOLVIDO
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para secao_211@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: secao_211@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para secao_211@tre-pe.jus.br enviado.
+  ✓   4 [chromium] › e2e/cdu-13.spec.ts:98:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 2: GESTOR devolve cadastro para ajustes COM observação (2.2s)
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 101010
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 7, Destinatário: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicaoDireta:52 - E-mail enviado para unidade COORD_21 (coord_21@tre-pe.jus.br) - Transição: CADASTRO_DISPONIBILIZADO
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 8, Destinatário: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.notificarHierarquia:155 - E-mail enviado para unidade superior COORD_21 (coord_21@tre-pe.jus.br)
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 9, Destinatário: secretaria_2@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.notificarHierarquia:155 - E-mail enviado para unidade superior SECRETARIA_2 (secretaria_2@tre-pe.jus.br)
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 10, Destinatário: admin@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.notificarHierarquia:155 - E-mail enviado para unidade superior ADMIN (admin@tre-pe.jus.br)
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para secretaria_2@tre-pe.jus.br
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para admin@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para coord_21@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para coord_21@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: secretaria_2@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para secretaria_2@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: admin@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para admin@tre-pe.jus.br enviado.
+  ✓   5 [chromium] › e2e/cdu-13.spec.ts:106:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 3: CHEFE visualiza histórico após devolução e disponibiliza novamente (2.7s)
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 999999
+  ✓   6 [chromium] › e2e/cdu-13.spec.ts:129:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 4: GESTOR cancela devolução (2.9s)
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 999999
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 11, Destinatário: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicaoDireta:52 - E-mail enviado para unidade COORD_21 (coord_21@tre-pe.jus.br) - Transição: CADASTRO_ACEITO
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.w.SubprocessoTransicaoService.registrarAnaliseETransicao:102 - Workflow SP201: MAPEAMENTO_CADASTRO_DISPONIBILIZADO -> CADASTRO_ACEITO
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para coord_21@tre-pe.jus.br enviado.
+  ✓   7 [chromium] › e2e/cdu-13.spec.ts:140:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 5: GESTOR registra aceite COM observação (2.2s)
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 191919
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 12, Destinatário: secao_211@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicaoDireta:52 - E-mail enviado para unidade SECAO_211 (secao_211@tre-pe.jus.br) - Transição: CADASTRO_DEVOLVIDO
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.w.SubprocessoTransicaoService.registrarAnaliseETransicao:102 - Workflow SP201: MAPEAMENTO_CADASTRO_EM_ANDAMENTO -> CADASTRO_DEVOLVIDO
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para secao_211@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: secao_211@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para secao_211@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 101010
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 13, Destinatário: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicaoDireta:52 - E-mail enviado para unidade COORD_21 (coord_21@tre-pe.jus.br) - Transição: CADASTRO_DISPONIBILIZADO
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 14, Destinatário: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.notificarHierarquia:155 - E-mail enviado para unidade superior COORD_21 (coord_21@tre-pe.jus.br)
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 15, Destinatário: secretaria_2@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.notificarHierarquia:155 - E-mail enviado para unidade superior SECRETARIA_2 (secretaria_2@tre-pe.jus.br)
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 16, Destinatário: admin@tre-pe.jus.br
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.notificarHierarquia:155 - E-mail enviado para unidade superior ADMIN (admin@tre-pe.jus.br)
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para secretaria_2@tre-pe.jus.br
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para admin@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para coord_21@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para coord_21@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: secretaria_2@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para secretaria_2@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: admin@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para admin@tre-pe.jus.br enviado.
+  ✓   8 [chromium] › e2e/cdu-13.spec.ts:148:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 6: ADMIN devolve para nova rodada de aceite (4.4s)
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 999999
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 17, Destinatário: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicaoDireta:52 - E-mail enviado para unidade COORD_21 (coord_21@tre-pe.jus.br) - Transição: CADASTRO_ACEITO
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.w.SubprocessoTransicaoService.registrarAnaliseETransicao:102 - Workflow SP201: MAPEAMENTO_CADASTRO_DISPONIBILIZADO -> CADASTRO_ACEITO
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: coord_21@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para coord_21@tre-pe.jus.br enviado.
+  ✓   9 [chromium] › e2e/cdu-13.spec.ts:171:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 7: GESTOR registra aceite com observação padrão (2.2s)
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 191919
+  ✓  10 [chromium] › e2e/cdu-13.spec.ts:179:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 8: ADMIN visualiza histórico com múltiplas análises (2.0s)
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 191919
+  ✓  11 [chromium] › e2e/cdu-13.spec.ts:199:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 9: ADMIN cancela homologação (2.2s)
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 191919
+  ✓  12 [chromium] › e2e/cdu-13.spec.ts:210:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenario 10: ADMIN homologa cadastro (2.5s)
+
+  12 passed (1.1m)

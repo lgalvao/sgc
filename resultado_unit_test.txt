@@ -1,0 +1,59 @@
+Calculating task graph as no cached configuration is available for tasks: test --tests sgc.seguranca.acesso.SubprocessoAccessPolicyTest
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :frontend:processTestResources NO-SOURCE
+> Task :frontend:compileJava NO-SOURCE
+> Task :frontend:processResources NO-SOURCE
+> Task :frontend:classes UP-TO-DATE
+> Task :frontend:compileTestJava NO-SOURCE
+> Task :frontend:testClasses UP-TO-DATE
+> Task :frontend:test NO-SOURCE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
+
+> Task :backend:test
+
+SubprocessoAccessPolicyTest > canExecute - Admin Localização (Escrita) FAILED
+    org.opentest4j.AssertionFailedError: expected: <false> but was: <true>
+        at app//org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+        at app//org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+        at app//org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:69)
+        at app//org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:41)
+        at app//org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:35)
+        at app//org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:246)
+        at app//sgc.seguranca.acesso.SubprocessoAccessPolicyTest.canExecute_AdminLocalizacao_Escrita(SubprocessoAccessPolicyTest.java:171)
+
+SubprocessoAccessPolicyTest > canExecute - Admin Devolver Cadastro - Deve Respeitar Hierarquia FAILED
+    org.opentest4j.AssertionFailedError: expected: <false> but was: <true>
+        at app//org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+        at app//org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+        at app//org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:69)
+        at app//org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:41)
+        at app//org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:35)
+        at app//org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:246)
+        at app//sgc.seguranca.acesso.SubprocessoAccessPolicyTest.canExecute_AdminDevolverCadastro_DeveRespeitarHierarquia(SubprocessoAccessPolicyTest.java:242)
+  Resultado: FAILURE
+  Total:     14 testes executados
+  + Passou:   12
+  - Falhou:   2
+  ○ Ignorado: 0
+  Tempo:     4.833s
+
+14 tests completed, 2 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///app/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 13s
+5 actionable tasks: 1 executed, 4 up-to-date
+Configuration cache entry stored.

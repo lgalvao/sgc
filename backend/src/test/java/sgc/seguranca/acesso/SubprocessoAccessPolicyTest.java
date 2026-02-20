@@ -161,14 +161,14 @@ class SubprocessoAccessPolicyTest {
     }
 
     @Test
-    @DisplayName("canExecute - Admin Localização (Escrita)")
+    @DisplayName("canExecute - Admin Localização (Escrita) - Global")
     void canExecute_AdminLocalizacao_Escrita() {
         Usuario u = criarUsuario(Perfil.ADMIN, 1L);
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 2L);
         
-        // EDITAR_MAPA é escrita -> Deve estar na unidade 1 do Admin
+        // EDITAR_MAPA é escrita -> Admin pode editar globalmente
         mockLocalizacao(sp, 2L); // Está na 2
-        assertFalse(policy.canExecute(u, Acao.EDITAR_MAPA, sp));
+        assertTrue(policy.canExecute(u, Acao.EDITAR_MAPA, sp));
         
         mockLocalizacao(sp, 1L); // Está na 1
         assertTrue(policy.canExecute(u, Acao.EDITAR_MAPA, sp));
@@ -231,15 +231,15 @@ class SubprocessoAccessPolicyTest {
     }
 
     @Test
-    @DisplayName("canExecute - Admin Devolver Cadastro - Deve Respeitar Hierarquia")
-    void canExecute_AdminDevolverCadastro_DeveRespeitarHierarquia() {
+    @DisplayName("canExecute - Admin Devolver Cadastro - Global")
+    void canExecute_AdminDevolverCadastro_Global() {
         Usuario u = criarUsuario(Perfil.ADMIN, 99L); // Admin na unidade 99
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, 1L); // SP na unidade 1
 
         mockLocalizacao(sp, 1L); // SP está fisicamente na unidade 1
 
-        // Admin (99) tentando Devolver Cadastro (localizado em 1) -> DEVE SER FALSE
-        assertFalse(policy.canExecute(u, Acao.DEVOLVER_CADASTRO, sp));
+        // Admin (99) tentando Devolver Cadastro (localizado em 1) -> DEVE SER TRUE (Global)
+        assertTrue(policy.canExecute(u, Acao.DEVOLVER_CADASTRO, sp));
 
         // Admin (1) tentando Devolver Cadastro (localizado em 1) -> DEVE SER TRUE
         Usuario uAdmin1 = criarUsuario(Perfil.ADMIN, 1L);
