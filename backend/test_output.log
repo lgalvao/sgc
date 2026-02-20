@@ -1,0 +1,14 @@
+Calculating task graph as configuration cache cannot be reused because system property 'stderr.encoding' has changed.
+> Task :frontend:processTestResources NO-SOURCE
+> Task :frontend:processResources NO-SOURCE
+> Task :frontend:compileJava NO-SOURCE
+> Task :frontend:classes UP-TO-DATE
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :frontend:compileTestJava NO-SOURCE
+> Task :frontend:testClasses UP-TO-DATE
+> Task :frontend:test NO-SOURCE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava UP-TO-DATE
+> Task :backend:testClasses UP-TO-DATE
