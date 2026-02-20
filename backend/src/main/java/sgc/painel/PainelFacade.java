@@ -168,7 +168,6 @@ public class PainelFacade {
         }
 
         Map<Long, String> existingSiglas = participantes.stream()
-                .filter(p -> p.getSigla() != null)
                 .collect(Collectors.toMap(
                         UnidadeProcesso::getUnidadeCodigo,
                         UnidadeProcesso::getSigla,
