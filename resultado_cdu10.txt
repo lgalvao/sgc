@@ -1,0 +1,107 @@
+[2m[WebServer] [22m[SMTP] Servidor SMTP rodando na porta 1025
+[2m[WebServer] [22m[BACKEND] INFO  s.s.login.GerenciadorJwt.verificarSegurancaChave:40 - ALERTA: Aplicação está usando o segredo JWT padrão.
+[2m[WebServer] [22m[BACKEND] INFO  s.o.s.ValidadorDadosOrgService.run:79 - Dados organizacionais validados com sucesso. 18 unidades verificadas.
+[2m[WebServer] [22m[FRONTEND]   [32m[1mVITE[22m v6.4.1[39m  [2mready in [0m[1m302[22m[2m[0m ms[22m
+[2m[WebServer] [22m[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[WebServer] [22m>>> Frontend, Backend e SMTP no ar!
+
+Running 1 test using 1 worker
+
+[2m[WebServer] [22m[BACKEND] INFO  sgc.e2e.E2eController.resetDatabase:68 - Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 191919
+[2m[WebServer] [22m[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:67 - Processo 201 criado com 1 participantes: [18] - [(201,18)]
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 1, Destinatário: secao_221@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.p.s.ProcessoNotificacaoService.enviarEmailProcessoIniciado:232 - E-mail enviado para unidade SECAO_221 (secao_221@tre-pe.jus.br)
+[2m[WebServer] [22m[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:95 - Processo de mapeamento 201 iniciado para 1 unidade(s).
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para secao_221@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: secao_221@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para secao_221@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 141414
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 2, Destinatário: coord_22@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicaoDireta:52 - E-mail enviado para unidade COORD_22 (coord_22@tre-pe.jus.br) - Transição: CADASTRO_DISPONIBILIZADO
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 3, Destinatário: coord_22@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.notificarHierarquia:155 - E-mail enviado para unidade superior COORD_22 (coord_22@tre-pe.jus.br)
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 4, Destinatário: secretaria_2@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.notificarHierarquia:155 - E-mail enviado para unidade superior SECRETARIA_2 (secretaria_2@tre-pe.jus.br)
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 5, Destinatário: admin@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.notificarHierarquia:155 - E-mail enviado para unidade superior ADMIN (admin@tre-pe.jus.br)
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para coord_22@tre-pe.jus.br
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para admin@tre-pe.jus.br
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para coord_22@tre-pe.jus.br
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para secretaria_2@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: coord_22@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para coord_22@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: coord_22@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para coord_22@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: admin@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para admin@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: secretaria_2@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para secretaria_2@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 191919
+[Aviso] navegarParaAtividades chamado fora de um contexto de subprocesso: http://localhost:5173/processo/201
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 6, Destinatário: secao_221@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicaoDireta:52 - E-mail enviado para unidade SECAO_221 (secao_221@tre-pe.jus.br) - Transição: MAPA_DISPONIBILIZADO
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para secao_221@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: secao_221@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para secao_221@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 141414
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 7, Destinatário: coord_22@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.n.SubprocessoEmailService.enviarEmailTransicaoDireta:52 - E-mail enviado para unidade COORD_22 (coord_22@tre-pe.jus.br) - Transição: MAPA_VALIDADO
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para coord_22@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: coord_22@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para coord_22@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 191919
+[2m[WebServer] [22m[BACKEND] INFO  s.p.service.ProcessoValidador.validarTodosSubprocessosHomologados:84 - Todos os subprocessos do processo 201 estão homologados
+[2m[WebServer] [22m[BACKEND] INFO  s.p.s.ProcessoFinalizador.tornarMapasVigentes:82 - Mapa vigente definido para o processo 201
+[2m[WebServer] [22m[BACKEND] INFO  s.p.s.ProcessoFinalizador.tornarMapasVigentes:96 - Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 8, Destinatário: secao_221@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.p.s.ProcessoNotificacaoService.enviarEmailUnidadeFinal:176 - E-mail de finalização enviado para SECAO_221
+[2m[WebServer] [22m[BACKEND] INFO  s.p.s.ProcessoFinalizador.finalizar:72 - Processo 201 finalizado
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para secao_221@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: secao_221@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para secao_221@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.p.s.ProcessoManutencaoService.criar:67 - Processo 202 criado com 1 participantes: [18] - [(202,18)]
+[2m[WebServer] [22m[BACKEND] INFO  s.s.s.f.SubprocessoFactory.criarParaRevisao:150 - Subprocesso para revisão criado para unidade SECAO_221
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.processarEnvioDeEmail:47 - Notificação persistida no banco - Código: 9, Destinatário: secao_221@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.p.s.ProcessoNotificacaoService.enviarEmailProcessoIniciado:232 - E-mail enviado para unidade SECAO_221 (secao_221@tre-pe.jus.br)
+[2m[WebServer] [22m[BACKEND] INFO  s.p.s.ProcessoInicializador.iniciar:95 - Processo de revisao 202 iniciado para 1 unidade(s).
+[2m[WebServer] [22m[SMTP] E-mail recebido de sgc@tre-pe.jus.br para secao_221@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailAsyncExecutor.enviarEmailAssincrono:53 - E-mail enviado a: secao_221@tre-pe.jus.br
+[2m[WebServer] [22m[BACKEND] INFO  s.n.NotificacaoEmailService.lambda$processarEnvioDeEmail$0:52 - E-mail para secao_221@tre-pe.jus.br enviado.
+[2m[WebServer] [22m[BACKEND] INFO  s.seguranca.login.LoginFacade.autenticar:57 - Usuário autenticado: 141414
+  ✘  1 [chromium] › e2e/cdu-10.spec.ts:29:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Fluxo completo de revisão de cadastro (22.3s)
+
+
+  1) [chromium] › e2e/cdu-10.spec.ts:29:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Fluxo completo de revisão de cadastro › 1. Preparação: Mapeamento completo e Revisão iniciada
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/processo\/\d+\/SECAO_221$/[39m
+    Received string:  [31m"http://localhost:5173/painel"[39m
+    Timeout: 3000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 3000ms[22m
+    [2m    7 × unexpected value "http://localhost:5173/painel"[22m
+
+
+      21 |
+      22 | async function verificarPaginaSubprocesso(page: Page, unidade: string) {
+    > 23 |     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));
+         |                        ^
+      24 | }
+      25 |
+      26 | test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos', () => {
+        at verificarPaginaSubprocesso (/app/e2e/cdu-10.spec.ts:23:24)
+        at /app/e2e/cdu-10.spec.ts:140:19
+        at /app/e2e/cdu-10.spec.ts:38:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cdu-10-CDU-10---Disponibil-8d523-leto-de-revisão-de-cadastro-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cdu-10-CDU-10---Disponibil-8d523-leto-de-revisão-de-cadastro-chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/cdu-10.spec.ts:29:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Fluxo completo de revisão de cadastro
