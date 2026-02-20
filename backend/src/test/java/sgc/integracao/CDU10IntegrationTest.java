@@ -139,6 +139,9 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         jdbcTemplate.update("UPDATE SGC.VW_UNIDADE SET titulo_titular = ? WHERE codigo = ?",
                 usuario.getTituloEleitoral(), unidade.getCodigo());
 
+        jdbcTemplate.update("INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, 'TITULAR', ?)",
+                unidade.getCodigo(), usuario.getTituloEleitoral(), usuario.getMatricula(), LocalDateTime.now());
+
         unidade.setTituloTitular(usuario.getTituloEleitoral());
         unidade.setMatriculaTitular(usuario.getMatricula());
     }
