@@ -65,8 +65,7 @@ public class SubprocessoEmailService {
 
     private void notificarResponsaveisPessoais(Unidade unidade, String assunto, String corpo) {
         UnidadeResponsavelDto responsavel = unidadeFacade.buscarResponsavelUnidade(unidade.getCodigo());
-        // TODO responsavel nunca pode ser nulo. É invariante do sistema, garantido pelas views.
-        if (responsavel == null) return;
+        // responsavel nunca deve ser nulo. É invariante do sistema, garantido pelas views.
 
         // Se houver substituto, ele é o responsável atual e deve receber no seu e-mail pessoal
         if (responsavel.substitutoTitulo() != null) {

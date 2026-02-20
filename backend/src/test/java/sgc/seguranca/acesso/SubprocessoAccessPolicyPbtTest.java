@@ -33,7 +33,10 @@ class SubprocessoAccessPolicyPbtTest {
         unidade.setCodigo(1L);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
         
-        Subprocesso sp = Subprocesso.builder().situacao(situacao).unidade(unidade).build();
+        sgc.processo.model.Processo processo = new sgc.processo.model.Processo();
+        processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
+
+        Subprocesso sp = Subprocesso.builder().situacao(situacao).unidade(unidade).processo(processo).build();
         
         // canExecute doesn't call repo.findPerfisByUsuario(admin) directly, it uses getPerfilAtivo()
         
@@ -70,7 +73,11 @@ class SubprocessoAccessPolicyPbtTest {
         unidadeSp.setCodigo(200L);
         unidadeSp.setSigla("U200");
         unidadeSp.setTituloTitular("TITULAR_QUALQUER");
-        Subprocesso sp = Subprocesso.builder().situacao(situacao).unidade(unidadeSp).build();
+
+        sgc.processo.model.Processo processo = new sgc.processo.model.Processo();
+        processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
+
+        Subprocesso sp = Subprocesso.builder().situacao(situacao).unidade(unidadeSp).processo(processo).build();
 
         // No canExecute, p.ex. para EDITAR_CADASTRO (CHEFE, [NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO], MESMA_UNIDADE)
         // verificaHierarquia(chefe, unidadeSp, MESMA_UNIDADE) deve retornar false pois 100 != 200

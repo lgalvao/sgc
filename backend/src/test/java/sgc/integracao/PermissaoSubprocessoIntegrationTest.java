@@ -136,6 +136,6 @@ class PermissaoSubprocessoIntegrationTest {
 
         // No AbstractAccessPolicy: Objects.equals(codUnidadeUsuario, codUnidadeRecurso)
         // Se um for Integer e o outro Long, Objects.equals retorna false!
-        assertThat(java.util.Objects.equals(idLong, idInteger)).isFalse();
+        assertThat(java.util.Objects.equals(idLong, idInteger.longValue())).isTrue();
     }
 }
