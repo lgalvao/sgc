@@ -10,13 +10,12 @@ import {useFeedbackStore} from '@/stores/feedback';
 import {SituacaoSubprocesso} from '@/types/tipos';
 
 // Mock router
-const { mockPush, mockBack } = vi.hoisted(() => ({
-    mockPush: vi.fn(),
-    mockBack: vi.fn()
+const { mockPush } = vi.hoisted(() => ({
+    mockPush: vi.fn()
 }));
 
 vi.mock('vue-router', () => ({
-    useRouter: () => ({ push: mockPush, back: mockBack }),
+    useRouter: () => ({ push: mockPush, back: vi.fn() }),
     useRoute: () => ({ params: { codProcesso: '1', sigla: 'TEST' } }),
     createRouter: vi.fn(() => ({
         beforeEach: vi.fn(),
@@ -381,7 +380,7 @@ describe('CadAtividades.vue Coverage', () => {
     it('navigates back when back button is clicked', async () => {
         const { wrapper } = createWrapper();
         await wrapper.find('[data-testid="btn-cad-atividades-voltar"]').trigger('click');
-        expect(mockBack).toHaveBeenCalled();
+        expect(mockPush).toHaveBeenCalledWith('/processo/1/TEST');
     });
 
     it('dismisses global error', async () => {

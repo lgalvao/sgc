@@ -20,17 +20,17 @@ const router = createRouter({
     routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
     const perfilStore = usePerfilStore();
     const isAuthenticated = perfilStore.usuarioCodigo;
     const publicPages = ["/login"];
     const authRequired = !publicPages.includes(to.path);
 
     if (authRequired && !isAuthenticated) {
-        return next("/login");
+        return "/login";
     }
 
-    next();
+    return true;
 });
 
 router.afterEach((to) => {

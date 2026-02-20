@@ -37,17 +37,17 @@ describe('Router Guards', () => {
     });
 
     // Copying logic from router/index.ts for testing
-    router.beforeEach((to: any, from: any, next: any) => {
+    router.beforeEach((to: any) => {
         const perfilStore = usePerfilStore();
         const isAuthenticated = perfilStore.usuarioCodigo;
         const publicPages = ["/login"];
         const authRequired = !publicPages.includes(to.path);
 
         if (authRequired && !isAuthenticated) {
-            return next("/login");
+            return "/login";
         }
 
-        next();
+        return true;
     });
 
     router.afterEach((to: any) => {
