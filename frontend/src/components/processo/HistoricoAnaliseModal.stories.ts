@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import HistoricoAnaliseModal from './HistoricoAnaliseModal.vue';
 import { ref } from 'vue';
 
@@ -19,6 +19,8 @@ const mockHistorico = [
     acao: 'Aceite',
     analistaUsuarioTitulo: 'Maria Administradora',
     observacoes: 'Cadastro revisado e aceito.',
+    motivo: '',
+    tipo: 'CADASTRO'
   },
   {
     dataHora: '2025-02-18T14:30:00Z',
@@ -27,6 +29,8 @@ const mockHistorico = [
     acao: 'Envio',
     analistaUsuarioTitulo: 'João Gestor',
     observacoes: 'Enviado para análise inicial.',
+    motivo: '',
+    tipo: 'CADASTRO'
   },
 ];
 

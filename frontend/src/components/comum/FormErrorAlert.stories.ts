@@ -1,6 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import FormErrorAlert from './FormErrorAlert.vue';
-import { ref } from 'vue';
 
 const meta: Meta<typeof FormErrorAlert> = {
   title: 'Comum/FormErrorAlert',
@@ -35,9 +34,9 @@ export const ComErroTecnico: Story = {
     variant: 'danger',
     title: 'Erro Inesperado',
     body: 'Ocorreu um erro ao processar sua solicitação no servidor.',
-    stackTrace: 'Error: Internal Server Error
+    stackTrace: `Error: Internal Server Error
   at processRequest (server.js:123:45)
-  at async handle (handler.js:67:89)',
+  at async handle (handler.js:67:89)`,
   },
 };
 

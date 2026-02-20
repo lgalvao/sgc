@@ -127,16 +127,12 @@ describe('mappers/mapas.ts', () => {
         it('retorna array vazio para atividadesAfetadas quando undefined', () => {
             const dto = {
                 temImpactos: true,
-                totalAtividadesInseridas: 0,
-                totalAtividadesRemovidas: 0,
-                totalAtividadesAlteradas: 0,
-                totalCompetenciasImpactadas: 1,
                 competenciasImpactadas: [
-                    { codigo: 1, descricao: 'Comp', tipoImpacto: ['REMOVIDA'] } // sem atividadesAfetadas
+                    { codigo: 1, descricao: 'Comp', tiposImpacto: ['REMOVIDA'] } // sem atividadesAfetadas
                 ]
             };
 
-            const result = mapImpactoMapaDtoToModel(dto);
+            const result = mapImpactoMapaDtoToModel(dto as any);
             expect(result.competenciasImpactadas[0].atividadesAfetadas).toEqual([]);
         });
     });

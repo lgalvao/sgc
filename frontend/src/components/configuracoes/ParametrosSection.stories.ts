@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import { fn } from "@storybook/test";
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import ParametrosSection from './ParametrosSection.vue';
 import { createTestingPinia } from '@pinia/testing';
-import { fn } from '@storybook/test';
 
 const meta: Meta<typeof ParametrosSection> = {
   title: 'Configuracoes/ParametrosSection',

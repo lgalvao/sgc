@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import RelatorioCardsSection from './RelatorioCardsSection.vue';
 
 const meta: Meta<typeof RelatorioCardsSection> = {
@@ -6,9 +6,9 @@ const meta: Meta<typeof RelatorioCardsSection> = {
   component: RelatorioCardsSection,
   tags: ['autodocs'],
   argTypes: {
-    onAbrirMapasVigentes: { action: 'abrir-mapas-vigentes' },
-    onAbrirDiagnosticosGaps: { action: 'abrir-diagnosticos-gaps' },
-    onAbrirAndamentoGeral: { action: 'abrir-andamento-geral' },
+    'onAbrir-mapas-vigentes': { action: 'abrir-mapas-vigentes' },
+    'onAbrir-diagnosticos-gaps': { action: 'abrir-diagnosticos-gaps' },
+    'onAbrir-andamento-geral': { action: 'abrir-andamento-geral' },
   },
 };
 

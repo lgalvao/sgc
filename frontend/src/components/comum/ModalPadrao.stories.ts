@@ -1,7 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import ModalPadrao from './ModalPadrao.vue';
 import { ref } from 'vue';
-import { fn } from '@storybook/test';
 
 const meta: Meta<typeof ModalPadrao> = {
   title: 'Comum/ModalPadrao',

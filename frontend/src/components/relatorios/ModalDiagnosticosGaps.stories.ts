@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import ModalDiagnosticosGaps from './ModalDiagnosticosGaps.vue';
 import { ref } from 'vue';
 

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import CriarCompetenciaModal from './CriarCompetenciaModal.vue';
 import { ref } from 'vue';
 
@@ -65,6 +65,7 @@ export const Edicao: Story = {
       codigo: 1,
       descricao: 'Competência Existente',
       atividadesAssociadas: [1, 3],
+      atividades: [],
     },
   },
   render: (args) => ({

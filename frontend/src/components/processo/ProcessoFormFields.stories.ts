@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import ProcessoFormFields from './ProcessoFormFields.vue';
 import { TipoProcesso } from '@/types/tipos';
 import { ref } from 'vue';

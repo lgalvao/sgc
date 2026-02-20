@@ -1,5 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import ModalRelatorioAndamento from './ModalRelatorioAndamento.vue';
+import { SituacaoProcesso, TipoProcesso } from '@/types/tipos';
 import { ref } from 'vue';
 
 const meta: Meta<typeof ModalRelatorioAndamento> = {
@@ -15,25 +16,31 @@ const mockProcessos = [
   {
     codigo: 1,
     descricao: 'Mapeamento Anual 2025',
-    tipo: 'MAPEAMENTO',
-    situacao: 'EM_ANDAMENTO',
-    dataLimite: new Date('2025-12-31'),
+    tipo: TipoProcesso.MAPEAMENTO,
+    situacao: SituacaoProcesso.EM_ANDAMENTO,
+    dataLimite: '2025-12-31',
+    dataCriacao: '2025-01-01',
+    unidadeCodigo: 1,
     unidadeNome: 'Geral',
   },
   {
     codigo: 2,
     descricao: 'Revisão Semestral TI',
-    tipo: 'REVISAO',
-    situacao: 'CONCLUIDO',
-    dataLimite: new Date('2025-06-30'),
+    tipo: TipoProcesso.REVISAO,
+    situacao: SituacaoProcesso.FINALIZADO,
+    dataLimite: '2025-06-30',
+    dataCriacao: '2025-01-01',
+    unidadeCodigo: 2,
     unidadeNome: 'DITEC',
   },
   {
     codigo: 3,
     descricao: 'Diagnóstico de Gaps Administrativos',
-    tipo: 'DIAGNOSTICO',
-    situacao: 'PENDENTE',
-    dataLimite: new Date('2025-08-15'),
+    tipo: TipoProcesso.DIAGNOSTICO,
+    situacao: SituacaoProcesso.CRIADO,
+    dataLimite: '2025-08-15',
+    dataCriacao: '2025-01-01',
+    unidadeCodigo: 3,
     unidadeNome: 'DIRAD',
   },
 ];

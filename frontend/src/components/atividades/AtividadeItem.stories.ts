@@ -1,17 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import AtividadeItem from './AtividadeItem.vue';
-import { fn } from '@storybook/test';
 
 const meta: Meta<typeof AtividadeItem> = {
   title: 'Atividades/AtividadeItem',
   component: AtividadeItem,
   tags: ['autodocs'],
   argTypes: {
-    onAtualizarAtividade: { action: 'atualizar-atividade' },
-    onRemoverAtividade: { action: 'remover-atividade' },
-    onAdicionarConhecimento: { action: 'adicionar-conhecimento' },
-    onAtualizarConhecimento: { action: 'atualizar-conhecimento' },
-    onRemoverConhecimento: { action: 'remover-conhecimento' },
+    'onAtualizar-atividade': { action: 'atualizar-atividade' },
+    'onRemover-atividade': { action: 'remover-atividade' },
+    'onAdicionar-conhecimento': { action: 'adicionar-conhecimento' },
+    'onAtualizar-conhecimento': { action: 'atualizar-conhecimento' },
+    'onRemover-conhecimento': { action: 'remover-conhecimento' },
   },
 };
 
