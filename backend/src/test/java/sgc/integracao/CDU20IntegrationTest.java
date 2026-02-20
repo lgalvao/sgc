@@ -5,8 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
@@ -42,7 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @Transactional
 @DisplayName("CDU-20: Analisar validação de mapa de competências")
-
 class CDU20IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UsuarioFacade usuarioService;
@@ -206,7 +203,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         List<Movimentacao> movimentacoesAceite =
                 movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
                         subprocesso.getCodigo());
-        assertThat(movimentacoesAceite).hasSize(3); // Movimentação inicial + devolução + aceite
+        assertThat(movimentacoesAceite).hasSize(4); // Setup + devolução + validação + aceite
         assertThat(movimentacoesAceite.getFirst().getDescricao())
                 .isEqualTo("Validação do mapa aceita");
         assertThat(movimentacoesAceite.getFirst().getUnidadeOrigem().getSigla())
@@ -246,12 +243,6 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         // Cenário: Subprocesso já validado e localizado na unidade (9)
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         subprocessoRepo.save(subprocesso);
-        
-        // Simular que o admin está na unidade do subprocesso para passar a regra de localização
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Usuario admin = (Usuario) auth.getPrincipal();
-        admin.setUnidadeAtivaCodigo(unidade.getCodigo());
-        
         subprocessoRepo.flush();
 
         // Ação
