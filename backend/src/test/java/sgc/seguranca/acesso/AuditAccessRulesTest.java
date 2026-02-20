@@ -20,9 +20,15 @@ class AuditAccessRulesTest {
         // Path relative to module root (backend/)
         Path outputPath = Paths.get("etc/scripts/access-audit-output.md");
         // Ensure directory exists
-        outputPath.getParent().toFile().mkdirs();
+        Path parent = outputPath.getParent();
+        if (parent != null) {
+            java.io.File parentDir = parent.toFile();
+            if (!parentDir.exists() && !parentDir.mkdirs()) {
+                throw new RuntimeException("Falha ao criar diretório para relatório de auditoria: " + parentDir);
+            }
+        }
 
-        try (PrintWriter out = new PrintWriter(new FileWriter(outputPath.toFile()))) {
+        try (PrintWriter out = new PrintWriter(new FileWriter(outputPath.toFile(), java.nio.charset.StandardCharsets.UTF_8))) {
             out.println("# Relatório de Regras de Acesso (Gerado Automaticamente)");
             out.println("\n## SubprocessoAccessPolicy\n");
             out.println("| Ação | Perfis Permitidos | Situações Permitidas | Requisito Hierarquia |");

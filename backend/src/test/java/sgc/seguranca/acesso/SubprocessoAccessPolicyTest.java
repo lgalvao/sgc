@@ -273,6 +273,11 @@ class SubprocessoAccessPolicyTest {
         Unidade un = new Unidade();
         un.setCodigo(codUnidade);
         sp.setUnidade(un);
+
+        sgc.processo.model.Processo p = new sgc.processo.model.Processo();
+        p.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
+        sp.setProcesso(p);
+
         return sp;
     }
 }

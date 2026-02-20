@@ -70,7 +70,11 @@ class SubprocessoEmailServiceTest {
         when(templateEngine.process(anyString(), any())).thenReturn("html");
 
         Unidade destino = new Unidade();
+        destino.setCodigo(1L);
         destino.setSigla("DEST");
+
+        // Mock responsavel para evitar NPE
+        when(unidadeFacade.buscarResponsavelUnidade(1L)).thenReturn(mock(UnidadeResponsavelDto.class));
 
         service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, origem, destino, null);
 
@@ -140,7 +144,11 @@ class SubprocessoEmailServiceTest {
         origem.setUnidadeSuperior(superior);
 
         Unidade destino = new Unidade();
+        destino.setCodigo(1L);
         destino.setSigla("DEST");
+
+        // Mock responsavel para evitar NPE
+        lenient().when(unidadeFacade.buscarResponsavelUnidade(1L)).thenReturn(mock(UnidadeResponsavelDto.class));
 
         when(templateEngine.process(anyString(), any())).thenReturn("html");
 
