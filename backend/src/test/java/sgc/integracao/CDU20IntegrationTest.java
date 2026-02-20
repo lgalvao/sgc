@@ -99,7 +99,19 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         subprocesso.setCodigo(null);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         subprocesso = subprocessoRepo.save(subprocesso);
+
+        // Simular que o mapa foi validado e enviado para a unidade superior (6)
+        Movimentacao m = Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(unidade)
+                .unidadeDestino(unidadeSuperior)
+                .descricao("Mapa validado e submetido para análise")
+                .usuario(usuarioChefe)
+                .build();
+        movimentacaoRepo.save(m);
+        
         subprocessoRepo.flush();
+        movimentacaoRepo.flush();
     }
 
     @Test

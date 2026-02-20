@@ -87,6 +87,23 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         subprocesso2.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso2 = subprocessoRepo.save(subprocesso2);
 
+        // Subprocessos devem estar na unidade superior (6) para o Gestor aceitar
+        Movimentacao m1 = Movimentacao.builder()
+                .subprocesso(subprocesso1)
+                .unidadeOrigem(unidade1)
+                .unidadeDestino(unidadeSuperior)
+                .descricao("Cadastro disponibilizado")
+                .build();
+        movimentacaoRepo.save(m1);
+
+        Movimentacao m2 = Movimentacao.builder()
+                .subprocesso(subprocesso2)
+                .unidadeOrigem(unidade2)
+                .unidadeDestino(unidadeSuperior)
+                .descricao("Cadastro disponibilizado")
+                .build();
+        movimentacaoRepo.save(m2);
+
         entityManager.flush();
         entityManager.clear();
 

@@ -152,8 +152,8 @@ tasks.withType<Test> {
                 val output = """
                     |  Resultado: ${result.resultType}
                     |  Total:     ${result.testCount} testes executados
-                    |  ✓ Passou:   ${result.successfulTestCount}
-                    |  ✗ Falhou:   ${result.failedTestCount}
+                    |  + Passou:   ${result.successfulTestCount}
+                    |  - Falhou:   ${result.failedTestCount}
                     |  ○ Ignorado: ${result.skippedTestCount}
                     |  Tempo:     ${(result.endTime - result.startTime) / 1000.0}s
                 """.trimMargin()

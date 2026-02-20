@@ -261,6 +261,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                 @Test
                 @DisplayName("ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO")
                 void adminHomologaSemImpactos() throws Exception {
+                        admin.setUnidadeAtivaCodigo(2L); // No STIC após aceite do Gestor
                         mockMvc.perform(post(API_SUBPROCESSOS_ID_HOMOLOGAR, subprocessoId)
                                         .with(csrf())
                                         .with(user(admin))
@@ -283,6 +284,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                         atividadeRepo.delete(atividadeExistente);
                         entityManager.flush();
 
+                        admin.setUnidadeAtivaCodigo(2L); // No STIC após aceite do Gestor
                         mockMvc.perform(post(API_SUBPROCESSOS_ID_HOMOLOGAR, subprocessoId)
                                         .with(csrf())
                                         .with(user(admin))
