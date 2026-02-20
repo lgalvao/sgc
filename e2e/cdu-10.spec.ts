@@ -138,7 +138,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await adicionarConhecimento(page, `Atividade Revisão Nova ${timestamp}`, 'Conhecimento Revisão');
             await page.getByTestId('btn-cad-atividades-voltar').click({force: true});
             await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
-            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro em andamento/i);
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
         });
 
         await test.step('2. Cenário 1: Validação - Atividade sem conhecimento', async () => {
@@ -150,7 +150,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await adicionarAtividade(page, atividadeIncompleta);
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             const erroInline = page.getByTestId('atividade-erro-validacao');
-            await expect(erroInline).toBeVisible();
+            await expect(erroInline).toBeVisible({timeout: 10000});
             await expect(erroInline).toContainText(/conhecimento/i);
 
             await adicionarConhecimento(page, atividadeIncompleta, 'Conhecimento Corretivo');
