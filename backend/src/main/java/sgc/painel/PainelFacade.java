@@ -12,6 +12,7 @@ import sgc.alerta.AlertaFacade;
 import sgc.alerta.model.Alerta;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
@@ -136,54 +137,82 @@ public class PainelFacade {
     }
 
     private String formatarUnidadesParticipantes(List<UnidadeProcesso> participantes, Map<Long, List<Long>> mapaPaiFilhos) {
-        Map<Long, UnidadeProcesso> participantesPorCodigo =
-                participantes.stream().collect(Collectors.toMap(
-                        UnidadeProcesso::getUnidadeCodigo,
-                        up -> up,
-                        (existing, replacement) -> existing));
-
-        Set<Long> participantesIds = participantesPorCodigo.keySet();
-
-        Set<Long> unidadesVisiveis = selecionarIdsVisiveis(participantesIds, participantesPorCodigo, mapaPaiFilhos);
-        return unidadesVisiveis.stream()
-                .map(participantesPorCodigo::get)
-                .filter(Objects::nonNull)
-                .map(UnidadeProcesso::getSigla)
-                .filter(Objects::nonNull)
-                .sorted()
-                .collect(Collectors.joining(", "));
-    }
-
-    private Set<Long> selecionarIdsVisiveis(Set<Long> participantesIds, Map<Long, UnidadeProcesso> participantesPorCodigo, Map<Long, List<Long>> mapaPaiFilhos) {
-        Set<Long> visiveis = new LinkedHashSet<>();
-        for (Long unidadeId : participantesIds) {
-            UnidadeProcesso unidade = participantesPorCodigo.get(unidadeId);
-            Long candidato = encontrarMaiorIdVisivel(unidade, participantesIds, participantesPorCodigo, mapaPaiFilhos);
-            visiveis.add(candidato);
-        }
-        return visiveis;
-    }
-
-    private Long encontrarMaiorIdVisivel(UnidadeProcesso unidade, Set<Long> participantesIds, 
-            Map<Long, UnidadeProcesso> participantesPorCodigo, Map<Long, List<Long>> mapaPaiFilhos) {
-        UnidadeProcesso atual = unidade;
-        while (true) {
-            if (!todasSubordinadasParticipam(atual.getUnidadeCodigo(), participantesIds, mapaPaiFilhos)) {
-                return atual.getUnidadeCodigo();
+        Map<Long, Long> mapaFilhoPai = new HashMap<>();
+        for (Map.Entry<Long, List<Long>> entry : mapaPaiFilhos.entrySet()) {
+            Long pai = entry.getKey();
+            for (Long filho : entry.getValue()) {
+                mapaFilhoPai.put(filho, pai);
             }
-            Long superiorCodigo = atual.getUnidadeSuperiorCodigo();
-            if (superiorCodigo == null || !participantesIds.contains(superiorCodigo)) {
-                return atual.getUnidadeCodigo();
-            }
-            atual = participantesPorCodigo.get(superiorCodigo);
         }
+
+        Set<Long> participantesIds = participantes.stream()
+                .map(UnidadeProcesso::getUnidadeCodigo)
+                .collect(Collectors.toSet());
+
+        Set<Long> displayIds = new HashSet<>();
+        Map<Long, Boolean> coveredCache = new HashMap<>();
+
+        for (Long pId : participantesIds) {
+            Long candidate = pId;
+            Long parent = mapaFilhoPai.get(candidate);
+
+            while (parent != null) {
+                if (isCovered(parent, participantesIds, mapaPaiFilhos, coveredCache)) {
+                    candidate = parent;
+                    parent = mapaFilhoPai.get(candidate);
+                } else {
+                    break;
+                }
+            }
+            displayIds.add(candidate);
+        }
+
+        Map<Long, String> existingSiglas = participantes.stream()
+                .collect(Collectors.toMap(UnidadeProcesso::getUnidadeCodigo, UnidadeProcesso::getSigla));
+
+        List<String> siglas = new ArrayList<>();
+        List<Long> missingIds = new ArrayList<>();
+
+        for (Long id : displayIds) {
+            if (existingSiglas.containsKey(id)) {
+                siglas.add(existingSiglas.get(id));
+            } else {
+                missingIds.add(id);
+            }
+        }
+
+        if (!missingIds.isEmpty()) {
+            List<Unidade> missingUnidades = unidadeService.buscarEntidadesPorIds(missingIds);
+            missingUnidades.forEach(u -> siglas.add(u.getSigla()));
+        }
+
+        return siglas.stream().sorted().collect(Collectors.joining(", "));
     }
 
-    private boolean todasSubordinadasParticipam(Long codigo, Set<Long> participantesIds, Map<Long, List<Long>> mapaPaiFilhos) {
-        for (Long subordinadaId : unidadeService.buscarIdsDescendentes(codigo, mapaPaiFilhos)) {
-            if (!participantesIds.contains(subordinadaId)) return false;
+    private boolean isCovered(Long unidadeId, Set<Long> participantesIds, Map<Long, List<Long>> mapaPaiFilhos, Map<Long, Boolean> cache) {
+        if (participantesIds.contains(unidadeId)) {
+            return true;
         }
-        return true;
+        if (cache.containsKey(unidadeId)) {
+            return cache.get(unidadeId);
+        }
+
+        List<Long> children = mapaPaiFilhos.get(unidadeId);
+        if (children == null || children.isEmpty()) {
+            cache.put(unidadeId, false);
+            return false;
+        }
+
+        boolean allCovered = true;
+        for (Long child : children) {
+            if (!isCovered(child, participantesIds, mapaPaiFilhos, cache)) {
+                allCovered = false;
+                break;
+            }
+        }
+
+        cache.put(unidadeId, allCovered);
+        return allCovered;
     }
 
     private String calcularLinkDestinoProcesso(Processo processo, Perfil perfil, Long codigoUnidade) {
