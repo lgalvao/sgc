@@ -79,11 +79,15 @@ test.describe('CDU-02 - Visualizar Painel', () => {
         test('Deve alternar ordenação da coluna Descrição na tabela de processos', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
             const cabecalhoDescricao = page.getByTestId('tbl-processos').getByRole('columnheader', {name: 'Descrição'});
             await expect(cabecalhoDescricao).toHaveClass(/b-table-sortable-column/);
-            await cabecalhoDescricao.click();
-            await expect(cabecalhoDescricao).toBeVisible();
 
             await cabecalhoDescricao.click();
-            await expect(cabecalhoDescricao).toBeVisible();
+            await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'descending');
+
+            await cabecalhoDescricao.click();
+            await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'none');
+
+            await cabecalhoDescricao.click();
+            await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'ascending');
         });
 
         test('Não deve incluir unidades INTERMEDIARIAS na seleção', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: ReturnType<typeof useProcessoCleanup>}) => {
@@ -138,7 +142,12 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await page.goto('/painel');
 
             // Verifica que o processo foi criado e aparece na tabela
-            await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
+            await verificarProcessoNaTabela(page, {
+                descricao: descricaoProcesso,
+                situacao: 'Criado',
+                tipo: 'Mapeamento',
+                unidadesParticipantes: ['COORD_11']
+            });
         });
     });
 

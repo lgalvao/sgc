@@ -68,6 +68,7 @@ export async function verificarProcessoNaTabela(page: Page, options: {
     descricao: string;
     situacao: string;
     tipo: string;
+    unidadesParticipantes?: string[];
 }): Promise<void> {
     await expect(page.getByTestId('tbl-processos')).toBeVisible();
     await expect(page.getByTestId('tbl-processos').getByText(options.descricao).first()).toBeVisible();
@@ -75,6 +76,12 @@ export async function verificarProcessoNaTabela(page: Page, options: {
     const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(options.descricao)});
     await expect(linhaProcesso.getByText(options.situacao)).toBeVisible();
     await expect(linhaProcesso.getByText(options.tipo, {exact: true})).toBeVisible();
+
+    if (options.unidadesParticipantes) {
+        for (const unidade of options.unidadesParticipantes) {
+            await expect(linhaProcesso.getByText(unidade)).toBeVisible();
+        }
+    }
 }
 
 export interface UnidadeParticipante {
