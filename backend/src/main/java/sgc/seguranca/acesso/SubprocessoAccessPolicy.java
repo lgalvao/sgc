@@ -6,6 +6,7 @@ import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.organizacao.service.HierarquiaService;
+import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -251,6 +252,12 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
         }
 
         // 3. Verifica hierarquia
+        // CASO ESPECIAL: Permitir VISUALIZAR_SUBPROCESSO se o processo estiver FINALIZADO,
+        // independentemente da hierarquia. Isso permite importação de atividades (Knowledge Base).
+        if (acao == VISUALIZAR_SUBPROCESSO && sp.getProcesso().getSituacao() == SituacaoProcesso.FINALIZADO) {
+            return true;
+        }
+
         if (!verificaHierarquia(usuario, sp.getUnidade(), regras.requisitoHierarquia)) {
             String motivo = obterMotivoNegacaoHierarquia(usuario, sp.getUnidade(), regras.requisitoHierarquia);
             log.info("Permissão negada para {}: {}", usuario.getTituloEleitoral(), motivo);

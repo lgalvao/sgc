@@ -7,6 +7,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.fixture.UnidadeFixture;
 import sgc.fixture.UsuarioFixture;
@@ -27,6 +31,7 @@ import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -72,7 +77,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             // Ignorado: falha ao resetar sequências no H2 não deve impedir o teste
         }
 
-        // 1. Criar unidades
+        // 1. Criar unidades (DISTINTAS)
         Unidade unidadeOrigem = UnidadeFixture.unidadePadrao();
         unidadeOrigem.setCodigo(null);
         unidadeOrigem.setSigla("U_ORIG");
@@ -87,7 +92,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
         // 2. Criar chefe para unidade destino (para validação de segurança)
         Usuario chefe = UsuarioFixture.usuarioPadrao();
-        chefe.setTituloEleitoral("888888888888"); // Título esperado pelo @WithMockChefe
+        chefe.setTituloEleitoral("888888888888");
         chefe.setNome("Chefe Destino");
         chefe.setUnidadeLotacao(unidadeDestino);
         chefe = usuarioRepo.save(chefe);
@@ -101,26 +106,34 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                 .build();
         usuarioPerfilRepo.save(perfilChefe);
 
-        Processo processo = Processo.builder()
-                .descricao("Processo Teste")
+        // Configuração manual de autenticação
+        chefe.setPerfilAtivo(Perfil.CHEFE);
+        chefe.setUnidadeAtivaCodigo(unidadeDestino.getCodigo());
+        chefe.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_CHEFE")));
+        Authentication auth = new UsernamePasswordAuthenticationToken(chefe, null, chefe.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        // 3. Processo Origem (FINALIZADO) - Permite importação de qualquer unidade
+        Processo processoOrigem = Processo.builder()
+                .descricao("Processo Origem Finalizado")
                 .tipo(TipoProcesso.MAPEAMENTO)
-                .situacao(SituacaoProcesso.EM_ANDAMENTO)
-                .dataLimite(LocalDateTime.now().plusDays(30))
+                .situacao(SituacaoProcesso.FINALIZADO)
+                .dataLimite(LocalDateTime.now().minusDays(30))
                 .build();
-        processoRepo.save(processo);
+        processoRepo.save(processoOrigem);
 
         subprocessoOrigem = Subprocesso.builder()
                 .unidade(unidadeOrigem)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
-                .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
-                .processo(processo)
+                .dataLimiteEtapa1(LocalDateTime.now().minusDays(40))
+                .processo(processoOrigem)
                 .build();
         subprocessoRepo.save(subprocessoOrigem);
 
         Mapa mapaOrigem = new Mapa();
         mapaOrigem.setSubprocesso(subprocessoOrigem);
         mapaRepo.save(mapaOrigem);
-        subprocessoOrigem.setMapa(mapaOrigem); // Manter coerência em memória
+        subprocessoOrigem.setMapa(mapaOrigem);
 
         Atividade atividade1 = Atividade.builder().mapa(mapaOrigem).descricao("Atividade 1").build();
         atividadeRepo.save(atividade1);
@@ -131,30 +144,38 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 2.1").atividade(atividade2).build());
         conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 2.2").atividade(atividade2).build());
 
+        // 4. Processo Destino (EM ANDAMENTO)
+        Processo processoDestino = Processo.builder()
+                .descricao("Processo Destino Ativo")
+                .tipo(TipoProcesso.MAPEAMENTO)
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .dataLimite(LocalDateTime.now().plusDays(30))
+                .build();
+        processoRepo.save(processoDestino);
+
         subprocessoDestino = Subprocesso.builder()
                 .unidade(unidadeDestino)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
                 .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
-                .processo(processo)
+                .processo(processoDestino)
                 .build();
         subprocessoRepo.save(subprocessoDestino);
 
-        Mapa mapa = new Mapa(); // Inicializa o mapa para os testes de CRUD
+        Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocessoDestino);
         mapaRepo.save(mapa);
-        subprocessoDestino.setMapa(mapa); // Manter coerência em memória
+        subprocessoDestino.setMapa(mapa);
 
         entityManager.flush();
         entityManager.clear();
 
-        // Recarregar objetos para garantir que estão gerenciados e atualizados
+        // Recarregar objetos
         subprocessoOrigem = subprocessoRepo.findById(subprocessoOrigem.getCodigo()).orElseThrow();
         subprocessoDestino = subprocessoRepo.findById(subprocessoDestino.getCodigo()).orElseThrow();
     }
 
     @Nested
     @DisplayName("Testes de importação de atividades")
-    @WithMockChefe("888888888888")
     class ImportacaoAtividades {
         @Test
         @DisplayName("Deve importar atividades e conhecimentos")
@@ -229,8 +250,8 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("Deve importar mesmo se subprocesso já estiver disponiblizado")
-        void deveImportarMesmoSeSubprocessoJaEstiverDisponibilizado() throws Exception {
+        @DisplayName("Não deve importar se subprocesso já estiver disponiblizado")
+        void naoDeveImportarSeSubprocessoJaEstiverDisponibilizado() throws Exception {
             subprocessoDestino.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             subprocessoRepo.save(subprocessoDestino);
 
@@ -244,7 +265,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isForbidden());
         }
 
         @Test
