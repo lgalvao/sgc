@@ -2,8 +2,6 @@ package sgc.mapa.dto;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Builder;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
 import sgc.mapa.model.MapaViews;
 
 import java.util.Collections;
@@ -18,16 +16,16 @@ public record ImpactoMapaResponse(
     boolean temImpactos,
     
     @JsonView(MapaViews.Publica.class)
-    List<Atividade> inseridas,
+    List<AtividadeImpactadaDto> inseridas,
     
     @JsonView(MapaViews.Publica.class)
-    List<Atividade> removidas,
+    List<AtividadeImpactadaDto> removidas,
     
     @JsonView(MapaViews.Publica.class)
-    List<Atividade> alteradas,
+    List<AtividadeImpactadaDto> alteradas,
     
     @JsonView(MapaViews.Publica.class)
-    List<Competencia> competenciasImpactadas
+    List<CompetenciaImpactadaDto> competenciasImpactadas
 ) {
     public static ImpactoMapaResponse semImpacto() {
         return ImpactoMapaResponse.builder()

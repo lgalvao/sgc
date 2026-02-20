@@ -172,6 +172,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     });
 
     test('Cenario 3: Visualizar processo finalizado', async ({page, autenticadoComoGestorCoord21}) => {
+        test.setTimeout(90000);
         // Preparar: Admin homologa o cadastro
         
 

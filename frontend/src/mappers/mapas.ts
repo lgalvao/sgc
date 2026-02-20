@@ -47,22 +47,27 @@ export function mapMapaCompletoDtoToModel(dto: any): MapaCompleto {
 }
 
 export function mapImpactoMapaDtoToModel(dto: ImpactoMapaDto): ImpactoMapa {
+    const inseridas = dto.inseridas || [];
+    const removidas = dto.removidas || [];
+    const alteradas = dto.alteradas || [];
+    const competencias = dto.competenciasImpactadas || [];
+
     return {
         temImpactos: dto.temImpactos,
-        totalAtividadesInseridas: dto.totalAtividadesInseridas,
-        totalAtividadesRemovidas: dto.totalAtividadesRemovidas,
-        totalAtividadesAlteradas: dto.totalAtividadesAlteradas,
-        totalCompetenciasImpactadas: dto.totalCompetenciasImpactadas,
+        totalAtividadesInseridas: inseridas.length,
+        totalAtividadesRemovidas: removidas.length,
+        totalAtividadesAlteradas: alteradas.length,
+        totalCompetenciasImpactadas: competencias.length,
         // Arrays de atividades impactadas - sem mapeamento trivial
-        atividadesInseridas: dto.atividadesInseridas || [],
-        atividadesRemovidas: dto.atividadesRemovidas || [],
-        atividadesAlteradas: dto.atividadesAlteradas || [],
-        competenciasImpactadas: (dto.competenciasImpactadas || []).map(
+        atividadesInseridas: inseridas,
+        atividadesRemovidas: removidas,
+        atividadesAlteradas: alteradas,
+        competenciasImpactadas: competencias.map(
             (c: any): CompetenciaImpactada => ({
                 codigo: c.codigo,
                 descricao: c.descricao,
                 atividadesAfetadas: c.atividadesAfetadas || [],
-                tiposImpacto: c.tipoImpacto,
+                tiposImpacto: c.tiposImpacto,
             }),
         ),
     };

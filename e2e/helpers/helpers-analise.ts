@@ -289,7 +289,7 @@ export async function homologarCadastroRevisaoComImpacto(page: Page) {
 
     // Verificar situação após homologação
     await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-        .toHaveText(/Revisão de Cadastro Homologada/i);
+        .toHaveText(/Revisão homologada/i);
 }
 
 /**
