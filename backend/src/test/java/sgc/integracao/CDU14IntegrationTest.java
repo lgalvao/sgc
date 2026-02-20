@@ -72,12 +72,12 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
                 admin = usuarioService.buscarPorLogin("111111111111");
                 admin.setPerfilAtivo(Perfil.ADMIN);
-                admin.setUnidadeAtivaCodigo(9L); // Atuando na unidade do subprocesso
+                admin.setUnidadeAtivaCodigo(100L); 
                 admin.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
 
                 gestor = usuarioService.buscarPorLogin("666666666666");
                 gestor.setPerfilAtivo(Perfil.GESTOR);
-                gestor.setUnidadeAtivaCodigo(9L); // Atuando na unidade do subprocesso
+                gestor.setUnidadeAtivaCodigo(6L); 
                 gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
 
                 chefe = usuarioService.buscarPorLogin("333333333333");
