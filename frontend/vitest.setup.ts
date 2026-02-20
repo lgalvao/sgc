@@ -1,6 +1,6 @@
 import {config, RouterLinkStub} from "@vue/test-utils";
 import {createBootstrap} from "bootstrap-vue-next";
-import {expect, vi} from "vitest";
+import {vi} from "vitest";
 
 // Mock HTMLCanvasElement.prototype.getContext
 HTMLCanvasElement.prototype.getContext = vi.fn();

@@ -168,7 +168,11 @@ public class PainelFacade {
         }
 
         Map<Long, String> existingSiglas = participantes.stream()
-                .collect(Collectors.toMap(UnidadeProcesso::getUnidadeCodigo, UnidadeProcesso::getSigla));
+                .filter(p -> p.getSigla() != null)
+                .collect(Collectors.toMap(
+                        UnidadeProcesso::getUnidadeCodigo,
+                        UnidadeProcesso::getSigla,
+                        (s1, s2) -> s1));
 
         List<String> siglas = new ArrayList<>();
         List<Long> missingIds = new ArrayList<>();

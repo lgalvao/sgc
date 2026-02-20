@@ -208,6 +208,7 @@ class PainelFacadeTest {
         
         UnidadeProcesso up2 = mock(UnidadeProcesso.class);
         when(up2.getUnidadeCodigo()).thenReturn(10L); // Mesmo código
+        when(up2.getSigla()).thenReturn("U1"); // Mock de sigla
 
         // Retorna lista com duplicados
         when(p.getParticipantes()).thenReturn(List.of(up1, up2));
@@ -240,6 +241,7 @@ class PainelFacadeTest {
         UnidadeProcesso up2 = mock(UnidadeProcesso.class);
         when(up2.getUnidadeCodigo()).thenReturn(2L);
         when(up2.getUnidadeSuperiorCodigo()).thenReturn(1L);
+        when(up2.getSigla()).thenReturn("U2");
 
         when(p.getParticipantes()).thenReturn(List.of(up1, up2));
 
