@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import sgc.comum.model.ComumViews;
 import sgc.comum.model.EntidadeBase;
 import sgc.organizacao.model.Unidade;
 
@@ -44,7 +45,7 @@ public class Processo extends EntidadeBase {
     private LocalDateTime dataLimite;
 
     @Column(name = "descricao", nullable = false)
-    @JsonView(ProcessoViews.Publica.class)
+    @JsonView({ProcessoViews.Publica.class, ComumViews.Publica.class})
     private String descricao;
 
     @Enumerated(EnumType.STRING)
@@ -54,7 +55,7 @@ public class Processo extends EntidadeBase {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20, nullable = false)
-    @JsonView(ProcessoViews.Publica.class)
+    @JsonView({ProcessoViews.Publica.class, ComumViews.Publica.class})
     private TipoProcesso tipo;
 
     /**
