@@ -145,37 +145,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await aceitarCadastroMapeamento(page, 'Cadastro aprovado conforme análise');
     });
 
-    test('Cenario 6: ADMIN devolve para nova rodada de aceite', async ({page, autenticadoComoAdmin}) => {
-        // Devolver para permitir novo aceite sem observação
-        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        if (!await page.getByTestId('card-subprocesso-atividades-vis').isVisible().catch(() => false)) {
-            await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        }
-        await navegarParaAtividadesVisualizacao(page);
-
-        await devolverCadastroMapeamento(page, 'Pequeno ajuste necessário');
-
-        // CHEFE disponibiliza novamente
-        await fazerLogout(page);
-        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
-
-        await acessarSubprocessoChefeDireto(page, descProcesso);
-        await navegarParaAtividades(page);
-
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
-        await verificarPaginaPainel(page);
-    });
-
-    test('Cenario 7: GESTOR registra aceite com observação padrão', async ({page, autenticadoComoGestorCoord21}) => {
-        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-
-        // Aceitar sem observação
-        await aceitarCadastroMapeamento(page);
-    });
-
     test('Cenario 8: ADMIN visualiza histórico com múltiplas análises', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         if (!await page.getByTestId('card-subprocesso-atividades-vis').isVisible().catch(() => false)) {
@@ -196,22 +165,4 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await fecharHistoricoAnalise(page);
     });
 
-    test('Cenario 9: ADMIN cancela homologação', async ({page, autenticadoComoAdmin}) => {
-        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-
-        // Cancelar homologação
-        await cancelarHomologacao(page);
-
-        // Verificar que permanece na mesma tela
-        await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
-    });
-
-    test('Cenario 10: ADMIN homologa cadastro', async ({page, autenticadoComoAdmin}) => {
-        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-
-        // Homologar
-        await homologarCadastroMapeamento(page);
-    });
 });

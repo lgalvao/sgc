@@ -122,7 +122,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
             Map.entry(HOMOLOGAR_CADASTRO, new RegrasAcao(
                     EnumSet.of(ADMIN),
                     EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO),
-                    RequisitoHierarquia.NENHUM)),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
 
             // ========== REVISÃO CADASTRO ==========
             Map.entry(EDITAR_REVISAO_CADASTRO, new RegrasAcao(
@@ -148,7 +148,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
             Map.entry(HOMOLOGAR_REVISAO_CADASTRO, new RegrasAcao(
                     EnumSet.of(ADMIN),
                     EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA),
-                    RequisitoHierarquia.NENHUM)),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
 
             // ========== MAPA ==========
             Map.entry(VISUALIZAR_MAPA, new RegrasAcao(
@@ -171,7 +171,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                     EnumSet.of(MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO,
                             MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA,
                             REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES),
-                    RequisitoHierarquia.NENHUM)),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
 
             Map.entry(VERIFICAR_IMPACTOS, new RegrasAcao(
                     EnumSet.of(ADMIN, GESTOR, CHEFE),
@@ -206,12 +206,12 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                     EnumSet.of(ADMIN),
                     EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
                             REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO),
-                    RequisitoHierarquia.NENHUM)),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
 
             Map.entry(AJUSTAR_MAPA, new RegrasAcao(
                     EnumSet.of(ADMIN),
                     EnumSet.of(REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO),
-                    RequisitoHierarquia.NENHUM)),
+                    RequisitoHierarquia.MESMA_UNIDADE)),
 
             // ========== DIAGNÓSTICO ==========
             Map.entry(VISUALIZAR_DIAGNOSTICO, new RegrasAcao(
@@ -303,12 +303,9 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
         if (sp.getCodigo() == null) {
             return sp.getUnidade();
         }
-        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
-        if (movs.isEmpty()) {
-            return sp.getUnidade();
-        }
-        Unidade destino = movs.get(0).getUnidadeDestino();
-        return (destino != null) ? destino : sp.getUnidade();
+        return movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
+                .map(m -> m.getUnidadeDestino() != null ? m.getUnidadeDestino() : sp.getUnidade())
+                .orElse(sp.getUnidade());
     }
 
     /**

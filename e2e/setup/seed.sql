@@ -329,6 +329,10 @@ INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_mat
 VALUES (18, '141414', '00141414', 'TITULAR', CURRENT_TIMESTAMP);
 INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (99, '123456789012', '56789012', 'TITULAR', CURRENT_TIMESTAMP);
+
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('212121', 'GESTOR', 11);
+
 -- Reset identity sequences to prevent ID conflicts with test data
 -- This ensures auto-generated IDs start above the manually inserted ones
 ALTER TABLE sgc.processo ALTER COLUMN codigo RESTART WITH 201;
