@@ -267,6 +267,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     vi.clearAllMocks();
     
     (diagnosticoService.salvarAvaliacao as any).mockRejectedValueOnce({
+      isAxiosError: true,
       response: { data: { message: 'Erro de validação' } }
     });
 
@@ -301,6 +302,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     vi.clearAllMocks();
     
     (diagnosticoService.concluirAutoavaliacao as any).mockRejectedValueOnce({
+      isAxiosError: true,
       response: { data: { message: 'Erro ao finalizar' } }
     });
 
@@ -387,6 +389,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     vi.clearAllMocks();
 
     (diagnosticoService.concluirAutoavaliacao as any).mockRejectedValueOnce({
+      isAxiosError: true,
       response: { data: { message: 'Erro da API' } }
     });
 
