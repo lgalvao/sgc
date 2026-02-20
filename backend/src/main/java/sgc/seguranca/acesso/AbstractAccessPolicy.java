@@ -78,8 +78,12 @@ public abstract class AbstractAccessPolicy<T> implements AccessPolicy<T> {
         final Long codUnidadeUsuario = usuario.getUnidadeAtivaCodigo();
 
         // ADMIN tem privilégios especiais POR SER ADMIN
-        // Bypassa verificações de hierarquia (exceto TITULAR_UNIDADE que é pessoal)
-        if (usuario.getPerfilAtivo() == Perfil.ADMIN && requisito != RequisitoHierarquia.TITULAR_UNIDADE) {
+        // Bypassa verificações de hierarquia recursiva (ex: ver unidades subordinadas),
+        // mas DEVE respeitar a localização atual (MESMA_UNIDADE) para ações de escrita/análise
+        // e o TITULAR_UNIDADE que é pessoal.
+        if (usuario.getPerfilAtivo() == Perfil.ADMIN 
+                && requisito != RequisitoHierarquia.TITULAR_UNIDADE 
+                && requisito != RequisitoHierarquia.MESMA_UNIDADE) {
             return true;
         }
 

@@ -72,12 +72,12 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
                 admin = usuarioService.buscarPorLogin("111111111111");
                 admin.setPerfilAtivo(Perfil.ADMIN);
-                admin.setUnidadeAtivaCodigo(100L);
+                admin.setUnidadeAtivaCodigo(9L); // Atuando na unidade do subprocesso
                 admin.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
 
                 gestor = usuarioService.buscarPorLogin("666666666666");
                 gestor.setPerfilAtivo(Perfil.GESTOR);
-                gestor.setUnidadeAtivaCodigo(6L);
+                gestor.setUnidadeAtivaCodigo(9L); // Atuando na unidade do subprocesso
                 gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
 
                 chefe = usuarioService.buscarPorLogin("333333333333");
@@ -345,7 +345,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                         .andExpect(jsonPath("$.temImpactos", is(true)))
                                         .andExpect(jsonPath("$.competenciasImpactadas", hasSize(1)))
                                         .andExpect(
-                                                        jsonPath("$.competenciasImpactadas[0].atividades",
+                                                        jsonPath("$.competenciasImpactadas[0].atividadesAfetadas",
                                                                         hasSize(1)));
                 }
         }

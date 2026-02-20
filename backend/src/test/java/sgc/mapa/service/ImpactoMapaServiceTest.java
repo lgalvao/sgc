@@ -91,7 +91,7 @@ class ImpactoMapaServiceTest {
         ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
         assertEquals(1, result.inseridas().size());
-        assertEquals("Nova", result.inseridas().getFirst().getDescricao());
+        assertEquals("Nova", result.inseridas().getFirst().descricao());
     }
 
     @Test
@@ -132,10 +132,10 @@ class ImpactoMapaServiceTest {
         ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
         assertEquals(1, result.removidas().size());
-        assertEquals("Antiga", result.removidas().getFirst().getDescricao());
+        assertEquals("Antiga", result.removidas().getFirst().descricao());
         
         assertEquals(1, result.competenciasImpactadas().size());
-        assertEquals("Comp A", result.competenciasImpactadas().getFirst().getDescricao());
+        assertEquals("Comp A", result.competenciasImpactadas().getFirst().descricao());
     }
 
     @Test
@@ -181,7 +181,7 @@ class ImpactoMapaServiceTest {
         ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
         assertEquals(1, result.alteradas().size());
-        assertEquals("Ativ A", result.alteradas().getFirst().getDescricao());
+        assertEquals("Ativ A", result.alteradas().getFirst().descricao());
     }
 
     @Test
@@ -252,7 +252,7 @@ class ImpactoMapaServiceTest {
         ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
         assertEquals(1, result.alteradas().size());
-        assertEquals("Ativ Teste", result.alteradas().getFirst().getDescricao());
+        assertEquals("Ativ Teste", result.alteradas().getFirst().descricao());
     }
 
     private Subprocesso criarSubprocesso(Long unidadeCodigo, Mapa mapa) {

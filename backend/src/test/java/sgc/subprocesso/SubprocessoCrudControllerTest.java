@@ -75,7 +75,9 @@ class SubprocessoCrudControllerTest {
     @Test
     @DisplayName("obterPorCodigo - Sucesso")
     void obterPorCodigo() {
-        when(subprocessoFacade.obterDetalhes(1L)).thenReturn(new SubprocessoDetalheResponse(null, null, null, null, null));
+        when(subprocessoFacade.obterDetalhes(1L)).thenReturn(SubprocessoDetalheResponse.builder()
+                .localizacaoAtual("U1")
+                .build());
         SubprocessoDetalheResponse result = controller.obterPorCodigo(1L);
         assertThat(result).isNotNull();
     }

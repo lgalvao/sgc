@@ -1,4 +1,5 @@
-import type {Meta, StoryObj} from '@storybook/vue3-vite';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {expect, within} from '@storybook/test';
 import ArvoreUnidades from './ArvoreUnidades.vue';
 import type {Unidade} from '@/types/tipos';
 import {ref} from 'vue';
@@ -10,6 +11,7 @@ const meta: Meta<typeof ArvoreUnidades> = {
   argTypes: {
     modoSelecao: { control: 'boolean' },
     ocultarRaiz: { control: 'boolean' },
+    'onUpdate:modelValue': { action: 'update:modelValue' },
   },
 };
 
@@ -70,12 +72,18 @@ export const Default: Story = {
     template: `
       <div>
         <ArvoreUnidades v-bind="args" v-model="selected" />
-        <div class="mt-3">
+        <div class="mt-3 p-2 bg-light border rounded">
           <strong>Selecionados IDs:</strong> {{ selected }}
         </div>
       </div>
     `,
   }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // Verifica se a árvore foi renderizada
+    const item = canvas.getByText('Presidência');
+    await expect(item).toBeInTheDocument();
+  },
 };
 
 export const ComPreSelecao: Story = {
@@ -94,7 +102,7 @@ export const ComPreSelecao: Story = {
     template: `
       <div>
         <ArvoreUnidades v-bind="args" v-model="selected" />
-        <div class="mt-3">
+        <div class="mt-3 p-2 bg-light border rounded">
           <strong>Selecionados IDs:</strong> {{ selected }}
         </div>
       </div>
@@ -105,7 +113,7 @@ export const ComPreSelecao: Story = {
 export const ApenasVisualizacao: Story = {
   args: {
     unidades: mockUnidades,
-    modelValue: [2, 3, 4], // DITEC and children
+    modelValue: [2, 3, 4],
     modoSelecao: false,
     ocultarRaiz: false,
   },
@@ -126,9 +134,9 @@ export const OcultandoRaiz: Story = {
     },
     template: `
       <div>
-        <p class="text-muted">A raiz "Presidência" deve estar oculta, mostrando apenas seus filhos diretos.</p>
+        <p class="text-muted small mb-2">A raiz "Presidência" deve estar oculta, mostrando apenas seus filhos diretos.</p>
         <ArvoreUnidades v-bind="args" v-model="selected" />
-        <div class="mt-3">
+        <div class="mt-3 p-2 bg-light border rounded">
           <strong>Selecionados IDs:</strong> {{ selected }}
         </div>
       </div>

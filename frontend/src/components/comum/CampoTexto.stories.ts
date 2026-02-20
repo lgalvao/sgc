@@ -1,6 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import CampoTexto from './CampoTexto.vue';
-import {ref} from 'vue';
 
 const meta: Meta<typeof CampoTexto> = {
   title: 'Comum/CampoTexto',
@@ -12,6 +11,7 @@ const meta: Meta<typeof CampoTexto> = {
     obrigatorio: { control: 'boolean' },
     disabled: { control: 'boolean' },
     erro: { control: 'text' },
+    'onUpdate:modelValue': { action: 'update:modelValue' },
   },
 };
 
@@ -25,20 +25,6 @@ export const Default: Story = {
     placeholder: 'Digite seu nome',
     modelValue: '',
   },
-  render: (args) => ({
-    components: { CampoTexto },
-    setup() {
-      const valor = ref(args.modelValue);
-      return { args, valor };
-    },
-    template: `
-      <CampoTexto
-        v-bind="args"
-        v-model="valor"
-      />
-      <div class="mt-2 text-muted small">Valor atual: {{ valor }}</div>
-    `,
-  }),
 };
 
 export const Required: Story = {
