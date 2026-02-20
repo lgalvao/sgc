@@ -57,6 +57,28 @@ router.push({
 ```
 Isso garante que o Vue Router construa a URL corretamente baseada na definição da rota `Subprocesso`.
 
+### CDU-09: Erro 403 ao devolver cadastro (Admin)
+
+**Problema:**
+O teste `CDU-09` falhava no Cenário 3 ao tentar devolver o cadastro como ADMIN. O backend retornava 403 Forbidden.
+
+**Causa Raiz:**
+A `SubprocessoAccessPolicy` exigia `RequisitoHierarquia.MESMA_UNIDADE` para a ação `DEVOLVER_CADASTRO`.
+Como o subprocesso estava na unidade superior (localização), o ADMIN (unidade raiz) não atendia ao requisito.
+
+**Solução:**
+Alterada a `SubprocessoAccessPolicy` para permitir que o ADMIN execute ações de devolução e aceite (`DEVOLVER_CADASTRO`, `ACEITAR_CADASTRO`, etc.) globalmente, ignorando a restrição de unidade.
+
+### CDU-10 (Regressão): Redirecionamento incorreto ao Voltar
+
+**Problema:**
+O teste `CDU-10` falhava novamente ao verificar a URL após clicar em "Voltar". O sistema redirecionava para `/painel`.
+A tentativa anterior de usar rota nomeada (`name: 'Subprocesso'`) aparentemente falhou na resolução correta dos parâmetros em runtime ou causou um redirecionamento inesperado.
+
+**Solução:**
+Alterado para utilizar navegação por string explícita: `router.push(\`/processo/${props.codProcesso}/${props.sigla}\`)`.
+Isso garante a construção correta da URL independentemente da resolução de nomes de rota.
+
 ## Aprendizados
 
 1.  **Navegação Nomeada:** Sempre preferir `router.push({ name: 'Rota', params: { ... } })` em vez de construir URLs manualmente. Isso evita erros de digitação e garante consistência com a configuração de rotas.

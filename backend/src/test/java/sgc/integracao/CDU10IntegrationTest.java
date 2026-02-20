@@ -29,6 +29,8 @@ import sgc.organizacao.model.UsuarioRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -59,6 +61,8 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     private UsuarioRepo usuarioRepo;
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
 
 
     private Unidade unidadeSuperior;
@@ -209,6 +213,17 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         sp.setDataFimEtapa1(null);
         subprocessoRepo.saveAndFlush(sp);
+
+        Movimentacao mov = new Movimentacao();
+        mov.setSubprocesso(sp);
+        mov.setUnidadeOrigem(unidadeSuperior);
+        mov.setUnidadeDestino(sp.getUnidade());
+        mov.setDataHora(LocalDateTime.now());
+        mov.setDescricao("Devolução simulada");
+        // Usuario Superior
+        Usuario usuarioSuperior = usuarioRepo.findById("666666666666").get();
+        mov.setUsuario(usuarioSuperior);
+        movimentacaoRepo.saveAndFlush(mov);
 
         // 5. Nova disponibilização
         mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId))
