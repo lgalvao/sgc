@@ -10,8 +10,8 @@ import {
 } from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
-    acessarSubprocessoAdmin,
-    acessarSubprocessoChefeDireto
+    acessarSubprocessoChefeDireto,
+    acessarSubprocessoGestor
 } from './helpers/helpers-analise.js';
 import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
@@ -109,9 +109,9 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
     });
 
-    test('Cenario 3: Devolucao e Historico de Analise', async ({page, autenticadoComoAdmin}) => {
-        // 1. Admin devolve o cadastro
-        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
+    test('Cenario 3: Devolucao e Historico de Analise', async ({page, autenticadoComoGestorCoord22}) => {
+        // 1. Gestor (Coord 22) devolve o cadastro
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
 
         // Entrar no cadastro de atividades (visualização)
         await navegarParaAtividadesVisualizacao(page);

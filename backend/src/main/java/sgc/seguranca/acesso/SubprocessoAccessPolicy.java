@@ -270,6 +270,11 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
         if (isAcaoAnaliseOuEscrita(acao)) {
             Unidade localizacao = obterUnidadeLocalizacao(sp);
 
+            // IMPORTANT: ADMIN DOES NOT have global write access. They must respect the subprocess location.
+            // If the subprocess is in a subordinate unit, it must be accepted/moved up to the ADMIN's unit
+            // before the ADMIN can perform state-changing actions.
+            // DO NOT ADD global access bypass for ADMIN here.
+
             if (!verificaHierarquia(usuario, localizacao, regras.requisitoHierarquia)) {
                 String motivo = obterMotivoNegacaoHierarquia(usuario, localizacao, regras.requisitoHierarquia);
                 log.info("Permissão negada por localização para {}: {}", usuario.getTituloEleitoral(), motivo);

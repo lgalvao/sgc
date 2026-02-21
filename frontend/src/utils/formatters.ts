@@ -53,7 +53,7 @@ export function formatSituacaoSubprocesso(situacao: SituacaoSubprocesso | string
     [SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO]: 'Mapa homologado',
     [SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO]: 'Revisão em andamento',
     [SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA]: 'Revisão do cadastro disponibilizada',
-    [SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA]: 'Revisão homologada',
+    [SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA]: 'Revisão do cadastro homologada',
     [SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO]: 'Mapa ajustado',
     [SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO]: 'Mapa disponibilizado',
     [SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES]: 'Mapa com sugestões',

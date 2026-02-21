@@ -11,8 +11,15 @@ import {
     removerAtividade
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
-import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
+import {
+    aceitarCadastroMapeamento,
+    aceitarRevisao,
+    acessarSubprocessoAdmin,
+    acessarSubprocessoChefeDireto,
+    acessarSubprocessoGestor
+} from './helpers/helpers-analise.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {loginComPerfil} from './helpers/helpers-auth.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));
@@ -86,6 +93,19 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
+    test('Preparacao 3a: Gestor COORD_21 aceita cadastro', async ({page, autenticadoComoGestorCoord21}) => {
+        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page);
+    });
+
+    test('Preparacao 3b: Gestor SECRETARIA_2 aceita cadastro', async ({page}) => {
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page);
+    });
+
     test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         
 
@@ -126,6 +146,23 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         // Validação: confirmar redirecionamento para Painel (CDU-19 passo 8)
         await verificarPaginaPainel(page);
         await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
+    });
+
+    test('Preparacao 6a: Gestor COORD_21 aceita mapa', async ({page, autenticadoComoGestorCoord21}) => {
+        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await verificarPaginaPainel(page);
+    });
+
+    test('Preparacao 6b: Gestor SECRETARIA_2 aceita mapa', async ({page}) => {
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await verificarPaginaPainel(page);
     });
 
     test('Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento', async ({page, autenticadoComoAdmin}) => {
@@ -202,6 +239,19 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
         await expect(page.getByText(/Revisão do cadastro de atividades disponibilizada/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
+    });
+
+    test('Preparacao 9a: Gestor COORD_21 aceita revisão', async ({page, autenticadoComoGestorCoord21}) => {
+        await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarRevisao(page);
+    });
+
+    test('Preparacao 9b: Gestor SECRETARIA_2 aceita revisão', async ({page}) => {
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarRevisao(page);
     });
 
     test('Preparacao 9: Admin homologa revisão do cadastro', async ({page}) => {

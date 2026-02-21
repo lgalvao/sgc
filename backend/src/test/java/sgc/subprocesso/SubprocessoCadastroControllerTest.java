@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.comum.dto.ComumDtos.JustificativaRequest;
+import sgc.comum.dto.ComumDtos.TextoOpcionalRequest;
 import sgc.comum.dto.ComumDtos.TextoRequest;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.RestExceptionHandler;
@@ -233,7 +234,7 @@ class SubprocessoCadastroControllerTest {
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
-            TextoRequest request = new TextoRequest("Aprovado");
+            TextoOpcionalRequest request = new TextoOpcionalRequest("Aprovado");
 
             // Act & Assert
             mockMvc.perform(post("/api/subprocessos/1/aceitar-cadastro")
@@ -243,6 +244,27 @@ class SubprocessoCadastroControllerTest {
                     .andExpect(status().isOk());
 
             verify(subprocessoFacade).aceitarCadastro(eq(1L), anyString(), eq(usuario));
+        }
+
+        @Test
+        @DisplayName("deve aceitar cadastro sem observações")
+        @WithMockUser(roles = "GESTOR")
+        void deveAceitarCadastroSemTexto() throws Exception {
+            // Arrange
+            Usuario usuario = new Usuario();
+            when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
+            when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
+
+            TextoOpcionalRequest request = new TextoOpcionalRequest(null);
+
+            // Act & Assert
+            mockMvc.perform(post("/api/subprocessos/1/aceitar-cadastro")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            verify(subprocessoFacade).aceitarCadastro(eq(1L), eq(""), eq(usuario));
         }
     }
 
@@ -258,7 +280,7 @@ class SubprocessoCadastroControllerTest {
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
-            TextoRequest request = new TextoRequest("Homologado");
+            TextoOpcionalRequest request = new TextoOpcionalRequest("Homologado");
 
             // Act & Assert
             mockMvc.perform(post("/api/subprocessos/1/homologar-cadastro")
@@ -308,7 +330,7 @@ class SubprocessoCadastroControllerTest {
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
-            TextoRequest request = new TextoRequest("Revisão aceita");
+            TextoOpcionalRequest request = new TextoOpcionalRequest("Revisão aceita");
 
             // Act & Assert
             mockMvc.perform(post("/api/subprocessos/1/aceitar-revisao-cadastro")
@@ -333,7 +355,7 @@ class SubprocessoCadastroControllerTest {
             when(organizacaoFacade.extrairTituloUsuario(any())).thenReturn("123");
             when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
 
-            TextoRequest request = new TextoRequest("Homologado");
+            TextoOpcionalRequest request = new TextoOpcionalRequest("Homologado");
 
             // Act & Assert
             mockMvc.perform(post("/api/subprocessos/1/homologar-revisao-cadastro")

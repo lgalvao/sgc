@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.comum.dto.ComumDtos.JustificativaRequest;
+import sgc.comum.dto.ComumDtos.TextoOpcionalRequest;
 import sgc.comum.dto.ComumDtos.TextoRequest;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroValidacao;
@@ -131,10 +132,11 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Aceita o cadastro de atividades")
     public void aceitarCadastro(
             @PathVariable Long codigo,
-            @Valid @RequestBody TextoRequest request,
+            @Valid @RequestBody TextoOpcionalRequest request,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.texto()))
+        String sanitizedObservacoes = Optional.ofNullable(request.texto())
+                .map(UtilSanitizacao::sanitizar)
                 .orElse("");
 
         subprocessoFacade.aceitarCadastro(codigo, sanitizedObservacoes, usuario);
@@ -145,10 +147,11 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Homologa o cadastro de atividades")
     public void homologarCadastro(
             @PathVariable Long codigo,
-            @Valid @RequestBody TextoRequest request,
+            @Valid @RequestBody TextoOpcionalRequest request,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.texto()))
+        String sanitizedObservacoes = Optional.ofNullable(request.texto())
+                .map(UtilSanitizacao::sanitizar)
                 .orElse("");
 
         subprocessoFacade.homologarCadastro(codigo, sanitizedObservacoes, usuario);
@@ -173,10 +176,11 @@ public class SubprocessoCadastroController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     public void aceitarRevisaoCadastro(
             @PathVariable Long codigo,
-            @Valid @RequestBody TextoRequest request,
+            @Valid @RequestBody TextoOpcionalRequest request,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.texto()))
+        String sanitizedObservacoes = Optional.ofNullable(request.texto())
+                .map(UtilSanitizacao::sanitizar)
                 .orElse("");
 
         subprocessoFacade.aceitarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);
@@ -187,10 +191,11 @@ public class SubprocessoCadastroController {
     @PreAuthorize("hasRole('ADMIN')")
     public void homologarRevisaoCadastro(
             @PathVariable Long codigo,
-            @Valid @RequestBody TextoRequest request,
+            @Valid @RequestBody TextoOpcionalRequest request,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.texto()))
+        String sanitizedObservacoes = Optional.ofNullable(request.texto())
+                .map(UtilSanitizacao::sanitizar)
                 .orElse("");
 
         subprocessoFacade.homologarRevisaoCadastro(codigo, sanitizedObservacoes, usuario);

@@ -14,6 +14,10 @@ public final class ComumDtos {
         String texto
     ) {}
 
+    public record TextoOpcionalRequest(
+        String texto
+    ) {}
+
     public record JustificativaRequest(
         @NotBlank(message = "A justificativa é obrigatória")
         String justificativa
