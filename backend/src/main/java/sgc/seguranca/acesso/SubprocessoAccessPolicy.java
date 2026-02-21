@@ -157,7 +157,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                     RequisitoHierarquia.MESMA_OU_SUBORDINADA)),
 
             Map.entry(EDITAR_MAPA, new RegrasAcao(
-                    EnumSet.of(ADMIN, GESTOR, CHEFE),
+                    EnumSet.of(ADMIN),
                     EnumSet.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
                             MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO,
                             MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO,
@@ -167,7 +167,7 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
                     RequisitoHierarquia.MESMA_UNIDADE)),
 
             Map.entry(DISPONIBILIZAR_MAPA, new RegrasAcao(
-                    EnumSet.of(ADMIN, GESTOR, CHEFE),
+                    EnumSet.of(ADMIN),
                     EnumSet.of(MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO,
                             MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA,
                             REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES),

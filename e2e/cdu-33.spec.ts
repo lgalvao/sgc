@@ -70,15 +70,16 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await homologarCadastroMapeamento(page);
         await fazerLogout(page);
 
-        // 6. Chefe cria mapa e disponibiliza
-        await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
-        await acessarSubprocessoChefeDireto(page, descMapeamento);
+        // 6. Admin cria mapa e disponibiliza
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await criarCompetencia(page, `Comp Map ${timestamp}`, [`Ativ Map ${timestamp}`]);
         await disponibilizarMapa(page, '2030-12-31');
+        await fazerLogout(page);
 
-        // 7. Chefe valida mapa (já logado)
-        // Re-navegar pois disponibilizar redireciona para painel
+        // 7. Chefe valida mapa
+        await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
         await acessarSubprocessoChefeDireto(page, descMapeamento);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-validar').click();
