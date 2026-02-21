@@ -1,65 +1,66 @@
-# Simplification Suggestions for SGC
+# Radical Simplification Suggestions for SGC
 
-This document outlines areas of overengineering, excessive complexity, and fragmentation in the SGC codebase, with concrete suggestions for simplification tailored to a small intranet application (5-10 concurrent users).
+> **Context:** This system will be used by **at most 5-10 simultaneous users** inside an intranet.
+> **Diagnosis:** The current architecture is designed for high-scale, distributed teams (Microservices patterns, Hexagonal/Clean Architecture, strict isolation).
+> **Verdict:** 80% of the code is "glue code" managing complexity that doesn't exist.
 
-## Guiding Principle: "YAGNI" (You Ain't Gonna Need It)
-For a system with minimal concurrency and a small user base, **simplicity and maintainability are paramount**. Patterns designed for large-scale distributed systems (microservices, complex event sourcing, strict layered architecture with heavy DTO separation) often introduce unnecessary overhead and cognitive load without providing their intended benefits (scalability, decoupling).
+This document outlines a strategy to aggressively simplify the codebase, reducing maintenance overhead and cognitive load.
 
-## Backend Analysis (`sgc.subprocesso` as a Case Study)
+## 1. The "One Service, One Controller" Rule (Backend)
 
-The `subprocesso` module exhibits significant overengineering for a CRUD-heavy application:
+The `subprocesso` module is the prime example of fragmentation. It currently has:
+- 4 Controllers (`Cadastro`, `Crud`, `Mapa`, `Validacao`)
+- 1 Facade (`SubprocessoFacade`)
+- 10+ Services (`Workflow`, `Contexto`, `Permissao`, `Atividade`, etc.)
 
-### 1. Excessive Fragmentation (Dependencies Explosion)
-**Observation:** Logic is scattered across multiple services and controllers. The `subprocesso` package alone has:
--   **4 Controllers:** `SubprocessoCadastroController`, `SubprocessoCrudController`, `SubprocessoMapaController`, `SubprocessoValidacaoController`.
--   **10+ Services:** `SubprocessoCrudService`, `SubprocessoValidacaoService`, `SubprocessoCadastroWorkflowService`, `SubprocessoMapaWorkflowService`, `SubprocessoAdminWorkflowService`, `SubprocessoAjusteMapaService`, `SubprocessoAtividadeService`, `SubprocessoContextoService`, `SubprocessoPermissaoCalculator`.
--   **1 Facade:** `SubprocessoFacade` acts as a middleman, delegating calls to these services.
+**Action:** Merge them.
+- **Single Controller:** `SubprocessoController`. It handles all HTTP requests related to a Subprocess.
+- **Single Service:** `SubprocessoService`. It contains all business logic. Yes, it might be 2000 lines long. *That is fine.* A single file is easier to navigate than 15 files with circular dependencies and interface overhead.
+- **Delete the Facade:** It adds no value. Inject the Repository directly into the Service.
 
-**Impact:** Exploring a simple feature requires jumping between 5-10 files. It’s hard to understand the full lifecycle of a subprocess. Circular dependencies are likely (e.g., Service A needs Service B, which needs Service A for validation).
+## 2. Eliminate the Custom "Access Control Framework"
 
-**Suggestion:**
--   **Consolidate into `SubprocessoService`**: Merge `Crud`, `Validacao`, `Contexto`, and `Atividade` logic into a single service. A single 1000-line service is easier to follow than ten 100-line services with circular references.
--   **Merge Controllers**: A single `SubprocessoController` is sufficient for this domain. Separation by "phase" (Cadastro vs Mapa) is artificial at this scale.
--   **Remove `SubprocessoFacade`**: Inject the consolidated `SubprocessoService` directly into the Controller. The Facade pattern here adds no value as it just delegates 1-to-1.
+The system implements a custom security framework in `sgc.seguranca.acesso` (`AccessControlService`, `AccessPolicy`, `AccessAuditService`, `AbstractAccessPolicy`).
+This mimics Spring Security ACLs but with custom code.
 
-### 2. Over-engineered Access Control (`sgc.seguranca.acesso`)
-**Observation:** The system uses a custom Policy-based access control system (`AccessControlService`, `AbstractAccessPolicy`, `AccessAuditService`, `SubprocessoAccessPolicy`, etc.) that mimics complex frameworks like Spring Security ACL or OPA.
-**Impact:** Adding a new permission check requires creating a Policy class, updating the Service, and potentially the Audit service. It adds significant cognitive load to understand *why* a user can/cannot access a resource.
-**Suggestion:**
--   **Simplify to Service-Layer Checks**: Use standard Spring Security `@PreAuthorize("hasRole('ADMIN')")` or simple checks within the service method (e.g., `if (!user.isAdmin() && !subprocesso.isOwner(user)) throw new AccessDeniedException()`).
--   **Remove separate Audit Service**: Standard logging or a simple aspect is sufficient for auditing 5-10 users. The complexity of reflective policy auditing (`access-control-report.md`) is overkill.
+**Action:** Use Standard Spring Security.
+- **Delete** `AccessControlService`, `AccessPolicy`, and all `*AccessPolicy` classes.
+- **Use Annotations:** `@PreAuthorize("hasRole('ADMIN')")` or `@PreAuthorize("@subprocessoSecurity.canEdit(#id, principal)")`.
+- **Simple Logic:** Implement a single `SecurityService` with methods like `canEdit(user, entityId)`.
+- **Trust the Framework:** Spring Security handles authentication and authorization efficiently. We don't need a custom audit layer for 5 users; standard logs are sufficient.
 
-### 3. Redundant DTO/Entity Mappings
-**Observation:** Extensive mapping between Entities and DTOs, often with identical structures. The `SubprocessoDetalheResponse` flattens the `Subprocesso` entity unnecessarily, requiring complex mapping logic.
-**Impact:** Adding a field requires updating the Entity, DTO, Mapper, and Frontend Mapper.
-**Suggestion:**
--   **Use Entities directly for simple Read/Write**: For a small internal app, exposing entities (carefully, avoiding circular references with `@JsonIgnore` or `@JsonManagedReference`) is often acceptable and drastically reduces boilerplate.
--   **Use DTOs only when necessary**: Only create DTOs for complex aggregations or specific API contracts that differ significantly from the domain model.
+## 3. Pragmatic Data Access (The "Anti-DTO" Pattern)
 
-## Frontend Analysis
+The system currently enforces a strict `Entity -> DTO -> Response` mapping, often with 3-4 layers of object copying.
 
-### 1. Manual Mappers (`frontend/src/mappers/`)
-**Observation:** The frontend contains files like `subprocessos.ts` that manually map API responses (DTOs) to internal "Models" that are often identical. It includes fallback logic (e.g., `unidade: dto.unidade || { nome: 'N/I' }`) that hides backend data issues.
-**Impact:** Triples the work when adding a field (DTO type, Model type, Mapper function). It creates a false sense of security by "fixing" data on the client.
-**Suggestion:**
--   **Remove Mappers**: Use the API response types (DTOs) directly in the components. If the backend returns `null`, handle it in the UI (e.g., `v-if="subprocesso.unidade"`), don't mask it in a mapper.
--   **Trust the Contract**: The backend should guarantee the data shape. If `unidade` is mandatory, the backend must ensure it's not null.
+**Action:** Use Entities for Read/Write where possible.
+- **Return Entities:** For internal intranet apps, returning the JPA Entity (with `@JsonIgnore` on recursive fields) is perfectly acceptable and saves writing hundreds of DTOs.
+- **MapStruct is Optional:** If you need a DTO, write a simple constructor or a static factory method. You don't need a complex Mapper interface and generated implementation for every single object.
+- **Repo in Controller:** For simple "Get by ID" or "List All" endpoints, injecting the `Repository` directly into the `Controller` is acceptable. The "Service Layer" is for *business logic*, not for passthrough.
 
-### 2. Fragmented State Management (Pinia Stores)
-**Observation:** Stores are highly granular (e.g., separate stores for Processos, Subprocessos, Mapas, Atividades).
-**Impact:** Managing related state (e.g., a Process containing Subprocesses) becomes difficult, leading to synchronization issues.
-**Suggestion:**
--   **Consolidate by Feature**: Create a `useSubprocessoFeatureStore` that manages the state for a Subprocess and its related Map and Activities. This reflects how the user interacts with the data (viewing a subprocess and its details).
+## 4. Frontend: Trust the Backend Contract
 
-## General Architectural Recommendations
+The frontend currently re-validates and re-maps everything (`frontend/src/mappers/`).
 
-1.  **Vertical Slices over Layers**: Instead of `Controller -> Facade -> Service -> Repository`, organize code by feature (e.g., `features/subprocesso`).
-2.  **KISS (Keep It Simple, Stupid)**: Avoid patterns like CQRS, Event Sourcing, or intricate Design Patterns (Strategy, Factory, Facade) unless the problem *strictly* demands it. A simple `if/else` is often better than a Strategy pattern for 3 cases.
-3.  **Monolithic Service**: Don't be afraid of a "God Service" for a domain if it's cohesive. A single service handling all Subprocess logic is perfectly fine for this scale.
+**Action:** Delete the Mappers.
+- **Use the API Types:** The backend DTOs (or Entities) are the source of truth.
+- **Fail Fast:** If the backend sends `null` where a string is expected, let the UI break or show a generic error. Writing defensive code for every single field ("defensive programming") is expensive and hides bugs.
+- **Consolidate Stores:** A single `useSubprocessoStore` is enough. You don't need `useSubprocessoMapaStore`, `useSubprocessoAtividadeStore`, etc. State fragmentation leads to sync bugs.
 
-## Immediate Action Plan
+## 5. Specific Targets for Deletion
 
-1.  **Delete `SubprocessoFacade`**: Refactor controllers to use services directly.
-2.  **Merge Services**: Combine `SubprocessoCrudService`, `SubprocessoValidacaoService`, and `SubprocessoContextoService` into `SubprocessoService`.
-3.  **Simplify Workflow**: Move workflow logic (currently in `*WorkflowService`) into `SubprocessoService` or a single `SubprocessoStateService`.
-4.  **Remove Frontend Mappers**: Delete `frontend/src/mappers/subprocessos.ts` and update components to use the API types.
+| Component | Reason | Replacement |
+| :--- | :--- | :--- |
+| `SubprocessoFacade` | Passthrough layer | `SubprocessoService` |
+| `Subprocesso*Controller` (x4) | Arbitrary splitting | `SubprocessoController` |
+| `*AccessPolicy` classes | Overengineered framework | `@PreAuthorize` + Simple Service Check |
+| `AccessAuditService` | Redundant logging | Standard `slf4j` logs |
+| `frontend/src/mappers/*.ts` | Redundant mapping | Direct API types |
+| `ComumRepo` | Custom Wrapper | Standard `JpaRepository` |
+| `ADR-001` (Facades) | Premature optimization | Direct Service Injection |
+| `ADR-005` (Split Controllers) | Premature optimization | Cohesive Controllers |
+
+## 6. Development Workflow Changes
+
+- **Stop writing Interfaces for Services:** `ISubprocessoService` + `SubprocessoServiceImpl` is an antipattern in Spring unless you have multiple implementations (you don't). Just write the class.
+- **Stop mocking everything:** For a small app, integration tests (`@SpringBootTest`) are more valuable and easier to write than mocking 15 dependencies.
