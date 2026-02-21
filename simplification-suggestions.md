@@ -1,6 +1,7 @@
 # Radical Simplification Suggestions for SGC
 
-> **Context:** This system will be used by **at most 5-10 simultaneous users** inside an intranet.
+> **Verified Context (v3.0.0):** This document is based on an analysis of the codebase at `backend/src/main/java/sgc`. The fragmentation and complexity issues are confirmed, though some specific implementation details (like interface usage) were previously misstated.
+> **Constraint:** This system will be used by **at most 5-10 simultaneous users** inside an intranet.
 > **Diagnosis:** The current architecture is designed for high-scale, distributed teams (Microservices patterns, Hexagonal/Clean Architecture, strict isolation).
 > **Verdict:** 80% of the code is "glue code" managing complexity that doesn't exist.
 
@@ -8,14 +9,14 @@ This document outlines a strategy to aggressively simplify the codebase, reducin
 
 ## 1. The "One Service, One Controller" Rule (Backend)
 
-The `subprocesso` module is the prime example of fragmentation. It currently has:
-- 4 Controllers (`Cadastro`, `Crud`, `Mapa`, `Validacao`)
-- 1 Facade (`SubprocessoFacade`)
-- 10+ Services (`Workflow`, `Contexto`, `Permissao`, `Atividade`, etc.)
+The `subprocesso` module (`backend/src/main/java/sgc/subprocesso`) is the prime example of fragmentation. It currently has:
+- **4 Controllers:** `SubprocessoCadastroController`, `SubprocessoCrudController`, `SubprocessoMapaController`, `SubprocessoValidacaoController`.
+- **1 Facade:** `SubprocessoFacade` (which injects 11 other services).
+- **10+ Services:** `SubprocessoCrudService`, `SubprocessoValidacaoService`, `SubprocessoCadastroWorkflowService`, `SubprocessoMapaWorkflowService`, `SubprocessoAdminWorkflowService`, `SubprocessoAjusteMapaService`, `SubprocessoAtividadeService`, `SubprocessoContextoService`, `SubprocessoPermissaoCalculator`, `SubprocessoFactory`, etc.
 
 **Action:** Merge them.
 - **Single Controller:** `SubprocessoController`. It handles all HTTP requests related to a Subprocess.
-- **Single Service:** `SubprocessoService`. It contains all business logic. Yes, it might be 2000 lines long. *That is fine.* A single file is easier to navigate than 15 files with circular dependencies and interface overhead.
+- **Single Service:** `SubprocessoService`. It contains all business logic. Yes, it might be 2000 lines long. *That is fine.* A single file is easier to navigate than 15 files with circular dependencies and injection overhead.
 - **Delete the Facade:** It adds no value. Inject the Repository directly into the Service.
 
 ## 2. Eliminate the Custom "Access Control Framework"
@@ -24,7 +25,7 @@ The system implements a custom security framework in `sgc.seguranca.acesso` (`Ac
 This mimics Spring Security ACLs but with custom code.
 
 **Action:** Use Standard Spring Security.
-- **Delete** `AccessControlService`, `AccessPolicy`, and all `*AccessPolicy` classes.
+- **Delete** `AccessControlService`, `AccessPolicy`, and all `*AccessPolicy` classes (`SubprocessoAccessPolicy`, `ProcessoAccessPolicy`, etc.).
 - **Use Annotations:** `@PreAuthorize("hasRole('ADMIN')")` or `@PreAuthorize("@subprocessoSecurity.canEdit(#id, principal)")`.
 - **Simple Logic:** Implement a single `SecurityService` with methods like `canEdit(user, entityId)`.
 - **Trust the Framework:** Spring Security handles authentication and authorization efficiently. We don't need a custom audit layer for 5 users; standard logs are sufficient.
@@ -40,7 +41,7 @@ The system currently enforces a strict `Entity -> DTO -> Response` mapping, ofte
 
 ## 4. Frontend: Trust the Backend Contract
 
-The frontend currently re-validates and re-maps everything (`frontend/src/mappers/`).
+The frontend currently re-validates and re-maps everything (`frontend/src/mappers/` contains files like `subprocessos.ts`, `mapas.ts`, `alertas.ts`).
 
 **Action:** Delete the Mappers.
 - **Use the API Types:** The backend DTOs (or Entities) are the source of truth.
@@ -62,5 +63,5 @@ The frontend currently re-validates and re-maps everything (`frontend/src/mapper
 
 ## 6. Development Workflow Changes
 
-- **Stop writing Interfaces for Services:** `ISubprocessoService` + `SubprocessoServiceImpl` is an antipattern in Spring unless you have multiple implementations (you don't). Just write the class.
+- **Consolidate Logic:** Stop creating new service classes for every small feature (e.g., `SubprocessoAjusteMapaService` for just one method). Keep logic related to the Subprocess entity in `SubprocessoService`.
 - **Stop mocking everything:** For a small app, integration tests (`@SpringBootTest`) are more valuable and easier to write than mocking 15 dependencies.
