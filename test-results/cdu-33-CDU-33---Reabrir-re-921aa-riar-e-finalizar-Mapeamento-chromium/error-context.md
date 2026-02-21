@@ -1,0 +1,166 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link "Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link "Minha unidade" [ref=e14] [cursor=pointer]:
+                  - /url: /unidade/11
+                  - generic [ref=e15]: 
+                  - text: Minha unidade
+              - listitem [ref=e16]:
+                - link "Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link "Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "GESTOR - SECRETARIA_2" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: GESTOR - SECRETARIA_2
+              - listitem "Sair" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e30]: 
+      - generic [ref=e33]:
+        - button "Voltar" [ref=e34] [cursor=pointer]:
+          - generic [ref=e35]: 
+        - navigation "breadcrumb" [ref=e36]:
+          - list [ref=e37]:
+            - listitem [ref=e38]:
+              - link "Início" [ref=e39] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e40]: 
+                - generic [ref=e41]: Início
+            - listitem [ref=e42]:
+              - text: ›
+              - link "Detalhes do processo" [ref=e43] [cursor=pointer]:
+                - /url: /processo/201
+            - listitem [ref=e44]:
+              - text: ›
+              - generic [ref=e45]: SECAO_212
+      - main [ref=e46]:
+        - generic [ref=e48]:
+          - generic [ref=e50]:
+            - heading "Subprocesso - SECAO_212" [level=2] [ref=e51]
+            - paragraph [ref=e52]: Mapeamento Pre-CDU-33 1771642576689
+            - generic [ref=e53]:
+              - generic [ref=e54]: "Etapa atual: Mapa validado"
+              - generic [ref=e55]: "Próxima ação: acompanhar a etapa \"Mapa validado\"."
+          - generic [ref=e56]:
+            - generic [ref=e58]:
+              - heading "SECAO_212" [level=2] [ref=e59]
+              - paragraph [ref=e60]: Seção 212
+            - generic [ref=e62]:
+              - paragraph [ref=e63]: "Processo: Mapeamento Pre-CDU-33 1771642576689"
+              - paragraph [ref=e64]: Situação:Mapa validado
+              - paragraph [ref=e65]:
+                - strong [ref=e66]: "Titular:"
+                - text: Pete Townshend
+              - paragraph [ref=e67]:
+                - generic [ref=e68]: 
+                - generic [ref=e69]: 
+                - text: pete.townshend@tre-pe.jus.br
+          - generic [ref=e70]:
+            - button "Atividades e conhecimentos Visualização das atividades e conhecimentos da unidade" [ref=e72] [cursor=pointer]:
+              - generic [ref=e74]:
+                - heading "Atividades e conhecimentos" [level=4] [ref=e75]
+                - paragraph [ref=e76]: Visualização das atividades e conhecimentos da unidade
+            - button "Mapa de Competências Visualização do mapa de competências técnicas" [active] [ref=e78] [cursor=pointer]:
+              - generic [ref=e80]:
+                - heading "Mapa de Competências" [level=4] [ref=e81]
+                - paragraph [ref=e82]: Visualização do mapa de competências técnicas
+          - generic [ref=e83]:
+            - heading "Movimentações" [level=4] [ref=e84]
+            - table [ref=e86]:
+              - rowgroup [ref=e87]:
+                - row "Data/Hora Unidade Origem Unidade Destino Situação Descrição" [ref=e88]:
+                  - columnheader "Data/Hora" [ref=e89]
+                  - columnheader "Unidade Origem" [ref=e90]
+                  - columnheader "Unidade Destino" [ref=e91]
+                  - columnheader "Situação" [ref=e92]
+                  - columnheader "Descrição" [ref=e93]
+              - rowgroup [ref=e94]:
+                - row "21/02/2026 02:56 COORD_21 SECRETARIA_2 MAPEAMENTO MAPA VALIDADO Validação do mapa aceita" [ref=e95]:
+                  - cell "21/02/2026 02:56" [ref=e96]
+                  - cell "COORD_21" [ref=e97]
+                  - cell "SECRETARIA_2" [ref=e98]
+                  - cell "MAPEAMENTO MAPA VALIDADO" [ref=e99]:
+                    - generic [ref=e100]: MAPEAMENTO MAPA VALIDADO
+                  - cell "Validação do mapa aceita" [ref=e101]
+                - row "21/02/2026 02:56 SECAO_212 COORD_21 MAPEAMENTO MAPA VALIDADO Validação do mapa de competências" [ref=e102]:
+                  - cell "21/02/2026 02:56" [ref=e103]
+                  - cell "SECAO_212" [ref=e104]
+                  - cell "COORD_21" [ref=e105]
+                  - cell "MAPEAMENTO MAPA VALIDADO" [ref=e106]:
+                    - generic [ref=e107]: MAPEAMENTO MAPA VALIDADO
+                  - cell "Validação do mapa de competências" [ref=e108]
+                - row "21/02/2026 02:56 ADMIN SECAO_212 MAPEAMENTO MAPA VALIDADO Disponibilização do mapa de competências para validação" [ref=e109]:
+                  - cell "21/02/2026 02:56" [ref=e110]
+                  - cell "ADMIN" [ref=e111]
+                  - cell "SECAO_212" [ref=e112]
+                  - cell "MAPEAMENTO MAPA VALIDADO" [ref=e113]:
+                    - generic [ref=e114]: MAPEAMENTO MAPA VALIDADO
+                  - cell "Disponibilização do mapa de competências para validação" [ref=e115]
+                - row "21/02/2026 02:56 ADMIN ADMIN MAPEAMENTO MAPA VALIDADO Cadastro de atividades e conhecimentos homologado" [ref=e116]:
+                  - cell "21/02/2026 02:56" [ref=e117]
+                  - cell "ADMIN" [ref=e118]
+                  - cell "ADMIN" [ref=e119]
+                  - cell "MAPEAMENTO MAPA VALIDADO" [ref=e120]:
+                    - generic [ref=e121]: MAPEAMENTO MAPA VALIDADO
+                  - cell "Cadastro de atividades e conhecimentos homologado" [ref=e122]
+                - row "21/02/2026 02:56 SECRETARIA_2 ADMIN MAPEAMENTO MAPA VALIDADO Cadastro de atividades e conhecimentos aceito" [ref=e123]:
+                  - cell "21/02/2026 02:56" [ref=e124]
+                  - cell "SECRETARIA_2" [ref=e125]
+                  - cell "ADMIN" [ref=e126]
+                  - cell "MAPEAMENTO MAPA VALIDADO" [ref=e127]:
+                    - generic [ref=e128]: MAPEAMENTO MAPA VALIDADO
+                  - cell "Cadastro de atividades e conhecimentos aceito" [ref=e129]
+                - row "21/02/2026 02:56 COORD_21 SECRETARIA_2 MAPEAMENTO MAPA VALIDADO Cadastro de atividades e conhecimentos aceito" [ref=e130]:
+                  - cell "21/02/2026 02:56" [ref=e131]
+                  - cell "COORD_21" [ref=e132]
+                  - cell "SECRETARIA_2" [ref=e133]
+                  - cell "MAPEAMENTO MAPA VALIDADO" [ref=e134]:
+                    - generic [ref=e135]: MAPEAMENTO MAPA VALIDADO
+                  - cell "Cadastro de atividades e conhecimentos aceito" [ref=e136]
+                - row "21/02/2026 02:56 SECAO_212 COORD_21 MAPEAMENTO MAPA VALIDADO Disponibilização do cadastro de atividades" [ref=e137]:
+                  - cell "21/02/2026 02:56" [ref=e138]
+                  - cell "SECAO_212" [ref=e139]
+                  - cell "COORD_21" [ref=e140]
+                  - cell "MAPEAMENTO MAPA VALIDADO" [ref=e141]:
+                    - generic [ref=e142]: MAPEAMENTO MAPA VALIDADO
+                  - cell "Disponibilização do cadastro de atividades" [ref=e143]
+                - row "21/02/2026 02:56 ADMIN SECAO_212 MAPEAMENTO MAPA VALIDADO Processo iniciado" [ref=e144]:
+                  - cell "21/02/2026 02:56" [ref=e145]
+                  - cell "ADMIN" [ref=e146]
+                  - cell "SECAO_212" [ref=e147]
+                  - cell "MAPEAMENTO MAPA VALIDADO" [ref=e148]:
+                    - generic [ref=e149]: MAPEAMENTO MAPA VALIDADO
+                  - cell "Processo iniciado" [ref=e150]
+      - contentinfo [ref=e151]:
+        - generic [ref=e152]:
+          - generic [ref=e153]: Versão 1.0.0
+          - generic [ref=e154]: © SESEL/COSIS/TRE-PE
+  - text:  
+```
