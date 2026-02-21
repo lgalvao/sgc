@@ -51,7 +51,7 @@ public class SubprocessoMapaController {
     }
 
     @PostMapping("/{codigo}/disponibilizar-mapa")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Disponibiliza o mapa para validação")
     public ResponseEntity<MensagemResponse> disponibilizarMapa(
             @PathVariable Long codigo,

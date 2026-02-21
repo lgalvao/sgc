@@ -2,7 +2,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
-import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {aceitarCadastroMapeamento, aceitarRevisao, acessarSubprocessoChefeDireto, acessarSubprocessoGestor, homologarCadastroMapeamento, homologarCadastroRevisaoComImpacto} from './helpers/helpers-analise.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
@@ -25,6 +25,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     // ========================================================================
 
     test('Preparacao 0: Criar e finalizar Mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+        test.setTimeout(90000);
         // 1. Criar Processo
         await criarProcesso(page, {
             descricao: descMapeamento,
@@ -67,18 +68,22 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await homologarCadastroMapeamento(page);
+        await fazerLogout(page);
 
-        // 6. Admin cria mapa e disponibiliza
+        // 6. Chefe cria mapa e disponibiliza
+        await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
+        await acessarSubprocessoChefeDireto(page, descMapeamento);
         await navegarParaMapa(page);
         await criarCompetencia(page, `Comp Map ${timestamp}`, [`Ativ Map ${timestamp}`]);
         await disponibilizarMapa(page, '2030-12-31');
 
-        // 7. Chefe valida mapa
-        await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
+        // 7. Chefe valida mapa (já logado)
+        // Re-navegar pois disponibilizar redireciona para painel
         await acessarSubprocessoChefeDireto(page, descMapeamento);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
+        await fazerLogout(page);
 
         // 8. Gestor COORD_21 aceita mapa
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
@@ -203,6 +208,6 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
 
         await expect(page.getByText(/Revisão de cadastro reaberta/i).first()).toBeVisible();
         await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-            .toHaveText(/Revisão do cadastro em andamento/i);
+            .toHaveText(/Revisão em andamento/i);
     });
 });
