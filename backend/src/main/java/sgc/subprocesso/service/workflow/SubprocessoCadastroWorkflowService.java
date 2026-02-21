@@ -253,7 +253,7 @@ public class SubprocessoCadastroWorkflowService {
                 .sp(sp)
                 .tipo(TipoTransicao.CADASTRO_HOMOLOGADO)
                 .origem(admin)
-                .destino(admin)
+                .destino(sp.getUnidade())
                 .usuario(usuario)
                 .observacoes(observacoes)
                 .build());
@@ -326,7 +326,7 @@ public class SubprocessoCadastroWorkflowService {
                     .sp(sp)
                     .tipo(TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA)
                     .origem(admin)
-                    .destino(admin)
+                    .destino(sp.getUnidade())
                     .usuario(usuario)
                     .observacoes(observacoes)
                     .build());
