@@ -282,14 +282,14 @@ export async function homologarCadastroRevisaoComImpacto(page: Page) {
     await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
 
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Revisão homologada/i).first()).toBeVisible();
+    await expect(page.getByText(/Revisão d[oe] cadastro homologada/i).first()).toBeVisible();
 
     // Verifica redirecionamento para tela de detalhes do subprocesso
     await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
 
     // Verificar situação após homologação
     await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-        .toHaveText(/Revisão homologada/i);
+        .toHaveText(/Revisão d[oe] cadastro homologada/i);
 }
 
 /**

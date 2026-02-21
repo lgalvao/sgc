@@ -10,6 +10,7 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.acesso.AccessControlService;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -29,6 +30,7 @@ class SubprocessoBulkOperationsPbtTest {
                                               @ForAll int indiceFalha) {
         // Mock dependencies
         SubprocessoRepo subprocessoRepo = mock(SubprocessoRepo.class);
+        MovimentacaoRepo movimentacaoRepo = mock(MovimentacaoRepo.class);
         SubprocessoCrudService crudService = mock(SubprocessoCrudService.class);
         AlertaFacade alertaService = mock(AlertaFacade.class);
         UnidadeFacade unidadeService = mock(UnidadeFacade.class);
@@ -40,7 +42,7 @@ class SubprocessoBulkOperationsPbtTest {
         AccessControlService accessControlService = mock(AccessControlService.class);
 
         SubprocessoCadastroWorkflowService service = new SubprocessoCadastroWorkflowService(
-                subprocessoRepo, crudService, alertaService, unidadeService, 
+                subprocessoRepo, movimentacaoRepo, crudService, alertaService, unidadeService,
                 transicaoService, analiseFacade, usuarioServiceFacade, 
                 validacaoService, impactoMapaService, accessControlService
         );
