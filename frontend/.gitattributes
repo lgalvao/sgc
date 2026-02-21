@@ -1,9 +1,4 @@
-# Define o comportamento padrão para arquivos de texto.
-# Git tentará adivinhar se um arquivo é texto e normalizará seus finais de linha.
 * text=auto
-
-# Declara explicitamente os tipos de arquivo que são texto.
-# Isso garante que eles sempre terão os finais de linha normalizados.
 *.md text
 *.js text
 *.ts text
@@ -11,7 +6,4 @@
 *.json text
 *.css text
 *.html text
-
-# Declara arquivos que devem SEMPRE usar o final de linha LF (padrão Linux/macOS).
-# Essencial para scripts que podem quebrar no Windows se tiverem CRLF.
 *.sh text eol=lf

@@ -60,6 +60,9 @@ public class SubprocessoTransicaoService {
                 .build();
         movimentacaoRepo.save(movimentacao);
 
+        // Atualiza a localização atual no cache do objeto para evitar N+1 em testes e chamadas sequenciais
+        cmd.sp().setLocalizacaoAtualCache(cmd.destino() != null ? cmd.destino() : cmd.sp().getUnidade());
+
         // 2. Notificar via alerta e e-mail (chamada direta, sem evento assíncrono)
         notificarTransicao(cmd.sp(), cmd.tipo(), cmd.origem(), cmd.destino(), cmd.observacoes());
     }
@@ -103,9 +106,9 @@ public class SubprocessoTransicaoService {
     }
 
     private void notificarTransicao(Subprocesso sp, TipoTransicao tipo,
-                                     sgc.organizacao.model.Unidade origem,
-                                     sgc.organizacao.model.Unidade destino,
-                                     String observacoes) {
+                                     @Nullable sgc.organizacao.model.Unidade origem,
+                                     @Nullable sgc.organizacao.model.Unidade destino,
+                                     @Nullable String observacoes) {
         try {
             if (tipo.geraAlerta()) {
                 String sigla = sp.getUnidade().getSigla();

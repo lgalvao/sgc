@@ -21,9 +21,9 @@ public record RegistrarWorkflowCommand(
         TipoAnalise tipoAnalise,
         TipoAcaoAnalise tipoAcaoAnalise,
         Unidade unidadeAnalise,
-        Unidade unidadeOrigemTransicao,
-        Unidade unidadeDestinoTransicao,
-        Usuario usuario,
+        @Nullable Unidade unidadeOrigemTransicao,
+        @Nullable Unidade unidadeDestinoTransicao,
+        @Nullable Usuario usuario,
         @Nullable String motivoAnalise,
         @Nullable String observacoes
 ) {

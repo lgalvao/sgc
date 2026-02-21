@@ -14,9 +14,9 @@ import sgc.subprocesso.model.Subprocesso;
 public record RegistrarTransicaoCommand(
         Subprocesso sp,
         TipoTransicao tipo,
-        Unidade origem,
-        Unidade destino,
-        Usuario usuario,
+        @Nullable Unidade origem,
+        @Nullable Unidade destino,
+        @Nullable Usuario usuario,
         @Nullable String observacoes
 ) {
 }

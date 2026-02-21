@@ -6,7 +6,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "4.0.2"
+    id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.github.spotbugs") version "6.4.8"
     id("info.solidsoft.pitest") version "1.19.0-rc.3"
@@ -33,7 +33,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test:7.0.3")
+    testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
     developmentOnly("org.springframework.boot:spring-boot-devtools")

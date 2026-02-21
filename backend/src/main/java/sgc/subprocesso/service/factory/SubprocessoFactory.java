@@ -111,6 +111,7 @@ public class SubprocessoFactory {
                     .usuario(usuario)
                     .descricao("Processo iniciado")
                     .build());
+            sp.setLocalizacaoAtualCache(sp.getUnidade());
         }
         movimentacaoRepo.saveAll(movimentacoes);
     }
@@ -144,6 +145,7 @@ public class SubprocessoFactory {
                 .usuario(usuario)
                 .descricao("Processo de revisão iniciado")
                 .build());
+        subprocessoSalvo.setLocalizacaoAtualCache(unidade);
         log.info("Subprocesso para revisão criado para unidade {}", unidade.getSigla());
     }
 
@@ -176,6 +178,7 @@ public class SubprocessoFactory {
                 .usuario(usuario)
                 .descricao("Processo de diagnóstico iniciado")
                 .build());
+        subprocessoSalvo.setLocalizacaoAtualCache(unidade);
         log.info("Subprocesso {} para diagnóstico criado para unidade {}", subprocessoSalvo.getCodigo(), unidade.getSigla());
     }
 }

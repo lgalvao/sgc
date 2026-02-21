@@ -1,0 +1,287 @@
+Calculating task graph as no cached configuration is available for tasks: test
+> Task :frontend:processResources NO-SOURCE
+> Task :frontend:processTestResources NO-SOURCE
+> Task :frontend:compileJava NO-SOURCE
+> Task :frontend:classes UP-TO-DATE
+> Task :frontend:compileTestJava NO-SOURCE
+> Task :frontend:testClasses UP-TO-DATE
+> Task :frontend:test NO-SOURCE
+> Task :backend:processTestResources
+> Task :backend:processResources
+> Task :backend:compileJava
+> Task :backend:classes
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+
+> Task :backend:test
+
+CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos > Deve excluir histórico de análises anteriores quando disponibilizar revisão novamente FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU10IntegrationTest.deveExcluirHistoricoAposNovaDisponibilizacao(CDU10IntegrationTest.java:230)
+
+CDU-13: Analisar cadastro de atividades e conhecimentos > Deve retornar o histórico de devoluções e aceites ordenado FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU13IntegrationTest.getHistorico_deveRetornarAcoesOrdenadas(CDU13IntegrationTest.java:316)
+
+CDU-13: Analisar cadastro de atividades e conhecimentos > Deve aceitar cadastro, registrar análise e mover para unidade superior FAILED
+    org.opentest4j.AssertionFailedError: 
+    expected: "SEDESENV-TEST"
+     but was: "COSIS-TEST"
+        at app//sgc.integracao.CDU13IntegrationTest.aceitarCadastro_deveFuncionarCorretamente(CDU13IntegrationTest.java:231)
+
+CDU-16: Ajustar mapa de competências > Deve submeter o mapa ajustado e alterar a situação do subprocesso FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU16IntegrationTest.deveSubmeterMapaAjustadoComSucesso(CDU16IntegrationTest.java:119)
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Sucesso > Deve disponibilizar mapa quando todos os dados estão corretos FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU17IntegrationTest$Sucesso.disponibilizarMapa_comDadosValidos_retornaOk(CDU17IntegrationTest.java:146)
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa se houver atividade sem competência associada FAILED
+    java.lang.AssertionError: Status expected:<422> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU17IntegrationTest$Falha.disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest(CDU17IntegrationTest.java:236)
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa se houver competência sem atividade associada FAILED
+    java.lang.AssertionError: Status expected:<422> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU17IntegrationTest$Falha.disponibilizarMapa_comCompetenciaNaoAssociada_retornaBadRequest(CDU17IntegrationTest.java:255)
+
+CDU-20: Analisar validação de mapa de competências > ADMIN deve homologar validação do mapa, alterando status para MAPA_HOMOLOGADO e registrando movimentação e alerta FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU20IntegrationTest.testHomologarValidacao_Sucesso(CDU20IntegrationTest.java:250)
+
+CDU-22: Aceitar cadastros em bloco > Deve aceitar cadastro de múltiplas unidades em bloco FAILED
+    org.opentest4j.AssertionFailedError: 
+    expected: 6L
+     but was: 2L
+        at app//sgc.integracao.CDU22IntegrationTest.aceitarCadastroEmBloco_deveAceitarTodasSelecionadas(CDU22IntegrationTest.java:153)
+
+CDU-23: Homologar cadastros em bloco > Deve homologar cadastro de múltiplas unidades em bloco FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU23IntegrationTest.homologarCadastroEmBloco_deveHomologarTodasSelecionadas(CDU23IntegrationTest.java:128)
+
+CDU-24: Disponibilizar mapas de competências em bloco > Deve disponibilizar mapas de competências em bloco (sucesso) FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU24IntegrationTest.disponibilizarMapaEmBloco_deveDisponibilizarSucesso(CDU24IntegrationTest.java:138)
+
+CDU-26: Homologar validação de mapas em bloco > Deve homologar validação de mapas em bloco FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU26IntegrationTest.homologarValidacaoEmBloco_deveHomologarSucesso(CDU26IntegrationTest.java:122)
+
+SubprocessoAccessPolicyTest > canExecute - Admin Localização (Escrita) FAILED
+    org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+        at app//org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+        at app//org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+        at app//org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:69)
+        at app//org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:41)
+        at app//org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:35)
+        at app//org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:195)
+        at app//sgc.seguranca.acesso.SubprocessoAccessPolicyTest.canExecute_AdminLocalizacao_Escrita(SubprocessoAccessPolicyTest.java:174)
+
+SubprocessoAccessPolicyTest > canExecute - VerificarImpactos - Complex Logic FAILED
+    org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+        at app//org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+        at app//org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+        at app//org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:69)
+        at app//org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:41)
+        at app//org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:35)
+        at app//org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:195)
+        at app//sgc.seguranca.acesso.SubprocessoAccessPolicyTest.canExecute_VerificarImpactos_Complex(SubprocessoAccessPolicyTest.java:190)
+
+SubprocessoAccessPolicyTest > canExecute - VERIFICAR_IMPACTOS - Gestor Disponibilizada (Ainda na Subordinada) FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+    Unnecessary stubbings detected.
+    Clean & maintainable test code requires zero unnecessary code.
+    Following stubbings are unnecessary (click to navigate to relevant line of code):
+      1. -> at sgc.seguranca.acesso.SubprocessoAccessPolicyTest.mockLocalizacao(SubprocessoAccessPolicyTest.java:47)
+    Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+        at app//org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+        at java.base@25.0.1/java.util.Optional.ifPresent(Optional.java:178)
+        at app//org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+SubprocessoAccessPolicyTest > canExecute - Admin Devolver Cadastro - Deve Respeitar Hierarquia FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+    Unnecessary stubbings detected.
+    Clean & maintainable test code requires zero unnecessary code.
+    Following stubbings are unnecessary (click to navigate to relevant line of code):
+      1. -> at sgc.seguranca.acesso.SubprocessoAccessPolicyTest.mockLocalizacao(SubprocessoAccessPolicyTest.java:47)
+    Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+        at app//org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+        at java.base@25.0.1/java.util.Optional.ifPresent(Optional.java:178)
+        at app//org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+SubprocessoAccessPolicyTest > canExecute - VERIFICAR_IMPACTOS - Chefe Mesma Unidade FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+    Unnecessary stubbings detected.
+    Clean & maintainable test code requires zero unnecessary code.
+    Following stubbings are unnecessary (click to navigate to relevant line of code):
+      1. -> at sgc.seguranca.acesso.SubprocessoAccessPolicyTest.mockLocalizacao(SubprocessoAccessPolicyTest.java:47)
+    Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+        at app//org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+        at java.base@25.0.1/java.util.Optional.ifPresent(Optional.java:178)
+        at app//org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+SubprocessoAccessPolicyTest > canExecute - Hierarquia Titular - OK FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+    Unnecessary stubbings detected.
+    Clean & maintainable test code requires zero unnecessary code.
+    Following stubbings are unnecessary (click to navigate to relevant line of code):
+      1. -> at sgc.seguranca.acesso.SubprocessoAccessPolicyTest.mockLocalizacao(SubprocessoAccessPolicyTest.java:47)
+    Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+        at app//org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+        at java.base@25.0.1/java.util.Optional.ifPresent(Optional.java:178)
+        at app//org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+SubprocessoAccessPolicyTest > canExecute - VERIFICAR_IMPACTOS - Chefe Outra Unidade FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+    Unnecessary stubbings detected.
+    Clean & maintainable test code requires zero unnecessary code.
+    Following stubbings are unnecessary (click to navigate to relevant line of code):
+      1. -> at sgc.seguranca.acesso.SubprocessoAccessPolicyTest.mockLocalizacao(SubprocessoAccessPolicyTest.java:47)
+    Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+        at app//org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+        at java.base@25.0.1/java.util.Optional.ifPresent(Optional.java:178)
+        at app//org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+SubprocessoAccessPolicyTest > canExecute - VERIFICAR_IMPACTOS - Combinacoes e Falhas FAILED
+    org.opentest4j.AssertionFailedError: expected: <false> but was: <true>
+        at app//org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+        at app//org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+        at app//org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:69)
+        at app//org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:41)
+        at app//org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:35)
+        at app//org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:246)
+        at app//sgc.seguranca.acesso.SubprocessoAccessPolicyTest.canExecute_VerificarImpactos_Combinacoes(SubprocessoAccessPolicyTest.java:216)
+
+SubprocessoAccessPolicyTest > canExecute - VERIFICAR_IMPACTOS - Admin Homologada (Na Unidade) FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+    Unnecessary stubbings detected.
+    Clean & maintainable test code requires zero unnecessary code.
+    Following stubbings are unnecessary (click to navigate to relevant line of code):
+      1. -> at sgc.seguranca.acesso.SubprocessoAccessPolicyTest.mockLocalizacao(SubprocessoAccessPolicyTest.java:47)
+    Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+        at app//org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+        at java.base@25.0.1/java.util.Optional.ifPresent(Optional.java:178)
+        at app//org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+SubprocessoAccessPolicyTest > canExecute - Hierarquia MesmaUnidade - OK FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+    Unnecessary stubbings detected.
+    Clean & maintainable test code requires zero unnecessary code.
+    Following stubbings are unnecessary (click to navigate to relevant line of code):
+      1. -> at sgc.seguranca.acesso.SubprocessoAccessPolicyTest.mockLocalizacao(SubprocessoAccessPolicyTest.java:47)
+    Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+        at app//org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+        at java.base@25.0.1/java.util.Optional.ifPresent(Optional.java:178)
+        at app//org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+        at java.base@25.0.1/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+SubprocessoAccessPolicyTest > canExecute - VERIFICAR_IMPACTOS - Gestor Disponibilizada (Na Unidade) FAILED
+    org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+        at app//org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+        at app//org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+        at app//org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:69)
+        at app//org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:41)
+        at app//org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:35)
+        at app//org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:195)
+        at app//sgc.seguranca.acesso.SubprocessoAccessPolicyTest.canExecute_VerificarImpactos_GestorDisponibilizada(SubprocessoAccessPolicyTest.java:78)
+
+SubprocessoCadastroWorkflowServiceTest > aceitarRevisaoCadastro - Com Unidade Superior da Analise FAILED
+    Argument(s) are different! Wanted:
+    transicaoService.registrarAnaliseETransicao(
+        <custom argument matcher>
+    );
+    -> at sgc.subprocesso.service.workflow.SubprocessoTransicaoService.registrarAnaliseETransicao(SubprocessoTransicaoService.java:77)
+    Actual invocations have different arguments:
+    transicaoService.registrarAnaliseETransicao(
+        RegistrarWorkflowCommand[sp=Subprocesso[codigo=null], novaSituacao=REVISAO_CADASTRO_DISPONIBILIZADA, tipoTransicao=REVISAO_CADASTRO_ACEITA, tipoAnalise=CADASTRO, tipoAcaoAnalise=ACEITE_REVISAO, unidadeAnalise=Unidade[codigo=null], unidadeOrigemTransicao=Unidade[codigo=null], unidadeDestinoTransicao=Unidade[codigo=null], usuario=sgc.organizacao.model.Usuario@1f, motivoAnalise=obs, observacoes=obs]
+    );
+    -> at sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService.aceitarRevisaoCadastro(SubprocessoCadastroWorkflowService.java:300)
+        at app//sgc.subprocesso.service.workflow.SubprocessoTransicaoService.registrarAnaliseETransicao(SubprocessoTransicaoService.java:77)
+        at app//sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowServiceTest.aceitarRevisaoCadastro_ComSuperiorAnalise(SubprocessoCadastroWorkflowServiceTest.java:301)
+
+SubprocessoMapaWorkflowService > Workflow de Validação > Deve aceitar validação e homologar se não tem proxima unidade FAILED
+    Wanted but not invoked:
+    analiseFacade.criarAnalise(
+        Subprocesso[codigo=1],
+        <any>
+    );
+    -> at sgc.analise.AnaliseFacade.criarAnalise(AnaliseFacade.java:90)
+    Actually, there were zero interactions with this mock.
+        at app//sgc.analise.AnaliseFacade.criarAnalise(AnaliseFacade.java:90)
+        at app//sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowServiceTest$WorkflowValidacao.deveAceitarEHomologarSeNaoProxima(SubprocessoMapaWorkflowServiceTest.java:509)
+  Resultado: FAILURE
+  Total:     1380 testes executados
+  + Passou:   1355
+  - Falhou:   25
+  ○ Ignorado: 0
+  Tempo:     38.949s
+
+1380 tests completed, 25 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///Users/leonardo/sgc/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 1m 3s
+5 actionable tasks: 5 executed
+Configuration cache entry stored.

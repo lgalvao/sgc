@@ -94,6 +94,7 @@ public class SubprocessoAdminWorkflowService {
                 .descricao("Lembrete de prazo enviado")
                 .usuario(usuario)
                 .build());
+        subprocesso.setLocalizacaoAtualCache(subprocesso.getUnidade());
     }
 
     public List<Subprocesso> listarSubprocessosHomologados() {

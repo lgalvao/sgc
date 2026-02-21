@@ -90,6 +90,7 @@ class SubprocessoAtividadeService {
                 .descricao(descMovimentacao)
                 .usuario(usuario)
                 .build());
+        spDestino.setLocalizacaoAtualCache(spDestino.getUnidade());
 
         log.info("Evento de importação de atividades publicado: subprocesso {} -> {}", 
                 codSubprocessoOrigem, codSubprocessoDestino);
