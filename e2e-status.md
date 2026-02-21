@@ -18,8 +18,26 @@ Este documento registra o status dos testes End-to-End executados e as lições 
 | `cdu-10.spec.ts` | ✅ Passou | 1 | 1 | Disponibilizar revisão do cadastro (Fluxo completo). |
 | `cdu-11.spec.ts` | ✅ Passou | 6 | 6 | Visualizar cadastro de atividades e conhecimentos. |
 | `cdu-12.spec.ts` | ✅ Passou | 7 | 7 | Verificar impactos no mapa de competências. |
+| `cdu-13.spec.ts` | ✅ Passou | 8 | 8 | Analisar cadastro de atividades e conhecimentos. |
 
 ## Problemas Identificados e Soluções
+
+### CDU-13: Lentidão e timeouts em validações de acesso do Admin
+
+**Problema:**
+O teste `CDU-13` falhava intermitentemente por timeout (ou "element not found") no cenário onde o ADMIN visualiza o histórico de análises.
+O log do backend exibia dezenas de mensagens "Permissão negada por localização" em um curto período, indicando verificação excessiva de permissões.
+
+**Causa Raiz:**
+A classe `SubprocessoContextoService` solicita o cálculo de todas as permissões (`SubprocessoPermissaoCalculator`) para a renderização da tela.
+A política de acesso (`SubprocessoAccessPolicy`) consultava o banco de dados (`movimentacaoRepo`) para *cada* verificação de ação (aprox. 20 ações por request) para determinar a localização atual do subprocesso.
+Como o ADMIN estava fora da unidade de localização, cada consulta resultava em falha de hierarquia e log de negação, além da latência de N+1 queries.
+
+**Solução:**
+Otimização de performance:
+1.  Adicionado campo `@Transient private Unidade localizacaoAtualCache` na entidade `Subprocesso`.
+2.  Alterado `SubprocessoAccessPolicy.obterUnidadeLocalizacao` para utilizar e popular esse cache.
+Isso reduziu de ~20 consultas ao banco para apenas 1 consulta por requisição de detalhes, eliminando a latência excessiva e estabilizando o teste.
 
 ### CDU-12: Permissão negada para ADMIN ao verificar impactos
 
@@ -85,3 +103,4 @@ Isso garante a construção correta da URL independentemente da resolução de n
 2.  **Verificação de Contexto:** Testes E2E são sensíveis a redirecionamentos. Quando um teste falha em `expect(page).toHaveURL(...)`, verifique se a navegação anterior foi executada corretamente e se os parâmetros da URL estão sendo passados.
 3.  **Logs de Teste:** Os logs do Playwright (`resultado_*.txt`) são essenciais para identificar *onde* o teste falhou e *qual* era a URL real vs esperada.
 4.  **Políticas de Acesso:** Verificações de permissão baseadas em localização (`MESMA_UNIDADE`) podem bloquear administradores se não houver exceção explícita ou uso de `RequisitoHierarquia.NENHUM`.
+5.  **Performance de Permissões:** O cálculo de permissões para renderização de interface (mostrar/esconder botões) deve ser eficiente. Evitar N+1 queries para verificar a mesma condição (como localização do subprocesso) repetidamente. Uso de campos `@Transient` para cache de requisição é uma solução válida.
