@@ -298,7 +298,7 @@ class SubprocessoCadastroWorkflowServiceTest {
 
         service.aceitarRevisaoCadastro(id, user, "obs");
 
-        verify(transicaoService).registrarAnaliseETransicao(argThat(req -> req.unidadeDestinoTransicao().equals(supSup)));
+        verify(transicaoService).registrarAnaliseETransicao(argThat(req -> req.unidadeDestinoTransicao().equals(sup)));
     }
 }
 

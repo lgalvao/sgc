@@ -2,6 +2,9 @@ package sgc.subprocesso.service.workflow;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.jspecify.annotations.Nullable;
+import sgc.organizacao.model.Unidade;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
@@ -27,9 +30,6 @@ import sgc.subprocesso.service.notificacao.SubprocessoEmailService;
  *   <li>Executar workflows completos com análises</li>
  *   <li>Atualizar estados de subprocessos</li>
  * </ol>
- *
- * <p>Este serviço <b>DEVE</b> ser chamado dentro de uma transação existente
- * ({@code @Transactional} no método chamador) para garantir atomicidade.
  */
 @Service
 @RequiredArgsConstructor
@@ -106,9 +106,9 @@ public class SubprocessoTransicaoService {
     }
 
     private void notificarTransicao(Subprocesso sp, TipoTransicao tipo,
-                                     @Nullable sgc.organizacao.model.Unidade origem,
-                                     @Nullable sgc.organizacao.model.Unidade destino,
-                                     @Nullable String observacoes) {
+                                     Unidade origem,
+                                     Unidade destino,
+                                     String observacoes) {
         try {
             if (tipo.geraAlerta()) {
                 String sigla = sp.getUnidade().getSigla();
