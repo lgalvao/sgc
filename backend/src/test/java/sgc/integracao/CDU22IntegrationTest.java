@@ -150,7 +150,8 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         List<Movimentacao> movs1 = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s1.getCodigo());
         assertThat(movs1).isNotEmpty();
         assertThat(movs1.getFirst().getDescricao()).contains("aceito");
-        assertThat(movs1.getFirst().getUnidadeDestino().getCodigo()).isEqualTo(unidadeSuperior.getCodigo());
+        // O aceite envia para a unidade superior da unidade atual (6 -> 2)
+        assertThat(movs1.getFirst().getUnidadeDestino().getCodigo()).isEqualTo(2L);
 
         // Verify Subprocesso 2
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
@@ -160,6 +161,6 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
 
         List<Movimentacao> movs2 = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s2.getCodigo());
         assertThat(movs2).isNotEmpty();
-        assertThat(movs2.getFirst().getUnidadeDestino().getCodigo()).isEqualTo(unidadeSuperior.getCodigo());
+        assertThat(movs2.getFirst().getUnidadeDestino().getCodigo()).isEqualTo(2L);
     }
 }

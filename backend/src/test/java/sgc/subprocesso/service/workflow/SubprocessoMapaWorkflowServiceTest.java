@@ -33,6 +33,7 @@ import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
@@ -41,6 +42,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -500,6 +502,11 @@ class SubprocessoMapaWorkflowServiceTest {
             superior.setSigla("SUP");
             u.setUnidadeSuperior(superior);
             superior.setUnidadeSuperior(null);
+
+            // Simula que o processo já está na unidade superior (que não tem próxima)
+            Movimentacao mov = Movimentacao.builder().unidadeDestino(superior).build();
+            when(repositorioMovimentacao.findFirstBySubprocessoCodigoOrderByDataHoraDesc(1L))
+                    .thenReturn(Optional.of(mov));
 
             Usuario user = new Usuario();
             user.setTituloEleitoral("123");

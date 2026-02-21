@@ -39,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
@@ -129,6 +130,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(unidadeSuperior)
                 .descricao("Disponibilização inicial")
                 .usuario(adminUser)
+                .dataHora(LocalDateTime.now())
                 .build();
         movimentacaoRepo.save(movimentacaoInicial);
 
@@ -227,8 +229,9 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         assertThat(movimentacoes).hasSize(2);
         Movimentacao movimentacaoAceite = movimentacoes.getFirst();
 
+        // O aceite parte da unidade atual (onde o processo está), que é a superior
         assertThat(movimentacaoAceite.getUnidadeOrigem().getSigla())
-                .isEqualTo(unidade.getSigla());
+                .isEqualTo(unidadeSuperior.getSigla());
         assertThat(movimentacaoAceite.getUnidadeDestino().getSigla())
                 .isEqualTo(unidadeSuperior.getSigla());
         assertThat(movimentacaoAceite.getDescricao())
@@ -303,8 +306,18 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(unidadeSuperior)
                 .descricao("Redisponibilização após ajustes")
                 .usuario(gestor) // Usando gestor ou qualquer outro aqui
+                .dataHora(LocalDateTime.now().plusDays(1)) // Garante que é a última
                 .build();
         movimentacaoRepo.saveAndFlush(movRedisponibiliza);
+
+        // Ensure user is configured correctly like in other passing tests
+        gestor.setPerfilAtivo(Perfil.GESTOR);
+        gestor.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo());
+        gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
+
+        // Clear persistence context to ensure controller fetches fresh data (including new movement)
+        entityManager.flush();
+        entityManager.clear();
 
         String obsAceite = "Agora sim, completo.";
         TextoRequest aceitarReq = new TextoRequest(obsAceite);
@@ -313,13 +326,21 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                         .with(user(gestor))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(aceitarReq)))
+                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
 
+        entityManager.flush();
+        entityManager.clear();
+
+        // Re-authenticate explicitly to avoid stale security context
+        // Using "132313231323" ensures the user is found in DB, and authorities ensures role check passes
         String jsonResponse = mockMvc
                 .perform(MockMvcRequestBuilders.get(
                                 "/api/subprocessos/{id}/historico-cadastro",
                                 subprocesso.getCodigo())
-                        .with(user(gestor))
+                        .with(user("132313231323")
+                                .roles("GESTOR")
+                                .authorities(new SimpleGrantedAuthority("ROLE_GESTOR")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn()

@@ -21,6 +21,8 @@ import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -42,6 +44,8 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
 
     private Subprocesso subprocesso;
     private Atividade atividade1;
@@ -77,6 +81,17 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
 
         // Atualizar referência no subprocesso (para consistência do objeto em memória)
         subprocesso.setMapa(mapa);
+
+        // Garante que o subprocesso esteja na unidade do ADMIN (100) para permitir ajuste
+        Unidade adminUnit = unidadeRepo.findById(100L).orElseThrow();
+        Movimentacao movAdmin = Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(unidade)
+                .unidadeDestino(adminUnit)
+                .descricao("Enviado para Admin para Ajuste")
+                .dataHora(LocalDateTime.now())
+                .build();
+        movimentacaoRepo.save(movAdmin);
 
         // Criar Competências e Atividades
         var c1 = competenciaRepo.save(Competencia.builder().descricao("Competência 1").mapa(mapa).build());

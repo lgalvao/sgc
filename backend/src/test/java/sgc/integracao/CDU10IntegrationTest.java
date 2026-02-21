@@ -115,6 +115,16 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         mapa = mapaRepo.save(mapa);
         subprocessoRevisao.setMapa(mapa);
 
+        // Garante que existe movimentação para a unidade do Chefe
+        Movimentacao mov = Movimentacao.builder()
+                .subprocesso(subprocessoRevisao)
+                .unidadeOrigem(unidadeChefe)
+                .unidadeDestino(unidadeChefe)
+                .descricao("Inicialização")
+                .dataHora(LocalDateTime.now())
+                .build();
+        movimentacaoRepo.save(mov);
+
         // 5. Autenticar
         autenticarUsuario(usuarioChefe, Perfil.CHEFE);
     }
@@ -218,12 +228,15 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         mov.setSubprocesso(sp);
         mov.setUnidadeOrigem(unidadeSuperior);
         mov.setUnidadeDestino(sp.getUnidade());
-        mov.setDataHora(LocalDateTime.now());
+        mov.setDataHora(LocalDateTime.now().plusSeconds(1)); // Ensure it's later
         mov.setDescricao("Devolução simulada");
         // Usuario Superior
         Usuario usuarioSuperior = usuarioRepo.findById("666666666666").get();
         mov.setUsuario(usuarioSuperior);
         movimentacaoRepo.saveAndFlush(mov);
+
+        entityManager.flush();
+        entityManager.clear();
 
         // 5. Nova disponibilização
         mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId))
