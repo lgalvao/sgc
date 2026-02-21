@@ -305,12 +305,20 @@ public class SubprocessoAccessPolicy extends AbstractAccessPolicy<Subprocesso> {
     }
 
     private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
+        if (sp.getLocalizacaoAtualCache() != null) {
+            return sp.getLocalizacaoAtualCache();
+        }
+
         if (sp.getCodigo() == null) {
             return sp.getUnidade();
         }
-        return movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
+
+        Unidade localizacao = movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
                 .map(m -> m.getUnidadeDestino() != null ? m.getUnidadeDestino() : sp.getUnidade())
                 .orElse(sp.getUnidade());
+
+        sp.setLocalizacaoAtualCache(localizacao);
+        return localizacao;
     }
 
     /**

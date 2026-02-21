@@ -1,5 +1,6 @@
 package sgc.subprocesso.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
@@ -66,6 +67,10 @@ public class Subprocesso extends EntidadeBase {
     @Column(name = "situacao", length = 50, nullable = false)
     @lombok.Builder.Default
     private SituacaoSubprocesso situacao = SituacaoSubprocesso.NAO_INICIADO;
+
+    @Transient
+    @JsonIgnore
+    private Unidade localizacaoAtualCache;
 
     @JsonView({ComumViews.Publica.class, SubprocessoViews.Publica.class, MapaViews.Publica.class})
     public Set<Atividade> getAtividades() {
