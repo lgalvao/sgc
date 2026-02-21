@@ -27,6 +27,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import tools.jackson.core.type.TypeReference;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -242,6 +243,17 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         subprocessoRepo.save(subprocesso);
         subprocessoRepo.flush();
+
+        // Garante que o subprocesso esteja na unidade do ADMIN (100)
+        Unidade adminUnit = unidadeRepo.findById(100L).orElseThrow();
+        Movimentacao movAdmin = Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(unidadeSuperior)
+                .unidadeDestino(adminUnit)
+                .descricao("Enviado para Admin para Homologação")
+                .dataHora(LocalDateTime.now())
+                .build();
+        movimentacaoRepo.save(movAdmin);
 
         // Ação
         mockMvc.perform(

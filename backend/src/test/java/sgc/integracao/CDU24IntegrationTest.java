@@ -26,6 +26,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -122,6 +123,26 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
         // Given
         Long codigoContexto = processo.getCodigo();
         List<Long> unidadesSelecionadas = List.of(unidade1.getCodigo(), unidade2.getCodigo());
+
+        // Garante que os subprocessos estejam na unidade do ADMIN (100)
+        Unidade adminUnit = unidadeRepo.findById(100L).orElseThrow();
+        Movimentacao movAdmin1 = Movimentacao.builder()
+                .subprocesso(subprocesso1)
+                .unidadeOrigem(unidade1)
+                .unidadeDestino(adminUnit)
+                .descricao("Enviado para Admin")
+                .dataHora(LocalDateTime.now())
+                .build();
+        movimentacaoRepo.save(movAdmin1);
+
+        Movimentacao movAdmin2 = Movimentacao.builder()
+                .subprocesso(subprocesso2)
+                .unidadeOrigem(unidade2)
+                .unidadeDestino(adminUnit)
+                .descricao("Enviado para Admin")
+                .dataHora(LocalDateTime.now())
+                .build();
+        movimentacaoRepo.save(movAdmin2);
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .subprocessos(unidadesSelecionadas)

@@ -114,6 +114,27 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
         Long codigoContexto = processo.getCodigo();
         List<Long> subprocessosSelecionados = List.of(unidade1.getCodigo(), unidade2.getCodigo());
 
+        // Para homologar, os subprocessos devem estar na unidade do Admin (100)
+        Unidade adminUnit = unidadeRepo.findById(100L).orElseThrow();
+
+        Movimentacao m1 = Movimentacao.builder()
+                .subprocesso(subprocesso1)
+                .unidadeOrigem(unidade1)
+                .unidadeDestino(adminUnit)
+                .descricao("Enviado para Admin")
+                .dataHora(LocalDateTime.now())
+                .build();
+        movimentacaoRepo.save(m1);
+
+        Movimentacao m2 = Movimentacao.builder()
+                .subprocesso(subprocesso2)
+                .unidadeOrigem(unidade2)
+                .unidadeDestino(adminUnit)
+                .descricao("Enviado para Admin")
+                .dataHora(LocalDateTime.now())
+                .build();
+        movimentacaoRepo.save(m2);
+
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .acao("HOMOLOGAR")
                 .subprocessos(subprocessosSelecionados)

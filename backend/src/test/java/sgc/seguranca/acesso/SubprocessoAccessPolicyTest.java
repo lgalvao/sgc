@@ -15,12 +15,12 @@ import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,15 +37,15 @@ class SubprocessoAccessPolicyTest {
 
     private void mockLocalizacao(Subprocesso sp, Long codUnidadeLocalizacao) {
         if (codUnidadeLocalizacao == null) {
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(any()))
-                    .thenReturn(Collections.emptyList());
+            lenient().when(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo()))
+                    .thenReturn(Optional.empty());
             return;
         }
         Unidade dest = new Unidade();
         dest.setCodigo(codUnidadeLocalizacao);
         Movimentacao m = Movimentacao.builder().unidadeDestino(dest).build();
-        when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(any()))
-                .thenReturn(List.of(m));
+        lenient().when(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo()))
+                .thenReturn(Optional.of(m));
     }
     
     @Test
@@ -161,42 +161,60 @@ class SubprocessoAccessPolicyTest {
     }
 
     @Test
-    @DisplayName("canExecute - Admin Localização (Escrita)")
-    void canExecute_AdminLocalizacao_Escrita() {
+    @DisplayName("canExecute - Admin Localização (Escrita) - Falha")
+    void canExecute_AdminLocalizacao_Escrita_Falha() {
         Usuario u = criarUsuario(Perfil.ADMIN, 1L);
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 2L);
-        
+
         // EDITAR_MAPA é escrita -> Deve estar na unidade 1 do Admin
         mockLocalizacao(sp, 2L); // Está na 2
         assertFalse(policy.canExecute(u, Acao.EDITAR_MAPA, sp));
-        
+    }
+
+    @Test
+    @DisplayName("canExecute - Admin Localização (Escrita) - Sucesso")
+    void canExecute_AdminLocalizacao_Escrita_Sucesso() {
+        Usuario u = criarUsuario(Perfil.ADMIN, 1L);
+        Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, 2L);
+
+        // EDITAR_MAPA é escrita -> Deve estar na unidade 1 do Admin
         mockLocalizacao(sp, 1L); // Está na 1
         assertTrue(policy.canExecute(u, Acao.EDITAR_MAPA, sp));
     }
 
     @Test
-    @DisplayName("canExecute - VerificarImpactos - Complex Logic")
-    void canExecute_VerificarImpactos_Complex() {
+    @DisplayName("canExecute - VerificarImpactos - Complex Logic - Admin")
+    void canExecute_VerificarImpactos_Complex_Admin() {
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, 1L);
-
-        // Admin - localizado no admin (99)
         Usuario admin = criarUsuario(Perfil.ADMIN, 99L);
         mockLocalizacao(sp, 99L);
         assertTrue(policy.canExecute(admin, Acao.VERIFICAR_IMPACTOS, sp));
+    }
 
-        // Gestor - localizado no gestor (88)
+    @Test
+    @DisplayName("canExecute - VerificarImpactos - Complex Logic - Gestor")
+    void canExecute_VerificarImpactos_Complex_Gestor() {
+        Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, 1L);
         Usuario gestor = criarUsuario(Perfil.GESTOR, 88L);
         mockLocalizacao(sp, 88L);
         assertTrue(policy.canExecute(gestor, Acao.VERIFICAR_IMPACTOS, sp));
+    }
 
-        // Chefe - Situação Errada (Disponibilizada não é para Chefe)
+    @Test
+    @DisplayName("canExecute - VerificarImpactos - Complex Logic - Chefe Fail")
+    void canExecute_VerificarImpactos_Complex_Chefe_Fail() {
+        Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, 1L);
         Usuario chefe = criarUsuario(Perfil.CHEFE, 1L);
         mockLocalizacao(sp, 1L);
         assertFalse(policy.canExecute(chefe, Acao.VERIFICAR_IMPACTOS, sp));
+    }
 
-        // Chefe - Situação Correta e Mesma Unidade
+    @Test
+    @DisplayName("canExecute - VerificarImpactos - Complex Logic - Chefe Success")
+    void canExecute_VerificarImpactos_Complex_Chefe_Success() {
         Subprocesso spChefe = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, 1L);
         spChefe.setCodigo(100L);
+        Usuario chefe = criarUsuario(Perfil.CHEFE, 1L);
         mockLocalizacao(spChefe, 1L);
         assertTrue(policy.canExecute(chefe, Acao.VERIFICAR_IMPACTOS, spChefe));
     }
@@ -207,25 +225,24 @@ class SubprocessoAccessPolicyTest {
         // 1. CHEFE (Mesma Unidade) + REVISAO_CADASTRO_EM_ANDAMENTO -> True
         Usuario uChefe = criarUsuario(Perfil.CHEFE, 1L);
         Subprocesso sp = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, 1L);
-        sp.setCodigo(1L);
         mockLocalizacao(sp, 1L);
         assertTrue(policy.canExecute(uChefe, Acao.VERIFICAR_IMPACTOS, sp));
 
         // 2. CHEFE (Outra Unidade/Localização) -> False
-        mockLocalizacao(sp, 2L);
-        assertFalse(policy.canExecute(uChefe, Acao.VERIFICAR_IMPACTOS, sp));
+        // Use a new object to avoid mock interference
+        Subprocesso sp2 = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, 1L);
+        mockLocalizacao(sp2, 2L);
+        assertFalse(policy.canExecute(uChefe, Acao.VERIFICAR_IMPACTOS, sp2));
 
         // 3. GESTOR + REVISAO_CADASTRO_DISPONIBILIZADA + Na Unidade -> True
         Usuario uGestor = criarUsuario(Perfil.GESTOR, 88L);
         Subprocesso spRevDisp = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, 1L);
-        spRevDisp.setCodigo(2L);
         mockLocalizacao(spRevDisp, 88L);
         assertTrue(policy.canExecute(uGestor, Acao.VERIFICAR_IMPACTOS, spRevDisp));
 
         // 4. ADMIN + REVISAO_CADASTRO_HOMOLOGADA + Na Unidade -> True
         Usuario uAdmin = criarUsuario(Perfil.ADMIN, 99L);
         Subprocesso spRevHom = criarSubprocesso(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, 1L);
-        spRevHom.setCodigo(3L);
         mockLocalizacao(spRevHom, 99L);
         assertTrue(policy.canExecute(uAdmin, Acao.VERIFICAR_IMPACTOS, spRevHom));
     }
