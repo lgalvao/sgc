@@ -20,6 +20,32 @@ Este documento consolida as regras de acesso e atividades permitidas para cada p
     *   *Responsabilidades*: Participar de processos de diagnóstico (autoavaliação).
     *   *Escopo*: Sua própria avaliação no contexto de sua unidade.
 
+## Conceito: Localização do Subprocesso
+
+Cada subprocesso pertence a uma **Unidade Responsável** (quem executa o trabalho), mas possui uma **Localização Atual** (onde o processo está "parado" aguardando ação).
+
+*   **Unidade Responsável**: É a unidade dona do subprocesso (ex: Seção de Compras). Define quem tem visibilidade permanente sobre o item.
+*   **Localização Atual**: É a unidade onde o fluxo de trabalho se encontra no momento (ex: Seção de Compras, Coordenadoria Superior, ou Unidade do Administrador). Define quem pode executar ações de alteração de estado.
+
+A localização muda conforme as ações de envio (Disponibilizar, Aceitar, Devolver).
+
+## Regras Gerais de Acesso
+
+O sistema aplica regras distintas para visualizar informações e para executar ações que alteram o estado do processo.
+
+### 1. Visualização (Leitura)
+A permissão de visualização é baseada na **Hierarquia da Unidade Responsável**. Se você tem permissão sobre a unidade dona do subprocesso, você pode vê-lo, independente de onde ele esteja localizado (com o Chefe ou com o Admin).
+
+*   **ADMIN**: Visualiza todos os subprocessos de todas as unidades.
+*   **GESTOR**: Visualiza subprocessos da sua própria unidade e de todas as unidades subordinadas.
+*   **CHEFE**: Visualiza apenas os subprocessos da sua unidade.
+
+### 2. Execução (Escrita e Movimentação)
+A permissão para alterar dados ou mudar a situação do subprocesso (ex: Homologar, Devolver, Validar) é estritamente baseada na **Localização Atual**.
+
+*   **Regra de Ouro**: O usuário só pode executar ações se o subprocesso estiver **localizado na sua unidade de trabalho atual**.
+*   **ADMIN**: O perfil de Administrador **não isenta** o usuário desta regra. Para que um ADMIN possa homologar um cadastro, o cadastro deve ter sido enviado (disponibilizado/aceito) até chegar à unidade do ADMIN (Raiz). O ADMIN não pode intervir em um processo que ainda está localizado na unidade do Chefe.
+
 ## Detalhamento por Caso de Uso (CDU)
 
 As seções a seguir detalham os atores, pré-condições e ações permitidas para cada Caso de Uso.
