@@ -28,5 +28,8 @@ public record SubprocessoDetalheResponse(
     List<Movimentacao> movimentacoes,
 
     @JsonView(SubprocessoViews.Publica.class)
-    String localizacaoAtual
+    String localizacaoAtual,
+
+    @JsonView(SubprocessoViews.Publica.class)
+    PermissoesSubprocessoDto permissoes
 ) {}

@@ -30,5 +30,6 @@ export function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe {
         etapaAtual: sp.etapaAtual || dto.etapaAtual || 1,
         movimentacoes: dto.movimentacoes || [],
         elementosProcesso: dto.elementosProcesso || [],
+        permissoes: dto.permissoes || {},
     } as SubprocessoDetalhe;
 }

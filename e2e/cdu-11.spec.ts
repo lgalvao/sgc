@@ -1,6 +1,6 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {
     adicionarAtividade,
@@ -184,6 +184,16 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
         await verificarPaginaPainel(page);
+
+        // Aceite SECRETARIA_2 (Cadastro)
+        await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await page.getByTestId('btn-acao-analisar-principal').click();
+        await page.getByTestId('inp-aceite-cadastro-obs').fill('Aceite Secretaria 2');
+        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+
+        await verificarPaginaPainel(page);
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
@@ -233,6 +243,24 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
         await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
+
+        // Aceite COORD_21 (Mapa)
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
+        await navegarParaSubprocesso(page, 'SECAO_211');
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await verificarPaginaPainel(page);
+
+        // Aceite SECRETARIA_2 (Mapa)
+        await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
+        await navegarParaSubprocesso(page, 'SECAO_211');
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await verificarPaginaPainel(page);
 
         // Admin homologa mapa e finaliza processo
         await fazerLogout(page);

@@ -14,14 +14,12 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.seguranca.Acao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.dto.PermissoesSubprocessoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.time.Instant;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static sgc.organizacao.model.Perfil.*;
 import static sgc.seguranca.Acao.*;
@@ -70,14 +68,14 @@ public class SubprocessoSecurity {
             Map.entry(EDITAR_CADASTRO, new RegrasAcao(EnumSet.of(CHEFE), EnumSet.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO), RequisitoHierarquia.MESMA_UNIDADE)),
             Map.entry(DISPONIBILIZAR_CADASTRO, new RegrasAcao(EnumSet.of(CHEFE), EnumSet.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO), RequisitoHierarquia.TITULAR_UNIDADE)),
             Map.entry(DEVOLVER_CADASTRO, new RegrasAcao(EnumSet.of(ADMIN, GESTOR), EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO), RequisitoHierarquia.MESMA_UNIDADE)),
-            Map.entry(ACEITAR_CADASTRO, new RegrasAcao(EnumSet.of(ADMIN, GESTOR), EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO), RequisitoHierarquia.MESMA_UNIDADE)),
+            Map.entry(ACEITAR_CADASTRO, new RegrasAcao(EnumSet.of(GESTOR), EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO), RequisitoHierarquia.MESMA_UNIDADE)),
             Map.entry(HOMOLOGAR_CADASTRO, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO), RequisitoHierarquia.MESMA_UNIDADE)),
 
             // ========== REVISÃO CADASTRO ==========
             Map.entry(EDITAR_REVISAO_CADASTRO, new RegrasAcao(EnumSet.of(CHEFE), EnumSet.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO), RequisitoHierarquia.MESMA_UNIDADE)),
             Map.entry(DISPONIBILIZAR_REVISAO_CADASTRO, new RegrasAcao(EnumSet.of(CHEFE), EnumSet.of(REVISAO_CADASTRO_EM_ANDAMENTO), RequisitoHierarquia.TITULAR_UNIDADE)),
             Map.entry(DEVOLVER_REVISAO_CADASTRO, new RegrasAcao(EnumSet.of(ADMIN, GESTOR), EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA), RequisitoHierarquia.MESMA_UNIDADE)),
-            Map.entry(ACEITAR_REVISAO_CADASTRO, new RegrasAcao(EnumSet.of(ADMIN, GESTOR), EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA), RequisitoHierarquia.MESMA_UNIDADE)),
+            Map.entry(ACEITAR_REVISAO_CADASTRO, new RegrasAcao(EnumSet.of(GESTOR), EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA), RequisitoHierarquia.MESMA_UNIDADE)),
             Map.entry(HOMOLOGAR_REVISAO_CADASTRO, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA), RequisitoHierarquia.MESMA_UNIDADE)),
 
             // ========== MAPA ==========
@@ -87,7 +85,7 @@ public class SubprocessoSecurity {
             Map.entry(APRESENTAR_SUGESTOES, new RegrasAcao(EnumSet.of(CHEFE), EnumSet.of(MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO), RequisitoHierarquia.MESMA_UNIDADE)),
             Map.entry(VALIDAR_MAPA, new RegrasAcao(EnumSet.of(CHEFE), EnumSet.of(MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO), RequisitoHierarquia.MESMA_UNIDADE)),
             Map.entry(DEVOLVER_MAPA, new RegrasAcao(EnumSet.of(ADMIN, GESTOR), EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO), RequisitoHierarquia.MESMA_UNIDADE)),
-            Map.entry(ACEITAR_MAPA, new RegrasAcao(EnumSet.of(ADMIN, GESTOR), EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO), RequisitoHierarquia.MESMA_UNIDADE)),
+            Map.entry(ACEITAR_MAPA, new RegrasAcao(EnumSet.of(GESTOR), EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO), RequisitoHierarquia.MESMA_UNIDADE)),
             Map.entry(HOMOLOGAR_MAPA, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.of(MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO, REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO), RequisitoHierarquia.MESMA_UNIDADE)),
             Map.entry(AJUSTAR_MAPA, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.of(REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO), RequisitoHierarquia.MESMA_UNIDADE))
     );
@@ -153,8 +151,6 @@ public class SubprocessoSecurity {
         if (!regras.perfisPermitidos.contains(usuario.getPerfilAtivo())) return false;
         if (!regras.situacoesPermitidas.contains(sp.getSituacao())) return false;
 
-        if (acao == VISUALIZAR_SUBPROCESSO && sp.getProcesso().getSituacao() == SituacaoProcesso.FINALIZADO) return true;
-
         Unidade unidadeVerificacao = isAcaoEscrita(acao) ? obterUnidadeLocalizacao(sp) : sp.getUnidade();
         return verificaHierarquia(usuario, unidadeVerificacao, regras.requisitoHierarquia);
     }
@@ -197,6 +193,28 @@ public class SubprocessoSecurity {
             case SUPERIOR_IMEDIATA -> hierarquiaService.isSuperiorImediata(unidade, Unidade.builder().codigo(usuario.getUnidadeAtivaCodigo()).build());
             case TITULAR_UNIDADE -> hierarquiaService.isResponsavel(unidade, usuario);
         };
+    }
+
+    public PermissoesSubprocessoDto obterPermissoesUI(Usuario usuario, Subprocesso sp) {
+        return PermissoesSubprocessoDto.builder()
+                .podeEditarCadastro(canExecute(usuario, EDITAR_CADASTRO, sp) || canExecute(usuario, EDITAR_REVISAO_CADASTRO, sp))
+                .podeDisponibilizarCadastro(canExecute(usuario, DISPONIBILIZAR_CADASTRO, sp) || canExecute(usuario, DISPONIBILIZAR_REVISAO_CADASTRO, sp))
+                .podeDevolverCadastro(canExecute(usuario, DEVOLVER_CADASTRO, sp) || canExecute(usuario, DEVOLVER_REVISAO_CADASTRO, sp))
+                .podeAceitarCadastro(canExecute(usuario, ACEITAR_CADASTRO, sp) || canExecute(usuario, ACEITAR_REVISAO_CADASTRO, sp))
+                .podeHomologarCadastro(canExecute(usuario, HOMOLOGAR_CADASTRO, sp) || canExecute(usuario, HOMOLOGAR_REVISAO_CADASTRO, sp))
+                .podeEditarMapa(canExecute(usuario, EDITAR_MAPA, sp))
+                .podeDisponibilizarMapa(canExecute(usuario, DISPONIBILIZAR_MAPA, sp))
+                .podeValidarMapa(canExecute(usuario, VALIDAR_MAPA, sp))
+                .podeApresentarSugestoes(canExecute(usuario, APRESENTAR_SUGESTOES, sp))
+                .podeDevolverMapa(canExecute(usuario, DEVOLVER_MAPA, sp))
+                .podeAceitarMapa(canExecute(usuario, ACEITAR_MAPA, sp))
+                .podeHomologarMapa(canExecute(usuario, HOMOLOGAR_MAPA, sp))
+                .podeVisualizarImpacto(canExecute(usuario, VERIFICAR_IMPACTOS, sp))
+                .podeAlterarDataLimite(canExecute(usuario, ALTERAR_DATA_LIMITE, sp))
+                .podeReabrirCadastro(canExecute(usuario, REABRIR_CADASTRO, sp))
+                .podeReabrirRevisao(canExecute(usuario, REABRIR_REVISAO, sp))
+                .podeEnviarLembrete(canExecute(usuario, ENVIAR_LEMBRETE_PROCESSO, sp))
+                .build();
     }
 
     private Usuario getUsuarioAutenticado() {

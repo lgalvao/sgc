@@ -73,7 +73,7 @@
         - generic [ref=e57]:
           - generic [ref=e59]:
             - heading "Subprocesso - SECAO_121" [level=2] [ref=e60]
-            - paragraph [ref=e61]: Processo Verificacao Labels 1771771948886
+            - paragraph [ref=e61]: Processo Verificacao Labels 1771790673135
             - generic [ref=e62]:
               - generic [ref=e63]: "Etapa atual: Cadastro em andamento"
               - generic [ref=e64]: "Próxima ação: acompanhar a etapa \"Cadastro em andamento\"."
@@ -92,49 +92,46 @@
                 - button "Reabrir Revisão" [ref=e75] [cursor=pointer]:
                   - generic [ref=e76]: 
                   - text: Reabrir Revisão
-                - button "Enviar lembrete" [ref=e77] [cursor=pointer]:
-                  - generic [ref=e78]: 
-                  - text: Enviar lembrete
-            - generic [ref=e80]:
-              - paragraph [ref=e81]: "Processo: Processo Verificacao Labels 1771771948886"
-              - paragraph [ref=e82]: Situação:Cadastro em andamento
-              - paragraph [ref=e83]:
-                - strong [ref=e84]: "Titular:"
+            - generic [ref=e78]:
+              - paragraph [ref=e79]: "Processo: Processo Verificacao Labels 1771790673135"
+              - paragraph [ref=e80]: Situação:Cadastro em andamento
+              - paragraph [ref=e81]:
+                - strong [ref=e82]: "Titular:"
                 - text: Lemmy Kilmister
-              - paragraph [ref=e85]:
-                - generic [ref=e86]: 
-                - generic [ref=e87]: 
+              - paragraph [ref=e83]:
+                - generic [ref=e84]: 
+                - generic [ref=e85]: 
                 - text: lemmy.kilmister@tre-pe.jus.br
-          - generic [ref=e88]:
-            - button "Atividades e conhecimentos Visualização das atividades e conhecimentos da unidade" [ref=e90] [cursor=pointer]:
-              - generic [ref=e92]:
-                - heading "Atividades e conhecimentos" [level=4] [ref=e93]
-                - paragraph [ref=e94]: Visualização das atividades e conhecimentos da unidade
-            - button "Mapa de Competências Visualização do mapa de competências técnicas" [ref=e96] [cursor=pointer]:
-              - generic [ref=e98]:
-                - heading "Mapa de Competências" [level=4] [ref=e99]
-                - paragraph [ref=e100]: Visualização do mapa de competências técnicas
-          - generic [ref=e101]:
-            - heading "Movimentações" [level=4] [ref=e102]
-            - table [ref=e104]:
-              - rowgroup [ref=e105]:
-                - row "Data/Hora Unidade Origem Unidade Destino Situação Descrição" [ref=e106]:
-                  - columnheader "Data/Hora" [ref=e107]
-                  - columnheader "Unidade Origem" [ref=e108]
-                  - columnheader "Unidade Destino" [ref=e109]
-                  - columnheader "Situação" [ref=e110]
-                  - columnheader "Descrição" [ref=e111]
-              - rowgroup [ref=e112]:
-                - row "22/02/2026 11:52 ADMIN SECAO_121 MAPEAMENTO CADASTRO EM ANDAMENTO Processo iniciado" [ref=e113]:
-                  - cell "22/02/2026 11:52" [ref=e114]
-                  - cell "ADMIN" [ref=e115]
-                  - cell "SECAO_121" [ref=e116]
-                  - cell "MAPEAMENTO CADASTRO EM ANDAMENTO" [ref=e117]:
-                    - generic [ref=e118]: MAPEAMENTO CADASTRO EM ANDAMENTO
-                  - cell "Processo iniciado" [ref=e119]
-      - contentinfo [ref=e120]:
-        - generic [ref=e121]:
-          - generic [ref=e122]: Versão 1.0.0
-          - generic [ref=e123]: © SESEL/COSIS/TRE-PE
+          - generic [ref=e86]:
+            - button "Atividades e conhecimentos Visualização das atividades e conhecimentos da unidade" [ref=e88] [cursor=pointer]:
+              - generic [ref=e90]:
+                - heading "Atividades e conhecimentos" [level=4] [ref=e91]
+                - paragraph [ref=e92]: Visualização das atividades e conhecimentos da unidade
+            - button "Mapa de Competências Visualização do mapa de competências técnicas" [ref=e94] [cursor=pointer]:
+              - generic [ref=e96]:
+                - heading "Mapa de Competências" [level=4] [ref=e97]
+                - paragraph [ref=e98]: Visualização do mapa de competências técnicas
+          - generic [ref=e99]:
+            - heading "Movimentações" [level=4] [ref=e100]
+            - table [ref=e102]:
+              - rowgroup [ref=e103]:
+                - row "Data/Hora Unidade Origem Unidade Destino Situação Descrição" [ref=e104]:
+                  - columnheader "Data/Hora" [ref=e105]
+                  - columnheader "Unidade Origem" [ref=e106]
+                  - columnheader "Unidade Destino" [ref=e107]
+                  - columnheader "Situação" [ref=e108]
+                  - columnheader "Descrição" [ref=e109]
+              - rowgroup [ref=e110]:
+                - row "22/02/2026 17:04 ADMIN SECAO_121 MAPEAMENTO CADASTRO EM ANDAMENTO Processo iniciado" [ref=e111]:
+                  - cell "22/02/2026 17:04" [ref=e112]
+                  - cell "ADMIN" [ref=e113]
+                  - cell "SECAO_121" [ref=e114]
+                  - cell "MAPEAMENTO CADASTRO EM ANDAMENTO" [ref=e115]:
+                    - generic [ref=e116]: MAPEAMENTO CADASTRO EM ANDAMENTO
+                  - cell "Processo iniciado" [ref=e117]
+      - contentinfo [ref=e118]:
+        - generic [ref=e119]:
+          - generic [ref=e120]: Versão 1.0.0
+          - generic [ref=e121]: © SESEL/COSIS/TRE-PE
   - text:  
 ```

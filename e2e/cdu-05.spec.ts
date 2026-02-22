@@ -1,11 +1,13 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
+    acessarSubprocessoGestor,
+    aceitarCadastroMapeamento,
     homologarCadastroMapeamento,
 } from './helpers/helpers-analise.js';
 import {
@@ -105,6 +107,14 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
+    test('Fase 1.3b: GESTOR da SECRETARIA_2 registra aceite', async ({page}) => {
+        // George Harrison (212121) é Gestor da SECRETARIA_2
+        await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcMapeamento, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page, 'Aceite intermediário');
+    });
+
     test('Fase 1.4: ADMIN homologa cadastro', async ({page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
@@ -127,6 +137,15 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
+        await verificarPaginaPainel(page);
+    });
+
+    test('Fase 1.6b: GESTOR da SECRETARIA_2 aceita validação do mapa', async ({page}) => {
+        await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcMapeamento, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await verificarPaginaPainel(page);
     });
 

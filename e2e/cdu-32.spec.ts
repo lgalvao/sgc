@@ -1,7 +1,8 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
+import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
-import {homologarCadastroMapeamento} from './helpers/helpers-analise.js';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
+import {aceitarCadastroMapeamento, acessarSubprocessoGestor, homologarCadastroMapeamento} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 /**
@@ -71,6 +72,20 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
     test('Preparacao 3: ADMIN homologa cadastro', async ({page, autenticadoComoAdmin}) => {
+        // Aceite COORD_22
+        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page, 'Aceite intermediário COORD_22');
+
+        // Aceite SECRETARIA_2
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page, 'Aceite intermediário SECRETARIA_2');
+
+        // Agora sim, ADMIN homologa
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await page.getByTestId('card-subprocesso-atividades-vis').click();

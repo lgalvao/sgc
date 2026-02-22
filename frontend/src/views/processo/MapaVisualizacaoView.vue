@@ -66,7 +66,7 @@
             variant="outline-success"
             @click="abrirModalAceitar"
         >
-          {{ perfilSelecionado === 'ADMIN' ? 'Homologar' : 'Registrar aceite' }}
+          {{ podeHomologarMapa ? 'Homologar' : 'Registrar aceite' }}
         </BButton>
       </template>
     </PageHeader>

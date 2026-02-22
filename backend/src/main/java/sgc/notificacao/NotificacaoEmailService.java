@@ -55,11 +55,7 @@ public class NotificacaoEmailService {
         try {
             Notificacao notificacao = criarEntidadeNotificacao(para, assunto, corpo);
             repositorioNotificacao.save(notificacao);
-            log.info("Notificação persistida no banco - Código: {}, Destinatário: {}", notificacao.getCodigo(), para);
-
             enviarEmailSmtp(para, assunto, corpo, html);
-            log.info("E-mail para {} enviado com sucesso.", para);
-
         } catch (MessagingException | UnsupportedEncodingException | RuntimeException e) {
             log.error("Erro ao processar notificação para {}: {}", para, e.getMessage(), e);
         }
@@ -94,6 +90,6 @@ public class NotificacaoEmailService {
     }
 
     private boolean isEmailValido(String email) {
-        return email != null && !email.isBlank() && PADRAO_EMAIL.matcher(email.trim()).matches();
+        return !email.isBlank() && PADRAO_EMAIL.matcher(email.trim()).matches();
     }
 }

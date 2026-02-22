@@ -1,6 +1,6 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {
     adicionarAtividade,
@@ -12,15 +12,17 @@ import {
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {
     abrirHistoricoAnalise,
+    aceitarCadastroMapeamento,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
+    acessarSubprocessoGestor,
     fecharHistoricoAnalise,
     homologarCadastroMapeamento
 } from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));
+    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}(?:/)?$`));
 }
 
 test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos', () => {
@@ -67,6 +69,17 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
             await verificarPaginaPainel(page);
 
+            // Aceites intermediários para Cadastro
+            await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+            await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
+            await navegarParaAtividadesVisualizacao(page);
+            await aceitarCadastroMapeamento(page, 'Aceite intermediário COORD_22');
+
+            await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+            await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
+            await navegarParaAtividadesVisualizacao(page);
+            await aceitarCadastroMapeamento(page, 'Aceite intermediário SECRETARIA_2');
+
             // Admin homologa cadastro
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
@@ -97,6 +110,19 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await page.getByTestId('btn-validar-mapa-confirmar').click();
             await expect(page).toHaveURL(/\/vis-mapa/);
             await page.goto('/painel');
+
+            // Aceites intermediários para Mapa
+            await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+            await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
+            await navegarParaMapa(page);
+            await page.getByTestId('btn-mapa-homologar-aceite').click();
+            await page.getByTestId('btn-aceite-mapa-confirmar').click();
+
+            await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+            await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
+            await navegarParaMapa(page);
+            await page.getByTestId('btn-mapa-homologar-aceite').click();
+            await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
             // Admin homologa mapa e finaliza processo
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -136,7 +162,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await navegarParaAtividades(page);
             await adicionarAtividade(page, `Atividade Revisão Nova ${timestamp}`);
             await adicionarConhecimento(page, `Atividade Revisão Nova ${timestamp}`, 'Conhecimento Revisão');
-            await page.getByTestId('btn-cad-atividades-voltar').click({force: true});
+            await page.getByTestId('btn-cad-atividades-voltar').click();
             await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
         });
@@ -174,8 +200,8 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
         });
 
         await test.step('4. Cenário 3: Devolução e Histórico', async () => {
-            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-            await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
+            await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+            await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
             await page.getByTestId('btn-acao-devolver').click();
             const motivoDevolucao = 'Necessário revisar os conhecimentos técnicos.';
@@ -197,8 +223,8 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
         });
 
         await test.step('5. Cenário 4: Limpeza de Histórico após nova disponibilização', async () => {
-            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-            await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
+            await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+            await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
             await page.getByTestId('btn-acao-devolver').click();
             await page.getByTestId('inp-devolucao-cadastro-obs').fill('Segunda devolução');
@@ -213,9 +239,9 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await expect(page.getByText(/Revisão do cadastro de atividades disponibilizada/i).first()).toBeVisible();
             await verificarPaginaPainel(page);
 
-            // Admin devolve novamente
-            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-            await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
+            // Gestor devolve novamente
+            await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+            await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
             await page.getByTestId('btn-acao-devolver').click();
             await page.getByTestId('inp-devolucao-cadastro-obs').fill('Terceira devolução');

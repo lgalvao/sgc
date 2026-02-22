@@ -24,6 +24,7 @@
           Histórico de análise
         </BButton>
         <BButton
+            v-if="podeDevolverCadastro"
             data-testid="btn-acao-devolver"
             title="Devolver para ajustes"
             variant="secondary"
@@ -32,12 +33,13 @@
           Devolver para ajustes
         </BButton>
         <BButton
+            v-if="podeAceitarCadastro || podeHomologarCadastro"
             data-testid="btn-acao-analisar-principal"
             title="Validar"
             variant="success"
             @click="validarCadastro"
         >
-          {{ isHomologacao ? 'Homologar' : 'Registrar aceite' }}
+          {{ podeHomologarCadastro ? 'Homologar' : 'Registrar aceite' }}
         </BButton>
       </template>
     </PageHeader>
@@ -192,10 +194,15 @@ const subprocesso = computed(() => {
   return encontrarUnidade(processosStore.processoDetalhe.unidades);
 });
 
-const { podeHomologarCadastro, podeVisualizarImpacto } = useAcesso(computed(() => subprocessosStore.subprocessoDetalhe));
+const {
+  podeHomologarCadastro,
+  podeAceitarCadastro,
+  podeDevolverCadastro,
+  podeVisualizarImpacto
+} = useAcesso(computed(() => subprocessosStore.subprocessoDetalhe));
 
-const isHomologacao = computed(() => podeHomologarCadastro.value);
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
+const isHomologacao = computed(() => podeHomologarCadastro.value);
 
 const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 

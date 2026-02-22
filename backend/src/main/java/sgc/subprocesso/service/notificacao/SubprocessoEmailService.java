@@ -49,7 +49,7 @@ public class SubprocessoEmailService {
             // 1. Enviar para o e-mail da unidade (ex: sesel@tre-pe.jus.br)
             String emailUnidade = String.format("%s@tre-pe.jus.br", unidadeDestino.getSigla().toLowerCase());
             notificacaoEmailService.enviarEmailHtml(emailUnidade, assunto, corpo);
-            log.info("E-mail enviado para unidade {} ({}) - Transição: {}", unidadeDestino.getSigla(), emailUnidade, tipo);
+            log.info("E-mail enviado para {} ({}) - Transição: {}", unidadeDestino.getSigla(), emailUnidade, tipo);
 
             // 2. Enviar para o responsável atual (substituto ou titular se solicitado)
             notificarResponsaveisPessoais(unidadeDestino, assunto, corpo);

@@ -1,109 +1,92 @@
 # Page snapshot
 
 ```yaml
-- generic [ref=e1]:
-  - generic [ref=e2]:
-    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
-      - /url: "#main-content"
-    - generic [ref=e4]:
-      - navigation [ref=e5]:
-        - generic [ref=e6]:
-          - link "SGC" [ref=e7] [cursor=pointer]:
-            - /url: /painel
-          - generic [ref=e8]:
-            - list [ref=e9]:
-              - listitem [ref=e10]:
-                - link "Painel" [ref=e11] [cursor=pointer]:
-                  - /url: /painel
-                  - generic [ref=e12]: 
-                  - text: Painel
-              - listitem [ref=e13]:
-                - link "Unidades" [ref=e14] [cursor=pointer]:
-                  - /url: /unidades
-                  - generic [ref=e15]: 
-                  - text: Unidades
-              - listitem [ref=e16]:
-                - link "Relatórios" [ref=e17] [cursor=pointer]:
-                  - /url: /relatorios
-                  - generic [ref=e18]: 
-                  - text: Relatórios
-              - listitem [ref=e19]:
-                - link "Histórico" [ref=e20] [cursor=pointer]:
-                  - /url: /historico
-                  - generic [ref=e21]: 
-                  - text: Histórico
-            - list [ref=e22]:
-              - listitem [ref=e23]:
-                - link "ADMIN - ADMIN" [ref=e24]:
-                  - /url: "#"
-                  - generic [ref=e25]:
-                    - generic [ref=e26]: 
-                    - generic [ref=e27]: ADMIN - ADMIN
-              - listitem "Configurações do sistema" [ref=e28]:
-                - link [ref=e29] [cursor=pointer]:
-                  - /url: /configuracoes
-                  - generic [ref=e30]: 
-              - listitem "Sair" [ref=e31]:
-                - link [ref=e32] [cursor=pointer]:
-                  - /url: "#"
-                  - generic [ref=e33]: 
-      - generic [ref=e36]:
-        - button "Voltar" [ref=e37] [cursor=pointer]:
-          - generic [ref=e38]: 
-        - navigation "breadcrumb" [ref=e39]:
-          - list [ref=e40]:
-            - listitem [ref=e41]:
-              - link "Início" [ref=e42] [cursor=pointer]:
+- generic [ref=e2]:
+  - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e4]:
+    - navigation [ref=e5]:
+      - generic [ref=e6]:
+        - link "SGC" [ref=e7] [cursor=pointer]:
+          - /url: /painel
+        - generic [ref=e8]:
+          - list [ref=e9]:
+            - listitem [ref=e10]:
+              - link "Painel" [ref=e11] [cursor=pointer]:
                 - /url: /painel
-                - generic [ref=e43]: 
-                - generic [ref=e44]: Início
-            - listitem [ref=e45]:
-              - text: ›
-              - link "Detalhes do processo" [ref=e46] [cursor=pointer]:
-                - /url: /processo/201
-            - listitem [ref=e47]:
-              - text: ›
-              - link "SECAO_121" [ref=e48] [cursor=pointer]:
-                - /url: /processo/201/SECAO_121
-            - listitem [ref=e49]:
-              - text: ›
-              - generic [ref=e50]: Atividades e conhecimentos
-      - main [ref=e51]:
-        - generic [ref=e52]:
-          - generic [ref=e53]:
-            - generic [ref=e54]:
-              - heading "Atividades e conhecimentos" [level=2] [ref=e55]
-              - paragraph [ref=e56]:
-                - generic [ref=e58]: SECAO_121
-            - generic [ref=e59]:
-              - button "Histórico de análise" [ref=e60] [cursor=pointer]
-              - button "Devolver para ajustes" [ref=e61] [cursor=pointer]
-              - button "Registrar aceite" [ref=e62] [cursor=pointer]
-          - generic [ref=e64]:
-            - strong [ref=e66]: Desenvolvimento Web
-            - generic [ref=e67]:
-              - generic [ref=e69]: TypeScript
-              - generic [ref=e71]: Vue.js
-          - generic [ref=e73]:
-            - strong [ref=e75]: Desenvolvimento Backend
-            - generic [ref=e76]:
-              - generic [ref=e78]: Java
-              - generic [ref=e80]: Spring Boot
-      - contentinfo [ref=e81]:
-        - generic [ref=e82]:
-          - generic [ref=e83]: Versão 1.0.0
-          - generic [ref=e84]: © SESEL/COSIS/TRE-PE
-  - dialog "Validação do cadastro" [active] [ref=e85]:
-    - generic [ref=e86]:
-      - generic [ref=e87]:
-        - heading "Validação do cadastro" [level=5] [ref=e88]
-        - button "Close" [ref=e89] [cursor=pointer]
-      - generic [ref=e90]:
-        - paragraph [ref=e91]: Confirma o aceite do cadastro de atividades?
-        - group [ref=e92]:
-          - generic [ref=e93]: Observação
-          - textbox "Observação" [ref=e94]
-      - generic [ref=e96]:
-        - button "Cancelar" [ref=e97] [cursor=pointer]
-        - button "Confirmar" [ref=e98] [cursor=pointer]
+                - generic [ref=e12]: 
+                - text: Painel
+            - listitem [ref=e13]:
+              - link "Unidades" [ref=e14] [cursor=pointer]:
+                - /url: /unidades
+                - generic [ref=e15]: 
+                - text: Unidades
+            - listitem [ref=e16]:
+              - link "Relatórios" [ref=e17] [cursor=pointer]:
+                - /url: /relatorios
+                - generic [ref=e18]: 
+                - text: Relatórios
+            - listitem [ref=e19]:
+              - link "Histórico" [ref=e20] [cursor=pointer]:
+                - /url: /historico
+                - generic [ref=e21]: 
+                - text: Histórico
+          - list [ref=e22]:
+            - listitem [ref=e23]:
+              - link "ADMIN - ADMIN" [ref=e24]:
+                - /url: "#"
+                - generic [ref=e25]:
+                  - generic [ref=e26]: 
+                  - generic [ref=e27]: ADMIN - ADMIN
+            - listitem "Configurações do sistema" [ref=e28]:
+              - link [ref=e29] [cursor=pointer]:
+                - /url: /configuracoes
+                - generic [ref=e30]: 
+            - listitem "Sair" [ref=e31]:
+              - link [ref=e32] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e33]: 
+    - generic [ref=e36]:
+      - button "Voltar" [ref=e37] [cursor=pointer]:
+        - generic [ref=e38]: 
+      - navigation "breadcrumb" [ref=e39]:
+        - list [ref=e40]:
+          - listitem [ref=e41]:
+            - link "Início" [ref=e42] [cursor=pointer]:
+              - /url: /painel
+              - generic [ref=e43]: 
+              - generic [ref=e44]: Início
+          - listitem [ref=e45]:
+            - text: ›
+            - link "Detalhes do processo" [ref=e46] [cursor=pointer]:
+              - /url: /processo/201
+          - listitem [ref=e47]:
+            - text: ›
+            - link "SECAO_121" [ref=e48] [cursor=pointer]:
+              - /url: /processo/201/SECAO_121
+          - listitem [ref=e49]:
+            - text: ›
+            - generic [ref=e50]: Atividades e conhecimentos
+    - main [ref=e51]:
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - heading "Atividades e conhecimentos" [level=2] [ref=e55]
+            - paragraph [ref=e56]:
+              - generic [ref=e58]: SECAO_121
+          - button "Histórico de análise" [ref=e60] [cursor=pointer]
+        - generic [ref=e62]:
+          - strong [ref=e64]: Desenvolvimento Web
+          - generic [ref=e65]:
+            - generic [ref=e67]: TypeScript
+            - generic [ref=e69]: Vue.js
+        - generic [ref=e71]:
+          - strong [ref=e73]: Desenvolvimento Backend
+          - generic [ref=e74]:
+            - generic [ref=e76]: Java
+            - generic [ref=e78]: Spring Boot
+    - contentinfo [ref=e79]:
+      - generic [ref=e80]:
+        - generic [ref=e81]: Versão 1.0.0
+        - generic [ref=e82]: © SESEL/COSIS/TRE-PE
 ```

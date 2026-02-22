@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {
     abrirModalImpacto,
@@ -14,7 +14,7 @@ import {
     verificarBotaoImpactoDropdown
 } from './helpers/helpers-atividades.js';
 import {fazerLogout, limparNotificacoes, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
-import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
+import {aceitarCadastroMapeamento, acessarSubprocessoChefeDireto, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
@@ -78,7 +78,17 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        // 3. Admin homologa cadastro
+        // 3. Aceites intermediários e Homologação do Cadastro
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
+        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page, 'Aceite intermediário COORD_21');
+
+        await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page, 'Aceite intermediário SECRETARIA_2');
+
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await expect(page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)})).toBeVisible();
@@ -119,7 +129,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('inp-disponibilizar-mapa-data').fill('2030-12-31');
         await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
 
-        // 5. Chefe Valida e Admin Homologa (Finalizar Mapeamento)
+        // 5. Chefe Valida, Aceites Intermediários e Admin Homologa (Finalizar Mapeamento)
         await fazerLogout(page);
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
@@ -127,6 +137,22 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await limparNotificacoes(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
+
+        // Aceite COORD_21 (Mapa)
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+
+        // Aceite SECRETARIA_2 (Mapa)
+        await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
+        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);

@@ -13,10 +13,12 @@ import sgc.seguranca.Acao;
 import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.dto.ContextoEdicaoResponse;
 import sgc.subprocesso.dto.SubprocessoDetalheResponse;
+import sgc.subprocesso.dto.PermissoesSubprocessoDto;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.subprocesso.security.SubprocessoSecurity;
 
 import java.util.List;
 
@@ -34,6 +36,7 @@ class SubprocessoContextoService {
     private final MovimentacaoRepo movimentacaoRepo;
     private final AccessControlService accessControlService;
     private final SubprocessoAtividadeService atividadeService;
+    private final SubprocessoSecurity subprocessoSecurity;
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheResponse obterDetalhes(Long codigo, Usuario usuarioAutenticado) {
@@ -67,12 +70,15 @@ class SubprocessoContextoService {
         }
 
 
+        PermissoesSubprocessoDto permissoes = subprocessoSecurity.obterPermissoesUI(usuarioAutenticado, sp);
+
         return SubprocessoDetalheResponse.builder()
                 .subprocesso(sp)
                 .responsavel(responsavel)
                 .titular(titular)
                 .movimentacoes(movimentacoes)
                 .localizacaoAtual(localizacaoAtual)
+                .permissoes(permissoes)
                 .build();
     }
 

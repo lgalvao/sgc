@@ -23,21 +23,24 @@ This document tracks the progress of the access control simplification outlined 
 ## Phase 2: Backend Simplification
 *Goal: Replace the custom framework with native Spring Security.*
 
-- [ ] **Create `SubprocessoSecurity` Bean:** Implement standard Ownership vs. Location checks (`canView`, `canExecute`).
-- [ ] **Annotate Controllers/Services:** Add `@PreAuthorize` tags to secure actions directly.
-- [ ] **Remove Data Transfer of `SubprocessoPermissoes`:** Exclude the heavy permissions DTO from standard read/fetch endpoints.
-- [ ] **Delete `SubprocessoPermissaoCalculator`:** Remove the class that performed the heavy DTO mapping.
+- [x] **Create `SubprocessoSecurity` Bean:** Implement standard Ownership vs. Location checks (`canView`, `canExecute`).
+- [x] **Annotate Controllers/Services:** Add `@PreAuthorize` tags to secure actions directly.
+- [x] **Remove Data Transfer of `SubprocessoPermissoes`:** Exclude the heavy permissions DTO from standard read/fetch endpoints.
+- [x] **Delete `SubprocessoPermissaoCalculator`:** Remove the class that performed the heavy DTO mapping.
 
 ---
 
 ## Phase 3: Deletion and Cleanup
 *Goal: Remove dead code.*
 
-- [ ] **Delete Custom Framework:** Obliterate `sgc.seguranca.acesso` (policies, audits, services).
-- [ ] **Update Tests:** Clean up integration and unit tests that mocked the old framework and adapt them to the new Spring Security methods.
-- [ ] **Verify ArchUnit Rules:** Ensure the updated architectural tests pass (we already cleared the blocking ones).
+- [x] **Delete Custom Framework:** Obliterate `sgc.seguranca.acesso` (policies, audits, services).
+- [x] **Update Tests:** Clean up integration and unit tests that mocked the old framework and adapt them to the new Spring Security methods.
+- [x] **Verify ArchUnit Rules:** Ensure the updated architectural tests pass (we already cleared the blocking ones).
 
 ---
 
 ## Notes & Impediments
-*   Phase 1 completed successfully, but numerous unit tests in the frontend are deeply coupled to the old permissions DTO payload. We must update the Vue Test Utils mocks in `src/views/__tests__/*` to mock `useAcesso` directly instead of passing the old `permissoes` prop.
+*   Phase 1 completed successfully.
+*   Frontend unit tests have been updated to mock `useAcesso` directly.
+*   Backend Phase 2 and 3 completed. `SubprocessoSecurity` is fully operational and `sgc.seguranca.acesso` has been removed.
+*   All tests (Frontend/Backend) are passing with the new security model.

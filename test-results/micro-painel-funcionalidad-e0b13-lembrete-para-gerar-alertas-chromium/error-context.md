@@ -1,0 +1,132 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link "Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link "Unidades" [ref=e14] [cursor=pointer]:
+                  - /url: /unidades
+                  - generic [ref=e15]: 
+                  - text: Unidades
+              - listitem [ref=e16]:
+                - link "Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link "Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "ADMIN - ADMIN" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: ADMIN - ADMIN
+              - listitem "Configurações do sistema" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: /configuracoes
+                  - generic [ref=e30]: 
+              - listitem "Sair" [ref=e31]:
+                - link [ref=e32] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e33]: 
+      - generic [ref=e36]:
+        - button "Voltar" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: 
+        - navigation "breadcrumb" [ref=e39]:
+          - list [ref=e40]:
+            - listitem [ref=e41]:
+              - link "Início" [ref=e42] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e43]: 
+                - generic [ref=e44]: Início
+            - listitem [ref=e45]:
+              - text: ›
+              - link "Detalhes do processo" [ref=e46] [cursor=pointer]:
+                - /url: /processo/202
+            - listitem [ref=e47]:
+              - text: ›
+              - generic [ref=e48]: ASSESSORIA_22
+      - main [ref=e49]:
+        - generic [ref=e51]:
+          - generic [ref=e53]:
+            - heading "Subprocesso - ASSESSORIA_22" [level=2] [ref=e54]
+            - paragraph [ref=e55]: Micro Alertas 1771790654303
+            - generic [ref=e56]:
+              - generic [ref=e57]: "Etapa atual: Cadastro em andamento"
+              - generic [ref=e58]: "Próxima ação: acompanhar a etapa \"Cadastro em andamento\"."
+          - generic [ref=e59]:
+            - generic [ref=e60]:
+              - generic [ref=e61]:
+                - heading "ASSESSORIA_22" [level=2] [ref=e62]
+                - paragraph [ref=e63]: Assessoria 22
+              - generic [ref=e64]:
+                - button "Alterar data limite" [ref=e65] [cursor=pointer]:
+                  - generic [ref=e66]: 
+                  - text: Alterar data limite
+                - button "Reabrir cadastro" [ref=e67] [cursor=pointer]:
+                  - generic [ref=e68]: 
+                  - text: Reabrir cadastro
+                - button "Reabrir Revisão" [ref=e69] [cursor=pointer]:
+                  - generic [ref=e70]: 
+                  - text: Reabrir Revisão
+            - generic [ref=e72]:
+              - paragraph [ref=e73]: "Processo: Micro Alertas 1771790654303"
+              - paragraph [ref=e74]: Situação:Cadastro em andamento
+              - paragraph [ref=e75]:
+                - strong [ref=e76]: "Titular:"
+                - text: Jimi Hendrix
+              - paragraph [ref=e77]:
+                - generic [ref=e78]: 
+                - generic [ref=e79]: 
+                - text: jimi.hendrix@tre-pe.jus.br
+          - generic [ref=e80]:
+            - button "Atividades e conhecimentos Visualização das atividades e conhecimentos da unidade" [ref=e82] [cursor=pointer]:
+              - generic [ref=e84]:
+                - heading "Atividades e conhecimentos" [level=4] [ref=e85]
+                - paragraph [ref=e86]: Visualização das atividades e conhecimentos da unidade
+            - button "Mapa de Competências Visualização do mapa de competências técnicas" [ref=e88] [cursor=pointer]:
+              - generic [ref=e90]:
+                - heading "Mapa de Competências" [level=4] [ref=e91]
+                - paragraph [ref=e92]: Visualização do mapa de competências técnicas
+          - generic [ref=e93]:
+            - heading "Movimentações" [level=4] [ref=e94]
+            - table [ref=e96]:
+              - rowgroup [ref=e97]:
+                - row "Data/Hora Unidade Origem Unidade Destino Situação Descrição" [ref=e98]:
+                  - columnheader "Data/Hora" [ref=e99]
+                  - columnheader "Unidade Origem" [ref=e100]
+                  - columnheader "Unidade Destino" [ref=e101]
+                  - columnheader "Situação" [ref=e102]
+                  - columnheader "Descrição" [ref=e103]
+              - rowgroup [ref=e104]:
+                - row "22/02/2026 17:04 ADMIN ASSESSORIA_22 MAPEAMENTO CADASTRO EM ANDAMENTO Processo iniciado" [ref=e105]:
+                  - cell "22/02/2026 17:04" [ref=e106]
+                  - cell "ADMIN" [ref=e107]
+                  - cell "ASSESSORIA_22" [ref=e108]
+                  - cell "MAPEAMENTO CADASTRO EM ANDAMENTO" [ref=e109]:
+                    - generic [ref=e110]: MAPEAMENTO CADASTRO EM ANDAMENTO
+                  - cell "Processo iniciado" [ref=e111]
+      - contentinfo [ref=e112]:
+        - generic [ref=e113]:
+          - generic [ref=e114]: Versão 1.0.0
+          - generic [ref=e115]: © SESEL/COSIS/TRE-PE
+  - text:  
+```
