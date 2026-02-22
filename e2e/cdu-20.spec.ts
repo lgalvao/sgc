@@ -8,8 +8,9 @@ import {
     navegarParaAtividadesVisualizacao
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {
+    aceitarCadastroMapeamento,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
     homologarCadastroMapeamento
@@ -71,6 +72,20 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
         await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
+    });
+
+    test('Preparacao 2a: Gestor COORD_22 aceita cadastro', async ({page}) => {
+        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page);
+    });
+
+    test('Preparacao 2b: Gestor SECRETARIA_2 aceita cadastro', async ({page}) => {
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page);
     });
 
     test('Preparacao 3: Admin homologa cadastro', async ({page}) => {
@@ -183,6 +198,20 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
         // Após aceite do GESTOR, o mapa ainda está validado mas agora no nível do ADMIN
         await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
+    });
+
+    test('Cenario 4b: Gestor SECRETARIA_2 aceita mapa', async ({page}) => {
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+
+        await verificarPaginaPainel(page);
+        await expect(page.getByText(/Aceite registrado/i).first()).toBeVisible();
     });
 
     test('Cenario 5: ADMIN homologa o mapa', async ({page}) => {
