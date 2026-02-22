@@ -1,0 +1,102 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link "Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link "Unidades" [ref=e14] [cursor=pointer]:
+                  - /url: /unidades
+                  - generic [ref=e15]: 
+                  - text: Unidades
+              - listitem [ref=e16]:
+                - link "Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link "Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "ADMIN - ADMIN" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: ADMIN - ADMIN
+              - listitem "Configurações do sistema" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: /configuracoes
+                  - generic [ref=e30]: 
+              - listitem "Sair" [ref=e31]:
+                - link [ref=e32] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e33]: 
+      - generic [ref=e36]:
+        - button "Voltar" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: 
+        - navigation "breadcrumb" [ref=e39]:
+          - list [ref=e40]:
+            - listitem [ref=e41]:
+              - link "Início" [ref=e42] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e43]: 
+                - generic [ref=e44]: Início
+            - listitem [ref=e45]:
+              - text: ›
+              - link "Detalhes do processo" [ref=e46] [cursor=pointer]:
+                - /url: /processo/201
+            - listitem [ref=e47]:
+              - text: ›
+              - link "SECAO_221" [ref=e48] [cursor=pointer]:
+                - /url: /processo/201/SECAO_221
+            - listitem [ref=e49]:
+              - text: ›
+              - generic [ref=e50]: Atividades e conhecimentos
+      - main [ref=e51]:
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - heading "Atividades e conhecimentos" [level=2] [ref=e55]
+              - paragraph [ref=e56]:
+                - generic [ref=e58]: SECAO_221
+            - generic [ref=e59]:
+              - button "Histórico de análise" [ref=e60] [cursor=pointer]
+              - button "Devolver para ajustes" [ref=e61] [cursor=pointer]
+              - button "Registrar aceite" [ref=e62] [cursor=pointer]
+          - generic [ref=e64]:
+            - strong [ref=e66]: Atividade Reabrir 1771771905956
+            - generic [ref=e69]: Conhecimento Reabrir 1
+      - contentinfo [ref=e70]:
+        - generic [ref=e71]:
+          - generic [ref=e72]: Versão 1.0.0
+          - generic [ref=e73]: © SESEL/COSIS/TRE-PE
+  - dialog "Validação do cadastro" [active] [ref=e74]:
+    - generic [ref=e75]:
+      - generic [ref=e76]:
+        - heading "Validação do cadastro" [level=5] [ref=e77]
+        - button "Close" [ref=e78] [cursor=pointer]
+      - generic [ref=e79]:
+        - paragraph [ref=e80]: Confirma o aceite do cadastro de atividades?
+        - group [ref=e81]:
+          - generic [ref=e82]: Observação
+          - textbox "Observação" [ref=e83]
+      - generic [ref=e85]:
+        - button "Cancelar" [ref=e86] [cursor=pointer]
+        - button "Confirmar" [ref=e87] [cursor=pointer]
+```

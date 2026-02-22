@@ -41,12 +41,9 @@ graph TD
 - **`NotificacaoEmailService`**: Serviço responsável pela lógica de envio de e-mails (perfil de produção).
     - **Assíncrono (`@Async`):** O envio é executado em uma thread separada para não bloquear a requisição original.
     - **Persistência e Auditoria:** Salva um registro da `Notificacao` no banco de dados.
-    - **Retentativas:** Em caso de falha, tenta reenviar o e-mail até 3 vezes com backoff exponencial.
 
 - **`NotificacaoModelosService`**: Serviço utilitário focado em construir o corpo HTML dos e-mails usando templates
   Thymeleaf.
-
-- **`NotificacaoEmailAsyncExecutor`**: Executor assíncrono para tarefas de envio de e-mail.
 
 - **`model/Notificacao`**: A entidade JPA que representa o registro de uma notificação enviada.
 

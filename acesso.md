@@ -1,19 +1,19 @@
 # Controle de Acesso e Regras de Negócio - SGC
 
-Este documento consolida as regras de acesso e atividades permitidas para cada perfil no Sistema de Gestão de Competências (SGC), servindo como fonte única de verdade para testes e desenvolvimento.
+Este documento consolida as regras de acesso e atividades permitidas para cada perfil e contexto do subprocesso.
 
 ## Perfis de Acesso
 
-*   **ADMIN**: Administrador do sistema (Unidade Raiz).
-    *   *Responsabilidades*: Criar e configurar processos, monitorar progresso, criar/ajustar mapas de competências, homologar cadastros e mapas, homologar diagnósticos.
+*   **ADMIN**: Administrador do sistema (lotado na unidade raiz - sigla 'ADMIN').
+    *   *Responsabilidades*: Criar e configurar processos, criar/ajustar mapas de competências, homologar cadastros, homologar mapas, homologar diagnósticos.
     *   *Escopo*: Todo o sistema.
 
 *   **GESTOR**: Responsável por unidade intermediária ou interoperacional (ex: Coordenador).
-    *   *Responsabilidades*: Visualizar e validar informações das unidades subordinadas, submeter para análise superior, devolver para ajustes.
-    *   *Escopo*: Unidades sob sua hierarquia.
+    *   *Responsabilidades*: Visualizar e validar informações das unidades subordinadas, submeter para análise superior, devolver para ajustes (com ou sem observações).
+    *   *Escopo*: Unidades sob sua hierarquia (recursivamente)
 
 *   **CHEFE**: Responsável por unidade operacional ou interoperacional.
-    *   *Responsabilidades*: Cadastrar informações (atividades/conhecimentos), submeter para validação superior.
+    *   *Responsabilidades*: Cadastrar atividades e conhecimento, submeter para validação superior.
     *   *Escopo*: Sua unidade de responsabilidade.
 
 *   **SERVIDOR**: Servidor lotado em unidade operacional/interoperacional.
@@ -22,19 +22,19 @@ Este documento consolida as regras de acesso e atividades permitidas para cada p
 
 ## Conceito: Localização do Subprocesso
 
-Cada subprocesso pertence a uma **Unidade Responsável** (quem executa o trabalho), mas possui uma **Localização Atual** (onde o processo está "parado" aguardando ação).
+Cada subprocesso pertence a uma **Unidade responsável** (quem executa o trabalho), mas possui uma **Localização atual** (onde o processo está "parado" aguardando uma ação).
 
-*   **Unidade Responsável**: É a unidade dona do subprocesso (ex: Seção de Compras). Define quem tem visibilidade permanente sobre o item.
-*   **Localização Atual**: É a unidade onde o fluxo de trabalho se encontra no momento (ex: Seção de Compras, Coordenadoria Superior, ou Unidade do Administrador). Define quem pode executar ações de alteração de estado.
+*   **Unidade responsável**: É a unidade dona do subprocesso (ex: SECAO_111). Define quem tem visibilidade sobre o item e pode cadastrar atividades e conhecimentos para ela (quando o subprocesso estiver na situação pertinente).
+*   **Localização atual**: É a unidade onde o fluxo de trabalho se encontra no momento (ex: SECAO_111, COORD_11, SECRETARIA_1 ADMIN). Define quem pode executar ações de alteração de estado.
 
-A localização muda conforme as ações de envio (Disponibilizar, Aceitar, Devolver).
+A localização muda conforme as ações de envio (Disponibilizar, Aceitar, Devolver etc.). Essencialmente, qualquer ação que gera uma movimenatação muda a localização atual de um subprocesso 
 
 ## Regras Gerais de Acesso
 
 O sistema aplica regras distintas para visualizar informações e para executar ações que alteram o estado do processo.
 
 ### 1. Visualização (Leitura)
-A permissão de visualização é baseada na **Hierarquia da Unidade Responsável**. Se você tem permissão sobre a unidade dona do subprocesso, você pode vê-lo, independente de onde ele esteja localizado (com o Chefe ou com o Admin).
+A permissão de visualização é baseada na **Hierarquia da Unidade Responsável**. Se você tem permissão sobre a unidade responsável pelo subprocesso, você pode vê-lo, independente de onde ele esteja localizado (com o Chefe ou com o Admin).
 
 *   **ADMIN**: Visualiza todos os subprocessos de todas as unidades.
 *   **GESTOR**: Visualiza subprocessos da sua própria unidade e de todas as unidades subordinadas.

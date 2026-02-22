@@ -42,7 +42,7 @@ server:
 
 logging:
   pattern:
-    console: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"
+    console: "%-5level %logger{0}: %msg%n"
   level:
     sgc: INFO
     org:
@@ -102,7 +102,7 @@ server:
 
 logging:
   pattern:
-    console: "%-5level %logger{30}.%M:%L - %msg%n"
+    console: "%-5level %logger{0}.%M:%L: %msg%n"
   level:
     sgc: INFO
     org:

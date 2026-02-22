@@ -64,13 +64,9 @@ public class ProcessoManutencaoService {
         processo.adicionarParticipantes(participantes);
         Processo processoSalvo = processoRepo.saveAndFlush(processo);
 
-        log.info("Processo {} criado com {} participantes: {} - {}",
+        log.info("Processo {} criado com {} participantes",
                 processoSalvo.getCodigo(),
-                processoSalvo.getParticipantes().size(),
-                processoSalvo.getCodigosParticipantes(),
-                processoSalvo.getParticipantes().stream()
-                        .map(up -> "(" + up.getId().getProcessoCodigo() + "," + up.getId().getUnidadeCodigo() + ")")
-                        .toList());
+                processoSalvo.getParticipantes().size());
         
         return processoSalvo;
     }

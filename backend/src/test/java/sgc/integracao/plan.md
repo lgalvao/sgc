@@ -47,5 +47,5 @@ This plan addresses the bugs found in the email notification system and ensures 
 - Run `./gradlew :backend:test` for all integration tests to ensure no regressions.
 
 ### Manual Verification (Logs)
-- Check terminal output for `Notificação persistida no banco` and `E-mail para ... enviado`.
+- Check terminal output for `E-mail para ... enviado`.
 - Ensure no `Endereço de e-mail inválido` errors appear for valid transitions.

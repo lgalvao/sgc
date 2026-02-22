@@ -8,13 +8,11 @@ import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.organizacao.service.HierarquiaService;
 import sgc.processo.model.SituacaoProcesso;
-import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Map;
 
 import static sgc.organizacao.model.Perfil.*;

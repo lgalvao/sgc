@@ -3,7 +3,6 @@ package sgc.subprocesso.service.workflow;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.jspecify.annotations.Nullable;
 import sgc.organizacao.model.Unidade;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

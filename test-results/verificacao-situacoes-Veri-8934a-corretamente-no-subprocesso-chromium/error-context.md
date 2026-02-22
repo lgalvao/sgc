@@ -1,0 +1,140 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - alert [ref=e4]:
+      - generic [ref=e5]:
+        - strong [ref=e6]: Processo iniciado
+        - button "Close" [ref=e7] [cursor=pointer]
+      - generic [ref=e9]: O processo foi iniciado com sucesso.
+    - generic [ref=e10]:
+      - navigation [ref=e11]:
+        - generic [ref=e12]:
+          - link "SGC" [ref=e13] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e14]:
+            - list [ref=e15]:
+              - listitem [ref=e16]:
+                - link "Painel" [ref=e17] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e18]: 
+                  - text: Painel
+              - listitem [ref=e19]:
+                - link "Unidades" [ref=e20] [cursor=pointer]:
+                  - /url: /unidades
+                  - generic [ref=e21]: 
+                  - text: Unidades
+              - listitem [ref=e22]:
+                - link "Relatórios" [ref=e23] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e24]: 
+                  - text: Relatórios
+              - listitem [ref=e25]:
+                - link "Histórico" [ref=e26] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e27]: 
+                  - text: Histórico
+            - list [ref=e28]:
+              - listitem [ref=e29]:
+                - link "ADMIN - ADMIN" [ref=e30]:
+                  - /url: "#"
+                  - generic [ref=e31]:
+                    - generic [ref=e32]: 
+                    - generic [ref=e33]: ADMIN - ADMIN
+              - listitem "Configurações do sistema" [ref=e34]:
+                - link [ref=e35] [cursor=pointer]:
+                  - /url: /configuracoes
+                  - generic [ref=e36]: 
+              - listitem "Sair" [ref=e37]:
+                - link [ref=e38] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e39]: 
+      - generic [ref=e42]:
+        - button "Voltar" [ref=e43] [cursor=pointer]:
+          - generic [ref=e44]: 
+        - navigation "breadcrumb" [ref=e45]:
+          - list [ref=e46]:
+            - listitem [ref=e47]:
+              - link "Início" [ref=e48] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e49]: 
+                - generic [ref=e50]: Início
+            - listitem [ref=e51]:
+              - text: ›
+              - link "Detalhes do processo" [ref=e52] [cursor=pointer]:
+                - /url: /processo/201
+            - listitem [ref=e53]:
+              - text: ›
+              - generic [ref=e54]: SECAO_121
+      - main [ref=e55]:
+        - generic [ref=e57]:
+          - generic [ref=e59]:
+            - heading "Subprocesso - SECAO_121" [level=2] [ref=e60]
+            - paragraph [ref=e61]: Processo Verificacao Labels 1771771948886
+            - generic [ref=e62]:
+              - generic [ref=e63]: "Etapa atual: Cadastro em andamento"
+              - generic [ref=e64]: "Próxima ação: acompanhar a etapa \"Cadastro em andamento\"."
+          - generic [ref=e65]:
+            - generic [ref=e66]:
+              - generic [ref=e67]:
+                - heading "SECAO_121" [level=2] [ref=e68]
+                - paragraph [ref=e69]: Seção 121
+              - generic [ref=e70]:
+                - button "Alterar data limite" [ref=e71] [cursor=pointer]:
+                  - generic [ref=e72]: 
+                  - text: Alterar data limite
+                - button "Reabrir cadastro" [ref=e73] [cursor=pointer]:
+                  - generic [ref=e74]: 
+                  - text: Reabrir cadastro
+                - button "Reabrir Revisão" [ref=e75] [cursor=pointer]:
+                  - generic [ref=e76]: 
+                  - text: Reabrir Revisão
+                - button "Enviar lembrete" [ref=e77] [cursor=pointer]:
+                  - generic [ref=e78]: 
+                  - text: Enviar lembrete
+            - generic [ref=e80]:
+              - paragraph [ref=e81]: "Processo: Processo Verificacao Labels 1771771948886"
+              - paragraph [ref=e82]: Situação:Cadastro em andamento
+              - paragraph [ref=e83]:
+                - strong [ref=e84]: "Titular:"
+                - text: Lemmy Kilmister
+              - paragraph [ref=e85]:
+                - generic [ref=e86]: 
+                - generic [ref=e87]: 
+                - text: lemmy.kilmister@tre-pe.jus.br
+          - generic [ref=e88]:
+            - button "Atividades e conhecimentos Visualização das atividades e conhecimentos da unidade" [ref=e90] [cursor=pointer]:
+              - generic [ref=e92]:
+                - heading "Atividades e conhecimentos" [level=4] [ref=e93]
+                - paragraph [ref=e94]: Visualização das atividades e conhecimentos da unidade
+            - button "Mapa de Competências Visualização do mapa de competências técnicas" [ref=e96] [cursor=pointer]:
+              - generic [ref=e98]:
+                - heading "Mapa de Competências" [level=4] [ref=e99]
+                - paragraph [ref=e100]: Visualização do mapa de competências técnicas
+          - generic [ref=e101]:
+            - heading "Movimentações" [level=4] [ref=e102]
+            - table [ref=e104]:
+              - rowgroup [ref=e105]:
+                - row "Data/Hora Unidade Origem Unidade Destino Situação Descrição" [ref=e106]:
+                  - columnheader "Data/Hora" [ref=e107]
+                  - columnheader "Unidade Origem" [ref=e108]
+                  - columnheader "Unidade Destino" [ref=e109]
+                  - columnheader "Situação" [ref=e110]
+                  - columnheader "Descrição" [ref=e111]
+              - rowgroup [ref=e112]:
+                - row "22/02/2026 11:52 ADMIN SECAO_121 MAPEAMENTO CADASTRO EM ANDAMENTO Processo iniciado" [ref=e113]:
+                  - cell "22/02/2026 11:52" [ref=e114]
+                  - cell "ADMIN" [ref=e115]
+                  - cell "SECAO_121" [ref=e116]
+                  - cell "MAPEAMENTO CADASTRO EM ANDAMENTO" [ref=e117]:
+                    - generic [ref=e118]: MAPEAMENTO CADASTRO EM ANDAMENTO
+                  - cell "Processo iniciado" [ref=e119]
+      - contentinfo [ref=e120]:
+        - generic [ref=e121]:
+          - generic [ref=e122]: Versão 1.0.0
+          - generic [ref=e123]: © SESEL/COSIS/TRE-PE
+  - text:  
+```
