@@ -1,4 +1,4 @@
-package sgc.seguranca.acesso;
+package sgc.seguranca;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;

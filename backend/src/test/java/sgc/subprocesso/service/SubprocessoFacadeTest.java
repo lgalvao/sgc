@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroAcessoNegado;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.model.Mapa;
@@ -53,8 +52,6 @@ class SubprocessoFacadeTest {
     private SubprocessoAtividadeService atividadeService;
     @Mock
     private SubprocessoContextoService contextoService;
-    @Mock
-    private SubprocessoPermissaoCalculator permissaoCalculator;
     @Mock
     private SubprocessoFactory subprocessoFactory;
     @Mock
@@ -570,15 +567,6 @@ class SubprocessoFacadeTest {
     @DisplayName("Cenários de Permissões e Detalhes")
     class PermissaoDetalheTests {
         @Test
-        @DisplayName("Deve disparar erro se não autenticado ao obter permissões")
-        void deveDispararErroSeNaoAutenticado() {
-            when(usuarioService.obterUsuarioAutenticado())
-                    .thenThrow(new ErroAcessoNegado("Nenhum usuário autenticado"));
-
-            Assertions.assertThrows(ErroAcessoNegado.class, () -> facade.obterPermissoes(1L));
-        }
-
-        @Test
         @DisplayName("Deve obter detalhes do subprocesso")
         void deveObterDetalhes() {
             Long codigo = 1L;
@@ -588,18 +576,6 @@ class SubprocessoFacadeTest {
             facade.obterDetalhes(codigo);
 
             verify(contextoService).obterDetalhes(codigo, usuario);
-        }
-
-        @Test
-        @DisplayName("Deve obter permissões")
-        void deveObterPermissoes() {
-            Long codigo = 1L;
-            Usuario usuario = new Usuario();
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
-
-            facade.obterPermissoes(codigo);
-
-            verify(permissaoCalculator).obterPermissoes(codigo, usuario);
         }
     }
 

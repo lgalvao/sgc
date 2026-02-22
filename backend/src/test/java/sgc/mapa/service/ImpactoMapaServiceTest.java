@@ -13,8 +13,8 @@ import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.acesso.Acao;
-import sgc.seguranca.acesso.AccessControlService;
+import sgc.seguranca.Acao;
+import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.Collections;

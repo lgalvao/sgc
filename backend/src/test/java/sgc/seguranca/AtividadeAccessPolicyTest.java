@@ -1,4 +1,4 @@
-package sgc.seguranca.acesso;
+package sgc.seguranca;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,8 +21,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static sgc.organizacao.model.Perfil.CHEFE;
 import static sgc.organizacao.model.Perfil.SERVIDOR;
-import static sgc.seguranca.acesso.Acao.CRIAR_ATIVIDADE;
-import static sgc.seguranca.acesso.Acao.LISTAR_SUBPROCESSOS;
+import static sgc.seguranca.Acao.CRIAR_ATIVIDADE;
+import static sgc.seguranca.Acao.LISTAR_SUBPROCESSOS;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")

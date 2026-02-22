@@ -1,4 +1,4 @@
-package sgc.seguranca.acesso;
+package sgc.seguranca;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -13,6 +13,7 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.security.SubprocessoSecurity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -23,10 +24,7 @@ import static org.mockito.Mockito.*;
 @DisplayName("Testes do AccessControlService")
 class AccessControlServiceTest {
     @Mock
-    private AccessAuditService auditService;
-
-    @Mock
-    private SubprocessoAccessPolicy subprocessoAccessPolicy;
+    private SubprocessoSecurity subprocessoSecurity;
 
     @Mock
     private ProcessoAccessPolicy processoAccessPolicy;
@@ -55,8 +53,8 @@ class AccessControlServiceTest {
     }
 
     @Test
-    @DisplayName("Deve auditar acesso concedido ao verificar permissão")
-    void deveAuditarAcessoConcedidoAoVerificarPermissao() {
+    @DisplayName("Deve permitir acesso sem lançar exceção")
+    void devePermitirAcessoAoVerificarPermissao() {
         Usuario usuario = criarUsuario("123456789012");
         Acao acao = Acao.VISUALIZAR_PROCESSO;
         Processo processo = criarProcesso(1L);
@@ -64,8 +62,6 @@ class AccessControlServiceTest {
         when(processoAccessPolicy.canExecute(usuario, acao, processo)).thenReturn(true);
 
         assertDoesNotThrow(() -> accessControlService.verificarPermissao(usuario, acao, processo));
-
-        verify(auditService).logAccessGranted(usuario, acao, processo);
     }
 
     @Test
@@ -96,16 +92,16 @@ class AccessControlServiceTest {
     }
 
     @Test
-    @DisplayName("Deve delegar para SubprocessoAccessPolicy quando recurso é Subprocesso")
-    void deveDelegarParaSubprocessoAccessPolicy() {
+    @DisplayName("Deve delegar para SubprocessoSecurity quando recurso é Subprocesso")
+    void deveDelegarParaSubprocessoSecurity() {
         Usuario usuario = criarUsuario("123456789012");
         Subprocesso subprocesso = new Subprocesso();
         Acao acao = Acao.EDITAR_SUBPROCESSO;
 
-        when(subprocessoAccessPolicy.canExecute(usuario, acao, subprocesso)).thenReturn(true);
+        when(subprocessoSecurity.canExecute(usuario, acao, subprocesso)).thenReturn(true);
 
         assertThat(accessControlService.podeExecutar(usuario, acao, subprocesso)).isTrue();
-        verify(subprocessoAccessPolicy).canExecute(usuario, acao, subprocesso);
+        verify(subprocessoSecurity).canExecute(usuario, acao, subprocesso);
     }
 
     @Test
@@ -197,9 +193,6 @@ class AccessControlServiceTest {
             assertThat(e.getMessage()).contains("não autenticado");
             assertThat(e.getMessage()).contains(Acao.VISUALIZAR_PROCESSO.getDescricao());
         }
-        
-        // Verificar que audit foi chamado com acesso negado
-        verify(auditService).logAccessDenied(eq(null), eq(Acao.VISUALIZAR_PROCESSO), any(Processo.class), anyString());
     }
 
     @Test

@@ -1,4 +1,4 @@
-package sgc.seguranca.acesso;
+package sgc.seguranca;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

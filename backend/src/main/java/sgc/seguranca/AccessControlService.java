@@ -10,6 +10,7 @@ import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.security.SubprocessoSecurity;
 
 /**
  * Serviço central de controle de acesso do SGC.
@@ -20,8 +21,7 @@ import sgc.subprocesso.model.Subprocesso;
 @Slf4j
 @RequiredArgsConstructor
 public class AccessControlService {
-    private final AccessAuditService auditService;
-    private final SubprocessoAccessPolicy subprocessoAccessPolicy;
+    private final SubprocessoSecurity subprocessoSecurity;
     private final ProcessoAccessPolicy processoAccessPolicy;
     private final AtividadeAccessPolicy atividadeAccessPolicy;
     private final MapaAccessPolicy mapaAccessPolicy;
@@ -33,11 +33,8 @@ public class AccessControlService {
     public <T> void verificarPermissao(Usuario usuario, Acao acao, T recurso) {
         if (!podeExecutar(usuario, acao, recurso)) {
             String motivo = obterMotivoNegacao(usuario, acao, recurso);
-            auditService.logAccessDenied(usuario, acao, recurso, motivo);
             throw new ErroAcessoNegado(motivo);
         }
-
-        auditService.logAccessGranted(usuario, acao, recurso);
     }
 
     /**
@@ -52,7 +49,7 @@ public class AccessControlService {
         // Delega para a policy apropriada baseado no tipo do recurso
         switch (recurso) {
             case Subprocesso sp -> {
-                return subprocessoAccessPolicy.canExecute(usuario, acao, sp);
+                return subprocessoSecurity.canExecute(usuario, acao, sp);
             }
             case Processo p -> {
                 return processoAccessPolicy.canExecute(usuario, acao, p);
@@ -95,7 +92,7 @@ public class AccessControlService {
     private <T> @Nullable String getMotivoPolicy(T recurso) {
         String motivoPolicy = null;
         switch (recurso) {
-            case Subprocesso sp -> motivoPolicy = subprocessoAccessPolicy.getMotivoNegacao();
+            case Subprocesso sp -> motivoPolicy = "Ação não permitida para a situação atual do subprocesso";
             case Processo p -> motivoPolicy = processoAccessPolicy.getMotivoNegacao();
             case Atividade a -> motivoPolicy = atividadeAccessPolicy.getMotivoNegacao();
             case Mapa m -> motivoPolicy = mapaAccessPolicy.getMotivoNegacao();

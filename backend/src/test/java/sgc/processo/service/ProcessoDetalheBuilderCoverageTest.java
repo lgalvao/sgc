@@ -15,7 +15,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.model.UnidadeProcesso;
-import sgc.seguranca.acesso.AccessControlService;
+import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;

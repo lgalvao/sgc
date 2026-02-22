@@ -12,10 +12,9 @@ import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.acesso.AccessControlService;
+import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.dto.ContextoEdicaoResponse;
 import sgc.subprocesso.dto.SubprocessoDetalheResponse;
-import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
@@ -37,8 +36,6 @@ class SubprocessoContextoServiceTest {
     private UsuarioFacade usuarioService;
     @Mock
     private MovimentacaoRepo movimentacaoRepo;
-    @Mock
-    private SubprocessoPermissaoCalculator permissaoCalculator;
     @Mock
     private AccessControlService accessControlService;
     @Mock
@@ -63,7 +60,6 @@ class SubprocessoContextoServiceTest {
         when(usuarioService.buscarResponsavelAtual("U1")).thenReturn(new Usuario());
         when(usuarioService.buscarPorLogin("T1")).thenReturn(new Usuario());
         when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(id)).thenReturn(List.of());
-        when(permissaoCalculator.calcularPermissoes(sp, user)).thenReturn(SubprocessoPermissoesDto.builder().build());
 
         SubprocessoDetalheResponse result = service.obterDetalhes(id, user);
 
@@ -84,7 +80,6 @@ class SubprocessoContextoServiceTest {
         when(usuarioService.buscarResponsavelAtual("U1")).thenReturn(new Usuario());
         when(usuarioService.buscarPorLogin("T1")).thenThrow(new RuntimeException("Erro"));
         when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(id)).thenReturn(List.of());
-        when(permissaoCalculator.calcularPermissoes(sp, user)).thenReturn(SubprocessoPermissoesDto.builder().build());
 
         SubprocessoDetalheResponse result = service.obterDetalhes(sp, user);
 
@@ -109,7 +104,6 @@ class SubprocessoContextoServiceTest {
         when(usuarioService.buscarResponsavelAtual("U1")).thenReturn(new Usuario());
         when(usuarioService.buscarPorLogin("T1")).thenReturn(new Usuario());
         when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(id)).thenReturn(List.of());
-        when(permissaoCalculator.calcularPermissoes(sp, user)).thenReturn(SubprocessoPermissoesDto.builder().build());
         when(atividadeService.listarAtividadesSubprocesso(id)).thenReturn(List.of());
         when(mapaFacade.obterPorCodigo(10L)).thenReturn(new Mapa());
 
