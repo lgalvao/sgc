@@ -110,8 +110,6 @@ export async function removerCompetencia(
     return mapMapaCompletoDtoToModel(response.data);
 }
 
-// Métodos para ações em bloco
-
 export async function aceitarCadastroEmBloco(
     codSubprocesso: number,
     payload: { unidadeCodigos: number[] }

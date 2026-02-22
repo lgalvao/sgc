@@ -6,48 +6,58 @@
 
 ---
 
-## 1. Cohesive Controllers & Services
+## 1. Eliminate Fragmentation in `subprocesso`
 
-The `subprocesso` module (`backend/src/main/java/sgc/subprocesso`) is a prime example of fragmentation. Currently, it has 4 Controllers, 1 Facade (injecting 11 services), and 10+ Services representing arbitrarily split logic.
+The `subprocesso` module (`backend/src/main/java/sgc/subprocesso`) is fragmented into unnecessarily small pieces.
 
-Navigating a simple feature requires jumping through 5 files. The Facade pattern is designed for orchestrating complex microservice boundaries, not for a simple intranet monolith. It adds pure passthrough boilerplate.
-
-**Action Plan:**
-- **Merge Controllers:** Consolidate into a single cohesive `SubprocessoController` handling all Subprocess-related HTTP routing.
-- **Delete the Facade:** Controllers should inject focused Services directly.
-- **Group Services by Cohesion:** Merge the 10+ fragmented services into 2-3 focused services based on domain logic (e.g., `SubprocessoCrudService` for basic data entry, `SubprocessoWorkflowService` for state transitions). Eliminate classes with only 1 or 2 methods that simply pass data through.
-- **Maintain Standard Flow:** Always maintain the standard `Controller -> Service -> Repository` flow. The `@Service` layer is crucial for safely defining database transaction boundaries (`@Transactional`).
-
-## 2. Standardize Access Control
-
-The system currently implements a custom security framework in `sgc.seguranca.acesso` (`AccessControlService`, `AccessPolicy`, `AccessAuditService`, `AbstractAccessPolicy`). It mimics Spring Security ACLs using bespoke code and manual interceptors.
-
-Maintaining custom security code is a massive liability. Spring Security is the industry standard and natively supports complex method-level authorization. A custom framework for a small intranet application is unnecessary overhead.
+**Current State:**
+- **4 Controllers:** `SubprocessoCadastroController`, `SubprocessoCrudController`, `SubprocessoMapaController`, `SubprocessoValidacaoController`.
+- **1 Facade:** `SubprocessoFacade` (injects 11 services just to delegate calls).
+- **Multiple Workflow Services:** `SubprocessoCadastroWorkflowService`, `SubprocessoMapaWorkflowService`, `SubprocessoAdminWorkflowService`.
+- **Helper Services:** `SubprocessoBaseService`, `SubprocessoContextoService`, `SubprocessoFactory`, etc.
 
 **Action Plan:**
-- **Use Standard Spring Security:** Leverage standard expressions like `@PreAuthorize("@subprocessoSecurity.canEdit(#id, principal)")`.
-- **Delete the Custom Framework:** Remove all `*AccessPolicy` classes and custom security interceptors.
-- **Centralize Checks:** Create localized security services (e.g., `SubprocessoSecurity`) to evaluate complex rules using standard Spring paradigms.
-- **Simplify Auditing:** Rely on standard `slf4j` logging instead of custom audit tables for authorization checks.
+1.  **Delete `SubprocessoFacade`:** Controllers should inject Services directly.
+2.  **Merge Controllers:** Consolidate into a single `SubprocessoController` handling all Subprocess-related HTTP routing.
+3.  **Merge Workflow Logic:** Combine `SubprocessoCadastroWorkflowService`, `SubprocessoMapaWorkflowService`, and `SubprocessoAdminWorkflowService` into a single cohesive `SubprocessoWorkflowService`.
+4.  **Simplify CRUD:** Merge basic CRUD operations into `SubprocessoService`.
 
-## 3. Simplify Data Transport (DTOs & Mappers)
+## 2. Replace Custom Access Control with Spring Security
 
-The system currently uses complex mapping frameworks and deep defensive programming when passing data between the database and the frontend.
+The system currently implements a custom security framework in `sgc.seguranca.acesso` which mimics Spring Security ACLs using bespoke code.
+
+**Current State:**
+- **Custom Framework:** `AccessControlService`, `AccessAuditService`, `AbstractAccessPolicy`.
+- **Policy Implementations:** `SubprocessoAccessPolicy` (complex rule map), `ProcessoAccessPolicy`, etc.
+- **Manual Checks:** Code like `accessControlService.verificarPermissao(usuario, Acao.EDITAR, subprocesso)` scattered throughout services.
 
 **Action Plan:**
-- **Use Simple DTOs:** Keep Data Transfer Objects, but simplify them. Instead of complex mappers (like MapStruct), use Java 17+ `record` types to create lightweight DTOs. Use basic constructors or static factory methods (e.g., `return new SubprocessoResponse(entity)`) to map data safely. This avoids the `LazyInitializationException` risks of returning JPA Entities directly while removing mapper boilerplate.
-- **Use Generated API Types on the Frontend:** Eliminate manual mapping code in the UI (`frontend/src/mappers/*.ts`). Rely on strictly typed TypeScript definitions generated from the backend OpenAPI/Swagger contracts.
+1.  **Delete Custom Framework:** Remove `AccessControlService`, `AccessAuditService`, and all `*AccessPolicy` classes.
+2.  **Use Standard Annotations:** Leverage Spring Security's `@PreAuthorize` with SpEL.
+    - Example: `@PreAuthorize("@subprocessoSecurity.canEdit(#id, principal)")`
+3.  **Centralize Logic:** Create a simple `SubprocessoSecurity` bean with straightforward methods (`canEdit`, `canView`) that implement the business rules without the overhead of a policy engine.
 
-## 4. Specific Targets for Refactoring
+## 3. Remove Excessive Testing Infrastructure
 
-| Component | Diagnosis | Action |
-| :--- | :--- | :--- |
-| `SubprocessoFacade` | Passthrough "glue code" | **Delete.** Controllers inject Services directly. |
-| `Subprocesso*Controller` (x4) | Arbitrary fragmentation | **Merge** into `SubprocessoController`. |
-| `*AccessPolicy` classes | Overengineered custom framework | **Delete.** Replace with `@PreAuthorize` + standard service checks. |
-| `AccessAuditService` | Redundant custom logging | **Delete.** Use standard `slf4j` logging. |
-| `frontend/src/mappers/*.ts` | Manual, redundant mapping | **Refactor.** Use direct API types via OpenAPI generators. |
-| Complex mapStruct mappers | Excessive boilerplate | **Refactor.** Replace with Java `record` constructors. |
+For a small internal app, maintaining contract tests (Pact) adds significant overhead with little benefit since the frontend and backend are likely deployed together or by the same team.
+
+**Action Plan:**
+1.  **Remove Pact (Backend):** Remove `au.com.dius.pact` dependencies from `backend/build.gradle.kts`.
+2.  **Remove Pact (Frontend):** Delete `frontend/pact/` directory and remove `@pact-foundation/pact` from `frontend/package.json`.
+3.  **Focus on Integration Tests:** Rely on `@SpringBootTest` for backend logic and standard E2E tests (Playwright) for critical user flows.
+
+## 4. Simplify Data Transport (DTOs & Mappers)
+
+The frontend manually maps backend DTOs to internal models, duplicating logic and types.
+
+**Current State:**
+- **Manual Mappers:** `frontend/src/mappers/subprocessos.ts`, `frontend/src/mappers/mapas.ts`, etc.
+- **Defensive Coding:** Extensive null checks in mappers for fields that should be guaranteed by the backend.
+
+**Action Plan:**
+1.  **Use Generated Types:** Configure `openapi-typescript` to generate strict TypeScript types from the backend OpenAPI definition.
+2.  **Remove Manual Mappers:** Delete `frontend/src/mappers/*.ts` and use the generated types directly in Vue components.
+3.  **Simplify Backend DTOs:** Use Java `record` types for DTOs to reduce boilerplate. Ensure DTOs structure matches UI needs to minimize frontend transformation logic.
 
 ## 5. Development Workflow Guidelines
 
