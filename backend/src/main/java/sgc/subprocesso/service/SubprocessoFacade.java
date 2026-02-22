@@ -215,18 +215,14 @@ public class SubprocessoFacade {
     }
 
     @Transactional
-    public void aceitarCadastroEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        List<Subprocesso> subprocessos = crudService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
-        List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
+    public void aceitarCadastroEmBloco(List<Long> ids, Usuario usuario) {
         if (!ids.isEmpty()) {
             cadastroWorkflowService.aceitarCadastroEmBloco(ids, usuario);
         }
     }
 
     @Transactional
-    public void homologarCadastroEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        List<Subprocesso> subprocessos = crudService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
-        List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
+    public void homologarCadastroEmBloco(List<Long> ids, Usuario usuario) {
         if (!ids.isEmpty()) {
             cadastroWorkflowService.homologarCadastroEmBloco(ids, usuario);
         }
@@ -299,18 +295,14 @@ public class SubprocessoFacade {
     }
 
     @Transactional
-    public void aceitarValidacaoEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        List<Subprocesso> subprocessos = crudService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
-        List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
+    public void aceitarValidacaoEmBloco(List<Long> ids, Usuario usuario) {
         if (!ids.isEmpty()) {
             mapaWorkflowService.aceitarValidacaoEmBloco(ids, usuario);
         }
     }
 
     @Transactional
-    public void homologarValidacaoEmBloco(List<Long> codUnidades, Long codProcesso, Usuario usuario) {
-        List<Subprocesso> subprocessos = crudService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
-        List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
+    public void homologarValidacaoEmBloco(List<Long> ids, Usuario usuario) {
         if (!ids.isEmpty()) {
             mapaWorkflowService.homologarValidacaoEmBloco(ids, usuario);
         }

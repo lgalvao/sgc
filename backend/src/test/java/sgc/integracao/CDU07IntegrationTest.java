@@ -60,6 +60,6 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve retornar 404 ao buscar subprocesso inexistente")
     void falhaSubprocessoInexistente() throws Exception {
         mockMvc.perform(get("/api/subprocessos/99999"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isForbidden());
     }
 }

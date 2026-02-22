@@ -107,7 +107,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
     void homologarValidacaoEmBloco_deveHomologarSucesso() throws Exception {
         // Given
         Long codigoContexto = processo.getCodigo();
-        List<Long> subprocessosSelecionados = List.of(unidade1.getCodigo(), unidade2.getCodigo());
+        List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
         // Garante que os subprocessos estejam na unidade do ADMIN (100)
         Unidade adminUnit = unidadeRepo.findById(100L).orElseThrow();

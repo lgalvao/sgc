@@ -121,7 +121,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
     void aceitarCadastroEmBloco_deveAceitarTodasSelecionadas() throws Exception {
         // Given
         Long codigoContexto = processo.getCodigo();
-        List<Long> subprocessosSelecionados = List.of(unidade1.getCodigo(), unidade2.getCodigo());
+        List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .acao("ACEITAR_CADASTRO")
