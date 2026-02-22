@@ -162,6 +162,8 @@ describe("VisAtividades.vue", () => {
     const mountComponent = (initialState: any = {}, accessOverrides: Record<string, any> = {}) => {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeHomologarCadastro: ref(true),
+            podeAceitarCadastro: ref(true),
+            podeDevolverCadastro: ref(true),
             podeVisualizarImpacto: ref(true),
             ...accessOverrides
         } as any);
