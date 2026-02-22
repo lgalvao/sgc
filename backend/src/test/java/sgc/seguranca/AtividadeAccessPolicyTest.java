@@ -82,7 +82,7 @@ class AtividadeAccessPolicyTest {
     void deveNegarServidorCriarAtividade() {
         boolean resultado = policy.canExecute(usuarioServidor, CRIAR_ATIVIDADE, atividade);
         assertThat(resultado).isFalse();
-        assertThat(policy.getMotivoNegacao()).contains("não possui um dos perfis necessários");
+        assertThat(policy.getMotivoNegacao()).contains("não tem permissão");
     }
 
     @Test
@@ -92,7 +92,7 @@ class AtividadeAccessPolicyTest {
         org.mockito.Mockito.when(hierarquiaService.isResponsavel(unidade, usuarioChefe)).thenReturn(false);
         boolean resultado = policy.canExecute(usuarioChefe, CRIAR_ATIVIDADE, atividade);
         assertThat(resultado).isFalse();
-        assertThat(policy.getMotivoNegacao()).contains("não é o titular da unidade");
+        assertThat(policy.getMotivoNegacao()).contains("não é o responsável");
     }
 
     @Test

@@ -60,7 +60,7 @@ class MapaAccessPolicyTest {
     @DisplayName("Deve negar GESTOR criar mapa")
     void deveNegarGestorCriarMapa() {
         assertThat(policy.canExecute(usuarioGestor, CRIAR_MAPA, mapa)).isFalse();
-        assertThat(policy.getMotivoNegacao()).contains("não possui um dos perfis necessários");
+        assertThat(policy.getMotivoNegacao()).contains("não tem permissão");
     }
 
     @Test

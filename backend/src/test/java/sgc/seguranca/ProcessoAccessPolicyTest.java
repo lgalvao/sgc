@@ -60,7 +60,7 @@ class ProcessoAccessPolicyTest {
     @DisplayName("Deve negar GESTOR criar processo")
     void deveNegarGestorCriarProcesso() {
         assertThat(policy.canExecute(usuarioGestor, CRIAR_PROCESSO, processo)).isFalse();
-        assertThat(policy.getMotivoNegacao()).contains("não possui um dos perfis necessários");
+        assertThat(policy.getMotivoNegacao()).contains("não tem permissão");
     }
 
     @Test
