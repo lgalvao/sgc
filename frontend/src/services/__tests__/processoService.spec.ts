@@ -129,8 +129,8 @@ describe('processoService', () => {
         const codSubprocesso = 1;
         const dados = { novaData: '2024-12-31' };
         await processoService.alterarDataLimiteSubprocesso(codSubprocesso, dados);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/data-limite`, { 
-            novaDataLimite: dados.novaData 
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/data-limite`, {
+            data: dados.novaData
         });
     });
 
@@ -138,7 +138,9 @@ describe('processoService', () => {
         const codSubprocesso = 1;
         const dados = { sugestoes: 'Texto' };
         await processoService.apresentarSugestoes(codSubprocesso, dados);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/apresentar-sugestoes`, dados);
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/apresentar-sugestoes`, {
+            texto: dados.sugestoes
+        });
     });
 
     it('validarMapa deve fazer requisição POST', async () => {
@@ -155,12 +157,15 @@ describe('processoService', () => {
 
     it('aceitarValidacao deve fazer requisição POST', async () => {
         const codSubprocesso = 1;
-        const dados = { observacoes: 'Obs' };
-        await processoService.aceitarValidacao(codSubprocesso, dados);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/aceitar-validacao`, dados);
-
         await processoService.aceitarValidacao(codSubprocesso);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/aceitar-validacao`, {});
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/aceitar-validacao`);
+    });
+
+    it('devolverValidacao deve fazer requisição POST', async () => {
+        const codSubprocesso = 1;
+        const dados = { justificativa: 'Erro' };
+        await processoService.devolverValidacao(codSubprocesso, dados);
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/devolver-validacao`, dados);
     });
 
     it('buscarSubprocessos deve fazer requisição GET', async () => {

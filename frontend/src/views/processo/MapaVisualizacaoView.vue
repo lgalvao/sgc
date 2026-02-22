@@ -346,9 +346,7 @@ async function confirmarAceitacao(observacoes?: string) {
         await processosStore.homologarValidacao(codSubprocesso.value);
       }
     } else {
-      await processosStore.aceitarValidacao(codSubprocesso.value, {
-        observacoes: observacoes || "",
-      });
+      await processosStore.aceitarValidacao(codSubprocesso.value);
     }
     fecharModalAceitar();
     feedbackStore.show(

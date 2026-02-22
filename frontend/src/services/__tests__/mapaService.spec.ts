@@ -43,7 +43,7 @@ describe("mapaService", () => {
             mockApi.post.mockResolvedValue({ data: {} });
             await mapaService.salvarMapaCompleto(1, {});
             expect(mockApi.post).toHaveBeenCalledWith(
-                "/subprocessos/1/mapa-completo/salvar",
+                "/subprocessos/1/mapa-completo",
                 {}
             );
             expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
@@ -64,7 +64,7 @@ describe("mapaService", () => {
     describe("salvarMapaAjuste", () => {
         testPostEndpoint(
             () => mapaService.salvarMapaAjuste(1, {}),
-            "/subprocessos/1/mapa-ajuste/salvar",
+            "/subprocessos/1/mapa-ajuste/atualizar",
             {},
             {}
         );

@@ -101,18 +101,34 @@ describe("subprocessoService", () => {
         const payload = { unidadeCodigos: [1] };
 
         await service.aceitarCadastroEmBloco(1, payload);
-        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/aceitar-cadastro-bloco", payload);
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/aceitar-cadastro-bloco", {
+            acao: 'ACEITAR',
+            subprocessos: [1]
+        });
 
         await service.homologarCadastroEmBloco(1, payload);
-        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/homologar-cadastro-bloco", payload);
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/homologar-cadastro-bloco", {
+            acao: 'HOMOLOGAR',
+            subprocessos: [1]
+        });
 
         await service.aceitarValidacaoEmBloco(1, payload);
-        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/aceitar-validacao-bloco", payload);
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/aceitar-validacao-bloco", {
+            acao: 'ACEITAR_VALIDACAO',
+            subprocessos: [1]
+        });
 
         await service.homologarValidacaoEmBloco(1, payload);
-        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/homologar-validacao-bloco", payload);
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/homologar-validacao-bloco", {
+            acao: 'HOMOLOGAR_VALIDACAO',
+            subprocessos: [1]
+        });
 
-        await service.disponibilizarMapaEmBloco(1, payload);
-        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/disponibilizar-mapa-bloco", payload);
+        await service.disponibilizarMapaEmBloco(1, { ...payload, dataLimite: '2025-01-01' });
+        expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/disponibilizar-mapa-bloco", {
+            acao: 'DISPONIBILIZAR',
+            subprocessos: [1],
+            dataLimite: '2025-01-01'
+        });
     });
 });
