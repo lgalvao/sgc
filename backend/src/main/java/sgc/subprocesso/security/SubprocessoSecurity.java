@@ -10,7 +10,6 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.HierarquiaService;
 import sgc.organizacao.service.UnidadeService;
-import sgc.processo.model.SituacaoProcesso;
 import sgc.seguranca.Acao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -63,6 +62,7 @@ public class SubprocessoSecurity {
             Map.entry(ALTERAR_DATA_LIMITE, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.allOf(SituacaoSubprocesso.class), RequisitoHierarquia.NENHUM)),
             Map.entry(REABRIR_CADASTRO, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.allOf(SituacaoSubprocesso.class), RequisitoHierarquia.NENHUM)),
             Map.entry(REABRIR_REVISAO, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.allOf(SituacaoSubprocesso.class), RequisitoHierarquia.NENHUM)),
+            Map.entry(ENVIAR_LEMBRETE_PROCESSO, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.allOf(SituacaoSubprocesso.class), RequisitoHierarquia.NENHUM)),
 
             // ========== CADASTRO ==========
             Map.entry(EDITAR_CADASTRO, new RegrasAcao(EnumSet.of(CHEFE), EnumSet.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO), RequisitoHierarquia.MESMA_UNIDADE)),
@@ -135,8 +135,6 @@ public class SubprocessoSecurity {
         if (usuario == null) return false;
 
         Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
-        if (unidade == null) return false;
-
         return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, unidade.getCodigo())
                 .map(sp -> verificarRegras(usuario, Acao.VISUALIZAR_SUBPROCESSO, sp))
                 .orElse(false);

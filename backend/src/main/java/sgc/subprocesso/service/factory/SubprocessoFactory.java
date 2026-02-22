@@ -84,7 +84,7 @@ public class SubprocessoFactory {
                         .processo(processo)
                         .unidade(unidade)
                         .mapa(null)
-                        .situacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                        .situacao(NAO_INICIADO)
                         .dataLimiteEtapa1(processo.getDataLimite())
                         .build())
                 .map(Subprocesso.class::cast)
@@ -127,7 +127,7 @@ public class SubprocessoFactory {
                 .processo(processo)
                 .unidade(unidade)
                 .mapa(null)
-                .situacao(REVISAO_CADASTRO_EM_ANDAMENTO)
+                .situacao(NAO_INICIADO)
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build();
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
