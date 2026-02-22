@@ -1,7 +1,7 @@
 import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
-import {computed, defineComponent, nextTick} from "vue";
+import {computed, defineComponent, nextTick, ref} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
@@ -272,9 +272,9 @@ describe("CadMapa.vue", () => {
 
     function createWrapper(customState = {}, accessOverrides = {}) {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeVisualizarImpacto: { value: true },
-            podeEditarMapa: { value: true },
-            podeDisponibilizarMapa: { value: true },
+            podeVisualizarImpacto: ref(true),
+            podeEditarMapa: ref(true),
+            podeDisponibilizarMapa: ref(true),
             ...accessOverrides
         } as any);
 

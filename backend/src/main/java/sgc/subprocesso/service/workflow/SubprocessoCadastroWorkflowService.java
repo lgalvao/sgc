@@ -15,8 +15,8 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.acesso.Acao;
-import sgc.seguranca.acesso.AccessControlService;
+import sgc.seguranca.Acao;
+import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
 import sgc.subprocesso.eventos.TipoTransicao;
@@ -31,7 +31,7 @@ import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static sgc.seguranca.acesso.Acao.*;
+import static sgc.seguranca.Acao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service

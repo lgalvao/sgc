@@ -28,22 +28,16 @@ public class SubprocessoCrudController {
     private final SubprocessoFacade subprocessoFacade;
     private final OrganizacaoFacade organizacaoFacade;
 
-    @GetMapping("/{codigo}/permissoes")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<SubprocessoPermissoesDto> obterPermissoes(@PathVariable Long codigo) {
-        SubprocessoPermissoesDto permissoes = subprocessoFacade.obterPermissoes(codigo);
-        return ResponseEntity.ok(permissoes);
-    }
 
     @GetMapping("/{codigo}/validar-cadastro")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
     @Operation(summary = "Valida se o cadastro está pronto para disponibilização")
     public ResponseEntity<ValidacaoCadastroDto> validarCadastro(@PathVariable Long codigo) {
         return ResponseEntity.ok(subprocessoFacade.validarCadastro(codigo));
     }
 
     @GetMapping("/{codigo}/status")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
     @Operation(summary = "Obtém apenas o status atual do subprocesso")
     public ResponseEntity<SubprocessoSituacaoDto> obterStatus(@PathVariable Long codigo) {
         return ResponseEntity.ok(subprocessoFacade.obterSituacao(codigo));
@@ -57,14 +51,14 @@ public class SubprocessoCrudController {
     }
 
     @GetMapping("/{codigo}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
     @JsonView(SubprocessoViews.Publica.class)
     public SubprocessoDetalheResponse obterPorCodigo(@PathVariable Long codigo) {
         return subprocessoFacade.obterDetalhes(codigo);
     }
 
     @GetMapping("/buscar")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canView(#codProcesso, #siglaUnidade)")
     @JsonView(SubprocessoViews.Publica.class)
     public ResponseEntity<Subprocesso> buscarPorProcessoEUnidade(
             @RequestParam Long codProcesso, @RequestParam String siglaUnidade) {

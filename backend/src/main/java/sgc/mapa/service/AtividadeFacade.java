@@ -10,7 +10,7 @@ import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.acesso.AccessControlService;
+import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
@@ -18,7 +18,7 @@ import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
 
-import static sgc.seguranca.acesso.Acao.*;
+import static sgc.seguranca.Acao.*;
 
 @Service
 @Transactional

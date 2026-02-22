@@ -42,8 +42,6 @@ export const useAtividadesStore = defineStore("atividades", () => {
         const subprocessosStore = useSubprocessosStore();
         subprocessosStore.atualizarStatusLocal(response.subprocesso);
         
-        // Refresh permissions because situation changed
-        await subprocessosStore.buscarPermissoes(codSubprocesso);
     }
 
     async function buscarAtividadesParaSubprocesso(codSubprocesso: number) {

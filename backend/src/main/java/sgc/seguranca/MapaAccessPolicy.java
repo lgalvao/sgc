@@ -1,4 +1,4 @@
-package sgc.seguranca.acesso;
+package sgc.seguranca;
 
 import org.springframework.stereotype.Component;
 import sgc.mapa.model.Mapa;
@@ -11,7 +11,7 @@ import java.util.EnumSet;
 import java.util.Map;
 
 import static sgc.organizacao.model.Perfil.*;
-import static sgc.seguranca.acesso.Acao.*;
+import static sgc.seguranca.Acao.*;
 
 /**
  * Política de acesso para operações diretas em mapas.

@@ -42,7 +42,6 @@ public class SubprocessoFacade {
     private final SubprocessoAjusteMapaService ajusteMapaService;
     private final SubprocessoAtividadeService atividadeService;
     private final SubprocessoContextoService contextoService;
-    private final SubprocessoPermissaoCalculator permissaoCalculator;
     private final SubprocessoFactory subprocessoFactory;
     private final UsuarioFacade usuarioService;
 
@@ -149,11 +148,6 @@ public class SubprocessoFacade {
         return ajusteMapaService.obterMapaParaAjuste(codigo);
     }
 
-    @Transactional(readOnly = true)
-    public SubprocessoPermissoesDto obterPermissoes(Long codigo) {
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        return permissaoCalculator.obterPermissoes(codigo, usuario);
-    }
 
     @Transactional(readOnly = true)
     public ValidacaoCadastroDto validarCadastro(Long codigo) {

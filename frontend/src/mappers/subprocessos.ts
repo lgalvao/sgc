@@ -16,34 +16,6 @@ export function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe {
     const unidadeDefault = { codigo: 0, nome: 'Não informada', sigla: 'N/I' };
     const unidade = sp.unidade || dto.unidade || unidadeDefault;
 
-    // Fallback para permissões: Mescla o padrão com o que veio do DTO para garantir todas as chaves obrigatórias como booleano
-    const permissoesDefault = {
-        podeVerPagina: true,
-        podeEditarMapa: false,
-        podeEditarCadastro: false,
-        podeVisualizarMapa: true,
-        podeDisponibilizarMapa: false,
-        podeDisponibilizarCadastro: false,
-        podeDevolverCadastro: false,
-        podeAceitarCadastro: false,
-        podeHomologarCadastro: false,
-        podeVisualizarDiagnostico: true,
-        podeAlterarDataLimite: false,
-        podeVisualizarImpacto: false,
-        podeRealizarAutoavaliacao: false,
-        podeReabrirCadastro: false,
-        podeReabrirRevisao: false,
-        podeEnviarLembrete: false,
-        podeApresentarSugestoes: false,
-        podeValidarMapa: false,
-        podeAceitarMapa: false,
-        podeDevolverMapa: false,
-        podeHomologarMapa: false
-    };
-    
-    const dtoPermissoes = dto.permissoes || sp.permissoes || {};
-    const permissoes = { ...permissoesDefault, ...dtoPermissoes };
-
     return {
         codigo: sp.codigo || dto.codigo || 0,
         unidade: unidade,
@@ -58,6 +30,5 @@ export function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe {
         etapaAtual: sp.etapaAtual || dto.etapaAtual || 1,
         movimentacoes: dto.movimentacoes || [],
         elementosProcesso: dto.elementosProcesso || [],
-        permissoes: permissoes
     } as SubprocessoDetalhe;
 }

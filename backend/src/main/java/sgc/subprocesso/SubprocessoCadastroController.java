@@ -15,7 +15,6 @@ import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.comum.dto.ComumDtos.JustificativaRequest;
 import sgc.comum.dto.ComumDtos.TextoOpcionalRequest;
-import sgc.comum.dto.ComumDtos.TextoRequest;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
@@ -47,20 +46,20 @@ public class SubprocessoCadastroController {
     private final OrganizacaoFacade organizacaoFacade;
 
     @GetMapping("/{codigo}/historico-cadastro")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
     public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long codigo) {
         return analiseFacade.listarHistoricoCadastro(codigo);
     }
 
     @GetMapping("/{codigo}/contexto-edicao")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
     @JsonView(SubprocessoViews.Publica.class)
     public ResponseEntity<ContextoEdicaoResponse> obterContextoEdicao(@PathVariable Long codigo) {
         return ResponseEntity.ok(subprocessoFacade.obterContextoEdicao(codigo));
     }
 
     @PostMapping("/{codigo}/cadastro/disponibilizar")
-    @PreAuthorize("hasRole('CHEFE')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codSubprocesso, 'DISPONIBILIZAR_CADASTRO')")
     @Operation(summary = "Disponibiliza o cadastro de atividades para análise")
     public ResponseEntity<MensagemResponse> disponibilizarCadastro(
             @PathVariable("codigo") Long codSubprocesso,
@@ -83,7 +82,7 @@ public class SubprocessoCadastroController {
     }
 
     @PostMapping("/{codigo}/disponibilizar-revisao")
-    @PreAuthorize("hasRole('CHEFE')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'DISPONIBILIZAR_REVISAO_CADASTRO')")
     @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
     public ResponseEntity<MensagemResponse> disponibilizarRevisao(
             @PathVariable Long codigo, @AuthenticationPrincipal @Nullable Object principal) {
@@ -107,13 +106,13 @@ public class SubprocessoCadastroController {
 
     @JsonView(MapaViews.Publica.class)
     @GetMapping("/{codigo}/cadastro")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
     public Subprocesso obterCadastro(@PathVariable Long codigo) {
         return subprocessoFacade.buscarSubprocesso(codigo);
     }
 
     @PostMapping("/{codigo}/devolver-cadastro")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'DEVOLVER_CADASTRO')")
     @Operation(summary = "Devolve o cadastro de atividades para o responsável")
     public void devolverCadastro(
             @PathVariable Long codigo,
@@ -128,7 +127,7 @@ public class SubprocessoCadastroController {
     }
 
     @PostMapping("/{codigo}/aceitar-cadastro")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'ACEITAR_CADASTRO')")
     @Operation(summary = "Aceita o cadastro de atividades")
     public void aceitarCadastro(
             @PathVariable Long codigo,
@@ -143,7 +142,7 @@ public class SubprocessoCadastroController {
     }
 
     @PostMapping("/{codigo}/homologar-cadastro")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'HOMOLOGAR_CADASTRO')")
     @Operation(summary = "Homologa o cadastro de atividades")
     public void homologarCadastro(
             @PathVariable Long codigo,
@@ -159,7 +158,7 @@ public class SubprocessoCadastroController {
 
     @PostMapping("/{codigo}/devolver-revisao-cadastro")
     @Operation(summary = "Devolve a revisão do cadastro de atividades para o responsável")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'DEVOLVER_REVISAO_CADASTRO')")
     public void devolverRevisaoCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody JustificativaRequest request,
@@ -173,7 +172,7 @@ public class SubprocessoCadastroController {
 
     @PostMapping("/{codigo}/aceitar-revisao-cadastro")
     @Operation(summary = "Aceita a revisão do cadastro de atividades")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'ACEITAR_REVISAO_CADASTRO')")
     public void aceitarRevisaoCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody TextoOpcionalRequest request,
@@ -188,7 +187,7 @@ public class SubprocessoCadastroController {
 
     @PostMapping("/{codigo}/homologar-revisao-cadastro")
     @Operation(summary = "Homologa a revisão do cadastro de atividades")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'HOMOLOGAR_REVISAO_CADASTRO')")
     public void homologarRevisaoCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody TextoOpcionalRequest request,
@@ -202,7 +201,7 @@ public class SubprocessoCadastroController {
     }
 
     @PostMapping("/{codigo}/importar-atividades")
-    @PreAuthorize("hasRole('CHEFE')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'EDITAR_CADASTRO')")
     @Transactional
     @Operation(summary = "Importa atividades de outro subprocesso")
     public Map<String, String> importarAtividades(
@@ -212,7 +211,7 @@ public class SubprocessoCadastroController {
     }
 
     @PostMapping("/{codigo}/aceitar-cadastro-bloco")
-    @PreAuthorize("hasAnyRole('GESTOR', 'ADMIN')")
+    @PreAuthorize("@subprocessoSecurity.canExecuteBulk(#request.subprocessos, 'ACEITAR_CADASTRO')")
     @Operation(summary = "Aceita cadastros em bloco")
     public void aceitarCadastroEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
@@ -222,7 +221,7 @@ public class SubprocessoCadastroController {
     }
 
     @PostMapping("/{codigo}/homologar-cadastro-bloco")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@subprocessoSecurity.canExecuteBulk(#request.subprocessos, 'HOMOLOGAR_CADASTRO')")
     @Operation(summary = "Homologa cadastros em bloco")
     public void homologarCadastroEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,

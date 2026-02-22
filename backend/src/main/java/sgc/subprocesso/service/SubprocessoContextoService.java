@@ -9,11 +9,10 @@ import sgc.mapa.service.MapaFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.acesso.Acao;
-import sgc.seguranca.acesso.AccessControlService;
+import sgc.seguranca.Acao;
+import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.dto.ContextoEdicaoResponse;
 import sgc.subprocesso.dto.SubprocessoDetalheResponse;
-import sgc.subprocesso.dto.SubprocessoPermissoesDto;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
@@ -35,7 +34,6 @@ class SubprocessoContextoService {
     private final MovimentacaoRepo movimentacaoRepo;
     private final AccessControlService accessControlService;
     private final SubprocessoAtividadeService atividadeService;
-    private final SubprocessoPermissaoCalculator permissaoCalculator;
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheResponse obterDetalhes(Long codigo, Usuario usuarioAutenticado) {
@@ -68,14 +66,12 @@ class SubprocessoContextoService {
             }
         }
 
-        SubprocessoPermissoesDto permissoes = permissaoCalculator.calcularPermissoes(sp, usuarioAutenticado);
 
         return SubprocessoDetalheResponse.builder()
                 .subprocesso(sp)
                 .responsavel(responsavel)
                 .titular(titular)
                 .movimentacoes(movimentacoes)
-                .permissoes(permissoes)
                 .localizacaoAtual(localizacaoAtual)
                 .build();
     }

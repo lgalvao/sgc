@@ -33,7 +33,7 @@ public class SubprocessoValidacaoController {
     private final AnaliseFacade analiseFacade;
 
     @PostMapping("/{codigo}/apresentar-sugestoes")
-    @PreAuthorize("hasRole('CHEFE')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'APRESENTAR_SUGESTOES')")
     @Operation(summary = "Apresenta sugestões de melhoria para o mapa")
     public void apresentarSugestoes(
             @PathVariable Long codigo,
@@ -43,19 +43,19 @@ public class SubprocessoValidacaoController {
     }
 
     @GetMapping("/{codigo}/sugestoes")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
     public Map<String, Object> obterSugestoes(@PathVariable Long codigo) {
         return subprocessoFacade.obterSugestoes(codigo);
     }
 
     @GetMapping("/{codigo}/historico-validacao")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
     public List<AnaliseHistoricoDto> obterHistoricoValidacao(@PathVariable Long codigo) {
         return analiseFacade.listarHistoricoValidacao(codigo);
     }
 
     @PostMapping("/{codigo}/validar-mapa")
-    @PreAuthorize("hasRole('CHEFE')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'VALIDAR_MAPA')")
     @Operation(summary = "Valida o mapa de competências da unidade")
     public ResponseEntity<Void> validarMapa(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
         subprocessoFacade.validarMapa(codigo, usuario);
@@ -63,7 +63,7 @@ public class SubprocessoValidacaoController {
     }
 
     @PostMapping("/{codigo}/devolver-validacao")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'DEVOLVER_MAPA')")
     @Operation(summary = "Devolve o mapa para ajuste (pelo chefe/gestor)")
     public ResponseEntity<Void> devolverValidacao(
             @PathVariable Long codigo,
@@ -74,7 +74,7 @@ public class SubprocessoValidacaoController {
     }
 
     @PostMapping("/{codigo}/aceitar-validacao")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'ACEITAR_MAPA')")
     @Operation(summary = "Aceita a validação (pelo gestor)")
     public ResponseEntity<Void> aceitarValidacao(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
         subprocessoFacade.aceitarValidacao(codigo, usuario);
@@ -82,7 +82,7 @@ public class SubprocessoValidacaoController {
     }
 
     @PostMapping("/{codigo}/homologar-validacao")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'HOMOLOGAR_MAPA')")
     @Operation(summary = "Homologa a validação")
     public ResponseEntity<Void> homologarValidacao(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
         subprocessoFacade.homologarValidacao(codigo, usuario);
@@ -90,7 +90,7 @@ public class SubprocessoValidacaoController {
     }
 
     @PostMapping("/{codigo}/submeter-mapa-ajustado")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'AJUSTAR_MAPA')")
     @Operation(summary = "Submete o mapa após ajustes solicitados")
     public ResponseEntity<Void> submeterMapaAjustado(
             @PathVariable Long codigo,
@@ -101,7 +101,7 @@ public class SubprocessoValidacaoController {
     }
 
     @PostMapping("/{codigo}/aceitar-validacao-bloco")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("@subprocessoSecurity.canExecuteBulk(#request.subprocessos, 'ACEITAR_MAPA')")
     @Operation(summary = "Aceita validação de mapas em bloco")
     public void aceitarValidacaoEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
@@ -110,7 +110,7 @@ public class SubprocessoValidacaoController {
     }
 
     @PostMapping("/{codigo}/homologar-validacao-bloco")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@subprocessoSecurity.canExecuteBulk(#request.subprocessos, 'HOMOLOGAR_MAPA')")
     @Operation(summary = "Homologa validação de mapas em bloco")
     public void homologarValidacaoEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,

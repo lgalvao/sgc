@@ -20,7 +20,7 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
-import sgc.seguranca.acesso.AccessControlService;
+import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static sgc.seguranca.acesso.Acao.*;
+import static sgc.seguranca.Acao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service

@@ -1,4 +1,4 @@
-package sgc.seguranca.acesso;
+package sgc.seguranca;
 
 import org.springframework.stereotype.Component;
 import sgc.mapa.model.Atividade;
@@ -14,7 +14,7 @@ import java.util.EnumSet;
 import java.util.Map;
 
 import static sgc.organizacao.model.Perfil.CHEFE;
-import static sgc.seguranca.acesso.Acao.*;
+import static sgc.seguranca.Acao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**

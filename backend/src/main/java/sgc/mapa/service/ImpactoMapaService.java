@@ -12,13 +12,13 @@ import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.acesso.AccessControlService;
+import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static sgc.seguranca.acesso.Acao.VERIFICAR_IMPACTOS;
+import static sgc.seguranca.Acao.VERIFICAR_IMPACTOS;
 
 /**
  * Serviço responsável por detectar impactos no mapa de competências causados

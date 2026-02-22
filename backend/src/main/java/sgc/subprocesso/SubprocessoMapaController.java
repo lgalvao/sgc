@@ -35,7 +35,7 @@ public class SubprocessoMapaController {
     private final MapaFacade mapaFacade;
 
     @GetMapping("/{codigo}/impactos-mapa")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'VERIFICAR_IMPACTOS')")
     @JsonView(MapaViews.Publica.class)
     public ImpactoMapaResponse verificarImpactos(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codigo);
@@ -43,7 +43,7 @@ public class SubprocessoMapaController {
     }
 
     @GetMapping("/{codigo}/mapa")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
     @JsonView(MapaViews.Publica.class)
     public Mapa obterMapa(@PathVariable Long codigo) {
         Subprocesso sp = subprocessoFacade.buscarSubprocessoComMapa(codigo);
@@ -51,7 +51,7 @@ public class SubprocessoMapaController {
     }
 
     @PostMapping("/{codigo}/disponibilizar-mapa")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'DISPONIBILIZAR_MAPA')")
     @Operation(summary = "Disponibiliza o mapa para validação")
     public ResponseEntity<MensagemResponse> disponibilizarMapa(
             @PathVariable Long codigo,
@@ -62,7 +62,7 @@ public class SubprocessoMapaController {
     }
 
     @GetMapping("/{codigo}/mapa-visualizacao")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
     @Operation(summary = "Obtém o mapa formatado para visualização")
     @JsonView(MapaViews.Publica.class)
     public MapaVisualizacaoResponse obterMapaParaVisualizacao(@PathVariable Long codigo) {
@@ -71,7 +71,7 @@ public class SubprocessoMapaController {
     }
 
     @PostMapping("/{codigo}/mapa")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'EDITAR_MAPA')")
     @Operation(summary = "Salva as alterações do mapa")
     @JsonView(MapaViews.Publica.class)
     public Mapa salvarMapa(
@@ -81,7 +81,7 @@ public class SubprocessoMapaController {
     }
 
     @GetMapping("/{codigo}/mapa-completo")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
     @Operation(summary = "Obtém o mapa completo para edição/visualização")
     @JsonView(MapaViews.Publica.class)
     @Transactional(readOnly = true)
@@ -96,7 +96,7 @@ public class SubprocessoMapaController {
     }
 
     @PostMapping("/{codigo}/mapa-completo")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'EDITAR_MAPA')")
     @Operation(summary = "Salva o mapa completo (batch)")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> salvarMapaCompleto(
@@ -108,7 +108,7 @@ public class SubprocessoMapaController {
     }
 
     @PostMapping("/{codigo}/disponibilizar-mapa-bloco")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@subprocessoSecurity.canExecuteBulk(#request.subprocessos, 'DISPONIBILIZAR_MAPA')")
     @Operation(summary = "Disponibiliza mapas em bloco")
     public void disponibilizarMapaEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
@@ -120,14 +120,14 @@ public class SubprocessoMapaController {
     }
 
     @GetMapping("/{codigo}/mapa-ajuste")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'AJUSTAR_MAPA')")
     @Operation(summary = "Obtém dados do mapa preparados para ajuste")
     public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long codigo) {
         return subprocessoFacade.obterMapaParaAjuste(codigo);
     }
 
     @PostMapping("/{codigo}/mapa-ajuste/atualizar")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'EDITAR_MAPA')")
     // TODO aqui acho que deveria ser so ADMIN. Confirmar
     @Operation(summary = "Salva os ajustes feitos no mapa")
     public void salvarAjustesMapa(
@@ -137,7 +137,7 @@ public class SubprocessoMapaController {
     }
 
     @PostMapping("/{codigo}/competencia")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'EDITAR_MAPA')")
     @Operation(summary = "Adiciona uma competência ao mapa")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> adicionarCompetencia(
@@ -148,7 +148,7 @@ public class SubprocessoMapaController {
     }
 
     @PostMapping("/{codigo}/competencia/{codCompetencia}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'EDITAR_MAPA')")
     @Operation(summary = "Atualiza uma competência do mapa")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> atualizarCompetencia(
@@ -160,7 +160,7 @@ public class SubprocessoMapaController {
     }
 
     @PostMapping("/{codigo}/competencia/{codCompetencia}/remover")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'EDITAR_MAPA')")
     @Operation(summary = "Remove uma competência do mapa")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> removerCompetencia(

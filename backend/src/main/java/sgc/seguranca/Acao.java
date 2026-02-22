@@ -1,4 +1,4 @@
-package sgc.seguranca.acesso;
+package sgc.seguranca;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

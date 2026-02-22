@@ -1,4 +1,4 @@
 @NullMarked
-package sgc.seguranca.acesso;
+package sgc.seguranca;
 
 import org.jspecify.annotations.NullMarked;

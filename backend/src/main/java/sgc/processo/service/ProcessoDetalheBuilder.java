@@ -8,8 +8,8 @@ import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.UnidadeProcesso;
-import sgc.seguranca.acesso.Acao;
-import sgc.seguranca.acesso.AccessControlService;
+import sgc.seguranca.Acao;
+import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 

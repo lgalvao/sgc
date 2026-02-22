@@ -1,4 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
+import {ref} from "vue";
 import {flushPromises, mount} from "@vue/test-utils";
 import VisAtividades from "@/views/processo/AtividadesVisualizacaoView.vue";
 import {createTestingPinia} from "@pinia/testing";
@@ -160,8 +161,8 @@ describe("VisAtividades.vue", () => {
 
     const mountComponent = (initialState: any = {}, accessOverrides: Record<string, any> = {}) => {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeHomologarCadastro: { value: true },
-            podeVisualizarImpacto: { value: true },
+            podeHomologarCadastro: ref(true),
+            podeVisualizarImpacto: ref(true),
             ...accessOverrides
         } as any);
 
@@ -230,7 +231,7 @@ describe("VisAtividades.vue", () => {
                     codigo: 10,
                 }
             }
-        }, { podeHomologarCadastro: { value: false } });
+        }, { podeHomologarCadastro: ref(false) });
         subprocessosStore = useSubprocessosStore();
         vi.spyOn(subprocessosStore, "aceitarRevisaoCadastro").mockResolvedValue(true);
 
@@ -290,7 +291,7 @@ describe("VisAtividades.vue", () => {
     });
 
     describe("Fluxo Mapeamento (Não Revisão)", () => {
-        const mountOptionsMapeamento = () => mountOptions({
+        const stateMapeamento = {
             processos: {
                 processoDetalhe: {
                     codigo: 2,
@@ -309,7 +310,7 @@ describe("VisAtividades.vue", () => {
                     codigo: 20,
                 }
             }
-        });
+        };
 
         beforeEach(() => {
             (obterDetalhesProcesso as any).mockResolvedValue({
@@ -324,7 +325,7 @@ describe("VisAtividades.vue", () => {
         });
 
         it("deve homologar cadastro de mapeamento", async () => {
-            const wrapper = mountComponent(mountOptionsMapeamento().props.global?.initialState);
+            const wrapper = mountComponent(stateMapeamento);
             subprocessosStore = useSubprocessosStore();
             vi.spyOn(subprocessosStore, "homologarCadastro").mockResolvedValue(true);
 
@@ -368,7 +369,7 @@ describe("VisAtividades.vue", () => {
                         codigo: 20,
                     }
                 }
-            }, { podeHomologarCadastro: { value: false }, podeVisualizarImpacto: { value: true } });
+            }, { podeHomologarCadastro: ref(false), podeVisualizarImpacto: ref(true) });
             subprocessosStore = useSubprocessosStore();
             vi.spyOn(subprocessosStore, "aceitarCadastro").mockResolvedValue(true);
 
@@ -381,7 +382,7 @@ describe("VisAtividades.vue", () => {
         });
 
         it("deve devolver cadastro de mapeamento", async () => {
-            const wrapper = mountComponent(mountOptionsMapeamento().props.global?.initialState);
+            const wrapper = mountComponent(stateMapeamento);
             subprocessosStore = useSubprocessosStore();
             vi.spyOn(subprocessosStore, "devolverCadastro").mockResolvedValue(true);
 
@@ -395,13 +396,13 @@ describe("VisAtividades.vue", () => {
         });
 
         it("deve mostrar texto correto no botão de impacto", async () => {
-            const wrapper = mountComponent(mountOptionsMapeamento().props.global?.initialState);
+            const wrapper = mountComponent(stateMapeamento);
             const btn = wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa-visualizacao"]');
-            expect(btn.text()).toContain("Ver impactos");
+            expect(btn.text()).toContain("Impacto no mapa");
         });
 
         it("não deve redirecionar se devolução de mapeamento falhar", async () => {
-            const wrapper = mountComponent(mountOptionsMapeamento().props.global?.initialState);
+            const wrapper = mountComponent(stateMapeamento);
             subprocessosStore = useSubprocessosStore();
             vi.spyOn(subprocessosStore, "devolverCadastro").mockResolvedValue(false);
 
@@ -613,7 +614,7 @@ describe("VisAtividades.vue", () => {
                         }]
                     }
                 }
-            }, { podeHomologarCadastro: { value: false } });
+            }, { podeHomologarCadastro: ref(false) });
             await flushPromises();
             expect((wrapper.vm as any).isHomologacao).toBe(false);
         });
@@ -633,7 +634,7 @@ describe("VisAtividades.vue", () => {
                     }
                 },
                 subprocessos: { subprocessoDetalhe: null }
-            }, { podeVisualizarImpacto: { value: false } });
+            }, { podeVisualizarImpacto: ref(false) });
             expect((wrapper.vm as any).podeVerImpacto).toBe(false);
         });
     });

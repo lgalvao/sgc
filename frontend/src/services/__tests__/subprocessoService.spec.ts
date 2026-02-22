@@ -30,11 +30,6 @@ describe("subprocessoService", () => {
         expect(apiClient.get).toHaveBeenCalledWith("/subprocessos/1/contexto-edicao");
     });
 
-    it("obterPermissoes chama o endpoint correto", async () => {
-        vi.mocked(apiClient.get).mockResolvedValue({ data: {} });
-        await service.obterPermissoes(1);
-        expect(apiClient.get).toHaveBeenCalledWith("/subprocessos/1/permissoes");
-    });
 
     it("validarCadastro chama o endpoint correto", async () => {
         vi.mocked(apiClient.get).mockResolvedValue({ data: {} });
