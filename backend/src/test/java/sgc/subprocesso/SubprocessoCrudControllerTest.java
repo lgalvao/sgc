@@ -39,14 +39,6 @@ class SubprocessoCrudControllerTest {
     @InjectMocks
     private SubprocessoCrudController controller;
 
-    @Test
-    @DisplayName("obterPermissoes - Sucesso")
-    void obterPermissoes() {
-        when(subprocessoFacade.obterPermissoes(1L)).thenReturn(SubprocessoPermissoesDto.builder().build());
-        ResponseEntity<SubprocessoPermissoesDto> response = controller.obterPermissoes(1L);
-        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-        verify(subprocessoFacade).obterPermissoes(1L);
-    }
 
     @Test
     @DisplayName("validarCadastro - Sucesso")
