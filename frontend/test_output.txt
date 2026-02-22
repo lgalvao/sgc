@@ -1,0 +1,7 @@
+
+> sgc@1.0.0 test:unit
+> vitest --run --reporter=dot --no-color
+
+
+ RUN  v4.0.18 /Users/leonardo/sgc/frontend
+

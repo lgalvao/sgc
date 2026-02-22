@@ -129,11 +129,6 @@ describe("CadAtividades.vue", () => {
                         situacao: isRevisao
                             ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
                             : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                         permissoes: {
-                             podeEditarMapa: true,
-                             podeDisponibilizarCadastro: true,
-                             podeVisualizarImpacto: true
-                        },
                         tipoProcesso: isRevisao ? TipoProcesso.REVISAO : TipoProcesso.MAPEAMENTO
                     }
                 },

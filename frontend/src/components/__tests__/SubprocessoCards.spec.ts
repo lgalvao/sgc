@@ -14,20 +14,6 @@ describe('SubprocessoCards.vue', () => {
     const defaultProps = {
         tipoProcesso: TipoProcesso.MAPEAMENTO,
         mapa: { codigo: 1 } as any,
-        permissoes: {
-            podeEditarMapa: true,
-            podeEditarCadastro: true,
-            podeVisualizarMapa: true,
-            podeVisualizarDiagnostico: false,
-            podeVerPagina: true,
-            podeDisponibilizarCadastro: false,
-            podeDevolverCadastro: false,
-            podeAceitarCadastro: false,
-            podeVisualizarImpacto: false,
-            podeAlterarDataLimite: false,
-            podeRealizarAutoavaliacao: false,
-            podeDisponibilizarMapa: false
-        },
         codSubprocesso: 100,
         codProcesso: 1,
         siglaUnidade: 'TESTE'
@@ -41,7 +27,7 @@ describe('SubprocessoCards.vue', () => {
             podeVisualizarDiagnostico: false,
             podeVerPagina: true,
             ...accessOverrides
-        } as any);
+        });
 
         return mount(SubprocessoCards, {
             props: { ...defaultProps, ...propsOverrides },

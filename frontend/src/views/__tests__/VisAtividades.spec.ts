@@ -546,7 +546,6 @@ describe("VisAtividades.vue", () => {
                     sigla: "U1",
                     codSubprocesso: 20,
                     situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
-                    permissoes: { podeHomologarCadastro: true }
                 }]
             });
             const wrapper = mountComponent({
@@ -576,7 +575,6 @@ describe("VisAtividades.vue", () => {
                     sigla: "U1",
                     codSubprocesso: 10,
                     situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
-                    permissoes: { podeHomologarCadastro: true }
                 }]
             });
             const wrapper = mountComponent({
@@ -600,7 +598,6 @@ describe("VisAtividades.vue", () => {
         it("isHomologacao deve ser false se permissão for false", async () => {
             (buscarSubprocessoDetalhe as any).mockImplementation((cod: number) => Promise.resolve({
                 codigo: cod,
-                permissoes: { podeHomologarCadastro: false }
             }));
 
             const wrapper = mountComponent({

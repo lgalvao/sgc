@@ -12,7 +12,6 @@ import {
     buscarContextoEdicao,
     buscarSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade,
-    obterPermissoes,
     validarCadastro,
 } from '@/services/subprocessoService';
 import {
@@ -33,7 +32,6 @@ vi.mock('@/services/subprocessoService', () => ({
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
-    obterPermissoes: vi.fn(),
     validarCadastro: vi.fn(),
 }));
 
@@ -467,26 +465,5 @@ describe('Subprocessos Store', () => {
             expect(mockFeedbackStore.show).toHaveBeenCalledWith('Revisão de cadastro reaberta', expect.any(String), 'success');
         });
     });
-
-    describe('buscarPermissoes', () => {
-        it('deve buscar e atualizar permissões se o ID coincidir', async () => {
-            store.subprocessoDetalhe = { codigo: 10, unidade: { codigo: 10 }, permissoes: null } as any;
-            (obterPermissoes as any).mockResolvedValue({ podeEditar: true });
-
-            await store.buscarPermissoes(10);
-
-            expect(obterPermissoes).toHaveBeenCalledWith(10);
-            expect(store.subprocessoDetalhe?.permissoes).toEqual({ podeEditar: true });
-        });
-
-        it('deve buscar mas NÃO atualizar permissões se o ID não coincidir', async () => {
-            store.subprocessoDetalhe = { codigo: 10, unidade: { codigo: 10 }, permissoes: null } as any;
-            (obterPermissoes as any).mockResolvedValue({ podeEditar: true });
-
-            await store.buscarPermissoes(20);
-
-            expect(obterPermissoes).toHaveBeenCalledWith(20);
-            expect(store.subprocessoDetalhe?.permissoes).toBeNull();
-        });
-    });
 });
+
