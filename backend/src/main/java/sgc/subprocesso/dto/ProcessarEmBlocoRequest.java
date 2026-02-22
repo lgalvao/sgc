@@ -6,9 +6,6 @@ import lombok.Builder;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * DTO para requisição de processamento de subprocessos em lote.
- */
 @Builder
 public record ProcessarEmBlocoRequest(
         @NotBlank(message = "A ação é obrigatória")

@@ -27,9 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Orquestra operações de Subprocesso.
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -89,8 +86,6 @@ public class SubprocessoFacade {
     public void excluir(Long codigo) {
         crudService.excluir(codigo);
     }
-
-    // ===== Consultas e Detalhes =====
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheResponse obterDetalhes(Long codigo) {

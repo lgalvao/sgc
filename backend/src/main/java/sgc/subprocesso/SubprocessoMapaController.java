@@ -22,9 +22,6 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 
-/**
- * Operações relacionadas ao Mapa de Competências dentro do workflow de Subprocesso.
- */
 @RestController
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor

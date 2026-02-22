@@ -54,8 +54,6 @@ public class SubprocessoCadastroWorkflowService {
 
     private final AccessControlService accessControlService;
 
-    // Métodos para reabertura de cadastro
-
     @Transactional
     public void reabrirCadastro(Long codigo, String justificativa) {
         executarReabertura(codigo, justificativa, MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
@@ -112,8 +110,6 @@ public class SubprocessoCadastroWorkflowService {
             superior = superior.getUnidadeSuperior();
         }
     }
-
-    // Métodos de workflow de cadastro
 
     @Transactional
     public void disponibilizarCadastro(Long codSubprocesso, Usuario usuario) {
