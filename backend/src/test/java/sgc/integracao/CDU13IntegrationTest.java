@@ -39,7 +39,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
@@ -338,9 +337,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                 .perform(MockMvcRequestBuilders.get(
                                 "/api/subprocessos/{id}/historico-cadastro",
                                 subprocesso.getCodigo())
-                        .with(user("132313231323")
-                                .roles("GESTOR")
-                                .authorities(new SimpleGrantedAuthority("ROLE_GESTOR")))
+                        .with(user(gestor))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn()

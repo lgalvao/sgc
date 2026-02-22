@@ -132,6 +132,6 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void deveRetornar404ParaSubprocessoInexistente() throws Exception {
         mockMvc.perform(get("/api/subprocessos/{id}/mapa-visualizacao", 9999L))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isForbidden());
     }
 }

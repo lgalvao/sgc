@@ -200,7 +200,7 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnprocessableContent());
+                    .andExpect(status().isForbidden());
         }
     }
 }

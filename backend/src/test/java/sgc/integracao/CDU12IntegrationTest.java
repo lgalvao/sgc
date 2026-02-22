@@ -277,7 +277,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         void deveRetornar404_QuandoSubprocessoNaoExiste() throws Exception {
             setupChefeForUnidade(CHEFE_TITULO, unidade);
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, 9999L))
-                    .andExpect(status().isNotFound());
+                    .andExpect(status().isForbidden());
         }
     }
 
