@@ -8,6 +8,7 @@ import {useFeedbackStore} from '@/stores/feedback';
 import {useProcessosStore} from '@/stores/processos';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
+import * as useAcessoModule from '@/composables/useAcesso';
 
 // Mock child components
 const SubprocessoHeaderStub = {
@@ -69,21 +70,7 @@ describe('Subprocesso.vue', () => {
     localizacaoAtual: 'Unidade Teste',
     isEmAndamento: true,
     elementosProcesso: [],
-    permissoes: {
-      podeAlterarDataLimite: true,
-      podeEditarMapa: true,
-      podeVisualizarMapa: true,
-      podeVisualizarDiagnostico: true,
-      podeDisponibilizarCadastro: false,
-      podeDevolverCadastro: false,
-      podeAceitarCadastro: false,
-      podeVisualizarImpacto: false,
-      podeVerPagina: true,
-      podeRealizarAutoavaliacao: false,
-      podeReabrirCadastro: true,
-      podeReabrirRevisao: true,
-      podeEnviarLembrete: true
-    },
+
     movimentacoes: [] as any[]
   };
 
@@ -103,8 +90,18 @@ describe('Subprocesso.vue', () => {
   });
 
   // Helper to mount component with specific setup
-  const mountComponent = (overrideMockSubprocesso?: Partial<typeof mockSubprocesso>) => {
+  const mountComponent = (overrideMockSubprocesso?: Partial<typeof mockSubprocesso>, accessOverrides: Partial<Record<string, any>> = {}) => {
     const subprocessoToUse = overrideMockSubprocesso ? { ...mockSubprocesso, ...overrideMockSubprocesso } : mockSubprocesso;
+
+    vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
+      podeAlterarDataLimite: { value: true },
+      podeReabrirCadastro: { value: true },
+      podeReabrirRevisao: { value: true },
+      podeEnviarLembrete: { value: true },
+      podeDisponibilizarCadastro: { value: true },
+      podeEditarCadastro: { value: true },
+      ...accessOverrides
+    } as any);
     
     const pinia = createTestingPinia({
       createSpy: vi.fn,
@@ -217,11 +214,7 @@ describe('Subprocesso.vue', () => {
   });
 
   it('shows error when opening date limit modal is not allowed', async () => {
-    const subprocessoSemPermissao = {
-      permissoes: { ...mockSubprocesso.permissoes, podeAlterarDataLimite: false }
-    };
-    
-    const { wrapper, feedbackStore } = mountComponent(subprocessoSemPermissao);
+    const { wrapper, feedbackStore } = mountComponent({}, { podeAlterarDataLimite: { value: false } });
     await flushPromises();
     await (wrapper.vm as any).$nextTick();
 

@@ -9,6 +9,7 @@ import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useFeedbackStore} from "@/stores/feedback";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
+import * as useAcessoModule from '@/composables/useAcesso';
 
 // Mocks for services
 vi.mock("@/services/unidadeService", () => ({
@@ -29,15 +30,6 @@ vi.mock("@/services/processoService", () => ({
 }));
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({ 
-        permissoes: {
-            podeValidarMapa: true,
-            podeApresentarSugestoes: true,
-            podeAceitarMapa: true,
-            podeDevolverMapa: true,
-            podeHomologarMapa: true,
-            podeVerPagina: true,
-            podeVisualizarMapa: true,
-        }
     }),
 }));
 vi.mock("@/services/mapaService", () => ({
@@ -79,7 +71,18 @@ describe("VisMapa.vue", () => {
         await router.isReady();
     });
 
-    const mountComponent = (initialState: any = {}, siglaUnidade = "TEST") => {
+    const mountComponent = (initialState: any = {}, siglaUnidade = "TEST", accessOverrides: any = {}) => {
+        vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
+            podeValidarMapa: { value: true },
+            podeApresentarSugestoes: { value: true },
+            podeAceitarMapa: { value: true },
+            podeDevolverMapa: { value: true },
+            podeHomologarMapa: { value: false },
+            podeVerPagina: { value: true },
+            podeVisualizarMapa: { value: true },
+            ...accessOverrides
+        } as any);
+
         context.wrapper = mount(VisMapa, {
             global: {
                 plugins: [
@@ -143,15 +146,6 @@ describe("VisMapa.vue", () => {
                                 subprocessoDetalhe: {
                                     codigo: 10,
                                     codSubprocesso: 10,
-                                    permissoes: {
-                                        podeValidarMapa: true,
-                                        podeApresentarSugestoes: true,
-                                        podeAceitarMapa: true,
-                                        podeDevolverMapa: true,
-                                        podeHomologarMapa: false,
-                                        podeVerPagina: true,
-                                        podeVisualizarMapa: true,
-                                    }
                                 },
                                 ...initialState["subprocessos"],
                             },
@@ -281,7 +275,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("opens validar modal and confirms", async () => {
-        const { wrapper, feedbackStore } = mountComponent();
+        const { wrapper, feedbackStore } = mountComponent({}, "TEST", { podeValidarMapa: { value: true } });
         const store = useProcessosStore();
 
         await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
@@ -298,7 +292,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("opens sugestoes modal and confirms", async () => {
-        const { wrapper, feedbackStore } = mountComponent();
+        const { wrapper, feedbackStore } = mountComponent({}, "TEST", { podeValidarMapa: { value: true } });
         const store = useProcessosStore();
 
         await wrapper
@@ -406,7 +400,7 @@ describe("VisMapa.vue", () => {
                     ],
                 },
             },
-        });
+        }, "TEST", { podeHomologarMapa: { value: true } });
         const store = useSubprocessosStore();
 
         await wrapper
@@ -582,7 +576,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("handles error in confirmarValidacao", async () => {
-        const { wrapper, feedbackStore } = mountComponent();
+        const { wrapper, feedbackStore } = mountComponent({}, "TEST", { podeValidarMapa: { value: true } });
         const store = useProcessosStore();
         (store.validarMapa as any).mockRejectedValue(new Error("Fail"));
         vi.spyOn(feedbackStore, "show");
@@ -596,11 +590,12 @@ describe("VisMapa.vue", () => {
     });
 
     it("handles error in confirmarSugestoes", async () => {
-        const { wrapper, feedbackStore } = mountComponent();
+        const { wrapper, feedbackStore } = mountComponent({
+            perfil: { perfilSelecionado: "CHEFE" }
+        }, "TEST", { podeValidarMapa: { value: true } });
         const store = useProcessosStore();
         (store.apresentarSugestoes as any).mockRejectedValue(new Error("Fail"));
         vi.spyOn(feedbackStore, "show");
-
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
         await wrapper.vm.$nextTick();
         await wrapper.find('[data-testid="btn-sugestoes-mapa-confirmar"]').trigger("click");
@@ -612,26 +607,7 @@ describe("VisMapa.vue", () => {
     it("closes ver sugestoes modal", async () => {
         const { wrapper } = mountComponent({
             perfil: { perfilSelecionado: "GESTOR" },
-            subprocessos: {
-                subprocessoDetalhe: {
-                    codigo: 10,
-                    permissoes: { 
-                        podeApresentarSugestoes: true, 
-                        podeVisualizarMapa: true, 
-                        podeAceitarMapa: true 
-                    }
-                }
-            },
-            processos: {
-                processoDetalhe: {
-                    unidades: [{
-                        sigla: 'TEST',
-                        codSubprocesso: 10,
-                        situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES
-                    }]
-                }
-            }
-        });
+        }, "TEST", { podeAnalisar: { value: true }, podeApresentarSugestoes: { value: true }, podeAceitarMapa: { value: true } });
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-mapa-ver-sugestoes"]').trigger("click");
@@ -644,7 +620,7 @@ describe("VisMapa.vue", () => {
     it("closes historico modal", async () => {
         const { wrapper } = mountComponent({
             perfil: { perfilSelecionado: "GESTOR" }
-        });
+        }, "TEST", { podeAceitarMapa: { value: true } });
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-mapa-historico-gestor"]').trigger("click");
@@ -655,9 +631,9 @@ describe("VisMapa.vue", () => {
         await modal.vm.$emit('fechar');
         expect(wrapper.vm.mostrarModalHistorico).toBe(false);
     });
-
     it("triggers focus on shown in sugestoes modal", async () => {
-        const { wrapper } = mountComponent();
+        const { wrapper } = mountComponent({}, "TEST", { podeValidarMapa: { value: true } });
+        await wrapper.vm.$nextTick();
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
         
         const modal = wrapper.findAllComponents({ name: 'ModalConfirmacao' }).find(c => c.props('titulo') === 'Apresentar Sugestões');
@@ -666,24 +642,10 @@ describe("VisMapa.vue", () => {
 
     it("triggers focus on shown in devolucao modal", async () => {
         const { wrapper } = mountComponent({
-            perfil: { perfilSelecionado: "GESTOR" },
-            subprocessos: {
-                subprocessoDetalhe: {
-                    codigo: 10,
-                    permissoes: { podeDevolverMapa: true, podeVisualizarMapa: true }
-                }
-            },
-            processos: {
-                processoDetalhe: {
-                    unidades: [{
-                        sigla: 'TEST',
-                        codSubprocesso: 10,
-                        situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO
-                    }]
-                }
-            }
-        });
+            perfil: { perfilSelecionado: "GESTOR" }
+        }, "TEST", { podeDevolverMapa: { value: true } });
         await flushPromises();
+        await wrapper.vm.$nextTick();
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
         

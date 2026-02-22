@@ -36,6 +36,8 @@ vi.mock("@/services/subprocessoService", () => ({
     validarCadastro: vi.fn(),
 }));
 
+import * as useAcessoModule from '@/composables/useAcesso';
+
 vi.mock("@/services/processoService");
 
 // Stubs
@@ -153,6 +155,12 @@ describe("CadAtividades.vue", () => {
         subprocessosStore.disponibilizarRevisaoCadastro.mockResolvedValue(true);
         // Mock validarCadastro to call through to service mock
         subprocessosStore.validarCadastro.mockImplementation((cod: number) => subprocessoService.validarCadastro(cod));
+        
+        vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
+            podeVisualizarImpacto: { value: true },
+            podeEditarCadastro: { value: true },
+            podeDisponibilizarCadastro: { value: true }
+        } as any);
 
         atividadesStore = useAtividadesStore(pinia) as any;
         // Actions

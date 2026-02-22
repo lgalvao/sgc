@@ -41,6 +41,8 @@ vi.mock("@/composables/usePerfil", () => ({
     usePerfil: vi.fn(),
 }));
 
+import * as useAcessoModule from '@/composables/useAcesso';
+
 // Mock services explicitly
 vi.mock("@/services/mapaService", () => ({
     obterMapaCompleto: vi.fn(),
@@ -268,7 +270,14 @@ describe("CadMapa.vue", () => {
         },
     };
 
-    function createWrapper(customState = {}) {
+    function createWrapper(customState = {}, accessOverrides = {}) {
+        vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
+            podeVisualizarImpacto: { value: true },
+            podeEditarMapa: { value: true },
+            podeDisponibilizarMapa: { value: true },
+            ...accessOverrides
+        } as any);
+
         vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
             perfilSelecionado: {value: Perfil.CHEFE},
             servidorLogado: {value: null},
@@ -336,14 +345,12 @@ describe("CadMapa.vue", () => {
         ).mockResolvedValue({codigo: 123} as any);
 
         vi.mocked(subprocessoService.buscarSubprocessoDetalhe).mockResolvedValue({
-            permissoes: {podeVisualizarImpacto: true, podeEditarMapa: true, podeDisponibilizarMapa: true},
         } as any);
 
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
             subprocesso: {
                 situacao: 'EM_ANDAMENTO',
                 situacaoLabel: 'Em Andamento',
-                permissoes: { podeVisualizarImpacto: true, podeEditarMapa: true, podeDisponibilizarMapa: true }
             },
             mapa: mockMapaCompleto,
             atividades: mockAtividades,
@@ -387,7 +394,6 @@ describe("CadMapa.vue", () => {
             subprocesso: {
                 situacao: 'EM_ANDAMENTO',
                 situacaoLabel: 'Em Andamento',
-                permissoes: { podeEditarMapa: true, podeVisualizarImpacto: true }
             },
             mapa: { ...mockMapaCompleto, competencias: [] },
             atividades: mockAtividades,
@@ -552,17 +558,7 @@ describe("CadMapa.vue", () => {
     });
 
     it('não deve mostrar o botão "Impacto no mapa" se não tiver permissão', async () => {
-        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
-            subprocesso: {
-                situacao: 'EM_ANDAMENTO',
-                permissoes: { podeVisualizarImpacto: false }
-            },
-            mapa: mockMapaCompleto,
-            atividades: mockAtividades,
-            unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
-        } as any);
-
-        const {wrapper} = createWrapper();
+        const {wrapper} = createWrapper({}, { podeVisualizarImpacto: { value: false } });
         await flushPromises();
 
         expect(wrapper.find('[data-testid="btn-impactos-mapa"]').exists()).toBe(false);

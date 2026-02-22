@@ -12,11 +12,11 @@ This document tracks the progress of the access control simplification outlined 
 ## Phase 1: Frontend Decoupling
 *Goal: Stop relying on the backend to tell the UI which buttons to show.*
 
-- [ ] **Create `useAcesso` Composable:** Implement local calculation of permissions based on profile, unit, `situacao`, and `localizacaoAtual`.
-- [ ] **Refactor `SubprocessoDetalheView.vue`:** Use local logic instead of `subprocesso.permissoes`.
-- [ ] **Refactor `AtividadesCadastroView.vue`:** Use local logic for actions (e.g., `podeEditarCadastro`, `podeDisponibilizarCadastro`).
-- [ ] **Refactor `SubprocessoCards` & `SubprocessoHeader`:** Replace `permissoes` prop with local check logic.
-- [ ] **Clean Up Types & Stores:** Remove `SubprocessoPermissoes` from `tipos.ts`, `subprocessos.ts`, and mappers.
+- [x] **Create `useAcesso` Composable:** Implement local calculation of permissions based on profile, unit, `situacao`, and `localizacaoAtual`.
+- [x] **Refactor `SubprocessoDetalheView.vue`:** Use local logic instead of `subprocesso.permissoes`.
+- [x] **Refactor `AtividadesCadastroView.vue`:** Use local logic for actions (e.g., `podeEditarCadastro`, `podeDisponibilizarCadastro`).
+- [x] **Refactor `SubprocessoCards` & `SubprocessoHeader`:** Replace `permissoes` prop with local check logic.
+- [x] **Clean Up Types & Stores:** Remove `SubprocessoPermissoes` from `tipos.ts`, `subprocessos.ts`, and mappers.
 
 ---
 
@@ -40,4 +40,4 @@ This document tracks the progress of the access control simplification outlined 
 ---
 
 ## Notes & Impediments
-*   None yet.
+*   Phase 1 completed successfully, but numerous unit tests in the frontend are deeply coupled to the old permissions DTO payload. We must update the Vue Test Utils mocks in `src/views/__tests__/*` to mock `useAcesso` directly instead of passing the old `permissoes` prop.

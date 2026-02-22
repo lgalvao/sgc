@@ -2,6 +2,8 @@ import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import SubprocessoCards from '@/components/processo/SubprocessoCards.vue';
 import {TipoProcesso} from '@/types/tipos';
+import {createTestingPinia} from '@pinia/testing';
+import * as useAcessoModule from '@/composables/useAcesso';
 
 const pushMock = vi.fn();
 vi.mock('vue-router', () => ({
@@ -31,14 +33,36 @@ describe('SubprocessoCards.vue', () => {
         siglaUnidade: 'TESTE'
     };
 
-    it('renderiza cards de edição para MAPEAMENTO com permissão', async () => {
-        const wrapper = mount(SubprocessoCards, {
-            props: defaultProps,
+    const mountComponent = (propsOverrides: any = {}, accessOverrides: any = {}) => {
+        vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
+            podeEditarMapa: true,
+            podeEditarCadastro: true,
+            podeVisualizarMapa: true,
+            podeVisualizarDiagnostico: false,
+            podeVerPagina: true,
+            ...accessOverrides
+        } as any);
+
+        return mount(SubprocessoCards, {
+            props: { ...defaultProps, ...propsOverrides },
             global: {
-                stubs: {
-                }
+                plugins: [
+                    createTestingPinia({
+                        createSpy: vi.fn,
+                        initialState: {
+                            subprocessos: {
+                                subprocessoDetalhe: { codigo: 100 }
+                            }
+                        }
+                    })
+                ],
+                stubs: {}
             }
         });
+    };
+
+    it('renderiza cards de edição para MAPEAMENTO com permissão', async () => {
+        const wrapper = mountComponent();
 
         expect(wrapper.find('[data-testid="card-subprocesso-atividades"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').exists()).toBe(true);
@@ -93,16 +117,7 @@ describe('SubprocessoCards.vue', () => {
     });
 
     it('renderiza cards de visualização se não puder editar', async () => {
-        const wrapper = mount(SubprocessoCards, {
-            props: {
-                ...defaultProps,
-                permissoes: { ...defaultProps.permissoes, podeEditarMapa: false, podeEditarCadastro: false }
-            },
-            global: {
-                stubs: {
-                }
-            }
-        });
+        const wrapper = mountComponent({}, { podeEditarMapa: false, podeEditarCadastro: false, podeVerPagina: true });
 
         expect(wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').exists()).toBe(true);
 
@@ -151,17 +166,7 @@ describe('SubprocessoCards.vue', () => {
     });
 
     it('renderiza cards de diagnostico e navega corretamente', async () => {
-        const wrapper = mount(SubprocessoCards, {
-            props: {
-                ...defaultProps,
-                tipoProcesso: TipoProcesso.DIAGNOSTICO,
-                permissoes: { ...defaultProps.permissoes, podeVisualizarDiagnostico: true }
-            },
-            global: {
-                stubs: {
-                }
-            }
-        });
+        const wrapper = mountComponent({ tipoProcesso: TipoProcesso.DIAGNOSTICO, codSubprocesso: 100 }, { podeVisualizarDiagnostico: true });
 
         // Diagnostico Card Actions
         await wrapper.find('[data-testid="card-subprocesso-diagnostico"]').trigger('click');
@@ -230,16 +235,7 @@ describe('SubprocessoCards.vue', () => {
     });
 
     it('trata estado desabilitado (sem mapa) corretamente', async () => {
-        const wrapper = mount(SubprocessoCards, {
-            props: {
-                ...defaultProps,
-                mapa: null
-            },
-            global: {
-                stubs: {
-                }
-            }
-        });
+        const wrapper = mountComponent({ mapa: null, codSubprocesso: 100 });
 
         const card = wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]');
         expect(card.exists()).toBe(true);
@@ -259,17 +255,7 @@ describe('SubprocessoCards.vue', () => {
     });
 
     it('trata estado desabilitado (sem mapa) em modo visualização', async () => {
-        const wrapper = mount(SubprocessoCards, {
-            props: {
-                ...defaultProps,
-                permissoes: { ...defaultProps.permissoes, podeEditarMapa: false },
-                mapa: null
-            },
-            global: {
-                stubs: {
-                }
-            }
-        });
+        const wrapper = mountComponent({ mapa: null }, { podeEditarMapa: false, podeEditarCadastro: false, podeVerPagina: true });
 
         const card = wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]');
         expect(card.classes()).toContain('disabled-card');

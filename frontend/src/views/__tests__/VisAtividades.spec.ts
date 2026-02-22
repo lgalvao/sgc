@@ -9,6 +9,7 @@ import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {useRouter} from "vue-router";
 import {obterDetalhesProcesso} from "@/services/processoService";
 import {buscarSubprocessoDetalhe} from "@/services/subprocessoService";
+import * as useAcessoModule from '@/composables/useAcesso';
 
 // Hoist mocks to avoid ReferenceError
 const { mockApiClient } = vi.hoisted(() => {
@@ -67,15 +68,6 @@ vi.mock("@/services/processoService", () => ({
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoDetalhe: vi.fn().mockImplementation((cod) => Promise.resolve({
         codigo: cod,
-        permissoes: {
-            podeVerPagina: true,
-            podeEditarMapa: true,
-            podeVisualizarMapa: true,
-            podeVisualizarImpacto: true,
-            podeHomologarCadastro: true,
-            podeAceitarCadastro: true,
-            podeDevolverCadastro: true,
-        }
     })),
 }));
 
@@ -133,7 +125,6 @@ describe("VisAtividades.vue", () => {
                                         nome: "Unidade 1",
                                         codSubprocesso: 10,
                                         situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
-                                        permissoes: { podeVisualizarImpacto: true }
                                     }
                                 ]
                             }
@@ -147,7 +138,6 @@ describe("VisAtividades.vue", () => {
                         subprocessos: {
                             subprocessoDetalhe: {
                                 codigo: 10,
-                                permissoes: { podeHomologarCadastro: true, podeVisualizarImpacto: true }
                             }
                         },
                         ...initialState,
@@ -168,8 +158,18 @@ describe("VisAtividades.vue", () => {
         },
     });
 
+    const mountComponent = (initialState: any = {}, accessOverrides: Record<string, any> = {}) => {
+        vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
+            podeHomologarCadastro: { value: true },
+            podeVisualizarImpacto: { value: true },
+            ...accessOverrides
+        } as any);
+
+        return mount(VisAtividades, mountOptions(initialState));
+    };
+
     it("deve validar cadastro (Homologar) e redirecionar", async () => {
-        const wrapper = mount(VisAtividades, mountOptions({
+        const wrapper = mountComponent({
             processos: {
                 processoDetalhe: {
                     codigo: 1,
@@ -179,12 +179,11 @@ describe("VisAtividades.vue", () => {
                             sigla: "U1",
                             codSubprocesso: 10,
                             situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
-                            permissoes: { podeHomologarCadastro: true, podeVisualizarImpacto: true }
                         }
                     ]
                 }
             }
-        }));
+        });
         subprocessosStore = useSubprocessosStore();
 
         // Mock success response
@@ -211,7 +210,7 @@ describe("VisAtividades.vue", () => {
     });
 
     it("deve validar cadastro (Aceitar) e redirecionar", async () => {
-        const wrapper = mount(VisAtividades, mountOptions({
+        const wrapper = mountComponent({
             perfil: { perfilSelecionado: Perfil.GESTOR },
             processos: {
                 processoDetalhe: {
@@ -222,7 +221,6 @@ describe("VisAtividades.vue", () => {
                             sigla: "U1",
                             codSubprocesso: 10,
                             situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
-                            permissoes: { podeAceitarCadastro: true }
                         }
                     ]
                 }
@@ -230,10 +228,9 @@ describe("VisAtividades.vue", () => {
             subprocessos: {
                 subprocessoDetalhe: {
                     codigo: 10,
-                    permissoes: { podeAceitarCadastro: true, podeHomologarCadastro: false }
                 }
             }
-        }));
+        }, { podeHomologarCadastro: { value: false } });
         subprocessosStore = useSubprocessosStore();
         vi.spyOn(subprocessosStore, "aceitarRevisaoCadastro").mockResolvedValue(true);
 
@@ -246,7 +243,7 @@ describe("VisAtividades.vue", () => {
     });
 
     it("deve devolver cadastro e redirecionar", async () => {
-        const wrapper = mount(VisAtividades, mountOptions());
+        const wrapper = mountComponent({});
         subprocessosStore = useSubprocessosStore();
         vi.spyOn(subprocessosStore, "devolverRevisaoCadastro").mockResolvedValue(true);
 
@@ -267,7 +264,7 @@ describe("VisAtividades.vue", () => {
     });
 
     it("deve abrir modal de impacto ao clicar no botão", async () => {
-        const wrapper = mount(VisAtividades, mountOptions());
+        const wrapper = mountComponent({});
         // Force button visibility
         const btn = wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa-visualizacao"]');
         await btn.trigger("click");
@@ -277,7 +274,7 @@ describe("VisAtividades.vue", () => {
     });
 
     it("deve abrir modal de histórico de análise", async () => {
-        const wrapper = mount(VisAtividades, mountOptions());
+        const wrapper = mountComponent({});
         await flushPromises(); // Ensure initial load
 
         const analisesStore = useAnalisesStore();
@@ -310,7 +307,6 @@ describe("VisAtividades.vue", () => {
             subprocessos: {
                 subprocessoDetalhe: {
                     codigo: 20,
-                    permissoes: { podeVisualizarImpacto: true, podeHomologarCadastro: true }
                 }
             }
         });
@@ -328,7 +324,7 @@ describe("VisAtividades.vue", () => {
         });
 
         it("deve homologar cadastro de mapeamento", async () => {
-            const wrapper = mount(VisAtividades, mountOptionsMapeamento());
+            const wrapper = mountComponent(mountOptionsMapeamento().props.global?.initialState);
             subprocessosStore = useSubprocessosStore();
             vi.spyOn(subprocessosStore, "homologarCadastro").mockResolvedValue(true);
 
@@ -354,7 +350,7 @@ describe("VisAtividades.vue", () => {
                 }]
             });
 
-             const wrapper = mount(VisAtividades, mountOptions({
+             const wrapper = mountComponent({
                 perfil: { perfilSelecionado: Perfil.GESTOR },
                 processos: {
                     processoDetalhe: {
@@ -364,17 +360,15 @@ describe("VisAtividades.vue", () => {
                             sigla: "U1",
                             codSubprocesso: 20,
                             situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-                            permissoes: { podeAceitarCadastro: true }
                         }]
                     }
                 },
                 subprocessos: {
                     subprocessoDetalhe: {
                         codigo: 20,
-                        permissoes: { podeAceitarCadastro: true, podeHomologarCadastro: false }
                     }
                 }
-            }));
+            }, { podeHomologarCadastro: { value: false }, podeVisualizarImpacto: { value: true } });
             subprocessosStore = useSubprocessosStore();
             vi.spyOn(subprocessosStore, "aceitarCadastro").mockResolvedValue(true);
 
@@ -387,7 +381,7 @@ describe("VisAtividades.vue", () => {
         });
 
         it("deve devolver cadastro de mapeamento", async () => {
-            const wrapper = mount(VisAtividades, mountOptionsMapeamento());
+            const wrapper = mountComponent(mountOptionsMapeamento().props.global?.initialState);
             subprocessosStore = useSubprocessosStore();
             vi.spyOn(subprocessosStore, "devolverCadastro").mockResolvedValue(true);
 
@@ -401,13 +395,13 @@ describe("VisAtividades.vue", () => {
         });
 
         it("deve mostrar texto correto no botão de impacto", async () => {
-            const wrapper = mount(VisAtividades, mountOptionsMapeamento());
+            const wrapper = mountComponent(mountOptionsMapeamento().props.global?.initialState);
             const btn = wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa-visualizacao"]');
-            expect(btn.text()).toContain("Impacto no mapa");
+            expect(btn.text()).toContain("Ver impactos");
         });
 
         it("não deve redirecionar se devolução de mapeamento falhar", async () => {
-            const wrapper = mount(VisAtividades, mountOptionsMapeamento());
+            const wrapper = mountComponent(mountOptionsMapeamento().props.global?.initialState);
             subprocessosStore = useSubprocessosStore();
             vi.spyOn(subprocessosStore, "devolverCadastro").mockResolvedValue(false);
 
@@ -430,13 +424,12 @@ describe("VisAtividades.vue", () => {
                     sigla: "U1",
                     codSubprocesso: 10,
                     situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
-                    permissoes: { podeHomologarCadastro: true }
                 }]
             });
         });
 
         it("não deve redirecionar se validação falhar", async () => {
-            const wrapper = mount(VisAtividades, mountOptions());
+            const wrapper = mountComponent({});
             subprocessosStore = useSubprocessosStore();
             // Spy on both possible actions
             const homologarSpy = vi.spyOn(subprocessosStore, "homologarRevisaoCadastro").mockResolvedValue(false);
@@ -452,7 +445,7 @@ describe("VisAtividades.vue", () => {
         });
 
         it("não deve redirecionar se devolução falhar", async () => {
-             const wrapper = mount(VisAtividades, mountOptions());
+             const wrapper = mountComponent({});
             subprocessosStore = useSubprocessosStore();
             vi.spyOn(subprocessosStore, "devolverRevisaoCadastro").mockResolvedValue(false);
 
@@ -473,7 +466,7 @@ describe("VisAtividades.vue", () => {
                 tipo: TipoProcesso.REVISAO,
                 unidades: []
             });
-             const wrapper = mount(VisAtividades, mountOptions({
+             const wrapper = mountComponent({
                 processos: {
                     processoDetalhe: {
                         codigo: 1,
@@ -481,7 +474,7 @@ describe("VisAtividades.vue", () => {
                         unidades: [] // Sem unidade correspondente
                     }
                 }
-            }));
+            });
             const mapasStore = useMapasStore();
 
             // Chama o método diretamente pois o botão estaria oculto
@@ -497,7 +490,7 @@ describe("VisAtividades.vue", () => {
                 tipo: TipoProcesso.REVISAO,
                 unidades: []
             });
-            const wrapper = mount(VisAtividades, mountOptions({
+            const wrapper = mountComponent({
                 processos: {
                     processoDetalhe: {
                         codigo: 1,
@@ -505,7 +498,7 @@ describe("VisAtividades.vue", () => {
                         unidades: []
                     }
                 }
-            }));
+            });
             subprocessosStore = useSubprocessosStore();
             vi.spyOn(subprocessosStore, "homologarRevisaoCadastro");
 
@@ -525,7 +518,7 @@ describe("VisAtividades.vue", () => {
                 tipo: TipoProcesso.REVISAO,
                 unidades: []
             });
-            const wrapper = mount(VisAtividades, mountOptions({
+            const wrapper = mountComponent({
                 processos: {
                     processoDetalhe: {
                         codigo: 1,
@@ -533,7 +526,7 @@ describe("VisAtividades.vue", () => {
                         unidades: []
                     }
                 }
-            }));
+            });
             subprocessosStore = useSubprocessosStore();
             vi.spyOn(subprocessosStore, "devolverRevisaoCadastro");
 
@@ -556,7 +549,7 @@ describe("VisAtividades.vue", () => {
                     permissoes: { podeHomologarCadastro: true }
                 }]
             });
-            const wrapper = mount(VisAtividades, mountOptions({
+            const wrapper = mountComponent({
                 perfil: { perfilSelecionado: Perfil.ADMIN },
                 processos: {
                     processoDetalhe: {
@@ -566,11 +559,10 @@ describe("VisAtividades.vue", () => {
                             sigla: "U1",
                             codSubprocesso: 20,
                             situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
-                            permissoes: { podeHomologarCadastro: true }
                         }]
                     }
                 }
-            }));
+            });
             await flushPromises();
             // isHomologacao deve ser true
             expect((wrapper.vm as any).isHomologacao).toBe(true);
@@ -587,7 +579,7 @@ describe("VisAtividades.vue", () => {
                     permissoes: { podeHomologarCadastro: true }
                 }]
             });
-            const wrapper = mount(VisAtividades, mountOptions({
+            const wrapper = mountComponent({
                 perfil: { perfilSelecionado: Perfil.ADMIN },
                 processos: {
                     processoDetalhe: {
@@ -597,11 +589,10 @@ describe("VisAtividades.vue", () => {
                             sigla: "U1",
                             codSubprocesso: 10,
                             situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
-                            permissoes: { podeHomologarCadastro: true }
                         }]
                     }
                 }
-            }));
+            });
             await flushPromises();
             expect((wrapper.vm as any).isHomologacao).toBe(true);
         });
@@ -612,7 +603,7 @@ describe("VisAtividades.vue", () => {
                 permissoes: { podeHomologarCadastro: false }
             }));
 
-            const wrapper = mount(VisAtividades, mountOptions({
+            const wrapper = mountComponent({
                 perfil: { perfilSelecionado: Perfil.GESTOR },
                 processos: {
                     processoDetalhe: {
@@ -622,11 +613,10 @@ describe("VisAtividades.vue", () => {
                             sigla: "U1",
                             codSubprocesso: 10,
                             situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
-                            permissoes: { podeAceitarCadastro: true }
                         }]
                     }
                 }
-            }));
+            }, { podeHomologarCadastro: { value: false } });
             await flushPromises();
             expect((wrapper.vm as any).isHomologacao).toBe(false);
         });
@@ -637,7 +627,7 @@ describe("VisAtividades.vue", () => {
                 tipo: TipoProcesso.REVISAO,
                 unidades: []
             });
-             const wrapper = mount(VisAtividades, mountOptions({
+             const wrapper = mountComponent({
                 processos: {
                     processoDetalhe: {
                         codigo: 1,
@@ -646,7 +636,7 @@ describe("VisAtividades.vue", () => {
                     }
                 },
                 subprocessos: { subprocessoDetalhe: null }
-            }));
+            }, { podeVisualizarImpacto: { value: false } });
             expect((wrapper.vm as any).podeVerImpacto).toBe(false);
         });
     });

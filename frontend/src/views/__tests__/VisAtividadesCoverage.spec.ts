@@ -7,6 +7,7 @@ import {useAtividadesStore} from "@/stores/atividades";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {useRouter} from "vue-router";
 import {obterDetalhesProcesso} from "@/services/processoService";
+import * as useAcessoModule from '@/composables/useAcesso';
 
 // Hoist mocks
 const { mockApiClient } = vi.hoisted(() => {
@@ -46,7 +47,6 @@ vi.mock("@/services/subprocessoService", () => ({
     listarAtividades: vi.fn().mockResolvedValue([]),
     buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({
         codigo: 10,
-        permissoes: { podeHomologarCadastro: true, podeVisualizarImpacto: true }
     }),
     homologarRevisaoCadastro: vi.fn(), // Already mocking in store spy, but good to have
     devolverRevisaoCadastro: vi.fn(),
@@ -110,6 +110,16 @@ describe("VisAtividades.vue Coverage", () => {
         },
     });
 
+    const mountComponent = (initialState: any = {}, propsData: any = { codProcesso: "1", sigla: "U1" }, accessOverrides: Record<string, any> = {}) => {
+        vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
+            podeHomologarCadastro: { value: true },
+            podeVisualizarImpacto: { value: true },
+            ...accessOverrides
+        } as any);
+
+        return mount(VisAtividades, mountOptions(initialState, propsData));
+    };
+
     it("deve encontrar unidade aninhada recursivamente", async () => {
         const initialState = {
             unidades: {
@@ -142,7 +152,7 @@ describe("VisAtividades.vue Coverage", () => {
             }
         };
 
-        const wrapper = mount(VisAtividades, mountOptions(initialState, { codProcesso: "1", sigla: "NESTED" }));
+        const wrapper = mountComponent(initialState, { codProcesso: "1", sigla: "NESTED" });
         await flushPromises();
 
         expect(wrapper.text()).toContain("Nested Unit");
@@ -171,14 +181,13 @@ describe("VisAtividades.vue Coverage", () => {
                             sigla: "U1",
                             codSubprocesso: 10,
                             situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
-                            permissoes: { podeHomologarCadastro: true }
                         }
                     ]
                 }
             }
         };
 
-        const wrapper = mount(VisAtividades, mountOptions(initialState));
+        const wrapper = mountComponent(initialState);
         await flushPromises(); // Wait for onMounted to update store
 
         const subprocessosStore = useSubprocessosStore();
@@ -230,7 +239,7 @@ describe("VisAtividades.vue Coverage", () => {
             }
         };
 
-        const wrapper = mount(VisAtividades, mountOptions(initialState));
+        const wrapper = mountComponent(initialState);
         await flushPromises();
 
         const subprocessosStore = useSubprocessosStore();
@@ -268,7 +277,7 @@ describe("VisAtividades.vue Coverage", () => {
             }
         };
 
-        mount(VisAtividades, mountOptions(initialState));
+        mountComponent(initialState);
         const atividadesStore = useAtividadesStore();
 
         await flushPromises();

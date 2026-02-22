@@ -232,6 +232,7 @@ import {useAnalisesStore} from "@/stores/analises";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useFeedbackStore} from "@/stores/feedback";
 import {usePerfil} from "@/composables/usePerfil";
+import {useAcesso} from "@/composables/useAcesso";
 import {TipoProcesso} from "@/types/tipos";
 import logger from "@/utils/logger";
 
@@ -259,16 +260,17 @@ const subprocesso = computed(() => {
 const processo = computed(() => processosStore.processoDetalhe);
 const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 
-const permissoes = computed(() => subprocessosStore.subprocessoDetalhe?.permissoes || null);
-const podeValidar = computed(() => permissoes.value?.podeValidarMapa || false);
+const { podeValidarMapa, podeAceitarMapa, podeDevolverMapa, podeHomologarMapa, podeApresentarSugestoes } = useAcesso(computed(() => subprocessosStore.subprocessoDetalhe));
+
+const podeValidar = computed(() => podeValidarMapa.value);
 const podeAnalisar = computed(() => {
   return (
-    (permissoes.value?.podeAceitarMapa || false) ||
-    (permissoes.value?.podeDevolverMapa || false) ||
-    (permissoes.value?.podeHomologarMapa || false)
+    podeAceitarMapa.value ||
+    podeDevolverMapa.value ||
+    podeHomologarMapa.value
   );
 });
-const podeVerSugestoes = computed(() => permissoes.value?.podeApresentarSugestoes || false);
+const podeVerSugestoes = computed(() => podeApresentarSugestoes.value);
 
 const historicoAnalise = computed(() => {
   if (!codSubprocesso.value) return [];
@@ -334,7 +336,7 @@ async function confirmarValidacao() {
 async function confirmarAceitacao(observacoes?: string) {
   if (!codSubprocesso.value) return;
   isLoading.value = true;
-  const isHomologacao = permissoes.value?.podeHomologarMapa || perfilSelecionado.value === "ADMIN";
+  const isHomologacao = podeHomologarMapa.value || perfilSelecionado.value === "ADMIN";
 
   try {
     if (isHomologacao) {
