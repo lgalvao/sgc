@@ -17,7 +17,6 @@ import sgc.subprocesso.dto.PermissoesSubprocessoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
-import java.time.Instant;
 import java.util.*;
 
 import static sgc.organizacao.model.Perfil.*;
@@ -95,17 +94,7 @@ public class SubprocessoSecurity {
 
     public boolean canExecute(Usuario usuario, Acao acao, Subprocesso sp) {
         if (usuario == null || sp == null) return false;
-        boolean permitido = verificarRegras(usuario, acao, sp);
-
-        if (permitido) {
-            log.debug("ACCESS_GRANTED: user={}, action={}, resource=Subprocesso:{}, timestamp={}",
-                    usuario.getTituloEleitoral(), acao, sp.getCodigo(), Instant.now());
-        } else {
-            log.debug("ACCESS_DENIED: user={}, action={}, resource=Subprocesso:{}, timestamp={}",
-                    usuario.getTituloEleitoral(), acao, sp.getCodigo(), Instant.now());
-        }
-
-        return permitido;
+        return verificarRegras(usuario, acao, sp);
     }
 
     public boolean canExecute(Long codSubprocesso, String acaoStr) {

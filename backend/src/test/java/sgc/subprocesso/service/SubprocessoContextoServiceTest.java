@@ -17,6 +17,7 @@ import sgc.subprocesso.dto.ContextoEdicaoResponse;
 import sgc.subprocesso.dto.SubprocessoDetalheResponse;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.security.SubprocessoSecurity;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;
@@ -42,6 +43,8 @@ class SubprocessoContextoServiceTest {
     private SubprocessoAtividadeService atividadeService;
     @Mock
     private MapaFacade mapaFacade;
+    @Mock
+    private SubprocessoSecurity subprocessoSecurity;
 
     @InjectMocks
     private SubprocessoContextoService service;

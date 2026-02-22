@@ -229,7 +229,7 @@ public class ProcessoNotificacaoService {
 
             String emailUnidade = String.format("%s@tre-pe.jus.br", unidade.getSigla().toLowerCase());
             notificacaoEmailService.enviarEmailHtml(emailUnidade, assunto, corpoHtml);
-            log.info("E-mail enviado para {} ({})", unidade.getSigla(), emailUnidade);
+            log.info("E-mail enviado para {}", unidade.getSigla());
 
             if (responsavel.substitutoTitulo() != null) {
                 enviarEmailParaSubstituto(responsavel.substitutoTitulo(), usuarios, assunto, corpoHtml, nomeUnidade);
