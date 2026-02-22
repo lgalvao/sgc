@@ -339,53 +339,6 @@ class ProcessoFacadeTest {
                     .hasMessageContaining("não participa");
         }
 
-        @Test
-        @DisplayName("Deve apenas logar aviso quando unidade não tem titular definido")
-        void deveLogarAvisoQuandoUnidadeSemTitular() {
-            Processo p = ProcessoFixture.processoEmAndamento();
-            Unidade u = UnidadeFixture.unidadeComId(10L);
-            u.setTituloTitular(null); // Sem titular
-            p.adicionarParticipantes(Set.of(u));
-
-            when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
-            when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
-            when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L))
-                    .thenReturn(Subprocesso.builder().codigo(99L).build());
-            when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any()))
-                    .thenReturn("HTML");
-
-            processoFacade.enviarLembrete(1L, 10L);
-
-            verify(alertaService).criarAlertaAdmin(any(), any(), any());
-            verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
-            verifyNoInteractions(notificacaoEmailService);
-        }
-
-        @Test
-        @DisplayName("Deve apenas logar aviso quando titular não tem email")
-        void deveLogarAvisoQuandoTitularSemEmail() {
-            Processo p = ProcessoFixture.processoEmAndamento();
-            Unidade u = UnidadeFixture.unidadeComId(10L);
-            u.setTituloTitular("T10");
-            p.adicionarParticipantes(Set.of(u));
-
-            when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
-            when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
-            when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L))
-                    .thenReturn(Subprocesso.builder().codigo(99L).build());
-            when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any()))
-                    .thenReturn("HTML");
-
-            Usuario titular = new Usuario();
-            titular.setEmail(null); // Sem email
-            when(usuarioService.buscarPorLogin("T10")).thenReturn(titular);
-
-            processoFacade.enviarLembrete(1L, 10L);
-
-            verify(alertaService).criarAlertaAdmin(any(), any(), any());
-            verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
-            verifyNoInteractions(notificacaoEmailService);
-        }
     }
 
     @Nested

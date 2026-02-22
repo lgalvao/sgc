@@ -170,13 +170,8 @@ public class ProcessoFacade {
         subprocessoFacade.registrarMovimentacaoLembrete(subprocesso.getCodigo());
 
         // Enviar para o titular da unidade
-        String tituloTitular = unidade.getTituloTitular();
-        Usuario titular = usuarioService.buscarPorLogin(tituloTitular);
-        if (titular.getEmail() != null && !titular.getEmail().isBlank()) {
-            notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
-        } else {
-            log.warn("Lembrete de e-mail não enviado para {}: titular não possui e-mail cadastrado.", unidade.getSigla());
-        }
+        Usuario titular = usuarioService.buscarPorLogin(unidade.getTituloTitular());
+        notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
  
         alertaService.criarAlertaAdmin(processo, unidade, descricao);
     }
