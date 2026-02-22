@@ -441,124 +441,94 @@ class SubprocessoFacadeTest {
         @Test
         @DisplayName("aceitarCadastroEmBloco deve delegar se houver itens")
         void aceitarCadastroEmBloco_DeveDelegar() {
-            Long codProcesso = 1L;
-            List<Long> unidades = List.of(10L);
+            List<Long> ids = List.of(50L);
             Usuario usuario = new Usuario();
-            when(crudService.listarEntidadesPorProcessoEUnidades(codProcesso, unidades))
-                    .thenReturn(List.of(Subprocesso.builder().codigo(50L).build()));
 
-            facade.aceitarCadastroEmBloco(unidades, codProcesso, usuario);
+            facade.aceitarCadastroEmBloco(ids, usuario);
 
-            verify(cadastroWorkflowService).aceitarCadastroEmBloco(List.of(50L), usuario);
+            verify(cadastroWorkflowService).aceitarCadastroEmBloco(ids, usuario);
         }
 
         @Test
         @DisplayName("homologarCadastroEmBloco deve delegar se houver itens")
         void homologarCadastroEmBloco_DeveDelegar() {
-            Long codProcesso = 1L;
-            List<Long> unidades = List.of(10L, 20L);
+            List<Long> ids = List.of(50L, 60L);
             Usuario usuario = new Usuario();
-            when(crudService.listarEntidadesPorProcessoEUnidades(codProcesso, unidades))
-                    .thenReturn(List.of(
-                            Subprocesso.builder().codigo(50L).build(),
-                            Subprocesso.builder().codigo(60L).build()
-                    ));
 
-            facade.homologarCadastroEmBloco(unidades, codProcesso, usuario);
+            facade.homologarCadastroEmBloco(ids, usuario);
 
-            verify(cadastroWorkflowService).homologarCadastroEmBloco(List.of(50L, 60L), usuario);
+            verify(cadastroWorkflowService).homologarCadastroEmBloco(ids, usuario);
         }
 
         @Test
         @DisplayName("disponibilizarMapaEmBloco deve delegar se houver itens")
         void disponibilizarMapaEmBloco_DeveDelegar() {
             Long codProcesso = 1L;
-            List<Long> unidades = List.of(10L);
+            List<Long> ids = List.of(50L);
             Usuario usuario = new Usuario();
             DisponibilizarMapaRequest req = DisponibilizarMapaRequest.builder()
                     .dataLimite(LocalDate.now().plusDays(1))
                     .build();
-            when(crudService.listarEntidadesPorProcessoEUnidades(codProcesso, unidades))
-                    .thenReturn(List.of(Subprocesso.builder().codigo(50L).build()));
 
-            facade.disponibilizarMapaEmBloco(unidades, codProcesso, req, usuario);
+            facade.disponibilizarMapaEmBloco(ids, codProcesso, req, usuario);
 
-            verify(mapaWorkflowService).disponibilizarMapaEmBloco(List.of(50L), req, usuario);
+            verify(mapaWorkflowService).disponibilizarMapaEmBloco(ids, req, usuario);
         }
 
         @Test
         @DisplayName("aceitarValidacaoEmBloco deve delegar se houver itens")
         void aceitarValidacaoEmBloco_DeveDelegar() {
-            Long codProcesso = 1L;
-            List<Long> unidades = List.of(10L, 20L);
+            List<Long> ids = List.of(50L, 60L);
             Usuario usuario = new Usuario();
-            when(crudService.listarEntidadesPorProcessoEUnidades(codProcesso, unidades))
-                    .thenReturn(List.of(
-                            Subprocesso.builder().codigo(50L).build(),
-                            Subprocesso.builder().codigo(60L).build()
-                    ));
 
-            facade.aceitarValidacaoEmBloco(unidades, codProcesso, usuario);
+            facade.aceitarValidacaoEmBloco(ids, usuario);
 
-            verify(mapaWorkflowService).aceitarValidacaoEmBloco(List.of(50L, 60L), usuario);
+            verify(mapaWorkflowService).aceitarValidacaoEmBloco(ids, usuario);
         }
 
         @Test
         @DisplayName("homologarValidacaoEmBloco deve delegar se houver itens")
         void homologarValidacaoEmBloco_DeveDelegar() {
-            Long codProcesso = 1L;
-            List<Long> unidades = List.of(10L);
+            List<Long> ids = List.of(50L);
             Usuario usuario = new Usuario();
-            when(crudService.listarEntidadesPorProcessoEUnidades(codProcesso, unidades))
-                    .thenReturn(List.of(Subprocesso.builder().codigo(50L).build()));
 
-            facade.homologarValidacaoEmBloco(unidades, codProcesso, usuario);
+            facade.homologarValidacaoEmBloco(ids, usuario);
 
-            verify(mapaWorkflowService).homologarValidacaoEmBloco(List.of(50L), usuario);
+            verify(mapaWorkflowService).homologarValidacaoEmBloco(ids, usuario);
         }
 
         @Test
         @DisplayName("aceitarCadastroEmBloco não deve delegar se não houver itens")
         void aceitarCadastroEmBloco_NaoDeveDelegarSeVazio() {
-            when(crudService.listarEntidadesPorProcessoEUnidades(anyLong(), anyList()))
-                    .thenReturn(Collections.emptyList());
-            facade.aceitarCadastroEmBloco(List.of(1L), 1L, new Usuario());
+            facade.aceitarCadastroEmBloco(List.of(), new Usuario());
             verify(cadastroWorkflowService, never()).aceitarCadastroEmBloco(anyList(), any());
         }
 
         @Test
         @DisplayName("homologarCadastroEmBloco não deve delegar se não houver itens")
         void homologarCadastroEmBloco_NaoDeveDelegarSeVazio() {
-            when(crudService.listarEntidadesPorProcessoEUnidades(anyLong(), anyList()))
-                    .thenReturn(Collections.emptyList());
-            facade.homologarCadastroEmBloco(List.of(1L), 1L, new Usuario());
+            facade.homologarCadastroEmBloco(List.of(), new Usuario());
             verify(cadastroWorkflowService, never()).homologarCadastroEmBloco(anyList(), any());
         }
 
         @Test
         @DisplayName("disponibilizarMapaEmBloco não deve delegar se não houver itens")
         void disponibilizarMapaEmBloco_NaoDeveDelegarSeVazio() {
-            when(crudService.listarEntidadesPorProcessoEUnidades(anyLong(), anyList()))
-                    .thenReturn(Collections.emptyList());
-            facade.disponibilizarMapaEmBloco(List.of(1L), 1L, DisponibilizarMapaRequest.builder().build(), new Usuario());
+            facade.disponibilizarMapaEmBloco(List.of(), 1L, DisponibilizarMapaRequest.builder().build(), new Usuario());
             verify(mapaWorkflowService, never()).disponibilizarMapaEmBloco(anyList(), any(), any());
         }
 
         @Test
         @DisplayName("aceitarValidacaoEmBloco não deve delegar se não houver itens")
         void aceitarValidacaoEmBloco_NaoDeveDelegarSeVazio() {
-            when(crudService.listarEntidadesPorProcessoEUnidades(anyLong(), anyList()))
-                    .thenReturn(Collections.emptyList());
-            facade.aceitarValidacaoEmBloco(List.of(1L), 1L, new Usuario());
+            facade.aceitarValidacaoEmBloco(List.of(), new Usuario());
             verify(mapaWorkflowService, never()).aceitarValidacaoEmBloco(anyList(), any());
         }
 
         @Test
         @DisplayName("homologarValidacaoEmBloco não deve delegar se não houver itens")
         void homologarValidacaoEmBloco_NaoDeveDelegarSeVazio() {
-            when(crudService.listarEntidadesPorProcessoEUnidades(anyLong(), anyList()))
-                    .thenReturn(Collections.emptyList());
-            facade.homologarValidacaoEmBloco(List.of(1L), 1L, new Usuario());
+            facade.homologarValidacaoEmBloco(List.of(), new Usuario());
             verify(mapaWorkflowService, never()).homologarValidacaoEmBloco(anyList(), any());
         }
     }

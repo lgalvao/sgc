@@ -217,7 +217,7 @@ public class SubprocessoCadastroController {
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        subprocessoFacade.aceitarCadastroEmBloco(request.subprocessos(), codigo, usuario);
+        subprocessoFacade.aceitarCadastroEmBloco(request.subprocessos(), usuario);
     }
 
     @PostMapping("/{codigo}/homologar-cadastro-bloco")
@@ -227,7 +227,7 @@ public class SubprocessoCadastroController {
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal @Nullable Object principal) {
         Usuario usuario = obterUsuarioAutenticado(principal);
-        subprocessoFacade.homologarCadastroEmBloco(request.subprocessos(), codigo, usuario);
+        subprocessoFacade.homologarCadastroEmBloco(request.subprocessos(), usuario);
     }
 
     // TODO achei esse metodo confuso. Melhorar ou pelo menos documentar porque tem esse fallback estraho

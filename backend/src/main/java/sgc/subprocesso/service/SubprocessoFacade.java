@@ -284,11 +284,8 @@ public class SubprocessoFacade {
     }
 
     @Transactional
-    public void disponibilizarMapaEmBloco(List<Long> codUnidades, Long codProcesso, DisponibilizarMapaRequest request,
+    public void disponibilizarMapaEmBloco(List<Long> ids, Long codProcesso, DisponibilizarMapaRequest request,
             Usuario usuario) {
-
-        List<Subprocesso> subprocessos = crudService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
-        List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
         if (!ids.isEmpty()) {
             mapaWorkflowService.disponibilizarMapaEmBloco(ids, request, usuario);
         }

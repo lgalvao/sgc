@@ -145,7 +145,7 @@ class SubprocessoValidacaoControllerTest {
 
         controller.aceitarValidacaoEmBloco(codigo, req, usuario);
 
-        verify(subprocessoFacade).aceitarValidacaoEmBloco(subprocessos, codigo, usuario);
+        verify(subprocessoFacade).aceitarValidacaoEmBloco(subprocessos, usuario);
     }
 
     @Test
@@ -158,6 +158,6 @@ class SubprocessoValidacaoControllerTest {
 
         controller.homologarValidacaoEmBloco(codigo, req, usuario);
 
-        verify(subprocessoFacade).homologarValidacaoEmBloco(subprocessos, codigo, usuario);
+        verify(subprocessoFacade).homologarValidacaoEmBloco(subprocessos, usuario);
     }
 }

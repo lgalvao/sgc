@@ -170,24 +170,14 @@ public class ProcessoFacade {
         subprocessoFacade.registrarMovimentacaoLembrete(subprocesso.getCodigo());
 
         // Enviar para o titular da unidade
-        try {
-            String tituloTitular = unidade.getTituloTitular();
-            // TODO titulo do titular (na verdade de nenhum usuario, pode ser nulo: é invariante!)
-            if (tituloTitular != null) {
-                Usuario titular = usuarioService.buscarPorLogin(tituloTitular);
-                // TODO titulo de nenhuma unidade pode ser nulo. Invariante!
-                if (titular != null && titular.getEmail() != null && !titular.getEmail().isBlank()) {
-                    notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
-                } else {
-                    log.warn("Lembrete de e-mail não enviado para {}: titular não possui e-mail cadastrado.", unidade.getSigla());
-                }
-            } else {
-                log.warn("Lembrete de e-mail não enviado para {}: unidade sem titular definido.", unidade.getSigla());
-            }
-        } catch (Exception e) {
-            log.error("Erro ao tentar enviar e-mail de lembrete para {}: {}", unidade.getSigla(), e.getMessage());
+        String tituloTitular = unidade.getTituloTitular();
+        Usuario titular = usuarioService.buscarPorLogin(tituloTitular);
+        if (titular.getEmail() != null && !titular.getEmail().isBlank()) {
+            notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
+        } else {
+            log.warn("Lembrete de e-mail não enviado para {}: titular não possui e-mail cadastrado.", unidade.getSigla());
         }
-
+ 
         alertaService.criarAlertaAdmin(processo, unidade, descricao);
     }
 
@@ -218,75 +208,74 @@ public class ProcessoFacade {
     @Transactional
     public void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoRequest req) {
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        List<Subprocesso> subprocessos = subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
 
         if (req.acao() == DISPONIBILIZAR) {
+            List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
             DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(
                     req.dataLimite(),
                     "Disponibilização em bloco"
             );
-            subprocessoFacade.disponibilizarMapaEmBloco(req.unidadeCodigos(), codProcesso, dispReq, usuario);
+            subprocessoFacade.disponibilizarMapaEmBloco(ids, codProcesso, dispReq, usuario);
             return;
         }
 
-        processarAcoesAceiteHomologacao(codProcesso, req, usuario);
+        processarAcoesAceiteHomologacao(req, usuario, subprocessos);
     }
 
-    private void processarAcoesAceiteHomologacao(Long codProcesso, AcaoEmBlocoRequest req, Usuario usuario) {
-        List<Long> unidadesAceitarCadastro = new ArrayList<>();
-        List<Long> unidadesAceitarValidacao = new ArrayList<>();
-        List<Long> unidadesHomologarCadastro = new ArrayList<>();
-        List<Long> unidadesHomologarValidacao = new ArrayList<>();
+    private void processarAcoesAceiteHomologacao(AcaoEmBlocoRequest req, Usuario usuario, List<Subprocesso> subprocessos) {
+        List<Long> idsAceitarCadastro = new ArrayList<>();
+        List<Long> idsAceitarValidacao = new ArrayList<>();
+        List<Long> idsHomologarCadastro = new ArrayList<>();
+        List<Long> idsHomologarValidacao = new ArrayList<>();
 
-        if (req.unidadeCodigos().isEmpty()) return;
-        
-        List<Subprocesso> subprocessos = subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
+        if (subprocessos.isEmpty()) return;
 
         for (Subprocesso sp : subprocessos) {
-            categorizarUnidadePorAcao(req, sp, unidadesAceitarCadastro, unidadesAceitarValidacao, unidadesHomologarCadastro, unidadesHomologarValidacao);
+            categorizarPorAcao(req, sp, idsAceitarCadastro, idsAceitarValidacao, idsHomologarCadastro, idsHomologarValidacao);
         }
 
-        executarAcoesBatch(codProcesso, usuario, unidadesAceitarCadastro, unidadesAceitarValidacao, unidadesHomologarCadastro, unidadesHomologarValidacao);
+        executarAcoesBatch(usuario, idsAceitarCadastro, idsAceitarValidacao, idsHomologarCadastro, idsHomologarValidacao);
     }
 
-    private void categorizarUnidadePorAcao(AcaoEmBlocoRequest req, Subprocesso sp,
-                                           List<Long> unitsAceitarCad, List<Long> unitsAceitarVal,
-                                           List<Long> unitsHomolCad, List<Long> unitsHomolVal) {
-        Long codUnidade = sp.getCodUnidade();
+    private void categorizarPorAcao(AcaoEmBlocoRequest req, Subprocesso sp,
+                                           List<Long> idsAceitarCad, List<Long> idsAceitarVal,
+                                           List<Long> idsHomolCad, List<Long> idsHomolVal) {
+        Long codId = sp.getCodigo();
         boolean isCadastro = isSituacaoCadastro(sp.getSituacao());
 
         if (req.acao() == ACEITAR) {
             if (isCadastro) {
-                unitsAceitarCad.add(codUnidade);
+                idsAceitarCad.add(codId);
             } else {
-                unitsAceitarVal.add(codUnidade);
+                idsAceitarVal.add(codId);
             }
         } else if (req.acao() == HOMOLOGAR) {
             if (isCadastro) {
-                unitsHomolCad.add(codUnidade);
+                idsHomolCad.add(codId);
             } else {
-                unitsHomolVal.add(codUnidade);
+                idsHomolVal.add(codId);
             }
         }
     }
 
-    private void executarAcoesBatch(Long codProcesso,
-                                    Usuario usuario,
-                                    List<Long> unidadesAceitarCadastro,
-                                    List<Long> unidadesAceitarValidacao,
-                                    List<Long> unidadesHomologarCadastro,
-                                    List<Long> unidadesHomologarValidacao) {
-
-        if (!unidadesAceitarCadastro.isEmpty()) {
-            subprocessoFacade.aceitarCadastroEmBloco(unidadesAceitarCadastro, codProcesso, usuario);
+    private void executarAcoesBatch(Usuario usuario,
+                                    List<Long> idsAceitarCadastro,
+                                    List<Long> idsAceitarValidacao,
+                                    List<Long> idsHomologarCadastro,
+                                    List<Long> idsHomologarValidacao) {
+ 
+        if (!idsAceitarCadastro.isEmpty()) {
+            subprocessoFacade.aceitarCadastroEmBloco(idsAceitarCadastro, usuario);
         }
-        if (!unidadesAceitarValidacao.isEmpty()) {
-            subprocessoFacade.aceitarValidacaoEmBloco(unidadesAceitarValidacao, codProcesso, usuario);
+        if (!idsAceitarValidacao.isEmpty()) {
+            subprocessoFacade.aceitarValidacaoEmBloco(idsAceitarValidacao, usuario);
         }
-        if (!unidadesHomologarCadastro.isEmpty()) {
-            subprocessoFacade.homologarCadastroEmBloco(unidadesHomologarCadastro, codProcesso, usuario);
+        if (!idsHomologarCadastro.isEmpty()) {
+            subprocessoFacade.homologarCadastroEmBloco(idsHomologarCadastro, usuario);
         }
-        if (!unidadesHomologarValidacao.isEmpty()) {
-            subprocessoFacade.homologarValidacaoEmBloco(unidadesHomologarValidacao, codProcesso, usuario);
+        if (!idsHomologarValidacao.isEmpty()) {
+            subprocessoFacade.homologarValidacaoEmBloco(idsHomologarValidacao, usuario);
         }
     }
 

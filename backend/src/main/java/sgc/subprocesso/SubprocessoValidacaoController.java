@@ -106,7 +106,7 @@ public class SubprocessoValidacaoController {
     public void aceitarValidacaoEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        subprocessoFacade.aceitarValidacaoEmBloco(request.subprocessos(), codigo, usuario);
+        subprocessoFacade.aceitarValidacaoEmBloco(request.subprocessos(), usuario);
     }
 
     @PostMapping("/{codigo}/homologar-validacao-bloco")
@@ -115,6 +115,6 @@ public class SubprocessoValidacaoController {
     public void homologarValidacaoEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        subprocessoFacade.homologarValidacaoEmBloco(request.subprocessos(), codigo, usuario);
+        subprocessoFacade.homologarValidacaoEmBloco(request.subprocessos(), usuario);
     }
 }

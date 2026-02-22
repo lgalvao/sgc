@@ -13,7 +13,6 @@ import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.comum.dto.ComumDtos.JustificativaRequest;
 import sgc.comum.dto.ComumDtos.TextoOpcionalRequest;
-import sgc.comum.dto.ComumDtos.TextoRequest;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.model.Atividade;
@@ -264,7 +263,7 @@ class SubprocessoCadastroControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoFacade).aceitarCadastro(eq(1L), eq(""), eq(usuario));
+            verify(subprocessoFacade).aceitarCadastro(1L, "", usuario);
         }
     }
 
@@ -416,7 +415,7 @@ class SubprocessoCadastroControllerTest {
                     .andExpect(status().isOk());
 
             verify(subprocessoFacade).aceitarCadastroEmBloco(
-                    List.of(1L, 2L, 3L), 100L, usuario);
+                    List.of(1L, 2L, 3L), usuario);
         }
     }
 
@@ -446,7 +445,7 @@ class SubprocessoCadastroControllerTest {
                     .andExpect(status().isOk());
 
             verify(subprocessoFacade).homologarCadastroEmBloco(
-                    List.of(1L, 2L), 100L, usuario);
+                    List.of(1L, 2L), usuario);
         }
     @Nested
     @DisplayName("Testes Unitários Isolados")

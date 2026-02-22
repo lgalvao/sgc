@@ -199,8 +199,8 @@ class ProcessoFacadeTest {
             AcaoEmBlocoRequest reqNull = new AcaoEmBlocoRequest(List.of(10L), null, LocalDate.now());
             processoFacade.executarAcaoEmBloco(codProcesso, reqNull);
 
-            verify(subprocessoFacade, never()).aceitarCadastroEmBloco(any(), any(), any());
-            verify(subprocessoFacade, never()).homologarCadastroEmBloco(any(), any(), any());
+            verify(subprocessoFacade, never()).aceitarCadastroEmBloco(any(), any());
+            verify(subprocessoFacade, never()).homologarCadastroEmBloco(any(), any());
         }
     }
 
@@ -598,6 +598,11 @@ class ProcessoFacadeTest {
                     dataLimite
                 );
 
+                Subprocesso sp1 = Subprocesso.builder().codigo(1001L).unidade(Unidade.builder().codigo(1L).build()).build();
+                Subprocesso sp2 = Subprocesso.builder().codigo(1002L).unidade(Unidade.builder().codigo(2L).build()).build();
+                Subprocesso sp3 = Subprocesso.builder().codigo(1003L).unidade(Unidade.builder().codigo(3L).build()).build();
+                when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L, 2L, 3L))).thenReturn(List.of(sp1, sp2, sp3));
+
                 // Act
                 processoFacade.executarAcaoEmBloco(100L, req);
 
@@ -605,7 +610,7 @@ class ProcessoFacadeTest {
                 ArgumentCaptor<DisponibilizarMapaRequest> captor = 
                     ArgumentCaptor.forClass(DisponibilizarMapaRequest.class);
                 verify(subprocessoFacade).disponibilizarMapaEmBloco(
-                    eq(List.of(1L, 2L, 3L)),
+                    eq(List.of(1001L, 1002L, 1003L)),
                     eq(100L),
                     captor.capture(),
                     eq(usuario)
@@ -650,7 +655,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
                 // Assert
-                verify(subprocessoFacade).aceitarCadastroEmBloco(List.of(10L, 20L), 100L, usuario);
+                verify(subprocessoFacade).aceitarCadastroEmBloco(List.of(1L, 2L), usuario);
             }
 
             @Test
@@ -678,7 +683,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
                 // Assert
-                verify(subprocessoFacade).aceitarValidacaoEmBloco(List.of(10L), 100L, usuario);
+                verify(subprocessoFacade).aceitarValidacaoEmBloco(List.of(1L), usuario);
             }
         }
 
@@ -710,7 +715,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
                 // Assert
-                verify(subprocessoFacade).homologarCadastroEmBloco(List.of(10L), 100L, usuario);
+                verify(subprocessoFacade).homologarCadastroEmBloco(List.of(1L), usuario);
             }
 
             @Test
@@ -738,7 +743,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
                 // Assert
-                verify(subprocessoFacade).homologarValidacaoEmBloco(List.of(10L), 100L, usuario);
+                verify(subprocessoFacade).homologarValidacaoEmBloco(List.of(1L), usuario);
             }
         }
     }
