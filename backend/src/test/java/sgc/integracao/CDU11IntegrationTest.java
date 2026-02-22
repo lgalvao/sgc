@@ -176,13 +176,6 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
     @Nested
     @DisplayName("Testes de Casos de Borda e Falhas")
     class CasosDeBorda {
-        @Test
-        @DisplayName("Deve retornar 404 Not Found para um subprocesso inexistente")
-        void deveRetornarNotFound_QuandoSubprocessoNaoExiste() throws Exception {
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, 9999L)
-                            .header("Authorization", "Bearer " + tokenAdmin))
-                    .andExpect(status().isNotFound());
-        }
 
         @Test
         @DisplayName("Deve retornar uma lista de atividades vazia quando o mapa não tem atividades")

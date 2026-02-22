@@ -128,7 +128,6 @@ public class SubprocessoMapaController {
 
     @PostMapping("/{codigo}/mapa-ajuste/atualizar")
     @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'EDITAR_MAPA')")
-    // TODO aqui acho que deveria ser so ADMIN. Confirmar
     @Operation(summary = "Salva os ajustes feitos no mapa")
     public void salvarAjustesMapa(
             @PathVariable Long codigo,

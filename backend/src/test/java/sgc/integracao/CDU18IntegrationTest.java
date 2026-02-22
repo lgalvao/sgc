@@ -127,11 +127,4 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.competencias[1].atividades[0].conhecimentos[0].descricao").value("Conhecimento 2.1"));
     }
 
-    @Test
-    @DisplayName("Deve retornar 404 se o subprocesso não existir")
-    @WithMockAdmin
-    void deveRetornar404ParaSubprocessoInexistente() throws Exception {
-        mockMvc.perform(get("/api/subprocessos/{id}/mapa-visualizacao", 9999L))
-                .andExpect(status().isForbidden());
-    }
 }

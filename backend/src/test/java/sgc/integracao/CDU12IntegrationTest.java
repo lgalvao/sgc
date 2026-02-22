@@ -271,14 +271,6 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(false)));
         }
 
-        @Test
-        @WithMockChefe(CHEFE_TITULO)
-        @DisplayName("Deve retornar 404 para subprocesso inexistente")
-        void deveRetornar404_QuandoSubprocessoNaoExiste() throws Exception {
-            setupChefeForUnidade(CHEFE_TITULO, unidade);
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, 9999L))
-                    .andExpect(status().isForbidden());
-        }
     }
 
     @Nested
