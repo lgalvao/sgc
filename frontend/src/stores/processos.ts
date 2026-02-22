@@ -145,9 +145,16 @@ export const useProcessosStore = defineStore("processos", () => {
         });
     }
 
-    async function aceitarValidacao(codigo: number, dados?: { observacoes?: string }) {
+    async function aceitarValidacao(codigo: number) {
         return withErrorHandling(async () => {
-            await processoService.aceitarValidacao(codigo, dados);
+            await processoService.aceitarValidacao(codigo);
+            if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
+        });
+    }
+
+    async function devolverValidacao(codigo: number, dados: { justificativa: string }) {
+        return withErrorHandling(async () => {
+            await processoService.devolverValidacao(codigo, dados);
             if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
         });
     }
@@ -222,6 +229,7 @@ export const useProcessosStore = defineStore("processos", () => {
         validarMapa,
         homologarValidacao,
         aceitarValidacao,
+        devolverValidacao,
         executarAcaoBloco,
         enviarLembrete,
         subprocessosElegiveis,

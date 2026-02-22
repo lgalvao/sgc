@@ -387,9 +387,7 @@ describe("VisMapa.vue", () => {
 
         modal.vm.$emit("confirmar-aceitacao", "Obs aceite");
 
-        expect(store.aceitarValidacao).toHaveBeenCalledWith(10, {
-            observacoes: "Obs aceite",
-        });
+        expect(store.aceitarValidacao).toHaveBeenCalledWith(10);
     });
 
     it("confirms homologacao (ADMIN)", async () => {

@@ -98,7 +98,7 @@ export async function alterarDataLimiteSubprocesso(
     dados: { novaData: string },
 ): Promise<void> {
     await apiClient.post(`/subprocessos/${codSubprocesso}/data-limite`, {
-        novaDataLimite: dados.novaData
+        data: dados.novaData,
     });
 }
 
@@ -106,7 +106,9 @@ export async function apresentarSugestoes(
     codSubprocesso: number,
     dados: { sugestoes: string },
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/apresentar-sugestoes`, dados);
+    await apiClient.post(`/subprocessos/${codSubprocesso}/apresentar-sugestoes`, {
+        texto: dados.sugestoes,
+    });
 }
 
 export async function validarMapa(codSubprocesso: number): Promise<void> {
@@ -117,8 +119,17 @@ export async function homologarValidacao(codSubprocesso: number): Promise<void> 
     await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-validacao`);
 }
 
-export async function aceitarValidacao(codSubprocesso: number, dados?: { observacoes?: string }): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-validacao`, dados || {});
+export async function aceitarValidacao(
+    codSubprocesso: number,
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-validacao`);
+}
+
+export async function devolverValidacao(
+    codSubprocesso: number,
+    dados: { justificativa: string },
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/devolver-validacao`, dados);
 }
 
 export async function buscarSubprocessos(

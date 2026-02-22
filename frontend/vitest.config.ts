@@ -17,7 +17,17 @@ export default defineConfig({
             reporter: ["json", "text", "html", "lcov"],
             reportsDirectory: "./coverage",
             include: ["src/**/*.{js,ts,vue}"],
-            exclude: ["node_modules", "dist", "**/*.d.ts", "src/main.ts", "**/*.config.*", "src/constants/**", "src/types/**", "src/test-utils/**"],
+            exclude: [
+                "node_modules",
+                "dist",
+                "**/*.d.ts",
+                "src/main.ts",
+                "**/*.config.*",
+                "src/constants/**",
+                "src/types/**",
+                "src/test-utils/**",
+                "**/*.stories.ts"
+            ],
             thresholds: {
                 statements: 90,
                 branches: 80,

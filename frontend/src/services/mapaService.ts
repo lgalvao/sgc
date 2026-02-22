@@ -27,7 +27,7 @@ export async function salvarMapaCompleto(
     data: any,
 ): Promise<MapaCompleto> {
     const response = await apiClient.post(
-        `/subprocessos/${codSubprocesso}/mapa-completo/salvar`,
+        `/subprocessos/${codSubprocesso}/mapa-completo`,
         data,
     );
     return mapMapaCompletoDtoToModel(response.data);
@@ -43,7 +43,7 @@ export async function salvarMapaAjuste(
     data: any,
 ): Promise<void> {
     await apiClient.post(
-        `/subprocessos/${codSubprocesso}/mapa-ajuste/salvar`,
+        `/subprocessos/${codSubprocesso}/mapa-ajuste/atualizar`,
         data,
     );
 }

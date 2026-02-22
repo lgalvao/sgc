@@ -95,6 +95,24 @@ describe("useProcessosStore", () => {
             });
         });
 
+        describe("devolverValidacao", () => {
+            it("deve chamar service corretamente", async () => {
+                context.store.processoDetalhe = { codigo: 1 } as any;
+                const dados = { justificativa: 'Erro' };
+                processoService.devolverValidacao.mockResolvedValue(undefined);
+                processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
+                await context.store.devolverValidacao(10, dados);
+                expect(processoService.devolverValidacao).toHaveBeenCalledWith(10, dados);
+                expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+            });
+
+            it("deve lançar erro em caso de falha", async () => {
+                processoService.devolverValidacao.mockRejectedValue(MOCK_ERROR);
+                await expect(context.store.devolverValidacao(10, { justificativa: 'E' })).rejects.toThrow(MOCK_ERROR);
+                expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
+            });
+        });
+
         describe("buscarContextoCompleto", () => {
             it("deve limpar o estado anterior antes de buscar novo contexto", async () => {
                 context.store.processoDetalhe = { codigo: 1 } as any;
@@ -450,8 +468,8 @@ describe("useProcessosStore", () => {
                 context.store.processoDetalhe = { codigo: 1 } as any;
                 processoService.aceitarValidacao.mockResolvedValue(undefined);
                 processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
-                await context.store.aceitarValidacao(10, { observacoes: 'Obs' });
-                expect(processoService.aceitarValidacao).toHaveBeenCalledWith(10, { observacoes: 'Obs' });
+                await context.store.aceitarValidacao(10);
+                expect(processoService.aceitarValidacao).toHaveBeenCalledWith(10);
                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
 
@@ -459,9 +477,9 @@ describe("useProcessosStore", () => {
                 context.store.processoDetalhe = null;
                 processoService.aceitarValidacao.mockResolvedValue(undefined);
 
-                await context.store.aceitarValidacao(10, { observacoes: 'Obs' });
+                await context.store.aceitarValidacao(10);
 
-                expect(processoService.aceitarValidacao).toHaveBeenCalledWith(10, { observacoes: 'Obs' });
+                expect(processoService.aceitarValidacao).toHaveBeenCalledWith(10);
                 expect(processoService.obterDetalhesProcesso).not.toHaveBeenCalled();
             });
 
