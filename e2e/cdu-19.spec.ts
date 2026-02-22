@@ -1,8 +1,15 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {
+    adicionarAtividade,
+    adicionarConhecimento,
+    navegarParaAtividades,
+    navegarParaAtividadesVisualizacao
+} from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {aceitarCadastroMapeamento, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
+import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
 test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -62,6 +69,19 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
+    test('Preparacao 2a: Gestor COORD_22 aceita cadastro', async ({page, autenticadoComoGestorCoord22}) => {
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page);
+    });
+
+    test('Preparacao 2b: Gestor SECRETARIA_2 aceita cadastro', async ({page}) => {
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page);
+    });
+
     test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         
 
@@ -109,7 +129,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
             .toHaveText(/Mapa disponibilizado/i);
 
         // Passo 1: Clica no card Mapa de competências
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         // Passo 2: Sistema mostra tela de Visualização de mapa
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
@@ -124,7 +144,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         // Clicar em Validar
         await page.getByTestId('btn-mapa-validar').click();
@@ -147,7 +167,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         // Passo 5: Clicar em Validar
         await page.getByTestId('btn-mapa-validar').click();

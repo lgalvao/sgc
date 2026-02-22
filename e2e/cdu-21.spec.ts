@@ -1,13 +1,20 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {
+    adicionarAtividade,
+    adicionarConhecimento,
+    navegarParaAtividades,
+    navegarParaAtividadesVisualizacao
+} from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {aceitarCadastroMapeamento, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
+import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
 async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
     await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-    await page.getByTestId('card-subprocesso-mapa').click();
+    await navegarParaMapa(page);
 }
 
 test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => {
@@ -68,6 +75,19 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await verificarPaginaPainel(page);
     });
 
+    test('Preparacao 2a: Gestor COORD_22 aceita cadastro', async ({page, autenticadoComoGestorCoord22}) => {
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page);
+    });
+
+    test('Preparacao 2b: Gestor SECRETARIA_2 aceita cadastro', async ({page}) => {
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page);
+    });
+
     test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         
 
@@ -115,7 +135,20 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
+
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+
+        await verificarPaginaPainel(page);
+    });
+
+    test('Preparacao 6b: Gestor SECRETARIA_2 aceita mapa', async ({page}) => {
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaMapa(page);
 
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         const modal = page.getByRole('dialog');
@@ -130,7 +163,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
-        await page.getByTestId('card-subprocesso-mapa').click();
+        await navegarParaMapa(page);
 
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         const modal = page.getByRole('dialog');

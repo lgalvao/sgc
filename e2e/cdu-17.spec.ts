@@ -8,6 +8,8 @@ import {
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {aceitarCadastroMapeamento, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
+import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
 test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_211';
@@ -69,6 +71,19 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
         await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
+    });
+
+    test('Preparacao 2a: Gestor COORD_21 aceita cadastro', async ({page, autenticadoComoGestorCoord21}) => {
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page);
+    });
+
+    test('Preparacao 2b: Gestor SECRETARIA_2 aceita cadastro', async ({page}) => {
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page);
     });
 
     test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
