@@ -263,29 +263,7 @@ export interface UnidadeParticipante {
     filhos: UnidadeParticipante[];
 }
 
-export interface SubprocessoPermissoes {
-    podeVerPagina: boolean;
-    podeEditarMapa: boolean;
-    podeEditarCadastro?: boolean;
-    podeVisualizarMapa: boolean;
-    podeDisponibilizarMapa: boolean;
-    podeDisponibilizarCadastro: boolean;
-    podeDevolverCadastro: boolean;
-    podeAceitarCadastro: boolean;
-    podeHomologarCadastro?: boolean;
-    podeVisualizarDiagnostico: boolean;
-    podeAlterarDataLimite: boolean;
-    podeVisualizarImpacto: boolean;
-    podeRealizarAutoavaliacao?: boolean;
-    podeReabrirCadastro?: boolean;
-    podeReabrirRevisao?: boolean;
-    podeEnviarLembrete?: boolean;
-    podeApresentarSugestoes?: boolean;
-    podeValidarMapa?: boolean;
-    podeAceitarMapa?: boolean;
-    podeDevolverMapa?: boolean;
-    podeHomologarMapa?: boolean;
-}
+
 
 export interface SubprocessoDetalhe {
     codigo: number;
@@ -301,7 +279,6 @@ export interface SubprocessoDetalhe {
     etapaAtual: number;
     movimentacoes: Movimentacao[];
     elementosProcesso: any[];
-    permissoes: SubprocessoPermissoes;
 }
 
 // Interfaces de visualização removidas (consolidadas no início do arquivo)

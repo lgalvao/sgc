@@ -97,6 +97,7 @@ import {storeToRefs} from "pinia";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
+import {useAcesso} from "@/composables/useAcesso";
 import {useFormErrors} from '@/composables/useFormErrors';
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
@@ -117,32 +118,15 @@ const mapasStore = useMapasStore();
 const {mapaCompleto, impactoMapa} = storeToRefs(mapasStore);
 const atividadesStore = useAtividadesStore();
 const subprocessosStore = useSubprocessosStore();
+const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const unidadesStore = useUnidadesStore();
 usePerfil();
 
 const codProcesso = computed(() => Number(route.params.codProcesso));
 const siglaUnidade = computed(() => String(route.params.siglaUnidade));
 
-const podeVerImpacto = computed(() => {
-  return (
-      subprocessosStore.subprocessoDetalhe?.permissoes?.podeVisualizarImpacto ||
-      false
-  );
-});
-
-const podeEditarMapa = computed(() => {
-  return (
-      subprocessosStore.subprocessoDetalhe?.permissoes?.podeEditarMapa ||
-      false
-  );
-});
-
-const podeDisponibilizarMapa = computed(() => {
-  return (
-      subprocessosStore.subprocessoDetalhe?.permissoes?.podeDisponibilizarMapa ||
-      false
-  );
-});
+const {podeVisualizarImpacto, podeEditarMapa, podeDisponibilizarMapa} = useAcesso(subprocesso);
+const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 
 const mostrarModalImpacto = ref(false);
 const loadingImpacto = ref(false);

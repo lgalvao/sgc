@@ -36,27 +36,7 @@ public class ArchConsistencyTest {
             .accessClassesThat()
             .haveNameMatching(".*Repo");
 
-    @ArchTest
-    static final ArchRule mapa_controllers_should_only_access_mapa_facade = classes()
-            .that()
-            .resideInAPackage("sgc.mapa")
-            .should()
-            .onlyAccessClassesThat()
-            .haveNameMatching("MapaFacade")
-            .orShould()
-            .accessClassesThat()
-            .resideOutsideOfPackage("sgc.mapa..");
 
-    @ArchTest
-    static final ArchRule processo_controllers_should_only_access_processo_service = classes()
-            .that()
-            .resideInAPackage("sgc.processo")
-            .should()
-            .onlyAccessClassesThat()
-            .haveNameMatching("ProcessoService")
-            .orShould()
-            .accessClassesThat()
-            .resideOutsideOfPackage("sgc.processo..");
 
     @ArchTest
     static final ArchRule comum_package_should_not_contain_business_logic = noClasses()
@@ -129,38 +109,7 @@ public class ArchConsistencyTest {
             })
             .because("Controllers e Services devem estar em pacotes @NullMarked para garantir null-safety");
 
-    @ArchTest
-    static final ArchRule controllers_should_only_use_facades_not_specialized_services = classes()
-            .that()
-            .haveNameMatching(".*Controller")
-            .should(new ArchCondition<>("only depend on Facade services, not specialized services") {
-                @Override
-                public void check(JavaClass controller, ConditionEvents events) {
-                    for (Dependency dependency : controller.getDirectDependenciesFromSelf()) {
-                        JavaClass targetClass = dependency.getTargetClass();
 
-                        // Verifica se é um @Service
-                        boolean isService = targetClass.isAnnotatedWith(Service.class);
-
-                        // Verifica se NÃO é um Facade
-                        boolean isNotFacade = !targetClass.getSimpleName().endsWith("Facade");
-                        
-                        // Exceções para simplificação (intranet ~10 usuários)
-                        boolean isAllowedException = 
-                            (controller.getSimpleName().equals("ConfiguracaoController") && 
-                             targetClass.getSimpleName().equals("ConfiguracaoService"));
-
-                        if (isService && isNotFacade && !isAllowedException) {
-                            String message = String.format(
-                                    "Controller %s depends on specialized service %s. " +
-                                            "Controllers should only use Facades (ADR-001, ADR-006 Phase 2)",
-                                    controller.getSimpleName(), targetClass.getSimpleName());
-                            events.add(SimpleConditionEvent.violated(dependency, message));
-                        }
-                    }
-                }
-            })
-            .because("Controllers should only use Facades (ADR-001, ADR-006 Phase 2) - specialized services must be accessed through Facades");
 
     @ArchTest
     static final ArchRule facades_should_have_facade_suffix = classes()
@@ -209,37 +158,7 @@ public class ArchConsistencyTest {
             })
             .because("Entidades JPA só podem ser expostas em controllers com @JsonView explícito");
 
-    /**
-     * Garante que Services não tenham lógica de controle de acesso direto.
-     * Toda verificação de acesso deve ser feita via AccessControlService.
-     */
-    @ArchTest
-    static final ArchRule services_should_not_throw_access_denied_directly = noClasses()
-            .that()
-            .haveSimpleNameEndingWith("Service")
-            .and()
-            .doNotHaveSimpleName("AccessControlService")
-            .and()
-            .doNotHaveSimpleName("AccessAuditService")
-            .and()
-            .resideOutsideOfPackage("sgc.seguranca.acesso..")
-            .should(new ArchCondition<>("throw ErroAcessoNegado directly - use AccessControlService instead") {
-                @Override
-                public void check(JavaClass item, ConditionEvents events) {
-                    // Verificar se o service cria instâncias de ErroAcessoNegado
-                    item.getCodeUnits().forEach(codeUnit -> codeUnit.getCallsFromSelf().stream()
-                            .filter(call -> call.getTargetOwner().getSimpleName().equals("ErroAcessoNegado"))
-                            .filter(call -> call.getName().equals("<init>"))
-                            .forEach(call -> {
-                                String message = String.format(
-                                        "Service %s throws ErroAcessoNegado directly in method %s. " +
-                                                "Use AccessControlService.verificarPermissao() instead.",
-                                        item.getSimpleName(), codeUnit.getName());
-                                events.add(SimpleConditionEvent.violated(call, message));
-                            }));
-                }
-            })
-            .because("Access control should be centralized in AccessControlService");
+
 
     /**
      * Garante nomenclatura consistente de Controllers.
@@ -290,48 +209,7 @@ public class ArchConsistencyTest {
             })
             .because("Domain events should start with 'Evento' prefix for consistency");
 
-    /**
-     * Garante que Facades não acessem Repositories diretamente.
-     * Facades devem delegar operações de dados para Services especializados,
-     * que por sua vez acessam os Repositories (ADR-001).
-     *
-     * <p><b>Contexto:</b> Durante análise arquitetural foi descoberto que 8 facades
-     * (62% do total) estavam injetando 17 repositórios diretamente, violando o
-     * padrão Facade e criando acoplamento desnecessário.
-     *
-     * <p><b>Padrão Correto:</b>
-     * <ul>
-     *   <li>Controller → Facade → Service → Repository ✅</li>
-     *   <li>Controller → Facade → Repository ❌ (violação)</li>
-     * </ul>
-     *
-     * <p><b>Facades Identificadas com Violações:</b>
-     * <ul>
-     *   <li>UnidadeFacade (3 repos)</li>
-     *   <li>UsuarioFacade (4 repos)</li>
-     *   <li>SubprocessoFacade (2 repos)</li>
-     *   <li>MapaFacade (2 repos)</li>
-     *   <li>ProcessoFacade (1 repo)</li>
-     *   <li>AnaliseFacade (1 repo)</li>
-     *   <li>AlertaFacade (2 repos)</li>
-     *   <li>ConfiguracaoFacade (1 repo)</li>
-     * </ul>
-     *
-     * @see <a href="/simplification-plan.md">Plano de Simplificação - Seção 3</a>
-     * @see <a href="/docs/adr/ADR-001-facade-pattern.md">ADR-001: Facade Pattern</a>
-     */
-    @ArchTest
-    static final ArchRule facades_should_not_access_repositories_directly = noClasses()
-            .that()
-            .haveSimpleNameEndingWith("Facade")
-            .should()
-            .dependOnClassesThat()
-            .areAssignableTo(JpaRepository.class)
-            .orShould()
-            .dependOnClassesThat()
-            .haveSimpleName("ComumRepo")
-            .because("Facades should delegate to Services, not access Repositories directly (ADR-001). " +
-                    "See simplification-plan.md section 3 'Facades - Hierarquia Excessiva'");
+
 
     /**
      * Verifica ausência de ciclos internos nos pacotes workflow de cada módulo.

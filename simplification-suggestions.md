@@ -1,67 +1,55 @@
-# Radical Simplification Suggestions for SGC
+# Pragmatic Simplification Strategy for SGC
 
-> **Verified Context (v3.0.0):** This document is based on an analysis of the codebase at `backend/src/main/java/sgc`. The fragmentation and complexity issues are confirmed, though some specific implementation details (like interface usage) were previously misstated.
-> **Constraint:** This system will be used by **at most 5-10 simultaneous users** inside an intranet.
-> **Diagnosis:** The current architecture is designed for high-scale, distributed teams (Microservices patterns, Hexagonal/Clean Architecture, strict isolation).
-> **Verdict:** 80% of the code is "glue code" managing complexity that doesn't exist.
+> **Context:** This system will be used by **at most 5-10 simultaneous users** inside an intranet.
+> **Diagnosis:** The current architecture is designed for high-scale, distributed teams (Microservices patterns, Hexagonal/Clean Architecture, strict isolation), leading to excessive "glue code" managing non-existent complexity.
+> **Goal:** This document outlines a strategy to aggressively simplify the codebase, reducing maintenance overhead and cognitive load, while maintaining application stability and security.
 
-This document outlines a strategy to aggressively simplify the codebase, reducing maintenance overhead and cognitive load.
+---
 
-## 1. The "One Service, One Controller" Rule (Backend)
+## 1. Cohesive Controllers & Services
 
-The `subprocesso` module (`backend/src/main/java/sgc/subprocesso`) is the prime example of fragmentation. It currently has:
-- **4 Controllers:** `SubprocessoCadastroController`, `SubprocessoCrudController`, `SubprocessoMapaController`, `SubprocessoValidacaoController`.
-- **1 Facade:** `SubprocessoFacade` (which injects 11 other services).
-- **10+ Services:** `SubprocessoCrudService`, `SubprocessoValidacaoService`, `SubprocessoCadastroWorkflowService`, `SubprocessoMapaWorkflowService`, `SubprocessoAdminWorkflowService`, `SubprocessoAjusteMapaService`, `SubprocessoAtividadeService`, `SubprocessoContextoService`, `SubprocessoPermissaoCalculator`, `SubprocessoFactory`, etc.
+The `subprocesso` module (`backend/src/main/java/sgc/subprocesso`) is a prime example of fragmentation. Currently, it has 4 Controllers, 1 Facade (injecting 11 services), and 10+ Services representing arbitrarily split logic.
 
-**Action:** Merge them.
-- **Single Controller:** `SubprocessoController`. It handles all HTTP requests related to a Subprocess.
-- **Single Service:** `SubprocessoService`. It contains all business logic. Yes, it might be 2000 lines long. *That is fine.* A single file is easier to navigate than 15 files with circular dependencies and injection overhead.
-- **Delete the Facade:** It adds no value. Inject the Repository directly into the Service.
+Navigating a simple feature requires jumping through 5 files. The Facade pattern is designed for orchestrating complex microservice boundaries, not for a simple intranet monolith. It adds pure passthrough boilerplate.
 
-## 2. Eliminate the Custom "Access Control Framework"
+**Action Plan:**
+- **Merge Controllers:** Consolidate into a single cohesive `SubprocessoController` handling all Subprocess-related HTTP routing.
+- **Delete the Facade:** Controllers should inject focused Services directly.
+- **Group Services by Cohesion:** Merge the 10+ fragmented services into 2-3 focused services based on domain logic (e.g., `SubprocessoCrudService` for basic data entry, `SubprocessoWorkflowService` for state transitions). Eliminate classes with only 1 or 2 methods that simply pass data through.
+- **Maintain Standard Flow:** Always maintain the standard `Controller -> Service -> Repository` flow. The `@Service` layer is crucial for safely defining database transaction boundaries (`@Transactional`).
 
-The system implements a custom security framework in `sgc.seguranca.acesso` (`AccessControlService`, `AccessPolicy`, `AccessAuditService`, `AbstractAccessPolicy`).
-This mimics Spring Security ACLs but with custom code.
+## 2. Standardize Access Control
 
-**Action:** Use Standard Spring Security.
-- **Delete** `AccessControlService`, `AccessPolicy`, and all `*AccessPolicy` classes (`SubprocessoAccessPolicy`, `ProcessoAccessPolicy`, etc.).
-- **Use Annotations:** `@PreAuthorize("hasRole('ADMIN')")` or `@PreAuthorize("@subprocessoSecurity.canEdit(#id, principal)")`.
-- **Simple Logic:** Implement a single `SecurityService` with methods like `canEdit(user, entityId)`.
-- **Trust the Framework:** Spring Security handles authentication and authorization efficiently. We don't need a custom audit layer for 5 users; standard logs are sufficient.
+The system currently implements a custom security framework in `sgc.seguranca.acesso` (`AccessControlService`, `AccessPolicy`, `AccessAuditService`, `AbstractAccessPolicy`). It mimics Spring Security ACLs using bespoke code and manual interceptors.
 
-## 3. Pragmatic Data Access (The "Anti-DTO" Pattern)
+Maintaining custom security code is a massive liability. Spring Security is the industry standard and natively supports complex method-level authorization. A custom framework for a small intranet application is unnecessary overhead.
 
-The system currently enforces a strict `Entity -> DTO -> Response` mapping, often with 3-4 layers of object copying.
+**Action Plan:**
+- **Use Standard Spring Security:** Leverage standard expressions like `@PreAuthorize("@subprocessoSecurity.canEdit(#id, principal)")`.
+- **Delete the Custom Framework:** Remove all `*AccessPolicy` classes and custom security interceptors.
+- **Centralize Checks:** Create localized security services (e.g., `SubprocessoSecurity`) to evaluate complex rules using standard Spring paradigms.
+- **Simplify Auditing:** Rely on standard `slf4j` logging instead of custom audit tables for authorization checks.
 
-**Action:** Use Entities for Read/Write where possible.
-- **Return Entities:** For internal intranet apps, returning the JPA Entity (with `@JsonIgnore` on recursive fields) is perfectly acceptable and saves writing hundreds of DTOs.
-- **MapStruct is Optional:** If you need a DTO, write a simple constructor or a static factory method. You don't need a complex Mapper interface and generated implementation for every single object.
-- **Repo in Controller:** For simple "Get by ID" or "List All" endpoints, injecting the `Repository` directly into the `Controller` is acceptable. The "Service Layer" is for *business logic*, not for passthrough.
+## 3. Simplify Data Transport (DTOs & Mappers)
 
-## 4. Frontend: Trust the Backend Contract
+The system currently uses complex mapping frameworks and deep defensive programming when passing data between the database and the frontend.
 
-The frontend currently re-validates and re-maps everything (`frontend/src/mappers/` contains files like `subprocessos.ts`, `mapas.ts`, `alertas.ts`).
+**Action Plan:**
+- **Use Simple DTOs:** Keep Data Transfer Objects, but simplify them. Instead of complex mappers (like MapStruct), use Java 17+ `record` types to create lightweight DTOs. Use basic constructors or static factory methods (e.g., `return new SubprocessoResponse(entity)`) to map data safely. This avoids the `LazyInitializationException` risks of returning JPA Entities directly while removing mapper boilerplate.
+- **Use Generated API Types on the Frontend:** Eliminate manual mapping code in the UI (`frontend/src/mappers/*.ts`). Rely on strictly typed TypeScript definitions generated from the backend OpenAPI/Swagger contracts.
 
-**Action:** Delete the Mappers.
-- **Use the API Types:** The backend DTOs (or Entities) are the source of truth.
-- **Fail Fast:** If the backend sends `null` where a string is expected, let the UI break or show a generic error. Writing defensive code for every single field ("defensive programming") is expensive and hides bugs.
-- **Consolidate Stores:** A single `useSubprocessoStore` is enough. You don't need `useSubprocessoMapaStore`, `useSubprocessoAtividadeStore`, etc. State fragmentation leads to sync bugs.
+## 4. Specific Targets for Refactoring
 
-## 5. Specific Targets for Deletion
-
-| Component | Reason | Replacement |
+| Component | Diagnosis | Action |
 | :--- | :--- | :--- |
-| `SubprocessoFacade` | Passthrough layer | `SubprocessoService` |
-| `Subprocesso*Controller` (x4) | Arbitrary splitting | `SubprocessoController` |
-| `*AccessPolicy` classes | Overengineered framework | `@PreAuthorize` + Simple Service Check |
-| `AccessAuditService` | Redundant logging | Standard `slf4j` logs |
-| `frontend/src/mappers/*.ts` | Redundant mapping | Direct API types |
-| `ComumRepo` | Custom Wrapper | Standard `JpaRepository` |
-| `ADR-001` (Facades) | Premature optimization | Direct Service Injection |
-| `ADR-005` (Split Controllers) | Premature optimization | Cohesive Controllers |
+| `SubprocessoFacade` | Passthrough "glue code" | **Delete.** Controllers inject Services directly. |
+| `Subprocesso*Controller` (x4) | Arbitrary fragmentation | **Merge** into `SubprocessoController`. |
+| `*AccessPolicy` classes | Overengineered custom framework | **Delete.** Replace with `@PreAuthorize` + standard service checks. |
+| `AccessAuditService` | Redundant custom logging | **Delete.** Use standard `slf4j` logging. |
+| `frontend/src/mappers/*.ts` | Manual, redundant mapping | **Refactor.** Use direct API types via OpenAPI generators. |
+| Complex mapStruct mappers | Excessive boilerplate | **Refactor.** Replace with Java `record` constructors. |
 
-## 6. Development Workflow Changes
+## 5. Development Workflow Guidelines
 
-- **Consolidate Logic:** Stop creating new service classes for every small feature (e.g., `SubprocessoAjusteMapaService` for just one method). Keep logic related to the Subprocess entity in `SubprocessoService`.
-- **Stop mocking everything:** For a small app, integration tests (`@SpringBootTest`) are more valuable and easier to write than mocking 15 dependencies.
+- **Stop arbitrarily splitting logic:** If a feature belongs to "Subprocess Management", it goes in the primary Subprocess service. Avoid creating new classes for single methods.
+- **Leverage Integration Tests:** Avoid writing 50 lines of Mockito setup to test a 3-line service passthrough method. Focus on `@SpringBootTest` or `@DataJpaTest` to verify the code actually works against a real (or in-memory) database schema.

@@ -6,7 +6,7 @@
           md="4"
       >
         <BCard
-            v-if="permissoes.podeEditarCadastro"
+            v-if="podeEditarCadastro"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-atividades"
             role="button"
@@ -24,7 +24,7 @@
           </div>
         </BCard>
         <BCard
-            v-else-if="permissoes.podeVisualizarMapa"
+            v-else
             class="h-100 card-actionable"
             data-testid="card-subprocesso-atividades-vis"
             role="button"
@@ -48,7 +48,7 @@
           md="4"
       >
         <BCard
-            v-if="permissoes.podeEditarMapa"
+            v-if="podeEditarMapa"
             :aria-disabled="!mapa"
             :class="{ 'disabled-card': !mapa }"
             class="h-100 card-actionable"
@@ -68,7 +68,7 @@
           </div>
         </BCard>
         <BCard
-            v-else-if="permissoes.podeVisualizarMapa"
+            v-else
             :aria-disabled="!mapa"
             :class="{ 'disabled-card': !mapa }"
             class="h-100 card-actionable"
@@ -96,7 +96,6 @@
           md="4"
       >
         <BCard
-            v-if="permissoes.podeVisualizarDiagnostico"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-diagnostico"
             role="button"
@@ -166,7 +165,10 @@
 <script lang="ts" setup>
 import {BCard, BCardText, BCardTitle, BCol, BRow} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
-import {type Mapa, type MapaCompleto, SubprocessoPermissoes, TipoProcesso,} from "@/types/tipos";
+import {computed} from "vue";
+import {useAcesso} from "@/composables/useAcesso";
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {type Mapa, type MapaCompleto, TipoProcesso,} from "@/types/tipos";
 
 const TipoProcessoEnum = TipoProcesso;
 
@@ -174,13 +176,16 @@ const props = defineProps<{
   tipoProcesso: TipoProcesso;
   mapa: Mapa | MapaCompleto | null;
   situacao?: string;
-  permissoes: SubprocessoPermissoes;
   codSubprocesso: number;
   codProcesso: number;
   siglaUnidade: string;
 }>();
 
 const router = useRouter();
+const subprocessosStore = useSubprocessosStore();
+const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
+
+const { podeEditarCadastro, podeEditarMapa } = useAcesso(subprocesso);
 
 function navegarPara(routeName: string) {
   router.push({

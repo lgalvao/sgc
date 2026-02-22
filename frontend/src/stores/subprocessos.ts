@@ -14,7 +14,6 @@ import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
-    obterPermissoes as serviceObterPermissoes,
     validarCadastro as serviceValidarCadastro,
 } from "@/services/subprocessoService";
 import {
@@ -181,17 +180,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         );
     }
 
-    async function buscarPermissoes(codigo: number) {
-        return withErrorHandling(async () => {
-            const permissoes = await serviceObterPermissoes(codigo);
-            if (subprocessoDetalhe.value && subprocessoDetalhe.value.codigo === codigo) {
-                subprocessoDetalhe.value = {
-                    ...subprocessoDetalhe.value,
-                    permissoes: permissoes
-                };
-            }
-        });
-    }
+
 
     return {
         subprocessoDetalhe,
@@ -205,7 +194,6 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         validarCadastro,
         reabrirCadastro,
         reabrirRevisaoCadastro,
-        buscarPermissoes,
         disponibilizarCadastro: (codSubprocesso: number) =>
             _executarAcao(
                 () => disponibilizarCadastro(codSubprocesso),

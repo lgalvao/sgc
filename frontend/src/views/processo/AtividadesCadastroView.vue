@@ -54,7 +54,7 @@
         </BDropdown>
 
         <LoadingButton
-            v-if="!!permissoes?.podeDisponibilizarCadastro"
+            v-if="!!podeDisponibilizarCadastro"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
             variant="success"
@@ -74,7 +74,7 @@
     <CadAtividadeForm
         ref="atividadeFormRef"
         v-model="novaAtividade"
-        :disabled="!codSubprocesso || !permissoes?.podeEditarCadastro"
+        :disabled="!codSubprocesso || !podeEditarCadastro"
         :erro="erroNovaAtividade"
         :loading="loadingAdicionar"
         @submit="handleAdicionarAtividade"
@@ -106,7 +106,7 @@
     >
       <AtividadeItem
           :atividade="atividade"
-          :pode-editar="!!permissoes?.podeEditarCadastro"
+          :pode-editar="!!podeEditarCadastro"
           :erro-validacao="obterErroParaAtividade(atividade.codigo)"
           @atualizar-atividade="(desc) => salvarEdicaoAtividade(atividade.codigo, desc)"
           @remover-atividade="() => removerAtividade(idx)"
@@ -181,6 +181,7 @@ import {useUnidadesStore} from "@/stores/unidades";
 import {useAnalisesStore} from "@/stores/analises";
 import {useFeedbackStore} from "@/stores/feedback";
 import {usePerfil} from "@/composables/usePerfil";
+import {useAcesso} from "@/composables/useAcesso";
 import type {Atividade, Conhecimento, CriarConhecimentoRequest, ErroValidacao,} from "@/types/tipos";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import logger from "@/utils/logger";
@@ -209,9 +210,9 @@ const codSubprocesso = ref<number | null>(null);
 const codMapa = computed(() => mapasStore.mapaCompleto?.codigo || null);
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const nomeUnidade = computed(() => unidadesStore.unidade?.nome || "");
-const permissoes = computed(() => subprocesso.value?.permissoes || null);
+const { podeEditarCadastro, podeDisponibilizarCadastro, podeVisualizarImpacto } = useAcesso(subprocesso);
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
-const podeVerImpacto = computed(() => permissoes.value?.podeVisualizarImpacto ?? false);
+const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 
 const atividades = computed(() => {
   if (codSubprocesso.value === null) return [];

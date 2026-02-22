@@ -17,19 +17,7 @@ const meta: Meta<typeof SubprocessoCards> = {
 export default meta;
 type Story = StoryObj<typeof SubprocessoCards>;
 
-const mockPermissoesFull = {
-  podeVerPagina: true,
-  podeEditarCadastro: true,
-  podeVisualizarMapa: true,
-  podeEditarMapa: true,
-  podeVisualizarDiagnostico: true,
-  podeDisponibilizarMapa: true,
-  podeDisponibilizarCadastro: true,
-  podeDevolverCadastro: true,
-  podeAceitarCadastro: true,
-  podeAlterarDataLimite: true,
-  podeVisualizarImpacto: true,
-};
+
 
 const mockMapa = {
   codigo: 1,
@@ -45,7 +33,6 @@ export const MapeamentoGestor: Story = {
   args: {
     tipoProcesso: TipoProcesso.MAPEAMENTO,
     mapa: mockMapa,
-    permissoes: mockPermissoesFull,
     codSubprocesso: 123,
     codProcesso: 456,
     siglaUnidade: 'DITEC',
@@ -56,13 +43,6 @@ export const MapeamentoVisualizador: Story = {
   args: {
     tipoProcesso: TipoProcesso.MAPEAMENTO,
     mapa: mockMapa,
-    permissoes: {
-      ...mockPermissoesFull,
-      podeEditarCadastro: false,
-      podeVisualizarMapa: true,
-      podeEditarMapa: false,
-      podeVisualizarDiagnostico: false,
-    },
     codSubprocesso: 123,
     codProcesso: 456,
     siglaUnidade: 'DITEC',
@@ -73,7 +53,6 @@ export const MapeamentoSemMapa: Story = {
   args: {
     tipoProcesso: TipoProcesso.MAPEAMENTO,
     mapa: null,
-    permissoes: mockPermissoesFull,
     codSubprocesso: 123,
     codProcesso: 456,
     siglaUnidade: 'DITEC',
@@ -84,7 +63,6 @@ export const Diagnostico: Story = {
   args: {
     tipoProcesso: TipoProcesso.DIAGNOSTICO,
     mapa: mockMapa,
-    permissoes: mockPermissoesFull,
     codSubprocesso: 123,
     codProcesso: 456,
     siglaUnidade: 'DITEC',

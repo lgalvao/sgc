@@ -9,10 +9,10 @@
       />
 
       <SubprocessoHeader
-          :pode-alterar-data-limite="subprocesso.permissoes.podeAlterarDataLimite"
-          :pode-reabrir-cadastro="subprocesso.permissoes.podeReabrirCadastro"
-          :pode-reabrir-revisao="subprocesso.permissoes.podeReabrirRevisao"
-          :pode-enviar-lembrete="subprocesso.permissoes.podeEnviarLembrete"
+          :pode-alterar-data-limite="podeAlterarDataLimite"
+          :pode-reabrir-cadastro="podeReabrirCadastro"
+          :pode-reabrir-revisao="podeReabrirRevisao"
+          :pode-enviar-lembrete="podeEnviarLembrete"
           :processo-descricao="subprocesso.processoDescricao || ''"
           :responsavel-email="subprocesso.responsavel?.email || ''"
           :responsavel-nome="subprocesso.responsavel?.nome || ''"
@@ -34,7 +34,6 @@
           :cod-processo="props.codProcesso"
           :cod-subprocesso="codSubprocesso"
           :mapa="mapa"
-          :permissoes="subprocesso.permissoes || { podeEditarMapa: true, podeVisualizarMapa: true, podeVisualizarDiagnostico: true, podeAlterarDataLimite: false, podeDisponibilizarCadastro: false, podeDevolverCadastro: false, podeAceitarCadastro: false, podeVisualizarImpacto: false, podeVerPagina: true, podeRealizarAutoavaliacao: false, podeDisponibilizarMapa: false }"
           :sigla-unidade="props.siglaUnidade"
           :situacao="subprocesso.situacao"
           :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
@@ -118,9 +117,10 @@ import {usePerfilStore} from "@/stores/perfil";
 import {useModalManager} from "@/composables/useModalManager";
 import {useLoadingManager} from "@/composables/useLoadingManager";
 
+import {useAcesso} from "@/composables/useAcesso";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useProcessosStore} from "@/stores/processos";
-import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso,} from "@/types/tipos";
+import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
 
@@ -145,6 +145,16 @@ const modalLembreteAberto = ref(false);
 const subprocesso = computed<SubprocessoDetalhe | null>(
     () => subprocessosStore.subprocessoDetalhe,
 );
+
+const { 
+  podeAlterarDataLimite, 
+  podeReabrirCadastro, 
+  podeReabrirRevisao, 
+  podeEnviarLembrete,
+  podeDisponibilizarCadastro,
+  podeEditarCadastro
+} = useAcesso(subprocesso);
+
 const mapa = computed(() => mapaStore.mapaCompleto);
 const movimentacoes = computed<Movimentacao[]>(
     () => subprocesso.value?.movimentacoes || [],
@@ -158,8 +168,8 @@ const {obterProximaAcao} = useProximaAcao();
 const proximaAcaoSubprocesso = computed(() => obterProximaAcao({
   perfil: perfilStore.perfilSelecionado,
   situacao: formatSituacaoSubprocesso(subprocesso.value?.situacao),
-  podeDisponibilizarCadastro: subprocesso.value?.permissoes?.podeDisponibilizarCadastro,
-  podeEditarCadastro: subprocesso.value?.permissoes?.podeEditarCadastro,
+  podeDisponibilizarCadastro: podeDisponibilizarCadastro.value,
+  podeEditarCadastro: podeEditarCadastro.value,
 }));
 
 onMounted(async () => {
@@ -183,7 +193,7 @@ onMounted(async () => {
 });
 
 function abrirModalAlterarDataLimite() {
-  if (subprocesso.value?.permissoes.podeAlterarDataLimite) {
+  if (podeAlterarDataLimite.value) {
     modals.open('alterarDataLimite');
   } else {
     feedbackStore.show("Ação não permitida", "Você não tem permissão para alterar a data limite.", "danger");

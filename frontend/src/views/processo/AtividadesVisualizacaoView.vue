@@ -139,6 +139,7 @@ import type {
   Unidade,
   UnidadeParticipante,
 } from "@/types/tipos";
+import {useAcesso} from "@/composables/useAcesso";
 import {TipoProcesso} from "@/types/tipos";
 
 const props = defineProps<{
@@ -191,15 +192,10 @@ const subprocesso = computed(() => {
   return encontrarUnidade(processosStore.processoDetalhe.unidades);
 });
 
-const permissoes = computed(() => subprocessosStore.subprocessoDetalhe?.permissoes);
+const { podeHomologarCadastro, podeVisualizarImpacto } = useAcesso(computed(() => subprocessosStore.subprocessoDetalhe));
 
-const isHomologacao = computed(() => {
-  return permissoes.value?.podeHomologarCadastro ?? false;
-});
-
-const podeVerImpacto = computed(() => {
-  return permissoes.value?.podeVisualizarImpacto ?? false;
-});
+const isHomologacao = computed(() => podeHomologarCadastro.value);
+const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 
 const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 

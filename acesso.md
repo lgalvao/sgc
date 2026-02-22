@@ -2,6 +2,17 @@
 
 Este documento consolida as regras de acesso e atividades permitidas para cada perfil e contexto do subprocesso.
 
+## Resumo Executivo: Visão vs. Execução
+
+O sistema de acesso do SGC baseia-se em um conjunto simples, mas rígido, de regras de fluxo de trabalho ditadas por dois eixos distintos: **Hierarquia** e **Situação/Localização**.
+
+A regra de ouro que norteia toda a arquitetura de acesso é a separação entre *pertencimento* e *localização*:
+1. **Unidade Responsável (Quem é o dono):** Define as **Regras de Visualização (Leitura)**. Um usuário pode visualizar qualquer subprocesso que pertença à sua unidade ou às unidades subordinadas a ele, independentemente de onde o subprocesso esteja "estacionado" no fluxo de trabalho.
+2. **Localização Atual (Com quem está a bola):** Define as **Regras de Execução (Escrita)**. Como um documento físico tramitando entre mesas, um usuário **só pode executar ações** (editar, aceitar, devolver, homologar) se o subprocesso estiver fisicamente "na sua mesa" (localizado na sua unidade). 
+   * *Exemplo Clássico:* Nem mesmo um ADMIN global pode alterar ou aprovar um rascunho de um CHEFE se o CHEFE não tiver apertado o botão "Disponibilizar" para enviar o subprocesso adiante.
+
+Essa dicotomia permite substituir interceptadores de segurança complexos por duas checagens lógicas diretas e universais.
+
 ## Perfis de Acesso
 
 *   **ADMIN**: Administrador do sistema (lotado na unidade raiz - sigla 'ADMIN').
