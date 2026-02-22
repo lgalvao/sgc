@@ -9,10 +9,6 @@ import sgc.subprocesso.model.SubprocessoViews;
 
 import java.util.List;
 
-/**
- * Resposta agregada para detalhes de um subprocesso.
- * Utiliza @JsonView para filtrar campos das entidades internas.
- */
 @Builder
 public record SubprocessoDetalheResponse(
     @JsonView(SubprocessoViews.Publica.class)

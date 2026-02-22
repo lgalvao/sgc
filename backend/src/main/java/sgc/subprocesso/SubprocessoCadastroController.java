@@ -38,7 +38,6 @@ import java.util.Optional;
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
 @Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
-// TODO faltando varias documentações do OpenAPI
 public class SubprocessoCadastroController {
 
     private final SubprocessoFacade subprocessoFacade;
@@ -230,14 +229,12 @@ public class SubprocessoCadastroController {
         subprocessoFacade.homologarCadastroEmBloco(request.subprocessos(), usuario);
     }
 
-    // TODO achei esse metodo confuso. Melhorar ou pelo menos documentar porque tem esse fallback estraho
     private Usuario obterUsuarioAutenticado(@Nullable Object principal) {
         if (principal instanceof Usuario usuario) {
             return usuario;
         }
 
         String titulo = organizacaoFacade.extrairTituloUsuario(principal);
-        // TODO invariante: titulo nunca poderá ser nulo!
         if (titulo == null) {
             throw new ErroAutenticacao("Usuário não identificado");
         }
