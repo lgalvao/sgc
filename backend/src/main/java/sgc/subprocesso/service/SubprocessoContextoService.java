@@ -50,7 +50,6 @@ class SubprocessoContextoService {
 
         Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
 
-        // TODO aqui já começou errado. O titular nunca pode ser nulo!
         Usuario titular = null;
         try {
             titular = usuarioService.buscarPorLogin(sp.getUnidade().getTituloTitular());
@@ -91,7 +90,6 @@ class SubprocessoContextoService {
         Unidade unidade = subprocesso.getUnidade();
         List<AtividadeDto> atividades = atividadeService.listarAtividadesSubprocesso(codSubprocesso);
 
-        // TODO deveria usar builder
         return new ContextoEdicaoResponse(
                 unidade,
                 subprocesso,

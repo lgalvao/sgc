@@ -33,7 +33,6 @@ public class AnaliseFacade {
     /**
      * Lista todas as análises de um determinado tipoAnalise para um subprocesso específico.
      *
-     * @param codSubprocesso O código do subprocesso.
      * @param tipoAnalise    O tipo de análise a ser filtrada (e.g., CADASTRO, VALIDACAO).
      * @return Uma lista de {@link Analise} ordenada pela data e hora em ordem decrescente.
      */
@@ -81,7 +80,6 @@ public class AnaliseFacade {
     /**
      * Cria e persiste uma análise com base nos dados fornecidos.
      *
-     * @param subprocesso A entidade do subprocesso.
      * @param command     O comando contendo todas as informações necessárias para criar a análise.
      * @return A entidade {@link Analise} que foi criada e salva no banco de dados.
      */
@@ -110,8 +108,6 @@ public class AnaliseFacade {
      * análises dependentes também sejam removidas.
      *
      * <p>Este método deve ser chamado dentro de uma transação existente.
-     *
-     * @param codSubprocesso O código do subprocesso cujas análises serão removidas.
      */
     @Transactional
     public void removerPorSubprocesso(Long codSubprocesso) {

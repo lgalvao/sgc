@@ -1,6 +1,5 @@
 <template>
   <LayoutPadrao>
-    <!-- Tabela de Processos -->
     <div class="mb-5">
       <PageHeader title="Processos" title-test-id="txt-painel-titulo-processos">
         <template #actions>

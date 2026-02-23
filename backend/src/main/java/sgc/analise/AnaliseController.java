@@ -60,7 +60,6 @@ public class AnaliseController {
         return criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO);
     }
 
-    // TODO essa logica deveria estar no facade o service! Inclusive ja tem um quase igual la.
     private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {
         Subprocesso sp = subprocessoFacade.buscarSubprocesso(codSubprocesso);
         String obs = StringUtils.stripToEmpty(request.observacoes());

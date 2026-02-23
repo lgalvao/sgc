@@ -2,10 +2,8 @@
   <div class="container-fluid mt-4">
     <PageHeader title="Configurações" />
 
-    <!-- Seção de Administradores -->
     <AdministradoresSection v-if="podeGerenciarAdministradores" />
 
-    <!-- Seção de Configurações de Parâmetros -->
     <ParametrosSection />
   </div>
 </template>

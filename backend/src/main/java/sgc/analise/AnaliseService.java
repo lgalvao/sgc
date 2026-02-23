@@ -19,37 +19,19 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-// TODO essa classe deveria ser consolidada com a AnaliseFacade. Tem muito pouca coisa aqui!
 public class AnaliseService {
 
     private final AnaliseRepo analiseRepo;
 
-    /**
-     * Lista análises de um subprocesso ordenadas por data/hora descendente.
-     *
-     * @param codSubprocesso código do subprocesso
-     * @return lista de análises ordenadas
-     */
     public List<Analise> listarPorSubprocesso(Long codSubprocesso) {
         return analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso);
     }
 
-    /**
-     * Salva uma análise.
-     *
-     * @param analise análise a salvar
-     * @return análise salva
-     */
     @Transactional
     public Analise salvar(Analise analise) {
         return analiseRepo.save(analise);
     }
 
-    /**
-     * Remove todas as análises de um subprocesso.
-     *
-     * @param codSubprocesso código do subprocesso
-     */
     @Transactional
     public void removerPorSubprocesso(Long codSubprocesso) {
         List<Analise> analises = analiseRepo.findBySubprocessoCodigo(codSubprocesso);
