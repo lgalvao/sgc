@@ -245,7 +245,7 @@ class UsuarioServiceTest {
         void deveVerificarUsuarioTemPerfil() {
             // Act & Assert
             assertTrue(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, String.valueOf(Perfil.CHEFE), 2L));
-            assertTrue(usuarioService.usuarioTemPerfil(TITULO_ADMIN, String.valueOf(Perfil.ADMIN), 100L));
+            assertTrue(usuarioService.usuarioTemPerfil(TITULO_ADMIN, String.valueOf(Perfil.ADMIN), 1L));
         }
 
         @Test
@@ -255,25 +255,13 @@ class UsuarioServiceTest {
             List<Long> adminUnits = usuarioService.buscarUnidadesPorPerfil(TITULO_ADMIN, String.valueOf(Perfil.ADMIN));
 
             // Assert
-            assertTrue(adminUnits.contains(100L));
+            assertTrue(adminUnits.contains(1L));
         }
     }
 
     @Nested
     @DisplayName("Cobertura Extra")
     class CoberturaExtra {
-        @Test
-        @DisplayName("Deve retornar null se não houver usuário autenticado")
-        void deveRetornarNullSeNaoAutenticado() {
-            // Limpa contexto
-            SecurityContextHolder.clearContext();
-
-            assertNull(usuarioService.obterUsuarioAutenticadoOuNull());
-
-            assertThrows(ErroAcessoNegado.class,
-                    () -> usuarioService.obterUsuarioAutenticado());
-        }
-
         @Test
         @DisplayName("Deve extrair título de principal")
         void deveExtrairTituloDePrincipal() {

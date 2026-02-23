@@ -80,11 +80,11 @@ class ProcessoAcessoServiceTest {
         when(auth.getAuthorities()).thenAnswer(m -> List.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
 
         when(usuarioService.buscarPerfisUsuario("gestor")).thenReturn(List.of(
-                PerfilDto.builder().unidadeCodigo(100L).build()
+                PerfilDto.builder().unidadeCodigo(1L).build()
         ));
 
-        // Mock hierarquia: 100 -> 101 -> 102
-        Unidade u100 = UnidadeTestBuilder.umaDe().comCodigo("100").build();
+        // Mock hierarquia: 1 -> 101 -> 102
+        Unidade u100 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
         Unidade u101 = UnidadeTestBuilder.umaDe().comCodigo("101").comSuperior(u100).build();
         Unidade u102 = UnidadeTestBuilder.umaDe().comCodigo("102").comSuperior(u101).build();
 
@@ -92,7 +92,7 @@ class ProcessoAcessoServiceTest {
 
         when(queryService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {
             List<Long> ids = invocation.getArgument(1);
-            return ids.contains(100L) && ids.contains(101L) && ids.contains(102L);
+            return ids.contains(1L) && ids.contains(101L) && ids.contains(102L);
         });
 
         assertThat(processoAcessoService.checarAcesso(auth, 1L)).isTrue();
@@ -174,14 +174,14 @@ class ProcessoAcessoServiceTest {
         when(auth.getName()).thenReturn("multi_perfil_user");
         when(auth.getAuthorities()).thenAnswer(m -> List.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
 
-        // Mock: Retorna Unidade 100 (Sem acesso) e depois Unidade 200 (Com acesso)
-        // A implementação com bug pegaria apenas o primeiro (100) e negaria o acesso.
+        // Mock: Retorna Unidade 1 (Sem acesso) e depois Unidade 200 (Com acesso)
+        // A implementação com bug pegaria apenas o primeiro (1) e negaria o acesso.
         when(usuarioService.buscarPerfisUsuario("multi_perfil_user")).thenReturn(List.of(
-                PerfilDto.builder().unidadeCodigo(100L).build(),
+                PerfilDto.builder().unidadeCodigo(1L).build(),
                 PerfilDto.builder().unidadeCodigo(200L).build()
         ));
 
-        Unidade u100 = UnidadeTestBuilder.umaDe().comCodigo("100").build();
+        Unidade u100 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
         Unidade u200 = UnidadeTestBuilder.umaDe().comCodigo("200").build();
 
         when(unidadeService.buscarTodasEntidadesComHierarquia()).thenReturn(List.of(u100, u200));

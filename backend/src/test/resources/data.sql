@@ -55,12 +55,11 @@ FROM SGC.PARAMETRO;
 -- -------------------------------------------------------------------------------------------------
 -- Unidade ADMIN (id=1) - não é uma unidade real, serve como raiz da hierarquia
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('1', 'ADMIN', 'ADMIN', 'INTERMEDIARIA', 'ATIVA', NULL, NULL, NULL, NULL);
+VALUES ('1', 'ADMIN', 'ADMIN', 'RAIZ', 'ATIVA', NULL, '7', '00000007', CURRENT_TIMESTAMP);
 
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
 VALUES ('2', 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', 'ATIVA', 1, '777', '00000777', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('100', 'ADMIN-UNIT', 'ADMIN-UNIT', 'INTEROPERACIONAL', 'ATIVA', 1, '7', '00000007', CURRENT_TIMESTAMP);
+
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
 VALUES ('200', 'Secretaria de Gestao de Pessoas', 'SGP', 'INTERMEDIARIA', 'ATIVA', 1, '2', '00000002', CURRENT_TIMESTAMP);
 
@@ -73,7 +72,7 @@ VALUES ('7', 'Coordenadoria de Suporte e Infraestrutura', 'COSINF', 'INTERMEDIAR
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
 VALUES ('14', 'Coordenadoria Jurídica', 'COJUR', 'INTERMEDIARIA', 'ATIVA', 2, '777', '00000777', CURRENT_TIMESTAMP);
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('101', 'GESTOR-UNIT', 'GESTOR-UNIT', 'INTERMEDIARIA', 'ATIVA', 100, '222222222222', '22222222', CURRENT_TIMESTAMP);
+VALUES ('101', 'GESTOR-UNIT', 'GESTOR-UNIT', 'INTERMEDIARIA', 'ATIVA', 1, '222222222222', '22222222', CURRENT_TIMESTAMP);
 
 INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
 VALUES ('201', 'Coordenadoria de Atenção ao Servidor', 'CAS', 'INTEROPERACIONAL', 'ATIVA', 200, '2', '00000002', CURRENT_TIMESTAMP);
@@ -200,7 +199,7 @@ VALUES ('29', 'Bruno Rodrigues', 'bruno.rodrigues@tre-pe.jus.br', '7023', 6, '00
 INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo, MATRICULA)
 VALUES ('30', 'Mariana Costa', 'mariana.costa@tre-pe.jus.br', '7024', 2, '00000030');
 INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo, MATRICULA)
-VALUES ('111111111111', 'Admin Teste', 'admin.teste@tre-pe.jus.br', '1111', 100, '11111111');
+VALUES ('111111111111', 'Admin Teste', 'admin.teste@tre-pe.jus.br', '1111', 1, '11111111');
 INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo, MATRICULA)
 VALUES ('222222222222', 'Gestor Teste', 'gestor.teste@tre-pe.jus.br', '2222', 101, '22222222');
 INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo, MATRICULA)
@@ -256,7 +255,7 @@ VALUES ('8', 'GESTOR', 8);
 INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
 VALUES ('777', 'CHEFE', 2);
 INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
-VALUES ('111111111111', 'ADMIN', 100);
+VALUES ('111111111111', 'ADMIN', 1);
 INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
 VALUES ('111111111111', 'CHEFE', 102);
 INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo)
@@ -285,7 +284,7 @@ VALUES ('202020202020', 'GESTOR', 2);
 INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (2, '777', '00000777', 'TITULAR', CURRENT_TIMESTAMP);
 INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
-VALUES (100, '7', '00000007', 'TITULAR', CURRENT_TIMESTAMP);
+VALUES (1, '7', '00000007', 'TITULAR', CURRENT_TIMESTAMP);
 INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (200, '2', '00000002', 'TITULAR', CURRENT_TIMESTAMP);
 INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)

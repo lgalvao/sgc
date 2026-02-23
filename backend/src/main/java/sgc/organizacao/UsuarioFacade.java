@@ -91,13 +91,6 @@ public class UsuarioFacade {
     }
 
     @Transactional(readOnly = true)
-    public @Nullable Usuario obterUsuarioAutenticadoOuNull() {
-        return obterTituloUsuarioAutenticado()
-                .map(this::buscarPorLoginInterno)
-                .orElse(null);
-    }
-
-    @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String sigla) {
         return responsavelUnidadeService.buscarResponsavelAtual(sigla);
     }

@@ -118,19 +118,6 @@ class UsuarioFacadeTest {
             assertThat(resultado).isFalse();
             assertThat(unidades).isEmpty();
         }
-
-        @Test
-        @DisplayName("Deve retornar null quando autenticação for nula")
-        void deveRetornarNullQuandoAutenticacaoForNula() {
-            // Arrange
-            SecurityContextHolder.clearContext();
-
-            // Act
-            Usuario resultado = facade.obterUsuarioAutenticadoOuNull();
-
-            // Assert
-            assertThat(resultado).isNull();
-        }
     }
 
     @Nested

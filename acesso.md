@@ -53,7 +53,7 @@ A permissão de visualização é baseada na **Hierarquia da Unidade Responsáve
 ### 2. Execução (Escrita e Movimentação)
 A permissão para alterar dados ou mudar a situação do subprocesso (ex: Homologar, Devolver, Validar) é estritamente baseada na **Localização Atual**.
 
-*   **Regra de Ouro**: O usuário só pode executar ações se o subprocesso estiver **localizado na sua unidade de trabalho atual** -- mesmo para o perfil ADMIN.
+*   **Regra de Ouro**: O usuário só pode executar ações no subprocesso, se o subprocesso estiver **localizado na sua unidade de trabalho atual** -- mesmo para o perfil ADMIN.
 *   **ADMIN**: O perfil de Administrador **não isenta** o usuário desta regra. Para que um ADMIN possa homologar um cadastro, o cadastro deve ter sido enviado (disponibilizado/aceito) até chegar à unidade do ADMIN (Raiz). O ADMIN não pode intervir em um processo que ainda está localizado na unidade do Chefe.
 
 ## Detalhamento por Caso de Uso (CDU)
@@ -70,7 +70,8 @@ As seções a seguir detalham os atores, pré-condições e ações permitidas p
 ### CDU-02 - Visualizar Painel
 **Atores**: Todos os perfis.
 **Ações**:
-*   **Todos**: Visualizar tabela de processos ativos (limitado à hierarquia do usuário) e alertas.
+*   **Todos**: 
+    *   Visualizar tabela de processos ativos (limitado à hierarquia do usuário) e alertas.
 *   **ADMIN**:
     *   Visualizar processos na situação 'Criado'.
     *   Visualizar/clicar no botão `Criar processo` (leva ao CDU-03).

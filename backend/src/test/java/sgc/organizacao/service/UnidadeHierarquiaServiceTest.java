@@ -143,7 +143,7 @@ class UnidadeHierarquiaServiceTest {
     void buscarSiglasSubordinadas_DeveRetornarVazioSeNaoEncontrar() {
         when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz));
         Unidade extra = Unidade.builder()
-                .codigo(100L)
+                .codigo(999L)
                 .sigla("INEXISTENTE")
                 .tipo(TipoUnidade.OPERACIONAL)
                 .build();

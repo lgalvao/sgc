@@ -74,7 +74,7 @@ public class SubprocessoCadastroWorkflowService {
             "Subprocesso ainda está em fase de " + (isRevisao ? "revisão" : "cadastro") + ".");
 
         Unidade admin = unidadeService.buscarEntidadePorSigla(SIGLA_ADMIN);
-        Usuario usuario = usuarioServiceFacade.obterUsuarioAutenticadoOuNull();
+        Usuario usuario = usuarioServiceFacade.obterUsuarioAutenticado();
 
         sp.setSituacao(novaSituacao);
         sp.setDataFimEtapa1(null);

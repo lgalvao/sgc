@@ -197,6 +197,9 @@ class ProcessoConsultaServiceTest {
     @DisplayName("Deve retornar lista vazia quando não há processos finalizados")
     void deveRetornarListaVaziaQuandoNaoHaProcessosFinalizados() {
         // Arrange
+        Usuario admin = Usuario.builder().perfilAtivo(Perfil.ADMIN).build();
+        when(usuarioService.obterUsuarioAutenticado()).thenReturn(admin);
+        
         when(processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO))
                 .thenReturn(List.of());
 
