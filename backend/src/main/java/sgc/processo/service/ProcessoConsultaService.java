@@ -34,6 +34,7 @@ public class ProcessoConsultaService {
     private final ComumRepo repo;
     private final ConsultasSubprocessoService servicoConsultas;
     private final UsuarioFacade usuarioService;
+    private final ProcessoAcessoService processoAcessoService;
 
     public Processo buscarProcessoCodigo(Long codigo) {
         return repo.buscar(Processo.class, codigo);
@@ -49,7 +50,13 @@ public class ProcessoConsultaService {
     }
 
     public List<Processo> processosFinalizados() {
-        return processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        if (usuario.getPerfilAtivo() == Perfil.ADMIN) {
+            return processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
+        }
+
+        List<Long> unidadesAcesso = processoAcessoService.buscarCodigosDescendentes(usuario.getUnidadeAtivaCodigo());
+        return processoRepo.listarPorSituacaoEUnidadeCodigos(SituacaoProcesso.FINALIZADO, unidadesAcesso);
     }
 
     public Page<Processo> processos(Pageable pageable) {

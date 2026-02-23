@@ -30,6 +30,16 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
             """)
     List<Processo> listarPorSituacaoComParticipantes(@Param("situacao") SituacaoProcesso situacao);
 
+    @Query("""
+            SELECT DISTINCT p FROM Processo p JOIN p.participantes up
+            WHERE p.situacao = :situacao
+            AND up.id.unidadeCodigo IN :codigos
+            ORDER BY p.dataFinalizacao DESC
+            """)
+    List<Processo> listarPorSituacaoEUnidadeCodigos(
+            @Param("situacao") SituacaoProcesso situacao,
+            @Param("codigos") List<Long> codigos);
+
     /**
      * Busca processos onde as unidades participantes incluem as unidades especificadas
      * e o processo não está na situação especificada.

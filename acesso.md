@@ -16,7 +16,7 @@ Essa dicotomia permite substituir interceptadores de segurança complexos por du
 ## Perfis de Acesso
 
 *   **ADMIN**: Administrador do sistema (lotado, independentemente do real usuário logado, na unidade raiz - sigla 'ADMIN').
-    *   *Responsabilidades*: Criar e iniciar processos, criar/ajustar mapas de competências, homologar cadastros, homologar mapas, homologar diagnósticos, editar configurações do sistema.
+    *   *Responsabilidades*: Criar e iniciar processos, editar processos (desde que não tenham sido iniciados), criar e ajustar mapas de competências, homologar cadastros, criar outros administradores, homologar mapas, homologar diagnósticos, editar configurações do sistema.
     *   *Escopo*: Todo o sistema, para visualização.
 
 *   **GESTOR**: Responsável por unidade intermediária ou interoperacional (ex: Coordenador).

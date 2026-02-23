@@ -56,6 +56,7 @@ public class SubprocessoSecurity {
             // ========== CRUD ==========
             Map.entry(LISTAR_SUBPROCESSOS, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.allOf(SituacaoSubprocesso.class), RequisitoHierarquia.NENHUM)),
             Map.entry(VISUALIZAR_SUBPROCESSO, new RegrasAcao(EnumSet.of(ADMIN, GESTOR, CHEFE, SERVIDOR), EnumSet.allOf(SituacaoSubprocesso.class), RequisitoHierarquia.MESMA_OU_SUBORDINADA)),
+            Map.entry(CONSULTAR_PARA_IMPORTACAO, new RegrasAcao(EnumSet.of(ADMIN, GESTOR, CHEFE), EnumSet.allOf(SituacaoSubprocesso.class), RequisitoHierarquia.NENHUM)),
             Map.entry(CRIAR_SUBPROCESSO, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.allOf(SituacaoSubprocesso.class), RequisitoHierarquia.NENHUM)),
             Map.entry(EDITAR_SUBPROCESSO, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.allOf(SituacaoSubprocesso.class), RequisitoHierarquia.NENHUM)),
             Map.entry(EXCLUIR_SUBPROCESSO, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.allOf(SituacaoSubprocesso.class), RequisitoHierarquia.NENHUM)),
@@ -138,8 +139,8 @@ public class SubprocessoSecurity {
 
         if (!regras.perfisPermitidos.contains(usuario.getPerfilAtivo())) return false;
 
-        // Visualização de processos finalizados (Histórico/Importação) é permitida para os perfis autorizados
-        if (!isAcaoEscrita(acao) && sp.getProcesso().getSituacao() == SituacaoProcesso.FINALIZADO) {
+        // Regra especial para importação de histórico: qualquer um pode consultar processos finalizados para este fim
+        if (acao == CONSULTAR_PARA_IMPORTACAO && sp.getProcesso().getSituacao() == SituacaoProcesso.FINALIZADO) {
             return true;
         }
 

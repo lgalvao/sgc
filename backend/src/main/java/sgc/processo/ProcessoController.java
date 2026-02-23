@@ -157,6 +157,7 @@ public class ProcessoController {
     }
 
     @GetMapping("/{codigo}/subprocessos")
+    @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
     @Operation(summary = "Lista todos os subprocessos de um processo")
     @JsonView(SubprocessoViews.Publica.class)
     public ResponseEntity<List<Subprocesso>> listarSubprocessos(@PathVariable Long codigo) {
