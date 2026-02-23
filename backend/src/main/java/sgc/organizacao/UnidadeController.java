@@ -30,7 +30,7 @@ import static sgc.processo.model.TipoProcesso.REVISAO;
 @RequiredArgsConstructor
 @Validated
 public class UnidadeController {
-    private final UnidadeFacade unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
     private final ProcessoFacade processoFacade;
 
     @PostMapping("/{codUnidade}/atribuicoes-temporarias")
@@ -38,20 +38,20 @@ public class UnidadeController {
     public ResponseEntity<Void> criarAtribuicaoTemporaria(
             @PathVariable Long codUnidade, @Valid @RequestBody CriarAtribuicaoRequest request) {
 
-        unidadeService.criarAtribuicaoTemporaria(codUnidade, request);
+        organizacaoFacade.criarAtribuicaoTemporaria(codUnidade, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/atribuicoes")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AtribuicaoDto>> buscarTodasAtribuicoes() {
-        return ResponseEntity.ok(unidadeService.buscarTodasAtribuicoes());
+        return ResponseEntity.ok(organizacaoFacade.buscarTodasAtribuicoes());
     }
 
     @GetMapping
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<List<UnidadeDto>> buscarTodasUnidades() {
-        List<UnidadeDto> hierarquia = unidadeService.buscarTodasUnidades();
+        List<UnidadeDto> hierarquia = organizacaoFacade.buscarTodasUnidades();
         return ResponseEntity.ok(hierarquia);
     }
 
@@ -65,14 +65,14 @@ public class UnidadeController {
         boolean requerMapaVigente = tipo == REVISAO || tipo == DIAGNOSTICO;
 
         Set<Long> bloqueadas = processoFacade.buscarIdsUnidadesEmProcessosAtivos(codProcesso);
-        List<UnidadeDto> arvore = unidadeService.buscarArvoreComElegibilidade(requerMapaVigente, bloqueadas);
+        List<UnidadeDto> arvore = organizacaoFacade.buscarArvoreComElegibilidade(requerMapaVigente, bloqueadas);
 
         return ResponseEntity.ok(arvore);
     }
 
     @GetMapping("/{codUnidade}/mapa-vigente")
     public ResponseEntity<Map<String, Boolean>> verificarMapaVigente(@PathVariable Long codUnidade) {
-        boolean temMapaVigente = unidadeService.verificarMapaVigente(codUnidade);
+        boolean temMapaVigente = organizacaoFacade.verificarMapaVigente(codUnidade);
         return ResponseEntity.ok(Map.of("temMapaVigente", temMapaVigente));
     }
 
@@ -80,7 +80,7 @@ public class UnidadeController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<List<Usuario>> buscarUsuariosPorUnidade(@PathVariable Long codUnidade) {
-        List<Usuario> usuarios = unidadeService.todosPorCodigoUnidade(codUnidade);
+        List<Usuario> usuarios = organizacaoFacade.todosPorCodigoUnidade(codUnidade);
         return ResponseEntity.ok(usuarios);
     }
 
@@ -88,33 +88,33 @@ public class UnidadeController {
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarUnidadePorSigla(
             @PathVariable @Pattern(regexp = "^[a-zA-Z0-9_.-]+$") String siglaUnidade) {
-        UnidadeDto unidade = unidadeService.buscarPorSigla(siglaUnidade);
+        UnidadeDto unidade = organizacaoFacade.buscarPorSigla(siglaUnidade);
         return ResponseEntity.ok(unidade);
     }
 
     @GetMapping("/{codigo}")
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarUnidadePorCodigo(@PathVariable Long codigo) {
-        UnidadeDto unidade = unidadeService.dtoPorCodigo(codigo);
+        UnidadeDto unidade = organizacaoFacade.dtoPorCodigo(codigo);
         return ResponseEntity.ok(unidade);
     }
 
     @GetMapping("/{codigo}/arvore")
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarArvoreUnidade(@PathVariable Long codigo) {
-        return ResponseEntity.ok(unidadeService.buscarArvore(codigo));
+        return ResponseEntity.ok(organizacaoFacade.buscarArvore(codigo));
     }
 
     @GetMapping("/sigla/{sigla}/subordinadas")
     public ResponseEntity<List<String>> buscarSiglasSubordinadas(
             @PathVariable @Pattern(regexp = "^[a-zA-Z0-9_.-]+$") String sigla) {
-        List<String> siglas = unidadeService.buscarSiglasSubordinadas(sigla);
+        List<String> siglas = organizacaoFacade.buscarSiglasSubordinadas(sigla);
         return ResponseEntity.ok(siglas);
     }
 
     @GetMapping("/sigla/{sigla}/superior")
     public ResponseEntity<String> buscarSiglaSuperior(@PathVariable @Pattern(regexp = "^[a-zA-Z0-9_.-]+$") String sigla) {
-        return unidadeService
+        return organizacaoFacade
                 .buscarSiglaSuperior(sigla)
                 .map(res -> ResponseEntity.ok(HtmlUtils.htmlEscape(res)))
                 .orElseGet(() -> ResponseEntity.noContent().build());

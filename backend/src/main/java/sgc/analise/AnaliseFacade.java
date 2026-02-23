@@ -8,7 +8,7 @@ import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -28,7 +28,7 @@ import java.util.List;
 @Slf4j
 public class AnaliseFacade {
     private final AnaliseService analiseService;
-    private final UnidadeFacade unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
 
     /**
      * Lista todas as análises de um determinado tipoAnalise para um subprocesso específico.
@@ -64,7 +64,7 @@ public class AnaliseFacade {
     }
 
     public AnaliseHistoricoDto paraHistoricoDto(Analise analise) {
-        UnidadeDto unidade = unidadeService.dtoPorCodigo(analise.getUnidadeCodigo());
+        UnidadeDto unidade = organizacaoFacade.dtoPorCodigo(analise.getUnidadeCodigo());
         return AnaliseHistoricoDto.builder()
                 .dataHora(analise.getDataHora())
                 .observacoes(analise.getObservacoes())
@@ -87,7 +87,7 @@ public class AnaliseFacade {
      */
     @Transactional
     public Analise criarAnalise(Subprocesso subprocesso, CriarAnaliseCommand command) {
-        UnidadeDto unidadeDto = unidadeService.buscarPorSigla(command.siglaUnidade());
+        UnidadeDto unidadeDto = organizacaoFacade.buscarPorSigla(command.siglaUnidade());
 
         Analise analise = Analise.builder()
                 .subprocesso(subprocesso)

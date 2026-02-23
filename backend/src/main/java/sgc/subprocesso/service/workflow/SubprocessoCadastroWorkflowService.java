@@ -11,7 +11,7 @@ import sgc.analise.model.TipoAcaoAnalise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -44,7 +44,7 @@ public class SubprocessoCadastroWorkflowService {
     private final MovimentacaoRepo movimentacaoRepo;
     private final SubprocessoCrudService crudService;
     private final AlertaFacade alertaService;
-    private final UnidadeFacade unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
     private final SubprocessoTransicaoService transicaoService;
     private final AnaliseFacade analiseFacade;
     private final UsuarioFacade usuarioServiceFacade;
@@ -73,7 +73,7 @@ public class SubprocessoCadastroWorkflowService {
         validacaoService.validarSituacaoMinima(sp, situacaoMinima,
             "Subprocesso ainda está em fase de " + (isRevisao ? "revisão" : "cadastro") + ".");
 
-        Unidade admin = unidadeService.buscarEntidadePorSigla(SIGLA_ADMIN);
+        Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
         Usuario usuario = usuarioServiceFacade.obterUsuarioAutenticado();
 
         sp.setSituacao(novaSituacao);
@@ -241,7 +241,7 @@ public class SubprocessoCadastroWorkflowService {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
         accessControlService.verificarPermissao(usuario, HOMOLOGAR_CADASTRO, sp);
 
-        Unidade admin = unidadeService.buscarEntidadePorSigla(SIGLA_ADMIN);
+        Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
         sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocessoRepo.save(sp);
 
@@ -315,7 +315,7 @@ public class SubprocessoCadastroWorkflowService {
 
         var impactos = impactoMapaService.verificarImpactos(sp, usuario);
         if (impactos.temImpactos()) {
-            Unidade admin = unidadeService.buscarEntidadePorSigla(SIGLA_ADMIN);
+            Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
             sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
             subprocessoRepo.save(sp);
             transicaoService.registrar(RegistrarTransicaoCommand.builder()

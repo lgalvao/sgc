@@ -116,6 +116,7 @@ public class ProcessoInicializador {
         switch (tipo) {
             case TipoProcesso.MAPEAMENTO ->
                     subprocessoFacade.criarParaMapeamento(processo, unidadesParaProcessar, admin, usuario);
+
             case TipoProcesso.REVISAO -> {
                 for (Long codUnidade : codigosUnidades) {
                     Unidade unidade = repo.buscar(Unidade.class, codUnidade);
@@ -123,7 +124,8 @@ public class ProcessoInicializador {
                     subprocessoFacade.criarParaRevisao(processo, unidade, um, admin, usuario);
                 }
             }
-            default -> { // Caso DIAGNOSTICO
+
+            case TipoProcesso.DIAGNOSTICO -> {
                 for (Unidade unidade : unidadesParaProcessar) {
                     UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
                     subprocessoFacade.criarParaDiagnostico(processo, unidade, um, admin, usuario);

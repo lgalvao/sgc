@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
 import sgc.comum.ComumRepo;
 import sgc.notificacao.EmailService;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
@@ -30,7 +30,7 @@ public class SubprocessoAdminWorkflowService {
     private final AlertaFacade alertaService;
     private final EmailService emailService;
     private final MovimentacaoRepo movimentacaoRepo;
-    private final UnidadeFacade unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
     private final UsuarioFacade usuarioService;
 
     @Transactional
@@ -85,7 +85,7 @@ public class SubprocessoAdminWorkflowService {
     public void registrarMovimentacaoLembrete(Long codSubprocesso) {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioService.obterUsuarioAutenticado();
-        var unidadeAdmin = unidadeService.buscarEntidadePorSigla("ADMIN");
+        var unidadeAdmin = organizacaoFacade.buscarEntidadePorSigla("ADMIN");
 
         movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(subprocesso)

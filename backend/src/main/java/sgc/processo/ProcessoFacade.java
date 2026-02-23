@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
 import sgc.notificacao.EmailService;
 import sgc.notificacao.EmailModelosService;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -38,7 +38,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 public class ProcessoFacade {
     private final ProcessoConsultaService processoConsultaService;
     private final ProcessoManutencaoService processoManutencaoService;
-    private final UnidadeFacade unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
     private final SubprocessoFacade subprocessoFacade;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final UsuarioFacade usuarioService;
@@ -149,7 +149,7 @@ public class ProcessoFacade {
     @Transactional
     public void enviarLembrete(Long codProcesso, Long unidadeCodigo) {
         Processo processo = buscarEntidadePorId(codProcesso);
-        Unidade unidade = unidadeService.porCodigo(unidadeCodigo);
+        Unidade unidade = organizacaoFacade.porCodigo(unidadeCodigo);
 
         // Verifica se unidade participa do processo
         if (processo.getParticipantes().stream().noneMatch(u -> u.getUnidadeCodigo().equals(unidadeCodigo))) {

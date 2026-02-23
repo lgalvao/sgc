@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.dto.CriarProcessoRequest;
@@ -16,7 +16,6 @@ import sgc.processo.model.TipoProcesso;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,17 +28,15 @@ import static sgc.processo.model.TipoProcesso.REVISAO;
 @RequiredArgsConstructor
 public class ProcessoManutencaoService {
     private final ProcessoRepo processoRepo;
-    private final UnidadeFacade unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
     private final ProcessoValidador processoValidador;
     private final ProcessoConsultaService processoConsultaService;
 
     @Transactional
     public Processo criar(CriarProcessoRequest req) {
-        Set<Unidade> participantes = new HashSet<>();
-        for (Long codigoUnidade : req.unidades()) {
-            Unidade unidade = unidadeService.porCodigo(codigoUnidade);
-            participantes.add(unidade);
-        }
+        Set<Unidade> participantes = req.unidades().stream()
+                .map(organizacaoFacade::porCodigo)
+                .collect(Collectors.toSet());
 
         processoValidador.validarTiposUnidades(new ArrayList<>(participantes)).ifPresent(msg -> {
             throw new ErroProcesso(msg);
@@ -86,7 +83,7 @@ public class ProcessoManutencaoService {
             });
         }
 
-        Set<Unidade> participantes = req.unidades().stream().map(unidadeService::porCodigo).collect(Collectors.toSet());
+        Set<Unidade> participantes = req.unidades().stream().map(organizacaoFacade::porCodigo).collect(Collectors.toSet());
         processoValidador.validarTiposUnidades(new ArrayList<>(participantes)).ifPresent(msg -> {
             throw new ErroProcesso(msg);
         });

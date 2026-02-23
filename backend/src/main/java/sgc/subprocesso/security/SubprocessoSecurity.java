@@ -5,11 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.HierarquiaService;
-import sgc.organizacao.service.UnidadeService;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.seguranca.Acao;
 import sgc.subprocesso.model.MovimentacaoRepo;
@@ -35,7 +35,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 public class SubprocessoSecurity {
 
     private final SubprocessoRepo subprocessoRepo;
-    private final UnidadeService unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
     private final HierarquiaService hierarquiaService;
     private final MovimentacaoRepo movimentacaoRepo;
 
@@ -125,7 +125,7 @@ public class SubprocessoSecurity {
         Usuario usuario = getUsuarioAutenticado();
         if (usuario == null) return false;
 
-        Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
+        Unidade unidade = organizacaoFacade.buscarEntidadePorSigla(siglaUnidade);
         return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, unidade.getCodigo())
                 .map(sp -> verificarRegras(usuario, Acao.VISUALIZAR_SUBPROCESSO, sp))
                 .orElse(false);

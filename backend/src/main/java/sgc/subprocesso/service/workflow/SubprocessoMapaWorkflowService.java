@@ -16,7 +16,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.MapaFacade;
 import sgc.mapa.service.MapaManutencaoService;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
@@ -71,7 +71,7 @@ public class SubprocessoMapaWorkflowService {
     private final SubprocessoValidacaoService validacaoService;
     private final AnaliseFacade analiseFacade;
     private final SubprocessoTransicaoService transicaoService;
-    private final UnidadeFacade unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
 
     public Mapa salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
@@ -190,7 +190,7 @@ public class SubprocessoMapaWorkflowService {
         sp.setDataFimEtapa1(LocalDateTime.now());
         subprocessoRepo.save(sp);
 
-        Unidade admin = unidadeService.buscarEntidadePorSigla(SIGLA_ADMIN);
+        Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
 
         transicaoService.registrar(RegistrarTransicaoCommand.builder()
                 .sp(sp)
@@ -379,7 +379,7 @@ public class SubprocessoMapaWorkflowService {
         sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
         subprocessoRepo.save(sp);
 
-        Unidade admin = unidadeService.buscarEntidadePorSigla(SIGLA_ADMIN);
+        Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
         transicaoService.registrar(RegistrarTransicaoCommand.builder()
                 .sp(sp)
                 .tipo(TipoTransicao.MAPA_HOMOLOGADO)

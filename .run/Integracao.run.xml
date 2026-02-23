@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Integracao" type="JUnit" factoryName="JUnit">
+    <module name="sgc.backend.test" />
+    <shortenClasspath name="ARGS_FILE" />
+    <option name="MAIN_CLASS_NAME" value="" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="directory" />
+    <option name="VM_PARAMETERS" value="-ea -XX:+EnableDynamicAgentLoading" />
+    <dir value="$PROJECT_DIR$/backend/src/test/java/sgc/integracao" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

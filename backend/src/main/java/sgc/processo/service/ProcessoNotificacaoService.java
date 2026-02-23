@@ -8,7 +8,7 @@ import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.notificacao.EmailModelosService;
 import sgc.notificacao.EmailService;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.TipoUnidade;
@@ -37,7 +37,7 @@ public class ProcessoNotificacaoService {
     private final AlertaFacade servicoAlertas;
     private final EmailService emailService;
     private final EmailModelosService emailModelosService;
-    private final UnidadeFacade unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
     private final UsuarioFacade usuarioService;
     private final ProcessoRepo processoRepo;
     private final SubprocessoFacade subprocessoFacade;
@@ -77,7 +77,7 @@ public class ProcessoNotificacaoService {
                 .map(s -> s.getUnidade().getCodigo())
                 .toList();
 
-        Map<Long, UnidadeResponsavelDto> responsaveis = unidadeService.buscarResponsaveisUnidades(todosCodigosUnidades);
+        Map<Long, UnidadeResponsavelDto> responsaveis = organizacaoFacade.buscarResponsaveisUnidades(todosCodigosUnidades);
 
         List<String> todosTitulos = new ArrayList<>();
         responsaveis.values().forEach(r -> {
@@ -103,10 +103,10 @@ public class ProcessoNotificacaoService {
             return;
         }
 
-        List<Unidade> unidadesParticipantes = unidadeService.porCodigos(codigosParticipantes);
+        List<Unidade> unidadesParticipantes = organizacaoFacade.porCodigos(codigosParticipantes);
 
         List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
-        Map<Long, UnidadeResponsavelDto> responsaveis = unidadeService.buscarResponsaveisUnidades(todosCodigosUnidades);
+        Map<Long, UnidadeResponsavelDto> responsaveis = organizacaoFacade.buscarResponsaveisUnidades(todosCodigosUnidades);
 
         Map<String, Usuario> usuarios = usuarioService.buscarUsuariosPorTitulos(responsaveis.values().stream()
                 .map(UnidadeResponsavelDto::titularTitulo)
@@ -134,10 +134,8 @@ public class ProcessoNotificacaoService {
                 enviarEmailUnidadeIntermediaria(processo, unidade, emailUnidade, subordinadas);
             }
 
-            // TODO estranho isso. O responsavel é será definido pela view. Ele pode ser o titular, uma pesssoa substituta ou uma pesoa designaca numa atribuição temporaria. Sempre vai ser preenchido. Entao o titulo nunca pode ser nulo!
             if (responsavel.substitutoTitulo() != null) {
                 String assunto = String.format("SGC: Finalização do processo %s", processo.getDescricao());
-
                 String html = emailModelosService.criarEmailProcessoFinalizadoPorUnidade(
                         unidade.getSigla(),
                         processo.getDescricao());
@@ -172,13 +170,6 @@ public class ProcessoNotificacaoService {
                 .map(Unidade::getSigla)
                 .sorted()
                 .toList();
-
-        // TODO nenhum sentido isso: se uma unidade é intermediaria TEM que ter subordinadas! Invariante. Nao era para ter chegado inconsistente aqui!
-        if (siglasSubordinadas.isEmpty()) {
-            log.warn("Nenhuma unidade subordinada encontrada para notificar a unidade intermediária {}",
-                    unidade.getSigla());
-            return;
-        }
 
         String assunto = String.format("SGC: Finalização do processo %s em unidades subordinadas",
                 processo.getDescricao());

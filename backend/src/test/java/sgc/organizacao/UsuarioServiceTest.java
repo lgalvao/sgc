@@ -6,10 +6,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.AdministradorDto;
@@ -34,7 +32,6 @@ class UsuarioServiceTest {
 
     // Data from backend/src/test/resources/data.sql
     private static final String TITULO_ADMIN = "111111111111";
-    private static final String EMAIL_ADMIN = "admin.teste@tre-pe.jus.br";
     private static final String NOME_ADMIN = "Admin Teste";
 
     private static final Long COD_UNIT_SEC1 = 2L;

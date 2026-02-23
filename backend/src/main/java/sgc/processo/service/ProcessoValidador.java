@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
@@ -24,7 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 class ProcessoValidador {
 
-    private final UnidadeFacade unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
     private final ConsultasSubprocessoService queryService;
 
     /**
@@ -38,14 +38,12 @@ class ProcessoValidador {
             return Optional.empty();
         }
 
-        List<Unidade> unidades = unidadeService.porCodigos(codigosUnidades);
-        List<Long> unidadesSemMapa = unidades.stream()
-                .map(Unidade::getCodigo)
-                .filter(codigo -> !unidadeService.verificarMapaVigente(codigo))
+        List<Long> unidadesSemMapa = codigosUnidades.stream()
+                .filter(codigo -> !organizacaoFacade.verificarMapaVigente(codigo))
                 .toList();
 
         if (!unidadesSemMapa.isEmpty()) {
-            List<String> siglasUnidadesSemMapa = unidadeService.siglasUnidadesPorCodigos(unidadesSemMapa);
+            List<String> siglasUnidadesSemMapa = organizacaoFacade.siglasUnidadesPorCodigos(unidadesSemMapa);
             return Optional.of(("As seguintes unidades não possuem mapa vigente e não podem participar"
                     + " de um processo de revisão: %s").formatted(String.join(", ", siglasUnidadesSemMapa)));
         }
@@ -89,7 +87,7 @@ class ProcessoValidador {
      * @return Optional com mensagem de erro se houver unidade inválida
      */
     public Optional<String> validarTiposUnidades(List<Unidade> unidades) {
-        if (unidades == null || unidades.isEmpty()) {
+        if (unidades.isEmpty()) {
             return Optional.empty();
         }
 

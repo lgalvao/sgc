@@ -6,7 +6,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.PerfilDto;
 import sgc.organizacao.model.Unidade;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class ProcessoAcessoService {
-    private final UnidadeFacade unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
     private final UsuarioFacade usuarioService;
     private final ConsultasSubprocessoService consultas;
 
@@ -56,7 +56,7 @@ public class ProcessoAcessoService {
                 .collect(Collectors.toSet());
         if (unidadesUsuario.isEmpty()) return false;
 
-        List<Unidade> todasUnidades = unidadeService.buscarTodasEntidadesComHierarquia();
+        List<Unidade> todasUnidades = organizacaoFacade.buscarTodasEntidadesComHierarquia();
         Map<Long, List<Unidade>> mapaPorPai = buildMapaPorPai(todasUnidades);
 
         Set<Long> todasUnidadesAcesso = new HashSet<>();
@@ -75,7 +75,7 @@ public class ProcessoAcessoService {
      */
     @Transactional(readOnly = true)
     public List<Long> buscarCodigosDescendentes(Long codUnidade) {
-        List<Unidade> todasUnidades = unidadeService.buscarTodasEntidadesComHierarquia();
+        List<Unidade> todasUnidades = organizacaoFacade.buscarTodasEntidadesComHierarquia();
         Map<Long, List<Unidade>> mapaPorPai = buildMapaPorPai(todasUnidades);
         return new ArrayList<>(buscarDescendentesNoMapa(codUnidade, mapaPorPai));
     }

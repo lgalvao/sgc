@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
@@ -33,7 +33,7 @@ public class LoginFacade {
     private final UsuarioFacade usuarioService;
     private final GerenciadorJwt gerenciadorJwt;
     private final @Nullable ClienteAcessoAd clienteAcessoAd;
-    private final UnidadeFacade unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
     private final UsuarioService usuarioServiceInterno;
 
     @Value("${aplicacao.ambiente-testes:true}")
@@ -42,12 +42,12 @@ public class LoginFacade {
     public LoginFacade(UsuarioFacade usuarioService,
                        GerenciadorJwt gerenciadorJwt,
                        @Autowired(required = false) @Nullable ClienteAcessoAd clienteAcessoAd,
-                       UnidadeFacade unidadeService,
+                       OrganizacaoFacade organizacaoFacade,
                        UsuarioService usuarioServiceInterno) {
         this.usuarioService = usuarioService;
         this.gerenciadorJwt = gerenciadorJwt;
         this.clienteAcessoAd = clienteAcessoAd;
-        this.unidadeService = unidadeService;
+        this.organizacaoFacade = organizacaoFacade;
         this.usuarioServiceInterno = usuarioServiceInterno;
     }
 
@@ -86,7 +86,7 @@ public class LoginFacade {
     @Transactional(readOnly = true)
     public String entrar(EntrarRequest request) {
         Long codUnidade = request.unidadeCodigo();
-        unidadeService.porCodigo(codUnidade);
+        organizacaoFacade.porCodigo(codUnidade);
 
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.tituloEleitoral());
         Perfil perfilSolicitado = Perfil.valueOf(request.perfil());

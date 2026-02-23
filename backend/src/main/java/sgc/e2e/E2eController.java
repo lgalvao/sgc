@@ -210,7 +210,7 @@ public class E2eController {
             throw new ErroValidacao("Unidade é obrigatória");
         }
 
-        UnidadeDto unidade = organizacaoFacade.buscarUnidadePorSigla(request.unidadeSigla());
+        UnidadeDto unidade = organizacaoFacade.buscarPorSigla(request.unidadeSigla());
 
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
         LocalDateTime dataLimite = LocalDate.now().plusDays(diasLimite).atStartOfDay();

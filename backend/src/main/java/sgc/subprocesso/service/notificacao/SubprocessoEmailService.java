@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import sgc.notificacao.EmailService;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.Unidade;
@@ -29,7 +29,7 @@ public class SubprocessoEmailService {
 
     private final EmailService emailService;
     private final TemplateEngine templateEngine;
-    private final UnidadeFacade unidadeFacade;
+    private final OrganizacaoFacade organizacaoFacade;
     private final UsuarioFacade usuarioFacade;
 
     /**
@@ -64,7 +64,7 @@ public class SubprocessoEmailService {
     }
 
     private void notificarResponsaveisPessoais(Unidade unidade, String assunto, String corpo) {
-        UnidadeResponsavelDto responsavel = unidadeFacade.buscarResponsavelUnidade(unidade.getCodigo());
+        UnidadeResponsavelDto responsavel = organizacaoFacade.buscarResponsavelUnidade(unidade.getCodigo());
         // responsavel nunca deve ser nulo. É invariante do sistema, garantido pelas views.
 
         // Se houver substituto, ele é o responsável atual e deve receber no seu e-mail pessoal

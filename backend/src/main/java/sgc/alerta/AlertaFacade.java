@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaUsuario;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
@@ -27,13 +27,13 @@ import java.util.*;
 public class AlertaFacade {
     private final AlertaService alertaService;
     private final UsuarioFacade usuarioService;
-    private final UnidadeFacade unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
 
     /**
      * Obtém a unidade raiz (ADMIN) do sistema.
      */
     private Unidade getUnidadeRaiz() {
-        return unidadeService.porCodigo(1L);
+        return organizacaoFacade.porCodigo(1L);
     }
 
     /**

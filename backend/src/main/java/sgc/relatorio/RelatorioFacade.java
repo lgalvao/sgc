@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.MapaManutencaoService;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
@@ -25,7 +25,7 @@ import java.util.List;
 public class RelatorioFacade {
     private final ProcessoFacade processoFacade;
     private final SubprocessoFacade subprocessoFacade;
-    private final UnidadeFacade unidadeService;
+    private final OrganizacaoFacade organizacaoFacade;
     private final MapaManutencaoService mapaManutencaoService;
     private final PdfFactory pdfFactory;
 
@@ -43,7 +43,7 @@ public class RelatorioFacade {
 
             for (Subprocesso sp : subprocessos) {
                 Unidade unidade = sp.getUnidade();
-                UnidadeResponsavelDto respDto = unidadeService.buscarResponsavelUnidade(unidade.getCodigo());
+                UnidadeResponsavelDto respDto = organizacaoFacade.buscarResponsavelUnidade(unidade.getCodigo());
                 String responsavel = respDto.titularNome();
 
                 String texto = String.format(
