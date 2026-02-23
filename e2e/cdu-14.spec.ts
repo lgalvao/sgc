@@ -84,18 +84,14 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
     test('Preparacao 0.4: ADMIN homologa cadastro', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descMapeamento, UNIDADE_ALVO);
-        if (!await page.getByTestId('card-subprocesso-atividades-vis').or(page.getByTestId('card-subprocesso-atividades')).isVisible().catch(() => false)) {
-            await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        }
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await homologarCadastroMapeamento(page);
     });
 
     test('Preparacao 0.5: ADMIN cria competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descMapeamento, UNIDADE_ALVO);
-        if (!await page.getByTestId('card-subprocesso-mapa-edicao').or(page.getByTestId('card-subprocesso-mapa-visualizacao')).isVisible().catch(() => false)) {
-            await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        }
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await criarCompetencia(page, `Competência Map ${timestamp}`, [`Atividade Map 1 ${timestamp}`]);
         await disponibilizarMapa(page, '2030-12-31');

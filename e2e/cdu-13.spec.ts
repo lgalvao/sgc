@@ -147,9 +147,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 
     test('Cenario 8: ADMIN visualiza histórico com múltiplas análises', async ({page, autenticadoComoAdmin}) => {
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        if (!await page.getByTestId('card-subprocesso-atividades-vis').isVisible().catch(() => false)) {
-            await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        }
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
 
         // Abrir histórico

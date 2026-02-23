@@ -183,6 +183,10 @@ VALUES ('303030', '00303030', 'Alice Cooper', 'alice.cooper@tre-pe.jus.br', '203
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('303030', 'CHEFE', 8);
 
+-- Administradores do Sistema (necessário para listar em configurações)
+INSERT INTO sgc.administrador (usuario_titulo) VALUES ('191919');
+INSERT INTO sgc.administrador (usuario_titulo) VALUES ('111111');
+
 -- Inserir Mapa vigente para Assessoria 12 (Unit 4) para testes de Revisão
 -- Processo 99
 INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, descricao, situacao, tipo)
