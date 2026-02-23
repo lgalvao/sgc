@@ -172,6 +172,8 @@ public class ProcessoNotificacaoService {
                 .toList();
 
         if (siglasSubordinadas.isEmpty()) {
+            log.warn("Unidade intermediária {} sem unidades subordinadas participantes para notificar na finalização do processo {}.", 
+                    unidade.getSigla(), processo.getCodigo());
             return;
         }
 

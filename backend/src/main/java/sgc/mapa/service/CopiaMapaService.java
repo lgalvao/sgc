@@ -7,6 +7,7 @@ import sgc.comum.ComumRepo;
 import sgc.mapa.model.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Realiza cópias profundas de mapas de competências. Duplica toda a estrutura hierárquica de um mapa:
@@ -41,19 +42,15 @@ public class CopiaMapaService {
     @Transactional
     public void importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId) {
         List<Atividade> atividadesOrigem = atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId);
-        Set<String> descricoesExistentes = obterDescExistentes(mapaDestinoId);
+        Set<String> descExistentes = obterDescExistentes(mapaDestinoId);
         Mapa mapaDestino = repo.buscar(Mapa.class, mapaDestinoId);
 
-        List<Atividade> atividadesParaSalvar = new ArrayList<>();
-        for (Atividade atividadeOrigem : atividadesOrigem) {
-            if (!descricoesExistentes.contains(atividadeOrigem.getDescricao())) {
-                atividadesParaSalvar.add(prepararCopiaAtividade(atividadeOrigem, mapaDestino));
-            }
-        }
+        List<Atividade> atividadesParaSalvar = atividadesOrigem.stream()
+                .filter(ativ -> !descExistentes.contains(ativ.getDescricao()))
+                .map(ativ -> prepararCopiaAtividade(ativ, mapaDestino))
+                .toList();
 
-        if (!atividadesParaSalvar.isEmpty()) {
-            atividadeRepo.saveAll(atividadesParaSalvar);
-        }
+        if (!atividadesParaSalvar.isEmpty()) atividadeRepo.saveAll(atividadesParaSalvar);
     }
 
     private Mapa criarNovoMapa(Mapa fonte) {

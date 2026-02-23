@@ -297,6 +297,7 @@ public class MapaManutencaoService {
     private void validarDescricaoAtividadeUnica(Long mapaCodigo, String descricao) {
         boolean existe = atividadeRepo.findByMapaCodigoSemFetch(mapaCodigo).stream()
                 .anyMatch(a -> a.getDescricao().equalsIgnoreCase(descricao));
+
         if (existe) {
             throw new ErroValidacao("Já existe uma atividade com esta descrição neste mapa.");
         }
@@ -305,6 +306,7 @@ public class MapaManutencaoService {
     private void validarDescricaoConhecimentoUnica(Long codAtividade, String descricao) {
         boolean existe = conhecimentoRepo.findByAtividade_Codigo(codAtividade).stream()
                 .anyMatch(c -> c.getDescricao().equalsIgnoreCase(descricao));
+
         if (existe) {
             throw new ErroValidacao("Já existe um conhecimento com esta descrição nesta atividade.");
         }
