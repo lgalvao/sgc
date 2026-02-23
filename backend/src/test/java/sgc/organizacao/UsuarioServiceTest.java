@@ -43,7 +43,7 @@ class UsuarioServiceTest {
     private UsuarioFacade usuarioService;
 
     @Autowired
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade orgFacade;
 
     @Nested
     @DisplayName("Consultas de Usuário")
@@ -107,7 +107,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar unidade por código")
         void deveBuscarUnidadePorCodigo() {
             // Act
-            UnidadeDto result = unidadeService.dtoPorCodigo(COD_UNIT_SEC1);
+            UnidadeDto result = orgFacade.dtoPorCodigo(COD_UNIT_SEC1);
 
             // Assert
             assertNotNull(result);
@@ -118,20 +118,17 @@ class UsuarioServiceTest {
         @Test
         @DisplayName("Deve buscar unidades ativas")
         void deveBuscarUnidadesAtivas() {
-            // Act
-            List<UnidadeDto> result = unidadeService.buscarTodasUnidades();
+            List<UnidadeDto> result = orgFacade.buscarTodasUnidades();
 
-            // Assert
             assertNotNull(result);
             assertFalse(result.isEmpty());
-            assertTrue(result.size() >= 1);
         }
 
         @Test
         @DisplayName("Deve buscar subunidades")
         void deveBuscarSubunidades() {
             // Act
-            List<UnidadeDto> result = unidadeService.buscarSubordinadas(COD_UNIT_SEC1);
+            List<UnidadeDto> result = orgFacade.buscarSubordinadas(COD_UNIT_SEC1);
 
             // Assert
             assertNotNull(result);
@@ -145,7 +142,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve construir árvore hierárquica")
         void deveConstruirArvoreHierarquica() {
             // Act
-            List<UnidadeDto> result = unidadeService.buscarArvoreHierarquica();
+            List<UnidadeDto> result = orgFacade.buscarArvoreHierarquica();
 
             // Assert
             assertNotNull(result);
@@ -164,15 +161,15 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar usuários por unidade de lotação")
         void deveBuscarPorUnidadeLotacao() {
             // Unidade 2 tem usuários no data.sql
-            List<Usuario> res = unidadeService.todosPorCodigoUnidade(2L);
+            List<Usuario> res = orgFacade.usuariosPorCodigoUnidade(2L);
             assertFalse(res.isEmpty());
         }
 
         @Test
         @DisplayName("Deve lançar erro ao buscar unidade inexistente por código ou sigla")
         void deveRetornarErroAoBuscarUnidadeInexistente() {
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService.dtoPorCodigo(9999L));
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService.buscarPorSigla("SIGLA_NAO_EXISTE"));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> orgFacade.dtoPorCodigo(9999L));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> orgFacade.buscarPorSigla("SIGLA_NAO_EXISTE"));
         }
     }
 
@@ -183,7 +180,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar responsável da unidade")
         void deveBuscarResponsavelUnidade() {
             // Act
-            UnidadeResponsavelDto result = unidadeService.buscarResponsavelUnidade(2L);
+            UnidadeResponsavelDto result = orgFacade.buscarResponsavelUnidade(2L);
 
             // Assert
             assertNotNull(result);
@@ -210,7 +207,7 @@ class UsuarioServiceTest {
             List<Long> unidades = List.of(2L, 9L);
 
             // Act
-            Map<Long, UnidadeResponsavelDto> result = unidadeService.buscarResponsaveisUnidades(unidades);
+            Map<Long, UnidadeResponsavelDto> result = orgFacade.buscarResponsaveisUnidades(unidades);
 
             // Assert
             assertNotNull(result);
@@ -276,7 +273,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar responsáveis ignorando unidades sem chefe")
         void deveBuscarResponsaveisIgnorandoSemChefe() {
             // Unidade 9999 não existe ou não tem chefe
-            Map<Long, UnidadeResponsavelDto> res = unidadeService.buscarResponsaveisUnidades(List.of(9999L));
+            Map<Long, UnidadeResponsavelDto> res = orgFacade.buscarResponsaveisUnidades(List.of(9999L));
             assertTrue(res.isEmpty());
         }
 

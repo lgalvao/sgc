@@ -102,7 +102,7 @@ class SubprocessoContextoServiceTest {
         mapa.setCodigo(10L);
         Subprocesso sp = Subprocesso.builder().codigo(id).unidade(u).mapa(mapa).build();
 
-        when(usuarioService.obterUsuarioAutenticado()).thenReturn(user);
+        when(usuarioService.usuarioAutenticado()).thenReturn(user);
         when(crudService.buscarSubprocesso(id)).thenReturn(sp);
         when(usuarioService.buscarResponsavelAtual("U1")).thenReturn(new Usuario());
         when(usuarioService.buscarPorLogin("T1")).thenReturn(new Usuario());

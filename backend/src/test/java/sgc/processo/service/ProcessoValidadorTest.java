@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.erros.ErroProcesso;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 class ProcessoValidadorTest {
 
     @Mock
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
 
     @Mock
     private ConsultasSubprocessoService queryService;
@@ -51,7 +51,6 @@ class ProcessoValidadorTest {
     void getMensagemErroUnidadesSemMapaComErro() {
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        when(unidadeService.porCodigos(List.of(1L))).thenReturn(List.of(u));
         when(unidadeService.verificarMapaVigente(1L)).thenReturn(false);
         when(unidadeService.siglasUnidadesPorCodigos(List.of(1L))).thenReturn(List.of("SIGLA"));
 
@@ -65,7 +64,6 @@ class ProcessoValidadorTest {
     void getMensagemErroUnidadesSemMapaSucesso() {
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        when(unidadeService.porCodigos(List.of(1L))).thenReturn(List.of(u));
         when(unidadeService.verificarMapaVigente(1L)).thenReturn(true);
 
         Optional<String> msg = validador.getMensagemErroUnidadesSemMapa(List.of(1L));

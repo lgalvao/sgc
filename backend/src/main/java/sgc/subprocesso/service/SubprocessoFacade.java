@@ -92,7 +92,7 @@ public class SubprocessoFacade {
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheResponse obterDetalhes(Long codigo) {
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
         return contextoService.obterDetalhes(codigo, usuario);
     }
 

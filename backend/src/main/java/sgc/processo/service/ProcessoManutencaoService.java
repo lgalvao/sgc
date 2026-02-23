@@ -35,7 +35,7 @@ public class ProcessoManutencaoService {
     @Transactional
     public Processo criar(CriarProcessoRequest req) {
         Set<Unidade> participantes = req.unidades().stream()
-                .map(organizacaoFacade::porCodigo)
+                .map(organizacaoFacade::unidadePorCodigo)
                 .collect(Collectors.toSet());
 
         processoValidador.validarTiposUnidades(new ArrayList<>(participantes)).ifPresent(msg -> {
@@ -83,7 +83,7 @@ public class ProcessoManutencaoService {
             });
         }
 
-        Set<Unidade> participantes = req.unidades().stream().map(organizacaoFacade::porCodigo).collect(Collectors.toSet());
+        Set<Unidade> participantes = req.unidades().stream().map(organizacaoFacade::unidadePorCodigo).collect(Collectors.toSet());
         processoValidador.validarTiposUnidades(new ArrayList<>(participantes)).ifPresent(msg -> {
             throw new ErroProcesso(msg);
         });

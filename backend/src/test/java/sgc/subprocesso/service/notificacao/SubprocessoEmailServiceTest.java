@@ -33,7 +33,7 @@ class SubprocessoEmailServiceTest {
     @Mock
     private TemplateEngine templateEngine;
     @Mock
-    private sgc.organizacao.UnidadeFacade unidadeFacade;
+    private sgc.organizacao.OrganizacaoFacade OrganizacaoFacade;
     @Mock
     private sgc.organizacao.UsuarioFacade usuarioFacade;
 
@@ -74,7 +74,7 @@ class SubprocessoEmailServiceTest {
         destino.setSigla("DEST");
 
         // Mock responsavel para evitar NPE
-        when(unidadeFacade.buscarResponsavelUnidade(1L)).thenReturn(mock(UnidadeResponsavelDto.class));
+        when(OrganizacaoFacade.buscarResponsavelUnidade(1L)).thenReturn(mock(UnidadeResponsavelDto.class));
 
         service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, origem, destino, null);
 
@@ -148,7 +148,7 @@ class SubprocessoEmailServiceTest {
         destino.setSigla("DEST");
 
         // Mock responsavel para evitar NPE
-        lenient().when(unidadeFacade.buscarResponsavelUnidade(1L)).thenReturn(mock(UnidadeResponsavelDto.class));
+        lenient().when(OrganizacaoFacade.buscarResponsavelUnidade(1L)).thenReturn(mock(UnidadeResponsavelDto.class));
 
         when(templateEngine.process(anyString(), any())).thenReturn("html");
 
@@ -234,7 +234,7 @@ class SubprocessoEmailServiceTest {
                 .unidadeCodigo(1L)
                 .substitutoTitulo("123456")
                 .build();
-        when(unidadeFacade.buscarResponsavelUnidade(1L)).thenReturn(resp);
+        when(OrganizacaoFacade.buscarResponsavelUnidade(1L)).thenReturn(resp);
 
         Usuario substituto = new Usuario();
         substituto.setEmail("sub@teste.com");
@@ -259,7 +259,7 @@ class SubprocessoEmailServiceTest {
                 .unidadeCodigo(1L)
                 .substitutoTitulo("123456")
                 .build();
-        when(unidadeFacade.buscarResponsavelUnidade(1L)).thenReturn(resp);
+        when(OrganizacaoFacade.buscarResponsavelUnidade(1L)).thenReturn(resp);
 
         Usuario substituto = new Usuario();
         substituto.setEmail(""); // Email vazio
@@ -281,7 +281,7 @@ class SubprocessoEmailServiceTest {
         dest.setSigla("DEST");
 
         when(templateEngine.process(anyString(), any())).thenReturn("html");
-        when(unidadeFacade.buscarResponsavelUnidade(1L)).thenReturn(null);
+        when(OrganizacaoFacade.buscarResponsavelUnidade(1L)).thenReturn(null);
 
         service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
 

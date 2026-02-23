@@ -50,7 +50,7 @@ public class ProcessoConsultaService {
     }
 
     public List<Processo> processosFinalizados() {
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
         Perfil perfil = usuario.getPerfilAtivo();
         Long unidadeCodigo = usuario.getUnidadeAtivaCodigo();
 
@@ -91,7 +91,7 @@ public class ProcessoConsultaService {
      * Lista subprocessos elegíveis para o usuário atual no contexto do processo especificado
      */
     public List<SubprocessoElegivelDto> subprocessosElegiveis(Long codProcesso) {
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
 
         if (usuario.getPerfilAtivo() == Perfil.ADMIN) {
             return servicoConsultas.listarPorProcessoESituacoes(codProcesso,

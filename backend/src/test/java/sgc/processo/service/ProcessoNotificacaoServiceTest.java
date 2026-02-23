@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
 import sgc.notificacao.EmailModelosService;
 import sgc.notificacao.EmailService;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.SituacaoUnidade;
@@ -51,7 +51,7 @@ class ProcessoNotificacaoServiceTest {
     private UsuarioFacade usuarioService;
 
     @Mock
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
 
     @Mock
     private EmailService emailService;
@@ -211,7 +211,7 @@ class ProcessoNotificacaoServiceTest {
                 "T2", Usuario.builder().email("int@mail.com").build()
         ));
 
-        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(operacional, intermediaria));
+        when(unidadeService.unidadesPorCodigos(anyList())).thenReturn(List.of(operacional, intermediaria));
         
         // 1. Intermediária sem subordinadas (log.warn)
         service.emailFinalizacaoProcesso(2L);
@@ -237,7 +237,7 @@ class ProcessoNotificacaoServiceTest {
                 "TS", Usuario.builder().email("sub@mail.com").build()
         ));
 
-        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(operacional, intermediaria, sub));
+        when(unidadeService.unidadesPorCodigos(anyList())).thenReturn(List.of(operacional, intermediaria, sub));
 
         service.emailFinalizacaoProcesso(2L);
 
@@ -282,7 +282,7 @@ class ProcessoNotificacaoServiceTest {
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
                 "T1", Usuario.builder().email("op@mail.com").build()
         ));
-        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(semEquipe));
+        when(unidadeService.unidadesPorCodigos(anyList())).thenReturn(List.of(semEquipe));
         service.emailFinalizacaoProcesso(2L);
         verify(emailService, never()).enviarEmailHtml(any(), any(), any());
     }
@@ -397,7 +397,7 @@ class ProcessoNotificacaoServiceTest {
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
                 "T1", Usuario.builder().email("inter@mail.com").build()
         ));
-        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(interoperacional));
+        when(unidadeService.unidadesPorCodigos(anyList())).thenReturn(List.of(interoperacional));
 
         service.emailFinalizacaoProcesso(5L);
 
@@ -433,7 +433,7 @@ class ProcessoNotificacaoServiceTest {
         // Simular exceção ao criar email para unidade intermediária
         when(emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any()))
                 .thenThrow(new RuntimeException("Erro ao criar template"));
-        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(intermediaria, sub));
+        when(unidadeService.unidadesPorCodigos(anyList())).thenReturn(List.of(intermediaria, sub));
 
         service.emailFinalizacaoProcesso(6L);
 
@@ -566,7 +566,7 @@ class ProcessoNotificacaoServiceTest {
                 "T2", Usuario.builder().email("out@mail.com").build(),
                 "T4", Usuario.builder().email("outro_sup@mail.com").build()
         ));
-        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(intermediaria, outra, comOutroSuperior));
+        when(unidadeService.unidadesPorCodigos(anyList())).thenReturn(List.of(intermediaria, outra, comOutroSuperior));
 
         service.emailFinalizacaoProcesso(10L);
 
@@ -721,7 +721,7 @@ class ProcessoNotificacaoServiceTest {
             when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(processo));
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, rInter));
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1));
-            when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uInter, uSubordinadaInvalida));
+            when(unidadeService.unidadesPorCodigos(anyList())).thenReturn(List.of(uInter, uSubordinadaInvalida));
 
             service.emailFinalizacaoProcesso(codProcesso);
 
@@ -759,7 +759,7 @@ class ProcessoNotificacaoServiceTest {
 
         Usuario substituto = Usuario.builder().tituloEleitoral("S1").email("sub@mail.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", Usuario.builder().build(), "S1", substituto));
-        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(u));
+        when(unidadeService.unidadesPorCodigos(anyList())).thenReturn(List.of(u));
 
         service.emailFinalizacaoProcesso(11L);
 

@@ -47,7 +47,7 @@ public class SubprocessoTransicaoService {
      */
     @Transactional
     public void registrar(RegistrarTransicaoCommand cmd) {
-        Usuario usuario = cmd.usuario() != null ? cmd.usuario() : usuarioFacade.obterUsuarioAutenticado();
+        Usuario usuario = cmd.usuario() != null ? cmd.usuario() : usuarioFacade.usuarioAutenticado();
 
         // 1. Salvar movimentação (trilha de auditoria completa)
         Movimentacao movimentacao = Movimentacao.builder()

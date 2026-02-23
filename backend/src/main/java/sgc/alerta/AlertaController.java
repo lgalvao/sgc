@@ -30,7 +30,7 @@ public class AlertaController {
     @Operation(summary = "Lista todos os alertas do usuário autenticado")
     public ResponseEntity<List<Alerta>> listarAlertas(@AuthenticationPrincipal Object principal) {
         String usuarioTitulo = extractTituloUsuario(principal);
-        List<Alerta> alertas = alertaFacade.listarAlertasPorUsuario(usuarioTitulo);
+        List<Alerta> alertas = alertaFacade.alertasPorUsuario(usuarioTitulo);
 
         return ResponseEntity.ok(alertas);
     }

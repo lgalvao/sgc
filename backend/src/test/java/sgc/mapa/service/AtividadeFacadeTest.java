@@ -117,7 +117,7 @@ class AtividadeFacadeTest {
                     .descricao("Desc")
                     .build();
             
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(mapaFacade.obterPorCodigo(mapaCodigo)).thenReturn(mapa);
             when(mapaManutencaoService.criarAtividade(request)).thenReturn(salvo);
             when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
@@ -159,7 +159,7 @@ class AtividadeFacadeTest {
             atividade.setDescricao("Antiga Desc");
 
             when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(atividade);
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.emptyList());
@@ -195,7 +195,7 @@ class AtividadeFacadeTest {
             atividade.setMapa(mapa);
             
             when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(atividade);
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.emptyList());
@@ -238,7 +238,7 @@ class AtividadeFacadeTest {
                     .build();
             
             when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(atividade);
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(mapaManutencaoService.criarConhecimento(atividadeCodigo, request)).thenReturn(conhecimentoSalvo);
             
             // Mocking for response creation
@@ -281,7 +281,7 @@ class AtividadeFacadeTest {
             atividade.setMapa(mapa);
             
             when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(atividade);
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.emptyList());
@@ -318,7 +318,7 @@ class AtividadeFacadeTest {
             atividade.setMapa(mapa);
             
             when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(atividade);
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.emptyList());

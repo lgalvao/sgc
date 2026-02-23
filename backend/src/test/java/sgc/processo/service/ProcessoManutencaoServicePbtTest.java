@@ -1,7 +1,7 @@
 package sgc.processo.service;
 
 import net.jqwik.api.*;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
@@ -28,7 +28,7 @@ class ProcessoManutencaoServicePbtTest {
     void criar_rejeitaProcessoRevisaoSemMapa(@ForAll("requisicaoRevisaoInvalida") CriarProcessoRequest req) {
         // Mock dependencies
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
-        UnidadeFacade unidadeService = mock(UnidadeFacade.class);
+        OrganizacaoFacade unidadeService = mock(OrganizacaoFacade.class);
         ProcessoValidador processoValidador = mock(ProcessoValidador.class);
         ProcessoConsultaService processoConsultaService = mock(ProcessoConsultaService.class);
 
@@ -36,7 +36,7 @@ class ProcessoManutencaoServicePbtTest {
             processoRepo, unidadeService, processoValidador, processoConsultaService
         );
 
-        when(unidadeService.porCodigo(any())).thenAnswer(inv -> {
+        when(unidadeService.unidadePorCodigo(any())).thenAnswer(inv -> {
              Unidade u = new Unidade();
              u.setCodigo((Long) inv.getArgument(0));
              u.setSituacao(SituacaoUnidade.ATIVA);
@@ -55,7 +55,7 @@ class ProcessoManutencaoServicePbtTest {
     void criar_aceitaProcessoValido(@ForAll("requisicaoValida") CriarProcessoRequest req) {
          // Mock dependencies
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
-        UnidadeFacade unidadeService = mock(UnidadeFacade.class);
+        OrganizacaoFacade unidadeService = mock(OrganizacaoFacade.class);
         ProcessoValidador processoValidador = mock(ProcessoValidador.class);
         ProcessoConsultaService processoConsultaService = mock(ProcessoConsultaService.class);
 
@@ -63,7 +63,7 @@ class ProcessoManutencaoServicePbtTest {
             processoRepo, unidadeService, processoValidador, processoConsultaService
         );
 
-        when(unidadeService.porCodigo(any())).thenAnswer(inv -> {
+        when(unidadeService.unidadePorCodigo(any())).thenAnswer(inv -> {
              Unidade u = new Unidade();
              u.setCodigo((Long) inv.getArgument(0));
              u.setSituacao(SituacaoUnidade.ATIVA);
@@ -85,7 +85,7 @@ class ProcessoManutencaoServicePbtTest {
                                         @ForAll("requisicaoValidaAtualizar") AtualizarProcessoRequest req) {
         // Mock dependencies
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
-        UnidadeFacade unidadeService = mock(UnidadeFacade.class);
+        OrganizacaoFacade unidadeService = mock(OrganizacaoFacade.class);
         ProcessoValidador processoValidador = mock(ProcessoValidador.class);
         ProcessoConsultaService processoConsultaService = mock(ProcessoConsultaService.class);
 
@@ -109,7 +109,7 @@ class ProcessoManutencaoServicePbtTest {
     void apagar_rejeitaSeNaoForCriado(@ForAll("situacaoNaoCriada") SituacaoProcesso situacao) {
         // Mock dependencies
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
-        UnidadeFacade unidadeService = mock(UnidadeFacade.class);
+        OrganizacaoFacade unidadeService = mock(OrganizacaoFacade.class);
         ProcessoValidador processoValidador = mock(ProcessoValidador.class);
         ProcessoConsultaService processoConsultaService = mock(ProcessoConsultaService.class);
 

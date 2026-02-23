@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import sgc.alerta.AlertaFacade;
 import sgc.alerta.model.Alerta;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
@@ -39,7 +39,7 @@ class PainelServiceTest {
     @Mock
     private AlertaFacade alertaService;
     @Mock
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
     @InjectMocks
     private PainelFacade painelService;
 
@@ -206,7 +206,7 @@ class PainelServiceTest {
             p.adicionarParticipantes(Set.of(u));
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
-            lenient().when(unidadeService.porCodigo(999L)).thenReturn(null);
+            lenient().when(unidadeService.unidadePorCodigo(999L)).thenReturn(null);
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
             assertThat(result.getContent()).isNotEmpty();
@@ -303,7 +303,7 @@ class PainelServiceTest {
             p.adicionarParticipantes(Set.of(u));
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
-            lenient().when(unidadeService.porCodigo(999L)).thenThrow(new RuntimeException("ERRO"));
+            lenient().when(unidadeService.unidadePorCodigo(999L)).thenThrow(new RuntimeException("ERRO"));
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
 

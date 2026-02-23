@@ -80,7 +80,7 @@ public class UnidadeController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<List<Usuario>> buscarUsuariosPorUnidade(@PathVariable Long codUnidade) {
-        List<Usuario> usuarios = organizacaoFacade.todosPorCodigoUnidade(codUnidade);
+        List<Usuario> usuarios = organizacaoFacade.usuariosPorCodigoUnidade(codUnidade);
         return ResponseEntity.ok(usuarios);
     }
 

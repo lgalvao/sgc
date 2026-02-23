@@ -21,6 +21,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrganizacaoFacade {
     private final UsuarioFacade usuarioFacade;
     private final UnidadeService unidadeService;
@@ -29,7 +30,7 @@ public class OrganizacaoFacade {
     private final ResponsavelUnidadeService responsavelService;
 
     public Usuario obterUsuarioAutenticado() {
-        return usuarioFacade.obterUsuarioAutenticado();
+        return usuarioFacade.usuarioAutenticado();
     }
 
     public @Nullable String extrairTituloUsuario(@Nullable Object principal) {
@@ -50,6 +51,7 @@ public class OrganizacaoFacade {
 
     public List<UnidadeDto> buscarArvoreComElegibilidade(
             boolean requerMapaVigente, Set<Long> unidadesBloqueadas) {
+
         Set<Long> unidadesComMapa = requerMapaVigente
                 ? new HashSet<>(unidadeService.buscarTodosCodigosUnidadesComMapa())
                 : Collections.emptySet();
@@ -93,15 +95,16 @@ public class OrganizacaoFacade {
         return unidadeService.verificarMapaVigente(codigoUnidade);
     }
 
+    public List<AtribuicaoDto> buscarTodasAtribuicoes() {
+        return responsavelService.buscarTodasAtribuicoes();
+    }
+
     @Transactional
     public void definirMapaVigente(Long codigoUnidade, Mapa mapa) {
         unidadeService.definirMapaVigente(codigoUnidade, mapa);
     }
 
-    public List<AtribuicaoDto> buscarTodasAtribuicoes() {
-        return responsavelService.buscarTodasAtribuicoes();
-    }
-
+    @Transactional
     public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoRequest request) {
         responsavelService.criarAtribuicaoTemporaria(codUnidade, request);
     }
@@ -115,7 +118,6 @@ public class OrganizacaoFacade {
         return responsavelService.buscarResponsavelUnidade(unidadeCodigo);
     }
 
-    @Transactional(readOnly = true)
     public Map<Long, UnidadeResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         return responsavelService.buscarResponsaveisUnidades(unidadesCodigos);
     }
@@ -130,19 +132,19 @@ public class OrganizacaoFacade {
     }
 
     public UnidadeDto dtoPorCodigo(Long codigo) {
-        Unidade unidade = porCodigo(codigo);
+        Unidade unidade = unidadePorCodigo(codigo);
         return UnidadeDto.fromEntity(unidade);
     }
 
-    public Unidade porCodigo(Long codigo) {
+    public Unidade unidadePorCodigo(Long codigo) {
         return unidadeService.buscarPorId(codigo);
     }
 
-    public List<Unidade> porCodigos(List<Long> codigos) {
+    public List<Unidade> unidadesPorCodigos(List<Long> codigos) {
         return unidadeService.porCodigos(codigos);
     }
 
-    public List<Unidade> buscarTodasEntidadesComHierarquia() {
+    public List<Unidade> unidadesComHierarquia() {
         return unidadeService.todasComHierarquia();
     }
 
@@ -150,11 +152,7 @@ public class OrganizacaoFacade {
         return unidadeService.buscarSiglasPorIds(codigos);
     }
 
-    public List<Usuario> todosPorCodigoUnidade(Long codigoUnidade) {
-        return usuarioService.buscarPorUnidadeLotacao(codigoUnidade);
-    }
-
-    public List<Usuario> buscarEntidadesUsuariosPorUnidade(Long codigoUnidade) {
+    public List<Usuario> usuariosPorCodigoUnidade(Long codigoUnidade) {
         return usuarioService.buscarPorUnidadeLotacao(codigoUnidade);
     }
 }

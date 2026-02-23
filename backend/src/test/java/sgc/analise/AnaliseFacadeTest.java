@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -28,7 +28,7 @@ class AnaliseFacadeTest {
     private AnaliseService analiseService;
 
     @Mock
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
 
     @InjectMocks
     private AnaliseFacade facade;

@@ -14,7 +14,7 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaManutencaoService;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
@@ -43,7 +43,7 @@ class RelatorioFacadeTest {
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
     @Mock
     private MapaManutencaoService mapaManutencaoService;
 

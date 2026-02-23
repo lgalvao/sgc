@@ -61,7 +61,7 @@ public class SubprocessoCrudController {
     @JsonView(SubprocessoViews.Publica.class)
     public ResponseEntity<Subprocesso> buscarPorProcessoEUnidade(
             @RequestParam Long codProcesso, @RequestParam String siglaUnidade) {
-        UnidadeDto unidade = organizacaoFacade.buscarUnidadePorSigla(siglaUnidade);
+        UnidadeDto unidade = organizacaoFacade.buscarPorSigla(siglaUnidade);
         Subprocesso sp = subprocessoFacade.obterEntidadePorProcessoEUnidade(codProcesso, unidade.getCodigo());
         return ResponseEntity.ok(sp);
     }

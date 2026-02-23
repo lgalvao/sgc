@@ -16,14 +16,14 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("UnidadeFacade - Testes de Hierarquia")
-class UnidadeFacadeHierarchyTest {
+@DisplayName("OrganizacaoFacade - Testes de Hierarquia")
+class OrganizacaoFacadeHierarchyTest {
 
     @Mock
     private UnidadeHierarquiaService unidadeHierarquiaService;
 
     @InjectMocks
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
 
     @Test
     @DisplayName("buscarIdsDescendentes: deve retornar lista vazia se não houver descendentes")

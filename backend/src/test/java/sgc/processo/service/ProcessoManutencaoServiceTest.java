@@ -9,7 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.dto.CriarProcessoRequest;
@@ -36,7 +36,7 @@ class ProcessoManutencaoServiceTest {
     private ProcessoRepo processoRepo;
 
     @Mock
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
 
     @Mock
     private ProcessoValidador processoValidador;
@@ -66,8 +66,8 @@ class ProcessoManutencaoServiceTest {
             Unidade unidade1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
             Unidade unidade2 = UnidadeTestBuilder.umaDe().comCodigo("2").build();
 
-            when(unidadeService.porCodigo(1L)).thenReturn(unidade1);
-            when(unidadeService.porCodigo(2L)).thenReturn(unidade2);
+            when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidade1);
+            when(unidadeService.unidadePorCodigo(2L)).thenReturn(unidade2);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty());
             
             Processo processoSalvo = new Processo();
@@ -114,7 +114,7 @@ class ProcessoManutencaoServiceTest {
 
             Unidade unidade1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
 
-            when(unidadeService.porCodigo(1L)).thenReturn(unidade1);
+            when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidade1);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty());
             
             Processo processoSalvo = new Processo();
@@ -152,7 +152,7 @@ class ProcessoManutencaoServiceTest {
 
             Unidade unidade1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
 
-            when(unidadeService.porCodigo(1L)).thenReturn(unidade1);
+            when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidade1);
             
             Processo processoSalvo = new Processo();
             processoSalvo.setCodigo(102L);
@@ -184,7 +184,7 @@ class ProcessoManutencaoServiceTest {
 
             Unidade unidade1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
 
-            when(unidadeService.porCodigo(1L)).thenReturn(unidade1);
+            when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidade1);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList()))
                     .thenReturn(Optional.of("Unidades sem mapa: Unidade 1"));
 
@@ -212,8 +212,8 @@ class ProcessoManutencaoServiceTest {
             Unidade unidade1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
             Unidade unidade2 = UnidadeTestBuilder.umaDe().comCodigo("2").build();
 
-            when(unidadeService.porCodigo(1L)).thenReturn(unidade1);
-            when(unidadeService.porCodigo(2L)).thenReturn(unidade2);
+            when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidade1);
+            when(unidadeService.unidadePorCodigo(2L)).thenReturn(unidade2);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList()))
                     .thenReturn(Optional.of("Unidades sem mapa: Unidade 1, Unidade 2"));
 
@@ -256,8 +256,8 @@ class ProcessoManutencaoServiceTest {
             Unidade unidade2 = UnidadeTestBuilder.umaDe().comCodigo("2").build();
 
             when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
-            when(unidadeService.porCodigo(1L)).thenReturn(unidade1);
-            when(unidadeService.porCodigo(2L)).thenReturn(unidade2);
+            when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidade1);
+            when(unidadeService.unidadePorCodigo(2L)).thenReturn(unidade2);
             
             Processo processoAtualizado = new Processo();
             processoAtualizado.setCodigo(codigoProcesso);
@@ -360,7 +360,7 @@ class ProcessoManutencaoServiceTest {
 
             when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty());
-            when(unidadeService.porCodigo(1L)).thenReturn(unidade1);
+            when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidade1);
             when(processoRepo.saveAndFlush(any(Processo.class))).thenReturn(processo);
 
             // When
@@ -396,8 +396,8 @@ class ProcessoManutencaoServiceTest {
 
             when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
             when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.empty());
-            when(unidadeService.porCodigo(1L)).thenReturn(unidade1);
-            when(unidadeService.porCodigo(2L)).thenReturn(unidade2);
+            when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidade1);
+            when(unidadeService.unidadePorCodigo(2L)).thenReturn(unidade2);
             when(processoRepo.saveAndFlush(any(Processo.class))).thenReturn(processo);
 
             // When
@@ -497,7 +497,7 @@ class ProcessoManutencaoServiceTest {
             Unidade unidade1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
 
             when(processoConsultaService.buscarProcessoCodigo(codigoProcesso)).thenReturn(processo);
-            when(unidadeService.porCodigo(1L)).thenReturn(unidade1);
+            when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidade1);
             when(processoRepo.saveAndFlush(any(Processo.class))).thenReturn(processo);
 
             // When

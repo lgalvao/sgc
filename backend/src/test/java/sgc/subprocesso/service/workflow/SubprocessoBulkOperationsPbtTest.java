@@ -5,7 +5,7 @@ import sgc.alerta.AlertaFacade;
 import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -33,7 +33,7 @@ class SubprocessoBulkOperationsPbtTest {
         MovimentacaoRepo movimentacaoRepo = mock(MovimentacaoRepo.class);
         SubprocessoCrudService crudService = mock(SubprocessoCrudService.class);
         AlertaFacade alertaService = mock(AlertaFacade.class);
-        UnidadeFacade unidadeService = mock(UnidadeFacade.class);
+        OrganizacaoFacade unidadeService = mock(OrganizacaoFacade.class);
         SubprocessoTransicaoService transicaoService = mock(SubprocessoTransicaoService.class);
         AnaliseFacade analiseFacade = mock(AnaliseFacade.class);
         UsuarioFacade usuarioServiceFacade = mock(UsuarioFacade.class);

@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import sgc.alerta.model.Alerta;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
@@ -31,7 +31,7 @@ class AlertaFacadeCoverageTest {
     private UsuarioFacade usuarioService;
 
     @Mock
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
 
     @InjectMocks
     private AlertaFacade alertaFacade;

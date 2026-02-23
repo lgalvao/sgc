@@ -28,11 +28,11 @@ class ProcessoWorkflowPbtTest {
         if (situacao == SituacaoProcesso.CRIADO) return;
 
         ProcessoRepo repo = mock(ProcessoRepo.class);
-        sgc.organizacao.UnidadeFacade unidadeFacade = mock(sgc.organizacao.UnidadeFacade.class);
+        sgc.organizacao.OrganizacaoFacade OrganizacaoFacade = mock(sgc.organizacao.OrganizacaoFacade.class);
         ProcessoValidador validador = mock(ProcessoValidador.class);
         ProcessoConsultaService consultaService = mock(ProcessoConsultaService.class);
 
-        ProcessoManutencaoService service = new ProcessoManutencaoService(repo, unidadeFacade, validador, consultaService);
+        ProcessoManutencaoService service = new ProcessoManutencaoService(repo, OrganizacaoFacade, validador, consultaService);
 
         Processo p = Processo.builder()
                 .situacao(situacao)

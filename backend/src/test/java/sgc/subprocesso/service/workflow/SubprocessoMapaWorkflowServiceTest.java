@@ -19,7 +19,7 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.MapaFacade;
 import sgc.mapa.service.MapaManutencaoService;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -63,7 +63,7 @@ class SubprocessoMapaWorkflowServiceTest {
     @Mock
     private AnaliseFacade analiseFacade;
     @Mock
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
     @Mock
     private SubprocessoValidacaoService validacaoService;
 

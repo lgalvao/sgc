@@ -185,7 +185,7 @@ public class PainelFacade {
         }
 
         if (!missingIds.isEmpty()) {
-            List<Unidade> missingUnidades = organizacaoFacade.porCodigos(missingIds);
+            List<Unidade> missingUnidades = organizacaoFacade.unidadesPorCodigos(missingIds);
             missingUnidades.forEach(u -> siglas.add(u.getSigla()));
         }
 

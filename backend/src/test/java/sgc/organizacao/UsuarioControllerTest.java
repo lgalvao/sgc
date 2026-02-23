@@ -49,7 +49,7 @@ class UsuarioControllerTest {
         entity.setTituloEleitoral("123");
         entity.setNome("Teste");
         entity.setUnidadeLotacao(Unidade.builder().codigo(1L).build());
-        when(usuarioService.buscarEntidadeUsuarioPorTitulo("123")).thenReturn(Optional.of(entity));
+        when(usuarioService.buscarUsuarioPorTitulo("123")).thenReturn(Optional.of(entity));
 
         mockMvc.perform(get("/api/usuarios/123"))
                 .andExpect(status().isOk())
@@ -61,7 +61,7 @@ class UsuarioControllerTest {
     @DisplayName("GET /api/usuarios/{titulo} - Deve retornar 404 quando não encontrado")
     @WithMockUser
     void buscarUsuarioPorTitulo_NaoEncontrado() throws Exception {
-        when(usuarioService.buscarEntidadeUsuarioPorTitulo("999")).thenReturn(Optional.empty());
+        when(usuarioService.buscarUsuarioPorTitulo("999")).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/usuarios/999"))
                 .andExpect(status().isNotFound());

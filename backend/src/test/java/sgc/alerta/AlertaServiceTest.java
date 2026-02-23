@@ -49,12 +49,12 @@ class AlertaServiceTest {
 
     @Test
     @DisplayName("Deve buscar alertas por unidade de destino")
-    void deveBuscarPorUnidadeDestino() {
+    void devePorUnidadeDestinoPaginado() {
         Long codigoUnidade = 1L;
         List<Alerta> alertas = Collections.singletonList(new Alerta());
         when(alertaRepo.findByUnidadeDestino_Codigo(codigoUnidade)).thenReturn(alertas);
 
-        List<Alerta> resultado = alertaService.buscarPorUnidadeDestino(codigoUnidade);
+        List<Alerta> resultado = alertaService.porUnidadeDestino(codigoUnidade);
 
         assertThat(resultado).isNotEmpty();
         assertThat(resultado).hasSize(1);
@@ -63,13 +63,13 @@ class AlertaServiceTest {
 
     @Test
     @DisplayName("Deve buscar alertas por unidade de destino com paginação")
-    void deveBuscarPorUnidadeDestinoComPaginacao() {
+    void devePorUnidadeDestinoPaginadoComPaginacao() {
         Long codigoUnidade = 1L;
         Pageable pageable = PageRequest.of(0, 10);
         Page<Alerta> page = new PageImpl<>(Collections.singletonList(new Alerta()));
         when(alertaRepo.findByUnidadeDestino_Codigo(codigoUnidade, pageable)).thenReturn(page);
 
-        Page<Alerta> resultado = alertaService.buscarPorUnidadeDestino(codigoUnidade, pageable);
+        Page<Alerta> resultado = alertaService.porUnidadeDestinoPaginado(codigoUnidade, pageable);
 
         assertThat(resultado).isNotNull();
         assertThat(resultado.getContent()).hasSize(1);
@@ -78,12 +78,12 @@ class AlertaServiceTest {
 
     @Test
     @DisplayName("Deve buscar alerta por código")
-    void deveBuscarPorCodigo() {
+    void devePorCodigo() {
         Long codigo = 1L;
         Alerta alerta = new Alerta();
         when(alertaRepo.findById(codigo)).thenReturn(Optional.of(alerta));
 
-        Optional<Alerta> resultado = alertaService.buscarPorCodigo(codigo);
+        Optional<Alerta> resultado = alertaService.porCodigo(codigo);
 
         assertThat(resultado).isPresent();
         verify(alertaRepo).findById(codigo);
@@ -91,12 +91,12 @@ class AlertaServiceTest {
 
     @Test
     @DisplayName("Deve buscar AlertaUsuario por chave")
-    void deveBuscarAlertaUsuario() {
+    void deveAlertaUsuario() {
         AlertaUsuario.Chave chave = AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo("user").build();
         AlertaUsuario alertaUsuario = new AlertaUsuario();
         when(alertaUsuarioRepo.findById(chave)).thenReturn(Optional.of(alertaUsuario));
 
-        Optional<AlertaUsuario> resultado = alertaService.buscarAlertaUsuario(chave);
+        Optional<AlertaUsuario> resultado = alertaService.alertaUsuario(chave);
 
         assertThat(resultado).isPresent();
         verify(alertaUsuarioRepo).findById(chave);
@@ -116,13 +116,13 @@ class AlertaServiceTest {
 
     @Test
     @DisplayName("Deve buscar AlertaUsuario por usuário e lista de alertas")
-    void deveBuscarPorUsuarioEAlertas() {
+    void deveAlertasUsuarios() {
         String usuario = "user";
         List<Long> codigos = List.of(1L, 2L);
         List<AlertaUsuario> lista = Collections.singletonList(new AlertaUsuario());
         when(alertaUsuarioRepo.findByUsuarioAndAlertas(usuario, codigos)).thenReturn(lista);
 
-        List<AlertaUsuario> resultado = alertaService.buscarPorUsuarioEAlertas(usuario, codigos);
+        List<AlertaUsuario> resultado = alertaService.alertasUsuarios(usuario, codigos);
 
         assertThat(resultado).isNotEmpty();
         verify(alertaUsuarioRepo).findByUsuarioAndAlertas(usuario, codigos);
@@ -130,7 +130,7 @@ class AlertaServiceTest {
 
     @Test
     @DisplayName("Deve obter data hora de leitura")
-    void deveObterDataHoraLeitura() {
+    void deveDataHoraLeituraAlertaUsuario() {
         Long codigoAlerta = 1L;
         String usuario = "user";
         LocalDateTime now = LocalDateTime.now();
@@ -139,7 +139,7 @@ class AlertaServiceTest {
         
         when(alertaUsuarioRepo.findById(any(AlertaUsuario.Chave.class))).thenReturn(Optional.of(alertaUsuario));
 
-        Optional<LocalDateTime> resultado = alertaService.obterDataHoraLeitura(codigoAlerta, usuario);
+        Optional<LocalDateTime> resultado = alertaService.dataHoraLeituraAlertaUsuario(codigoAlerta, usuario);
 
         assertThat(resultado).isPresent();
         assertThat(resultado.get()).isEqualTo(now);

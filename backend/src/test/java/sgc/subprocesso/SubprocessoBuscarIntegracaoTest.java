@@ -47,7 +47,7 @@ class SubprocessoBuscarIntegracaoTest {
                 .situacao(SituacaoSubprocesso.NAO_INICIADO)
                 .build();
 
-        when(organizacaoFacade.buscarUnidadePorSigla(siglaUnidade)).thenReturn(unidade);
+        when(organizacaoFacade.buscarPorSigla(siglaUnidade)).thenReturn(unidade);
         when(subprocessoFacade.obterEntidadePorProcessoEUnidade(codProcesso, 10L)).thenReturn(sp);
 
         // Act & Assert

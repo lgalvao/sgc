@@ -75,7 +75,7 @@ class AlertaControllerTest {
         @Test
         @DisplayName("Deve retornar lista de alertas com sucesso")
         void listarAlertas_quandoSucesso_deveRetornarListaDeAlertas() throws Exception {
-            when(alertaFacade.listarAlertasPorUsuario(TITULO_TESTE))
+            when(alertaFacade.alertasPorUsuario(TITULO_TESTE))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/api/alertas")
@@ -85,7 +85,7 @@ class AlertaControllerTest {
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$").isEmpty());
 
-            verify(alertaFacade).listarAlertasPorUsuario(TITULO_TESTE);
+            verify(alertaFacade).alertasPorUsuario(TITULO_TESTE);
         }
 
         @Test
@@ -115,7 +115,7 @@ class AlertaControllerTest {
             // Este caso já é coberto pelos testes acima usando .with(user(TITULO_TESTE))
             // que passa uma String como principal
             
-            when(alertaFacade.listarAlertasPorUsuario(TITULO_TESTE))
+            when(alertaFacade.alertasPorUsuario(TITULO_TESTE))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/api/alertas")
@@ -123,7 +123,7 @@ class AlertaControllerTest {
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk());
 
-            verify(alertaFacade).listarAlertasPorUsuario(TITULO_TESTE);
+            verify(alertaFacade).alertasPorUsuario(TITULO_TESTE);
         }
         
         @Test

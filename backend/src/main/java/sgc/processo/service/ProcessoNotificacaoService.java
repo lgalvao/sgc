@@ -103,7 +103,7 @@ public class ProcessoNotificacaoService {
             return;
         }
 
-        List<Unidade> unidadesParticipantes = organizacaoFacade.porCodigos(codigosParticipantes);
+        List<Unidade> unidadesParticipantes = organizacaoFacade.unidadesPorCodigos(codigosParticipantes);
 
         List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
         Map<Long, UnidadeResponsavelDto> responsaveis = organizacaoFacade.buscarResponsaveisUnidades(todosCodigosUnidades);

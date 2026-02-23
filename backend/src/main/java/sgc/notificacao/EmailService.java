@@ -22,8 +22,8 @@ import java.util.regex.Pattern;
 public class EmailService {
     private static final Pattern PADRAO_EMAIL = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
-    private final NotificacaoRepo repositorioNotificacao;
-    private final JavaMailSender enviadorDeEmail;
+    private final NotificacaoRepo notificacaoRepo;
+    private final JavaMailSender enviadorEmail;
     private final ConfigAplicacao config;
 
     /**
@@ -32,7 +32,7 @@ public class EmailService {
     @Async
     @Transactional
     public void enviarEmail(String para, String assunto, String corpo) {
-        processarEnvioDeEmail(para, assunto, corpo, false);
+        processarEnvioEmail(para, assunto, corpo, false);
     }
 
     /**
@@ -41,40 +41,37 @@ public class EmailService {
     @Async
     @Transactional
     public void enviarEmailHtml(String para, String assunto, String corpoHtml) {
-        processarEnvioDeEmail(para, assunto, corpoHtml, true);
+        processarEnvioEmail(para, assunto, corpoHtml, true);
     }
 
-    private void processarEnvioDeEmail(String para, String assunto, String corpo, boolean html) {
+    private void processarEnvioEmail(String para, String assunto, String corpo, boolean html) {
         if (!isEmailValido(para)) {
             log.error("Endereço de e-mail inválido, envio cancelado: {}", para);
             return;
         }
 
+        Notificacao notificacao = criarNotificacao(para, assunto, corpo);
+        notificacaoRepo.save(notificacao);
+        enviarEmailSmtp(para, assunto, corpo, html);
+    }
+
+    private void enviarEmailSmtp(String destinatario, String assunto, String corpo, boolean html) {
+        MimeMessage mensagem = enviadorEmail.createMimeMessage();
+        ConfigAplicacao.Email emailConfig = config.getEmail();
         try {
-            Notificacao notificacao = criarEntidadeNotificacao(para, assunto, corpo);
-            repositorioNotificacao.save(notificacao);
-            enviarEmailSmtp(para, assunto, corpo, html);
-        } catch (MessagingException | UnsupportedEncodingException | RuntimeException e) {
-            log.error("Erro ao processar notificação para {}: {}", para, e.getMessage(), e);
+            MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
+            helper.setFrom(new InternetAddress(emailConfig.getRemetente(), emailConfig.getRemetenteNome()));
+            helper.setTo(destinatario);
+            String assuntoCompleto = "%s %s".formatted(emailConfig.getAssuntoPrefixo(), assunto);
+            helper.setSubject(assuntoCompleto);
+            helper.setText(corpo, html);
+            enviadorEmail.send(mensagem);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private void enviarEmailSmtp(String destinatario, String assunto, String corpo, boolean html)
-            throws UnsupportedEncodingException, MessagingException {
-        MimeMessage mensagem = enviadorDeEmail.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
-
-        var emailConfig = config.getEmail();
-        helper.setFrom(new InternetAddress(emailConfig.getRemetente(), emailConfig.getRemetenteNome()));
-        helper.setTo(destinatario);
-        String assuntoCompleto = "%s %s".formatted(emailConfig.getAssuntoPrefixo(), assunto);
-        helper.setSubject(assuntoCompleto);
-        helper.setText(corpo, html);
-
-        enviadorDeEmail.send(mensagem);
-    }
-
-    private Notificacao criarEntidadeNotificacao(String para, String assunto, String corpo) {
+    private Notificacao criarNotificacao(String para, String assunto, String corpo) {
         Notificacao notificacao = new Notificacao();
         notificacao.setDataHora(LocalDateTime.now());
         String conteudo = String.format("Para: %s | Assunto: %s | Corpo: %s", para, assunto, corpo);

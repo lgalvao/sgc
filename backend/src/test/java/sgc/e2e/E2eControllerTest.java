@@ -246,7 +246,7 @@ class E2eControllerTest {
 
         UnidadeDto un = new UnidadeDto();
         un.setCodigo(1L);
-        when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
+        when(organizacaoFacade.buscarPorSigla("SIGLA")).thenReturn(un);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -269,7 +269,7 @@ class E2eControllerTest {
 
         UnidadeDto un = new UnidadeDto();
         un.setCodigo(1L);
-        when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
+        when(organizacaoFacade.buscarPorSigla("SIGLA")).thenReturn(un);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -293,7 +293,7 @@ class E2eControllerTest {
 
         UnidadeDto un = new UnidadeDto();
         un.setCodigo(1L);
-        when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
+        when(organizacaoFacade.buscarPorSigla("SIGLA")).thenReturn(un);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -341,7 +341,7 @@ class E2eControllerTest {
 
         UnidadeDto un = new UnidadeDto();
         un.setCodigo(1L);
-        when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
+        when(organizacaoFacade.buscarPorSigla("SIGLA")).thenReturn(un);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -370,7 +370,7 @@ class E2eControllerTest {
 
         UnidadeDto un = new UnidadeDto();
         un.setCodigo(1L);
-        when(organizacaoFacade.buscarUnidadePorSigla("SIGLA")).thenReturn(un);
+        when(organizacaoFacade.buscarPorSigla("SIGLA")).thenReturn(un);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -440,7 +440,7 @@ class E2eControllerTest {
         @DisplayName("criarProcessoFixture: Unidade não encontrada")
         void criarProcessoFixture_UnidadeNaoEncontrada() {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", false, 30);
-            when(organizacaoFacadeMock.buscarUnidadePorSigla("SIGLA")).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA"));
+            when(organizacaoFacadeMock.buscarPorSigla("SIGLA")).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA"));
 
             assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -452,7 +452,7 @@ class E2eControllerTest {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
             
             UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
-            when(organizacaoFacadeMock.buscarUnidadePorSigla("SIGLA")).thenReturn(unidade);
+            when(organizacaoFacadeMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
             
             Processo dto = Processo.builder().codigo(100L).build();
             when(processoFacadeMock.criar(any())).thenReturn(dto);
@@ -471,7 +471,7 @@ class E2eControllerTest {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
             
             UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
-            when(organizacaoFacadeMock.buscarUnidadePorSigla("SIGLA")).thenReturn(unidade);
+            when(organizacaoFacadeMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
             
             Processo dto = Processo.builder().codigo(100L).build();
             when(processoFacadeMock.criar(any())).thenReturn(dto);

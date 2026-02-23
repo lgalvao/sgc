@@ -13,7 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaUsuario;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
@@ -45,7 +45,7 @@ class AlertaFacadeTest {
     private UsuarioFacade usuarioService;
 
     @Mock
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
 
     @InjectMocks
     private AlertaFacade service;
@@ -54,7 +54,7 @@ class AlertaFacadeTest {
         Unidade unidadeRaiz = new Unidade();
         unidadeRaiz.setCodigo(1L);
         unidadeRaiz.setSigla("ADMIN");
-        when(unidadeService.porCodigo(1L)).thenReturn(unidadeRaiz);
+        when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidadeRaiz);
     }
 
     @Nested
@@ -269,12 +269,12 @@ class AlertaFacadeTest {
             Alerta alerta = new Alerta();
             alerta.setCodigo(100L);
 
-            when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
-            when(alertaService.buscarPorUnidadeDestino(codUnidade)).thenReturn(List.of(alerta));
-            when(alertaService.buscarPorUsuarioEAlertas(eq(usuarioTitulo), anyList())).thenReturn(List.of());
+            when(usuarioService.buscarPorTitulo(usuarioTitulo)).thenReturn(usuario);
+            when(alertaService.porUnidadeDestino(codUnidade)).thenReturn(List.of(alerta));
+            when(alertaService.alertasUsuarios(eq(usuarioTitulo), anyList())).thenReturn(List.of());
 
             // When
-            List<Alerta> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
+            List<Alerta> resultado = service.alertasPorUsuario(usuarioTitulo);
 
             // Then
             assertThat(resultado).hasSize(1);
@@ -305,12 +305,12 @@ class AlertaFacadeTest {
             alertaUsuarioExistente.setAlerta(alerta);
             alertaUsuarioExistente.setDataHoraLeitura(LocalDateTime.now());
 
-            when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
-            when(alertaService.buscarPorUnidadeDestino(codUnidade)).thenReturn(List.of(alerta));
-            when(alertaService.buscarPorUsuarioEAlertas(eq(usuarioTitulo), anyList())).thenReturn(List.of(alertaUsuarioExistente));
+            when(usuarioService.buscarPorTitulo(usuarioTitulo)).thenReturn(usuario);
+            when(alertaService.porUnidadeDestino(codUnidade)).thenReturn(List.of(alerta));
+            when(alertaService.alertasUsuarios(eq(usuarioTitulo), anyList())).thenReturn(List.of(alertaUsuarioExistente));
 
             // When
-            List<Alerta> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
+            List<Alerta> resultado = service.alertasPorUsuario(usuarioTitulo);
 
             // Then
             assertThat(resultado).hasSize(1);
@@ -331,10 +331,10 @@ class AlertaFacadeTest {
             usuario.setTituloEleitoral(usuarioTitulo);
             usuario.setUnidadeLotacao(unidade);
 
-            when(usuarioService.buscarPorId(usuarioTitulo)).thenReturn(usuario);
-            when(alertaService.buscarPorUnidadeDestino(codUnidade)).thenReturn(List.of());
+            when(usuarioService.buscarPorTitulo(usuarioTitulo)).thenReturn(usuario);
+            when(alertaService.porUnidadeDestino(codUnidade)).thenReturn(List.of());
 
-            List<Alerta> resultado = service.listarAlertasPorUsuario(usuarioTitulo);
+            List<Alerta> resultado = service.alertasPorUsuario(usuarioTitulo);
 
             assertThat(resultado).isEmpty();
         }
@@ -347,7 +347,7 @@ class AlertaFacadeTest {
         @DisplayName("Listar por unidade paginado")
         void listarPorUnidadePaginado() {
             Pageable p = Pageable.unpaged();
-            when(alertaService.buscarPorUnidadeDestino(1L, p)).thenReturn(Page.empty());
+            when(alertaService.porUnidadeDestinoPaginado(1L, p)).thenReturn(Page.empty());
             assertThat(service.listarPorUnidade(1L, p)).isEmpty();
         }
 
@@ -356,7 +356,7 @@ class AlertaFacadeTest {
         void obterDataHoraLeitura() {
             AlertaUsuario au = new AlertaUsuario();
             au.setDataHoraLeitura(LocalDateTime.now());
-            when(alertaService.obterDataHoraLeitura(1L, "user")).thenReturn(Optional.of(au.getDataHoraLeitura()));
+            when(alertaService.dataHoraLeituraAlertaUsuario(1L, "user")).thenReturn(Optional.of(au.getDataHoraLeitura()));
             assertThat(service.obterDataHoraLeitura(1L, "user")).isPresent();
         }
     }
@@ -371,9 +371,9 @@ class AlertaFacadeTest {
             Long codigoInexistente = 999L;
             Usuario usuario = new Usuario();
 
-            when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
-            when(alertaService.buscarAlertaUsuario(any())).thenReturn(Optional.empty());
-            when(alertaService.buscarPorCodigo(codigoInexistente)).thenReturn(Optional.empty());
+            when(usuarioService.buscarPorTitulo(titulo)).thenReturn(usuario);
+            when(alertaService.alertaUsuario(any())).thenReturn(Optional.empty());
+            when(alertaService.porCodigo(codigoInexistente)).thenReturn(Optional.empty());
 
             service.marcarComoLidos(titulo, List.of(codigoInexistente));
 
@@ -388,9 +388,9 @@ class AlertaFacadeTest {
             Usuario usuario = new Usuario();
             Alerta alerta = new Alerta();
 
-            when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
-            when(alertaService.buscarAlertaUsuario(any())).thenReturn(Optional.empty());
-            when(alertaService.buscarPorCodigo(codigo)).thenReturn(Optional.of(alerta));
+            when(usuarioService.buscarPorTitulo(titulo)).thenReturn(usuario);
+            when(alertaService.alertaUsuario(any())).thenReturn(Optional.empty());
+            when(alertaService.porCodigo(codigo)).thenReturn(Optional.of(alerta));
 
             service.marcarComoLidos(titulo, List.of(codigo));
 
@@ -414,8 +414,8 @@ class AlertaFacadeTest {
             existente.setDataHoraLeitura(null);
             existente.setUsuario(usuario);
 
-            when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
-            when(alertaService.buscarAlertaUsuario(any())).thenReturn(Optional.of(existente));
+            when(usuarioService.buscarPorTitulo(titulo)).thenReturn(usuario);
+            when(alertaService.alertaUsuario(any())).thenReturn(Optional.of(existente));
 
             service.marcarComoLidos(titulo, List.of(codigo));
 
@@ -434,8 +434,8 @@ class AlertaFacadeTest {
             existente.setDataHoraLeitura(LocalDateTime.now());
             existente.setUsuario(usuario);
 
-            when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
-            when(alertaService.buscarAlertaUsuario(any())).thenReturn(Optional.of(existente));
+            when(usuarioService.buscarPorTitulo(titulo)).thenReturn(usuario);
+            when(alertaService.alertaUsuario(any())).thenReturn(Optional.of(existente));
 
             service.marcarComoLidos(titulo, List.of(codigo));
 
@@ -460,14 +460,14 @@ class AlertaFacadeTest {
             Alerta a2 = new Alerta();
             a2.setCodigo(2L);
 
-            when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
-            when(alertaService.buscarPorUnidadeDestino(1L)).thenReturn(List.of(a1, a2));
+            when(usuarioService.buscarPorTitulo(titulo)).thenReturn(usuario);
+            when(alertaService.porUnidadeDestino(1L)).thenReturn(List.of(a1, a2));
 
             // a1 lido, a2 nao lido
             AlertaUsuario au1 = new AlertaUsuario();
             au1.setId(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());
             au1.setDataHoraLeitura(LocalDateTime.now());
-            when(alertaService.buscarPorUsuarioEAlertas(eq(titulo), anyList())).thenReturn(List.of(au1));
+            when(alertaService.alertasUsuarios(eq(titulo), anyList())).thenReturn(List.of(au1));
 
             List<Alerta> result = service.listarNaoLidos(titulo);
 
@@ -486,18 +486,18 @@ class AlertaFacadeTest {
             unidadeRaizMock.setSigla("ADMIN");
             unidadeRaizMock.setCodigo(1L);
 
-            when(unidadeService.porCodigo(1L)).thenReturn(unidadeRaizMock);
+            when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidadeRaizMock);
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             // Primeira chamada: deve buscar unidadeRaiz
             service.criarAlertaAdmin(new Processo(), new Unidade(), "Teste");
-            verify(unidadeService).porCodigo(1L);
+            verify(unidadeService).unidadePorCodigo(1L);
 
             // Segunda chamada: busca novamente (sem cache lazy - simplificação para sistema pequeno)
             service.criarAlertaAdmin(new Processo(), new Unidade(), "Teste 2");
             // No mockito, verify acumula as chamadas, mas como é lazy, a segunda chamada não deve invocar o metodo no service.
             // Então verify(times(1)) deve ser correto para o total.
-            verify(unidadeService, times(2)).porCodigo(1L);
+            verify(unidadeService, times(2)).unidadePorCodigo(1L);
         }
     }
 }

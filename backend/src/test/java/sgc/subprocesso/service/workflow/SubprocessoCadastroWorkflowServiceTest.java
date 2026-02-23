@@ -13,7 +13,7 @@ import sgc.comum.ComumRepo;
 import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.MapaFacade;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Unidade;
@@ -40,7 +40,7 @@ class SubprocessoCadastroWorkflowServiceTest {
     @Mock
     private SubprocessoTransicaoService transicaoService;
     @Mock
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
     @Mock
     private AnaliseFacade analiseFacade;
     @Mock

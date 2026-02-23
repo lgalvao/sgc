@@ -24,14 +24,14 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Slf4j
 @RequiredArgsConstructor
 public class SubprocessoAdminWorkflowService {
-    private final SubprocessoRepo subprocessoRepo;
     private final ComumRepo repo;
+    private final SubprocessoRepo subprocessoRepo;
     private final SubprocessoCrudService crudService;
     private final AlertaFacade alertaService;
-    private final EmailService emailService;
     private final MovimentacaoRepo movimentacaoRepo;
     private final OrganizacaoFacade organizacaoFacade;
-    private final UsuarioFacade usuarioService;
+    private final UsuarioFacade usuarioFacade;
+    private final EmailService emailService;
 
     @Transactional
     public void alterarDataLimite(Long codSubprocesso, LocalDate novaDataLimite) {
@@ -84,7 +84,7 @@ public class SubprocessoAdminWorkflowService {
     @Transactional
     public void registrarMovimentacaoLembrete(Long codSubprocesso) {
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
         var unidadeAdmin = organizacaoFacade.buscarEntidadePorSigla("ADMIN");
 
         movimentacaoRepo.save(Movimentacao.builder()

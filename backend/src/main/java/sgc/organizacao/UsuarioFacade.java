@@ -47,31 +47,23 @@ public class UsuarioFacade {
         return usuarioService.buscarOpt(titulo);
     }
 
-    public Optional<Usuario> buscarEntidadeUsuarioPorTitulo(String titulo) {
-        return usuarioService.buscarOpt(titulo);
-    }
-
     public List<Usuario> buscarUsuariosPorUnidade(Long codigoUnidade) {
         return usuarioService.buscarPorUnidadeLotacao(codigoUnidade);
     }
 
     @Transactional(readOnly = true)
-    public Usuario buscarPorId(String titulo) {
+    public Usuario buscarPorTitulo(String titulo) {
         return usuarioService.buscar(titulo);
     }
 
     @Transactional(readOnly = true)
     public Usuario buscarPorLogin(String login) {
-        return buscarPorLoginInterno(login);
-    }
-
-    private Usuario buscarPorLoginInterno(String login) {
         Usuario usuario = usuarioService.buscarComAtribuicoes(login);
         carregarAtribuicoes(usuario);
         return usuario;
     }
 
-    private Optional<String> obterTituloUsuarioAutenticado() {
+    private Optional<String> tituloUsuarioAutenticado() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
             return Optional.empty();
@@ -80,13 +72,17 @@ public class UsuarioFacade {
     }
 
     @Transactional(readOnly = true)
-    public Usuario obterUsuarioAutenticado() {
+    public Usuario usuarioAutenticado() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof Usuario usuario) {
             return usuario;
         }
-        return obterTituloUsuarioAutenticado()
-                .map(this::buscarPorLoginInterno)
+        return tituloUsuarioAutenticado()
+                .map(login -> {
+                    Usuario usuario = usuarioService.buscarComAtribuicoes(login);
+                    carregarAtribuicoes(usuario);
+                    return usuario;
+                })
                 .orElseThrow(() -> new ErroAcessoNegado("Nenhum usuário autenticado no contexto"));
     }
 
@@ -114,11 +110,6 @@ public class UsuarioFacade {
 
     public List<Usuario> buscarUsuariosAtivos() {
         return usuarioService.buscarTodos();
-    }
-
-    @SuppressWarnings("unused")
-    public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
-        return responsavelUnidadeService.buscarResponsavelUnidade(unidadeCodigo);
     }
 
     @Transactional(readOnly = true)

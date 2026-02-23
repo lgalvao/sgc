@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
 import sgc.analise.AnaliseFacade;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -34,7 +34,7 @@ class SubprocessoCadastroWorkflowServiceCoverageTest {
     @Mock private SubprocessoRepo subprocessoRepo;
     @Mock private SubprocessoCrudService crudService;
     @Mock private AlertaFacade alertaService;
-    @Mock private UnidadeFacade unidadeService;
+    @Mock private OrganizacaoFacade unidadeService;
     @Mock private SubprocessoTransicaoService transicaoService;
     @Mock private AnaliseFacade analiseFacade;
     @Mock private UsuarioFacade usuarioServiceFacade;

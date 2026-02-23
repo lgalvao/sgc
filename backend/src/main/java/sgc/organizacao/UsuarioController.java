@@ -27,7 +27,7 @@ public class UsuarioController {
     @JsonView(OrganizacaoViews.Publica.class)
     @GetMapping("/{titulo}")
     public ResponseEntity<Usuario> buscarUsuarioPorTitulo(@PathVariable String titulo) {
-        return usuarioService.buscarEntidadeUsuarioPorTitulo(titulo)
+        return usuarioService.buscarUsuarioPorTitulo(titulo)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

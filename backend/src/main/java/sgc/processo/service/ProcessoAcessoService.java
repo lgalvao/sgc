@@ -56,7 +56,7 @@ public class ProcessoAcessoService {
                 .collect(Collectors.toSet());
         if (unidadesUsuario.isEmpty()) return false;
 
-        List<Unidade> todasUnidades = organizacaoFacade.buscarTodasEntidadesComHierarquia();
+        List<Unidade> todasUnidades = organizacaoFacade.unidadesComHierarquia();
         Map<Long, List<Unidade>> mapaPorPai = buildMapaPorPai(todasUnidades);
 
         Set<Long> todasUnidadesAcesso = new HashSet<>();
@@ -75,7 +75,7 @@ public class ProcessoAcessoService {
      */
     @Transactional(readOnly = true)
     public List<Long> buscarCodigosDescendentes(Long codUnidade) {
-        List<Unidade> todasUnidades = organizacaoFacade.buscarTodasEntidadesComHierarquia();
+        List<Unidade> todasUnidades = organizacaoFacade.unidadesComHierarquia();
         Map<Long, List<Unidade>> mapaPorPai = buildMapaPorPai(todasUnidades);
         return new ArrayList<>(buscarDescendentesNoMapa(codUnidade, mapaPorPai));
     }

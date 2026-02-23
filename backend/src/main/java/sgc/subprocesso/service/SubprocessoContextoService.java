@@ -84,7 +84,7 @@ class SubprocessoContextoService {
 
     @Transactional(readOnly = true)
     public ContextoEdicaoResponse obterContextoEdicao(Long codSubprocesso) {
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
         Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
         SubprocessoDetalheResponse detalhes = obterDetalhes(subprocesso, usuario);
 

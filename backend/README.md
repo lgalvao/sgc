@@ -223,7 +223,7 @@ User Request + DTO → Controller (@Valid) → Facade
 
 #### `sgc.organizacao`
 
-* **Services:** `UsuarioFacade`, `UnidadeFacade`
+* **Services:** `UsuarioFacade`, `OrganizacaoFacade`
 * **Responsabilidade:** Estrutura organizacional (usuários, unidades, perfis)
 * **Entidades:** `Usuario`, `Unidade`, `Perfil`
 

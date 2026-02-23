@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.ComumRepo;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
@@ -38,7 +38,7 @@ class ProcessoFinalizadorTest {
     @Mock
     private ComumRepo repo;
     @Mock
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
     @Mock
     private ConsultasSubprocessoService queryService;
     @Mock

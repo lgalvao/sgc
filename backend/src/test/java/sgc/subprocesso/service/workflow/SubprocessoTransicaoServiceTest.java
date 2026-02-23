@@ -112,7 +112,7 @@ class SubprocessoTransicaoServiceTest {
         when(subprocesso.getProcesso()).thenReturn(mock(sgc.processo.model.Processo.class));
 
         Usuario usuarioAutenticado = new Usuario();
-        when(usuarioFacade.obterUsuarioAutenticado()).thenReturn(usuarioAutenticado);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuarioAutenticado);
 
         // Act
         service.registrar(RegistrarTransicaoCommand.builder()
@@ -121,7 +121,7 @@ class SubprocessoTransicaoServiceTest {
                 .build());
 
         // Assert
-        verify(usuarioFacade).obterUsuarioAutenticado();
+        verify(usuarioFacade).usuarioAutenticado();
         verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
 
@@ -130,7 +130,7 @@ class SubprocessoTransicaoServiceTest {
     void deveLancarErroQuandoUsuarioNaoAutenticado() {
         // Arrange
         Subprocesso subprocesso = mock(Subprocesso.class);
-        when(usuarioFacade.obterUsuarioAutenticado()).thenThrow(new ErroAcessoNegado("Erro"));
+        when(usuarioFacade.usuarioAutenticado()).thenThrow(new ErroAcessoNegado("Erro"));
 
         RegistrarTransicaoCommand cmd = RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)

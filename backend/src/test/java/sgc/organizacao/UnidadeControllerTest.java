@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UnidadeControllerTest {
 
     @MockitoBean
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
 
     @MockitoBean
     private ProcessoFacade processoFacade;
@@ -49,18 +49,17 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar 201 ao criar atribuição temporária")
     @WithMockUser(roles = "ADMIN")
     void deveRetornar201AoCriarAtribuicaoTemporaria() throws Exception {
-        // Act & Assert
-        mockMvc.perform(
-                        post("/api/unidades/1/atribuicoes-temporarias")
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("""
-                                        {
-                                            "tituloEleitoralUsuario":"123",
-                                            "dataTermino":"2025-12-31",
-                                            "justificativa":"teste"
-                                        }
-                                        """))
+        String conteudo = """
+                {
+                    "tituloEleitoralUsuario":"123",
+                    "dataTermino":"2025-12-31",
+                    "justificativa":"teste"
+                }""";
+
+        mockMvc.perform(post("/api/unidades/1/atribuicoes-temporarias")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(conteudo))
                 .andExpect(status().isCreated());
 
         verify(unidadeService)
@@ -120,7 +119,7 @@ class UnidadeControllerTest {
                 .nome("Teste")
                 .unidadeLotacao(Unidade.builder().codigo(1L).build())
                 .build();
-        when(unidadeService.buscarEntidadesUsuariosPorUnidade(1L)).thenReturn(List.of(usuario));
+        when(unidadeService.usuariosPorCodigoUnidade(1L)).thenReturn(List.of(usuario));
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/1/usuarios")).andExpect(status().isOk());

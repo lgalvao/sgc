@@ -26,29 +26,38 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AlertaService {
     private final AlertaRepo alertaRepo;
     private final AlertaUsuarioRepo alertaUsuarioRepo;
 
-    @Transactional
-    public Alerta salvar(Alerta alerta) {
-        return alertaRepo.save(alerta);
-    }
-
-    public List<Alerta> buscarPorUnidadeDestino(Long codigoUnidade) {
-        return alertaRepo.findByUnidadeDestino_Codigo(codigoUnidade);
-    }
-
-    public Page<Alerta> buscarPorUnidadeDestino(Long codigoUnidade, Pageable pageable) {
-        return alertaRepo.findByUnidadeDestino_Codigo(codigoUnidade, pageable);
-    }
-
-    public Optional<Alerta> buscarPorCodigo(Long codigo) {
+    public Optional<Alerta> porCodigo(Long codigo) {
         return alertaRepo.findById(codigo);
     }
 
-    public Optional<AlertaUsuario> buscarAlertaUsuario(AlertaUsuario.Chave chave) {
+    public List<Alerta> porUnidadeDestino(Long codigoUnidade) {
+        return alertaRepo.findByUnidadeDestino_Codigo(codigoUnidade);
+    }
+
+    public Page<Alerta> porUnidadeDestinoPaginado(Long codigoUnidade, Pageable pageable) {
+        return alertaRepo.findByUnidadeDestino_Codigo(codigoUnidade, pageable);
+    }
+
+    public Optional<AlertaUsuario> alertaUsuario(AlertaUsuario.Chave chave) {
         return alertaUsuarioRepo.findById(chave);
+    }
+
+    public Optional<LocalDateTime> dataHoraLeituraAlertaUsuario(Long codigoAlerta, String usuarioTitulo) {
+        AlertaUsuario.Chave chave = AlertaUsuario.Chave.builder()
+                .alertaCodigo(codigoAlerta)
+                .usuarioTitulo(usuarioTitulo)
+                .build();
+
+        return alertaUsuarioRepo.findById(chave).map(AlertaUsuario::getDataHoraLeitura);
+    }
+
+    public List<AlertaUsuario> alertasUsuarios(String usuarioTitulo, List<Long> alertaCodigos) {
+        return alertaUsuarioRepo.findByUsuarioAndAlertas(usuarioTitulo, alertaCodigos);
     }
 
     @Transactional
@@ -56,23 +65,8 @@ public class AlertaService {
         return alertaUsuarioRepo.save(alertaUsuario);
     }
 
-    public List<AlertaUsuario> buscarPorUsuarioEAlertas(String usuarioTitulo, List<Long> alertaCodigos) {
-        return alertaUsuarioRepo.findByUsuarioAndAlertas(usuarioTitulo, alertaCodigos);
-    }
-
-    /**
-     * Busca data/hora de leitura de um alerta para um usuário.
-     *
-     * @param codigoAlerta  código do alerta
-     * @param usuarioTitulo título do usuário
-     * @return data/hora de leitura, se o alerta foi lido
-     */
-    public Optional<LocalDateTime> obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
-        AlertaUsuario.Chave chave = AlertaUsuario.Chave.builder()
-                .alertaCodigo(codigoAlerta)
-                .usuarioTitulo(usuarioTitulo)
-                .build();
-
-        return alertaUsuarioRepo.findById(chave).map(AlertaUsuario::getDataHoraLeitura);
+    @Transactional
+    public Alerta salvar(Alerta alerta) {
+        return alertaRepo.save(alerta);
     }
 }

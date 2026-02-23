@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroAutenticacao;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.UsuarioService;
@@ -36,7 +36,7 @@ class LoginFacadeTest {
     @Mock
     private ClienteAcessoAd clienteAcessoAd;
     @Mock
-    private UnidadeFacade unidadeFacade;
+    private OrganizacaoFacade OrganizacaoFacade;
     @Mock
     private UsuarioService usuarioServiceInterno;
 
@@ -48,7 +48,7 @@ class LoginFacadeTest {
             usuarioFacade, 
             gerenciadorJwt, 
             clienteAcessoAd, 
-            unidadeFacade, 
+            OrganizacaoFacade, 
             usuarioServiceInterno
         );
         ReflectionTestUtils.setField(loginFacade, "ambienteTestes", false);
@@ -64,7 +64,7 @@ class LoginFacadeTest {
     @Test
     @DisplayName("autenticar deve retornar false se clienteAcessoAd for null")
     void autenticar_ClienteAdNull() {
-        LoginFacade facadeSemAd = new LoginFacade(usuarioFacade, gerenciadorJwt, null, unidadeFacade, usuarioServiceInterno);
+        LoginFacade facadeSemAd = new LoginFacade(usuarioFacade, gerenciadorJwt, null, OrganizacaoFacade, usuarioServiceInterno);
         ReflectionTestUtils.setField(facadeSemAd, "ambienteTestes", false);
         assertThat(facadeSemAd.autenticar("123", "senha")).isFalse();
     }

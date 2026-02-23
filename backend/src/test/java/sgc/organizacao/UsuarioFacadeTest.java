@@ -58,7 +58,7 @@ class UsuarioFacadeTest {
             when(usuarioService.buscarComAtribuicoes(titulo)).thenReturn(usuario);
 
             // Act
-            Usuario resultado = facade.obterUsuarioAutenticado();
+            Usuario resultado = facade.usuarioAutenticado();
 
             // Assert
             assertThat(resultado).isNotNull();
@@ -71,7 +71,7 @@ class UsuarioFacadeTest {
         @DisplayName("Deve lançar ErroAcessoNegado se não autenticado")
         void deveLancarErroAcessoNegadoSeNaoAutenticado() {
             SecurityContextHolder.clearContext();
-            assertThatThrownBy(() -> facade.obterUsuarioAutenticado())
+            assertThatThrownBy(() -> facade.usuarioAutenticado())
                     .isInstanceOf(ErroAcessoNegado.class);
         }
 
@@ -87,7 +87,7 @@ class UsuarioFacadeTest {
             SecurityContextHolder.setContext(context);
 
             // Act
-            Usuario resultado = facade.obterUsuarioAutenticado();
+            Usuario resultado = facade.usuarioAutenticado();
 
             // Assert
             assertThat(resultado).isSameAs(usuario);

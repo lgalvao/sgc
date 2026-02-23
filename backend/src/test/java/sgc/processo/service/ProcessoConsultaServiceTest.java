@@ -132,7 +132,7 @@ class ProcessoConsultaServiceTest {
                 .tituloEleitoral("admin")
                 .perfilAtivo(Perfil.ADMIN)
                 .build();
-        when(usuarioService.obterUsuarioAutenticado()).thenReturn(admin);
+        when(usuarioService.usuarioAutenticado()).thenReturn(admin);
 
         Subprocesso s1 = Subprocesso.builder()
                 .situacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)
@@ -156,7 +156,7 @@ class ProcessoConsultaServiceTest {
                 .perfilAtivo(Perfil.GESTOR)
                 .unidadeAtivaCodigo(100L)
                 .build();
-        when(usuarioService.obterUsuarioAutenticado()).thenReturn(user);
+        when(usuarioService.usuarioAutenticado()).thenReturn(user);
 
         Unidade u1 = Unidade.builder().nome("U1").sigla("S1").situacao(SituacaoUnidade.ATIVA).build();
         u1.setCodigo(100L);
@@ -198,7 +198,7 @@ class ProcessoConsultaServiceTest {
     void deveRetornarListaVaziaQuandoNaoHaProcessosFinalizados() {
         // Arrange
         Usuario admin = Usuario.builder().perfilAtivo(Perfil.ADMIN).build();
-        when(usuarioService.obterUsuarioAutenticado()).thenReturn(admin);
+        when(usuarioService.usuarioAutenticado()).thenReturn(admin);
         
         when(processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO))
                 .thenReturn(List.of());

@@ -1,5 +1,6 @@
 package sgc.analise.dto;
 
+import jakarta.annotation.Nullable;
 import lombok.Builder;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 import sgc.analise.model.TipoAcaoAnalise;
@@ -9,16 +10,17 @@ import java.time.LocalDateTime;
 
 @Builder
 public record AnaliseHistoricoDto(
-        LocalDateTime dataHora,
-
-        String observacoes,
+        TipoAnalise tipo,
         TipoAcaoAnalise acao,
-        String unidadeSigla,
-        String unidadeNome,
 
         @TituloEleitoral
         String analistaUsuarioTitulo,
 
+        String unidadeSigla,
+        String unidadeNome,
+        LocalDateTime dataHora,
+
         String motivo,
-        TipoAnalise tipo) {
+        String observacoes
+) {
 }

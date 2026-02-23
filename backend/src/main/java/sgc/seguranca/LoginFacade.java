@@ -86,7 +86,7 @@ public class LoginFacade {
     @Transactional(readOnly = true)
     public String entrar(EntrarRequest request) {
         Long codUnidade = request.unidadeCodigo();
-        organizacaoFacade.porCodigo(codUnidade);
+        organizacaoFacade.unidadePorCodigo(codUnidade);
 
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.tituloEleitoral());
         Perfil perfilSolicitado = Perfil.valueOf(request.perfil());

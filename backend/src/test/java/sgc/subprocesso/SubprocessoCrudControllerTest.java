@@ -78,7 +78,7 @@ class SubprocessoCrudControllerTest {
     @DisplayName("buscarPorProcessoEUnidade - Sucesso")
     void buscarPorProcessoEUnidade() {
         UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
-        when(organizacaoFacade.buscarUnidadePorSigla("U1")).thenReturn(unidade);
+        when(organizacaoFacade.buscarPorSigla("U1")).thenReturn(unidade);
         when(subprocessoFacade.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(Subprocesso.builder().codigo(100L).build());
 
         ResponseEntity<Subprocesso> response = controller.buscarPorProcessoEUnidade(1L, "U1");

@@ -541,7 +541,7 @@ class SubprocessoFacadeTest {
         void deveObterDetalhes() {
             Long codigo = 1L;
             Usuario usuario = new Usuario();
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
             facade.obterDetalhes(codigo);
 

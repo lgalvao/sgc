@@ -38,8 +38,8 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
-@DisplayName("UnidadeFacade - Predicado de Elegibilidade")
-class UnidadeFacadeElegibilidadePredicateTest {
+@DisplayName("OrganizacaoFacade - Predicado de Elegibilidade")
+class OrganizacaoFacadeElegibilidadePredicateTest {
     @Mock
     private UnidadeHierarquiaService hierarquiaService;
     
@@ -47,7 +47,7 @@ class UnidadeFacadeElegibilidadePredicateTest {
     private UnidadeService unidadeService;
 
     @InjectMocks
-    private UnidadeFacade facade;
+    private OrganizacaoFacade facade;
 
     @Captor
     private ArgumentCaptor<Predicate<Unidade>> predicateCaptor;

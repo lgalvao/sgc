@@ -137,7 +137,7 @@ public class ProcessoFacade {
     }
 
     private List<String> iniciarProcesso(Long codigo, List<Long> codsUnidades) {
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
         return processoInicializador.iniciar(codigo, codsUnidades, usuario);
     }
 
@@ -149,7 +149,7 @@ public class ProcessoFacade {
     @Transactional
     public void enviarLembrete(Long codProcesso, Long unidadeCodigo) {
         Processo processo = buscarEntidadePorId(codProcesso);
-        Unidade unidade = organizacaoFacade.porCodigo(unidadeCodigo);
+        Unidade unidade = organizacaoFacade.unidadePorCodigo(unidadeCodigo);
 
         // Verifica se unidade participa do processo
         if (processo.getParticipantes().stream().noneMatch(u -> u.getUnidadeCodigo().equals(unidadeCodigo))) {
@@ -203,7 +203,7 @@ public class ProcessoFacade {
 
     @Transactional
     public void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoRequest req) {
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
 
         if (req.acao() == DISPONIBILIZAR) {

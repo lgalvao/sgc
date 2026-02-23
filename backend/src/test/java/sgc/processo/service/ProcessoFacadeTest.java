@@ -20,7 +20,7 @@ import sgc.fixture.ProcessoFixture;
 import sgc.fixture.UnidadeFixture;
 import sgc.notificacao.EmailModelosService;
 import sgc.notificacao.EmailService;
-import sgc.organizacao.UnidadeFacade;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -65,7 +65,7 @@ class ProcessoFacadeTest {
     @Mock
     private ProcessoConsultaService processoConsultaService;
     @Mock
-    private UnidadeFacade unidadeService;
+    private OrganizacaoFacade unidadeService;
     @Mock
     private AlertaFacade alertaService;
     @Mock
@@ -97,7 +97,7 @@ class ProcessoFacadeTest {
             Long codigo = 1L;
             List<Long> unidades = List.of(2L, 3L);
             Usuario usuario = new Usuario();
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(processoInicializador.iniciar(codigo, unidades, usuario)).thenReturn(List.of("OK"));
 
             var result = processoFacade.iniciarProcessoDiagnostico(codigo, unidades);
@@ -136,7 +136,7 @@ class ProcessoFacadeTest {
             processo.adicionarParticipantes(Set.of(unidade));
 
             when(processoConsultaService.buscarProcessoCodigo(codProcesso)).thenReturn(processo);
-            when(unidadeService.porCodigo(codUnidade)).thenReturn(unidade);
+            when(unidadeService.unidadePorCodigo(codUnidade)).thenReturn(unidade);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
             when(subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
             unidade.setTituloTitular("T1");
@@ -186,7 +186,7 @@ class ProcessoFacadeTest {
             );
 
             Usuario usuario = new Usuario();
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             
             Subprocesso sub = Subprocesso.builder()
                     .codigo(100L)
@@ -249,7 +249,7 @@ class ProcessoFacadeTest {
         void deveIniciarMapeamentoComSucesso() {
             Long id = 100L;
             Usuario usuario = new Usuario();
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(processoInicializador.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
 
             List<String> erros = processoFacade.iniciarProcessoMapeamento(id, List.of(1L));
@@ -263,7 +263,7 @@ class ProcessoFacadeTest {
         void deveRetornarErroAoIniciarMapeamentoSeUnidadeEmUso() {
             Long id = 100L;
             Usuario usuario = new Usuario();
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             String mensagemErro = "As seguintes unidades já participam de outro processo ativo: U1";
             when(processoInicializador.iniciar(id, List.of(1L), usuario)).thenReturn(List.of(mensagemErro));
 
@@ -277,7 +277,7 @@ class ProcessoFacadeTest {
         void deveIniciarRevisaoComSucesso() {
             Long id = 100L;
             Usuario usuario = new Usuario();
-            when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(processoInicializador.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
 
             List<String> erros = processoFacade.iniciarProcessoRevisao(id, List.of(1L));
@@ -308,7 +308,7 @@ class ProcessoFacadeTest {
             p.adicionarParticipantes(Set.of(u));
 
             when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
-            when(unidadeService.porCodigo(10L)).thenReturn(u);
+            when(unidadeService.unidadePorCodigo(10L)).thenReturn(u);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
             when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
             u.setTituloTitular("T10");
@@ -333,7 +333,7 @@ class ProcessoFacadeTest {
             p.adicionarParticipantes(Set.of(outra));
 
             when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
-            when(unidadeService.porCodigo(10L)).thenReturn(u);
+            when(unidadeService.unidadePorCodigo(10L)).thenReturn(u);
 
             assertThatThrownBy(() -> processoFacade.enviarLembrete(1L, 10L))
                     .isInstanceOf(ErroProcesso.class)
@@ -543,7 +543,7 @@ class ProcessoFacadeTest {
                 // Arrange
                 Usuario usuario = new Usuario();
                 usuario.setTituloEleitoral("12345678901");
-                when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+                when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
                 LocalDate dataLimite = LocalDate.now().plusDays(30);
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
@@ -584,7 +584,7 @@ class ProcessoFacadeTest {
             void deveAceitarCadastroQuandoMapeamentoCadastro() {
                 // Arrange
                 Usuario usuario = new Usuario();
-                when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+                when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
                 Subprocesso sp1 = Subprocesso.builder()
                     .codigo(1L)
@@ -617,7 +617,7 @@ class ProcessoFacadeTest {
             void deveAceitarValidacaoQuandoMapaDisponibilizado() {
                 // Arrange
                 Usuario usuario = new Usuario();
-                when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+                when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
                 Subprocesso sp1 = Subprocesso.builder()
                     .codigo(1L)
@@ -649,7 +649,7 @@ class ProcessoFacadeTest {
             void deveHomologarCadastroQuandoCadastro() {
                 // Arrange
                 Usuario usuario = new Usuario();
-                when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+                when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
                 Subprocesso sp1 = Subprocesso.builder()
                     .codigo(1L)
@@ -677,7 +677,7 @@ class ProcessoFacadeTest {
             void deveHomologarValidacaoQuandoValidacao() {
                 // Arrange
                 Usuario usuario = new Usuario();
-                when(usuarioService.obterUsuarioAutenticado()).thenReturn(usuario);
+                when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
                 Subprocesso sp1 = Subprocesso.builder()
                         .codigo(1L)

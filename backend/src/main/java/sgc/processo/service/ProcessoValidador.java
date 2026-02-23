@@ -87,7 +87,7 @@ class ProcessoValidador {
      * @return Optional com mensagem de erro se houver unidade inválida
      */
     public Optional<String> validarTiposUnidades(List<Unidade> unidades) {
-        if (unidades.isEmpty()) {
+        if (unidades == null || unidades.isEmpty()) {
             return Optional.empty();
         }
 

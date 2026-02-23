@@ -49,7 +49,7 @@ class SubprocessoAtividadeService {
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
         final Subprocesso spDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
 
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
 
         Acao acao = spDestino.getProcesso().getTipo() == TipoProcesso.REVISAO
                 ? Acao.EDITAR_REVISAO_CADASTRO

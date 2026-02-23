@@ -59,7 +59,7 @@ public class AtividadeFacade {
 
     public AtividadeOperacaoResponse criarAtividade(CriarAtividadeRequest request) {
         Long mapaCodigo = request.mapaCodigo();
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
         Mapa mapa = mapaFacade.obterPorCodigo(mapaCodigo);
 
         Atividade atividadeTemp = Atividade.builder().mapa(mapa).build();
@@ -71,7 +71,7 @@ public class AtividadeFacade {
 
     public AtividadeOperacaoResponse atualizarAtividade(Long codigo, AtualizarAtividadeRequest request) {
         Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codigo);
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
 
         accessControlService.verificarPermissao(usuario, EDITAR_ATIVIDADE, atividade);
         mapaManutencaoService.atualizarAtividade(codigo, request);
@@ -84,7 +84,7 @@ public class AtividadeFacade {
         Mapa mapa = atividade.getMapa();
         Long codMapa = mapa.getCodigo();
 
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
         accessControlService.verificarPermissao(usuario, EXCLUIR_ATIVIDADE, atividade);
         mapaManutencaoService.excluirAtividade(codigo);
 
@@ -93,7 +93,7 @@ public class AtividadeFacade {
 
     public ResultadoOperacaoConhecimento criarConhecimento(Long codAtividade, CriarConhecimentoRequest request) {
         Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codAtividade);
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
         accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
 
         Conhecimento salvo = mapaManutencaoService.criarConhecimento(codAtividade, request);
@@ -104,7 +104,7 @@ public class AtividadeFacade {
 
     public AtividadeOperacaoResponse atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
         Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codAtividade);
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
         accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
 
         mapaManutencaoService.atualizarConhecimento(codAtividade, codConhecimento, request);
@@ -114,7 +114,7 @@ public class AtividadeFacade {
     public AtividadeOperacaoResponse excluirConhecimento(Long codAtividade, Long codConhecimento) {
         Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codAtividade);
 
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
         accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
 
         mapaManutencaoService.excluirConhecimento(codAtividade, codConhecimento);
@@ -145,10 +145,8 @@ public class AtividadeFacade {
 
     private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
         SubprocessoSituacaoDto situacaoDto = subprocessoFacade.obterSituacao(codSubprocesso);
-        log.info("[Response] Subprocesso: {}, Situação: {}", situacaoDto.codigo(), situacaoDto.situacao());
-        
         List<AtividadeDto> todasAtividades = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        Usuario usuario = usuarioService.usuarioAutenticado();
         PermissoesSubprocessoDto permissoes = subprocessoFacade.obterPermissoesUI(codSubprocesso, usuario);
 
         AtividadeDto atividadeVis = null;

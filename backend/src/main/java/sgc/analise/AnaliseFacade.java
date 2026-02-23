@@ -26,28 +26,17 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class AnaliseFacade {
     private final AnaliseService analiseService;
     private final OrganizacaoFacade organizacaoFacade;
 
-    /**
-     * Lista todas as análises de um determinado tipoAnalise para um subprocesso específico.
-     *
-     * @param codSubprocesso O código do subprocesso.
-     * @param tipoAnalise    O tipo de análise a ser filtrada (e.g., CADASTRO, VALIDACAO).
-     * @return Uma lista de {@link Analise} ordenada pela data e hora em ordem decrescente.
-     */
-    @Transactional(readOnly = true)
     public List<Analise> listarPorSubprocesso(Long codSubprocesso, TipoAnalise tipoAnalise) {
         return analiseService.listarPorSubprocesso(codSubprocesso).stream()
                 .filter(a -> a.getTipo() == tipoAnalise)
                 .toList();
     }
 
-    /**
-     * Lista o histórico de análises de cadastro para um subprocesso.
-     */
-    @Transactional(readOnly = true)
     public List<AnaliseHistoricoDto> listarHistoricoCadastro(Long codSubprocesso) {
         return analiseService.listarPorSubprocesso(codSubprocesso).stream()
                 .filter(a -> a.getTipo() == TipoAnalise.CADASTRO)
@@ -55,7 +44,6 @@ public class AnaliseFacade {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<AnaliseHistoricoDto> listarHistoricoValidacao(Long codSubprocesso) {
         return analiseService.listarPorSubprocesso(codSubprocesso).stream()
                 .filter(a -> a.getTipo() == TipoAnalise.VALIDACAO)
@@ -77,14 +65,6 @@ public class AnaliseFacade {
                 .build();
     }
 
-
-    /**
-     * Cria e persiste uma análise com base nos dados fornecidos.
-     *
-     * @param subprocesso A entidade do subprocesso.
-     * @param command     O comando contendo todas as informações necessárias para criar a análise.
-     * @return A entidade {@link Analise} que foi criada e salva no banco de dados.
-     */
     @Transactional
     public Analise criarAnalise(Subprocesso subprocesso, CriarAnaliseCommand command) {
         UnidadeDto unidadeDto = organizacaoFacade.buscarPorSigla(command.siglaUnidade());
@@ -103,16 +83,6 @@ public class AnaliseFacade {
         return analiseService.salvar(analise);
     }
 
-    /**
-     * Remove todas as análises associadas a um subprocesso específico.
-     *
-     * <p>Para cenários de limpeza de dados, como a exclusão de um subprocesso, garantindo que suas
-     * análises dependentes também sejam removidas.
-     *
-     * <p>Este método deve ser chamado dentro de uma transação existente.
-     *
-     * @param codSubprocesso O código do subprocesso cujas análises serão removidas.
-     */
     @Transactional
     public void removerPorSubprocesso(Long codSubprocesso) {
         analiseService.removerPorSubprocesso(codSubprocesso);

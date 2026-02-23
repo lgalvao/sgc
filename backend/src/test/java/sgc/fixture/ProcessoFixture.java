@@ -34,6 +34,12 @@ public class ProcessoFixture {
         return processo;
     }
 
+    public static Processo novoProcesso() {
+        Processo processo = processoPadrao();
+        processo.setCodigo(null);
+        return processo;
+    }
+
     /**
      * Cria um snapshot de UnidadeProcesso a partir de uma Unidade para uso em testes.
      * Este método permite criar snapshots sem ter um Processo persistido.

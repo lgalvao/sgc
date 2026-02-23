@@ -30,8 +30,8 @@ public class AtividadeController {
      *
      * @param codAtividade O código da atividade a ser buscada.
      * @return Um {@link ResponseEntity} contendo a {@link Atividade}
-     *         correspondente ou um status
-     *         404 Not Found se a atividade não for encontrada.
+     * correspondente ou um status
+     * 404 Not Found se a atividade não for encontrada.
      */
     @GetMapping("/{codAtividade}")
     @PreAuthorize("isAuthenticated()")
@@ -45,8 +45,8 @@ public class AtividadeController {
      *
      * @param request O Request contendo os dados da atividade a ser criada.
      * @return Um {@link ResponseEntity} com status 201 Created e
-     *         {@link AtividadeOperacaoResponse}
-     *         contendo a atividade criada e o status do subprocesso.
+     * {@link AtividadeOperacaoResponse}
+     * contendo a atividade criada e o status do subprocesso.
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -65,14 +65,14 @@ public class AtividadeController {
      * @param request O Request com os novos dados da atividade. A descrição será
      *                sanitizada.
      * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse}
-     *         contendo
-     *         a atividade atualizada e o status do subprocesso.
+     * contendo
+     * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codigo}/atualizar")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Atualiza atividade existente")
     public ResponseEntity<AtividadeOperacaoResponse> atualizar(@PathVariable Long codigo,
-            @RequestBody @Valid AtualizarAtividadeRequest request) {
+                                                               @RequestBody @Valid AtualizarAtividadeRequest request) {
         AtividadeOperacaoResponse response = atividadeFacade.atualizarAtividade(codigo, request);
         return ResponseEntity.ok(response);
     }
@@ -87,8 +87,8 @@ public class AtividadeController {
      *
      * @param codAtividade O código da atividade a ser excluída.
      * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse}
-     *         contendo
-     *         o status atualizado do subprocesso (atividade será null).
+     * contendo
+     * o status atualizado do subprocesso (atividade será null).
      */
     @PostMapping("/{codAtividade}/excluir")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -103,7 +103,7 @@ public class AtividadeController {
      *
      * @param codAtividade O código da atividade pai.
      * @return Um {@link ResponseEntity} com status 200 OK e a lista de
-     *         {@link Conhecimento}.
+     * {@link Conhecimento}.
      */
     @GetMapping("/{codAtividade}/conhecimentos")
     @PreAuthorize("isAuthenticated()")
@@ -119,9 +119,9 @@ public class AtividadeController {
      *                     associado.
      * @param request      O Request com os dados do conhecimento a ser criado.
      * @return Um {@link ResponseEntity} com status 201 Created e
-     *         {@link AtividadeOperacaoResponse}
-     *         contendo a atividade atualizada com o novo conhecimento e o situação
-     *         do subprocesso.
+     * {@link AtividadeOperacaoResponse}
+     * contendo a atividade atualizada com o novo conhecimento e o situação
+     * do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -131,8 +131,7 @@ public class AtividadeController {
             @Valid @RequestBody CriarConhecimentoRequest request) {
 
         ResultadoOperacaoConhecimento resultado = atividadeFacade.criarConhecimento(codAtividade, request);
-        URI uri = URI
-                .create("/api/atividades/%d/conhecimentos/%d".formatted(codAtividade, resultado.novoConhecimentoId()));
+        URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(codAtividade, resultado.novoConhecimentoId()));
         return ResponseEntity.created(uri).body(resultado.response());
     }
 
@@ -143,8 +142,8 @@ public class AtividadeController {
      * @param codConhecimento O código do conhecimento a ser atualizado.
      * @param request         O Request com os novos dados do conhecimento.
      * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse}
-     *         contendo
-     *         a atividade atualizada e o status do subprocesso.
+     * contendo
+     * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/atualizar")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -154,8 +153,9 @@ public class AtividadeController {
             @PathVariable Long codConhecimento,
             @Valid @RequestBody AtualizarConhecimentoRequest request) {
 
-        AtividadeOperacaoResponse response = atividadeFacade.atualizarConhecimento(codAtividade, codConhecimento,
-                request);
+        AtividadeOperacaoResponse response = atividadeFacade.atualizarConhecimento(
+                codAtividade, codConhecimento, request
+        );
         return ResponseEntity.ok(response);
     }
 
@@ -165,8 +165,8 @@ public class AtividadeController {
      * @param codAtividade    O código da atividade pai.
      * @param codConhecimento O código do conhecimento a ser excluído.
      * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse}
-     *         contendo
-     *         a atividade atualizada e o status do subprocesso.
+     * contendo
+     * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/excluir")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")

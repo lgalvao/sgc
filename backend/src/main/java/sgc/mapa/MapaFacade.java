@@ -19,67 +19,65 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MapaFacade {
     private final MapaSalvamentoService mapaSalvamentoService;
     private final MapaManutencaoService mapaManutencaoService;
     private final MapaVisualizacaoService mapaVisualizacaoService;
     private final ImpactoMapaService impactoMapaService;
 
-    @Transactional(readOnly = true)
     public List<Mapa> listar() {
         return mapaManutencaoService.listarTodosMapas();
     }
 
-    @Transactional(readOnly = true)
     public Mapa obterPorCodigo(Long codigo) {
         return mapaManutencaoService.buscarMapaPorCodigo(codigo);
     }
 
-    @Transactional(readOnly = true)
     public Mapa obterMapaCompletoPorSubprocesso(Long codSubprocesso) {
         return mapaManutencaoService.buscarMapaCompletoPorSubprocesso(codSubprocesso);
     }
 
-    @Transactional(readOnly = true)
     public Optional<Mapa> buscarMapaVigentePorUnidade(Long codigoUnidade) {
         return mapaManutencaoService.buscarMapaVigentePorUnidade(codigoUnidade);
     }
 
-    @Transactional(readOnly = true)
     public Optional<Mapa> buscarPorSubprocessoCodigo(Long codSubprocesso) {
         return mapaManutencaoService.buscarMapaPorSubprocessoCodigo(codSubprocesso);
     }
 
-    public Mapa salvar(Mapa mapa) {
-        return mapaManutencaoService.salvarMapa(mapa);
-    }
-
-    public Mapa atualizar(Long codigo, Mapa mapa) {
-        Mapa existente = mapaManutencaoService.buscarMapaPorCodigo(codigo);
-        existente.setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado());
-        existente.setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao());
-        existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
-        return mapaManutencaoService.salvarMapa(existente);
-    }
-
-    public void excluir(Long codigo) {
-        mapaManutencaoService.excluirMapa(codigo);
-    }
-
-    public Mapa salvarMapaCompleto(Long codMapa, SalvarMapaRequest request) {
-        return mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
-    }
-
-    @Transactional(readOnly = true)
     public MapaVisualizacaoResponse obterMapaParaVisualizacao(Subprocesso subprocesso) {
         return mapaVisualizacaoService.obterMapaParaVisualizacao(subprocesso);
     }
 
-    @Transactional(readOnly = true)
     public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
         return impactoMapaService.verificarImpactos(subprocesso, usuario);
+    }
+
+    @Transactional
+    public Mapa salvar(Mapa mapa) {
+        return mapaManutencaoService.salvarMapa(mapa);
+    }
+
+    @Transactional
+    public void excluir(Long codigo) {
+        mapaManutencaoService.excluirMapa(codigo);
+    }
+
+    @Transactional
+    public Mapa atualizar(Long codigo, Mapa mapa) {
+        Mapa existente = mapaManutencaoService.buscarMapaPorCodigo(codigo)
+                .setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado())
+                .setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao())
+                .setDataHoraHomologado(mapa.getDataHoraHomologado());
+
+        return mapaManutencaoService.salvarMapa(existente);
+    }
+
+    @Transactional
+    public Mapa salvarMapaCompleto(Long codMapa, SalvarMapaRequest request) {
+        return mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
     }
 }

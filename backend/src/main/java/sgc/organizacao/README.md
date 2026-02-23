@@ -14,7 +14,7 @@ informações de identidade e estrutura organizacional.
     - Administração de usuários com papel de administrador
 
 2. **Gestão de Unidades:**
-    - Hierarquia organizacional via `UnidadeFacade`
+    - Hierarquia organizacional via `OrganizacaoFacade`
     - Mapa vigente por unidade
     - Atribuições temporárias de servidores
 
@@ -28,7 +28,7 @@ informações de identidade e estrutura organizacional.
 ### Serviços
 
 - **`UsuarioFacade`**: Lógica de autenticação, autorização e gestão de administradores
-- **`UnidadeFacade`**: Hierarquia de unidades, elegibilidade e atribuições temporárias
+- **`OrganizacaoFacade`**: Hierarquia de unidades, elegibilidade e atribuições temporárias
 
 ### Modelo (`model/`)
 
