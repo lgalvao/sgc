@@ -114,7 +114,7 @@ public class SubprocessoMapaWorkflowService {
             }
         }
 
-        return mapaFacade.obterPorCodigo(mapa.getCodigo());
+        return mapaFacade.mapaPorCodigo(mapa.getCodigo());
     }
 
     public Mapa atualizarCompetencia(
@@ -126,7 +126,7 @@ public class SubprocessoMapaWorkflowService {
         mapaManutencaoService.atualizarCompetencia(codCompetencia, request.descricao(), request.atividadesIds());
 
         Mapa mapa = subprocesso.getMapa();
-        return mapaFacade.obterPorCodigo(mapa.getCodigo());
+        return mapaFacade.mapaPorCodigo(mapa.getCodigo());
     }
 
     public Mapa removerCompetencia(Long codSubprocesso, Long codCompetencia) {
@@ -149,7 +149,7 @@ public class SubprocessoMapaWorkflowService {
             }
         }
 
-        return mapaFacade.obterPorCodigo(subprocesso.getMapa().getCodigo());
+        return mapaFacade.mapaPorCodigo(subprocesso.getMapa().getCodigo());
     }
 
     private Subprocesso getSubprocessoParaEdicao(Long codSubprocesso) {

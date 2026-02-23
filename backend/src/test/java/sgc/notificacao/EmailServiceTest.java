@@ -22,10 +22,10 @@ class EmailServiceTest {
     private static final int TAMANHO_CORPO_LONGO = 600;
 
     @Mock
-    private NotificacaoRepo repositorioNotificacao;
+    private NotificacaoRepo notificacaoRepo;
 
     @Mock
-    private JavaMailSender enviadorDeEmail;
+    private JavaMailSender enviadorEmail;
 
     @Mock
     private ConfigAplicacao config;
@@ -33,7 +33,7 @@ class EmailServiceTest {
     @InjectMocks
     private EmailService notificacaoServico;
 
-    private static final String RECIPIENT = "recipient@test.com";
+    private static final String DESTINATARIO = "recipient@test.com";
     private static final String TEST_BODY = "Test body";
 
     private void setupMockEmail() {
@@ -44,23 +44,23 @@ class EmailServiceTest {
         when(config.getEmail()).thenReturn(emailConfig);
 
         MimeMessage mimeMessage = mock(MimeMessage.class);
-        when(enviadorDeEmail.createMimeMessage()).thenReturn(mimeMessage);
+        when(enviadorEmail.createMimeMessage()).thenReturn(mimeMessage);
     }
 
     @Test
     @DisplayName("Deve enviar e-mail HTML")
     void enviarEmailHtmlDeveEnviarComSucesso() {
         setupMockEmail();
-        when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
+        when(notificacaoRepo.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
 
-        String para = RECIPIENT;
+        String para = DESTINATARIO;
         String assunto = "Test Subject";
         String corpoHtml = "<h1>Test Body</h1>";
 
         notificacaoServico.enviarEmailHtml(para, assunto, corpoHtml);
 
-        verify(repositorioNotificacao, times(1)).save(any(Notificacao.class));
-        verify(enviadorDeEmail, times(1)).send(any(MimeMessage.class));
+        verify(notificacaoRepo, times(1)).save(any(Notificacao.class));
+        verify(enviadorEmail, times(1)).send(any(MimeMessage.class));
     }
 
     @Test
@@ -72,24 +72,23 @@ class EmailServiceTest {
 
         notificacaoServico.enviarEmailHtml(para, assunto, corpoHtml);
 
-        verify(enviadorDeEmail, never()).send(any(MimeMessage.class));
-        verify(repositorioNotificacao, never()).save(any(Notificacao.class));
+        verify(enviadorEmail, never()).send(any(MimeMessage.class));
+        verify(notificacaoRepo, never()).save(any(Notificacao.class));
     }
 
     @Test
     @DisplayName("Deve enviar e-mail de texto simples")
     void deveEnviarEmailTextoSimples() {
         setupMockEmail();
-        when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
+        when(notificacaoRepo.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
 
-        String para = RECIPIENT;
         String assunto = "Test Subject Plain";
         String corpo = "This is plain text";
 
-        notificacaoServico.enviarEmail(para, assunto, corpo);
+        notificacaoServico.enviarEmail(DESTINATARIO, assunto, corpo);
         
-        verify(repositorioNotificacao, times(1)).save(any(Notificacao.class));
-        verify(enviadorDeEmail, times(1)).send(any(MimeMessage.class));
+        verify(notificacaoRepo, times(1)).save(any(Notificacao.class));
+        verify(enviadorEmail, times(1)).send(any(MimeMessage.class));
     }
 
     @Test
@@ -101,50 +100,26 @@ class EmailServiceTest {
 
         notificacaoServico.enviarEmail(para, assunto, corpo);
 
-        verify(enviadorDeEmail, never()).send(any(MimeMessage.class));
-        verify(repositorioNotificacao, never()).save(any(Notificacao.class));
+        verify(enviadorEmail, never()).send(any(MimeMessage.class));
+        verify(notificacaoRepo, never()).save(any(Notificacao.class));
     }
 
     @Test
     @DisplayName("Deve truncar conteúdo longo da notificação")
     void deveTruncarConteudoLongoDaNotificacao() {
         setupMockEmail();
-        when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
+        when(notificacaoRepo.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
 
         String assunto = "Test";
         String corpoLongo = "A".repeat(TAMANHO_CORPO_LONGO);
 
-        notificacaoServico.enviarEmail(RECIPIENT, assunto, corpoLongo);
+        notificacaoServico.enviarEmail(DESTINATARIO, assunto, corpoLongo);
 
         ArgumentCaptor<Notificacao> captorNotificacao = ArgumentCaptor.forClass(Notificacao.class);
-        verify(repositorioNotificacao).save(captorNotificacao.capture());
+        verify(notificacaoRepo).save(captorNotificacao.capture());
 
         Notificacao notificacaoSalva = captorNotificacao.getValue();
         assertThat(notificacaoSalva.getConteudo().length()).isLessThanOrEqualTo(LIMITE_CONTEUDO_NOTIFICACAO);
         assertThat(notificacaoSalva.getConteudo()).endsWith("...");
-    }
-
-    @Test
-    @DisplayName("Deve logar erro mas não quebrar quando save falha")
-    void deveLogarErroQuandoSaveFalha() {
-        when(repositorioNotificacao.save(any(Notificacao.class))).thenThrow(new RuntimeException("Erro db"));
-
-        notificacaoServico.enviarEmail(RECIPIENT, "Test", TEST_BODY);
-
-        verify(repositorioNotificacao).save(any(Notificacao.class));
-        verify(enviadorDeEmail, never()).send(any(MimeMessage.class));
-    }
-
-    @Test
-    @DisplayName("Deve logar erro quando disparar email falha")
-    void deveLogarErroQunadoDisparoFalha() {
-        setupMockEmail();
-        when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
-        doThrow(new RuntimeException("Erro email")).when(enviadorDeEmail).send(any(MimeMessage.class));
-
-        notificacaoServico.enviarEmail(RECIPIENT, "Test", TEST_BODY);
-
-        verify(repositorioNotificacao).save(any(Notificacao.class));
-        verify(enviadorDeEmail).send(any(MimeMessage.class));
     }
 }

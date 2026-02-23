@@ -171,6 +171,10 @@ public class ProcessoNotificacaoService {
                 .sorted()
                 .toList();
 
+        if (siglasSubordinadas.isEmpty()) {
+            return;
+        }
+
         String assunto = String.format("SGC: Finalização do processo %s em unidades subordinadas",
                 processo.getDescricao());
 

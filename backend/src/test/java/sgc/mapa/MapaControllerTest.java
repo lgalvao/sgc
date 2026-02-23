@@ -55,7 +55,7 @@ class MapaControllerTest {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
 
-        when(mapaFacade.listar()).thenReturn(List.of(mapa));
+        when(mapaFacade.todosMapas()).thenReturn(List.of(mapa));
 
         mockMvc.perform(get(API_MAPAS))
                 .andExpect(status().isOk())
@@ -69,7 +69,7 @@ class MapaControllerTest {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
 
-        when(mapaFacade.obterPorCodigo(1L)).thenReturn(mapa);
+        when(mapaFacade.mapaPorCodigo(1L)).thenReturn(mapa);
 
         mockMvc.perform(get(API_MAPAS_1))
                 .andExpect(status().isOk())
@@ -80,12 +80,12 @@ class MapaControllerTest {
     @WithMockUser
     @DisplayName("Deve retornar NotFound quando mapa não existir")
     void deveRetornarNotFoundQuandoMapaNaoExistir() throws Exception {
-        when(mapaFacade.obterPorCodigo(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 999L));
+        when(mapaFacade.mapaPorCodigo(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 999L));
 
         mockMvc.perform(get("/api/mapas/999"))
                 .andExpect(status().isNotFound());
 
-        verify(mapaFacade).obterPorCodigo(999L);
+        verify(mapaFacade).mapaPorCodigo(999L);
     }
 
     @Test

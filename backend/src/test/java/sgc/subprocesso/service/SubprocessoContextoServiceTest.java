@@ -108,7 +108,7 @@ class SubprocessoContextoServiceTest {
         when(usuarioService.buscarPorLogin("T1")).thenReturn(new Usuario());
         when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(id)).thenReturn(List.of());
         when(atividadeService.listarAtividadesSubprocesso(id)).thenReturn(List.of());
-        when(mapaFacade.obterPorCodigo(10L)).thenReturn(new Mapa());
+        when(mapaFacade.mapaPorCodigo(10L)).thenReturn(new Mapa());
 
         ContextoEdicaoResponse result = service.obterContextoEdicao(id);
 

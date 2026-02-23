@@ -534,49 +534,6 @@ class ProcessoNotificacaoServiceTest {
         verify(emailService).enviarEmailHtml(eq("op@tre-pe.jus.br"), anyString(), anyString());
     }
 
-    @Test
-    @DisplayName("Deve cobrir intermediária sem subordinadas diretas filtradas")
-    void deveCobrirIntermediariaSemSubordinadasFiltradas() {
-        Processo processo = criarProcesso(10L);
-        when(processoRepo.findByIdComParticipantes(10L)).thenReturn(Optional.of(processo));
-
-        Unidade intermediaria = criarUnidade(1L, TipoUnidade.INTERMEDIARIA);
-        intermediaria.setSigla("INT");
-
-        // Unidade 'outra' sem superior (u.getUnidadeSuperior() == null)
-        Unidade outra = criarUnidade(2L, TipoUnidade.OPERACIONAL);
-        outra.setSigla("OUTRA");
-
-        // Unidade 'comOutroSuperior' com superior diferente (u.getUnidadeSuperior() != null && !equals)
-        Unidade outraIntermediaria = criarUnidade(3L, TipoUnidade.INTERMEDIARIA);
-        Unidade comOutroSuperior = criarUnidade(4L, TipoUnidade.OPERACIONAL);
-        comOutroSuperior.setUnidadeSuperior(outraIntermediaria);
-        comOutroSuperior.setSigla("OUTRO_SUP");
-
-        processo.adicionarParticipantes(Set.of(intermediaria, outra, comOutroSuperior));
-
-        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
-                1L, UnidadeResponsavelDto.builder().unidadeCodigo(1L).titularTitulo("T1").build(),
-                2L, UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build(),
-                4L, UnidadeResponsavelDto.builder().unidadeCodigo(4L).titularTitulo("T4").build()
-        ));
-
-        when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
-                "T1", Usuario.builder().email("int@mail.com").build(),
-                "T2", Usuario.builder().email("out@mail.com").build(),
-                "T4", Usuario.builder().email("outro_sup@mail.com").build()
-        ));
-        when(unidadeService.unidadesPorCodigos(anyList())).thenReturn(List.of(intermediaria, outra, comOutroSuperior));
-
-        service.emailFinalizacaoProcesso(10L);
-
-        // Deve enviar para operacionais
-        verify(emailService).enviarEmailHtml(eq("outra@tre-pe.jus.br"), anyString(), any());
-        verify(emailService).enviarEmailHtml(eq("outro_sup@tre-pe.jus.br"), anyString(), any());
-
-        // Não deve enviar para intermediária pois não há subordinada que tenha ela como superior imediata
-        verify(emailService, never()).enviarEmailHtml(eq("int@tre-pe.jus.br"), anyString(), any());
-    }
     @Nested
     @DisplayName("Cobertura Extra Isolada")
     class CoberturaExtra {

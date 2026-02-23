@@ -118,7 +118,7 @@ class AtividadeFacadeTest {
                     .build();
             
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(mapaFacade.obterPorCodigo(mapaCodigo)).thenReturn(mapa);
+            when(mapaFacade.mapaPorCodigo(mapaCodigo)).thenReturn(mapa);
             when(mapaManutencaoService.criarAtividade(request)).thenReturn(salvo);
             when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));

@@ -96,7 +96,7 @@ class SubprocessoContextoService {
                 unidade,
                 subprocesso,
                 detalhes,
-                mapaFacade.obterPorCodigo(subprocesso.getMapa().getCodigo()),
+                mapaFacade.mapaPorCodigo(subprocesso.getMapa().getCodigo()),
                 atividades
         );
     }

@@ -34,7 +34,7 @@ public class MapaController {
     @Operation(summary = "Lista todos os mapas")
     @JsonView(MapaViews.Publica.class)
     public List<Mapa> listar() {
-        return mapaFacade.listar();
+        return mapaFacade.todosMapas();
     }
 
     /**
@@ -48,7 +48,7 @@ public class MapaController {
     @Operation(summary = "Obtém um mapa pelo código")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> obterPorId(@PathVariable Long codigo) {
-        var mapa = mapaFacade.obterPorCodigo(codigo);
+        var mapa = mapaFacade.mapaPorCodigo(codigo);
         return ResponseEntity.ok(mapa);
     }
 

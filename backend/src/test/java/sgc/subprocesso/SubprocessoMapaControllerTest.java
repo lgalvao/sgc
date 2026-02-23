@@ -93,7 +93,7 @@ class SubprocessoMapaControllerTest {
         MapaVisualizacaoResponse vis = MapaVisualizacaoResponse.builder().build();
         
         when(subprocessoFacade.buscarSubprocesso(codigo)).thenReturn(sp);
-        when(mapaFacade.obterMapaParaVisualizacao(sp)).thenReturn(vis);
+        when(mapaFacade.mapaParaVisualizacao(sp)).thenReturn(vis);
 
         MapaVisualizacaoResponse result = controller.obterMapaParaVisualizacao(codigo);
 
@@ -121,7 +121,7 @@ class SubprocessoMapaControllerTest {
         Mapa mapa = new Mapa();
         mapa.setCodigo(100L);
         
-        when(mapaFacade.obterMapaCompletoPorSubprocesso(codigo)).thenReturn(mapa);
+        when(mapaFacade.mapaCompletoPorSubprocesso(codigo)).thenReturn(mapa);
 
         ResponseEntity<Mapa> response = controller.obterMapaCompleto(codigo);
 

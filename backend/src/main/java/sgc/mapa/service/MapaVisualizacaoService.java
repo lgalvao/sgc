@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.model.EntidadeBase;
 import sgc.mapa.dto.MapaVisualizacaoResponse;
 import sgc.mapa.model.*;
 import sgc.subprocesso.model.Subprocesso;
@@ -23,6 +24,7 @@ public class MapaVisualizacaoService {
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
 
+    // TODO muito suspeito. Coisas vazias que nao poderiam chegar vazias aqui
     public MapaVisualizacaoResponse obterMapaParaVisualizacao(Subprocesso subprocesso) {
         Mapa mapa = mapaRepo.findFullBySubprocessoCodigo(subprocesso.getCodigo())
                 .orElse(subprocesso.getMapa());
@@ -36,16 +38,13 @@ public class MapaVisualizacaoService {
         }
 
         List<Competencia> competencias = competenciaRepo.findByMapa_Codigo(mapa.getCodigo());
-        
-        Set<Long> atividadesComCompetenciaIds = new HashSet<>();
-        for (Competencia comp : competencias) {
-            for (Atividade ativ : comp.getAtividades()) {
-                atividadesComCompetenciaIds.add(ativ.getCodigo());
-            }
-        }
+        Set<Long> codAtividadesComCompetencia = new HashSet<>();
+        competencias.forEach(comp -> comp.getAtividades().stream()
+                .map(EntidadeBase::getCodigo)
+                .forEach(codAtividadesComCompetencia::add));
 
         List<Atividade> atividadesSemCompetencia = mapa.getAtividades().stream()
-                .filter(a -> !atividadesComCompetenciaIds.contains(a.getCodigo()))
+                .filter(a -> !codAtividadesComCompetencia.contains(a.getCodigo()))
                 .toList();
 
         return MapaVisualizacaoResponse.builder()

@@ -92,6 +92,7 @@ public class ImpactoMapaService {
         List<AtividadeImpactadaDto> inseridas = detectarInseridas(atividadesAtuais, mapaVigentes.keySet());
         List<AtividadeImpactadaDto> removidas = detectarRemovidas(mapaAtuais, atividadesVigentes, atividadeIdToCompetencias);
         List<AtividadeImpactadaDto> alteradas = detectarAlteradas(atividadesAtuais, mapaVigentes, atividadeIdToCompetencias);
+
         List<CompetenciaImpactadaDto> competenciasImpactadas = competenciasImpactadas(
                 competenciasMapa, removidas, alteradas, atividadesVigentes);
 

@@ -241,7 +241,7 @@ class SubprocessoMapaWorkflowServiceTest {
             mapa.setCodigo(10L);
             sp.setMapa(mapa);
             when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(new Competencia()));
-            when(mapaFacade.obterPorCodigo(10L)).thenReturn(mapa);
+            when(mapaFacade.mapaPorCodigo(10L)).thenReturn(mapa);
 
             CompetenciaRequest req = CompetenciaRequest.builder().descricao("D").build();
             service.adicionarCompetencia(1L, req);
@@ -258,7 +258,7 @@ class SubprocessoMapaWorkflowServiceTest {
             mapa.setCodigo(10L);
             sp.setMapa(mapa);
             when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
-            when(mapaFacade.obterPorCodigo(10L)).thenReturn(mapa);
+            when(mapaFacade.mapaPorCodigo(10L)).thenReturn(mapa);
 
             service.removerCompetencia(1L, 5L);
 
@@ -274,7 +274,7 @@ class SubprocessoMapaWorkflowServiceTest {
             mapa.setCodigo(10L);
             sp.setMapa(mapa);
             when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(new Competencia()));
-            when(mapaFacade.obterPorCodigo(10L)).thenReturn(mapa);
+            when(mapaFacade.mapaPorCodigo(10L)).thenReturn(mapa);
 
             service.removerCompetencia(1L, 5L);
 
@@ -290,7 +290,7 @@ class SubprocessoMapaWorkflowServiceTest {
             mapa.setCodigo(10L);
             sp.setMapa(mapa);
             when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
-            when(mapaFacade.obterPorCodigo(10L)).thenReturn(mapa);
+            when(mapaFacade.mapaPorCodigo(10L)).thenReturn(mapa);
 
             service.removerCompetencia(1L, 5L);
 

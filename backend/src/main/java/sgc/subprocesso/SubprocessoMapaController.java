@@ -64,7 +64,7 @@ public class SubprocessoMapaController {
     @JsonView(MapaViews.Publica.class)
     public MapaVisualizacaoResponse obterMapaParaVisualizacao(@PathVariable Long codigo) {
         Subprocesso subprocesso = subprocessoFacade.buscarSubprocesso(codigo);
-        return mapaFacade.obterMapaParaVisualizacao(subprocesso);
+        return mapaFacade.mapaParaVisualizacao(subprocesso);
     }
 
     @PostMapping("/{codigo}/mapa")
@@ -84,7 +84,7 @@ public class SubprocessoMapaController {
     @Transactional(readOnly = true)
     public ResponseEntity<Mapa> obterMapaCompleto(@PathVariable Long codigo) {
         try {
-            Mapa mapa = mapaFacade.obterMapaCompletoPorSubprocesso(codigo);
+            Mapa mapa = mapaFacade.mapaCompletoPorSubprocesso(codigo);
             return ResponseEntity.ok(mapa);
         } catch (Exception e) {
             log.error("Erro ao buscar mapa completo para subprocesso {}: {}", codigo, e.getMessage(), e);

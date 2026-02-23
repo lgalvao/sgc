@@ -60,7 +60,7 @@ public class AtividadeFacade {
     public AtividadeOperacaoResponse criarAtividade(CriarAtividadeRequest request) {
         Long mapaCodigo = request.mapaCodigo();
         Usuario usuario = usuarioService.usuarioAutenticado();
-        Mapa mapa = mapaFacade.obterPorCodigo(mapaCodigo);
+        Mapa mapa = mapaFacade.mapaPorCodigo(mapaCodigo);
 
         Atividade atividadeTemp = Atividade.builder().mapa(mapa).build();
         accessControlService.verificarPermissao(usuario, CRIAR_ATIVIDADE, atividadeTemp);

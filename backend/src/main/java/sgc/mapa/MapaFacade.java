@@ -28,27 +28,26 @@ public class MapaFacade {
     private final MapaVisualizacaoService mapaVisualizacaoService;
     private final ImpactoMapaService impactoMapaService;
 
-    public List<Mapa> listar() {
+    public List<Mapa> todosMapas() {
         return mapaManutencaoService.listarTodosMapas();
     }
 
-    public Mapa obterPorCodigo(Long codigo) {
+    public Mapa mapaPorCodigo(Long codigo) {
         return mapaManutencaoService.buscarMapaPorCodigo(codigo);
     }
 
-    public Mapa obterMapaCompletoPorSubprocesso(Long codSubprocesso) {
+    public Optional<Mapa> mapaPorSubprocesso(Long codSubprocesso) {
+        return mapaManutencaoService.buscarMapaPorSubprocessoCodigo(codSubprocesso);
+    }
+    public Mapa mapaCompletoPorSubprocesso(Long codSubprocesso) {
         return mapaManutencaoService.buscarMapaCompletoPorSubprocesso(codSubprocesso);
     }
 
-    public Optional<Mapa> buscarMapaVigentePorUnidade(Long codigoUnidade) {
+    public Optional<Mapa> mapaVigentePorUnidade(Long codigoUnidade) {
         return mapaManutencaoService.buscarMapaVigentePorUnidade(codigoUnidade);
     }
 
-    public Optional<Mapa> buscarPorSubprocessoCodigo(Long codSubprocesso) {
-        return mapaManutencaoService.buscarMapaPorSubprocessoCodigo(codSubprocesso);
-    }
-
-    public MapaVisualizacaoResponse obterMapaParaVisualizacao(Subprocesso subprocesso) {
+    public MapaVisualizacaoResponse mapaParaVisualizacao(Subprocesso subprocesso) {
         return mapaVisualizacaoService.obterMapaParaVisualizacao(subprocesso);
     }
 

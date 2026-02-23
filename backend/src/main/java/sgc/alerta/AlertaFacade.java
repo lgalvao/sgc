@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaUsuario;
-import sgc.comum.ComumRepo;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.TipoUnidade;
@@ -30,10 +29,47 @@ public class AlertaFacade {
     private final AlertaService alertaService;
     private final UsuarioFacade usuarioService;
     private final OrganizacaoFacade organizacaoFacade;
-    private final ComumRepo comumRepo;
 
     private Unidade unidadeRaiz() {
         return organizacaoFacade.unidadePorCodigo(1L);
+    }
+
+    public List<Alerta> alertasPorUsuario(String usuarioTitulo) {
+        Usuario usuario = usuarioService.buscarPorTitulo(usuarioTitulo);
+        Unidade lotacao = usuario.getUnidadeLotacao();
+
+        List<Alerta> alertasUnidade = alertaService.porUnidadeDestino(lotacao.getCodigo());
+        if (alertasUnidade.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> alertaCodigos = alertasUnidade.stream().map(Alerta::getCodigo).toList();
+        List<AlertaUsuario> leituras = alertaService.alertasUsuarios(usuarioTitulo, alertaCodigos);
+
+        Map<Long, LocalDateTime> mapaLeitura = new HashMap<>();
+        for (AlertaUsuario au : leituras) {
+            mapaLeitura.put(au.getId().getAlertaCodigo(), au.getDataHoraLeitura());
+        }
+
+        for (Alerta alerta : alertasUnidade) {
+            alerta.setDataHoraLeitura(mapaLeitura.get(alerta.getCodigo()));
+        }
+
+        return alertasUnidade;
+    }
+
+    public List<Alerta> listarNaoLidos(String usuarioTitulo) {
+        return alertasPorUsuario(usuarioTitulo).stream()
+                .filter(alerta -> alerta.getDataHoraLeitura() == null)
+                .toList();
+    }
+
+    public Page<Alerta> listarPorUnidade(Long codigoUnidade, Pageable pageable) {
+        return alertaService.porUnidadeDestinoPaginado(codigoUnidade, pageable);
+    }
+
+    public Optional<LocalDateTime> obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
+        return alertaService.dataHoraLeituraAlertaUsuario(codigoAlerta, usuarioTitulo);
     }
 
     @Transactional
@@ -122,56 +158,27 @@ public class AlertaFacade {
                     .usuarioTitulo(usuarioTitulo)
                     .build();
 
-            AlertaUsuario alertaUsuario = alertaService.alertaUsuario(chave).orElseGet(() -> {
-                Alerta alerta = comumRepo.buscar(Alerta.class, codigo);
-                return AlertaUsuario.builder()
+            Optional<AlertaUsuario> optAlertaUsuario = alertaService.alertaUsuario(chave);
+
+            if (optAlertaUsuario.isPresent()) {
+                AlertaUsuario au = optAlertaUsuario.get();
+                if (au.getDataHoraLeitura() == null) {
+                    au.setDataHoraLeitura(agora);
+                    alertaService.salvarAlertaUsuario(au);
+                }
+                continue;
+            }
+
+            alertaService.porCodigo(codigo).ifPresent(alerta -> {
+                AlertaUsuario novo = AlertaUsuario.builder()
                         .id(chave)
                         .alerta(alerta)
                         .usuario(usuario)
                         .dataHoraLeitura(agora)
                         .build();
+                alertaService.salvarAlertaUsuario(novo);
             });
-
-            alertaService.salvarAlertaUsuario(alertaUsuario);
         }
-    }
-
-    public List<Alerta> alertasPorUsuario(String usuarioTitulo) {
-        Usuario usuario = usuarioService.buscarPorTitulo(usuarioTitulo);
-        Unidade lotacao = usuario.getUnidadeLotacao();
-
-        List<Alerta> alertasUnidade = alertaService.porUnidadeDestino(lotacao.getCodigo());
-        if (alertasUnidade.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<Long> alertaCodigos = alertasUnidade.stream().map(Alerta::getCodigo).toList();
-        List<AlertaUsuario> leituras = alertaService.alertasUsuarios(usuarioTitulo, alertaCodigos);
-
-        Map<Long, LocalDateTime> mapaLeitura = new HashMap<>();
-        for (AlertaUsuario au : leituras) {
-            mapaLeitura.put(au.getId().getAlertaCodigo(), au.getDataHoraLeitura());
-        }
-
-        for (Alerta alerta : alertasUnidade) {
-            alerta.setDataHoraLeitura(mapaLeitura.get(alerta.getCodigo()));
-        }
-
-        return alertasUnidade;
-    }
-
-    public List<Alerta> listarNaoLidos(String usuarioTitulo) {
-        return alertasPorUsuario(usuarioTitulo).stream()
-                .filter(alerta -> alerta.getDataHoraLeitura() == null)
-                .toList();
-    }
-
-    public Page<Alerta> listarPorUnidade(Long codigoUnidade, Pageable pageable) {
-        return alertaService.porUnidadeDestinoPaginado(codigoUnidade, pageable);
-    }
-
-    public Optional<LocalDateTime> obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
-        return alertaService.dataHoraLeituraAlertaUsuario(codigoAlerta, usuarioTitulo);
     }
 
     @Transactional

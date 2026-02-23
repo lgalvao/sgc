@@ -48,7 +48,7 @@ class MapaFacadeTest {
         @DisplayName("Deve listar todos os mapas")
         void deveListarMapas() {
             when(mapaManutencaoService.listarTodosMapas()).thenReturn(List.of(new Mapa()));
-            var resultado = facade.listar();
+            var resultado = facade.todosMapas();
             assertThat(resultado).isNotNull().isNotEmpty().hasSize(1);
         }
 
@@ -56,7 +56,7 @@ class MapaFacadeTest {
         @DisplayName("Deve retornar lista vazia quando não há mapas")
         void deveRetornarListaVaziaQuandoNaoHaMapas() {
             when(mapaManutencaoService.listarTodosMapas()).thenReturn(List.of());
-            var resultado = facade.listar();
+            var resultado = facade.todosMapas();
             assertThat(resultado).isNotNull().isEmpty();
         }
 
@@ -64,14 +64,14 @@ class MapaFacadeTest {
         @DisplayName("Deve obter mapa por código")
         void deveObterPorCodigo() {
             when(mapaManutencaoService.buscarMapaPorCodigo(1L)).thenReturn(new Mapa());
-            assertThat(facade.obterPorCodigo(1L)).isNotNull();
+            assertThat(facade.mapaPorCodigo(1L)).isNotNull();
         }
 
         @Test
         @DisplayName("Deve lançar exceção se mapa não encontrado")
         void deveLancarExcecaoSeNaoEncontrado() {
             when(mapaManutencaoService.buscarMapaPorCodigo(1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
-            assertThatThrownBy(() -> facade.obterPorCodigo(1L))
+            assertThatThrownBy(() -> facade.mapaPorCodigo(1L))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
 
@@ -126,7 +126,7 @@ class MapaFacadeTest {
         @DisplayName("Deve buscar mapa vigente por unidade")
         void deveBuscarMapaVigente() {
             when(mapaManutencaoService.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(new Mapa()));
-            var resultado = facade.buscarMapaVigentePorUnidade(1L);
+            var resultado = facade.mapaVigentePorUnidade(1L);
             assertThat(resultado).isPresent().get().isNotNull();
         }
 
@@ -134,7 +134,7 @@ class MapaFacadeTest {
         @DisplayName("Deve buscar por código do subprocesso")
         void deveBuscarPorSubprocesso() {
             when(mapaManutencaoService.buscarMapaPorSubprocessoCodigo(1L)).thenReturn(Optional.of(new Mapa()));
-            var resultado = facade.buscarPorSubprocessoCodigo(1L);
+            var resultado = facade.mapaPorSubprocesso(1L);
             assertThat(resultado).isPresent().get().isNotNull();
         }
     }
@@ -172,7 +172,7 @@ class MapaFacadeTest {
 
             when(mapaVisualizacaoService.obterMapaParaVisualizacao(subprocesso)).thenReturn(expectedResponse);
 
-            var resultado = facade.obterMapaParaVisualizacao(subprocesso);
+            var resultado = facade.mapaParaVisualizacao(subprocesso);
 
             assertThat(resultado).isNotNull().isSameAs(expectedResponse);
             verify(mapaVisualizacaoService).obterMapaParaVisualizacao(subprocesso);
