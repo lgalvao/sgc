@@ -32,6 +32,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -230,6 +231,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                             post(
                                     "/api/subprocessos/{id}/importar-atividades",
                                     subprocessoDestino.getCodigo())
+                                    .with(user(chefe))
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
@@ -254,6 +256,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                             post(
                                     "/api/subprocessos/{id}/importar-atividades",
                                     subprocessoDestino.getCodigo())
+                                    .with(user(chefe))
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
@@ -269,6 +272,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                             post(
                                     "/api/subprocessos/{id}/importar-atividades",
                                     subprocessoDestino.getCodigo())
+                                    .with(user(chefe))
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
@@ -289,6 +293,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                             post(
                                     "/api/subprocessos/{id}/importar-atividades",
                                     subprocessoDestino.getCodigo())
+                                    .with(user(chefe))
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))

@@ -4,10 +4,10 @@ build/
 !gradle-wrapper.jar
 
 # IDE
-!.idea/
+.idea/
 *.iml
 *.iws
-!.settings/
+.settings/
 
 # Node
 frontend/node_modules/
