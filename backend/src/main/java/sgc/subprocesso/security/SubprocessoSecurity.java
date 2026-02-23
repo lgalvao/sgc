@@ -10,6 +10,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.HierarquiaService;
 import sgc.organizacao.service.UnidadeService;
+import sgc.processo.model.SituacaoProcesso;
 import sgc.seguranca.Acao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -136,6 +137,12 @@ public class SubprocessoSecurity {
         if (regras == null) return false;
 
         if (!regras.perfisPermitidos.contains(usuario.getPerfilAtivo())) return false;
+
+        // Visualização de processos finalizados (Histórico/Importação) é permitida para os perfis autorizados
+        if (!isAcaoEscrita(acao) && sp.getProcesso().getSituacao() == SituacaoProcesso.FINALIZADO) {
+            return true;
+        }
+
         if (!regras.situacoesPermitidas.contains(sp.getSituacao())) return false;
 
         // Administrador visualiza tudo (Leitura), mas para escrita segue regra de localização

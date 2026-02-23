@@ -22,6 +22,7 @@ public enum Acao {
     // ========== SUBPROCESSO - CRUD ==========
     LISTAR_SUBPROCESSOS("Listar subprocessos"),
     VISUALIZAR_SUBPROCESSO("Visualizar subprocesso"),
+    CONSULTAR_PARA_IMPORTACAO("Consultar para importação"),
     CRIAR_SUBPROCESSO("Criar subprocesso"),
     EDITAR_SUBPROCESSO("Editar subprocesso"),
     EXCLUIR_SUBPROCESSO("Excluir subprocesso"),

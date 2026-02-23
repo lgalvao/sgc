@@ -15,9 +15,9 @@ Essa dicotomia permite substituir interceptadores de segurança complexos por du
 
 ## Perfis de Acesso
 
-*   **ADMIN**: Administrador do sistema (lotado na unidade raiz - sigla 'ADMIN').
-    *   *Responsabilidades*: Criar e configurar processos, criar/ajustar mapas de competências, homologar cadastros, homologar mapas, homologar diagnósticos.
-    *   *Escopo*: Todo o sistema.
+*   **ADMIN**: Administrador do sistema (lotado, independentemente do real usuário logado, na unidade raiz - sigla 'ADMIN').
+    *   *Responsabilidades*: Criar e iniciar processos, criar/ajustar mapas de competências, homologar cadastros, homologar mapas, homologar diagnósticos, editar configurações do sistema.
+    *   *Escopo*: Todo o sistema, para visualização.
 
 *   **GESTOR**: Responsável por unidade intermediária ou interoperacional (ex: Coordenador).
     *   *Responsabilidades*: Visualizar e validar informações das unidades subordinadas, submeter para análise superior, devolver para ajustes (com ou sem observações).
@@ -33,19 +33,18 @@ Essa dicotomia permite substituir interceptadores de segurança complexos por du
 
 ## Conceito: Localização do Subprocesso
 
-Cada subprocesso pertence a uma **Unidade responsável** (quem executa o trabalho), mas possui uma **Localização atual** (onde o processo está "parado" aguardando uma ação).
+Cada subprocesso pertence a uma **Unidade responsável** (quem executa o trabalho) e possui uma **Localização atual** (onde o processo está "parado" aguardando uma ação).
 
 *   **Unidade responsável**: É a unidade dona do subprocesso (ex: SECAO_111). Define quem tem visibilidade sobre o item e pode cadastrar atividades e conhecimentos para ela (quando o subprocesso estiver na situação pertinente).
-*   **Localização atual**: É a unidade onde o fluxo de trabalho se encontra no momento (ex: SECAO_111, COORD_11, SECRETARIA_1 ADMIN). Define quem pode executar ações de alteração de estado.
 
-A localização muda conforme as ações de envio (Disponibilizar, Aceitar, Devolver etc.). Essencialmente, qualquer ação que gera uma movimenatação muda a localização atual de um subprocesso 
+*   **Localização atual**: É a unidade onde o fluxo de trabalho se encontra no momento (ex: SECAO_111, COORD_11, SECRETARIA_1 ADMIN). Define quem pode executar ações de alteração de estado. A localização muda conforme as ações de envio (Disponibilizar, Aceitar, Devolver etc.). Essencialmente, qualquer ação que gera uma movimentação muda a localização atual de um subprocesso 
 
 ## Regras Gerais de Acesso
 
-O sistema aplica regras distintas para visualizar informações e para executar ações que alteram o estado do processo.
+O sistema aplica regras distintas para visualizar informações e para executar ações que alteram o estado dos processos e subprocessos.
 
 ### 1. Visualização (Leitura)
-A permissão de visualização é baseada na **Hierarquia da Unidade Responsável**. Se você tem permissão sobre a unidade responsável pelo subprocesso, você pode vê-lo, independente de onde ele esteja localizado (com o Chefe ou com o Admin).
+A permissão de visualização é baseada na **Hierarquia da Unidade Responsável**. Se o usuário logado tiver permissão sobre a unidade responsável pelo subprocesso, poderá vê-lo, independentemente de onde o subprocesso esteja localizado.
 
 *   **ADMIN**: Visualiza todos os subprocessos de todas as unidades.
 *   **GESTOR**: Visualiza subprocessos da sua própria unidade e de todas as unidades subordinadas.
@@ -54,7 +53,7 @@ A permissão de visualização é baseada na **Hierarquia da Unidade Responsáve
 ### 2. Execução (Escrita e Movimentação)
 A permissão para alterar dados ou mudar a situação do subprocesso (ex: Homologar, Devolver, Validar) é estritamente baseada na **Localização Atual**.
 
-*   **Regra de Ouro**: O usuário só pode executar ações se o subprocesso estiver **localizado na sua unidade de trabalho atual**.
+*   **Regra de Ouro**: O usuário só pode executar ações se o subprocesso estiver **localizado na sua unidade de trabalho atual** -- mesmo para o perfil ADMIN.
 *   **ADMIN**: O perfil de Administrador **não isenta** o usuário desta regra. Para que um ADMIN possa homologar um cadastro, o cadastro deve ter sido enviado (disponibilizado/aceito) até chegar à unidade do ADMIN (Raiz). O ADMIN não pode intervir em um processo que ainda está localizado na unidade do Chefe.
 
 ## Detalhamento por Caso de Uso (CDU)
@@ -74,8 +73,8 @@ As seções a seguir detalham os atores, pré-condições e ações permitidas p
 *   **Todos**: Visualizar tabela de processos ativos (limitado à hierarquia do usuário) e alertas.
 *   **ADMIN**:
     *   Visualizar processos na situação 'Criado'.
-    *   Clicar no botão `Criar processo` (leva ao CDU-03).
-    *   Clicar em processo 'Criado' para editar (leva ao CDU-03).
+    *   Visualizar/clicar no botão `Criar processo` (leva ao CDU-03).
+    *   Visualizar/clicar em processo 'Criado' para editar (leva ao CDU-03).
 *   **ADMIN/GESTOR**: Clicar em processos 'Em andamento'/'Finalizado' para ver detalhes do processo (CDU-06).
 *   **CHEFE/SERVIDOR**: Clicar em processos 'Em andamento'/'Finalizado' para ver detalhes do subprocesso da própria unidade (CDU-07).
 
