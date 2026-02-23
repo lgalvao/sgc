@@ -406,6 +406,7 @@ export interface AtividadeOperacaoResponse {
     atividade: Atividade | null;
     subprocesso: SubprocessoStatus;
     atividadesAtualizadas: Atividade[];
+    permissoes: PermissoesSubprocesso;
 }
 
 /**

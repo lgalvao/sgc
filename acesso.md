@@ -47,7 +47,6 @@ O sistema aplica regras distintas para visualizar informações e para executar 
 ### 1. Visualização (Leitura)
 A permissão de visualização é baseada na **Hierarquia da Unidade Responsável**. Se você tem permissão sobre a unidade responsável pelo subprocesso, você pode vê-lo, independente de onde ele esteja localizado (com o Chefe ou com o Admin).
 
-*   **Regra de Reuso (Importação)**: Subprocessos de processos na situação **'Finalizado'** podem ser visualizados (leitura) por **qualquer usuário autenticado**, independente de hierarquia, para permitir a importação de atividades (CDU-08).
 *   **ADMIN**: Visualiza todos os subprocessos de todas as unidades.
 *   **GESTOR**: Visualiza subprocessos da sua própria unidade e de todas as unidades subordinadas.
 *   **CHEFE**: Visualiza apenas os subprocessos da sua unidade.

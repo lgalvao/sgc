@@ -38,13 +38,8 @@ public class WithMockAdminSecurityContextFactory
 
         principal.setPerfilAtivo(Perfil.ADMIN);
         
-        // ADMIN geralmente atua em unidades centrais (ex: 100 no data.sql)
-        UsuarioPerfil adminPerfil = atribuicoes.stream()
-                .filter(a -> a.getPerfil() == Perfil.ADMIN)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Usuário 111111111111 não possui perfil de ADMIN no data.sql"));
-
-        principal.setUnidadeAtivaCodigo(adminPerfil.getUnidadeCodigo());
+        // ADMIN atua na unidade raiz (id=1) conforme acesso.md
+        principal.setUnidadeAtivaCodigo(1L);
 
         Set<GrantedAuthority> authorities = Set.of(Perfil.ADMIN.toGrantedAuthority());
         principal.setAuthorities(authorities);

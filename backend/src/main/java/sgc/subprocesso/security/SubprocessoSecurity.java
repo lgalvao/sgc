@@ -143,6 +143,8 @@ public class SubprocessoSecurity {
     }
 
     private boolean canExecuteVerificarImpactos(Usuario usuario, Subprocesso sp) {
+        if (sp.getProcesso().getTipo() != sgc.processo.model.TipoProcesso.REVISAO) return false;
+
         SituacaoSubprocesso situacao = sp.getSituacao();
         Unidade localizacao = obterUnidadeLocalizacao(sp);
 
@@ -164,15 +166,18 @@ public class SubprocessoSecurity {
     }
 
     private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
+        if (sp.getLocalizacaoAtualCache() != null) return sp.getLocalizacaoAtualCache();
+        
         if (sp.getCodigo() == null) return sp.getUnidade();
-        return movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
+        Unidade localizacao = movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
                 .map(m -> m.getUnidadeDestino() != null ? m.getUnidadeDestino() : sp.getUnidade())
                 .orElse(sp.getUnidade());
+        
+        sp.setLocalizacaoAtualCache(localizacao);
+        return localizacao;
     }
 
     private boolean verificaHierarquia(Usuario usuario, Unidade unidade, RequisitoHierarquia requisito) {
-        if (usuario.getPerfilAtivo() == ADMIN && requisito != RequisitoHierarquia.TITULAR_UNIDADE && requisito != RequisitoHierarquia.MESMA_UNIDADE) return true;
-
         return switch (requisito) {
             case NENHUM -> true;
             case MESMA_UNIDADE -> Objects.equals(usuario.getUnidadeAtivaCodigo(), unidade.getCodigo());

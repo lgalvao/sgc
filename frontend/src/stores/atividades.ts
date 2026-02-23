@@ -38,9 +38,12 @@ export const useAtividadesStore = defineStore("atividades", () => {
             atividadesPorSubprocesso.value.set(codSubprocesso, atividades);
         }
         
-        // Atualizar status do subprocesso
+        // Atualizar status e permissões do subprocesso
         const subprocessosStore = useSubprocessosStore();
-        subprocessosStore.atualizarStatusLocal(response.subprocesso);
+        subprocessosStore.atualizarStatusLocal({
+            ...response.subprocesso,
+            permissoes: response.permissoes
+        });
         
     }
 

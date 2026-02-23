@@ -22,6 +22,8 @@ import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
 import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
 
+import sgc.subprocesso.security.SubprocessoSecurity;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -41,6 +43,7 @@ public class SubprocessoFacade {
     private final SubprocessoContextoService contextoService;
     private final SubprocessoFactory subprocessoFactory;
     private final UsuarioFacade usuarioService;
+    private final SubprocessoSecurity subprocessoSecurity;
 
     @Transactional(readOnly = true)
     public Subprocesso buscarSubprocesso(Long codigo) {
@@ -96,6 +99,12 @@ public class SubprocessoFacade {
     @Transactional(readOnly = true)
     public SubprocessoSituacaoDto obterSituacao(Long codigo) {
         return crudService.obterStatus(codigo);
+    }
+
+    @Transactional(readOnly = true)
+    public PermissoesSubprocessoDto obterPermissoesUI(Long codSubprocesso, Usuario usuario) {
+        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
+        return subprocessoSecurity.obterPermissoesUI(usuario, sp);
     }
 
     @Transactional(readOnly = true)

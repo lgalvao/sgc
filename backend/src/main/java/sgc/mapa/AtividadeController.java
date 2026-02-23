@@ -1,6 +1,5 @@
 package sgc.mapa;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.MapaViews;
 import sgc.mapa.service.AtividadeFacade;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 
@@ -36,7 +34,6 @@ public class AtividadeController {
      *         correspondente ou um status
      *         404 Not Found se a atividade não for encontrada.
      */
-    @JsonView(MapaViews.Publica.class)
     @GetMapping("/{codAtividade}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém uma atividade pelo código")
@@ -56,6 +53,7 @@ public class AtividadeController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Cria uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> criar(@Valid @RequestBody CriarAtividadeRequest request) {
+        System.out.println("[Controller] Criando atividade para mapa: " + request.mapaCodigo());
         AtividadeOperacaoResponse resp = atividadeFacade.criarAtividade(request);
 
         URI uri = URI.create("/api/atividades/%d".formatted(resp.atividade().codigo()));
@@ -108,7 +106,6 @@ public class AtividadeController {
      * @return Um {@link ResponseEntity} com status 200 OK e a lista de
      *         {@link Conhecimento}.
      */
-    @JsonView(MapaViews.Publica.class)
     @GetMapping("/{codAtividade}/conhecimentos")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista todos os conhecimentos de uma atividade")

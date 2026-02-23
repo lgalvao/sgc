@@ -52,7 +52,6 @@ public class SubprocessoCrudController {
 
     @GetMapping("/{codigo}")
     @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
-    @JsonView(SubprocessoViews.Publica.class)
     public SubprocessoDetalheResponse obterPorCodigo(@PathVariable Long codigo) {
         return subprocessoFacade.obterDetalhes(codigo);
     }

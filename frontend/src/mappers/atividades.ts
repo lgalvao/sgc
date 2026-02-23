@@ -42,10 +42,11 @@ export function mapSubprocessoSituacaoToModel(dto: SubprocessoSituacaoDto): Subp
 export function mapAtividadeOperacaoResponseToModel(dto: AtividadeOperacaoResponseDto): AtividadeOperacaoResponse {
     return {
         atividade: dto.atividade ? mapAtividadeToModel(dto.atividade) : null,
-        subprocesso: mapSubprocessoSituacaoToModel(dto.subprocesso),
-        atividadesAtualizadas: dto.atividadesAtualizadas
+        subprocesso: mapSubprocessoSituacaoToModel(dto.subprocesso || { codigo: 0, situacao: 'NAO_INICIADO' as any }),
+        atividadesAtualizadas: (dto.atividadesAtualizadas || [])
             .map(mapAtividadeToModel)
             .filter((a): a is Atividade => a !== null),
+        permissoes: dto.permissoes,
     };
 }
 

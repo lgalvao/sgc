@@ -18,5 +18,6 @@ import java.util.List;
 public record AtividadeOperacaoResponse(
         AtividadeDto atividade,
         SubprocessoSituacaoDto subprocesso,
-        List<AtividadeDto> atividadesAtualizadas) {
+        List<AtividadeDto> atividadesAtualizadas,
+        PermissoesSubprocessoDto permissoes) {
 }

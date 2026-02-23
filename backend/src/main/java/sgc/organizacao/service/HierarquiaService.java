@@ -1,6 +1,7 @@
 package sgc.organizacao.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sgc.organizacao.model.ResponsabilidadeRepo;
 import sgc.organizacao.model.Unidade;
@@ -14,6 +15,7 @@ import java.util.Objects;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class HierarquiaService {
     private final ResponsabilidadeRepo responsabilidadeRepo;
 

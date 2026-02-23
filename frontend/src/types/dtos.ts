@@ -123,6 +123,7 @@ export interface AtividadeOperacaoResponseDto {
     atividade: AtividadeDto | null;
     subprocesso: SubprocessoSituacaoDto;
     atividadesAtualizadas: AtividadeDto[];
+    permissoes?: any;
 }
 
 

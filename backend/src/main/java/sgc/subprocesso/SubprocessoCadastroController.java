@@ -52,7 +52,6 @@ public class SubprocessoCadastroController {
 
     @GetMapping("/{codigo}/contexto-edicao")
     @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
-    @JsonView(SubprocessoViews.Publica.class)
     public ResponseEntity<ContextoEdicaoResponse> obterContextoEdicao(@PathVariable Long codigo) {
         return ResponseEntity.ok(subprocessoFacade.obterContextoEdicao(codigo));
     }

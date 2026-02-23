@@ -1,5 +1,6 @@
 package sgc.mapa.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
+import sgc.subprocesso.dto.PermissoesSubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -22,6 +24,7 @@ import static sgc.seguranca.Acao.*;
 
 @Service
 @Transactional
+@Slf4j
 public class AtividadeFacade {
     private final MapaManutencaoService mapaManutencaoService;
     private final SubprocessoFacade subprocessoFacade;
@@ -141,7 +144,11 @@ public class AtividadeFacade {
 
     private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
         SubprocessoSituacaoDto situacaoDto = subprocessoFacade.obterSituacao(codSubprocesso);
+        log.info("[Response] Subprocesso: {}, Situação: {}", situacaoDto.codigo(), situacaoDto.situacao());
+        
         List<AtividadeDto> todasAtividades = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
+        Usuario usuario = usuarioService.obterUsuarioAutenticado();
+        PermissoesSubprocessoDto permissoes = subprocessoFacade.obterPermissoesUI(codSubprocesso, usuario);
 
         AtividadeDto atividadeVis = null;
         if (incluirAtividade) {
@@ -155,6 +162,7 @@ public class AtividadeFacade {
                 .atividade(atividadeVis)
                 .subprocesso(situacaoDto)
                 .atividadesAtualizadas(todasAtividades)
+                .permissoes(permissoes)
                 .build();
     }
 }

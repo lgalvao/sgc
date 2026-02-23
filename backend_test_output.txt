@@ -1,0 +1,168 @@
+Reusing configuration cache.
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+> Task :backend:compileTestJava
+> Task :backend:testClasses
+
+> Task :backend:test
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Não deve importar nada de subprocesso sem atividades FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU08IntegrationTest$ImportacaoAtividades.naoDeveImportarNadaDeSubprocessoSemAtividades(CDU08IntegrationTest.java:288)
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Deve importar atividades e conhecimentos FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU08IntegrationTest$ImportacaoAtividades.deveImportarAtividadesEConhecimentosComSucesso(CDU08IntegrationTest.java:171)
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Deve importar e atualizar status se NAO_INICIADO FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU08IntegrationTest$ImportacaoAtividades.deveImportarEAtualizarStatus(CDU08IntegrationTest.java:228)
+
+CDU-08: Manter cadastro de atividades e conhecimentos > Testes de importação de atividades > Deve importar apenas atividades não existentes no destino FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU08IntegrationTest$ImportacaoAtividades.deveImportarApenasAtividadesNaoExistentesNoDestino(CDU08IntegrationTest.java:312)
+
+CDU-11: Visualizar cadastro de atividades e conhecimentos > Testes de Cenário de Sucesso > Deve permitir que ADMIN visualize o cadastro de qualquer unidade FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU11IntegrationTest$Sucesso.devePermitirAdminVisualizarCadastro(CDU11IntegrationTest.java:153)
+
+CDU-11: Visualizar cadastro de atividades e conhecimentos > Testes de Casos de Borda e Falhas > Deve retornar uma lista de atividades vazia quando o mapa não tem atividades FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU11IntegrationTest$CasosDeBorda.deveRetornarListaVazia_QuandoNaoHaAtividades(CDU11IntegrationTest.java:194)
+
+CDU-11: Visualizar cadastro de atividades e conhecimentos > Testes de Casos de Borda e Falhas > Deve retornar uma atividade com a lista de conhecimentos vazia FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU11IntegrationTest$CasosDeBorda.deveRetornarAtividadeComConhecimentosVazios(CDU11IntegrationTest.java:223)
+
+CDU-18: Visualizar Mapa de Competências > Deve retornar o mapa de competências formatado para visualização FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU18IntegrationTest.deveRetornarMapaParaVisualizacao(CDU18IntegrationTest.java:114)
+
+CDU-16: Ajustar mapa de competências > Deve submeter o mapa ajustado e alterar a situação do subprocesso FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU16IntegrationTest.deveSubmeterMapaAjustadoComSucesso(CDU16IntegrationTest.java:134)
+
+CDU-16: Ajustar mapa de competências > Testes de ajuste do mapa > Deve salvar ajustes no mapa e alterar a situação do subprocesso FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU16IntegrationTest$AjusteDoMapa.deveSalvarAjustesComSucesso(CDU16IntegrationTest.java:172)
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Sucesso > Deve disponibilizar mapa quando todos os dados estão corretos FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU17IntegrationTest$Sucesso.disponibilizarMapa_comDadosValidos_retornaOk(CDU17IntegrationTest.java:158)
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa se houver atividade sem competência associada FAILED
+    java.lang.AssertionError: Status expected:<422> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU17IntegrationTest$Falha.disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest(CDU17IntegrationTest.java:248)
+
+CDU-17: Disponibilizar Mapa de Competências > Testes de Falha > Não deve disponibilizar mapa se houver competência sem atividade associada FAILED
+    java.lang.AssertionError: Status expected:<422> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU17IntegrationTest$Falha.disponibilizarMapa_comCompetenciaNaoAssociada_retornaBadRequest(CDU17IntegrationTest.java:267)
+
+CDU-20: Analisar validação de mapa de competências > ADMIN deve homologar validação do mapa, alterando status para MAPA_HOMOLOGADO e registrando movimentação e alerta FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU20IntegrationTest.testHomologarValidacao_Sucesso(CDU20IntegrationTest.java:262)
+
+CDU-23: Homologar cadastros em bloco > Deve homologar cadastro de múltiplas unidades em bloco FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU23IntegrationTest.homologarCadastroEmBloco_deveHomologarTodasSelecionadas(CDU23IntegrationTest.java:149)
+
+CDU-24: Disponibilizar mapas de competências em bloco > Deve disponibilizar mapas de competências em bloco (sucesso) FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU24IntegrationTest.disponibilizarMapaEmBloco_deveDisponibilizarSucesso(CDU24IntegrationTest.java:159)
+
+CDU-26: Homologar validação de mapas em bloco > Deve homologar validação de mapas em bloco FAILED
+    java.lang.AssertionError: Status expected:<200> but was:<403>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at sgc.integracao.CDU26IntegrationTest.homologarValidacaoEmBloco_deveHomologarSucesso(CDU26IntegrationTest.java:143)
+  Resultado: FAILURE
+  Total:     1338 testes executados
+  + Passou:   1321
+  - Falhou:   17
+  ○ Ignorado: 0
+  Tempo:     33.654s
+
+1338 tests completed, 17 failed
+
+> Task :backend:test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///Users/leonardo/sgc/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 34s
+5 actionable tasks: 2 executed, 3 up-to-date
+Configuration cache entry reused.

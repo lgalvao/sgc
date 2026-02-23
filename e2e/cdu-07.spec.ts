@@ -35,7 +35,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
         await verificarDetalhesSubprocesso(page, {
             sigla: UNIDADE_ALVO,
-            situacao: 'Cadastro em andamento',
+            situacao: 'Não iniciado',
             prazo: '/'
         });
         await expect(page.locator('[data-testid="card-subprocesso-atividades"], [data-testid="card-subprocesso-atividades-vis"]').first()).toBeVisible();
@@ -54,7 +54,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(page).toHaveURL(new RegExp(`/processo/\\d+/${UNIDADE_ALVO}$`));
         await verificarDetalhesSubprocesso(page, {
             sigla: UNIDADE_ALVO,
-            situacao: 'Cadastro em andamento',
+            situacao: 'Não iniciado',
             prazo: '/'
         });
     });

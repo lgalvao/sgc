@@ -149,12 +149,20 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     }
 
     /**
-     * Atualiza o status do subprocesso localmente, sem fazer chamada HTTP.
-     * Usado após operações CRUD que retornam o status atualizado.
+     * Atualiza o status e as permissões do subprocesso localmente, sem fazer chamada HTTP.
+     * Usado após operações CRUD que retornam o status e as permissões atualizadas.
      */
-    function atualizarStatusLocal(status: { codigo: number; situacao: SituacaoSubprocesso }) {
+    function atualizarStatusLocal(status: { 
+        codigo: number; 
+        situacao: SituacaoSubprocesso;
+        permissoes?: any;
+    }) {
         if (subprocessoDetalhe.value) {
-            subprocessoDetalhe.value.situacao = status.situacao;
+            subprocessoDetalhe.value = {
+                ...subprocessoDetalhe.value,
+                situacao: status.situacao,
+                permissoes: status.permissoes || subprocessoDetalhe.value.permissoes
+            };
         }
     }
 
