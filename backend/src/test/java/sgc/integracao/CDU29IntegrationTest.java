@@ -106,7 +106,7 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("GESTOR deve listar apenas processos de sua unidade e subunidades")
-    @WithMockGestor("222222222222") // Unidade 101, subunidade 102
+    @WithMockGestor
     void listarFinalizados_gestor_sucesso() throws Exception {
         mockMvc.perform(get("/api/processos/finalizados").with(csrf()))
                 .andExpect(status().isOk())
@@ -121,7 +121,7 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("CHEFE deve listar apenas processos de sua unidade específica")
-    @WithMockChefe("111111111111") // Unidade 102
+    @WithMockChefe
     void listarFinalizados_chefe_sucesso() throws Exception {
         mockMvc.perform(get("/api/processos/finalizados").with(csrf()))
                 .andExpect(status().isOk())
