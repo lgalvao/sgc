@@ -5,6 +5,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.*;
+import sgc.seguranca.dto.EntrarRequest;
 
 import java.util.Set;
 

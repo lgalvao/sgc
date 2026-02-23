@@ -12,6 +12,7 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.organizacao.service.HierarquiaService;
+import sgc.seguranca.policy.AbstractAccessPolicy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

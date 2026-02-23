@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.dto.AtribuicaoTemporariaDto;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.organizacao.dto.AtribuicaoDto;
+import sgc.organizacao.dto.CriarAtribuicaoRequest;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.TipoUnidade;
@@ -87,11 +87,11 @@ public class UnidadeFacade {
         unidadeService.definirMapaVigente(codigoUnidade, mapa);
     }
 
-    public List<AtribuicaoTemporariaDto> buscarTodasAtribuicoes() {
+    public List<AtribuicaoDto> buscarTodasAtribuicoes() {
         return responsavelService.buscarTodasAtribuicoes();
     }
 
-    public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoTemporariaRequest request) {
+    public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoRequest request) {
         responsavelService.criarAtribuicaoTemporaria(codUnidade, request);
     }
 
@@ -118,28 +118,28 @@ public class UnidadeFacade {
         return unidadeService.buscarPorSigla(sigla);
     }
 
-    public UnidadeDto buscarPorCodigo(Long codigo) {
-        Unidade unidade = buscarEntidadePorId(codigo);
+    public UnidadeDto dtoPorCodigo(Long codigo) {
+        Unidade unidade = porCodigo(codigo);
         return UnidadeDto.fromEntity(unidade);
     }
 
-    public Unidade buscarEntidadePorId(Long codigo) {
+    public Unidade porCodigo(Long codigo) {
         return unidadeService.buscarPorId(codigo);
     }
 
-    public List<Unidade> buscarEntidadesPorIds(List<Long> codigos) {
-        return unidadeService.buscarEntidadesPorIds(codigos);
+    public List<Unidade> porCodigos(List<Long> codigos) {
+        return unidadeService.porCodigos(codigos);
     }
 
     public List<Unidade> buscarTodasEntidadesComHierarquia() {
-        return unidadeService.buscarTodasEntidadesComHierarquia();
+        return unidadeService.todasComHierarquia();
     }
 
-    public List<String> buscarSiglasPorIds(List<Long> codigos) {
+    public List<String> siglasUnidadesPorCodigos(List<Long> codigos) {
         return unidadeService.buscarSiglasPorIds(codigos);
     }
 
-    public List<Usuario> buscarUsuariosPorUnidade(Long codigoUnidade) {
+    public List<Usuario> todosPorCodigoUnidade(Long codigoUnidade) {
         return usuarioService.buscarPorUnidadeLotacao(codigoUnidade);
     }
 

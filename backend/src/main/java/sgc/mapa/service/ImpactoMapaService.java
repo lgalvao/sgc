@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaResponse;
@@ -65,14 +65,12 @@ public class ImpactoMapaService {
      * @param usuario O usuário autenticado que realiza a operação.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso ou seu mapa não forem
      *                                   encontrados.
-     * @throws ErroAcessoNegado         se o usuário não tiver permissão para
+     * @throws ErroAcessoNegado          se o usuário não tiver permissão para
      *                                   executar a operação na
      *                                   situação atual do subprocesso.
      */
     @Transactional(readOnly = true)
     public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
-
-        // Verificação centralizada de acesso
         accessControlService.verificarPermissao(usuario, VERIFICAR_IMPACTOS, subprocesso);
 
         Optional<Mapa> mapaVigenteOpt = mapaRepo.findMapaVigenteByUnidade(subprocesso.getUnidade().getCodigo());
@@ -82,28 +80,18 @@ public class ImpactoMapaService {
         }
 
         Mapa mapaVigente = mapaVigenteOpt.get();
-
         Mapa mapaSubprocesso = repo.buscar(Mapa.class, "subprocesso.codigo", subprocesso.getCodigo());
-
         List<Atividade> atividadesAtuais = obterAtividadesDoMapa(mapaSubprocesso);
         List<Atividade> atividadesVigentes = obterAtividadesDoMapa(mapaVigente);
-
         List<Competencia> competenciasMapa = competenciaRepo.findByMapa_Codigo(mapaVigente.getCodigo());
 
         Map<Long, List<Competencia>> atividadeIdToCompetencias = construirMapaAtividadeCompetencias(competenciasMapa);
-
         Map<String, Atividade> mapaVigentes = atividadesPorDescricao(atividadesVigentes);
         Map<String, Atividade> mapaAtuais = atividadesPorDescricao(atividadesAtuais);
 
-        List<AtividadeImpactadaDto> inseridas = detectarInseridas(
-                atividadesAtuais, mapaVigentes.keySet());
-
-        List<AtividadeImpactadaDto> removidas = detectarRemovidas(
-                mapaAtuais, atividadesVigentes, atividadeIdToCompetencias);
-
-        List<AtividadeImpactadaDto> alteradas = detectarAlteradas(
-                atividadesAtuais, mapaVigentes, atividadeIdToCompetencias);
-
+        List<AtividadeImpactadaDto> inseridas = detectarInseridas(atividadesAtuais, mapaVigentes.keySet());
+        List<AtividadeImpactadaDto> removidas = detectarRemovidas(mapaAtuais, atividadesVigentes, atividadeIdToCompetencias);
+        List<AtividadeImpactadaDto> alteradas = detectarAlteradas(atividadesAtuais, mapaVigentes, atividadeIdToCompetencias);
         List<CompetenciaImpactadaDto> competenciasImpactadas = competenciasImpactadas(
                 competenciasMapa, removidas, alteradas, atividadesVigentes);
 
@@ -238,7 +226,7 @@ public class ImpactoMapaService {
     }
 
     private List<String> obterNomesCompetencias(Long codigoAtividade,
-            Map<Long, List<Competencia>> atividadeIdToCompetencias) {
+                                                Map<Long, List<Competencia>> atividadeIdToCompetencias) {
         return atividadeIdToCompetencias.getOrDefault(codigoAtividade, List.of())
                 .stream()
                 .map(Competencia::getDescricao)
@@ -257,20 +245,14 @@ public class ImpactoMapaService {
 
         Map<Long, CompetenciaImpactoAcumulador> mapaImpactos = new HashMap<>();
 
-        // Indexar competências por ID da atividade
         Map<Long, List<Competencia>> atividadeIdToCompetencias = construirMapaAtividadeCompetencias(competenciasDoMapa);
-
-        // Indexar IDs das atividades vigentes por descrição para lookup rápido
         Map<String, Long> descricaoToVigenteId = atividadesVigentes.stream()
                 .collect(Collectors.toMap(
-                        Atividade::getDescricao, 
+                        Atividade::getDescricao,
                         Atividade::getCodigo,
                         (existing, replacement) -> existing));
 
-        // Processar Atividades Removidas
         processarRemovidas(removidas, atividadeIdToCompetencias, mapaImpactos);
-
-        // Processar Atividades Alteradas
         processarAlteradas(alteradas, descricaoToVigenteId, atividadeIdToCompetencias, mapaImpactos);
 
         return mapaImpactos.values().stream()

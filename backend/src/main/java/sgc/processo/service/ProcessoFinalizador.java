@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
@@ -18,7 +18,6 @@ import sgc.subprocesso.service.query.ConsultasSubprocessoService;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Serviço responsável pela finalização de processos.
@@ -35,7 +34,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-class ProcessoFinalizador {
+public class ProcessoFinalizador {
 
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
@@ -54,9 +53,8 @@ class ProcessoFinalizador {
     @Transactional
     public void finalizar(Long codigo) {
         Processo processo = repo.buscar(Processo.class, codigo);
-
         processoValidador.validarFinalizacaoProcesso(processo);
-        
+
         if (processo.getTipo() != TipoProcesso.DIAGNOSTICO) {
             tornarMapasVigentes(processo);
         }
@@ -65,9 +63,7 @@ class ProcessoFinalizador {
         processo.setDataFinalizacao(LocalDateTime.now());
 
         processoRepo.save(processo);
-
-        // Notificar diretamente (sem evento assíncrono)
-        notificacaoService.notificarFinalizacaoProcesso(processo.getCodigo());
+        notificacaoService.emailFinalizacaoProcesso(processo.getCodigo());
 
         log.info("Processo {} finalizado", codigo);
     }
@@ -83,15 +79,9 @@ class ProcessoFinalizador {
         List<Subprocesso> subprocessos = queryService.listarEntidadesPorProcesso(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
-            Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
-                    .orElseThrow(() -> new ErroProcesso(
-                            "Subprocesso %d sem unidade associada.".formatted(subprocesso.getCodigo())));
-
-            Mapa mapaDoSubprocesso = Optional.ofNullable(subprocesso.getMapa())
-                    .orElseThrow(() -> new ErroProcesso(
-                            "Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
-
-            unidadeService.definirMapaVigente(unidade.getCodigo(), mapaDoSubprocesso);
+            Unidade unidade = subprocesso.getUnidade();
+            Mapa mapa = subprocesso.getMapa();
+            unidadeService.definirMapaVigente(unidade.getCodigo(), mapa);
         }
         log.info("Mapa(s) de {} subprocesso(s) definidos como vigentes.", subprocessos.size());
     }

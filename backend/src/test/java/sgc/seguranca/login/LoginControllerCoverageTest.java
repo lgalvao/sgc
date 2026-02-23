@@ -11,7 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import sgc.organizacao.OrganizacaoFacade;
-import sgc.seguranca.login.dto.AutenticarRequest;
+import sgc.seguranca.LoginFacade;
+import sgc.seguranca.dto.AutenticarRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;

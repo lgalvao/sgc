@@ -11,11 +11,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.organizacao.dto.CriarAtribuicaoRequest;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.processo.service.ProcessoFacade;
+import sgc.processo.ProcessoFacade;
 
 import java.util.Collections;
 import java.util.List;
@@ -64,7 +64,7 @@ class UnidadeControllerTest {
                 .andExpect(status().isCreated());
 
         verify(unidadeService)
-                .criarAtribuicaoTemporaria(eq(1L), any(CriarAtribuicaoTemporariaRequest.class));
+                .criarAtribuicaoTemporaria(eq(1L), any(CriarAtribuicaoRequest.class));
     }
 
     @Test
@@ -142,7 +142,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornarUnidadePorId() throws Exception {
         // Arrange
-        when(unidadeService.buscarPorCodigo(1L)).thenReturn(UnidadeDto.builder().build());
+        when(unidadeService.dtoPorCodigo(1L)).thenReturn(UnidadeDto.builder().build());
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/1")).andExpect(status().isOk());

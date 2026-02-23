@@ -7,8 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
-import sgc.comum.repo.ComumRepo;
-import sgc.notificacao.NotificacaoEmailService;
+import sgc.comum.ComumRepo;
+import sgc.notificacao.EmailService;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
@@ -36,7 +36,7 @@ class SubprocessoAdminWorkflowServiceTest {
     @Mock
     private AlertaFacade alertaService;
     @Mock
-    private NotificacaoEmailService notificacaoEmailService;
+    private EmailService emailService;
     @Mock
     private ComumRepo repo;
 
@@ -60,7 +60,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
         verify(subprocessoRepo).save(sp);
         assertEquals(novaData.atStartOfDay(), sp.getDataLimiteEtapa1());
-        verify(notificacaoEmailService).enviarEmail(anyString(), eq("SGC: Data limite alterada"), contains("foi alterada para"));
+        verify(emailService).enviarEmail(anyString(), eq("SGC: Data limite alterada"), contains("foi alterada para"));
         verify(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), any(), eq(1));
     }
 
@@ -84,7 +84,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
         verify(subprocessoRepo).save(sp);
         assertEquals(novaData.atStartOfDay(), sp.getDataLimiteEtapa1());
-        verify(notificacaoEmailService).enviarEmail(anyString(), eq("SGC: Data limite alterada"), contains("foi alterada para"));
+        verify(emailService).enviarEmail(anyString(), eq("SGC: Data limite alterada"), contains("foi alterada para"));
         verify(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), any(), eq(1));
     }
 
@@ -108,7 +108,7 @@ class SubprocessoAdminWorkflowServiceTest {
 
         verify(subprocessoRepo).save(sp);
         assertEquals(novaData.atStartOfDay(), sp.getDataLimiteEtapa2());
-        verify(notificacaoEmailService).enviarEmail(anyString(), eq("SGC: Data limite alterada"), contains("foi alterada para"));
+        verify(emailService).enviarEmail(anyString(), eq("SGC: Data limite alterada"), contains("foi alterada para"));
         verify(alertaService).criarAlertaAlteracaoDataLimite(any(), any(), any(), eq(2));
     }
 

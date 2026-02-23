@@ -18,7 +18,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.model.UnidadeProcesso;
-import sgc.processo.service.ProcessoFacade;
+import sgc.processo.ProcessoFacade;
 import sgc.testutils.UnidadeTestBuilder;
 
 import java.time.LocalDateTime;
@@ -84,7 +84,7 @@ class PainelFacadeTest {
 
         when(unidadeFacade.buscarMapaHierarquia()).thenReturn(new HashMap<>());
         when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class))).thenReturn(page);
-        when(unidadeFacade.buscarPorCodigo(100L)).thenThrow(new RuntimeException("Erro"));
+        when(unidadeFacade.dtoPorCodigo(100L)).thenThrow(new RuntimeException("Erro"));
 
         PageRequest pageRequest = PageRequest.of(0, 10);
         assertThatThrownBy(() -> painelFacade.listarProcessos(Perfil.CHEFE, 100L, pageRequest))

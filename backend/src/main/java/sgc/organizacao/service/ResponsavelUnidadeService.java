@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.ComumRepo;
-import sgc.organizacao.dto.AtribuicaoTemporariaDto;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.comum.ComumRepo;
+import sgc.organizacao.dto.AtribuicaoDto;
+import sgc.organizacao.dto.CriarAtribuicaoRequest;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.*;
 
@@ -42,15 +42,15 @@ public class ResponsavelUnidadeService {
      *
      * @return lista de DTOs de atribuições temporárias
      */
-    public List<AtribuicaoTemporariaDto> buscarTodasAtribuicoes() {
+    public List<AtribuicaoDto> buscarTodasAtribuicoes() {
         return atribuicaoTemporariaRepo.findAll().stream()
                 .map(this::toAtribuicaoTemporariaDto)
                 .toList();
     }
 
-    private AtribuicaoTemporariaDto toAtribuicaoTemporariaDto(AtribuicaoTemporaria a) {
+    private AtribuicaoDto toAtribuicaoTemporariaDto(AtribuicaoTemporaria a) {
         Usuario usuario = repo.buscar(Usuario.class, a.getUsuarioTitulo());
-        return AtribuicaoTemporariaDto.builder()
+        return AtribuicaoDto.builder()
                 .codigo(a.getCodigo())
                 .unidadeCodigo(a.getUnidade().getCodigo())
                 .unidadeSigla(a.getUnidade().getSigla())
@@ -68,7 +68,7 @@ public class ResponsavelUnidadeService {
      * @param request    dados da atribuição (usuário, datas, justificativa)
      * @throws ErroValidacao se a data de término for anterior à data de início
      */
-    public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoTemporariaRequest request) {
+    public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoRequest request) {
         Unidade unidade = repo.buscar(Unidade.class, codUnidade);
 
         String titulo = request.tituloEleitoralUsuario();

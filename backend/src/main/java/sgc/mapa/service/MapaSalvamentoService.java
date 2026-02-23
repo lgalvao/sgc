@@ -6,7 +6,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.*;
 import sgc.seguranca.sanitizacao.UtilSanitizacao;

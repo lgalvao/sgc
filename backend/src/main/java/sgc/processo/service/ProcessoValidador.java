@@ -38,14 +38,14 @@ class ProcessoValidador {
             return Optional.empty();
         }
 
-        List<Unidade> unidades = unidadeService.buscarEntidadesPorIds(codigosUnidades);
+        List<Unidade> unidades = unidadeService.porCodigos(codigosUnidades);
         List<Long> unidadesSemMapa = unidades.stream()
                 .map(Unidade::getCodigo)
                 .filter(codigo -> !unidadeService.verificarMapaVigente(codigo))
                 .toList();
 
         if (!unidadesSemMapa.isEmpty()) {
-            List<String> siglasUnidadesSemMapa = unidadeService.buscarSiglasPorIds(unidadesSemMapa);
+            List<String> siglasUnidadesSemMapa = unidadeService.siglasUnidadesPorCodigos(unidadesSemMapa);
             return Optional.of(("As seguintes unidades não possuem mapa vigente e não podem participar"
                     + " de um processo de revisão: %s").formatted(String.join(", ", siglasUnidadesSemMapa)));
         }

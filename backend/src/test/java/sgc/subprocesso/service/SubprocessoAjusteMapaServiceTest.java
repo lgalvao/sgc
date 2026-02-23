@@ -12,7 +12,7 @@ import sgc.analise.AnaliseFacade;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
@@ -45,7 +45,6 @@ import static org.mockito.Mockito.*;
 @DisplayName("SubprocessoAjusteMapaService")
 @ExtendWith(MockitoExtension.class)
 class SubprocessoAjusteMapaServiceTest {
-
     @Mock
     private SubprocessoRepo subprocessoRepo;
     

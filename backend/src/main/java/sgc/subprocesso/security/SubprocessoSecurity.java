@@ -63,14 +63,14 @@ public class SubprocessoSecurity {
             Map.entry(REABRIR_REVISAO, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.allOf(SituacaoSubprocesso.class), RequisitoHierarquia.NENHUM)),
             Map.entry(ENVIAR_LEMBRETE_PROCESSO, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.allOf(SituacaoSubprocesso.class), RequisitoHierarquia.NENHUM)),
 
-            // ========== CADASTRO ==========
-            Map.entry(EDITAR_CADASTRO, new RegrasAcao(EnumSet.of(CHEFE), EnumSet.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO), RequisitoHierarquia.MESMA_UNIDADE)),
+            // ========== CADASTRO (Atua sobre Mapeamento e Revisão quando a ação é genérica) ==========
+            Map.entry(EDITAR_CADASTRO, new RegrasAcao(EnumSet.of(CHEFE), EnumSet.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO), RequisitoHierarquia.MESMA_UNIDADE)),
             Map.entry(DISPONIBILIZAR_CADASTRO, new RegrasAcao(EnumSet.of(CHEFE), EnumSet.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO), RequisitoHierarquia.TITULAR_UNIDADE)),
-            Map.entry(DEVOLVER_CADASTRO, new RegrasAcao(EnumSet.of(ADMIN, GESTOR), EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO), RequisitoHierarquia.MESMA_UNIDADE)),
-            Map.entry(ACEITAR_CADASTRO, new RegrasAcao(EnumSet.of(GESTOR), EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO), RequisitoHierarquia.MESMA_UNIDADE)),
-            Map.entry(HOMOLOGAR_CADASTRO, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO), RequisitoHierarquia.MESMA_UNIDADE)),
+            Map.entry(DEVOLVER_CADASTRO, new RegrasAcao(EnumSet.of(ADMIN, GESTOR), EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO, REVISAO_CADASTRO_DISPONIBILIZADA), RequisitoHierarquia.MESMA_UNIDADE)),
+            Map.entry(ACEITAR_CADASTRO, new RegrasAcao(EnumSet.of(GESTOR), EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO, REVISAO_CADASTRO_DISPONIBILIZADA), RequisitoHierarquia.MESMA_UNIDADE)),
+            Map.entry(HOMOLOGAR_CADASTRO, new RegrasAcao(EnumSet.of(ADMIN), EnumSet.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO, REVISAO_CADASTRO_DISPONIBILIZADA), RequisitoHierarquia.MESMA_UNIDADE)),
 
-            // ========== REVISÃO CADASTRO ==========
+            // ========== REVISÃO CADASTRO (Ações específicas de revisão) ==========
             Map.entry(EDITAR_REVISAO_CADASTRO, new RegrasAcao(EnumSet.of(CHEFE), EnumSet.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO), RequisitoHierarquia.MESMA_UNIDADE)),
             Map.entry(DISPONIBILIZAR_REVISAO_CADASTRO, new RegrasAcao(EnumSet.of(CHEFE), EnumSet.of(REVISAO_CADASTRO_EM_ANDAMENTO), RequisitoHierarquia.TITULAR_UNIDADE)),
             Map.entry(DEVOLVER_REVISAO_CADASTRO, new RegrasAcao(EnumSet.of(ADMIN, GESTOR), EnumSet.of(REVISAO_CADASTRO_DISPONIBILIZADA), RequisitoHierarquia.MESMA_UNIDADE)),
@@ -137,6 +137,11 @@ public class SubprocessoSecurity {
 
         if (!regras.perfisPermitidos.contains(usuario.getPerfilAtivo())) return false;
         if (!regras.situacoesPermitidas.contains(sp.getSituacao())) return false;
+
+        // Administrador visualiza tudo (Leitura), mas para escrita segue regra de localização
+        if (usuario.getPerfilAtivo() == Perfil.ADMIN && !isAcaoEscrita(acao)) {
+            return true;
+        }
 
         Unidade unidadeVerificacao = isAcaoEscrita(acao) ? obterUnidadeLocalizacao(sp) : sp.getUnidade();
         return verificaHierarquia(usuario, unidadeVerificacao, regras.requisitoHierarquia);

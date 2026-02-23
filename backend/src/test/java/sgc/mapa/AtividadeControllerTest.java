@@ -17,10 +17,9 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
+import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.service.AtividadeFacade;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 

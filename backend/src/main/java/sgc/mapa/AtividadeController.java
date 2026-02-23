@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
-import sgc.mapa.service.AtividadeFacade;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 
 import java.net.URI;

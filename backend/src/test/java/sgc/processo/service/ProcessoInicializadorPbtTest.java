@@ -1,7 +1,7 @@
 package sgc.processo.service;
 
 import net.jqwik.api.*;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;

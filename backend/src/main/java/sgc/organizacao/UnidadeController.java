@@ -10,13 +10,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
-import sgc.organizacao.dto.AtribuicaoTemporariaDto;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.organizacao.dto.AtribuicaoDto;
+import sgc.organizacao.dto.CriarAtribuicaoRequest;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.OrganizacaoViews;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoFacade;
+import sgc.processo.ProcessoFacade;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +36,7 @@ public class UnidadeController {
     @PostMapping("/{codUnidade}/atribuicoes-temporarias")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> criarAtribuicaoTemporaria(
-            @PathVariable Long codUnidade, @Valid @RequestBody CriarAtribuicaoTemporariaRequest request) {
+            @PathVariable Long codUnidade, @Valid @RequestBody CriarAtribuicaoRequest request) {
 
         unidadeService.criarAtribuicaoTemporaria(codUnidade, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -44,7 +44,7 @@ public class UnidadeController {
 
     @GetMapping("/atribuicoes")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<AtribuicaoTemporariaDto>> buscarTodasAtribuicoes() {
+    public ResponseEntity<List<AtribuicaoDto>> buscarTodasAtribuicoes() {
         return ResponseEntity.ok(unidadeService.buscarTodasAtribuicoes());
     }
 
@@ -80,7 +80,7 @@ public class UnidadeController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<List<Usuario>> buscarUsuariosPorUnidade(@PathVariable Long codUnidade) {
-        List<Usuario> usuarios = unidadeService.buscarEntidadesUsuariosPorUnidade(codUnidade);
+        List<Usuario> usuarios = unidadeService.todosPorCodigoUnidade(codUnidade);
         return ResponseEntity.ok(usuarios);
     }
 
@@ -95,7 +95,7 @@ public class UnidadeController {
     @GetMapping("/{codigo}")
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarUnidadePorCodigo(@PathVariable Long codigo) {
-        UnidadeDto unidade = unidadeService.buscarPorCodigo(codigo);
+        UnidadeDto unidade = unidadeService.dtoPorCodigo(codigo);
         return ResponseEntity.ok(unidade);
     }
 

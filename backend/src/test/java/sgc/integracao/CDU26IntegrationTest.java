@@ -109,8 +109,8 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
         Long codigoContexto = processo.getCodigo();
         List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
-        // Garante que os subprocessos estejam na unidade do ADMIN (100)
-        Unidade adminUnit = unidadeRepo.findById(100L).orElseThrow();
+        // Garante que os subprocessos estejam na unidade do ADMIN (1)
+        Unidade adminUnit = unidadeRepo.findById(1L).orElseThrow();
         Movimentacao movAdmin1 = Movimentacao.builder()
                 .subprocesso(subprocesso1)
                 .unidadeOrigem(unidade1)

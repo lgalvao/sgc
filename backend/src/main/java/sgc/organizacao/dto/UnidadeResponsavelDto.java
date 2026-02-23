@@ -5,7 +5,6 @@ import lombok.Builder;
 /**
  * DTO para dados de responsável (titular/substituto) de uma unidade.
  */
-@SuppressWarnings("unused")
 @Builder
 public record UnidadeResponsavelDto(
         Long unidadeCodigo,

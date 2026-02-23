@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.thymeleaf.TemplateEngine;
-import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.EmailService;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 class SubprocessoEmailServiceTest {
 
     @Mock
-    private NotificacaoEmailService notificacaoEmailService;
+    private EmailService emailService;
     @Mock
     private TemplateEngine templateEngine;
     @Mock
@@ -53,7 +53,7 @@ class SubprocessoEmailServiceTest {
 
         service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DEVOLVIDO, new Unidade(), dest, "Motivo");
 
-        verify(notificacaoEmailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), anyString(), eq("html"));
+        verify(emailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), anyString(), eq("html"));
     }
 
     @Test
@@ -79,7 +79,7 @@ class SubprocessoEmailServiceTest {
         service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, origem, destino, null);
 
         // Verifica envio para superior
-        verify(notificacaoEmailService).enviarEmailHtml(eq("sup@tre-pe.jus.br"), anyString(), eq("html"));
+        verify(emailService).enviarEmailHtml(eq("sup@tre-pe.jus.br"), anyString(), eq("html"));
     }
 
     @Test
@@ -102,7 +102,7 @@ class SubprocessoEmailServiceTest {
     void naoEnviaSeTipoNaoExige() {
         service.enviarEmailTransicaoDireta(null, TipoTransicao.CADASTRO_HOMOLOGADO, null, null, null);
 
-        verifyNoInteractions(notificacaoEmailService);
+        verifyNoInteractions(emailService);
         verifyNoInteractions(templateEngine);
     }
 
@@ -113,7 +113,7 @@ class SubprocessoEmailServiceTest {
         
         service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, null, null, null);
 
-        verifyNoInteractions(notificacaoEmailService);
+        verifyNoInteractions(emailService);
     }
 
     @Test
@@ -128,7 +128,7 @@ class SubprocessoEmailServiceTest {
         service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, null, destino, null);
 
         // Logs error because variable creation fails with null origin, so no email sent
-        verifyNoInteractions(notificacaoEmailService);
+        verifyNoInteractions(emailService);
     }
 
     @Test
@@ -152,13 +152,13 @@ class SubprocessoEmailServiceTest {
 
         when(templateEngine.process(anyString(), any())).thenReturn("html");
 
-        doNothing().when(notificacaoEmailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), anyString(), any());
-        doThrow(new RuntimeException("Fail")).when(notificacaoEmailService).enviarEmailHtml(eq("sup@tre-pe.jus.br"), anyString(), any());
+        doNothing().when(emailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), anyString(), any());
+        doThrow(new RuntimeException("Fail")).when(emailService).enviarEmailHtml(eq("sup@tre-pe.jus.br"), anyString(), any());
 
         service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, origem, destino, null);
 
-        verify(notificacaoEmailService).enviarEmailHtml(eq("sup@tre-pe.jus.br"), anyString(), any());
-        verify(notificacaoEmailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("sup@tre-pe.jus.br"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), anyString(), any());
     }
 
     @Test
@@ -171,7 +171,7 @@ class SubprocessoEmailServiceTest {
         Unidade orig = new Unidade(); orig.setSigla("O");
         Unidade dest = new Unidade(); dest.setSigla("D");
         service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, orig, dest, null);
-        verify(notificacaoEmailService).enviarEmailHtml(eq("d@tre-pe.jus.br"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("d@tre-pe.jus.br"), anyString(), any());
     }
 
     @Test
@@ -215,7 +215,7 @@ class SubprocessoEmailServiceTest {
         service.enviarEmailTransicaoDireta(sp, TipoTransicao.PROCESSO_INICIADO, new Unidade(), dest, null);
 
         // Verifica que enviou email com assunto formatado pelo default do switch
-        verify(notificacaoEmailService).enviarEmailHtml(any(),
+        verify(emailService).enviarEmailHtml(any(),
                 argThat(s -> s != null && s.contains("SGC: Notificação - Processo iniciado")),
                 any());
     }
@@ -242,7 +242,7 @@ class SubprocessoEmailServiceTest {
 
         service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
 
-        verify(notificacaoEmailService).enviarEmailHtml(eq("sub@teste.com"), anyString(), eq("html"));
+        verify(emailService).enviarEmailHtml(eq("sub@teste.com"), anyString(), eq("html"));
     }
 
     @Test
@@ -268,8 +268,8 @@ class SubprocessoEmailServiceTest {
         service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
 
         // Verifica envio para a unidade (padrão), mas NÃO para o substituto
-        verify(notificacaoEmailService, times(1)).enviarEmailHtml(anyString(), anyString(), anyString());
-        verify(notificacaoEmailService, never()).enviarEmailHtml(eq(""), anyString(), anyString());
+        verify(emailService, times(1)).enviarEmailHtml(anyString(), anyString(), anyString());
+        verify(emailService, never()).enviarEmailHtml(eq(""), anyString(), anyString());
     }
 
     @Test
@@ -286,7 +286,7 @@ class SubprocessoEmailServiceTest {
         service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
 
         // Apenas o email da unidade deve ser enviado
-        verify(notificacaoEmailService, times(1)).enviarEmailHtml(anyString(), anyString(), anyString());
+        verify(emailService, times(1)).enviarEmailHtml(anyString(), anyString(), anyString());
     }
 
     private Subprocesso criarSubprocesso() {

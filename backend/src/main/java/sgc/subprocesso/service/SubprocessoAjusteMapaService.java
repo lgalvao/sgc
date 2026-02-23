@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;

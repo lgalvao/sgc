@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.EmailService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class EmailIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private NotificacaoEmailService emailService;
+    private EmailService emailService;
 
     @Test
     @DisplayName("Deve enviar e-mail real para o servidor local GreenMail e permitir verificação")

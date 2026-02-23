@@ -22,7 +22,7 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoFacade;
+import sgc.processo.ProcessoFacade;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;

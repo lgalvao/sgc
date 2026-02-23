@@ -1,11 +1,11 @@
 package sgc.mapa.service;
 
 import net.jqwik.api.*;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.dto.CriarConhecimentoRequest;
-import sgc.mapa.mapper.AtividadeMapper;
-import sgc.mapa.mapper.ConhecimentoMapper;
+import sgc.mapa.dto.AtividadeMapper;
+import sgc.mapa.dto.ConhecimentoMapper;
 import sgc.mapa.model.*;
 import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
 

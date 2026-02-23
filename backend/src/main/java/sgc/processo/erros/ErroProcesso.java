@@ -8,7 +8,6 @@ import sgc.comum.erros.ErroNegocioBase;
  * especialmente em validações de estado e transições de processos.
  */
 public class ErroProcesso extends ErroNegocioBase {
-
     public ErroProcesso(String message) {
         super(message, "ERRO_PROCESSO", HttpStatus.CONFLICT);
     }

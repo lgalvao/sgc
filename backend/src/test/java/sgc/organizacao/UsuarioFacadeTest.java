@@ -55,7 +55,7 @@ class UsuarioFacadeTest {
             Usuario usuario = criarUsuario(titulo);
             
             configurarAutenticacao(titulo);
-            when(usuarioService.buscarPorIdComAtribuicoes(titulo)).thenReturn(usuario);
+            when(usuarioService.buscarComAtribuicoes(titulo)).thenReturn(usuario);
 
             // Act
             Usuario resultado = facade.obterUsuarioAutenticado();
@@ -105,7 +105,7 @@ class UsuarioFacadeTest {
             unidadeInativa.setSituacao(SituacaoUnidade.INATIVA);
             UsuarioPerfil atribuicao = criarAtribuicao(usuario, unidadeInativa, Perfil.CHEFE);
 
-            when(usuarioService.buscarPorIdComAtribuicoesOpcional(titulo))
+            when(usuarioService.buscarComAtribuicoesOpt(titulo))
                     .thenReturn(Optional.of(usuario));
             when(usuarioService.buscarPerfis(titulo))
                     .thenReturn(List.of(atribuicao));
@@ -143,7 +143,7 @@ class UsuarioFacadeTest {
             String titulo = "123456";
             Usuario usuario = criarUsuario(titulo);
             
-            when(usuarioService.buscarPorIdComAtribuicoesOpcional(titulo))
+            when(usuarioService.buscarComAtribuicoesOpt(titulo))
                     .thenReturn(Optional.of(usuario));
 
             // Act
@@ -203,8 +203,8 @@ class UsuarioFacadeTest {
             Administrador admin = new Administrador();
             admin.setUsuarioTitulo(titulo);
 
-            when(usuarioService.listarAdministradores()).thenReturn(List.of(admin));
-            when(usuarioService.buscarPorIdOpcional(titulo)).thenReturn(Optional.of(usuario));
+            when(usuarioService.buscarAdministradores()).thenReturn(List.of(admin));
+            when(usuarioService.buscarOpt(titulo)).thenReturn(Optional.of(usuario));
 
             // Act
             List<AdministradorDto> resultado = facade.listarAdministradores();
@@ -221,7 +221,7 @@ class UsuarioFacadeTest {
             String titulo = "123456";
             Usuario usuario = criarUsuario(titulo);
 
-            when(usuarioService.buscarPorId(titulo)).thenReturn(usuario);
+            when(usuarioService.buscar(titulo)).thenReturn(usuario);
 
             // Act
             AdministradorDto resultado = facade.adicionarAdministrador(titulo);
@@ -271,7 +271,7 @@ class UsuarioFacadeTest {
             String titulo = "123456";
             Usuario usuario = criarUsuario(titulo);
 
-            when(usuarioService.buscarPorIdOpcional(titulo))
+            when(usuarioService.buscarOpt(titulo))
                     .thenReturn(Optional.of(usuario));
 
             // Act
@@ -323,7 +323,7 @@ class UsuarioFacadeTest {
             Usuario usuario1 = criarUsuario("111111");
             Usuario usuario2 = criarUsuario("222222");
 
-            when(usuarioService.buscarTodosPorIds(titulos))
+            when(usuarioService.buscarPorTitulos(titulos))
                     .thenReturn(List.of(usuario1, usuario2));
 
             // Act

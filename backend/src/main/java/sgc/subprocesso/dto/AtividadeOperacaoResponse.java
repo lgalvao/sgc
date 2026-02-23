@@ -1,7 +1,7 @@
 package sgc.subprocesso.dto;
 
 import lombok.Builder;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
+import sgc.mapa.dto.AtividadeDto;
 
 import java.util.List;
 

@@ -36,8 +36,6 @@ public class ArchConsistencyTest {
             .accessClassesThat()
             .haveNameMatching(".*Repo");
 
-
-
     @ArchTest
     static final ArchRule comum_package_should_not_contain_business_logic = noClasses()
             .that()
@@ -65,8 +63,6 @@ public class ArchConsistencyTest {
                             String dependencyPackage = targetClass.getPackageName();
                             String dependencyModule = extractModule(dependencyPackage);
 
-                            // Check if dependency is in a recognized module and if it matches the item's
-                            // module
                             if (dependencyModule != null && !dependencyModule.equals(itemModule) && !dependencyModule.equals("comum")) {
                                 String message = String.format(
                                         "Service %s (module %s) accesses Repository %s (module %s)",
@@ -133,7 +129,7 @@ public class ArchConsistencyTest {
 
     /**
      * Garante que entidades JPA só sejam retornadas por controllers quando houver
-     * @JsonView explícito no método.
+     * {@code @JsonView} explícito no metodo.
      */
     @ArchTest
     static final ArchRule controllers_should_not_return_jpa_entities_without_json_view = methods()
@@ -225,5 +221,4 @@ public class ArchConsistencyTest {
             .matching("sgc.(*).service.(**)")
             .should()
             .beFreeOfCycles();
-
 }

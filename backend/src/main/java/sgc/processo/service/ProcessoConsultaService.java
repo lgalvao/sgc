@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
@@ -64,7 +64,6 @@ public class ProcessoConsultaService {
         return processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 unidadeIds, SituacaoProcesso.CRIADO, pageable);
     }
-
 
     public Set<Long> buscarIdsUnidadesComProcessosAtivos(Long codProcessoIgnorar) {
         return new HashSet<>(

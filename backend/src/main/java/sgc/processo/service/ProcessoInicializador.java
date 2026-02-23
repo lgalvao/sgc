@@ -3,7 +3,7 @@ package sgc.processo.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.organizacao.model.*;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.erros.ErroUnidadesNaoDefinidas;
@@ -22,7 +22,6 @@ import static sgc.processo.model.SituacaoProcesso.CRIADO;
 @RequiredArgsConstructor
 @Slf4j
 public class ProcessoInicializador {
-
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
     private final UnidadeRepo unidadeRepo;
@@ -48,7 +47,6 @@ public class ProcessoInicializador {
 
         // Determinar unidades baseado no tipo de processo
         if (tipo == TipoProcesso.REVISAO) {
-            // Revisão usa lista passada como parâmetro
             if (codsUnidadesParam.isEmpty()) {
                 throw new ErroUnidadesNaoDefinidas("A lista de unidades é obrigatória para iniciar o processo de revisão.");
             }
@@ -77,22 +75,14 @@ public class ProcessoInicializador {
             unidadesMapas = unidadeMapaRepo.findAllById(codigosUnidades);
         }
 
-        // Buscar ADMIN como unidade de origem para as movimentações iniciais
         Unidade admin = repo.buscarPorSigla(Unidade.class, "ADMIN");
-
-        // Criar subprocessos
         criarSubprocessos(processo, tipo, codigosUnidades, unidadesParaProcessar, unidadesMapas, admin, usuario);
-
-        // Atualizar situação e salvar
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processoRepo.save(processo);
+        notificacaoService.emailInicioProcesso(processo.getCodigo(), codigosUnidades);
 
-        // Notificar diretamente (sem evento assíncrono)
-        notificacaoService.notificarInicioProcesso(processo.getCodigo(), codigosUnidades);
-
-        log.info("Processo de {} {} iniciado para {} unidade(s).",
-                tipo.name().toLowerCase(), codigo, codigosUnidades.size());
-
+        int contagemUnidades = codigosUnidades.size();
+        log.info("Processo de {} {} iniciado para {} unidade(s).", tipo.name().toLowerCase(), codigo, contagemUnidades);
         return List.of();
     }
 
@@ -124,21 +114,21 @@ public class ProcessoInicializador {
                 .collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigo, m -> m));
 
         switch (tipo) {
-          case TipoProcesso.MAPEAMENTO -> subprocessoFacade.criarParaMapeamento(processo, unidadesParaProcessar, admin, usuario);
-          case TipoProcesso.REVISAO -> {
-              for (Long codUnidade : codigosUnidades) {
-                  Unidade unidade = repo.buscar(Unidade.class, codUnidade);
-                  UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
-                  subprocessoFacade.criarParaRevisao(processo, unidade, um, admin, usuario);
-              }
-          }
-          default -> {
-              // Caso DIAGNOSTICO
-              for (Unidade unidade : unidadesParaProcessar) {
-                  UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
-                  subprocessoFacade.criarParaDiagnostico(processo, unidade, um, admin, usuario);
-              }
-          }
+            case TipoProcesso.MAPEAMENTO ->
+                    subprocessoFacade.criarParaMapeamento(processo, unidadesParaProcessar, admin, usuario);
+            case TipoProcesso.REVISAO -> {
+                for (Long codUnidade : codigosUnidades) {
+                    Unidade unidade = repo.buscar(Unidade.class, codUnidade);
+                    UnidadeMapa um = mapaUnidadeMapa.get(codUnidade);
+                    subprocessoFacade.criarParaRevisao(processo, unidade, um, admin, usuario);
+                }
+            }
+            default -> { // Caso DIAGNOSTICO
+                for (Unidade unidade : unidadesParaProcessar) {
+                    UnidadeMapa um = mapaUnidadeMapa.get(unidade.getCodigo());
+                    subprocessoFacade.criarParaDiagnostico(processo, unidade, um, admin, usuario);
+                }
+            }
         }
     }
 

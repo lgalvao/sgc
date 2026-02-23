@@ -64,7 +64,7 @@ public class AnaliseFacade {
     }
 
     public AnaliseHistoricoDto paraHistoricoDto(Analise analise) {
-        UnidadeDto unidade = unidadeService.buscarPorCodigo(analise.getUnidadeCodigo());
+        UnidadeDto unidade = unidadeService.dtoPorCodigo(analise.getUnidadeCodigo());
         return AnaliseHistoricoDto.builder()
                 .dataHora(analise.getDataHora())
                 .observacoes(analise.getObservacoes())

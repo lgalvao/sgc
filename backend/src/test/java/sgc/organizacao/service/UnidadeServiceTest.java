@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeMapa;
@@ -62,22 +62,22 @@ class UnidadeServiceTest {
 
     @Test
     @DisplayName("buscarEntidadesPorIds - Sucesso")
-    void buscarEntidadesPorIds() {
+    void porCodigos() {
         List<Unidade> lista = List.of(new Unidade());
         when(unidadeRepo.findAllById(any())).thenReturn(lista);
 
-        List<Unidade> result = service.buscarEntidadesPorIds(List.of(1L));
+        List<Unidade> result = service.porCodigos(List.of(1L));
 
         assertThat(result).hasSize(1);
     }
 
     @Test
     @DisplayName("buscarTodasEntidadesComHierarquia - Sucesso")
-    void buscarTodasEntidadesComHierarquia() {
+    void todasComHierarquia() {
         List<Unidade> lista = List.of(new Unidade());
         when(unidadeRepo.findAllWithHierarquia()).thenReturn(lista);
 
-        List<Unidade> result = service.buscarTodasEntidadesComHierarquia();
+        List<Unidade> result = service.todasComHierarquia();
 
         assertThat(result).hasSize(1);
     }

@@ -1,6 +1,6 @@
 package sgc.subprocesso.dto;
 
-import sgc.mapa.dto.visualizacao.AtividadeDto;
+import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;

@@ -18,10 +18,11 @@ import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.login.dto.AutenticarRequest;
-import sgc.seguranca.login.dto.AutorizarRequest;
-import sgc.seguranca.login.dto.EntrarRequest;
-import sgc.seguranca.login.dto.PerfilUnidadeDto;
+import sgc.seguranca.LoginFacade;
+import sgc.seguranca.dto.AutenticarRequest;
+import sgc.seguranca.dto.AutorizarRequest;
+import sgc.seguranca.dto.EntrarRequest;
+import sgc.seguranca.dto.PerfilUnidadeDto;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;

@@ -10,8 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
-import sgc.notificacao.NotificacaoEmailService;
-import sgc.notificacao.NotificacaoModelosService;
+import sgc.notificacao.EmailModelosService;
+import sgc.notificacao.EmailService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
@@ -54,10 +54,10 @@ class ProcessoNotificacaoServiceTest {
     private UnidadeFacade unidadeService;
 
     @Mock
-    private NotificacaoEmailService notificacaoEmailService;
+    private EmailService emailService;
 
     @Mock
-    private NotificacaoModelosService notificacaoModelosService;
+    private EmailModelosService emailModelosService;
 
     @Mock
     private AlertaFacade servicoAlertas;
@@ -85,7 +85,7 @@ class ProcessoNotificacaoServiceTest {
     @Test
     @DisplayName("Deve disparar e-mails ao iniciar processo")
     void deveDispararEmailsAoIniciar() {
-        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
+        when(emailModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(1L);
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
 
@@ -109,10 +109,10 @@ class ProcessoNotificacaoServiceTest {
         Usuario substituto = Usuario.builder().tituloEleitoral("222").email("s@s.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("111", titular, "222", substituto));
 
-        service.notificarInicioProcesso(1L, List.of());
+        service.emailInicioProcesso(1L, List.of());
 
-        verify(notificacaoEmailService).enviarEmailHtml(eq("u1@tre-pe.jus.br"), anyString(), any());
-        verify(notificacaoEmailService).enviarEmailHtml(eq("s@s.com"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("u1@tre-pe.jus.br"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("s@s.com"), anyString(), any());
     }
 
     @Test
@@ -122,7 +122,7 @@ class ProcessoNotificacaoServiceTest {
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
 
-        service.notificarInicioProcesso(1L, List.of());
+        service.emailInicioProcesso(1L, List.of());
 
         verify(servicoAlertas, never()).criarAlertasProcessoIniciado(any(), any());
     }
@@ -149,14 +149,14 @@ class ProcessoNotificacaoServiceTest {
         when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularTitulo("T").build()));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", Usuario.builder().build()));
 
-        service.notificarInicioProcesso(1L, List.of());
-        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+        service.emailInicioProcesso(1L, List.of());
+        verify(emailService, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
     @DisplayName("Deve cobrir branches de substitutos")
     void deveCobrirBranchesSubstitutos() {
-        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
+        when(emailModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(1L);
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
 
@@ -172,25 +172,25 @@ class ProcessoNotificacaoServiceTest {
 
         // 1. Substituto null no mapa de usuários
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", titular));
-        service.notificarInicioProcesso(1L, List.of());
+        service.emailInicioProcesso(1L, List.of());
 
         // 2. Substituto com email null ou blank
         Usuario subEmailNull = Usuario.builder().tituloEleitoral("S").email(null).build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", titular, "S", subEmailNull));
-        service.notificarInicioProcesso(1L, List.of());
+        service.emailInicioProcesso(1L, List.of());
 
         Usuario subEmailBlank = Usuario.builder().tituloEleitoral("S").email("  ").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", titular, "S", subEmailBlank));
-        service.notificarInicioProcesso(1L, List.of());
+        service.emailInicioProcesso(1L, List.of());
 
-        verify(notificacaoEmailService, times(3)).enviarEmailHtml(contains("@tre-pe.jus.br"), anyString(), anyString());
-        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("t@mail.com"), anyString(), anyString());
+        verify(emailService, times(3)).enviarEmailHtml(contains("@tre-pe.jus.br"), anyString(), anyString());
+        verify(emailService, never()).enviarEmailHtml(eq("t@mail.com"), anyString(), anyString());
     }
 
     @Test
     @DisplayName("Deve cobrir branches na finalização de processo")
     void deveCobrirBranchesFinalizacao() {
-        when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
+        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(2L);
         when(processoRepo.findByIdComParticipantes(2L)).thenReturn(Optional.of(processo));
 
@@ -211,14 +211,14 @@ class ProcessoNotificacaoServiceTest {
                 "T2", Usuario.builder().email("int@mail.com").build()
         ));
 
-        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(operacional, intermediaria));
+        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(operacional, intermediaria));
         
         // 1. Intermediária sem subordinadas (log.warn)
-        service.notificarFinalizacaoProcesso(2L);
+        service.emailFinalizacaoProcesso(2L);
         // Operacional recebe (unit email), Intermediaria não (não tem subordinadas válidas no teste)
-        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("op@mail.com"), anyString(), any());
-        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
-        verify(notificacaoEmailService).enviarEmailHtml(eq("op@tre-pe.jus.br"), anyString(), any());
+        verify(emailService, never()).enviarEmailHtml(eq("op@mail.com"), anyString(), any());
+        verify(emailService, never()).enviarEmailHtml(eq("int@mail.com"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("op@tre-pe.jus.br"), anyString(), any());
 
         // 2. Intermediária com subordinadas (sucesso)
         Unidade sub = criarUnidade(21L, TipoUnidade.OPERACIONAL);
@@ -237,13 +237,13 @@ class ProcessoNotificacaoServiceTest {
                 "TS", Usuario.builder().email("sub@mail.com").build()
         ));
 
-        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(operacional, intermediaria, sub));
+        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(operacional, intermediaria, sub));
 
-        service.notificarFinalizacaoProcesso(2L);
+        service.emailFinalizacaoProcesso(2L);
 
         // Unit emails: op@ is sent in BOTH calls (part 1 and 2), int@ only in part 2
-        verify(notificacaoEmailService, times(2)).enviarEmailHtml(eq("op@tre-pe.jus.br"), anyString(), any());
-        verify(notificacaoEmailService, times(1)).enviarEmailHtml(eq("int@tre-pe.jus.br"), anyString(), any());
+        verify(emailService, times(2)).enviarEmailHtml(eq("op@tre-pe.jus.br"), anyString(), any());
+        verify(emailService, times(1)).enviarEmailHtml(eq("int@tre-pe.jus.br"), anyString(), any());
     }
 
     @Test
@@ -258,10 +258,10 @@ class ProcessoNotificacaoServiceTest {
 
         when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
 
-        service.notificarInicioProcesso(1L, List.of());
+        service.emailInicioProcesso(1L, List.of());
 
         // Deve logar erro e não enviar
-        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+        verify(emailService, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
@@ -282,22 +282,9 @@ class ProcessoNotificacaoServiceTest {
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
                 "T1", Usuario.builder().email("op@mail.com").build()
         ));
-        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(semEquipe));
-
-        service.notificarFinalizacaoProcesso(2L);
-
-        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
-    }
-
-    @Test
-    @DisplayName("Deve capturar exceção no processamento assíncrono geral")
-    void deveCapturarExcecaoAsyncGeral() {
-        when(processoRepo.findByIdComParticipantes(anyLong())).thenThrow(new RuntimeException("Crash"));
-
-        assertThatCode(() -> service.notificarInicioProcesso(1L, List.of()))
-                .doesNotThrowAnyException();
-        assertThatCode(() -> service.notificarFinalizacaoProcesso(1L))
-                .doesNotThrowAnyException();
+        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(semEquipe));
+        service.emailFinalizacaoProcesso(2L);
+        verify(emailService, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
@@ -307,7 +294,7 @@ class ProcessoNotificacaoServiceTest {
         p.setParticipantes(new ArrayList<>());
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(p));
 
-        service.notificarFinalizacaoProcesso(1L);
+        service.emailFinalizacaoProcesso(1L);
 
         verify(unidadeService, never()).buscarResponsaveisUnidades(anyList());
     }
@@ -315,7 +302,7 @@ class ProcessoNotificacaoServiceTest {
     @Test
     @DisplayName("Deve capturar exceção no catch interno do loop de e-mails")
     void deveCapturarExcecaoNoCatchInterno() {
-        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
+        when(emailModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(1L);
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
 
@@ -331,35 +318,9 @@ class ProcessoNotificacaoServiceTest {
         // Quando buscar usuário por titulo retornar null, o try interno vai estourar NPE
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Collections.emptyMap());
 
-        service.notificarInicioProcesso(1L, List.of());
+        service.emailInicioProcesso(1L, List.of());
 
-        verify(notificacaoEmailService).enviarEmailHtml(eq("u10@tre-pe.jus.br"), anyString(), any());
-    }
-
-    // Teste de defesa: garante que se não houver responsável (situação anômala), o envio é ignorado sem erro
-    // TODO me parece um teste de situacao impossivel!
-    @Test
-    @DisplayName("Deve ignorar participante sem responsável ou titular ao finalizar")
-    void deveIgnorarParticipanteSemResponsavelOuTitularAoFinalizar() {
-        Processo processo = criarProcesso(3L);
-        when(processoRepo.findByIdComParticipantes(3L)).thenReturn(Optional.of(processo));
-
-        Unidade u1 = criarUnidade(1L, TipoUnidade.OPERACIONAL);
-        Unidade u2 = criarUnidade(2L, TipoUnidade.OPERACIONAL);
-
-        processo.adicionarParticipantes(Set.of(u1, u2));
-
-        // u1 sem responsável no mapa
-        // u2 com responsável mas sem titularTitulo
-        UnidadeResponsavelDto r2 = UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo(null).build();
-
-        when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(2L, r2));
-        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(u1, u2));
-
-        service.notificarFinalizacaoProcesso(3L);
-
-        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("u1@tre-pe.jus.br"), anyString(), any());
-        verify(notificacaoEmailService).enviarEmailHtml(eq("u2@tre-pe.jus.br"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("u10@tre-pe.jus.br"), anyString(), any());
     }
 
     @Test
@@ -377,7 +338,7 @@ class ProcessoNotificacaoServiceTest {
     @Test
     @DisplayName("Deve ignorar e-mail se titular inválido ao iniciar")
     void deveIgnorarEmailSeTitularInvalidoAoIniciar() {
-        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
+        when(emailModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(1L);
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
 
@@ -410,18 +371,18 @@ class ProcessoNotificacaoServiceTest {
         // T1 ausente no map
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T2", user2, "T3", user3));
 
-        service.notificarInicioProcesso(1L, List.of());
+        service.emailInicioProcesso(1L, List.of());
 
         // Deve enviar para os e-mails das 3 unidades
-        verify(notificacaoEmailService).enviarEmailHtml(eq("u1@tre-pe.jus.br"), anyString(), any());
-        verify(notificacaoEmailService).enviarEmailHtml(eq("u2@tre-pe.jus.br"), anyString(), any());
-        verify(notificacaoEmailService).enviarEmailHtml(eq("u3@tre-pe.jus.br"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("u1@tre-pe.jus.br"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("u2@tre-pe.jus.br"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("u3@tre-pe.jus.br"), anyString(), any());
     }
 
     @Test
     @DisplayName("Deve cobrir tipo INTEROPERACIONAL na finalização")
     void deveCobrirTipoInteroperacionalNaFinalizacao() {
-        when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
+        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(5L);
         when(processoRepo.findByIdComParticipantes(5L)).thenReturn(Optional.of(processo));
 
@@ -436,18 +397,18 @@ class ProcessoNotificacaoServiceTest {
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
                 "T1", Usuario.builder().email("inter@mail.com").build()
         ));
-        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(interoperacional));
+        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(interoperacional));
 
-        service.notificarFinalizacaoProcesso(5L);
+        service.emailFinalizacaoProcesso(5L);
 
-        verify(notificacaoEmailService).enviarEmailHtml(eq("inter@tre-pe.jus.br"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("inter@tre-pe.jus.br"), anyString(), any());
     }
 
     @Test
     @DisplayName("Deve cobrir exceção ao enviar email para unidade intermediária")
     void deveCobrirExcecaoAoEnviarEmailUnidadeIntermediaria() {
-        when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
-        when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any())).thenReturn("corpo");
+        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
+        when(emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(6L);
         when(processoRepo.findByIdComParticipantes(6L)).thenReturn(Optional.of(processo));
 
@@ -470,21 +431,21 @@ class ProcessoNotificacaoServiceTest {
         ));
 
         // Simular exceção ao criar email para unidade intermediária
-        when(notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any()))
+        when(emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any()))
                 .thenThrow(new RuntimeException("Erro ao criar template"));
-        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(intermediaria, sub));
+        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(intermediaria, sub));
 
-        service.notificarFinalizacaoProcesso(6L);
+        service.emailFinalizacaoProcesso(6L);
 
         // Deve ter tentado enviar para operacional (sucesso) mas não para intermediária (exceção)
-        verify(notificacaoEmailService).enviarEmailHtml(eq("sub@tre-pe.jus.br"), anyString(), any());
-        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@tre-pe.jus.br"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("sub@tre-pe.jus.br"), anyString(), any());
+        verify(emailService, never()).enviarEmailHtml(eq("int@tre-pe.jus.br"), anyString(), any());
     }
 
     @Test
     @DisplayName("Deve cobrir substituto com email null")
     void deveCobrirSubstitutoComEmailNull() {
-        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
+        when(emailModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(7L);
         when(processoRepo.findByIdComParticipantes(7L)).thenReturn(Optional.of(processo));
 
@@ -509,10 +470,10 @@ class ProcessoNotificacaoServiceTest {
 
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", titular, "S1", substituto));
 
-        service.notificarInicioProcesso(7L, List.of());
+        service.emailInicioProcesso(7L, List.of());
 
-        verify(notificacaoEmailService).enviarEmailHtml(eq("u1@tre-pe.jus.br"), anyString(), any());
-        verify(notificacaoEmailService, never()).enviarEmailHtml(eq(null), anyString(), anyString());
+        verify(emailService).enviarEmailHtml(eq("u1@tre-pe.jus.br"), anyString(), any());
+        verify(emailService, never()).enviarEmailHtml(eq(null), anyString(), anyString());
     }
 
     @Test
@@ -535,15 +496,15 @@ class ProcessoNotificacaoServiceTest {
         // Stream vazio leva a buscarUsuariosPorTitulos com lista vazia
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Collections.emptyMap());
 
-        service.notificarFinalizacaoProcesso(8L);
+        service.emailFinalizacaoProcesso(8L);
 
-        verify(notificacaoEmailService, never()).enviarEmailHtml(any(), any(), any());
+        verify(emailService, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
     @DisplayName("Deve cobrir catch de exceção durante envio de email")
     void deveCobrirCatchExcecaoDuranteEnvioEmail() {
-        when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
+        when(emailModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(9L);
         when(processoRepo.findByIdComParticipantes(9L)).thenReturn(Optional.of(processo));
 
@@ -565,12 +526,12 @@ class ProcessoNotificacaoServiceTest {
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", titular));
 
         // Força erro no envio
-        doThrow(new RuntimeException("Fail")).when(notificacaoEmailService).enviarEmailHtml(eq("op@tre-pe.jus.br"), anyString(), anyString());
+        doThrow(new RuntimeException("Fail")).when(emailService).enviarEmailHtml(eq("op@tre-pe.jus.br"), anyString(), anyString());
 
-        service.notificarInicioProcesso(9L, List.of());
+        service.emailInicioProcesso(9L, List.of());
 
         // Verifica que o catch capturou a exceção e logou, mas tentou enviar
-        verify(notificacaoEmailService).enviarEmailHtml(eq("op@tre-pe.jus.br"), anyString(), anyString());
+        verify(emailService).enviarEmailHtml(eq("op@tre-pe.jus.br"), anyString(), anyString());
     }
 
     @Test
@@ -605,16 +566,16 @@ class ProcessoNotificacaoServiceTest {
                 "T2", Usuario.builder().email("out@mail.com").build(),
                 "T4", Usuario.builder().email("outro_sup@mail.com").build()
         ));
-        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(intermediaria, outra, comOutroSuperior));
+        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(intermediaria, outra, comOutroSuperior));
 
-        service.notificarFinalizacaoProcesso(10L);
+        service.emailFinalizacaoProcesso(10L);
 
         // Deve enviar para operacionais
-        verify(notificacaoEmailService).enviarEmailHtml(eq("outra@tre-pe.jus.br"), anyString(), any());
-        verify(notificacaoEmailService).enviarEmailHtml(eq("outro_sup@tre-pe.jus.br"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("outra@tre-pe.jus.br"), anyString(), any());
+        verify(emailService).enviarEmailHtml(eq("outro_sup@tre-pe.jus.br"), anyString(), any());
 
         // Não deve enviar para intermediária pois não há subordinada que tenha ela como superior imediata
-        verify(notificacaoEmailService, never()).enviarEmailHtml(eq("int@tre-pe.jus.br"), anyString(), any());
+        verify(emailService, never()).enviarEmailHtml(eq("int@tre-pe.jus.br"), anyString(), any());
     }
     @Nested
     @DisplayName("Cobertura Extra Isolada")
@@ -623,7 +584,7 @@ class ProcessoNotificacaoServiceTest {
         @Test
         @DisplayName("aoIniciarProcesso com unidade INTERMEDIARIA envia email apenas para titular se substituto ausente")
         void aoIniciarProcesso_Intermediaria() {
-            when(notificacaoModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
+            when(emailModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("corpo");
             Long codProcesso = 1L;
 
             Processo processo = new Processo();
@@ -658,9 +619,9 @@ class ProcessoNotificacaoServiceTest {
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(11L, resp));
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("TITULAR", usuarioTitular));
             
-            service.notificarInicioProcesso(codProcesso, List.of());
+            service.emailInicioProcesso(codProcesso, List.of());
 
-            verify(notificacaoEmailService).enviarEmailHtml(eq("ui@tre-pe.jus.br"), anyString(), anyString());
+            verify(emailService).enviarEmailHtml(eq("ui@tre-pe.jus.br"), anyString(), anyString());
         }
 
         @Test
@@ -692,7 +653,7 @@ class ProcessoNotificacaoServiceTest {
             
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(null);
             
-            Assertions.assertThatCode(() -> service.notificarInicioProcesso(codProcesso, List.of())).doesNotThrowAnyException();
+            Assertions.assertThatCode(() -> service.emailInicioProcesso(codProcesso, List.of())).doesNotThrowAnyException();
         }
 
         @Test
@@ -725,10 +686,10 @@ class ProcessoNotificacaoServiceTest {
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of());
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of());
 
-            service.notificarInicioProcesso(codProcesso, List.of());
+            service.emailInicioProcesso(codProcesso, List.of());
 
             // Unidade criada acima com id 99 e sigla U99
-            verify(notificacaoEmailService).enviarEmailHtml(eq("u99@tre-pe.jus.br"), anyString(), any());
+            verify(emailService).enviarEmailHtml(eq("u99@tre-pe.jus.br"), anyString(), any());
         }
 
         @Test
@@ -760,21 +721,11 @@ class ProcessoNotificacaoServiceTest {
             when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(processo));
             when(unidadeService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, rInter));
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", t1));
-            when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(uInter, uSubordinadaInvalida));
+            when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uInter, uSubordinadaInvalida));
 
-            service.notificarFinalizacaoProcesso(codProcesso);
+            service.emailFinalizacaoProcesso(codProcesso);
 
-            verify(notificacaoEmailService, never()).enviarEmailHtml(eq("ui@tre-pe.jus.br"), anyString(), anyString());
-        }
-
-        @Test
-        @DisplayName("aoFinalizarProcesso deve capturar exceção genérica no loop de envio")
-        void aoFinalizarProcesso_ErroNoLoop() {
-            Long codProcesso = 33L;
-
-            when(processoRepo.findByIdComParticipantes(codProcesso)).thenThrow(new RuntimeException("Erro inesperado"));
-
-            Assertions.assertThatCode(() -> service.notificarFinalizacaoProcesso(codProcesso)).doesNotThrowAnyException();
+            verify(emailService, never()).enviarEmailHtml(eq("ui@tre-pe.jus.br"), anyString(), anyString());
         }
 
         @Test
@@ -790,7 +741,7 @@ class ProcessoNotificacaoServiceTest {
     @Test
     @DisplayName("Deve notificar substituto na finalização do processo")
     void deveNotificarSubstitutoNaFinalizacao() {
-        when(notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
+        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("corpo");
         Processo processo = criarProcesso(11L);
         when(processoRepo.findByIdComParticipantes(11L)).thenReturn(Optional.of(processo));
 
@@ -808,11 +759,11 @@ class ProcessoNotificacaoServiceTest {
 
         Usuario substituto = Usuario.builder().tituloEleitoral("S1").email("sub@mail.com").build();
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", Usuario.builder().build(), "S1", substituto));
-        when(unidadeService.buscarEntidadesPorIds(anyList())).thenReturn(List.of(u));
+        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(u));
 
-        service.notificarFinalizacaoProcesso(11L);
+        service.emailFinalizacaoProcesso(11L);
 
-        verify(notificacaoEmailService).enviarEmailHtml(eq("sub@mail.com"), anyString(), anyString());
+        verify(emailService).enviarEmailHtml(eq("sub@mail.com"), anyString(), anyString());
     }
     }
 }

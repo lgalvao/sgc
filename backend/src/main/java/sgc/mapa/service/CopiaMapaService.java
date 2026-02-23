@@ -3,18 +3,14 @@ package sgc.mapa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.mapa.model.*;
 
 import java.util.*;
 
 /**
- * Serviço especializado para realizar cópias profundas de mapas de competências.
- *
- * <p>Responsável por duplicar toda a estrutura hierárquica de um mapa:
+ * Realiza cópias profundas de mapas de competências. Duplica toda a estrutura hierárquica de um mapa:
  * competências, atividades e conhecimentos, mantendo as associações entre eles.
- *
- * <p>Essencial para iniciar novos ciclos de revisão baseados em mapas anteriores.
  */
 @Service
 @RequiredArgsConstructor
@@ -45,7 +41,7 @@ public class CopiaMapaService {
     @Transactional
     public void importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId) {
         List<Atividade> atividadesOrigem = atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId);
-        Set<String> descricoesExistentes = obterDescricoesExistentes(mapaDestinoId);
+        Set<String> descricoesExistentes = obterDescExistentes(mapaDestinoId);
         Mapa mapaDestino = repo.buscar(Mapa.class, mapaDestinoId);
 
         List<Atividade> atividadesParaSalvar = new ArrayList<>();
@@ -98,16 +94,12 @@ public class CopiaMapaService {
                 .mapa(mapaDestino)
                 .build();
 
-        Set<Conhecimento> conhecimentosFonte = atividadeFonte.getConhecimentos();
-        if (!conhecimentosFonte.isEmpty()) {
-            for (Conhecimento conhecimentoFonte : conhecimentosFonte) {
-                Conhecimento novoConhecimento = Conhecimento.builder()
-                        .atividade(novaAtividade)
-                        .descricao(conhecimentoFonte.getDescricao())
-                        .build();
-
-                novaAtividade.getConhecimentos().add(novoConhecimento);
-            }
+        Set<Conhecimento> cs = atividadeFonte.getConhecimentos();
+        if (!cs.isEmpty()) {
+            cs.stream().map(c -> Conhecimento.builder()
+                    .atividade(novaAtividade)
+                    .descricao(c.getDescricao())
+                    .build()).forEach(novoConhecimento -> novaAtividade.getConhecimentos().add(novoConhecimento));
         }
 
         return novaAtividade;
@@ -118,34 +110,29 @@ public class CopiaMapaService {
         if (competenciasFonte.isEmpty()) return;
 
         List<Competencia> novasCompetencias = new ArrayList<>();
-
         for (Competencia competenciaFonte : competenciasFonte) {
             Set<Atividade> novasAtividadesAssociadas = new HashSet<>();
-            for (Atividade atividadeFonteAssociada : competenciaFonte.getAtividades()) {
-                Atividade novaAtividade = mapaAtividades.get(atividadeFonteAssociada.getCodigo());
+            for (Atividade ativOrigemAssociada : competenciaFonte.getAtividades()) {
+                Atividade novaAtividade = mapaAtividades.get(ativOrigemAssociada.getCodigo());
                 if (novaAtividade != null) {
                     novasAtividadesAssociadas.add(novaAtividade);
                 }
             }
-
             Competencia novaCompetencia = Competencia.builder()
                     .descricao(competenciaFonte.getDescricao())
                     .mapa(mapaSalvo)
                     .atividades(novasAtividadesAssociadas)
                     .build();
 
-            for (Atividade novaAtividade : novasAtividadesAssociadas) {
-                novaAtividade.getCompetencias().add(novaCompetencia);
-            }
-
+            novasAtividadesAssociadas.forEach(novaAtividade -> novaAtividade.getCompetencias().add(novaCompetencia));
             novasCompetencias.add(novaCompetencia);
         }
 
         competenciaRepo.saveAll(novasCompetencias);
     }
 
-    private Set<String> obterDescricoesExistentes(Long mapaDestinoId) {
-        return new HashSet<>(atividadeRepo.findByMapa_Codigo(mapaDestinoId).stream()
+    private Set<String> obterDescExistentes(Long codMapaDestino) {
+        return new HashSet<>(atividadeRepo.findByMapa_Codigo(codMapaDestino).stream()
                 .map(Atividade::getDescricao)
                 .toList());
     }

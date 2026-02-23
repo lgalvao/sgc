@@ -2,6 +2,7 @@ package sgc.relatorio.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import sgc.relatorio.PdfFactory;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

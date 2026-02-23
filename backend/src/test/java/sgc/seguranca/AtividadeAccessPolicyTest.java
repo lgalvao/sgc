@@ -12,6 +12,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.HierarquiaService;
+import sgc.seguranca.policy.AtividadeAccessPolicy;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.testutils.UnidadeTestBuilder;
 

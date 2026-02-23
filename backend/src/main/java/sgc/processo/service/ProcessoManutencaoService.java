@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static sgc.processo.model.SituacaoProcesso.CRIADO;
 import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
@@ -36,22 +37,19 @@ public class ProcessoManutencaoService {
     public Processo criar(CriarProcessoRequest req) {
         Set<Unidade> participantes = new HashSet<>();
         for (Long codigoUnidade : req.unidades()) {
-            Unidade unidade = unidadeService.buscarEntidadePorId(codigoUnidade);
+            Unidade unidade = unidadeService.porCodigo(codigoUnidade);
             participantes.add(unidade);
         }
 
-        processoValidador.validarTiposUnidades(new ArrayList<>(participantes))
-                .ifPresent(msg -> {
-                    throw new ErroProcesso(msg);
-                });
+        processoValidador.validarTiposUnidades(new ArrayList<>(participantes)).ifPresent(msg -> {
+            throw new ErroProcesso(msg);
+        });
 
         TipoProcesso tipoProcesso = req.tipo();
-
         if (tipoProcesso == REVISAO || tipoProcesso == DIAGNOSTICO) {
-            processoValidador.getMensagemErroUnidadesSemMapa(new ArrayList<>(req.unidades()))
-                    .ifPresent(msg -> {
-                        throw new ErroProcesso(msg);
-                    });
+            processoValidador.getMensagemErroUnidadesSemMapa(new ArrayList<>(req.unidades())).ifPresent(msg -> {
+                throw new ErroProcesso(msg);
+            });
         }
 
         Processo processo = new Processo()
@@ -67,38 +65,31 @@ public class ProcessoManutencaoService {
         log.info("Processo {} criado com {} participantes",
                 processoSalvo.getCodigo(),
                 processoSalvo.getParticipantes().size());
-        
+
         return processoSalvo;
     }
 
     @Transactional
-    public Processo atualizar(Long codigo, AtualizarProcessoRequest requisicao) {
+    public Processo atualizar(Long codigo, AtualizarProcessoRequest req) {
         Processo processo = processoConsultaService.buscarProcessoCodigo(codigo);
-
+        TipoProcesso tipoProcesso = req.tipo();
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser editados.");
         }
+        processo.setDescricao(req.descricao());
+        processo.setTipo(tipoProcesso);
+        processo.setDataLimite(req.dataLimiteEtapa1());
 
-        processo.setDescricao(requisicao.descricao());
-        processo.setTipo(requisicao.tipo());
-        processo.setDataLimite(requisicao.dataLimiteEtapa1());
-
-        if (requisicao.tipo() == REVISAO || requisicao.tipo() == DIAGNOSTICO) {
-            processoValidador.getMensagemErroUnidadesSemMapa(new ArrayList<>(requisicao.unidades()))
-                    .ifPresent(msg -> {
-                        throw new ErroProcesso(msg);
-                    });
+        if (tipoProcesso == REVISAO || tipoProcesso == DIAGNOSTICO) {
+            processoValidador.getMensagemErroUnidadesSemMapa(new ArrayList<>(req.unidades())).ifPresent(msg -> {
+                throw new ErroProcesso(msg);
+            });
         }
 
-        Set<Unidade> participantes = new HashSet<>();
-        for (Long codigoUnidade : requisicao.unidades()) {
-            participantes.add(unidadeService.buscarEntidadePorId(codigoUnidade));
-        }
-
-        processoValidador.validarTiposUnidades(new ArrayList<>(participantes))
-                .ifPresent(msg -> {
-                    throw new ErroProcesso(msg);
-                });
+        Set<Unidade> participantes = req.unidades().stream().map(unidadeService::porCodigo).collect(Collectors.toSet());
+        processoValidador.validarTiposUnidades(new ArrayList<>(participantes)).ifPresent(msg -> {
+            throw new ErroProcesso(msg);
+        });
 
         processo.sincronizarParticipantes(participantes);
 

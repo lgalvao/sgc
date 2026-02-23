@@ -20,7 +20,7 @@ import java.util.concurrent.Executor;
 /**
  * Configuração compartilhada para todos os testes de integração.
  * GreenMail é sempre iniciado no perfil "test", eliminando a necessidade de um perfil "email-test" separado.
- * Testes que não verificam e-mail podem simplesmente usar @MockitoBean em NotificacaoEmailService.
+ * Testes que não verificam e-mail podem simplesmente usar @MockitoBean em EmailService.
  */
 @Configuration
 public class TestConfig implements AsyncConfigurer {

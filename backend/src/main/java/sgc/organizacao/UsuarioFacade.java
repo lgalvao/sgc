@@ -36,7 +36,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
-        Usuario usuario = usuarioService.buscarPorIdComAtribuicoesOpcional(titulo).orElse(null);
+        Usuario usuario = usuarioService.buscarComAtribuicoesOpt(titulo).orElse(null);
         if (usuario != null) {
             carregarAtribuicoes(usuario);
         }
@@ -44,11 +44,11 @@ public class UsuarioFacade {
     }
 
     public Optional<Usuario> buscarUsuarioPorTitulo(String titulo) {
-        return usuarioService.buscarPorIdOpcional(titulo);
+        return usuarioService.buscarOpt(titulo);
     }
 
     public Optional<Usuario> buscarEntidadeUsuarioPorTitulo(String titulo) {
-        return usuarioService.buscarPorIdOpcional(titulo);
+        return usuarioService.buscarOpt(titulo);
     }
 
     public List<Usuario> buscarUsuariosPorUnidade(Long codigoUnidade) {
@@ -57,7 +57,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public Usuario buscarPorId(String titulo) {
-        return usuarioService.buscarPorId(titulo);
+        return usuarioService.buscar(titulo);
     }
 
     @Transactional(readOnly = true)
@@ -66,7 +66,7 @@ public class UsuarioFacade {
     }
 
     private Usuario buscarPorLoginInterno(String login) {
-        Usuario usuario = usuarioService.buscarPorIdComAtribuicoes(login);
+        Usuario usuario = usuarioService.buscarComAtribuicoes(login);
         carregarAtribuicoes(usuario);
         return usuario;
     }
@@ -104,7 +104,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
-        return usuarioService.buscarPorIdComAtribuicoesOpcional(titulo)
+        return usuarioService.buscarComAtribuicoesOpt(titulo)
                 .map(usuario -> {
                     List<UsuarioPerfil> atribuicoes = usuarioService.buscarPerfis(usuario.getTituloEleitoral());
                     return atribuicoes.stream()
@@ -137,7 +137,7 @@ public class UsuarioFacade {
     }
 
     public Map<String, Usuario> buscarUsuariosPorTitulos(List<String> titulos) {
-        return usuarioService.buscarTodosPorIds(titulos).stream()
+        return usuarioService.buscarPorTitulos(titulos).stream()
                 .collect(toMap(Usuario::getTituloEleitoral, u -> u, (u1, u2) -> u1));
     }
 
@@ -148,7 +148,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
-        return usuarioService.buscarPorIdComAtribuicoesOpcional(titulo)
+        return usuarioService.buscarComAtribuicoesOpt(titulo)
                 .map(u -> {
                     List<UsuarioPerfil> atribuicoes = usuarioService.buscarPerfis(u.getTituloEleitoral());
                     return atribuicoes.stream()
@@ -161,7 +161,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
-        return usuarioService.buscarPorIdComAtribuicoesOpcional(titulo)
+        return usuarioService.buscarComAtribuicoesOpt(titulo)
                 .map(u -> {
                     List<UsuarioPerfil> atribuicoes = usuarioService.buscarPerfis(u.getTituloEleitoral());
                     return atribuicoes.stream()
@@ -185,8 +185,8 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public List<AdministradorDto> listarAdministradores() {
-        return usuarioService.listarAdministradores().stream()
-                .flatMap(admin -> usuarioService.buscarPorIdOpcional(admin.getUsuarioTitulo())
+        return usuarioService.buscarAdministradores().stream()
+                .flatMap(admin -> usuarioService.buscarOpt(admin.getUsuarioTitulo())
                         .map(this::toAdministradorDto)
                         .stream())
                 .toList();
@@ -194,7 +194,7 @@ public class UsuarioFacade {
 
     @Transactional
     public AdministradorDto adicionarAdministrador(String usuarioTitulo) {
-        Usuario usuario = usuarioService.buscarPorId(usuarioTitulo);
+        Usuario usuario = usuarioService.buscar(usuarioTitulo);
 
         usuarioService.adicionarAdministrador(usuarioTitulo);
 

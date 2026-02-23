@@ -5,13 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.mapa.dto.AtualizarAtividadeRequest;
 import sgc.mapa.dto.AtualizarConhecimentoRequest;
 import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.dto.CriarConhecimentoRequest;
-import sgc.mapa.mapper.AtividadeMapper;
-import sgc.mapa.mapper.ConhecimentoMapper;
+import sgc.mapa.dto.AtividadeMapper;
+import sgc.mapa.dto.ConhecimentoMapper;
 import sgc.mapa.model.*;
 import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
 
@@ -73,21 +73,17 @@ public class MapaManutencaoService {
         List<Atividade> atividades = atividadeRepo.findAllById(descricoesPorId.keySet());
         Set<Long> mapasAfetados = new HashSet<>();
 
-        for (Atividade atividade : atividades) {
+        atividades.forEach(atividade -> {
             String novaDescricao = descricoesPorId.get(atividade.getCodigo());
             if (novaDescricao != null) {
                 atividade.setDescricao(novaDescricao);
             }
             var mapa = atividade.getMapa();
             mapasAfetados.add(mapa.getCodigo());
-        }
+        });
 
         atividadeRepo.saveAll(atividades);
-
-        for (Long codMapa : mapasAfetados) {
-            notificarAlteracaoMapa(codMapa);
-        }
-
+        mapasAfetados.forEach(this::notificarAlteracaoMapa);
     }
 
     public void excluirAtividade(Long codAtividade) {

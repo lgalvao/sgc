@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import sgc.organizacao.model.Perfil;
-import sgc.seguranca.login.dto.AutenticarRequest;
-import sgc.seguranca.login.dto.AutorizarRequest;
-import sgc.seguranca.login.dto.EntrarRequest;
-import sgc.seguranca.login.dto.EntrarResponse;
+import sgc.seguranca.dto.AutenticarRequest;
+import sgc.seguranca.dto.AutorizarRequest;
+import sgc.seguranca.dto.EntrarRequest;
+import sgc.seguranca.dto.EntrarResponse;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

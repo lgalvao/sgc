@@ -2,7 +2,7 @@ package sgc.organizacao.dto;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Builder;
-import sgc.comum.validacao.TituloEleitoral;
+import sgc.comum.TituloEleitoral;
 import sgc.organizacao.model.OrganizacaoViews;
 
 /**

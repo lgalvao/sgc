@@ -54,7 +54,7 @@ class AlertaFacadeTest {
         Unidade unidadeRaiz = new Unidade();
         unidadeRaiz.setCodigo(1L);
         unidadeRaiz.setSigla("ADMIN");
-        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidadeRaiz);
+        when(unidadeService.porCodigo(1L)).thenReturn(unidadeRaiz);
     }
 
     @Nested
@@ -486,18 +486,18 @@ class AlertaFacadeTest {
             unidadeRaizMock.setSigla("ADMIN");
             unidadeRaizMock.setCodigo(1L);
 
-            when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidadeRaizMock);
+            when(unidadeService.porCodigo(1L)).thenReturn(unidadeRaizMock);
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             // Primeira chamada: deve buscar unidadeRaiz
             service.criarAlertaAdmin(new Processo(), new Unidade(), "Teste");
-            verify(unidadeService).buscarEntidadePorId(1L);
+            verify(unidadeService).porCodigo(1L);
 
             // Segunda chamada: busca novamente (sem cache lazy - simplificação para sistema pequeno)
             service.criarAlertaAdmin(new Processo(), new Unidade(), "Teste 2");
             // No mockito, verify acumula as chamadas, mas como é lazy, a segunda chamada não deve invocar o metodo no service.
             // Então verify(times(1)) deve ser correto para o total.
-            verify(unidadeService, times(2)).buscarEntidadePorId(1L);
+            verify(unidadeService, times(2)).porCodigo(1L);
         }
     }
 }

@@ -17,7 +17,7 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.mapa.service.MapaFacade;
+import sgc.mapa.MapaFacade;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.SituacaoUnidade;

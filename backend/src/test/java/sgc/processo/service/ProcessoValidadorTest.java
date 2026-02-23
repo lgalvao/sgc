@@ -51,9 +51,9 @@ class ProcessoValidadorTest {
     void getMensagemErroUnidadesSemMapaComErro() {
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
+        when(unidadeService.porCodigos(List.of(1L))).thenReturn(List.of(u));
         when(unidadeService.verificarMapaVigente(1L)).thenReturn(false);
-        when(unidadeService.buscarSiglasPorIds(List.of(1L))).thenReturn(List.of("SIGLA"));
+        when(unidadeService.siglasUnidadesPorCodigos(List.of(1L))).thenReturn(List.of("SIGLA"));
 
         Optional<String> msg = validador.getMensagemErroUnidadesSemMapa(List.of(1L));
         assertThat(msg).isPresent();
@@ -65,7 +65,7 @@ class ProcessoValidadorTest {
     void getMensagemErroUnidadesSemMapaSucesso() {
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        when(unidadeService.buscarEntidadesPorIds(List.of(1L))).thenReturn(List.of(u));
+        when(unidadeService.porCodigos(List.of(1L))).thenReturn(List.of(u));
         when(unidadeService.verificarMapaVigente(1L)).thenReturn(true);
 
         Optional<String> msg = validador.getMensagemErroUnidadesSemMapa(List.of(1L));

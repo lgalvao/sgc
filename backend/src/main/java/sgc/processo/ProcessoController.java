@@ -15,7 +15,6 @@ import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoViews;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoFacade;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoViews;
 
@@ -35,7 +34,6 @@ import java.util.function.BiFunction;
 public class ProcessoController {
     private final ProcessoFacade processoFacade;
 
-    // Strategy Pattern: Map de handlers para inicialização de processo por tipo
     Map<TipoProcesso, BiFunction<Long, List<Long>, List<String>>> getProcessadoresInicio() {
         return Map.of(
                 TipoProcesso.MAPEAMENTO, processoFacade::iniciarProcessoMapeamento,
@@ -122,9 +120,7 @@ public class ProcessoController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Inicia um processo")
     @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<Processo> iniciar(
-            @PathVariable Long codigo, @Valid @RequestBody IniciarProcessoRequest req) {
-
+    public ResponseEntity<Processo> iniciar(@PathVariable Long codigo, @Valid @RequestBody IniciarProcessoRequest req) {
         var processador = getProcessadoresInicio().get(req.tipo());
 
         List<String> erros = processador.apply(codigo, req.unidades());
@@ -176,6 +172,7 @@ public class ProcessoController {
             @RequestBody @Valid EnviarLembreteRequest request) {
         processoFacade.enviarLembrete(codigo, request.unidadeCodigo());
     }
+
     @PostMapping("/{codigo}/acao-em-bloco")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Executa ação em bloco para um processo")

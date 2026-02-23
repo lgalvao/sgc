@@ -18,12 +18,13 @@ import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.UnidadeFixture;
-import sgc.notificacao.NotificacaoEmailService;
-import sgc.notificacao.NotificacaoModelosService;
+import sgc.notificacao.EmailModelosService;
+import sgc.notificacao.EmailService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.processo.ProcessoFacade;
 import sgc.processo.dto.AcaoEmBlocoRequest;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoDetalheDto;
@@ -68,9 +69,9 @@ class ProcessoFacadeTest {
     @Mock
     private AlertaFacade alertaService;
     @Mock
-    private NotificacaoEmailService notificacaoEmailService;
+    private EmailService emailService;
     @Mock
-    private NotificacaoModelosService notificacaoModelosService;
+    private EmailModelosService emailModelosService;
     @Mock
     private SubprocessoFacade subprocessoFacade;
     @Mock
@@ -135,7 +136,7 @@ class ProcessoFacadeTest {
             processo.adicionarParticipantes(Set.of(unidade));
 
             when(processoConsultaService.buscarProcessoCodigo(codProcesso)).thenReturn(processo);
-            when(unidadeService.buscarEntidadePorId(codUnidade)).thenReturn(unidade);
+            when(unidadeService.porCodigo(codUnidade)).thenReturn(unidade);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
             when(subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
             unidade.setTituloTitular("T1");
@@ -143,13 +144,13 @@ class ProcessoFacadeTest {
             titular.setEmail("titular@teste.com");
             when(usuarioService.buscarPorLogin("T1")).thenReturn(titular);
             
-            when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
+            when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
 
             processoFacade.enviarLembrete(codProcesso, codUnidade);
 
             verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("15/03/2026"));
             verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
-            verify(notificacaoEmailService).enviarEmailHtml(
+            verify(emailService).enviarEmailHtml(
                 eq("titular@teste.com"), 
                 contains("SGC: Lembrete de prazo"), 
                 anyString()
@@ -307,19 +308,19 @@ class ProcessoFacadeTest {
             p.adicionarParticipantes(Set.of(u));
 
             when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
-            when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
+            when(unidadeService.porCodigo(10L)).thenReturn(u);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
             when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
             u.setTituloTitular("T10");
             Usuario titular = new Usuario();
             titular.setEmail("u10@teste.com");
             when(usuarioService.buscarPorLogin("T10")).thenReturn(titular);
-            when(notificacaoModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
+            when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
 
             processoFacade.enviarLembrete(1L, 10L);
             verify(alertaService).criarAlertaAdmin(eq(p), eq(u), anyString());
             verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
-            verify(notificacaoEmailService).enviarEmailHtml(eq("u10@teste.com"), contains(p.getDescricao()), anyString());
+            verify(emailService).enviarEmailHtml(eq("u10@teste.com"), contains(p.getDescricao()), anyString());
         }
 
         @Test
@@ -332,7 +333,7 @@ class ProcessoFacadeTest {
             p.adicionarParticipantes(Set.of(outra));
 
             when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
-            when(unidadeService.buscarEntidadePorId(10L)).thenReturn(u);
+            when(unidadeService.porCodigo(10L)).thenReturn(u);
 
             assertThatThrownBy(() -> processoFacade.enviarLembrete(1L, 10L))
                     .isInstanceOf(ErroProcesso.class)

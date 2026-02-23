@@ -9,6 +9,9 @@ import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
+import sgc.seguranca.policy.AtividadeAccessPolicy;
+import sgc.seguranca.policy.MapaAccessPolicy;
+import sgc.seguranca.policy.ProcessoAccessPolicy;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.security.SubprocessoSecurity;
 
@@ -60,7 +63,6 @@ public class AccessControlService {
             case Mapa m -> {
                 return mapaAccessPolicy.canExecute(usuario, acao, m);
             }
-            // Não executa nada para outros tipos
             default -> {
                 // Não executa nada para outros tipos
             }

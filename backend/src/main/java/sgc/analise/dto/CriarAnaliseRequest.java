@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import sgc.analise.model.TipoAcaoAnalise;
-import sgc.comum.validacao.TituloEleitoral;
+import sgc.comum.TituloEleitoral;
 
 @Builder
 public record CriarAnaliseRequest(

@@ -54,7 +54,7 @@ class ProcessoManutencaoServiceValidationTest {
                 .comTipo(TipoUnidade.INTERMEDIARIA)
                 .build();
 
-        when(unidadeService.buscarEntidadePorId(1L)).thenReturn(unidadeIntermediaria);
+        when(unidadeService.porCodigo(1L)).thenReturn(unidadeIntermediaria);
 
         when(processoValidador.validarTiposUnidades(anyList()))
                 .thenReturn(Optional.of("Unidades do tipo INTERMEDIARIA não podem participar de processos: COORD_11"));

@@ -32,12 +32,12 @@
     -->
     <Match>
         <Or>
-            <Class name="sgc.mapa.service.MapaFacade"/>
-            <Class name="sgc.mapa.service.AtividadeFacade"/>
+            <Class name="sgc.mapa.MapaFacade"/>
+            <Class name="sgc.mapa.AtividadeFacade"/>
             <Class name="sgc.subprocesso.service.crud.SubprocessoCrudService"/>
             <Class name="sgc.subprocesso.service.workflow.SubprocessoWorkflowService"/>
             <Class name="sgc.processo.service.ProcessoConsultaService"/>
-            <Class name="sgc.seguranca.login.LoginFacade"/>
+            <Class name="sgc.seguranca.LoginFacade"/>
             <Class name="sgc.e2e.E2eController"/>
         </Or>
         <Bug pattern="EI_EXPOSE_REP2"/>
@@ -57,7 +57,7 @@
         O padrão de exceção com causa é intencional para stack trace.
     -->
     <Match>
-        <Class name="sgc.relatorio.service.ErroRelatorio"/>
+        <Class name="sgc.relatorio.ErroRelatorio"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
 

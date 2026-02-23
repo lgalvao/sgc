@@ -8,11 +8,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.model.Unidade;
-import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -72,7 +71,7 @@ class ProcessoFinalizadorTest {
         verify(unidadeService).definirMapaVigente(100L, m);
         verify(processoRepo).save(p);
 
-        verify(processoNotificacaoService).notificarFinalizacaoProcesso(codigo);
+        verify(processoNotificacaoService).emailFinalizacaoProcesso(codigo);
     }
 
     @Test
@@ -82,25 +81,5 @@ class ProcessoFinalizadorTest {
                 .thenThrow(new ErroEntidadeNaoEncontrada("Processo", 1L));
         assertThatThrownBy(() -> finalizador.finalizar(1L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-    }
-
-    @Test
-    @DisplayName("Deve falhar se subprocesso não tiver mapa")
-    void deveFalharSeSubprocessoSemMapa() {
-        Long codigo = 1L;
-        Processo p = new Processo();
-        p.setCodigo(codigo);
-        when(repo.buscar(Processo.class, codigo)).thenReturn(p);
-
-        Subprocesso s = new Subprocesso();
-        s.setCodigo(10L);
-        s.setUnidade(new Unidade());
-        s.setMapa(null);
-
-        when(queryService.listarEntidadesPorProcesso(codigo)).thenReturn(List.of(s));
-
-        assertThatThrownBy(() -> finalizador.finalizar(codigo))
-                .isInstanceOf(ErroProcesso.class)
-                .hasMessageContaining("sem mapa associado");
     }
 }

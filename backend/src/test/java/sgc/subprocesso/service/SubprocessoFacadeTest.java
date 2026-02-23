@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
+import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;

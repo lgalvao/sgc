@@ -15,7 +15,7 @@ import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoFacade;
+import sgc.processo.ProcessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -13,9 +13,9 @@ import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
-import sgc.seguranca.login.dto.AutenticarRequest;
-import sgc.seguranca.login.dto.AutorizarRequest;
-import sgc.seguranca.login.dto.EntrarRequest;
+import sgc.seguranca.dto.AutenticarRequest;
+import sgc.seguranca.dto.AutorizarRequest;
+import sgc.seguranca.dto.EntrarRequest;
 import sgc.util.TestUtil;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;

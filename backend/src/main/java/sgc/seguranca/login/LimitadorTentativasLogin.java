@@ -50,11 +50,7 @@ public class LimitadorTentativasLogin {
 
         if (tentativasPorIp.size() >= maxCacheEntries) {
             limparCachePeriodico();
-
             if (tentativasPorIp.size() >= maxCacheEntries) {
-                // Se ainda estiver cheio após limpeza, estamos sob ataque ou carga pesada.
-                // Não limpamos o cache (Fail Safe), pois isso permitiria brute-force.
-                // Em vez disso, rejeitamos novos IPs.
                 if (!tentativasPorIp.containsKey(ip)) {
                     log.warn("Limitador de login cheio. Rejeitando novo IP: {}", ip);
                     throw new ErroMuitasTentativas("Muitas tentativas de login no sistema. Tente novamente mais tarde.");

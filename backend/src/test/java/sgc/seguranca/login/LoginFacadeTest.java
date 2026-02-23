@@ -14,8 +14,9 @@ import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.UsuarioService;
-import sgc.seguranca.login.dto.EntrarRequest;
-import sgc.seguranca.login.dto.PerfilUnidadeDto;
+import sgc.seguranca.LoginFacade;
+import sgc.seguranca.dto.EntrarRequest;
+import sgc.seguranca.dto.PerfilUnidadeDto;
 
 import java.util.List;
 

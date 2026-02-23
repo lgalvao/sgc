@@ -9,9 +9,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.repo.ComumRepo;
-import sgc.organizacao.dto.AtribuicaoTemporariaDto;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.comum.ComumRepo;
+import sgc.organizacao.dto.AtribuicaoDto;
+import sgc.organizacao.dto.CriarAtribuicaoRequest;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.*;
 
@@ -70,7 +70,7 @@ class ResponsavelUnidadeServiceTest {
             when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuario);
 
             // When
-            List<AtribuicaoTemporariaDto> resultado = service.buscarTodasAtribuicoes();
+            List<AtribuicaoDto> resultado = service.buscarTodasAtribuicoes();
 
             // Then
             assertThat(resultado).hasSize(1);
@@ -91,7 +91,7 @@ class ResponsavelUnidadeServiceTest {
             LocalDate dataInicio = LocalDate.of(2024, 1, 15);
             LocalDate dataTermino = LocalDate.of(2024, 2, 15);
             
-            CriarAtribuicaoTemporariaRequest request = new CriarAtribuicaoTemporariaRequest(
+            CriarAtribuicaoRequest request = new CriarAtribuicaoRequest(
                     "123456789012",
                     dataInicio,
                     dataTermino,

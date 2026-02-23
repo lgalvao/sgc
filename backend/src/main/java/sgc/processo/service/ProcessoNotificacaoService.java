@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.notificacao.NotificacaoEmailService;
-import sgc.notificacao.NotificacaoModelosService;
+import sgc.notificacao.EmailModelosService;
+import sgc.notificacao.EmailService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
@@ -35,8 +35,8 @@ import static sgc.organizacao.model.TipoUnidade.*;
 @Slf4j
 public class ProcessoNotificacaoService {
     private final AlertaFacade servicoAlertas;
-    private final NotificacaoEmailService notificacaoEmailService;
-    private final NotificacaoModelosService notificacaoModelosService;
+    private final EmailService emailService;
+    private final EmailModelosService emailModelosService;
     private final UnidadeFacade unidadeService;
     private final UsuarioFacade usuarioService;
     private final ProcessoRepo processoRepo;
@@ -46,31 +46,23 @@ public class ProcessoNotificacaoService {
      * Notifica sobre o início de um processo (alertas + e-mails).
      */
     @Transactional
-    public void notificarInicioProcesso(Long codProcesso, List<Long> codUnidades) {
-        try {
-            processarInicioProcesso(codProcesso);
-        } catch (Exception e) {
-            log.error("Erro ao processar notificação de processo iniciado: {}", e.getClass().getSimpleName(), e);
-        }
+    public void emailInicioProcesso(Long codProcesso, List<Long> codUnidades) {
+        processarInicioProcesso(codProcesso);
     }
 
     /**
      * Notifica sobre a finalização de um processo (alertas + e-mails).
      */
     @Transactional
-    public void notificarFinalizacaoProcesso(Long codProcesso) {
-        try {
-            processarFinalizacaoProcesso(codProcesso);
-        } catch (Exception e) {
-            log.error("Erro ao processar notificação de processo finalizado: {}", e.getClass().getSimpleName(), e);
-        }
+    public void emailFinalizacaoProcesso(Long codProcesso) {
+        processarFinalizacaoProcesso(codProcesso);
     }
 
     private void processarInicioProcesso(Long codProcesso) {
         Processo processo = processoRepo.findByIdComParticipantes(codProcesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
-        List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
 
+        List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
         if (subprocessos.isEmpty()) {
             log.warn("Nenhum subprocesso encontrado para o processo {}", codProcesso);
             return;
@@ -95,9 +87,8 @@ public class ProcessoNotificacaoService {
         });
 
         Map<String, Usuario> usuarios = usuarioService.buscarUsuariosPorTitulos(todosTitulos);
-
-        for (Subprocesso subprocesso : subprocessos) {
-            enviarEmailProcessoIniciado(processo, subprocesso, responsaveis, usuarios);
+        for (Subprocesso sp : subprocessos) {
+            enviarEmailProcessoIniciado(processo, sp, responsaveis, usuarios);
         }
     }
 
@@ -106,14 +97,13 @@ public class ProcessoNotificacaoService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
 
         List<Long> codigosParticipantes = processo.getCodigosParticipantes();
-
         if (codigosParticipantes.isEmpty()) {
             log.warn("Nenhuma unidade participante encontrada para notificar ao finalizar processo {}",
                     processo.getCodigo());
             return;
         }
 
-        List<Unidade> unidadesParticipantes = unidadeService.buscarEntidadesPorIds(codigosParticipantes);
+        List<Unidade> unidadesParticipantes = unidadeService.porCodigos(codigosParticipantes);
 
         List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
         Map<Long, UnidadeResponsavelDto> responsaveis = unidadeService.buscarResponsaveisUnidades(todosCodigosUnidades);
@@ -125,21 +115,16 @@ public class ProcessoNotificacaoService {
                 .toList());
 
         for (Unidade unidade : unidadesParticipantes) {
-            enviarNotificacaoFinalizacao(processo, unidade, responsaveis, usuarios, unidadesParticipantes);
+            enviarEmailFinalizacao(processo, unidade, responsaveis, usuarios, unidadesParticipantes);
         }
     }
 
-    private void enviarNotificacaoFinalizacao(Processo processo, Unidade unidade,
-            Map<Long, UnidadeResponsavelDto> responsaveis,
-            Map<String, Usuario> usuarios,
-            List<Unidade> subordinadas) {
+    private void enviarEmailFinalizacao(Processo processo, Unidade unidade,
+                                        Map<Long, UnidadeResponsavelDto> responsaveis,
+                                        Map<String, Usuario> usuarios,
+                                        List<Unidade> subordinadas) {
         try {
             UnidadeResponsavelDto responsavel = responsaveis.get(unidade.getCodigo());
-            // TODO nem responsavel nem sigla podem ser nulos nunca. É invariante do sistema!
-            if (responsavel == null || unidade.getSigla() == null) {
-                return;
-            }
-
             TipoUnidade tipoUnidade = unidade.getTipo();
             String emailUnidade = String.format("%s@tre-pe.jus.br", unidade.getSigla().toLowerCase());
 
@@ -153,8 +138,7 @@ public class ProcessoNotificacaoService {
             if (responsavel.substitutoTitulo() != null) {
                 String assunto = String.format("SGC: Finalização do processo %s", processo.getDescricao());
 
-                // Simplesmente reusa a lógica de corpo se for operacional
-                String html = notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(
+                String html = emailModelosService.criarEmailProcessoFinalizadoPorUnidade(
                         unidade.getSigla(),
                         processo.getDescricao());
                 enviarEmailParaSubstituto(responsavel.substitutoTitulo(), usuarios, assunto, html, unidade.getNome());
@@ -168,17 +152,17 @@ public class ProcessoNotificacaoService {
     private void enviarEmailUnidadeFinal(Processo processo, Unidade unidade, String email) {
         String assunto = String.format("SGC: Finalização do processo %s", processo.getDescricao());
 
-        String html = notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(
+        String html = emailModelosService.criarEmailProcessoFinalizadoPorUnidade(
                 unidade.getSigla(),
                 processo.getDescricao());
 
-        notificacaoEmailService.enviarEmailHtml(email, assunto, html);
+        emailService.enviarEmailHtml(email, assunto, html);
         log.info("E-mail de finalização enviado para {}", unidade.getSigla());
     }
 
     private void enviarEmailUnidadeIntermediaria(
-            Processo processo, 
-            Unidade unidade, 
+            Processo processo,
+            Unidade unidade,
             String email,
             List<Unidade> subordinadas) {
 
@@ -189,7 +173,7 @@ public class ProcessoNotificacaoService {
                 .sorted()
                 .toList();
 
-        // TODO nenhuma sentido isso: se uma unidade é intermediaria TEM que ter subordinadas! Invariante. Nao era para ter chegado inconsistente aqui!
+        // TODO nenhum sentido isso: se uma unidade é intermediaria TEM que ter subordinadas! Invariante. Nao era para ter chegado inconsistente aqui!
         if (siglasSubordinadas.isEmpty()) {
             log.warn("Nenhuma unidade subordinada encontrada para notificar a unidade intermediária {}",
                     unidade.getSigla());
@@ -199,10 +183,10 @@ public class ProcessoNotificacaoService {
         String assunto = String.format("SGC: Finalização do processo %s em unidades subordinadas",
                 processo.getDescricao());
 
-        String html = notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(unidade.getSigla(),
+        String html = emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(unidade.getSigla(),
                 processo.getDescricao(), siglasSubordinadas);
 
-        notificacaoEmailService.enviarEmailHtml(email, assunto, html);
+        emailService.enviarEmailHtml(email, assunto, html);
         log.info("E-mail de finalização (unidade intermediaria) enviado para {}", unidade.getSigla());
     }
 
@@ -219,16 +203,15 @@ public class ProcessoNotificacaoService {
             UnidadeResponsavelDto responsavel = responsaveis.get(codigoUnidade);
             String nomeUnidade = unidade.getNome();
             String assunto = switch (unidade.getTipo()) {
-                case OPERACIONAL, INTEROPERACIONAL, RAIZ -> "Processo Iniciado - %s".formatted(processo.getDescricao());
+                case OPERACIONAL, INTEROPERACIONAL, RAIZ -> "Processo iniciado - %s".formatted(processo.getDescricao());
                 case INTERMEDIARIA ->
-                    "Processo Iniciado em Unidades Subordinadas - %s".formatted(processo.getDescricao());
+                        "Processo iniciado em unidades subordinadas - %s".formatted(processo.getDescricao());
                 case SEM_EQUIPE -> "Notificação não enviada para unidade (N/A)";
             };
 
             String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
-
             String emailUnidade = String.format("%s@tre-pe.jus.br", unidade.getSigla().toLowerCase());
-            notificacaoEmailService.enviarEmailHtml(emailUnidade, assunto, corpoHtml);
+            emailService.enviarEmailHtml(emailUnidade, assunto, corpoHtml);
             log.info("E-mail enviado para {}", unidade.getSigla());
 
             if (responsavel.substitutoTitulo() != null) {
@@ -242,7 +225,7 @@ public class ProcessoNotificacaoService {
     String criarCorpoEmailPorTipo(TipoUnidade tipoUnidade, Processo processo, Subprocesso subprocesso) {
         return switch (tipoUnidade) {
             case OPERACIONAL, INTEROPERACIONAL, INTERMEDIARIA, RAIZ ->
-                    notificacaoModelosService.criarEmailProcessoIniciado(
+                    emailModelosService.criarEmailProcessoIniciado(
                             subprocesso.getUnidade().getNome(),
                             processo.getDescricao(),
                             processo.getTipo().name(),
@@ -253,16 +236,15 @@ public class ProcessoNotificacaoService {
     }
 
     void enviarEmailParaSubstituto(String tituloSubstituto, Map<String, Usuario> usuarios, String assunto,
-            String corpoHtml, String nomeUnidade) {
+                                   String corpoHtml, String nomeUnidade) {
         try {
             Usuario substituto = usuarios.get(tituloSubstituto);
             if (substituto != null && !substituto.getEmail().isBlank()) {
-                notificacaoEmailService.enviarEmailHtml(substituto.getEmail(), assunto, corpoHtml);
+                emailService.enviarEmailHtml(substituto.getEmail(), assunto, corpoHtml);
                 log.info("E-mail enviado ao substituto da unidade {}.", nomeUnidade);
             }
         } catch (Exception e) {
-            log.warn("Erro ao enviar e-mail ao substituto da unidade {}: {}", nomeUnidade,
-                    e.getClass().getSimpleName());
+            log.warn("Erro ao enviar e-mail ao substituto da unidade {}: {}", nomeUnidade, e.getClass().getSimpleName());
         }
     }
 }

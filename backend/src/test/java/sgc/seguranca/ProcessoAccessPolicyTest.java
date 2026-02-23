@@ -13,6 +13,7 @@ import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
 import sgc.organizacao.model.UsuarioPerfilRepo;
 import sgc.processo.model.Processo;
+import sgc.seguranca.policy.ProcessoAccessPolicy;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;

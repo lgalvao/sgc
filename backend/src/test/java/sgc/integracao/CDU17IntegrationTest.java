@@ -101,9 +101,9 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         subprocesso.setDataFimEtapa2(null);
         subprocesso = subprocessoRepo.save(subprocesso);
 
-        // Garante que o subprocesso esteja na unidade do ADMIN (100) para permitir DISPONIBILIZAR_MAPA
-        // O WithMockAdmin posiciona o usuario na unidade 100 por padrao (data.sql)
-        Unidade adminUnit = unidadeRepo.findById(100L).orElseThrow();
+        // Garante que o subprocesso esteja na unidade do ADMIN (1) para permitir DISPONIBILIZAR_MAPA
+        // O WithMockAdmin posiciona o usuario na unidade 1 por padrao (data.sql)
+        Unidade adminUnit = unidadeRepo.findById(1L).orElseThrow();
         Movimentacao movAdmin = Movimentacao.builder()
                 .subprocesso(subprocesso)
                 .unidadeOrigem(unidade)

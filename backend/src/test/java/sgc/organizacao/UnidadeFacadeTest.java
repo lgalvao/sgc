@@ -10,8 +10,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.dto.AtribuicaoTemporariaDto;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.organizacao.dto.AtribuicaoDto;
+import sgc.organizacao.dto.CriarAtribuicaoRequest;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.TipoUnidade;
@@ -99,7 +99,7 @@ class UnidadeFacadeTest {
             when(unidadeService.buscarPorId(1L)).thenReturn(unidade);
 
             // Act & Assert
-            assertThat(service.buscarPorCodigo(1L)).isNotNull();
+            assertThat(service.dtoPorCodigo(1L)).isNotNull();
         }
 
         @Test
@@ -194,7 +194,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve criar atribuição temporária com sucesso")
         void deveCriarAtribuicaoTemporariaComSucesso() {
             // Arrange
-            CriarAtribuicaoTemporariaRequest req = new CriarAtribuicaoTemporariaRequest(
+            CriarAtribuicaoRequest req = new CriarAtribuicaoRequest(
                     "123", LocalDate.now(), LocalDate.now().plusDays(1), "Justificativa");
 
             // Act
@@ -211,18 +211,18 @@ class UnidadeFacadeTest {
             when(usuarioService.buscarPorUnidadeLotacao(1L)).thenReturn(List.of(new Usuario()));
 
             // Act & Assert
-            assertThat(service.buscarUsuariosPorUnidade(1L)).hasSize(1);
+            assertThat(service.todosPorCodigoUnidade(1L)).hasSize(1);
         }
 
         @Test
         @DisplayName("Deve buscar todas as atribuições")
         void deveBuscarTodasAtribuicoes() {
             // Arrange
-            AtribuicaoTemporariaDto dto = AtribuicaoTemporariaDto.builder().build();
+            AtribuicaoDto dto = AtribuicaoDto.builder().build();
             when(responsavelService.buscarTodasAtribuicoes()).thenReturn(List.of(dto));
 
             // Act
-            List<AtribuicaoTemporariaDto> result = service.buscarTodasAtribuicoes();
+            List<AtribuicaoDto> result = service.buscarTodasAtribuicoes();
 
             // Assert
             assertThat(result).hasSize(1);
@@ -250,8 +250,8 @@ class UnidadeFacadeTest {
         @Test
         @DisplayName("Buscar entidades por IDs")
         void buscarEntidadesPorIds() {
-            service.buscarEntidadesPorIds(List.of(1L));
-            verify(unidadeService).buscarEntidadesPorIds(any());
+            service.porCodigos(List.of(1L));
+            verify(unidadeService).porCodigos(any());
         }
 
         @Test
@@ -271,7 +271,7 @@ class UnidadeFacadeTest {
         @DisplayName("Deve falhar ao buscar entidade por ID inexistente")
         void deveFalharAoBuscarEntidadePorIdInexistente() {
             when(unidadeService.buscarPorId(999L)).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 999L));
-            assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.buscarEntidadePorId(999L)));
+            assertNotNull(assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.porCodigo(999L)));
         }
     }
 

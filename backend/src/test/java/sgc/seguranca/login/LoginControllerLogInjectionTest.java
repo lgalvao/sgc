@@ -13,7 +13,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.OrganizacaoFacade;
-import sgc.seguranca.login.dto.AutenticarRequest;
+import sgc.seguranca.LoginFacade;
+import sgc.seguranca.dto.AutenticarRequest;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

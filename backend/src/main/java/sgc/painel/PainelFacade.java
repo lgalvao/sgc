@@ -17,7 +17,7 @@ import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.UnidadeProcesso;
-import sgc.processo.service.ProcessoFacade;
+import sgc.processo.ProcessoFacade;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -185,7 +185,7 @@ public class PainelFacade {
         }
 
         if (!missingIds.isEmpty()) {
-            List<Unidade> missingUnidades = unidadeService.buscarEntidadesPorIds(missingIds);
+            List<Unidade> missingUnidades = unidadeService.porCodigos(missingIds);
             missingUnidades.forEach(u -> siglas.add(u.getSigla()));
         }
 
@@ -225,7 +225,7 @@ public class PainelFacade {
         if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) {
             return "/processo/" + processo.getCodigo();
         }
-        var unidade = unidadeService.buscarPorCodigo(codigoUnidade);
+        var unidade = unidadeService.dtoPorCodigo(codigoUnidade);
         return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
     }
 }

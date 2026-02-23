@@ -10,7 +10,7 @@ import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.analise.model.TipoAcaoAnalise;
-import sgc.comum.dto.ComumDtos.JustificativaRequest;
+import sgc.comum.ComumDtos.JustificativaRequest;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.WithMockAdmin;
@@ -244,8 +244,8 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         subprocessoRepo.save(subprocesso);
         subprocessoRepo.flush();
 
-        // Garante que o subprocesso esteja na unidade do ADMIN (100)
-        Unidade adminUnit = unidadeRepo.findById(100L).orElseThrow();
+        // Garante que o subprocesso esteja na unidade do ADMIN (1)
+        Unidade adminUnit = unidadeRepo.findById(1L).orElseThrow();
         Movimentacao movAdmin = Movimentacao.builder()
                 .subprocesso(subprocesso)
                 .unidadeOrigem(unidadeSuperior)

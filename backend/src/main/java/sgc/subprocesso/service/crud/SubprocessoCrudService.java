@@ -5,7 +5,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;

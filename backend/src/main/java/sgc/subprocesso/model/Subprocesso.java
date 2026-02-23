@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.jspecify.annotations.NonNull;
 import sgc.comum.model.ComumViews;
 import sgc.comum.model.EntidadeBase;
 import sgc.mapa.model.Atividade;
@@ -23,6 +22,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Entity
 @Table(name = "SUBPROCESSO", schema = "sgc")
@@ -107,31 +108,16 @@ public class Subprocesso extends EntidadeBase {
         this.situacao = novaSituacao;
     }
 
-    public @NonNull Processo getProcesso() {
-        return processo;
-    }
-
-    public @NonNull Unidade getUnidade() {
-        return unidade;
-    }
-
     public boolean isEmAndamento() {
         final List<SituacaoSubprocesso> situacoesFinalizadas =
-                Arrays.asList(
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-                        SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
-                        SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
-
+                Arrays.asList(MAPEAMENTO_MAPA_HOMOLOGADO, REVISAO_MAPA_HOMOLOGADO, DIAGNOSTICO_CONCLUIDO);
         return !situacoesFinalizadas.contains(this.situacao) && !SituacaoSubprocesso.NAO_INICIADO.equals(this.situacao);
     }
 
+    // TODO nao existe etapa nula.
     public Integer getEtapaAtual() {
         final List<SituacaoSubprocesso> situacoesFinalizadas =
-                Arrays.asList(
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-                        SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
-                        SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
-
+                Arrays.asList(MAPEAMENTO_MAPA_HOMOLOGADO, REVISAO_MAPA_HOMOLOGADO, DIAGNOSTICO_CONCLUIDO);
         return !situacoesFinalizadas.contains(this.situacao) ? 1 : null;
     }
 }

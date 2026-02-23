@@ -11,7 +11,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
-import sgc.comum.dto.ComumDtos.JustificativaRequest;
+import sgc.comum.ComumDtos.JustificativaRequest;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.WithMockAdmin;

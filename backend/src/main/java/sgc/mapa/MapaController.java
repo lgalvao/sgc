@@ -10,7 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaViews;
-import sgc.mapa.service.MapaFacade;
 
 import java.net.URI;
 import java.util.List;

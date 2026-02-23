@@ -110,7 +110,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar unidade por código")
         void deveBuscarUnidadePorCodigo() {
             // Act
-            UnidadeDto result = unidadeService.buscarPorCodigo(COD_UNIT_SEC1);
+            UnidadeDto result = unidadeService.dtoPorCodigo(COD_UNIT_SEC1);
 
             // Assert
             assertNotNull(result);
@@ -167,14 +167,14 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar usuários por unidade de lotação")
         void deveBuscarPorUnidadeLotacao() {
             // Unidade 2 tem usuários no data.sql
-            List<Usuario> res = unidadeService.buscarUsuariosPorUnidade(2L);
+            List<Usuario> res = unidadeService.todosPorCodigoUnidade(2L);
             assertFalse(res.isEmpty());
         }
 
         @Test
         @DisplayName("Deve lançar erro ao buscar unidade inexistente por código ou sigla")
         void deveRetornarErroAoBuscarUnidadeInexistente() {
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService.buscarPorCodigo(9999L));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService.dtoPorCodigo(9999L));
             assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService.buscarPorSigla("SIGLA_NAO_EXISTE"));
         }
     }

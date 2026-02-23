@@ -6,8 +6,8 @@ import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import sgc.notificacao.NotificacaoEmailService;
-import sgc.notificacao.NotificacaoModelosService;
+import sgc.notificacao.EmailService;
+import sgc.notificacao.EmailModelosService;
 
 import java.time.LocalDateTime;
 
@@ -17,10 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ProcessoEmailIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private NotificacaoEmailService emailService;
+    private EmailService emailService;
 
     @Autowired
-    private NotificacaoModelosService modelosService;
+    private EmailModelosService modelosService;
 
     @Test
     @DisplayName("Deve enviar e-mail HTML real usando template e verificar no GreenMail")

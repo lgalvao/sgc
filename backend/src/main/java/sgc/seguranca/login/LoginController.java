@@ -19,7 +19,8 @@ import sgc.comum.erros.ErroAutenticacao;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.login.dto.*;
+import sgc.seguranca.LoginFacade;
+import sgc.seguranca.dto.*;
 
 import java.util.List;
 import java.util.Optional;

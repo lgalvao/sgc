@@ -19,7 +19,7 @@ import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.service.ProcessoFacade;
+import sgc.processo.ProcessoFacade;
 import sgc.testutils.UnidadeTestBuilder;
 
 import java.time.LocalDateTime;
@@ -144,7 +144,7 @@ class PainelServiceTest {
             Processo p = criarProcessoMock(1L);
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
                     .thenReturn(new PageImpl<>(List.of(p)));
-            when(unidadeService.buscarPorCodigo(1L)).thenReturn(UnidadeDto.builder()
+            when(unidadeService.dtoPorCodigo(1L)).thenReturn(UnidadeDto.builder()
                     .codigo(1L)
                     .sigla("U1")
                     .build());
@@ -159,7 +159,7 @@ class PainelServiceTest {
         void listarProcessos_ChefeRetornaLinkComSigla() {
             Long codigoUnidade = 1L;
             UnidadeDto unidadeDto = UnidadeDto.builder().sigla("SIGLA").build();
-            when(unidadeService.buscarPorCodigo(codigoUnidade)).thenReturn(unidadeDto);
+            when(unidadeService.dtoPorCodigo(codigoUnidade)).thenReturn(unidadeDto);
 
             Processo p = new Processo();
             p.setCodigo(100L);
@@ -206,7 +206,7 @@ class PainelServiceTest {
             p.adicionarParticipantes(Set.of(u));
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
-            lenient().when(unidadeService.buscarEntidadePorId(999L)).thenReturn(null);
+            lenient().when(unidadeService.porCodigo(999L)).thenReturn(null);
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
             assertThat(result.getContent()).isNotEmpty();
@@ -303,7 +303,7 @@ class PainelServiceTest {
             p.adicionarParticipantes(Set.of(u));
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
-            lenient().when(unidadeService.buscarEntidadePorId(999L)).thenThrow(new RuntimeException("ERRO"));
+            lenient().when(unidadeService.porCodigo(999L)).thenThrow(new RuntimeException("ERRO"));
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
 

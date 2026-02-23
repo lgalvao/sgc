@@ -7,7 +7,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.EmailService;
 import sgc.organizacao.UnidadeFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
@@ -27,7 +27,7 @@ import java.util.Map;
 public class SubprocessoEmailService {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private final NotificacaoEmailService notificacaoEmailService;
+    private final EmailService emailService;
     private final TemplateEngine templateEngine;
     private final UnidadeFacade unidadeFacade;
     private final UsuarioFacade usuarioFacade;
@@ -48,7 +48,7 @@ public class SubprocessoEmailService {
 
             // 1. Enviar para o e-mail da unidade (ex: sesel@tre-pe.jus.br)
             String emailUnidade = String.format("%s@tre-pe.jus.br", unidadeDestino.getSigla().toLowerCase());
-            notificacaoEmailService.enviarEmailHtml(emailUnidade, assunto, corpo);
+            emailService.enviarEmailHtml(emailUnidade, assunto, corpo);
             log.info("E-mail enviado para {}", unidadeDestino.getSigla());
 
             // 2. Enviar para o responsável atual (substituto ou titular se solicitado)
@@ -72,7 +72,7 @@ public class SubprocessoEmailService {
             usuarioFacade.buscarUsuarioPorTitulo(responsavel.substitutoTitulo())
                 .ifPresent(u -> {
                     if (u.getEmail() != null && !u.getEmail().isBlank()) {
-                        notificacaoEmailService.enviarEmailHtml(u.getEmail(), assunto, corpo);
+                        emailService.enviarEmailHtml(u.getEmail(), assunto, corpo);
                         log.info("E-mail pessoal enviado para substituto da unidade {}: {}", unidade.getSigla(), u.getEmail());
                     }
                 });
@@ -151,7 +151,7 @@ public class SubprocessoEmailService {
         while (superior != null) {
             try {
                 String emailSuperior = String.format("%s@tre-pe.jus.br", superior.getSigla().toLowerCase());
-                notificacaoEmailService.enviarEmailHtml(emailSuperior, assunto, corpo);
+                emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
                 log.info("E-mail enviado para unidade superior {} ({})", superior.getSigla(), emailSuperior);
             } catch (Exception e) {
                 log.warn("Falha ao enviar e-mail para {}: {}", superior.getSigla(), e.getMessage());

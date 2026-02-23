@@ -16,7 +16,7 @@ import sgc.mapa.dto.MapaVisualizacaoResponse;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaViews;
-import sgc.mapa.service.MapaFacade;
+import sgc.mapa.MapaFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;

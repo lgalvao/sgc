@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.OrganizacaoFacade;
-import sgc.processo.service.ProcessoFacade;
+import sgc.processo.ProcessoFacade;
 
 import javax.sql.DataSource;
 

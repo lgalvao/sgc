@@ -56,48 +56,29 @@ public class ProcessoDetalheBuilder {
             mapaSubprocessos.put(sp.getUnidade().getCodigo(), sp);
         }
 
-        // Loop 1 consolidado: Mapear participantes (snapshots) E preencher dados dos subprocessos
         for (UnidadeProcesso participante : processo.getParticipantes()) {
             UnidadeParticipanteDto unidadeDto = UnidadeParticipanteDto.fromSnapshot(participante);
-            
-            // Preencher dados do subprocesso se existir
             Subprocesso sp = mapaSubprocessos.get(participante.getUnidadeCodigo());
-            if (sp != null && unidadeDto != null) {
+            if (sp != null) {
                 unidadeDto.setSituacaoSubprocesso(sp.getSituacao());
                 unidadeDto.setDataLimite(sp.getDataLimiteEtapa1());
                 unidadeDto.setCodSubprocesso(sp.getCodigo());
-                if (sp.getMapa() != null) {
-                    unidadeDto.setMapaCodigo(sp.getMapa().getCodigo());
-                }
+                if (sp.getMapa() != null) unidadeDto.setMapaCodigo(sp.getMapa().getCodigo());
             }
-
-            if (unidadeDto != null) {
-                mapaUnidades.put(participante.getUnidadeCodigo(), unidadeDto);
-            }
+            mapaUnidades.put(participante.getUnidadeCodigo(), unidadeDto);
         }
 
-        // Loop 2 consolidado: Montar hierarquia E adicionar raízes
         for (UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
             Long codUnidadeSuperior = unidadeDto.getCodUnidadeSuperior();
             UnidadeParticipanteDto pai = mapaUnidades.get(codUnidadeSuperior);
-            
-            if (pai != null) {
-                // Tem pai participando do processo: adicionar como filho
-                pai.getFilhos().add(unidadeDto);
-            } else {
-                // Não tem pai ou pai não participa: é raiz
-                dto.getUnidades().add(unidadeDto);
-            }
+
+            if (pai != null) pai.getFilhos().add(unidadeDto);
+            else dto.getUnidades().add(unidadeDto);
         }
 
         // Ordenação
-        Comparator<UnidadeParticipanteDto> comparator =
-                Comparator.comparing(UnidadeParticipanteDto::getSigla);
-
+        Comparator<UnidadeParticipanteDto> comparator = Comparator.comparing(UnidadeParticipanteDto::getSigla);
         dto.getUnidades().sort(comparator);
-
-        for (UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
-            unidadeDto.getFilhos().sort(comparator);
-        }
+        mapaUnidades.values().forEach(unidadeDto -> unidadeDto.getFilhos().sort(comparator));
     }
 }

@@ -1,7 +1,7 @@
 package sgc.organizacao.dto;
 
 import lombok.Builder;
-import sgc.comum.validacao.TituloEleitoral;
+import sgc.comum.TituloEleitoral;
 import sgc.organizacao.model.Perfil;
 
 @Builder

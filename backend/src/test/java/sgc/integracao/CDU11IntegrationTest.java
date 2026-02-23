@@ -61,6 +61,7 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         // Unidade
         unidade = UnidadeFixture.unidadeComSigla("SENIC");
         unidade.setCodigo(null);
+        unidade.setUnidadeSuperior(unidadeRepo.findById(1L).orElseThrow());
         unidade = unidadeRepo.save(unidade);
 
         // Assign users to this new unit so login works

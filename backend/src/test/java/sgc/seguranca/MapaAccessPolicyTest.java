@@ -13,6 +13,7 @@ import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
 import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.seguranca.policy.MapaAccessPolicy;
 
 import java.util.ArrayList;
 import java.util.List;

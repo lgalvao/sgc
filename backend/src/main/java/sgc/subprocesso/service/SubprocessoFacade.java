@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
+import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;

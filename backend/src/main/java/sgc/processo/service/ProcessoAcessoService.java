@@ -17,17 +17,17 @@ import java.util.stream.Collectors;
 
 /**
  * Serviço responsável pelo controle de acesso a processos.
- *
+ * <p>
  * Implementa a lógica de verificação hierárquica de acesso baseada
  * em unidades organizacionais e perfis de usuário.
  */
 @Service
 @Slf4j
 @RequiredArgsConstructor
-class ProcessoAcessoService {
+public class ProcessoAcessoService {
     private final UnidadeFacade unidadeService;
     private final UsuarioFacade usuarioService;
-    private final ConsultasSubprocessoService queryService;
+    private final ConsultasSubprocessoService consultas;
 
     /**
      * Verifica se o usuário autenticado tem acesso ao processo.
@@ -45,24 +45,16 @@ class ProcessoAcessoService {
         String username = authentication.getName();
         boolean isGestorOuChefe = authentication.getAuthorities().stream()
                 .anyMatch(a -> "ROLE_GESTOR".equals(a.getAuthority()) || "ROLE_CHEFE".equals(a.getAuthority()));
-
-        if (!isGestorOuChefe) {
-            return false;
-        }
+        if (!isGestorOuChefe) return false;
 
         List<PerfilDto> perfis = usuarioService.buscarPerfisUsuario(username);
-        if (perfis.isEmpty()) {
-            return false;
-        }
+        if (perfis.isEmpty()) return false;
 
         Set<Long> unidadesUsuario = perfis.stream()
                 .map(PerfilDto::unidadeCodigo)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
-
-        if (unidadesUsuario.isEmpty()) {
-            return false;
-        }
+        if (unidadesUsuario.isEmpty()) return false;
 
         List<Unidade> todasUnidades = unidadeService.buscarTodasEntidadesComHierarquia();
         Map<Long, List<Unidade>> mapaPorPai = buildMapaPorPai(todasUnidades);
@@ -72,7 +64,7 @@ class ProcessoAcessoService {
             todasUnidadesAcesso.addAll(buscarDescendentesNoMapa(codUnidade, mapaPorPai));
         }
 
-        return queryService.verificarAcessoUnidadeAoProcesso(codProcesso, new ArrayList<>(todasUnidadesAcesso));
+        return consultas.verificarAcessoUnidadeAoProcesso(codProcesso, new ArrayList<>(todasUnidadesAcesso));
     }
 
     /**

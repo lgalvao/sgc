@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.fixture.UsuarioFixture;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.organizacao.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.organizacao.dto.CriarAtribuicaoRequest;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioRepo;
@@ -57,7 +57,7 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void criarAtribuicaoTemporaria_sucesso() throws Exception {
         // Given
-        CriarAtribuicaoTemporariaRequest request = new CriarAtribuicaoTemporariaRequest(
+        CriarAtribuicaoRequest request = new CriarAtribuicaoRequest(
                 usuario.getTituloEleitoral(),
                 LocalDate.now(),
                 LocalDate.now().plusDays(30),
@@ -99,7 +99,7 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     void criarAtribuicaoTemporaria_datasInvalidas_erro() throws Exception {
         // Given: Data término antes do início
-        CriarAtribuicaoTemporariaRequest request = new CriarAtribuicaoTemporariaRequest(
+        CriarAtribuicaoRequest request = new CriarAtribuicaoRequest(
                 usuario.getTituloEleitoral(),
                 LocalDate.now().plusDays(10),
                 LocalDate.now(),

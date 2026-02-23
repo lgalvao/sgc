@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
-import sgc.comum.dto.ComumDtos.JustificativaRequest;
-import sgc.comum.dto.ComumDtos.TextoOpcionalRequest;
+import sgc.comum.ComumDtos.JustificativaRequest;
+import sgc.comum.ComumDtos.TextoOpcionalRequest;
 import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
@@ -27,7 +27,6 @@ import sgc.subprocesso.dto.ImportarAtividadesRequest;
 import sgc.subprocesso.dto.MensagemResponse;
 import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoViews;
 import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;

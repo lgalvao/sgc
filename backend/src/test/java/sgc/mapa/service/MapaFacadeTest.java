@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.MapaFacade;
 import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.dto.MapaVisualizacaoResponse;
 import sgc.mapa.dto.SalvarMapaRequest;

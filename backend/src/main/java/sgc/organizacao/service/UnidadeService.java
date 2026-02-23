@@ -3,7 +3,7 @@ package sgc.organizacao.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.repo.ComumRepo;
+import sgc.comum.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.*;
 
@@ -33,8 +33,6 @@ public class UnidadeService {
     private final UnidadeMapaRepo unidadeMapaRepo;
     private final ComumRepo repo;
 
-    // ========== Consultas Básicas ==========
-
     public Unidade buscarPorId(Long codigo) {
         return repo.buscar(Unidade.class, Map.of("codigo", codigo, "situacao", SituacaoUnidade.ATIVA));
     }
@@ -43,19 +41,17 @@ public class UnidadeService {
         return repo.buscarPorSigla(Unidade.class, sigla);
     }
 
-    public List<Unidade> buscarEntidadesPorIds(List<Long> codigos) {
+    public List<Unidade> porCodigos(List<Long> codigos) {
         return unidadeRepo.findAllById(codigos);
     }
 
-    public List<Unidade> buscarTodasEntidadesComHierarquia() {
+    public List<Unidade> todasComHierarquia() {
         return unidadeRepo.findAllWithHierarquia();
     }
 
     public List<String> buscarSiglasPorIds(List<Long> codigos) {
         return unidadeRepo.findSiglasByCodigos(codigos);
     }
-
-    // ========== Mapas Vigentes ==========
 
     /**
      * Verifica se uma unidade possui mapa vigente.

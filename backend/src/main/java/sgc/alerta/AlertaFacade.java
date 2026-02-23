@@ -33,7 +33,7 @@ public class AlertaFacade {
      * Obtém a unidade raiz (ADMIN) do sistema.
      */
     private Unidade getUnidadeRaiz() {
-        return unidadeService.buscarEntidadePorId(1L);
+        return unidadeService.porCodigo(1L);
     }
 
     /**

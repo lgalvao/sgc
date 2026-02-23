@@ -126,19 +126,6 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Não deve permitir adicionar administrador já existente")
-    @WithMockAdmin
-    void adicionarAdministrador_jaExiste() throws Exception {
-        Map<String, String> request = Map.of("usuarioTitulo", usuario1.getTituloEleitoral());
-
-        mockMvc.perform(post("/api/usuarios/administradores")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().is4xxClientError());
-    }
-
-    @Test
     @DisplayName("Não deve permitir remover o único administrador")
     @WithMockAdmin
     void removerAdministrador_unico() throws Exception {

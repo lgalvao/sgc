@@ -82,8 +82,8 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
         // Atualizar referência no subprocesso (para consistência do objeto em memória)
         subprocesso.setMapa(mapa);
 
-        // Garante que o subprocesso esteja na unidade do ADMIN (100) para permitir ajuste
-        Unidade adminUnit = unidadeRepo.findById(100L).orElseThrow();
+        // Garante que o subprocesso esteja na unidade do ADMIN (1) para permitir ajuste
+        Unidade adminUnit = unidadeRepo.findById(1L).orElseThrow();
         Movimentacao movAdmin = Movimentacao.builder()
                 .subprocesso(subprocesso)
                 .unidadeOrigem(unidade)

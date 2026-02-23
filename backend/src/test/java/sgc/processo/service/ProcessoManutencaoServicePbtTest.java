@@ -36,7 +36,7 @@ class ProcessoManutencaoServicePbtTest {
             processoRepo, unidadeService, processoValidador, processoConsultaService
         );
 
-        when(unidadeService.buscarEntidadePorId(any())).thenAnswer(inv -> {
+        when(unidadeService.porCodigo(any())).thenAnswer(inv -> {
              Unidade u = new Unidade();
              u.setCodigo((Long) inv.getArgument(0));
              u.setSituacao(SituacaoUnidade.ATIVA);
@@ -63,7 +63,7 @@ class ProcessoManutencaoServicePbtTest {
             processoRepo, unidadeService, processoValidador, processoConsultaService
         );
 
-        when(unidadeService.buscarEntidadePorId(any())).thenAnswer(inv -> {
+        when(unidadeService.porCodigo(any())).thenAnswer(inv -> {
              Unidade u = new Unidade();
              u.setCodigo((Long) inv.getArgument(0));
              u.setSituacao(SituacaoUnidade.ATIVA);

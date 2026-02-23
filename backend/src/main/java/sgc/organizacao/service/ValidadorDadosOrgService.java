@@ -69,7 +69,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
                     .collect(Collectors.joining("; "));
 
             if (violacoes.size() > 3) {
-                detalhes += "; ... (+ " + (violacoes.size() - 3) + " outras)";
+                detalhes += "; ... (+ %d outras)".formatted(violacoes.size() - 3);
             }
 
             String msg = "Dados organizacionais inválidos. %d %s: [%s]".formatted(violacoes.size(), termo, detalhes);
