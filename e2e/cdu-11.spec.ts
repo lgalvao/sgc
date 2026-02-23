@@ -197,18 +197,14 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-        if (!await page.getByTestId('card-subprocesso-atividades-vis').isVisible().catch(() => false)) {
-            await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        }
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado para finalização do cenário');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
         await page.goto('/painel');
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-        if (!await page.getByTestId('card-subprocesso-mapa').isVisible().catch(() => false)) {
-            await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        }
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
 
         // Adicionar competências e disponibilizar mapa
         await navegarParaMapa(page);
