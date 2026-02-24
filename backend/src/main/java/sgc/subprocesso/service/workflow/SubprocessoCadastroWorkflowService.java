@@ -15,8 +15,6 @@ import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.Acao;
-import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
 import sgc.subprocesso.eventos.TipoTransicao;
@@ -31,7 +29,6 @@ import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static sgc.seguranca.Acao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service
@@ -51,8 +48,6 @@ public class SubprocessoCadastroWorkflowService {
 
     private final SubprocessoValidacaoService validacaoService;
     private final ImpactoMapaService impactoMapaService;
-
-    private final AccessControlService accessControlService;
 
     @Transactional
     public void reabrirCadastro(Long codigo, String justificativa) {
@@ -113,22 +108,22 @@ public class SubprocessoCadastroWorkflowService {
 
     @Transactional
     public void disponibilizarCadastro(Long codSubprocesso, Usuario usuario) {
-        disponibilizar(codSubprocesso, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO,
-                DISPONIBILIZAR_CADASTRO, usuario);
+        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
+        validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        disponibilizar(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, usuario);
     }
 
     @Transactional
     public void disponibilizarRevisao(Long codSubprocesso, Usuario usuario) {
-        disponibilizar(codSubprocesso, REVISAO_CADASTRO_DISPONIBILIZADA,
-                TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, DISPONIBILIZAR_REVISAO_CADASTRO, usuario);
+        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
+        validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_EM_ANDAMENTO);
+        disponibilizar(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, usuario);
     }
 
-    private void disponibilizar(Long codSubprocesso, SituacaoSubprocesso novaSituacao,
-            TipoTransicao transicao, Acao acaoPermissao, Usuario usuario) {
+    private void disponibilizar(Subprocesso sp, SituacaoSubprocesso novaSituacao,
+            TipoTransicao transicao, Usuario usuario) {
 
-        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, acaoPermissao, sp);
-        validarRequisitosNegocioParaDisponibilizacao(codSubprocesso);
+        validarRequisitosNegocioParaDisponibilizacao(sp.getCodigo());
 
         Unidade origem = sp.getUnidade();
 
@@ -165,7 +160,7 @@ public class SubprocessoCadastroWorkflowService {
     @Transactional
     public void devolverCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, DEVOLVER_CADASTRO, sp);
+        validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         Unidade unidadeSubprocesso = sp.getUnidade();
         Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
@@ -197,7 +192,7 @@ public class SubprocessoCadastroWorkflowService {
 
     private void executarAceiteCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, ACEITAR_CADASTRO, sp);
+        validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         Unidade unidadeAtual = obterUnidadeLocalizacao(sp);
         Unidade unidadeDestino = unidadeAtual.getUnidadeSuperior();
@@ -239,7 +234,7 @@ public class SubprocessoCadastroWorkflowService {
 
     private void executarHomologacaoCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, HOMOLOGAR_CADASTRO, sp);
+        validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
         sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
@@ -258,7 +253,7 @@ public class SubprocessoCadastroWorkflowService {
     @Transactional
     public void devolverRevisaoCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, DEVOLVER_REVISAO_CADASTRO, sp);
+        validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_DISPONIBILIZADA);
 
         Unidade unidadeSubprocesso = sp.getUnidade();
         Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
@@ -285,7 +280,7 @@ public class SubprocessoCadastroWorkflowService {
     @Transactional
     public void aceitarRevisaoCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, ACEITAR_REVISAO_CADASTRO, sp);
+        validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_DISPONIBILIZADA);
 
         Unidade unidadeAtual = obterUnidadeLocalizacao(sp);
         Unidade unidadeDestino = unidadeAtual.getUnidadeSuperior();
@@ -311,7 +306,7 @@ public class SubprocessoCadastroWorkflowService {
     @Transactional
     public void homologarRevisaoCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, HOMOLOGAR_REVISAO_CADASTRO, sp);
+        validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_DISPONIBILIZADA);
 
         var impactos = impactoMapaService.verificarImpactos(sp, usuario);
         if (impactos.temImpactos()) {

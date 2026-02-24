@@ -19,10 +19,12 @@ import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.*;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.comum.erros.ErroAcessoNegado;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ public class ProcessoFacade {
     private final ProcessoAcessoService processoAcessoService;
     private final ProcessoFinalizador processoFinalizador;
     private final EmailModelosService emailModelosService;
+    private final SgcPermissionEvaluator permissionEvaluator;
 
     private Processo buscarPorId(Long id) {
         return processoConsultaService.buscarProcessoCodigo(id);
@@ -207,6 +210,9 @@ public class ProcessoFacade {
         List<Subprocesso> subprocessos = subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
 
         if (req.acao() == DISPONIBILIZAR) {
+            if (!permissionEvaluator.checkPermission(usuario, subprocessos, "DISPONIBILIZAR_MAPA")) {
+                throw new ErroAcessoNegado("Usuário não tem permissão para disponibilizar mapas para algumas unidades selecionadas.");
+            }
             List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
             DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(
                     req.dataLimite(),
@@ -220,6 +226,17 @@ public class ProcessoFacade {
     }
 
     private void processarAcoesAceiteHomologacao(AcaoEmBlocoRequest req, Usuario usuario, List<Subprocesso> subprocessos) {
+        String permissao = null;
+        if (req.acao() == ACEITAR) permissao = "ACEITAR_CADASTRO"; // Pode ser ACEITAR_MAPA também, depende do contexto
+        if (req.acao() == HOMOLOGAR) permissao = "HOMOLOGAR_CADASTRO";
+
+        // A verificação exata depende do tipo de subprocesso (Cadastro vs Mapa), que é inferido pela situação.
+        // O PermissionEvaluator verifica a ação específica.
+        // Aqui vamos iterar e verificar individualmente ou confiar que o método hasPermission(Collection) do Evaluator
+        // consegue lidar se passarmos a lista. Mas como a ação varia (Aceitar Cadastro vs Aceitar Mapa),
+        // precisamos refinar.
+
+        // Melhor abordagem: Deixar o loop de categorização verificar ou agrupar e depois verificar.
         List<Long> idsAceitarCadastro = new ArrayList<>();
         List<Long> idsAceitarValidacao = new ArrayList<>();
         List<Long> idsHomologarCadastro = new ArrayList<>();
@@ -231,7 +248,42 @@ public class ProcessoFacade {
             categorizarPorAcao(req, sp, idsAceitarCadastro, idsAceitarValidacao, idsHomologarCadastro, idsHomologarValidacao);
         }
 
+        verificarPermissoesBatch(usuario, subprocessos, idsAceitarCadastro, idsAceitarValidacao, idsHomologarCadastro, idsHomologarValidacao);
         executarAcoesBatch(usuario, idsAceitarCadastro, idsAceitarValidacao, idsHomologarCadastro, idsHomologarValidacao);
+    }
+
+    private void verificarPermissoesBatch(Usuario usuario, List<Subprocesso> todosSubprocessos,
+                                          List<Long> idsAceitarCadastro, List<Long> idsAceitarValidacao,
+                                          List<Long> idsHomologarCadastro, List<Long> idsHomologarValidacao) {
+
+        // Helper para filtrar subprocessos por lista de IDs
+        var mapSubprocessos = new java.util.HashMap<Long, Subprocesso>();
+        todosSubprocessos.forEach(sp -> mapSubprocessos.put(sp.getCodigo(), sp));
+
+        if (!idsAceitarCadastro.isEmpty()) {
+            List<Subprocesso> alvos = idsAceitarCadastro.stream().map(mapSubprocessos::get).toList();
+            if (!permissionEvaluator.checkPermission(usuario, alvos, "ACEITAR_CADASTRO")) {
+                 throw new ErroAcessoNegado("Sem permissão para aceitar alguns cadastros selecionados.");
+            }
+        }
+        if (!idsAceitarValidacao.isEmpty()) {
+            List<Subprocesso> alvos = idsAceitarValidacao.stream().map(mapSubprocessos::get).toList();
+            if (!permissionEvaluator.checkPermission(usuario, alvos, "ACEITAR_MAPA")) {
+                 throw new ErroAcessoNegado("Sem permissão para aceitar alguns mapas selecionados.");
+            }
+        }
+        if (!idsHomologarCadastro.isEmpty()) {
+            List<Subprocesso> alvos = idsHomologarCadastro.stream().map(mapSubprocessos::get).toList();
+            if (!permissionEvaluator.checkPermission(usuario, alvos, "HOMOLOGAR_CADASTRO")) {
+                 throw new ErroAcessoNegado("Sem permissão para homologar alguns cadastros selecionados.");
+            }
+        }
+        if (!idsHomologarValidacao.isEmpty()) {
+            List<Subprocesso> alvos = idsHomologarValidacao.stream().map(mapSubprocessos::get).toList();
+            if (!permissionEvaluator.checkPermission(usuario, alvos, "HOMOLOGAR_MAPA")) {
+                 throw new ErroAcessoNegado("Sem permissão para homologar alguns mapas selecionados.");
+            }
+        }
     }
 
     private void categorizarPorAcao(AcaoEmBlocoRequest req, Subprocesso sp,

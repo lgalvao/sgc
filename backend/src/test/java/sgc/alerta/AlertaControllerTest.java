@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.seguranca.SgcPermissionEvaluator;
 
 import java.util.List;
 
@@ -36,6 +37,8 @@ class AlertaControllerTest {
     private static final String TITULO_TESTE = "12345678901"; // 11 ou 12 dígitos
     @Autowired
     private MockMvc mockMvc;
+    @MockitoBean
+    private SgcPermissionEvaluator permissionEvaluator;
     @MockitoBean
     private AlertaFacade alertaFacade;
 

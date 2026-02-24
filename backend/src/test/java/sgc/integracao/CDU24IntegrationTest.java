@@ -144,6 +144,9 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                 .build();
         movimentacaoRepo.save(movAdmin2);
 
+        entityManager.flush();
+        entityManager.clear();
+
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .subprocessos(unidadesSelecionadas)
                 .acao("DISPONIBILIZAR")

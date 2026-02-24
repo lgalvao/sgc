@@ -1,4 +1,6 @@
 package sgc.seguranca.login;
+import sgc.seguranca.SgcPermissionEvaluator;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +42,8 @@ class LoginControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @MockitoBean
+    private SgcPermissionEvaluator permissionEvaluator;
 
     private ObjectMapper objectMapper;
 

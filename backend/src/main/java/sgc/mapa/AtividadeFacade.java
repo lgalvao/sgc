@@ -12,16 +12,18 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.AccessControlService;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.PermissoesSubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
+import sgc.comum.erros.ErroAcessoNegado;
 
 import java.util.List;
 
-import static sgc.seguranca.Acao.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service
 @Transactional
@@ -29,22 +31,25 @@ import static sgc.seguranca.Acao.*;
 public class AtividadeFacade {
     private final MapaManutencaoService mapaManutencaoService;
     private final SubprocessoFacade subprocessoFacade;
-    private final AccessControlService accessControlService;
+    private final SgcPermissionEvaluator permissionEvaluator;
     private final UsuarioFacade usuarioService;
     private final MapaFacade mapaFacade;
+    private final SubprocessoValidacaoService validacaoService;
 
     public AtividadeFacade(
             MapaManutencaoService mapaManutencaoService,
             @Lazy SubprocessoFacade subprocessoFacade,
-            AccessControlService accessControlService,
+            SgcPermissionEvaluator permissionEvaluator,
             UsuarioFacade usuarioService,
-            MapaFacade mapaFacade) {
+            MapaFacade mapaFacade,
+            SubprocessoValidacaoService validacaoService) {
 
         this.mapaManutencaoService = mapaManutencaoService;
         this.subprocessoFacade = subprocessoFacade;
-        this.accessControlService = accessControlService;
+        this.permissionEvaluator = permissionEvaluator;
         this.usuarioService = usuarioService;
         this.mapaFacade = mapaFacade;
+        this.validacaoService = validacaoService;
     }
 
     @Transactional(readOnly = true)
@@ -60,10 +65,7 @@ public class AtividadeFacade {
     public AtividadeOperacaoResponse criarAtividade(CriarAtividadeRequest request) {
         Long mapaCodigo = request.mapaCodigo();
         Usuario usuario = usuarioService.usuarioAutenticado();
-        Mapa mapa = mapaFacade.mapaPorCodigo(mapaCodigo);
-
-        Atividade atividadeTemp = Atividade.builder().mapa(mapa).build();
-        accessControlService.verificarPermissao(usuario, CRIAR_ATIVIDADE, atividadeTemp);
+        verificarPermissaoEdicao(mapaCodigo, usuario);
 
         Atividade salvo = mapaManutencaoService.criarAtividade(request);
         return criarRespostaOperacaoPorMapaCodigo(mapaCodigo, salvo.getCodigo(), true);
@@ -73,7 +75,7 @@ public class AtividadeFacade {
         Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codigo);
         Usuario usuario = usuarioService.usuarioAutenticado();
 
-        accessControlService.verificarPermissao(usuario, EDITAR_ATIVIDADE, atividade);
+        verificarPermissaoEdicao(atividade.getMapa().getCodigo(), usuario);
         mapaManutencaoService.atualizarAtividade(codigo, request);
 
         return criarRespostaOperacaoPorAtividade(codigo);
@@ -81,11 +83,10 @@ public class AtividadeFacade {
 
     public AtividadeOperacaoResponse excluirAtividade(Long codigo) {
         Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codigo);
-        Mapa mapa = atividade.getMapa();
-        Long codMapa = mapa.getCodigo();
+        Long codMapa = atividade.getMapa().getCodigo();
 
         Usuario usuario = usuarioService.usuarioAutenticado();
-        accessControlService.verificarPermissao(usuario, EXCLUIR_ATIVIDADE, atividade);
+        verificarPermissaoEdicao(codMapa, usuario);
         mapaManutencaoService.excluirAtividade(codigo);
 
         return criarRespostaOperacaoPorMapaCodigo(codMapa, codigo, false);
@@ -94,7 +95,7 @@ public class AtividadeFacade {
     public ResultadoOperacaoConhecimento criarConhecimento(Long codAtividade, CriarConhecimentoRequest request) {
         Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codAtividade);
         Usuario usuario = usuarioService.usuarioAutenticado();
-        accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
+        verificarPermissaoEdicao(atividade.getMapa().getCodigo(), usuario);
 
         Conhecimento salvo = mapaManutencaoService.criarConhecimento(codAtividade, request);
         AtividadeOperacaoResponse response = criarRespostaOperacaoPorAtividade(codAtividade);
@@ -105,7 +106,7 @@ public class AtividadeFacade {
     public AtividadeOperacaoResponse atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
         Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codAtividade);
         Usuario usuario = usuarioService.usuarioAutenticado();
-        accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
+        verificarPermissaoEdicao(atividade.getMapa().getCodigo(), usuario);
 
         mapaManutencaoService.atualizarConhecimento(codAtividade, codConhecimento, request);
         return criarRespostaOperacaoPorAtividade(codAtividade);
@@ -115,10 +116,23 @@ public class AtividadeFacade {
         Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codAtividade);
 
         Usuario usuario = usuarioService.usuarioAutenticado();
-        accessControlService.verificarPermissao(usuario, ASSOCIAR_CONHECIMENTOS, atividade);
+        verificarPermissaoEdicao(atividade.getMapa().getCodigo(), usuario);
 
         mapaManutencaoService.excluirConhecimento(codAtividade, codConhecimento);
         return criarRespostaOperacaoPorAtividade(codAtividade);
+    }
+
+    private void verificarPermissaoEdicao(Long mapaCodigo, Usuario usuario) {
+        Subprocesso sp = subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo);
+
+        if (!permissionEvaluator.checkPermission(usuario, sp, "EDITAR_CADASTRO")) {
+             throw new ErroAcessoNegado("Usuário não tem permissão para editar atividades neste subprocesso.");
+        }
+
+        validacaoService.validarSituacaoPermitida(sp,
+                NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO,
+                MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES,
+                REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES);
     }
 
     private AtividadeOperacaoResponse criarRespostaOperacaoPorAtividade(Long codigoAtividade) {

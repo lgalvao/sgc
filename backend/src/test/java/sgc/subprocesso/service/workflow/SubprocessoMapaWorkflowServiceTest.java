@@ -25,7 +25,6 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.dto.CompetenciaRequest;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
@@ -67,8 +66,6 @@ class SubprocessoMapaWorkflowServiceTest {
     @Mock
     private SubprocessoValidacaoService validacaoService;
 
-    @Mock
-    private AccessControlService accessControlService;
     @Mock
     private SubprocessoCrudService crudService;
     @Mock

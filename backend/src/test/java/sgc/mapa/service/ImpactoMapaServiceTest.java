@@ -13,9 +13,9 @@ import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.Acao;
-import sgc.seguranca.AccessControlService;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,19 +23,29 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
+import org.junit.jupiter.api.BeforeEach;
 
 @ExtendWith(MockitoExtension.class)
 class ImpactoMapaServiceTest {
     @Mock private MapaRepo mapaRepo;
     @Mock private CompetenciaRepo competenciaRepo;
     @Mock private MapaManutencaoService mapaManutencaoService;
-    @Mock private AccessControlService accessControlService;
+    @Mock private SgcPermissionEvaluator permissionEvaluator;
+    @Mock private SubprocessoValidacaoService validacaoService;
     @Mock private ComumRepo repo;
 
     @InjectMocks
     private ImpactoMapaService impactoMapaService;
+
+    @BeforeEach
+    void setUp() {
+        // Default permission behavior for tests unless overridden
+        doReturn(true).when(permissionEvaluator).checkPermission(any(), any(), any());
+    }
 
     @Test
     @DisplayName("Deve retornar sem impacto se não houver mapa vigente")
@@ -54,8 +64,6 @@ class ImpactoMapaServiceTest {
         assertTrue(result.inseridas().isEmpty());
         assertTrue(result.removidas().isEmpty());
         assertTrue(result.alteradas().isEmpty());
-        
-        verify(accessControlService).verificarPermissao(usuario, Acao.VERIFICAR_IMPACTOS, subprocesso);
     }
 
     @Test

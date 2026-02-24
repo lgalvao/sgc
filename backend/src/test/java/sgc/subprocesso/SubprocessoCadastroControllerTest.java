@@ -1,4 +1,6 @@
 package sgc.subprocesso;
+import sgc.seguranca.SgcPermissionEvaluator;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
@@ -52,6 +54,8 @@ class SubprocessoCadastroControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @MockitoBean
+    private SgcPermissionEvaluator permissionEvaluator;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -447,40 +451,6 @@ class SubprocessoCadastroControllerTest {
             verify(subprocessoFacade).homologarCadastroEmBloco(
                     List.of(1L, 2L), usuario);
         }
-    @Nested
-    @DisplayName("Testes Unitários Isolados")
-    class UnitTests {
-        
-        // Manual mocks for isolated testing
-        private SubprocessoCadastroController controller;
-        private SubprocessoFacade subprocessoFacadeMock;
-        private AnaliseFacade analiseFacadeMock;
-        private OrganizacaoFacade organizacaoFacadeMock;
-
-        @BeforeEach
-        void setUp() {
-            subprocessoFacadeMock = Mockito.mock(SubprocessoFacade.class);
-            analiseFacadeMock = Mockito.mock(AnaliseFacade.class);
-            organizacaoFacadeMock = Mockito.mock(OrganizacaoFacade.class);
-
-            controller = new SubprocessoCadastroController(
-                subprocessoFacadeMock,
-                analiseFacadeMock,
-                organizacaoFacadeMock
-            );
-        }
-
-        @Test
-        @DisplayName("disponibilizarCadastro lança ErroAutenticacao se principal for nulo")
-        void disponibilizarCadastro_PrincipalNulo() {
-            Object principal = null;
-            Long codigo = 1L;
-
-            when(organizacaoFacadeMock.extrairTituloUsuario(principal)).thenReturn(null);
-
-            Assertions.assertThrows(ErroAutenticacao.class, 
-                () -> controller.disponibilizarCadastro(codigo, principal));
-        }
-    }
+    // Removed legacy UnitTests since I refactored the controller to expect Usuario directly
 }
 }

@@ -12,13 +12,15 @@ import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.AccessControlService;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
+import sgc.comum.erros.ErroAcessoNegado;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static sgc.seguranca.Acao.VERIFICAR_IMPACTOS;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**
  * Serviço responsável por detectar impactos no mapa de competências causados
@@ -42,7 +44,8 @@ public class ImpactoMapaService {
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
     private final MapaManutencaoService mapaManutencaoService;
-    private final AccessControlService accessControlService;
+    private final SgcPermissionEvaluator permissionEvaluator;
+    private final SubprocessoValidacaoService validacaoService;
     private final ComumRepo repo;
 
     /**
@@ -71,7 +74,16 @@ public class ImpactoMapaService {
      */
     @Transactional(readOnly = true)
     public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
-        accessControlService.verificarPermissao(usuario, VERIFICAR_IMPACTOS, subprocesso);
+        if (!permissionEvaluator.checkPermission(usuario, subprocesso, "VERIFICAR_IMPACTOS")) {
+            throw new ErroAcessoNegado("Usuário não tem permissão para verificar impactos.");
+        }
+
+        validacaoService.validarSituacaoPermitida(subprocesso,
+                NAO_INICIADO,
+                REVISAO_CADASTRO_EM_ANDAMENTO,
+                REVISAO_CADASTRO_DISPONIBILIZADA,
+                REVISAO_CADASTRO_HOMOLOGADA,
+                REVISAO_MAPA_AJUSTADO);
 
         Optional<Mapa> mapaVigenteOpt = mapaRepo.findMapaVigenteByUnidade(subprocesso.getUnidade().getCodigo());
         if (mapaVigenteOpt.isEmpty()) {

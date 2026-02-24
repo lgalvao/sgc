@@ -1,4 +1,6 @@
 package sgc.organizacao;
+import sgc.seguranca.SgcPermissionEvaluator;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -44,6 +46,8 @@ class UnidadeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @MockitoBean
+    private SgcPermissionEvaluator permissionEvaluator;
 
     @Test
     @DisplayName("Deve retornar 201 ao criar atribuição temporária")

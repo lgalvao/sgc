@@ -1,4 +1,6 @@
 package sgc.subprocesso;
+import sgc.seguranca.SgcPermissionEvaluator;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,8 @@ class SubprocessoBuscarIntegracaoTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @MockitoBean
+    private SgcPermissionEvaluator permissionEvaluator;
 
     @Test
     @DisplayName("buscarPorProcessoEUnidade - Sucesso com retorno de subprocesso")

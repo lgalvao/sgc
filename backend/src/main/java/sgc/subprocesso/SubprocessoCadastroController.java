@@ -44,25 +44,24 @@ public class SubprocessoCadastroController {
     private final OrganizacaoFacade organizacaoFacade;
 
     @GetMapping("/{codigo}/historico-cadastro")
-    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long codigo) {
         return analiseFacade.listarHistoricoCadastro(codigo);
     }
 
     @GetMapping("/{codigo}/contexto-edicao")
-    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public ResponseEntity<ContextoEdicaoResponse> obterContextoEdicao(@PathVariable Long codigo) {
         return ResponseEntity.ok(subprocessoFacade.obterContextoEdicao(codigo));
     }
 
     @PostMapping("/{codigo}/cadastro/disponibilizar")
-    @PreAuthorize("@subprocessoSecurity.canExecute(#codSubprocesso, 'DISPONIBILIZAR_CADASTRO')")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DISPONIBILIZAR_CADASTRO')")
     @Operation(summary = "Disponibiliza o cadastro de atividades para análise")
     public ResponseEntity<MensagemResponse> disponibilizarCadastro(
             @PathVariable("codigo") Long codSubprocesso,
-            @AuthenticationPrincipal @Nullable Object principal) {
+            @AuthenticationPrincipal Usuario usuario) {
 
-        Usuario usuario = obterUsuarioAutenticado(principal);
         List<Atividade> faltando = subprocessoFacade.obterAtividadesSemConhecimento(codSubprocesso);
         if (!faltando.isEmpty()) {
             var lista = faltando.stream()
@@ -79,12 +78,11 @@ public class SubprocessoCadastroController {
     }
 
     @PostMapping("/{codigo}/disponibilizar-revisao")
-    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'DISPONIBILIZAR_REVISAO_CADASTRO')")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'DISPONIBILIZAR_REVISAO_CADASTRO')")
     @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
     public ResponseEntity<MensagemResponse> disponibilizarRevisao(
-            @PathVariable Long codigo, @AuthenticationPrincipal @Nullable Object principal) {
+            @PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
 
-        Usuario usuario = obterUsuarioAutenticado(principal);
         List<Atividade> faltando = subprocessoFacade.obterAtividadesSemConhecimento(codigo);
         if (!faltando.isEmpty()) {
             var lista = faltando.stream()
@@ -103,20 +101,19 @@ public class SubprocessoCadastroController {
 
     @JsonView(MapaViews.Publica.class)
     @GetMapping("/{codigo}/cadastro")
-    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public Subprocesso obterCadastro(@PathVariable Long codigo) {
         return subprocessoFacade.buscarSubprocesso(codigo);
     }
 
     @PostMapping("/{codigo}/devolver-cadastro")
-    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'DEVOLVER_CADASTRO')")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'DEVOLVER_CADASTRO')")
     @Operation(summary = "Devolve o cadastro de atividades para o responsável")
     public void devolverCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody JustificativaRequest request,
-            @AuthenticationPrincipal @Nullable Object principal) {
+            @AuthenticationPrincipal Usuario usuario) {
         
-        Usuario usuario = obterUsuarioAutenticado(principal);
         String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.justificativa()))
                 .orElse("");
 
@@ -124,13 +121,12 @@ public class SubprocessoCadastroController {
     }
 
     @PostMapping("/{codigo}/aceitar-cadastro")
-    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'ACEITAR_CADASTRO')")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'ACEITAR_CADASTRO')")
     @Operation(summary = "Aceita o cadastro de atividades")
     public void aceitarCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody TextoOpcionalRequest request,
-            @AuthenticationPrincipal @Nullable Object principal) {
-        Usuario usuario = obterUsuarioAutenticado(principal);
+            @AuthenticationPrincipal Usuario usuario) {
         String sanitizedObservacoes = Optional.ofNullable(request.texto())
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");
@@ -139,13 +135,12 @@ public class SubprocessoCadastroController {
     }
 
     @PostMapping("/{codigo}/homologar-cadastro")
-    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'HOMOLOGAR_CADASTRO')")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'HOMOLOGAR_CADASTRO')")
     @Operation(summary = "Homologa o cadastro de atividades")
     public void homologarCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody TextoOpcionalRequest request,
-            @AuthenticationPrincipal @Nullable Object principal) {
-        Usuario usuario = obterUsuarioAutenticado(principal);
+            @AuthenticationPrincipal Usuario usuario) {
         String sanitizedObservacoes = Optional.ofNullable(request.texto())
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");
@@ -155,12 +150,11 @@ public class SubprocessoCadastroController {
 
     @PostMapping("/{codigo}/devolver-revisao-cadastro")
     @Operation(summary = "Devolve a revisão do cadastro de atividades para o responsável")
-    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'DEVOLVER_REVISAO_CADASTRO')")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'DEVOLVER_REVISAO_CADASTRO')")
     public void devolverRevisaoCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody JustificativaRequest request,
-            @AuthenticationPrincipal @Nullable Object principal) {
-        Usuario usuario = obterUsuarioAutenticado(principal);
+            @AuthenticationPrincipal Usuario usuario) {
         String sanitizedObservacoes = Optional.of(UtilSanitizacao.sanitizar(request.justificativa()))
                 .orElse("");
 
@@ -169,12 +163,11 @@ public class SubprocessoCadastroController {
 
     @PostMapping("/{codigo}/aceitar-revisao-cadastro")
     @Operation(summary = "Aceita a revisão do cadastro de atividades")
-    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'ACEITAR_REVISAO_CADASTRO')")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'ACEITAR_REVISAO_CADASTRO')")
     public void aceitarRevisaoCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody TextoOpcionalRequest request,
-            @AuthenticationPrincipal @Nullable Object principal) {
-        Usuario usuario = obterUsuarioAutenticado(principal);
+            @AuthenticationPrincipal Usuario usuario) {
         String sanitizedObservacoes = Optional.ofNullable(request.texto())
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");
@@ -184,12 +177,11 @@ public class SubprocessoCadastroController {
 
     @PostMapping("/{codigo}/homologar-revisao-cadastro")
     @Operation(summary = "Homologa a revisão do cadastro de atividades")
-    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'HOMOLOGAR_REVISAO_CADASTRO')")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'HOMOLOGAR_REVISAO_CADASTRO')")
     public void homologarRevisaoCadastro(
             @PathVariable Long codigo,
             @Valid @RequestBody TextoOpcionalRequest request,
-            @AuthenticationPrincipal @Nullable Object principal) {
-        Usuario usuario = obterUsuarioAutenticado(principal);
+            @AuthenticationPrincipal Usuario usuario) {
         String sanitizedObservacoes = Optional.ofNullable(request.texto())
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");
@@ -198,7 +190,7 @@ public class SubprocessoCadastroController {
     }
 
     @PostMapping("/{codigo}/importar-atividades")
-    @PreAuthorize("@subprocessoSecurity.canExecute(#codigo, 'EDITAR_CADASTRO')")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'IMPORTAR_ATIVIDADES')")
     @Transactional
     @Operation(summary = "Importa atividades de outro subprocesso")
     public Map<String, String> importarAtividades(
@@ -208,35 +200,20 @@ public class SubprocessoCadastroController {
     }
 
     @PostMapping("/{codigo}/aceitar-cadastro-bloco")
-    @PreAuthorize("@subprocessoSecurity.canExecuteBulk(#request.subprocessos, 'ACEITAR_CADASTRO')")
+    @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'ACEITAR_CADASTRO')")
     @Operation(summary = "Aceita cadastros em bloco")
     public void aceitarCadastroEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
-            @AuthenticationPrincipal @Nullable Object principal) {
-        Usuario usuario = obterUsuarioAutenticado(principal);
+            @AuthenticationPrincipal Usuario usuario) {
         subprocessoFacade.aceitarCadastroEmBloco(request.subprocessos(), usuario);
     }
 
     @PostMapping("/{codigo}/homologar-cadastro-bloco")
-    @PreAuthorize("@subprocessoSecurity.canExecuteBulk(#request.subprocessos, 'HOMOLOGAR_CADASTRO')")
+    @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'HOMOLOGAR_CADASTRO')")
     @Operation(summary = "Homologa cadastros em bloco")
     public void homologarCadastroEmBloco(@PathVariable Long codigo,
             @RequestBody @Valid ProcessarEmBlocoRequest request,
-            @AuthenticationPrincipal @Nullable Object principal) {
-        Usuario usuario = obterUsuarioAutenticado(principal);
+            @AuthenticationPrincipal Usuario usuario) {
         subprocessoFacade.homologarCadastroEmBloco(request.subprocessos(), usuario);
-    }
-
-    private Usuario obterUsuarioAutenticado(@Nullable Object principal) {
-        if (principal instanceof Usuario usuario) {
-            return usuario;
-        }
-
-        String titulo = organizacaoFacade.extrairTituloUsuario(principal);
-        if (titulo == null) {
-            throw new ErroAutenticacao("Usuário não identificado");
-        }
-
-        return organizacaoFacade.buscarPorLogin(titulo);
     }
 }

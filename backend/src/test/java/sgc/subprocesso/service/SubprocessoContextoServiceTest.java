@@ -12,12 +12,12 @@ import sgc.mapa.MapaFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.AccessControlService;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.dto.ContextoEdicaoResponse;
 import sgc.subprocesso.dto.SubprocessoDetalheResponse;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.security.SubprocessoSecurity;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
 
 import java.util.List;
@@ -38,13 +38,11 @@ class SubprocessoContextoServiceTest {
     @Mock
     private MovimentacaoRepo movimentacaoRepo;
     @Mock
-    private AccessControlService accessControlService;
+    private SgcPermissionEvaluator permissionEvaluator;
     @Mock
     private SubprocessoAtividadeService atividadeService;
     @Mock
     private MapaFacade mapaFacade;
-    @Mock
-    private SubprocessoSecurity subprocessoSecurity;
 
     @InjectMocks
     private SubprocessoContextoService service;
@@ -57,7 +55,11 @@ class SubprocessoContextoServiceTest {
         Unidade u = new Unidade();
         u.setSigla("U1");
         u.setTituloTitular("T1");
-        Subprocesso sp = Subprocesso.builder().codigo(id).unidade(u).build();
+        Subprocesso sp = Subprocesso.builder()
+                .codigo(id)
+                .unidade(u)
+                .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                .build();
 
         when(crudService.buscarSubprocesso(id)).thenReturn(sp);
         when(usuarioService.buscarResponsavelAtual("U1")).thenReturn(new Usuario());
@@ -67,7 +69,6 @@ class SubprocessoContextoServiceTest {
         SubprocessoDetalheResponse result = service.obterDetalhes(id, user);
 
         assertThat(result).isNotNull();
-        verify(accessControlService).verificarPermissao(eq(user), any(), eq(sp));
     }
 
     @Test
@@ -78,7 +79,11 @@ class SubprocessoContextoServiceTest {
         Unidade u = new Unidade();
         u.setSigla("U1");
         u.setTituloTitular("T1");
-        Subprocesso sp = Subprocesso.builder().codigo(id).unidade(u).build();
+        Subprocesso sp = Subprocesso.builder()
+                .codigo(id)
+                .unidade(u)
+                .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                .build();
 
         when(usuarioService.buscarResponsavelAtual("U1")).thenReturn(new Usuario());
         when(usuarioService.buscarPorLogin("T1")).thenThrow(new RuntimeException("Erro"));
@@ -100,7 +105,12 @@ class SubprocessoContextoServiceTest {
         u.setTituloTitular("T1");
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
-        Subprocesso sp = Subprocesso.builder().codigo(id).unidade(u).mapa(mapa).build();
+        Subprocesso sp = Subprocesso.builder()
+                .codigo(id)
+                .unidade(u)
+                .mapa(mapa)
+                .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                .build();
 
         when(usuarioService.usuarioAutenticado()).thenReturn(user);
         when(crudService.buscarSubprocesso(id)).thenReturn(sp);

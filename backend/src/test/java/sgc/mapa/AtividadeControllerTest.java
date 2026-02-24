@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.model.Atividade;
@@ -43,6 +44,9 @@ class AtividadeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private SgcPermissionEvaluator permissionEvaluator;
 
     @MockitoBean
     private AtividadeFacade atividadeFacade;

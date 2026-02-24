@@ -13,10 +13,12 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
-import sgc.seguranca.Acao;
-import sgc.seguranca.AccessControlService;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
+import sgc.comum.erros.ErroAcessoNegado;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +42,8 @@ class SubprocessoAtividadeService {
     private final CopiaMapaService copiaMapaService;
     private final MovimentacaoRepo movimentacaoRepo;
     private final UsuarioFacade usuarioService;
-    private final AccessControlService accessControlService;
+    private final SgcPermissionEvaluator permissionEvaluator;
+    private final SubprocessoValidacaoService validacaoService;
 
     /**
      * Importa atividades de um subprocesso de origem para um subprocesso de destino.
@@ -51,14 +54,15 @@ class SubprocessoAtividadeService {
 
         Usuario usuario = usuarioService.usuarioAutenticado();
 
-        Acao acao = spDestino.getProcesso().getTipo() == TipoProcesso.REVISAO
-                ? Acao.EDITAR_REVISAO_CADASTRO
-                : Acao.EDITAR_CADASTRO;
-
-        accessControlService.verificarPermissao(usuario, acao, spDestino);
+        if (!permissionEvaluator.checkPermission(usuario, spDestino, "EDITAR_CADASTRO")) {
+             throw new ErroAcessoNegado("Usuário não tem permissão para importar atividades.");
+        }
+        validacaoService.validarSituacaoPermitida(spDestino, NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO);
 
         Subprocesso spOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);
-        accessControlService.verificarPermissao(usuario, Acao.CONSULTAR_PARA_IMPORTACAO, spOrigem);
+        if (!permissionEvaluator.checkPermission(usuario, spOrigem, "CONSULTAR_PARA_IMPORTACAO")) {
+            throw new ErroAcessoNegado("Usuário não tem permissão para consultar o subprocesso de origem.");
+        }
 
         // Importar atividades diretamente (sem evento assíncrono)
         copiaMapaService.importarAtividadesDeOutroMapa(

@@ -20,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.seguranca.SgcPermissionEvaluator;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +43,8 @@ class RestExceptionHandlerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @MockitoBean
+    private SgcPermissionEvaluator permissionEvaluator;
 
     @Autowired
     private RestExceptionHandler restExceptionHandler;
