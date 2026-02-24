@@ -79,13 +79,13 @@ class SubprocessoContextoService {
         Unidade unidade = subprocesso.getUnidade();
         List<AtividadeDto> atividades = atividadeService.listarAtividadesSubprocesso(codSubprocesso);
 
-        return ContextoEdicaoResponse.builder()
-                .unidade(unidade)
-                .subprocesso(subprocesso)
-                .detalhes(detalhes)
-                .mapa(mapaFacade.mapaPorCodigo(subprocesso.getMapa().getCodigo()))
-                .atividadesDisponiveis(atividades)
-                .build();
+        return new ContextoEdicaoResponse(
+                unidade,
+                subprocesso,
+                detalhes,
+                mapaFacade.mapaPorCodigo(subprocesso.getMapa().getCodigo()),
+                atividades
+        );
     }
 
     PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp, Usuario usuario) {
