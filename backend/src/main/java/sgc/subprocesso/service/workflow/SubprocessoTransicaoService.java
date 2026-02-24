@@ -62,7 +62,7 @@ public class SubprocessoTransicaoService {
         // Atualiza a localização atual no cache do objeto para evitar N+1 em testes e chamadas sequenciais
         cmd.sp().setLocalizacaoAtualCache(cmd.destino() != null ? cmd.destino() : cmd.sp().getUnidade());
 
-        // 2. Notificar via alerta e e-mail (chamada direta, sem evento assíncrono)
+        // 2. Notificar via alerta e e-mail
         notificarTransicao(cmd.sp(), cmd.tipo(), cmd.origem(), cmd.destino(), cmd.observacoes());
     }
 
@@ -88,10 +88,10 @@ public class SubprocessoTransicaoService {
                         .motivo(cmd.motivoAnalise())
                         .build());
 
-        // 2. Atualizar Estado
+        // 2. Atualizar situacao
         sp.setSituacao(cmd.novaSituacao());
 
-        // 3. Registrar Transição e Eventos
+        // 3. Registrar Transição
         registrar(RegistrarTransicaoCommand.builder()
                 .sp(sp)
                 .tipo(cmd.tipoTransicao())
@@ -101,7 +101,7 @@ public class SubprocessoTransicaoService {
                 .observacoes(cmd.observacoes())
                 .build());
 
-        log.info("Workflow SP{}: {} -> {}", sp.getCodigo(), cmd.novaSituacao(), cmd.tipoTransicao());
+        log.info("{} -> {}", cmd.novaSituacao(), cmd.tipoTransicao());
     }
 
     private void notificarTransicao(Subprocesso sp, TipoTransicao tipo,

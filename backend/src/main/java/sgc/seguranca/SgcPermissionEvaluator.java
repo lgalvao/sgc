@@ -44,7 +44,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
             "EDITAR_CADASTRO", "DISPONIBILIZAR_CADASTRO", "DEVOLVER_CADASTRO", "ACEITAR_CADASTRO", "HOMOLOGAR_CADASTRO",
             "EDITAR_REVISAO_CADASTRO", "DISPONIBILIZAR_REVISAO_CADASTRO", "DEVOLVER_REVISAO_CADASTRO", "ACEITAR_REVISAO_CADASTRO", "HOMOLOGAR_REVISAO_CADASTRO",
             "EDITAR_MAPA", "DISPONIBILIZAR_MAPA", "APRESENTAR_SUGESTOES", "VALIDAR_MAPA", "DEVOLVER_MAPA", "ACEITAR_MAPA", "HOMOLOGAR_MAPA", "AJUSTAR_MAPA",
-            "REALIZAR_AUTOAVALIACAO", "IMPORTAR_ATIVIDADES", "VERIFICAR_IMPACTOS"
+            "REALIZAR_AUTOAVALIACAO", "IMPORTAR_ATIVIDADES"
     );
 
     @Override
@@ -190,7 +190,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
                     "HOMOLOGAR_CADASTRO_EM_BLOCO",
                     "HOMOLOGAR_MAPA_EM_BLOCO",
                     "ACEITAR_CADASTRO_EM_BLOCO",
-                    "DISPONIBILIZAR_MAPA_EM_BLOCO" // Ações em bloco afetam subprocessos mas são chamadas no contexto do Processo/Lista
+                    "DISPONIBILIZAR_MAPA_EM_BLOCO" 
             ).contains(acao);
         }
 
