@@ -21,15 +21,8 @@ import java.util.List;
 
 /**
  * Serviço responsável pela finalização de processos.
- *
- * <p>Coordena todas as etapas necessárias para finalizar um processo,
- * incluindo validações, publicação de mapas vigentes e eventos.</p>
- *
- * <p><b>Refatoração v3.0:</b> Removido uso de @Lazy e dependência circular.
- * Agora utiliza {@link ConsultasSubprocessoService} para queries de leitura,
- * eliminando acoplamento bidirecional com SubprocessoFacade.</p>
- *
- * @since 3.0.0 - Removido @Lazy, introduzido Query Service Pattern
+ * Coordena todas as etapas necessárias para finalizar um processo,
+ * incluindo validações, publicação de mapas vigentes e eventos.
  */
 @Service
 @Slf4j

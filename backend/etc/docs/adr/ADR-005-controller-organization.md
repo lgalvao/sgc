@@ -1,201 +1,72 @@
-# ADR-005: Organização de Controllers por Workflow Phase
+# ADR-005: Organização de Controllers
 
-**Status:** ✅ Ativo
+**Status:** 🔄 Em Revisão (Atualizado 2026-02-24)
 
 ---
 
 ## Contexto e Problema
 
-O módulo `subprocesso` possui 4 controllers distintos que gerenciam diferentes aspectos do ciclo de vida de um subprocesso:
+O módulo `subprocesso` possui 4 controllers distintos organizados por workflow phase:
 
-1. **SubprocessoCrudController** - CRUD básico, permissões, busca
-2. **SubprocessoCadastroController** - Disponibilizar, devolver, aceitar, homologar
-3. **SubprocessoMapaController** - Edição de mapa, impactos, salvamento
-4. **SubprocessoValidacaoController** - Validação, sugestões, homologação
+1. **SubprocessoCrudController** — CRUD básico, permissões, busca
+2. **SubprocessoCadastroController** — Disponibilizar, devolver, aceitar, homologar
+3. **SubprocessoMapaController** — Edição de mapa, impactos, salvamento
+4. **SubprocessoValidacaoController** — Validação, sugestões, homologação
 
 Todos usam o mesmo `SubprocessoFacade`.
 
-### Questão Avaliada
+---
 
-> "Dado que todos os controllers usam a mesma facade e o mesmo base path (`/api/subprocessos/{codigo}/...`), faria
-> sentido consolidá-los em um único `SubprocessoController`?"
+## Decisão Original (2026-02-16)
+
+✅ Manter 4 controllers separados por workflow phase, priorizando SRP and navigability.
 
 ---
 
-## Análise Realizada
+## Reavaliação (2026-02-24)
 
-### Opção A: Consolidar em 1 Controller ❌
+Após diagnóstico de sobre-engenharia no sistema (ver ADR-008), reavaliamos esta decisão considerando a escala real: **5-10 usuários simultâneos, equipe única**.
 
-**Estrutura Resultante:**
+### Problemas Identificados com a Separação
 
-```java
-@RestController
-@RequestMapping("/api/subprocessos")
-public class SubprocessoController {
-    // Todos endpoints CRUD, cadastro, mapa e validação em um único arquivo
-}
-```
+1. **Fragmentação desnecessária** — 4 controllers + facade + 8+ services para um único domínio
+2. **Overhead cognitivo** — Desenvolvedores precisam saber em qual controller cada endpoint está
+3. **Controllers "thin"** — Cada controller só delega para a facade, sem lógica própria
+4. **Não justifica SRP** — Controllers REST são "handlers de rota" — agrupá-los por domínio é igualmente válido
+5. **Escala não justifica** — Para uma equipe de 1-3 devs, navegabilidade por arquivo não é gargalo
 
-**Problemas Identificados:**
+### Nova Direção
 
-- ❌ **Arquivo muito grande** - difícil navegação
-- ❌ **Mistura de responsabilidades** - CRUD + 3 workflows diferentes
-- ❌ **Pior documentação** - Swagger misturaria endpoints de contextos diferentes
-- ❌ **Testes menos focados** - Difícil criar testes por workflow
-- ❌ **Dificuldade de manutenção** - Mudanças em um workflow afetam todo o arquivo
-- ❌ **Violação de SRP** - Controller com múltiplas razões para mudar
+Para módulos onde os controllers são thin (apenas delegam para facade/services sem lógica significativa):
 
-### Opção B: Manter 4 Controllers (Status Quo) ✅
+- ✅ **1 controller por domínio** é aceitável e preferível
+- ✅ Organizar endpoints em seções com comentários quando necessário
+- ✅ Manter arquivos com até ~400 linhas (limite pragmático)
 
-**Estrutura Atual:**
+Para módulos com lógica significativa nos controllers:
 
-```
-SubprocessoCrudController      - CRUD básico, permissões, busca
-SubprocessoCadastroController  - Disponibilizar, devolver, aceitar, homologar
-SubprocessoMapaController      - Edição de mapa, impactos, salvamento
-SubprocessoValidacaoController - Validação, sugestões, homologação
-```
-
-**Vantagens:**
-
-- ✅ **Navegabilidade** - Endpoints relacionados agrupados logicamente
-- ✅ **Organização** - Separação clara por fase do workflow
-- ✅ **Testabilidade** - Testes focados em workflows específicos
-- ✅ **Documentação** - Swagger organizado por contexto (CRUD, Cadastro, Mapa, Validação)
-- ✅ **Manutenibilidade** - Arquivos de tamanho razoável
-- ✅ **Coesão** - Cada controller tem responsabilidade bem definida
-- ✅ **Aderência a SRP** - Cada controller muda por uma razão específica
+- ✅ Separar continua sendo válido se cada controller tem responsabilidade comprovadamente distinta
+- ❌ Não separar arbitrariamente apenas para "ter arquivos pequenos"
 
 ---
 
-## Decisão
-
-✅ **MANTER 4 controllers separados por workflow phase.**
-
-A separação atual reflete perfeitamente as diferentes fases do ciclo de vida de um subprocesso:
-
-1. **CRUD** - Operações básicas de criação, leitura, atualização, exclusão
-2. **Cadastro** - Workflow de cadastro de atividades (CDU-08, CDU-12)
-3. **Mapa** - Workflow de edição de mapa de competências (CDU-10, CDU-12, CDU-16)
-4. **Validação** - Workflow de validação pelas unidades (CDU-09, CDU-10)
-
-Esta organização:
-
-- **Alinha com o domínio** - Cada controller mapeia uma fase do processo de negócio
-- **Facilita onboarding** - Novos desenvolvedores entendem rapidamente a organização
-- **Suporta evolução** - Fases podem evoluir independentemente
-- **Melhora documentação** - Swagger fica organizado por contexto de uso
-
----
-
-## Consequências
+## Consequências da Mudança
 
 ### Positivas ✅
 
-1. **Navegabilidade Superior**
-    - Desenvolvedores encontram endpoints rapidamente
-    - Nome do controller indica claramente o contexto
-
-2. **Documentação Swagger Organizada**
-    - Endpoints agrupados por fase de workflow
-    - Facilita uso por frontend/consumidores da API
-
-3. **Testes Mais Focados**
-    - Testes de CRUD separados de testes de workflow
-    - Menor acoplamento entre testes
-
-4. **Manutenibilidade**
-    - Mudanças em workflow de cadastro não afetam outros controllers
-    - Arquivos de tamanho gerenciável
-
-5. **Aderência ao SRP**
-    - Cada controller tem uma razão clara para mudar
-    - Responsabilidades bem definidas
+- Menos arquivos para navegar
+- Menos indireção
+- Mais fácil encontrar "onde está o endpoint X"
+- Consistente com a simplificação geral (ADR-008)
 
 ### Negativas ❌
 
-1. **Mais Arquivos**
-    - Múltiplos arquivos em vez de um único
-    - *Mitigação*: Organização compensa o número de arquivos
-
-2. **Possível Duplicação de Código**
-    - Validações ou lógica comum podem se repetir
-    - *Mitigação*: Facade centraliza lógica; controllers são thin
-
----
-
-## Princípios Aplicados
-
-### Single Responsibility Principle (SRP)
-
-Cada controller tem UMA responsabilidade clara:
-
-- CRUD: Gerenciar operações básicas
-- Cadastro: Orquestrar workflow de cadastro
-- Mapa: Orquestrar workflow de mapa
-- Validação: Orquestrar workflow de validação
-
-### Interface Segregation Principle (ISP)
-
-Consumidores da API (frontend) usam apenas os endpoints necessários para o contexto:
-
-- Tela de edição de cadastro → SubprocessoCadastroController
-- Tela de edição de mapa → SubprocessoMapaController
-- Tela de validação → SubprocessoValidacaoController
-
-### Open/Closed Principle (OCP)
-
-Controllers podem evoluir independentemente sem afetar os demais.
-
----
-
-## Alternativas Consideradas
-
-### Consolidação Parcial
-
-```
-SubprocessoController        (CRUD básico)
-SubprocessoWorkflowController (Cadastro + Mapa + Validação)
-```
-
-**Razão para Rejeitar:**
-
-- Ainda misturaria 3 workflows diferentes em um controller
-- Perderia benefícios de separação por fase
-- Pior que status quo
-
-### Consolidação por Tipo de Operação
-
-```
-SubprocessoQueryController   (GET endpoints)
-SubprocessoCommandController (POST endpoints)
-```
-
-**Razão para Rejeitar:**
-
-- Separação artificial (CQRS não aplicado no projeto)
-- Não alinha com domínio de negócio
-- Dificulta navegação (GET de diferentes contextos misturados)
-
----
-
-## Conformidade
-
-### Testes Arquiteturais (ArchUnit)
-
-Controllers seguem padrões:
-
-- ✅ Nomeação: `*Controller`
-- ✅ Uso de Facades: Apenas `SubprocessoFacade`
-- ✅ Localização: `sgc.subprocesso` package
-- ✅ Anotações: `@RestController`, `@RequestMapping`
-
+- Controller resultante pode ter ~300-400 linhas
+  - *Mitigação:* Ainda gerenciável; prefira seções claras com comentários
 
 ---
 
 ## Referências
 
-- [ADR-001: Facade Pattern](/etc/docs/adr/ADR-001-facade-pattern.md)
-- [ARCHITECTURE.md](/etc/docsdocs/ARCHITECTURE.md)
-- [Backend Patterns](/etc/docs/backend-padroes.md)
-- [Refactoring Plan](/refactoring-plan.md) - Fase 5
+- ADR-001: Facade Pattern
+- ADR-008: Decisões de Simplificação

@@ -1,14 +1,14 @@
 # ADR-008: Decisões de Simplificação Arquitetural
 
 **Data:** 17 de Fevereiro de 2026  
-**Status:** ✅ Fase 2 Concluída / 🚀 Fase 4 Iniciada  
-**Versão:** 1.1
+**Status:** ✅ Fases 1-2 Concluídas / 🚀 Fases 4-5 Iniciadas  
+**Versão:** 1.2 (Atualizado 2026-02-24)
 
 ---
 
 ## Contexto
 
-O sistema SGC identificou sobre-engenharia técnica em aproximadamente 60-70% acima do necessário para sua escala real. Iniciou-se um processo de simplificação incremental em fases.
+O sistema SGC identificou sobre-engenharia técnica em aproximadamente 60-70% acima do necessário para sua escala real (5-10 usuários simultâneos, intranet). Iniciou-se um processo de simplificação incremental em fases.
 
 ---
 
@@ -31,6 +31,7 @@ O sistema SGC identificou sobre-engenharia técnica em aproximadamente 60-70% ac
 - **Eliminação de Facades Pass-Through:** `AcompanhamentoFacade` e `ConfiguracaoFacade` removidas.
 - **Introdução de @JsonView:** Substituição inicial de DTOs Response por Entidades anotadas.
 - **Reforço do ArchUnit:** Regras automatizadas para garantir o uso correto de Facades e impedir vazamento de dados.
+- **Eliminação do Framework de Segurança Custom:** `AccessControlService`, `AccessPolicy<T>`, `AccessAuditService`, enum `Acao` removidos. Substituídos por `SgcPermissionEvaluator` (implementa `PermissionEvaluator` do Spring Security). Ver ADR-003.
 
 ---
 
@@ -50,19 +51,42 @@ O sistema SGC identificou sobre-engenharia técnica em aproximadamente 60-70% ac
 
 ---
 
-## Métricas e Resultados (Atualizado 17/02/2026)
+## Fase 5: Consolidação Arquitetural (Planejada 🚀)
 
-| Componente | Baseline | Atual | Redução | Status |
-|------------|----------|-------|---------|--------|
-| Services | 17 | 17 | 0% | ✅ |
-| Facades | 14 | 12 | -14% | ✅ |
-| DTOs | 86 | 64 | -25% | 🚀 Fase 4 |
-| Mappers | 15 | 9 | -40% | 🚀 Fase 4 |
-| Composables | 19 | 13 | -32% | ✅ |
+**Objetivo:** Eliminar fragmentação desnecessária e código morto. Ver [implementation_plan.md](/simplification-suggestions.md).
+
+### 5.1. Remoção de Código Morto (Pact)
+- Pact já foi removido das dependências, mas arquivos de teste e config permanecem como código morto
+- Alvo: `FrontendBackendPactTest.java`, `ProcessoService.pact.spec.ts`, `frontend/pact/`, `vitest.pact.config.ts`
+
+### 5.2. Consolidação do Módulo Subprocesso
+- `SubprocessoFacade` (353 linhas, pass-through puro) → Controllers injetarão services diretamente
+- 4 controllers → 1 `SubprocessoController` (ver ADR-005 reavaliação)
+- Workflow services fragmentados → Consolidar em `SubprocessoService`
+
+### 5.3. Remoção de Mappers Manuais do Frontend
+- 9 mappers + 6 testes → Usar tipos da API diretamente ou tipos TypeScript manuais
 
 ---
 
-## Próximos Passos
-1. Eliminar `AlertaDto` e `AlertaMapper` (Módulo Alerta).
-2. Simplificar `ProcessoDto` e mappers associados.
-3. Consolidar requests de campo único no módulo Subprocesso.
+## Métricas e Resultados
+
+| Componente | Baseline | Atual | Meta Fase 5 | Status |
+|------------|----------|-------|-------------|--------|
+| Services | 17 | 17 | ~12 | 🚀 |
+| Facades | 14 | 12 | 11 | 🚀 |
+| Controllers (subprocesso) | 4 | 4 | 1 | 🚀 |
+| DTOs | 86 | 64 | - | 🚀 Fase 4 |
+| Mappers (backend) | 15 | 9 | - | 🚀 Fase 4 |
+| Mappers (frontend) | 9 | 9 | 0 | 🚀 Fase 5 |
+| Código morto Pact | 4+ arq. | 4+ arq. | 0 | 🚀 Fase 5 |
+| Composables | 19 | 13 | - | ✅ |
+
+---
+
+## Referências
+
+- [acesso.md](/acesso.md) — Regras de negócio e casos de uso
+- ADR-001: Facade Pattern (em revisão)
+- ADR-003: Security Architecture (reescrito)
+- ADR-005: Controller Organization (em revisão)

@@ -9,10 +9,10 @@
       />
 
       <SubprocessoHeader
-          :pode-alterar-data-limite="podeAlterarDataLimite"
-          :pode-reabrir-cadastro="podeReabrirCadastro"
-          :pode-reabrir-revisao="podeReabrirRevisao"
-          :pode-enviar-lembrete="podeEnviarLembrete"
+          :pode-alterar-data-limite="podeAlterarDataLimite && !isProcessoFinalizado"
+          :pode-reabrir-cadastro="podeReabrirCadastro && !isProcessoFinalizado"
+          :pode-reabrir-revisao="podeReabrirRevisao && !isProcessoFinalizado"
+          :pode-enviar-lembrete="podeEnviarLembrete && !isProcessoFinalizado"
           :processo-descricao="subprocesso.processoDescricao || ''"
           :responsavel-email="subprocesso.responsavel?.email || ''"
           :responsavel-nome="subprocesso.responsavel?.nome || ''"
@@ -120,7 +120,7 @@ import {useLoadingManager} from "@/composables/useLoadingManager";
 import {useAcesso} from "@/composables/useAcesso";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useProcessosStore} from "@/stores/processos";
-import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
+import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso, SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
 
@@ -154,6 +154,12 @@ const {
   podeDisponibilizarCadastro,
   podeEditarCadastro
 } = useAcesso(subprocesso);
+
+const isProcessoFinalizado = computed(() => {
+  return subprocesso.value?.situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO || 
+         subprocesso.value?.situacao === SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO ||
+         processosStore.processoDetalhe?.situacao === SituacaoProcesso.FINALIZADO;
+});
 
 const mapa = computed(() => mapaStore.mapaCompleto);
 const movimentacoes = computed<Movimentacao[]>(

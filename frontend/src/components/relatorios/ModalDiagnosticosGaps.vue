@@ -62,7 +62,7 @@
 import {BButton} from "bootstrap-vue-next";
 import {computed} from "vue";
 import {downloadCSV, gerarCSV} from "@/utils/csv";
-import {formatDateBR} from "@/utils";
+import {formatDateBR, formatNumberBR} from "@/utils";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 
 interface Diagnostico {
@@ -109,8 +109,8 @@ function exportar() {
     Processo: diag.processo,
     Unidade: diag.unidade,
     "Gaps Identificados": diag.gaps,
-    "Importancia Media": diag.importanciaMedia,
-    "Dominio Medio": diag.dominioMedio,
+    "Importancia Media": formatNumberBR(diag.importanciaMedia, 1),
+    "Dominio Medio": formatNumberBR(diag.dominioMedio, 1),
     "Competencias Criticas": diag.competenciasCriticas.join("; "),
     Status: diag.status,
     "Data Diagnostico": formatDateBR(diag.data),

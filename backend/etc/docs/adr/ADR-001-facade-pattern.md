@@ -1,6 +1,6 @@
 # ADR-001: Uso do Padrão Facade para Orquestração de Serviços
 
-**Status:** ✅ Ativo (Atualizado 2026-02-16)
+**Status:** 🔄 Em Revisão (Atualizado 2026-02-24)
 
 ---
 
@@ -114,10 +114,20 @@ Durante revisão arquitetural identificamos:
    - Documentado em ArchConsistencyTest com exceções explícitas
    - Code review valida justificativa
 
-**Métricas:**
-- Facades totais: 14 → 12 (-14%)
-- Facades com orquestração real: 12/12 (100%)
-- Indireção desnecessária eliminada: 117 LOC
+### Reavaliação (2026-02-24)
+
+`SubprocessoFacade` (353 linhas, 61 métodos) é a maior facade do sistema e funciona como pass-through:
+cada método delega para exatamente um service sem lógica de orquestração adicional.
+
+**Próximos passos (ver ADR-008):**
+- Controllers do subprocesso passarão a injetar services diretamente
+- `SubprocessoFacade` será reduzida para expor apenas métodos usados por módulos *externos*
+  (`ProcessoFacade`, `RelatorioFacade`, `AnaliseController`, `AtividadeFacade`, etc.)
+- Regra ArchUnit `controllers_devem_usar_facades` precisará ser relaxada para o módulo subprocesso
+
+**Métricas (atualizadas):**
+- Facades totais: 12 → 11 (após simplificação de SubprocessoFacade)
+- Facades pass-through restantes: `SubprocessoFacade` (candidata a eliminação parcial)
 
 ---
 
@@ -126,3 +136,4 @@ Durante revisão arquitetural identificamos:
 Testes ArchUnit garantem que controllers usam apenas Facades:
 
 - Ver `sgc.arquitetura.ArchConsistencyTest`
+- **Nota (2026-02-24):** Regra será ajustada para permitir injeção direta de services em controllers thin

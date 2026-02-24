@@ -1,396 +1,137 @@
-# ADR-003: Arquitetura de Controle de Acesso Centralizada
+# ADR-003: Arquitetura de Controle de Acesso — SgcPermissionEvaluator
 
-**Status:** ✅ Ativo
+**Status:** ✅ Ativo (Reescrito 2026-02-24)  
+**Supersede:** Versão anterior baseada em `AccessControlService` + `AccessPolicy` (removidos em 2026-02)
 
 ---
 
 ## Contexto
 
-O sistema SGC precisa controlar acesso a operações baseado em múltiplos fatores:
+O SGC é um sistema interno para 5-10 usuários simultâneos. O controle de acesso precisa considerar:
 
-1. **Perfil do Usuário**: ADMIN, GESTOR, CHEFE, SERVIDOR
-2. **Hierarquia de Unidades**: Unidade do usuário vs. unidade do recurso
-3. **Estado do Recurso**: Situação do subprocesso/processo
-4. **Ownership**: Usuário pertence à mesma unidade do recurso
+1. **Perfil do Usuário**: `ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`
+2. **Hierarquia de Unidades**: Relação entre a unidade do usuário e a unidade do recurso
+3. **Localização do Subprocesso**: Para ações de escrita, o subprocesso deve estar na mesma unidade do usuário
 
-Historicamente, o SGC implementava controle de acesso de forma **dispersa**:
+### Histórico
 
-- Controllers com `@PreAuthorize`
-- Services com verificações programáticas ad-hoc
-- Lógica de permissões espalhada em múltiplos arquivos
-- Padrões inconsistentes entre módulos
+Anteriormente o SGC utilizava um framework custom (`AccessControlService` → `AccessPolicy` → `AccessAuditService`).
+Essa abordagem foi removida por ser **sobre-engenheirada para a escala do sistema**: 4 classes de policy, 1 orquestrador, 1 auditor e 1 enum,
+quando toda a lógica de permissão cabia em uma única classe de ~230 linhas usando a interface padrão do Spring Security.
 
-Isso resultava em:
-
-- ❌ **Difícil auditoria**: Impossível rastrear todas as decisões de acesso
-- ❌ **Manutenção complexa**: Mudanças em regras requeriam alterações em múltiplos locais
-- ❌ **Risco de bypass**: Lógica duplicada aumentava chance de inconsistências
-- ❌ **Testabilidade baixa**: Testes de segurança dispersos e incompletos
+---
 
 ## Decisão
 
-Implementamos uma **arquitetura de controle de acesso centralizada em 3 camadas**:
+Implementar o controle de acesso através de um **único `PermissionEvaluator`** do Spring Security,
+eliminando toda a camada custom de policies e auditoria.
+
+### Arquitetura Atual
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│           CAMADA 1: HTTP (Authentication)              │
-│  - ConfigSeguranca (SecurityFilterChain)               │
-│  - @PreAuthorize nos Controllers (verificação de roles)│
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│           CAMADA 1: HTTP (Authentication)            │
+│  - ConfigSeguranca (SecurityFilterChain)             │
+│  - Autenticação via ActiveDirectory (prod) ou       │
+│    bypass em ambiente de testes                      │
+└──────────────────────────────────────────────────────┘
                          ↓
-┌─────────────────────────────────────────────────────────┐
-│         CAMADA 2: AUTHORIZATION (Centralizada)         │
-│  ┌───────────────────────────────────────────────────┐ │
-│  │        AccessControlService (Orquestrador)        │ │
-│  │  - verificarPermissao(usuario, acao, recurso)    │ │
-│  │  - podeExecutar(usuario, acao, recurso)          │ │
-│  └───────────────────────────────────────────────────┘ │
-│         ↓                    ↓                    ↓     │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │
-│  │  Processo    │  │ Subprocesso  │  │  Atividade   │ │
-│  │AccessPolicy  │  │AccessPolicy  │  │AccessPolicy  │ │
-│  └──────────────┘  └──────────────┘  └──────────────┘ │
-│                                                         │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │     HierarchyService (Hierarquia de Unidades)    │  │
-│  └──────────────────────────────────────────────────┘  │
-│                                                         │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │   AccessAuditService (Auditoria de Decisões)     │  │
-│  └──────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│       CAMADA 2: AUTHORIZATION (PermissionEvaluator)  │
+│  ┌────────────────────────────────────────────────┐  │
+│  │         SgcPermissionEvaluator                 │  │
+│  │  - implements PermissionEvaluator (Spring)     │  │
+│  │  - "Regra de Ouro" centralizada               │  │
+│  │  - Perfil + Hierarquia + Localização           │  │
+│  └────────────────────────────────────────────────┘  │
+│                        ↓                              │
+│  ┌────────────────────────────────────────────────┐  │
+│  │   HierarquiaService (hierarquia de unidades)   │  │
+│  └────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────┘
                          ↓
-┌─────────────────────────────────────────────────────────┐
-│         CAMADA 3: BUSINESS LOGIC (Services)            │
-│  - Executam regras de negócio                          │
-│  - SEM verificações de acesso diretas                  │
-│  - Confiam que Camada 2 já validou permissões          │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│         CAMADA 3: BUSINESS LOGIC (Services)          │
+│  - Executam regras de negócio                        │
+│  - SEM verificações de acesso diretas                │
+└──────────────────────────────────────────────────────┘
 ```
 
-### Componentes Principais
+### Componente Principal: `SgcPermissionEvaluator`
 
-#### 1. `AccessControlService` (Orquestrador)
-
-Service centralizado que:
-
-- Recebe requisições de verificação de permissão
-- Delega para a `AccessPolicy` apropriada
-- Loga todas as decisões via `AccessAuditService`
-- Lança `ErroAccessoNegado` quando acesso negado
-
-```java
-@Service
-public class AccessControlService {
-    
-    public void verificarPermissao(Usuario usuario, Acao acao, Object recurso) {
-        AccessPolicy policy = getPolicyForResource(recurso);
-        boolean permitido = policy.canExecute(usuario, acao, recurso);
-        
-        if (permitido) {
-            auditService.logAccessGranted(usuario, acao, recurso);
-        } else {
-            auditService.logAccessDenied(usuario, acao, recurso, policy.getMotivoNegacao());
-            throw new ErroAccessoNegado(policy.getMotivoNegacao());
-        }
-    }
-}
-```
-
-#### 2. `AccessPolicy<T>` (Interface)
-
-Políticas especializadas por tipo de recurso:
-
-```java
-public interface AccessPolicy<T> {
-    boolean canExecute(Usuario usuario, Acao acao, T recurso);
-    String getMotivoNegacao();
-}
-```
-
-**Implementações:**
-
-- `ProcessoAccessPolicy` - Regras para processos
-- `SubprocessoAccessPolicy` - Regras para subprocessos
-- `AtividadeAccessPolicy` - Regras para atividades
-- `MapaAccessPolicy` - Regras para mapas
-
-#### 3. `Acao` (Enum)
-
-Enumeração de todas as ações do sistema:
-
-```java
-public enum Acao {
-    // Processo
-    CRIAR_PROCESSO, EDITAR_PROCESSO, EXCLUIR_PROCESSO,
-    INICIAR_PROCESSO, FINALIZAR_PROCESSO,
-    
-    // Subprocesso - Cadastro
-    VISUALIZAR_SUBPROCESSO, EDITAR_CADASTRO,
-    DISPONIBILIZAR_CADASTRO, DEVOLVER_CADASTRO,
-    ACEITAR_CADASTRO, HOMOLOGAR_CADASTRO,
-    
-    // Subprocesso - Mapa
-    VERIFICAR_IMPACTOS, APRESENTAR_SUGESTOES,
-    VALIDAR_MAPA, DEVOLVER_MAPA, ACEITAR_MAPA,
-    HOMOLOGAR_MAPA, AJUSTAR_MAPA,
-    
-    // ... outras ações
-}
-```
-
-#### 4. `HierarchyService`
-
-Centraliza verificações de hierarquia de unidades:
-
-```java
-@Service
-public class HierarchyService {
-    boolean isSubordinada(Unidade alvo, Unidade superior);
-    List<Unidade> buscarSubordinadas(Unidade raiz);
-    List<Long> buscarCodigosHierarquia(Long codUnidade);
-}
-```
-
-#### 5. `AccessAuditService`
-
-Loga todas as decisões de acesso para auditoria:
-
-```java
-@Service
-public class AccessAuditService {
-    void logAccessGranted(Usuario usuario, Acao acao, Object recurso);
-    void logAccessDenied(Usuario usuario, Acao acao, Object recurso, String motivo);
-}
-```
-
-Logs no formato:
-
-```
-ACCESS_GRANTED: user=333333333333, action=VALIDAR_MAPA, resource=Subprocesso:42, timestamp=...
-ACCESS_DENIED: user=444444444444, action=HOMOLOGAR_CADASTRO, resource=Subprocesso:42, 
-               reason="Perfil CHEFE não autorizado. Requer: [ADMIN]", timestamp=...
-```
-
-### Exemplo de Implementação: SubprocessoAccessPolicy
+Localização: `sgc.seguranca.SgcPermissionEvaluator`
 
 ```java
 @Component
-public class SubprocessoAccessPolicy implements AccessPolicy<Subprocesso> {
-    
-    // Mapeamento: Ação → (Perfis, Situações, Requisito Hierarquia)
-    private static final Map<Acao, RegrasAcao> REGRAS = Map.ofEntries(
-        entry(DISPONIBILIZAR_CADASTRO, new RegrasAcao(
-            Set.of(CHEFE),
-            Set.of(CADASTRO_EM_ANDAMENTO),
-            RequisitoHierarquia.MESMA_UNIDADE
-        )),
-        entry(ACEITAR_CADASTRO, new RegrasAcao(
-            Set.of(ADMIN, GESTOR),
-            Set.of(CADASTRO_DISPONIBILIZADO),
-            RequisitoHierarquia.SUPERIOR_IMEDIATA
-        ))
-        // ... 24 outras ações
+public class SgcPermissionEvaluator implements PermissionEvaluator {
+
+    // Ações de escrita exigem que o subprocesso esteja na mesma unidade do usuário
+    private static final Set<String> ACOES_ESCRITA = Set.of(
+        "EDITAR_CADASTRO", "DISPONIBILIZAR_CADASTRO", ...
     );
-    
+
     @Override
-    public boolean canExecute(Usuario usuario, Acao acao, Subprocesso subprocesso) {
-        RegrasAcao regras = REGRAS.get(acao);
-        
-        return temPerfilPermitido(usuario, regras.perfisPermitidos)
-            && temSituacaoPermitida(subprocesso, regras.situacoesPermitidas)
-            && verificaHierarquia(usuario, subprocesso.getUnidade(), regras.requisitoHierarquia);
+    public boolean hasPermission(Authentication auth, Object target, Object permission) {
+        // Dispatch por tipo: Subprocesso ou Processo
+    }
+
+    private boolean checkSubprocesso(Usuario usuario, Subprocesso sp, String acao) {
+        // 1. Leitura → Hierarquia (Admin vê tudo, Gestor vê subordinadas, Chefe/Servidor só sua)
+        // 2. Escrita → RBAC (checkPerfil) + Localização (Regra de Ouro)
     }
 }
 ```
 
-## Fluxo de Uso
+### A "Regra de Ouro"
 
-### Antes (Disperso)
+Regra central que governa todo o controle de acesso:
+
+| Tipo de Ação | Regra |
+|:--|:--|
+| **Leitura** | Hierarquia da Unidade Responsável do subprocesso |
+| **Escrita** | Localização Atual do Subprocesso (unidade do usuário == localização) |
+
+### Uso nos Controllers
 
 ```java
-// Controller
-@PostMapping("/{id}/disponibilizar")
-@PreAuthorize("hasRole('CHEFE')")  // Verificação 1
-public RespostaDto disponibilizar(@PathVariable Long id, Auth auth) {
-    return service.disponibilizar(id, auth);
-}
-
-// Service
-public RespostaDto disponibilizar(Long id, Authentication auth) {
-    Subprocesso sp = repo.findById(id).orElseThrow();
-    
-    // Verificação 2 (duplicada)
-    if (!auth.hasRole("CHEFE")) {
-        throw new ErroAccessoNegado("Apenas CHEFE");
-    }
-    
-    // Verificação 3
-    if (sp.getSituacao() != CADASTRO_EM_ANDAMENTO) {
-        throw new ErroProcessoEmSituacaoInvalida("...");
-    }
-    
-    // Verificação 4
-    if (!sp.getUnidade().equals(usuarioLogado.getUnidade())) {
-        throw new ErroAccessoNegado("Unidade diferente");
-    }
-    
-    // ... lógica de negócio
+// Via @PreAuthorize com SpEL
+@PostMapping("/{codigo}/disponibilizar")
+@PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'DISPONIBILIZAR_CADASTRO')")
+public RespostaDto disponibilizar(@PathVariable Long codigo) {
+    return facade.disponibilizar(codigo);
 }
 ```
 
-### Depois (Centralizado)
-
-```java
-// Controller
-@PostMapping("/{id}/disponibilizar")
-@PreAuthorize("hasRole('CHEFE')")  // Apenas autenticação básica
-public RespostaDto disponibilizar(@PathVariable Long id, Auth auth) {
-    return facade.disponibilizar(id, auth);
-}
-
-// Facade
-public RespostaDto disponibilizar(Long id, Authentication auth) {
-    Usuario usuario = usuarioService.buscarPorTituloEleitoral(auth.getName());
-    Subprocesso sp = repo.findById(id).orElseThrow();
-    
-    // UMA ÚNICA verificação centralizada
-    accessControlService.verificarPermissao(usuario, DISPONIBILIZAR_CADASTRO, sp);
-    
-    // ... delega para service de negócio (SEM verificações de acesso)
-    return cadastroService.disponibilizar(sp);
-}
-
-// Service (PURO - apenas lógica de negócio)
-public RespostaDto disponibilizar(Subprocesso sp) {
-    sp.setSituacao(CADASTRO_DISPONIBILIZADO);
-    sp.setDataDisponibilizacao(LocalDate.now());
-    repo.save(sp);
-    
-    eventPublisher.publishEvent(new EventoCadastroDisponibilizado(sp.getCodigo()));
-    
-    return new RespostaDto("Cadastro disponibilizado com sucesso");
-}
-```
-
-## Validação
-
-### Testes ArchUnit
-
-Criado `CyclicDependencyTest.java` com:
-```java
-@ArchTest
-static final ArchRule no_cycles_within_service_packages = slices()
-        .matching("sgc.(*).service.(**)")
-        .should()
-        .beFreeOfCycles();
-```
+---
 
 ## Consequências
 
 ### Vantagens ✅
 
-1. **Auditabilidade Total**
-    - Todas as decisões de acesso logadas em um único ponto
-    - Fácil rastrear quem tentou acessar o quê
-    - Compliance com LGPD e requisitos de auditoria
+1. **Simplicidade** — Toda a lógica de permissão em uma única classe (~230 linhas)
+2. **Padrão Spring** — Usa `PermissionEvaluator` nativo, sem framework custom
+3. **Testabilidade** — Fácil testar com `@WithMockUser` e testes de integração
+4. **Manutenibilidade** — Mudanças de regras em um único local
+5. **Auditoria** — Logging via SLF4J integrado nos pontos de negação
 
-2. **Manutenibilidade**
-    - Mudança de regras em um único local (AccessPolicy)
-    - Fácil adicionar novas ações (enum + regras)
-    - Código de negócio limpo (sem lógica de segurança)
+### O que foi removido
 
-3. **Testabilidade**
-    - Testes de segurança centralizados em `AccessControlServiceTest`
-    - Testes de policies isolados
+| Componente Antigo | Motivo da Remoção |
+|:--|:--|
+| `AccessControlService` | Orquestrador desnecessário para 1 evaluator |
+| `AccessPolicy<T>` (interface) | Sobre-abstração — `if/else` por tipo basta |
+| `ProcessoAccessPolicy` | Absorvido em `checkProcesso()` |
+| `SubprocessoAccessPolicy` | Absorvido em `checkSubprocesso()` |
+| `AtividadeAccessPolicy` | Absorvido em `checkPerfil()` |
+| `MapaAccessPolicy` | Absorvido em `checkSubprocesso()` |
+| `AccessAuditService` | Substituído por `log.info()` nos pontos de negação |
+| `Acao` (enum) | Substituído por `String` — enum não justificava overhead |
 
-4. **Consistência**
-    - Padrão único para todas as verificações
-    - Impossível esquecer verificações (compilador força)
-    - Mensagens de erro padronizadas
-
-5. **Performance**
-    - Verificações otimizadas (cache de hierarquias)
-    - Sem duplicação de queries
-    - Decisões rápidas (mapa de regras em memória)
-
-6. **Segurança**
-    - Fail-safe defaults (padrão é negar)
-    - Impossível bypass (camada obrigatória)
-    - Auditoria automática de todas as tentativas
-
-### Desvantagens ⚠️
-
-1. **Complexidade Inicial**
-    - Curva de aprendizado para novos desenvolvedores
-    - Mais arquivos/classes
-    - **Mitigação**: Documentação completa + exemplos
-
-2. **Overhead de Abstração**
-    - Chamada adicional (AccessControlService)
-    - Lookup de policy
-    - **Mitigação**: Overhead < 1ms (imperceptível)
-
-3. **Manutenção de Enum Acao**
-    - Precisa adicionar nova ação para cada operação
-    - **Mitigação**: Processo claro + checklist
-
-### Riscos Mitigados ✅
-
-| Risco Anterior          | Mitigação                                            |
-|-------------------------|------------------------------------------------------|
-| Verificações esquecidas | Enum `Acao` força mapeamento completo                |
-| Lógica inconsistente    | Políticas centralizadas garantem consistência        |
-| Bypass de segurança     | Camada obrigatória + testes arquiteturais (ArchUnit) |
-| Falta de auditoria      | `AccessAuditService` loga tudo automaticamente       |
-| Difícil rastreamento    | Logs estruturados + um único ponto de decisão        |
-
-## Alternativas Consideradas
-
-### Alternativa 1: Manter Status Quo (Rejeitada)
-
-- **Prós**: Sem mudanças, sem riscos
-- **Contras**: Problemas de auditoria, manutenção e segurança permanecem
-- **Motivo da Rejeição**: Insustentável a longo prazo
-
-### Alternativa 2: Spring Security Method Security Pura (Rejeitada)
-
-- **Prós**: Padrão do Spring, bem documentado
-- **Contras**:
-    - Difícil centralizar lógica complexa (hierarquia + estado)
-    - Auditoria requer aspect customizado
-    - SpEL complexo e difícil de testar
-- **Motivo da Rejeição**: Não atende requisitos de auditoria e complexidade
-
-### Alternativa 3: AOP com Aspects (Rejeitada)
-
-- **Prós**: Separação de concerns via AOP
-- **Contras**:
-    - Mágica implícita (difícil debugar)
-    - Ordem de execução de aspects pode ser problemática
-    - Mais complexo que solução explícita
-- **Motivo da Rejeição**: Muito mágico, prefere-se explícito
-
-### Alternativa 4: AccessControlService + Policies (✅ ESCOLHIDA)
-
-- **Prós**:
-    - Centralização explícita
-    - Fácil testar e auditar
-    - Extensível (novas policies)
-    - Performance adequada
-- **Contras**: Overhead mínimo de abstração
-- **Motivo da Escolha**: Melhor trade-off entre clareza, testabilidade e auditoria
-
-## Lições Aprendidas
-
-1. **Centralização Compensa**: Overhead inicial vale a pena para manutenibilidade a longo prazo
-2. **Auditoria é Crucial**: Logs estruturados facilitam compliance e debugging
-3. **Políticas Declarativas**: Map de regras é mais claro que if/else aninhados
-4. **Testes Arquiteturais**: ArchUnit garante que padrão seja seguido
+---
 
 ## Referências
 
+- [acesso.md](/acesso.md) — Documento autoritativo com todas as regras de negócio, perfis, CDUs e a "Regra de Ouro"
+- Spring Security `PermissionEvaluator`: [docs](https://docs.spring.io/spring-security/reference/servlet/authorization/architecture.html)
 - ADR-001: Facade Pattern
-- ADR-002: Unified Events Pattern
-- [Spring @Lazy Documentation](https://docs.spring.io/spring-framework/reference/core/beans/dependencies/factory-lazy-init.html)
-- [Circular Dependencies in Spring](https://www.baeldung.com/circular-dependencies-in-spring)
+- ADR-008: Decisões de Simplificação

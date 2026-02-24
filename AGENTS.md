@@ -22,8 +22,8 @@ específicas** do projeto que diferem dos padrões genéricos.
 
 ## 2. Backend (Java / Spring Boot 4)
 
-* **Arquitetura:** Módulos de domínio com uma **Service Facade** (ex: `MapaService`) que orquestra serviços
-  especializados. Controllers interagem *apenas* com a Facade.
+* **Arquitetura:** Módulos de domínio. Facades orquestram múltiplos services quando há lógica de coordenação real.
+  Controllers podem injetar services diretamente quando a facade é pass-through (ver ADR-001).
 * **Comunicação entre Módulos:** Use **Spring Events** para desacoplamento (ex:
   `eventPublisher.publishEvent(new EventoProcessoIniciado(codigo))`).
 * **REST Não-Padrão:**
@@ -33,14 +33,14 @@ específicas** do projeto que diferem dos padrões genéricos.
       `/api/processos/{id}/iniciar`, `/api/processos/{id}/excluir`).
 * **Persistence:** Tabelas em `UPPER_CASE`, colunas em `snake_case`. Enums como `STRING`.
 * **Controle de Acesso (Security):**
-    * **SEMPRE** use a arquitetura centralizada: `Controller → AccessControlService → Services`
-    * **Controllers:** Use `@PreAuthorize` para verificações básicas de role
-    * **Services:** NUNCA adicione verificações de acesso diretas. Use
-      `AccessControlService.verificarPermissao(usuario, acao, recurso)`
-    * **Políticas:** Crie `AccessPolicy` específica para cada tipo de recurso (Processo, Subprocesso, Atividade, Mapa)
-    * **Ações:** Use enum `Acao` do pacote `sgc.seguranca.acesso`
-    * **Hierarquia:** Use `HierarchyService` para verificações de hierarquia de unidades
-    * **Auditoria:** Todas as decisões de acesso são automaticamente logadas por `AccessAuditService`
+    * Baseado na **"Regra de Ouro"** documentada em [`acesso.md`](/acesso.md):
+        * **Leitura**: Hierarquia da Unidade Responsável
+        * **Escrita**: Localização Atual do Subprocesso
+    * **Implementação:** `SgcPermissionEvaluator` (implementa `PermissionEvaluator` do Spring Security)
+    * **Controllers:** Use `@PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'ACAO')")` para verificações
+    * **Services:** NÃO fazem verificações de acesso diretas
+    * **Hierarquia:** `HierarquiaService` para verificações de hierarquia de unidades
+    * **Perfis:** `ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR` (ver `acesso.md` para detalhes)
 
 ## 3. Frontend (Vue 3.5 / TypeScript)
 
@@ -72,25 +72,23 @@ específicas** do projeto que diferem dos padrões genéricos.
 
 ## 5. Padrões Arquiteturais (ADRs)
 
-O SGC segue padrões arquiteturais bem definidos, documentados em ADRs (Architectural Decision Records):
+O SGC segue padrões arquiteturais documentados em ADRs (Architectural Decision Records):
 
-* **[ADR-001: Facade Pattern](/backend/etc/docs/adr/ADR-001-facade-pattern.md)** - ✅ Implementado
-    * Controllers usam APENAS Facades, nunca Services especializados diretamente
-    * Facades orquestram operações complexas delegando para Services especializados
-    * Exemplo: `ProcessoFacade`, `SubprocessoFacade`, `MapaFacade`, `AtividadeFacade`
+* **[ADR-001: Facade Pattern](/backend/etc/docs/adr/ADR-001-facade-pattern.md)** - 🔄 Em Revisão
+    * Facades são usadas quando há orquestração real de múltiplos services
+    * Controllers podem injetar services diretamente quando a facade é pass-through
+    * `SubprocessoFacade` é candidata a simplificação (ver ADR-008)
 
 * **[ADR-002: Unified Events Pattern](/backend/etc/docs/adr/ADR-002-unified-events.md)** - ✅ Implementado
     * Eventos de domínio para comunicação assíncrona entre módulos
     * Padrão unificado: `EventoTransicaoSubprocesso` (design ⭐)
     * Exemplo: `EventoProcessoCriado`, `EventoProcessoIniciado`, `EventoMapaAlterado`
 
-* **[ADR-003: Security Architecture](/backend/etc/docs/adr/ADR-003-security-architecture.md)** - ✅ Implementado
-    * Arquitetura centralizada de controle de acesso em 3 camadas
-    * `AccessControlService` centraliza TODAS as verificações de permissão
-    * `AccessPolicy` especializada por tipo de recurso (Processo, Subprocesso, Atividade, Mapa)
-    * `HierarchyService` para verificações de hierarquia de unidades
-    * `AccessAuditService` para auditoria completa de decisões de acesso
-    * **CRÍTICO:** Services NUNCA fazem verificações de acesso diretas
+* **[ADR-003: Security Architecture](/backend/etc/docs/adr/ADR-003-security-architecture.md)** - ✅ Implementado (Reescrito 2026-02-24)
+    * `SgcPermissionEvaluator` implementa `PermissionEvaluator` do Spring Security
+    * "Regra de Ouro": Leitura por Hierarquia, Escrita por Localização
+    * Sem framework custom — usa padrão nativo do Spring
+    * Regras de negócio detalhadas em [`acesso.md`](/acesso.md)
 
 * **[ADR-004: DTO Pattern](/backend/etc/docs/adr/ADR-004-dto-pattern.md)**
     * Mappers implementados com MapStruct para conversão Entidade ↔ DTO
@@ -109,12 +107,14 @@ O SGC segue padrões arquiteturais bem definidos, documentados em ADRs (Architec
           `record`
     * **Documentação completa:** Ver [`backend/etc/regras/guia-dtos.md`](/backend/etc/regras/guia-dtos.md)
 
-* **[ADR-005: Controller Organization](/backend/etc/docs/adr/ADR-005-controller-organization.md)** - ✅ Implementado
-    * Controllers organizados por workflow phase, não consolidados em arquivos grandes
-    * Separação clara: CRUD, Cadastro, Mapa, Validação
-    * Mantém arquivos de tamanho gerenciável (~200-300 linhas)
-    * Melhor navegabilidade, testabilidade e documentação Swagger
-    * Aderência ao Single Responsibility Principle
+* **[ADR-005: Controller Organization](/backend/etc/docs/adr/ADR-005-controller-organization.md)** - 🔄 Em Revisão
+    * Originalmente: Controllers separados por workflow phase
+    * Reavaliação (2026-02-24): Consolidação em 1 controller por domínio é preferível
+      para controllers thin (que apenas delegam)
+
+* **[ADR-008: Simplification Decisions](/backend/etc/docs/adr/ADR-008-simplification-decisions.md)** - 🚀 Em Andamento
+    * Histórico de todas as decisões de simplificação
+    * Fases 1-2 concluídas, Fases 4-5 em andamento
 
 ## 6. Referências e Padrões Detalhados
 
