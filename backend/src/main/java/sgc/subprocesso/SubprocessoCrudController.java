@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.ComumDtos.DataRequest;
@@ -30,14 +31,14 @@ public class SubprocessoCrudController {
 
 
     @GetMapping("/{codigo}/validar-cadastro")
-    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Valida se o cadastro está pronto para disponibilização")
     public ResponseEntity<ValidacaoCadastroDto> validarCadastro(@PathVariable Long codigo) {
         return ResponseEntity.ok(subprocessoFacade.validarCadastro(codigo));
     }
 
     @GetMapping("/{codigo}/status")
-    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Obtém apenas o status atual do subprocesso")
     public ResponseEntity<SubprocessoSituacaoDto> obterStatus(@PathVariable Long codigo) {
         return ResponseEntity.ok(subprocessoFacade.obterSituacao(codigo));
@@ -51,13 +52,13 @@ public class SubprocessoCrudController {
     }
 
     @GetMapping("/{codigo}")
-    @PreAuthorize("@subprocessoSecurity.canView(#codigo)")
+    @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public SubprocessoDetalheResponse obterPorCodigo(@PathVariable Long codigo) {
         return subprocessoFacade.obterDetalhes(codigo);
     }
 
     @GetMapping("/buscar")
-    @PreAuthorize("@subprocessoSecurity.canView(#codProcesso, #siglaUnidade)")
+    @PostAuthorize("hasPermission(returnObject.body, 'VISUALIZAR_SUBPROCESSO')")
     @JsonView(SubprocessoViews.Publica.class)
     public ResponseEntity<Subprocesso> buscarPorProcessoEUnidade(
             @RequestParam Long codProcesso, @RequestParam String siglaUnidade) {

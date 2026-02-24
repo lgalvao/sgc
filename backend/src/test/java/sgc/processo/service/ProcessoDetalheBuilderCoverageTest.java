@@ -15,7 +15,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.processo.model.UnidadeProcesso;
-import sgc.seguranca.AccessControlService;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -34,7 +34,7 @@ class ProcessoDetalheBuilderCoverageTest {
     @Mock
     private SubprocessoRepo subprocessoRepo;
     @Mock
-    private AccessControlService accessControlService;
+    private SgcPermissionEvaluator permissionEvaluator;
 
     @InjectMocks
     private ProcessoDetalheBuilder builder;

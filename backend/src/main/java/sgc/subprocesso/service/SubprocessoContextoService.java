@@ -9,8 +9,6 @@ import sgc.mapa.MapaFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.Acao;
-import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.dto.ContextoEdicaoResponse;
 import sgc.subprocesso.dto.SubprocessoDetalheResponse;
 import sgc.subprocesso.dto.PermissoesSubprocessoDto;
@@ -18,9 +16,12 @@ import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
-import sgc.subprocesso.security.SubprocessoSecurity;
+import sgc.seguranca.SgcPermissionEvaluator;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Service responsável por preparar contextos de visualização de subprocessos.
@@ -34,9 +35,8 @@ class SubprocessoContextoService {
     private final UsuarioFacade usuarioService;
     private final MapaFacade mapaFacade;
     private final MovimentacaoRepo movimentacaoRepo;
-    private final AccessControlService accessControlService;
     private final SubprocessoAtividadeService atividadeService;
-    private final SubprocessoSecurity subprocessoSecurity;
+    private final SgcPermissionEvaluator permissionEvaluator;
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheResponse obterDetalhes(Long codigo, Usuario usuarioAutenticado) {
@@ -46,8 +46,6 @@ class SubprocessoContextoService {
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheResponse obterDetalhes(Subprocesso sp, Usuario usuarioAutenticado) {
-        accessControlService.verificarPermissao(usuarioAutenticado, Acao.VISUALIZAR_SUBPROCESSO, sp);
-
         Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
 
         // TODO aqui já começou errado. O titular nunca pode ser nulo!
@@ -70,7 +68,7 @@ class SubprocessoContextoService {
         }
 
 
-        PermissoesSubprocessoDto permissoes = subprocessoSecurity.obterPermissoesUI(usuarioAutenticado, sp);
+        PermissoesSubprocessoDto permissoes = obterPermissoesUI(sp, usuarioAutenticado);
 
         return SubprocessoDetalheResponse.builder()
                 .subprocesso(sp)
@@ -99,5 +97,70 @@ class SubprocessoContextoService {
                 mapaFacade.mapaPorCodigo(subprocesso.getMapa().getCodigo()),
                 atividades
         );
+    }
+
+    PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp, Usuario usuario) {
+        return PermissoesSubprocessoDto.builder()
+            .podeEditarCadastro(
+                canExecute(usuario, sp, "EDITAR_CADASTRO", Set.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO)) ||
+                canExecute(usuario, sp, "EDITAR_REVISAO_CADASTRO", Set.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO)))
+            .podeDisponibilizarCadastro(
+                canExecute(usuario, sp, "DISPONIBILIZAR_CADASTRO", Set.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO)) ||
+                canExecute(usuario, sp, "DISPONIBILIZAR_REVISAO_CADASTRO", Set.of(REVISAO_CADASTRO_EM_ANDAMENTO)))
+            .podeDevolverCadastro(
+                canExecute(usuario, sp, "DEVOLVER_CADASTRO", Set.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO)) ||
+                canExecute(usuario, sp, "DEVOLVER_REVISAO_CADASTRO", Set.of(REVISAO_CADASTRO_DISPONIBILIZADA)))
+            .podeAceitarCadastro(
+                canExecute(usuario, sp, "ACEITAR_CADASTRO", Set.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO)) ||
+                canExecute(usuario, sp, "ACEITAR_REVISAO_CADASTRO", Set.of(REVISAO_CADASTRO_DISPONIBILIZADA)))
+            .podeHomologarCadastro(
+                canExecute(usuario, sp, "HOMOLOGAR_CADASTRO", Set.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO)) ||
+                canExecute(usuario, sp, "HOMOLOGAR_REVISAO_CADASTRO", Set.of(REVISAO_CADASTRO_DISPONIBILIZADA)))
+            .podeEditarMapa(
+                canExecute(usuario, sp, "EDITAR_MAPA", Set.of(
+                    NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO,
+                    MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES,
+                    REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_HOMOLOGADA,
+                    REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES,
+                    DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO)))
+            .podeDisponibilizarMapa(
+                canExecute(usuario, sp, "DISPONIBILIZAR_MAPA", Set.of(
+                    MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES,
+                    REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES)))
+            .podeValidarMapa(
+                canExecute(usuario, sp, "VALIDAR_MAPA", Set.of(MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO)))
+            .podeApresentarSugestoes(
+                canExecute(usuario, sp, "APRESENTAR_SUGESTOES", Set.of(MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO)))
+            .podeDevolverMapa(
+                canExecute(usuario, sp, "DEVOLVER_MAPA", Set.of(
+                    MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
+                    REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO)))
+            .podeAceitarMapa(
+                canExecute(usuario, sp, "ACEITAR_MAPA", Set.of(
+                    MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
+                    REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO)))
+            .podeHomologarMapa(
+                canExecute(usuario, sp, "HOMOLOGAR_MAPA", Set.of(
+                    MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
+                    REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO)))
+            .podeVisualizarImpacto(
+                canExecute(usuario, sp, "VERIFICAR_IMPACTOS", Set.of(
+                    NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO,
+                    REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA,
+                    REVISAO_MAPA_AJUSTADO)))
+            .podeAlterarDataLimite(
+                canExecute(usuario, sp, "ALTERAR_DATA_LIMITE", Set.of(SituacaoSubprocesso.values())))
+            .podeReabrirCadastro(
+                canExecute(usuario, sp, "REABRIR_CADASTRO", Set.of(SituacaoSubprocesso.values())))
+            .podeReabrirRevisao(
+                canExecute(usuario, sp, "REABRIR_REVISAO", Set.of(SituacaoSubprocesso.values())))
+            .podeEnviarLembrete(
+                canExecute(usuario, sp, "ENVIAR_LEMBRETE_PROCESSO", Set.of(SituacaoSubprocesso.values())))
+            .build();
+    }
+
+    private boolean canExecute(Usuario usuario, Subprocesso sp, String acao, Set<SituacaoSubprocesso> allowedStates) {
+        if (!allowedStates.contains(sp.getSituacao())) return false;
+        return permissionEvaluator.checkPermission(usuario, sp, acao);
     }
 }

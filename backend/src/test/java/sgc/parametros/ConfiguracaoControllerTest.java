@@ -1,4 +1,6 @@
 package sgc.parametros;
+import sgc.seguranca.SgcPermissionEvaluator;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +32,8 @@ class ConfiguracaoControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @MockitoBean
+    private SgcPermissionEvaluator permissionEvaluator;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

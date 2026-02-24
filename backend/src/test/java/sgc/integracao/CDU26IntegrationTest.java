@@ -129,6 +129,9 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
                 .build();
         movimentacaoRepo.save(movAdmin2);
 
+        entityManager.flush();
+        entityManager.clear();
+
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .acao("HOMOLOGAR_VALIDACAO")
                 .subprocessos(subprocessosSelecionados)

@@ -17,13 +17,13 @@ import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.Acao;
-import sgc.seguranca.AccessControlService;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,9 +38,10 @@ class AtividadeFacadeTest {
 
     @Mock private MapaManutencaoService mapaManutencaoService;
     @Mock private SubprocessoFacade subprocessoFacade;
-    @Mock private AccessControlService accessControlService;
+    @Mock private SgcPermissionEvaluator permissionEvaluator;
     @Mock private UsuarioFacade usuarioService;
     @Mock private MapaFacade mapaFacade;
+    @Mock private SubprocessoValidacaoService validacaoService;
     @Mock private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
@@ -118,7 +119,6 @@ class AtividadeFacadeTest {
                     .build();
             
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(mapaFacade.mapaPorCodigo(mapaCodigo)).thenReturn(mapa);
             when(mapaManutencaoService.criarAtividade(request)).thenReturn(salvo);
             when(subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
@@ -126,10 +126,11 @@ class AtividadeFacadeTest {
                     new AtividadeDto(atividadeCodigo, "Desc", null)
             ));
 
+            doReturn(true).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Subprocesso.class), anyString());
+
             AtividadeOperacaoResponse result = atividadeFacade.criarAtividade(request);
 
             assertNotNull(result);
-            verify(accessControlService).verificarPermissao(eq(usuario), eq(Acao.CRIAR_ATIVIDADE), any(Atividade.class));
         }
     }
 
@@ -164,10 +165,11 @@ class AtividadeFacadeTest {
             when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.emptyList());
 
+            doReturn(true).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Subprocesso.class), anyString());
+
             AtividadeOperacaoResponse result = atividadeFacade.atualizarAtividade(atividadeCodigo, request);
 
             assertNotNull(result);
-            verify(accessControlService).verificarPermissao(usuario, Acao.EDITAR_ATIVIDADE, atividade);
             verify(mapaManutencaoService).atualizarAtividade(atividadeCodigo, request);
         }
     }
@@ -200,10 +202,11 @@ class AtividadeFacadeTest {
             when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.emptyList());
 
+            doReturn(true).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Subprocesso.class), anyString());
+
             AtividadeOperacaoResponse result = atividadeFacade.excluirAtividade(atividadeCodigo);
 
             assertNotNull(result);
-            verify(accessControlService).verificarPermissao(usuario, Acao.EXCLUIR_ATIVIDADE, atividade);
             verify(mapaManutencaoService).excluirAtividade(atividadeCodigo);
         }
     }
@@ -248,11 +251,12 @@ class AtividadeFacadeTest {
                     new AtividadeDto(atividadeCodigo, "Desc", null)
             ));
 
+            doReturn(true).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Subprocesso.class), anyString());
+
             ResultadoOperacaoConhecimento result = atividadeFacade.criarConhecimento(atividadeCodigo, request);
 
             assertNotNull(result);
             assertEquals(500L, result.novoConhecimentoId());
-            verify(accessControlService).verificarPermissao(usuario, Acao.ASSOCIAR_CONHECIMENTOS, atividade);
         }
     }
 
@@ -286,10 +290,11 @@ class AtividadeFacadeTest {
             when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.emptyList());
 
+            doReturn(true).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Subprocesso.class), anyString());
+
             AtividadeOperacaoResponse result = atividadeFacade.atualizarConhecimento(atividadeCodigo, conhecimentoCodigo, request);
 
             assertNotNull(result);
-            verify(accessControlService).verificarPermissao(usuario, Acao.ASSOCIAR_CONHECIMENTOS, atividade);
             verify(mapaManutencaoService).atualizarConhecimento(atividadeCodigo, conhecimentoCodigo, request);
         }
     }
@@ -323,10 +328,11 @@ class AtividadeFacadeTest {
             when(subprocessoFacade.obterSituacao(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoFacade.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.emptyList());
 
+            doReturn(true).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Subprocesso.class), anyString());
+
             AtividadeOperacaoResponse result = atividadeFacade.excluirConhecimento(atividadeCodigo, conhecimentoCodigo);
 
             assertNotNull(result);
-            verify(accessControlService).verificarPermissao(usuario, Acao.ASSOCIAR_CONHECIMENTOS, atividade);
             verify(mapaManutencaoService).excluirConhecimento(atividadeCodigo, conhecimentoCodigo);
         }
     }

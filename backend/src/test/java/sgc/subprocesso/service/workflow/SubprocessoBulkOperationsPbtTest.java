@@ -9,7 +9,6 @@ import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -39,12 +38,11 @@ class SubprocessoBulkOperationsPbtTest {
         UsuarioFacade usuarioServiceFacade = mock(UsuarioFacade.class);
         SubprocessoValidacaoService validacaoService = mock(SubprocessoValidacaoService.class);
         ImpactoMapaService impactoMapaService = mock(ImpactoMapaService.class);
-        AccessControlService accessControlService = mock(AccessControlService.class);
 
         SubprocessoCadastroWorkflowService service = new SubprocessoCadastroWorkflowService(
                 subprocessoRepo, movimentacaoRepo, crudService, alertaService, unidadeService,
                 transicaoService, analiseFacade, usuarioServiceFacade, 
-                validacaoService, impactoMapaService, accessControlService
+                validacaoService, impactoMapaService
         );
 
         Usuario usuario = new Usuario();
@@ -60,7 +58,7 @@ class SubprocessoBulkOperationsPbtTest {
         if (indiceFalha >= 0 && indiceFalha < subprocessos.size()) {
             Subprocesso spFalha = subprocessos.get(indiceFalha);
             doThrow(new ErroValidacao("Erro provocado no item " + indiceFalha))
-                    .when(accessControlService).verificarPermissao(eq(usuario), any(), eq(spFalha));
+                    .when(validacaoService).validarSituacaoPermitida(eq(spFalha), anySet());
 
             assertThatThrownBy(() -> service.aceitarCadastroEmBloco(ids, usuario))
                     .isInstanceOf(ErroValidacao.class);

@@ -44,7 +44,8 @@ describe("useAtividadesStore", () => {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
                 },
-                atividadesAtualizadas: [novaAtividade]
+                atividadesAtualizadas: [novaAtividade],
+                permissoes: {} as any
             });
 
             await context.store.adicionarAtividade(1, 999, {descricao: "Nova Atividade"});
@@ -75,7 +76,8 @@ describe("useAtividadesStore", () => {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
                 },
-                atividadesAtualizadas: []
+                atividadesAtualizadas: [],
+                permissoes: {} as any
             });
 
             await context.store.removerAtividade(1, 1);
@@ -109,7 +111,8 @@ describe("useAtividadesStore", () => {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
                 },
-                atividadesAtualizadas: [atividadeComConhecimento]
+                atividadesAtualizadas: [atividadeComConhecimento],
+                permissoes: {} as any
             });
 
             await context.store.adicionarConhecimento(1, 1, {
@@ -154,7 +157,8 @@ describe("useAtividadesStore", () => {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
                 },
-                atividadesAtualizadas: [atividadeSemConhecimento]
+                atividadesAtualizadas: [atividadeSemConhecimento],
+                permissoes: {} as any
             });
 
             await context.store.removerConhecimento(1, 1, 1);
@@ -211,7 +215,8 @@ describe("useAtividadesStore", () => {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
                 },
-                atividadesAtualizadas: [atividadeAtualizada]
+                atividadesAtualizadas: [atividadeAtualizada],
+                permissoes: {} as any
             });
 
             await context.store.atualizarAtividade(1, 1, atividadeAtualizada);
@@ -264,7 +269,8 @@ describe("useAtividadesStore", () => {
                     codigo: 1,
                     situacao: "CADASTRO_EM_ANDAMENTO" as any,
                 },
-                atividadesAtualizadas: [atividadeComConhecimentoAtualizado]
+                atividadesAtualizadas: [atividadeComConhecimentoAtualizado],
+                permissoes: {} as any
             });
 
             await context.store.atualizarConhecimento(1, 1, 1, conhecimentoAtualizado);

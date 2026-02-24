@@ -20,7 +20,6 @@ import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
-import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.MovimentacaoRepo;
@@ -36,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static sgc.seguranca.Acao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service
@@ -67,7 +65,6 @@ public class SubprocessoMapaWorkflowService {
     private final SubprocessoCrudService crudService;
     private final MapaManutencaoService mapaManutencaoService;
     private final MapaFacade mapaFacade;
-    private final AccessControlService accessControlService;
     private final SubprocessoValidacaoService validacaoService;
     private final AnaliseFacade analiseFacade;
     private final SubprocessoTransicaoService transicaoService;
@@ -172,7 +169,9 @@ public class SubprocessoMapaWorkflowService {
 
     private void executarDisponibilizacaoMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
         Subprocesso sp = getSubprocessoParaEdicao(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, DISPONIBILIZAR_MAPA, sp);
+        validacaoService.validarSituacaoPermitida(sp,
+                MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES,
+                REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES);
 
         validarMapaParaDisponibilizacao(sp);
         validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
@@ -234,7 +233,7 @@ public class SubprocessoMapaWorkflowService {
     @Transactional
     public void apresentarSugestoes(Long codSubprocesso, @Nullable String sugestoes, Usuario usuario) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, APRESENTAR_SUGESTOES, sp);
+        validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO);
 
         sp.getMapa().setSugestoes(sugestoes);
         sp.setSituacao(SITUACAO_MAPA_COM_SUGESTOES.get(sp.getProcesso().getTipo()));
@@ -262,7 +261,7 @@ public class SubprocessoMapaWorkflowService {
     @Transactional
     public void validarMapa(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, VALIDAR_MAPA, sp);
+        validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO);
 
         sp.setSituacao(SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo()));
 
@@ -286,7 +285,9 @@ public class SubprocessoMapaWorkflowService {
     @Transactional
     public void devolverValidacao(Long codSubprocesso, @Nullable String justificativa, Usuario usuario) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, DEVOLVER_MAPA, sp);
+        validacaoService.validarSituacaoPermitida(sp,
+                MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
+                REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO);
 
         SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo());
         sp.setDataFimEtapa2(null);
@@ -318,7 +319,9 @@ public class SubprocessoMapaWorkflowService {
 
     private void executarAceiteValidacao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, ACEITAR_MAPA, sp);
+        validacaoService.validarSituacaoPermitida(sp,
+                MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
+                REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO);
 
         Unidade unidadeAtual = obterUnidadeLocalizacao(sp);
         Unidade proximaUnidade = unidadeAtual.getUnidadeSuperior();
@@ -374,7 +377,9 @@ public class SubprocessoMapaWorkflowService {
 
     private void executarHomologacaoValidacao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, HOMOLOGAR_MAPA, sp);
+        validacaoService.validarSituacaoPermitida(sp,
+                MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
+                REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO);
 
         sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
         subprocessoRepo.save(sp);
@@ -392,7 +397,7 @@ public class SubprocessoMapaWorkflowService {
     @Transactional
     public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoRequest request, Usuario usuario) {
         Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        accessControlService.verificarPermissao(usuario, AJUSTAR_MAPA, sp);
+        validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO);
         validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
 
         sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));

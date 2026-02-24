@@ -18,7 +18,6 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -47,8 +46,6 @@ class SubprocessoCadastroWorkflowServiceTest {
     private SubprocessoValidacaoService validacaoService;
     @Mock
     private ImpactoMapaService impactoMapaService;
-    @Mock
-    private AccessControlService accessControlService;
     @Mock
     private ComumRepo repo;
     @Mock
@@ -219,6 +216,7 @@ class SubprocessoCadastroWorkflowServiceTest {
         Usuario user = new Usuario();
         Unidade u = criarUnidade("U1");
         Subprocesso sp = new Subprocesso();
+        sp.setCodigo(id);
         sp.setUnidade(u);
 
         when(crudService.buscarSubprocesso(id)).thenReturn(sp);

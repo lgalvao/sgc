@@ -13,7 +13,6 @@ import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.seguranca.AccessControlService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -39,7 +38,6 @@ class SubprocessoCadastroWorkflowServiceCoverageTest {
     @Mock private AnaliseFacade analiseFacade;
     @Mock private UsuarioFacade usuarioServiceFacade;
     @Mock private SubprocessoValidacaoService validacaoService;
-    @Mock private AccessControlService accessControlService;
 
     @InjectMocks
     private SubprocessoCadastroWorkflowService service;

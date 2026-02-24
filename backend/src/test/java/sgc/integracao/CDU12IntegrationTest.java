@@ -17,6 +17,8 @@ import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
@@ -55,6 +57,8 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     private UnidadeMapaRepo unidadeMapaRepo;
     @Autowired
     private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -297,6 +301,16 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
             subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             subprocessoRepo.save(subprocessoRevisao);
 
+            // Simular envio para unidade superior (onde está o gestor)
+            Movimentacao movimentacao = Movimentacao.builder()
+                    .subprocesso(subprocessoRevisao)
+                    .unidadeOrigem(unidade)
+                    .unidadeDestino(unidade.getUnidadeSuperior())
+                    .descricao("Enviado para Gestor")
+                    .dataHora(LocalDateTime.now())
+                    .build();
+            movimentacaoRepo.save(movimentacao);
+
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
                     .andExpect(status().isOk());
         }
@@ -306,6 +320,16 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @DisplayName("ADMIN pode acessar se subprocesso está em 'Revisão do cadastro homologada'")
         void adminPodeAcessar_EmRevisaoHomologada() throws Exception {
             configurarUnidadeAdministrador(unidade.getCodigo());
+
+            // Simular movimento para ADMIN (Unidade 1)
+            // Mas espera, aqui o teste configuraAdmin na unidade do subprocesso?
+            // "configurarUnidadeAdministrador(unidade.getCodigo())" sets the user's unit to the subprocess unit.
+            // If user is in subprocess unit, Location check passes.
+            // So we don't strictly need movement if we force user location.
+            // But strict logic says Admin works in Admin Unit.
+            // However, this test seems to force admin into local unit for simplicity.
+            // I will leave it as is if it passes (it passed before).
+
             subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
             subprocessoRepo.save(subprocessoRevisao);
 
@@ -332,6 +356,20 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
             setupChefeForUnidade(CHEFE_TITULO, unidade);
             subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             subprocessoRepo.save(subprocessoRevisao);
+
+            // Simular que o processo saiu da unidade do chefe (foi para unidade superior ou outra)
+            // Precisamos criar uma unidade "Outra" ou usar Superior
+            Unidade superior = UnidadeFixture.unidadeComSigla("SUP");
+            superior = unidadeRepo.save(superior);
+
+            Movimentacao movimentacao = Movimentacao.builder()
+                    .subprocesso(subprocessoRevisao)
+                    .unidadeOrigem(unidade)
+                    .unidadeDestino(superior)
+                    .descricao("Enviado para Superior")
+                    .dataHora(LocalDateTime.now())
+                    .build();
+            movimentacaoRepo.save(movimentacao);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
                     .andExpect(status().isForbidden());

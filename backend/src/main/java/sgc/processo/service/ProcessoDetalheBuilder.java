@@ -8,8 +8,7 @@ import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.UnidadeProcesso;
-import sgc.seguranca.Acao;
-import sgc.seguranca.AccessControlService;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
@@ -19,7 +18,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ProcessoDetalheBuilder {
     private final SubprocessoRepo subprocessoRepo;
-    private final AccessControlService accessControlService;
+    private final SgcPermissionEvaluator permissionEvaluator;
 
     @Transactional(readOnly = true)
     public ProcessoDetalheDto build(Processo processo, Usuario usuario) {
@@ -31,11 +30,11 @@ public class ProcessoDetalheBuilder {
                 .dataCriacao(processo.getDataCriacao())
                 .dataFinalizacao(processo.getDataFinalizacao())
                 .dataLimite(processo.getDataLimite())
-                .podeFinalizar(accessControlService.podeExecutar(usuario, Acao.FINALIZAR_PROCESSO, processo))
-                .podeHomologarCadastro(accessControlService.podeExecutar(usuario, Acao.HOMOLOGAR_CADASTRO_EM_BLOCO, processo))
-                .podeHomologarMapa(accessControlService.podeExecutar(usuario, Acao.HOMOLOGAR_MAPA_EM_BLOCO, processo))
-                .podeAceitarCadastroBloco(accessControlService.podeExecutar(usuario, Acao.ACEITAR_CADASTRO_EM_BLOCO, processo))
-                .podeDisponibilizarMapaBloco(accessControlService.podeExecutar(usuario, Acao.DISPONIBILIZAR_MAPA_EM_BLOCO, processo))
+                .podeFinalizar(permissionEvaluator.checkPermission(usuario, processo, "FINALIZAR_PROCESSO"))
+                .podeHomologarCadastro(permissionEvaluator.checkPermission(usuario, processo, "HOMOLOGAR_CADASTRO_EM_BLOCO"))
+                .podeHomologarMapa(permissionEvaluator.checkPermission(usuario, processo, "HOMOLOGAR_MAPA_EM_BLOCO"))
+                .podeAceitarCadastroBloco(permissionEvaluator.checkPermission(usuario, processo, "ACEITAR_CADASTRO_EM_BLOCO"))
+                .podeDisponibilizarMapaBloco(permissionEvaluator.checkPermission(usuario, processo, "DISPONIBILIZAR_MAPA_EM_BLOCO"))
 
                 .unidades(new ArrayList<>())
                 .build();

@@ -24,6 +24,7 @@ import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -93,6 +94,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                 .unidadeOrigem(unidade1)
                 .unidadeDestino(unidadeSuperior)
                 .descricao("Mapa validado")
+                .dataHora(LocalDateTime.now())
                 .build();
         movimentacaoRepo.save(m1);
 
@@ -101,6 +103,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                 .unidadeOrigem(unidade2)
                 .unidadeDestino(unidadeSuperior)
                 .descricao("Mapa validado")
+                .dataHora(LocalDateTime.now())
                 .build();
         movimentacaoRepo.save(m2);
 

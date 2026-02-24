@@ -23,11 +23,11 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.seguranca.Acao;
-import sgc.seguranca.AccessControlService;
+import sgc.seguranca.SgcPermissionEvaluator;
 
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -66,7 +66,10 @@ class SubprocessoAtividadeServiceTest {
     private ComumRepo repo;
 
     @Mock
-    private AccessControlService accessControlService;
+    private SgcPermissionEvaluator permissionEvaluator;
+
+    @Mock
+    private SubprocessoValidacaoService validacaoService;
 
     @InjectMocks
     private SubprocessoAtividadeService service;
@@ -108,6 +111,8 @@ class SubprocessoAtividadeServiceTest {
             when(repo.buscar(Subprocesso.class, codOrigem))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", codOrigem));
 
+            doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spDestino), eq("EDITAR_CADASTRO"));
+
             // Act & Assert
             assertThatThrownBy(() -> service.importarAtividades(codDestino, codOrigem))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -133,19 +138,13 @@ class SubprocessoAtividadeServiceTest {
             when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
             when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
 
-            doNothing().when(accessControlService)
-                    .verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_CADASTRO), eq(spDestino));
-
-            doThrow(new ErroAcessoNegado("Sem acesso"))
-                    .when(accessControlService)
-                    .verificarPermissao(any(Usuario.class), eq(Acao.CONSULTAR_PARA_IMPORTACAO), eq(spOrigem));
+            doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spDestino), eq("EDITAR_CADASTRO"));
+            doReturn(false).when(permissionEvaluator).checkPermission(any(), eq(spOrigem), eq("CONSULTAR_PARA_IMPORTACAO"));
 
             // Act & Assert
             assertThatThrownBy(() -> service.importarAtividades(codDestino, codOrigem))
                     .isInstanceOf(ErroAcessoNegado.class);
 
-            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_CADASTRO), eq(spDestino));
-            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.CONSULTAR_PARA_IMPORTACAO), eq(spOrigem));
             verifyNoInteractions(copiaMapaService);
         }
 
@@ -166,15 +165,14 @@ class SubprocessoAtividadeServiceTest {
             when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
             when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
+            doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spDestino), eq("EDITAR_CADASTRO"));
+            doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spOrigem), eq("CONSULTAR_PARA_IMPORTACAO"));
 
             // Act
             service.importarAtividades(codDestino, codOrigem);
 
             // Assert
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
-
-            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_CADASTRO), eq(spDestino));
-            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.CONSULTAR_PARA_IMPORTACAO), eq(spOrigem));
             verify(movimentacaoRepo).save(any(Movimentacao.class));
             verify(subprocessoRepo, never()).save(any(Subprocesso.class)); // Não deve salvar pois já está em cadastro
         }
@@ -198,6 +196,8 @@ class SubprocessoAtividadeServiceTest {
             when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(spDestino);
             when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
+            doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spDestino), eq("EDITAR_CADASTRO"));
+            doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spOrigem), eq("CONSULTAR_PARA_IMPORTACAO"));
 
             // Act
             service.importarAtividades(codDestino, codOrigem);
@@ -210,8 +210,6 @@ class SubprocessoAtividadeServiceTest {
             assertThat(subprocessoSalvo.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
             verify(usuarioService).usuarioAutenticado();
-            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_CADASTRO), eq(spDestino));
-            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.CONSULTAR_PARA_IMPORTACAO), eq(spOrigem));
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
             verify(movimentacaoRepo).save(any(Movimentacao.class));
         }
@@ -235,6 +233,8 @@ class SubprocessoAtividadeServiceTest {
             when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(spDestino);
             when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
+            doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spDestino), eq("EDITAR_CADASTRO"));
+            doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spOrigem), eq("CONSULTAR_PARA_IMPORTACAO"));
 
             // Act
             service.importarAtividades(codDestino, codOrigem);
@@ -247,7 +247,6 @@ class SubprocessoAtividadeServiceTest {
             assertThat(subprocessoSalvo.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
             verify(usuarioService).usuarioAutenticado();
-            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.CONSULTAR_PARA_IMPORTACAO), eq(spOrigem));
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
             verify(movimentacaoRepo).save(any(Movimentacao.class));
         }
@@ -271,14 +270,14 @@ class SubprocessoAtividadeServiceTest {
             when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(spDestino);
             when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
+            doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spDestino), eq("EDITAR_CADASTRO"));
+            doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spOrigem), eq("CONSULTAR_PARA_IMPORTACAO"));
 
             // Act
             service.importarAtividades(codDestino, codOrigem);
 
             // Assert
             verify(subprocessoRepo).save(spDestino);
-            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_CADASTRO), eq(spDestino));
-            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.CONSULTAR_PARA_IMPORTACAO), eq(spOrigem));
             assertThat(spDestino.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO); // Não muda no default
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
         }
@@ -301,13 +300,13 @@ class SubprocessoAtividadeServiceTest {
             when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
             when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
+            doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spDestino), eq("EDITAR_CADASTRO"));
+            doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spOrigem), eq("CONSULTAR_PARA_IMPORTACAO"));
 
             // Act
             service.importarAtividades(codDestino, codOrigem);
 
             // Assert
-            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.EDITAR_REVISAO_CADASTRO), eq(spDestino));
-            verify(accessControlService).verificarPermissao(any(Usuario.class), eq(Acao.CONSULTAR_PARA_IMPORTACAO), eq(spOrigem));
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
             verify(movimentacaoRepo).save(any(Movimentacao.class));
             verify(subprocessoRepo, never()).save(any(Subprocesso.class)); // Não deve salvar

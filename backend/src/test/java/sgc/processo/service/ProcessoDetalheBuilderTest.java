@@ -14,8 +14,7 @@ import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.seguranca.Acao;
-import sgc.seguranca.AccessControlService;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -28,7 +27,9 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -40,7 +41,7 @@ class ProcessoDetalheBuilderTest {
 
 
     @Mock
-    private AccessControlService accessControlService;
+    private SgcPermissionEvaluator permissionEvaluator;
 
     @InjectMocks
     private ProcessoDetalheBuilder builder;
@@ -112,7 +113,7 @@ class ProcessoDetalheBuilderTest {
         processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
-        when(accessControlService.podeExecutar(usuario, Acao.FINALIZAR_PROCESSO, processo)).thenReturn(true);
+        doReturn(true).when(permissionEvaluator).checkPermission(usuario, processo, "FINALIZAR_PROCESSO");
 
         // Act
         ProcessoDetalheDto dto = builder.build(processo, usuario);
@@ -132,7 +133,7 @@ class ProcessoDetalheBuilderTest {
         processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
-        when(accessControlService.podeExecutar(usuario, Acao.FINALIZAR_PROCESSO, processo)).thenReturn(false);
+        doReturn(false).when(permissionEvaluator).checkPermission(usuario, processo, "FINALIZAR_PROCESSO");
 
         // Act
         ProcessoDetalheDto dto = builder.build(processo, usuario);
@@ -217,8 +218,7 @@ class ProcessoDetalheBuilderTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
-        when(accessControlService.podeExecutar(any(Usuario.class), any(), any(Processo.class)))
-                .thenReturn(false);
+        doReturn(false).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Processo.class), anyString());
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
         assertThat(dto.isPodeHomologarCadastro()).isFalse();
@@ -235,8 +235,7 @@ class ProcessoDetalheBuilderTest {
         Unidade u1 = criarUnidade(1L, "U1", "U1");
         processo.adicionarParticipantes(Set.of(u1));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
-        when(accessControlService.podeExecutar(any(Usuario.class), any(), any(Processo.class)))
-                .thenReturn(false);
+        doReturn(false).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Processo.class), anyString());
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
         assertThat(dto.isPodeHomologarCadastro()).isFalse();
@@ -338,8 +337,7 @@ class ProcessoDetalheBuilderTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
-        when(accessControlService.podeExecutar(any(Usuario.class), any(), any(Processo.class)))
-                .thenReturn(false);
+        doReturn(false).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Processo.class), anyString());
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
