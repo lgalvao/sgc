@@ -176,7 +176,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await adicionarAtividade(page, atividadeIncompleta);
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             const erroInline = page.getByTestId('atividade-erro-validacao');
-            await expect(erroInline).toBeVisible({timeout: 10000});
+            await expect(erroInline).toBeVisible();
             await expect(erroInline).toContainText(/conhecimento/i);
 
             await adicionarConhecimento(page, atividadeIncompleta, 'Conhecimento Corretivo');

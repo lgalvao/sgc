@@ -44,17 +44,13 @@ public class AtividadeController {
      * Cria uma nova atividade no sistema.
      *
      * @param request O Request contendo os dados da atividade a ser criada.
-     * @return Um {@link ResponseEntity} com status 201 Created e
-     * {@link AtividadeOperacaoResponse}
-     * contendo a atividade criada e o status do subprocesso.
+     * @return Um {@link ResponseEntity} com status 201 Created e {@link AtividadeOperacaoResponse} COM a atividade criada e o status do subprocesso.
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Cria uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> criar(@Valid @RequestBody CriarAtividadeRequest request) {
-        System.out.println("[Controller] Criando atividade para mapa: " + request.mapaCodigo());
         AtividadeOperacaoResponse resp = atividadeFacade.criarAtividade(request);
-
         URI uri = URI.create("/api/atividades/%d".formatted(resp.atividade().codigo()));
         return ResponseEntity.created(uri).body(resp);
     }
@@ -62,11 +58,8 @@ public class AtividadeController {
     /**
      * Atualiza os dados de uma atividade existente.
      *
-     * @param request O Request com os novos dados da atividade. A descrição será
-     *                sanitizada.
-     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse}
-     * contendo
-     * a atividade atualizada e o status do subprocesso.
+     * @param request O Request com os novos dados da atividade. A descrição será sanitizada.
+     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codigo}/atualizar")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")

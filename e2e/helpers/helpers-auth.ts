@@ -20,7 +20,8 @@ export const USUARIOS = {
     CHEFE_SECAO_121: {titulo: '171717', senha: 'senha'}, // Lemmy Kilmister (Seção 121)
     CHEFE_SECAO_111: {titulo: '333333', senha: 'senha'}, // Chefe da Seção 111
     GESTOR_COORD_12: {titulo: '222223', senha: 'senha'}, // Ringo Starr (COORD_12)
-    CHEFE_SECRETARIA_1: {titulo: '202020', senha: 'senha'}, // John Lennon (SECRETARIA_1)
+    CHEFE_SECRETARIA_1: {titulo: '202020', senha: 'senha', perfil: 'CHEFE - SECRETARIA_1'}, // John Lennon (SECRETARIA_1)
+    GESTOR_SECRETARIA_1: {titulo: '202020', senha: 'senha', perfil: 'GESTOR - SECRETARIA_1'}, // John Lennon (SECRETARIA_1)
     CHEFE_SECRETARIA_2: {titulo: '212121', senha: 'senha'}, // George Harrison (Secretaria 2)
     INVALIDO: {titulo: '999999999', senha: 'senhaerrada'}
 } as const;

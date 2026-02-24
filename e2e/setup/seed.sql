@@ -132,6 +132,8 @@ INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_c
 VALUES ('202020', '00202020', 'John Lennon', 'john.lennon@tre-pe.jus.br', '2020', 2, 2);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('202020', 'CHEFE', 2);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('202020', 'GESTOR', 2);
 
 INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
 VALUES ('212121', '00212121', 'George Harrison', 'george.harrison@tre-pe.jus.br', '2021', 11, 11);

@@ -10,7 +10,7 @@ import {
     navegarParaAtividades,
     navegarParaAtividadesVisualizacao
 } from './helpers/helpers-atividades.js';
-import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
+import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {abrirModalCriarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 import * as path from 'node:path';
@@ -514,9 +514,9 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
             await expect(page.getByText(/Cadastro aceito/i).first()).toBeVisible();
 
-            // 2. CHEFE SECRETARIA_1 - Segundo Aceite
+            // 2. GESTOR SECRETARIA_1 - Segundo Aceite
             await page.getByTestId('btn-logout').click({force: true});
-            await login(page, USUARIOS.CHEFE_SECRETARIA_1.titulo, USUARIOS.CHEFE_SECRETARIA_1.senha);
+            await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
             await capturarTela(page, '05-mapa', '00b-analise-chefe-secretaria', {fullPage: true});
