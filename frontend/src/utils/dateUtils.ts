@@ -1,7 +1,7 @@
 import {differenceInDays, format, isFuture, isValid, parse, parseISO, startOfDay,} from "date-fns";
 import {ptBR} from "date-fns/locale";
 
-export type DateInput = string | number | Date | null | undefined;
+export type DateInput = string | number | Date | number[] | null | undefined;
 
 function parseStringDate(s: string): Date | null {
     const trimmed = s.trim();
@@ -28,28 +28,34 @@ function parseStringDate(s: string): Date | null {
     return null;
 }
 
-export function parseDate(dateInput: DateInput): Date | null {
+export function parseDate(dateInput: any): Date | null {
     if (dateInput === null || dateInput === undefined || dateInput === "") {
         return null;
     }
 
-    if (dateInput instanceof Date) {
-        return isValid(dateInput) ? dateInput : null;
+    // Suporte para objetos de contexto do BTable (bootstrap-vue-next)
+    const val = (typeof dateInput === 'object' && !Array.isArray(dateInput) && 'value' in dateInput) 
+        ? dateInput.value 
+        : dateInput;
+
+    if (val instanceof Date) {
+        return isValid(val) ? val : null;
     }
 
-    if (typeof dateInput === "number") {
-        const d = new Date(dateInput);
+    if (typeof val === "number") {
+        const d = new Date(val);
         return isValid(d) ? d : null;
     }
 
-    if (typeof dateInput === "string") {
-        return parseStringDate(dateInput);
+    if (typeof val === "string") {
+        return parseStringDate(val);
     }
 
-    if (Array.isArray(dateInput)) {
-        const [year, month, day, hour = 0, minute = 0, second = 0] = dateInput;
+    if (Array.isArray(val)) {
+        const [year, month, day, hour = 0, minute = 0, second = 0] = val;
         // Mês no JS é 0-indexed
-        return new Date(year, month - 1, day, hour, minute, second);
+        const d = new Date(year, month - 1, day, hour, minute, second);
+        return isValid(d) ? d : null;
     }
 
     return null;

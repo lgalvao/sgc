@@ -506,14 +506,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-logout').click({force: true});
             await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
             
-            console.log(`[DEBUG] Logado como GESTOR_COORD_12. Aguardando processo: ${descricao}`);
-            const tabelaRoot = page.getByTestId('tbl-processos');
-            await expect(tabelaRoot).toBeVisible({timeout: 10000});
-            
-            // Log do conteúdo da tabela se falhar
-            const rows = await tabelaRoot.locator('tr').allInnerTexts();
-            console.log('[DEBUG] Linhas na tabela:', rows);
-
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
             await capturarTela(page, '05-mapa', '00a-analise-gestor-coordenadoria', {fullPage: true});

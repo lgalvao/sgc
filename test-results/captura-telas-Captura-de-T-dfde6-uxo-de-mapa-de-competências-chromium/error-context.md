@@ -55,8 +55,8 @@
                   - columnheader "Unidades" [ref=e44]
                   - columnheader "Situação" [ref=e45] [cursor=pointer]
               - rowgroup [ref=e46]:
-                - row "Proc Mapa 1771936792199 Mapeamento COORD_12 Em andamento" [ref=e47] [cursor=pointer]:
-                  - cell "Proc Mapa 1771936792199" [ref=e48]
+                - row "Proc Mapa 1771937859603 Mapeamento COORD_12 Em andamento" [ref=e47] [cursor=pointer]:
+                  - cell "Proc Mapa 1771937859603" [ref=e48]
                   - cell "Mapeamento" [ref=e49]
                   - cell "COORD_12" [ref=e50]
                   - cell "Em andamento" [ref=e51]:
@@ -71,19 +71,19 @@
                 - columnheader "Processo" [ref=e64] [cursor=pointer]
                 - columnheader "Origem" [ref=e65]
             - rowgroup [ref=e66]:
-              - 'row "Data inválida Não lido: Cadastro de atividades/conhecimentos da unidade SECAO_121 disponibilizado para análise Proc Mapa 1771936792199 SECAO_121" [ref=e67] [cursor=pointer]':
-                - cell "Data inválida" [ref=e68]
+              - 'row "24/02/2026 Não lido: Cadastro de atividades/conhecimentos da unidade SECAO_121 disponibilizado para análise Proc Mapa 1771937859603 SECAO_121" [ref=e67] [cursor=pointer]':
+                - cell "24/02/2026" [ref=e68]
                 - 'cell "Não lido: Cadastro de atividades/conhecimentos da unidade SECAO_121 disponibilizado para análise" [ref=e69]':
                   - generic [ref=e70]: "Não lido:"
                   - text: Cadastro de atividades/conhecimentos da unidade SECAO_121 disponibilizado para análise
-                - cell "Proc Mapa 1771936792199" [ref=e71]
+                - cell "Proc Mapa 1771937859603" [ref=e71]
                 - cell "SECAO_121" [ref=e72]
-              - 'row "Data inválida Não lido: Início do processo em unidades subordinadas Proc Mapa 1771936792199 ADMIN" [ref=e73] [cursor=pointer]':
-                - cell "Data inválida" [ref=e74]
+              - 'row "24/02/2026 Não lido: Início do processo em unidades subordinadas Proc Mapa 1771937859603 ADMIN" [ref=e73] [cursor=pointer]':
+                - cell "24/02/2026" [ref=e74]
                 - 'cell "Não lido: Início do processo em unidades subordinadas" [ref=e75]':
                   - generic [ref=e76]: "Não lido:"
                   - text: Início do processo em unidades subordinadas
-                - cell "Proc Mapa 1771936792199" [ref=e77]
+                - cell "Proc Mapa 1771937859603" [ref=e77]
                 - cell "ADMIN" [ref=e78]
     - contentinfo [ref=e79]:
       - generic [ref=e80]:

@@ -17,13 +17,14 @@ import {verificarPaginaPainel} from './helpers-navegacao.js';
  */
 export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: string, siglaUnidade: string) {
     await expect(page).toHaveURL(/\/painel$/);
-    await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible({timeout: 15000});
-    await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
+    const row = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso});
+    await expect(row).toBeVisible({timeout: 15000});
+    await row.click();
 
     await expect(page).toHaveURL(/\/processo\/\d+/);
 
     if (siglaUnidade) {
-        const match = page.url().match(/\/processo\/(\d+)/);
+        const match = /\/processo\/(\d+)/.exec(page.url());
         if (match) {
             const processoId = match[1];
             const targetUrl = `/processo/${processoId}/${siglaUnidade}`;
@@ -73,7 +74,7 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
 
     // Navegação robusta: extrair ID e navegar explicitamente se necessário
     if (siglaUnidade) {
-        const match = page.url().match(/\/processo\/(\d+)/);
+        const match = /\/processo\/(\d+)/.exec(page.url());
         if (match) {
             const processoId = match[1];
             const targetUrl = `/processo/${processoId}/${siglaUnidade}`;
@@ -107,7 +108,7 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
 
     // Navegação robusta: extrair ID e navegar explicitamente
     if (siglaUnidade) {
-        const match = page.url().match(/\/processo\/(\d+)/);
+        const match = /\/processo\/(\d+)/.exec(page.url());
         if (match) {
             const processoId = match[1];
             const targetUrl = `/processo/${processoId}/${siglaUnidade}`;

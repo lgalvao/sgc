@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,11 +14,9 @@ import sgc.analise.AnaliseFacade;
 import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.comum.ComumDtos.JustificativaRequest;
 import sgc.comum.ComumDtos.TextoOpcionalRequest;
-import sgc.comum.erros.ErroAutenticacao;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.MapaViews;
-import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.sanitizacao.UtilSanitizacao;
 import sgc.subprocesso.dto.ContextoEdicaoResponse;
@@ -41,8 +38,6 @@ public class SubprocessoCadastroController {
 
     private final SubprocessoFacade subprocessoFacade;
     private final AnaliseFacade analiseFacade;
-    private final OrganizacaoFacade organizacaoFacade;
-
     @GetMapping("/{codigo}/historico-cadastro")
     @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long codigo) {
