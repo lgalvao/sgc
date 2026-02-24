@@ -17,6 +17,8 @@ export const useFeedbackStore = defineStore('feedback', () => {
     // Referência interna ao controller do Toast
     const toast = ref<ToastController | null>(null);
     const messageQueue = ref<any[]>([]);
+    const lastShowTime = ref(0);
+    const THROTTLE_MS = 500;
 
     function init(toastInstance: any) {
         toast.value = toastInstance;
@@ -28,7 +30,15 @@ export const useFeedbackStore = defineStore('feedback', () => {
     }
 
     function show(title: string, message: string, variant: 'success' | 'danger' | 'warning' | 'info' = 'info', autoHideDelay = 3000) {
+        const now = Date.now();
+
+        // Se já está inicializado, aplica o throttle para evitar spam
+        if (toast.value && (now - lastShowTime.value < THROTTLE_MS)) {
+            return;
+        }
+
         if (toast.value) {
+            lastShowTime.value = now;
             toast.value.create({
                 props: {
                     title,
