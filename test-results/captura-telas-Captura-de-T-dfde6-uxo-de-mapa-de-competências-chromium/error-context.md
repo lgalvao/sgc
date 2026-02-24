@@ -1,0 +1,92 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e4]:
+    - navigation [ref=e5]:
+      - generic [ref=e6]:
+        - link "SGC" [ref=e7] [cursor=pointer]:
+          - /url: /painel
+        - generic [ref=e8]:
+          - list [ref=e9]:
+            - listitem [ref=e10]:
+              - link "Painel" [ref=e11] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e12]: 
+                - text: Painel
+            - listitem [ref=e13]:
+              - link "Minha unidade" [ref=e14] [cursor=pointer]:
+                - /url: /unidade/9
+                - generic [ref=e15]: 
+                - text: Minha unidade
+            - listitem [ref=e16]:
+              - link "Relatórios" [ref=e17] [cursor=pointer]:
+                - /url: /relatorios
+                - generic [ref=e18]: 
+                - text: Relatórios
+            - listitem [ref=e19]:
+              - link "Histórico" [ref=e20] [cursor=pointer]:
+                - /url: /historico
+                - generic [ref=e21]: 
+                - text: Histórico
+          - list [ref=e22]:
+            - listitem [ref=e23]:
+              - link "GESTOR - COORD_12" [ref=e24]:
+                - /url: "#"
+                - generic [ref=e25]:
+                  - generic [ref=e26]: 
+                  - generic [ref=e27]: GESTOR - COORD_12
+            - listitem "Sair" [ref=e28]:
+              - link [ref=e29] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e30]: 
+    - main [ref=e31]:
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - heading "Processos" [level=2] [ref=e36]
+          - generic "Lista de processos cadastrados" [ref=e38]:
+            - table [ref=e39]:
+              - rowgroup [ref=e40]:
+                - row "Descrição Tipo Unidades Situação" [ref=e41]:
+                  - columnheader "Descrição" [ref=e42] [cursor=pointer]
+                  - columnheader "Tipo" [ref=e43] [cursor=pointer]
+                  - columnheader "Unidades" [ref=e44]
+                  - columnheader "Situação" [ref=e45] [cursor=pointer]
+              - rowgroup [ref=e46]:
+                - row "Proc Mapa 1771936792199 Mapeamento COORD_12 Em andamento" [ref=e47] [cursor=pointer]:
+                  - cell "Proc Mapa 1771936792199" [ref=e48]
+                  - cell "Mapeamento" [ref=e49]
+                  - cell "COORD_12" [ref=e50]
+                  - cell "Em andamento" [ref=e51]:
+                    - generic [ref=e52]: Em andamento
+        - generic [ref=e53]:
+          - heading "Alertas" [level=2] [ref=e56]
+          - table [ref=e59]:
+            - rowgroup [ref=e60]:
+              - row "Data/Hora Descrição Processo Origem" [ref=e61]:
+                - columnheader "Data/Hora" [ref=e62] [cursor=pointer]
+                - columnheader "Descrição" [ref=e63]
+                - columnheader "Processo" [ref=e64] [cursor=pointer]
+                - columnheader "Origem" [ref=e65]
+            - rowgroup [ref=e66]:
+              - 'row "Data inválida Não lido: Cadastro de atividades/conhecimentos da unidade SECAO_121 disponibilizado para análise Proc Mapa 1771936792199 SECAO_121" [ref=e67] [cursor=pointer]':
+                - cell "Data inválida" [ref=e68]
+                - 'cell "Não lido: Cadastro de atividades/conhecimentos da unidade SECAO_121 disponibilizado para análise" [ref=e69]':
+                  - generic [ref=e70]: "Não lido:"
+                  - text: Cadastro de atividades/conhecimentos da unidade SECAO_121 disponibilizado para análise
+                - cell "Proc Mapa 1771936792199" [ref=e71]
+                - cell "SECAO_121" [ref=e72]
+              - 'row "Data inválida Não lido: Início do processo em unidades subordinadas Proc Mapa 1771936792199 ADMIN" [ref=e73] [cursor=pointer]':
+                - cell "Data inválida" [ref=e74]
+                - 'cell "Não lido: Início do processo em unidades subordinadas" [ref=e75]':
+                  - generic [ref=e76]: "Não lido:"
+                  - text: Início do processo em unidades subordinadas
+                - cell "Proc Mapa 1771936792199" [ref=e77]
+                - cell "ADMIN" [ref=e78]
+    - contentinfo [ref=e79]:
+      - generic [ref=e80]:
+        - generic [ref=e81]: Versão 1.0.0
+        - generic [ref=e82]: © SESEL/COSIS/TRE-PE
+```

@@ -12,7 +12,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import sgc.organizacao.UsuarioFacade;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.seguranca.login.FiltroJwt;
 import sgc.seguranca.login.GerenciadorJwt;
 
@@ -34,6 +37,13 @@ public class E2eSecurityConfig {
     @Bean
     public FiltroJwt filtroJwt(GerenciadorJwt gerenciadorJwt, UsuarioFacade usuarioFacade) {
         return new FiltroJwt(gerenciadorJwt, usuarioFacade);
+    }
+
+    @Bean
+    public MethodSecurityExpressionHandler createExpressionHandler(SgcPermissionEvaluator permissionEvaluator) {
+        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+        expressionHandler.setPermissionEvaluator(permissionEvaluator);
+        return expressionHandler;
     }
 
     /**

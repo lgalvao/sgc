@@ -175,7 +175,7 @@ function startSmtpServer() {
                 buffer += chunk;
             });
             stream.on('end', () => {
-                log('SMTP', `E-mail recebido de ${session.envelope.mailFrom.address} para ${session.envelope.rcptTo.map(r => r.address).join(', ')}`);
+                // log('SMTP', `E-mail recebido de ${session.envelope.mailFrom.address} para ${session.envelope.rcptTo.map(r => r.address).join(', ')}`);
                 // Se precisar do corpo do e-mail para debug futuro, pode logar 'buffer' aqui
                 callback();
             });
@@ -187,7 +187,7 @@ function startSmtpServer() {
     });
 
     smtpServer.listen(SMTP_PORT, '0.0.0.0', () => {
-        log('SMTP', `Servidor SMTP rodando na porta ${SMTP_PORT}`);
+        log('SMTP', `Servidor SMTP local executando na porta ${SMTP_PORT}`);
     });
 }
 
@@ -205,7 +205,7 @@ function stopProcess(proc, isWindows) {
 }
 
 function cleanup() {
-    // Matar apenas processos iniciados, preservando Gradle Daemons
+    // Encerrar apenas processos iniciados, preservando Gradle Daemons
     stopProcess(backendProcess, isWindows);
     stopProcess(frontendProcess, isWindows);
     if (smtpServer) {
@@ -263,9 +263,9 @@ try {
     await checkBackendHealth();
     startFrontend();
     await checkFrontendHealth();
-    lifecycleLogger.info('>>> Frontend, Backend e SMTP no ar!');
+    lifecycleLogger.info('>>> Frontend, Backend e SMTP no ar.');
 } catch (error) {
-    lifecycleLogger.error(`Erro ao iniciar infraestrutura de testes: ${error && error.message ? error.message : error}`);
+    lifecycleLogger.error(`Erro ao iniciar infra de testes: ${error && error.message ? error.message : error}`);
     process.exit(1);
 }
 

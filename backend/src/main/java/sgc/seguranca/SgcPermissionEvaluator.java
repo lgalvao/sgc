@@ -133,7 +133,12 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         // 3. Execução (Escrita) - Baseada na Localização Atual (Regra de Ouro)
         // O usuário só pode executar se o subprocesso estiver na sua unidade
         Unidade localizacao = obterUnidadeLocalizacao(sp);
-        return Objects.equals(usuario.getUnidadeAtivaCodigo(), localizacao.getCodigo());
+        boolean permitido = Objects.equals(usuario.getUnidadeAtivaCodigo(), localizacao.getCodigo());
+        if (!permitido) {
+            log.info("Acesso de ESCRITA negado para {} (Unidade Ativa: {}). Subprocesso {} localizado em {}.",
+                    usuario.getTituloEleitoral(), usuario.getUnidadeAtivaCodigo(), sp.getCodigo(), localizacao.getCodigo());
+        }
+        return permitido;
     }
 
     private boolean checkPerfil(Usuario usuario, String acao) {
@@ -207,6 +212,9 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
             Unidade unidadeUsuario = Unidade.builder().codigo(usuario.getUnidadeAtivaCodigo()).build();
             return hierarquiaService.isMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
         }
+
+        log.info("Acesso negado por hierarquia para {} (Perfil: {}, Unidade Ativa: {}). Unidade alvo: {}.",
+                usuario.getTituloEleitoral(), usuario.getPerfilAtivo(), usuario.getUnidadeAtivaCodigo(), unidadeAlvo.getCodigo());
         return false;
     }
 

@@ -500,9 +500,40 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Disponibilizar (como chefe)
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await page.waitForTimeout(100);
+            await page.waitForTimeout(500);
 
-            // Logout e login como ADMIN para Homologar
+            // 1. GESTOR COORD_12 - Primeiro Aceite
+            await page.getByTestId('btn-logout').click({force: true});
+            await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
+            
+            console.log(`[DEBUG] Logado como GESTOR_COORD_12. Aguardando processo: ${descricao}`);
+            const tabelaRoot = page.getByTestId('tbl-processos');
+            await expect(tabelaRoot).toBeVisible({timeout: 10000});
+            
+            // Log do conteúdo da tabela se falhar
+            const rows = await tabelaRoot.locator('tr').allInnerTexts();
+            console.log('[DEBUG] Linhas na tabela:', rows);
+
+            await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
+            await navegarParaAtividadesVisualizacao(page);
+            await capturarTela(page, '05-mapa', '00a-analise-gestor-coordenadoria', {fullPage: true});
+            await page.getByTestId('btn-acao-analisar-principal').click();
+            await page.getByTestId('inp-aceite-cadastro-obs').fill('Cadastro muito bem detalhado. Seguindo para a Secretaria.');
+            await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+            await expect(page.getByText(/Cadastro aceito/i).first()).toBeVisible();
+
+            // 2. CHEFE SECRETARIA_1 - Segundo Aceite
+            await page.getByTestId('btn-logout').click({force: true});
+            await login(page, USUARIOS.CHEFE_SECRETARIA_1.titulo, USUARIOS.CHEFE_SECRETARIA_1.senha);
+            await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
+            await navegarParaAtividadesVisualizacao(page);
+            await capturarTela(page, '05-mapa', '00b-analise-chefe-secretaria', {fullPage: true});
+            await page.getByTestId('btn-acao-analisar-principal').click();
+            await page.getByTestId('inp-aceite-cadastro-obs').fill('Ok. Para homologação do ADMIN.');
+            await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+            await expect(page.getByText(/Cadastro aceito/i).first()).toBeVisible();
+
+            // 3. ADMIN - Homologação Final
             await page.getByTestId('btn-logout').click({force: true});
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 

@@ -46,6 +46,12 @@ export function parseDate(dateInput: DateInput): Date | null {
         return parseStringDate(dateInput);
     }
 
+    if (Array.isArray(dateInput)) {
+        const [year, month, day, hour = 0, minute = 0, second = 0] = dateInput;
+        // Mês no JS é 0-indexed
+        return new Date(year, month - 1, day, hour, minute, second);
+    }
+
     return null;
 }
 

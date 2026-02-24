@@ -141,6 +141,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
+                
         String sanitizedObservacoes = Optional.ofNullable(request.texto())
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");
