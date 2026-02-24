@@ -94,4 +94,87 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByTestId('tbl-processos').getByText(descricao)).not.toBeVisible();
     });
+
+    test('Deve validar regras de seleção em cascata na árvore de unidades', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
+        await page.getByTestId('btn-painel-criar-processo').click();
+
+        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+        await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
+        await page.getByTestId('btn-arvore-expand-COORD_11').click();
+
+        // 1. Selecionar pai deve selecionar todos os filhos elegíveis
+        await page.getByTestId('chk-arvore-unidade-COORD_11').check();
+        await expect(page.getByTestId('chk-arvore-unidade-SECAO_111')).toBeChecked();
+        await expect(page.getByTestId('chk-arvore-unidade-SECAO_112')).toBeChecked();
+        await expect(page.getByTestId('chk-arvore-unidade-SECAO_113')).toBeChecked();
+
+        // 2. Desmarcar um filho deve deixar o pai em estado indeterminado
+        await page.getByTestId('chk-arvore-unidade-SECAO_111').uncheck();
+        const chkCoord = page.getByTestId('chk-arvore-unidade-COORD_11').locator('input');
+        const isIndeterminate = await chkCoord.evaluate((node: HTMLInputElement) => node.indeterminate);
+        expect(isIndeterminate).toBe(true);
+
+        // 3. Desmarcar todos os filhos deve desmarcar o pai
+        await page.getByTestId('chk-arvore-unidade-SECAO_112').uncheck();
+        await page.getByTestId('chk-arvore-unidade-SECAO_113').uncheck();
+        await expect(page.getByTestId('chk-arvore-unidade-COORD_11')).not.toBeChecked();
+    });
+
+    test('Deve validar restrições de unidades sem mapa para REVISAO e DIAGNOSTICO', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
+        await page.getByTestId('btn-painel-criar-processo').click();
+
+        // Seleciona tipo REVISÃO
+        await page.getByTestId('sel-processo-tipo').selectOption('REVISAO');
+
+        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+        await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
+
+        // ASSESSORIA_11 não tem mapa vigente no seed -> deve estar desabilitada
+        const chkInvalida = page.getByTestId('chk-arvore-unidade-ASSESSORIA_11');
+        await expect(chkInvalida).toBeDisabled();
+
+        // Valida tooltip de unidade desabilitada
+        await chkInvalida.hover();
+        await expect(page.getByText('Esta unidade não está disponível para seleção')).toBeVisible();
+
+        // ASSESSORIA_12 TEM mapa vigente no seed -> deve estar habilitada
+        await expect(page.getByTestId('chk-arvore-unidade-ASSESSORIA_12')).toBeEnabled();
+    });
+
+    test('Deve validar fluxos de cancelamento e mensagens de feedback', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: any}) => {
+        const descricao = `Processo Feedback - ${Date.now()}`;
+
+        // 1. Cancelar criação
+        await page.getByTestId('btn-painel-criar-processo').click();
+        await page.getByTestId('inp-processo-descricao').fill(descricao);
+        await page.getByRole('button', {name: 'Cancelar'}).click();
+        await expect(page).toHaveURL(/\/painel/);
+        await expect(page.getByText(descricao)).not.toBeVisible();
+
+        // 2. Criar e validar mensagem de sucesso
+        await criarProcesso(page, {
+            descricao: descricao,
+            tipo: 'MAPEAMENTO',
+            diasLimite: 30,
+            unidade: 'ASSESSORIA_12',
+            expandir: ['SECRETARIA_1']
+        });
+        await expect(page.getByText('Processo criado.')).toBeVisible();
+
+        // Capturar ID para cleanup
+        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        const id = await page.url().match(/codProcesso=(\d+)/)?.[1];
+        if (id) cleanupAutomatico.registrar(Number(id));
+
+        // 3. Cancelar remoção
+        await page.getByTestId('btn-processo-remover').click();
+        await page.getByRole('button', {name: 'Cancelar'}).filter({hasText: 'Cancelar'}).click();
+        await expect(page.getByText(`Remover o processo '${descricao}'?`)).not.toBeVisible();
+        await expect(page).toHaveURL(/\/processo\/cadastro/);
+
+        // 4. Confirmar remoção e validar mensagem
+        await page.getByTestId('btn-processo-remover').click();
+        await page.getByRole('button', {name: 'Remover'}).last().click();
+        await expect(page.getByText(`Processo ${descricao} removido`)).toBeVisible();
+    });
 });

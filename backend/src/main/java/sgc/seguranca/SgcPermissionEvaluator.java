@@ -49,7 +49,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+        if (!(authentication.getPrincipal() instanceof Usuario usuario)) {
             return false;
         }
 
@@ -61,8 +61,8 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
         if (targetDomainObject instanceof Subprocesso sp) {
             return checkSubprocesso(usuario, sp, acao);
-        } else if (targetDomainObject instanceof Processo p) {
-            return checkProcesso(usuario, p, acao);
+        } else if (targetDomainObject instanceof Processo) {
+            return checkProcesso(usuario, acao);
         }
 
         return false;
@@ -70,7 +70,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
-        if (authentication == null || targetId == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+        if (!(authentication.getPrincipal() instanceof Usuario usuario)) {
             return false;
         }
 
@@ -86,7 +86,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
                     .orElse(false);
         } else if ("Processo".equals(targetType)) {
              return processoRepo.findById((Long) targetId)
-                    .map(p -> checkProcesso(usuario, p, acao))
+                    .map(p -> checkProcesso(usuario, acao))
                     .orElse(false);
         }
 
@@ -102,8 +102,8 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
         if (targetDomainObject instanceof Subprocesso sp) {
             return checkSubprocesso(usuario, sp, permission);
-        } else if (targetDomainObject instanceof Processo p) {
-            return checkProcesso(usuario, p, permission);
+        } else if (targetDomainObject instanceof Processo) {
+            return checkProcesso(usuario, permission);
         }
         return false;
     }
@@ -177,7 +177,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         return true;
     }
 
-    private boolean checkProcesso(Usuario usuario, Processo p, String acao) {
+    private boolean checkProcesso(Usuario usuario, String acao) {
         // Regras para Processo (baseadas em Perfil)
         boolean isAdmin = usuario.getPerfilAtivo() == ADMIN;
 

@@ -131,3 +131,13 @@ Para detalhes técnicos e exemplos de código, consulte:
 
 * **Módulo-Específico:**
     * `README.md` de cada módulo e diretório para responsabilidades específicas
+
+## 7. Apêndice: Aprendizados do Ambiente (Local)
+
+* **Sistema Operacional:** Windows (win32).
+* **Shell:** PowerShell via `powershell.exe -NoProfile -Command`.
+* **Comandos de Shell:**
+    * Comandos `dir` com sintaxe legada do CMD (ex: `dir /s /b`) podem falhar se usados com múltiplos argumentos de busca simultâneos ou se mal interpretados pelo wrapper do PowerShell.
+    * Prefira comandos nativos do PowerShell como `Get-ChildItem` para buscas recursivas.
+* **Ferramenta `glob`:** Funciona bem para padrões simples, mas pode ser sensível a maiúsculas/minúsculas dependendo da configuração.
+* **Deploy:** O script `release-hom.sh` é exclusivo para Linux/Bash e não deve ser executado localmente no Windows.
