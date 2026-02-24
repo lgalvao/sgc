@@ -13,14 +13,16 @@
 - [x] ADR-008: Simplification Decisions → adicionada Fase 5
 - [x] AGENTS.md → seções §2 e §5 atualizadas
 
-## Fase 1 — Remover Código Morto (Pact)
+## Fase 1 — Remover Código Morto (Pact) ✅ Concluída (2026-02-24)
 
-- [ ] Deletar `backend/src/test/java/sgc/pact/`
-- [ ] Deletar `frontend/src/services/__tests__/ProcessoService.pact.spec.ts`
-- [ ] Deletar `frontend/pact/`
-- [ ] Deletar `frontend/vitest.pact.config.ts`
-- [ ] Buscar refs restantes a "pact"
-- [ ] Verificação: testes backend + frontend
+- [x] Deletar `backend/src/test/java/sgc/pact/`
+- [x] Deletar `frontend/src/services/__tests__/ProcessoService.pact.spec.ts`
+- [x] Deletar `frontend/pact/`
+- [x] Deletar `frontend/vitest.pact.config.ts`
+- [x] Remover `@pact-foundation/pact` do `package.json`
+- [x] Remover script `test:pact` do `package.json`
+- [x] Remover exclusão `*.pact.spec.ts` do `vitest.config.ts`
+- [ ] Verificação: testes backend + frontend (a cargo do usuário)
 
 ## Fase 2 — Consolidar Services do Subprocesso
 
