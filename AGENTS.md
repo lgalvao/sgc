@@ -132,7 +132,11 @@ Para detalhes técnicos e exemplos de código, consulte:
 * **Módulo-Específico:**
     * `README.md` de cada módulo e diretório para responsabilidades específicas
 
-## 7. Apêndice: Aprendizados do Ambiente (Local)
+## 7. Aprendizados e Diretrizes (Específicos)
+
+- **Testes E2E Seriais**: Em testes marcados como `test.describe.serial`, não se deve executar cenários individualmente (ex: usando `-g "Cenario X"`), pois cada cenário depende do estado deixado pelo anterior. Execute sempre o arquivo de teste completo.
+
+## 8. Apêndice: Aprendizados do Ambiente (Local)
 
 * **Sistema Operacional:** Windows (win32).
 * **Shell:** PowerShell via `powershell.exe -NoProfile -Command`.

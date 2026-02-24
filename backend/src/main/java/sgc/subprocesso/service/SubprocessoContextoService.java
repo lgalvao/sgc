@@ -47,17 +47,8 @@ class SubprocessoContextoService {
     @Transactional(readOnly = true)
     public SubprocessoDetalheResponse obterDetalhes(Subprocesso sp, Usuario usuarioAutenticado) {
         Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
-
-        // TODO aqui já começou errado. O titular nunca pode ser nulo!
-        Usuario titular = null;
-        try {
-            titular = usuarioService.buscarPorLogin(sp.getUnidade().getTituloTitular());
-        } catch (Exception e) {
-            log.warn("Erro ao buscar titular: {}", e.getMessage());
-        }
-
-        List<Movimentacao> movimentacoes = movimentacaoRepo
-                .findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        Usuario titular = usuarioService.buscarPorLogin(sp.getUnidade().getTituloTitular());
+        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
 
         String localizacaoAtual = sp.getUnidade().getSigla();
         if (!movimentacoes.isEmpty()) {
@@ -66,7 +57,6 @@ class SubprocessoContextoService {
                 localizacaoAtual = destino.getSigla();
             }
         }
-
 
         PermissoesSubprocessoDto permissoes = obterPermissoesUI(sp, usuarioAutenticado);
 
@@ -89,14 +79,13 @@ class SubprocessoContextoService {
         Unidade unidade = subprocesso.getUnidade();
         List<AtividadeDto> atividades = atividadeService.listarAtividadesSubprocesso(codSubprocesso);
 
-        // TODO deveria usar builder
-        return new ContextoEdicaoResponse(
-                unidade,
-                subprocesso,
-                detalhes,
-                mapaFacade.mapaPorCodigo(subprocesso.getMapa().getCodigo()),
-                atividades
-        );
+        return ContextoEdicaoResponse.builder()
+                .unidade(unidade)
+                .subprocesso(subprocesso)
+                .detalhes(detalhes)
+                .mapa(mapaFacade.mapaPorCodigo(subprocesso.getMapa().getCodigo()))
+                .atividadesDisponiveis(atividades)
+                .build();
     }
 
     PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp, Usuario usuario) {
@@ -160,6 +149,9 @@ class SubprocessoContextoService {
     }
 
     private boolean canExecute(Usuario usuario, Subprocesso sp, String acao, Set<SituacaoSubprocesso> allowedStates) {
+        if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
+            return false;
+        }
         if (!allowedStates.contains(sp.getSituacao())) return false;
         return permissionEvaluator.checkPermission(usuario, sp, acao);
     }

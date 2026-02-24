@@ -1,6 +1,6 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
+import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
@@ -47,7 +47,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        processoId = await extrairProcessoId(page);
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
@@ -242,5 +242,35 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
         // Verificar que processo não aparece mais no painel ativo (foi finalizado)
         // (Processo finalizado não aparece na lista de processos ativos)
+    });
+
+    test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({page, autenticadoComoAdmin}) => {
+        // Issue #1220: Garantir que botões de ação não aparecem para processos finalizados
+
+        // Navegar para o histórico ou buscar o processo finalizado
+        // Nota: O processo finalizado pode não estar no painel inicial. 
+        // Vamos forçar a navegação para os detalhes dele usando o ID capturado anteriormente.
+        await page.goto(`/processo/${processoId}`);
+
+        // 1. Verificar que a mensagem de "Processo concluído" aparece (via useProximaAcao)
+        await expect(page.getByText(/Processo concluído/i)).toBeVisible();
+
+        // 2. Verificar que o botão "Finalizar processo" NÃO está visível
+        await expect(page.getByTestId('btn-processo-finalizar')).not.toBeVisible();
+
+        // 3. Verificar que as ações em bloco NÃO estão visíveis
+        await expect(page.getByTestId('btn-acao-bloco-aceitar')).not.toBeVisible();
+        await expect(page.getByTestId('btn-acao-bloco-homologar')).not.toBeVisible();
+
+        // 4. Entrar em um subprocesso e verificar botões do cabeçalho
+        await navegarParaSubprocesso(page, 'SECAO_221');
+        await expect(page.getByTestId('btn-analise-enviar-lembrete')).not.toBeVisible();
+        await expect(page.getByTestId('btn-analise-reabrir-cadastro')).not.toBeVisible();
+        await expect(page.getByTestId('btn-analise-alterar-data')).not.toBeVisible();
+
+        // 5. Verificar que botões de edição de atividades não aparecem nos cards
+        await expect(page.getByTestId('card-subprocesso-atividades')).not.toBeVisible();
+        // Deve aparecer o de visualização
+        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
     });
 });
