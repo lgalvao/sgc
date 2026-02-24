@@ -285,10 +285,12 @@ async function salvarProcesso() {
           processoEditando.value.codigo,
           request,
       );
+      feedbackStore.show("Processo alterado", "O processo foi alterado com sucesso.", "success");
       await router.push("/painel");
     } else {
       const request = construirCriarRequest();
       await processosStore.criarProcesso(request);
+      feedbackStore.show("Processo criado", "O processo foi criado com sucesso.", "success");
       await router.push("/painel");
     }
     limparCampos();
@@ -332,9 +334,9 @@ async function confirmarIniciarProcesso() {
         tipo.value as TipoProcesso,
         unidadesSelecionadas.value,
     );
+    feedbackStore.show("Processo iniciado", "O processo foi iniciado com sucesso.", "success");
     await router.push("/painel");
     mostrarModalConfirmacao.value = false;
-    feedbackStore.show("Processo iniciado", "O processo foi iniciado com sucesso.", "success");
   } catch (error) {
     console.error("Erro ao iniciar processo:", error);
     mostrarModalConfirmacao.value = false;
@@ -355,8 +357,10 @@ function fecharModalRemocao() {
 async function confirmarRemocao() {
   if (processoEditando.value) {
     isLoading.value = true;
+    const descRemovida = processoEditando.value.descricao;
     try {
       await processosStore.removerProcesso(processoEditando.value.codigo);
+      feedbackStore.show("Processo removido", `Processo ${descRemovida} removido`, "success");
       await router.push("/painel");
       if (!processoEditando.value) {
         limparCampos();
