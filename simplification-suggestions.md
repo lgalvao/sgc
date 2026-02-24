@@ -1,4 +1,4 @@
-# Pragmatic Simplification Strategy for SGC
+# Radical Simplification Strategy for SGC
 
 > **Context:** This system will be used by **at most 5-10 simultaneous users** inside an intranet.
 > **Diagnosis:** The current architecture is designed for high-scale, distributed teams (Microservices patterns, Hexagonal/Clean Architecture, strict isolation), leading to excessive "glue code" managing non-existent complexity.
@@ -20,7 +20,7 @@ The `subprocesso` module (`backend/src/main/java/sgc/subprocesso`) is fragmented
 **Action Plan:**
 1.  **Delete `SubprocessoFacade`:** Controllers should inject Services directly. The facade adds no value.
 2.  **Merge Controllers:** Consolidate all 4 controllers into a single `SubprocessoController` handling all Subprocess-related HTTP routing.
-3.  **Merge Workflow Logic:** Combine `SubprocessoCadastroWorkflowService`, `SubprocessoMapaWorkflowService`, `SubprocessoAdminWorkflowService`, and `SubprocessoFactory` into a single cohesive `SubprocessoWorkflowService` (or just `SubprocessoService`).
+3.  **Merge Workflow Logic:** Combine `SubprocessoCadastroWorkflowService`, `SubprocessoMapaWorkflowService`, `SubprocessoAdminWorkflowService`, and `SubprocessoFactory` into a single cohesive `SubprocessoService`.
 4.  **Simplify CRUD:** Merge basic CRUD operations into `SubprocessoService`.
 5.  **Remove Helper Services:** If a helper service has only 1-2 methods used by the main service, merge it back into the main service unless it has a distinct, reusable responsibility.
 
@@ -43,6 +43,10 @@ The system currently implements a custom security framework in `sgc.seguranca.ac
 
 For a small internal app, maintaining contract tests (Pact) adds significant overhead with little benefit since the frontend and backend are likely deployed together or by the same team.
 
+**Current State:**
+- **Backend Pact:** `backend/src/test/java/au/com/dius/pact/` and dependencies in `build.gradle.kts`.
+- **Frontend Pact:** `frontend/pact/` directory and `vitest.pact.config.ts`.
+
 **Action Plan:**
 1.  **Remove Pact (Backend):** Remove `au.com.dius.pact` dependencies from `backend/build.gradle.kts` and delete any Pact test classes.
 2.  **Remove Pact (Frontend):** Delete `frontend/pact/` directory and remove `@pact-foundation/pact` from `frontend/package.json`.
@@ -60,7 +64,7 @@ The frontend manually maps backend DTOs to internal models, duplicating logic an
 **Action Plan:**
 1.  **Use Generated Types:** Configure `openapi-typescript` to generate strict TypeScript types from the backend OpenAPI definition.
 2.  **Remove Manual Mappers:** Delete `frontend/src/mappers/*.ts` and use the generated types directly in Vue components.
-3.  **Merge Frontend Services:** Combine `subprocessoService.ts` and `mapaService.ts` into a single `processoService.ts` (or `workflowService.ts`) to match the backend simplification.
+3.  **Merge Frontend Services:** Combine `subprocessoService.ts` and `mapaService.ts` into a single `processoService.ts` (or keep `subprocessoService.ts` as the main one) to match the backend simplification.
 4.  **Backend-for-Frontend (BFF):** If the UI needs data in a specific format, shape the DTO in the backend to match the UI, rather than reshaping it in the frontend.
 
 ## 5. Development Workflow Guidelines
