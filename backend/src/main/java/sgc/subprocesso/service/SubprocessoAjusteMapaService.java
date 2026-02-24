@@ -26,9 +26,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * Service responsável por operações relacionadas a ajustes de mapa em subprocessos.
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -41,11 +38,6 @@ class SubprocessoAjusteMapaService {
     private final AnaliseFacade analiseFacade;
     private final MapaAjusteMapper mapaAjusteMapper;
 
-    /**
-     * Salva ajustes feitos no mapa de um subprocesso.
-     * 
-     * @throws sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida se situação não permite ajuste
-     */
     @Transactional
     public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
         Subprocesso sp = repo.buscar(Subprocesso.class, codSubprocesso);
@@ -58,9 +50,6 @@ class SubprocessoAjusteMapaService {
         subprocessoRepo.save(sp);
     }
 
-    /**
-     * Obtém mapa preparado para ajuste.
-     */
     @Transactional(readOnly = true)
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
         Subprocesso sp = crudService.buscarSubprocessoComMapa(codSubprocesso);
@@ -79,11 +68,6 @@ class SubprocessoAjusteMapaService {
         return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes);
     }
 
-    /**
-     * Valida se a situação do subprocesso permite ajuste de mapa.
-     * 
-     * @throws sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida se situação inválida
-     */
     private void validarSituacaoParaAjuste(Subprocesso sp) {
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
                 && sp.getSituacao() != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
@@ -93,9 +77,6 @@ class SubprocessoAjusteMapaService {
         }
     }
 
-    /**
-     * Atualiza descrições de atividades em lote.
-     */
     private void atualizarDescricoesAtividades(List<CompetenciaAjusteDto> competencias) {
         Map<Long, String> atividadeDescricoes = new HashMap<>();
         for (CompetenciaAjusteDto compDto : competencias) {
@@ -108,9 +89,6 @@ class SubprocessoAjusteMapaService {
         }
     }
 
-    /**
-     * Atualiza competências e suas associações com atividades.
-     */
     private void atualizarCompetenciasEAssociacoes(List<CompetenciaAjusteDto> competencias) {
         // Carregar todas as competências envolvidas
         List<Long> competenciaIds = competencias.stream()

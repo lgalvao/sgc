@@ -23,14 +23,6 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Service responsável por operações relacionadas a atividades de subprocessos. Responsabilidades:
- * <ul>
- *   <li>Importar atividades entre subprocessos (via eventos)</li>
- *   <li>Listar atividades de um subprocesso para visualização</li>
- *   <li>Transformar atividades em DTOs para visualização</li>
- * </ul>
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -45,9 +37,6 @@ class SubprocessoAtividadeService {
     private final SgcPermissionEvaluator permissionEvaluator;
     private final SubprocessoValidacaoService validacaoService;
 
-    /**
-     * Importa atividades de um subprocesso de origem para um subprocesso de destino.
-     */
     @Transactional
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
         final Subprocesso spDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
@@ -100,9 +89,6 @@ class SubprocessoAtividadeService {
                 codSubprocessoOrigem, codSubprocessoDestino);
     }
 
-    /**
-     * Lista todas as atividades de um subprocesso para visualização.
-     */
     @Transactional(readOnly = true)
     public List<AtividadeDto> listarAtividadesSubprocesso(Long codSubprocesso) {
         Subprocesso subprocesso = crudService.buscarSubprocessoComMapa(codSubprocesso);
@@ -111,9 +97,6 @@ class SubprocessoAtividadeService {
         return todasAtividades.stream().map(this::mapAtividadeToDto).toList();
     }
 
-    /**
-     * Transforma uma atividade em DTO para visualização.
-     */
     private AtividadeDto mapAtividadeToDto(Atividade atividade) {
         return AtividadeDto.builder()
                 .codigo(atividade.getCodigo())

@@ -37,17 +37,14 @@ export const usePerfilStore = defineStore("perfil", () => {
 
     function definirUsuarioCodigo(novoId: string) {
         usuarioCodigo.value = novoId;
-        // localStorage.setItem removido - sincronização automática
     }
 
     function definirPerfilUnidade(perfil: Perfil, unidadeCodigo: number, unidadeSigla: string, nome?: string) {
         perfilSelecionado.value = perfil;
         unidadeSelecionada.value = unidadeCodigo;
         unidadeSelecionadaSigla.value = unidadeSigla;
-        // localStorage.setItem removido - sincronização automática
         if (nome) {
             usuarioNome.value = nome;
-            // localStorage.setItem removido - sincronização automática
         }
     }
 
@@ -57,7 +54,6 @@ export const usePerfilStore = defineStore("perfil", () => {
 
     function definirPerfis(novosPerfis: Perfil[]) {
         perfis.value = novosPerfis;
-        // localStorage.setItem removido - sincronização automática
     }
 
     async function loginCompleto(tituloEleitoral: string, senha: string) {
@@ -128,7 +124,6 @@ export const usePerfilStore = defineStore("perfil", () => {
     }
 
     function logout() {
-        // Limpa estados - remoção do localStorage é automática
         usuarioCodigo.value = null;
         perfilSelecionado.value = null;
         unidadeSelecionada.value = null;
@@ -136,8 +131,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         usuarioNome.value = null;
         perfisUnidades.value = [];
         perfis.value = [];
-        
-        // Apenas jwtToken precisa de remoção manual (não é gerenciado pelo composable)
+
         localStorage.removeItem("jwtToken");
     }
 

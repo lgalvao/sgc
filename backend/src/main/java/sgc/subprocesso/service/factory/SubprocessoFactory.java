@@ -116,9 +116,6 @@ public class SubprocessoFactory {
         movimentacaoRepo.saveAll(movimentacoes);
     }
 
-    /**
-     * Cria subprocesso para processo de revisão e copia o mapa vigente da unidade.
-     */
     public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
 
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
@@ -149,10 +146,6 @@ public class SubprocessoFactory {
         log.info("Subprocesso para revisão criado para unidade {}", unidade.getSigla());
     }
 
-    /**
-     * Cria subprocesso para processo de diagnóstico.
-     * Copia o mapa vigente e inicia com autoavaliação em andamento.
-     */
     public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
 
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();

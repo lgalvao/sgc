@@ -121,12 +121,6 @@ public class SubprocessoValidacaoService {
                 .build();
     }
 
-    /**
-     * Valida se a situação atual do subprocesso está entre as situações permitidas.
-     *
-     * @throws ErroValidacao se a situação atual não está entre as permitidas
-     * @throws IllegalArgumentException se situação do subprocesso for null
-     */
     public void validarSituacaoPermitida(Subprocesso subprocesso, Set<SituacaoSubprocesso> permitidas) {
         if (subprocesso.getSituacao() == null) {
             throw new IllegalArgumentException("Situação do subprocesso não pode ser nula");
@@ -145,12 +139,6 @@ public class SubprocessoValidacaoService {
         }
     }
 
-    /**
-     * Valida se a situação atual do subprocesso está entre as situações permitidas (variadic).
-     *
-     * @throws ErroValidacao se a situação atual não está entre as permitidas
-     * @throws IllegalArgumentException se subprocesso for null, situação for null, ou nenhuma situação permitida for fornecida
-     */
     public void validarSituacaoPermitida(Subprocesso subprocesso, SituacaoSubprocesso... permitidas) {
         if (permitidas.length == 0) {
             throw new IllegalArgumentException("Pelo menos uma situação permitida deve ser fornecida");
@@ -158,12 +146,6 @@ public class SubprocessoValidacaoService {
         validarSituacaoPermitida(subprocesso, Set.of(permitidas));
     }
 
-    /**
-     * Valida se a situação atual do subprocesso está entre as situações permitidas com mensagem customizada.
-     *
-     * @throws ErroValidacao se a situação atual não está entre as permitidas
-     * @throws IllegalArgumentException se a situação do subprocesso for null, ou nenhuma situação permitida for fornecida
-     */
     public void validarSituacaoPermitida(Subprocesso subprocesso, String mensagem, SituacaoSubprocesso... permitidas) {
         if (subprocesso.getSituacao() == null) {
             throw new IllegalArgumentException("Situação do subprocesso não pode ser nula");
@@ -178,12 +160,6 @@ public class SubprocessoValidacaoService {
         }
     }
 
-    /**
-     * Valida se a situação atual do subprocesso é maior ou igual à situação mínima.
-     *
-     * @throws ErroValidacao se a situação atual é inferior à mínima
-     * @throws IllegalArgumentException se a situação do subprocesso for null
-     */
     public void validarSituacaoMinima(Subprocesso subprocesso, SituacaoSubprocesso minima) {
         if (subprocesso.getSituacao() == null) {
             throw new IllegalArgumentException("Situação do subprocesso não pode ser nula");
@@ -196,12 +172,6 @@ public class SubprocessoValidacaoService {
         }
     }
 
-    /**
-     * Valida se a situação atual do subprocesso é maior ou igual à situação mínima com mensagem customizada.
-     *
-     * @throws ErroValidacao se a situação atual é inferior à mínima
-     * @throws IllegalArgumentException se a situação do subprocesso for null
-     */
     public void validarSituacaoMinima(Subprocesso subprocesso, SituacaoSubprocesso minima, String mensagem) {
         if (subprocesso.getSituacao() == null) {
             throw new IllegalArgumentException("Situação do subprocesso não pode ser nula");

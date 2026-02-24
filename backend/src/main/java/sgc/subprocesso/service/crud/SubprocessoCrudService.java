@@ -22,18 +22,9 @@ import java.util.Optional;
  * Serviço especializado para operações CRUD básicas de Subprocesso.
  *
  * <p>
- * Responsável pelas operações de criação, leitura, atualização e exclusão
- * de subprocessos. Parte da decomposição arquitetural do módulo subprocesso.
- *
- * <p>
  * <b>Visibilidade:</b> Package-private - uso interno ao módulo subprocesso.
  * Acesso externo deve ser feito via
  * {@link sgc.subprocesso.service.SubprocessoFacade}.
- *
- * <p><b>Refatoração v3.0:</b> Removido uso de @Lazy e dependência em MapaFacade.
- * A criação do mapa agora é responsabilidade de SubprocessoFactory.</p>
- *
- * @since 3.0.0 - Removido @Lazy e MapaFacade
  */
 @Service
 @Transactional
@@ -48,9 +39,6 @@ public class SubprocessoCrudService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codigo));
     }
 
-    /**
-     * Busca subprocesso e seu mapa associado.
-     */
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
         return buscarSubprocesso(codigo);
     }

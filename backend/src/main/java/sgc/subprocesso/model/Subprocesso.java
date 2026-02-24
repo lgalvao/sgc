@@ -114,7 +114,6 @@ public class Subprocesso extends EntidadeBase {
         return !situacoesFinalizadas.contains(this.situacao) && !SituacaoSubprocesso.NAO_INICIADO.equals(this.situacao);
     }
 
-    // TODO nao existe etapa nula.
     public Integer getEtapaAtual() {
         final List<SituacaoSubprocesso> situacoesFinalizadas =
                 Arrays.asList(MAPEAMENTO_MAPA_HOMOLOGADO, REVISAO_MAPA_HOMOLOGADO, DIAGNOSTICO_CONCLUIDO);
