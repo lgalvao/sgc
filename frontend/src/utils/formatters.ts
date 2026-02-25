@@ -63,7 +63,7 @@ export function formatSituacaoSubprocesso(situacao: SituacaoSubprocesso | string
   return labels[situacao] || situacao;
 }
 
-export function formatNumberBR(value: number | null | undefined, decimalPlaces: number = 1): string {
+export function formatNumeroCsvBR(value: number | null | undefined, decimalPlaces: number = 1): string {
   if (value === null || value === undefined) return '';
   return new Intl.NumberFormat('pt-BR', {
     minimumFractionDigits: decimalPlaces,

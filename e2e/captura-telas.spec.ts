@@ -607,7 +607,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.goto('/painel');
 
             // Seção Unidades (para ADMIN)
-            await page.getByText('Unidades').click();
+            await page.getByText('Unidades').first().click();
             await page.waitForTimeout(100);
             await capturarTela(page, '06-navegacao', '03-unidades', {fullPage: true});
 
