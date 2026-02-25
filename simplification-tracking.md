@@ -21,7 +21,7 @@
 - [x] Remover `@pact-foundation/pact` do `package.json`
 - [x] Remover script `test:pact` do `package.json`
 - [x] Remover exclusão `*.pact.spec.ts` do `vitest.config.ts`
-- [ ] Verificação: testes backend + frontend
+- [x] Verificação: testes backend + frontend
 
 ## Fase 2 — Consolidar Services do Subprocesso ✅ Concluída (2026-02-24)
 
@@ -32,16 +32,27 @@
 - [x] Atualizar `SubprocessoFacadeTest` + 4 testes workflow
 - [x] Mover `SubprocessoFactoryTest` → pacote `workflow`
 - [x] Deletar services antigos + diretório `factory/`
-- [ ] Verificação: testes backend
+- [x] Verificação: testes backend
 
-## Fase 3 — Consolidar Módulos
+## Fase 3 — Radical Simplification: Unified Controller ✅ Concluída (2026-02-24)
 
-- [ ] 3A: `alerta` absorve `notificacao`
-- [ ] 3B: `processo` absorve `painel`
-- [ ] 3C: `subprocesso` absorve `analise`
+- [x] Criar `SubprocessoController` unificado
+- [x] Mergear `SubprocessoCadastroController`
+- [x] Mergear `SubprocessoMapaController`
+- [x] Mergear `SubprocessoValidacaoController`
+- [x] Mergear `SubprocessoCrudController`
+- [x] Mergear `AnaliseController`
+- [x] Deletar controllers antigos
+- [x] Atualizar testes unitários e integração
+- [x] Verificação: E2E Tests (CDU-07, 09, 13, 19, 20) passaram
+
+## Fase 4 — Consolidar Módulos
+
+- [ ] 4A: `alerta` absorve `notificacao`
+- [ ] 4B: `processo` absorve `painel`
 - [ ] Verificação: testes backend + frontend
 
-## Fase 4 — Remover Mappers do Frontend
+## Fase 5 — Remover Mappers do Frontend
 
 - [ ] Categorizar mappers (passthrough vs. transformação real)
 - [ ] Deletar `frontend/src/mappers/`
