@@ -1,5 +1,6 @@
 package sgc.subprocesso.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -7,18 +8,27 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.thymeleaf.TemplateEngine;
+import sgc.alerta.AlertaFacade;
+import sgc.alerta.EmailService;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.model.ComumRepo;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.subprocesso.AnaliseFacade;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.MapaAjusteMapper;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.service.CopiaMapaService;
+import sgc.mapa.service.ImpactoMapaService;
+import sgc.mapa.service.MapaManutencaoService;
+import sgc.mapa.service.MapaSalvamentoService;
+import sgc.organizacao.OrganizacaoFacade;
+import sgc.organizacao.UsuarioFacade;
+import sgc.seguranca.SgcPermissionEvaluator;
+import sgc.subprocesso.dto.CompetenciaRequest;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.model.*;
 
@@ -28,26 +38,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-@DisplayName("SubprocessoAjusteMapaService")
+@DisplayName("SubprocessoService - Ajuste Mapa")
 @ExtendWith(MockitoExtension.class)
-class SubprocessoAjusteMapaServiceTest {
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
-    
-    @Mock
-    private MapaManutencaoService mapaManutencaoService;
-    
-    @Mock
-    private AnaliseFacade analiseFacade;
-    
-    @Mock
-    private MapaAjusteMapper mapaAjusteMapper;
-
-    @Mock
-    private ComumRepo repo;
+class SubprocessoServiceAjusteTest {
+    @Mock private SubprocessoRepo subprocessoRepo;
+    @Mock private MovimentacaoRepo movimentacaoRepo;
+    @Mock private ComumRepo repo;
+    @Mock private AnaliseRepo analiseRepo;
+    @Mock private AlertaFacade alertaService;
+    @Mock private OrganizacaoFacade organizacaoFacade;
+    @Mock private UsuarioFacade usuarioFacade;
+    @Mock private ImpactoMapaService impactoMapaService;
+    @Mock private CopiaMapaService copiaMapaService;
+    @Mock private EmailService emailService;
+    @Mock private TemplateEngine templateEngine;
+    @Mock private MapaManutencaoService mapaManutencaoService;
+    @Mock private MapaSalvamentoService mapaSalvamentoService;
+    @Mock private MapaAjusteMapper mapaAjusteMapper;
+    @Mock private SgcPermissionEvaluator permissionEvaluator;
 
     @InjectMocks
-    private SubprocessoAjusteMapaService service;
+    private SubprocessoService service;
+
+    @BeforeEach
+    void setup() {
+        service.setMapaManutencaoService(mapaManutencaoService);
+        service.setSubprocessoRepo(subprocessoRepo);
+        service.setMovimentacaoRepo(movimentacaoRepo);
+        service.setCopiaMapaService(copiaMapaService);
+    }
 
     private Subprocesso criarSubprocesso(Long codigo) {
         return Subprocesso.builder()
@@ -184,6 +203,7 @@ class SubprocessoAjusteMapaServiceTest {
             
             Analise analise = new Analise();
             analise.setCodigo(1L);
+            analise.setTipo(TipoAnalise.VALIDACAO); // Ensure type matches what SubprocessoService looks for
             
             List<Competencia> competencias = List.of(Competencia.builder().codigo(1L).build());
             List<Atividade> atividades = List.of(Atividade.builder().codigo(1L).build());
@@ -193,7 +213,7 @@ class SubprocessoAjusteMapaServiceTest {
             MapaAjusteDto expected = MapaAjusteDto.builder().build();
             
             when(subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso)).thenReturn(Optional.of(sp));
-            when(analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO))
+            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso))
                     .thenReturn(List.of(analise));
             when(mapaManutencaoService.buscarCompetenciasPorCodMapaSemRelacionamentos(codMapa))
                     .thenReturn(competencias);
@@ -226,7 +246,7 @@ class SubprocessoAjusteMapaServiceTest {
             sp.setMapa(mapa);
             
             when(subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso)).thenReturn(Optional.of(sp));
-            when(analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO))
+            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso))
                     .thenReturn(Collections.emptyList());
             when(mapaManutencaoService.buscarCompetenciasPorCodMapaSemRelacionamentos(codMapa))
                     .thenReturn(Collections.emptyList());

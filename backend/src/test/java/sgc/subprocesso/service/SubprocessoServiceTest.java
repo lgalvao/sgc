@@ -1,4 +1,4 @@
-package sgc.subprocesso.service.workflow;
+package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -7,16 +7,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.thymeleaf.TemplateEngine;
 import sgc.alerta.AlertaFacade;
 import sgc.alerta.EmailService;
 import sgc.comum.model.ComumRepo;
+import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.MapaFacade;
-import sgc.mapa.dto.ImpactoMapaResponse;
+import sgc.mapa.service.CopiaMapaService;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.service.MapaManutencaoService;
+import sgc.mapa.service.MapaSalvamentoService;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.SituacaoUnidade;
@@ -24,16 +26,11 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.AnaliseFacade;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.SubprocessoTransicaoService;
-import sgc.subprocesso.service.SubprocessoWorkflowService;
+import sgc.seguranca.SgcPermissionEvaluator;
+import sgc.subprocesso.dto.MapaAjusteMapper;
+import sgc.subprocesso.model.*;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -45,41 +42,33 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("SubprocessoWorkflowService")
-class SubprocessoWorkflowServiceTest {
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
-    @Mock
-    private SubprocessoTransicaoService transicaoService;
-    @Mock
-    private OrganizacaoFacade unidadeService;
-    @Mock
-    private AnaliseFacade analiseFacade;
-    @Mock
-    private MapaManutencaoService mapaManutencaoService;
-    @Mock
-    private ImpactoMapaService impactoMapaService;
-    @Mock
-    private ComumRepo repo;
-    @Mock
-    private AlertaFacade alertaService;
-    @Mock
-    private EmailService emailService;
-    @Mock
-    private MovimentacaoRepo movimentacaoRepo;
-    @Mock
-    private MapaFacade mapaFacade;
-    @Mock
-    private UsuarioFacade usuarioServiceFacade;
+@DisplayName("SubprocessoService")
+class SubprocessoServiceTest {
+    @Mock private SubprocessoRepo subprocessoRepo;
+    @Mock private MovimentacaoRepo movimentacaoRepo;
+    @Mock private ComumRepo repo;
+    @Mock private AnaliseRepo analiseRepo;
+    @Mock private AlertaFacade alertaService;
+    @Mock private OrganizacaoFacade organizacaoFacade;
+    @Mock private UsuarioFacade usuarioFacade;
+    @Mock private ImpactoMapaService impactoMapaService;
+    @Mock private CopiaMapaService copiaMapaService;
+    @Mock private EmailService emailService;
+    @Mock private TemplateEngine templateEngine;
+    @Mock private MapaManutencaoService mapaManutencaoService;
+    @Mock private MapaSalvamentoService mapaSalvamentoService;
+    @Mock private MapaAjusteMapper mapaAjusteMapper;
+    @Mock private SgcPermissionEvaluator permissionEvaluator;
 
     @InjectMocks
-    private SubprocessoWorkflowService service;
+    private SubprocessoService service;
 
     @BeforeEach
     void setup() {
         service.setMapaManutencaoService(mapaManutencaoService);
         service.setSubprocessoRepo(subprocessoRepo);
         service.setMovimentacaoRepo(movimentacaoRepo);
+        service.setCopiaMapaService(copiaMapaService);
     }
 
     private Unidade criarUnidade(String sigla) {
@@ -125,7 +114,8 @@ class SubprocessoWorkflowServiceTest {
         sp.setUnidade(u);
 
         when(subprocessoRepo.findByIdWithMapaAndAtividades(codigo)).thenReturn(Optional.of(sp));
-        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(criarUnidade("ADMIN"));
+        when(organizacaoFacade.buscarEntidadePorSigla("ADMIN")).thenReturn(criarUnidade("ADMIN"));
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
 
         service.reabrirCadastro(codigo, "J");
 
@@ -154,7 +144,9 @@ class SubprocessoWorkflowServiceTest {
 
         service.disponibilizarCadastro(id, user);
 
-        verify(transicaoService).registrar(any());
+        verify(movimentacaoRepo).save(any(Movimentacao.class));
+        verify(subprocessoRepo).save(sp);
+        assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, sp.getSituacao());
     }
 
     @Test
@@ -162,16 +154,20 @@ class SubprocessoWorkflowServiceTest {
     void devolverCadastro() {
         Long id = 1L;
         Usuario user = new Usuario();
+        user.setTituloEleitoral("123");
         Unidade u = criarUnidade("U1");
         Subprocesso sp = new Subprocesso();
+        sp.setCodigo(id);
         sp.setUnidade(u);
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         when(subprocessoRepo.findByIdWithMapaAndAtividades(id)).thenReturn(Optional.of(sp));
+        when(organizacaoFacade.buscarPorSigla(any())).thenReturn(new sgc.organizacao.dto.UnidadeDto());
 
         service.devolverCadastro(id, user, "obs");
 
-        verify(transicaoService).registrarAnaliseETransicao(any());
+        verify(movimentacaoRepo).save(any(Movimentacao.class));
+        verify(analiseRepo).save(any(Analise.class));
     }
 
     @Test
@@ -179,16 +175,20 @@ class SubprocessoWorkflowServiceTest {
     void aceitarCadastro() {
         Long id = 1L;
         Usuario user = new Usuario();
+        user.setTituloEleitoral("123");
         Unidade u = criarUnidade("U1");
         Subprocesso sp = new Subprocesso();
+        sp.setCodigo(id);
         sp.setUnidade(u);
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         when(subprocessoRepo.findByIdWithMapaAndAtividades(id)).thenReturn(Optional.of(sp));
+        when(organizacaoFacade.buscarPorSigla(any())).thenReturn(new sgc.organizacao.dto.UnidadeDto());
 
         service.aceitarCadastro(id, user, "obs");
 
-        verify(transicaoService).registrarAnaliseETransicao(any());
+        verify(movimentacaoRepo).save(any(Movimentacao.class));
+        verify(analiseRepo).save(any(Analise.class));
     }
 
     @Test
@@ -196,15 +196,17 @@ class SubprocessoWorkflowServiceTest {
     void homologarCadastroEmBloco() {
         Long id = 1L;
         Subprocesso sp = new Subprocesso();
+        sp.setCodigo(id);
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         Usuario user = new Usuario();
 
         when(subprocessoRepo.findByIdWithMapaAndAtividades(id)).thenReturn(Optional.of(sp));
-        when(unidadeService.buscarEntidadePorSigla("ADMIN")).thenReturn(criarUnidade("ADMIN"));
+        when(organizacaoFacade.buscarEntidadePorSigla("ADMIN")).thenReturn(criarUnidade("ADMIN"));
 
         service.homologarCadastroEmBloco(List.of(id), user);
 
         verify(subprocessoRepo).save(sp);
+        verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
 
     @Test
@@ -213,6 +215,7 @@ class SubprocessoWorkflowServiceTest {
         Long id = 1L;
         Usuario user = new Usuario();
         Subprocesso sp = new Subprocesso();
+        sp.setCodigo(id);
         sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
         when(subprocessoRepo.findByIdWithMapaAndAtividades(id)).thenReturn(Optional.of(sp));

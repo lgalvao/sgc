@@ -1,5 +1,6 @@
 package sgc.subprocesso.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,23 +9,34 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.thymeleaf.TemplateEngine;
+import sgc.alerta.AlertaFacade;
+import sgc.alerta.EmailService;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.model.ComumRepo;
 import sgc.mapa.dto.AtividadeDto;
+import sgc.subprocesso.dto.MapaAjusteMapper;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.CopiaMapaService;
+import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.service.MapaManutencaoService;
+import sgc.mapa.service.MapaSalvamentoService;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.seguranca.SgcPermissionEvaluator;
-
-import sgc.subprocesso.model.*;
+import sgc.subprocesso.model.AnaliseRepo;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -34,38 +46,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-@DisplayName("SubprocessoAtividadeService")
+@DisplayName("SubprocessoService - Atividades")
 @ExtendWith(MockitoExtension.class)
-class SubprocessoAtividadeServiceTest {
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
-
-    @Mock
-    private SubprocessoWorkflowService crudService;
-
-    @Mock
-    private MapaManutencaoService mapaManutencaoService;
-
-    @Mock
-    private CopiaMapaService copiaMapaService;
-
-    @Mock
-    private MovimentacaoRepo movimentacaoRepo;
-
-    @Mock
-    private UsuarioFacade usuarioService;
-
-    @Mock
-    private ComumRepo repo;
-
-    @Mock
-    private SgcPermissionEvaluator permissionEvaluator;
-
-    @Mock
-    private SubprocessoWorkflowService validacaoService;
+class SubprocessoServiceAtividadeTest {
+    @Mock private SubprocessoRepo subprocessoRepo;
+    @Mock private MovimentacaoRepo movimentacaoRepo;
+    @Mock private ComumRepo repo;
+    @Mock private AnaliseRepo analiseRepo;
+    @Mock private AlertaFacade alertaService;
+    @Mock private OrganizacaoFacade organizacaoFacade;
+    @Mock private UsuarioFacade usuarioService; // Renamed to match field usage in original test (was usuarioService)
+    @Mock private ImpactoMapaService impactoMapaService;
+    @Mock private CopiaMapaService copiaMapaService;
+    @Mock private EmailService emailService;
+    @Mock private TemplateEngine templateEngine;
+    @Mock private MapaManutencaoService mapaManutencaoService;
+    @Mock private MapaSalvamentoService mapaSalvamentoService;
+    @Mock private MapaAjusteMapper mapaAjusteMapper;
+    @Mock private SgcPermissionEvaluator permissionEvaluator;
 
     @InjectMocks
-    private SubprocessoAtividadeService service;
+    private SubprocessoService service;
+
+    @BeforeEach
+    void setup() {
+        service.setMapaManutencaoService(mapaManutencaoService);
+        service.setSubprocessoRepo(subprocessoRepo);
+        service.setMovimentacaoRepo(movimentacaoRepo);
+        service.setCopiaMapaService(copiaMapaService);
+    }
 
     @Nested
     @DisplayName("importarAtividades")

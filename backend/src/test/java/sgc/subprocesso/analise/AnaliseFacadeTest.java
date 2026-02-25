@@ -8,12 +8,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.organizacao.OrganizacaoFacade;
 import sgc.subprocesso.AnaliseFacade;
 import sgc.subprocesso.model.Analise;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.TipoAnalise;
-import sgc.subprocesso.service.AnaliseService;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,29 +24,24 @@ import static org.mockito.Mockito.*;
 @DisplayName("Testes para AnaliseFacade")
 class AnaliseFacadeTest {
     @Mock
-    private AnaliseService analiseService;
-
-    @Mock
-    private OrganizacaoFacade unidadeService;
+    private SubprocessoService subprocessoService;
 
     @InjectMocks
     private AnaliseFacade facade;
 
     @BeforeEach
     void setUp() {
-        Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setCodigo(1L);
     }
 
     @Nested
     @DisplayName("Testes para listarPorSubprocesso")
     class ListarPorSubprocesso {
         @Test
-        @DisplayName("Deve retornar lista de análises de cadastro")
-        void deveRetornarListaDeAnalisesCadastro() {
+        @DisplayName("Deve delegar para SubprocessoService")
+        void deveDelegarParaSubprocessoService() {
             Analise analise = new Analise();
             analise.setTipo(TipoAnalise.CADASTRO);
-            when(analiseService.listarPorSubprocesso(1L))
+            when(subprocessoService.listarAnalisesPorSubprocesso(1L, TipoAnalise.CADASTRO))
                     .thenReturn(List.of(analise));
 
             List<Analise> resultado = facade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
@@ -56,54 +50,14 @@ class AnaliseFacadeTest {
                     .isNotEmpty()
                     .hasSize(1)
                     .first()
-                    .extracting(Analise::getTipo)
-                    .isEqualTo(TipoAnalise.CADASTRO);
-            verify(analiseService).listarPorSubprocesso(1L);
+                    .isEqualTo(analise);
+            verify(subprocessoService).listarAnalisesPorSubprocesso(1L, TipoAnalise.CADASTRO);
         }
 
         @Test
-        @DisplayName("Deve retornar lista de análises de validação")
-        void deveRetornarListaDeAnalisesValidacao() {
-            Analise analise = new Analise();
-            analise.setTipo(TipoAnalise.VALIDACAO);
-            when(analiseService.listarPorSubprocesso(1L))
-                    .thenReturn(List.of(analise));
-
-            List<Analise> resultado = facade.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO);
-
-            assertThat(resultado)
-                    .isNotEmpty()
-                    .hasSize(1)
-                    .first()
-                    .extracting(Analise::getTipo)
-                    .isEqualTo(TipoAnalise.VALIDACAO);
-            verify(analiseService).listarPorSubprocesso(1L);
-        }
-
-        @Test
-        @DisplayName("Deve filtrar análises de outro tipo")
-        void deveFiltrarAnalisesDeOutroTipo() {
-            Analise analiseCadastro = new Analise();
-            analiseCadastro.setTipo(TipoAnalise.CADASTRO);
-            Analise analiseValidacao = new Analise();
-            analiseValidacao.setTipo(TipoAnalise.VALIDACAO);
-
-            when(analiseService.listarPorSubprocesso(1L))
-                    .thenReturn(List.of(analiseCadastro, analiseValidacao));
-
-            List<Analise> resultado = facade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
-
-            assertThat(resultado)
-                    .hasSize(1)
-                    .extracting(Analise::getTipo)
-                    .containsExactly(TipoAnalise.CADASTRO);
-        }
-
-        @Test
-        @DisplayName("Deve retornar lista vazia quando não há análises do tipo solicitado")
-        void deveRetornarListaVaziaQuandoNaoHaAnalisesDoTipo() {
-            // Pattern 1: Empty list validation
-            when(analiseService.listarPorSubprocesso(1L))
+        @DisplayName("Deve retornar lista vazia quando serviço retorna vazio")
+        void deveRetornarListaVaziaQuandoServicoRetornaVazio() {
+            when(subprocessoService.listarAnalisesPorSubprocesso(1L, TipoAnalise.CADASTRO))
                     .thenReturn(Collections.emptyList());
 
             List<Analise> resultado = facade.listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
@@ -111,7 +65,6 @@ class AnaliseFacadeTest {
             assertThat(resultado)
                     .isNotNull()
                     .isEmpty();
-            verify(analiseService).listarPorSubprocesso(1L);
         }
     }
 
@@ -123,7 +76,7 @@ class AnaliseFacadeTest {
         void deveRemoverAnalisesPorSubprocesso() {
             facade.removerPorSubprocesso(1L);
 
-            verify(analiseService).removerPorSubprocesso(1L);
+            verify(subprocessoService).removerAnalisesPorSubprocesso(1L);
         }
     }
 }

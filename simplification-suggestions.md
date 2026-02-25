@@ -34,10 +34,11 @@ Consolidate all business logic for subprocesses into one robust service. Methods
   - `SubprocessoWorkflowService`
   - `SubprocessoMapaWorkflowService`
   - `SubprocessoTransicaoService` (move transition logic to private methods)
-  - `SubprocessoValidacaoService` (move validations to private methods)
   - `SubprocessoAjusteMapaService`
-  - `SubprocessoFactory` (factory methods)
-  - `SubprocessoFacade` (delete)
+  - `SubprocessoContextoService`
+  - `SubprocessoAtividadeService`
+  - `SubprocessoEmailService`
+  - `AnaliseService`
 
 #### C. Remove Facades
 Delete all Facade classes. Controllers must call Services directly.
@@ -88,10 +89,12 @@ For simple queries (e.g., `listar()`, `buscar()`), the Controller or Service can
 
 1.  **Refactor Backend:**
     1.  Create `SubprocessoService` (empty).
-    2.  Move logic from `SubprocessoWorkflowService` and `SubprocessoMapaWorkflowService` into it, resolving circular dependencies by inlining logic.
-    3.  Update `Subprocesso` entity to include necessary helper methods.
-    4.  Create `SubprocessoController` and migrate endpoints from the 4 fragmented controllers.
-    5.  Delete old Controllers, Facades, and Services.
+    2.  Move logic from `SubprocessoWorkflowService`, `SubprocessoMapaWorkflowService`, `SubprocessoTransicaoService`, `SubprocessoAjusteMapaService`, `SubprocessoContextoService`, `SubprocessoAtividadeService`, `SubprocessoEmailService`, `AnaliseService` into `SubprocessoService`, resolving circular dependencies by inlining logic.
+    3.  Update Facades (`SubprocessoFacade`, `AnaliseFacade`) to delegate to `SubprocessoService`.
+    4.  Verify Backend Tests.
+    5.  Delete old services.
+    6.  Create `SubprocessoController` and migrate endpoints from the 5 fragmented controllers.
+    7.  Delete old Controllers and Facades.
 
 2.  **Refactor Security:**
     1.  Update `SgcPermissionEvaluator` to handle the consolidated logic.
