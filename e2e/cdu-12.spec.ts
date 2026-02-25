@@ -16,6 +16,7 @@ import {
 import {fazerLogout, limparNotificacoes, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {
     aceitarCadastroMapeamento,
+    aceitarRevisao,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor
 } from './helpers/helpers-analise.js';
@@ -218,14 +219,14 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await abrirModalImpacto(page);
         await expect(page.locator('.modal-content').getByText('Competências impactadas')).toBeVisible();
         await fecharModalImpacto(page);
-        await aceitarCadastroMapeamento(page, 'Aceite revisão COORD_21');
+        await aceitarRevisao(page, 'Aceite revisão COORD_21');
 
         // 2. ADMIN verifica na visualização (Após aceite de SECRETARIA_2 para chegar em ADMIN)
         // 2.1 Aceite SECRETARIA_2 (Localização: SECRETARIA_2 -> ADMIN)
         await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
-        await aceitarCadastroMapeamento(page, 'Aceite revisão SECRETARIA_2');
+        await aceitarRevisao(page, 'Aceite revisão SECRETARIA_2');
 
         // 2.2 ADMIN verifica (Localização: ADMIN)
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);

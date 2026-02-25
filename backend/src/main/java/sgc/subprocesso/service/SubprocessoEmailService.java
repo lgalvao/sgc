@@ -152,7 +152,7 @@ public class SubprocessoEmailService {
             try {
                 String emailSuperior = String.format("%s@tre-pe.jus.br", superior.getSigla().toLowerCase());
                 emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
-                log.info("E-mail enviado para unidade superior {} ({})", superior.getSigla(), emailSuperior);
+                log.info("E-mail enviado para unidade superior: {}", superior.getSigla());
             } catch (Exception e) {
                 log.warn("Falha ao enviar e-mail para {}: {}", superior.getSigla(), e.getMessage());
             }
