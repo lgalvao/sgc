@@ -8,9 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.analise.model.Analise;
-import sgc.analise.model.AnaliseRepo;
-import sgc.analise.model.TipoAcaoAnalise;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.integracao.mocks.WithMockGestor;
@@ -19,10 +16,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,8 +39,6 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    private Unidade unidade1;
-    private Unidade unidade2;
     private Subprocesso subprocesso1;
     private Subprocesso subprocesso2;
     private Processo processo;
@@ -59,13 +51,9 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         // Unit 8 (SEDESENV - OPERACIONAL) - subordinate to 6
         // Unit 9 (SEDIA - OPERACIONAL) - subordinate to 6
 
-        // When GESTOR of unit 6 accepts validations from units 8/9:
-        // proximaUnidade = unidade8.getUnidadeSuperior().getUnidadeSuperior() = unit 2 (not null)
-        // So it will create análise/movimentação for next level (unit 2)
-
-        unidade1 = unidadeRepo.findById(8L)
+        Unidade unidade1 = unidadeRepo.findById(8L)
                 .orElseThrow(() -> new RuntimeException("Unit 8 not found in data.sql"));
-        unidade2 = unidadeRepo.findById(9L)
+        Unidade unidade2 = unidadeRepo.findById(9L)
                 .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
 
         // Create test process

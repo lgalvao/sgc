@@ -28,10 +28,5 @@ public final class ComumDtos {
         LocalDate data
     ) {}
 
-    public record CodigoRequest(
-        @NotNull(message = "O código é obrigatório")
-        Long codigo
-    ) {}
-
     private ComumDtos() {}
 }

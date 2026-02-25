@@ -1,18 +1,16 @@
 package sgc.subprocesso;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-import sgc.analise.AnaliseFacade;
-import sgc.analise.dto.AnaliseHistoricoDto;
 import sgc.comum.ComumDtos.JustificativaRequest;
 import sgc.comum.ComumDtos.TextoRequest;
 import sgc.organizacao.model.Usuario;
+import sgc.subprocesso.dto.AnaliseHistoricoDto;
 import sgc.subprocesso.dto.ProcessarEmBlocoRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -25,7 +23,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@Tag("unit")
 @DisplayName("Testes de Cobertura para SubprocessoValidacaoController")
 class SubprocessoValidacaoControllerTest {
 

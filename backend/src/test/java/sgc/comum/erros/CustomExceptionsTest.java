@@ -1,17 +1,15 @@
 package sgc.comum.erros;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import sgc.painel.ErroParametroPainelInvalido;
+import sgc.processo.painel.ErroParametroPainelInvalido;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Tag("unit")
 @DisplayName("Testes de Exceções Customizadas")
 class CustomExceptionsTest {
 

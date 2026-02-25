@@ -4,17 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Unidade;
-import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.query.ConsultasSubprocessoService;
+import sgc.subprocesso.service.ConsultasSubprocessoService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,9 +38,6 @@ public class ProcessoFinalizador {
 
     /**
      * Finaliza um processo, validando e tornando os mapas vigentes.
-     *
-     * @param codigo código do processo a finalizar
-     * @throws ErroProcesso              se o processo não puder ser finalizado
      */
     @Transactional
     public void finalizar(Long codigo) {
@@ -63,9 +59,6 @@ public class ProcessoFinalizador {
 
     /**
      * Torna os mapas de todos os subprocessos do processo como vigentes.
-     *
-     * @param processo processo cujos mapas serão tornados vigentes
-     * @throws ErroProcesso se algum subprocesso não tiver unidade ou mapa associado
      */
     private void tornarMapasVigentes(Processo processo) {
         log.info("Mapa vigente definido para o processo {}", processo.getCodigo());

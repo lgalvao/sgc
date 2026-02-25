@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @Tag("PBT")
@@ -38,7 +37,7 @@ class ProcessoManutencaoServicePbtTest {
 
         when(unidadeService.unidadePorCodigo(any())).thenAnswer(inv -> {
              Unidade u = new Unidade();
-             u.setCodigo((Long) inv.getArgument(0));
+             u.setCodigo(inv.getArgument(0));
              u.setSituacao(SituacaoUnidade.ATIVA);
              u.setTipo(TipoUnidade.OPERACIONAL);
              return u;
@@ -65,7 +64,7 @@ class ProcessoManutencaoServicePbtTest {
 
         when(unidadeService.unidadePorCodigo(any())).thenAnswer(inv -> {
              Unidade u = new Unidade();
-             u.setCodigo((Long) inv.getArgument(0));
+             u.setCodigo(inv.getArgument(0));
              u.setSituacao(SituacaoUnidade.ATIVA);
              u.setTipo(TipoUnidade.OPERACIONAL);
              return u;

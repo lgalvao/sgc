@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.integracao.mocks.WithMockAdmin;
 import sgc.parametros.model.Parametro;
 import sgc.parametros.model.ParametroRepo;
-import sgc.integracao.mocks.WithMockAdmin;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;

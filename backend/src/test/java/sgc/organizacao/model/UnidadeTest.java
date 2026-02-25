@@ -1,12 +1,10 @@
 package sgc.organizacao.model;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Tag("unit")
 @DisplayName("Testes da Entidade Unidade")
 class UnidadeTest {
     @Test

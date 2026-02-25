@@ -10,8 +10,7 @@ import sgc.comum.erros.ErroAutenticacao;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Cliente para integração com o serviço AcessoAD (autenticação via Active
- * Directory).
+ * Cliente para integração com o serviço AcessoAD (autenticação via AD)
  */
 @Component
 @RequiredArgsConstructor
@@ -22,17 +21,10 @@ public class ClienteAcessoAd {
 
     /**
      * Autentica um usuário no serviço AcessoAD.
-     *
-     * @param titulo Título de eleitor do usuário
-     * @param senha  Senha do usuário
-     * @return true se a autenticação for bem-sucedida
-     * @throws ErroAutenticacao se a autenticação falhar
      */
-    @SuppressWarnings("SameReturnValue")
     public boolean autenticar(String titulo, String senha) {
         try {
             AutenticarRequest request = new AutenticarRequest(titulo, senha);
-
             acessoAdRestClient.post()
                     .uri("/auth/autenticar")
                     .body(request)
@@ -45,7 +37,7 @@ public class ClienteAcessoAd {
                             })
                     .body(String.class);
 
-            log.info("Usuário {} autenticado com sucesso no AD.", titulo);
+            log.info("Usuário {} autenticado no AD.", titulo);
             return true;
         } catch (ErroAutenticacao e) {
             throw e;

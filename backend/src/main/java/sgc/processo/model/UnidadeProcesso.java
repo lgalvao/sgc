@@ -1,5 +1,6 @@
 package sgc.processo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +33,7 @@ public class UnidadeProcesso implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("processoCodigo")
     @JoinColumn(name = "processo_codigo")
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @JsonIgnore
     private Processo processo;
     
     public Long getUnidadeCodigo() {

@@ -1,7 +1,6 @@
 package sgc.processo.service;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@Tag("unit")
 @DisplayName("ProcessoDetalheBuilder - Cobertura Adicional")
 class ProcessoDetalheBuilderCoverageTest {
 
@@ -72,7 +70,7 @@ class ProcessoDetalheBuilderCoverageTest {
 
         // Assert
         assertThat(dto.getUnidades()).hasSize(1);
-        ProcessoDetalheDto.UnidadeParticipanteDto result = dto.getUnidades().get(0);
+        ProcessoDetalheDto.UnidadeParticipanteDto result = dto.getUnidades().getFirst();
         assertThat(result.getCodSubprocesso()).isEqualTo(500L);
     }
 
@@ -101,7 +99,7 @@ class ProcessoDetalheBuilderCoverageTest {
 
         // Assert
         assertThat(dto.getUnidades()).hasSize(1);
-        assertThat(dto.getUnidades().get(0).getSigla()).isEqualTo("TESTE");
-        assertThat(dto.getUnidades().get(0).getCodSubprocesso()).isNull();
+        assertThat(dto.getUnidades().getFirst().getSigla()).isEqualTo("TESTE");
+        assertThat(dto.getUnidades().getFirst().getCodSubprocesso()).isNull();
     }
 }

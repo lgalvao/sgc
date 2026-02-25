@@ -18,9 +18,6 @@ import java.util.Set;
 /**
  * Filtro de segurança que valida tokens JWT em cada requisição.
  * Extrai o token do header Authorization e configura o contexto de segurança.
- *
- * <p><b>Refatoração v3.0:</b> Removido @Lazy - filtros são instanciados após
- * o contexto de aplicação estar completo, não há necessidade de lazy loading.</p>
  */
 @RequiredArgsConstructor
 @Slf4j

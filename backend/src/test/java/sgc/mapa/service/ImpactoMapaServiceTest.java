@@ -1,5 +1,6 @@
 package sgc.mapa.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,14 +9,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
 import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
+import sgc.subprocesso.service.SubprocessoWorkflowService;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,11 +24,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import org.junit.jupiter.api.BeforeEach;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ImpactoMapaServiceTest {
@@ -35,7 +34,7 @@ class ImpactoMapaServiceTest {
     @Mock private CompetenciaRepo competenciaRepo;
     @Mock private MapaManutencaoService mapaManutencaoService;
     @Mock private SgcPermissionEvaluator permissionEvaluator;
-    @Mock private SubprocessoValidacaoService validacaoService;
+    @Mock private SubprocessoWorkflowService validacaoService;
     @Mock private ComumRepo repo;
 
     @InjectMocks

@@ -13,15 +13,11 @@
     "typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
     "test": "npm run test:unit",
     "test:unit": "vitest --run --reporter=dot --no-color",
-    "test:visual": "vitest --config vitest.browser.config.ts --run",
     "coverage:unit": "vitest --run --coverage --reporter=dot",
     "quality:test": "vitest --run --coverage --reporter=dot",
     "quality:lint": "eslint . --ext .vue,.js,.mjs,.ts --max-warnings 0 --ignore-pattern coverage --ignore-pattern dist || true",
     "quality:typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict || true",
-    "quality:all": "npm run quality:test && npm run quality:lint && npm run quality:typecheck",
-    "api:generate": "openapi-typescript http://localhost:10000/api-docs -o src/types/api.ts",
-    "check:deps": "npx -y depcheck --ignores='@vitest/coverage-v8,@vitest/browser,@storybook/addon-docs,@storybook/addon-links,@vue/typescript-plugin'",
-    "clean:deps": "npx -y npm-check -u"
+    "quality:all": "npm run quality:test && npm run quality:lint && npm run quality:typecheck"
   },
   "dependencies": {
     "axios": "^1.13.5",

@@ -2,13 +2,12 @@ package sgc.organizacao.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
@@ -26,7 +25,6 @@ import static org.mockito.Mockito.when;
  * Testes unitários para {@link UnidadeHierarquiaService}.
  */
 @ExtendWith(MockitoExtension.class)
-@Tag("unit")
 @DisplayName("UnidadeHierarquiaService")
 class UnidadeHierarquiaServiceTest {
 
@@ -67,9 +65,9 @@ class UnidadeHierarquiaServiceTest {
         List<UnidadeDto> resultado = service.buscarArvoreHierarquica();
 
         assertThat(resultado).hasSize(1);
-        assertThat(resultado.get(0).getSigla()).isEqualTo(unidadeRaiz.getSigla());
-        assertThat(resultado.get(0).getSubunidades()).hasSize(1);
-        assertThat(resultado.get(0).getSubunidades().get(0).getSigla()).isEqualTo(unidadeIntermediaria.getSigla());
+        assertThat(resultado.getFirst().getSigla()).isEqualTo(unidadeRaiz.getSigla());
+        assertThat(resultado.getFirst().getSubunidades()).hasSize(1);
+        assertThat(resultado.getFirst().getSubunidades().getFirst().getSigla()).isEqualTo(unidadeIntermediaria.getSigla());
     }
 
     @Test
@@ -82,9 +80,9 @@ class UnidadeHierarquiaServiceTest {
 
         assertThat(resultado).hasSize(1);
         // A raiz não é elegível mas aparece na árvore
-        assertThat(resultado.get(0).isElegivel()).isFalse();
+        assertThat(resultado.getFirst().isElegivel()).isFalse();
         // A operacional é elegível
-        UnidadeDto operacionalDto = resultado.get(0).getSubunidades().get(0).getSubunidades().get(0);
+        UnidadeDto operacionalDto = resultado.getFirst().getSubunidades().getFirst().getSubunidades().getFirst();
         assertThat(operacionalDto.isElegivel()).isTrue();
     }
 
@@ -172,6 +170,6 @@ class UnidadeHierarquiaServiceTest {
         List<UnidadeDto> result = service.buscarSubordinadas(1L);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getSigla()).isEqualTo(unidadeIntermediaria.getSigla());
+        assertThat(result.getFirst().getSigla()).isEqualTo(unidadeIntermediaria.getSigla());
     }
 }

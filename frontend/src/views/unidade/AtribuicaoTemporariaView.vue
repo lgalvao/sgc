@@ -118,6 +118,7 @@ import {useFeedbackStore} from "@/stores/feedback";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useUsuariosStore} from "@/stores/usuarios";
 import {useAtribuicaoTemporariaStore} from "@/stores/atribuicoes";
+import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 
 const props = defineProps<{ codUnidade: number }>();
 

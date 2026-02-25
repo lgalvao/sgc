@@ -8,8 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
-import sgc.notificacao.EmailService;
-import sgc.notificacao.EmailModelosService;
+import sgc.alerta.EmailService;
+import sgc.alerta.EmailModelosService;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import java.util.HashMap;
 
 @Service
 @Slf4j
@@ -226,17 +227,6 @@ public class ProcessoFacade {
     }
 
     private void processarAcoesAceiteHomologacao(AcaoEmBlocoRequest req, Usuario usuario, List<Subprocesso> subprocessos) {
-        String permissao = null;
-        if (req.acao() == ACEITAR) permissao = "ACEITAR_CADASTRO"; // Pode ser ACEITAR_MAPA também, depende do contexto
-        if (req.acao() == HOMOLOGAR) permissao = "HOMOLOGAR_CADASTRO";
-
-        // A verificação exata depende do tipo de subprocesso (Cadastro vs Mapa), que é inferido pela situação.
-        // O PermissionEvaluator verifica a ação específica.
-        // Aqui vamos iterar e verificar individualmente ou confiar que o método hasPermission(Collection) do Evaluator
-        // consegue lidar se passarmos a lista. Mas como a ação varia (Aceitar Cadastro vs Aceitar Mapa),
-        // precisamos refinar.
-
-        // Melhor abordagem: Deixar o loop de categorização verificar ou agrupar e depois verificar.
         List<Long> idsAceitarCadastro = new ArrayList<>();
         List<Long> idsAceitarValidacao = new ArrayList<>();
         List<Long> idsHomologarCadastro = new ArrayList<>();
@@ -256,8 +246,7 @@ public class ProcessoFacade {
                                           List<Long> idsAceitarCadastro, List<Long> idsAceitarValidacao,
                                           List<Long> idsHomologarCadastro, List<Long> idsHomologarValidacao) {
 
-        // Helper para filtrar subprocessos por lista de IDs
-        var mapSubprocessos = new java.util.HashMap<Long, Subprocesso>();
+        var mapSubprocessos = new HashMap<Long, Subprocesso>();
         todosSubprocessos.forEach(sp -> mapSubprocessos.put(sp.getCodigo(), sp));
 
         if (!idsAceitarCadastro.isEmpty()) {

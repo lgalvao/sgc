@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import InlineEditor from './InlineEditor.vue';
 import { ref } from 'vue';
-import { expect, userEvent, within } from '@storybook/test';
+import { expect } from 'vitest';
+import { userEvent, page } from '@vitest/browser/context';
 
 const meta: Meta<typeof InlineEditor> = {
   title: 'Comum/InlineEditor',
@@ -36,18 +37,17 @@ export const Default: Story = {
       </div>
     `,
   }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+  play: async () => {
     // Verifica estado inicial
-    await expect(canvas.getByText('Texto para editar')).toBeInTheDocument();
+    await expect.element(page.getByText('Texto para editar')).toBeVisible();
     
     // Inicia edição
-    const editBtn = canvas.getByRole('button', { name: /editar/i });
+    const editBtn = page.getByRole('button', { name: /editar/i });
     await userEvent.click(editBtn);
     
     // Verifica se o input apareceu
-    const input = canvas.getByRole('textbox');
-    await expect(input).toHaveValue('Texto para editar');
+    const input = page.getByRole('textbox');
+    await expect.element(input).toHaveValue('Texto para editar');
   },
 };
 

@@ -1,6 +1,4 @@
 package sgc.seguranca.login;
-import sgc.seguranca.SgcPermissionEvaluator;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.seguranca.LoginFacade;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.seguranca.dto.AutenticarRequest;
 
 import static org.mockito.Mockito.verify;

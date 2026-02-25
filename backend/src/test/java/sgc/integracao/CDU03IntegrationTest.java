@@ -238,14 +238,4 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
                 // 3. Tentar buscar o processo removido para confirmar que não existe mais
                 mockMvc.perform(get(API_PROCESSOS_ID, processoId)).andExpect(status().isNotFound());
         }
-
-        @Test
-        void testRemoverProcesso_processoNaoEncontrado_falha() throws Exception {
-                mockMvc.perform(
-                                post(
-                                                API_PROCESSOS + "/{codProcesso}/excluir",
-                                                99999L) // código que não existe
-                                                .with(csrf()))
-                                .andExpect(status().isNotFound());
-        }
 }

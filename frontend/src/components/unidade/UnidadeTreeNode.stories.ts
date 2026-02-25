@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import UnidadeTreeNode from './UnidadeTreeNode.vue';
-import { fn } from '@storybook/test';
+import { vi } from 'vitest';
 
 const meta: Meta<typeof UnidadeTreeNode> = {
   title: 'Unidade/UnidadeTreeNode',
@@ -31,8 +31,8 @@ const mockFunctions = {
   getEstadoSelecao: (unidade: any) => unidade.codigo === 2,
   isExpanded: (unidade: any) => unidade.codigo === 1,
   isHabilitado: (_: any) => true,
-  onToggle: fn(),
-  onToggleExpand: fn(),
+  onToggle: vi.fn(),
+  onToggleExpand: vi.fn(),
 };
 
 export const ModoSelecao: Story = {

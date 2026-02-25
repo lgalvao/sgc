@@ -3,15 +3,12 @@ package sgc.integracao;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
-import sgc.analise.model.Analise;
-import sgc.analise.model.AnaliseRepo;
 import sgc.fixture.MapaFixture;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
@@ -26,12 +23,10 @@ import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,9 +60,6 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Use existing ADMIN from data.sql (ID 1) instead of creating a duplicate with ID 100.
-        // Creating a duplicate 'ADMIN' causes NonUniqueResultException in services looking up by sigla.
- 
         // Ensure Admin user has profile in ADMIN (ID 1)
         jdbcTemplate.update("MERGE INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) KEY(usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
                 "111111111111", 1, "ADMIN");
@@ -77,9 +69,6 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         unidade.setCodigo(null);
         unidade.setNome("Unidade CDU-17");
         unidade.setSigla("U17");
-
-
-
         unidade = unidadeRepo.save(unidade);
 
         // Criar Processo via Fixture
@@ -102,22 +91,16 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         subprocesso.setDataFimEtapa2(null);
         subprocesso = subprocessoRepo.save(subprocesso);
 
-        // Garante que o subprocesso esteja na unidade do ADMIN (1) para permitir DISPONIBILIZAR_MAPA
-        // O WithMockAdmin posiciona o usuario na unidade 1 por padrao (data.sql)
         Unidade adminUnit = unidadeRepo.findById(1L).orElseThrow();
         Movimentacao movAdmin = Movimentacao.builder()
                 .subprocesso(subprocesso)
                 .unidadeOrigem(unidade)
                 .unidadeDestino(adminUnit)
                 .descricao("Enviado para Admin para Ajuste")
-                .dataHora(java.time.LocalDateTime.now())
+                .dataHora(LocalDateTime.now())
                 .build();
         movimentacaoRepo.save(movAdmin);
 
-        // Link mapa back to subprocesso if needed or just ensured via subprocesso.setMapa
-        // MapaFixture.mapaPadrao(null) leaves it null, but subprocesso.setMapa sets it on subprocesso.
-
-        // Setup inicial de Atividade e Competência válidas
         Atividade atividade = Atividade.builder().mapa(mapa).descricao("Atividade Valida").build();
         atividade = atividadeRepo.save(atividade);
 
@@ -160,36 +143,31 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                     .andExpect(
                             jsonPath("$.mensagem").value("Mapa de competências disponibilizado."));
 
-            Subprocesso spAtualizado =
-                    subprocessoRepo
-                            .findById(subprocesso.getCodigo())
-                            .orElseThrow();
-            // Subprocesso starts as REVISAO... so it should transition to REVISAO_MAPA_DISPONIBILIZADO
+            Subprocesso spAtualizado = subprocessoRepo
+                    .findById(subprocesso.getCodigo())
+                    .orElseThrow();
+
             assertThat(spAtualizado.getSituacao())
                     .isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO);
+
             assertThat(spAtualizado.getDataLimiteEtapa2()).isEqualTo(dataLimite.atStartOfDay());
 
-            Mapa mapaAtualizado =
-                    mapaRepo.findById(mapa.getCodigo())
-                            .orElseThrow();
+            Mapa mapaAtualizado = mapaRepo.findById(mapa.getCodigo()).orElseThrow();
             assertThat(mapaAtualizado.getSugestoes()).isEqualTo(observacoes);
 
-            List<Movimentacao> movimentacoes =
-                    movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
-                            subprocesso.getCodigo());
+            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                    subprocesso.getCodigo());
             assertThat(movimentacoes).hasSizeGreaterThanOrEqualTo(1);
+
             Movimentacao mov = movimentacoes.getFirst();
             assertThat(mov.getUnidadeOrigem().getSigla()).isEqualTo(ADMIN_LITERAL);
             assertThat(mov.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
-            assertThat(mov.getDescricao())
-                    .isEqualTo("Disponibilização do mapa de competências para validação");
+            assertThat(mov.getDescricao()).isEqualTo("Disponibilização do mapa de competências para validação");
 
-            List<Alerta> alertas =
-                    alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
+            List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
 
-            List<Analise> analisesRestantes =
-                    analiseRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
+            List<Analise> analisesRestantes = analiseRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
             assertThat(analisesRestantes).isEmpty();
         }
     }
@@ -201,14 +179,14 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Não deve disponibilizar mapa com usuário sem permissão (não ADMIN)")
         @WithMockGestor
         void disponibilizarMapa_semPermissao_retornaForbidden() throws Exception {
-            DisponibilizarMapaRequest request =
-                    new DisponibilizarMapaRequest(LocalDate.now().plusDays(10), OBS_LITERAL);
+            DisponibilizarMapaRequest request = new DisponibilizarMapaRequest(
+                    LocalDate.now().plusDays(10), OBS_LITERAL
+            );
 
-            mockMvc.perform(
-                            post(API_URL, subprocesso.getCodigo())
-                                    .with(csrf())
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(API_URL, subprocesso.getCodigo())
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isForbidden());
         }
 
@@ -219,14 +197,12 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
             subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             subprocessoRepo.save(subprocesso);
 
-            DisponibilizarMapaRequest request =
-                    new DisponibilizarMapaRequest(LocalDate.now().plusDays(10), OBS_LITERAL);
+            DisponibilizarMapaRequest request = new DisponibilizarMapaRequest(LocalDate.now().plusDays(10), OBS_LITERAL);
 
-            mockMvc.perform(
-                            post(API_URL, subprocesso.getCodigo())
-                                    .with(csrf())
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(API_URL, subprocesso.getCodigo())
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableContent());
         }
 
@@ -247,7 +223,6 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableContent())
-                    // Adjusted expectation based on actual error message
                     .andExpect(jsonPath("$.message").value(Matchers.containsString("Todas as atividades devem estar associadas a pelo menos uma competência.")));
         }
 
@@ -257,14 +232,14 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         void disponibilizarMapa_comCompetenciaNaoAssociada_retornaBadRequest() throws Exception {
             competenciaRepo.save(Competencia.builder().descricao("Competência Solta").mapa(mapa).build());
 
-            DisponibilizarMapaRequest request =
-                    new DisponibilizarMapaRequest(LocalDate.now().plusDays(10), OBS_LITERAL);
+            DisponibilizarMapaRequest request = new DisponibilizarMapaRequest(
+                    LocalDate.now().plusDays(10), OBS_LITERAL
+            );
 
-            mockMvc.perform(
-                            post(API_URL, subprocesso.getCodigo())
-                                    .with(csrf())
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(API_URL, subprocesso.getCodigo())
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.message").value("Todas as competências devem estar associadas a pelo menos uma atividade."));
         }

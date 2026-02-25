@@ -19,7 +19,7 @@ class AtividadeJsonViewTest {
 
     @Test
     @DisplayName("Deve serializar campos públicos da Atividade incluindo conhecimentos")
-    void deveSerializarCamposPublicos() throws Exception {
+    void deveSerializarCamposPublicos() {
         Mapa mapa = Mapa.builder().codigo(10L).build();
         Atividade atividade = Atividade.builder()
                 .codigo(1L)
@@ -51,7 +51,7 @@ class AtividadeJsonViewTest {
 
     @Test
     @DisplayName("Deve ocultar conhecimentos na visão Minimal")
-    void deveOcultarConhecimentosEmVisaoMinimal() throws Exception {
+    void deveOcultarConhecimentosEmVisaoMinimal() {
         Atividade atividade = Atividade.builder()
                 .codigo(1L)
                 .descricao("Atividade Teste")

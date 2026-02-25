@@ -35,7 +35,7 @@
             <Class name="sgc.mapa.MapaFacade"/>
             <Class name="sgc.mapa.AtividadeFacade"/>
             <Class name="sgc.subprocesso.service.crud.SubprocessoCrudService"/>
-            <Class name="sgc.subprocesso.service.workflow.SubprocessoWorkflowService"/>
+            <Class name="sgc.subprocesso.service.SubprocessoWorkflowService"/>
             <Class name="sgc.processo.service.ProcessoConsultaService"/>
             <Class name="sgc.seguranca.LoginFacade"/>
             <Class name="sgc.e2e.E2eController"/>
@@ -66,7 +66,7 @@
         Padrão comum em Spring para contornar limitação de self-invocation.
     -->
     <Match>
-        <Class name="sgc.subprocesso.service.workflow.SubprocessoWorkflowService"/>
+        <Class name="sgc.subprocesso.service.SubprocessoWorkflowService"/>
         <Method name="setSelf"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>

@@ -16,16 +16,15 @@ import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.model.UsuarioPerfil;
 import sgc.organizacao.service.UsuarioService;
-import sgc.seguranca.login.ClienteAcessoAd;
-import sgc.seguranca.login.GerenciadorJwt;
 import sgc.seguranca.dto.EntrarRequest;
 import sgc.seguranca.dto.PerfilUnidadeDto;
+import sgc.seguranca.login.ClienteAcessoAd;
+import sgc.seguranca.login.GerenciadorJwt;
 
 import java.util.List;
 
 /**
- * Serviço responsável pelo fluxo de login: autenticação, autorização e geração
- * de token.
+ * Serviço responsável pelo fluxo de login: autenticação, autorização e geração de tokens.
  */
 @Service
 @Slf4j
@@ -44,6 +43,7 @@ public class LoginFacade {
                        @Autowired(required = false) @Nullable ClienteAcessoAd clienteAcessoAd,
                        OrganizacaoFacade organizacaoFacade,
                        UsuarioService usuarioServiceInterno) {
+
         this.usuarioService = usuarioService;
         this.gerenciadorJwt = gerenciadorJwt;
         this.clienteAcessoAd = clienteAcessoAd;
@@ -73,7 +73,6 @@ public class LoginFacade {
 
     /**
      * Retorna os perfis e unidades que o usuário pode acessar.
-     * Requer autenticação prévia.
      */
     @Transactional(readOnly = true)
     public List<PerfilUnidadeDto> autorizar(String tituloEleitoral) {

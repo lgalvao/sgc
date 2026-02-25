@@ -1,6 +1,4 @@
 package sgc.mapa;
-import sgc.seguranca.SgcPermissionEvaluator;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.mapa.model.Mapa;
+import sgc.seguranca.SgcPermissionEvaluator;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -101,11 +100,10 @@ class MapaControllerTest {
 
         when(mapaFacade.salvar(any(Mapa.class))).thenReturn(mapa);
 
-        mockMvc.perform(
-                        post(API_MAPAS)
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(mapa)))
+        mockMvc.perform(post(API_MAPAS)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(mapa)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", API_MAPAS_1));
     }
@@ -119,11 +117,10 @@ class MapaControllerTest {
 
         when(mapaFacade.atualizar(eq(1L), any(Mapa.class))).thenReturn(mapa);
 
-        mockMvc.perform(
-                        post(API_MAPAS_1_ATUALIZAR)
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(mapa)))
+        mockMvc.perform(post(API_MAPAS_1_ATUALIZAR)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(mapa)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
     }

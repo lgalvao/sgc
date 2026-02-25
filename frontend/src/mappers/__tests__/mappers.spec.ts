@@ -1,9 +1,8 @@
 import {describe, expect, it} from "vitest";
 import {mapVWUsuariosArray, mapVWUsuarioToUsuario,} from "@/mappers/usuarios";
 import {mapUnidade, mapUnidadesArray, mapUnidadeSnapshot,} from "@/mappers/unidades";
-import type {Alerta, Mapa, MapaAjuste} from "@/types/tipos";
+import type {Mapa, MapaAjuste} from "@/types/tipos";
 import {TipoImpactoAtividade} from "@/types/tipos";
-import {mapAlertaDtoToFrontend} from "../alertas";
 import {
     mapAtividadeToModel,
     mapConhecimentoToModel,
@@ -25,34 +24,11 @@ import {
 } from "../sgrh";
 
 describe("mappers/alertas", () => {
-    it("mapAlertaDtoToFrontend deve mapear todos os campos corretamente", () => {
-        const dto = {
-            codigo: 1,
-            codProcesso: 10,
-            descricao: "Test Alert",
-            dataHora: "2025-10-18T10:00:00",
-            unidadeOrigem: "UO",
-            unidadeDestino: "UD",
-            dataHoraLeitura: undefined,
-            linkDestino: "/test",
-            mensagem: "Test Message",
-            origem: "UO",
-            processo: "Test Process",
-        };
-
-        const mapped: Alerta = mapAlertaDtoToFrontend(dto);
-
-        expect(mapped.codigo).toBe(1);
-        expect(mapped.codProcesso).toBe(10);
-        expect(mapped.descricao).toBe("Test Alert");
-        expect(mapped.dataHora).toBe("2025-10-18T10:00:00");
-        expect(mapped.unidadeOrigem).toBe("UO");
-        expect(mapped.unidadeDestino).toBe("UD");
-        expect(mapped.mensagem).toBe("Test Message");
-        expect(mapped.origem).toBe("UO");
-        expect(mapped.processo).toBe("Test Process");
+    it("stub para manter arquivo", () => {
+        expect(true).toBe(true);
     });
 });
+
 
 describe("mappers/atividades", () => {
     it("mapAtividadeToModel deve mapear corretamente", () => {

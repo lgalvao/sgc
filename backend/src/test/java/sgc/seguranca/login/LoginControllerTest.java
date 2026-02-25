@@ -1,6 +1,4 @@
 package sgc.seguranca.login;
-import sgc.seguranca.SgcPermissionEvaluator;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +19,7 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.LoginFacade;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.seguranca.dto.AutenticarRequest;
 import sgc.seguranca.dto.AutorizarRequest;
 import sgc.seguranca.dto.EntrarRequest;
@@ -326,21 +325,19 @@ class LoginControllerTest {
 
         private LoginController controller;
         private LoginFacade loginFacadeMock;
-        private OrganizacaoFacade organizacaoFacadeMock;
-        private LimitadorTentativasLogin limitadorMock;
         private GerenciadorJwt gerenciadorJwtMock;
 
         @BeforeEach
         void setUp() {
             loginFacadeMock = mock(LoginFacade.class);
-            organizacaoFacadeMock = mock(OrganizacaoFacade.class);
-            limitadorMock = mock(LimitadorTentativasLogin.class);
+            OrganizacaoFacade organizacaoFacadeMock = mock(OrganizacaoFacade.class);
+            LimitadorTentativasLogin limitadorMock = mock(LimitadorTentativasLogin.class);
             gerenciadorJwtMock = mock(GerenciadorJwt.class);
 
             controller = new LoginController(
-                loginFacadeMock, 
-                organizacaoFacadeMock, 
-                limitadorMock, 
+                loginFacadeMock,
+                    organizacaoFacadeMock,
+                    limitadorMock,
                 gerenciadorJwtMock
             );
         }

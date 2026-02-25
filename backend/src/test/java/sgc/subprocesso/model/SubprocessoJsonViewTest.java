@@ -18,7 +18,7 @@ class SubprocessoJsonViewTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void deveIncluirRelacionamentosNaVisaoPublica() throws Exception {
+    void deveIncluirRelacionamentosNaVisaoPublica() {
         Processo processo = new Processo();
         processo.setCodigo(50L);
 

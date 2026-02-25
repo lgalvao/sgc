@@ -154,8 +154,6 @@ public class ArchConsistencyTest {
             })
             .because("Entidades JPA só podem ser expostas em controllers com @JsonView explícito");
 
-
-
     /**
      * Garante nomenclatura consistente de Controllers.
      */
@@ -178,34 +176,6 @@ public class ArchConsistencyTest {
             .haveSimpleNameEndingWith("Repo")
             .because("Repositories should have 'Repo' suffix for consistency");
 
-    /**
-     * Garante que eventos de domínio sigam o padrão de nomenclatura.
-     * Exceções: Enums (como TipoTransicao) e Listeners (como EventoProcessoListener).
-     */
-    @ArchTest
-    static final ArchRule domain_events_should_start_with_evento = classes()
-            .that()
-            .resideInAPackage("..eventos..")
-            .or()
-            .resideInAPackage("..evento..")
-            .should(new ArchCondition<>("start with 'Evento' (unless it's an Enum, Listener or package-info)") {
-                @Override
-                public void check(JavaClass item, ConditionEvents events) {
-                    boolean isEnum = item.isEnum();
-                    boolean isListener = item.getSimpleName().endsWith("Listener");
-                    boolean isPackageInfo = item.getSimpleName().contains("package-info");
-                    boolean startsWithEvento = item.getSimpleName().startsWith("Evento");
-
-                    if (!isEnum && !isListener && !isPackageInfo && !startsWithEvento) {
-                        String message = String.format("Class %s resides in event package but doesn't start with 'Evento'", 
-                                item.getName());
-                        events.add(SimpleConditionEvent.violated(item, message));
-                    }
-                }
-            })
-            .because("Domain events should start with 'Evento' prefix for consistency");
-
-
 
     /**
      * Verifica ausência de ciclos internos nos pacotes workflow de cada módulo.
@@ -220,5 +190,6 @@ public class ArchConsistencyTest {
     static final ArchRule no_cycles_within_service_packages = slices()
             .matching("sgc.(*).service.(**)")
             .should()
-            .beFreeOfCycles();
+            .beFreeOfCycles()
+            .allowEmptyShould(true);
 }

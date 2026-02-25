@@ -1,25 +1,20 @@
 package sgc.mapa.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.ComumRepo;
-import sgc.mapa.dto.AtualizarAtividadeRequest;
-import sgc.mapa.dto.AtualizarConhecimentoRequest;
-import sgc.mapa.dto.CriarAtividadeRequest;
-import sgc.mapa.dto.CriarConhecimentoRequest;
-import sgc.mapa.dto.AtividadeMapper;
-import sgc.mapa.dto.ConhecimentoMapper;
+import sgc.comum.model.ComumRepo;
+import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.*;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MapaManutencaoService {
     private final AtividadeRepo atividadeRepo;
@@ -29,7 +24,26 @@ public class MapaManutencaoService {
     private final ComumRepo repo;
     private final AtividadeMapper atividadeMapper;
     private final ConhecimentoMapper conhecimentoMapper;
-    private final SubprocessoAdminWorkflowService subprocessoAdminService;
+    private final SubprocessoFacade subprocessoFacade;
+
+    public MapaManutencaoService(
+            AtividadeRepo atividadeRepo,
+            CompetenciaRepo competenciaRepo,
+            ConhecimentoRepo conhecimentoRepo,
+            MapaRepo mapaRepo,
+            ComumRepo repo,
+            AtividadeMapper atividadeMapper,
+            ConhecimentoMapper conhecimentoMapper,
+            @Lazy SubprocessoFacade subprocessoFacade) {
+        this.atividadeRepo = atividadeRepo;
+        this.competenciaRepo = competenciaRepo;
+        this.conhecimentoRepo = conhecimentoRepo;
+        this.mapaRepo = mapaRepo;
+        this.repo = repo;
+        this.atividadeMapper = atividadeMapper;
+        this.conhecimentoMapper = conhecimentoMapper;
+        this.subprocessoFacade = subprocessoFacade;
+    }
 
     public List<Atividade> listarAtividades() {
         return atividadeRepo.findAll();
@@ -109,7 +123,7 @@ public class MapaManutencaoService {
 
     public Mapa buscarMapaCompletoPorSubprocesso(Long subprocessoCodigo) {
         return mapaRepo.findFullBySubprocessoCodigo(subprocessoCodigo)
-                .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada("Mapa", "S:" + subprocessoCodigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", "S:" + subprocessoCodigo));
     }
 
     public Mapa buscarMapaPorCodigo(Long codigo) {
@@ -178,6 +192,16 @@ public class MapaManutencaoService {
         conhecimentoRepo.deleteAll(conhecimentos);
 
         atividadeRepo.delete(atividade);
+    }
+
+    @Transactional
+    public Mapa salvarMapa(Mapa mapa) {
+        return mapaRepo.save(mapa);
+    }
+
+    @Transactional
+    public List<Mapa> salvarMapas(List<Mapa> mapas) {
+        return mapaRepo.saveAll(mapas);
     }
 
     @Transactional
@@ -265,11 +289,6 @@ public class MapaManutencaoService {
     }
 
     @Transactional
-    public Mapa salvarMapa(Mapa mapa) {
-        return mapaRepo.save(mapa);
-    }
-
-    @Transactional
     public void excluirMapa(Long codigo) {
         mapaRepo.deleteById(codigo);
     }
@@ -291,7 +310,7 @@ public class MapaManutencaoService {
     }
 
     private void notificarAlteracaoMapa(Long mapaCodigo) {
-        subprocessoAdminService.atualizarParaEmAndamento(mapaCodigo);
+        subprocessoFacade.atualizarSituacaoParaEmAndamento(mapaCodigo);
     }
 
     private void validarDescricaoAtividadeUnica(Long mapaCodigo, String descricao) {

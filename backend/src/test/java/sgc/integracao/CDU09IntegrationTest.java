@@ -8,16 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.AlertaRepo;
-import sgc.analise.model.Analise;
-import sgc.analise.model.AnaliseRepo;
-import sgc.analise.model.TipoAcaoAnalise;
-import sgc.analise.model.TipoAnalise;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.model.*;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -44,12 +37,12 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     @Autowired private AnaliseRepo analiseRepo;
     @Autowired private EntityManager entityManager;
 
-    private final Long SP_CODIGO = 60000L; // SEDESENV (Unidade 8) no data.sql
-
     @Test
     @WithMockChefe("3") // Fernanda Oliveira - Chefe da Unidade 8 no data.sql
     @DisplayName("Fluxo Principal - Visualizar, Preparar e Disponibilizar Cadastro")
     void fluxoCompletoDisponibilizacao() throws Exception {
+        // SEDESENV (Unidade 8) no data.sql
+        Long SP_CODIGO = 60000L;
         Subprocesso sp = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
         
         // --- ETAPA 1: Visualizar Detalhes e Histórico de Análise (Passos 1 a 5) ---

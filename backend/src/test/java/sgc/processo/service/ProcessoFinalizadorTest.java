@@ -1,14 +1,13 @@
 package sgc.processo.service;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Unidade;
@@ -16,7 +15,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.query.ConsultasSubprocessoService;
+import sgc.subprocesso.service.ConsultasSubprocessoService;
 
 import java.util.List;
 
@@ -26,7 +25,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@Tag("unit")
 @DisplayName("Testes para ProcessoFinalizador")
 class ProcessoFinalizadorTest {
 

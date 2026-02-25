@@ -17,7 +17,7 @@ class ConhecimentoJsonViewTest {
 
     @Test
     @DisplayName("Deve serializar apenas campos públicos do Conhecimento")
-    void deveSerializarCamposPublicos() throws Exception {
+    void deveSerializarCamposPublicos() {
         Atividade atividade = Atividade.builder().codigo(1L).build();
         Conhecimento conhecimento = Conhecimento.builder()
                 .codigo(100L)

@@ -4,8 +4,8 @@ import lombok.Builder;
 import org.jspecify.annotations.Nullable;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.TipoTransicao;
 
 /**
  * Comando para registro de transição simples.

@@ -2,7 +2,6 @@ package sgc.subprocesso.service.workflow;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,18 +12,18 @@ import sgc.comum.erros.ErroAcessoNegado;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
-import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.notificacao.SubprocessoEmailService;
+import sgc.subprocesso.model.TipoTransicao;
+import sgc.subprocesso.service.SubprocessoEmailService;
+import sgc.subprocesso.service.SubprocessoTransicaoService;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@Tag("unit")
 @DisplayName("Testes Unitários para SubprocessoTransicaoService")
 class SubprocessoTransicaoServiceTest {
 
@@ -51,7 +50,7 @@ class SubprocessoTransicaoServiceTest {
         Unidade unidade = mock(Unidade.class);
         when(unidade.getSigla()).thenReturn("U1");
         when(subprocesso.getUnidade()).thenReturn(unidade);
-        when(subprocesso.getProcesso()).thenReturn(mock(sgc.processo.model.Processo.class));
+        when(subprocesso.getProcesso()).thenReturn(mock(Processo.class));
 
         Unidade origem = mock(Unidade.class);
         Unidade destino = mock(Unidade.class);
@@ -81,7 +80,7 @@ class SubprocessoTransicaoServiceTest {
         Unidade unidade = mock(Unidade.class);
         when(unidade.getSigla()).thenReturn("U1");
         when(subprocesso.getUnidade()).thenReturn(unidade);
-        when(subprocesso.getProcesso()).thenReturn(mock(sgc.processo.model.Processo.class));
+        when(subprocesso.getProcesso()).thenReturn(mock(Processo.class));
 
         Unidade origem = mock(Unidade.class);
         Unidade destino = mock(Unidade.class);
@@ -109,7 +108,7 @@ class SubprocessoTransicaoServiceTest {
         Unidade unidade = mock(Unidade.class);
         when(unidade.getSigla()).thenReturn("U1");
         when(subprocesso.getUnidade()).thenReturn(unidade);
-        when(subprocesso.getProcesso()).thenReturn(mock(sgc.processo.model.Processo.class));
+        when(subprocesso.getProcesso()).thenReturn(mock(Processo.class));
 
         Usuario usuarioAutenticado = new Usuario();
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuarioAutenticado);
@@ -138,9 +137,7 @@ class SubprocessoTransicaoServiceTest {
                 .build();
 
         // Act & Assert
-        Assertions.assertThrows(ErroAcessoNegado.class, () -> {
-            service.registrar(cmd);
-        });
+        Assertions.assertThrows(ErroAcessoNegado.class, () -> service.registrar(cmd));
     }
 
     @Test
@@ -151,7 +148,7 @@ class SubprocessoTransicaoServiceTest {
         Unidade unidade = mock(Unidade.class);
         when(unidade.getSigla()).thenReturn("U1");
         when(subprocesso.getUnidade()).thenReturn(unidade);
-        when(subprocesso.getProcesso()).thenReturn(mock(sgc.processo.model.Processo.class));
+        when(subprocesso.getProcesso()).thenReturn(mock(Processo.class));
 
         Usuario usuario = new Usuario();
 

@@ -24,7 +24,6 @@ public class MapaVisualizacaoService {
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
 
-    // TODO muito suspeito. Coisas vazias que nao poderiam chegar vazias aqui
     public MapaVisualizacaoResponse obterMapaParaVisualizacao(Subprocesso subprocesso) {
         Mapa mapa = mapaRepo.findFullBySubprocessoCodigo(subprocesso.getCodigo())
                 .orElse(subprocesso.getMapa());

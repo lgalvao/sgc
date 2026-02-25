@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
@@ -25,11 +24,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("integration")
 @SpringBootTest
-@ActiveProfiles("test")
 @Transactional
 @DisplayName("Testes do Serviço UsuarioFacade")
 class UsuarioServiceTest {
-
     // Data from backend/src/test/resources/data.sql
     private static final String TITULO_ADMIN = "111111111111";
     private static final String NOME_ADMIN = "Admin Teste";

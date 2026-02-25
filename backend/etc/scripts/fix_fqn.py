@@ -78,9 +78,6 @@ def determine_replacement(match, current_package, existing_imports, new_imports_
     cls = match.group(4)
     fqn = f"{pkg}.{cls}"
     
-    # Logic to decide if we should replace
-    var = False
-    
     if should_ignore_fqn(pkg, cls):
          should_replace = True
     elif current_package and pkg == current_package:

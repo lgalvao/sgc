@@ -1,4 +1,4 @@
-package sgc.subprocesso.service.query;
+package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
@@ -34,8 +34,6 @@ public class ConsultasSubprocessoService {
 
     /**
      * Valida se todos os subprocessos de um processo estão homologados.
-     *
-     * @return resultado da validação com detalhes
      */
     public ValidationResult validarSubprocessosParaFinalizacao(Long processoId) {
         long total = subprocessoRepo.countByProcessoCodigo(processoId);
@@ -61,25 +59,14 @@ public class ConsultasSubprocessoService {
         return ValidationResult.ofValido();
     }
 
-    /**
-     * Lista subprocessos por processo e múltiplas situações.
-     */
     public List<Subprocesso> listarPorProcessoESituacoes(Long processoId, List<SituacaoSubprocesso> situacoes) {
         return subprocessoRepo.findByProcessoCodigoAndSituacaoInWithUnidade(processoId, situacoes);
     }
 
-    /**
-     * Lista todos os subprocessos de um processo.
-     *
-     * @return lista de subprocessos com unidade e mapa carregados
-     */
     public List<Subprocesso> listarEntidadesPorProcesso(Long processoId) {
         return subprocessoRepo.findByProcessoCodigoWithUnidade(processoId);
     }
 
-    /**
-     * Lista subprocessos por processo, unidade e situações.
-     */
     public List<Subprocesso> listarPorProcessoUnidadeESituacoes(
             Long processoId, Long unidadeId, List<SituacaoSubprocesso> situacoes) {
         return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(

@@ -10,7 +10,6 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
-import sgc.comum.util.Sleeper;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -24,8 +23,6 @@ import java.util.concurrent.Executor;
  */
 @Configuration
 public class TestConfig implements AsyncConfigurer {
-
-    // --- GreenMail: sempre disponível em testes ---
     @Bean(destroyMethod = "stop")
     @Profile({"test", "e2e", "secure-test"})
     public GreenMail greenMail() {
@@ -35,7 +32,6 @@ public class TestConfig implements AsyncConfigurer {
         return gm;
     }
 
-    // --- JavaMailSender real conectado ao GreenMail ---
     @Bean
     @Primary
     @Profile({"test", "e2e", "secure-test"})
@@ -51,16 +47,11 @@ public class TestConfig implements AsyncConfigurer {
         return mailSender;
     }
 
-    // --- ObjectMapper ---
     @Bean
     public ObjectMapper objectMapper() {
         return JsonMapper.builder().findAndAddModules().build();
     }
 
-    /**
-     * Usa SimpleAsyncTaskExecutor para suporte correto de @Async com CompletableFuture.
-     * SyncTaskExecutor não implementa AsyncTaskExecutor, causando fallback para thread pool real.
-     */
     @Override
     @Bean(name = "taskExecutor")
     @Profile({"test", "e2e", "secure-test"})
@@ -68,19 +59,5 @@ public class TestConfig implements AsyncConfigurer {
         var executor = new SimpleAsyncTaskExecutor();
         executor.setConcurrencyLimit(1);
         return executor;
-    }
-
-    /**
-     * No-op Sleeper para testes: elimina esperas reais entre tentativas de reenvio.
-     */
-    @Bean
-    @Primary
-    public Sleeper sleeper() {
-        return new Sleeper() {
-            @Override
-            public void sleep(long millis) {
-                // não dorme em testes
-            }
-        };
     }
 }

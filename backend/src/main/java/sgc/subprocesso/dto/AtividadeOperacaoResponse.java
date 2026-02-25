@@ -7,12 +7,10 @@ import java.util.List;
 
 /**
  * DTO de resposta para operações CRUD em atividades.
- *
  * <p>
- * Retorna tanto a atividade afetada quanto o status atualizado do subprocesso,
- * permitindo que o frontend atualize a UI sem precisar fazer chamadas
- * adicionais
- * para buscar o processo completo.
+ * Retorna a atividade afetada e o status atualizado do subprocesso, permitindo
+ * que o frontend atualize a UI sem precisar fazer chamadas adicionais para
+ * buscar o processo completo.
  */
 @Builder
 public record AtividadeOperacaoResponse(

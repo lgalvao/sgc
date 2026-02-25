@@ -1,8 +1,7 @@
 package sgc.subprocesso;
-import sgc.seguranca.SgcPermissionEvaluator;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -13,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
@@ -25,8 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(SubprocessoCrudController.class)
 @Import(RestExceptionHandler.class)
 @DisplayName("SubprocessoCrudController - Busca Integração")
+@Tag("integration")
 class SubprocessoBuscarIntegracaoTest {
-
     @MockitoBean
     private SubprocessoFacade subprocessoFacade;
 
@@ -35,6 +35,7 @@ class SubprocessoBuscarIntegracaoTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
 

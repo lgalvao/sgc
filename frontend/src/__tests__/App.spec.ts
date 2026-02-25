@@ -6,7 +6,6 @@ import {mount} from "@vue/test-utils";
 import App from "../App.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useRoute} from "vue-router";
-import {useToast} from "bootstrap-vue-next";
 import {useFeedbackStore} from "@/stores/feedback";
 
 // Mock de components

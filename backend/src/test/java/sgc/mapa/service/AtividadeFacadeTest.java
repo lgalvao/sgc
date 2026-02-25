@@ -7,11 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.AtividadeFacade;
-import sgc.mapa.MapaFacade;
 import sgc.mapa.dto.*;
-import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
@@ -23,7 +20,6 @@ import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
-import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,14 +31,10 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AtividadeFacade")
 class AtividadeFacadeTest {
-
     @Mock private MapaManutencaoService mapaManutencaoService;
     @Mock private SubprocessoFacade subprocessoFacade;
     @Mock private SgcPermissionEvaluator permissionEvaluator;
     @Mock private UsuarioFacade usuarioService;
-    @Mock private MapaFacade mapaFacade;
-    @Mock private SubprocessoValidacaoService validacaoService;
-    @Mock private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private AtividadeFacade atividadeFacade;

@@ -2,13 +2,9 @@ package sgc.subprocesso.dto;
 
 import lombok.Builder;
 import org.jspecify.annotations.Nullable;
-import sgc.analise.model.TipoAcaoAnalise;
-import sgc.analise.model.TipoAnalise;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.eventos.TipoTransicao;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.*;
 
 /**
  * Comando para registro de workflow completo (Análise + Transição).

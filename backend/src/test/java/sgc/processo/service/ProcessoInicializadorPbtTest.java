@@ -1,7 +1,7 @@
 package sgc.processo.service;
 
 import net.jqwik.api.*;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
 import sgc.organizacao.model.*;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
@@ -12,7 +12,6 @@ import sgc.subprocesso.service.SubprocessoFacade;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @Tag("PBT")
@@ -71,8 +70,8 @@ class ProcessoInicializadorPbtTest {
     }
 
     static class ProcessoArgs {
-        Processo processo;
-        List<Long> codsUnidadesParam;
+        final Processo processo;
+        final List<Long> codsUnidadesParam;
         
         ProcessoArgs(Processo p, List<Long> params) {
             this.processo = p;

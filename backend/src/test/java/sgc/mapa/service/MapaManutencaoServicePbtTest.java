@@ -1,13 +1,14 @@
 package sgc.mapa.service;
 
 import net.jqwik.api.*;
-import sgc.comum.ComumRepo;
-import sgc.mapa.dto.CriarAtividadeRequest;
-import sgc.mapa.dto.CriarConhecimentoRequest;
+import sgc.comum.erros.ErroValidacao;
+import sgc.comum.model.ComumRepo;
 import sgc.mapa.dto.AtividadeMapper;
 import sgc.mapa.dto.ConhecimentoMapper;
+import sgc.mapa.dto.CriarAtividadeRequest;
+import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.model.*;
-import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ class MapaManutencaoServicePbtTest {
         ComumRepo repo = mock(ComumRepo.class);
         AtividadeMapper atividadeMapper = mock(AtividadeMapper.class);
         ConhecimentoMapper conhecimentoMapper = mock(ConhecimentoMapper.class);
-        SubprocessoAdminWorkflowService subprocessoAdminService = mock(SubprocessoAdminWorkflowService.class);
+        SubprocessoFacade subprocessoAdminService = mock(SubprocessoFacade.class);
 
         MapaManutencaoService service = new MapaManutencaoService(
                 atividadeRepo, competenciaRepo, conhecimentoRepo, mapaRepo, repo,
@@ -50,7 +51,7 @@ class MapaManutencaoServicePbtTest {
         CriarAtividadeRequest request = new CriarAtividadeRequest(mapaCodigo, descricoes[1]);
         
         assertThatThrownBy(() -> service.criarAtividade(request))
-                .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
+                .isInstanceOf(ErroValidacao.class);
     }
 
     @Property
@@ -62,7 +63,7 @@ class MapaManutencaoServicePbtTest {
         ComumRepo repo = mock(ComumRepo.class);
         AtividadeMapper atividadeMapper = mock(AtividadeMapper.class);
         ConhecimentoMapper conhecimentoMapper = mock(ConhecimentoMapper.class);
-        SubprocessoAdminWorkflowService subprocessoAdminService = mock(SubprocessoAdminWorkflowService.class);
+        SubprocessoFacade subprocessoAdminService = mock(SubprocessoFacade.class);
 
         MapaManutencaoService service = new MapaManutencaoService(
                 atividadeRepo, competenciaRepo, conhecimentoRepo, mapaRepo, repo,
@@ -82,7 +83,7 @@ class MapaManutencaoServicePbtTest {
         CriarConhecimentoRequest request = new CriarConhecimentoRequest(ativCodigo, descricoes[1]);
         
         assertThatThrownBy(() -> service.criarConhecimento(ativCodigo, request))
-                .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
+                .isInstanceOf(ErroValidacao.class);
     }
 
     @Provide

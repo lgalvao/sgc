@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.TipoUnidade;
@@ -23,10 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional
 @Tag("integration")
-@ActiveProfiles("test") // Garante profile de teste
 @DisplayName("ProcessoRepo - Testes de Repositório")
 class ProcessoRepoTest {
-
     @Autowired
     private ProcessoRepo processoRepo;
 
@@ -47,7 +44,7 @@ class ProcessoRepoTest {
         return unidade;
     }
 
-    private Processo criarProcesso(String descricao, SituacaoProcesso situacao, Unidade... participantes) {
+    private void criarProcesso(String descricao, SituacaoProcesso situacao, Unidade... participantes) {
         Processo processo = Processo.builder()
                 .descricao(descricao)
                 .situacao(situacao)
@@ -60,7 +57,6 @@ class ProcessoRepoTest {
             processo.adicionarParticipantes(Set.of(participantes));
         }
         entityManager.persist(processo);
-        return processo;
     }
 
     @Test

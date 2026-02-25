@@ -1,4 +1,4 @@
-package sgc.subprocesso.service.workflow;
+package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,28 +6,19 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import sgc.analise.AnaliseFacade;
-import sgc.analise.dto.CriarAnaliseCommand;
-import sgc.analise.model.TipoAcaoAnalise;
-import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroValidacao;
+import sgc.mapa.MapaFacade;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
-import sgc.mapa.MapaFacade;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.AnaliseFacade;
 import sgc.subprocesso.dto.*;
-import sgc.subprocesso.eventos.TipoTransicao;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.crud.SubprocessoCrudService;
-import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
+import sgc.subprocesso.model.*;
 
 import java.time.LocalDateTime;
 import java.util.EnumMap;
@@ -62,10 +53,9 @@ public class SubprocessoMapaWorkflowService {
 
     private final SubprocessoRepo subprocessoRepo;
     private final MovimentacaoRepo movimentacaoRepo;
-    private final SubprocessoCrudService crudService;
+    private final SubprocessoWorkflowService workflowService;
     private final MapaManutencaoService mapaManutencaoService;
     private final MapaFacade mapaFacade;
-    private final SubprocessoValidacaoService validacaoService;
     private final AnaliseFacade analiseFacade;
     private final SubprocessoTransicaoService transicaoService;
     private final OrganizacaoFacade organizacaoFacade;
@@ -150,9 +140,9 @@ public class SubprocessoMapaWorkflowService {
     }
 
     private Subprocesso getSubprocessoParaEdicao(Long codSubprocesso) {
-        Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
+        Subprocesso subprocesso = workflowService.buscarSubprocesso(codSubprocesso);
 
-        validacaoService.validarSituacaoPermitida(subprocesso,
+        workflowService.validarSituacaoPermitida(subprocesso,
             "Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s".formatted(subprocesso.getSituacao()),
             MAPEAMENTO_CADASTRO_HOMOLOGADO,
             MAPEAMENTO_MAPA_CRIADO,
@@ -169,12 +159,12 @@ public class SubprocessoMapaWorkflowService {
 
     private void executarDisponibilizacaoMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
         Subprocesso sp = getSubprocessoParaEdicao(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp,
+        workflowService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES,
                 REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES);
 
         validarMapaParaDisponibilizacao(sp);
-        validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
+        workflowService.validarAssociacoesMapa(sp.getMapa().getCodigo());
 
         sp.getMapa().setSugestoes(null);
         analiseFacade.removerPorSubprocesso(codSubprocesso);
@@ -232,8 +222,8 @@ public class SubprocessoMapaWorkflowService {
 
     @Transactional
     public void apresentarSugestoes(Long codSubprocesso, @Nullable String sugestoes, Usuario usuario) {
-        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO);
+        Subprocesso sp = workflowService.buscarSubprocesso(codSubprocesso);
+        workflowService.validarSituacaoPermitida(sp, MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO);
 
         sp.getMapa().setSugestoes(sugestoes);
         sp.setSituacao(SITUACAO_MAPA_COM_SUGESTOES.get(sp.getProcesso().getTipo()));
@@ -260,8 +250,8 @@ public class SubprocessoMapaWorkflowService {
 
     @Transactional
     public void validarMapa(Long codSubprocesso, Usuario usuario) {
-        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO);
+        Subprocesso sp = workflowService.buscarSubprocesso(codSubprocesso);
+        workflowService.validarSituacaoPermitida(sp, MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO);
 
         sp.setSituacao(SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo()));
 
@@ -284,8 +274,8 @@ public class SubprocessoMapaWorkflowService {
 
     @Transactional
     public void devolverValidacao(Long codSubprocesso, @Nullable String justificativa, Usuario usuario) {
-        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp,
+        Subprocesso sp = workflowService.buscarSubprocesso(codSubprocesso);
+        workflowService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
                 REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO);
 
@@ -318,8 +308,8 @@ public class SubprocessoMapaWorkflowService {
     }
 
     private void executarAceiteValidacao(Long codSubprocesso, Usuario usuario) {
-        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp,
+        Subprocesso sp = workflowService.buscarSubprocesso(codSubprocesso);
+        workflowService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
                 REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO);
 
@@ -365,9 +355,7 @@ public class SubprocessoMapaWorkflowService {
         if (sp.getCodigo() == null) {
             return sp.getUnidade();
         }
-        return movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
-                .map(m -> m.getUnidadeDestino() != null ? m.getUnidadeDestino() : sp.getUnidade())
-                .orElse(sp.getUnidade());
+        return movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo()).filter(m -> m.getUnidadeDestino() != null).map(Movimentacao::getUnidadeDestino).orElse(sp.getUnidade());
     }
 
     @Transactional
@@ -376,8 +364,8 @@ public class SubprocessoMapaWorkflowService {
     }
 
     private void executarHomologacaoValidacao(Long codSubprocesso, Usuario usuario) {
-        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp,
+        Subprocesso sp = workflowService.buscarSubprocesso(codSubprocesso);
+        workflowService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
                 REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO);
 
@@ -396,9 +384,9 @@ public class SubprocessoMapaWorkflowService {
 
     @Transactional
     public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoRequest request, Usuario usuario) {
-        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO);
-        validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
+        Subprocesso sp = workflowService.buscarSubprocesso(codSubprocesso);
+        workflowService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO);
+        workflowService.validarAssociacoesMapa(sp.getMapa().getCodigo());
 
         sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));
         sp.setDataFimEtapa1(LocalDateTime.now());

@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * DTO de requisição para adicionar/atualizar competência.
  */
-@SuppressWarnings("unused")
 @Builder
 public record CompetenciaRequest(
         @NotBlank(message = "A descrição da competência é obrigatória")

@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroAcessoNegado;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.ComumRepo;
+import sgc.comum.erros.ErroValidacao;
+import sgc.comum.model.ComumRepo;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaResponse;
@@ -14,8 +14,6 @@ import sgc.mapa.model.*;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.comum.erros.ErroAcessoNegado;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,18 +22,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**
  * Serviço responsável por detectar impactos no mapa de competências causados
- * por alterações no
- * cadastro de atividades durante processos de revisão.
- *
- * <p>
- * Este serviço consolida toda a lógica de detecção de mudanças em atividades e
- * análise de
- * impactos em competências. Anteriormente, essa funcionalidade estava
- * distribuída entre três
- * services separados (ImpactoMapaService, DetectorMudancasAtividadeService e
- * DetectorImpactoCompetenciaService), mas foram consolidados para eliminar
- * delegação desnecessária
- * e manter o pipeline de processamento coeso.
+ * por alterações no cadastro de atividades durante processos de revisão.
  */
 @Service
 @Slf4j
@@ -45,32 +32,19 @@ public class ImpactoMapaService {
     private final CompetenciaRepo competenciaRepo;
     private final MapaManutencaoService mapaManutencaoService;
     private final SgcPermissionEvaluator permissionEvaluator;
-    private final SubprocessoValidacaoService validacaoService;
     private final ComumRepo repo;
 
     /**
      * Realiza a verificação de impactos no mapa de competências, comparando o mapa
-     * em revisão de um
-     * subprocesso com o mapa vigente da unidade.
-     *
+     * em revisão de um subprocesso com o mapa vigente da unidade.
      * <p>
      * Analisa as diferenças entre os dois mapas, identificando atividades
-     * inseridas,
-     * removidas ou alteradas, e as competências que são afetadas por essas
+     * inseridas, removidas ou alteradas, e as competências que são afetadas por essas
      * mudanças.
-     *
      * <p>
      * O acesso a esta funcionalidade é restrito por perfil e pela situação atual do
-     * subprocesso
-     * para garantir que a análise de impacto seja feita no momento correto do fluxo
+     * subprocesso para garantir que a análise de impacto seja feita no momento correto do fluxo
      * de trabalho.
-     *
-     * @param usuario O usuário autenticado que realiza a operação.
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso ou seu mapa não forem
-     *                                   encontrados.
-     * @throws ErroAcessoNegado          se o usuário não tiver permissão para
-     *                                   executar a operação na
-     *                                   situação atual do subprocesso.
      */
     @Transactional(readOnly = true)
     public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
@@ -78,12 +52,13 @@ public class ImpactoMapaService {
             throw new ErroAcessoNegado("Usuário não tem permissão para verificar impactos.");
         }
 
-        validacaoService.validarSituacaoPermitida(subprocesso,
-                NAO_INICIADO,
-                REVISAO_CADASTRO_EM_ANDAMENTO,
-                REVISAO_CADASTRO_DISPONIBILIZADA,
-                REVISAO_CADASTRO_HOMOLOGADA,
-                REVISAO_MAPA_AJUSTADO);
+        if (!Set.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO,
+                REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA,
+                REVISAO_MAPA_AJUSTADO).contains(subprocesso.getSituacao())) {
+            throw new ErroValidacao(
+                "Situação do subprocesso não permite esta operação. Situação atual: %s"
+                    .formatted(subprocesso.getSituacao()));
+        }
 
         Optional<Mapa> mapaVigenteOpt = mapaRepo.findMapaVigenteByUnidade(subprocesso.getUnidade().getCodigo());
         if (mapaVigenteOpt.isEmpty()) {
@@ -114,6 +89,10 @@ public class ImpactoMapaService {
                 .removidas(removidas)
                 .alteradas(alteradas)
                 .competenciasImpactadas(competenciasImpactadas)
+                .totalInseridas(inseridas.size())
+                .totalRemovidas(removidas.size())
+                .totalAlteradas(alteradas.size())
+                .totalCompetenciasImpactadas(competenciasImpactadas.size())
                 .build();
     }
 
@@ -147,8 +126,7 @@ public class ImpactoMapaService {
     }
 
     /**
-     * Detecta atividades que foram removidas do mapa atual em comparação com o
-     * vigente.
+     * Detecta atividades que foram removidas do mapa atual em comparação com o vigente.
      */
     private List<AtividadeImpactadaDto> detectarRemovidas(
             Map<String, Atividade> atuaisMap,
@@ -210,7 +188,6 @@ public class ImpactoMapaService {
 
     /**
      * Constrói um mapa de Atividades indexado pela descrição.
-     * Útil para buscar atividades por nome (O(1)).
      */
     private Map<String, Atividade> atividadesPorDescricao(List<Atividade> atividades) {
         return atividades.stream().collect(Collectors.toMap(
@@ -222,7 +199,6 @@ public class ImpactoMapaService {
 
     private boolean conhecimentosDiferentes(Collection<Conhecimento> lista1, Collection<Conhecimento> lista2) {
         if (lista1.size() != lista2.size()) return true;
-
         if (lista1.isEmpty()) return false;
 
         Set<String> descricoes1 = HashSet.newHashSet(lista1.size());
@@ -247,8 +223,7 @@ public class ImpactoMapaService {
     }
 
     /**
-     * Identifica quais competências foram impactadas pelas atividades removidas ou
-     * alteradas.
+     * Identifica quais competências foram impactadas pelas atividades removidas ou alteradas.
      */
     private List<CompetenciaImpactadaDto> competenciasImpactadas(
             List<Competencia> competenciasDoMapa,
@@ -332,7 +307,6 @@ public class ImpactoMapaService {
 
     /**
      * Constrói um mapa invertido de Atividade ID → Lista de Competências.
-     * Útil para buscar quais competências estão ligadas a uma atividade (O(1)).
      */
     private Map<Long, List<Competencia>> construirMapaAtividadeCompetencias(List<Competencia> competencias) {
         Map<Long, List<Competencia>> mapa = new HashMap<>();

@@ -1,21 +1,23 @@
 package sgc.subprocesso.service.notificacao;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.thymeleaf.TemplateEngine;
-import sgc.notificacao.EmailService;
+import sgc.alerta.EmailService;
+import sgc.organizacao.OrganizacaoFacade;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.TipoTransicao;
+import sgc.subprocesso.service.SubprocessoEmailService;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -24,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@Tag("unit")
 @DisplayName("SubprocessoEmailService Test")
 class SubprocessoEmailServiceTest {
 
@@ -33,9 +34,9 @@ class SubprocessoEmailServiceTest {
     @Mock
     private TemplateEngine templateEngine;
     @Mock
-    private sgc.organizacao.OrganizacaoFacade OrganizacaoFacade;
+    private OrganizacaoFacade OrganizacaoFacade;
     @Mock
-    private sgc.organizacao.UsuarioFacade usuarioFacade;
+    private UsuarioFacade usuarioFacade;
 
     @InjectMocks
     private SubprocessoEmailService service;

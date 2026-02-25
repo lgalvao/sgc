@@ -8,12 +8,7 @@ import sgc.mapa.model.TipoImpactoCompetencia;
 import java.util.List;
 
 /**
- * DTO que representa uma competência que foi impactada pelas mudanças nas
- * atividades durante a
- * revisão do cadastro.
- *
- * <p>
- * CDU-12 - Verificar impactos no mapa de competências
+ * DTO que representa uma competência que foi impactada por mudanças nas atividades na revisão.
  */
 @Builder
 public record CompetenciaImpactadaDto(

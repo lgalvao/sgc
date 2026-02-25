@@ -26,8 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Controller responsável pelo fluxo de login: autenticação, autorização e
- * entrada.
+ * Controller responsável pelo fluxo de login: autenticação, autorização e entrada.
  */
 @RestController
 @RequestMapping("/api/usuarios")

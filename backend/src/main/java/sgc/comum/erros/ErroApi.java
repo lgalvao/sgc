@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatusCode;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ public class ErroApi {
         this.timestamp = LocalDateTime.now();
         this.message = "";
         this.code = "";
-        this.details = new java.util.HashMap<>();
+        this.details = new HashMap<>();
     }
 
     public ErroApi(HttpStatusCode status, String message) {

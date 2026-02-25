@@ -1,7 +1,8 @@
 package sgc.processo.service;
 
 import net.jqwik.api.*;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
@@ -28,7 +29,7 @@ class ProcessoWorkflowPbtTest {
         if (situacao == SituacaoProcesso.CRIADO) return;
 
         ProcessoRepo repo = mock(ProcessoRepo.class);
-        sgc.organizacao.OrganizacaoFacade OrganizacaoFacade = mock(sgc.organizacao.OrganizacaoFacade.class);
+        OrganizacaoFacade OrganizacaoFacade = mock(OrganizacaoFacade.class);
         ProcessoValidador validador = mock(ProcessoValidador.class);
         ProcessoConsultaService consultaService = mock(ProcessoConsultaService.class);
 
@@ -104,12 +105,11 @@ class ProcessoWorkflowPbtTest {
             Arbitraries.of(TipoProcesso.MAPEAMENTO, TipoProcesso.DIAGNOSTICO).flatMap(tipo ->
                 Arbitraries.longs().between(10000, 20000).list().uniqueElements().ofMinSize(1).ofMaxSize(10).map(uIds -> {
                     ProcessoETunidades data = new ProcessoETunidades();
-                    Processo p = Processo.builder()
+                    data.processo = Processo.builder()
                             .codigo(id)
                             .tipo(tipo)
                             .situacao(SituacaoProcesso.CRIADO)
                             .build();
-                    data.processo = p;
                     
                     data.unidades = new ArrayList<>();
                     Set<Unidade> setUnidades = new HashSet<>();

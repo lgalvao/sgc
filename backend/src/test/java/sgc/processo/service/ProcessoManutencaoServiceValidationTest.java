@@ -33,9 +33,6 @@ class ProcessoManutencaoServiceValidationTest {
     private OrganizacaoFacade unidadeService;
     @Mock
     private ProcessoValidador processoValidador;
-    @Mock
-    private ProcessoConsultaService processoConsultaService;
-
     @InjectMocks
     private ProcessoManutencaoService service;
 

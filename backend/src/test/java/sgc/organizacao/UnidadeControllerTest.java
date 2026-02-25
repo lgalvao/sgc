@@ -1,6 +1,4 @@
 package sgc.organizacao;
-import sgc.seguranca.SgcPermissionEvaluator;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -18,6 +16,7 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.ProcessoFacade;
+import sgc.seguranca.SgcPermissionEvaluator;
 
 import java.util.Collections;
 import java.util.List;

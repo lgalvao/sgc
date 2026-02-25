@@ -4,8 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroAcessoNegado;
+import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.dto.*;
-import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
@@ -18,10 +19,9 @@ import sgc.subprocesso.dto.PermissoesSubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
-import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.comum.erros.ErroAcessoNegado;
 
 import java.util.List;
+import java.util.Set;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
@@ -33,23 +33,16 @@ public class AtividadeFacade {
     private final SubprocessoFacade subprocessoFacade;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final UsuarioFacade usuarioService;
-    private final MapaFacade mapaFacade;
-    private final SubprocessoValidacaoService validacaoService;
-
     public AtividadeFacade(
             MapaManutencaoService mapaManutencaoService,
             @Lazy SubprocessoFacade subprocessoFacade,
             SgcPermissionEvaluator permissionEvaluator,
-            UsuarioFacade usuarioService,
-            MapaFacade mapaFacade,
-            SubprocessoValidacaoService validacaoService) {
+            UsuarioFacade usuarioService) {
 
         this.mapaManutencaoService = mapaManutencaoService;
         this.subprocessoFacade = subprocessoFacade;
         this.permissionEvaluator = permissionEvaluator;
         this.usuarioService = usuarioService;
-        this.mapaFacade = mapaFacade;
-        this.validacaoService = validacaoService;
     }
 
     @Transactional(readOnly = true)
@@ -129,10 +122,13 @@ public class AtividadeFacade {
              throw new ErroAcessoNegado("Usuário não tem permissão para editar atividades neste subprocesso.");
         }
 
-        validacaoService.validarSituacaoPermitida(sp,
-                NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO,
+        if (!Set.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO,
                 MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES,
-                REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES);
+                REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES).contains(sp.getSituacao())) {
+            throw new ErroValidacao(
+                "Situação do subprocesso não permite esta operação. Situação atual: %s"
+                    .formatted(sp.getSituacao()));
+        }
     }
 
     private AtividadeOperacaoResponse criarRespostaOperacaoPorAtividade(Long codigoAtividade) {

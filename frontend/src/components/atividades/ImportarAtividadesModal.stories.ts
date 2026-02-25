@@ -1,4 +1,4 @@
-import { fn } from "@storybook/test";
+import { vi } from "vitest";
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import ImportarAtividadesModal from './ImportarAtividadesModal.vue';
 import { createTestingPinia } from '@pinia/testing';
@@ -38,7 +38,7 @@ export const Default: Story = {
     setup() {
       const show = ref(args.mostrar);
       const pinia = createTestingPinia({
-        createSpy: fn,
+        createSpy: vi.fn,
         initialState: {
           processos: {
             processosFinalizados: mockProcessos,
@@ -72,7 +72,7 @@ export const SemProcessos: Story = {
     setup() {
       const show = ref(args.mostrar);
       const pinia = createTestingPinia({
-        createSpy: fn,
+        createSpy: vi.fn,
         initialState: {
           processos: { processosFinalizados: [] },
         },

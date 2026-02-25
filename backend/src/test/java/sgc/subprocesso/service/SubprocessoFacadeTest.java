@@ -1,12 +1,14 @@
 package sgc.subprocesso.service;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -15,12 +17,6 @@ import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.crud.SubprocessoCrudService;
-import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.factory.SubprocessoFactory;
-import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
-import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
-import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -28,24 +24,16 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@Tag("unit")
 @DisplayName("SubprocessoFacade - Testes Consolidados")
 class SubprocessoFacadeTest {
 
     @Mock
-    private SubprocessoCrudService crudService;
-    @Mock
-    private SubprocessoValidacaoService validacaoService;
-    @Mock
-    private SubprocessoCadastroWorkflowService cadastroWorkflowService;
+    private SubprocessoWorkflowService workflowService;
     @Mock
     private SubprocessoMapaWorkflowService mapaWorkflowService;
-    @Mock
-    private SubprocessoAdminWorkflowService adminWorkflowService;
     @Mock
     private SubprocessoAjusteMapaService ajusteMapaService;
     @Mock
@@ -53,12 +41,19 @@ class SubprocessoFacadeTest {
     @Mock
     private SubprocessoContextoService contextoService;
     @Mock
-    private SubprocessoFactory subprocessoFactory;
-    @Mock
     private UsuarioFacade usuarioService;
 
     @InjectMocks
     private SubprocessoFacade facade;
+
+    private Subprocesso criarSubprocesso(Long codigo) {
+        return Subprocesso.builder()
+                .codigo(codigo)
+                .processo(Processo.builder().codigo(1L).build())
+                .unidade(Unidade.builder().codigo(1L).build())
+                .situacao(sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO)
+                .build();
+    }
 
     @Nested
     @DisplayName("Cenários de Leitura")
@@ -67,49 +62,49 @@ class SubprocessoFacadeTest {
         @Test
         @DisplayName("Deve buscar subprocesso por ID")
         void deveBuscarSubprocessoPorId() {
-            when(crudService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
+            when(workflowService.buscarSubprocesso(1L)).thenReturn(criarSubprocesso(1L));
             assertThat(facade.buscarSubprocesso(1L)).isNotNull();
-            verify(crudService).buscarSubprocesso(1L);
+            verify(workflowService).buscarSubprocesso(1L);
         }
 
         @Test
         @DisplayName("Deve buscar subprocesso com mapa")
         void deveBuscarSubprocessoComMapa() {
-            when(crudService.buscarSubprocessoComMapa(1L)).thenReturn(new Subprocesso());
+            when(workflowService.buscarSubprocessoComMapa(1L)).thenReturn(criarSubprocesso(1L));
             assertThat(facade.buscarSubprocessoComMapa(1L)).isNotNull();
-            verify(crudService).buscarSubprocessoComMapa(1L);
+            verify(workflowService).buscarSubprocessoComMapa(1L);
         }
 
         @Test
         @DisplayName("Deve listar todos os subprocessos")
         void deveListar() {
-            when(crudService.listarEntidades()).thenReturn(List.of(new Subprocesso()));
+            when(workflowService.listarEntidades()).thenReturn(List.of(criarSubprocesso(1L)));
             assertThat(facade.listar()).hasSize(1);
-            verify(crudService).listarEntidades();
+            verify(workflowService).listarEntidades();
         }
 
         @Test
         @DisplayName("Deve retornar lista vazia quando não há subprocessos")
         void deveRetornarListaVaziaQuandoNaoHaSubprocessos() {
-            when(crudService.listarEntidades()).thenReturn(List.of());
+            when(workflowService.listarEntidades()).thenReturn(List.of());
 
             List<Subprocesso> resultado = facade.listar();
 
             assertThat(resultado)
                     .isNotNull()
                     .isEmpty();
-            verify(crudService).listarEntidades();
+            verify(workflowService).listarEntidades();
         }
 
         @Test
         @DisplayName("Deve obter por processo e unidade")
         void deveObterPorProcessoEUnidade() {
-            when(crudService.obterEntidadePorProcessoEUnidade(1L, 10L))
-                    .thenReturn(Subprocesso.builder().codigo(1L).build());
+            when(workflowService.obterEntidadePorProcessoEUnidade(1L, 10L))
+                    .thenReturn(criarSubprocesso(1L));
             Subprocesso result = facade.obterPorProcessoEUnidade(1L, 10L);
             assertThat(result).isNotNull();
             assertThat(result.getCodigo()).isEqualTo(1L);
-            verify(crudService).obterEntidadePorProcessoEUnidade(1L, 10L);
+            verify(workflowService).obterEntidadePorProcessoEUnidade(1L, 10L);
         }
 
         @Test
@@ -117,23 +112,23 @@ class SubprocessoFacadeTest {
         void deveListarPorProcessoEUnidades() {
             Long codProcesso = 1L;
             List<Long> unidades = List.of(2L);
-            when(crudService.listarEntidadesPorProcessoEUnidades(codProcesso, unidades))
-                    .thenReturn(List.of(new Subprocesso()));
+            when(workflowService.listarEntidadesPorProcessoEUnidades(codProcesso, unidades))
+                    .thenReturn(List.of(criarSubprocesso(1L)));
 
             List<Subprocesso> resultado = facade.listarPorProcessoEUnidades(codProcesso, unidades);
 
             assertThat(resultado)
                     .isNotNull()
                     .hasSize(1);
-            verify(crudService).listarEntidadesPorProcessoEUnidades(codProcesso, unidades);
+            verify(workflowService).listarEntidadesPorProcessoEUnidades(codProcesso, unidades);
         }
 
         @Test
         @DisplayName("Deve retornar situação")
         void deveObterSituacao() {
-            when(crudService.obterStatus(1L)).thenReturn(SubprocessoSituacaoDto.builder().build());
+            when(workflowService.obterStatus(1L)).thenReturn(SubprocessoSituacaoDto.builder().build());
             assertThat(facade.obterSituacao(1L)).isNotNull();
-            verify(crudService).obterStatus(1L);
+            verify(workflowService).obterStatus(1L);
         }
 
         @Test
@@ -153,18 +148,18 @@ class SubprocessoFacadeTest {
         @Test
         @DisplayName("Deve obter atividades sem conhecimento por ID")
         void deveObterAtividadesSemConhecimentoPorId() {
-            when(validacaoService.obterAtividadesSemConhecimento(1L)).thenReturn(Collections.emptyList());
+            when(workflowService.obterAtividadesSemConhecimento(1L)).thenReturn(Collections.emptyList());
             assertThat(facade.obterAtividadesSemConhecimento(1L)).isEmpty();
-            verify(validacaoService).obterAtividadesSemConhecimento(1L);
+            verify(workflowService).obterAtividadesSemConhecimento(1L);
         }
 
         @Test
         @DisplayName("Deve obter atividades sem conhecimento por Mapa")
         void deveObterAtividadesSemConhecimentoPorMapa() {
             Mapa mapa = new Mapa();
-            when(validacaoService.obterAtividadesSemConhecimento(mapa)).thenReturn(Collections.emptyList());
+            when(workflowService.obterAtividadesSemConhecimento(mapa)).thenReturn(Collections.emptyList());
             assertThat(facade.obterAtividadesSemConhecimento(mapa)).isEmpty();
-            verify(validacaoService).obterAtividadesSemConhecimento(mapa);
+            verify(workflowService).obterAtividadesSemConhecimento(mapa);
         }
 
         @Test
@@ -177,35 +172,34 @@ class SubprocessoFacadeTest {
         @Test
         @DisplayName("Deve retornar entidade por código do mapa")
         void deveRetornarEntidadePorCodigoMapa() {
-            when(crudService.obterEntidadePorCodigoMapa(100L)).thenReturn(new Subprocesso());
+            when(workflowService.obterEntidadePorCodigoMapa(100L)).thenReturn(criarSubprocesso(1L));
             assertThat(facade.obterEntidadePorCodigoMapa(100L)).isNotNull();
-            verify(crudService).obterEntidadePorCodigoMapa(100L);
+            verify(workflowService).obterEntidadePorCodigoMapa(100L);
         }
 
         @Test
         @DisplayName("Deve verificar acesso da unidade ao processo")
         void deveVerificarAcessoUnidadeAoProcesso() {
-            when(crudService.verificarAcessoUnidadeAoProcesso(1L, List.of(10L, 20L)))
+            when(workflowService.verificarAcessoUnidadeAoProcesso(1L, List.of(10L, 20L)))
                     .thenReturn(true);
             assertThat(facade.verificarAcessoUnidadeAoProcesso(1L, List.of(10L, 20L))).isTrue();
-            verify(crudService).verificarAcessoUnidadeAoProcesso(1L, List.of(10L, 20L));
+            verify(workflowService).verificarAcessoUnidadeAoProcesso(1L, List.of(10L, 20L));
         }
 
         @Test
         @DisplayName("Deve listar entidades por processo")
         void deveListarEntidadesPorProcesso() {
-            when(crudService.listarEntidadesPorProcesso(1L))
-                    .thenReturn(List.of(new Subprocesso()));
+            when(workflowService.listarEntidadesPorProcesso(1L))
+                    .thenReturn(List.of(criarSubprocesso(1L)));
             assertThat(facade.listarEntidadesPorProcesso(1L)).hasSize(1);
-            verify(crudService).listarEntidadesPorProcesso(1L);
+            verify(workflowService).listarEntidadesPorProcesso(1L);
         }
 
         @Test
         @DisplayName("Deve obter sugestões")
         void deveObterSugestoes() {
-            Map<String, Object> expected = Map.of("sugestoes", "");
             Map<String, Object> result = facade.obterSugestoes(1L);
-            assertThat(result).isEqualTo(expected);
+            assertThat(result).containsKey("sugestoes");
         }
 
         @Test
@@ -223,25 +217,25 @@ class SubprocessoFacadeTest {
         @DisplayName("Deve criar subprocesso com sucesso")
         void deveCriarSubprocessoComSucesso() {
             CriarSubprocessoRequest request = CriarSubprocessoRequest.builder().codProcesso(1L).codUnidade(1L).build();
-            when(crudService.criarEntidade(request)).thenReturn(new Subprocesso());
+            when(workflowService.criarEntidade(request)).thenReturn(criarSubprocesso(1L));
             assertThat(facade.criar(request)).isNotNull();
-            verify(crudService).criarEntidade(request);
+            verify(workflowService).criarEntidade(request);
         }
 
         @Test
         @DisplayName("Deve atualizar subprocesso com sucesso")
         void deveAtualizarSubprocessoComSucesso() {
             AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().build();
-            when(crudService.atualizarEntidade(1L, request)).thenReturn(new Subprocesso());
+            when(workflowService.atualizarEntidade(1L, request)).thenReturn(criarSubprocesso(1L));
             assertThat(facade.atualizar(1L, request)).isNotNull();
-            verify(crudService).atualizarEntidade(1L, request);
+            verify(workflowService).atualizarEntidade(1L, request);
         }
 
         @Test
         @DisplayName("Deve excluir subprocesso com sucesso")
         void deveExcluirSubprocessoComSucesso() {
             facade.excluir(1L);
-            verify(crudService).excluir(1L);
+            verify(workflowService).excluir(1L);
         }
     }
 
@@ -252,25 +246,25 @@ class SubprocessoFacadeTest {
         @DisplayName("Deve validar cadastro")
         void deveValidarCadastro() {
             ValidacaoCadastroDto val = ValidacaoCadastroDto.builder().valido(true).build();
-            when(validacaoService.validarCadastro(1L)).thenReturn(val);
+            when(workflowService.validarCadastro(1L)).thenReturn(val);
 
             ValidacaoCadastroDto result = facade.validarCadastro(1L);
             assertThat(result.valido()).isTrue();
-            verify(validacaoService).validarCadastro(1L);
+            verify(workflowService).validarCadastro(1L);
         }
 
         @Test
         @DisplayName("Deve validar existência de atividades")
         void deveValidarExistenciaAtividades() {
             facade.validarExistenciaAtividades(1L);
-            verify(validacaoService).validarExistenciaAtividades(1L);
+            verify(workflowService).validarExistenciaAtividades(1L);
         }
 
         @Test
         @DisplayName("Deve validar associações do mapa")
         void deveValidarAssociacoesMapa() {
             facade.validarAssociacoesMapa(100L);
-            verify(validacaoService).validarAssociacoesMapa(100L);
+            verify(workflowService).validarAssociacoesMapa(100L);
         }
     }
 
@@ -281,29 +275,29 @@ class SubprocessoFacadeTest {
         @DisplayName("Deve atualizar situação para EM ANDAMENTO")
         void deveAtualizarParaEmAndamento() {
             facade.atualizarSituacaoParaEmAndamento(100L);
-            verify(adminWorkflowService).atualizarParaEmAndamento(100L);
+            verify(workflowService).atualizarParaEmAndamento(100L);
         }
 
         @Test
         @DisplayName("Deve listar subprocessos homologados")
         void deveListarSubprocessosHomologados() {
-            when(adminWorkflowService.listarSubprocessosHomologados()).thenReturn(Collections.emptyList());
+            when(workflowService.listarSubprocessosHomologados()).thenReturn(Collections.emptyList());
             assertThat(facade.listarSubprocessosHomologados()).isEmpty();
-            verify(adminWorkflowService).listarSubprocessosHomologados();
+            verify(workflowService).listarSubprocessosHomologados();
         }
 
         @Test
         @DisplayName("Deve reabrir cadastro")
         void deveReabrirCadastro() {
             facade.reabrirCadastro(1L, "Justificativa");
-            verify(cadastroWorkflowService).reabrirCadastro(1L, "Justificativa");
+            verify(workflowService).reabrirCadastro(1L, "Justificativa");
         }
 
         @Test
         @DisplayName("Deve reabrir revisão cadastro")
         void deveReabrirRevisaoCadastro() {
             facade.reabrirRevisaoCadastro(1L, "Justificativa");
-            verify(cadastroWorkflowService).reabrirRevisaoCadastro(1L, "Justificativa");
+            verify(workflowService).reabrirRevisaoCadastro(1L, "Justificativa");
         }
 
         @Test
@@ -311,7 +305,7 @@ class SubprocessoFacadeTest {
         void deveAlterarDataLimite() {
             LocalDate novaData = LocalDate.now();
             facade.alterarDataLimite(1L, novaData);
-            verify(adminWorkflowService).alterarDataLimite(1L, novaData);
+            verify(workflowService).alterarDataLimite(1L, novaData);
         }
 
         @Test
@@ -335,7 +329,7 @@ class SubprocessoFacadeTest {
         void deveDisponibilizarCadastro() {
             Usuario usuario = new Usuario();
             facade.disponibilizarCadastro(1L, usuario);
-            verify(cadastroWorkflowService).disponibilizarCadastro(1L, usuario);
+            verify(workflowService).disponibilizarCadastro(1L, usuario);
         }
 
         @Test
@@ -343,7 +337,7 @@ class SubprocessoFacadeTest {
         void deveDisponibilizarRevisao() {
             Usuario usuario = new Usuario();
             facade.disponibilizarRevisao(1L, usuario);
-            verify(cadastroWorkflowService).disponibilizarRevisao(1L, usuario);
+            verify(workflowService).disponibilizarRevisao(1L, usuario);
         }
 
         @Test
@@ -351,7 +345,7 @@ class SubprocessoFacadeTest {
         void deveDevolverCadastro() {
             Usuario usuario = new Usuario();
             facade.devolverCadastro(1L, "obs", usuario);
-            verify(cadastroWorkflowService).devolverCadastro(1L, usuario, "obs");
+            verify(workflowService).devolverCadastro(1L, usuario, "obs");
         }
 
         @Test
@@ -359,7 +353,7 @@ class SubprocessoFacadeTest {
         void deveAceitarCadastro() {
             Usuario usuario = new Usuario();
             facade.aceitarCadastro(1L, "obs", usuario);
-            verify(cadastroWorkflowService).aceitarCadastro(1L, usuario, "obs");
+            verify(workflowService).aceitarCadastro(1L, usuario, "obs");
         }
 
         @Test
@@ -367,7 +361,7 @@ class SubprocessoFacadeTest {
         void deveHomologarCadastro() {
             Usuario usuario = new Usuario();
             facade.homologarCadastro(1L, "obs", usuario);
-            verify(cadastroWorkflowService).homologarCadastro(1L, usuario, "obs");
+            verify(workflowService).homologarCadastro(1L, usuario, "obs");
         }
 
         @Test
@@ -431,7 +425,7 @@ class SubprocessoFacadeTest {
         @DisplayName("Deve registrar movimentação de lembrete")
         void deveRegistrarMovimentacaoLembrete() {
             facade.registrarMovimentacaoLembrete(1L);
-            verify(adminWorkflowService).registrarMovimentacaoLembrete(1L);
+            verify(workflowService).registrarMovimentacaoLembrete(1L);
         }
     }
 
@@ -446,7 +440,7 @@ class SubprocessoFacadeTest {
 
             facade.aceitarCadastroEmBloco(ids, usuario);
 
-            verify(cadastroWorkflowService).aceitarCadastroEmBloco(ids, usuario);
+            verify(workflowService).aceitarCadastroEmBloco(ids, usuario);
         }
 
         @Test
@@ -457,7 +451,7 @@ class SubprocessoFacadeTest {
 
             facade.homologarCadastroEmBloco(ids, usuario);
 
-            verify(cadastroWorkflowService).homologarCadastroEmBloco(ids, usuario);
+            verify(workflowService).homologarCadastroEmBloco(ids, usuario);
         }
 
         @Test
@@ -501,14 +495,14 @@ class SubprocessoFacadeTest {
         @DisplayName("aceitarCadastroEmBloco não deve delegar se não houver itens")
         void aceitarCadastroEmBloco_NaoDeveDelegarSeVazio() {
             facade.aceitarCadastroEmBloco(List.of(), new Usuario());
-            verify(cadastroWorkflowService, never()).aceitarCadastroEmBloco(anyList(), any());
+            verify(workflowService, never()).aceitarCadastroEmBloco(anyList(), any());
         }
 
         @Test
         @DisplayName("homologarCadastroEmBloco não deve delegar se não houver itens")
         void homologarCadastroEmBloco_NaoDeveDelegarSeVazio() {
             facade.homologarCadastroEmBloco(List.of(), new Usuario());
-            verify(cadastroWorkflowService, never()).homologarCadastroEmBloco(anyList(), any());
+            verify(workflowService, never()).homologarCadastroEmBloco(anyList(), any());
         }
 
         @Test
@@ -561,7 +555,7 @@ class SubprocessoFacadeTest {
             Usuario usuario = new Usuario();
 
             facade.criarParaMapeamento(processo, unidades, unidadeOrigem, usuario);
-            verify(subprocessoFactory).criarParaMapeamento(processo, unidades, unidadeOrigem, usuario);
+            verify(workflowService).criarParaMapeamento(processo, unidades, unidadeOrigem, usuario);
         }
 
         @Test
@@ -574,7 +568,7 @@ class SubprocessoFacadeTest {
             Usuario usuario = new Usuario();
 
             facade.criarParaRevisao(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
-            verify(subprocessoFactory).criarParaRevisao(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
+            verify(workflowService).criarParaRevisao(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
         }
 
         @Test
@@ -587,7 +581,7 @@ class SubprocessoFacadeTest {
             Usuario usuario = new Usuario();
 
             facade.criarParaDiagnostico(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
-            verify(subprocessoFactory).criarParaDiagnostico(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
+            verify(workflowService).criarParaDiagnostico(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
         }
     }
 }

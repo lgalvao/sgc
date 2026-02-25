@@ -3,11 +3,10 @@ package sgc.mapa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
 import sgc.mapa.model.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Realiza cópias profundas de mapas de competências. Duplica toda a estrutura hierárquica de um mapa:

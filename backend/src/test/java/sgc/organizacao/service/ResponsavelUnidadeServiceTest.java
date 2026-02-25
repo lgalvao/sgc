@@ -2,14 +2,13 @@ package sgc.organizacao.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
 import sgc.organizacao.dto.AtribuicaoDto;
 import sgc.organizacao.dto.CriarAtribuicaoRequest;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
@@ -24,7 +23,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@Tag("unit")
 @DisplayName("ResponsavelUnidadeService")
 class ResponsavelUnidadeServiceTest {
 
@@ -74,8 +72,8 @@ class ResponsavelUnidadeServiceTest {
 
             // Then
             assertThat(resultado).hasSize(1);
-            assertThat(resultado.get(0).unidadeCodigo()).isEqualTo(10L);
-            assertThat(resultado.get(0).usuario()).isEqualTo(usuario);
+            assertThat(resultado.getFirst().unidadeCodigo()).isEqualTo(10L);
+            assertThat(resultado.getFirst().usuario()).isEqualTo(usuario);
         }
     }
 

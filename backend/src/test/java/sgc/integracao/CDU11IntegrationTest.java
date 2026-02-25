@@ -126,10 +126,6 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         conhecimentoRepo.save(conhecimento2b);
     }
 
-    protected void beforeTest() {
-        // Clear any state if needed
-    }
-
     @Nested
     @DisplayName("Testes de Cenário de Sucesso")
     class Sucesso {

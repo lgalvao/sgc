@@ -1,5 +1,4 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {
     adicionarAtividade,
@@ -15,12 +14,10 @@ import {
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
     cancelarDevolucao,
-    cancelarHomologacao,
     devolverCadastroMapeamento,
     fecharHistoricoAnalise,
-    homologarCadastroMapeamento,
 } from './helpers/helpers-analise.js';
-import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_211';

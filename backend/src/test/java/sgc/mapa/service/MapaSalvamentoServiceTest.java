@@ -1,14 +1,13 @@
 package sgc.mapa.service;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroValidacao;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.*;
 
@@ -18,12 +17,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyCollection;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@Tag("unit")
 @DisplayName("MapaSalvamentoService Tests")
 class MapaSalvamentoServiceTest {
     @Mock

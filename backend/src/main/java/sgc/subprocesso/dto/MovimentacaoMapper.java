@@ -1,11 +1,10 @@
-package sgc.subprocesso.mapper;
+package sgc.subprocesso.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import sgc.comum.config.CentralMapperConfig;
 import sgc.comum.util.FormatadorData;
 import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.dto.MovimentacaoDto;
 import sgc.subprocesso.model.Movimentacao;
 
 import java.util.Objects;

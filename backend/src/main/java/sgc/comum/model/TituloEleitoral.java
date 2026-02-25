@@ -1,4 +1,4 @@
-package sgc.comum;
+package sgc.comum.model;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

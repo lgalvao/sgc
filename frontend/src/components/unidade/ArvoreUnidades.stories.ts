@@ -1,5 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import {expect, within} from '@storybook/test';
+import {expect} from 'vitest';
+import {page} from '@vitest/browser/context';
 import ArvoreUnidades from './ArvoreUnidades.vue';
 import type {Unidade} from '@/types/tipos';
 import {ref} from 'vue';
@@ -78,11 +79,10 @@ export const Default: Story = {
       </div>
     `,
   }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+  play: async () => {
     // Verifica se a árvore foi renderizada
-    const item = canvas.getByText('Presidência');
-    await expect(item).toBeInTheDocument();
+    const item = page.getByText('Presidência');
+    await expect.element(item).toBeVisible();
   },
 };
 

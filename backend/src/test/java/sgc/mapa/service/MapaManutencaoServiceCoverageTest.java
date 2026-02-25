@@ -1,64 +1,37 @@
 package sgc.mapa.service;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
 import sgc.mapa.model.*;
-import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
+import sgc.subprocesso.service.SubprocessoFacade;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@Tag("unit")
 @DisplayName("MapaManutencaoService - Cobertura Adicional")
 class MapaManutencaoServiceCoverageTest {
+    @InjectMocks
+    private MapaManutencaoService service;
 
     @Mock
     private AtividadeRepo atividadeRepo;
     @Mock
     private CompetenciaRepo competenciaRepo;
     @Mock
-    private SubprocessoAdminWorkflowService subprocessoAdminWorkflowService;
-
-    @InjectMocks
-    private MapaManutencaoService service;
-
-    @Test
-    @DisplayName("atualizarDescricoesAtividadeEmLote deve ignorar valores nulos no mapa")
-    void deveIgnorarValoresNulosNoLote() {
-        // Arrange
-        Long codAtiv = 1L;
-        Atividade atividade = new Atividade();
-        atividade.setCodigo(codAtiv);
-        atividade.setDescricao("Antiga");
-        
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(10L);
-        atividade.setMapa(mapa);
-
-        when(atividadeRepo.findAllById(any())).thenReturn(List.of(atividade));
-
-        // Act
-        // Passando null como valor para o código 1L (Map.of não permite null values)
-        Map<Long, String> descricoes = new HashMap<>();
-        descricoes.put(codAtiv, null);
-        service.atualizarDescricoesAtividadeEmLote(descricoes);
-
-        // Assert
-        // A descrição não deve ter mudado (cobertura da linha 80)
-        verify(atividadeRepo).saveAll(anyList());
-    }
+    private SubprocessoFacade subprocessoFacade;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private ComumRepo repo;
 
     @Test
     @DisplayName("buscarAtividadesPorCodigos deve chamar o repositório")
@@ -68,11 +41,6 @@ class MapaManutencaoServiceCoverageTest {
         verify(atividadeRepo).findAllById(ids);
     }
 
-    @Mock
-    private MapaRepo mapaRepo;
-
-    @Mock
-    private ComumRepo repo;
 
     @Test
     @DisplayName("buscarMapaPorCodigo deve usar o ComumRepo")

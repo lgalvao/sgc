@@ -25,7 +25,19 @@ public record ImpactoMapaResponse(
     List<AtividadeImpactadaDto> alteradas,
     
     @JsonView(MapaViews.Publica.class)
-    List<CompetenciaImpactadaDto> competenciasImpactadas
+    List<CompetenciaImpactadaDto> competenciasImpactadas,
+
+    @JsonView(MapaViews.Publica.class)
+    int totalInseridas,
+
+    @JsonView(MapaViews.Publica.class)
+    int totalRemovidas,
+
+    @JsonView(MapaViews.Publica.class)
+    int totalAlteradas,
+
+    @JsonView(MapaViews.Publica.class)
+    int totalCompetenciasImpactadas
 ) {
     public static ImpactoMapaResponse semImpacto() {
         return ImpactoMapaResponse.builder()
@@ -34,6 +46,10 @@ public record ImpactoMapaResponse(
                 .removidas(Collections.emptyList())
                 .alteradas(Collections.emptyList())
                 .competenciasImpactadas(Collections.emptyList())
+                .totalInseridas(0)
+                .totalRemovidas(0)
+                .totalAlteradas(0)
+                .totalCompetenciasImpactadas(0)
                 .build();
     }
 }

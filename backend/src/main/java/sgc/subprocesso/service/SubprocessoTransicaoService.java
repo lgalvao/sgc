@@ -1,23 +1,21 @@
-package sgc.subprocesso.service.workflow;
+package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import sgc.organizacao.model.Unidade;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
-import sgc.analise.AnaliseFacade;
-import sgc.analise.dto.CriarAnaliseCommand;
 import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.subprocesso.AnaliseFacade;
+import sgc.subprocesso.dto.CriarAnaliseCommand;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
-import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.notificacao.SubprocessoEmailService;
+import sgc.subprocesso.model.TipoTransicao;
 
 /**
  * Serviço consolidado para gerenciar transições e workflows de subprocessos.

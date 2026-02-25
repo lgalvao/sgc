@@ -13,7 +13,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Tag("unit")
 @DisplayName("Testes de Validação: CriarProcessoRequest")
 class CriarProcessoRequestValidationTest {
     private ValidatorFactory factory;

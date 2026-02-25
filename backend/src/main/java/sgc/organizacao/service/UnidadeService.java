@@ -3,7 +3,7 @@ package sgc.organizacao.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.*;
 

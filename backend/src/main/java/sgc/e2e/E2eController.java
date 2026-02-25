@@ -18,11 +18,11 @@ import sgc.comum.erros.ErroConfiguracao;
 import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeDto;
+import sgc.processo.ProcessoFacade;
 import sgc.processo.dto.CriarProcessoRequest;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoViews;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.ProcessoFacade;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

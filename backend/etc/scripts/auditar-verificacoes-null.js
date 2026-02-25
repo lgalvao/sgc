@@ -1,6 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import {fileURLToPath} from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,11 +17,9 @@ function getAllFiles(dirPath, arrayOfFiles) {
     files.forEach(function(file) {
         if (fs.statSync(dirPath + "/" + file).isDirectory()) {
             arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
-        } else {
-            if (file.endsWith('.java')) {
+        } else if (file.endsWith('.java')) {
                 arrayOfFiles.push(path.join(dirPath, "/", file));
             }
-        }
     });
 
     return arrayOfFiles;

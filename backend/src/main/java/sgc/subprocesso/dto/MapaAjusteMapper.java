@@ -1,17 +1,13 @@
-package sgc.subprocesso.mapper;
+package sgc.subprocesso.dto;
 
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import sgc.analise.model.Analise;
 import sgc.comum.config.CentralMapperConfig;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
-import sgc.subprocesso.dto.AtividadeAjusteDto;
-import sgc.subprocesso.dto.CompetenciaAjusteDto;
-import sgc.subprocesso.dto.ConhecimentoAjusteDto;
-import sgc.subprocesso.dto.MapaAjusteDto;
+import sgc.subprocesso.model.Analise;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.*;

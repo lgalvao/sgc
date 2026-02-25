@@ -2,7 +2,6 @@ package sgc.seguranca.login;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.env.Environment;
 import sgc.seguranca.login.LimitadorTentativasLogin.ErroMuitasTentativas;
@@ -16,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Tag("unit")
 @DisplayName("LimitadorTentativasLogin - Testes Unitários")
 class LimitadorTentativasLoginTest {
     private LimitadorTentativasLogin limitador;

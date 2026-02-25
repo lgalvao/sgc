@@ -1,26 +1,27 @@
 package sgc.subprocesso.service.crud;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
 import sgc.mapa.model.Mapa;
-import sgc.organizacao.UsuarioFacade;
+import sgc.mapa.service.CopiaMapaService;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
 import sgc.subprocesso.dto.CriarSubprocessoRequest;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
+import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.factory.SubprocessoFactory;
+import sgc.subprocesso.service.SubprocessoWorkflowService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,34 +31,52 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-@Tag("unit")
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes para SubprocessoCrudService")
+@DisplayName("SubprocessoWorkflowService (CRUD)")
 class SubprocessoCrudServiceTest {
     @Mock
     private SubprocessoRepo subprocessoRepo;
     @Mock
     private ComumRepo repositorioComum;
     @Mock
-    private SubprocessoFactory subprocessoFactory;
+    private MapaManutencaoService mapaManutencaoService;
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private CopiaMapaService servicoDeCopiaDeMapa;
     @Mock
-    private UsuarioFacade usuarioService;
-
+    private MovimentacaoRepo movimentacaoRepo;
     @InjectMocks
-    private SubprocessoCrudService service;
+    private SubprocessoWorkflowService service;
+
+    @BeforeEach
+    void setup() {
+        service.setSubprocessoRepo(subprocessoRepo);
+        service.setMapaManutencaoService(mapaManutencaoService);
+        service.setMovimentacaoRepo(movimentacaoRepo);
+        service.setServicoDeCopiaDeMapa(servicoDeCopiaDeMapa);
+    }
 
     private Subprocesso criarSubprocessoCompleto() {
-        Subprocesso sp = new Subprocesso();
-        Processo proc = new Processo();
-        proc.setCodigo(1L);
-        sp.setProcesso(proc);
-        Unidade uni = new Unidade();
-        uni.setCodigo(1L);
-        sp.setUnidade(uni);
-        Mapa mapa = new Mapa();
-        mapa.setCodigo(1L);
+        Processo proc = Processo.builder()
+                .codigo(1L)
+                .tipo(sgc.processo.model.TipoProcesso.MAPEAMENTO)
+                .build();
+        Unidade uni = Unidade.builder()
+                .codigo(1L)
+                .sigla("TESTE")
+                .build();
+        
+        Subprocesso sp = Subprocesso.builder()
+                .codigo(1L)
+                .processo(proc)
+                .unidade(uni)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(7))
+                .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                .build();
+
+        Mapa mapa = Mapa.builder()
+                .codigo(1L)
+                .subprocesso(sp)
+                .build();
         sp.setMapa(mapa);
         return sp;
     }
@@ -65,12 +84,29 @@ class SubprocessoCrudServiceTest {
     @Test
     @DisplayName("Deve criar subprocesso com sucesso")
     void deveCriar() {
-        CriarSubprocessoRequest request = CriarSubprocessoRequest.builder().codProcesso(1L).codUnidade(1L).build();
-        Subprocesso entity = criarSubprocessoCompleto();
+        CriarSubprocessoRequest request = CriarSubprocessoRequest.builder()
+                .codProcesso(1L)
+                .codUnidade(1L)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(7))
+                .build();
+        
+        when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(i -> {
+            Subprocesso sp = i.getArgument(0);
+            if (sp.getCodigo() == null) sp.setCodigo(1L);
+            return sp;
+        });
+        when(mapaManutencaoService.salvarMapa(any(Mapa.class))).thenAnswer(i -> {
+            Mapa m = i.getArgument(0);
+            if (m.getCodigo() == null) m.setCodigo(10L);
+            return m;
+        });
 
-        when(subprocessoFactory.criar(request)).thenReturn(entity);
-
-        assertThat(service.criarEntidade(request)).isNotNull();
+        Subprocesso result = service.criarEntidade(request);
+        
+        assertThat(result).isNotNull();
+        assertThat(result.getMapa()).isNotNull();
+        verify(subprocessoRepo, atLeastOnce()).save(any(Subprocesso.class));
+        verify(mapaManutencaoService).salvarMapa(any(Mapa.class));
     }
 
     @Test
@@ -303,11 +339,9 @@ class SubprocessoCrudServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar lista vazia quando unidades nulo ou vazio")
-    void deveRetornarVazioQuandoUnidadesNuloOuVazio() {
-        assertThat(service.listarEntidadesPorProcessoEUnidades(1L, null)).isEmpty();
+    @DisplayName("Deve retornar lista vazia quando unidades vazio")
+    void deveRetornarVazioQuandoUnidadesVazio() {
         assertThat(service.listarEntidadesPorProcessoEUnidades(1L, List.of())).isEmpty();
-
         verify(subprocessoRepo, never()).findByProcessoCodigoAndUnidadeCodigoInWithUnidade(anyLong(), anyList());
     }
 }

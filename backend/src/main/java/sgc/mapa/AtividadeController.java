@@ -42,9 +42,6 @@ public class AtividadeController {
 
     /**
      * Cria uma nova atividade no sistema.
-     *
-     * @param request O Request contendo os dados da atividade a ser criada.
-     * @return Um {@link ResponseEntity} com status 201 Created e {@link AtividadeOperacaoResponse} COM a atividade criada e o status do subprocesso.
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -57,9 +54,6 @@ public class AtividadeController {
 
     /**
      * Atualiza os dados de uma atividade existente.
-     *
-     * @param request O Request com os novos dados da atividade. A descrição será sanitizada.
-     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse} contendo a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codigo}/atualizar")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -72,16 +66,6 @@ public class AtividadeController {
 
     /**
      * Exclui uma atividade do sistema.
-     *
-     * <p>
-     * Se a atividade não for encontrada, o serviço lançará uma exceção que
-     * resultará em uma
-     * resposta 404 Not Found. Retorna o status atualizado do subprocesso.
-     *
-     * @param codAtividade O código da atividade a ser excluída.
-     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse}
-     * contendo
-     * o status atualizado do subprocesso (atividade será null).
      */
     @PostMapping("/{codAtividade}/excluir")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -107,14 +91,6 @@ public class AtividadeController {
 
     /**
      * Adiciona um novo conhecimento a uma atividade existente.
-     *
-     * @param codAtividade O código da atividade à qual o conhecimento será
-     *                     associado.
-     * @param request      O Request com os dados do conhecimento a ser criado.
-     * @return Um {@link ResponseEntity} com status 201 Created e
-     * {@link AtividadeOperacaoResponse}
-     * contendo a atividade atualizada com o novo conhecimento e o situação
-     * do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -130,13 +106,6 @@ public class AtividadeController {
 
     /**
      * Atualiza um conhecimento existente dentro de uma atividade.
-     *
-     * @param codAtividade    O código da atividade pai.
-     * @param codConhecimento O código do conhecimento a ser atualizado.
-     * @param request         O Request com os novos dados do conhecimento.
-     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse}
-     * contendo
-     * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/atualizar")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -154,12 +123,6 @@ public class AtividadeController {
 
     /**
      * Exclui um conhecimento de uma atividade.
-     *
-     * @param codAtividade    O código da atividade pai.
-     * @param codConhecimento O código do conhecimento a ser excluído.
-     * @return Um {@link ResponseEntity} com {@link AtividadeOperacaoResponse}
-     * contendo
-     * a atividade atualizada e o status do subprocesso.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/excluir")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")

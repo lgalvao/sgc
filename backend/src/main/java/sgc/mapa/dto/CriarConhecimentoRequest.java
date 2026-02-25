@@ -5,9 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
-/**
- * Request para criação de Conhecimento.
- */
 @Builder
 public record CriarConhecimentoRequest(
         @NotNull(message = "Código da atividade é obrigatório")

@@ -2,7 +2,6 @@ package sgc.processo.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,11 +14,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import sgc.alerta.AlertaFacade;
+import sgc.alerta.EmailModelosService;
+import sgc.alerta.EmailService;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.UnidadeFixture;
-import sgc.notificacao.EmailModelosService;
-import sgc.notificacao.EmailService;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
@@ -46,12 +45,10 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static sgc.processo.model.AcaoProcesso.ACEITAR;
 import static sgc.processo.model.AcaoProcesso.HOMOLOGAR;
 
-@Tag("unit")
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoFacade Test Suite")
 class ProcessoFacadeTest {

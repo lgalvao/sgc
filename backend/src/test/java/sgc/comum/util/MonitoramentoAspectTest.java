@@ -3,7 +3,6 @@ package sgc.comum.util;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -13,10 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@Tag("unit")
 @DisplayName("Testes do Aspecto de Monitoramento")
 class MonitoramentoAspectTest {
-
     private final MonitoramentoAspect aspect = new MonitoramentoAspect();
 
     @Mock
@@ -49,6 +46,5 @@ class MonitoramentoAspectTest {
         Object result = aspect.monitorarExecucao(joinPoint);
 
         assertThat(result).isEqualTo("OK");
-        // O teste passa se não lançar exceção. As linhas de log serão executadas.
     }
 }

@@ -1,7 +1,6 @@
 # Simplificação do SGC — Tracking de Progresso
 
-**Início:** 2026-02-24  
-**Plano:** [simplification.md](file:///c:/sgc/simplification.md)
+**Plano:** [simplification.md](./simplification-plan.md)
 
 ---
 
@@ -22,15 +21,17 @@
 - [x] Remover `@pact-foundation/pact` do `package.json`
 - [x] Remover script `test:pact` do `package.json`
 - [x] Remover exclusão `*.pact.spec.ts` do `vitest.config.ts`
-- [ ] Verificação: testes backend + frontend (a cargo do usuário)
+- [ ] Verificação: testes backend + frontend
 
-## Fase 2 — Consolidar Services do Subprocesso
+## Fase 2 — Consolidar Services do Subprocesso ✅ Concluída (2026-02-24)
 
-- [ ] Criar `SubprocessoWorkflowService` (merge de Cadastro + Admin + Transição + Factory)
-- [ ] Avaliar absorção de helpers (Contexto, Atividade, AjusteMapa)
-- [ ] Atualizar `SubprocessoFacade` para novos services
-- [ ] Atualizar testes unitários
-- [ ] Limpar subdiretórios esvaziados
+- [x] Criar `SubprocessoWorkflowService` (merge de Cadastro + Admin + Factory)
+- [x] Manter `SubprocessoTransicaoService` separado (compartilhado com MapaWorkflow)
+- [x] Atualizar `SubprocessoFacade` (3 deps → 1 `workflowService`)
+- [x] Atualizar `MapaManutencaoService` + 3 testes
+- [x] Atualizar `SubprocessoFacadeTest` + 4 testes workflow
+- [x] Mover `SubprocessoFactoryTest` → pacote `workflow`
+- [x] Deletar services antigos + diretório `factory/`
 - [ ] Verificação: testes backend
 
 ## Fase 3 — Consolidar Módulos

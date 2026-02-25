@@ -1,7 +1,6 @@
 package sgc.processo.model;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import sgc.organizacao.model.SituacaoUnidade;
 import sgc.organizacao.model.Unidade;
@@ -13,7 +12,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Tag("unit")
 @DisplayName("Modelos - Cobertura de Casos de Borda")
 class ModelCoverageTest {
 
@@ -64,6 +62,6 @@ class ModelCoverageTest {
         processo.sincronizarParticipantes(new HashSet<>(Collections.singletonList(u2)));
         
         assertThat(processo.getParticipantes()).hasSize(1);
-        assertThat(processo.getParticipantes().get(0).getUnidadeCodigo()).isEqualTo(2L);
+        assertThat(processo.getParticipantes().getFirst().getUnidadeCodigo()).isEqualTo(2L);
     }
 }

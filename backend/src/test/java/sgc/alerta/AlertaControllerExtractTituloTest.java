@@ -2,11 +2,9 @@ package sgc.alerta;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,13 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * via MockMvc: Usuario entity e default case.
  */
 @ExtendWith(MockitoExtension.class)
-@Tag("unit")
 @DisplayName("AlertaController - Extração Título Usuário (Método Privado)")
 class AlertaControllerExtractTituloTest {
-
-    @Mock
-    private AlertaFacade alertaFacade;
-
     @InjectMocks
     private AlertaController controller;
 

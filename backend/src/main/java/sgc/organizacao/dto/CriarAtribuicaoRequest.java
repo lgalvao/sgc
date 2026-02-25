@@ -1,7 +1,7 @@
 package sgc.organizacao.dto;
 
 import jakarta.validation.constraints.Size;
-import sgc.comum.TituloEleitoral;
+import sgc.comum.model.TituloEleitoral;
 import sgc.seguranca.sanitizacao.SanitizarHtml;
 
 import java.time.LocalDate;

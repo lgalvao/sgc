@@ -16,11 +16,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.ResultadoOperacaoConhecimento;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 
@@ -41,7 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @DisplayName("Testes do Controlador de Atividades")
 class AtividadeControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 

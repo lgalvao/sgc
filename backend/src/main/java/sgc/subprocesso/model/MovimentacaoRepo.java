@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repositório JPA para a entidade Movimentacao. Inclui query para recuperar movimentações de um
@@ -30,7 +31,7 @@ public interface MovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
             ORDER BY m.dataHora DESC
             LIMIT 1
             """)
-    java.util.Optional<Movimentacao> findFirstBySubprocessoCodigoOrderByDataHoraDesc(@Param("subprocessoCodigo") Long subprocessoCodigo);
+    Optional<Movimentacao> findFirstBySubprocessoCodigoOrderByDataHoraDesc(@Param("subprocessoCodigo") Long subprocessoCodigo);
 
     List<Movimentacao> findBySubprocessoCodigo(Long subprocessoCodigo);
 }

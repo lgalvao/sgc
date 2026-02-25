@@ -10,7 +10,6 @@ import sgc.mapa.model.Atividade;
 @Component
 @Mapper(config = CentralMapperConfig.class)
 public abstract class AtividadeMapper {
-
     @Mapping(target = "codigo", ignore = true)
     @Mapping(target = "mapa", ignore = true)
     @Mapping(target = "conhecimentos", ignore = true)

@@ -181,6 +181,6 @@ class SituacaoSubprocessoTest {
     }
 
     private boolean invocarPodeIniciar(SituacaoSubprocesso target, SituacaoSubprocesso nova, TipoProcesso tipo) {
-        return (boolean) ReflectionTestUtils.invokeMethod(target, "podeIniciar", nova, tipo);
+        return ReflectionTestUtils.invokeMethod(target, "podeIniciar", nova, tipo);
     }
 }

@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.UsuarioFacade;
@@ -15,12 +15,6 @@ import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.crud.SubprocessoCrudService;
-import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
-import sgc.subprocesso.service.factory.SubprocessoFactory;
-import sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService;
-import sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService;
-import sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -31,59 +25,60 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class SubprocessoFacade {
-    private final SubprocessoCrudService crudService;
-    private final SubprocessoValidacaoService validacaoService;
-    private final SubprocessoCadastroWorkflowService cadastroWorkflowService;
+    private final SubprocessoWorkflowService workflowService;
     private final SubprocessoMapaWorkflowService mapaWorkflowService;
-    private final SubprocessoAdminWorkflowService adminWorkflowService;
     private final SubprocessoAjusteMapaService ajusteMapaService;
     private final SubprocessoAtividadeService atividadeService;
     private final SubprocessoContextoService contextoService;
-    private final SubprocessoFactory subprocessoFactory;
     private final UsuarioFacade usuarioService;
+
+    // ========================================================================
+    // LEITURA
+    // ========================================================================
+
     @Transactional(readOnly = true)
     public Subprocesso buscarSubprocesso(Long codigo) {
-        return crudService.buscarSubprocesso(codigo);
+        return workflowService.buscarSubprocesso(codigo);
     }
 
     @Transactional(readOnly = true)
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
-        return crudService.buscarSubprocessoComMapa(codigo);
+        return workflowService.buscarSubprocessoComMapa(codigo);
     }
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listar() {
-        return crudService.listarEntidades();
+        return workflowService.listarEntidades();
     }
 
     @Transactional(readOnly = true)
     public Subprocesso obterPorProcessoEUnidade(Long codProcesso, Long codUnidade) {
-        return crudService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade);
+        return workflowService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade);
     }
 
     @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorProcessoEUnidade(Long codProcesso, Long codUnidade) {
-        return crudService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade);
+        return workflowService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade);
     }
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarPorProcessoEUnidades(Long codProcesso, List<Long> codUnidades) {
-        return crudService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
+        return workflowService.listarEntidadesPorProcessoEUnidades(codProcesso, codUnidades);
     }
 
     @Transactional
     public Subprocesso criar(CriarSubprocessoRequest request) {
-        return crudService.criarEntidade(request);
+        return workflowService.criarEntidade(request);
     }
 
     @Transactional
     public Subprocesso atualizar(Long codigo, AtualizarSubprocessoRequest request) {
-        return crudService.atualizarEntidade(codigo, request);
+        return workflowService.atualizarEntidade(codigo, request);
     }
 
     @Transactional
     public void excluir(Long codigo) {
-        crudService.excluir(codigo);
+        workflowService.excluir(codigo);
     }
 
     @Transactional(readOnly = true)
@@ -94,12 +89,12 @@ public class SubprocessoFacade {
 
     @Transactional(readOnly = true)
     public SubprocessoSituacaoDto obterSituacao(Long codigo) {
-        return crudService.obterStatus(codigo);
+        return workflowService.obterStatus(codigo);
     }
 
     @Transactional(readOnly = true)
     public PermissoesSubprocessoDto obterPermissoesUI(Long codSubprocesso, Usuario usuario) {
-        Subprocesso sp = crudService.buscarSubprocesso(codSubprocesso);
+        Subprocesso sp = workflowService.buscarSubprocesso(codSubprocesso);
         return contextoService.obterPermissoesUI(sp, usuario);
     }
 
@@ -110,12 +105,12 @@ public class SubprocessoFacade {
 
     @Transactional(readOnly = true)
     public List<Atividade> obterAtividadesSemConhecimento(Long codigo) {
-        return validacaoService.obterAtividadesSemConhecimento(codigo);
+        return workflowService.obterAtividadesSemConhecimento(codigo);
     }
 
     @Transactional(readOnly = true)
     public List<Atividade> obterAtividadesSemConhecimento(Mapa mapa) {
-        return validacaoService.obterAtividadesSemConhecimento(mapa);
+        return workflowService.obterAtividadesSemConhecimento(mapa);
     }
 
     @Transactional(readOnly = true)
@@ -125,17 +120,17 @@ public class SubprocessoFacade {
 
     @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
-        return crudService.obterEntidadePorCodigoMapa(codMapa);
+        return workflowService.obterEntidadePorCodigoMapa(codMapa);
     }
 
     @Transactional(readOnly = true)
     public boolean verificarAcessoUnidadeAoProcesso(Long codProcesso, List<Long> codigosUnidadesHierarquia) {
-        return crudService.verificarAcessoUnidadeAoProcesso(codProcesso, codigosUnidadesHierarquia);
+        return workflowService.verificarAcessoUnidadeAoProcesso(codProcesso, codigosUnidadesHierarquia);
     }
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarEntidadesPorProcesso(Long codProcesso) {
-        return crudService.listarEntidadesPorProcesso(codProcesso);
+        return workflowService.listarEntidadesPorProcesso(codProcesso);
     }
 
     @Transactional(readOnly = true)
@@ -148,85 +143,92 @@ public class SubprocessoFacade {
         return ajusteMapaService.obterMapaParaAjuste(codigo);
     }
 
-
     @Transactional(readOnly = true)
     public ValidacaoCadastroDto validarCadastro(Long codigo) {
-        return validacaoService.validarCadastro(codigo);
+        return workflowService.validarCadastro(codigo);
     }
 
     @Transactional
     public void validarExistenciaAtividades(Long codigo) {
-        validacaoService.validarExistenciaAtividades(codigo);
+        workflowService.validarExistenciaAtividades(codigo);
     }
 
     @Transactional
     public void validarAssociacoesMapa(Long mapaId) {
-        validacaoService.validarAssociacoesMapa(mapaId);
+        workflowService.validarAssociacoesMapa(mapaId);
     }
+
+    // ========================================================================
+    // WORKFLOW
+    // ========================================================================
 
     @Transactional
     public void atualizarSituacaoParaEmAndamento(Long mapaCodigo) {
-        adminWorkflowService.atualizarParaEmAndamento(mapaCodigo);
+        workflowService.atualizarParaEmAndamento(mapaCodigo);
     }
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarSubprocessosHomologados() {
-        return adminWorkflowService.listarSubprocessosHomologados();
+        return workflowService.listarSubprocessosHomologados();
     }
 
     @Transactional
     public void disponibilizarCadastro(Long codigo, Usuario usuario) {
-        cadastroWorkflowService.disponibilizarCadastro(codigo, usuario);
+        workflowService.disponibilizarCadastro(codigo, usuario);
     }
 
     @Transactional
     public void disponibilizarRevisao(Long codigo, Usuario usuario) {
-        cadastroWorkflowService.disponibilizarRevisao(codigo, usuario);
+        workflowService.disponibilizarRevisao(codigo, usuario);
     }
 
     @Transactional
     public void devolverCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.devolverCadastro(codigo, usuario, observacoes);
+        workflowService.devolverCadastro(codigo, usuario, observacoes);
     }
 
     @Transactional
     public void aceitarCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.aceitarCadastro(codigo, usuario, observacoes);
+        workflowService.aceitarCadastro(codigo, usuario, observacoes);
     }
 
     @Transactional
     public void homologarCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.homologarCadastro(codigo, usuario, observacoes);
+        workflowService.homologarCadastro(codigo, usuario, observacoes);
     }
 
     @Transactional
     public void devolverRevisaoCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.devolverRevisaoCadastro(codigo, usuario, observacoes);
+        workflowService.devolverRevisaoCadastro(codigo, usuario, observacoes);
     }
 
     @Transactional
     public void aceitarRevisaoCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.aceitarRevisaoCadastro(codigo, usuario, observacoes);
+        workflowService.aceitarRevisaoCadastro(codigo, usuario, observacoes);
     }
 
     @Transactional
     public void homologarRevisaoCadastro(Long codigo, String observacoes, Usuario usuario) {
-        cadastroWorkflowService.homologarRevisaoCadastro(codigo, usuario, observacoes);
+        workflowService.homologarRevisaoCadastro(codigo, usuario, observacoes);
     }
 
     @Transactional
     public void aceitarCadastroEmBloco(List<Long> ids, Usuario usuario) {
         if (!ids.isEmpty()) {
-            cadastroWorkflowService.aceitarCadastroEmBloco(ids, usuario);
+            workflowService.aceitarCadastroEmBloco(ids, usuario);
         }
     }
 
     @Transactional
     public void homologarCadastroEmBloco(List<Long> ids, Usuario usuario) {
         if (!ids.isEmpty()) {
-            cadastroWorkflowService.homologarCadastroEmBloco(ids, usuario);
+            workflowService.homologarCadastroEmBloco(ids, usuario);
         }
     }
+
+    // ========================================================================
+    // MAPA WORKFLOW
+    // ========================================================================
 
     @Transactional
     public Mapa salvarMapaSubprocesso(Long codigo, SalvarMapaRequest request) {
@@ -305,24 +307,28 @@ public class SubprocessoFacade {
         }
     }
 
+    // ========================================================================
+    // ADMIN / REABERTURA
+    // ========================================================================
+
     @Transactional
     public void reabrirCadastro(Long codigo, String justificativa) {
-        cadastroWorkflowService.reabrirCadastro(codigo, justificativa);
+        workflowService.reabrirCadastro(codigo, justificativa);
     }
 
     @Transactional
     public void reabrirRevisaoCadastro(Long codigo, String justificativa) {
-        cadastroWorkflowService.reabrirRevisaoCadastro(codigo, justificativa);
+        workflowService.reabrirRevisaoCadastro(codigo, justificativa);
     }
 
     @Transactional
     public void alterarDataLimite(Long codigo, LocalDate novaDataLimite) {
-        adminWorkflowService.alterarDataLimite(codigo, novaDataLimite);
+        workflowService.alterarDataLimite(codigo, novaDataLimite);
     }
 
     @Transactional
     public void registrarMovimentacaoLembrete(Long codigo) {
-        adminWorkflowService.registrarMovimentacaoLembrete(codigo);
+        workflowService.registrarMovimentacaoLembrete(codigo);
     }
 
     @Transactional
@@ -335,18 +341,22 @@ public class SubprocessoFacade {
         atividadeService.importarAtividades(codSubprocessoDestino, codSubprocessoOrigem);
     }
 
+    // ========================================================================
+    // FACTORY
+    // ========================================================================
+
     @Transactional
     public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
-        subprocessoFactory.criarParaMapeamento(processo, unidades, unidadeOrigem, usuario);
+        workflowService.criarParaMapeamento(processo, unidades, unidadeOrigem, usuario);
     }
 
     @Transactional
     public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
-        subprocessoFactory.criarParaRevisao(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
+        workflowService.criarParaRevisao(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
     }
 
     @Transactional
     public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
-        subprocessoFactory.criarParaDiagnostico(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
+        workflowService.criarParaDiagnostico(processo, unidade, unidadeMapa, unidadeOrigem, usuario);
     }
 }

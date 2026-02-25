@@ -2,7 +2,6 @@ package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -11,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroAcessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
 import sgc.mapa.dto.AtividadeDto;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Conhecimento;
@@ -26,21 +25,15 @@ import sgc.processo.model.TipoProcesso;
 import sgc.seguranca.SgcPermissionEvaluator;
 
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.crud.SubprocessoCrudService;
-import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-/**
- * Testes unitários para SubprocessoAtividadeService.
- * Cobre importação de atividades, listagem e transformação de DTOs.
- */
-@Tag("unit")
 @DisplayName("SubprocessoAtividadeService")
 @ExtendWith(MockitoExtension.class)
 class SubprocessoAtividadeServiceTest {
@@ -48,7 +41,7 @@ class SubprocessoAtividadeServiceTest {
     private SubprocessoRepo subprocessoRepo;
 
     @Mock
-    private SubprocessoCrudService crudService;
+    private SubprocessoWorkflowService crudService;
 
     @Mock
     private MapaManutencaoService mapaManutencaoService;
@@ -69,7 +62,7 @@ class SubprocessoAtividadeServiceTest {
     private SgcPermissionEvaluator permissionEvaluator;
 
     @Mock
-    private SubprocessoValidacaoService validacaoService;
+    private SubprocessoWorkflowService validacaoService;
 
     @InjectMocks
     private SubprocessoAtividadeService service;
@@ -96,8 +89,6 @@ class SubprocessoAtividadeServiceTest {
             verify(repo).buscar(Subprocesso.class, codDestino);
             verifyNoInteractions(copiaMapaService);
         }
-
-
 
         @Test
         @DisplayName("deve lançar exceção quando subprocesso origem não encontrado")
@@ -333,7 +324,7 @@ class SubprocessoAtividadeServiceTest {
             Atividade atividade1 = criarAtividadeComConhecimentos(1L, "Atividade 1", List.of(conhecimento1));
             Atividade atividade2 = criarAtividadeComConhecimentos(2L, "Atividade 2", List.of(conhecimento2));
 
-            when(crudService.buscarSubprocessoComMapa(codSubprocesso)).thenReturn(subprocesso);
+            when(subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso)).thenReturn(Optional.of(subprocesso));
             when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(codMapa))
                     .thenReturn(List.of(atividade1, atividade2));
 
@@ -356,7 +347,7 @@ class SubprocessoAtividadeServiceTest {
             assertThat(dto2.conhecimentos()).hasSize(1);
             assertThat(dto2.conhecimentos().getFirst().getCodigo()).isEqualTo(101L);
 
-            verify(crudService).buscarSubprocessoComMapa(codSubprocesso);
+            verify(subprocessoRepo).findByIdWithMapaAndAtividades(codSubprocesso);
             verify(mapaManutencaoService).buscarAtividadesPorMapaCodigoComConhecimentos(codMapa);
         }
 
@@ -370,7 +361,7 @@ class SubprocessoAtividadeServiceTest {
             Mapa mapa = criarMapa(codMapa);
             Subprocesso subprocesso = criarSubprocessoComMapa(codSubprocesso, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, mapa);
 
-            when(crudService.buscarSubprocessoComMapa(codSubprocesso)).thenReturn(subprocesso);
+            when(subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso)).thenReturn(Optional.of(subprocesso));
             when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(codMapa))
                     .thenReturn(List.of());
 
@@ -379,7 +370,7 @@ class SubprocessoAtividadeServiceTest {
 
             // Assert
             assertThat(resultado).isEmpty();
-            verify(crudService).buscarSubprocessoComMapa(codSubprocesso);
+            verify(subprocessoRepo).findByIdWithMapaAndAtividades(codSubprocesso);
             verify(mapaManutencaoService).buscarAtividadesPorMapaCodigoComConhecimentos(codMapa);
         }
     }

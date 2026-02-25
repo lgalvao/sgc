@@ -120,7 +120,13 @@ import {useLoadingManager} from "@/composables/useLoadingManager";
 import {useAcesso} from "@/composables/useAcesso";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useProcessosStore} from "@/stores/processos";
-import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso, SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
+import {
+  type Movimentacao,
+  SituacaoProcesso,
+  SituacaoSubprocesso,
+  type SubprocessoDetalhe,
+  TipoProcesso
+} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
 
@@ -254,7 +260,7 @@ async function confirmarReabertura() {
   }
 
   await loading.withLoading('reabertura', async () => {
-    let sucesso = false;
+    let sucesso: boolean;
     if (tipoReabertura.value === 'cadastro') {
       sucesso = await subprocessosStore.reabrirCadastro(codSubprocesso.value!, justificativaReabertura.value);
     } else {

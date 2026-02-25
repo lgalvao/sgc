@@ -12,6 +12,7 @@ import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
 import {Perfil} from "@/types/tipos";
 import CadMapa from "@/views/processo/MapaCadastroView.vue";
+import * as useAcessoModule from '@/composables/useAcesso';
 
 const {pushMock} = vi.hoisted(() => {
     return {pushMock: vi.fn()};
@@ -40,8 +41,6 @@ vi.mock("vue-router", () => ({
 vi.mock("@/composables/usePerfil", () => ({
     usePerfil: vi.fn(),
 }));
-
-import * as useAcessoModule from '@/composables/useAcesso';
 
 // Mock services explicitly
 vi.mock("@/services/mapaService", () => ({

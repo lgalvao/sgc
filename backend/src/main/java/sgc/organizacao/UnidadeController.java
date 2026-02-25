@@ -15,8 +15,8 @@ import sgc.organizacao.dto.CriarAtribuicaoRequest;
 import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.OrganizacaoViews;
 import sgc.organizacao.model.Usuario;
-import sgc.processo.model.TipoProcesso;
 import sgc.processo.ProcessoFacade;
+import sgc.processo.model.TipoProcesso;
 
 import java.util.List;
 import java.util.Map;

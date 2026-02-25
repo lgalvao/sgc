@@ -64,6 +64,7 @@ import PageHeader from '@/components/layout/PageHeader.vue';
 import {useFeedbackStore} from '@/stores/feedback';
 import {useDiagnosticosStore} from '@/stores/diagnosticos';
 import type {DiagnosticoDto} from '@/services/diagnosticoService';
+import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 
 const route = useRoute();
 const router = useRouter();

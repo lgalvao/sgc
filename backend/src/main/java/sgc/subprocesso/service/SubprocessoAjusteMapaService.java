@@ -4,30 +4,26 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.analise.AnaliseFacade;
-import sgc.analise.model.Analise;
-import sgc.analise.model.TipoAnalise;
-import sgc.comum.ComumRepo;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.model.ComumRepo;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.service.MapaManutencaoService;
+import sgc.subprocesso.AnaliseFacade;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.dto.MapaAjusteDto;
+import sgc.subprocesso.dto.MapaAjusteMapper;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
-import sgc.subprocesso.mapper.MapaAjusteMapper;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.subprocesso.model.*;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Service responsável por operações relacionadas a ajustes de mapa em subprocessos.
+ * Operações relacionadas a ajustes de mapa em subprocessos.
  */
 @Service
 @RequiredArgsConstructor
@@ -36,16 +32,10 @@ class SubprocessoAjusteMapaService {
 
     private final SubprocessoRepo subprocessoRepo;
     private final ComumRepo repo;
-    private final SubprocessoCrudService crudService;
     private final MapaManutencaoService mapaManutencaoService;
     private final AnaliseFacade analiseFacade;
     private final MapaAjusteMapper mapaAjusteMapper;
 
-    /**
-     * Salva ajustes feitos no mapa de um subprocesso.
-     * 
-     * @throws sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida se situação não permite ajuste
-     */
     @Transactional
     public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
         Subprocesso sp = repo.buscar(Subprocesso.class, codSubprocesso);
@@ -58,12 +48,9 @@ class SubprocessoAjusteMapaService {
         subprocessoRepo.save(sp);
     }
 
-    /**
-     * Obtém mapa preparado para ajuste.
-     */
     @Transactional(readOnly = true)
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
-        Subprocesso sp = crudService.buscarSubprocessoComMapa(codSubprocesso);
+        Subprocesso sp = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
         Long codMapa = sp.getMapa().getCodigo();
         
         Analise analise = analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO)
@@ -79,11 +66,6 @@ class SubprocessoAjusteMapaService {
         return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes);
     }
 
-    /**
-     * Valida se a situação do subprocesso permite ajuste de mapa.
-     * 
-     * @throws sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida se situação inválida
-     */
     private void validarSituacaoParaAjuste(Subprocesso sp) {
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
                 && sp.getSituacao() != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
@@ -93,9 +75,6 @@ class SubprocessoAjusteMapaService {
         }
     }
 
-    /**
-     * Atualiza descrições de atividades em lote.
-     */
     private void atualizarDescricoesAtividades(List<CompetenciaAjusteDto> competencias) {
         Map<Long, String> atividadeDescricoes = new HashMap<>();
         for (CompetenciaAjusteDto compDto : competencias) {
@@ -108,11 +87,7 @@ class SubprocessoAjusteMapaService {
         }
     }
 
-    /**
-     * Atualiza competências e suas associações com atividades.
-     */
     private void atualizarCompetenciasEAssociacoes(List<CompetenciaAjusteDto> competencias) {
-        // Carregar todas as competências envolvidas
         List<Long> competenciaIds = competencias.stream()
                 .map(CompetenciaAjusteDto::getCodCompetencia)
                 .toList();

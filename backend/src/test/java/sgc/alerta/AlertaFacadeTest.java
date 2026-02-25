@@ -2,7 +2,6 @@ package sgc.alerta;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -34,7 +33,6 @@ import static org.mockito.Mockito.*;
  * - AlertaServiceTest.java (15 testes)
  * - AlertaServiceUpdateTest.java (4 testes)
  */
-@Tag("unit")
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AlertaFacade - Testes Unitários")
 class AlertaFacadeTest {

@@ -1,9 +1,21 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
+import {
+    adicionarAtividade,
+    adicionarConhecimento,
+    navegarParaAtividades,
+    navegarParaAtividadesVisualizacao
+} from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
-import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import {aceitarCadastroMapeamento, aceitarRevisao, acessarSubprocessoChefeDireto, acessarSubprocessoGestor, homologarCadastroMapeamento, homologarCadastroRevisaoComImpacto} from './helpers/helpers-analise.js';
+import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {
+    aceitarCadastroMapeamento,
+    aceitarRevisao,
+    acessarSubprocessoChefeDireto,
+    acessarSubprocessoGestor,
+    homologarCadastroMapeamento,
+    homologarCadastroRevisaoComImpacto
+} from './helpers/helpers-analise.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
 /**

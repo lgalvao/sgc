@@ -3,7 +3,7 @@ package sgc.seguranca.dto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import sgc.comum.TituloEleitoral;
+import sgc.comum.model.TituloEleitoral;
 
 /**
  * DTO para a requisição de entrada (login) do usuário.

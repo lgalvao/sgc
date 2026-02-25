@@ -59,7 +59,7 @@ public class ProcessoManutencaoService {
         processo.adicionarParticipantes(participantes);
         Processo processoSalvo = processoRepo.saveAndFlush(processo);
 
-        log.info("Processo {} criado com {} participantes",
+        log.info("Processo {} criado com {} unidades participantes",
                 processoSalvo.getCodigo(),
                 processoSalvo.getParticipantes().size());
 
@@ -69,10 +69,11 @@ public class ProcessoManutencaoService {
     @Transactional
     public Processo atualizar(Long codigo, AtualizarProcessoRequest req) {
         Processo processo = processoConsultaService.buscarProcessoCodigo(codigo);
-        TipoProcesso tipoProcesso = req.tipo();
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser editados.");
         }
+
+        TipoProcesso tipoProcesso = req.tipo();
         processo.setDescricao(req.descricao());
         processo.setTipo(tipoProcesso);
         processo.setDataLimite(req.dataLimiteEtapa1());
@@ -99,12 +100,11 @@ public class ProcessoManutencaoService {
     @Transactional
     public void apagar(Long codigo) {
         Processo processo = processoConsultaService.buscarProcessoCodigo(codigo);
-
         if (processo.getSituacao() != CRIADO) {
             throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser removidos.");
         }
-
         processoRepo.deleteById(codigo);
+
         log.info("Processo {} removido.", codigo);
     }
 }

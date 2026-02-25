@@ -1,19 +1,19 @@
-package sgc.subprocesso.service.notificacao;
+package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import sgc.notificacao.EmailService;
+import sgc.alerta.EmailService;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.TipoTransicao;
+
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;

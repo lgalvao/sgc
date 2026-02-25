@@ -9,11 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.analise.dto.AnaliseHistoricoDto;
-import sgc.analise.model.Analise;
-import sgc.analise.model.AnaliseRepo;
-import sgc.analise.model.TipoAcaoAnalise;
 import sgc.comum.ComumDtos.JustificativaRequest;
 import sgc.comum.ComumDtos.TextoRequest;
 import sgc.fixture.ProcessoFixture;
@@ -25,10 +22,8 @@ import sgc.organizacao.model.UsuarioRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.dto.AnaliseHistoricoDto;
+import sgc.subprocesso.model.*;
 import tools.jackson.core.type.TypeReference;
 
 import java.time.LocalDateTime;
@@ -325,7 +320,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                         .with(user(gestor))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(aceitarReq)))
-                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
 
         entityManager.flush();

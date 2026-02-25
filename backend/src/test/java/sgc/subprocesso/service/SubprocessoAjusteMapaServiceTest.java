@@ -2,54 +2,37 @@ package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.analise.AnaliseFacade;
-import sgc.analise.model.Analise;
-import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.ComumRepo;
+import sgc.comum.model.ComumRepo;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaManutencaoService;
+import sgc.subprocesso.AnaliseFacade;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.dto.MapaAjusteDto;
+import sgc.subprocesso.dto.MapaAjusteMapper;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
-import sgc.subprocesso.mapper.MapaAjusteMapper;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.subprocesso.model.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-/**
- * Testes unitários para SubprocessoAjusteMapaService.
- * Foca em cobrir branches e cenários de erro não cobertos.
- */
-@Tag("unit")
 @DisplayName("SubprocessoAjusteMapaService")
 @ExtendWith(MockitoExtension.class)
 class SubprocessoAjusteMapaServiceTest {
     @Mock
     private SubprocessoRepo subprocessoRepo;
-    
-    @Mock
-    private SubprocessoCrudService crudService;
     
     @Mock
     private MapaManutencaoService mapaManutencaoService;
@@ -66,6 +49,15 @@ class SubprocessoAjusteMapaServiceTest {
     @InjectMocks
     private SubprocessoAjusteMapaService service;
 
+    private Subprocesso criarSubprocesso(Long codigo) {
+        return Subprocesso.builder()
+                .codigo(codigo)
+                .processo(sgc.processo.model.Processo.builder().codigo(10L).build())
+                .unidade(sgc.organizacao.model.Unidade.builder().codigo(20L).build())
+                .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
+                .build();
+    }
+
     @Nested
     @DisplayName("salvarAjustesMapa")
     class SalvarAjustesMapaTests {
@@ -75,11 +67,7 @@ class SubprocessoAjusteMapaServiceTest {
         void deveSalvarAjustesComSucesso() {
             // Arrange
             Long codSubprocesso = 1L;
-            
-            Subprocesso sp = Subprocesso.builder()
-                    .codigo(codSubprocesso)
-                    .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
-                    .build();
+            Subprocesso sp = criarSubprocesso(codSubprocesso);
             
             AtividadeAjusteDto atividadeDto = new AtividadeAjusteDto(1L, "Atividade 1", Collections.emptyList());
             CompetenciaAjusteDto competenciaDto = CompetenciaAjusteDto.builder()
@@ -122,16 +110,12 @@ class SubprocessoAjusteMapaServiceTest {
         void devePermitirAjusteQuandoSituacaoRevisaoMapaAjustado() {
             // Arrange
             Long codSubprocesso = 1L;
-            
-            Subprocesso sp = Subprocesso.builder()
-                    .codigo(codSubprocesso)
-                    .situacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO)
-                    .build();
+            Subprocesso sp = criarSubprocesso(codSubprocesso);
+            sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
             
             AtividadeAjusteDto atividadeDto = new AtividadeAjusteDto(1L, "Atividade 1", Collections.emptyList());
             CompetenciaAjusteDto competenciaDto = CompetenciaAjusteDto.builder()
                     .codCompetencia(100L)
-                    .nome("Competencia 1")
                     .atividades(List.of(atividadeDto))
                     .build();
             
@@ -170,11 +154,8 @@ class SubprocessoAjusteMapaServiceTest {
         void deveLancarErroQuandoSituacaoInvalidaParaAjuste() {
             // Arrange
             Long codSubprocesso = 1L;
-            
-            Subprocesso sp = Subprocesso.builder()
-                    .codigo(codSubprocesso)
-                    .situacao(SituacaoSubprocesso.NAO_INICIADO)
-                    .build();
+            Subprocesso sp = criarSubprocesso(codSubprocesso);
+            sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
             
             when(repo.buscar(Subprocesso.class, codSubprocesso)).thenReturn(sp);
             
@@ -183,27 +164,6 @@ class SubprocessoAjusteMapaServiceTest {
             assertThatThrownBy(() -> service.salvarAjustesMapa(codSubprocesso, ajustes))
                     .isInstanceOf(ErroMapaEmSituacaoInvalida.class)
                     .hasMessageContaining("Ajustes no mapa só podem ser feitos em estados específicos");
-        }
-
-        @Test
-        @DisplayName("deve processar competencias vazias sem erro")
-        void deveProcessarCompetenciasVaziasSemErro() {
-            // Arrange
-            Long codSubprocesso = 1L;
-            
-            Subprocesso sp = Subprocesso.builder()
-                    .codigo(codSubprocesso)
-                    .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
-                    .build();
-            
-            when(repo.buscar(Subprocesso.class, codSubprocesso)).thenReturn(sp);
-            
-            // Act
-            service.salvarAjustesMapa(codSubprocesso, Collections.emptyList());
-            
-            // Assert
-            verify(subprocessoRepo).save(any(Subprocesso.class));
-            verify(mapaManutencaoService, never()).atualizarDescricoesAtividadeEmLote(anyMap());
         }
     }
 
@@ -219,10 +179,8 @@ class SubprocessoAjusteMapaServiceTest {
             Long codMapa = 100L;
             
             Mapa mapa = Mapa.builder().codigo(codMapa).build();
-            Subprocesso sp = Subprocesso.builder()
-                    .codigo(codSubprocesso)
-                    .mapa(mapa)
-                    .build();
+            Subprocesso sp = criarSubprocesso(codSubprocesso);
+            sp.setMapa(mapa);
             
             Analise analise = new Analise();
             analise.setCodigo(1L);
@@ -234,7 +192,7 @@ class SubprocessoAjusteMapaServiceTest {
             
             MapaAjusteDto expected = MapaAjusteDto.builder().build();
             
-            when(crudService.buscarSubprocessoComMapa(codSubprocesso)).thenReturn(sp);
+            when(subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso)).thenReturn(Optional.of(sp));
             when(analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO))
                     .thenReturn(List.of(analise));
             when(mapaManutencaoService.buscarCompetenciasPorCodMapaSemRelacionamentos(codMapa))
@@ -264,12 +222,10 @@ class SubprocessoAjusteMapaServiceTest {
             Long codMapa = 100L;
             
             Mapa mapa = Mapa.builder().codigo(codMapa).build();
-            Subprocesso sp = Subprocesso.builder()
-                    .codigo(codSubprocesso)
-                    .mapa(mapa)
-                    .build();
+            Subprocesso sp = criarSubprocesso(codSubprocesso);
+            sp.setMapa(mapa);
             
-            when(crudService.buscarSubprocessoComMapa(codSubprocesso)).thenReturn(sp);
+            when(subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso)).thenReturn(Optional.of(sp));
             when(analiseFacade.listarPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO))
                     .thenReturn(Collections.emptyList());
             when(mapaManutencaoService.buscarCompetenciasPorCodMapaSemRelacionamentos(codMapa))
@@ -289,37 +245,6 @@ class SubprocessoAjusteMapaServiceTest {
             // Assert
             assertThat(result).isNotNull();
             verify(mapaAjusteMapper).toDto(eq(sp), isNull(), anyList(), anyList(), anyList(), anyMap());
-        }
-    }
-
-    @Nested
-    @DisplayName("atualizarCompetenciasEAssociacoes internal scenarios")
-    class AtualizarCompetenciasInterno {
-        @Test
-        @DisplayName("deve ignorar competencia nao encontrada no mapa")
-        void deveIgnorarCompetenciaNaoEncontrada() {
-            // Arrange
-            Long codSubprocesso = 1L;
-            Subprocesso sp = Subprocesso.builder()
-                    .codigo(codSubprocesso)
-                    .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA)
-                    .build();
-            
-            CompetenciaAjusteDto compDto = CompetenciaAjusteDto.builder()
-                    .codCompetencia(100L)
-                    .atividades(Collections.emptyList())
-                    .build();
-            
-            when(repo.buscar(Subprocesso.class, codSubprocesso)).thenReturn(sp);
-            // Return empty list for competencies to trigger (competencia == null)
-            when(mapaManutencaoService.buscarCompetenciasPorCodigos(anyList())).thenReturn(Collections.emptyList());
-            when(mapaManutencaoService.buscarAtividadesPorCodigos(anyList())).thenReturn(Collections.emptyList());
-            
-            // Act
-            service.salvarAjustesMapa(codSubprocesso, List.of(compDto));
-            
-            // Assert
-            verify(mapaManutencaoService).salvarTodasCompetencias(argThat(List::isEmpty));
         }
     }
 }

@@ -1,11 +1,17 @@
 package sgc.integracao;
 
+import com.icegreen.greenmail.store.FolderException;
+import com.icegreen.greenmail.util.GreenMail;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,12 +34,13 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @Transactional
 @Import({TestConfig.class, TestSecurityConfig.class})
 @AutoConfigureMockMvc
-@org.springframework.test.context.ActiveProfiles({"test"})
+@ActiveProfiles({"test"})
+@Tag("integration")
 public abstract class BaseIntegrationTest {
     protected MockMvc mockMvc;
     
     @Autowired(required = false)
-    protected com.icegreen.greenmail.util.GreenMail greenMail;
+    protected GreenMail greenMail;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -56,7 +63,7 @@ public abstract class BaseIntegrationTest {
         if (greenMail != null) {
             try {
                 greenMail.purgeEmailFromAllMailboxes();
-            } catch (com.icegreen.greenmail.store.FolderException e) {
+            } catch (FolderException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -84,12 +91,12 @@ public abstract class BaseIntegrationTest {
         return false;
     }
 
-    private String extrairHtmlDaMensagem(jakarta.mail.Part part) throws Exception {
+    private String extrairHtmlDaMensagem(Part part) throws Exception {
         if (part.isMimeType("text/html") && part.getContent() instanceof String s) {
             return s;
         }
         if (part.isMimeType("multipart/*")) {
-            jakarta.mail.Multipart mp = (jakarta.mail.Multipart) part.getContent();
+            Multipart mp = (Multipart) part.getContent();
             for (int i = 0; i < mp.getCount(); i++) {
                 String s = extrairHtmlDaMensagem(mp.getBodyPart(i));
                 if (s != null) return s;

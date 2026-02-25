@@ -12,8 +12,8 @@ import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
 import sgc.processo.ProcessoFacade;
+import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoFacade;
 

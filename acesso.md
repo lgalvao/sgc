@@ -49,6 +49,7 @@ A permissão de visualização é baseada na **Hierarquia da Unidade Responsáve
 *   **ADMIN**: Visualiza todos os subprocessos de todas as unidades.
 *   **GESTOR**: Visualiza subprocessos da sua própria unidade e de todas as unidades subordinadas.
 *   **CHEFE**: Visualiza apenas os subprocessos da sua unidade.
+*   **⚠️ Exceções**: Algumas ações de leitura, como a **Verificação de Impactos (CDU-12)**, possuem restrições situacionais adicionais baseadas no perfil e na localização (ex: CHEFE só vê em 'Andamento', GESTOR só vê se estiver 'Disponibilizado' na sua unidade).
 
 ### 2. Execução (Escrita e Movimentação)
 A permissão para alterar dados ou mudar a situação do subprocesso (ex: Homologar, Devolver, Validar) é estritamente baseada na **Localização Atual**.

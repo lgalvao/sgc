@@ -4,55 +4,59 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.dto.AtividadeDto;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.MapaFacade;
+import sgc.mapa.dto.AtividadeDto;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.dto.ContextoEdicaoResponse;
-import sgc.subprocesso.dto.SubprocessoDetalheResponse;
-import sgc.subprocesso.dto.PermissoesSubprocessoDto;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.crud.SubprocessoCrudService;
+import sgc.processo.model.SituacaoProcesso;
 import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import sgc.subprocesso.dto.ContextoEdicaoResponse;
+import sgc.subprocesso.dto.PermissoesSubprocessoDto;
+import sgc.subprocesso.dto.SubprocessoDetalheResponse;
+import sgc.subprocesso.model.*;
 
 import java.util.List;
 import java.util.Set;
 
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+
 /**
- * Service responsável por preparar contextos de visualização de subprocessos.
+ * Prepara contextos de visualização de subprocessos.
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 class SubprocessoContextoService {
-
-    private final SubprocessoCrudService crudService;
+    private final SubprocessoRepo subprocessoRepo;
     private final UsuarioFacade usuarioService;
     private final MapaFacade mapaFacade;
     private final MovimentacaoRepo movimentacaoRepo;
     private final SubprocessoAtividadeService atividadeService;
     private final SgcPermissionEvaluator permissionEvaluator;
 
-    @Transactional(readOnly = true)
     public SubprocessoDetalheResponse obterDetalhes(Long codigo, Usuario usuarioAutenticado) {
-        Subprocesso sp = crudService.buscarSubprocesso(codigo);
+        Subprocesso sp = subprocessoRepo.findByIdWithMapaAndAtividades(codigo).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codigo));
         return obterDetalhes(sp, usuarioAutenticado);
     }
 
-    @Transactional(readOnly = true)
     public SubprocessoDetalheResponse obterDetalhes(Subprocesso sp, Usuario usuarioAutenticado) {
-        Usuario responsavel = usuarioService.buscarResponsavelAtual(sp.getUnidade().getSigla());
-        Usuario titular = usuarioService.buscarPorLogin(sp.getUnidade().getTituloTitular());
-        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        String siglaUnidade = sp.getUnidade().getSigla();
+        String localizacaoAtual = siglaUnidade;
 
-        String localizacaoAtual = sp.getUnidade().getSigla();
+        Usuario responsavel = usuarioService.buscarResponsavelAtual(siglaUnidade);
+        Usuario titular = null;
+        try {
+            titular = usuarioService.buscarPorLogin(sp.getUnidade().getTituloTitular());
+        } catch (Exception e) {
+            log.warn("Erro ao buscar titular da unidade {}: {}", siglaUnidade, e.getMessage());
+        }
+
+        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
         if (!movimentacoes.isEmpty()) {
-            Unidade destino = movimentacoes.get(0).getUnidadeDestino();
+            Unidade destino = movimentacoes.getFirst().getUnidadeDestino();
             if (destino != null) {
                 localizacaoAtual = destino.getSigla();
             }
@@ -70,10 +74,9 @@ class SubprocessoContextoService {
                 .build();
     }
 
-    @Transactional(readOnly = true)
     public ContextoEdicaoResponse obterContextoEdicao(Long codSubprocesso) {
         Usuario usuario = usuarioService.usuarioAutenticado();
-        Subprocesso subprocesso = crudService.buscarSubprocesso(codSubprocesso);
+        Subprocesso subprocesso = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
         SubprocessoDetalheResponse detalhes = obterDetalhes(subprocesso, usuario);
 
         Unidade unidade = subprocesso.getUnidade();
@@ -88,7 +91,7 @@ class SubprocessoContextoService {
         );
     }
 
-    PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp, Usuario usuario) {
+    public PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp, Usuario usuario) {
         return PermissoesSubprocessoDto.builder()
             .podeEditarCadastro(
                 canExecute(usuario, sp, "EDITAR_CADASTRO", Set.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO)) ||
@@ -149,7 +152,7 @@ class SubprocessoContextoService {
     }
 
     private boolean canExecute(Usuario usuario, Subprocesso sp, String acao, Set<SituacaoSubprocesso> allowedStates) {
-        if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
+        if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == SituacaoProcesso.FINALIZADO) {
             return false;
         }
         if (!allowedStates.contains(sp.getSituacao())) return false;

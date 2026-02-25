@@ -14,7 +14,7 @@ class UsuarioJsonViewTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void deveSerializarApenasCamposPublicosDoUsuario() throws Exception {
+    void deveSerializarApenasCamposPublicosDoUsuario() {
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
         unidade.setSigla("UNIT");

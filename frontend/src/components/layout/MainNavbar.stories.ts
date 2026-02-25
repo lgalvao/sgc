@@ -1,4 +1,4 @@
-import { fn } from "@storybook/test";
+import { vi } from "vitest";
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import MainNavbar from './MainNavbar.vue';
 import { createTestingPinia } from '@pinia/testing';
@@ -24,7 +24,7 @@ export const Admin: Story = {
     setup() {
       // Mocking Pinia and Router
       const pinia = createTestingPinia({
-        createSpy: fn,
+        createSpy: vi.fn,
         initialState: {
           perfil: {
             perfilSelecionado: 'ADMIN',
@@ -44,7 +44,7 @@ export const Gestor: Story = {
     components: { MainNavbar },
     setup() {
       const pinia = createTestingPinia({
-        createSpy: fn,
+        createSpy: vi.fn,
         initialState: {
           perfil: {
             perfilSelecionado: 'GESTOR',
@@ -69,7 +69,7 @@ export const Mobile: Story = {
     components: { MainNavbar },
     setup() {
       const pinia = createTestingPinia({
-        createSpy: fn,
+        createSpy: vi.fn,
         initialState: {
           perfil: {
             perfilSelecionado: 'ADMIN',

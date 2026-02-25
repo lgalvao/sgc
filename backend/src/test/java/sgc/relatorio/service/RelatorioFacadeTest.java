@@ -1,7 +1,6 @@
 package sgc.relatorio.service;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,8 +16,8 @@ import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
 import sgc.processo.ProcessoFacade;
+import sgc.processo.model.Processo;
 import sgc.relatorio.PdfFactory;
 import sgc.relatorio.RelatorioFacade;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -33,7 +32,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-@Tag("unit")
 @ExtendWith(MockitoExtension.class)
 @DisplayName("RelatorioFacade Test")
 class RelatorioFacadeTest {

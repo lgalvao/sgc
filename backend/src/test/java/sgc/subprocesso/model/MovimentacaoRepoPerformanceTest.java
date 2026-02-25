@@ -23,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("integration")
 @ActiveProfiles("test")
 class MovimentacaoRepoPerformanceTest {
-
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
 

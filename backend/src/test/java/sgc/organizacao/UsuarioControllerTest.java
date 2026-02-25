@@ -1,6 +1,4 @@
 package sgc.organizacao;
-import sgc.seguranca.SgcPermissionEvaluator;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +20,7 @@ import sgc.comum.erros.RestExceptionHandler;
 import sgc.organizacao.dto.AdministradorDto;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
+import sgc.seguranca.SgcPermissionEvaluator;
 
 import java.util.List;
 import java.util.Optional;

@@ -11,9 +11,7 @@ import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.HierarquiaService;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.model.*;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -21,6 +19,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static sgc.organizacao.model.Perfil.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**
  * Avaliador central de permissões do SGC.
@@ -96,20 +95,17 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     public boolean checkPermission(Usuario usuario, Object targetDomainObject, String permission) {
         if (usuario == null) return false;
 
-        if (targetDomainObject instanceof Collection<?> collection) {
-            return collection.stream().allMatch(item -> checkPermission(usuario, item, permission));
-        }
+        return switch (targetDomainObject) {
+            case Collection<?> collection ->
+                    collection.stream().allMatch(item -> checkPermission(usuario, item, permission));
+            case Subprocesso sp -> checkSubprocesso(usuario, sp, permission);
+            case Processo processo -> checkProcesso(usuario, permission);
+            case null, default -> false;
+        };
 
-        if (targetDomainObject instanceof Subprocesso sp) {
-            return checkSubprocesso(usuario, sp, permission);
-        } else if (targetDomainObject instanceof Processo) {
-            return checkProcesso(usuario, permission);
-        }
-        return false;
     }
 
     private boolean checkSubprocesso(Usuario usuario, Subprocesso sp, String acao) {
-        // 1. É Admin? (Para visualização vê tudo. Para escrita segue regra de localização)
         boolean isAdmin = usuario.getPerfilAtivo() == ADMIN;
         boolean isEscrita = isAcaoEscrita(acao);
 
@@ -117,9 +113,15 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         if (!isEscrita) {
             if (isAdmin) return true; // Admin vê tudo
 
-            // Exceção: Importação permite ler de outras unidades (ex: históricos/modelos)
+            // Exceção: Importação permite ler de outras unidades para obter atividades/conhecimentos
             if ("CONSULTAR_PARA_IMPORTACAO".equals(acao) && (usuario.getPerfilAtivo() == CHEFE || usuario.getPerfilAtivo() == GESTOR)) {
                 return true;
+            }
+
+            // CDU-12: Exceção à regra de visualização baseada apenas em hierarquia
+            // A verificação de impactos exige situações específicas conforme o perfil.
+            if ("VERIFICAR_IMPACTOS".equals(acao) && !checkSituacaoImpactos(usuario, sp)) {
+                return false;
             }
 
             return checkHierarquia(usuario, sp.getUnidade());
@@ -177,6 +179,31 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         return true;
     }
 
+    private boolean checkSituacaoImpactos(Usuario usuario, Subprocesso sp) {
+        Perfil perfil = usuario.getPerfilAtivo();
+        SituacaoSubprocesso situacao = sp.getSituacao();
+
+        // ADMIN vê se estiver disponibilizado, homologado ou ajustado
+        if (perfil == ADMIN) {
+            return situacao == REVISAO_CADASTRO_DISPONIBILIZADA ||
+                   situacao == REVISAO_CADASTRO_HOMOLOGADA ||
+                   situacao == REVISAO_MAPA_AJUSTADO;
+        }
+
+        // GESTOR vê se estiver disponibilizado E na sua unidade (localização)
+        if (perfil == GESTOR) {
+            if (situacao != REVISAO_CADASTRO_DISPONIBILIZADA) return false;
+            return Objects.equals(usuario.getUnidadeAtivaCodigo(), obterUnidadeLocalizacao(sp).getCodigo());
+        }
+
+        // CHEFE vê se estiver em andamento (localização é implícita pois andamento é sempre local)
+        if (perfil == CHEFE) {
+            return situacao == REVISAO_CADASTRO_EM_ANDAMENTO;
+        }
+
+        return false;
+    }
+
     private boolean checkProcesso(Usuario usuario, String acao) {
         // Regras para Processo (baseadas em Perfil)
         boolean isAdmin = usuario.getPerfilAtivo() == ADMIN;
@@ -206,6 +233,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         if (usuario.getPerfilAtivo() == CHEFE || usuario.getPerfilAtivo() == SERVIDOR) {
             return Objects.equals(usuario.getUnidadeAtivaCodigo(), unidadeAlvo.getCodigo());
         }
+
         // Gestor vê sua unidade e subordinadas
         if (usuario.getPerfilAtivo() == GESTOR) {
             // Assume-se que o usuário logado tem sua unidade ativa carregada ou acessível via código
@@ -223,9 +251,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
         if (sp.getCodigo() == null) return sp.getUnidade();
 
-        Unidade localizacao = movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
-                .map(m -> m.getUnidadeDestino() != null ? m.getUnidadeDestino() : sp.getUnidade())
-                .orElse(sp.getUnidade());
+        Unidade localizacao = movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo()).filter(m -> m.getUnidadeDestino() != null).map(Movimentacao::getUnidadeDestino).orElse(sp.getUnidade());
 
         sp.setLocalizacaoAtualCache(localizacao);
         return localizacao;

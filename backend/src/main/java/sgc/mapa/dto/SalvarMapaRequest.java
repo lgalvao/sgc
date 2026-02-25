@@ -12,7 +12,6 @@ import java.util.List;
 /**
  * DTO de requisição para salvar mapa. CDU-09 item 1 a 4.
  */
-@SuppressWarnings("unused")
 @Builder
 public record SalvarMapaRequest(
         @Nullable @Size(max = 1000, message = "As observações devem ter no máximo 1000 caracteres") @SanitizarHtml String observacoes,

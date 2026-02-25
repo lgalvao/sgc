@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("Testes de Segurança do Actuator")
 class ActuatorSecurityTest {
-
     @Autowired
     private MockMvc mockMvc;
 

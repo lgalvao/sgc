@@ -4,10 +4,10 @@ import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
+    aceitarCadastroMapeamento,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
-    aceitarCadastroMapeamento,
     homologarCadastroMapeamento,
 } from './helpers/helpers-analise.js';
 import {

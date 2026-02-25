@@ -2,18 +2,18 @@ package sgc.subprocesso.service.workflow;
 
 import net.jqwik.api.*;
 import sgc.alerta.AlertaFacade;
-import sgc.analise.AnaliseFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
+import sgc.subprocesso.AnaliseFacade;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
-import sgc.subprocesso.eventos.TipoTransicao;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.notificacao.SubprocessoEmailService;
+import sgc.subprocesso.model.TipoTransicao;
+import sgc.subprocesso.service.SubprocessoEmailService;
+import sgc.subprocesso.service.SubprocessoTransicaoService;
 
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @Tag("PBT")
@@ -71,8 +71,8 @@ class SubprocessoTransicaoServicePbtTest {
     }
 
     static class Unidades {
-        Unidade origem;
-        Unidade destino;
+        final Unidade origem;
+        final Unidade destino;
         Unidades(Unidade o, Unidade d) { this.origem = o; this.destino = d; }
     }
 

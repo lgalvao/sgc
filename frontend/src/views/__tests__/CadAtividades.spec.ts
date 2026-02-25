@@ -10,6 +10,7 @@ import {SituacaoSubprocesso, TipoProcesso,} from "@/types/tipos";
 import {useFeedbackStore} from "@/stores/feedback";
 import {createTestingPinia} from "@pinia/testing";
 import {nextTick} from "vue";
+import * as useAcessoModule from '@/composables/useAcesso';
 
 // Mocks
 const mocks = vi.hoisted(() => ({
@@ -35,8 +36,6 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarContextoEdicao: vi.fn(),
     validarCadastro: vi.fn(),
 }));
-
-import * as useAcessoModule from '@/composables/useAcesso';
 
 vi.mock("@/services/processoService");
 

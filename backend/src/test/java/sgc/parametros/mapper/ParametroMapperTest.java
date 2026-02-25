@@ -1,7 +1,6 @@
 package sgc.parametros.mapper;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import sgc.parametros.ParametroMapper;
@@ -9,7 +8,6 @@ import sgc.parametros.model.Parametro;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Tag("unit")
 @DisplayName("ParametroMapper Tests")
 class ParametroMapperTest {
     private final ParametroMapper mapper = Mappers.getMapper(ParametroMapper.class);

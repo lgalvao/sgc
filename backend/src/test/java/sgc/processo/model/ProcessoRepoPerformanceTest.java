@@ -2,10 +2,10 @@ package sgc.processo.model;
 
 import jakarta.persistence.EntityManager;
 import org.hibernate.Hibernate;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.UnidadeRepo;
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-@ActiveProfiles("test")
+@Tag("integration")
 class ProcessoRepoPerformanceTest {
     @Autowired
     private ProcessoRepo processoRepo;

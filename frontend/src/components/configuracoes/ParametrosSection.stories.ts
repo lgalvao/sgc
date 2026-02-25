@@ -1,4 +1,4 @@
-import { fn } from "@storybook/test";
+import { vi } from "vitest";
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import ParametrosSection from './ParametrosSection.vue';
 import { createTestingPinia } from '@pinia/testing';
@@ -17,7 +17,7 @@ export const Default: Story = {
     components: { ParametrosSection },
     setup() {
       const pinia = createTestingPinia({
-        createSpy: fn,
+        createSpy: vi.fn,
         initialState: {
           configuracoes: {
             parametros: [
@@ -39,7 +39,7 @@ export const Carregando: Story = {
     components: { ParametrosSection },
     setup() {
       const pinia = createTestingPinia({
-        createSpy: fn,
+        createSpy: vi.fn,
         initialState: {
           configuracoes: { loading: true },
         },

@@ -6,20 +6,6 @@ import sgc.organizacao.model.Unidade;
 
 /**
  * Builder para criação de objetos Unidade em testes.
- * <p>
- * Elimina a necessidade de mocks complexos e setup repetitivo.
- * <p>
- * {@code @example}
- * ```java
- * // Ao invés de:
- * Unidade unidade = mock(Unidade.class);
- * when(unidade.getCodigo()).thenReturn("ASSESSORIA_11");
- * when(unidade.getSigla()).thenReturn("ASSESSORIA_11");
- * when(unidade.getTipo()).thenReturn(TipoUnidade.OPERACIONAL);
- * <p>
- * // Use:
- * Unidade unidade = UnidadeTestBuilder.operacional().build();
- * ```
  */
 public class UnidadeTestBuilder {
     private String codigo = "1"; 
@@ -107,21 +93,17 @@ public class UnidadeTestBuilder {
     }
 
     public Unidade build() {
+        Long codigoLong = Long.parseLong(codigo);
+
         Unidade unidade = new Unidade();
-        if (codigo != null) {
-            try {
-                Long codigoLong = Long.parseLong(codigo);
-                unidade.setCodigo(codigoLong);
-            } catch (NumberFormatException ex) {
-                // not a numeric id, don't set codigo (it's generated). Use sigla instead.
-            }
-        }
+        unidade.setCodigo(codigoLong);
         unidade.setSigla(sigla);
         unidade.setNome(nome);
         unidade.setTipo(tipo);
         unidade.setTituloTitular(tituloTitular);
         unidade.setUnidadeSuperior(unidadeSuperior);
         unidade.setSituacao(SituacaoUnidade.ATIVA);
+
         return unidade;
     }
 }

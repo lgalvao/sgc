@@ -2,22 +2,20 @@ package sgc.subprocesso.service.workflow;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
-import sgc.analise.AnaliseFacade;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
+import sgc.mapa.MapaFacade;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.mapa.MapaFacade;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.model.SituacaoUnidade;
@@ -25,17 +23,14 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.AnaliseFacade;
 import sgc.subprocesso.dto.CompetenciaRequest;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
-import sgc.subprocesso.eventos.TipoTransicao;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.crud.SubprocessoCrudService;
-import sgc.subprocesso.service.crud.SubprocessoValidacaoService;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
+import sgc.subprocesso.service.SubprocessoTransicaoService;
+import sgc.subprocesso.service.SubprocessoWorkflowService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -48,7 +43,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@Tag("unit")
 @DisplayName("SubprocessoMapaWorkflowService")
 class SubprocessoMapaWorkflowServiceTest {
     @Mock
@@ -64,10 +58,7 @@ class SubprocessoMapaWorkflowServiceTest {
     @Mock
     private OrganizacaoFacade unidadeService;
     @Mock
-    private SubprocessoValidacaoService validacaoService;
-
-    @Mock
-    private SubprocessoCrudService crudService;
+    private SubprocessoWorkflowService workflowService;
     @Mock
     private AlertaFacade alertaService;
     @Mock
@@ -81,7 +72,7 @@ class SubprocessoMapaWorkflowServiceTest {
     @Test
     @DisplayName("Deve falhar ao buscar subprocesso inexistente")
     void deveFalharSubprocessoInexistente() {
-        when(crudService.buscarSubprocesso(999L))
+        when(workflowService.buscarSubprocesso(999L))
                 .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", 999L));
         CompetenciaRequest request = CompetenciaRequest.builder().build();
         assertThatThrownBy(() -> service.adicionarCompetencia(999L, request))
@@ -91,7 +82,7 @@ class SubprocessoMapaWorkflowServiceTest {
     private Subprocesso mockSubprocesso(Long codigo) {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(codigo);
-        when(crudService.buscarSubprocesso(codigo)).thenReturn(sp);
+        when(workflowService.buscarSubprocesso(codigo)).thenReturn(sp);
         return sp;
     }
 

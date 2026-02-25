@@ -141,8 +141,8 @@ import type {
   Unidade,
   UnidadeParticipante,
 } from "@/types/tipos";
-import {useAcesso} from "@/composables/useAcesso";
 import {TipoProcesso} from "@/types/tipos";
+import {useAcesso} from "@/composables/useAcesso";
 
 const props = defineProps<{
   codProcesso: number | string;
