@@ -6,7 +6,7 @@
           md="4"
       >
         <BCard
-            v-if="podeEditarCadastro"
+            v-if="podeEditarCadastroFinal"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-atividades"
             role="button"
@@ -48,7 +48,7 @@
           md="4"
       >
         <BCard
-            v-if="podeEditarMapa"
+            v-if="podeEditarMapaFinal"
             :aria-disabled="!mapa"
             :class="{ 'disabled-card': !mapa }"
             class="h-100 card-actionable"
@@ -168,7 +168,7 @@ import {useRouter} from "vue-router";
 import {computed} from "vue";
 import {useAcesso} from "@/composables/useAcesso";
 import {useSubprocessosStore} from "@/stores/subprocessos";
-import {type Mapa, type MapaCompleto, TipoProcesso,} from "@/types/tipos";
+import {type Mapa, type MapaCompleto, SituacaoSubprocesso, TipoProcesso,} from "@/types/tipos";
 
 const TipoProcessoEnum = TipoProcesso;
 
@@ -186,6 +186,14 @@ const subprocessosStore = useSubprocessosStore();
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 
 const { podeEditarCadastro, podeEditarMapa } = useAcesso(subprocesso);
+
+const isProcessoFinalizado = computed(() => {
+  return props.situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO || 
+         props.situacao === SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
+});
+
+const podeEditarCadastroFinal = computed(() => podeEditarCadastro.value && !isProcessoFinalizado.value);
+const podeEditarMapaFinal = computed(() => podeEditarMapa.value && !isProcessoFinalizado.value);
 
 function navegarPara(routeName: string) {
   router.push({

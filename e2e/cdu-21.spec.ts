@@ -264,9 +264,10 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
         // 4. Entrar em um subprocesso e verificar botões do cabeçalho
         await navegarParaSubprocesso(page, 'SECAO_221');
-        await expect(page.getByTestId('btn-analise-enviar-lembrete')).not.toBeVisible();
-        await expect(page.getByTestId('btn-analise-reabrir-cadastro')).not.toBeVisible();
-        await expect(page.getByTestId('btn-analise-alterar-data')).not.toBeVisible();
+        await expect(page.getByTestId('btn-enviar-lembrete')).not.toBeVisible();
+        await expect(page.getByTestId('btn-reabrir-cadastro')).not.toBeVisible();
+        await expect(page.getByTestId('btn-reabrir-revisao')).not.toBeVisible();
+        await expect(page.getByTestId('btn-alterar-data-limite')).not.toBeVisible();
 
         // 5. Verificar que botões de edição de atividades não aparecem nos cards
         await expect(page.getByTestId('card-subprocesso-atividades')).not.toBeVisible();

@@ -45,7 +45,7 @@ describe("CriarCompetenciaModal.vue", () => {
                     BCard,
                     BFormCheckbox,
                     BModal,
-                    ...(options.global.components || {})
+                    ...options.global.components
                 }
             },
         });

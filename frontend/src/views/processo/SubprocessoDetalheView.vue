@@ -182,6 +182,7 @@ const proximaAcaoSubprocesso = computed(() => obterProximaAcao({
   situacao: formatSituacaoSubprocesso(subprocesso.value?.situacao),
   podeDisponibilizarCadastro: podeDisponibilizarCadastro.value,
   podeEditarCadastro: podeEditarCadastro.value,
+  isProcessoFinalizado: isProcessoFinalizado.value,
 }));
 
 onMounted(async () => {
