@@ -141,8 +141,8 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         Unidade localizacao = obterUnidadeLocalizacao(sp);
         boolean permitido = Objects.equals(usuario.getUnidadeAtivaCodigo(), localizacao.getCodigo());
         if (!permitido) {
-            log.info("Acesso de ESCRITA negado para {} (Unidade Ativa: {}). Subprocesso {} localizado em {}.",
-                    usuario.getTituloEleitoral(), usuario.getUnidadeAtivaCodigo(), sp.getCodigo(), localizacao.getCodigo());
+            log.debug("Acesso de ESCRITA negado para a ação '{}'. Usuário: {} (Unidade Ativa: {}). Subprocesso {} localizado em {}.",
+                    acao, usuario.getTituloEleitoral(), usuario.getUnidadeAtivaCodigo(), sp.getCodigo(), localizacao.getCodigo());
         }
         return permitido;
     }

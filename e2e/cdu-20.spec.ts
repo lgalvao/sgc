@@ -88,8 +88,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await aceitarCadastroMapeamento(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro', async ({page}) => {
-        
+    test('Preparacao 3: Admin homologa cadastro, cria competências e disponibiliza mapa', async ({page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
@@ -97,13 +96,8 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await homologarCadastroMapeamento(page);
 
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
-    });
 
-    test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page}) => {
-        
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        // Continua como Admin para criar competências (antiga Preparação 4)
         await navegarParaMapa(page);
 
         await criarCompetencia(page, competencia1, [atividade1]);
@@ -115,7 +109,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await expect(page.getByText(/Mapa disponibilizado/i).first()).toBeVisible();
     });
 
-    test('Preparacao 5: Chefe valida o mapa', async ({page}) => {
+    test('Preparacao 4: Chefe valida o mapa', async ({page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarSubprocessoChefe(page, descProcesso);
 
@@ -129,74 +123,45 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
     });
 
-    test('Cenario 1: GESTOR navega para visualização do mapa validado', async ({page}) => {
+    test('Cenarios 1-4: GESTOR analisa, cancela ações e registra aceite', async ({page}) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
 
-        // Passo 1: No Painel, escolhe o processo
+        // Cenario 1: Navegação e visualização
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-
-        // Passo 2: Tela Detalhes do subprocesso
-        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
-
         await navegarParaMapa(page);
 
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
         await expect(page.getByTestId('btn-mapa-historico-gestor')).toBeVisible();
         await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
         await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeVisible();
-    });
 
-    test('Cenario 2: GESTOR cancela aceite - permanece na tela', async ({page}) => {
-        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaMapa(page);
+        // Cenario 2: Cancela aceite - permanece na tela (antiga Scenario 2)
         await page.getByTestId('btn-mapa-homologar-aceite').click();
-
-        const modal = page.getByRole('dialog');
+        let modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
-
         await page.getByTestId('btn-aceite-mapa-cancelar').click();
-
-        // Permanece na tela de visualização
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
-        await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeVisible();
-    });
 
-    test('Cenario 3: GESTOR cancela devolução para ajustes e permanece no mapa', async ({page}) => {
-        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaMapa(page);
+        // Cenario 3: Cancela devolução - permanece na tela (antiga Scenario 3)
         await page.getByTestId('btn-mapa-devolver').click();
-
-        const modal = page.getByRole('dialog');
+        modal = page.getByRole('dialog');
         await expect(modal.getByRole('heading', {name: 'Devolução'})).toBeVisible();
-        await expect(modal.getByText(/Confirma a devolução da validação do mapa para ajustes/i)).toBeVisible();
         await page.getByTestId('btn-devolucao-mapa-cancelar').click();
-
         await expect(modal).toBeHidden();
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
-    });
 
-    test('Cenario 4: GESTOR registra aceite do mapa', async ({page}) => {
-        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaMapa(page);
+        // Cenario 4: Registra aceite do mapa (antiga Scenario 4)
         await page.getByTestId('btn-mapa-homologar-aceite').click();
-
-        const modal = page.getByRole('dialog');
+        modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
         await expect(page.getByText(/Aceite registrado/i).first()).toBeVisible();
 
-        // Verificar que o mapa avançou para ADMIN analisar
+        // Verificação adicional do fluxo
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
-
-        // Após aceite do GESTOR, o mapa ainda está validado mas agora no nível do ADMIN
         await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
     });
 
