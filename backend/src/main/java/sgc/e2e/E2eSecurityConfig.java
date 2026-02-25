@@ -52,9 +52,6 @@ public class E2eSecurityConfig {
      * <p>
      * Permite acesso aos endpoints de fixture E2E sem autenticação, mas mantém
      * a autenticação para outros endpoints da API.
-     *
-     * @param http o construtor {@link HttpSecurity} para configurar a segurança.
-     * @return o {@link SecurityFilterChain} configurado.
      */
     @Bean
     public SecurityFilterChain e2eSecurityFilterChain(HttpSecurity http, FiltroJwt filtroJwt) {

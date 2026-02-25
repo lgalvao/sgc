@@ -10,6 +10,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaFacade;
 import sgc.alerta.EmailService;
 import sgc.comum.model.ComumRepo;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.MapaFacade;
 import sgc.mapa.dto.ImpactoMapaResponse;
 import sgc.mapa.service.ImpactoMapaService;
@@ -33,6 +36,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -74,6 +78,8 @@ class SubprocessoWorkflowServiceTest {
     @BeforeEach
     void setup() {
         service.setMapaManutencaoService(mapaManutencaoService);
+        service.setSubprocessoRepo(subprocessoRepo);
+        service.setMovimentacaoRepo(movimentacaoRepo);
     }
 
     private Unidade criarUnidade(String sigla) {
@@ -136,9 +142,15 @@ class SubprocessoWorkflowServiceTest {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(id);
         sp.setUnidade(u);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        Mapa m = new Mapa();
+        m.setCodigo(100L);
+        sp.setMapa(m);
 
         when(subprocessoRepo.findByIdWithMapaAndAtividades(id)).thenReturn(Optional.of(sp));
-        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(any())).thenReturn(Collections.emptyList());
+        Atividade a = new Atividade();
+        a.setConhecimentos(Set.of(new Conhecimento()));
+        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(any())).thenReturn(List.of(a));
 
         service.disponibilizarCadastro(id, user);
 
@@ -153,6 +165,7 @@ class SubprocessoWorkflowServiceTest {
         Unidade u = criarUnidade("U1");
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(u);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         when(subprocessoRepo.findByIdWithMapaAndAtividades(id)).thenReturn(Optional.of(sp));
 
@@ -169,6 +182,7 @@ class SubprocessoWorkflowServiceTest {
         Unidade u = criarUnidade("U1");
         Subprocesso sp = new Subprocesso();
         sp.setUnidade(u);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         when(subprocessoRepo.findByIdWithMapaAndAtividades(id)).thenReturn(Optional.of(sp));
 
@@ -199,7 +213,8 @@ class SubprocessoWorkflowServiceTest {
         Long id = 1L;
         Usuario user = new Usuario();
         Subprocesso sp = new Subprocesso();
-        
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+
         when(subprocessoRepo.findByIdWithMapaAndAtividades(id)).thenReturn(Optional.of(sp));
         ImpactoMapaResponse impacts = ImpactoMapaResponse.builder().temImpactos(false).build();
         when(impactoMapaService.verificarImpactos(sp, user)).thenReturn(impacts);

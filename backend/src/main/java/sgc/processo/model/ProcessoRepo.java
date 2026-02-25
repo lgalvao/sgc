@@ -12,12 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface ProcessoRepo extends JpaRepository<Processo, Long> {
-    /**
-     * Busca processos por situação.
-     *
-     * @param situacao Situação do processo (CRIADO, EM_ANDAMENTO, FINALIZADO)
-     * @return Lista de processos com a situação especificada
-     */
+
     @Query("""
             SELECT DISTINCT p FROM Processo p LEFT JOIN FETCH p.participantes WHERE p.situacao = :situacao
             """)
@@ -43,11 +38,6 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
     /**
      * Busca processos onde as unidades participantes incluem as unidades especificadas
      * e o processo não está na situação especificada.
-     * 
-     * @param codigos Lista de códigos de unidades participantes
-     * @param situacao Situação a ser excluída
-     * @param pageable Informações de paginação
-     * @return Página de processos que atendem aos critérios
      */
     @Query(value = """
             SELECT DISTINCT p FROM Processo p

@@ -457,20 +457,6 @@ describe("CadMapa.vue", () => {
 
         await flushPromises();
 
-        // Note: The mocked modal hardcodes "Nova Competencia Teste" in emit if we rely on its internal logic.
-        // We should update our expectation to match the mock behavior or update mock.
-        // Mock emits { descricao: 'Nova Competencia Teste', ... }
-        // BUT component updates `competenciaSendoEditada`.
-        // The modal emits `salvar` with data.
-        // Component uses that data.
-        // So expectation should match mock emit.
-
-        // Wait, editing uses existing description?
-        // Component passes `competencia-para-editar` to modal.
-        // Modal mock ignores it and uses internal ref/template.
-        // The mock template emits 'Nova Competencia Teste'.
-        // So expectation should use that.
-
         expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(
             123,
             expect.objectContaining({

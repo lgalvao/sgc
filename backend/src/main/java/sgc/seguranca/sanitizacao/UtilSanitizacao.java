@@ -16,9 +16,6 @@ public final class UtilSanitizacao {
 
     /**
      * Sanitiza o texto fornecido, removendo todas as tags HTML.
-     *
-     * @param entrada O texto a ser sanitizado.
-     * @return O texto sem tags HTML.
      */
     public static String sanitizar(String entrada) {
         return POLITICA_PADRAO.sanitize(entrada);

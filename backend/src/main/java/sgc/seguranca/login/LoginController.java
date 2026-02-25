@@ -44,10 +44,6 @@ public class LoginController {
 
     /**
      * Autentica um usuário com base no título de eleitor e senha.
-     *
-     * @param request O DTO contendo o título de eleitor e a senha.
-     * @return Um {@link ResponseEntity} com {@code true} se a autenticação for
-     * bem-sucedida.
      */
     @PostMapping("/autenticar")
     @Operation(summary = "Autentica um usuário com título e senha")
@@ -77,9 +73,6 @@ public class LoginController {
     /**
      * Autoriza um usuário, retornando a lista de perfis e unidades a que ele tem
      * acesso.
-     *
-     * @return Um {@link ResponseEntity} contendo a lista de
-     * {@link PerfilUnidadeDto}.
      */
     @PostMapping("/autorizar")
     @Operation(summary = "Retorna os perfis e unidades disponíveis para o usuário")
@@ -95,10 +88,6 @@ public class LoginController {
     /**
      * Finaliza o processo de login, registrando o perfil e a unidade escolhidos
      * pelo usuário.
-     *
-     * @param request O DTO contendo o título de eleitor e o perfil/unidade
-     *                selecionado.
-     * @return Um {@link ResponseEntity} com o token de sessão.
      */
     @PostMapping("/entrar")
     @Operation(summary = "Finaliza o login e retorna o token JWT")
