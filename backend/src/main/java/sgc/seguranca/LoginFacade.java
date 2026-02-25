@@ -23,32 +23,35 @@ import sgc.seguranca.login.GerenciadorJwt;
 
 import java.util.List;
 
+import static sgc.organizacao.model.Perfil.ADMIN;
+
 /**
  * Serviço responsável pelo fluxo de login: autenticação, autorização e geração de tokens.
  */
 @Service
 @Slf4j
 public class LoginFacade {
-    private final UsuarioFacade usuarioService;
-    private final GerenciadorJwt gerenciadorJwt;
     private final @Nullable ClienteAcessoAd clienteAcessoAd;
+
+    private final UsuarioFacade usuarioFacade;
     private final OrganizacaoFacade organizacaoFacade;
-    private final UsuarioService usuarioServiceInterno;
+    private final GerenciadorJwt gerenciadorJwt;
+    private final UsuarioService usuarioService;
 
     @Value("${aplicacao.ambiente-testes:true}")
     private boolean ambienteTestes;
 
-    public LoginFacade(UsuarioFacade usuarioService,
+    public LoginFacade(UsuarioFacade usuarioFacade,
                        GerenciadorJwt gerenciadorJwt,
                        @Autowired(required = false) @Nullable ClienteAcessoAd clienteAcessoAd,
                        OrganizacaoFacade organizacaoFacade,
-                       UsuarioService usuarioServiceInterno) {
+                       UsuarioService usuarioService) {
 
-        this.usuarioService = usuarioService;
+        this.usuarioFacade = usuarioFacade;
         this.gerenciadorJwt = gerenciadorJwt;
         this.clienteAcessoAd = clienteAcessoAd;
         this.organizacaoFacade = organizacaoFacade;
-        this.usuarioServiceInterno = usuarioServiceInterno;
+        this.usuarioService = usuarioService;
     }
 
     /**
@@ -56,7 +59,7 @@ public class LoginFacade {
      */
     public boolean autenticar(String tituloEleitoral, String senha) {
         if (ambienteTestes) {
-            log.info("Usuário autenticado: {}", tituloEleitoral);
+            log.debug("Usuário autenticado: {}", tituloEleitoral);
             return true;
         }
         if (clienteAcessoAd == null) {
@@ -75,8 +78,8 @@ public class LoginFacade {
      * Retorna os perfis e unidades que o usuário pode acessar.
      */
     @Transactional(readOnly = true)
-    public List<PerfilUnidadeDto> autorizar(String tituloEleitoral) {
-        return buscarAutorizacoesInterno(tituloEleitoral);
+    public List<PerfilUnidadeDto> buscarAutorizacoesUsuario(String tituloEleitoral) {
+        return buscarAutorizacoes(tituloEleitoral);
     }
 
     /**
@@ -87,11 +90,12 @@ public class LoginFacade {
         Long codUnidade = request.unidadeCodigo();
         organizacaoFacade.unidadePorCodigo(codUnidade);
 
-        List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoesInterno(request.tituloEleitoral());
+        String tituloEleitoral = request.tituloEleitoral();
+        List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoes(tituloEleitoral);
         Perfil perfilSolicitado = Perfil.valueOf(request.perfil());
 
-        if (perfilSolicitado == Perfil.ADMIN) {
-            boolean temPerfilAdmin = autorizacoes.stream().anyMatch(pu -> pu.perfil() == Perfil.ADMIN);
+        if (perfilSolicitado == ADMIN) {
+            boolean temPerfilAdmin = autorizacoes.stream().anyMatch(pu -> pu.perfil() == ADMIN);
             if (!temPerfilAdmin) {
                 throw new ErroAcessoNegado("Usuário não tem permissão para acessar com perfil e unidade informados.");
             }
@@ -107,19 +111,22 @@ public class LoginFacade {
             }
         }
 
+        String siglaUnidade = organizacaoFacade.unidadePorCodigo(codUnidade).getSigla();
+        log.info("Usuário {} autorizado: {}-{}", tituloEleitoral, perfilSolicitado, siglaUnidade);
+
         return gerenciadorJwt.gerarToken(
-                request.tituloEleitoral(),
+                tituloEleitoral,
                 perfilSolicitado,
                 codUnidade);
     }
 
-    private List<PerfilUnidadeDto> buscarAutorizacoesInterno(String tituloEleitoral) {
-        Usuario usuario = usuarioService.carregarUsuarioParaAutenticacao(tituloEleitoral);
+    private List<PerfilUnidadeDto> buscarAutorizacoes(String tituloEleitoral) {
+        Usuario usuario = usuarioFacade.carregarUsuarioParaAutenticacao(tituloEleitoral);
         if (usuario == null) {
             throw new ErroAutenticacao("Credenciais inválidas");
         }
 
-        List<UsuarioPerfil> atribuicoes = usuarioServiceInterno.buscarPerfis(usuario.getTituloEleitoral());
+        List<UsuarioPerfil> atribuicoes = usuarioService.buscarPerfis(usuario.getTituloEleitoral());
         return atribuicoes.stream()
                 .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                 .map(atribuicao -> new PerfilUnidadeDto(

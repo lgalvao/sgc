@@ -174,7 +174,7 @@ class LoginFacadeTest {
 
     @Test
     @DisplayName("autorizar deve retornar lista de perfis")
-    void autorizar_Sucesso() {
+    void buscarAutorizacoesUsuario_Sucesso() {
         Usuario user = new Usuario();
         user.setTituloEleitoral("123");
         when(usuarioFacade.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
@@ -191,7 +191,7 @@ class LoginFacadeTest {
         
         when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
 
-        List<PerfilUnidadeDto> result = loginFacade.autorizar("123");
+        List<PerfilUnidadeDto> result = loginFacade.buscarAutorizacoesUsuario("123");
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().perfil()).isEqualTo(Perfil.GESTOR);
     }

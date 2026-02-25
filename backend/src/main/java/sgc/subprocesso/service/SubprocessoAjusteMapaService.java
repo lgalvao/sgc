@@ -38,6 +38,7 @@ class SubprocessoAjusteMapaService {
 
     @Transactional
     public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
+        log.info("Salvando ajustes no mapa do subprocesso {} ({} competências)", codSubprocesso, competencias.size());
         Subprocesso sp = repo.buscar(Subprocesso.class, codSubprocesso);
 
         validarSituacaoParaAjuste(sp);
@@ -50,6 +51,7 @@ class SubprocessoAjusteMapaService {
 
     @Transactional(readOnly = true)
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
+        log.info("Recuperando mapa para ajustes do subprocesso {}", codSubprocesso);
         Subprocesso sp = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
         Long codMapa = sp.getMapa().getCodigo();
         

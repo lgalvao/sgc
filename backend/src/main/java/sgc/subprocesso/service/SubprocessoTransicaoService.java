@@ -99,7 +99,7 @@ public class SubprocessoTransicaoService {
                 .observacoes(cmd.observacoes())
                 .build());
 
-        log.info("{} -> {}", cmd.novaSituacao(), cmd.tipoTransicao());
+        log.debug("{} -> {}", cmd.novaSituacao(), cmd.tipoTransicao());
     }
 
     private void notificarTransicao(Subprocesso sp, TipoTransicao tipo,
@@ -114,7 +114,7 @@ public class SubprocessoTransicaoService {
             }
 
             if (tipo.enviaEmail()) {
-                emailService.enviarEmailTransicaoDireta(sp, tipo, origem, destino, observacoes);
+                emailService.notificarMovimentacao(sp, tipo, origem, destino, observacoes);
             }
         } catch (Exception e) {
             log.error("Falha ao enviar notificação de transição {}: {}", tipo, e.getMessage(), e);

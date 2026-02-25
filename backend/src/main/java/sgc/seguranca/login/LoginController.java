@@ -88,7 +88,7 @@ public class LoginController {
             HttpServletRequest httpRequest) {
 
         verificarTokenPreAuth(httpRequest, request.tituloEleitoral());
-        List<PerfilUnidadeDto> perfis = loginFacade.autorizar(request.tituloEleitoral());
+        List<PerfilUnidadeDto> perfis = loginFacade.buscarAutorizacoesUsuario(request.tituloEleitoral());
         return ResponseEntity.ok(perfis);
     }
 

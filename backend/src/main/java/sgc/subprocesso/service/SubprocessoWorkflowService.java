@@ -677,11 +677,11 @@ public class SubprocessoWorkflowService {
         if (subprocesso.getSituacao() == NAO_INICIADO) {
             var tipoProcesso = subprocesso.getProcesso().getTipo();
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
-                log.info("Atualizando sit. SP{} para MAPEAMENTO_CADASTRO_EM_ANDAMENTO", subprocesso.getCodigo());
+                log.debug("Atualizando subprocesso {} p/ MAPEAMENTO_CADASTRO_EM_ANDAMENTO", subprocesso.getCodigo());
                 subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
                 subprocessoRepo.save(subprocesso);
             } else if (tipoProcesso == TipoProcesso.REVISAO) {
-                log.info("Atualizando sit. SP{} para REVISAO_CADASTRO_EM_ANDAMENTO", subprocesso.getCodigo());
+                log.debug("Atualizando subprocesso {} p/ REVISAO_CADASTRO_EM_ANDAMENTO", subprocesso.getCodigo());
                 subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
                 subprocessoRepo.save(subprocesso);
             }
@@ -782,8 +782,9 @@ public class SubprocessoWorkflowService {
                 .usuario(usuario)
                 .descricao("Processo de revisão iniciado")
                 .build());
+
         subprocessoSalvo.setLocalizacaoAtualCache(unidade);
-        log.info("Subprocesso para revisão criado para unidade {}", unidade.getSigla());
+        log.info("Subprocesso criado para unidade {}", unidade.getSigla());
     }
 
     public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {

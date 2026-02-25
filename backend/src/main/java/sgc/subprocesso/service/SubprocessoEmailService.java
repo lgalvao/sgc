@@ -33,9 +33,9 @@ public class SubprocessoEmailService {
     private final UsuarioFacade usuarioFacade;
 
     /**
-     * Envia e-mail de transição diretamente (sem evento assíncrono).
+     * Ponto de entrada para disparar todas as comunicações (e-mails) relacionadas a uma movimentação.
      */
-    public void enviarEmailTransicaoDireta(Subprocesso sp, TipoTransicao tipo,
+    public void notificarMovimentacao(Subprocesso sp, TipoTransicao tipo,
                                             Unidade unidadeOrigem, Unidade unidadeDestino,
                                             String observacoes) {
         if (!tipo.enviaEmail())
@@ -43,39 +43,69 @@ public class SubprocessoEmailService {
 
         try {
             Map<String, Object> variaveis = criarVariaveisTemplateDireto(sp, unidadeOrigem, unidadeDestino, observacoes);
-            String assunto = criarAssunto(tipo, sp);
-            String corpo = processarTemplate(tipo.getTemplateEmail(), variaveis);
+            
+            // 1. Notificação Operacional (Unidade Destino - quem deve agir)
+            enviarNotificacaoOperacional(sp, tipo, unidadeDestino, variaveis);
 
-            // 1. Enviar para o e-mail da unidade (ex: sesel@tre-pe.jus.br)
-            String emailUnidade = String.format("%s@tre-pe.jus.br", unidadeDestino.getSigla().toLowerCase());
-            emailService.enviarEmailHtml(emailUnidade, assunto, corpo);
-            log.info("E-mail enviado para {}", unidadeDestino.getSigla());
-
-            // 2. Enviar para o responsável atual (substituto ou titular se solicitado)
-            notificarResponsaveisPessoais(unidadeDestino, assunto, corpo);
-
-            if (deveNotificarHierarquia(tipo)) {
-                notificarHierarquia(unidadeOrigem, assunto, corpo);
+            // 2. Notificação de Acompanhamento (Unidades Superiores - quem deve monitorar)
+            if (tipo.enviaEmailSuperior()) {
+                enviarNotificacaoAcompanhamentoSuperior(unidadeOrigem, sp, tipo, variaveis, unidadeDestino);
             }
 
         } catch (Exception e) {
-            log.error("Erro ao enviar e-mail de transição {}: {}", tipo, e.getMessage(), e);
+            log.error("Erro ao processar comunicações da movimentação {}: {}", tipo, e.getMessage(), e);
         }
     }
 
-    private void notificarResponsaveisPessoais(Unidade unidade, String assunto, String corpo) {
-        UnidadeResponsavelDto responsavel = organizacaoFacade.buscarResponsavelUnidade(unidade.getCodigo());
-        // responsavel nunca deve ser nulo. É invariante do sistema, garantido pelas views.
+    private void enviarNotificacaoOperacional(Subprocesso sp, TipoTransicao tipo, Unidade unidadeDestino, Map<String, Object> variaveis) {
+        String assunto = criarAssunto(tipo, sp, false);
+        String corpo = processarTemplate(tipo.getTemplateEmail(), variaveis);
+        
+        String emailUnidade = String.format("%s@tre-pe.jus.br", unidadeDestino.getSigla().toLowerCase());
+        emailService.enviarEmailHtml(emailUnidade, assunto, corpo);
+        log.info("Notificação OPERACIONAL de '{}' enviada para unidade {}", tipo, unidadeDestino.getSigla());
 
-        // Se houver substituto, ele é o responsável atual e deve receber no seu e-mail pessoal
+        // Responsável pessoal (substituto) também recebe a operacional
+        notificarResponsavelPessoal(unidadeDestino, assunto, corpo, tipo);
+    }
+
+    private void notificarResponsavelPessoal(Unidade unidade, String assunto, String corpo, TipoTransicao tipo) {
+        UnidadeResponsavelDto responsavel = organizacaoFacade.buscarResponsavelUnidade(unidade.getCodigo());
         if (responsavel.substitutoTitulo() != null) {
             usuarioFacade.buscarUsuarioPorTitulo(responsavel.substitutoTitulo())
                 .ifPresent(u -> {
                     if (u.getEmail() != null && !u.getEmail().isBlank()) {
                         emailService.enviarEmailHtml(u.getEmail(), assunto, corpo);
-                        log.info("E-mail pessoal enviado para substituto da unidade {}: {}", unidade.getSigla(), u.getEmail());
+                        log.info("Notificação OPERACIONAL de '{}' enviada para e-mail pessoal de {}", tipo, u.getNome());
                     }
                 });
+        }
+    }
+
+    private void enviarNotificacaoAcompanhamentoSuperior(Unidade unidadeOrigem, Subprocesso sp, TipoTransicao tipo, Map<String, Object> variaveisBase, Unidade unidadeJaNotificada) {
+        Unidade superior = unidadeOrigem.getUnidadeSuperior();
+        String assunto = criarAssunto(tipo, sp, true);
+
+        while (superior != null) {
+            // Evita duplicidade se a unidade superior for a própria unidade de destino operacional
+            if (unidadeJaNotificada != null && superior.getCodigo().equals(unidadeJaNotificada.getCodigo())) {
+                superior = superior.getUnidadeSuperior();
+                continue;
+            }
+
+            try {
+                Map<String, Object> variaveis = new HashMap<>(variaveisBase);
+                variaveis.put("siglaUnidadeSuperior", superior.getSigla());
+                
+                String corpo = processarTemplate(tipo.getTemplateEmailSuperior(), variaveis);
+                String emailSuperior = String.format("%s@tre-pe.jus.br", superior.getSigla().toLowerCase());
+                
+                emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
+                log.info("Notificação de ACOMPANHAMENTO de '{}' enviada para unidade superior {}", tipo, superior.getSigla());
+            } catch (Exception e) {
+                log.warn("Falha ao notificar acompanhamento superior {}: {}", superior.getSigla(), e.getMessage());
+            }
+            superior = superior.getUnidadeSuperior();
         }
     }
 
@@ -101,62 +131,27 @@ public class SubprocessoEmailService {
 
         if (sp.getDataLimiteEtapa2() != null) {
             variaveis.put("dataLimiteEtapa2", sp.getDataLimiteEtapa2().format(DATE_FORMATTER));
+            variaveis.put("dataLimiteValidacao", sp.getDataLimiteEtapa2().format(DATE_FORMATTER));
         }
 
         if (observacoes != null) {
             variaveis.put("observacoes", observacoes);
-            variaveis.put("motivo", observacoes);
         }
 
         return variaveis;
     }
 
-    private String criarAssunto(TipoTransicao tipo, Subprocesso sp) {
-        String siglaUnidade = sp.getUnidade().getSigla();
-
-        return switch (tipo) {
-            case CADASTRO_DISPONIBILIZADO, REVISAO_CADASTRO_DISPONIBILIZADA ->
-                String.format("SGC: Cadastro de atividades da unidade %s disponibilizado", siglaUnidade);
-            case CADASTRO_DEVOLVIDO, REVISAO_CADASTRO_DEVOLVIDA ->
-                String.format("SGC: Cadastro de atividades da unidade %s devolvido para ajustes", siglaUnidade);
-            case CADASTRO_ACEITO ->
-                String.format("SGC: Cadastro de atividades da unidade %s aceito", siglaUnidade);
-            case REVISAO_CADASTRO_ACEITA ->
-                String.format("SGC: Revisão do cadastro de atividades e conhecimentos da %s submetido para análise", siglaUnidade);
-            case MAPA_DISPONIBILIZADO ->
-                String.format("SGC: Mapa de competências da unidade %s disponibilizado", siglaUnidade);
-            case MAPA_SUGESTOES_APRESENTADAS -> String.format("SGC: Sugestões para o mapa da unidade %s", siglaUnidade);
-            case MAPA_VALIDADO -> String.format("SGC: Mapa de competências da unidade %s validado", siglaUnidade);
-            case MAPA_VALIDACAO_DEVOLVIDA ->
-                String.format("SGC: Validação do mapa da unidade %s devolvida", siglaUnidade);
-            case MAPA_VALIDACAO_ACEITA -> String.format("SGC: Validação do mapa da unidade %s aceita", siglaUnidade);
-            default -> String.format("SGC: Notificação - %s", tipo.getDescricaoMovimentacao());
-        };
-    }
-
-    private String processarTemplate(String templateName, Map<String, Object> variaveis) {
-        Context context = new Context();
-        context.setVariables(variaveis);
-        return templateEngine.process(templateName, context);
-    }
-
-    private boolean deveNotificarHierarquia(TipoTransicao tipo) {
-        return tipo == TipoTransicao.MAPA_DISPONIBILIZADO
-                || tipo == TipoTransicao.CADASTRO_DISPONIBILIZADO
-                || tipo == TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA;
-    }
-
-    private void notificarHierarquia(Unidade unidadeOrigem, String assunto, String corpo) {
-        Unidade superior = unidadeOrigem.getUnidadeSuperior();
-        while (superior != null) {
-            try {
-                String emailSuperior = String.format("%s@tre-pe.jus.br", superior.getSigla().toLowerCase());
-                emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
-                log.info("E-mail enviado para unidade superior: {}", superior.getSigla());
-            } catch (Exception e) {
-                log.warn("Falha ao enviar e-mail para {}: {}", superior.getSigla(), e.getMessage());
-            }
-            superior = superior.getUnidadeSuperior();
+    private String criarAssunto(TipoTransicao tipo, Subprocesso sp, boolean paraSuperior) {
+        String base = tipo.getDescricaoMovimentacao();
+        if (paraSuperior) {
+            return "SGC: %s - %s".formatted(base, sp.getUnidade().getSigla());
         }
+        return "SGC: %s".formatted(base);
+    }
+
+    private String processarTemplate(String templateName, Map<String, Object> variables) {
+        Context context = new Context();
+        context.setVariables(variables);
+        return templateEngine.process(templateName, context);
     }
 }

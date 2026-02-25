@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import sgc.alerta.EmailService;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,9 +52,9 @@ class SubprocessoEmailServiceTest {
         Unidade dest = new Unidade();
         dest.setSigla("DEST");
 
-        when(templateEngine.process(anyString(), any())).thenReturn("html");
+        when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
 
-        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DEVOLVIDO, new Unidade(), dest, "Motivo");
+        service.notificarMovimentacao(sp, TipoTransicao.CADASTRO_DEVOLVIDO, new Unidade(), dest, "Motivo");
 
         verify(emailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), anyString(), eq("html"));
     }
@@ -62,22 +64,23 @@ class SubprocessoEmailServiceTest {
     void notificaHierarquia() {
         Subprocesso sp = criarSubprocesso();
 
-        Unidade origem = new Unidade();
-        origem.setSigla("ORIG");
-        Unidade superior = new Unidade();
-        superior.setSigla("SUP");
-        origem.setUnidadeSuperior(superior);
-
-        when(templateEngine.process(anyString(), any())).thenReturn("html");
-
         Unidade destino = new Unidade();
         destino.setCodigo(1L);
         destino.setSigla("DEST");
 
+        Unidade origem = new Unidade();
+        origem.setSigla("ORIG");
+        Unidade superior = new Unidade();
+        superior.setCodigo(2L); // ID diferente de DEST
+        superior.setSigla("SUP");
+        origem.setUnidadeSuperior(superior);
+
+        when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
+
         // Mock responsavel para evitar NPE
         when(OrganizacaoFacade.buscarResponsavelUnidade(1L)).thenReturn(mock(UnidadeResponsavelDto.class));
 
-        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, origem, destino, null);
+        service.notificarMovimentacao(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, origem, destino, null);
 
         // Verifica envio para superior
         verify(emailService).enviarEmailHtml(eq("sup@tre-pe.jus.br"), anyString(), eq("html"));
@@ -92,16 +95,16 @@ class SubprocessoEmailServiceTest {
         dest.setSigla("DEST");
         
         // Ensure template engine is called, so exception is thrown in the try block
-        lenient().when(templateEngine.process(anyString(), any())).thenThrow(new RuntimeException("Template error"));
+        lenient().when(templateEngine.process(anyString(), any(Context.class))).thenThrow(new RuntimeException("Template error"));
 
-        assertThatCode(() -> service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, null, dest, null))
+        assertThatCode(() -> service.notificarMovimentacao(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, null, dest, null))
                 .doesNotThrowAnyException();
     }
 
     @Test
     @DisplayName("Não envia email se tipo de transição não exige")
     void naoEnviaSeTipoNaoExige() {
-        service.enviarEmailTransicaoDireta(null, TipoTransicao.CADASTRO_HOMOLOGADO, null, null, null);
+        service.notificarMovimentacao(null, TipoTransicao.CADASTRO_HOMOLOGADO, null, null, null);
 
         verifyNoInteractions(emailService);
         verifyNoInteractions(templateEngine);
@@ -112,7 +115,7 @@ class SubprocessoEmailServiceTest {
     void naoEnviaSeDestinoNulo() {
         Subprocesso sp = criarSubprocesso();
         
-        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, null, null, null);
+        service.notificarMovimentacao(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, null, null, null);
 
         verifyNoInteractions(emailService);
     }
@@ -124,9 +127,9 @@ class SubprocessoEmailServiceTest {
         Unidade destino = new Unidade();
         destino.setSigla("DEST");
 
-        lenient().when(templateEngine.process(anyString(), any())).thenReturn("html");
+        lenient().when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
 
-        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, null, destino, null);
+        service.notificarMovimentacao(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, null, destino, null);
 
         // Logs error because variable creation fails with null origin, so no email sent
         verifyNoInteractions(emailService);
@@ -141,6 +144,7 @@ class SubprocessoEmailServiceTest {
         Unidade origem = new Unidade();
         origem.setSigla("ORIG");
         Unidade superior = new Unidade();
+        superior.setCodigo(2L); // ID diferente de DEST
         superior.setSigla("SUP");
         origem.setUnidadeSuperior(superior);
 
@@ -151,12 +155,12 @@ class SubprocessoEmailServiceTest {
         // Mock responsavel para evitar NPE
         lenient().when(OrganizacaoFacade.buscarResponsavelUnidade(1L)).thenReturn(mock(UnidadeResponsavelDto.class));
 
-        when(templateEngine.process(anyString(), any())).thenReturn("html");
+        when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
 
         doNothing().when(emailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), anyString(), any());
         doThrow(new RuntimeException("Fail")).when(emailService).enviarEmailHtml(eq("sup@tre-pe.jus.br"), anyString(), any());
 
-        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, origem, destino, null);
+        service.notificarMovimentacao(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, origem, destino, null);
 
         verify(emailService).enviarEmailHtml(eq("sup@tre-pe.jus.br"), anyString(), any());
         verify(emailService).enviarEmailHtml(eq("dest@tre-pe.jus.br"), anyString(), any());
@@ -171,7 +175,7 @@ class SubprocessoEmailServiceTest {
 
         Unidade orig = new Unidade(); orig.setSigla("O");
         Unidade dest = new Unidade(); dest.setSigla("D");
-        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, orig, dest, null);
+        service.notificarMovimentacao(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, orig, dest, null);
         verify(emailService).enviarEmailHtml(eq("d@tre-pe.jus.br"), anyString(), any());
     }
 
@@ -181,12 +185,13 @@ class SubprocessoEmailServiceTest {
         Subprocesso sp = criarSubprocesso();
         sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
 
-        when(templateEngine.process(anyString(), any())).thenReturn("html");
+        when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
 
         Unidade dest = new Unidade(); dest.setSigla("D");
-        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
+        service.notificarMovimentacao(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
 
-        verify(templateEngine).process(anyString(), argThat(ctx -> ctx.getVariable("dataLimiteEtapa2") != null
+        verify(templateEngine).process(eq("cadastro-disponibilizado"), argThat(ctx -> 
+            ctx instanceof Context && ((Context)ctx).getVariable("dataLimiteEtapa2") != null
         ));
     }
 
@@ -195,13 +200,13 @@ class SubprocessoEmailServiceTest {
     void deveIncluirObservacoesNasVariaveis() {
         Subprocesso sp = criarSubprocesso();
 
-        when(templateEngine.process(anyString(), any())).thenReturn("html");
+        when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
 
         Unidade dest = new Unidade(); dest.setSigla("D");
-        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, "Minha Observação");
+        service.notificarMovimentacao(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, "Minha Observação");
 
-        verify(templateEngine).process(anyString(), argThat(ctx ->
-                "Minha Observação".equals(ctx.getVariable("observacoes"))
+        verify(templateEngine).process(eq("cadastro-disponibilizado"), argThat(ctx ->
+                ctx instanceof Context && "Minha Observação".equals(((Context)ctx).getVariable("observacoes"))
         ));
     }
 
@@ -210,14 +215,14 @@ class SubprocessoEmailServiceTest {
     void deveLidarComTipoProcessoIniciado() {
         Subprocesso sp = criarSubprocesso();
 
-        when(templateEngine.process(anyString(), any())).thenReturn("html");
+        when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
 
         Unidade dest = new Unidade(); dest.setSigla("D");
-        service.enviarEmailTransicaoDireta(sp, TipoTransicao.PROCESSO_INICIADO, new Unidade(), dest, null);
+        service.notificarMovimentacao(sp, TipoTransicao.PROCESSO_INICIADO, new Unidade(), dest, null);
 
-        // Verifica que enviou email com assunto formatado pelo default do switch
+        // Verifica que enviou email com assunto formatado
         verify(emailService).enviarEmailHtml(any(),
-                argThat(s -> s != null && s.contains("SGC: Notificação - Processo iniciado")),
+                argThat(s -> s != null && s.contains("SGC: Processo iniciado")),
                 any());
     }
 
@@ -229,7 +234,7 @@ class SubprocessoEmailServiceTest {
         dest.setCodigo(1L);
         dest.setSigla("DEST");
 
-        when(templateEngine.process(anyString(), any())).thenReturn("html");
+        when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
 
         UnidadeResponsavelDto resp = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(1L)
@@ -241,7 +246,7 @@ class SubprocessoEmailServiceTest {
         substituto.setEmail("sub@teste.com");
         when(usuarioFacade.buscarUsuarioPorTitulo("123456")).thenReturn(Optional.of(substituto));
 
-        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
+        service.notificarMovimentacao(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
 
         verify(emailService).enviarEmailHtml(eq("sub@teste.com"), anyString(), eq("html"));
     }
@@ -254,7 +259,7 @@ class SubprocessoEmailServiceTest {
         dest.setCodigo(1L);
         dest.setSigla("DEST");
 
-        when(templateEngine.process(anyString(), any())).thenReturn("html");
+        when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
 
         UnidadeResponsavelDto resp = UnidadeResponsavelDto.builder()
                 .unidadeCodigo(1L)
@@ -266,7 +271,7 @@ class SubprocessoEmailServiceTest {
         substituto.setEmail(""); // Email vazio
         when(usuarioFacade.buscarUsuarioPorTitulo("123456")).thenReturn(Optional.of(substituto));
 
-        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
+        service.notificarMovimentacao(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
 
         // Verifica envio para a unidade (padrão), mas NÃO para o substituto
         verify(emailService, times(1)).enviarEmailHtml(anyString(), anyString(), anyString());
@@ -281,10 +286,10 @@ class SubprocessoEmailServiceTest {
         dest.setCodigo(1L);
         dest.setSigla("DEST");
 
-        when(templateEngine.process(anyString(), any())).thenReturn("html");
+        when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
         when(OrganizacaoFacade.buscarResponsavelUnidade(1L)).thenReturn(null);
 
-        service.enviarEmailTransicaoDireta(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
+        service.notificarMovimentacao(sp, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Unidade(), dest, null);
 
         // Apenas o email da unidade deve ser enviado
         verify(emailService, times(1)).enviarEmailHtml(anyString(), anyString(), anyString());

@@ -41,7 +41,6 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
     test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page, autenticadoComoAdmin}) => {
         // 1. Admin cria e inicia processo
-
         await criarProcesso(page, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
@@ -59,131 +58,68 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         // 2. Chefe adiciona atividades e conhecimentos
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
-
         await acessarSubprocessoChefeDireto(page, descProcesso);
         await navegarParaAtividades(page);
-
         await adicionarAtividade(page, ATIVIDADE_1);
         await adicionarConhecimento(page, ATIVIDADE_1, CONHECIMENTO_1);
-
         await adicionarAtividade(page, ATIVIDADE_2);
         await adicionarConhecimento(page, ATIVIDADE_2, CONHECIMENTO_2);
-
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        // 3. Gestor aceita
+        // 3. Gestores aceitam
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
-
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
 
-        // 3.1. Secretaria 2 aceita (nível superior)
-        // Usuário 212121 possui perfis CHEFE e GESTOR na mesma unidade (11), então precisa selecionar
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
-
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
 
         // 4. Admin homologa
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await homologarCadastroMapeamento(page);
 
-        // Agora deve estar em "Cadastro homologado"
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
     });
 
-    test('CT-00 e CT-01: Acessar Edição de Mapa e verificar elementos', async ({page, autenticadoComoAdmin}) => {
-        
-
+    test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({page, autenticadoComoAdmin}) => {
+        // CT-00 e CT-01: Acessar Edição e verificar elementos
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-
         await navegarParaMapa(page);
 
-        // Verificar título
         await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
-
-        // Verificar botões principais
-        await expect(
-            page.getByTestId('btn-abrir-criar-competencia').or(page.getByTestId('btn-abrir-criar-competencia-empty'))
-        ).toBeVisible();
-
-        // Botão disponibilizar deve estar desabilitado se não houver competências
+        await expect(page.getByTestId('btn-abrir-criar-competencia').or(page.getByTestId('btn-abrir-criar-competencia-empty'))).toBeVisible();
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
-    });
 
-    test('CT-02: Criar Competência', async ({page, autenticadoComoAdmin}) => {
-        
-        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-
+        // CT-02: Criar Competência
         const compDesc = `Competência 1 ${timestamp}`;
         await criarCompetencia(page, compDesc, [ATIVIDADE_1]);
-
-        // Verificar mudança de situação
         await verificarSituacaoSubprocesso(page, 'Mapa criado');
-
-        // Verificar se botão disponibilizar ficou habilitado
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeEnabled();
-    });
 
-    test('CT-03: Editar Competência', async ({page, autenticadoComoAdmin}) => {
-        
-        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-
-        const oldDesc = `Competência 1 ${timestamp}`;
+        // CT-03: Editar Competência
         const newDesc = `Competência 1 Editada ${timestamp}`;
-
-        // Editar descrição e adicionar mais uma atividade
-        await editarCompetencia(page, oldDesc, newDesc, [ATIVIDADE_2]);
-
-        // Verificar que agora tem as duas atividades
+        await editarCompetencia(page, compDesc, newDesc, [ATIVIDADE_2]);
         await verificarCompetenciaNoMapa(page, newDesc, [ATIVIDADE_1, ATIVIDADE_2]);
-    });
 
-    test('CT-05: Validar Cancelamento da Exclusão', async ({page, autenticadoComoAdmin}) => {
-        
-        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaMapa(page);
+        // CT-05: Validar Cancelamento da Exclusão
+        await excluirCompetenciaCancelando(page, newDesc);
+        await expect(page.getByText(newDesc).first()).toBeVisible();
 
-        const compDesc = `Competência 1 Editada ${timestamp}`;
-
-        await excluirCompetenciaCancelando(page, compDesc);
-
-        await expect(page.getByText(compDesc).first()).toBeVisible();
-    });
-
-    test('CT-04: Excluir Competência com Confirmação', async ({page, autenticadoComoAdmin}) => {
-        
-        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-
-        const compDesc = `Competência 1 Editada ${timestamp}`;
-
-        await excluirCompetenciaConfirmando(page, compDesc);
-
-        // Lista deve estar vazia agora, botão disponibilizar deve desabilitar
+        // CT-04: Excluir Competência com Confirmação
+        await excluirCompetenciaConfirmando(page, newDesc);
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
-    });
 
-    test('CT-06: Navegar para Disponibilização', async ({page, autenticadoComoAdmin}) => {
-        // Recriar uma competência para poder disponibilizar
-        
-        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-
-        const compDesc = `Competência Final ${timestamp}`;
-        await criarCompetencia(page, compDesc, [ATIVIDADE_1, ATIVIDADE_2]);
-
+        // CT-06: Navegar para Disponibilização
+        const compFinal = `Competência Final ${timestamp}`;
+        await criarCompetencia(page, compFinal, [ATIVIDADE_1, ATIVIDADE_2]);
         await disponibilizarMapa(page);
 
-        // Após disponibilizar, deve redirecionar para o painel
         await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
     });

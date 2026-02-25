@@ -38,7 +38,7 @@ Este roteiro utiliza a hierarquia da **Secretaria 2**. A senha padrão para todo
     *   Clique em **Iniciar** e confirme.
     *   ✅ **Resultado Esperado:** O processo muda para a situação "EM_ANDAMENTO". O processo desaparece da visão do ADMIN (pois agora está com o CHEFE) e um alerta de início de processo é gerado para a `Seção 221`.
 
-### 2. Mapeamento de Atividades e Conhecimentos (CHEFE)
+### 2. Cadastrar Atividades e Conhecimentos (CHEFE)
 
 **Ator:** Chefe de Seção (`141414`)
 
@@ -58,11 +58,11 @@ Este roteiro utiliza a hierarquia da **Secretaria 2**. A senha padrão para todo
 4.  **Disponibilizar Cadastro:**
     *   Clique em **Disponibilizar**.
     *   Na modal de confirmação, clique em **Confirmar**.
-    *   ✅ **Resultado Esperado:** O sistema redireciona para o Painel com uma mensagem de sucesso. O processo não está mais na sua caixa de entrada. A situação do subprocesso muda para "Cadastro disponibilizado".
+    *   ✅ **Resultado Esperado:** O sistema redireciona para o Painel com uma mensagem de sucesso. A situação do subprocesso muda para "Cadastro disponibilizado".
 
-### 3. Análise e Devolução do Cadastro (GESTOR)
+### 3. Análise/Devolução do Cadastro (GESTOR)
 
-**Ator:** Gestor da Coordenação (`131313`)
+**Ator:** Gestor da Coordenadoria (`131313`)
 
 1.  **Login:** Faça login como `131313` (Mick Jagger).
 2.  **Acessar Processo para Análise:**
@@ -72,9 +72,9 @@ Este roteiro utiliza a hierarquia da **Secretaria 2**. A senha padrão para todo
     *   Acesse a aba/card **Atividades e Conhecimentos**.
     *   Clique no botão **Devolver para ajustes**.
     *   Na modal, preencha a **Observação**: `É necessário adicionar uma atividade sobre relatórios.` e clique em **Confirmar**.
-    *   ✅ **Resultado Esperado:** O sistema redireciona para o Painel com uma mensagem de sucesso. O processo desaparece da sua caixa de entrada.
+    *   ✅ **Resultado Esperado:** O sistema redireciona para o Painel com uma mensagem de sucesso.
 
-### 4. Ajuste e Reenvio do Cadastro (CHEFE)
+### 4. Ajuste e nova disponibilização do Cadastro (CHEFE)
 
 **Ator:** Chefe de Seção (`141414`)
 
@@ -88,15 +88,15 @@ Este roteiro utiliza a hierarquia da **Secretaria 2**. A senha padrão para todo
     *   Adicione a nova atividade: `Elaboração de Relatórios Gerenciais` com o conhecimento `Análise de Dados`.
 4.  **Reenviar Cadastro:**
     *   Clique em **Disponibilizar** e confirme.
-    *   ✅ **Resultado Esperado:** Sucesso. O processo é enviado novamente para o Gestor.
+    *   ✅ **Resultado Esperado:** Sucesso. O subprocesso é 'enviado' para a unidade superior.
 
 ### 5. Aceite do Cadastro (GESTOR)
 
-**Ator:** Gestor da Coordenação (`131313`)
+**Ator:** Gestor da Coordenadoria (`131313`)
 
 1.  **Login:** Faça login como `131313` (Mick Jagger).
 2.  **Acessar e Analisar:**
-    *   Acesse o processo e o subprocesso da `Seção 221` novamente.
+    *   Acesse o processo atual e depois o subprocesso da `Seção 221` novamente.
     *   Verifique se a nova atividade foi incluída.
 3.  **Registrar Aceite:**
     *   Clique em **Registrar aceite**.
@@ -109,7 +109,7 @@ Este roteiro utiliza a hierarquia da **Secretaria 2**. A senha padrão para todo
 
 1.  **Login:** Faça login como `191919`.
 2.  **Acessar e Homologar:**
-    *   Acesse o processo e o subprocesso da `Seção 221`.
+    *   Acesse o processo atual e o subprocesso da `Seção 221`.
     *   Acesse **Atividades e Conhecimentos**.
     *   Clique em **Homologar**.
     *   Na modal, confirme a homologação.
@@ -158,7 +158,7 @@ Este roteiro utiliza a hierarquia da **Secretaria 2**. A senha padrão para todo
 
 1.  **Login:** Faça login como `191919`.
 2.  **Acessar e Homologar Mapa:**
-    *   Acesse o processo, o subprocesso da `Seção 221` e o **Mapa de Competências**.
+    *   Acesse o processo, depois o subprocesso da `Seção 221` e o **Mapa de Competências**.
     *   Clique em **Homologar Mapa**.
     *   Confirme a homologação.
     *   ✅ **Resultado Esperado:** Sucesso. A situação do subprocesso muda para "Mapa homologado".

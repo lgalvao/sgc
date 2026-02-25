@@ -4,14 +4,15 @@ async function garantirContextoSubprocesso(page: Page) {
     const cardEdicao = page.getByTestId('card-subprocesso-atividades');
     const cardVisualizacao = page.getByTestId('card-subprocesso-atividades-vis');
     
-    // Se algum dos cards já está visível, estamos no contexto correto
-    if (await cardEdicao.or(cardVisualizacao).first().isVisible()) {
+    // Tenta aguardar um pouco se não estiver no contexto, para evitar avisos falsos em navegações lentas
+    try {
+        await expect(cardEdicao.or(cardVisualizacao).first()).toBeVisible({ timeout: 2000 });
         return;
-    }
-
-    // Se não estiver em um subprocesso (URL com sigla no final), avisar ou falhar
-    if (!/\/processo\/\d+\/[A-Z0-9_]+$/.test(page.url())) {
-        console.warn(`[Aviso] navegarParaAtividades chamado fora de um contexto de subprocesso: ${page.url()}`);
+    } catch {
+        // Se após 2s não estiver visível, verifica a URL
+        if (!/\/processo\/\d+\/[A-Z0-9_]+$/.test(page.url())) {
+            console.warn(`[Aviso] navegarParaAtividades chamado fora de um contexto de subprocesso: ${page.url()}`);
+        }
     }
 }
 

@@ -38,7 +38,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
 
     test('Preparacao 0: Criar e finalizar Mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         test.setTimeout(90000);
-        // 1. Criar Processo
+        // 1. Criar e Iniciar Processo (Admin)
         await criarProcesso(page, {
             descricao: descMapeamento,
             tipo: 'MAPEAMENTO',
@@ -54,7 +54,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
-        // 2. Chefe (SECAO_212) disponibiliza
+        // 2. Chefe (SECAO_212) disponibiliza cadastro
         await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
         await acessarSubprocessoChefeDireto(page, descMapeamento);
         await navegarParaAtividades(page);
@@ -63,56 +63,48 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        // 3. Gestor COORD_21 aceita
+        // 3. Gestores aceitam cadastro
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
 
-        // 4. Gestor SECRETARIA_2 aceita
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
 
-        // 5. Admin homologa cadastro
+        // 4. Admin homologa cadastro e disponibiliza mapa
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await homologarCadastroMapeamento(page);
-        await fazerLogout(page);
-
-        // 6. Admin cria mapa e disponibiliza
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
+        
         await navegarParaMapa(page);
         await criarCompetencia(page, `Comp Map ${timestamp}`, [`Ativ Map ${timestamp}`]);
         await disponibilizarMapa(page, '2030-12-31');
-        await fazerLogout(page);
 
-        // 7. Chefe valida mapa
+        // 5. Chefe valida mapa
         await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
         await acessarSubprocessoChefeDireto(page, descMapeamento);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
-        await fazerLogout(page);
 
-        // 8. Gestor COORD_21 aceita mapa
+        // 6. Gestores aceitam mapa
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
-        // 9. Gestor SECRETARIA_2 aceita mapa
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
-        // 10. Admin homologa mapa e finaliza processo
+        // 7. Admin homologa mapa e finaliza processo
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -154,7 +146,6 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await acessarSubprocessoChefeDireto(page, descRevisao);
         await navegarParaAtividades(page);
 
-        // Adicionar uma atividade para ter algo na revisão
         await adicionarAtividade(page, `Atividade Rev ${timestamp}`);
         await adicionarConhecimento(page, `Atividade Rev ${timestamp}`, 'Conhecimento Rev');
 
@@ -164,20 +155,20 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3a: Gestor COORD_21 aceita revisão', async ({page, autenticadoComoGestorCoord21}) => {
+    test('Preparacao 3: Gestores e ADMIN aceitam revisão', async ({page, autenticadoComoGestorCoord21}) => {
+        // Gestor COORD_21
         await acessarSubprocessoGestor(page, descRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarRevisao(page);
-    });
 
-    test('Preparacao 3b: Gestor SECRETARIA_2 aceita revisão', async ({page}) => {
+        // Gestor SECRETARIA_2
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarRevisao(page);
-    });
 
-    test('Preparacao 3: ADMIN homologa revisão de cadastro', async ({page, autenticadoComoAdmin}) => {
+        // ADMIN homologa
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoChefeDireto(page, descRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await homologarCadastroRevisaoComImpacto(page);
@@ -190,37 +181,26 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     // TESTES PRINCIPAIS
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para subprocesso de revisão', async ({page, autenticadoComoAdmin}) => {
-        await acessarSubprocessoChefeDireto(page, descRevisao, UNIDADE_ALVO);
-    });
-
-    test('Cenario 2: ADMIN visualiza botão Reabrir Revisão', async ({page, autenticadoComoAdmin}) => {
+    test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({page, autenticadoComoAdmin}) => {
+        // Cenario 1 & 2: Navegação e visualização do botão
         await acessarSubprocessoChefeDireto(page, descRevisao, UNIDADE_ALVO);
 
         const btnReabrir = page.getByTestId('btn-reabrir-revisao');
         await expect(btnReabrir).toBeVisible();
         await expect(btnReabrir).toBeEnabled();
-    });
 
-    test('Cenario 3: ADMIN abre modal de reabertura de revisão', async ({page, autenticadoComoAdmin}) => {
-        await acessarSubprocessoChefeDireto(page, descRevisao, UNIDADE_ALVO);
-
-        await page.getByTestId('btn-reabrir-revisao').click();
+        // Cenario 3: Abrir modal
+        await btnReabrir.click();
 
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await expect(modal.getByRole('heading', {name: /Reabrir Revisão/i})).toBeVisible();
-    });
 
-    test('Cenario 4: ADMIN confirma reabertura da revisão', async ({page, autenticadoComoAdmin}) => {
-        await acessarSubprocessoChefeDireto(page, descRevisao, UNIDADE_ALVO);
-        await page.getByTestId('btn-reabrir-revisao').click();
-
+        // Cenario 4: Confirmar reabertura
         await page.getByTestId('inp-justificativa-reabrir').fill('Ajuste necessário');
         await page.getByTestId('btn-confirmar-reabrir').click();
 
         await expect(page.getByText(/Revisão de cadastro reaberta/i).first()).toBeVisible();
-        await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-            .toHaveText(/Revisão em andamento/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
     });
 });

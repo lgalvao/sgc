@@ -20,10 +20,6 @@ import {
 } from './helpers/helpers-analise.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
-async function verificarPaginaSubprocesso(page: Page, unidade: string) {
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));
-}
-
 test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_211';
 
@@ -47,8 +43,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        
-
         await criarProcesso(page, {
             descricao: descProcessoMapeamento,
             tipo: 'MAPEAMENTO',
@@ -70,12 +64,9 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     });
 
     test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao211}) => {
-        
-
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
         await navegarParaAtividades(page);
 
-        // Três atividades para criar três competências
         await adicionarAtividade(page, atividadeBase1);
         await adicionarConhecimento(page, atividadeBase1, 'Conhecimento 1A');
 
@@ -92,70 +83,59 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3a: Gestor COORD_21 aceita cadastro', async ({page, autenticadoComoGestorCoord21}) => {
+    test('Preparacao 3: Gestores aceitam cadastro', async ({page, autenticadoComoGestorCoord21}) => {
+        console.log('-> Gestores (COORD e SEC) aceitando cadastro...');
+        // Gestor COORD_21
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
-    });
 
-    test('Preparacao 3b: Gestor SECRETARIA_2 aceita cadastro', async ({page}) => {
+        // Gestor SECRETARIA_2
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
-        
-
+    test('Preparacao 4: Admin homologa cadastro, cria competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
+        // Homologação do cadastro
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
-    });
 
-    test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
-        
-
-        await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
+        // Criação do mapa
         await navegarParaMapa(page);
-
-        // Criar três competências, uma para cada atividade
         await criarCompetencia(page, competencia1, [atividadeBase1]);
         await criarCompetencia(page, competencia2, [atividadeBase2]);
         await criarCompetencia(page, competencia3, [atividadeBase3]);
 
         await disponibilizarMapa(page, '2030-12-31');
-
-        await verificarPaginaPainel(page);
         await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
+        await verificarPaginaPainel(page);
     });
 
     test('Preparacao 5: Chefe valida mapa', async ({page, autenticadoComoChefeSecao211}) => {
-        
-
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
         await navegarParaMapa(page);
 
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
-        // Validação: confirmar redirecionamento para Painel (CDU-19 passo 8)
         await verificarPaginaPainel(page);
         await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
     });
 
-    test('Preparacao 6a: Gestor COORD_21 aceita mapa', async ({page, autenticadoComoGestorCoord21}) => {
+    test('Preparacao 6: Gestores aceitam mapa', async ({page, autenticadoComoGestorCoord21}) => {
+        // Gestor COORD_21
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await verificarPaginaPainel(page);
-    });
 
-    test('Preparacao 6b: Gestor SECRETARIA_2 aceita mapa', async ({page}) => {
+        // Gestor SECRETARIA_2
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -164,33 +144,20 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 6: Admin homologa mapa e finaliza processo de mapeamento', async ({page, autenticadoComoAdmin}) => {
-        
-
+    test('Preparacao 7: Admin homologa mapa, finaliza e inicia revisão', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+        // Homologação e finalização do Mapeamento
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
-
-        // Aguardar redirecionamento para o Painel
         await verificarPaginaPainel(page);
 
-        // Navegar de volta para verificar situação atualizada
-        await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await expect(page.getByText(/Mapa homologado/i).first()).toBeVisible();
-
-        // Finalizar processo
-        await page.goto('/painel');
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
-
         await verificarPaginaPainel(page);
-    });
 
-    test('Preparacao 7: Admin cria e inicia processo de revisão', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        
-
+        // Criação e início da Revisão
         await criarProcesso(page, {
             descricao: descProcessoRevisao,
             tipo: 'REVISAO',
@@ -207,32 +174,24 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
-
         await verificarPaginaPainel(page);
     });
 
     test('Preparacao 8: Chefe revisa atividades com alterações', async ({page, autenticadoComoChefeSecao211}) => {
-        
-
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
         await navegarParaAtividades(page);
 
-        // Verificar atividades do mapeamento foram copiadas
         await expect(page.getByText(atividadeBase1)).toBeVisible();
         await expect(page.getByText(atividadeBase2)).toBeVisible();
         await expect(page.getByText(atividadeBase3)).toBeVisible();
 
-        // Adicionar nova atividade (causa impacto: atividade inserida)
         await adicionarAtividade(page, atividadeNovaRevisao);
         await adicionarConhecimento(page, atividadeNovaRevisao, 'Conhecimento Novo');
 
-        // Editar atividade existente (causa impacto na competência 2)
         await editarAtividade(page, atividadeBase2, `${atividadeBase2} Editada`);
 
-        // Remover atividade (causa impacto na competência 3)
         await removerAtividade(page, atividadeBase3);
 
-        // Disponibilizar revisão
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
@@ -240,34 +199,25 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 9a: Gestor COORD_21 aceita revisão', async ({page, autenticadoComoGestorCoord21}) => {
+    test('Preparacao 9: Gestores e Admin aceitam revisão', async ({page, autenticadoComoGestorCoord21}) => {
+        // Gestor COORD_21
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarRevisao(page);
-    });
 
-    test('Preparacao 9b: Gestor SECRETARIA_2 aceita revisão', async ({page}) => {
+        // Gestor SECRETARIA_2
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarRevisao(page);
-    });
 
-    test('Preparacao 9: Admin homologa revisão do cadastro', async ({page}) => {
-        // Esta homologação leva o subprocesso ao estado "Revisão do cadastro homologada"
-        // que é a pré-condição para CDU-16
-        await page.goto('/painel');
+        // Admin homologa
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-
         await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
-        // Após aceite, redireciona para Detalhes do subprocesso
-        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
-
-        // Verificar situação é "Revisão do cadastro homologada"
         await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Revis[aã]o d[oe] cadastro homologada/i);
     });
@@ -276,108 +226,55 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     // TESTES PRINCIPAIS - CDU-16
     // ========================================================================
 
-    test('Cenario 1: ADMIN navega para tela de edição do mapa', async ({page, autenticadoComoAdmin}) => {
-        // CDU-16: Passo 1-6
-        
+    test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({page, autenticadoComoAdmin}) => {
+        // Cenario 1: Navegação para tela de edição do mapa
+        await test.step('Cenário 1: Navegação para o Mapa', async () => {
+            await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
+            await navegarParaMapa(page);
 
-        // Passo 1: No Painel, ADMIN escolhe o processo de revisão
-        await expect(page.getByTestId('tbl-processos').getByText(descProcessoRevisao).first()).toBeVisible();
-        
-        // Passo 2-4: Sistema mostra Detalhes do processo, ADMIN clica na unidade
-        await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
+            await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
+            await expect(page.getByTestId('cad-mapa__btn-impactos-mapa')).toBeVisible();
+            await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
+            await expect(page.getByText(competencia1)).toBeVisible();
+            await expect(page.getByText(competencia2)).toBeVisible();
+        });
 
-        // Sistema mostra Detalhes do subprocesso
-        await expect(page.getByText(/Revis[aã]o d[oe] cadastro homologada/i).first()).toBeVisible();
+        // Cenario 2: Visualização de impactos no mapa
+        await test.step('Cenário 2: Visualização de Impactos', async () => {
+            await page.getByTestId('cad-mapa__btn-impactos-mapa').click();
+            await expect(page.getByTestId('modal-impacto-body')).toBeVisible();
 
-        // Passo 5-6: ADMIN clica no card Mapa de Competências
-        await navegarParaMapa(page);
+            const modal = page.getByRole('dialog');
+            await expect(modal.getByText('Atividades Inseridas')).toBeVisible();
+            await expect(modal.getByText(atividadeNovaRevisao)).toBeVisible();
+            await expect(modal.getByText('Competências Impactadas')).toBeVisible();
+            await expect(modal.getByText(competencia2)).toBeVisible();
+            await expect(modal.getByText(competencia3)).toBeVisible();
 
-        // Verificar tela de Edição de mapa
-        await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
+            await page.getByTestId('btn-fechar-impacto').click();
+            await expect(modal).toBeHidden();
+        });
 
-        // Verificar botão Impactos no mapa (CDU-16 passo 6)
-        await expect(page.getByTestId('cad-mapa__btn-impactos-mapa')).toBeVisible();
+        // Cenario 3: Abrir modal para editar competência
+        await test.step('Cenário 3: Edição de Competência', async () => {
+            const card = page.locator('.competencia-card', {has: page.getByText(competencia1, {exact: true})});
+            await card.hover();
+            await card.getByTestId('btn-editar-competencia').click();
 
-        // Verificar botão Disponibilizar (CDU-16 passo 6)
-        await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
+            const modalCria = page.getByTestId('mdl-criar-competencia');
+            await expect(modalCria).toBeVisible();
+            await expect(page.getByTestId('inp-criar-competencia-descricao')).toHaveValue(competencia1);
 
-        // Verificar competências existentes estão visíveis
-        await expect(page.getByText(competencia1)).toBeVisible();
-        await expect(page.getByText(competencia2)).toBeVisible();
-    });
+            await page.getByRole('button', {name: 'Cancelar'}).click();
+            await expect(modalCria).toBeHidden();
+        });
 
-    test('Cenario 2: ADMIN visualiza impactos no mapa', async ({page, autenticadoComoAdmin}) => {
-        // CDU-16: Passo 7-8
-        
+        // Cenario 4: Associar atividade não vinculada a nova competência
+        await test.step('Cenário 4: Associação de Nova Competência', async () => {
+            const novaCompetencia = `Competência Nova Ajuste ${timestamp}`;
+            await criarCompetencia(page, novaCompetencia, [atividadeNovaRevisao]);
 
-        await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-
-        // Passo 7: ADMIN clica em Impactos no mapa
-        await page.getByTestId('cad-mapa__btn-impactos-mapa').click();
-
-        // Passo 8: Sistema mostra modal Impactos no mapa
-        await expect(page.getByTestId('modal-impacto-body')).toBeVisible();
-
-        // Verificar impactos usando getByRole para o dialog
-        const modal = page.getByRole('dialog');
-        await expect(modal).toBeVisible();
-
-        // - Atividade inserida (atividadeNovaRevisao) - não vinculada a competência
-        await expect(modal.getByText('Atividades Inseridas')).toBeVisible();
-        await expect(modal.getByText(atividadeNovaRevisao)).toBeVisible();
-
-        // - Competência 2 impactada (atividade editada)
-        await expect(modal.getByText('Competências Impactadas')).toBeVisible();
-        await expect(modal.getByText(competencia2)).toBeVisible();
-
-        // - Competência 3 impactada (atividade removida)
-        await expect(modal.getByText(competencia3)).toBeVisible();
-
-        // Fechar modal
-        await page.getByTestId('btn-fechar-impacto').click();
-        await expect(modal).toBeHidden();
-    });
-
-    test('Cenario 3: ADMIN pode abrir modal para editar competência', async ({page, autenticadoComoAdmin}) => {
-        // CDU-16: Passo 9 - ADMIN pode acessar edição de competências
-        
-
-        await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-
-        // Verificar que a competência existe
-        await expect(page.getByText(competencia1)).toBeVisible();
-
-        // Clicar para editar competência
-        const card = page.locator('.competencia-card', {has: page.getByText(competencia1, {exact: true})});
-        await card.hover();
-        const editButton = card.getByTestId('btn-editar-competencia');
-        await expect(editButton).toBeVisible();
-        await editButton.click();
-
-        // Verificar que o modal abre com a descrição correta
-        const modal = page.getByTestId('mdl-criar-competencia');
-        await expect(modal).toBeVisible();
-        await expect(page.getByTestId('inp-criar-competencia-descricao')).toHaveValue(competencia1);
-
-        // Cancelar edição
-        await page.getByRole('button', {name: 'Cancelar'}).click();
-        await expect(modal).toBeHidden();
-    });
-
-    test('Cenario 4: ADMIN associa atividade não vinculada a nova competência', async ({page, autenticadoComoAdmin}) => {
-        // CDU-16: Passo 9.1 - ADMIN deve associar todas as atividades não associadas
-        
-
-        await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-
-        // Criar nova competência com a atividade nova da revisão
-        const novaCompetencia = `Competência Nova Ajuste ${timestamp}`;
-        await criarCompetencia(page, novaCompetencia, [atividadeNovaRevisao]);
-
-        // Verificar que a nova competência foi criada com a atividade vinculada
-        await expect(page.getByText(novaCompetencia)).toBeVisible();
+            await expect(page.getByText(novaCompetencia)).toBeVisible();
+        });
     });
 });

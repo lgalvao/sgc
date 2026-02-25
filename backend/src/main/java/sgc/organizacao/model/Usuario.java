@@ -75,7 +75,7 @@ public class Usuario implements UserDetails {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Usuario usuario = (Usuario) obj;

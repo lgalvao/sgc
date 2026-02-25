@@ -216,7 +216,7 @@ class LoginControllerTest {
     void autorizar_Sucesso() throws Exception {
         UnidadeDto unidadeDto = UnidadeDto.builder().codigo(1L).nome("AdmUnit").sigla("ADM").build();
         PerfilUnidadeDto pu = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
-        when(loginFacade.autorizar("123")).thenReturn(List.of(pu));
+        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(pu));
         when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
 
         AutorizarRequest req = AutorizarRequest.builder().tituloEleitoral("123").build();
@@ -234,7 +234,7 @@ class LoginControllerTest {
     @DisplayName("POST /api/usuarios/autorizar - Deve retornar lista vazia quando usuário sem perfis ativos")
     @WithMockUser
     void autorizar_DeveRetornarListaVaziaQuandoSemPerfisAtivos() throws Exception {
-        when(loginFacade.autorizar("123")).thenReturn(List.of());
+        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of());
         when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
 
         AutorizarRequest req = AutorizarRequest.builder().tituloEleitoral("123").build();

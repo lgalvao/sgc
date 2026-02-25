@@ -136,6 +136,7 @@ public class MapaManutencaoService {
 
     @Transactional
     public Atividade criarAtividade(CriarAtividadeRequest request) {
+        log.info("Criando atividade no mapa {}: {}", request.mapaCodigo(), request.descricao());
         validarDescricaoAtividadeUnica(request.mapaCodigo(), request.descricao());
         Mapa mapa = repo.buscar(Mapa.class, request.mapaCodigo());
         notificarAlteracaoMapa(request.mapaCodigo());
@@ -148,6 +149,7 @@ public class MapaManutencaoService {
 
     @Transactional
     public void atualizarAtividade(Long codigo, AtualizarAtividadeRequest request) {
+        log.info("Atualizando atividade {}: {}", codigo, request.descricao());
         Atividade existente = repo.buscar(Atividade.class, codigo);
         if (!existente.getDescricao().equalsIgnoreCase(request.descricao())) {
             validarDescricaoAtividadeUnica(existente.getMapa().getCodigo(), request.descricao());
@@ -161,6 +163,7 @@ public class MapaManutencaoService {
 
     @Transactional
     public void atualizarDescricoesAtividadeEmLote(Map<Long, String> descricoesPorId) {
+        log.info("Atualizando descrições de {} atividades em lote", descricoesPorId.size());
         List<Atividade> atividades = atividadeRepo.findAllById(descricoesPorId.keySet());
         Set<Long> mapasAfetados = new HashSet<>();
 
@@ -179,6 +182,7 @@ public class MapaManutencaoService {
 
     @Transactional
     public void excluirAtividade(Long codAtividade) {
+        log.info("Excluindo atividade {}", codAtividade);
         Atividade atividade = repo.buscar(Atividade.class, codAtividade);
         excluirAtividadeEConhecimentos(atividade);
     }
@@ -211,11 +215,13 @@ public class MapaManutencaoService {
 
     @Transactional
     public void salvarTodasCompetencias(List<Competencia> competencias) {
+        log.info("Salvando lote de {} competências", competencias.size());
         competenciaRepo.saveAll(competencias);
     }
 
     @Transactional
     public void criarCompetenciaComAtividades(Mapa mapa, String descricao, List<Long> codigosAtividades) {
+        log.info("Criando competência no mapa {}: {} ({} atividades)", mapa.getCodigo(), descricao, codigosAtividades.size());
         Competencia competencia = Competencia.builder()
                 .descricao(descricao)
                 .mapa(mapa)
@@ -228,6 +234,7 @@ public class MapaManutencaoService {
 
     @Transactional
     public void atualizarCompetencia(Long codCompetencia, String descricao, List<Long> atividadesIds) {
+        log.info("Atualizando competência {}: {} ({} atividades)", codCompetencia, descricao, atividadesIds.size());
         Competencia competencia = repo.buscar(Competencia.class, codCompetencia);
         competencia.setDescricao(descricao);
 
@@ -244,6 +251,7 @@ public class MapaManutencaoService {
 
     @Transactional
     public void removerCompetencia(Long codCompetencia) {
+        log.info("Removendo competência {}", codCompetencia);
         Competencia competencia = repo.buscar(Competencia.class, codCompetencia);
 
         List<Atividade> atividadesAssociadas = atividadeRepo.listarPorCompetencia(competencia);
@@ -255,6 +263,7 @@ public class MapaManutencaoService {
 
     @Transactional
     public Conhecimento criarConhecimento(Long codAtividade, CriarConhecimentoRequest request) {
+        log.info("Criando conhecimento na atividade {}: {}", codAtividade, request.descricao());
         validarDescricaoConhecimentoUnica(codAtividade, request.descricao());
         var atividade = repo.buscar(Atividade.class, codAtividade);
         var mapa = atividade.getMapa();
@@ -268,6 +277,7 @@ public class MapaManutencaoService {
 
     @Transactional
     public void atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
+        log.info("Atualizando conhecimento {} na atividade {}: {}", codConhecimento, codAtividade, request.descricao());
         var existente = repo.buscar(Conhecimento.class, Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade));
 
         if (!existente.getDescricao().equalsIgnoreCase(request.descricao())) {
@@ -284,6 +294,7 @@ public class MapaManutencaoService {
 
     @Transactional
     public void excluirConhecimento(Long codAtividade, Long codConhecimento) {
+        log.info("Excluindo conhecimento {} da atividade {}", codConhecimento, codAtividade);
         var conhecimento = repo.buscar(Conhecimento.class, Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade));
         executarExclusaoConhecimento(conhecimento);
     }
