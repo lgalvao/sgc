@@ -18,7 +18,7 @@
 
     <div v-else-if="impacto" data-testid="modal-impacto-body">
       <BAlert v-if="!impacto.temImpactos" :fade="false" :model-value="true" variant="success">
-        <i aria-hidden="true" class="bi bi-check-circle me-2"/> Nenhum impacto detectado no mapa.
+        <i aria-hidden="true" class="bi bi-check-circle me-2"/> Nenhum impacto no mapa da unidade.
       </BAlert>
 
       <div v-else class="mt-3">
@@ -35,8 +35,18 @@
             >
               <strong>{{ ativ.descricao }}</strong>
               <div
-                  v-if="ativ.competenciasVinculadas && ativ.competenciasVinculadas.length > 0"
+                  v-if="ativ.conhecimentos && ativ.conhecimentos.length > 0"
                   class="mt-1"
+              >
+                <ul class="list-unstyled ms-3 small text-muted">
+                  <li v-for="(conhecimento, idx) in ativ.conhecimentos" :key="idx">
+                    <i aria-hidden="true" class="bi bi-dot"/> {{ conhecimento }}
+                  </li>
+                </ul>
+              </div>
+              <div
+                  v-if="ativ.competenciasVinculadas && ativ.competenciasVinculadas.length > 0"
+                  class="mt-1 border-top pt-1"
               >
                 <small class="text-muted">Vinculada a: {{ ativ.competenciasVinculadas.join(', ') }}</small>
               </div>

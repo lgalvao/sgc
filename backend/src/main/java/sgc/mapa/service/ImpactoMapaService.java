@@ -116,6 +116,7 @@ public class ImpactoMapaService {
                         .descricao(atual.getDescricao())
                         .tipoImpacto(TipoImpactoAtividade.INSERIDA)
                         .descricaoAnterior(atual.getDescricao())
+                        .conhecimentos(atual.getConhecimentos().stream().map(Conhecimento::getDescricao).toList())
                         .competenciasVinculadas(List.of())
                         .build();
 
@@ -143,6 +144,7 @@ public class ImpactoMapaService {
                         .descricao(vigente.getDescricao())
                         .tipoImpacto(TipoImpactoAtividade.REMOVIDA)
                         .descricaoAnterior(vigente.getDescricao())
+                        .conhecimentos(vigente.getConhecimentos().stream().map(Conhecimento::getDescricao).toList())
                         .competenciasVinculadas(obterNomesCompetencias(vigenteCodigo, competenciasVinculadas))
                         .build();
 
@@ -177,6 +179,7 @@ public class ImpactoMapaService {
                                     .descricao(atual.getDescricao())
                                     .tipoImpacto(TipoImpactoAtividade.ALTERADA)
                                     .descricaoAnterior(vigente.getDescricao())
+                                    .conhecimentos(vigente.getConhecimentos().stream().map(Conhecimento::getDescricao).toList())
                                     .competenciasVinculadas(
                                             obterNomesCompetencias(vigente.getCodigo(), atividadeIdToCompetencias))
                                     .build());

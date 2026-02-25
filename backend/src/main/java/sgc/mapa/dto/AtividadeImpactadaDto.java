@@ -21,5 +21,7 @@ public record AtividadeImpactadaDto(
         @JsonView(MapaViews.Publica.class)
         String descricaoAnterior,
         @JsonView(MapaViews.Publica.class)
+        List<String> conhecimentos,
+        @JsonView(MapaViews.Publica.class)
         List<String> competenciasVinculadas) {
 }

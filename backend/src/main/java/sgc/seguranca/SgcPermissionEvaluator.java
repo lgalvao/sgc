@@ -123,9 +123,9 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
             }
 
             // CDU-12: Exceção à regra de visualização baseada apenas em hierarquia
-            // A verificação de impactos exige situações específicas conforme o perfil.
-            if ("VERIFICAR_IMPACTOS".equals(acao) && !checkSituacaoImpactos(usuario, sp)) {
-                return false;
+            // Se for VERIFICAR_IMPACTOS, a lógica de checkSituacaoImpactos é soberana
+            if ("VERIFICAR_IMPACTOS".equals(acao)) {
+                return checkSituacaoImpactos(usuario, sp);
             }
 
             return checkHierarquia(usuario, sp.getUnidade());
@@ -186,23 +186,24 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     private boolean checkSituacaoImpactos(Usuario usuario, Subprocesso sp) {
         Perfil perfil = usuario.getPerfilAtivo();
         SituacaoSubprocesso situacao = sp.getSituacao();
+        Long unidadeUsuario = usuario.getUnidadeAtivaCodigo();
+        Long localizacaoSp = obterUnidadeLocalizacao(sp).getCodigo();
 
-        // ADMIN vê se estiver disponibilizado, homologado ou ajustado
-        if (perfil == ADMIN) {
-            return situacao == REVISAO_CADASTRO_DISPONIBILIZADA ||
-                   situacao == REVISAO_CADASTRO_HOMOLOGADA ||
-                   situacao == REVISAO_MAPA_AJUSTADO;
-        }
-
-        // GESTOR vê se estiver disponibilizado E na sua unidade (localização)
-        if (perfil == GESTOR) {
-            if (situacao != REVISAO_CADASTRO_DISPONIBILIZADA) return false;
-            return Objects.equals(usuario.getUnidadeAtivaCodigo(), obterUnidadeLocalizacao(sp).getCodigo());
-        }
-
-        // CHEFE vê se estiver em andamento (localização é implícita pois andamento é sempre local)
+        // 3.1 CHEFE - Revisão do cadastro em andamento na sua unidade
         if (perfil == CHEFE) {
-            return situacao == REVISAO_CADASTRO_EM_ANDAMENTO;
+            return (situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO) && Objects.equals(unidadeUsuario, localizacaoSp);
+        }
+
+        // 3.2 GESTOR ou ADMIN - Revisão do cadastro disponibilizada na sua unidade
+        if (situacao == REVISAO_CADASTRO_DISPONIBILIZADA) {
+            if (perfil == GESTOR || perfil == ADMIN) {
+                return Objects.equals(unidadeUsuario, localizacaoSp);
+            }
+        }
+
+        // 3.3 ADMIN - Revisão do cadastro homologada ou Mapa ajustado (Edição de Mapa)
+        if (perfil == ADMIN) {
+            return situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO || situacao == REVISAO_CADASTRO_HOMOLOGADA || situacao == REVISAO_MAPA_AJUSTADO;
         }
 
         return false;

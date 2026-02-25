@@ -21,6 +21,7 @@ export interface AtividadeImpactadaDto {
     descricao: string;
     tipoImpacto: TipoImpactoAtividade;
     descricaoAnterior?: string;
+    conhecimentos?: string[];
     competenciasVinculadas: string[];
 }
 
