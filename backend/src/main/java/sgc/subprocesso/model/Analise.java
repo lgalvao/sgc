@@ -1,0 +1,51 @@
+package sgc.subprocesso.model;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import sgc.comum.model.EntidadeBase;
+
+import java.time.LocalDateTime;
+
+/**
+ * Representa um registro de análise realizado em um subprocesso.
+ *
+ * <p>Funciona como um log de auditoria para as diversas etapas de análise (e.g., análise de cadastro,
+ * análise de validação), registrando a ação, o analista, as observações e o resultado.
+ */
+@Entity
+@Table(name = "ANALISE", schema = "sgc")
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
+public class Analise extends EntidadeBase {
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", length = 20, nullable = false)
+    private TipoAnalise tipo;
+
+    @ManyToOne
+    @JoinColumn(name = "subprocesso_codigo", nullable = false)
+    private Subprocesso subprocesso;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "acao", length = 20, nullable = false)
+    private TipoAcaoAnalise acao;
+
+    @Column(name = "data_hora", nullable = false)
+    private LocalDateTime dataHora;
+
+    @Column(name = "unidade_codigo", nullable = false)
+    private Long unidadeCodigo;
+
+    @Column(name = "usuario_titulo", length = 12, nullable = false)
+    private String usuarioTitulo;
+
+    @Column(name = "motivo", length = 200)
+    private String motivo;
+
+    @Column(name = "observacoes", length = 500)
+    private String observacoes;
+}
