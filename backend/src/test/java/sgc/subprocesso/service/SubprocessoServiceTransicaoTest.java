@@ -1,46 +1,65 @@
-package sgc.subprocesso.service.workflow;
+package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import sgc.alerta.AlertaFacade;
+import sgc.alerta.EmailService;
 import sgc.comum.erros.ErroAcessoNegado;
+import sgc.comum.model.ComumRepo;
+import sgc.subprocesso.dto.MapaAjusteMapper;
+import sgc.mapa.service.CopiaMapaService;
+import sgc.mapa.service.ImpactoMapaService;
+import sgc.mapa.service.MapaManutencaoService;
+import sgc.mapa.service.MapaSalvamentoService;
+import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.TipoTransicao;
-import sgc.subprocesso.service.SubprocessoEmailService;
-import sgc.subprocesso.service.SubprocessoTransicaoService;
+import sgc.subprocesso.model.*;
 
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes Unitários para SubprocessoTransicaoService")
-class SubprocessoTransicaoServiceTest {
+@DisplayName("SubprocessoService - Transição")
+class SubprocessoServiceTransicaoTest {
 
-    @Mock
-    private MovimentacaoRepo movimentacaoRepo;
-
-    @Mock
-    private AlertaFacade alertaService;
-
-    @Mock
-    private SubprocessoEmailService emailService;
-
-    @Mock
-    private UsuarioFacade usuarioFacade;
+    @Mock private SubprocessoRepo subprocessoRepo;
+    @Mock private MovimentacaoRepo movimentacaoRepo;
+    @Mock private ComumRepo repo;
+    @Mock private AnaliseRepo analiseRepo;
+    @Mock private AlertaFacade alertaService;
+    @Mock private OrganizacaoFacade organizacaoFacade;
+    @Mock private UsuarioFacade usuarioFacade;
+    @Mock private ImpactoMapaService impactoMapaService;
+    @Mock private CopiaMapaService copiaMapaService;
+    @Mock private EmailService emailService;
+    @Mock private TemplateEngine templateEngine;
+    @Mock private MapaManutencaoService mapaManutencaoService;
+    @Mock private MapaSalvamentoService mapaSalvamentoService;
+    @Mock private MapaAjusteMapper mapaAjusteMapper;
+    @Mock private SgcPermissionEvaluator permissionEvaluator;
 
     @InjectMocks
-    private SubprocessoTransicaoService service;
+    private SubprocessoService service;
+
+    @BeforeEach
+    void setup() {
+        service.setMapaManutencaoService(mapaManutencaoService);
+        service.setSubprocessoRepo(subprocessoRepo);
+        service.setMovimentacaoRepo(movimentacaoRepo);
+        service.setCopiaMapaService(copiaMapaService);
+    }
 
     @Test
     @DisplayName("Deve registrar transição com observações e notificar via alerta/email")
@@ -53,11 +72,16 @@ class SubprocessoTransicaoServiceTest {
         when(subprocesso.getProcesso()).thenReturn(mock(Processo.class));
 
         Unidade origem = mock(Unidade.class);
+        when(origem.getSigla()).thenReturn("O");
         Unidade destino = mock(Unidade.class);
+        when(destino.getSigla()).thenReturn("D");
         Usuario usuario = new Usuario();
 
+        // Ensure template engine is mocked to avoid NPE if email logic is triggered
+        lenient().when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
+
         // Act
-        service.registrar(RegistrarTransicaoCommand.builder()
+        service.registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
                 .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
                 .origem(origem)
@@ -69,7 +93,8 @@ class SubprocessoTransicaoServiceTest {
         // Assert
         verify(movimentacaoRepo).save(any(Movimentacao.class));
         verify(alertaService).criarAlertaTransicao(any(), anyString(), any(), any());
-        verify(emailService).notificarMovimentacao(any(), any(), any(), any(), any());
+        // Email verification happens via interactions with EmailService, not by verifying call to private method
+        verify(emailService, atLeastOnce()).enviarEmailHtml(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -86,8 +111,10 @@ class SubprocessoTransicaoServiceTest {
         Unidade destino = mock(Unidade.class);
         Usuario usuario = new Usuario();
 
+        lenient().when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
+
         // Act
-        service.registrar(RegistrarTransicaoCommand.builder()
+        service.registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
                 .tipo(TipoTransicao.CADASTRO_DEVOLVIDO)
                 .origem(origem)
@@ -112,9 +139,10 @@ class SubprocessoTransicaoServiceTest {
 
         Usuario usuarioAutenticado = new Usuario();
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuarioAutenticado);
+        lenient().when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
 
         // Act
-        service.registrar(RegistrarTransicaoCommand.builder()
+        service.registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
                 .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
                 .build());
@@ -137,7 +165,7 @@ class SubprocessoTransicaoServiceTest {
                 .build();
 
         // Act & Assert
-        Assertions.assertThrows(ErroAcessoNegado.class, () -> service.registrar(cmd));
+        Assertions.assertThrows(ErroAcessoNegado.class, () -> service.registrarTransicao(cmd));
     }
 
     @Test
@@ -151,9 +179,10 @@ class SubprocessoTransicaoServiceTest {
         when(subprocesso.getProcesso()).thenReturn(mock(Processo.class));
 
         Usuario usuario = new Usuario();
+        lenient().when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
 
         // Act
-        service.registrar(RegistrarTransicaoCommand.builder()
+        service.registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
                 .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
                 .usuario(usuario)
@@ -171,7 +200,7 @@ class SubprocessoTransicaoServiceTest {
         Usuario usuario = new Usuario();
 
         // CADASTRO_HOMOLOGADO: geraAlerta=false, enviaEmail=false
-        service.registrar(RegistrarTransicaoCommand.builder()
+        service.registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
                 .tipo(TipoTransicao.CADASTRO_HOMOLOGADO)
                 .usuario(usuario)
@@ -182,6 +211,4 @@ class SubprocessoTransicaoServiceTest {
         verifyNoInteractions(alertaService);
         verifyNoInteractions(emailService);
     }
-
-
 }

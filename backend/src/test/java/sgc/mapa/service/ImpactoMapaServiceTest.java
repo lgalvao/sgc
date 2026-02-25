@@ -16,7 +16,6 @@ import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoWorkflowService;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +33,6 @@ class ImpactoMapaServiceTest {
     @Mock private CompetenciaRepo competenciaRepo;
     @Mock private MapaManutencaoService mapaManutencaoService;
     @Mock private SgcPermissionEvaluator permissionEvaluator;
-    @Mock private SubprocessoWorkflowService validacaoService;
     @Mock private ComumRepo repo;
 
     @InjectMocks
