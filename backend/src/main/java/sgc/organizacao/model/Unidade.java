@@ -50,15 +50,20 @@ public class Unidade extends EntidadeBase {
     @Column(name = "situacao", length = 20, nullable = false)
     private SituacaoUnidade situacao;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_superior_codigo")
     @Nullable
     @JsonIgnore
     private Unidade unidadeSuperior;
 
-    @OneToMany(mappedBy = "unidadeSuperior")
+    @OneToMany(mappedBy = "unidadeSuperior", fetch = FetchType.LAZY)
     @Builder.Default
     @JsonIgnore
     private List<Unidade> subunidades = new ArrayList<>();
+
+    @OneToOne(mappedBy = "unidade", fetch = FetchType.LAZY)
+    @Nullable
+    @JsonIgnore
+    private Responsabilidade responsabilidade;
 
 }

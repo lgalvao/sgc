@@ -58,12 +58,12 @@ public class Usuario implements UserDetails {
     @JsonIgnore
     private String ramal;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_lot_codigo", nullable = false)
     @JsonIgnore
     private Unidade unidadeLotacao;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_comp_codigo")
     @JsonIgnore
     private Unidade unidadeCompetencia;

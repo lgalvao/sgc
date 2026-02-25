@@ -46,13 +46,18 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
 
     private final UnidadeRepo unidadeRepo;
     private final UsuarioRepo usuarioRepo;
-    private final ResponsabilidadeRepo responsabilidadeRepo;
 
     @Override
     @Transactional(readOnly = true)
     public void run(ApplicationArguments args) {
         List<String> violacoes = new ArrayList<>();
         List<Unidade> unidadesAtivas = carregarUnidadesAtivas();
+
+        if (unidadesAtivas.isEmpty()) {
+            log.info("Nenhuma unidade ativa participante encontrada para validação.");
+            return;
+        }
+
         Map<String, Usuario> usuarios = carregarUsuariosTitulares(unidadesAtivas);
 
         validarTitularesUnidades(unidadesAtivas, violacoes);
@@ -83,13 +88,9 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
      * Valida que todas as unidades participantes possuem um responsável atual definido.
      */
     private void validarResponsaveisAtuais(List<Unidade> unidades, List<String> violacoes) {
-        List<Long> ids = unidades.stream().map(Unidade::getCodigo).toList();
-        Map<Long, Responsabilidade> responsabilidades = responsabilidadeRepo.findByUnidadeCodigoIn(ids).stream()
-                .collect(Collectors.toMap(Responsabilidade::getUnidadeCodigo, r -> r));
-
         for (Unidade u : unidades) {
-            Responsabilidade r = responsabilidades.get(u.getCodigo());
-            if (r == null || r.getUsuarioTitulo().isBlank()) {
+            Responsabilidade r = u.getResponsabilidade();
+            if (r == null || r.getUsuarioTitulo() == null || r.getUsuarioTitulo().isBlank()) {
                 violacoes.add("Unidade %s (%s) não possui responsável atual definido (Titular, Substituto ou Atribuição)"
                         .formatted(u.getSigla(), u.getTipo()));
             }
@@ -97,10 +98,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
     }
 
     private List<Unidade> carregarUnidadesAtivas() {
-        return unidadeRepo.findAllWithHierarquia().stream()
-                .filter(u -> u.getSituacao() == SituacaoUnidade.ATIVA)
-                .filter(u -> TIPOS_QUE_PARTICIPAM.contains(u.getTipo()))
-                .toList();
+        return unidadeRepo.findBySituacaoAtivaAndTipoIn(TIPOS_QUE_PARTICIPAM);
     }
 
     private Map<String, Usuario> carregarUsuariosTitulares(List<Unidade> unidades) {
@@ -114,7 +112,14 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
             return Map.of();
         }
 
-        return usuarioRepo.findAllById(titulos).stream()
+        // Particionar para evitar limite de 1000 do Oracle no IN
+        List<Usuario> usuarios = new ArrayList<>();
+        for (int i = 0; i < titulos.size(); i += 999) {
+            List<String> subList = titulos.subList(i, Math.min(i + 999, titulos.size()));
+            usuarios.addAll(usuarioRepo.findAllById(subList));
+        }
+
+        return usuarios.stream()
                 .collect(Collectors.toMap(Usuario::getTituloEleitoral, u -> u, (u1, u2) -> u1));
     }
 

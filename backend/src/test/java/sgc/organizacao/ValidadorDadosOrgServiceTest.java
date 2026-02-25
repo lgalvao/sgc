@@ -20,6 +20,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,18 +31,23 @@ class ValidadorDadosOrgServiceTest {
     private UnidadeRepo unidadeRepo;
     @Mock
     private UsuarioRepo usuarioRepo;
-    @Mock
-    private ResponsabilidadeRepo responsabilidadeRepo;
     @InjectMocks
     private ValidadorDadosOrgService validador;
 
     private Unidade criarUnidadeValida(Long codigo, String sigla, TipoUnidade tipo) {
-        return UnidadeTestBuilder.umaDe()
+        Unidade u = UnidadeTestBuilder.umaDe()
                 .comCodigo(String.valueOf(codigo))
                 .comSigla(sigla)
                 .comTipo(tipo)
                 .comTituloTitular("TITULO_" + codigo)
                 .build();
+        
+        u.setResponsabilidade(Responsabilidade.builder()
+                .unidadeCodigo(codigo)
+                .usuarioTitulo("TITULO_" + codigo)
+                .build());
+        
+        return u;
     }
 
     private Usuario criarUsuarioValido(String titulo) {
@@ -63,11 +69,8 @@ class ValidadorDadosOrgServiceTest {
             Unidade u1 = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             Usuario titular = criarUsuarioValido("TITULO_1");
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u1));
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular));
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(
-                    Responsabilidade.builder().unidadeCodigo(1L).usuarioTitulo("TITULO_1").build()
-            ));
 
             // Act & Assert
             assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
@@ -77,12 +80,9 @@ class ValidadorDadosOrgServiceTest {
         @DisplayName("Deve ignorar unidades inativas")
         void deveIgnorarUnidadesInativas() {
             // Arrange
-            Unidade inativa = criarUnidadeValida(1L, "INATIVA", TipoUnidade.OPERACIONAL);
-            inativa.setSituacao(SituacaoUnidade.INATIVA);
-            inativa.setTituloTitular(""); // Sem titular, mas é inativa
-
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(inativa));
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of());
+            // Como o repositório agora filtra por situação ATIVA no banco,
+            // unidades inativas não seriam retornadas pelo método simulado.
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of());
 
             // Act & Assert
             assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
@@ -92,13 +92,9 @@ class ValidadorDadosOrgServiceTest {
         @DisplayName("Deve ignorar unidades SEM_EQUIPE e RAIZ")
         void deveIgnorarUnidadesNaoParticipantes() {
             // Arrange
-            Unidade semEquipe = criarUnidadeValida(1L, "SEM", TipoUnidade.SEM_EQUIPE);
-            semEquipe.setTituloTitular("");
-            Unidade raiz = criarUnidadeValida(2L, "RAIZ", TipoUnidade.RAIZ);
-            raiz.setTituloTitular("");
-
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(semEquipe, raiz));
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of());
+            // Como o repositório agora filtra por tipo participante no banco,
+            // unidades SEM_EQUIPE e RAIZ não seriam retornadas.
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of());
 
             // Act & Assert
             assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
@@ -115,13 +111,9 @@ class ValidadorDadosOrgServiceTest {
             Usuario titularPai = criarUsuarioValido("TITULO_1");
             Usuario titularFilha = criarUsuarioValido("TITULO_2");
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(pai, filha));
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(pai, filha));
             when(usuarioRepo.findAllById(List.of("TITULO_1", "TITULO_2")))
                     .thenReturn(List.of(titularPai, titularFilha));
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(
-                    Responsabilidade.builder().unidadeCodigo(1L).usuarioTitulo("TITULO_1").build(),
-                    Responsabilidade.builder().unidadeCodigo(2L).usuarioTitulo("TITULO_2").build()
-            ));
 
             // Act & Assert
             assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
@@ -134,12 +126,7 @@ class ValidadorDadosOrgServiceTest {
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             u.setTituloTitular(""); // Sem titular
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
-            Responsabilidade r = Responsabilidade.builder()
-                    .unidadeCodigo(1L)
-                    .usuarioTitulo("OUTRO")
-                    .build();
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(List.of(1L))).thenReturn(List.of(r));
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u));
 
             // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
@@ -154,11 +141,8 @@ class ValidadorDadosOrgServiceTest {
             Usuario titular1 = criarUsuarioValido("TITULO_1");
             Usuario titular2 = criarUsuarioValido("TITULO_1"); // Duplicado
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u1));
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular1, titular2));
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(
-                    Responsabilidade.builder().unidadeCodigo(1L).usuarioTitulo("TITULO_1").build()
-            ));
 
             // Act & Assert
             assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
@@ -177,11 +161,7 @@ class ValidadorDadosOrgServiceTest {
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             u.setTituloTitular("");
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
-            // Fornece um responsável válido para não gerar uma segunda violação aqui
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(
-                    Responsabilidade.builder().unidadeCodigo(1L).usuarioTitulo("OUTRO").build()
-            ));
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u));
 
             // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
@@ -195,13 +175,8 @@ class ValidadorDadosOrgServiceTest {
             // Arrange
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u));
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of()); // Usuário não existe
-            Responsabilidade r = Responsabilidade.builder()
-                    .unidadeCodigo(1L)
-                    .usuarioTitulo("TITULO_1")
-                    .build();
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(List.of(1L))).thenReturn(List.of(r));
 
             // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
@@ -217,13 +192,8 @@ class ValidadorDadosOrgServiceTest {
             Usuario titular = criarUsuarioValido("TITULO_1");
             titular.setEmail("   ");
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u));
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular));
-            Responsabilidade r = Responsabilidade.builder()
-                    .unidadeCodigo(1L)
-                    .usuarioTitulo("TITULO_1")
-                    .build();
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(List.of(1L))).thenReturn(List.of(r));
 
             // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
@@ -237,11 +207,8 @@ class ValidadorDadosOrgServiceTest {
             Unidade intermediaria = criarUnidadeValida(1L, "INT", TipoUnidade.INTERMEDIARIA);
             Usuario titular = criarUsuarioValido("TITULO_1");
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(intermediaria));
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(intermediaria));
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular));
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(
-                    Responsabilidade.builder().unidadeCodigo(1L).usuarioTitulo("TITULO_1").build()
-            ));
 
             // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
@@ -256,12 +223,7 @@ class ValidadorDadosOrgServiceTest {
             Unidade semTitular = criarUnidadeValida(2L, "SEM", TipoUnidade.OPERACIONAL);
             semTitular.setTituloTitular("");
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(semTitular));
-            Responsabilidade r = Responsabilidade.builder()
-                    .unidadeCodigo(2L)
-                    .usuarioTitulo("OUTRO")
-                    .build();
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(List.of(2L))).thenReturn(List.of(r));
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(semTitular));
 
             // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
@@ -275,12 +237,7 @@ class ValidadorDadosOrgServiceTest {
             Unidade uBranca = criarUnidadeValida(2L, "B", TipoUnidade.OPERACIONAL);
             uBranca.setTituloTitular("   ");
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(uBranca));
-            Responsabilidade r = Responsabilidade.builder()
-                    .unidadeCodigo(2L)
-                    .usuarioTitulo("OUTRO")
-                    .build();
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(List.of(2L))).thenReturn(List.of(r));
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(uBranca));
 
             assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
@@ -294,13 +251,7 @@ class ValidadorDadosOrgServiceTest {
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             u.setTituloTitular("");
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
-            // Fornece um responsável válido para não gerar uma segunda violação aqui
-            Responsabilidade r = Responsabilidade.builder()
-                    .unidadeCodigo(1L)
-                    .usuarioTitulo("OUTRO")
-                    .build();
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(List.of(1L))).thenReturn(List.of(r));
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u));
 
             // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
@@ -312,22 +263,18 @@ class ValidadorDadosOrgServiceTest {
         @DisplayName("Deve limitar mensagem de erro quando houver muitas violações")
         void deveGerarExceptionComMuitasViolacoes() {
             // Arrange
-            // Cria 4 unidades com problemas (sem titular)
-            // Isso gerará pelo menos 4 violações (titular ausente) 
-            // e possivelmente mais 4 (responsável atual ausente)
             List<Unidade> unidades = new ArrayList<>();
             for (long i = 1; i <= 4; i++) {
                 Unidade u = criarUnidadeValida(i, "U" + i, TipoUnidade.OPERACIONAL);
                 u.setTituloTitular(""); // Violação 1: Titular ausente
+                // Forçamos a responsabilidade ser nula para gerar Violação 2
+                u.setResponsabilidade(null);
                 unidades.add(u);
             }
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(unidades);
-            // Violação 2: Responsável atual ausente (mapa vazio)
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of());
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(unidades);
 
             // Act & Assert
-            // Deve conter a mensagem de resumo indicando o total de violações (8 neste caso)
             assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("violações encontradas")
@@ -341,15 +288,11 @@ class ValidadorDadosOrgServiceTest {
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             Usuario titular = criarUsuarioValido("TITULO_1");
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u));
             when(usuarioRepo.findAllById(anyList())).thenReturn(List.of(titular));
 
             // Responsabilidade presente mas com título em branco
-            Responsabilidade r = Responsabilidade.builder()
-                    .unidadeCodigo(1L)
-                    .usuarioTitulo("   ")
-                    .build();
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(r));
+            u.getResponsabilidade().setUsuarioTitulo("   ");
 
             // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
@@ -363,11 +306,11 @@ class ValidadorDadosOrgServiceTest {
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             Usuario titular = criarUsuarioValido("TITULO_1");
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u));
+            when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u));
             when(usuarioRepo.findAllById(anyList())).thenReturn(List.of(titular));
 
-            // Responsabilidades vazio -> r será nulo no loop
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of());
+            // Responsabilidade nula
+            u.setResponsabilidade(null);
 
             // Act & Assert
             assertThatThrownBy(() -> validador.run(args))

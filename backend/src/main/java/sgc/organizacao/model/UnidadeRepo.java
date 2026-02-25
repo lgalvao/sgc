@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Repositório JPA para a entidade Unidade.
@@ -25,6 +26,15 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             AND u.situacao = SituacaoUnidade.ATIVA
             """)
     List<String> findSiglasByCodigos(@Param("codigos") List<Long> codigos);
+
+    @Query("""
+            SELECT u FROM Unidade u
+            LEFT JOIN FETCH u.unidadeSuperior
+            LEFT JOIN FETCH u.responsabilidade
+            WHERE u.situacao = SituacaoUnidade.ATIVA
+            AND u.tipo IN :tipos
+            """)
+    List<Unidade> findBySituacaoAtivaAndTipoIn(@Param("tipos") Set<TipoUnidade> tipos);
 
     @Query("""
             SELECT u FROM Unidade u
