@@ -63,7 +63,7 @@ public class SubprocessoEmailService {
         
         String emailUnidade = String.format("%s@tre-pe.jus.br", unidadeDestino.getSigla().toLowerCase());
         emailService.enviarEmailHtml(emailUnidade, assunto, corpo);
-        log.info("Notificação OPERACIONAL de '{}' enviada para unidade {}", tipo, unidadeDestino.getSigla());
+        log.info("Notificação operacional {} enviada para {}", tipo, unidadeDestino.getSigla());
 
         // Responsável pessoal (substituto) também recebe a operacional
         notificarResponsavelPessoal(unidadeDestino, assunto, corpo, tipo);
@@ -74,9 +74,9 @@ public class SubprocessoEmailService {
         if (responsavel.substitutoTitulo() != null) {
             usuarioFacade.buscarUsuarioPorTitulo(responsavel.substitutoTitulo())
                 .ifPresent(u -> {
-                    if (u.getEmail() != null && !u.getEmail().isBlank()) {
+                    if (!u.getEmail().isBlank()) {
                         emailService.enviarEmailHtml(u.getEmail(), assunto, corpo);
-                        log.info("Notificação OPERACIONAL de '{}' enviada para e-mail pessoal de {}", tipo, u.getNome());
+                        log.info("Notificação operacional '{}' enviada a e-mail pessoal de {}", tipo, u.getNome());
                     }
                 });
         }
@@ -88,11 +88,10 @@ public class SubprocessoEmailService {
 
         while (superior != null) {
             // Evita duplicidade se a unidade superior for a própria unidade de destino operacional
-            if (unidadeJaNotificada != null && superior.getCodigo().equals(unidadeJaNotificada.getCodigo())) {
+            if (superior.getCodigo().equals(unidadeJaNotificada.getCodigo())) {
                 superior = superior.getUnidadeSuperior();
                 continue;
             }
-
             try {
                 Map<String, Object> variaveis = new HashMap<>(variaveisBase);
                 variaveis.put("siglaUnidadeSuperior", superior.getSigla());
@@ -101,9 +100,9 @@ public class SubprocessoEmailService {
                 String emailSuperior = String.format("%s@tre-pe.jus.br", superior.getSigla().toLowerCase());
                 
                 emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
-                log.info("Notificação de ACOMPANHAMENTO de '{}' enviada para unidade superior {}", tipo, superior.getSigla());
+                log.info("Notificação de acompanhamento {} enviada para unidade {}", tipo, superior.getSigla());
             } catch (Exception e) {
-                log.warn("Falha ao notificar acompanhamento superior {}: {}", superior.getSigla(), e.getMessage());
+                log.warn("Falha ao notificar unidade superior {}: {}", superior.getSigla(), e.getMessage());
             }
             superior = superior.getUnidadeSuperior();
         }

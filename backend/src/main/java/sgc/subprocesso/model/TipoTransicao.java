@@ -130,9 +130,9 @@ public enum TipoTransicao {
     );
 
     private final String descricaoMovimentacao;
-    private final @Nullable String templateAlerta;
-    private final @Nullable String templateEmail;
-    private final @Nullable String templateEmailSuperior;
+    private final String templateAlerta;
+    private final String templateEmail;
+    private final String templateEmailSuperior;
 
     public String formatarAlerta(String siglaUnidade) {
         return templateAlerta != null ? templateAlerta.formatted(siglaUnidade) : "";

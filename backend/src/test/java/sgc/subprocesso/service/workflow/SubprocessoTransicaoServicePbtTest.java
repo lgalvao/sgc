@@ -64,9 +64,9 @@ class SubprocessoTransicaoServicePbtTest {
         }
 
         if (tipo.enviaEmail()) {
-            verify(emailService, times(1)).enviarEmailTransicaoDireta(sp, tipo, unidades.origem, unidades.destino, "Obs");
+            verify(emailService, times(1)).notificarMovimentacao(sp, tipo, unidades.origem, unidades.destino, "Obs");
         } else {
-            verify(emailService, never()).enviarEmailTransicaoDireta(any(), any(), any(), any(), any());
+            verify(emailService, never()).notificarMovimentacao(any(), any(), any(), any(), any());
         }
     }
 

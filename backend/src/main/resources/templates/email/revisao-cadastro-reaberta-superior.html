@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Revisão de cadastro reaberta - Unidade Subordinada</title>
+</head>
+<body>
+<p>Prezado(a) responsável pela <strong th:text="${siglaUnidadeSuperior}">UNIDADE SUPERIOR</strong>,</p>
+<p>Informamos que a revisão do cadastro de atividades da unidade <strong th:text="${siglaUnidade}">UNIDADE</strong> foi reaberta para ajustes no processo
+    <strong th:text="${nomeProcesso}">PROCESSO</strong>.</p>
+<p><strong>Justificativa:</strong> <span th:text="${observacoes}">Motivo da reabertura</span></p>
+</body>
+</html>
