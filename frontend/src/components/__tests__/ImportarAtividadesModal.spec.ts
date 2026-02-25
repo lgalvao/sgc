@@ -141,10 +141,6 @@ describe("ImportarAtividadesModal", () => {
         const selects = wrapper.findAllComponents(BFormSelect as any);
         await selects[0].setValue("1");
         await flushPromises();
-        // BFormSelect/setValue might set it as string "1" even if bound to number
-        // Check if wrapper.vm.processoSelecionadoId is 1 or "1" depends on implementation and bootstrap-vue-next
-        // Original test expected "1". Since we mocked state with number 1, let's see.
-        // If setValue sets string, v-model becomes string.
         expect((wrapper.vm as any).processoSelecionadoId).toBe("1");
 
         await selects[0].setValue(""); // Select placeholder/empty

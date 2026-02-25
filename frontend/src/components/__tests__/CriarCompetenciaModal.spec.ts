@@ -1,6 +1,6 @@
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {flushPromises, mount} from "@vue/test-utils";
-import {BButton, BCard, BFormCheckbox, BFormTextarea} from "bootstrap-vue-next";
+import {BButton, BCard, BFormCheckbox, BFormTextarea, BModal} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import CriarCompetenciaModal from "@/components/mapa/CriarCompetenciaModal.vue";
 

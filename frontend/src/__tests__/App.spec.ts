@@ -7,6 +7,7 @@ import App from "../App.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useRoute} from "vue-router";
 import {useFeedbackStore} from "@/stores/feedback";
+import {useToast} from "bootstrap-vue-next";
 
 // Mock de components
 vi.mock("@/components/layout/BarraNavegacao.vue", () => ({default: {template: '<div data-testid="barra-navegacao"></div>'}}));

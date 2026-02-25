@@ -149,16 +149,6 @@ describe("DisponibilizarMapaModal.vue", () => {
 
     it("deve resetar campos quando mostrar mudar para true", async () => {
         const wrapper = createWrapper({ mostrar: false });
-
-        // Set values while hidden (simulating state persistence if it wasn't reset)
-        // Note: Since we can't easily set ref values directly from wrapper without exposing them,
-        // we can test the effect by verifying they are empty after showing.
-        // But to really test the watch, we can simulate the flow:
-        // 1. Show modal
-        // 2. Set values
-        // 3. Hide modal (prop change)
-        // 4. Show modal again (prop change) -> Expect empty
-
         await wrapper.setProps({ mostrar: true });
         
         const inputWrapper = wrapper.findComponent(BFormInput);

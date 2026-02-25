@@ -17,7 +17,7 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
   const globalOptions = {
     stubs: {
       BModal: BModalStub,
-      BButton: BButton
+      BButton: { template: '<button><slot /></button>' }
     }
   }
 
@@ -59,8 +59,8 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
       global: globalOptions
     })
 
-    const cancelBtn = wrapper.findAll('button').filter(b => b.text() === 'Cancelar')[0]
-    await cancelBtn.trigger('click')
+    const cancelBtn = wrapper.findAll('button').find(b => b.text() === 'Cancelar')
+    await cancelBtn?.trigger('click')
 
     expect(wrapper.emitted('fechar')).toHaveLength(1)
   })
