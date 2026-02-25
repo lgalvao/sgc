@@ -5,10 +5,6 @@
 /**
  * Achata uma estrutura de árvore hierárquica em uma lista plana.
  * 
- * @param items - Array de itens com possível propriedade de filhos
- * @param childrenKey - Nome da propriedade que contém os filhos (padrão: 'subordinadas')
- * @returns Array plano contendo todos os itens e seus filhos recursivamente
- * 
  * @example
  * // Com subordinadas (unidades)
  * const arvore = [

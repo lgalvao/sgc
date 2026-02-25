@@ -28,9 +28,6 @@ interface ModalManager {
  * Simplifica o gerenciamento de múltiplas modals em um componente,
  * eliminando a necessidade de criar refs individuais para cada modal.
  * 
- * @param modalNames - Lista de nomes das modals a gerenciar
- * @returns Gerenciador de modals
- * 
  * @example
  * ```ts
  * const { modals, open, close, isOpen } = useModalManager([

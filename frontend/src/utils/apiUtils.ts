@@ -11,11 +11,6 @@ import apiClient from '@/axios-setup';
 /**
  * Realiza uma requisição GET genérica.
  * 
- * @template T Tipo de retorno esperado
- * @param url URL relativa da API
- * @param params Parâmetros de query opcionais
- * @returns Promise com os dados tipados
- * 
  * @example
  * const processo = await apiGet<Processo>(`/processos/${id}`);
  * const processos = await apiGet<Processo[]>('/processos', { status: 'ATIVO' });
@@ -27,12 +22,6 @@ export async function apiGet<T>(url: string, params?: Record<string, any>): Prom
 
 /**
  * Realiza uma requisição POST genérica.
- * 
- * @template T Tipo de retorno esperado
- * @template D Tipo do body da requisição
- * @param url URL relativa da API
- * @param data Dados a serem enviados no body
- * @returns Promise com os dados tipados (ou void se não há retorno)
  * 
  * @example
  * const processo = await apiPost<Processo, CriarProcessoRequest>('/processos', request);

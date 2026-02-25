@@ -108,6 +108,7 @@ class LoginFacadeTest {
         
         when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
         when(gerenciadorJwt.gerarToken("123", Perfil.ADMIN, 1L)).thenReturn("token");
+        when(OrganizacaoFacade.unidadePorCodigo(1L)).thenReturn(unidade);
 
         EntrarRequest req = new EntrarRequest("123", "ADMIN", 1L);
         assertThat(loginFacade.entrar(req)).isEqualTo("token");
@@ -144,6 +145,7 @@ class LoginFacadeTest {
         
         when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
         when(gerenciadorJwt.gerarToken("123", Perfil.GESTOR, 1L)).thenReturn("token");
+        when(OrganizacaoFacade.unidadePorCodigo(1L)).thenReturn(unidade);
 
         EntrarRequest req = new EntrarRequest("123", "GESTOR", 1L);
         assertThat(loginFacade.entrar(req)).isEqualTo("token");

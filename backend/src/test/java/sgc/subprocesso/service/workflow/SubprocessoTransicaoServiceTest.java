@@ -69,7 +69,7 @@ class SubprocessoTransicaoServiceTest {
         // Assert
         verify(movimentacaoRepo).save(any(Movimentacao.class));
         verify(alertaService).criarAlertaTransicao(any(), anyString(), any(), any());
-        verify(emailService).enviarEmailTransicaoDireta(any(), any(), any(), any(), any());
+        verify(emailService).notificarMovimentacao(any(), any(), any(), any(), any());
     }
 
     @Test

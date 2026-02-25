@@ -32,7 +32,7 @@ describe("ImpactoMapaModal.vue", () => {
         const wrapper = createWrapper({ impacto });
         await flushPromises();
 
-        expect(wrapper.text()).toContain("Nenhum impacto detectado no mapa.");
+        expect(wrapper.text()).toContain("Nenhum impacto no mapa da unidade.");
     });
 
     it("deve mostrar atividades inseridas", async () => {

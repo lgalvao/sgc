@@ -59,9 +59,6 @@ public class ConfigSeguranca {
      * protegidos.
      * <li>Configura headers de segurança (HSTS, CSP, etc).
      * </ul>
-     *
-     * @param http o construtor {@link HttpSecurity} para configurar a segurança.
-     * @return o {@link SecurityFilterChain} configurado.
      */
     @Bean("defaultSecurityFilterChain")
     public SecurityFilterChain securityFilterChain(HttpSecurity http,

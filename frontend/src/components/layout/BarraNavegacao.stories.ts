@@ -26,11 +26,5 @@ export const Default: Story = {
     template: '<BarraNavegacao />',
   }),
   parameters: {
-    // We'll need to mock useBreadcrumbs or provide a custom implementation via provide/inject if needed
-    // For now, let's assume it picks up the current route or is mocked in the setup
   }
 };
-
-// Note: Components heavily dependent on routing and complex composables 
-// like useBreadcrumbs might need more elaborate mocking in Storybook.
-// In a real scenario, we'd mock useBreadcrumbs to return specific crumbs.

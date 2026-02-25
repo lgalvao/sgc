@@ -53,31 +53,14 @@ public class UnidadeService {
         return unidadeRepo.findSiglasByCodigos(codigos);
     }
 
-    /**
-     * Verifica se uma unidade possui mapa vigente.
-     *
-     * @param codigoUnidade código da unidade
-     * @return true se a unidade possui mapa vigente
-     */
     public boolean verificarMapaVigente(Long codigoUnidade) {
         return unidadeMapaRepo.existsById(codigoUnidade);
     }
 
-    /**
-     * Busca todos os códigos de unidades que possuem mapa vigente.
-     *
-     * @return lista de códigos
-     */
     public List<Long> buscarTodosCodigosUnidadesComMapa() {
         return unidadeMapaRepo.findAllUnidadeCodigos();
     }
 
-    /**
-     * Define ou atualiza o mapa vigente de uma unidade.
-     *
-     * @param codigoUnidade código da unidade
-     * @param mapa          mapa a ser definido como vigente
-     */
     @Transactional
     public void definirMapaVigente(Long codigoUnidade, Mapa mapa) {
         UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(codigoUnidade).orElse(new UnidadeMapa());
