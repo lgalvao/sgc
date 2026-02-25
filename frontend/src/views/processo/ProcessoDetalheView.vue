@@ -107,7 +107,7 @@ import {useProximaAcao} from "@/composables/useProximaAcao";
 import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
-import {SituacaoSubprocesso} from "@/types/tipos";
+import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 import {formatSituacaoProcesso, formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
 
@@ -138,17 +138,17 @@ const processo = computed(() => processosStore.processoDetalhe);
 const participantesHierarquia = computed(() => processo.value?.unidades || []);
 
 const podeAceitarBloco = computed(() => {
-  return (processo.value?.podeAceitarCadastroBloco || false)
+  return !isProcessoFinalizado.value && (processo.value?.podeAceitarCadastroBloco || false)
     && unidadesElegiveisPorAcao.value.aceitar.length > 0;
 });
 
 const podeHomologarBloco = computed(() => {
-  return (processo.value?.podeHomologarCadastro || processo.value?.podeHomologarMapa || false)
+  return !isProcessoFinalizado.value && (processo.value?.podeHomologarCadastro || processo.value?.podeHomologarMapa || false)
     && unidadesElegiveisPorAcao.value.homologar.length > 0;
 });
 
 const podeDisponibilizarBloco = computed(() => {
-  return (processo.value?.podeDisponibilizarMapaBloco || false)
+  return !isProcessoFinalizado.value && (processo.value?.podeDisponibilizarMapaBloco || false)
     && unidadesElegiveisPorAcao.value.disponibilizar.length > 0;
 });
 
@@ -158,6 +158,10 @@ const mostrarBotoesBloco = computed(() => {
 
 const podeFinalizar = computed(() => {
   return processo.value?.podeFinalizar || false;
+});
+
+const isProcessoFinalizado = computed(() => {
+  return processo.value?.situacao === SituacaoProcesso.FINALIZADO;
 });
 
 const unidadesElegiveisPorAcao = computed(() => {
@@ -236,6 +240,7 @@ const proximaAcaoProcesso = computed(() => obterProximaAcao({
   perfil: perfilStore.perfilSelecionado,
   situacao: processo.value?.situacao,
   podeFinalizar: podeFinalizar.value,
+  isProcessoFinalizado: isProcessoFinalizado.value,
 }));
 
 async function abrirDetalhesUnidade(row: any) {

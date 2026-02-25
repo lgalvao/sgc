@@ -244,7 +244,7 @@ class SubprocessoCrudServiceTest {
         Subprocesso sp = criarSubprocessoCompleto();
         sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
-                .dataLimiteEtapa1(LocalDateTime.now())
+                .dataLimiteEtapa1(sp.getDataLimiteEtapa1())
                 .dataFimEtapa1(LocalDateTime.now())
                 .dataFimEtapa2(LocalDateTime.now())
                 .build();
@@ -262,7 +262,9 @@ class SubprocessoCrudServiceTest {
     void deveAtualizarSemMudancas() {
         Subprocesso sp = criarSubprocessoCompleto();
         sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
-        AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().build();
+        AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
+                .dataLimiteEtapa1(sp.getDataLimiteEtapa1())
+                .build();
 
         when(subprocessoRepo.findByIdWithMapaAndAtividades(1L)).thenReturn(Optional.of(sp));
         when(subprocessoRepo.save(sp)).thenReturn(sp);
@@ -279,7 +281,9 @@ class SubprocessoCrudServiceTest {
         sp.setCodigo(1L);
         sp.setMapa(new Mapa()); // Tem mapa
 
-        AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder().build(); // codMapa null
+        AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
+                .dataLimiteEtapa1(sp.getDataLimiteEtapa1())
+                .build(); // codMapa null
 
         when(subprocessoRepo.findByIdWithMapaAndAtividades(1L)).thenReturn(Optional.of(sp));
         when(subprocessoRepo.save(sp)).thenReturn(sp);

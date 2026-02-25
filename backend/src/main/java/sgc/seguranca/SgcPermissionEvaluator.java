@@ -2,6 +2,7 @@ package sgc.seguranca;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
             "EDITAR_CADASTRO", "DISPONIBILIZAR_CADASTRO", "DEVOLVER_CADASTRO", "ACEITAR_CADASTRO", "HOMOLOGAR_CADASTRO",
             "EDITAR_REVISAO_CADASTRO", "DISPONIBILIZAR_REVISAO_CADASTRO", "DEVOLVER_REVISAO_CADASTRO", "ACEITAR_REVISAO_CADASTRO", "HOMOLOGAR_REVISAO_CADASTRO",
             "EDITAR_MAPA", "DISPONIBILIZAR_MAPA", "APRESENTAR_SUGESTOES", "VALIDAR_MAPA", "DEVOLVER_MAPA", "ACEITAR_MAPA", "HOMOLOGAR_MAPA", "AJUSTAR_MAPA",
-            "REALIZAR_AUTOAVALIACAO", "IMPORTAR_ATIVIDADES"
+            "REALIZAR_AUTOAVALIACAO", "IMPORTAR_ATIVIDADES", "ALTERAR_DATA_LIMITE", "REABRIR_CADASTRO", "REABRIR_REVISAO", "ENVIAR_LEMBRETE_PROCESSO"
     );
 
     @Override
@@ -60,8 +61,8 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
         if (targetDomainObject instanceof Subprocesso sp) {
             return checkSubprocesso(usuario, sp, acao);
-        } else if (targetDomainObject instanceof Processo) {
-            return checkProcesso(usuario, acao);
+        } else if (targetDomainObject instanceof Processo p) {
+            return checkProcesso(usuario, p, acao);
         }
 
         return false;
@@ -85,27 +86,30 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
                     .orElse(false);
         } else if ("Processo".equals(targetType)) {
              return processoRepo.findById((Long) targetId)
-                    .map(p -> checkProcesso(usuario, acao))
+                    .map(p -> checkProcesso(usuario, p, acao))
                     .orElse(false);
         }
 
         return false;
     }
 
-    public boolean checkPermission(Usuario usuario, Object targetDomainObject, String permission) {
+    public boolean checkPermission(@Nullable Usuario usuario, @Nullable Object targetDomainObject, String permission) {
         if (usuario == null) return false;
 
         return switch (targetDomainObject) {
             case Collection<?> collection ->
                     collection.stream().allMatch(item -> checkPermission(usuario, item, permission));
             case Subprocesso sp -> checkSubprocesso(usuario, sp, permission);
-            case Processo processo -> checkProcesso(usuario, permission);
+            case Processo processo -> checkProcesso(usuario, processo, permission);
             case null, default -> false;
         };
 
     }
 
     private boolean checkSubprocesso(Usuario usuario, Subprocesso sp, String acao) {
+        if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
+            return !isAcaoEscrita(acao);
+        }
         boolean isAdmin = usuario.getPerfilAtivo() == ADMIN;
         boolean isEscrita = isAcaoEscrita(acao);
 
@@ -204,7 +208,11 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         return false;
     }
 
-    private boolean checkProcesso(Usuario usuario, String acao) {
+    private boolean checkProcesso(Usuario usuario, @Nullable Processo processo, String acao) {
+        if (processo != null && processo.getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
+            return "VISUALIZAR_PROCESSO".equals(acao);
+        }
+
         // Regras para Processo (baseadas em Perfil)
         boolean isAdmin = usuario.getPerfilAtivo() == ADMIN;
 

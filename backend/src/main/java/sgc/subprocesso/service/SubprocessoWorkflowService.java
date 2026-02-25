@@ -174,7 +174,7 @@ public class SubprocessoWorkflowService {
     }
 
     private void processarAlteracoes(Subprocesso subprocesso, AtualizarSubprocessoRequest request) {
-        Optional.of(request.codMapa()).ifPresent(cod -> {
+        Optional.ofNullable(request.codMapa()).ifPresent(cod -> {
             Mapa m = Mapa.builder().codigo(cod).build();
             Long codAtual = subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null;
             if (!Objects.equals(codAtual, cod)) {
@@ -182,13 +182,16 @@ public class SubprocessoWorkflowService {
             }
         });
 
-        if (!Objects.equals(subprocesso.getDataLimiteEtapa1(), request.dataLimiteEtapa1())) {
+        if (request.dataLimiteEtapa1() != null && !Objects.equals(subprocesso.getDataLimiteEtapa1(), request.dataLimiteEtapa1())) {
             subprocesso.setDataLimiteEtapa1(request.dataLimiteEtapa1());
         }
-        if (!Objects.equals(subprocesso.getDataFimEtapa1(), request.dataFimEtapa1())) {
+        if (request.dataFimEtapa1() != null && !Objects.equals(subprocesso.getDataFimEtapa1(), request.dataFimEtapa1())) {
             subprocesso.setDataFimEtapa1(request.dataFimEtapa1());
         }
-        if (!Objects.equals(subprocesso.getDataFimEtapa2(), request.dataFimEtapa2())) {
+        if (request.dataLimiteEtapa2() != null && !Objects.equals(subprocesso.getDataLimiteEtapa2(), request.dataLimiteEtapa2())) {
+            subprocesso.setDataLimiteEtapa2(request.dataLimiteEtapa2());
+        }
+        if (request.dataFimEtapa2() != null && !Objects.equals(subprocesso.getDataFimEtapa2(), request.dataFimEtapa2())) {
             subprocesso.setDataFimEtapa2(request.dataFimEtapa2());
         }
     }

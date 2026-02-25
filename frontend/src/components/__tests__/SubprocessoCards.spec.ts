@@ -1,5 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
+import { ref } from 'vue';
 import SubprocessoCards from '@/components/processo/SubprocessoCards.vue';
 import {TipoProcesso} from '@/types/tipos';
 import {createTestingPinia} from '@pinia/testing';
@@ -21,13 +22,12 @@ describe('SubprocessoCards.vue', () => {
 
     const mountComponent = (propsOverrides: any = {}, accessOverrides: any = {}) => {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeEditarMapa: true,
-            podeEditarCadastro: true,
-            podeVisualizarMapa: true,
-            podeVisualizarDiagnostico: false,
-            podeVerPagina: true,
-            ...accessOverrides
-        });
+            podeEditarMapa: ref(accessOverrides.podeEditarMapa ?? true),
+            podeEditarCadastro: ref(accessOverrides.podeEditarCadastro ?? true),
+            podeVisualizarMapa: ref(accessOverrides.podeVisualizarMapa ?? true),
+            podeVisualizarDiagnostico: ref(accessOverrides.podeVisualizarDiagnostico ?? false),
+            podeVerPagina: ref(accessOverrides.podeVerPagina ?? true),
+        } as any);
 
         return mount(SubprocessoCards, {
             props: { ...defaultProps, ...propsOverrides },
