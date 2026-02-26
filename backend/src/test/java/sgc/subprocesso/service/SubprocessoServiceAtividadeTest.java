@@ -357,10 +357,6 @@ class SubprocessoServiceAtividadeTest {
         }
     }
 
-    // ============================================================================================
-    // MÉTODOS AUXILIARES
-    // ============================================================================================
-
     private Subprocesso criarSubprocesso(Long codigo, SituacaoSubprocesso situacao) {
         Unidade unidade = Unidade.builder()
                 .codigo(1L)

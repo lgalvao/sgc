@@ -23,11 +23,6 @@ public class TestLoginHelper {
 
     /**
      * Realiza login completo e retorna o token JWT.
-     *
-     * @param titulo Título eleitoral do usuário
-     * @param perfil Perfil desejado
-     * @param unidadeCodigo Código da unidade
-     * @return Token JWT para uso nos headers
      */
     public String login(MockMvc mockMvc, String titulo, Perfil perfil, Long unidadeCodigo) throws Exception {
         // 1. Autenticar
