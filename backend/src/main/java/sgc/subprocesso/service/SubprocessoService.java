@@ -18,12 +18,15 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.model.ComumRepo;
 import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.ImpactoMapaResponse;
+import sgc.mapa.dto.MapaVisualizacaoResponse;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.model.*;
 import sgc.mapa.service.CopiaMapaService;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.mapa.service.MapaSalvamentoService;
+import sgc.mapa.service.MapaVisualizacaoService;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.UnidadeDto;
@@ -85,6 +88,7 @@ public class SubprocessoService {
     private final MapaSalvamentoService mapaSalvamentoService;
     private final MapaAjusteMapper mapaAjusteMapper;
     private final SgcPermissionEvaluator permissionEvaluator;
+    private final MapaVisualizacaoService mapaVisualizacaoService;
 
     // @Lazy to break circular dependency: SubprocessoService -> MapaManutencaoService -> SubprocessoService (via Facade)
     @Lazy @Autowired @Setter
@@ -109,6 +113,37 @@ public class SubprocessoService {
 
     private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
             NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO);
+
+    // ========================================================================
+    // DELEGATES (Replacing MapaFacade / AnaliseFacade usage)
+    // ========================================================================
+
+    @Transactional(readOnly = true)
+    public MapaVisualizacaoResponse mapaParaVisualizacao(Long codSubprocesso) {
+        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        return mapaVisualizacaoService.obterMapaParaVisualizacao(sp);
+    }
+
+    @Transactional(readOnly = true)
+    public ImpactoMapaResponse verificarImpactos(Long codSubprocesso, Usuario usuario) {
+        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        return impactoMapaService.verificarImpactos(sp, usuario);
+    }
+
+    @Transactional
+    public Mapa salvarMapa(Long codSubprocesso, SalvarMapaRequest request) {
+        return salvarMapaSubprocesso(codSubprocesso, request);
+    }
+
+    @Transactional(readOnly = true)
+    public Mapa mapaCompletoPorSubprocesso(Long codSubprocesso) {
+        return mapaManutencaoService.buscarMapaCompletoPorSubprocesso(codSubprocesso);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> obterSugestoes(Long codSubprocesso) {
+        return Map.of("sugestoes", "");
+    }
 
     // ========================================================================
     // CRUD (from SubprocessoWorkflowService)

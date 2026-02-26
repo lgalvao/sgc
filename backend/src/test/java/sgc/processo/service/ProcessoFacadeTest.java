@@ -34,7 +34,7 @@ import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -71,7 +71,7 @@ class ProcessoFacadeTest {
     @Mock
     private EmailModelosService emailModelosService;
     @Mock
-    private SubprocessoFacade subprocessoFacade;
+    private SubprocessoService subprocessoService;
     @Mock
     private UsuarioFacade usuarioService;
     @Mock
@@ -138,7 +138,7 @@ class ProcessoFacadeTest {
             when(processoConsultaService.buscarProcessoCodigo(codProcesso)).thenReturn(processo);
             when(unidadeService.unidadePorCodigo(codUnidade)).thenReturn(unidade);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
-            when(subprocessoFacade.obterPorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
+            when(subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
             unidade.setTituloTitular("T1");
             Usuario titular = new Usuario();
             titular.setEmail("titular@teste.com");
@@ -149,7 +149,7 @@ class ProcessoFacadeTest {
             processoFacade.enviarLembrete(codProcesso, codUnidade);
 
             verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("15/03/2026"));
-            verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
+            verify(subprocessoService).registrarMovimentacaoLembrete(99L);
             verify(emailService).enviarEmailHtml(
                 eq("titular@teste.com"), 
                 contains("SGC: Lembrete de prazo"), 
@@ -194,14 +194,14 @@ class ProcessoFacadeTest {
                     .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                     .build();
 
-            when(subprocessoFacade.listarPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
+            when(subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
                 .thenReturn(List.of(sub));
             
             AcaoEmBlocoRequest reqNull = new AcaoEmBlocoRequest(List.of(10L), null, LocalDate.now());
             processoFacade.executarAcaoEmBloco(codProcesso, reqNull);
 
-            verify(subprocessoFacade, never()).aceitarCadastroEmBloco(any(), any());
-            verify(subprocessoFacade, never()).homologarCadastroEmBloco(any(), any());
+            verify(subprocessoService, never()).aceitarCadastroEmBloco(any(), any());
+            verify(subprocessoService, never()).homologarCadastroEmBloco(any(), any());
         }
     }
 
@@ -310,7 +310,7 @@ class ProcessoFacadeTest {
             when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
             when(unidadeService.unidadePorCodigo(10L)).thenReturn(u);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
-            when(subprocessoFacade.obterPorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
+            when(subprocessoService.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
             u.setTituloTitular("T10");
             Usuario titular = new Usuario();
             titular.setEmail("u10@teste.com");
@@ -319,7 +319,7 @@ class ProcessoFacadeTest {
 
             processoFacade.enviarLembrete(1L, 10L);
             verify(alertaService).criarAlertaAdmin(eq(p), eq(u), anyString());
-            verify(subprocessoFacade).registrarMovimentacaoLembrete(99L);
+            verify(subprocessoService).registrarMovimentacaoLembrete(99L);
             verify(emailService).enviarEmailHtml(eq("u10@teste.com"), contains(p.getDescricao()), anyString());
         }
 
@@ -509,22 +509,22 @@ class ProcessoFacadeTest {
         }
 
         @Test
-        @DisplayName("Deve listar todos os subprocessos delegando para facade")
-        void deveListarTodosSubprocessosDelegandoParaFacade() {
+        @DisplayName("Deve listar todos os subprocessos delegando para service")
+        void deveListarTodosSubprocessosDelegandoParaService() {
             Long codProcesso = 1L;
             List<Subprocesso> lista = List.of(Subprocesso.builder().build());
-            when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(lista);
+            when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(lista);
 
             var res = processoFacade.listarTodosSubprocessos(codProcesso);
             assertThat(res).isSameAs(lista);
         }
 
         @Test
-        @DisplayName("Deve listar entidades subprocessos delegando para facade")
-        void deveListarEntidadesSubprocessosDelegandoParaFacade() {
+        @DisplayName("Deve listar entidades subprocessos delegando para service")
+        void deveListarEntidadesSubprocessosDelegandoParaService() {
             Long codProcesso = 1L;
             List<Subprocesso> lista = List.of(Subprocesso.builder().build());
-            when(subprocessoFacade.listarEntidadesPorProcesso(codProcesso)).thenReturn(lista);
+            when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(lista);
 
             var res = processoFacade.listarEntidadesSubprocessos(codProcesso);
             assertThat(res).isSameAs(lista);
@@ -555,7 +555,7 @@ class ProcessoFacadeTest {
                 Subprocesso sp1 = Subprocesso.builder().codigo(1001L).unidade(Unidade.builder().codigo(1L).build()).build();
                 Subprocesso sp2 = Subprocesso.builder().codigo(1002L).unidade(Unidade.builder().codigo(2L).build()).build();
                 Subprocesso sp3 = Subprocesso.builder().codigo(1003L).unidade(Unidade.builder().codigo(3L).build()).build();
-                when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(1L, 2L, 3L))).thenReturn(List.of(sp1, sp2, sp3));
+                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(1L, 2L, 3L))).thenReturn(List.of(sp1, sp2, sp3));
                 doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("DISPONIBILIZAR_MAPA"));
 
                 // Act
@@ -564,9 +564,8 @@ class ProcessoFacadeTest {
                 // Assert
                 ArgumentCaptor<DisponibilizarMapaRequest> captor = 
                     ArgumentCaptor.forClass(DisponibilizarMapaRequest.class);
-                verify(subprocessoFacade).disponibilizarMapaEmBloco(
+                verify(subprocessoService).disponibilizarMapaEmBloco(
                     eq(List.of(1001L, 1002L, 1003L)),
-                    eq(100L),
                     captor.capture(),
                     eq(usuario)
                 );
@@ -598,7 +597,7 @@ class ProcessoFacadeTest {
                     .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                     .build();
 
-                when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(10L, 20L))).thenReturn(List.of(sp1, sp2));
+                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L, 20L))).thenReturn(List.of(sp1, sp2));
                 doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("ACEITAR_CADASTRO"));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
@@ -611,7 +610,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
                 // Assert
-                verify(subprocessoFacade).aceitarCadastroEmBloco(List.of(1L, 2L), usuario);
+                verify(subprocessoService).aceitarCadastroEmBloco(List.of(1L, 2L), usuario);
             }
 
             @Test
@@ -627,7 +626,7 @@ class ProcessoFacadeTest {
                     .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO)
                     .build();
 
-                when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
+                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
                 doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("ACEITAR_MAPA"));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
@@ -640,7 +639,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
                 // Assert
-                verify(subprocessoFacade).aceitarValidacaoEmBloco(List.of(1L), usuario);
+                verify(subprocessoService).aceitarValidacaoEmBloco(List.of(1L), usuario);
             }
         }
 
@@ -660,7 +659,7 @@ class ProcessoFacadeTest {
                     .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA)
                     .build();
 
-                when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
+                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
                 doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("HOMOLOGAR_CADASTRO"));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
@@ -673,7 +672,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
                 // Assert
-                verify(subprocessoFacade).homologarCadastroEmBloco(List.of(1L), usuario);
+                verify(subprocessoService).homologarCadastroEmBloco(List.of(1L), usuario);
             }
 
             @Test
@@ -689,7 +688,7 @@ class ProcessoFacadeTest {
                         .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO) // Situação que não é cadastro
                         .build();
 
-                when(subprocessoFacade.listarPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
+                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
                 doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("HOMOLOGAR_MAPA"));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
@@ -702,7 +701,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
                 // Assert
-                verify(subprocessoFacade).homologarValidacaoEmBloco(List.of(1L), usuario);
+                verify(subprocessoService).homologarValidacaoEmBloco(List.of(1L), usuario);
             }
         }
     }

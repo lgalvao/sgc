@@ -15,20 +15,20 @@ import sgc.organizacao.dto.UnidadeDto;
 import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(SubprocessoCrudController.class)
+@WebMvcTest(SubprocessoController.class)
 @Import(RestExceptionHandler.class)
-@DisplayName("SubprocessoCrudController - Busca Integração")
+@DisplayName("SubprocessoController - Busca Integração")
 @Tag("integration")
 class SubprocessoBuscarIntegracaoTest {
     @MockitoBean
-    private SubprocessoFacade subprocessoFacade;
+    private SubprocessoService subprocessoService;
 
     @MockitoBean
     private OrganizacaoFacade organizacaoFacade;
@@ -53,7 +53,7 @@ class SubprocessoBuscarIntegracaoTest {
                 .build();
 
         when(organizacaoFacade.buscarPorSigla(siglaUnidade)).thenReturn(unidade);
-        when(subprocessoFacade.obterEntidadePorProcessoEUnidade(codProcesso, 10L)).thenReturn(sp);
+        when(subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, 10L)).thenReturn(sp);
 
         // Act & Assert
         mockMvc.perform(get("/api/subprocessos/buscar")

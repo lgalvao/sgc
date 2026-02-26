@@ -18,7 +18,7 @@ import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 import sgc.subprocesso.dto.PermissoesSubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoSituacaoDto;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;
 import java.util.Set;
@@ -30,17 +30,17 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Slf4j
 public class AtividadeFacade {
     private final MapaManutencaoService mapaManutencaoService;
-    private final SubprocessoFacade subprocessoFacade;
+    private final SubprocessoService subprocessoService;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final UsuarioFacade usuarioService;
     public AtividadeFacade(
             MapaManutencaoService mapaManutencaoService,
-            @Lazy SubprocessoFacade subprocessoFacade,
+            @Lazy SubprocessoService subprocessoService,
             SgcPermissionEvaluator permissionEvaluator,
             UsuarioFacade usuarioService) {
 
         this.mapaManutencaoService = mapaManutencaoService;
-        this.subprocessoFacade = subprocessoFacade;
+        this.subprocessoService = subprocessoService;
         this.permissionEvaluator = permissionEvaluator;
         this.usuarioService = usuarioService;
     }
@@ -116,7 +116,7 @@ public class AtividadeFacade {
     }
 
     private void verificarPermissaoEdicao(Long mapaCodigo, Usuario usuario) {
-        Subprocesso sp = subprocessoFacade.obterEntidadePorCodigoMapa(mapaCodigo);
+        Subprocesso sp = subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo);
 
         if (!permissionEvaluator.checkPermission(usuario, sp, "EDITAR_CADASTRO")) {
              throw new ErroAcessoNegado("Usuário não tem permissão para editar atividades neste subprocesso.");
@@ -142,7 +142,7 @@ public class AtividadeFacade {
     }
 
     private Long obterCodigoSubprocessoPorMapa(Long codMapa) {
-        Subprocesso subprocesso = subprocessoFacade.obterEntidadePorCodigoMapa(codMapa);
+        Subprocesso subprocesso = subprocessoService.obterEntidadePorCodigoMapa(codMapa);
         return subprocesso.getCodigo();
     }
 
@@ -154,10 +154,11 @@ public class AtividadeFacade {
     }
 
     private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
-        SubprocessoSituacaoDto situacaoDto = subprocessoFacade.obterSituacao(codSubprocesso);
-        List<AtividadeDto> todasAtividades = subprocessoFacade.listarAtividadesSubprocesso(codSubprocesso);
+        SubprocessoSituacaoDto situacaoDto = subprocessoService.obterStatus(codSubprocesso);
+        List<AtividadeDto> todasAtividades = subprocessoService.listarAtividadesSubprocesso(codSubprocesso);
         Usuario usuario = usuarioService.usuarioAutenticado();
-        PermissoesSubprocessoDto permissoes = subprocessoFacade.obterPermissoesUI(codSubprocesso, usuario);
+        Subprocesso sp = subprocessoService.buscarSubprocesso(codSubprocesso);
+        PermissoesSubprocessoDto permissoes = subprocessoService.obterPermissoesUI(sp, usuario);
 
         AtividadeDto atividadeVis = null;
         if (incluirAtividade) {

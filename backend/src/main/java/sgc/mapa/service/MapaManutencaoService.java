@@ -9,7 +9,7 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.comum.model.ComumRepo;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.*;
 
@@ -24,7 +24,7 @@ public class MapaManutencaoService {
     private final ComumRepo repo;
     private final AtividadeMapper atividadeMapper;
     private final ConhecimentoMapper conhecimentoMapper;
-    private final SubprocessoFacade subprocessoFacade;
+    private final SubprocessoService subprocessoService;
 
     public MapaManutencaoService(
             AtividadeRepo atividadeRepo,
@@ -34,7 +34,7 @@ public class MapaManutencaoService {
             ComumRepo repo,
             AtividadeMapper atividadeMapper,
             ConhecimentoMapper conhecimentoMapper,
-            @Lazy SubprocessoFacade subprocessoFacade) {
+            @Lazy SubprocessoService subprocessoService) {
         this.atividadeRepo = atividadeRepo;
         this.competenciaRepo = competenciaRepo;
         this.conhecimentoRepo = conhecimentoRepo;
@@ -42,7 +42,7 @@ public class MapaManutencaoService {
         this.repo = repo;
         this.atividadeMapper = atividadeMapper;
         this.conhecimentoMapper = conhecimentoMapper;
-        this.subprocessoFacade = subprocessoFacade;
+        this.subprocessoService = subprocessoService;
     }
 
     public List<Atividade> listarAtividades() {
@@ -321,7 +321,7 @@ public class MapaManutencaoService {
     }
 
     private void notificarAlteracaoMapa(Long mapaCodigo) {
-        subprocessoFacade.atualizarSituacaoParaEmAndamento(mapaCodigo);
+        subprocessoService.atualizarParaEmAndamento(mapaCodigo);
     }
 
     private void validarDescricaoAtividadeUnica(Long mapaCodigo, String descricao) {

@@ -7,7 +7,7 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -25,11 +25,11 @@ class ProcessoInicializadorPbtTest {
         UnidadeRepo unidadeRepo = mock(UnidadeRepo.class);
         UnidadeMapaRepo unidadeMapaRepo = mock(UnidadeMapaRepo.class);
         ProcessoNotificacaoService notificacaoService = mock(ProcessoNotificacaoService.class);
-        SubprocessoFacade subprocessoFacade = mock(SubprocessoFacade.class);
+        SubprocessoService subprocessoService = mock(SubprocessoService.class);
         ProcessoValidador processoValidador = mock(ProcessoValidador.class);
 
         ProcessoInicializador inicializador = new ProcessoInicializador(
-                processoRepo, repo, unidadeRepo, unidadeMapaRepo, notificacaoService, subprocessoFacade, processoValidador
+                processoRepo, repo, unidadeRepo, unidadeMapaRepo, notificacaoService, subprocessoService, processoValidador
         );
 
         Processo processo = args.processo;
@@ -61,11 +61,11 @@ class ProcessoInicializadorPbtTest {
 
         // Assert
         if (processo.getTipo() == TipoProcesso.MAPEAMENTO) {
-            verify(subprocessoFacade, times(1)).criarParaMapeamento(eq(processo), any(), any(), eq(usuario));
+            verify(subprocessoService, times(1)).criarParaMapeamento(eq(processo), any(), any(), eq(usuario));
         } else if (processo.getTipo() == TipoProcesso.REVISAO) {
-            verify(subprocessoFacade, times(codsUnidadesParam.size())).criarParaRevisao(eq(processo), any(), any(), any(), eq(usuario));
+            verify(subprocessoService, times(codsUnidadesParam.size())).criarParaRevisao(eq(processo), any(), any(), any(), eq(usuario));
         } else if (processo.getTipo() == TipoProcesso.DIAGNOSTICO) {
-            verify(subprocessoFacade, times(processo.getParticipantes().size())).criarParaDiagnostico(eq(processo), any(), any(), any(), eq(usuario));
+            verify(subprocessoService, times(processo.getParticipantes().size())).criarParaDiagnostico(eq(processo), any(), any(), any(), eq(usuario));
         }
     }
 
