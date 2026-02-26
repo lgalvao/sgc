@@ -11,7 +11,7 @@ import type {
 } from "@/types/tipos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";
+import {mapAtividadeVisualizacaoToModel} from "@/services/subprocessoService";
 
 export const useAtividadesStore = defineStore("atividades", () => {
     const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());

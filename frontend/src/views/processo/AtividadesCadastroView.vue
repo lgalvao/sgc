@@ -125,7 +125,7 @@
 
     <ImpactoMapaModal
         v-if="codSubprocesso"
-        :impacto="impactoMapa"
+        :impacto="impactos"
         :loading="loadingImpacto"
         :mostrar="mostrarModalImpacto"
         @fechar="fecharModalImpacto"
@@ -201,7 +201,7 @@ const subprocessosStore = useSubprocessosStore();
 const analisesStore = useAnalisesStore();
 const mapasStore = useMapasStore();
 const feedbackStore = useFeedbackStore();
-const {impactoMapa} = storeToRefs(mapasStore);
+const {impactos} = storeToRefs(mapasStore);
 
 const {perfilSelecionado} = usePerfil();
 const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
@@ -220,8 +220,7 @@ const atividades = computed(() => {
 });
 
 const historicoAnalises = computed(() => {
-  if (!codSubprocesso.value) return [];
-  return analisesStore.obterAnalisesPorSubprocesso(codSubprocesso.value);
+  return analisesStore.analisesCadastro || [];
 });
 
 const {novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction} = useAtividadeForm();
@@ -434,7 +433,7 @@ async function confirmarDisponibilizacao() {
 
 async function abrirModalHistorico() {
   if (codSubprocesso.value) {
-    await analisesStore.buscarAnalisesCadastro(codSubprocesso.value);
+    await analisesStore.carregarHistorico(codSubprocesso.value);
   }
   mostrarModalHistorico.value = true;
 }

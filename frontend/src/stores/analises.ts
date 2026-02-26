@@ -1,56 +1,66 @@
+import {listarAnalisesCadastro, listarAnalisesValidacao} from "@/services/subprocessoService";
+import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import * as analiseService from "@/services/analiseService";
-import {useErrorHandler} from "@/composables/useErrorHandler";
-import {useSingleLoading} from "@/composables/useLoadingManager";
-
-import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
-
-type Analise = AnaliseCadastro | AnaliseValidacao;
 
 export const useAnalisesStore = defineStore("analises", () => {
-    const analisesPorSubprocesso = ref(new Map<number, Analise[]>());
-    const { lastError, clearError, withErrorHandling } = useErrorHandler();
-    const loading = useSingleLoading();
-
-    function obterAnalisesPorSubprocesso(codSubprocesso: number): Analise[] {
-        return analisesPorSubprocesso.value.get(codSubprocesso) || [];
-    }
+    const analisesCadastro = ref<AnaliseCadastro[]>([]);
+    const analisesValidacao = ref<AnaliseValidacao[]>([]);
+    const carregando = ref(false);
+    const erro = ref<string | null>(null);
 
     async function buscarAnalisesCadastro(codSubprocesso: number) {
-        if (loading.isLoading.value) return; // Previne race conditions
+        carregando.value = true;
+        erro.value = null;
+        analisesCadastro.value = [];
         
-        await loading.withLoading(async () => {
-            await withErrorHandling(async () => {
-                const analises = await analiseService.listarAnalisesCadastro(codSubprocesso);
-                const atuais = analisesPorSubprocesso.value.get(codSubprocesso) || [];
-                const outras = atuais.filter((a) => a.tipo !== "CADASTRO");
-                analisesPorSubprocesso.value.set(codSubprocesso, [...outras, ...analises]);
-            });
-        });
+        try {
+            if (codSubprocesso) {
+                const analises = await listarAnalisesCadastro(codSubprocesso);
+                analisesCadastro.value = analises;
+            }
+        } catch (e: any) {
+            erro.value = e.message || "Erro ao carregar histórico de análises de cadastro.";
+        } finally {
+            carregando.value = false;
+        }
     }
 
     async function buscarAnalisesValidacao(codSubprocesso: number) {
-        if (loading.isLoading.value) return; // Previne race conditions
-        
-        await loading.withLoading(async () => {
-            await withErrorHandling(async () => {
-                const analises =
-                    await analiseService.listarAnalisesValidacao(codSubprocesso);
-                const atuais = analisesPorSubprocesso.value.get(codSubprocesso) || [];
-                const outras = atuais.filter((a) => a.tipo !== "VALIDACAO");
-                analisesPorSubprocesso.value.set(codSubprocesso, [...outras, ...analises]);
-            });
-        });
+        carregando.value = true;
+        erro.value = null;
+        analisesValidacao.value = [];
+        try {
+            if (codSubprocesso) {
+                const validacoes = await listarAnalisesValidacao(codSubprocesso);
+                analisesValidacao.value = validacoes;
+            }
+        } catch (e: any) {
+            erro.value = e.message || "Erro ao carregar histórico de análises de validação.";
+        } finally {
+            carregando.value = false;
+        }
+    }
+
+    async function carregarHistorico(codSubprocesso: number) {
+        await buscarAnalisesCadastro(codSubprocesso);
+        await buscarAnalisesValidacao(codSubprocesso);
+    }
+
+    function obterAnalisesPorSubprocesso(codSubprocesso: number): (AnaliseCadastro | AnaliseValidacao)[] {
+        // Simplificação: Retorna a concatenação das listas carregadas.
+        // Assume-se que o contexto do subprocesso é mantido pelo componente que chama buscarAnalisesCadastro/Validacao.
+        return [...analisesCadastro.value, ...analisesValidacao.value];
     }
 
     return {
-        analisesPorSubprocesso,
-        lastError,
-        isLoading: loading.isLoading,
-        obterAnalisesPorSubprocesso,
+        analisesCadastro,
+        analisesValidacao,
+        carregando,
+        erro,
         buscarAnalisesCadastro,
         buscarAnalisesValidacao,
-        clearError
+        carregarHistorico,
+        obterAnalisesPorSubprocesso
     };
 });

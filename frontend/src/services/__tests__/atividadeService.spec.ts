@@ -1,12 +1,12 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {setupServiceTest, testErrorHandling} from "@/test-utils/serviceTestHelpers";
 import {createPinia, setActivePinia} from "pinia";
-import * as mappers from "@/mappers/atividades";
 import type {Conhecimento} from "@/types/tipos";
 import * as service from "../atividadeService";
+import * as subprocessoService from "@/services/subprocessoService";
 
-// Mocking mappers as they are used in the service
-vi.mock("@/mappers/atividades", () => ({
+// Mock internal mapping functions exposed from service
+vi.mock("@/services/subprocessoService", () => ({
     mapAtividadeToModel: vi.fn((dto) => ({...dto, mapped: true})),
     mapConhecimentoToModel: vi.fn((dto) => ({...dto, mapped: true})),
     mapCriarAtividadeRequestToDto: vi.fn((req) => ({...req, mapped: true})),
@@ -34,7 +34,7 @@ describe("atividadeService", () => {
         const result = await service.listarAtividades();
 
         expect(mockApi.get).toHaveBeenCalledWith("/atividades");
-        expect(mappers.mapAtividadeToModel).toHaveBeenCalled();
+        expect(subprocessoService.mapAtividadeToModel).toHaveBeenCalled();
         expect(result[0]).toHaveProperty("mapped", true);
     });
 
@@ -45,7 +45,7 @@ describe("atividadeService", () => {
         const result = await service.obterAtividadePorCodigo(1);
 
         expect(mockApi.get).toHaveBeenCalledWith("/atividades/1");
-        expect(mappers.mapAtividadeToModel).toHaveBeenCalledWith(dto);
+        expect(subprocessoService.mapAtividadeToModel).toHaveBeenCalledWith(dto);
         expect(result).toHaveProperty("mapped", true);
     });
 
@@ -60,7 +60,7 @@ describe("atividadeService", () => {
 
         const result = await service.criarAtividade(request, 100);
 
-        expect(mappers.mapCriarAtividadeRequestToDto).toHaveBeenCalledWith(request, 100);
+        expect(subprocessoService.mapCriarAtividadeRequestToDto).toHaveBeenCalledWith(request, 100);
         expect(mockApi.post).toHaveBeenCalledWith("/atividades", expect.any(Object));
         expect(result.atividade).toBeDefined();
         expect(result.subprocesso).toBeDefined();
@@ -77,7 +77,7 @@ describe("atividadeService", () => {
 
         const result = await service.atualizarAtividade(1, request);
 
-        expect(mappers.mapAtualizarAtividadeToDto).toHaveBeenCalledWith(request);
+        expect(subprocessoService.mapAtualizarAtividadeToDto).toHaveBeenCalledWith(request);
         expect(mockApi.post).toHaveBeenCalledWith("/atividades/1/atualizar", expect.any(Object));
         expect(result.atividade).toBeDefined();
         expect(result.subprocesso).toBeDefined();
@@ -105,8 +105,8 @@ describe("atividadeService", () => {
         const result = await service.listarConhecimentos(1);
 
         expect(mockApi.get).toHaveBeenCalledWith("/atividades/1/conhecimentos");
-        expect(mappers.mapConhecimentoToModel).toHaveBeenCalled();
-        expect((mappers.mapConhecimentoToModel as any).mock.calls[0][0]).toEqual(
+        expect(subprocessoService.mapConhecimentoToModel).toHaveBeenCalled();
+        expect((subprocessoService.mapConhecimentoToModel as any).mock.calls[0][0]).toEqual(
             dtoList[0],
         );
         expect(result[0]).toHaveProperty("mapped", true);
@@ -124,7 +124,7 @@ describe("atividadeService", () => {
 
         const result = await service.criarConhecimento(1, request);
 
-        expect(mappers.mapCriarConhecimentoRequestToDto).toHaveBeenCalledWith(
+        expect(subprocessoService.mapCriarConhecimentoRequestToDto).toHaveBeenCalledWith(
             request,
             1
         );
@@ -152,7 +152,7 @@ describe("atividadeService", () => {
 
         const expectedPayload = {...request, mapped: true};
 
-        expect(mappers.mapAtualizarConhecimentoToDto).toHaveBeenCalledWith(request, 1);
+        expect(subprocessoService.mapAtualizarConhecimentoToDto).toHaveBeenCalledWith(request, 1);
         expect(mockApi.post).toHaveBeenCalledWith(
             `/atividades/1/conhecimentos/${request.codigo}/atualizar`,
             expectedPayload,

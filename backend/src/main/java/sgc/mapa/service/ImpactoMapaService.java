@@ -49,13 +49,7 @@ public class ImpactoMapaService {
             throw new ErroAcessoNegado("Usuário não tem permissão para verificar impactos.");
         }
 
-        if (!Set.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO,
-                REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA,
-                REVISAO_MAPA_AJUSTADO).contains(subprocesso.getSituacao())) {
-            throw new ErroValidacao(
-                "Situação do subprocesso não permite esta operação. Situação atual: %s"
-                    .formatted(subprocesso.getSituacao()));
-        }
+        checkSituacao(usuario, subprocesso);
 
         Optional<Mapa> mapaVigenteOpt = mapaRepo.findMapaVigenteByUnidade(subprocesso.getUnidade().getCodigo());
         if (mapaVigenteOpt.isEmpty()) {
@@ -91,6 +85,42 @@ public class ImpactoMapaService {
                 .totalAlteradas(alteradas.size())
                 .totalCompetenciasImpactadas(competenciasImpactadas.size())
                 .build();
+    }
+
+    private void checkSituacao(Usuario usuario, Subprocesso sp) {
+        SituacaoSubprocesso situacao = sp.getSituacao();
+        Perfil perfil = usuario.getPerfilAtivo();
+
+        boolean situacaoValida;
+
+        // Regras de negócio migradas do SgcPermissionEvaluator (CDU-12)
+        if (perfil == Perfil.CHEFE) {
+            // CHEFE - Revisão do cadastro em andamento na sua unidade (ou NAO_INICIADO se aplicável)
+            situacaoValida = (situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO);
+        } else if (perfil == Perfil.GESTOR) {
+            // GESTOR - Revisão do cadastro disponibilizada
+            // Nota: O checkHierarquia já garantiu que é da unidade/subordinada,
+            // mas aqui validamos se o momento do fluxo é adequado para o Gestor ver impactos.
+            // Para visualização (VERIFICAR_IMPACTOS), GESTOR também pode ver em outras fases se desejar?
+            // A regra original era estrita:
+            // "if (situacao == REVISAO_CADASTRO_DISPONIBILIZADA) { if (perfil == GESTOR ... "
+            // Isso implicava que GESTOR só via impactos SE estivesse DISPONIBILIZADA.
+            // Vamos manter a regra original para fidelidade.
+            situacaoValida = (situacao == REVISAO_CADASTRO_DISPONIBILIZADA);
+        } else if (perfil == Perfil.ADMIN) {
+            // ADMIN - Várias fases
+            situacaoValida = Set.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO,
+                    REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA,
+                    REVISAO_MAPA_AJUSTADO).contains(situacao);
+        } else {
+            situacaoValida = false;
+        }
+
+        if (!situacaoValida) {
+            throw new ErroValidacao(
+                    "Situação do subprocesso (%s) não permite verificação de impactos para o perfil %s."
+                            .formatted(situacao, perfil));
+        }
     }
 
     /**

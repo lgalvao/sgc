@@ -121,9 +121,8 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
             }
 
             // CDU-12: Exceção à regra de visualização baseada apenas em hierarquia
-            // Se for VERIFICAR_IMPACTOS, a lógica de checkSituacaoImpactos é soberana
             if ("VERIFICAR_IMPACTOS".equals(acao)) {
-                return checkSituacaoImpactos(usuario, sp);
+                return true; // Permitir visualização se for verificação de impactos (controle de estado feito no serviço)
             }
 
             return checkHierarquia(usuario, sp.getUnidade());
@@ -179,32 +178,6 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         }
 
         return true;
-    }
-
-    private boolean checkSituacaoImpactos(Usuario usuario, Subprocesso sp) {
-        Perfil perfil = usuario.getPerfilAtivo();
-        SituacaoSubprocesso situacao = sp.getSituacao();
-        Long unidadeUsuario = usuario.getUnidadeAtivaCodigo();
-        Long localizacaoSp = obterUnidadeLocalizacao(sp).getCodigo();
-
-        // 3.1 CHEFE - Revisão do cadastro em andamento na sua unidade
-        if (perfil == CHEFE) {
-            return (situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO) && Objects.equals(unidadeUsuario, localizacaoSp);
-        }
-
-        // 3.2 GESTOR ou ADMIN - Revisão do cadastro disponibilizada na sua unidade
-        if (situacao == REVISAO_CADASTRO_DISPONIBILIZADA) {
-            if (perfil == GESTOR || perfil == ADMIN) {
-                return Objects.equals(unidadeUsuario, localizacaoSp);
-            }
-        }
-
-        // 3.3 ADMIN - Revisão do cadastro homologada ou Mapa ajustado (Edição de Mapa)
-        if (perfil == ADMIN) {
-            return situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO || situacao == REVISAO_CADASTRO_HOMOLOGADA || situacao == REVISAO_MAPA_AJUSTADO;
-        }
-
-        return false;
     }
 
     private boolean checkProcesso(Usuario usuario, @Nullable Processo processo, String acao) {
