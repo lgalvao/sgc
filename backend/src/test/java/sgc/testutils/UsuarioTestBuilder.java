@@ -16,36 +16,24 @@ public class UsuarioTestBuilder {
         return new UsuarioTestBuilder();
     }
 
-    /**
-     * Cria um usuário ADMIN padrão (191919)
-     */
     public static UsuarioTestBuilder admin() {
         return new UsuarioTestBuilder()
             .comTitulo("191919")
             .comNome("Admin Teste");
     }
 
-    /**
-     * Cria um usuário GESTOR padrão (222222)
-     */
     public static UsuarioTestBuilder gestor() {
         return new UsuarioTestBuilder()
             .comTitulo("222222")
             .comNome("Gestor Teste");
     }
 
-    /**
-     * Cria um usuário CHEFE padrão (555555)
-     */
     public static UsuarioTestBuilder chefe() {
         return new UsuarioTestBuilder()
             .comTitulo("555555")
             .comNome("Chefe Teste");
     }
 
-    /**
-     * Cria um usuário SERVIDOR padrão (666666)
-     */
     public static UsuarioTestBuilder servidor() {
         return new UsuarioTestBuilder()
             .comTitulo("666666")

@@ -22,8 +22,6 @@ public class UnidadeHierarquiaService {
 
     /**
      * Busca a árvore hierárquica completa de unidades.
-     *
-     * @return lista de unidades raiz com suas subunidades populadas
      */
     public List<UnidadeDto> buscarArvoreHierarquica() {
         List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
@@ -32,9 +30,6 @@ public class UnidadeHierarquiaService {
 
     /**
      * Busca a árvore hierárquica com filtro de elegibilidade.
-     *
-     * @param elegibilidadeChecker função para verificar se unidade é elegível
-     * @return lista de unidades raiz com suas subunidades populadas
      */
     public List<UnidadeDto> buscarArvoreComElegibilidade(Predicate<Unidade> elegibilidadeChecker) {
         List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
@@ -43,9 +38,6 @@ public class UnidadeHierarquiaService {
 
     /**
      * Busca todos os IDs de unidades descendentes de uma unidade.
-     *
-     * @param codigoUnidade código da unidade raiz
-     * @return lista de códigos de descendentes (filhos, netos, etc.)
      */
     public List<Long> buscarIdsDescendentes(Long codigoUnidade) {
         return buscarDescendentes(codigoUnidade, buscarMapaHierarquia());
@@ -53,10 +45,6 @@ public class UnidadeHierarquiaService {
 
     /**
      * Busca todos os IDs de unidades descendentes usando um mapa pré-carregado.
-     *
-     * @param codigoUnidade código da unidade raiz
-     * @param mapPaiFilhos mapa de hierarquia (Pai -> Lista de Filhos)
-     * @return lista de códigos de descendentes
      */
     public List<Long> buscarDescendentes(Long codigoUnidade, Map<Long, List<Long>> mapPaiFilhos) {
         List<Long> descendentes = new ArrayList<>();
@@ -66,8 +54,6 @@ public class UnidadeHierarquiaService {
 
     /**
      * Constrói o mapa de hierarquia (Pai -> Lista de Filhos) buscando todas as unidades.
-     *
-     * @return mapa onde a chave é o código da unidade pai e o valor é a lista de códigos das unidades filhas
      */
     public Map<Long, List<Long>> buscarMapaHierarquia() {
         List<Unidade> todas = unidadeRepo.findAllWithHierarquia();
@@ -84,8 +70,6 @@ public class UnidadeHierarquiaService {
     /**
      * Busca uma unidade específica na árvore hierárquica.
      *
-     * @param codigo código da unidade a buscar
-     * @return DTO da unidade com sua subárvore
      * @throws ErroEntidadeNaoEncontrada se a unidade não for encontrada
      */
     public UnidadeDto buscarArvore(Long codigo) {
@@ -101,7 +85,6 @@ public class UnidadeHierarquiaService {
     /**
      * Busca todas as siglas de unidades subordinadas a uma unidade.
      *
-     * @return lista de siglas de todas as subordinadas
      * @throws ErroEntidadeNaoEncontrada se a unidade não for encontrada
      */
     public List<String> buscarSiglasSubordinadas(String sigla) {
@@ -121,7 +104,6 @@ public class UnidadeHierarquiaService {
     /**
      * Busca a sigla da unidade superior de uma unidade.
      *
-     * @return Optional com a sigla da unidade superior, ou vazio se não houver
      * @throws ErroEntidadeNaoEncontrada se a unidade não for encontrada
      */
     public Optional<String> buscarSiglaSuperior(String sigla) {
@@ -132,9 +114,6 @@ public class UnidadeHierarquiaService {
 
     /**
      * Busca unidades subordinadas diretas de uma unidade.
-     *
-     * @param codUnidade código da unidade pai
-     * @return lista de DTOs das unidades filhas
      */
     public List<UnidadeDto> buscarSubordinadas(Long codUnidade) {
         return unidadeRepo.findByUnidadeSuperiorCodigo(codUnidade).stream()

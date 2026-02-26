@@ -35,8 +35,6 @@ public class ResponsavelUnidadeService {
 
     /**
      * Busca todas as atribuições temporárias cadastradas.
-     *
-     * @return lista de DTOs de atribuições temporárias
      */
     public List<AtribuicaoDto> buscarTodasAtribuicoes() {
         return atribuicaoTemporariaRepo.findAll().stream()
@@ -60,8 +58,6 @@ public class ResponsavelUnidadeService {
     /**
      * Cria uma atribuição temporária de responsável para uma unidade.
      *
-     * @param codUnidade código da unidade
-     * @param request    dados da atribuição (usuário, datas, justificativa)
      * @throws ErroValidacao se a data de término for anterior à data de início
      */
     public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoRequest request) {
@@ -90,8 +86,6 @@ public class ResponsavelUnidadeService {
     /**
      * Busca o responsável atual de uma unidade (com atribuições carregadas).
      *
-     * @param siglaUnidade sigla da unidade
-     * @return usuário responsável com atribuições carregadas
      * @throws ErroEntidadeNaoEncontrada se a unidade ou responsável não for encontrado
      */
     @Transactional(readOnly = true)
@@ -106,8 +100,6 @@ public class ResponsavelUnidadeService {
     /**
      * Busca o responsável (titular e substituto) de uma unidade.
      *
-     * @param unidadeCodigo código da unidade
-     * @return DTO do responsável com dados do titular e substituto
      * @throws ErroEntidadeNaoEncontrada se não houver responsável
      */
     public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
@@ -121,9 +113,6 @@ public class ResponsavelUnidadeService {
 
     /**
      * Busca responsáveis de múltiplas unidades em lote.
-     *
-     * @param unidadesCodigos lista de códigos de unidades
-     * @return mapa de código de unidade para DTO de responsável
      */
     @Transactional(readOnly = true)
     public Map<Long, UnidadeResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
@@ -179,9 +168,6 @@ public class ResponsavelUnidadeService {
 
     /**
      * Busca os códigos das unidades onde o usuário é o responsável atual.
-     *
-     * @param titulo título do usuário
-     * @return lista de códigos de unidades
      */
     @Transactional(readOnly = true)
     public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {

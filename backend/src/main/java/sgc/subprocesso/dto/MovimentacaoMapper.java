@@ -24,10 +24,6 @@ public interface MovimentacaoMapper {
 
     /**
      * Mapeia sigla da unidade, substituindo ADMIN (id=1) por "ADMIN" para o usuário.
-     * A unidade ADMIN é interna/técnica.
-     *
-     * @param unidade a unidade a mapear (garantida não nula pelo MapStruct)
-     * @return a sigla para exibição ao usuário ("ADMIN" se for a unidade raiz, senão a sigla original)
      */
     default String mapUnidadeSiglaParaUsuario(Unidade unidade) {
         return Objects.equals(unidade.getCodigo(), 1L) ? "ADMIN" : unidade.getSigla();
