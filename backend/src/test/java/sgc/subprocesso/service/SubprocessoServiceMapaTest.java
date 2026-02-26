@@ -23,7 +23,9 @@ import sgc.mapa.service.MapaManutencaoService;
 import sgc.mapa.service.MapaSalvamentoService;
 import sgc.organizacao.OrganizacaoFacade;
 import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.dto.UnidadeDto;
 import sgc.organizacao.model.SituacaoUnidade;
+import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.TipoProcesso;
@@ -31,14 +33,13 @@ import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.dto.CompetenciaRequest;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.MapaAjusteMapper;
-import sgc.subprocesso.dto.SubmeterMapaAjustadoRequest;
 import sgc.subprocesso.model.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

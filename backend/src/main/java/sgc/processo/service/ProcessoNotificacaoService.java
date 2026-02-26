@@ -17,7 +17,7 @@ import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class ProcessoNotificacaoService {
     private final OrganizacaoFacade organizacaoFacade;
     private final UsuarioFacade usuarioService;
     private final ProcessoRepo processoRepo;
-    private final SubprocessoFacade subprocessoFacade;
+    private final SubprocessoService subprocessoService;
 
     /**
      * Notifica sobre o início de um processo (alertas + e-mails).
@@ -62,7 +62,7 @@ public class ProcessoNotificacaoService {
         Processo processo = processoRepo.findByIdComParticipantes(codProcesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
 
-        List<Subprocesso> subprocessos = subprocessoFacade.listarEntidadesPorProcesso(codProcesso);
+        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
         if (subprocessos.isEmpty()) {
             log.warn("Nenhum subprocesso encontrado para o processo {}", codProcesso);
             return;

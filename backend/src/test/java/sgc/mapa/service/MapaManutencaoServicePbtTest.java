@@ -8,7 +8,7 @@ import sgc.mapa.dto.ConhecimentoMapper;
 import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.model.*;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;
 
@@ -28,11 +28,11 @@ class MapaManutencaoServicePbtTest {
         ComumRepo repo = mock(ComumRepo.class);
         AtividadeMapper atividadeMapper = mock(AtividadeMapper.class);
         ConhecimentoMapper conhecimentoMapper = mock(ConhecimentoMapper.class);
-        SubprocessoFacade subprocessoAdminService = mock(SubprocessoFacade.class);
+        SubprocessoService subprocessoService = mock(SubprocessoService.class);
 
         MapaManutencaoService service = new MapaManutencaoService(
                 atividadeRepo, competenciaRepo, conhecimentoRepo, mapaRepo, repo,
-                atividadeMapper, conhecimentoMapper, subprocessoAdminService
+                atividadeMapper, conhecimentoMapper, subprocessoService
         );
 
         Long mapaCodigo = 1L;
@@ -63,11 +63,11 @@ class MapaManutencaoServicePbtTest {
         ComumRepo repo = mock(ComumRepo.class);
         AtividadeMapper atividadeMapper = mock(AtividadeMapper.class);
         ConhecimentoMapper conhecimentoMapper = mock(ConhecimentoMapper.class);
-        SubprocessoFacade subprocessoAdminService = mock(SubprocessoFacade.class);
+        SubprocessoService subprocessoService = mock(SubprocessoService.class);
 
         MapaManutencaoService service = new MapaManutencaoService(
                 atividadeRepo, competenciaRepo, conhecimentoRepo, mapaRepo, repo,
-                atividadeMapper, conhecimentoMapper, subprocessoAdminService
+                atividadeMapper, conhecimentoMapper, subprocessoService
         );
 
         Long ativCodigo = 10L;

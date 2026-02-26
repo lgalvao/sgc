@@ -13,7 +13,7 @@ import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.*;
 
@@ -39,7 +39,7 @@ class MapaManutencaoServiceTest {
     @Mock
     private ConhecimentoMapper conhecimentoMapper;
     @Mock
-    private SubprocessoFacade subprocessoFacade;
+    private SubprocessoService subprocessoService;
 
     @InjectMocks
     private MapaManutencaoService service;
@@ -143,7 +143,7 @@ class MapaManutencaoServiceTest {
             Atividade res = service.criarAtividade(request);
 
             assertThat(res).isNotNull();
-            verify(subprocessoFacade).atualizarSituacaoParaEmAndamento(1L);
+            verify(subprocessoService).atualizarParaEmAndamento(1L);
         }
 
         @Test
@@ -186,7 +186,7 @@ class MapaManutencaoServiceTest {
             service.atualizarAtividade(id, request);
 
             verify(atividadeRepo).save(atividade);
-            verify(subprocessoFacade).atualizarSituacaoParaEmAndamento(1L);
+            verify(subprocessoService).atualizarParaEmAndamento(1L);
         }
 
 
@@ -219,7 +219,7 @@ class MapaManutencaoServiceTest {
 
             verify(conhecimentoRepo).deleteAll(anyList());
             verify(atividadeRepo).delete(atividade);
-            verify(subprocessoFacade).atualizarSituacaoParaEmAndamento(any());
+            verify(subprocessoService).atualizarParaEmAndamento(any());
         }
     }
 
@@ -255,7 +255,7 @@ class MapaManutencaoServiceTest {
             assertThat(atividade2.getDescricao()).isEqualTo("Nova 2");
 
             verify(atividadeRepo).saveAll(anyList());
-            verify(subprocessoFacade, times(1)).atualizarSituacaoParaEmAndamento(10L);
+            verify(subprocessoService, times(1)).atualizarParaEmAndamento(10L);
         }
     }
 
@@ -563,7 +563,7 @@ class MapaManutencaoServiceTest {
             Conhecimento resultado = service.criarConhecimento(1L, request);
 
             assertThat(resultado).isNotNull();
-            verify(subprocessoFacade).atualizarSituacaoParaEmAndamento(10L);
+            verify(subprocessoService).atualizarParaEmAndamento(10L);
             verify(conhecimentoRepo).save(conhecimento);
         }
 
@@ -602,7 +602,7 @@ class MapaManutencaoServiceTest {
             service.atualizarConhecimento(1L, 1L, request);
 
             assertThat(conhecimento.getDescricao()).isEqualTo("Conhecimento Atualizado");
-            verify(subprocessoFacade).atualizarSituacaoParaEmAndamento(10L);
+            verify(subprocessoService).atualizarParaEmAndamento(10L);
             verify(conhecimentoRepo).save(conhecimento);
         }
 
@@ -668,7 +668,7 @@ class MapaManutencaoServiceTest {
 
             service.excluirConhecimento(1L, 1L);
 
-            verify(subprocessoFacade).atualizarSituacaoParaEmAndamento(10L);
+            verify(subprocessoService).atualizarParaEmAndamento(10L);
             verify(conhecimentoRepo).delete(conhecimento);
         }
 
@@ -781,8 +781,8 @@ class MapaManutencaoServiceTest {
 
             verify(atividadeRepo).saveAll(anyList());
             // Deve publicar evento, pois atividades têm mapas
-            verify(subprocessoFacade).atualizarSituacaoParaEmAndamento(10L);
-            verify(subprocessoFacade).atualizarSituacaoParaEmAndamento(20L);
+            verify(subprocessoService).atualizarParaEmAndamento(10L);
+            verify(subprocessoService).atualizarParaEmAndamento(20L);
         }
 
         @Test

@@ -117,6 +117,7 @@ public class ArchConsistencyTest {
             .haveSimpleNameContaining("Facade")
             .should()
             .haveSimpleNameEndingWith("Facade")
+            .allowEmptyShould(true)
             .because("Facade classes should have 'Facade' as suffix for consistency");
 
     @ArchTest
