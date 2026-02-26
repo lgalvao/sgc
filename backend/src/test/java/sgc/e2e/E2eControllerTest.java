@@ -1,40 +1,30 @@
 package sgc.e2e;
 
 import org.junit.jupiter.api.*;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroConfiguracao;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.processo.ProcessoFacade;
-import sgc.processo.dto.CriarProcessoRequest;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
+import org.mockito.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.test.context.*;
+import org.springframework.core.io.*;
+import org.springframework.jdbc.core.*;
+import org.springframework.jdbc.core.namedparam.*;
+import org.springframework.test.context.*;
+import org.springframework.test.context.jdbc.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.*;
+import sgc.organizacao.dto.*;
+import sgc.processo.*;
+import sgc.processo.dto.*;
+import sgc.processo.model.*;
 
-import javax.sql.DataSource;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
+import javax.sql.*;
+import java.io.*;
+import java.nio.charset.*;
+import java.sql.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @Tag("integration")

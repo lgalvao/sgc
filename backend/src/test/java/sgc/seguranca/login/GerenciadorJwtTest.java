@@ -1,27 +1,22 @@
 package sgc.seguranca.login;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
-import sgc.comum.erros.ErroConfiguracao;
-import sgc.organizacao.model.Perfil;
-import sgc.seguranca.config.JwtProperties;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import org.springframework.core.env.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.model.*;
+import sgc.seguranca.config.*;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
+import java.nio.charset.*;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("GerenciadorJwt - Testes Unitários")

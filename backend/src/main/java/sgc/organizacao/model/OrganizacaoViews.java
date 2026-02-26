@@ -1,6 +1,6 @@
 package sgc.organizacao.model;
 
-import sgc.comum.model.ComumViews;
+import sgc.comum.model.*;
 
 public final class OrganizacaoViews {
     private OrganizacaoViews() {

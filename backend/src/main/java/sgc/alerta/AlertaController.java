@@ -1,20 +1,19 @@
 package sgc.alerta;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.annotation.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.tags.*;
+import lombok.*;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.*;
+import org.springframework.security.core.annotation.*;
+import org.springframework.security.core.userdetails.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.alerta.model.Alerta;
-import sgc.comum.model.ComumViews;
-import sgc.organizacao.model.Usuario;
+import sgc.alerta.model.*;
+import sgc.comum.model.*;
+import sgc.organizacao.model.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/alertas")

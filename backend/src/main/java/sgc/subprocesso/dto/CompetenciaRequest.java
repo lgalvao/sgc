@@ -1,10 +1,9 @@
 package sgc.subprocesso.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.Builder;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * DTO de requisição para adicionar/atualizar competência.

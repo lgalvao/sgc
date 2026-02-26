@@ -1,7 +1,6 @@
 package sgc.testutils;
 
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.*;
 
 /**
  * Builder para criação de objetos Usuario em testes.

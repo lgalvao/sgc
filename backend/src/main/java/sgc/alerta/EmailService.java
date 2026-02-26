@@ -1,22 +1,19 @@
 package sgc.alerta;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.mail.javamail.*;
+import org.springframework.scheduling.annotation.*;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.model.Notificacao;
-import sgc.alerta.model.NotificacaoRepo;
-import sgc.comum.config.ConfigAplicacao;
+import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
+import sgc.comum.config.*;
 
-import java.io.UnsupportedEncodingException;
-import java.time.LocalDateTime;
-import java.util.regex.Pattern;
+import java.io.*;
+import java.time.*;
+import java.util.regex.*;
 
 @Service
 @RequiredArgsConstructor

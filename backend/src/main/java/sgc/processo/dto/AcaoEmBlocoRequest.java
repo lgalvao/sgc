@@ -1,11 +1,10 @@
 package sgc.processo.dto;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import sgc.processo.model.AcaoProcesso;
+import jakarta.validation.constraints.*;
+import sgc.processo.model.*;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 public record AcaoEmBlocoRequest(
     @NotEmpty(message = "Pelo menos uma unidade deve ser selecionada")

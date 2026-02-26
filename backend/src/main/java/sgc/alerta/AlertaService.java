@@ -1,18 +1,13 @@
 package sgc.alerta;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.model.Alerta;
-import sgc.alerta.model.AlertaRepo;
-import sgc.alerta.model.AlertaUsuario;
-import sgc.alerta.model.AlertaUsuarioRepo;
+import lombok.*;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.time.*;
+import java.util.*;
 
 /**
  * Service responsável pelas operações de persistência de alertas.

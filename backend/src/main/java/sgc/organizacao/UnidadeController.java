@@ -1,29 +1,22 @@
 package sgc.organizacao;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
+import com.fasterxml.jackson.annotation.*;
+import jakarta.validation.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.*;
+import org.springframework.validation.annotation.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.HtmlUtils;
-import sgc.organizacao.dto.AtribuicaoDto;
-import sgc.organizacao.dto.CriarAtribuicaoRequest;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.model.OrganizacaoViews;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.ProcessoFacade;
-import sgc.processo.model.TipoProcesso;
+import org.springframework.web.util.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.processo.*;
+import sgc.processo.model.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
-import static sgc.processo.model.TipoProcesso.REVISAO;
+import static sgc.processo.model.TipoProcesso.*;
 
 @RestController
 @RequestMapping("/api/unidades")

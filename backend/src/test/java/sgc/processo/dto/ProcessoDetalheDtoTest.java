@@ -1,12 +1,11 @@
 package sgc.processo.dto;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto;
-import sgc.processo.model.UnidadeProcesso;
+import org.junit.jupiter.api.*;
+import sgc.organizacao.model.*;
+import sgc.processo.dto.ProcessoDetalheDto.*;
+import sgc.processo.model.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("ProcessoDetalheDto Test Suite")
 class ProcessoDetalheDtoTest {

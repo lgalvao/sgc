@@ -1,12 +1,10 @@
 package sgc.comum.config;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import io.swagger.v3.oas.models.*;
+import org.junit.jupiter.api.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @DisplayName("ConfigOpenApi - Cobertura Adicional")
 class ConfigOpenApiCoverageTest {

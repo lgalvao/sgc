@@ -1,39 +1,27 @@
 package sgc.mapa;
 
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.hamcrest.*;
+import org.junit.jupiter.api.*;
+import org.mockito.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.webmvc.test.autoconfigure.*;
+import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.RestExceptionHandler;
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.mapa.dto.AtividadeDto;
-import sgc.mapa.dto.ResultadoOperacaoConhecimento;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Mapa;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.dto.AtividadeOperacaoResponse;
-import sgc.subprocesso.dto.SubprocessoSituacaoDto;
+import org.springframework.test.context.bean.override.mockito.*;
+import org.springframework.test.web.servlet.*;
+import org.springframework.test.web.servlet.result.*;
+import sgc.comum.erros.*;
+import sgc.integracao.mocks.*;
+import sgc.mapa.dto.*;
+import sgc.mapa.model.*;
+import sgc.seguranca.*;
+import sgc.subprocesso.dto.*;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.ArgumentMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AtividadeController.class)

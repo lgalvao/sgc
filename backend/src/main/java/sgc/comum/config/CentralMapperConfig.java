@@ -1,9 +1,6 @@
 package sgc.comum.config;
 
-import org.mapstruct.MapperConfig;
-import org.mapstruct.NullValueMappingStrategy;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 /**
  * Configuração central para mappers MapStruct.

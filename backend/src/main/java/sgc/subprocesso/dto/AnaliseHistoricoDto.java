@@ -1,11 +1,10 @@
 package sgc.subprocesso.dto;
 
-import lombok.Builder;
-import org.hibernate.validator.constraints.br.TituloEleitoral;
-import sgc.subprocesso.model.TipoAcaoAnalise;
-import sgc.subprocesso.model.TipoAnalise;
+import lombok.*;
+import org.hibernate.validator.constraints.br.*;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 @Builder
 public record AnaliseHistoricoDto(

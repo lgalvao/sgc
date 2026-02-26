@@ -1,29 +1,20 @@
 package sgc.processo.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.dto.AtualizarProcessoRequest;
-import sgc.processo.dto.CriarProcessoRequest;
-import sgc.processo.erros.ErroProcesso;
-import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.dto.*;
+import sgc.processo.erros.*;
 import sgc.processo.model.*;
-import sgc.testutils.UnidadeTestBuilder;
+import sgc.testutils.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

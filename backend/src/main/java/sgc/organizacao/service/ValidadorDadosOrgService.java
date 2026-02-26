@@ -1,20 +1,16 @@
 package sgc.organizacao.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroConfiguracao;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.boot.*;
+import org.springframework.boot.autoconfigure.condition.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
 import static sgc.organizacao.model.TipoUnidade.*;
 

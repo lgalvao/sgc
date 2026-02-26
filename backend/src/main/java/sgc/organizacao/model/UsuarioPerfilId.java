@@ -2,7 +2,7 @@ package sgc.organizacao.model;
 
 import lombok.*;
 
-import java.io.Serializable;
+import java.io.*;
 
 @Getter
 @Setter

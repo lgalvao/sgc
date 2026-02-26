@@ -1,11 +1,10 @@
 package sgc.organizacao.dto;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import lombok.Builder;
-import sgc.organizacao.model.OrganizacaoViews;
-import sgc.organizacao.model.Usuario;
+import com.fasterxml.jackson.annotation.*;
+import lombok.*;
+import sgc.organizacao.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 @Builder
 public record AtribuicaoDto(

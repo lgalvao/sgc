@@ -1,9 +1,9 @@
 package sgc.processo.dto;
 
-import jakarta.validation.constraints.NotNull;
-import sgc.processo.model.TipoProcesso;
+import jakarta.validation.constraints.*;
+import sgc.processo.model.*;
 
-import java.util.List;
+import java.util.*;
 
 public record IniciarProcessoRequest(
         @NotNull(message = "O tipo do processo é obrigatório")

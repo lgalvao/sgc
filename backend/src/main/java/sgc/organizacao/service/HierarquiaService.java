@@ -1,13 +1,11 @@
 package sgc.organizacao.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import sgc.organizacao.model.ResponsabilidadeRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.stereotype.*;
+import sgc.organizacao.model.*;
 
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Serviço centralizado para gerenciar hierarquia de unidades organizacionais.

@@ -1,22 +1,18 @@
 package sgc.processo.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import sgc.comum.model.ComumRepo;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.stereotype.*;
+import sgc.comum.model.*;
 import sgc.organizacao.model.*;
-import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
-import sgc.processo.erros.ErroUnidadesNaoDefinidas;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.processo.erros.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.service.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
-import static sgc.processo.model.SituacaoProcesso.CRIADO;
+import static sgc.processo.model.SituacaoProcesso.*;
 
 @Service
 @RequiredArgsConstructor

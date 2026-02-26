@@ -1,17 +1,13 @@
 package sgc.processo.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.model.ComumRepo;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.service.ConsultasSubprocessoService;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import sgc.comum.model.*;
+import sgc.organizacao.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.service.*;
 
 import static org.mockito.Mockito.*;
 

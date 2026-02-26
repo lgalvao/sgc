@@ -1,21 +1,13 @@
 package sgc.organizacao;
 
-import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.model.Mapa;
-import sgc.organizacao.dto.AtribuicaoDto;
-import sgc.organizacao.dto.CriarAtribuicaoRequest;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.dto.UnidadeResponsavelDto;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.ResponsavelUnidadeService;
-import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeService;
-import sgc.organizacao.service.UsuarioService;
+import lombok.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 
 import java.util.*;
 

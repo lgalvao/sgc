@@ -1,11 +1,9 @@
 package sgc.comum.erros;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.junit.jupiter.api.*;
+import org.springframework.http.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("RestExceptionHandler - Cobertura Adicional")
 class RestExceptionHandlerCoverageTest {

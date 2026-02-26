@@ -1,19 +1,18 @@
 package sgc.processo.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.dto.PerfilDto;
-import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.service.ConsultasSubprocessoService;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.security.core.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.organizacao.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.subprocesso.service.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 /**
  * Serviço responsável pelo controle de acesso a processos.

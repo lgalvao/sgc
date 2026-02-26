@@ -1,7 +1,7 @@
 package sgc.processo.painel;
 
-import org.springframework.http.HttpStatus;
-import sgc.comum.erros.ErroNegocioBase;
+import org.springframework.http.*;
+import sgc.comum.erros.*;
 
 /**
  * Lançada quando um parâmetro obrigatório para o painel não é fornecido.

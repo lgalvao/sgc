@@ -1,21 +1,16 @@
 package sgc.alerta;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.model.Alerta;
-import sgc.alerta.model.AlertaUsuario;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.model.Processo;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
 
 /**
@@ -38,24 +33,20 @@ public class AlertaFacade {
         Usuario usuario = usuarioService.buscarPorTitulo(usuarioTitulo);
         Unidade lotacao = usuario.getUnidadeLotacao();
 
-        List<Alerta> alertasUnidade = alertaService.porUnidadeDestino(lotacao.getCodigo());
-        if (alertasUnidade.isEmpty()) {
-            return Collections.emptyList();
-        }
+        List<Alerta> alertas = alertaService.porUnidadeDestino(lotacao.getCodigo());
+        if (alertas.isEmpty()) return Collections.emptyList();
 
-        List<Long> alertaCodigos = alertasUnidade.stream().map(Alerta::getCodigo).toList();
+        List<Long> alertaCodigos = alertas.stream().map(Alerta::getCodigo).toList();
         List<AlertaUsuario> leituras = alertaService.alertasUsuarios(usuarioTitulo, alertaCodigos);
 
         Map<Long, LocalDateTime> mapaLeitura = new HashMap<>();
-        for (AlertaUsuario au : leituras) {
-            mapaLeitura.put(au.getId().getAlertaCodigo(), au.getDataHoraLeitura());
+        for (AlertaUsuario alertaUsuario : leituras) {
+            mapaLeitura.put(alertaUsuario.getId().getAlertaCodigo(), alertaUsuario.getDataHoraLeitura());
         }
 
-        for (Alerta alerta : alertasUnidade) {
-            alerta.setDataHoraLeitura(mapaLeitura.get(alerta.getCodigo()));
-        }
+        alertas.forEach(alerta -> alerta.setDataHoraLeitura(mapaLeitura.get(alerta.getCodigo())));
 
-        return alertasUnidade;
+        return alertas;
     }
 
     public List<Alerta> listarNaoLidos(String usuarioTitulo) {

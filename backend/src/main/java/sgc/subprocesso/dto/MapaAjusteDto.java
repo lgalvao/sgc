@@ -1,15 +1,10 @@
 package sgc.subprocesso.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Conhecimento;
-import sgc.subprocesso.model.Analise;
-import sgc.subprocesso.model.Subprocesso;
+import lombok.*;
+import sgc.mapa.model.*;
+import sgc.subprocesso.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * DTO de resposta para visualização do mapa na tela de ajustes.

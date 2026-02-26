@@ -1,27 +1,21 @@
 package sgc.mapa;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroAcessoNegado;
-import sgc.comum.erros.ErroValidacao;
+import lombok.extern.slf4j.*;
+import org.springframework.context.annotation.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Usuario;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.dto.AtividadeOperacaoResponse;
-import sgc.subprocesso.dto.PermissoesSubprocessoDto;
-import sgc.subprocesso.dto.SubprocessoSituacaoDto;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.seguranca.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 

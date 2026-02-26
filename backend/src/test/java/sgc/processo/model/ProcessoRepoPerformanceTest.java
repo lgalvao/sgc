@@ -1,20 +1,17 @@
 package sgc.processo.model;
 
-import jakarta.persistence.EntityManager;
-import org.hibernate.Hibernate;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
-import sgc.testutils.UnidadeTestBuilder;
+import jakarta.persistence.*;
+import org.hibernate.*;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.test.context.*;
+import org.springframework.transaction.annotation.*;
+import sgc.organizacao.model.*;
+import sgc.testutils.*;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional

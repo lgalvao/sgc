@@ -1,16 +1,11 @@
 package sgc.parametros.model;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import sgc.comum.model.EntidadeBase;
+import com.fasterxml.jackson.annotation.*;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import lombok.experimental.*;
+import sgc.comum.model.*;
 
 @Entity
 @Table(name = "PARAMETRO", schema = "sgc")

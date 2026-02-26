@@ -1,24 +1,19 @@
 package sgc.comum.erros;
 
-import jakarta.validation.ConstraintViolationException;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import sgc.seguranca.sanitizacao.UtilSanitizacao;
+import jakarta.validation.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.http.*;
+import org.springframework.http.converter.*;
+import org.springframework.security.access.*;
+import org.springframework.web.bind.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.*;
+import org.springframework.web.servlet.mvc.method.annotation.*;
+import sgc.seguranca.sanitizacao.*;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.UUID;
+import java.io.*;
+import java.util.*;
 
 /**
  * Handler centralizado para tratamento de exceções REST.

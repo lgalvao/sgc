@@ -1,6 +1,6 @@
 package sgc.subprocesso.dto;
 
-import lombok.Builder;
+import lombok.*;
 
 /**
  * DTO de erro de validação retornado na lista de erros de {@link ValidacaoCadastroDto}.

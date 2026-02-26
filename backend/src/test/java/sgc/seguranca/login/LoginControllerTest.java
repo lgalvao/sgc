@@ -1,37 +1,28 @@
 package sgc.seguranca.login;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.webmvc.test.autoconfigure.*;
+import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
-import sgc.comum.erros.ErroAutenticacao;
-import sgc.comum.erros.RestExceptionHandler;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
-import sgc.seguranca.LoginFacade;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.seguranca.dto.AutenticarRequest;
-import sgc.seguranca.dto.AutorizarRequest;
-import sgc.seguranca.dto.EntrarRequest;
-import sgc.seguranca.dto.PerfilUnidadeDto;
-import tools.jackson.databind.ObjectMapper;
+import org.springframework.security.test.context.support.*;
+import org.springframework.test.context.bean.override.mockito.*;
+import org.springframework.test.util.*;
+import org.springframework.test.web.servlet.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.seguranca.*;
+import sgc.seguranca.dto.*;
+import tools.jackson.databind.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(LoginController.class)

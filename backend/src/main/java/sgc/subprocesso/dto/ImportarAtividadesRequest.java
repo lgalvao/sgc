@@ -1,7 +1,7 @@
 package sgc.subprocesso.dto;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 /**
  * DTO para a requisição de importação de atividades de outro subprocesso.

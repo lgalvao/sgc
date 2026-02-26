@@ -1,17 +1,16 @@
 package sgc.parametros;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
+import com.fasterxml.jackson.annotation.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.tags.*;
+import jakarta.validation.*;
+import lombok.*;
+import org.springframework.security.access.prepost.*;
+import org.springframework.validation.annotation.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.parametros.model.ConfiguracaoViews;
-import sgc.parametros.model.Parametro;
+import sgc.parametros.model.*;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/configuracoes")

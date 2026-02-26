@@ -1,16 +1,15 @@
 package sgc.organizacao.service;
 
-import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.model.ComumRepo;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeRepo;
+import lombok.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import sgc.comum.erros.*;
+import sgc.comum.model.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
 
 import java.util.*;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 /**
  * Serviço especializado para gerenciar a hierarquia de unidades organizacionais.

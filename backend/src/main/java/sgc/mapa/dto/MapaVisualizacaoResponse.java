@@ -1,13 +1,11 @@
 package sgc.mapa.dto;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import lombok.Builder;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.MapaViews;
-import sgc.organizacao.model.Unidade;
+import com.fasterxml.jackson.annotation.*;
+import lombok.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * Resposta para visualização completa de um mapa de competências.

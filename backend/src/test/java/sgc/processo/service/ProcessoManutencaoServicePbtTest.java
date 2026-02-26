@@ -1,23 +1,16 @@
 package sgc.processo.service;
 
 import net.jqwik.api.*;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.model.SituacaoUnidade;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.dto.AtualizarProcessoRequest;
-import sgc.processo.dto.CriarProcessoRequest;
-import sgc.processo.erros.ErroProcesso;
-import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.dto.*;
+import sgc.processo.erros.*;
+import sgc.processo.model.*;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @Tag("PBT")

@@ -1,12 +1,10 @@
 package sgc.subprocesso.model;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.*;
+import org.springframework.stereotype.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Repositório JPA para a entidade Subprocesso. Inclui query com fetch join para evitar N+1 ao

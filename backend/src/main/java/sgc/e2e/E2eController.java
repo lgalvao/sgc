@@ -1,39 +1,31 @@
 package sgc.e2e;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
+import com.fasterxml.jackson.annotation.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.context.annotation.*;
+import org.springframework.core.io.*;
+import org.springframework.jdbc.core.*;
+import org.springframework.jdbc.core.namedparam.*;
+import org.springframework.jdbc.datasource.init.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.authority.*;
+import org.springframework.security.core.context.*;
+import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.erros.ErroConfiguracao;
-import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.processo.ProcessoFacade;
-import sgc.processo.dto.CriarProcessoRequest;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoViews;
-import sgc.processo.model.TipoProcesso;
+import sgc.comum.erros.*;
+import sgc.organizacao.*;
+import sgc.organizacao.dto.*;
+import sgc.processo.*;
+import sgc.processo.dto.*;
+import sgc.processo.model.*;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
+import javax.sql.*;
+import java.sql.*;
+import java.time.*;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
 
 @RestController
 @RequestMapping("/e2e")

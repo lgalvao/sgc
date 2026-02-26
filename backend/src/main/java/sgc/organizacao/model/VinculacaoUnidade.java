@@ -1,15 +1,10 @@
 package sgc.organizacao.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.Immutable;
-import org.jspecify.annotations.Nullable;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.*;
+import org.hibernate.annotations.*;
+import org.jspecify.annotations.*;
 
 /**
  * Representa a vinculação entre uma unidade atual e sua unidade anterior (histórico).

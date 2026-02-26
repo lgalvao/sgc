@@ -1,10 +1,9 @@
 package sgc.organizacao.dto;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import sgc.organizacao.model.Perfil;
+import org.junit.jupiter.api.*;
+import sgc.organizacao.model.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("PerfilDto Tests")
 class PerfilDtoTest {

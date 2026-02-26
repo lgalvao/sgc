@@ -1,10 +1,9 @@
 package sgc.comum.config;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import io.swagger.v3.oas.models.*;
+import io.swagger.v3.oas.models.info.*;
+import lombok.*;
+import org.springframework.context.annotation.*;
 
 @Configuration
 @RequiredArgsConstructor

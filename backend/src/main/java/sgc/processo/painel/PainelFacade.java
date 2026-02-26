@@ -1,27 +1,21 @@
 package sgc.processo.painel;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.AlertaFacade;
-import sgc.alerta.model.Alerta;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.ProcessoFacade;
-import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.UnidadeProcesso;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.alerta.*;
+import sgc.alerta.model.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.*;
+import sgc.processo.dto.*;
+import sgc.processo.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 @Service
 @RequiredArgsConstructor

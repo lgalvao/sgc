@@ -1,11 +1,10 @@
 package sgc.fixture;
 
-import sgc.alerta.model.Alerta;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.model.Processo;
+import sgc.alerta.model.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 public class AlertaFixture {
 

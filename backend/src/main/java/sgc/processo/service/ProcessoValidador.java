@@ -1,20 +1,17 @@
 package sgc.processo.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.erros.ErroProcesso;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.subprocesso.service.ConsultasSubprocessoService;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.erros.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.service.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Serviço responsável pelas validações de regras de negócio de Processo.

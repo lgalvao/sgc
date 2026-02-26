@@ -1,15 +1,12 @@
 package sgc.processo.service;
 
 import net.jqwik.api.*;
-import sgc.comum.model.ComumRepo;
+import sgc.comum.model.*;
 import sgc.organizacao.model.*;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.processo.model.*;
+import sgc.subprocesso.service.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
 
 import static org.mockito.Mockito.*;

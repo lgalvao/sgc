@@ -1,10 +1,9 @@
 package sgc.subprocesso.dto;
 
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
-import java.time.LocalDate;
+import java.time.*;
 
 /**
  * Requisição para disponibilizar mapa.

@@ -1,9 +1,9 @@
 package sgc.mapa.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.model.ComumRepo;
+import lombok.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.model.*;
 import sgc.mapa.model.*;
 
 import java.util.*;

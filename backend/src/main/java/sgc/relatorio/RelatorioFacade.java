@@ -1,23 +1,20 @@
 package sgc.relatorio;
 
-import lombok.RequiredArgsConstructor;
-import org.openpdf.text.Document;
-import org.openpdf.text.DocumentException;
-import org.openpdf.text.Paragraph;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.dto.UnidadeResponsavelDto;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.ProcessoFacade;
-import sgc.processo.model.Processo;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import lombok.*;
+import org.openpdf.text.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.organizacao.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.processo.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.io.OutputStream;
+import java.io.*;
 import java.util.List;
 
 @Service

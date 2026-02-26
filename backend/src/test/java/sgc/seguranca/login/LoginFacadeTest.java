@@ -1,27 +1,21 @@
 package sgc.seguranca.login;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-import sgc.comum.erros.ErroAcessoNegado;
-import sgc.comum.erros.ErroAutenticacao;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.UsuarioFacade;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import org.springframework.test.util.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.UsuarioService;
-import sgc.seguranca.LoginFacade;
-import sgc.seguranca.dto.EntrarRequest;
-import sgc.seguranca.dto.PerfilUnidadeDto;
+import sgc.organizacao.service.*;
+import sgc.seguranca.*;
+import sgc.seguranca.dto.*;
 
-import java.util.List;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("LoginFacade")

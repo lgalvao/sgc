@@ -1,14 +1,11 @@
 package sgc.processo.model;
 
 import net.jqwik.api.*;
-import sgc.organizacao.model.SituacaoUnidade;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.*;
 
 @Tag("PBT")
 class ProcessoPbtTest {

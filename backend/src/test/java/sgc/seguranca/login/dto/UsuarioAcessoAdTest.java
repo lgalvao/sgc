@@ -1,10 +1,9 @@
 package sgc.seguranca.login.dto;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import sgc.seguranca.dto.UsuarioAcessoAd;
+import org.junit.jupiter.api.*;
+import sgc.seguranca.dto.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Testes de Cobertura para UsuarioAcessoAd")
 class UsuarioAcessoAdTest {

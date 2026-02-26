@@ -1,11 +1,10 @@
 package sgc.mapa.dto;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import lombok.Builder;
-import sgc.mapa.model.MapaViews;
+import com.fasterxml.jackson.annotation.*;
+import lombok.*;
+import sgc.mapa.model.*;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Representa os impactos causados pela disponibilização de um mapa.

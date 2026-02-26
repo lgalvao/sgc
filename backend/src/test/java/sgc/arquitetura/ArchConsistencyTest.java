@@ -1,26 +1,19 @@
 package sgc.arquitetura;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.tngtech.archunit.core.domain.Dependency;
-import com.tngtech.archunit.core.domain.JavaClass;
-import com.tngtech.archunit.core.domain.JavaMethod;
-import com.tngtech.archunit.core.domain.JavaPackage;
-import com.tngtech.archunit.core.importer.ImportOption;
-import com.tngtech.archunit.junit.AnalyzeClasses;
-import com.tngtech.archunit.junit.ArchTest;
-import com.tngtech.archunit.lang.ArchCondition;
-import com.tngtech.archunit.lang.ArchRule;
-import com.tngtech.archunit.lang.ConditionEvents;
-import com.tngtech.archunit.lang.SimpleConditionEvent;
-import jakarta.persistence.Entity;
-import org.jspecify.annotations.NullMarked;
-import org.junit.jupiter.api.Tag;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.annotation.*;
+import com.tngtech.archunit.core.domain.*;
+import com.tngtech.archunit.core.importer.*;
+import com.tngtech.archunit.junit.*;
+import com.tngtech.archunit.lang.*;
+import jakarta.persistence.*;
+import org.jspecify.annotations.*;
+import org.junit.jupiter.api.*;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.stereotype.*;
+import org.springframework.web.bind.annotation.*;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
-import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
+import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.*;
 
 @Tag("integration")
 @AnalyzeClasses(packages = "sgc", importOptions = {

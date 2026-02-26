@@ -1,10 +1,9 @@
 package sgc.comum.erros;
 
-import lombok.Getter;
-import org.springframework.http.HttpStatus;
+import lombok.*;
+import org.springframework.http.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 public abstract class ErroNegocioBase extends RuntimeException implements ErroNegocio {

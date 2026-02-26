@@ -1,23 +1,18 @@
 package sgc.seguranca;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.HierarquiaService;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.security.access.*;
+import org.springframework.security.core.*;
+import org.springframework.stereotype.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 import static sgc.organizacao.model.Perfil.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
@@ -256,13 +251,13 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     }
 
     private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
-        if (sp.getLocalizacaoAtualCache() != null) return sp.getLocalizacaoAtualCache();
+        if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
 
         if (sp.getCodigo() == null) return sp.getUnidade();
 
         Unidade localizacao = movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo()).filter(m -> m.getUnidadeDestino() != null).map(Movimentacao::getUnidadeDestino).orElse(sp.getUnidade());
 
-        sp.setLocalizacaoAtualCache(localizacao);
+        sp.setLocalizacaoAtual(localizacao);
         return localizacao;
     }
 }

@@ -1,10 +1,9 @@
 package sgc.subprocesso.dto;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.Builder;
-import sgc.comum.model.TituloEleitoral;
-import sgc.subprocesso.model.TipoAcaoAnalise;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import sgc.comum.model.*;
+import sgc.subprocesso.model.*;
 
 @Builder
 public record CriarAnaliseRequest(

@@ -1,24 +1,16 @@
 package sgc.processo.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import sgc.comum.model.ComumViews;
-import sgc.comum.model.EntidadeBase;
-import sgc.organizacao.model.Unidade;
+import lombok.*;
+import lombok.experimental.*;
+import sgc.comum.model.*;
+import sgc.organizacao.model.*;
 
-import java.io.Serial;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.io.*;
+import java.time.*;
+import java.util.*;
+import java.util.stream.*;
 
 @Entity
 @Table(name = "PROCESSO", schema = "sgc")

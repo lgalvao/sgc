@@ -1,41 +1,24 @@
 package sgc.subprocesso.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.thymeleaf.TemplateEngine;
-import sgc.alerta.AlertaFacade;
-import sgc.alerta.EmailService;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.model.ComumRepo;
-import sgc.subprocesso.dto.AtividadeAjusteDto;
-import sgc.subprocesso.dto.CompetenciaAjusteDto;
-import sgc.subprocesso.dto.MapaAjusteDto;
-import sgc.subprocesso.dto.MapaAjusteMapper;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.CopiaMapaService;
-import sgc.mapa.service.ImpactoMapaService;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.mapa.service.MapaSalvamentoService;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.UsuarioFacade;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.dto.CompetenciaRequest;
-import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import org.thymeleaf.*;
+import sgc.alerta.*;
+import sgc.comum.erros.*;
+import sgc.comum.model.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.organizacao.*;
+import sgc.seguranca.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.erros.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("SubprocessoService - Ajuste Mapa")

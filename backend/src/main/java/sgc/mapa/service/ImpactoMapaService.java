@@ -1,22 +1,19 @@
 package sgc.mapa.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroAcessoNegado;
-import sgc.comum.erros.ErroValidacao;
-import sgc.comum.model.ComumRepo;
-import sgc.mapa.dto.AtividadeImpactadaDto;
-import sgc.mapa.dto.CompetenciaImpactadaDto;
-import sgc.mapa.dto.ImpactoMapaResponse;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
+import sgc.comum.model.*;
+import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.organizacao.model.Usuario;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.organizacao.model.*;
+import sgc.seguranca.*;
+import sgc.subprocesso.model.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 

@@ -1,7 +1,7 @@
 package sgc.seguranca.dto;
 
-import lombok.Builder;
-import sgc.comum.model.TituloEleitoral;
+import lombok.*;
+import sgc.comum.model.*;
 
 /**
  * DTO para a requisição de autorização de um usuário.

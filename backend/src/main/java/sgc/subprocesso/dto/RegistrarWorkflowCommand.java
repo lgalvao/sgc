@@ -1,9 +1,8 @@
 package sgc.subprocesso.dto;
 
-import lombok.Builder;
-import org.jspecify.annotations.Nullable;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
+import lombok.*;
+import org.jspecify.annotations.*;
+import sgc.organizacao.model.*;
 import sgc.subprocesso.model.*;
 
 /**

@@ -1,11 +1,9 @@
 package sgc.subprocesso.model;
 
-import net.jqwik.api.ForAll;
-import net.jqwik.api.Property;
-import net.jqwik.api.Tag;
-import sgc.processo.model.TipoProcesso;
+import net.jqwik.api.*;
+import sgc.processo.model.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @Tag("PBT")
 class SituacaoSubprocessoPbtTest {

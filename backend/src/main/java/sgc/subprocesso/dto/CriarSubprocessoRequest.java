@@ -1,9 +1,9 @@
 package sgc.subprocesso.dto;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 /**
  * DTO de requisição para criar um novo subprocesso.

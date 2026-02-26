@@ -1,8 +1,7 @@
 package sgc.processo.dto;
 
-import lombok.Builder;
-import lombok.Value;
-import sgc.subprocesso.model.SituacaoSubprocesso;
+import lombok.*;
+import sgc.subprocesso.model.*;
 
 @Value
 @Builder

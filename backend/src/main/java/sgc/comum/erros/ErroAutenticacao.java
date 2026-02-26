@@ -1,7 +1,7 @@
 package sgc.comum.erros;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
 @ResponseStatus(HttpStatus.UNAUTHORIZED)
 public class ErroAutenticacao extends RuntimeException {

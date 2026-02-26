@@ -1,11 +1,10 @@
 package sgc.subprocesso.dto;
 
-import lombok.Builder;
-import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.Subprocesso;
+import lombok.*;
+import sgc.organizacao.model.*;
+import sgc.subprocesso.model.*;
 
-import java.util.List;
+import java.util.*;
 
 @Builder
 public record SubprocessoDetalheResponse(

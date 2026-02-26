@@ -1,27 +1,23 @@
 package sgc.processo;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.fasterxml.jackson.annotation.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.tags.*;
+import jakarta.validation.*;
+import lombok.*;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.*;
+import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
-import sgc.processo.erros.ErroProcesso;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoViews;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoViews;
+import sgc.processo.erros.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
+import java.net.*;
+import java.util.*;
+import java.util.function.*;
 
 /**
  * Controller REST para Processos. Implementa endpoints CRUD e ações de

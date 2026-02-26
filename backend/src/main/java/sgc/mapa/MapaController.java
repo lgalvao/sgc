@@ -1,19 +1,18 @@
 package sgc.mapa;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import com.fasterxml.jackson.annotation.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.tags.*;
+import jakarta.validation.*;
+import lombok.*;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaViews;
-import sgc.mapa.service.MapaManutencaoService;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
 
-import java.net.URI;
-import java.util.List;
+import java.net.*;
+import java.util.*;
 
 /**
  * Controlador REST para gerenciar Mapas.

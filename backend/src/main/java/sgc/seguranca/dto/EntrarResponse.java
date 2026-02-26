@@ -1,7 +1,7 @@
 package sgc.seguranca.dto;
 
-import lombok.Builder;
-import sgc.organizacao.model.Perfil;
+import lombok.*;
+import sgc.organizacao.model.*;
 
 /**
  * DTO para resposta de login.

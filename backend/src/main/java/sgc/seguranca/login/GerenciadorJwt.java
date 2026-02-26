@@ -1,25 +1,21 @@
 package sgc.seguranca.login;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
-import org.springframework.stereotype.Component;
-import sgc.comum.erros.ErroConfiguracao;
-import sgc.organizacao.model.Perfil;
-import sgc.seguranca.config.JwtProperties;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.*;
+import jakarta.annotation.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.core.env.*;
+import org.springframework.stereotype.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.model.*;
+import sgc.seguranca.config.*;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.Optional;
+import javax.crypto.*;
+import java.nio.charset.*;
+import java.time.*;
+import java.time.temporal.*;
+import java.util.*;
 
 /**
  * Gerenciador de tokens JWT para autenticação.

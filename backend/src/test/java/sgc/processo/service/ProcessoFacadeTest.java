@@ -1,53 +1,34 @@
 package sgc.processo.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import sgc.alerta.AlertaFacade;
-import sgc.alerta.EmailModelosService;
-import sgc.alerta.EmailService;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.fixture.ProcessoFixture;
-import sgc.fixture.UnidadeFixture;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.ProcessoFacade;
-import sgc.processo.dto.AcaoEmBlocoRequest;
-import sgc.processo.dto.CriarProcessoRequest;
-import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.SubprocessoElegivelDto;
-import sgc.processo.erros.ErroProcesso;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import org.springframework.data.domain.*;
+import org.springframework.security.core.*;
+import sgc.alerta.*;
+import sgc.comum.erros.*;
+import sgc.fixture.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.*;
+import sgc.processo.dto.*;
+import sgc.processo.erros.*;
 import sgc.processo.model.*;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.dto.DisponibilizarMapaRequest;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.seguranca.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static sgc.processo.model.AcaoProcesso.ACEITAR;
-import static sgc.processo.model.AcaoProcesso.HOMOLOGAR;
+import static sgc.processo.model.AcaoProcesso.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoFacade Test Suite")

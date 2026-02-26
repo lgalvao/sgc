@@ -1,17 +1,14 @@
 package sgc.subprocesso.mapper;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
-import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.dto.MovimentacaoDto;
-import sgc.subprocesso.dto.MovimentacaoMapper;
-import sgc.subprocesso.model.Movimentacao;
+import org.junit.jupiter.api.*;
+import org.mapstruct.factory.*;
+import sgc.organizacao.model.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("MovimentacaoMapper")
 class MovimentacaoMapperTest {

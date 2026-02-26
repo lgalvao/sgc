@@ -1,16 +1,14 @@
 package sgc.processo.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto;
-import sgc.processo.model.Processo;
-import sgc.processo.model.UnidadeProcesso;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import lombok.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.organizacao.model.*;
+import sgc.processo.dto.*;
+import sgc.processo.dto.ProcessoDetalheDto.*;
+import sgc.processo.model.*;
+import sgc.seguranca.*;
+import sgc.subprocesso.model.*;
 
 import java.util.*;
 

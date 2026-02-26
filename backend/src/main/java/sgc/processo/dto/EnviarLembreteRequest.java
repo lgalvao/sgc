@@ -1,7 +1,7 @@
 package sgc.processo.dto;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 /**
  * DTO de requisição para enviar lembrete a uma unidade.

@@ -1,20 +1,15 @@
 package sgc.integracao.mocks;
 
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.ServerSetup;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.scheduling.annotation.AsyncConfigurer;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
+import com.icegreen.greenmail.util.*;
+import org.springframework.context.annotation.*;
+import org.springframework.core.task.*;
+import org.springframework.mail.javamail.*;
+import org.springframework.scheduling.annotation.*;
+import tools.jackson.databind.*;
+import tools.jackson.databind.json.*;
 
-import java.util.Properties;
-import java.util.concurrent.Executor;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Configuração compartilhada para todos os testes de integração.

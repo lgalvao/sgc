@@ -1,13 +1,13 @@
 package sgc.processo.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.validation.constraints.*;
-import lombok.Builder;
-import sgc.processo.model.TipoProcesso;
-import sgc.seguranca.sanitizacao.SanitizarHtml;
+import lombok.*;
+import sgc.processo.model.*;
+import sgc.seguranca.sanitizacao.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 /**
  * DTO de requisição para criar um processo.

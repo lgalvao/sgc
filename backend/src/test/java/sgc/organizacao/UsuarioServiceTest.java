@@ -1,24 +1,14 @@
 package sgc.organizacao;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroValidacao;
-import sgc.organizacao.dto.AdministradorDto;
-import sgc.organizacao.dto.PerfilDto;
-import sgc.organizacao.dto.UnidadeDto;
-import sgc.organizacao.dto.UnidadeResponsavelDto;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.test.context.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

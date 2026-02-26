@@ -1,26 +1,20 @@
 package sgc.processo.painel;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.model.Perfil;
-import sgc.processo.ProcessoFacade;
-import sgc.processo.dto.CriarProcessoRequest;
-import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.test.context.*;
+import org.springframework.data.domain.*;
+import org.springframework.security.test.context.support.*;
+import org.springframework.transaction.annotation.*;
+import sgc.organizacao.model.*;
+import sgc.processo.*;
+import sgc.processo.dto.*;
+import sgc.processo.model.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
 @SpringBootTest

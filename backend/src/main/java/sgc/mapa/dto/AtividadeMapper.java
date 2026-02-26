@@ -1,10 +1,9 @@
 package sgc.mapa.dto;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.stereotype.Component;
-import sgc.comum.config.CentralMapperConfig;
-import sgc.mapa.model.Atividade;
+import org.mapstruct.*;
+import org.springframework.stereotype.*;
+import sgc.comum.config.*;
+import sgc.mapa.model.*;
 
 @SuppressWarnings("NullableProblems")
 @Component

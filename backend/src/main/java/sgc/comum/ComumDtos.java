@@ -1,8 +1,8 @@
 package sgc.comum;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
+import jakarta.validation.constraints.*;
+
+import java.time.*;
 
 /**
  * DTOs genéricos para requisições de campo único, reduzindo boilerplate.

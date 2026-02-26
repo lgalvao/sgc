@@ -1,7 +1,6 @@
 package sgc.seguranca.sanitizacao;
 
-import org.owasp.html.HtmlPolicyBuilder;
-import org.owasp.html.PolicyFactory;
+import org.owasp.html.*;
 
 /**
  * Utilitário centralizado para sanitização de HTML.

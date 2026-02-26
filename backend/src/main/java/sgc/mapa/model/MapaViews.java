@@ -1,6 +1,6 @@
 package sgc.mapa.model;
 
-import sgc.comum.model.ComumViews;
+import sgc.comum.model.*;
 
 /**
  * Views para serialização JSON do módulo Mapa.

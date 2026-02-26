@@ -1,20 +1,16 @@
 package sgc.alerta.notificacao;
 
-import jakarta.mail.internet.MimeMessage;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mail.javamail.JavaMailSender;
-import sgc.alerta.EmailService;
-import sgc.alerta.model.Notificacao;
-import sgc.alerta.model.NotificacaoRepo;
-import sgc.comum.config.ConfigAplicacao;
+import jakarta.mail.internet.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import org.springframework.mail.javamail.*;
+import sgc.alerta.*;
+import sgc.alerta.model.*;
+import sgc.comum.config.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

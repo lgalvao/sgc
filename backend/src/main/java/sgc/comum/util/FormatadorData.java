@@ -1,7 +1,7 @@
 package sgc.comum.util;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.*;
+import java.time.format.*;
 
 /**
  * Utilitário centralizado para formatação de datas no padrão brasileiro.

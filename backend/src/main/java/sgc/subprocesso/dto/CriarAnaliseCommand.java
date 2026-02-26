@@ -1,9 +1,8 @@
 package sgc.subprocesso.dto;
 
-import lombok.Builder;
-import sgc.comum.model.TituloEleitoral;
-import sgc.subprocesso.model.TipoAcaoAnalise;
-import sgc.subprocesso.model.TipoAnalise;
+import lombok.*;
+import sgc.comum.model.*;
+import sgc.subprocesso.model.*;
 
 @Builder
 public record CriarAnaliseCommand(

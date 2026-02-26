@@ -1,7 +1,7 @@
 package sgc.subprocesso.erros;
 
-import org.springframework.http.HttpStatus;
-import sgc.comum.erros.ErroNegocioBase;
+import org.springframework.http.*;
+import sgc.comum.erros.*;
 
 /**
  * Lançada quando um mapa está em uma situação que não permite a operação solicitada.

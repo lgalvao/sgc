@@ -1,9 +1,9 @@
 package sgc.subprocesso.dto;
 
-import lombok.Builder;
-import sgc.mapa.dto.AtividadeDto;
+import lombok.*;
+import sgc.mapa.dto.*;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * DTO de resposta para operações CRUD em atividades.

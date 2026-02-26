@@ -1,9 +1,9 @@
 package sgc.parametros.model;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.stereotype.*;
 
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public interface ParametroRepo extends JpaRepository<Parametro, Long> {

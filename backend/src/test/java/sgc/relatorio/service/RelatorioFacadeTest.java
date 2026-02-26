@@ -1,35 +1,26 @@
 package sgc.relatorio.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.openpdf.text.Document;
-import org.openpdf.text.DocumentException;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.dto.UnidadeResponsavelDto;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.ProcessoFacade;
-import sgc.processo.model.Processo;
-import sgc.relatorio.PdfFactory;
-import sgc.relatorio.RelatorioFacade;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import org.openpdf.text.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.organizacao.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.processo.*;
+import sgc.processo.model.*;
+import sgc.relatorio.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

@@ -1,15 +1,14 @@
 package sgc.mapa.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroValidacao;
-import sgc.comum.model.ComumRepo;
+import lombok.extern.slf4j.*;
+import org.springframework.context.annotation.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
+import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.*;
 
 import java.util.*;
 

@@ -1,26 +1,20 @@
 package sgc.integracao.mocks;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import sgc.organizacao.UsuarioFacade;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.seguranca.login.FiltroJwt;
-import sgc.seguranca.login.GerenciadorJwt;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.autoconfigure.condition.*;
+import org.springframework.boot.test.context.*;
+import org.springframework.context.annotation.*;
+import org.springframework.http.*;
+import org.springframework.security.access.expression.method.*;
+import org.springframework.security.config.annotation.method.configuration.*;
+import org.springframework.security.config.annotation.web.builders.*;
+import org.springframework.security.config.annotation.web.configuration.*;
+import org.springframework.security.config.annotation.web.configurers.*;
+import org.springframework.security.web.*;
+import org.springframework.security.web.authentication.*;
+import sgc.organizacao.*;
+import sgc.seguranca.*;
+import sgc.seguranca.login.*;
 
 @TestConfiguration
 @EnableWebSecurity

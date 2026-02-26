@@ -1,11 +1,10 @@
 package sgc.mapa.dto;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import lombok.Builder;
-import sgc.mapa.model.MapaViews;
-import sgc.mapa.model.TipoImpactoAtividade;
+import com.fasterxml.jackson.annotation.*;
+import lombok.*;
+import sgc.mapa.model.*;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * DTO que representa uma atividade que sofreu alteração durante a revisão do cadastro.

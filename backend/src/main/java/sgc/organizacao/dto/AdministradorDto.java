@@ -1,9 +1,9 @@
 package sgc.organizacao.dto;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import lombok.Builder;
-import sgc.comum.model.TituloEleitoral;
-import sgc.organizacao.model.OrganizacaoViews;
+import com.fasterxml.jackson.annotation.*;
+import lombok.*;
+import sgc.comum.model.*;
+import sgc.organizacao.model.*;
 
 /**
  * DTO para representação de administrador.

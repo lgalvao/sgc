@@ -1,18 +1,15 @@
 package sgc.mapa.service;
 
 import net.jqwik.api.*;
-import sgc.comum.erros.ErroValidacao;
-import sgc.comum.model.ComumRepo;
-import sgc.mapa.dto.AtividadeMapper;
-import sgc.mapa.dto.ConhecimentoMapper;
-import sgc.mapa.dto.CriarAtividadeRequest;
-import sgc.mapa.dto.CriarConhecimentoRequest;
+import sgc.comum.erros.*;
+import sgc.comum.model.*;
+import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.*;
 
-import java.util.List;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @Tag("PBT")

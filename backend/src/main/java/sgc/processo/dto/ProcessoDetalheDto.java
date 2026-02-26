@@ -1,14 +1,12 @@
 package sgc.processo.dto;
 
 import lombok.*;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.UnidadeProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 @Getter
 @Builder

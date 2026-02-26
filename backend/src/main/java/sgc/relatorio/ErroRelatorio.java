@@ -1,8 +1,8 @@
 package sgc.relatorio;
 
-import lombok.Getter;
-import org.openpdf.text.DocumentException;
-import sgc.comum.erros.ErroInterno;
+import lombok.*;
+import org.openpdf.text.*;
+import sgc.comum.erros.*;
 
 @Getter
 public class ErroRelatorio extends ErroInterno {

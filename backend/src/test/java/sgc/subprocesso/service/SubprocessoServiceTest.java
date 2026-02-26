@@ -1,65 +1,52 @@
 package sgc.subprocesso.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.thymeleaf.TemplateEngine;
-import sgc.alerta.AlertaFacade;
-import sgc.alerta.EmailService;
-import sgc.comum.model.ComumRepo;
-import sgc.mapa.dto.ImpactoMapaResponse;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.CopiaMapaService;
-import sgc.mapa.service.ImpactoMapaService;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.mapa.service.MapaSalvamentoService;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.SituacaoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.dto.MapaAjusteMapper;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import sgc.alerta.*;
+import sgc.comum.model.*;
+import sgc.mapa.dto.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoService")
 class SubprocessoServiceTest {
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private MovimentacaoRepo movimentacaoRepo;
-    @Mock private ComumRepo repo;
-    @Mock private AnaliseRepo analiseRepo;
-    @Mock private AlertaFacade alertaService;
-    @Mock private OrganizacaoFacade organizacaoFacade;
-    @Mock private UsuarioFacade usuarioFacade;
-    @Mock private ImpactoMapaService impactoMapaService;
-    @Mock private CopiaMapaService copiaMapaService;
-    @Mock private EmailService emailService;
-    @Mock private TemplateEngine templateEngine;
-    @Mock private MapaManutencaoService mapaManutencaoService;
-    @Mock private MapaSalvamentoService mapaSalvamentoService;
-    @Mock private MapaAjusteMapper mapaAjusteMapper;
-    @Mock private SgcPermissionEvaluator permissionEvaluator;
-
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private MovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private ComumRepo repo;
+    @Mock
+    private AnaliseRepo analiseRepo;
+    @Mock
+    private AlertaFacade alertaService;
+    @Mock
+    private OrganizacaoFacade organizacaoFacade;
+    @Mock
+    private UsuarioFacade usuarioFacade;
+    @Mock
+    private ImpactoMapaService impactoMapaService;
+    @Mock
+    private CopiaMapaService copiaMapaService;
+    @Mock
+    private EmailService emailService;
+    @Mock
+    private MapaManutencaoService mapaManutencaoService;
     @InjectMocks
     private SubprocessoService service;
 
@@ -108,7 +95,7 @@ class SubprocessoServiceTest {
         Unidade u = criarUnidade("U1");
         Unidade sup = criarUnidade("SUP");
         u.setUnidadeSuperior(sup);
-        
+
         Subprocesso sp = new Subprocesso();
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         sp.setUnidade(u);
@@ -128,11 +115,12 @@ class SubprocessoServiceTest {
         Long id = 1L;
         Usuario user = new Usuario();
         Unidade u = criarUnidade("U1");
-        
+
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(id);
         sp.setUnidade(u);
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
         Mapa m = new Mapa();
         m.setCodigo(100L);
         sp.setMapa(m);
@@ -156,6 +144,7 @@ class SubprocessoServiceTest {
         Usuario user = new Usuario();
         user.setTituloEleitoral("123");
         Unidade u = criarUnidade("U1");
+
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(id);
         sp.setUnidade(u);
@@ -234,6 +223,7 @@ class SubprocessoServiceTest {
         Long codMapa = 100L;
         Subprocesso sp = new Subprocesso();
         sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
+
         Processo p = new Processo();
         p.setTipo(TipoProcesso.MAPEAMENTO);
         sp.setProcesso(p);
@@ -244,12 +234,5 @@ class SubprocessoServiceTest {
 
         assertEquals(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, sp.getSituacao());
         verify(subprocessoRepo).save(sp);
-    }
-
-    @Test
-    @DisplayName("listarSubprocessosHomologados")
-    void listarSubprocessosHomologados() {
-        service.listarSubprocessosHomologados();
-        verify(subprocessoRepo).findBySituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
     }
 }

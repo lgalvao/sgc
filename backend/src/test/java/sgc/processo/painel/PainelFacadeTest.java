@@ -1,30 +1,23 @@
 package sgc.processo.painel;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
-import sgc.alerta.AlertaFacade;
-import sgc.alerta.model.Alerta;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.ProcessoFacade;
-import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.processo.model.UnidadeProcesso;
-import sgc.testutils.UnidadeTestBuilder;
+import sgc.alerta.*;
+import sgc.alerta.model.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.*;
+import sgc.processo.dto.*;
+import sgc.processo.model.*;
+import sgc.testutils.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

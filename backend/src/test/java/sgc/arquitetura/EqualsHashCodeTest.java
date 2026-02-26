@@ -1,8 +1,7 @@
 package sgc.arquitetura;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-import org.junit.jupiter.api.Test;
+import nl.jqno.equalsverifier.*;
+import org.junit.jupiter.api.*;
 import sgc.organizacao.model.*;
 
 class EqualsHashCodeTest {

@@ -1,11 +1,8 @@
 package sgc.subprocesso.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * DTO para competência no contexto de ajustes do mapa.

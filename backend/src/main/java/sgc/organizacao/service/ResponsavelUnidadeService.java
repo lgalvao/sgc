@@ -1,21 +1,17 @@
 package sgc.organizacao.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroValidacao;
-import sgc.comum.model.ComumRepo;
-import sgc.organizacao.dto.AtribuicaoDto;
-import sgc.organizacao.dto.CriarAtribuicaoRequest;
-import sgc.organizacao.dto.UnidadeResponsavelDto;
+import lombok.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
+import sgc.comum.model.*;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
 
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 
 /**
  * Serviço especializado para gerenciar responsáveis e atribuições de unidades.

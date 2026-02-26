@@ -1,10 +1,9 @@
 package sgc.subprocesso.eventos;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import sgc.subprocesso.model.TipoTransicao;
+import org.junit.jupiter.api.*;
+import sgc.subprocesso.model.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Testes de TipoTransicao")
 class TipoTransicaoTest {

@@ -1,28 +1,21 @@
 package sgc.integracao;
 
-import jakarta.persistence.EntityManager;
-import jakarta.servlet.http.Cookie;
+import jakarta.persistence.*;
+import jakarta.servlet.http.*;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.fixture.UnidadeFixture;
-import sgc.fixture.UsuarioFixture;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
-import sgc.seguranca.dto.AutenticarRequest;
-import sgc.seguranca.dto.AutorizarRequest;
-import sgc.seguranca.dto.EntrarRequest;
-import sgc.util.TestUtil;
+import org.springframework.jdbc.core.*;
+import org.springframework.transaction.annotation.*;
+import sgc.fixture.*;
+import sgc.organizacao.model.*;
+import sgc.seguranca.dto.*;
+import sgc.util.*;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Tag("integration")
 @Transactional

@@ -1,13 +1,12 @@
 package sgc.subprocesso.model;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.test.util.ReflectionTestUtils;
-import sgc.processo.model.TipoProcesso;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
+import org.springframework.test.util.*;
+import sgc.processo.model.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @DisplayName("SituacaoSubprocesso - Teste de Transições")

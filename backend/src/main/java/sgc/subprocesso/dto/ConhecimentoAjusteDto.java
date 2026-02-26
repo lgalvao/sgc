@@ -1,6 +1,6 @@
 package sgc.subprocesso.dto;
 
-import lombok.Builder;
+import lombok.*;
 
 /**
  * DTO para conhecimento no contexto de ajustes do mapa.

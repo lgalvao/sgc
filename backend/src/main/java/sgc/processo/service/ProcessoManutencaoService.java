@@ -1,27 +1,21 @@
 package sgc.processo.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.dto.AtualizarProcessoRequest;
-import sgc.processo.dto.CriarProcessoRequest;
-import sgc.processo.erros.ErroProcesso;
-import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.TipoProcesso;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.dto.*;
+import sgc.processo.erros.*;
+import sgc.processo.model.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.time.*;
+import java.util.*;
+import java.util.stream.*;
 
-import static sgc.processo.model.SituacaoProcesso.CRIADO;
-import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
-import static sgc.processo.model.TipoProcesso.REVISAO;
+import static sgc.processo.model.SituacaoProcesso.*;
+import static sgc.processo.model.TipoProcesso.*;
 
 @Service
 @Slf4j

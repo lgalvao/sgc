@@ -1,39 +1,29 @@
 package sgc.processo;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.AlertaFacade;
-import sgc.alerta.EmailService;
-import sgc.alerta.EmailModelosService;
-import sgc.organizacao.OrganizacaoFacade;
-import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.data.domain.*;
+import org.springframework.security.core.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.alerta.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
-import sgc.processo.erros.ErroProcesso;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
+import sgc.processo.erros.*;
+import sgc.processo.model.*;
 import sgc.processo.service.*;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.dto.DisponibilizarMapaRequest;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
-import sgc.comum.erros.ErroAcessoNegado;
+import sgc.seguranca.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.time.format.*;
+import java.util.*;
+
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
-import java.util.HashMap;
 
 @Service
 @Slf4j

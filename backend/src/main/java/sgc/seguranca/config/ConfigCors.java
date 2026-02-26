@@ -1,10 +1,7 @@
 package sgc.seguranca.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.context.annotation.*;
+import org.springframework.web.cors.*;
 
 /**
  * Configuração do bean CORS.

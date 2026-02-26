@@ -1,10 +1,8 @@
 package sgc.parametros;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import sgc.comum.config.CentralMapperConfig;
-import sgc.parametros.model.Parametro;
+import org.mapstruct.*;
+import sgc.comum.config.*;
+import sgc.parametros.model.*;
 
 @Mapper(componentModel = "spring", config = CentralMapperConfig.class)
 public interface ParametroMapper {

@@ -1,11 +1,9 @@
 package sgc.organizacao.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import sgc.mapa.model.Mapa;
+import lombok.*;
+import lombok.experimental.*;
+import sgc.mapa.model.*;
 
 @Entity
 @Table(name = "UNIDADE_MAPA", schema = "sgc")

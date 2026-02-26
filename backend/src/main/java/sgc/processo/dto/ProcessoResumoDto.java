@@ -1,10 +1,10 @@
 package sgc.processo.dto;
 
-import lombok.Builder;
-import org.jspecify.annotations.Nullable;
-import sgc.processo.model.SituacaoProcesso;
+import lombok.*;
+import org.jspecify.annotations.*;
+import sgc.processo.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 /**
  * DTO de resposta com resumo de um processo.

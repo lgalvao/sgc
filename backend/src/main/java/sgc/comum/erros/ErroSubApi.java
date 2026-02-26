@@ -1,6 +1,6 @@
 package sgc.comum.erros;
 
-import lombok.Builder;
+import lombok.*;
 
 /**
  * Representa um erro específico de validação dentro de uma estrutura de erro de

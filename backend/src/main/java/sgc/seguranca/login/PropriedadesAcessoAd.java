@@ -1,6 +1,6 @@
 package sgc.seguranca.login;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.*;
 
 /**
  * Propriedades de configuração para integração com o serviço AcessoAD.

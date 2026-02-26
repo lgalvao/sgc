@@ -1,25 +1,20 @@
 package sgc.e2e;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import sgc.organizacao.UsuarioFacade;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.seguranca.login.FiltroJwt;
-import sgc.seguranca.login.GerenciadorJwt;
+import org.springframework.context.annotation.*;
+import org.springframework.http.*;
+import org.springframework.security.access.expression.method.*;
+import org.springframework.security.config.annotation.method.configuration.*;
+import org.springframework.security.config.annotation.web.builders.*;
+import org.springframework.security.config.annotation.web.configuration.*;
+import org.springframework.security.config.annotation.web.configurers.*;
+import org.springframework.security.web.*;
+import org.springframework.security.web.authentication.*;
+import org.springframework.web.cors.*;
+import sgc.organizacao.*;
+import sgc.seguranca.*;
+import sgc.seguranca.login.*;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * Configuração de segurança específica para testes E2E.

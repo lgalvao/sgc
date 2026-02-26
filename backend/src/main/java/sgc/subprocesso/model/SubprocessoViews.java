@@ -1,7 +1,7 @@
 package sgc.subprocesso.model;
 
-import sgc.mapa.model.MapaViews;
-import sgc.organizacao.model.OrganizacaoViews;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
 
 public final class SubprocessoViews {
     private SubprocessoViews() {

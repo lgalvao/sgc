@@ -1,8 +1,6 @@
 package sgc.parametros;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 /**
  * DTO de requisição para atualização de parâmetro de configuração.

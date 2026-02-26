@@ -1,34 +1,24 @@
 package sgc.integracao;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.*;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.model.Alerta;
-import sgc.alerta.model.AlertaRepo;
-import sgc.fixture.AlertaFixture;
-import sgc.fixture.ProcessoFixture;
-import sgc.fixture.UnidadeFixture;
-import sgc.fixture.UsuarioFixture;
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.model.UsuarioRepo;
-import sgc.processo.model.Processo;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.*;
+import org.springframework.security.core.authority.*;
+import org.springframework.security.core.context.*;
+import org.springframework.security.test.context.support.*;
+import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
+import sgc.fixture.*;
+import sgc.integracao.mocks.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Tag("integration")
 @Transactional

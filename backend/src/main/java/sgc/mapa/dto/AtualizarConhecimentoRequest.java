@@ -1,8 +1,8 @@
 package sgc.mapa.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
-import sgc.seguranca.sanitizacao.SanitizarHtml;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import sgc.seguranca.sanitizacao.*;
 
 /**
  * Request para atualização de Conhecimento.

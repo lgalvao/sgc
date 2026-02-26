@@ -1,16 +1,12 @@
 package sgc.processo.service;
 
 import net.jqwik.api.*;
-import sgc.comum.model.ComumRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapa;
-import sgc.organizacao.model.UnidadeRepo;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.comum.model.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.service.*;
 
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 @Tag("PBT")
 class ProcessoWorkflowPbtTest {

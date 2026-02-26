@@ -20,31 +20,12 @@ O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Ba
 | **Frontend** | Vue.js 3.5, TypeScript, Vite, Pinia, BootstrapVueNext                         |
 | **Testes**   | JUnit, Mockito, Vitest, Playwright                                            |
 
-### Documentação Detalhada
-
-A documentação técnica foi desacoplada deste README para facilitar a manutenção e evitar duplicação.
-
-**📚 [DOCUMENTACAO.md](DOCUMENTACAO.md)** - Índice completo de toda a documentação do projeto organizada por categoria.
-
 **Documentação Essencial:**
 
 * **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código,
   padrões de projeto e regras fundamentais.
 * **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
 * **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
-
-**Simplificação Arquitetural:**
-
-* **[GUIA-MIGRACAO-SIMPLIFICACAO.md](GUIA-MIGRACAO-SIMPLIFICACAO.md)**: Guia prático para desenvolvedores sobre mudanças de simplificação (Fases 1 e 2).
-* **[simplification-plan.md](simplification-plan.md)**: Plano consolidado de simplificação com detalhes, contexto e passos de implementação.
-* **[simplification-tracking.md](simplification-tracking.md)**: Rastreamento de progresso da simplificação (métricas e status).
-
-**Decisões Arquiteturais (ADRs):**
-
-* **[ADR-001: Facade Pattern](backend/etc/docs/adr/ADR-001-facade-pattern.md)**: Padrão de uso de Facades como fronteira de módulos.
-* **[ADR-003: Security Architecture](backend/etc/docs/adr/ADR-003-security-architecture.md)**: Arquitetura centralizada de controle de acesso.
-* **[ADR-004: DTO Pattern](backend/etc/docs/adr/ADR-004-dto-pattern.md)**: Padrão de DTOs obrigatórios e uso de @JsonView.
-* **[ADR-008: Simplification Decisions](backend/etc/docs/adr/ADR-008-simplification-decisions.md)**: Decisões e lições do processo de simplificação.
 
 ---
 
@@ -56,9 +37,8 @@ sgc/
 ├── frontend/           # Código do frontend Web (Vue.js 3.5)
 ├── e2e/                # Testes End-to-End (Playwright)
 ├── etc/                # Configurações, requisitos e scripts globais
-│   ├── reqs/           # Especificações de requisitos (Casos de Uso)
-│   └── scripts/        # Scripts utilitários
-└── build.gradle.kts    # Configuração de build raiz
+    ├── reqs/           # Especificações de requisitos (Casos de Uso)
+    └── scripts/        # Scripts utilitários
 ```
 
 ---
@@ -106,7 +86,7 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 | **Integração Backend** | `./gradlew :backend:integrationTest` | Executa apenas fluxos completos (Mais lento).    |
 | **Unitários Frontend** | `cd frontend && npm run test:unit`   | Vitest para componentes e lógica.                |
 | **End-to-End (E2E)**   | `npm run test:e2e`                   | Playwright simulando fluxos reais.               |
-| **Type Check (Front)** | `cd frontend && npm run typecheck`   | Verificação estática de tipos TypeScript.        |
+| **Type Check **        | `npm run typecheck`                  | Verificação de erros de tipos.                   |
 
 ### Verificação de Qualidade (Quality Gate)
 
@@ -121,27 +101,6 @@ Os relatórios são gerados em:
 * Backend: `backend/build/reports/`
 * Frontend: `frontend/coverage/`
 
-### Git Hooks (Automação Local)
-
-O projeto utiliza Git Hooks para garantir a qualidade do código antes de operações críticas.
-
-* **Pre-push:** Bloqueia o `git push` caso os testes do backend não passem 100%.
-  * **Arquivo:** `.git/hooks/pre-push`
-  * **Como ignorar (apenas em emergências):** `git push --no-verify`
-  * **Como instalar:** Se você clonar o repositório em uma nova máquina, copie o script de hook:
-    ```bash
-    # Exemplo de criação manual caso não exista
-    cp etc/scripts/git-hooks/pre-push .git/hooks/pre-push
-    ```
-
-### Guia de Testes JUnit
-
-Para aprender como criar novos testes unitários e de integração seguindo as melhores práticas do projeto, consulte:
-
-* **[guia-testes-junit.md](/backend/etc/regras/guia-testes-junit.md)**: Guia completo com recomendações, exemplos e checklist
-
----
-
 ## 📚 Documentação de Negócio
 
 Os requisitos do sistema estão documentados em casos de uso (CDUs) no diretório `etc/reqs/`.
@@ -149,12 +108,3 @@ Os requisitos do sistema estão documentados em casos de uso (CDUs) no diretóri
 * **Processo de Mapeamento**: Criação e definição de mapas de competências.
 * **Revisão**: Fluxo de aprovação e ajuste de mapas.
 * **Diagnóstico**: Avaliação de proficiência e identificação de gaps.
-
----
-
-## 🤝 Convenções de Contribuição
-
-Todo o código, comentários e documentação devem ser escritos em **Português Brasileiro**.
-
-Para detalhes completos sobre nomenclaturas (Classes, Variáveis, Banco de Dados) e padrões de projeto (Facade, DTO,
-Store, Service), consulte o arquivo **[AGENTS.md](AGENTS.md)**.

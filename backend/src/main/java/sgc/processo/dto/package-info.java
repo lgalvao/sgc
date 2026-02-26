@@ -1,4 +1,4 @@
 @NullMarked
 package sgc.processo.dto;
 
-import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.*;

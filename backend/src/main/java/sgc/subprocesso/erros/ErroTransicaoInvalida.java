@@ -1,7 +1,7 @@
 package sgc.subprocesso.erros;
 
-import org.springframework.http.HttpStatus;
-import sgc.comum.erros.ErroNegocioBase;
+import org.springframework.http.*;
+import sgc.comum.erros.*;
 
 /**
  * Exceção lançada quando uma transição de situação entre estados de um subprocesso é inválida.

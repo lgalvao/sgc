@@ -1,17 +1,15 @@
 package sgc.mapa.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.model.EntidadeBase;
-import sgc.mapa.dto.MapaVisualizacaoResponse;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.model.*;
+import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Service especializado para visualização de mapas de competências.

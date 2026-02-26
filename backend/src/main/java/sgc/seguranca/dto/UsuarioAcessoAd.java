@@ -1,7 +1,6 @@
 package sgc.seguranca.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * DTO para representar um usuário retornado pelo serviço AcessoAD.

@@ -1,12 +1,11 @@
 package sgc.subprocesso.model;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import sgc.organizacao.model.Usuario;
+import org.junit.jupiter.api.*;
+import sgc.organizacao.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Testes da Entidade Movimentacao")
 class MovimentacaoTest {

@@ -1,17 +1,12 @@
 package sgc.subprocesso.dto;
 
-import org.mapstruct.Context;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import sgc.comum.config.CentralMapperConfig;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Conhecimento;
-import sgc.subprocesso.model.Analise;
-import sgc.subprocesso.model.Subprocesso;
+import org.mapstruct.*;
+import sgc.comum.config.*;
+import sgc.mapa.model.*;
+import sgc.subprocesso.model.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 @Mapper(componentModel = "spring", config = CentralMapperConfig.class)
 public interface MapaAjusteMapper {

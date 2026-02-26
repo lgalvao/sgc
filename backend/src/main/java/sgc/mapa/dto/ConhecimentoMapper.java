@@ -1,9 +1,8 @@
 package sgc.mapa.dto;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import sgc.comum.config.CentralMapperConfig;
-import sgc.mapa.model.Conhecimento;
+import org.mapstruct.*;
+import sgc.comum.config.*;
+import sgc.mapa.model.*;
 
 @Mapper(config = CentralMapperConfig.class)
 public interface ConhecimentoMapper {

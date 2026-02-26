@@ -1,8 +1,8 @@
 package sgc.subprocesso.dto;
 
-import lombok.Builder;
+import lombok.*;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * DTO de resposta para validação de cadastro de subprocesso.

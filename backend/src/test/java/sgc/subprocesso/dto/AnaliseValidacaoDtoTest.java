@@ -1,11 +1,10 @@
 package sgc.subprocesso.dto;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("AnaliseValidacaoDto Tests")
 class AnaliseValidacaoDtoTest {

@@ -1,20 +1,16 @@
 package sgc.integracao.mocks;
 
-import jakarta.servlet.http.Cookie;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import sgc.organizacao.model.Perfil;
-import sgc.seguranca.dto.AutenticarRequest;
-import sgc.seguranca.dto.AutorizarRequest;
-import sgc.seguranca.dto.EntrarRequest;
-import sgc.seguranca.dto.EntrarResponse;
-import tools.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.http.*;
+import org.springframework.stereotype.*;
+import org.springframework.test.web.servlet.*;
+import sgc.organizacao.model.*;
+import sgc.seguranca.dto.*;
+import tools.jackson.databind.*;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Helper para realizar login completo em testes de integração.

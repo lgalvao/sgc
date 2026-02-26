@@ -1,13 +1,13 @@
 package sgc.seguranca.login;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
-import sgc.comum.erros.ErroAutenticacao;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.context.annotation.*;
+import org.springframework.stereotype.*;
+import org.springframework.web.client.*;
+import sgc.comum.erros.*;
 
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.*;
 
 /**
  * Cliente para integração com o serviço AcessoAD (autenticação via AD)

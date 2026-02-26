@@ -1,14 +1,13 @@
 package sgc.organizacao.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.model.ComumRepo;
-import sgc.mapa.model.Mapa;
+import lombok.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.model.*;
+import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Serviço consolidado para operações de Unidade.

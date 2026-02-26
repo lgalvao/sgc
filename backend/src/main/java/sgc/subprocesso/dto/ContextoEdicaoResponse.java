@@ -1,11 +1,11 @@
 package sgc.subprocesso.dto;
 
-import sgc.mapa.dto.AtividadeDto;
-import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.Unidade;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.mapa.dto.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
+import sgc.subprocesso.model.*;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * Resposta agregada para o contexto de edição de um subprocesso.
