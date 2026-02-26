@@ -93,7 +93,7 @@ export interface UnidadeParticipante {
 export async function verificarDetalhesProcesso(page: Page, dados: {
     descricao: string,
     tipo: string,
-    situacao: string
+    situacao: 'Criado' | 'Em andamento' | 'Finalizado'
 }) {
     // Aguardar carregamento dos detalhes
     await expect(page.getByText('Carregando detalhes do processo...').first()).toBeHidden();

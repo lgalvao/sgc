@@ -38,7 +38,69 @@ public class EmailModelosService {
     private final SpringTemplateEngine templateEngine;
 
     /**
-     * Gera o conteúdo HTML para o email de notificação de início de processo.
+     * Gera o conteúdo HTML para o email de notificação de início de processo consolidado.
+     */
+    public String criarEmailInicioProcessoConsolidado(
+            String siglaUnidade,
+            String nomeProcesso,
+            LocalDateTime dataLimite,
+            boolean isParticipante,
+            List<String> siglasSubordinadas) {
+
+        Context context = new Context();
+        String assunto = isParticipante 
+                ? "SGC: Início de processo de mapeamento de competências"
+                : "SGC: Início de processo de mapeamento de competências em unidades subordinadas";
+        
+        context.setVariable(VAR_TITULO, assunto);
+        context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
+        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        context.setVariable(VAR_DATA_LIMITE, dataLimite != null ? dataLimite.format(FORMATADOR) : "N/A");
+        context.setVariable("isParticipante", isParticipante);
+        context.setVariable("siglasSubordinadas", siglasSubordinadas);
+        context.setVariable("hasSubordinadas", siglasSubordinadas != null && !siglasSubordinadas.isEmpty());
+
+        return templateEngine.process("email-inicio-processo-consolidado", context);
+    }
+
+    /**
+     * Gera o conteúdo HTML para o email de notificação de início de processo para unidades operacionais.
+     */
+    public String criarEmailInicioProcessoUnidadeOperacional(
+            String siglaUnidade,
+            String nomeProcesso,
+            LocalDateTime dataLimite) {
+
+        Context context = new Context();
+        context.setVariable(VAR_TITULO, "SGC: Início de processo de mapeamento de competências");
+        context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
+        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        context.setVariable(VAR_DATA_LIMITE, dataLimite.format(FORMATADOR));
+
+        return templateEngine.process("email-inicio-processo-operacional", context);
+    }
+
+    /**
+     * Gera o conteúdo HTML para o email de notificação de início de processo para unidades intermediárias.
+     */
+    public String criarEmailInicioProcessoUnidadeIntermediaria(
+            String siglaUnidade,
+            String nomeProcesso,
+            List<String> siglasUnidadesSubordinadas,
+            LocalDateTime dataLimite) {
+
+        Context context = new Context();
+        context.setVariable(VAR_TITULO, "SGC: Início de processo de mapeamento de competências em unidades subordinadas");
+        context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
+        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        context.setVariable("siglasUnidadesSubordinadas", String.join(", ", siglasUnidadesSubordinadas));
+        context.setVariable(VAR_DATA_LIMITE, dataLimite.format(FORMATADOR));
+
+        return templateEngine.process("email-inicio-processo-intermediario", context);
+    }
+
+    /**
+     * Gera o conteúdo HTML para o email de notificação de início de processo (LEGACY/GENERIC).
      */
     public String criarEmailProcessoIniciado(
             String nomeUnidade,

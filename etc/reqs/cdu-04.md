@@ -4,34 +4,27 @@ Ator: ADMIN
 
 Pré-condições:
 
-- Login realizado com perfil ADMIN
 - Existência de ao menos um processo de mapeamento na situação 'Criado'
 
 Fluxo principal:
 
 1. No Painel, ADMIN clica em um processo de mapeamento que esteja na situação 'Criado'.
 
-2. O sistema muda para a tela `Cadastro de processo`, com os campos preenchidos com as informações do processo
-   selecionado.
+2. O sistema muda para a tela `Cadastro de processo`. Os campos aparecem preenchidos com as informações do processo selecionado.
 
 3. ADMIN clica no botão Iniciar processo.
 
-4. O sistema mostra modal de confirmação: "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas
-   as unidades participantes serão notificadas por e-mail.", com botões `Confirmar` e `Cancelar`.
+4. O sistema mostra modal de confirmação: "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes serão notificadas por e-mail.", com botões `Confirmar` e `Cancelar`.
 
-5. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de iniciação do processo, permanecendo na
-   mesma tela.
+5. Caso o usuário `Cancelar`, o sistema interrompe a operação de iniciação do processo, permanecendo na mesma tela.
 
 6. ADMIN confirma.
 
-7. O sistema armazena internamente uma cópia da árvore de unidades participantes e a vincula com o processo, a fim de
-   preservar a representação hierárquica vigente no momento do início do processo.
+7. O sistema armazena internamente uma cópia da árvore de unidades participantes e a vincula com o processo, a fim de preservar a representação hierárquica vigente no momento do início do processo.
 
 8. O sistema muda a situação do processo de mapeamento para 'Em andamento';
 
-9. O sistema cria internamente um subprocesso para cada unidade participante, que seja do tipo Operacional ou
-   Interoperacional,
-   com os seguintes campos e valores iniciais:
+9. O sistema cria internamente um subprocesso para cada unidade participante, que seja do tipo Operacional ou Interoperacional, com os seguintes campos e valores iniciais:
 
     - `Data limite etapa 1`: Data copiada da data limite da etapa inicial do processo.
     - `Situação`: 'Não iniciado'
@@ -63,8 +56,7 @@ Fluxo principal:
         O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
         ```
 
-    12.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das
-    unidades operacionais e interoperacionais subordinadas a elas, segundo o modelo:
+    12.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das unidades operacionais e interoperacionais subordinadas a elas, segundo o modelo:
 
         ```text
 
@@ -78,21 +70,21 @@ Fluxo principal:
         ```
 
 14. O sistema cria internamente alertas para todas as unidades participantes.
-    13.1. Para cada unidade operacional será criado um alerta com:
+
+    13.1. Para cada unidade **operacional** será criado um alerta com:
 
     - `Descrição`: "Início do processo"
     - `Processo`: [DESCRICAO_PROCESSO]
-    - Data/hora: Data/hora atual
+    - Data/hora: [Data/hora atual]
     - Unidade de origem: ADMIN
     - Unidade de destino: [SIGLA_UNIDADE].
 
-    13.2. Para cada unidade intermediária será criado um alerta com:
+    13.2. Para cada unidade **intermediária** será criado um alerta com:
 
     - Descrição: "Início do processo em unidade(s) subordinada(s)"
     - Processo: [DESCRICAO_PROCESSO]
-    - Data/hora: Data/hora atual
+    - Data/hora: [Data/hora atual]
     - Unidade de origem: ADMIN
     - Unidade de destino: [SIGLA_UNIDADE].
 
-    13.3. Para cada unidade interoperacional serão criados dois alertas: um de unidade operacional e outro de unidade
-    intermediária, como especificado acima.
+    13.3. Para cada unidade **interoperacional** serão criados dois alertas: um de unidade operacional e outro de unidade intermediária, como especificado acima.

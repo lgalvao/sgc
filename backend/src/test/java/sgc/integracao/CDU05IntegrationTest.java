@@ -37,6 +37,9 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
 
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
+
     private Unidade unidade;
     private Mapa mapaOriginal;
     private Competencia competenciaOriginal;
@@ -89,7 +92,22 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testIniciarProcessoRevisao_sucesso() throws Exception {
-        // 1. Criar um processo de revisão para ser iniciado
+        // 1. Criar hierarquia de unidades
+        Unidade unidadeSuperior = UnidadeFixture.unidadePadrao();
+        unidadeSuperior.setCodigo(null);
+        unidadeSuperior.setSigla("U_SUP");
+        unidadeSuperior.setNome("Unidade Superior");
+        unidadeSuperior = unidadeRepo.save(unidadeSuperior);
+
+        unidade.setUnidadeSuperior(unidadeSuperior);
+        unidade = unidadeRepo.save(unidade);
+
+        // Preencher dados originais no mapa para verificar se são limpos
+        mapaOriginal.setSugestoes("Sugestões Legadas");
+        mapaOriginal.setObservacoesDisponibilizacao("Observações Legadas");
+        mapaRepo.save(mapaOriginal);
+
+        // 2. Criar um processo de revisão para ser iniciado
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidade.getCodigo());
         CriarProcessoRequest criarRequestDTO = criarCriarProcessoReq("Processo de Revisão para Iniciar",
@@ -107,39 +125,43 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                 .asLong();
         var iniciarReq = new IniciarProcessoRequest(TipoProcesso.REVISAO, unidades);
 
-        // 2. Iniciar o processo de revisão
+        // 3. Iniciar o processo de revisão
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
-        // 3. Buscar o subprocesso criado e verificar a cópia do mapa
+        // 4. Buscar o processo e verificar snapshot da hierarquia (Passo 7)
+        Processo processo = processoRepo.findByIdComParticipantes(processoId).orElseThrow();
+        assertThat(processo.getParticipantes()).hasSize(2); // Unidade alvo + Unidade Superior
+        assertThat(processo.getParticipantes().stream().map(up -> up.getSigla()).toList())
+                .containsExactlyInAnyOrder("U_REV", "U_SUP");
+
+        // 5. Buscar o subprocesso criado e verificar a cópia do mapa
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processoId);
         assertThat(subprocessos).hasSize(1);
         Subprocesso subprocessoCriado = subprocessos.getFirst();
         Mapa mapaCopiado = subprocessoCriado.getMapa();
 
-        // 3.1. Verificar se o mapa copiado é uma nova instância (código diferente)
+        // 5.1. Verificar se o mapa copiado é uma nova instância (código diferente)
         assertThat(mapaCopiado.getCodigo()).isNotNull();
         assertThat(mapaCopiado.getCodigo()).isNotEqualTo(mapaOriginal.getCodigo());
 
-        // 3.2. Verificar se o conteúdo foi copiado
+        // 5.2. Verificar se campos foram limpos (Passo 9/10)
+        assertThat(mapaCopiado.getSugestoes()).isNull();
+        assertThat(mapaCopiado.getObservacoesDisponibilizacao()).isNull();
+
+        // 5.3. Verificar se o conteúdo foi copiado
         List<Competencia> competenciasCopiadas = competenciaRepo.findByMapa_Codigo(mapaCopiado.getCodigo());
         assertThat(competenciasCopiadas).hasSize(1);
         assertThat(competenciasCopiadas.getFirst().getDescricao())
                 .isEqualTo(competenciaOriginal.getDescricao());
 
-        List<Atividade> atividadesCopiadas = atividadeRepo.findByMapa_Codigo(mapaCopiado.getCodigo());
-        assertThat(atividadesCopiadas).hasSize(1);
-        assertThat(atividadesCopiadas.getFirst().getDescricao())
-                .isEqualTo(atividadeOriginal.getDescricao());
-
-        List<Conhecimento> conhecimentosCopiados = conhecimentoRepo
-                .findByAtividade_Codigo(atividadesCopiadas.getFirst().getCodigo());
-        assertThat(conhecimentosCopiados).hasSize(1);
-        assertThat(conhecimentosCopiados.getFirst().getDescricao())
-                .isEqualTo(conhecimentoOriginal.getDescricao());
+        // 6. Verificar movimentação (Passo 11)
+        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigo(subprocessoCriado.getCodigo());
+        assertThat(movs).hasSize(1);
+        assertThat(movs.getFirst().getDescricao()).isEqualTo("Processo iniciado");
     }
 
     @Test

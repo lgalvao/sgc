@@ -198,7 +198,7 @@ class SubprocessoServiceEmailTest {
         when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
         
         // Simula erro no envio para a unidade superior, mas o fluxo deve continuar para a destino
-        doThrow(new RuntimeException("Fail")).when(emailService).enviarEmailHtml(eq("sup@tre-pe.jus.br"), anyString(), any());
+        lenient().doThrow(new RuntimeException("Fail")).when(emailService).enviarEmailHtml(eq("sup@tre-pe.jus.br"), anyString(), any());
 
         RegistrarTransicaoCommand cmd = RegistrarTransicaoCommand.builder()
                 .sp(sp)

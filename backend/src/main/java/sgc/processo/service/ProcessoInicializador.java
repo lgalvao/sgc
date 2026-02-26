@@ -47,15 +47,19 @@ public class ProcessoInicializador {
                 throw new ErroUnidadesNaoDefinidas("A lista de unidades é obrigatória para iniciar o processo de revisão.");
             }
             codigosUnidades = codsUnidadesParam;
-            unidadesParaProcessar = Set.of(); // Será buscado individualmente via Repo se necessário
+            // Para REVISAO, as unidades a processar são as que receberão subprocessos
+            unidadesParaProcessar = new HashSet<>(unidadeRepo.findAllById(codigosUnidades));
+
+            // 7. Snapshot da árvore de unidades no momento da iniciação (Apenas para REVISAO conforme CDU-05)
+            Set<Unidade> snapshotArvore = carregarArvoreUnidades(unidadesParaProcessar);
+            processo.sincronizarParticipantes(snapshotArvore);
         } else {
-            // Mapeamento e Diagnóstico usam participantes do processo (snapshots)
+            // Mapeamento e Diagnóstico usam participantes do processo definidos na criação
             List<Long> codsParticipantes = processo.getCodigosParticipantes();
             if (codsParticipantes.isEmpty()) {
                 throw new ErroUnidadesNaoDefinidas("Não há unidades participantes definidas para este processo.");
             }
             codigosUnidades = codsParticipantes;
-            // Buscar as entidades Unidade do repositório para criar subprocessos
             unidadesParaProcessar = new HashSet<>(unidadeRepo.findAllById(codigosUnidades));
         }
 
@@ -65,7 +69,7 @@ public class ProcessoInicializador {
             return erros;
         }
 
-        // Se for REVISAO ou DIAGNOSTICO, precisamos carregar os mapas vigentes em lote para passar para a factory
+        // Se for REVISAO ou DIAGNOSTICO, precisamos carregar os mapas vigentes em lote
         List<UnidadeMapa> unidadesMapas = List.of();
         if (tipo == TipoProcesso.REVISAO || tipo == TipoProcesso.DIAGNOSTICO) {
             unidadesMapas = unidadeMapaRepo.findAllById(codigosUnidades);
@@ -80,6 +84,18 @@ public class ProcessoInicializador {
         int contagemUnidades = codigosUnidades.size();
         log.info("Processo de {} {} iniciado para {} unidade(s).", tipo.name().toLowerCase(), codigo, contagemUnidades);
         return List.of();
+    }
+
+    private Set<Unidade> carregarArvoreUnidades(Set<Unidade> participantes) {
+        Set<Unidade> arvore = new HashSet<>(participantes);
+        for (Unidade u : participantes) {
+            Unidade superior = u.getUnidadeSuperior();
+            while (superior != null) {
+                arvore.add(superior);
+                superior = superior.getUnidadeSuperior();
+            }
+        }
+        return arvore;
     }
 
     private void validarSituacaoProcesso(Processo processo) {

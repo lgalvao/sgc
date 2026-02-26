@@ -27,6 +27,7 @@
       <BFormSelect
           id="tipo"
           ref="selectTipoRef"
+          :disabled="isEdit"
           :model-value="modelValue.tipo"
           :options="tipoOptions"
           :state="fieldErrors.tipo ? false : null"
@@ -122,6 +123,7 @@ const props = defineProps<{
   fieldErrors: FieldErrors;
   unidades: Unidade[];
   isLoadingUnidades: boolean;
+  isEdit?: boolean;
 }>();
 
 const emit = defineEmits<{

@@ -40,11 +40,14 @@ const test = base.extend<{
         await use();
     }, {auto: true}],
     // Cleanup automático configurado para cada teste
-    cleanupAutomatico: async ({}, use, testInfo) => {
+    cleanupAutomatico: async ({request}, use) => {
         const cleanup = useProcessoCleanup();
         
         // Use
         await use(cleanup);
+
+        // Limpar após o teste
+        await cleanup.limpar(request);
     }
 });
 

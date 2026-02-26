@@ -16,8 +16,9 @@
           ref="formFieldsRef"
           v-model="formData"
           :field-errors="fieldErrors"
-          :unidades="unidadesStore.unidades"
+          :is-edit="!!processoEditando"
           :is-loading-unidades="unidadesStore.isLoading"
+          :unidades="unidadesStore.unidades"
       />
 
       <div class="d-flex justify-content-between">

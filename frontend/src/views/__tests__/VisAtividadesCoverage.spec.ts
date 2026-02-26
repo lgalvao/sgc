@@ -247,6 +247,7 @@ describe("VisAtividades.vue Coverage", () => {
         vi.spyOn(subprocessosStore, "devolverRevisaoCadastro").mockRejectedValue(new Error("Erro simulado"));
 
         (wrapper.vm as any).mostrarModalDevolver = true;
+        (wrapper.vm as any).observacaoDevolucao = "Motivo da devolução";
 
         try {
             await (wrapper.vm as any).confirmarDevolucao();

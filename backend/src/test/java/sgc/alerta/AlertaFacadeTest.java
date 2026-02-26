@@ -94,35 +94,6 @@ class AlertaFacadeTest {
         }
 
         @Test
-        @DisplayName("Deve criar alerta para unidade participante e seus ancestrais")
-        void deveCriarAlertaParaAncestrais() {
-            // Given
-            criarUnidadeRaizMock();
-            Processo p = new Processo();
-
-            Unidade root = Unidade.builder().nome("Root").tipo(TipoUnidade.INTEROPERACIONAL).build();
-            root.setCodigo(1L);
-
-            Unidade filho = Unidade.builder().nome("Filho").tipo(TipoUnidade.OPERACIONAL).build();
-            filho.setCodigo(2L);
-            filho.setUnidadeSuperior(root);
-
-            when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
-
-            // When
-            service.criarAlertasProcessoIniciado(p, List.of(filho));
-
-            // Then
-            // 1 alerta operacional para o filho
-            verify(alertaService).salvar(argThat(a -> "Início do processo".equals(a.getDescricao())
-                    && a.getUnidadeDestino().getCodigo().equals(2L)));
-
-            // 1 alerta intermediário para o pai (root)
-            verify(alertaService).salvar(argThat(a -> "Início do processo em unidades subordinadas".equals(a.getDescricao())
-                    && a.getUnidadeDestino().getCodigo().equals(1L)));
-        }
-
-        @Test
         @DisplayName("Deve criar 2 alertas para interoperacional participante")
         void deveCriarDoisAlertasInteroperacional() {
             // Given

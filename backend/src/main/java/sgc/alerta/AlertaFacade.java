@@ -75,30 +75,39 @@ public class AlertaFacade {
 
     @Transactional
     public List<Alerta> criarAlertasProcessoIniciado(Processo processo, List<Unidade> unidadesParticipantes) {
-        Map<Long, Unidade> operacionais = new HashMap<>();
-        Map<Long, Unidade> intermediarias = new HashMap<>();
+        Set<Long> codsOperacionais = new HashSet<>();
+        Set<Long> codsIntermediarias = new HashSet<>();
+        Map<Long, Unidade> todasUnidadesMap = new HashMap<>();
 
         for (Unidade unidade : unidadesParticipantes) {
-            operacionais.put(unidade.getCodigo(), unidade);
-            if (unidade.getTipo() == TipoUnidade.INTEROPERACIONAL) {
-                intermediarias.put(unidade.getCodigo(), unidade);
+            todasUnidadesMap.put(unidade.getCodigo(), unidade);
+            TipoUnidade tipo = unidade.getTipo();
+
+            if (tipo == TipoUnidade.OPERACIONAL || tipo == TipoUnidade.INTEROPERACIONAL || tipo == TipoUnidade.RAIZ) {
+                codsOperacionais.add(unidade.getCodigo());
             }
 
-            Unidade unidadeSuperior = unidade.getUnidadeSuperior();
-            while (unidadeSuperior != null) {
-                intermediarias.put(unidadeSuperior.getCodigo(), unidadeSuperior);
-                unidadeSuperior = unidadeSuperior.getUnidadeSuperior();
+            if (tipo == TipoUnidade.INTERMEDIARIA || tipo == TipoUnidade.INTEROPERACIONAL) {
+                codsIntermediarias.add(unidade.getCodigo());
+            }
+
+            // Unidades superiores (intermediárias) que não necessariamente participam do processo
+            // mas precisam de alerta se tiverem subordinadas participando
+            Unidade superior = unidade.getUnidadeSuperior();
+            while (superior != null) {
+                todasUnidadesMap.put(superior.getCodigo(), superior);
+                codsIntermediarias.add(superior.getCodigo());
+                superior = superior.getUnidadeSuperior();
             }
         }
 
         List<Alerta> alertasCriados = new ArrayList<>();
-        for (Unidade unidade : operacionais.values()) {
-            alertasCriados.add(criarAlertaAdmin(processo, unidade, "Início do processo"));
+        for (Long cod : codsOperacionais) {
+            alertasCriados.add(criarAlertaAdmin(processo, todasUnidadesMap.get(cod), "Início do processo"));
         }
 
-        for (Unidade unidade : intermediarias.values()) {
-            Alerta alerta = criarAlertaAdmin(processo, unidade, "Início do processo em unidades subordinadas");
-            alertasCriados.add(alerta);
+        for (Long cod : codsIntermediarias) {
+            alertasCriados.add(criarAlertaAdmin(processo, todasUnidadesMap.get(cod), "Início do processo em unidade(s) subordinada(s)"));
         }
 
         return alertasCriados;

@@ -765,7 +765,7 @@ public class SubprocessoService {
                 .unidadeOrigem(unidadeOrigem)
                 .unidadeDestino(unidade)
                 .usuario(usuario)
-                .descricao("Processo de revisão iniciado")
+                .descricao("Processo iniciado")
                 .build());
 
         subprocessoSalvo.setLocalizacaoAtual(unidade);

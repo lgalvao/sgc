@@ -54,8 +54,9 @@ public class CopiaMapaService {
 
     private Mapa criarNovoMapa(Mapa fonte) {
         return Mapa.builder()
-                .dataHoraDisponibilizado(fonte.getDataHoraDisponibilizado())
-                .observacoesDisponibilizacao(fonte.getObservacoesDisponibilizacao())
+                .dataHoraDisponibilizado(null)
+                .observacoesDisponibilizacao(null)
+                .sugestoes(null)
                 .dataHoraHomologado(null)
                 .build();
     }

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .header { background-color: #0066cc; color: white; padding: 15px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { padding: 20px; }
+        .footer { font-size: 12px; color: #666; text-align: center; margin-top: 20px; }
+    </style>
+    <title>SGC: Início de processo de mapeamento de competências</title>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Início de processo de mapeamento de competências</h1>
+    </div>
+    <div class="content">
+        <p>Prezado(a) responsável pela <strong th:text="${siglaUnidade}"></strong>,</p>
+        <p>Comunicamos o início do processo <strong th:text="${nomeProcesso}"></strong> para a sua unidade.</p>
+        <p>Já é possível realizar o cadastro de atividades e conhecimentos no Sistema de Gestão de Competências (SGC).</p>
+        <p>O prazo para conclusão desta etapa do processo é <strong th:text="${dataLimite}"></strong>.</p>
+        <p style="margin-top: 20px;">
+            <a href="https://sgc.tre-pe.jus.br" style="background-color: #0066cc; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                Acessar SGC
+            </a>
+        </p>
+    </div>
+    <div class="footer">
+        <p>Sistema de Gestão de Competências - TRE-PE</p>
+    </div>
+</div>
+</body>
+</html>

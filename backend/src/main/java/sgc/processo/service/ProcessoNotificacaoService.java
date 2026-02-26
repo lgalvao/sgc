@@ -13,7 +13,10 @@ import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static sgc.organizacao.model.TipoUnidade.*;
 
@@ -59,28 +62,47 @@ public class ProcessoNotificacaoService {
             return;
         }
 
-        List<Unidade> unidadesParticipantes = subprocessos.stream()
-                .map(Subprocesso::getUnidade)
-                .toList();
-        servicoAlertas.criarAlertasProcessoIniciado(processo, unidadesParticipantes);
+        // 1. Identificar quem são os participantes (12.1)
+        Map<Long, Subprocesso> participantesMap = subprocessos.stream()
+                .collect(Collectors.toMap(s -> s.getUnidade().getCodigo(), s -> s));
 
-        List<Long> todosCodigosUnidades = subprocessos.stream()
-                .map(s -> s.getUnidade().getCodigo())
-                .toList();
-
-        Map<Long, UnidadeResponsavelDto> responsaveis = organizacaoFacade.buscarResponsaveisUnidades(todosCodigosUnidades);
-
-        List<String> todosTitulos = new ArrayList<>();
-        responsaveis.values().forEach(r -> {
-            todosTitulos.add(r.titularTitulo());
-            if (r.substitutoTitulo() != null)
-                todosTitulos.add(r.substitutoTitulo());
-        });
-
-        Map<String, Usuario> usuarios = usuarioService.buscarUsuariosPorTitulos(todosTitulos);
+        // 2. Identificar quem são os gestores de participantes (12.2) e coletar subordinadas imediatas
+        Map<Long, Set<String>> gestoresSubordinadasMap = new HashMap<>();
         for (Subprocesso sp : subprocessos) {
-            enviarEmailProcessoIniciado(processo, sp, responsaveis, usuarios);
+            Unidade superior = sp.getUnidade().getUnidadeSuperior();
+            while (superior != null) {
+                Long codSuperior = superior.getCodigo();
+                gestoresSubordinadasMap.computeIfAbsent(codSuperior, k -> new HashSet<>())
+                        .add(sp.getUnidade().getSigla());
+                superior = superior.getUnidadeSuperior();
+            }
         }
+
+        // 3. Unir todas as unidades que precisam ser notificadas
+        Set<Long> todosCodigosNotificar = new HashSet<>(participantesMap.keySet());
+        todosCodigosNotificar.addAll(gestoresSubordinadasMap.keySet());
+
+        // 4. Buscar dados auxiliares em lote
+        Map<Long, UnidadeResponsavelDto> responsaveisMap = organizacaoFacade.buscarResponsaveisUnidades(new ArrayList<>(todosCodigosNotificar));
+        List<String> todosTitulosUsuarios = responsaveisMap.values().stream()
+                .flatMap(r -> Stream.of(r.titularTitulo(), r.substitutoTitulo()))
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        Map<String, Usuario> usuariosMap = usuarioService.buscarUsuariosPorTitulos(todosTitulosUsuarios);
+
+        // 5. Enviar e-mails consolidados
+        for (Long codUnidade : todosCodigosNotificar) {
+            Unidade unidade = organizacaoFacade.unidadePorCodigo(codUnidade);
+            Subprocesso sp = participantesMap.get(codUnidade);
+            Set<String> subordinadasNoProcesso = gestoresSubordinadasMap.get(codUnidade);
+
+            enviarEmailConsolidado(processo, unidade, sp, subordinadasNoProcesso, responsaveisMap.get(codUnidade), usuariosMap);
+        }
+
+        // 6. Criar alertas conforme 13.1, 13.2 e 13.3 (mantendo a lógica especificada)
+        List<Unidade> unidadesParticipantes = subprocessos.stream().map(Subprocesso::getUnidade).toList();
+        servicoAlertas.criarAlertasProcessoIniciado(processo, unidadesParticipantes);
     }
 
     private void processarFinalizacaoProcesso(Long codProcesso) {
@@ -125,7 +147,7 @@ public class ProcessoNotificacaoService {
                 enviarEmailUnidadeIntermediaria(processo, unidade, emailUnidade, subordinadas);
             }
 
-            if (responsavel.substitutoTitulo() != null) {
+            if (responsavel != null && responsavel.substitutoTitulo() != null) {
                 String assunto = String.format("SGC: Finalização do processo %s", processo.getDescricao());
                 String html = emailModelosService.criarEmailProcessoFinalizadoPorUnidade(
                         unidade.getSigla(),
@@ -178,49 +200,46 @@ public class ProcessoNotificacaoService {
         log.info("E-mail de finalização (unidade intermediaria) enviado para {}", unidade.getSigla());
     }
 
-    private void enviarEmailProcessoIniciado(
+    private void enviarEmailConsolidado(
             Processo processo,
-            Subprocesso subprocesso,
-            Map<Long, UnidadeResponsavelDto> responsaveis,
+            Unidade unidade,
+            Subprocesso sp,
+            Set<String> subordinadas,
+            UnidadeResponsavelDto responsavel,
             Map<String, Usuario> usuarios) {
 
-        Unidade unidade = subprocesso.getUnidade();
-        Long codigoUnidade = unidade.getCodigo();
+        boolean isParticipante = sp != null;
+        boolean isGestor = subordinadas != null && !subordinadas.isEmpty();
+
+        if (!isParticipante && !isGestor) return;
 
         try {
-            UnidadeResponsavelDto responsavel = responsaveis.get(codigoUnidade);
-            String nomeUnidade = unidade.getNome();
-            String assunto = switch (unidade.getTipo()) {
-                case OPERACIONAL, INTEROPERACIONAL, RAIZ -> "Processo iniciado - %s".formatted(processo.getDescricao());
-                case INTERMEDIARIA ->
-                        "Processo iniciado em unidades subordinadas - %s".formatted(processo.getDescricao());
-                case SEM_EQUIPE -> "Notificação não enviada para unidade (N/A)";
-            };
+            List<String> siglasSubordinadas = isGestor ? subordinadas.stream().sorted().toList() : Collections.emptyList();
+            LocalDateTime dataLimite = sp != null ? sp.getDataLimiteEtapa1() : processo.getDataLimite();
 
-            String corpoHtml = criarCorpoEmailPorTipo(unidade.getTipo(), processo, subprocesso);
-            String emailUnidade = String.format("%s@tre-pe.jus.br", unidade.getSigla().toLowerCase());
-            emailService.enviarEmailHtml(emailUnidade, assunto, corpoHtml);
-            log.info("E-mail enviado para {}", unidade.getSigla());
+            String assunto = isParticipante 
+                    ? "SGC: Início de processo de mapeamento de competências"
+                    : "SGC: Início de processo de mapeamento de competências em unidades subordinadas";
 
-            if (responsavel.substitutoTitulo() != null) {
-                enviarEmailParaSubstituto(responsavel.substitutoTitulo(), usuarios, assunto, corpoHtml, nomeUnidade);
-            }
+            String corpoHtml = emailModelosService.criarEmailInicioProcessoConsolidado(
+                    unidade.getSigla(), processo.getDescricao(), dataLimite, isParticipante, siglasSubordinadas);
+
+            enviarEmailEParaSubstituto(unidade, responsavel, usuarios, assunto, corpoHtml, unidade.getNome());
         } catch (Exception e) {
-            log.error("Erro ao enviar e-mail para {}: {}", codigoUnidade, e.getClass().getSimpleName(), e);
+            log.error("Erro ao enviar e-mail consolidado para {}: {}", unidade.getSigla(), e.getMessage(), e);
         }
     }
 
-    String criarCorpoEmailPorTipo(TipoUnidade tipoUnidade, Processo processo, Subprocesso subprocesso) {
-        return switch (tipoUnidade) {
-            case OPERACIONAL, INTEROPERACIONAL, INTERMEDIARIA, RAIZ ->
-                    emailModelosService.criarEmailProcessoIniciado(
-                            subprocesso.getUnidade().getNome(),
-                            processo.getDescricao(),
-                            processo.getTipo().name(),
-                            subprocesso.getDataLimiteEtapa1());
-            case SEM_EQUIPE ->
-                    throw new IllegalArgumentException("Tipo de unidade não suportado para geração de e-mail: " + tipoUnidade);
-        };
+    private void enviarEmailEParaSubstituto(Unidade unidade, UnidadeResponsavelDto responsavel, 
+                                            Map<String, Usuario> usuarios, String assunto, 
+                                            String corpoHtml, String nomeUnidade) {
+        String emailUnidade = String.format("%s@tre-pe.jus.br", unidade.getSigla().toLowerCase());
+        emailService.enviarEmailHtml(emailUnidade, assunto, corpoHtml);
+        log.info("E-mail enviado para {}", unidade.getSigla());
+
+        if (responsavel != null && responsavel.substitutoTitulo() != null) {
+            enviarEmailParaSubstituto(responsavel.substitutoTitulo(), usuarios, assunto, corpoHtml, nomeUnidade);
+        }
     }
 
     void enviarEmailParaSubstituto(String tituloSubstituto, Map<String, Usuario> usuarios, String assunto,

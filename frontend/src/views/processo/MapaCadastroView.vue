@@ -160,7 +160,7 @@ onMounted(async () => {
 });
 
 const atividades = computed<Atividade[]>(() => {
-  return [];
+  if (!codSubprocesso.value) return [];
   return atividadesStore.obterAtividadesPorSubprocesso(codSubprocesso.value) || [];
 });
 

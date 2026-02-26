@@ -1,55 +1,66 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso, extrairProcessoId, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {criarProcesso, extrairProcessoId, verificarDetalhesProcesso} from './helpers/helpers-processos.js';
+import type {Page} from '@playwright/test';
 
-test.describe('CDU-04 - Iniciar processo de mapeamento', () => {
-    test('Deve iniciar um processo com sucesso', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        const descricao = `Processo para Iniciar - ${Date.now()}`;
+test.describe('CDU-04 - Iniciar Processo', () => {
 
-        // 1. Cria processo em estado 'Criado'
+    test('Deve iniciar um processo e validar criação de subprocessos e alertas', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: any}) => {
+        const descricao = `CDU-04 Iniciar - ${Date.now()}`;
+        
+        // 1. Criar processo (sem iniciar)
         await criarProcesso(page, {
             descricao: descricao,
             tipo: 'MAPEAMENTO',
-            diasLimite: 30,
-            unidade: 'ASSESSORIA_11',
-            expandir: ['SECRETARIA_1']
+            diasLimite: 15,
+            unidade: ['SECRETARIA_1', 'ASSESSORIA_11', 'ASSESSORIA_12'], // Interoperacional + Operacionais
+            expandir: ['SECRETARIA_1'],
+            iniciar: false
         });
 
-        // 2. Entra na edição
+        // Capturar ID para cleanup
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
-        await expect(page).toHaveURL(/\/processo\/cadastro/);
-
-        // Capturar ID do processo para cleanup
         const processoId = await extrairProcessoId(page);
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
+        cleanupAutomatico.registrar(processoId);
 
-        // Aguarda carregamento dos dados
-        await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricao);
-
-        // 3. Clica em Iniciar
+        // 2. Iniciar processo
         await page.getByTestId('btn-processo-iniciar').click();
-
-        // 4. Verifica Modal
+        
+        // Validar texto do modal
         const modal = page.getByRole('dialog');
-        await expect(modal).toBeVisible();
-        await expect(modal.getByText('Ao iniciar o processo, não será mais possível editá-lo')).toBeVisible();
-
-        // 5. Cancela
+        await expect(modal.getByText(/Ao iniciar o processo, não será mais possível editá-lo ou removê-lo/i)).toBeVisible();
+        
+        // 3. Cancelar e verificar que continua na mesma tela
         await page.getByTestId('btn-iniciar-processo-cancelar').click();
-        await expect(modal).not.toBeVisible();
-        await expect(page).toHaveURL(/\/processo\/cadastro/);
+        await expect(page).toHaveURL(new RegExp(`codProcesso=${processoId}`));
+        await expect(page.getByTestId('btn-processo-iniciar')).toBeVisible();
 
-        // 6. Inicia novamente e Confirma
+        // 4. Confirmar iniciação
         await page.getByTestId('btn-processo-iniciar').click();
-        await expect(modal).toBeVisible();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
-        // 7. Verifica redirecionamento e Status
+        // 5. Validar redirecionamento e situação
         await expect(page).toHaveURL(/\/painel/);
+        await expect(page.getByText(/Processo iniciado/i).first()).toBeVisible();
+        
+        const linha = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descricao)});
+        await expect(linha.getByText('Em andamento')).toBeVisible();
 
-        await verificarProcessoNaTabela(page, {
+        // 6. Validar que não é mais editável (clicar redireciona para detalhes e não para cadastro)
+        await linha.click();
+        await page.waitForURL(new RegExp(`\\/processo\\/${processoId}$`));
+        
+        // Na tela de detalhes, verificar se os subprocessos foram criados
+        await verificarDetalhesProcesso(page, {
             descricao: descricao,
-            situacao: 'Em andamento',
-            tipo: 'Mapeamento'
+            tipo: 'Mapeamento',
+            situacao: 'Em andamento'
         });
+
+        // Verificar unidades na tabela de participantes
+        await expect(page.locator('tr', {hasText: 'ASSESSORIA_11'})).toContainText('Não iniciado');
+        await expect(page.locator('tr', {hasText: 'ASSESSORIA_12'})).toContainText('Não iniciado');
+        
+        // Secretaria 1 é interoperacional e também deve ter um subprocesso (conforme seed.sql)
+        await expect(page.locator('tr', {hasText: 'SECRETARIA_1'})).toContainText('Não iniciado');
     });
 });
