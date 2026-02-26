@@ -202,6 +202,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado para finalização do cenário');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+        await expect(page.getByText(/Cadastro homologado/i).first()).toBeVisible();
         await page.goto('/painel');
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
