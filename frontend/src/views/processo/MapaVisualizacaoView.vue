@@ -273,8 +273,7 @@ const podeAnalisar = computed(() => {
 const podeVerSugestoes = computed(() => podeApresentarSugestoes.value);
 
 const historicoAnalise = computed(() => {
-  if (!codSubprocesso.value) return [];
-  return analisesStore.obterAnalisesPorSubprocesso(codSubprocesso.value) || [];
+  return analisesStore.analisesCadastro || [];
 });
 
 const temHistoricoAnalise = computed(() => historicoAnalise.value.length > 0);
@@ -429,7 +428,7 @@ function fecharModalDevolucao() {
 
 async function abrirModalHistorico() {
   if (codSubprocesso.value) {
-    await analisesStore.buscarAnalisesCadastro(codSubprocesso.value);
+    await analisesStore.carregarHistorico(codSubprocesso.value);
   }
   mostrarModalHistorico.value = true;
 }

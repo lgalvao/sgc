@@ -54,7 +54,7 @@
     <!-- Modal de Impacto no Mapa -->
     <ImpactoMapaModal
         v-if="codSubprocesso"
-        :impacto="impactoMapa"
+        :impacto="impactos"
         :loading="loadingImpacto"
         :mostrar="mostrarModalImpacto"
         @fechar="fecharModalImpacto"
@@ -161,7 +161,7 @@ const processosStore = useProcessosStore();
 const analisesStore = useAnalisesStore();
 const mapasStore = useMapasStore();
 const subprocessosStore = useSubprocessosStore();
-const {impactoMapa} = storeToRefs(mapasStore);
+const {impactos} = storeToRefs(mapasStore);
 
 const unidadeId = computed(() => props.sigla);
 const codProcesso = computed(() => Number(props.codProcesso));
@@ -220,8 +220,7 @@ const processoAtual = computed(() => processosStore.processoDetalhe);
 const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
 
 const historicoAnalises = computed(() => {
-  if (!codSubprocesso.value) return [];
-  return analisesStore.obterAnalisesPorSubprocesso(codSubprocesso.value);
+  return analisesStore.analisesCadastro || [];
 });
 
 // Modais
@@ -247,7 +246,7 @@ async function abrirModalImpacto() {
   if (codSubprocesso.value) {
     loadingImpacto.value = true;
     try {
-      await mapasStore.buscarImpactoMapa(codSubprocesso.value);
+      await mapasStore.verificarImpactos(codSubprocesso.value);
     } finally {
       loadingImpacto.value = false;
     }
@@ -260,7 +259,7 @@ function fecharModalImpacto() {
 
 async function abrirModalHistoricoAnalise() {
   if (codSubprocesso.value) {
-    await analisesStore.buscarAnalisesCadastro(codSubprocesso.value);
+    await analisesStore.carregarHistorico(codSubprocesso.value);
   }
   mostrarModalHistoricoAnalise.value = true;
 }

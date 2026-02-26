@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import {mapUnidadesArray} from "@/mappers/unidades";
+import {mapUnidadesArray} from "@/services/unidadeService";
 import {
     buscarArvoreComElegibilidade,
     buscarArvoreUnidade as serviceBuscarArvoreUnidade,

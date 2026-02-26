@@ -34,11 +34,19 @@ class ImpactoMapaServiceTest {
         doReturn(true).when(permissionEvaluator).checkPermission(any(), any(), any());
     }
 
+    // Helper para criar usuário ADMIN para testes genéricos
+    private Usuario usuarioAdmin() {
+        Usuario u = new Usuario();
+        u.setPerfilAtivo(Perfil.ADMIN);
+        return u;
+    }
+
     @Test
     @DisplayName("Deve retornar sem impacto se não houver mapa vigente")
     void semMapaVigente() {
-        Usuario usuario = new Usuario();
+        Usuario usuario = usuarioAdmin();
         Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         subprocesso.setUnidade(unidade);
@@ -56,8 +64,9 @@ class ImpactoMapaServiceTest {
     @Test
     @DisplayName("Deve detectar atividade inserida")
     void deveDetectarInserida() {
-        Usuario usuario = new Usuario();
+        Usuario usuario = usuarioAdmin();
         Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setCodigo(10L);
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -92,8 +101,9 @@ class ImpactoMapaServiceTest {
     @Test
     @DisplayName("Deve detectar atividade removida e impacto em competência")
     void deveDetectarRemovida() {
-        Usuario usuario = new Usuario();
+        Usuario usuario = usuarioAdmin();
         Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setCodigo(10L);
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -136,8 +146,9 @@ class ImpactoMapaServiceTest {
     @Test
     @DisplayName("Deve detectar atividade alterada (conhecimentos diferentes)")
     void deveDetectarAlterada() {
-        Usuario usuario = new Usuario();
+        Usuario usuario = usuarioAdmin();
         Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setCodigo(10L);
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -184,8 +195,9 @@ class ImpactoMapaServiceTest {
         Mapa mapaVigente = Mapa.builder().codigo(100L).build();
         Mapa mapaAtual = Mapa.builder().codigo(200L).build();
         Subprocesso subprocesso = criarSubprocesso(1L, mapaAtual);
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
-        Usuario usuario = new Usuario();
+        Usuario usuario = usuarioAdmin();
 
         Atividade ativVigente = Atividade.builder()
                 .codigo(1L)
@@ -217,8 +229,9 @@ class ImpactoMapaServiceTest {
         Mapa mapaVigente = Mapa.builder().codigo(100L).build();
         Mapa mapaAtual = Mapa.builder().codigo(200L).build();
         Subprocesso subprocesso = criarSubprocesso(1L, mapaAtual);
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
-        Usuario usuario = new Usuario();
+        Usuario usuario = usuarioAdmin();
 
         Conhecimento c1 = Conhecimento.builder().codigo(1L).descricao("C1").build();
         Conhecimento c2 = Conhecimento.builder().codigo(2L).descricao("C2").build();
@@ -272,10 +285,11 @@ class ImpactoMapaServiceTest {
         void verificarImpactos_MapaSubprocessoInexistente() {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(1L);
+            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade();
             u.setCodigo(100L);
             sp.setUnidade(u);
-            Usuario usuario = new Usuario();
+            Usuario usuario = usuarioAdmin();
 
             when(mapaRepo.findMapaVigenteByUnidade(100L)).thenReturn(Optional.of(new Mapa()));
             when(repo.buscar(Mapa.class, "subprocesso.codigo", 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
@@ -288,6 +302,7 @@ class ImpactoMapaServiceTest {
         void verificarImpactos_AtividadesDuplicadas() {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(1L);
+            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade();
             u.setCodigo(100L);
             sp.setUnidade(u);
@@ -316,7 +331,7 @@ class ImpactoMapaServiceTest {
             
             when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(Collections.emptyList());
 
-            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, new Usuario());
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, usuarioAdmin());
             
             assertEquals(2, response.removidas().size());
         }
@@ -326,6 +341,7 @@ class ImpactoMapaServiceTest {
         void verificarImpactos_AtividadeAlteradaComCompetencia() {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(1L);
+            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             Unidade u = new Unidade();
             u.setCodigo(100L);
             sp.setUnidade(u);
@@ -361,7 +377,7 @@ class ImpactoMapaServiceTest {
             
             when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of(comp));
 
-            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, new Usuario());
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, usuarioAdmin());
             
             assertEquals(1, response.alteradas().size());
             assertEquals(1, response.competenciasImpactadas().size());

@@ -32,8 +32,8 @@
     </PageHeader>
 
     <ErrorAlert
-        :error="mapasStore.lastError"
-        @dismiss="mapasStore.clearError()"
+        :error="mapasStore.erro ? { message: mapasStore.erro } : null"
+        @dismiss="mapasStore.erro = null"
     />
 
     <CompetenciasListSection
@@ -78,7 +78,7 @@
 
     <ImpactoMapaModal
         v-if="codSubprocesso"
-        :impacto="impactoMapa"
+        :impacto="impactos"
         :loading="loadingImpacto"
         :mostrar="mostrarModalImpacto"
         @fechar="fecharModalImpacto"
@@ -115,7 +115,7 @@ const ModalMapaDisponibilizar = defineAsyncComponent(() => import("@/components/
 const route = useRoute();
 const router = useRouter();
 const mapasStore = useMapasStore();
-const {mapaCompleto, impactoMapa} = storeToRefs(mapasStore);
+const {mapaCompleto, impacts: impactos} = storeToRefs(mapasStore);
 const atividadesStore = useAtividadesStore();
 const subprocessosStore = useSubprocessosStore();
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
@@ -135,7 +135,7 @@ function abrirModalImpacto() {
   mostrarModalImpacto.value = true;
   if (codSubprocesso.value) {
     loadingImpacto.value = true;
-    mapasStore.buscarImpactoMapa(codSubprocesso.value)
+    mapasStore.verificarImpactos(codSubprocesso.value)
         .finally(() => loadingImpacto.value = false);
   }
 }
@@ -199,7 +199,7 @@ function abrirModalDisponibilizar() {
 function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   mostrarModalCriarNovaCompetencia.value = true;
   clearErrors();
-  mapasStore.clearError();
+  mapasStore.erro = null;
 
   if (competenciaParaEditar) {
     competenciaSendoEditada.value = competenciaParaEditar;
@@ -294,11 +294,11 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
 
 async function disponibilizarMapa(payload: { dataLimite: string; observacoes: string }) {
   if (!codSubprocesso.value) return;
-  mapasStore.clearError();
+  mapasStore.erro = null;
   loadingDisponibilizacao.value = true;
 
   try {
-    await mapasStore.disponibilizarMapa(codSubprocesso.value, payload);
+    await mapasStore.disponibilizar(codSubprocesso.value, payload);
     fecharModalDisponibilizar();
     await router.push({name: "Painel"});
   } catch {
@@ -324,7 +324,7 @@ defineExpose({
   unidade,
   competencias,
   atividades,
-  impactoMapa,
+  impactoMapa: impactos,
   mostrarModalImpacto,
   loadingImpacto,
   abrirModalImpacto,

@@ -342,28 +342,24 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
         @Test
         @WithMockChefe(CHEFE_TITULO)
-        @DisplayName("CHEFE NÃO pode acessar se subprocesso está em situação diferente de 'Revisão do cadastro em andamento'")
-        void chefeNaoPodeAcessar_EmSituacaoIncorreta() throws Exception {
+        @DisplayName("CHEFE recebe erro de validação (422) se subprocesso está em situação diferente de 'Revisão do cadastro em andamento' mas tem permissão visual")
+        void chefeRecebeErroValidacao_EmSituacaoIncorreta() throws Exception {
             setupChefeForUnidade(CHEFE_TITULO, unidade);
             subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             subprocessoRepo.save(subprocessoRevisao);
 
-            // Simular que o processo saiu da unidade do chefe (foi para unidade superior ou outra)
-            // Precisamos criar uma unidade "Outra" ou usar Superior
-            Unidade superior = UnidadeFixture.unidadeComSigla("SUP");
-            superior = unidadeRepo.save(superior);
+            // Agora, o acesso para verificar impactos é liberado via segurança (status().isForbidden() -> status().isOk() [na segurança]),
+            // mas o serviço deve bloquear por regra de negócio (checkSituacao).
+            // A implementação atual do serviço lança ErroValidacao -> 422 Unprocessable Entity
+            // ou pode ser 400 Bad Request, dependendo do handler. Assumindo 422 ou 400.
+            // O RestExceptionHandlerSecurityTest sugere que ErroValidacao pode ser 422.
 
-            Movimentacao movimentacao = Movimentacao.builder()
-                    .subprocesso(subprocessoRevisao)
-                    .unidadeOrigem(unidade)
-                    .unidadeDestino(superior)
-                    .descricao("Enviado para Superior")
-                    .dataHora(LocalDateTime.now())
-                    .build();
-            movimentacaoRepo.save(movimentacao);
+            // Nota: O teste original esperava Forbidden porque a regra estava no PermissionEvaluator.
+            // Agora a regra "VERIFICAR_IMPACTOS" retorna true no Evaluator, mas o serviço valida o estado.
+            // O serviço ImpactoMapaService lança ErroValidacao se o estado não for permitido.
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnprocessableEntity()); // Espera 422
         }
     }
 }

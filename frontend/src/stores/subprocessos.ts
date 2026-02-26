@@ -14,6 +14,9 @@ import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
+    mapAtividadeVisualizacaoToModel,
+    mapMapaCompletoDtoToModel,
+    mapSubprocessoDetalheDtoToModel,
     validarCadastro as serviceValidarCadastro,
 } from "@/services/subprocessoService";
 import {
@@ -27,9 +30,6 @@ import {useFeedbackStore} from "@/stores/feedback";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useMapasStore} from "@/stores/mapas";
 import {useAtividadesStore} from "@/stores/atividades";
-import {mapMapaCompletoDtoToModel} from "@/mappers/mapas";
-import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";
-import {mapSubprocessoDetalheDtoToModel} from "@/mappers/subprocessos";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,

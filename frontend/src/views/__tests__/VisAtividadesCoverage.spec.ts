@@ -48,6 +48,7 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({
         codigo: 10,
     }),
+    mapSubprocessoDetalheDtoToModel: vi.fn((dto) => dto),
     homologarRevisaoCadastro: vi.fn(), // Already mocking in store spy, but good to have
     devolverRevisaoCadastro: vi.fn(),
 }));

@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
-import type {PerfilUnidade} from "@/mappers/sgrh";
+import type {PerfilUnidade} from "@/services/usuarioService";
 import type {Perfil} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
 import {useErrorHandler} from "@/composables/useErrorHandler";

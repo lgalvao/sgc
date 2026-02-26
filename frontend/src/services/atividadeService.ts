@@ -6,8 +6,8 @@ import {
     mapConhecimentoToModel,
     mapCriarAtividadeRequestToDto,
     mapCriarConhecimentoRequestToDto,
-} from "@/mappers/atividades";
-import type {Atividade, AtividadeOperacaoResponse, Conhecimento, CriarConhecimentoRequest,} from "@/types/tipos";
+} from "@/services/subprocessoService";
+import type {Atividade, AtividadeOperacaoResponse, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
 import type {AtividadeDto, AtividadeOperacaoResponseDto, ConhecimentoDto} from "@/types/dtos";
 import apiClient from "@/axios-setup";
 
@@ -24,7 +24,7 @@ export async function obterAtividadePorCodigo(codAtividade: number): Promise<Ati
 }
 
 export async function criarAtividade(
-    request: any,
+    request: CriarAtividadeRequest,
     codMapa: number,
 ): Promise<AtividadeOperacaoResponse> {
     const requestDto = mapCriarAtividadeRequestToDto(request, codMapa);

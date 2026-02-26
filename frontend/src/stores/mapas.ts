@@ -1,152 +1,220 @@
-import {defineStore} from "pinia";
-import {ref} from "vue";
-import * as mapaService from "@/services/mapaService";
-import * as subprocessoService from "@/services/subprocessoService";
-import {useFeedbackStore} from "@/stores/feedback";
+import {
+    adicionarCompetencia,
+    atualizarCompetencia,
+    disponibilizarMapa,
+    obterMapaAjuste,
+    obterMapaCompleto,
+    obterMapaVisualizacao,
+    removerCompetencia,
+    salvarMapaAjuste,
+    salvarMapaCompleto,
+    verificarImpactosMapa,
+    verificarMapaVigente
+} from "@/services/subprocessoService";
 import type {
     Competencia,
     DisponibilizarMapaRequest,
     ImpactoMapa,
     MapaAjuste,
     MapaCompleto,
-    MapaVisualizacao,
-    SalvarAjustesRequest,
-    SalvarMapaRequest,
+    MapaVisualizacao
 } from "@/types/tipos";
+import {defineStore} from "pinia";
+import {ref} from "vue";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 
-
 export const useMapasStore = defineStore("mapas", () => {
+    const mapaVisualizacao = ref<MapaVisualizacao | null>(null);
     const mapaCompleto = ref<MapaCompleto | null>(null);
     const mapaAjuste = ref<MapaAjuste | null>(null);
     const impactoMapa = ref<ImpactoMapa | null>(null);
-    const mapaVisualizacao = ref<MapaVisualizacao | null>(null);
+    const carregando = ref(false);
+    const erro = ref<string | null>(null);
     const { lastError, clearError, withErrorHandling } = useErrorHandler();
-    const feedbackStore = useFeedbackStore();
 
     async function buscarMapaVisualizacao(codSubprocesso: number) {
-        return withErrorHandling(async () => {
-            mapaVisualizacao.value = null; // Limpa estado anterior
-            mapaVisualizacao.value =
-                await mapaService.obterMapaVisualizacao(codSubprocesso);
-        }, () => {
-            mapaVisualizacao.value = null;
-        });
+        carregando.value = true;
+        erro.value = null;
+        try {
+            if (codSubprocesso) {
+                mapaVisualizacao.value = await obterMapaVisualizacao(codSubprocesso);
+            }
+        } catch (e: any) {
+            erro.value = e.message || "Erro ao carregar mapa de visualização.";
+        } finally {
+            carregando.value = false;
+        }
     }
 
     async function buscarMapaCompleto(codSubprocesso: number) {
-        return withErrorHandling(async () => {
-            mapaCompleto.value = null; // Limpa estado anterior
-            mapaCompleto.value = await mapaService.obterMapaCompleto(codSubprocesso);
-        }, () => {
-            mapaCompleto.value = null;
-        });
-    }
-
-    async function salvarMapa(codSubprocesso: number, request: SalvarMapaRequest) {
-        return withErrorHandling(async () => {
-            mapaCompleto.value = await mapaService.salvarMapaCompleto(
-                codSubprocesso,
-                request,
-            );
-        });
-    }
-
-    async function adicionarCompetencia(
-        codSubprocesso: number,
-        competencia: Competencia,
-    ) {
-        return withErrorHandling(async () => {
-            mapaCompleto.value = await subprocessoService.adicionarCompetencia(
-                codSubprocesso,
-                competencia,
-            );
-        });
-    }
-
-    async function atualizarCompetencia(
-        codSubprocesso: number,
-        competencia: Competencia,
-    ) {
-        if (!competencia || !competencia.codigo) {
-            // Evitar chamada ao backend com id inválido
-            throw new Error("Código da competência inválido");
+        carregando.value = true;
+        erro.value = null;
+        try {
+            mapaCompleto.value = await obterMapaCompleto(codSubprocesso);
+        } catch (e: any) {
+            erro.value = e.message || "Erro ao carregar mapa completo.";
+        } finally {
+            carregando.value = false;
         }
-
-        return withErrorHandling(async () => {
-            mapaCompleto.value = await subprocessoService.atualizarCompetencia(
-                codSubprocesso,
-                competencia,
-            );
-        });
     }
 
-    async function removerCompetencia(codSubprocesso: number, idCompetencia: number) {
-        if (!idCompetencia || idCompetencia === 0) {
-            throw new Error("Código da competência inválido");
-        }
-
-        return withErrorHandling(async () => {
-            mapaCompleto.value = await subprocessoService.removerCompetencia(
+    async function salvarMapa(codSubprocesso: number, dados: any) {
+        carregando.value = true;
+        erro.value = null;
+        try {
+            mapaCompleto.value = await salvarMapaCompleto(
                 codSubprocesso,
-                idCompetencia,
+                dados,
             );
-        });
+        } catch (e: any) {
+            erro.value = e.message || "Erro ao salvar mapa completo.";
+            throw e;
+        } finally {
+            carregando.value = false;
+        }
     }
 
     async function buscarMapaAjuste(codSubprocesso: number) {
-        return withErrorHandling(async () => {
-            mapaAjuste.value = await mapaService.obterMapaAjuste(codSubprocesso);
-        }, () => {
-            mapaAjuste.value = null;
-        });
+        carregando.value = true;
+        erro.value = null;
+        try {
+            mapaAjuste.value = await obterMapaAjuste(codSubprocesso);
+        } catch (e: any) {
+            erro.value = e.message || "Erro ao carregar mapa para ajuste.";
+        } finally {
+            carregando.value = false;
+        }
     }
 
-    async function salvarAjustes(codSubprocesso: number, request: SalvarAjustesRequest) {
-        return withErrorHandling(async () => {
-            await mapaService.salvarMapaAjuste(codSubprocesso, request);
-        });
+    async function salvarAjustes(codSubprocesso: number, request: any) {
+        carregando.value = true;
+        erro.value = null;
+        try {
+            await salvarMapaAjuste(codSubprocesso, request);
+        } catch (e: any) {
+            erro.value = e.message || "Erro ao salvar ajustes do mapa.";
+            throw e;
+        } finally {
+            carregando.value = false;
+        }
     }
 
     async function buscarImpactoMapa(codSubprocesso: number) {
-        return withErrorHandling(async () => {
-            impactoMapa.value =
-                await mapaService.verificarImpactosMapa(codSubprocesso);
-        }, () => {
-            impactoMapa.value = null;
-        });
+        carregando.value = true;
+        erro.value = null;
+        try {
+            if (codSubprocesso) {
+                impactoMapa.value = await verificarImpactosMapa(codSubprocesso);
+            }
+        } catch (e: any) {
+            erro.value = e.message || "Erro ao verificar impactos.";
+            // Não relançar erro para não quebrar a UI, apenas logar/mostrar msg
+        } finally {
+            carregando.value = false;
+        }
     }
 
     async function disponibilizarMapa(
         codSubprocesso: number,
         request: DisponibilizarMapaRequest,
     ) {
-        return withErrorHandling(async () => {
-            await mapaService.disponibilizarMapa(codSubprocesso, request);
-            feedbackStore.show(
-                "Mapa disponibilizado",
-                "O mapa de competências foi disponibilizado com sucesso.",
-                "success"
+        carregando.value = true;
+        erro.value = null;
+        try {
+            await disponibilizarMapa(codSubprocesso, request);
+        } catch (e: any) {
+            erro.value = e.message || "Erro ao disponibilizar mapa.";
+            throw e;
+        } finally {
+            carregando.value = false;
+        }
+    }
+
+    async function adicionarCompetencia(
+        codSubprocesso: number,
+        competencia: Competencia,
+    ) {
+        carregando.value = true;
+        erro.value = null;
+        try {
+            mapaCompleto.value = await adicionarCompetencia(
+                codSubprocesso,
+                competencia,
             );
-        });
+        } catch (e: any) {
+            erro.value = e.message || "Erro ao adicionar competência.";
+            throw e;
+        } finally {
+            carregando.value = false;
+        }
+    }
+
+    async function atualizarCompetencia(
+        codSubprocesso: number,
+        competencia: Competencia,
+    ) {
+        carregando.value = true;
+        erro.value = null;
+        try {
+            mapaCompleto.value = await atualizarCompetencia(
+                codSubprocesso,
+                competencia,
+            );
+        } catch (e: any) {
+            erro.value = e.message || "Erro ao atualizar competência.";
+            throw e;
+        } finally {
+            carregando.value = false;
+        }
+    }
+
+    async function removerCompetencia(
+        codSubprocesso: number,
+        codCompetencia: number,
+    ) {
+        carregando.value = true;
+        erro.value = null;
+        try {
+            mapaCompleto.value = await removerCompetencia(
+                codSubprocesso,
+                codCompetencia,
+            );
+        } catch (e: any) {
+            erro.value = e.message || "Erro ao remover competência.";
+            throw e;
+        } finally {
+            carregando.value = false;
+        }
+    }
+
+    async function temMapaVigente(codigoUnidade: number): Promise<boolean> {
+        // Não gerencia estado de carregando/erro global aqui para ser mais leve
+        try {
+            return await verificarMapaVigente(codigoUnidade);
+        } catch (e) {
+            return false;
+        }
     }
 
     return {
+        mapaVisualizacao,
         mapaCompleto,
         mapaAjuste,
         impactoMapa,
-        mapaVisualizacao,
+        carregando,
+        erro,
         lastError,
+        clearError,
         buscarMapaVisualizacao,
         buscarMapaCompleto,
         salvarMapa,
-        adicionarCompetencia,
-        atualizarCompetencia,
-        removerCompetencia,
         buscarMapaAjuste,
         salvarAjustes,
         buscarImpactoMapa,
         disponibilizarMapa,
-        clearError
+        adicionarCompetencia,
+        atualizarCompetencia,
+        removerCompetencia,
+        temMapaVigente,
     };
 });

@@ -31,6 +31,7 @@ vi.mock("@/services/processoService", () => ({
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({ 
     }),
+    mapSubprocessoDetalheDtoToModel: vi.fn((dto) => dto),
 }));
 vi.mock("@/services/mapaService", () => ({
     obterMapaVisualizacao: vi.fn().mockResolvedValue({ competencias: [] }),

@@ -1,4 +1,59 @@
+import type {Unidade, UnidadeSnapshot} from "@/types/tipos";
 import {apiGet} from "@/utils/apiUtils";
+
+// ------------------------------------------------------------------------------------------------
+// Mappers Internos (formerly in /mappers/unidades.ts)
+// ------------------------------------------------------------------------------------------------
+
+export function mapUnidadeSnapshot(obj: any): UnidadeSnapshot {
+    return {
+        codigo: obj.codigo ?? 0,
+        nome: obj.nome ?? obj.nome_unidade ?? "",
+        sigla: obj.sigla ?? obj.sigla_unidade ?? obj.unidade ?? "",
+        filhas: Array.isArray(obj.filhas || obj.subunidades)
+            ? (obj.filhas || obj.subunidades).map(mapUnidadeSnapshot)
+            : [],
+    };
+}
+
+export function mapUnidade(obj: any): Unidade {
+    return {
+        codigo: obj.codigo ?? obj.codigo_unidade ?? 0,
+        sigla: obj.sigla ?? obj.sigla_unidade ?? "",
+        tipo: obj.tipo ?? obj.tipo_unidade ?? "",
+        nome: obj.nome ?? obj.nome_unidade ?? "",
+        isElegivel: obj.isElegivel,
+        usuarioCodigo:
+            obj.usuarioCodigo ?? obj.idServidorTitular ?? 0,
+        responsavel: obj.responsavel
+            ? {
+                codigo: obj.responsavel.codigo ?? 0,
+                nome: obj.responsavel.nome ?? "",
+                tituloEleitoral: obj.responsavel.tituloEleitoral ?? "",
+                unidade: obj.responsavel.unidade ?? ({} as Unidade),
+                email: obj.responsavel.email ?? "",
+                ramal: obj.responsavel.ramal ?? "",
+                usuarioTitulo: obj.responsavel.usuarioTitulo ?? "",
+                unidadeCodigo: obj.responsavel.unidadeCodigo ?? 0,
+                usuarioCodigo: obj.responsavel.usuarioCodigo ?? obj.responsavel.idServidorResponsavel ?? 0,
+                tipo: obj.responsavel.tipo ?? "",
+                dataInicio: obj.responsavel.dataInicio ?? "",
+                dataFim: obj.responsavel.dataFim ?? null,
+            }
+            : null,
+        filhas: Array.isArray(obj.filhas || obj.subunidades)
+            ? (obj.filhas || obj.subunidades).map(mapUnidade)
+            : [],
+    };
+}
+
+export function mapUnidadesArray(arr: any[] = []): Unidade[] {
+    return arr.map(mapUnidade);
+}
+
+// ------------------------------------------------------------------------------------------------
+// Unidade Services
+// ------------------------------------------------------------------------------------------------
 
 export async function buscarTodasUnidades() {
     return apiGet("/unidades");
