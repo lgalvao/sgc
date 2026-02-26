@@ -3,6 +3,7 @@ package sgc.organizacao.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.*;
+import org.jspecify.annotations.*;
 
 import java.io.*;
 import java.util.*;
@@ -39,7 +40,7 @@ public class UsuarioPerfil implements Serializable {
     private Unidade unidade;
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         UsuarioPerfil that = (UsuarioPerfil) obj;

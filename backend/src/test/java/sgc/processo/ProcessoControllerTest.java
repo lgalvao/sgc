@@ -40,8 +40,7 @@ class ProcessoControllerTest {
     protected static final String CODIGO_JSON_PATH = "$.codigo";
     protected static final String DESCRICAO_JSON_PATH = "$.descricao";
     protected static final String PROCESSO_ATUALIZADO = "Processo Atualizado";
-    protected static final String PROCESSO_NAO_ENCONTRADO = "Processo não encontrado";
-    
+
     @MockitoBean
     private ProcessoFacade processoFacade;
 

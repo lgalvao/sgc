@@ -12,7 +12,7 @@ public record CriarAnaliseCommand(
         TipoAcaoAnalise acao,
         Long codSubprocesso,
         String siglaUnidade,
-        String motivo,
-        String observacoes
+        @org.jspecify.annotations.Nullable String motivo,
+        @org.jspecify.annotations.Nullable String observacoes
 ) {
 }

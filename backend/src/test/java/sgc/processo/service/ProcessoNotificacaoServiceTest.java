@@ -87,23 +87,21 @@ class ProcessoNotificacaoServiceTest {
         ));
         when(emailModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("Conteúdo HTML");
 
-        service.emailInicioProcesso(1L, List.of(10L));
+        service.emailInicioProcesso(1L);
 
-        // Envia para o email da unidade
         verify(emailService, times(1)).enviarEmailHtml(eq("u1@tre-pe.jus.br"), anyString(), anyString());
-        // Envia para o email do substituto
         verify(emailService, times(1)).enviarEmailHtml(eq("substituto@teste.com"), anyString(), anyString());
         verify(alertaService, times(1)).criarAlertasProcessoIniciado(any(), anyList());
     }
 
     @Test
-    @DisplayName("Deve ignorar processamento se não houver subprocessos ao iniciar")
+    @DisplayName("Deve ignorar processamento se não houver subprocessos al iniciar")
     void deveIgnorarProcessamentoSeNaoHouverSubprocessosAoIniciar() {
         Processo processo = criarProcesso(1L);
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
 
-        service.emailInicioProcesso(1L, List.of());
+        service.emailInicioProcesso(1L);
 
         verifyNoInteractions(emailService);
         verifyNoInteractions(alertaService);
@@ -120,29 +118,20 @@ class ProcessoNotificacaoServiceTest {
         Subprocesso s = new Subprocesso();
         s.setUnidade(unidade);
 
-        // Testa catch no fluxo principal para tipo não suportado (ex: SEM_EQUIPE)
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
         when(organizacaoFacade.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularTitulo("T").build()));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", Usuario.builder().build()));
         when(emailModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("HTML");
 
-        // Simular erro ao enviar
         doThrow(new RuntimeException("Erro SMTP")).when(emailService).enviarEmailHtml(any(), any(), any());
 
-        service.emailInicioProcesso(1L, List.of(1L));
+        service.emailInicioProcesso(1L);
 
-        verify(emailService).enviarEmailHtml(any(), any(), any());
-        // Deve ter tentado criar alerta mesmo com erro no e-mail
+       verify(emailService, atLeastOnce()).enviarEmailHtml(any(), any(), any());
         verify(alertaService).criarAlertasProcessoIniciado(any(), anyList());
     }
 
-    @Test
-    @DisplayName("Não deve enviar e-mail se responsável não tiver e-mail cadastrado")
-    void naoDeveEnviarEmailSeSemEmailCadastrado() {
-        // Ignorando este teste pois o comportamento mudou (envia para Unidade)
-        // e não temos substituto neste cenário
-    }
 
     @Test
     @DisplayName("Deve criar alertas mesmo se não enviar e-mails")
@@ -157,11 +146,9 @@ class ProcessoNotificacaoServiceTest {
 
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
-        // Mocking behavior that creates email
         when(organizacaoFacade.buscarResponsaveisUnidades(anyList())).thenReturn(Collections.emptyMap());
-        // emailModelosService.criarEmailProcessoIniciado not strictly needed if responsaveis map empty or throws exception before
 
-        service.emailInicioProcesso(1L, List.of(1L));
+        service.emailInicioProcesso(1L);
 
         verify(alertaService).criarAlertasProcessoIniciado(eq(processo), anyList());
     }
@@ -172,7 +159,7 @@ class ProcessoNotificacaoServiceTest {
         Processo processo = criarProcesso(1L);
         Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL); u1.setSigla("U1");
         Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL); u2.setSigla("U2");
-        Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL); u3.setSigla("U3"); // Sem responsavel
+        Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL); u3.setSigla("U3");
 
         Subprocesso s1 = new Subprocesso(); s1.setUnidade(u1);
         Subprocesso s2 = new Subprocesso(); s2.setUnidade(u2);
@@ -191,7 +178,7 @@ class ProcessoNotificacaoServiceTest {
         Usuario user2 = new Usuario(); user2.setEmail("u2@t.com");
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", user1, "T2", user2));
 
-        service.emailInicioProcesso(1L, List.of(1L, 2L, 3L));
+        service.emailInicioProcesso(1L);
 
         verify(emailService, times(1)).enviarEmailHtml(eq("u1@tre-pe.jus.br"), anyString(), anyString());
         verify(emailService, times(1)).enviarEmailHtml(eq("u2@tre-pe.jus.br"), anyString(), anyString());
@@ -204,7 +191,6 @@ class ProcessoNotificacaoServiceTest {
     @DisplayName("Cobertura Extra")
     class CoberturaExtra {
         
-
         @Test
         @DisplayName("Deve lidar com map de responsáveis nulo ou incompleto")
         void deveLidarComMapResponsaveisIncompleto() {
@@ -217,12 +203,10 @@ class ProcessoNotificacaoServiceTest {
 
             when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(p));
             when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
-            // Retorna map vazio
             when(organizacaoFacade.buscarResponsaveisUnidades(any())).thenReturn(Collections.emptyMap());
-            // Need email template mock because we proceed to send unit email anyway
             when(emailModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("HTML");
 
-            service.emailInicioProcesso(1L, List.of(1L));
+            service.emailInicioProcesso(1L);
 
             verify(usuarioService).buscarUsuariosPorTitulos(anyList());
             verify(alertaService).criarAlertasProcessoIniciado(any(), anyList());
@@ -254,7 +238,7 @@ class ProcessoNotificacaoServiceTest {
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("TITULAR", usuarioTitular));
             when(emailModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("HTML");
             
-            service.emailInicioProcesso(codProcesso, List.of(11L));
+            service.emailInicioProcesso(codProcesso);
 
             verify(emailService).enviarEmailHtml(eq("u11@tre-pe.jus.br"), any(), any());
         }
@@ -286,15 +270,9 @@ class ProcessoNotificacaoServiceTest {
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("SUBSTITUTO", usuarioSub));
             when(emailModelosService.criarEmailProcessoIniciado(any(), any(), any(), any())).thenReturn("HTML");
 
-            service.emailInicioProcesso(codProcesso, List.of(12L));
+            service.emailInicioProcesso(codProcesso);
 
             verify(emailService).enviarEmailHtml(eq("sub@mail.com"), any(), any());
-        }
-
-        @Test
-        @DisplayName("Deve ignorar envio se email vazio")
-        void deveIgnorarEnvioEmailVazio() {
-            // Ignorado
         }
     }
 }

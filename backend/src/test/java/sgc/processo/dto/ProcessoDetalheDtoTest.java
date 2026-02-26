@@ -11,12 +11,6 @@ import static org.assertj.core.api.Assertions.*;
 class ProcessoDetalheDtoTest {
 
     @Test
-    @DisplayName("UnidadeParticipanteDto.fromUnidade deve retornar null se entrada for null")
-    void fromUnidadeDeveRetornarNullSeEntradaNull() {
-        assertThat(UnidadeParticipanteDto.fromUnidade(null)).isNull();
-    }
-
-    @Test
     @DisplayName("UnidadeParticipanteDto.fromUnidade deve mapear campos corretamente")
     void fromUnidadeDeveMapearCampos() {
         Unidade unidade = new Unidade();
@@ -48,12 +42,6 @@ class ProcessoDetalheDtoTest {
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodUnidadeSuperior()).isNull();
-    }
-
-    @Test
-    @DisplayName("UnidadeParticipanteDto.fromSnapshot deve retornar null se entrada for null")
-    void fromSnapshotDeveRetornarNullSeEntradaNull() {
-        assertThat(UnidadeParticipanteDto.fromSnapshot(null)).isNull();
     }
 
     @Test

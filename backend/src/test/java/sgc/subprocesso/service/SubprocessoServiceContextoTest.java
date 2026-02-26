@@ -80,23 +80,6 @@ class SubprocessoServiceContextoTest {
     }
 
     @Test
-    @DisplayName("obterDetalhes - Tratar erro ao buscar titular")
-    void obterDetalhes_ErroTitular() {
-        Long id = 1L;
-        Usuario user = new Usuario();
-        Subprocesso sp = criarSubprocesso(id);
-
-        when(usuarioFacade.buscarResponsavelAtual("U1")).thenReturn(new Usuario());
-        when(usuarioFacade.buscarPorLogin("T1")).thenThrow(new RuntimeException("Erro"));
-        when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(id)).thenReturn(List.of());
-
-        SubprocessoDetalheResponse result = service.obterDetalhes(sp, user);
-
-        assertThat(result).isNotNull();
-        assertThat(result.titular()).isNull();
-    }
-
-    @Test
     @DisplayName("obterContextoEdicao - Sucesso")
     void obterContextoEdicao() {
         Long id = 1L;

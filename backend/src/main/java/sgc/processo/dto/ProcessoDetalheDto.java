@@ -48,7 +48,7 @@ public class ProcessoDetalheDto {
         private String nome;
         private String sigla;
         private Long codUnidade;
-        private Long codUnidadeSuperior;
+        private @org.jspecify.annotations.Nullable Long codUnidadeSuperior;
         private SituacaoSubprocesso situacaoSubprocesso;
         private LocalDateTime dataLimite;
         private Long mapaCodigo;
@@ -56,7 +56,6 @@ public class ProcessoDetalheDto {
 
 
         public static UnidadeParticipanteDto fromUnidade(Unidade unidade) {
-            if (unidade == null) return null;
             return UnidadeParticipanteDto.builder()
                     .nome(unidade.getNome())
                     .sigla(unidade.getSigla())
@@ -67,7 +66,6 @@ public class ProcessoDetalheDto {
         }
 
         public static UnidadeParticipanteDto fromSnapshot(UnidadeProcesso snapshot) {
-            if (snapshot == null) return null;
             return UnidadeParticipanteDto.builder()
                     .nome(snapshot.getNome())
                     .sigla(snapshot.getSigla())

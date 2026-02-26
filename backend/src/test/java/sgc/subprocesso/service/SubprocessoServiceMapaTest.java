@@ -50,7 +50,6 @@ class SubprocessoServiceMapaTest {
         service.setMapaManutencaoService(mapaManutencaoService);
         service.setSubprocessoRepo(subprocessoRepo);
         service.setMovimentacaoRepo(movimentacaoRepo);
-        lenient().when(organizacaoFacade.buscarPorSigla(any())).thenReturn(new UnidadeDto());
     }
 
     @Test
@@ -274,6 +273,8 @@ class SubprocessoServiceMapaTest {
             u.setUnidadeSuperior(superior);
             superior.setUnidadeSuperior(proxima);
 
+            when(organizacaoFacade.buscarPorSigla(any())).thenReturn(new UnidadeDto());
+
             service.aceitarValidacao(1L, new Usuario());
 
             verify(movimentacaoRepo).save(any());
@@ -289,8 +290,11 @@ class SubprocessoServiceMapaTest {
             sp.setProcesso(p);
 
             Unidade u = new Unidade();
+            u.setSigla("U1");
             sp.setUnidade(u);
             u.setUnidadeSuperior(null);
+
+            when(organizacaoFacade.buscarPorSigla("U1")).thenReturn(new UnidadeDto());
 
             service.devolverValidacao(1L, "J", new Usuario());
 

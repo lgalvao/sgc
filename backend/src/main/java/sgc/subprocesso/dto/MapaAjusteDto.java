@@ -21,17 +21,17 @@ public class MapaAjusteDto {
     private final Long codMapa;
     private final String unidadeNome;
     private final List<CompetenciaAjusteDto> competencias;
-    private final String justificativaDevolucao;
+    private final @org.jspecify.annotations.Nullable String justificativaDevolucao;
 
     public static MapaAjusteDto of(
             Subprocesso sp,
-            Analise analise,
+            @org.jspecify.annotations.Nullable Analise analise,
             List<Competencia> competencias,
             List<Atividade> atividades,
             List<Conhecimento> conhecimentos) {
         Long codMapa = sp.getMapa().getCodigo();
         String nomeUnidade = sp.getUnidade().getNome();
-        String justificativa = analise.getObservacoes();
+        String justificativa = analise != null ? analise.getObservacoes() : null;
 
         List<CompetenciaAjusteDto> competenciaDtos = new ArrayList<>();
 

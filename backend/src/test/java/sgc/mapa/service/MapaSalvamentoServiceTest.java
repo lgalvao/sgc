@@ -67,7 +67,7 @@ class MapaSalvamentoServiceTest {
         Long codMapa = 1L;
         
         SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
-                .codigo(null)
+                .codigo(0L)
                 .descricao("Nova Comp")
                 .atividadesCodigos(List.of(10L))
                 .build();
@@ -153,7 +153,7 @@ class MapaSalvamentoServiceTest {
         Long codMapa = 1L;
         
         SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
-                .codigo(null)
+                .codigo(0L)
                 .descricao("Comp")
                 .atividadesCodigos(List.of()) // Comp sem atividade
                 .build();
@@ -182,7 +182,7 @@ class MapaSalvamentoServiceTest {
         Long codMapa = 1L;
         
         SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
-                .codigo(null)
+                .codigo(0L)
                 .descricao("Nova Comp")
                 .atividadesCodigos(List.of(99L))
                 .build();

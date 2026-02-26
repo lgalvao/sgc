@@ -37,7 +37,7 @@ public class ProcessoNotificacaoService {
      * Notifica sobre o início de um processo (alertas + e-mails).
      */
     @Transactional
-    public void emailInicioProcesso(Long codProcesso, List<Long> codUnidades) {
+    public void emailInicioProcesso(Long codProcesso) {
         processarInicioProcesso(codProcesso);
     }
 

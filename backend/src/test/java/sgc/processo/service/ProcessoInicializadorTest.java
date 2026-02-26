@@ -18,7 +18,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoInicializador Test")
 class ProcessoInicializadorTest {
-
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
@@ -33,7 +32,6 @@ class ProcessoInicializadorTest {
     private SubprocessoService subprocessoService;
     @Mock
     private ProcessoValidador processoValidador;
-
     @InjectMocks
     private ProcessoInicializador inicializador;
 
@@ -57,7 +55,7 @@ class ProcessoInicializadorTest {
 
         assertThat(erros).isEmpty();
         verify(subprocessoService).criarParaMapeamento(eq(p), any(), eq(admin), eq(usuario));
-        verify(notificacaoService).emailInicioProcesso(eq(1L), anyList());
+        verify(notificacaoService).emailInicioProcesso(eq(1L));
         assertThat(p.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
     }
 
@@ -75,9 +73,10 @@ class ProcessoInicializadorTest {
         UnidadeMapa um = new UnidadeMapa();
 
         when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-        lenient().when(repo.buscar(Unidade.class, 10L)).thenReturn(u);
+        when(repo.buscar(Unidade.class, 10L)).thenReturn(u);
         when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of(um));
         when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
+        when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
         um.setUnidadeCodigo(10L);
 
         List<String> erros = inicializador.iniciar(1L, List.of(10L), usuario);
@@ -85,7 +84,7 @@ class ProcessoInicializadorTest {
         assertThat(erros).isEmpty();
         verify(unidadeMapaRepo).findAllById(anyList());
         verify(subprocessoService).criarParaRevisao(p, u, um, admin, usuario);
-        verify(notificacaoService).emailInicioProcesso(eq(1L), anyList());
+        verify(notificacaoService).emailInicioProcesso(eq(1L));
     }
 
     @Test
@@ -106,11 +105,12 @@ class ProcessoInicializadorTest {
         when(unidadeRepo.findAllById(any())).thenReturn(List.of(UnidadeTestBuilder.umaDe().comCodigo("10").build()));
         when(unidadeMapaRepo.findAllById(any())).thenReturn(List.of(um));
         when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
+        when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
 
         List<String> erros = inicializador.iniciar(1L, null, usuario);
 
         assertThat(erros).isEmpty();
         verify(subprocessoService).criarParaDiagnostico(eq(p), any(), any(), eq(admin), eq(usuario));
-        verify(notificacaoService).emailInicioProcesso(eq(1L), anyList());
+        verify(notificacaoService).emailInicioProcesso(eq(1L));
     }
 }

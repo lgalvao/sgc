@@ -48,7 +48,7 @@ public class MapaVisualizacaoService {
                 .unidade(subprocesso.getUnidade())
                 .competencias(competencias)
                 .atividadesSemCompetencia(atividadesSemCompetencia)
-                .sugestoes(mapa.getSugestoes())
+                .sugestoes(Objects.toString(mapa.getSugestoes(), ""))
                 .build();
     }
 }

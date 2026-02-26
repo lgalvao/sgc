@@ -105,7 +105,10 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
             return !isAcaoEscrita(acao);
         }
-        boolean isAdmin = usuario.getPerfilAtivo() == ADMIN;
+        Perfil perfil = usuario.getPerfilAtivo();
+        if (perfil == null) return false;
+
+        boolean isAdmin = perfil == ADMIN;
         boolean isEscrita = isAcaoEscrita(acao);
 
         // Visualização (Leitura) - Baseada na Hierarquia
@@ -209,13 +212,16 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
             return "VISUALIZAR_PROCESSO".equals(acao);
         }
 
+        Perfil perfil = usuario.getPerfilAtivo();
+        if (perfil == null) return false;
+
         // Regras para Processo (baseadas em Perfil)
-        boolean isAdmin = usuario.getPerfilAtivo() == ADMIN;
+        boolean isAdmin = perfil == ADMIN;
 
         if (isAdmin) return true; // Admin faz tudo no Processo
 
         // Gestor e Chefe podem ver e realizar ações em bloco
-        if (usuario.getPerfilAtivo() == GESTOR || usuario.getPerfilAtivo() == CHEFE) {
+        if (perfil == GESTOR || perfil == CHEFE) {
             return Set.of(
                     "VISUALIZAR_PROCESSO",
                     "HOMOLOGAR_CADASTRO_EM_BLOCO",

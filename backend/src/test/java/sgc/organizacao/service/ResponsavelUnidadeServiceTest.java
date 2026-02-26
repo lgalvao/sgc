@@ -17,15 +17,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ResponsavelUnidadeService")
 class ResponsavelUnidadeServiceTest {
-
-    @Mock
-    private UsuarioRepo usuarioRepo;
-
     @Mock
     private AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
-
-    @Mock
-    private ResponsabilidadeRepo responsabilidadeRepo;
 
     @Mock
     private ComumRepo repo;

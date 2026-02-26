@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.comum.model.*;
-import sgc.organizacao.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.service.*;
 
@@ -20,13 +19,11 @@ class ProcessoFinalizadorCoverageTest {
     @Mock
     private ComumRepo repo;
     @Mock
-    private OrganizacaoFacade unidadeService;
-    @Mock
     private ConsultasSubprocessoService queryService;
     @Mock
-    private ProcessoValidador processoValidador;
-    @Mock
     private ProcessoNotificacaoService notificacaoService;
+    @Mock
+    private ProcessoValidador processoValidador;
 
     @InjectMocks
     private ProcessoFinalizador finalizador;

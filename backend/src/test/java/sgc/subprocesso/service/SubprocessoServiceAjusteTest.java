@@ -4,14 +4,10 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.thymeleaf.*;
-import sgc.alerta.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
-import sgc.organizacao.*;
-import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.erros.*;
 import sgc.subprocesso.model.*;
@@ -24,22 +20,20 @@ import static org.mockito.Mockito.*;
 @DisplayName("SubprocessoService - Ajuste Mapa")
 @ExtendWith(MockitoExtension.class)
 class SubprocessoServiceAjusteTest {
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private MovimentacaoRepo movimentacaoRepo;
-    @Mock private ComumRepo repo;
-    @Mock private AnaliseRepo analiseRepo;
-    @Mock private AlertaFacade alertaService;
-    @Mock private OrganizacaoFacade organizacaoFacade;
-    @Mock private UsuarioFacade usuarioFacade;
-    @Mock private ImpactoMapaService impactoMapaService;
-    @Mock private CopiaMapaService copiaMapaService;
-    @Mock private EmailService emailService;
-    @Mock private TemplateEngine templateEngine;
-    @Mock private MapaManutencaoService mapaManutencaoService;
-    @Mock private MapaSalvamentoService mapaSalvamentoService;
-    @Mock private MapaAjusteMapper mapaAjusteMapper;
-    @Mock private SgcPermissionEvaluator permissionEvaluator;
-
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private MovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private ComumRepo repo;
+    @Mock
+    private AnaliseRepo analiseRepo;
+    @Mock
+    private CopiaMapaService copiaMapaService;
+    @Mock
+    private MapaManutencaoService mapaManutencaoService;
+    @Mock
+    private MapaAjusteMapper mapaAjusteMapper;
     @InjectMocks
     private SubprocessoService service;
 
@@ -63,43 +57,42 @@ class SubprocessoServiceAjusteTest {
     @Nested
     @DisplayName("salvarAjustesMapa")
     class SalvarAjustesMapaTests {
-
         @Test
         @DisplayName("deve salvar ajustes com sucesso")
         void deveSalvarAjustesComSucesso() {
             // Arrange
             Long codSubprocesso = 1L;
             Subprocesso sp = criarSubprocesso(codSubprocesso);
-            
+
             AtividadeAjusteDto atividadeDto = new AtividadeAjusteDto(1L, "Atividade 1", Collections.emptyList());
             CompetenciaAjusteDto competenciaDto = CompetenciaAjusteDto.builder()
                     .codCompetencia(100L)
                     .nome("Competencia 1")
                     .atividades(List.of(atividadeDto))
                     .build();
-            
+
             List<CompetenciaAjusteDto> competencias = List.of(competenciaDto);
-            
+
             Competencia competenciaEntity = Competencia.builder()
                     .codigo(100L)
                     .descricao("Competencia 1")
                     .build();
-            
+
             Atividade atividadeEntity = Atividade.builder()
                     .codigo(1L)
                     .descricao("Atividade 1")
                     .build();
-            
+
             when(repo.buscar(Subprocesso.class, codSubprocesso)).thenReturn(sp);
             when(mapaManutencaoService.buscarCompetenciasPorCodigos(anyList()))
                     .thenReturn(List.of(competenciaEntity));
             when(mapaManutencaoService.buscarAtividadesPorCodigos(anyList()))
                     .thenReturn(List.of(atividadeEntity));
             when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(sp);
-            
+
             // Act
             service.salvarAjustesMapa(codSubprocesso, competencias);
-            
+
             // Assert
             verify(repo).buscar(Subprocesso.class, codSubprocesso);
             verify(mapaManutencaoService).atualizarDescricoesAtividadeEmLote(anyMap());
@@ -114,23 +107,23 @@ class SubprocessoServiceAjusteTest {
             Long codSubprocesso = 1L;
             Subprocesso sp = criarSubprocesso(codSubprocesso);
             sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
-            
+
             AtividadeAjusteDto atividadeDto = new AtividadeAjusteDto(1L, "Atividade 1", Collections.emptyList());
             CompetenciaAjusteDto competenciaDto = CompetenciaAjusteDto.builder()
                     .codCompetencia(100L)
                     .atividades(List.of(atividadeDto))
                     .build();
-            
+
             Competencia competenciaEntity = Competencia.builder().codigo(100L).build();
             Atividade atividadeEntity = Atividade.builder().codigo(1L).build();
-            
+
             when(repo.buscar(Subprocesso.class, codSubprocesso)).thenReturn(sp);
             when(mapaManutencaoService.buscarCompetenciasPorCodigos(anyList())).thenReturn(List.of(competenciaEntity));
             when(mapaManutencaoService.buscarAtividadesPorCodigos(anyList())).thenReturn(List.of(atividadeEntity));
-            
+
             // Act
             service.salvarAjustesMapa(codSubprocesso, List.of(competenciaDto));
-            
+
             // Assert
             verify(subprocessoRepo).save(any(Subprocesso.class));
         }
@@ -142,7 +135,7 @@ class SubprocessoServiceAjusteTest {
             Long codSubprocesso = 999L;
             when(repo.buscar(Subprocesso.class, codSubprocesso))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
-            
+
             // Act & Assert
             List<CompetenciaAjusteDto> ajustes = Collections.emptyList();
             assertThatThrownBy(() -> service.salvarAjustesMapa(codSubprocesso, ajustes))
@@ -158,9 +151,9 @@ class SubprocessoServiceAjusteTest {
             Long codSubprocesso = 1L;
             Subprocesso sp = criarSubprocesso(codSubprocesso);
             sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
-            
+
             when(repo.buscar(Subprocesso.class, codSubprocesso)).thenReturn(sp);
-            
+
             // Act & Assert
             List<CompetenciaAjusteDto> ajustes = Collections.emptyList();
             assertThatThrownBy(() -> service.salvarAjustesMapa(codSubprocesso, ajustes))
@@ -172,29 +165,28 @@ class SubprocessoServiceAjusteTest {
     @Nested
     @DisplayName("obterMapaParaAjuste")
     class ObterMapaParaAjusteTests {
-
         @Test
         @DisplayName("deve obter mapa para ajuste com analise")
         void deveObterMapaParaAjusteComAnalise() {
             // Arrange
             Long codSubprocesso = 1L;
             Long codMapa = 100L;
-            
+
             Mapa mapa = Mapa.builder().codigo(codMapa).build();
             Subprocesso sp = criarSubprocesso(codSubprocesso);
             sp.setMapa(mapa);
-            
+
             Analise analise = new Analise();
             analise.setCodigo(1L);
             analise.setTipo(TipoAnalise.VALIDACAO); // Ensure type matches what SubprocessoService looks for
-            
+
             List<Competencia> competencias = List.of(Competencia.builder().codigo(1L).build());
             List<Atividade> atividades = List.of(Atividade.builder().codigo(1L).build());
             List<Conhecimento> conhecimentos = List.of(Conhecimento.builder().codigo(1L).build());
             Map<Long, Set<Long>> associacoes = Map.of(1L, Set.of(1L));
-            
+
             MapaAjusteDto expected = MapaAjusteDto.builder().build();
-            
+
             when(subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso)).thenReturn(Optional.of(sp));
             when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso))
                     .thenReturn(List.of(analise));
@@ -208,10 +200,10 @@ class SubprocessoServiceAjusteTest {
                     .thenReturn(associacoes);
             when(mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes))
                     .thenReturn(expected);
-            
+
             // Act
             MapaAjusteDto result = service.obterMapaParaAjuste(codSubprocesso);
-            
+
             // Assert
             assertThat(result).isEqualTo(expected);
             verify(mapaAjusteMapper).toDto(sp, analise, competencias, atividades, conhecimentos, associacoes);
@@ -223,11 +215,11 @@ class SubprocessoServiceAjusteTest {
             // Arrange
             Long codSubprocesso = 1L;
             Long codMapa = 100L;
-            
+
             Mapa mapa = Mapa.builder().codigo(codMapa).build();
             Subprocesso sp = criarSubprocesso(codSubprocesso);
             sp.setMapa(mapa);
-            
+
             when(subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso)).thenReturn(Optional.of(sp));
             when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso))
                     .thenReturn(Collections.emptyList());
@@ -241,10 +233,10 @@ class SubprocessoServiceAjusteTest {
                     .thenReturn(Collections.emptyMap());
             when(mapaAjusteMapper.toDto(eq(sp), isNull(), anyList(), anyList(), anyList(), anyMap()))
                     .thenReturn(MapaAjusteDto.builder().build());
-            
+
             // Act
             MapaAjusteDto result = service.obterMapaParaAjuste(codSubprocesso);
-            
+
             // Assert
             assertThat(result).isNotNull();
             verify(mapaAjusteMapper).toDto(eq(sp), isNull(), anyList(), anyList(), anyList(), anyMap());

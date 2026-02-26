@@ -86,7 +86,7 @@ public class ValidadorDadosOrgService implements ApplicationRunner {
     private void validarResponsaveisAtuais(List<Unidade> unidades, List<String> violacoes) {
         for (Unidade u : unidades) {
             Responsabilidade r = u.getResponsabilidade();
-            if (r == null || r.getUsuarioTitulo() == null || r.getUsuarioTitulo().isBlank()) {
+            if (r == null || r.getUsuarioTitulo().isBlank()) {
                 violacoes.add("Unidade %s (%s) não possui responsável atual definido (Titular, Substituto ou Atribuição)"
                         .formatted(u.getSigla(), u.getTipo()));
             }

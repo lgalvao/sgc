@@ -18,13 +18,6 @@ public class UnidadeTestBuilder {
     }
 
     /**
-     * Alias/fixture para a assessoria frequentemente usada nos testes
-     */
-    public static UnidadeTestBuilder assessoria() {
-        return operacional();
-    }
-
-    /**
      * Cria uma Unidade Operacional padrão (ASSESSORIA_11)
      */
     public static UnidadeTestBuilder operacional() {

@@ -58,12 +58,6 @@ public class Processo extends EntidadeBase {
     @Builder.Default
     private List<UnidadeProcesso> participantes = new ArrayList<>();
 
-    @Override
-    @JsonView(ProcessoViews.Publica.class)
-    public Long getCodigo() {
-        return super.getCodigo();
-    }
-
     /**
      * Adiciona unidades participantes criando snapshots do estado atual.
      */

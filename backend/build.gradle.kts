@@ -76,10 +76,6 @@ dependencies {
     // Testes de Mutação
     testImplementation("org.pitest:pitest-junit5-plugin:1.2.3")
 
-    // Testes de Contrato (Pact)
-    testImplementation("au.com.dius.pact.provider:junit5:4.6.14")
-    testImplementation("au.com.dius.pact.provider:spring:4.6.14")
-
     // Documentação da API
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
     testImplementation("io.swagger.parser.v3:swagger-parser:2.1.37")

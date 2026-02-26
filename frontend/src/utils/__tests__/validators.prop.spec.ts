@@ -10,7 +10,7 @@ describe('Propriedades de Validação (validators.ts)', () => {
                 fc.property(
                     fc.string().filter(s => !s.includes('@')),
                     (s) => {
-                        return validarEmail(s) === false;
+                        return !validarEmail(s);
                     }
                 )
             );
@@ -21,7 +21,7 @@ describe('Propriedades de Validação (validators.ts)', () => {
                 fc.property(
                     fc.stringMatching(/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,4}$/),
                     (email) => {
-                         return validarEmail(email) === true;
+                         return validarEmail(email);
                     }
                 )
              );
@@ -39,7 +39,7 @@ describe('Propriedades de Validação (validators.ts)', () => {
                 fc.property(
                     fc.string().filter(s => s.length < 8),
                     (s) => {
-                        return validarSenha(s) === false;
+                        return !validarSenha(s);
                     }
                 )
             );
@@ -52,7 +52,7 @@ describe('Propriedades de Validação (validators.ts)', () => {
                     (s) => {
                         // Se não tem letra, deve ser falso
                         if (!/[A-Za-z]/.test(s)) {
-                            return validarSenha(s) === false;
+                            return !validarSenha(s);
                         }
                         return true; // Se tem letra, pode ser verdadeiro ou falso dependendo de outras regras
                     }

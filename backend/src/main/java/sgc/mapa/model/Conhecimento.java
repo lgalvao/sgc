@@ -26,6 +26,6 @@ public class Conhecimento extends EntidadeBase {
     @JsonView(MapaViews.Publica.class)
     @JsonProperty("atividadeCodigo")
     public Long getCodigoAtividade() {
-        return atividade != null ? atividade.getCodigo() : null;
+        return atividade.getCodigo();
     }
 }

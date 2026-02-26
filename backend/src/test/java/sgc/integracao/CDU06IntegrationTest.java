@@ -1,6 +1,5 @@
 package sgc.integracao;
 
-import jakarta.persistence.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.security.authentication.*;
@@ -20,7 +19,6 @@ import sgc.subprocesso.model.*;
 import java.time.*;
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -41,18 +39,13 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     private Processo processo;
     private Unidade unidade;
 
     @BeforeEach
     void setUp() {
-
         // Cria unidade programaticamente
         unidade = UnidadeFixture.unidadePadrao();
-        unidade.setCodigo(null);
         unidade.setSigla("U_TESTE");
         unidade.setNome("Unidade Teste");
         unidade = unidadeRepo.save(unidade);
@@ -69,30 +62,21 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     }
 
     private Authentication setupSecurityContext(Unidade unidade, Perfil perfil) {
-        Usuario principal = UsuarioFixture.usuarioPadrao();
-        principal.setTituloEleitoral(TEST_USER_ID);
-        principal.setUnidadeLotacao(unidade);
-        principal.setPerfilAtivo(perfil);
-        principal.setUnidadeAtivaCodigo(unidade.getCodigo());
+        Usuario principal = UsuarioFixture.usuarioPadrao()
+                .setTituloEleitoral(TEST_USER_ID)
+                .setUnidadeLotacao(unidade)
+                .setPerfilAtivo(perfil)
+                .setUnidadeAtivaCodigo(unidade.getCodigo());
         usuarioRepo.save(principal);
+
         principal.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_" + perfil.name())));
 
-        // Insert into VW_USUARIO_PERFIL_UNIDADE to support ProcessoDetalheBuilder query
-        try {
-            var up = UsuarioPerfil.builder()
-                    .usuarioTitulo(TEST_USER_ID)
-                    .unidadeCodigo(unidade.getCodigo())
-                    .perfil(perfil)
-                    .build();
-            usuarioPerfilRepo.save(up);
-        } catch (Exception e) {
-             e.printStackTrace();
-        }
-        
-        if (entityManager != null) {
-            entityManager.flush();
-            entityManager.clear();
-        }
+        UsuarioPerfil up = UsuarioPerfil.builder()
+                .usuarioTitulo(TEST_USER_ID)
+                .unidadeCodigo(unidade.getCodigo())
+                .perfil(perfil)
+                .build();
+        usuarioPerfilRepo.saveAndFlush(up);
 
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                 principal, null, principal.getAuthorities());
@@ -102,6 +86,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
 
         when(usuarioService.buscarPerfisUsuario(anyString())).thenReturn(List.of(
                 new PerfilDto(TEST_USER_ID, unidade.getCodigo(), unidade.getNome(), perfil.name(), perfil.name())));
+
         return auth;
     }
 
@@ -111,6 +96,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     void testDetalharProcesso_sucesso() throws Exception {
         processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
+
         subprocessoRepo.save(Subprocesso.builder()
                 .processo(processo)
                 .unidade(unidade)

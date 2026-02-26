@@ -28,7 +28,7 @@ import java.util.*;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private String sanitizar(String texto) {
+    private String sanitizar(@Nullable String texto) {
         return UtilSanitizacao.sanitizar(texto);
     }
 

@@ -464,7 +464,7 @@ public class SubprocessoController {
     @GetMapping("/{codigo}/sugestoes")
     @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public Map<String, Object> obterSugestoes(@PathVariable Long codigo) {
-        return subprocessoService.obterSugestoes(codigo);
+        return subprocessoService.obterSugestoes();
     }
 
     @GetMapping("/{codigo}/historico-validacao")
@@ -562,7 +562,7 @@ public class SubprocessoController {
     private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {
         Subprocesso sp = subprocessoService.buscarSubprocesso(codSubprocesso);
         // UtilSanitizacao not strictly needed if stripped, but good practice. Assuming StringUtils logic:
-        String obs = request.observacoes() != null ? request.observacoes().trim() : "";
+        String obs = request.observacoes().trim();
 
         CriarAnaliseCommand criarAnaliseCommand = CriarAnaliseCommand.builder()
                 .codSubprocesso(codSubprocesso)

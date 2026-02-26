@@ -69,15 +69,4 @@ class CustomExceptionsTest {
         assertThat(erro3.getCause()).isEqualTo(cause);
         assertThat(erro3.getDetails()).isEmpty();
     }
-
-    @Test
-    @DisplayName("ErroNegocio deve retornar empty map para getDetails() por padrão")
-    void testErroNegocioGetDetailsDefault() {
-        ErroNegocio erroInterface = new ErroNegocio() {
-            @Override public String getCode() { return "X"; }
-            @Override public HttpStatus getStatus() { return HttpStatus.OK; }
-            @Override public String getMessage() { return "M"; }
-        };
-        assertThat(erroInterface.getDetails()).isEmpty();
-    }
 }

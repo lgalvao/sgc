@@ -183,15 +183,6 @@ class AlertaFacadeTest {
         }
 
         @Test
-        @DisplayName("Deve criar alerta de transição e retornar null se destino nulo")
-        void deveRetornarNullSeDestinoNuloEmCriarAlertaTransicao() {
-            Processo p = new Processo();
-            Unidade uOrigem = new Unidade();
-            Alerta resultado = service.criarAlertaTransicao(p, "desc", uOrigem, null);
-            assertThat(resultado).isNull();
-        }
-
-        @Test
         @DisplayName("Deve criar alerta de transição com sucesso")
         void deveCriarAlertaTransicaoComSucesso() {
             Processo p = new Processo();

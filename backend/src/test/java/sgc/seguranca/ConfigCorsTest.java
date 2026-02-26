@@ -1,5 +1,6 @@
 package sgc.seguranca;
 
+import org.jspecify.annotations.*;
 import org.junit.jupiter.api.*;
 import org.springframework.mock.web.*;
 import org.springframework.web.cors.*;
@@ -14,7 +15,15 @@ class ConfigCorsTest {
     @Test
     @DisplayName("Deve configurar origem CORS com origens permitidas")
     void deveConfigurarOrigemCorsComOrigensPermitidas() {
-        // Cria record de propriedades imutável
+        CorsConfiguration configuration = createCorsConfiguration();
+        assertThat(configuration).isNotNull();
+        assertThat(configuration.getAllowedOrigins()).containsExactly("https://example.com");
+        assertThat(configuration.getAllowedMethods()).containsExactly("GET", "POST");
+        assertThat(configuration.getAllowedHeaders()).containsExactly("*");
+        assertThat(configuration.getAllowCredentials()).isTrue();
+    }
+
+    private static @Nullable CorsConfiguration createCorsConfiguration() {
         ConfigCorsProperties properties = new ConfigCorsProperties(
                 List.of("https://example.com"),
                 List.of("GET", "POST"),
@@ -29,13 +38,7 @@ class ConfigCorsTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRequestURI("/api/test");
 
-        CorsConfiguration configuration = source.getCorsConfiguration(request);
-
-        assertThat(configuration).isNotNull();
-        assertThat(configuration.getAllowedOrigins()).containsExactly("https://example.com");
-        assertThat(configuration.getAllowedMethods()).containsExactly("GET", "POST");
-        assertThat(configuration.getAllowedHeaders()).containsExactly("*");
-        assertThat(configuration.getAllowCredentials()).isTrue();
+        return source.getCorsConfiguration(request);
     }
 
     @Test

@@ -62,12 +62,7 @@ class ProcessoFacadeTest {
     @Mock
     private ProcessoFinalizador processoFinalizador;
     @Mock
-    private ProcessoRepo processoRepo;
-    @Mock
-    private ProcessoValidador processoValidador;
-    @Mock
     private SgcPermissionEvaluator permissionEvaluator;
-
 
     @Nested
     @DisplayName("Cobertura e Casos de Borda")

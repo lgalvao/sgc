@@ -62,7 +62,7 @@ public class UsuarioTestBuilder {
         return this;
     }
 
-    public UsuarioTestBuilder unidadeLotacao(Unidade unidade) {
+    public UsuarioTestBuilder comUnidadeLotacao(Unidade unidade) {
         this.unidadeLotacao = unidade;
         return this;
     }
@@ -74,8 +74,6 @@ public class UsuarioTestBuilder {
         if (unidadeLotacao != null) {
             usuario.setUnidadeLotacao(unidadeLotacao);
         }
-        // perfis/atribuições são representados por UsuarioPerfil; tests that need them
-        // should use UsuarioFixture.adicionarPerfil(...) to attach UsuarioPerfil instances.
         return usuario;
     }
 }

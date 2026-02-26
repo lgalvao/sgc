@@ -362,8 +362,8 @@ class MapaManutencaoServiceTest {
             service.criarCompetenciaComAtividades(mapa, "Competência Nova", List.of(1L, 2L));
 
             verify(competenciaRepo).save(any(Competencia.class));
-            verify(atividadeRepo).saveAll(argThat(atividades -> 
-                atividades != null && ((Collection<?>) atividades).size() == 2
+            verify(atividadeRepo).saveAll(argThat(atividades ->
+                    ((Collection<?>) atividades).size() == 2
             ));
         }
 
@@ -376,8 +376,8 @@ class MapaManutencaoServiceTest {
             service.criarCompetenciaComAtividades(mapa, "Competência Vazia", List.of());
 
             verify(competenciaRepo).save(any(Competencia.class));
-            verify(atividadeRepo).saveAll(argThat(atividades -> 
-                atividades != null && ((Collection<?>) atividades).isEmpty()
+            verify(atividadeRepo).saveAll(argThat(atividades ->
+                    ((Collection<?>) atividades).isEmpty()
             ));
             verify(atividadeRepo, never()).findAllById(anyList());
         }

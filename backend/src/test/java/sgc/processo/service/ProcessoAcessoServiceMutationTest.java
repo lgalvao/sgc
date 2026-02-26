@@ -8,7 +8,6 @@ import org.springframework.security.core.*;
 import org.springframework.security.core.authority.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
-import sgc.subprocesso.service.*;
 
 import java.util.*;
 
@@ -24,9 +23,6 @@ class ProcessoAcessoServiceMutationTest {
 
     @Mock
     private UsuarioFacade usuarioService;
-
-    @Mock
-    private ConsultasSubprocessoService queryService;
 
     @Test
     @DisplayName("checarAcesso deve retornar false se authentication for null")

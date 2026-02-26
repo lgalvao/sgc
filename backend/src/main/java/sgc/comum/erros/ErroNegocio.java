@@ -19,5 +19,6 @@ public interface ErroNegocio {
         return new HashMap<>();
     }
 
+    @org.jspecify.annotations.Nullable
     String getMessage();
 }

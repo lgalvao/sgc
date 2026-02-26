@@ -9,7 +9,6 @@ import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

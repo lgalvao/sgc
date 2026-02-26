@@ -17,6 +17,8 @@ import java.time.*;
 import java.util.*;
 import java.util.stream.*;
 
+import static java.util.stream.Collectors.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -39,20 +41,15 @@ public class PainelFacade {
         Pageable sortedPageable = garantirOrdenacaoPadrao(pageable);
         Page<Processo> processos;
 
-        // Pré-carrega o mapa da hierarquia para evitar N+1 selects
         Map<Long, List<Long>> mapaPaiFilhos = organizacaoFacade.buscarMapaHierarquia();
-
         if (perfil == Perfil.ADMIN) {
             processos = processoFacade.listarTodos(sortedPageable);
         } else {
             List<Long> codigosUnidades = new ArrayList<>();
-            // GESTOR vê processos da unidade e subordinadas
             if (perfil == Perfil.GESTOR) {
                 codigosUnidades.addAll(organizacaoFacade.buscarIdsDescendentes(codigoUnidade, mapaPaiFilhos));
             }
-            // Os demais perfis veem apenas processos da própria unidade
             codigosUnidades.add(codigoUnidade);
-
             processos = processoFacade.listarPorParticipantesIgnorandoCriado(codigosUnidades, sortedPageable);
         }
         return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade, mapaPaiFilhos));
@@ -79,7 +76,6 @@ public class PainelFacade {
      */
     @Transactional
     public Page<Alerta> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
-        // Aplica ordenação padrão por dataHora decrescente para alertas também
         Pageable sortedPageable = pageable;
         if (pageable.isPaged() && pageable.getSort().isUnsorted()) {
             sortedPageable = PageRequest.of(
@@ -106,7 +102,11 @@ public class PainelFacade {
         return alertasPage;
     }
 
-    private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade, Map<Long, List<Long>> mapaPaiFilhos) {
+    private ProcessoResumoDto paraProcessoResumoDto(Processo processo,
+                                                    Perfil perfil,
+                                                    Long codigoUnidade,
+                                                    Map<Long, List<Long>> mapaPaiFilhos) {
+
         var participantes = processo.getParticipantes();
         var participante = participantes.getFirst();
 
@@ -130,14 +130,11 @@ public class PainelFacade {
                 .build();
     }
 
-    private String formatarUnidadesParticipantes(List<UnidadeProcesso> participantes, Map<Long, List<Long>> mapaPaiFilhos) {
+    private String formatarUnidadesParticipantes(List<UnidadeProcesso> participantes,
+                                                 Map<Long, List<Long>> mapaPaiFilhos) {
+
         Map<Long, Long> mapaFilhoPai = new HashMap<>();
-        for (Map.Entry<Long, List<Long>> entry : mapaPaiFilhos.entrySet()) {
-            Long pai = entry.getKey();
-            for (Long filho : entry.getValue()) {
-                mapaFilhoPai.put(filho, pai);
-            }
-        }
+        mapaPaiFilhos.forEach((key, value) -> value.forEach(filho -> mapaFilhoPai.put(filho, key)));
 
         Set<Long> participantesIds = participantes.stream()
                 .map(UnidadeProcesso::getUnidadeCodigo)
@@ -145,13 +142,13 @@ public class PainelFacade {
 
         Set<Long> displayIds = new HashSet<>();
         Map<Long, Boolean> coveredCache = new HashMap<>();
-
         for (Long pId : participantesIds) {
             Long candidate = pId;
             Long parent = mapaFilhoPai.get(candidate);
 
             while (parent != null) {
-                if (isCovered(parent, participantesIds, mapaPaiFilhos, coveredCache)) {
+                // Só agrupa no pai se o pai também participar e estiver coberto
+                if (participantesIds.contains(parent) && isCovered(parent, participantesIds, mapaPaiFilhos, coveredCache)) {
                     candidate = parent;
                     parent = mapaFilhoPai.get(candidate);
                 } else {
@@ -161,22 +158,18 @@ public class PainelFacade {
             displayIds.add(candidate);
         }
 
-        Map<Long, String> existingSiglas = participantes.stream()
-                .collect(Collectors.toMap(
-                        UnidadeProcesso::getUnidadeCodigo,
-                        UnidadeProcesso::getSigla,
-                        (s1, s2) -> s1));
+        Map<Long, String> existingSiglas = participantes.stream().collect(toMap(
+                UnidadeProcesso::getUnidadeCodigo,
+                UnidadeProcesso::getSigla,
+                (s1, s2) -> s1)
+        );
 
         List<String> siglas = new ArrayList<>();
         List<Long> missingIds = new ArrayList<>();
-
-        for (Long id : displayIds) {
-            if (existingSiglas.containsKey(id)) {
-                siglas.add(existingSiglas.get(id));
-            } else {
-                missingIds.add(id);
-            }
-        }
+        displayIds.forEach(id -> {
+            if (existingSiglas.containsKey(id)) siglas.add(existingSiglas.get(id));
+            else missingIds.add(id);
+        });
 
         if (!missingIds.isEmpty()) {
             List<Unidade> missingUnidades = organizacaoFacade.unidadesPorCodigos(missingIds);
@@ -186,13 +179,14 @@ public class PainelFacade {
         return siglas.stream().sorted().collect(Collectors.joining(", "));
     }
 
-    private boolean isCovered(Long unidadeId, Set<Long> participantesIds, Map<Long, List<Long>> mapaPaiFilhos, Map<Long, Boolean> cache) {
-        if (participantesIds.contains(unidadeId)) {
-            return true;
-        }
-        if (cache.containsKey(unidadeId)) {
-            return cache.get(unidadeId);
-        }
+    private boolean isCovered(Long unidadeId,
+                              Set<Long> participantesIds,
+                              Map<Long, List<Long>> mapaPaiFilhos,
+                              Map<Long, Boolean> cache) {
+
+        if (participantesIds.contains(unidadeId)) return true;
+
+        if (cache.containsKey(unidadeId)) return cache.get(unidadeId);
 
         List<Long> children = mapaPaiFilhos.get(unidadeId);
         if (children == null || children.isEmpty()) {
@@ -216,9 +210,11 @@ public class PainelFacade {
         if (perfil == Perfil.ADMIN && processo.getSituacao() == SituacaoProcesso.CRIADO) {
             return String.format("/processo/cadastro?codProcesso=%s", processo.getCodigo());
         }
+
         if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) {
             return "/processo/" + processo.getCodigo();
         }
+
         var unidade = organizacaoFacade.dtoPorCodigo(codigoUnidade);
         return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
     }

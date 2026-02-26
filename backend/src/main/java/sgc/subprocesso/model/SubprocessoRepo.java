@@ -84,8 +84,6 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
 
     boolean existsByProcessoCodigoAndUnidadeCodigoIn(Long processoCodigo, List<Long> unidadesCodigos);
 
-    List<Subprocesso> findBySituacao(SituacaoSubprocesso situacao);
-
     long countByProcessoCodigo(Long processoCodigo);
 
     long countByProcessoCodigoAndSituacaoIn(Long processoCodigo, List<SituacaoSubprocesso> situacoes);

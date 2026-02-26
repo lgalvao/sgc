@@ -33,7 +33,6 @@ public class ProcessoDetalheBuilder {
                 .podeHomologarMapa(permissionEvaluator.checkPermission(usuario, processo, "HOMOLOGAR_MAPA_EM_BLOCO"))
                 .podeAceitarCadastroBloco(permissionEvaluator.checkPermission(usuario, processo, "ACEITAR_CADASTRO_EM_BLOCO"))
                 .podeDisponibilizarMapaBloco(permissionEvaluator.checkPermission(usuario, processo, "DISPONIBILIZAR_MAPA_EM_BLOCO"))
-
                 .unidades(new ArrayList<>())
                 .build();
 

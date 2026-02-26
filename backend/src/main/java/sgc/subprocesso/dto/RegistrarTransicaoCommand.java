@@ -1,7 +1,6 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
-import org.jspecify.annotations.*;
 import sgc.organizacao.model.*;
 import sgc.subprocesso.model.*;
 
@@ -12,9 +11,9 @@ import sgc.subprocesso.model.*;
 public record RegistrarTransicaoCommand(
         Subprocesso sp,
         TipoTransicao tipo,
-        @Nullable Unidade origem,
-        @Nullable Unidade destino,
-        @Nullable Usuario usuario,
-        @Nullable String observacoes
+        @org.jspecify.annotations.Nullable Unidade origem,
+        @org.jspecify.annotations.Nullable Unidade destino,
+        @org.jspecify.annotations.Nullable Usuario usuario,
+        @org.jspecify.annotations.Nullable String observacoes
 ) {
 }

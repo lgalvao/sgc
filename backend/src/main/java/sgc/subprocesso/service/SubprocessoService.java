@@ -36,9 +36,6 @@ import static sgc.organizacao.model.TipoUnidade.*;
 
 /**
  * Service unificado para todas as operações do domínio de Subprocesso.
- *
- * <p>Consolida a lógica anteriormente fragmentada em múltiplos services (Workflow, Mapa, Transição, etc.).
- * Implementa o padrão "Radical Simplification".
  */
 @Service
 @Slf4j
@@ -48,15 +45,8 @@ public class SubprocessoService {
     private static final String SIGLA_ADMIN = "ADMIN";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    @Setter
-    @Autowired
-    @Lazy
-    private SubprocessoRepo subprocessoRepo;
-
-    @Setter
-    @Autowired
-    @Lazy
-    private MovimentacaoRepo movimentacaoRepo;
+    @Setter @Autowired @Lazy private SubprocessoRepo subprocessoRepo;
+    @Setter @Autowired @Lazy private MovimentacaoRepo movimentacaoRepo;
 
     private final ComumRepo repo;
     private final AnaliseRepo analiseRepo;
@@ -65,10 +55,7 @@ public class SubprocessoService {
     private final UsuarioFacade usuarioFacade;
     private final ImpactoMapaService impactoMapaService;
 
-    @Setter
-    @Autowired
-    @Lazy
-    private CopiaMapaService copiaMapaService; // Renamed from servicoDeCopiaDeMapa
+    @Setter @Autowired @Lazy private CopiaMapaService copiaMapaService;
     private final EmailService emailService;
     private final TemplateEngine templateEngine;
     private final MapaSalvamentoService mapaSalvamentoService;
@@ -76,11 +63,7 @@ public class SubprocessoService {
     private final SgcPermissionEvaluator permissionEvaluator;
     private final MapaVisualizacaoService mapaVisualizacaoService;
 
-    // @Lazy to break circular dependency: SubprocessoService -> MapaManutencaoService -> SubprocessoService (via Facade)
-    @Lazy
-    @Autowired
-    @Setter
-    private MapaManutencaoService mapaManutencaoService;
+    @Lazy @Autowired @Setter private MapaManutencaoService mapaManutencaoService;
 
     private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_DISPONIBILIZADO = new EnumMap<>(Map.of(
             TipoProcesso.MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO,
@@ -100,10 +83,6 @@ public class SubprocessoService {
 
     private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
             SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-
-    // ========================================================================
-    // DELEGATES (Replacing MapaFacade / AnaliseFacade usage)
-    // ========================================================================
 
     @Transactional(readOnly = true)
     public MapaVisualizacaoResponse mapaParaVisualizacao(Long codSubprocesso) {
@@ -128,7 +107,7 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Object> obterSugestoes(Long codSubprocesso) {
+    public Map<String, Object> obterSugestoes() {
         return Map.of("sugestoes", "");
     }
 
@@ -201,11 +180,6 @@ public class SubprocessoService {
     public void excluir(Long codigo) {
         buscarSubprocesso(codigo);
         subprocessoRepo.deleteById(codigo);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean verificarAcessoUnidadeAoProcesso(Long codProcesso, List<Long> codigosUnidadesHierarquia) {
-        return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, codigosUnidadesHierarquia);
     }
 
     @Transactional(readOnly = true)
@@ -598,10 +572,6 @@ public class SubprocessoService {
                 codSubprocesso -> executarHomologacaoCadastro(codSubprocesso, usuario, "Homologação em bloco"));
     }
 
-    // ========================================================================
-    // ADMIN WORKFLOW (from SubprocessoWorkflowService)
-    // ========================================================================
-
     @Transactional
     public void reabrirCadastro(Long codigo, String justificativa) {
         executarReabertura(codigo, justificativa, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
@@ -773,12 +743,7 @@ public class SubprocessoService {
         movimentacaoRepo.saveAll(movimentacoes);
     }
 
-    public void criarParaRevisao(Processo processo,
-                                 Unidade unidade,
-                                 UnidadeMapa unidadeMapa,
-                                 Unidade unidadeOrigem,
-                                 Usuario usuario) {
-
+    public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
         Subprocesso subprocesso = Subprocesso.builder()
                 .processo(processo)
@@ -866,7 +831,6 @@ public class SubprocessoService {
 
         mapaManutencaoService.criarCompetenciaComAtividades(mapa, request.descricao(), request.atividadesIds());
 
-        // Se era vazio e passou a ter competências alterar situação para MAPA_CRIADO/AJUSTADO
         if (eraVazio) {
             SituacaoSubprocesso situacaoSp = subprocesso.getSituacao();
             if (situacaoSp == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO) {
@@ -881,11 +845,7 @@ public class SubprocessoService {
         return mapaManutencaoService.buscarMapaPorCodigo(mapa.getCodigo());
     }
 
-    public Mapa atualizarCompetencia(
-            Long codSubprocesso,
-            Long codCompetencia,
-            CompetenciaRequest request) {
-
+    public Mapa atualizarCompetencia(Long codSubprocesso, Long codCompetencia, CompetenciaRequest request) {
         Subprocesso sp = getSubprocessoParaEdicao(codSubprocesso);
         mapaManutencaoService.atualizarCompetencia(codCompetencia, request.descricao(), request.atividadesIds());
 
@@ -899,7 +859,6 @@ public class SubprocessoService {
         Long codMapa = subprocesso.getMapa().getCodigo();
         mapaManutencaoService.removerCompetencia(codCompetencia);
 
-        // Se o mapa ficou vazio, voltar para situação anterior
         boolean ficouVazio = mapaManutencaoService.buscarCompetenciasPorCodMapa(codMapa).isEmpty();
         if (ficouVazio) {
             if (subprocesso.getSituacao() == SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO) {
@@ -1105,8 +1064,7 @@ public class SubprocessoService {
         Unidade proximaUnidade = unidadeAtual.getUnidadeSuperior();
 
         if (proximaUnidade == null) {
-            Unidade sup = unidadeAtual.getUnidadeSuperior();
-            String siglaUnidade = sup != null ? sup.getSigla() : unidadeAtual.getSigla();
+            String siglaUnidade = unidadeAtual.getSigla();
 
             criarAnalise(sp, CriarAnaliseCommand.builder()
                     .codSubprocesso(codSubprocesso)
@@ -1301,12 +1259,7 @@ public class SubprocessoService {
         String localizacaoAtual = siglaUnidade;
 
         Usuario responsavel = usuarioFacade.buscarResponsavelAtual(siglaUnidade);
-        Usuario titular = null;
-        try {
-            titular = usuarioFacade.buscarPorLogin(sp.getUnidade().getTituloTitular());
-        } catch (Exception e) {
-            log.warn("Erro ao buscar titular da unidade {}: {}", siglaUnidade, e.getMessage());
-        }
+        Usuario titular = usuarioFacade.buscarPorLogin(sp.getUnidade().getTituloTitular());
 
         List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
         if (!movimentacoes.isEmpty()) {
@@ -1570,6 +1523,7 @@ public class SubprocessoService {
     @Transactional
     public void registrarAnaliseETransicao(RegistrarWorkflowCommand cmd) {
         Subprocesso sp = cmd.sp();
+        Usuario usuario = cmd.usuario() != null ? cmd.usuario() : usuarioFacade.usuarioAutenticado();
 
         criarAnalise(sp, CriarAnaliseCommand.builder()
                 .codSubprocesso(sp.getCodigo())
@@ -1577,7 +1531,7 @@ public class SubprocessoService {
                 .tipo(cmd.tipoAnalise())
                 .acao(cmd.tipoAcaoAnalise())
                 .siglaUnidade(cmd.unidadeAnalise().getSigla())
-                .tituloUsuario(cmd.usuario().getTituloEleitoral())
+                .tituloUsuario(usuario.getTituloEleitoral())
                 .motivo(cmd.motivoAnalise())
                 .build());
 
@@ -1588,7 +1542,7 @@ public class SubprocessoService {
                 .tipo(cmd.tipoTransicao())
                 .origem(cmd.unidadeOrigemTransicao())
                 .destino(cmd.unidadeDestinoTransicao())
-                .usuario(cmd.usuario())
+                .usuario(usuario)
                 .observacoes(cmd.observacoes())
                 .build());
 
@@ -1596,18 +1550,17 @@ public class SubprocessoService {
     }
 
     private void notificarTransicao(Subprocesso sp, TipoTransicao tipo,
-                                    Unidade origem,
-                                    Unidade destino,
-                                    String observacoes) {
+                                    @org.jspecify.annotations.Nullable Unidade origem,
+                                    @org.jspecify.annotations.Nullable Unidade destino,
+                                    @org.jspecify.annotations.Nullable String observacoes) {
         try {
             if (tipo.geraAlerta()) {
                 String sigla = sp.getUnidade().getSigla();
                 String descricao = tipo.formatarAlerta(sigla);
                 alertaService.criarAlertaTransicao(sp.getProcesso(), descricao, origem, destino);
             }
-
             if (tipo.enviaEmail()) {
-                notificarMovimentacaoEmail(sp, tipo, origem, destino, observacoes);
+                notificarMovimentacaoEmail(sp, tipo, origem, destino, Objects.requireNonNullElse(observacoes, ""));
             }
         } catch (Exception e) {
             log.error("Falha ao enviar notificação de movimentação {}: {}", tipo, e.getMessage(), e);
@@ -1615,36 +1568,45 @@ public class SubprocessoService {
     }
 
     private void notificarMovimentacaoEmail(Subprocesso sp, TipoTransicao tipo,
-                                            Unidade unidadeOrigem, Unidade unidadeDestino,
+                                            @org.jspecify.annotations.Nullable Unidade unidadeOrigem,
+                                            @org.jspecify.annotations.Nullable Unidade unidadeDestino,
                                             String observacoes) {
-        if (!tipo.enviaEmail())
+        if (!tipo.enviaEmail()) return;
+
+        if (unidadeOrigem == null || unidadeDestino == null) {
+            log.warn("Notificação de e-mail cancelada para transição {}: unidade de origem ou destino nula. Origem: {}, Destino: {}",
+                    tipo,
+                    unidadeOrigem != null ? unidadeOrigem.getSigla() : "null",
+                    unidadeDestino != null ? unidadeDestino.getSigla() : "null");
             return;
+        }
 
         try {
             Map<String, Object> variaveis = criarVariaveisTemplateDireto(sp, unidadeOrigem, unidadeDestino, observacoes);
+            enviarNotificacaoDireta(sp, tipo, unidadeDestino, variaveis);
 
-            // 1. Notificação Operacional
-            enviarNotificacaoOperacional(sp, tipo, unidadeDestino, variaveis);
-
-            // 2. Notificação de Acompanhamento
             if (tipo.notificacaoSuperior()) {
                 enviarNotificacaoSuperior(unidadeOrigem, sp, tipo, variaveis, unidadeDestino);
             }
-
         } catch (Exception e) {
             log.error("Erro ao processar comunicações da movimentação {}: {}", tipo, e.getMessage(), e);
         }
     }
 
-    private void enviarNotificacaoOperacional(Subprocesso sp,
-                                              TipoTransicao tipo,
-                                              Unidade unidadeDestino,
-                                              Map<String, Object> variaveis) {
+    private String getEmailUnidade(Unidade unidade) {
+        String sigla = unidade.getSigla();
+        return (sigla != null ? sigla.toLowerCase() : "desconhecida") + "@tre-pe.jus.br";
+    }
+
+    private void enviarNotificacaoDireta(Subprocesso sp,
+                                         TipoTransicao tipo,
+                                         Unidade unidadeDestino,
+                                         Map<String, Object> variaveis) {
 
         String assunto = criarAssunto(tipo, sp, false);
         String corpo = processarTemplate(tipo.getTemplateEmail(), variaveis);
 
-        String emailUnidade = String.format("%s@tre-pe.jus.br", unidadeDestino.getSigla().toLowerCase());
+        String emailUnidade = getEmailUnidade(unidadeDestino);
         emailService.enviarEmailHtml(emailUnidade, assunto, corpo);
 
         log.info("Notificação operacional {} enviada para {}", tipo, unidadeDestino.getSigla());
@@ -1653,7 +1615,7 @@ public class SubprocessoService {
 
     private void notificarResponsavelPessoal(Unidade unidade, String assunto, String corpo, TipoTransicao tipo) {
         UnidadeResponsavelDto responsavel = organizacaoFacade.buscarResponsavelUnidade(unidade.getCodigo());
-        if (responsavel.substitutoTitulo() != null) {
+        if (responsavel != null && responsavel.substitutoTitulo() != null) {
             usuarioFacade.buscarUsuarioPorTitulo(responsavel.substitutoTitulo())
                     .ifPresent(u -> {
                         if (!u.getEmail().isBlank()) {
@@ -1683,7 +1645,7 @@ public class SubprocessoService {
                 variaveis.put("siglaUnidadeSuperior", superior.getSigla());
 
                 String corpo = processarTemplate(tipo.getTemplateEmailSuperior(), variaveis);
-                String emailSuperior = String.format("%s@tre-pe.jus.br", superior.getSigla().toLowerCase());
+                String emailSuperior = getEmailUnidade(superior);
 
                 emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
                 log.info("Notificação de acompanhamento {} enviada para unidade {}", tipo, superior.getSigla());
@@ -1695,15 +1657,21 @@ public class SubprocessoService {
     }
 
     private Map<String, Object> criarVariaveisTemplateDireto(Subprocesso sp,
-                                                             Unidade unidadeOrigem, Unidade unidadeDestino,
-                                                             @Nullable String observacoes) {
+                                                             @org.jspecify.annotations.Nullable Unidade unidadeOrigem, Unidade unidadeDestino,
+                                                             @org.jspecify.annotations.Nullable String observacoes) {
         Map<String, Object> variaveis = new HashMap<>();
 
         variaveis.put("siglaUnidade", sp.getUnidade().getSigla());
         variaveis.put("nomeUnidade", sp.getUnidade().getNome());
 
-        variaveis.put("siglaUnidadeOrigem", unidadeOrigem.getSigla());
-        variaveis.put("nomeUnidadeOrigem", unidadeOrigem.getNome());
+        if (unidadeOrigem != null) {
+            variaveis.put("siglaUnidadeOrigem", unidadeOrigem.getSigla());
+            variaveis.put("nomeUnidadeOrigem", unidadeOrigem.getNome());
+        } else {
+            variaveis.put("siglaUnidadeOrigem", "N/A");
+            variaveis.put("nomeUnidadeOrigem", "N/A");
+        }
+
         variaveis.put("siglaUnidadeDestino", unidadeDestino.getSigla());
         variaveis.put("nomeUnidadeDestino", unidadeDestino.getNome());
 

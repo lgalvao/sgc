@@ -112,9 +112,8 @@ class ProcessoValidadorTest {
     }
 
     @Test
-    @DisplayName("validarTiposUnidades deve retornar vazio se lista nula ou vazia")
+    @DisplayName("validarTiposUnidades deve retornar vazio se lista vazia")
     void validarTiposUnidadesVazio() {
-        assertThat(validador.validarTiposUnidades(null)).isEmpty();
         assertThat(validador.validarTiposUnidades(Collections.emptyList())).isEmpty();
     }
 

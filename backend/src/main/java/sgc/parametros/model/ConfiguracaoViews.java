@@ -2,7 +2,8 @@ package sgc.parametros.model;
 
 import sgc.comum.model.*;
 
-public final class ConfiguracaoViews {
+public final
+class ConfiguracaoViews {
     private ConfiguracaoViews() {
     }
 

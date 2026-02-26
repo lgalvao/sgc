@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.*;
 
 @Tag("PBT")
 class ProcessoPbtTest {
-
     @Property
     void sincronizarParticipantes_mantemInvariante(@ForAll("conjuntoDeUnidades") Set<Unidade> unidadesIniciais,
                                                    @ForAll("conjuntoDeUnidades") Set<Unidade> novasUnidades) {

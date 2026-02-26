@@ -15,16 +15,11 @@ class ModelCoverageTest {
     @DisplayName("UnidadeProcesso deve lidar com ID nulo via getters e setters de conveniência")
     void deveLidarComIdNuloEmUnidadeProcesso() throws Exception {
         UnidadeProcesso up = new UnidadeProcesso();
-        
-        // Simular ID nulo (normalmente é inicializado inline, mas para 100% cobertura das branches defensivas)
         Field idField = UnidadeProcesso.class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(up, null);
-
-        // Branch id == null em getUnidadeCodigo
         assertThat(up.getUnidadeCodigo()).isNull();
 
-        // Branch id == null em setUnidadeCodigo (cria novo id)
         up.setUnidadeCodigo(999L);
         assertThat(up.getUnidadeCodigo()).isEqualTo(999L);
         assertThat(idField.get(up)).isNotNull();

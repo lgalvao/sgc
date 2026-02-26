@@ -34,9 +34,9 @@ class ProcessoFinalizadorTest {
     @Mock
     private ConsultasSubprocessoService queryService;
     @Mock
-    private ProcessoValidador processoValidador;
-    @Mock
     private ProcessoNotificacaoService processoNotificacaoService;
+    @Mock
+    private ProcessoValidador processoValidador;
 
     @Test
     @DisplayName("Deve finalizar processo com sucesso")

@@ -48,6 +48,7 @@ public class MapaSalvamentoService {
 
     private void atualizarObservacoes(Mapa mapa, @Nullable String observacoes) {
         var sanitizedObservacoes = UtilSanitizacao.sanitizar(observacoes);
+
         mapa.setObservacoesDisponibilizacao(sanitizedObservacoes);
         mapaRepo.save(mapa);
     }
@@ -109,7 +110,7 @@ public class MapaSalvamentoService {
         Long codigo = compDto.codigo();
         Competencia competencia;
 
-        if (codigo == null || codigo == 0) {
+        if (codigo == 0) {
             competencia = Competencia.builder()
                     .mapa(mapa)
                     .atividades(new HashSet<>())

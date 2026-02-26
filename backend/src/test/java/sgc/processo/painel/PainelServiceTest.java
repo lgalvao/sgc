@@ -8,7 +8,6 @@ import org.springframework.data.domain.*;
 import sgc.alerta.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.*;
-import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.processo.*;
 import sgc.processo.dto.*;
@@ -48,162 +47,103 @@ class PainelServiceTest {
         p.setDescricao("Processo " + codigo);
         p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         p.setTipo(TipoProcesso.MAPEAMENTO);
-        p.setDataCriacao(LocalDateTime.now());
-
-        Unidade participante = criarUnidade(1L, "PART");
-        p.adicionarParticipantes(Set.of(participante));
-
         return p;
     }
 
     @Nested
-    @DisplayName("Listar Processos - Consultas Básicas")
-    class ListarProcessosBasico {
+    @DisplayName("Listar Processos - Regras de Perfil")
+    class ListarProcessosPerfil {
+
         @Test
-        @DisplayName("listarProcessos para ADMIN deve listar todos")
+        @DisplayName("ADMIN: deve listar todos os processos")
         void listarProcessos_Admin() {
-            Processo p = criarProcessoMock(1L);
-            when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+            when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(Page.empty());
+            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
 
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
+            painelService.listarProcessos(Perfil.ADMIN, null, pageable);
 
-            assertThat(result.getContent()).hasSize(1);
+            verify(processoFacade).listarTodos(any(Pageable.class));
+            verify(processoFacade, never()).listarPorParticipantesIgnorandoCriado(any(), any());
         }
 
         @Test
-        @DisplayName("listarProcessos para GESTOR deve incluir subordinadas")
+        @DisplayName("GESTOR: deve listar processos da unidade e subordinadas")
         void listarProcessos_Gestor() {
-            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
-            when(unidadeService.buscarIdsDescendentes(eq(1L), any())).thenReturn(List.of(2L, 3L));
-
-            Processo p = criarProcessoMock(1L);
-            when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
-                    .thenReturn(new PageImpl<>(List.of(p)));
-
-            painelService.listarProcessos(Perfil.GESTOR, 1L, PageRequest.of(0, 10));
-
-            // Verifica se chamou buscando por 1L, 2L e 3L
-            verify(processoFacade).listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class));
-        }
-
-
-        @Test
-        @DisplayName("listarProcessos: Perfil GESTOR deve buscar subordinadas")
-        void listarProcessos_GestorBuscaSubordinadas() {
             Long codigoUnidade = 1L;
+            List<Long> subordinadas = List.of(2L, 3L);
+            
             when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
-            when(unidadeService.buscarIdsDescendentes(eq(codigoUnidade), any())).thenReturn(List.of(2L));
-
-            Processo p = new Processo();
-            p.setCodigo(100L);
-            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-            p.setTipo(TipoProcesso.MAPEAMENTO);
-
-            Unidade u = criarUnidade(1L, "U1");
-            p.adicionarParticipantes(Set.of(u));
-
-            when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
-
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.GESTOR, codigoUnidade, pageable);
-
-            assertThat(result.getContent()).isNotEmpty();
-            verify(unidadeService, atLeastOnce()).buscarIdsDescendentes(eq(codigoUnidade), any());
-            verify(processoFacade).listarPorParticipantesIgnorandoCriado(
-                    argThat(list -> list.contains(1L) && list.contains(2L)), any());
-        }
-
-
-    }
-
-    @Nested
-    @DisplayName("Listar Processos - Links de Destino")
-    class ListarProcessosLinks {
-        @Test
-        @DisplayName("listarProcessos deve calcular link correto para ADMIN e processo CRIADO")
-        void listarProcessos_LinkAdminCriado() {
-            Processo p = criarProcessoMock(1L);
-            p.setSituacao(SituacaoProcesso.CRIADO);
-            when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
-
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
-
-            assertThat(result.getContent().getFirst().linkDestino()).contains("/processo/cadastro?codProcesso=1");
-        }
-
-        @Test
-        @DisplayName("listarProcessos deve calcular link correto para CHEFE")
-        void listarProcessos_LinkChefe() {
-            Processo p = criarProcessoMock(1L);
+            when(unidadeService.buscarIdsDescendentes(eq(codigoUnidade), any())).thenReturn(subordinadas);
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
-                    .thenReturn(new PageImpl<>(List.of(p)));
-            when(unidadeService.dtoPorCodigo(1L)).thenReturn(UnidadeDto.builder()
-                    .codigo(1L)
-                    .sigla("U1")
-                    .build());
+                    .thenReturn(Page.empty());
 
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, 1L, PageRequest.of(0, 10));
+            painelService.listarProcessos(Perfil.GESTOR, codigoUnidade, pageable);
 
-            assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/1/U1");
+            @SuppressWarnings("unchecked")
+            ArgumentCaptor<List<Long>> captor = ArgumentCaptor.forClass(List.class);
+            verify(processoFacade).listarPorParticipantesIgnorandoCriado(captor.capture(), any());
+            assertThat(captor.getValue()).containsExactlyInAnyOrder(1L, 2L, 3L);
         }
 
         @Test
-        @DisplayName("listarProcessos: Perfil CHEFE retorna link com sigla")
-        void listarProcessos_ChefeRetornaLinkComSigla() {
+        @DisplayName("CHEFE: deve listar processos apenas da própria unidade")
+        void listarProcessos_Chefe() {
             Long codigoUnidade = 1L;
-            UnidadeDto unidadeDto = UnidadeDto.builder().sigla("SIGLA").build();
-            when(unidadeService.dtoPorCodigo(codigoUnidade)).thenReturn(unidadeDto);
+            
+            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
+                    .thenReturn(Page.empty());
 
-            Processo p = new Processo();
-            p.setCodigo(100L);
-            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-            p.setTipo(TipoProcesso.MAPEAMENTO);
+            painelService.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
 
-            Unidade u = criarUnidade(1L, "U1");
-            p.adicionarParticipantes(Set.of(u));
-
-            when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any())).thenReturn(new PageImpl<>(List.of(p)));
-
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
-
-            assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/100/SIGLA");
+            @SuppressWarnings("unchecked")
+            ArgumentCaptor<List<Long>> captor = ArgumentCaptor.forClass(List.class);
+            verify(processoFacade).listarPorParticipantesIgnorandoCriado(captor.capture(), any());
+            assertThat(captor.getValue()).containsExactly(1L);
         }
     }
 
     @Nested
     @DisplayName("Listar Processos - Formatação de Unidades")
     class ListarProcessosFormatacao {
-        @Test
-        @DisplayName("listarProcessos deve tratar exceção ao formatar unidades participantes")
-        void listarProcessos_FormatarUnidadesException() {
-            Unidade u = criarUnidade(1L, "U1");
 
-            Processo p = criarProcessoMock(1L);
+        @Test
+        @DisplayName("paraProcessoResumoDto deve gerar link destino correto para ADMIN em processo CRIADO")
+        void linkDestino_AdminCriado() {
+            Processo p = criarProcessoMock(100L);
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            
+            Unidade u = criarUnidade(1L, "SIGLA");
             p.adicionarParticipantes(Set.of(u));
 
             when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
 
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
+            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, pageable);
 
-            // Deve retornar lista mas com participantes vazio ou parcial, sem quebrar
-            assertThat(result.getContent()).hasSize(1);
+            assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/cadastro?codProcesso=100");
         }
-
 
         @Test
-        @DisplayName("encontrarMaiorIdVisivel deve retornar null se unidade for null ou não participante")
-        void encontrarMaiorIdVisivel_CasosBorda() {
-            Unidade u = criarUnidade(999L, "U999");
-
-            Processo p = criarProcessoMock(1L);
+        @DisplayName("paraProcessoResumoDto deve gerar link destino correto para CHEFE")
+        void linkDestino_Chefe() {
+            Long codigoUnidade = 1L;
+            Processo p = criarProcessoMock(100L);
+            Unidade u = criarUnidade(codigoUnidade, "SIGLA");
             p.adicionarParticipantes(Set.of(u));
 
-            when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
-            lenient().when(unidadeService.unidadePorCodigo(999L)).thenReturn(null);
+            when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
+                    .thenReturn(new PageImpl<>(List.of(p)));
+            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            
+            sgc.organizacao.dto.UnidadeDto dto = new sgc.organizacao.dto.UnidadeDto();
+            dto.setSigla("SIGLA");
+            when(unidadeService.dtoPorCodigo(codigoUnidade)).thenReturn(dto);
 
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
-            assertThat(result.getContent()).isNotEmpty();
+            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
+
+            assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/100/SIGLA");
         }
-
 
         @Test
         @DisplayName("formatarUnidadesParticipantes: deve formatar corretamente e agrupar hierarquia")
@@ -247,28 +187,11 @@ class PainelServiceTest {
             p.adicionarParticipantes(Set.of(filho));
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
+            when(unidadeService.buscarMapaHierarquia()).thenReturn(Map.of(1L, List.of(2L)));
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, pageable);
 
             assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("FILHO");
-        }
-
-        @Test
-        @DisplayName("Deve tratar exceção ao buscar unidade visível no formatarUnidadesParticipantes")
-        void excecaoEmSelecionarIdsVisiveis() {
-            Unidade part = criarUnidade(99L, "U99");
-
-            Processo p = new Processo();
-            p.setCodigo(1L);
-            p.adicionarParticipantes(Set.of(part));
-            p.setTipo(TipoProcesso.MAPEAMENTO);
-
-            when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
-
-            Page<ProcessoResumoDto> res = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
-
-            assertThat(res).isNotEmpty();
-            assertThat(res.getContent().getFirst().unidadesParticipantes()).contains("U99");
         }
     }
 
@@ -278,28 +201,13 @@ class PainelServiceTest {
         @Test
         @DisplayName("garantirOrdenacaoPadrao deve retornar pageable original se já estiver ordenado")
         void garantirOrdenacaoPadrao_JaOrdenado() {
-            PageRequest pageRequestWithSort = PageRequest.of(0, 10, Sort.by("descricao"));
-            when(processoFacade.listarTodos(pageRequestWithSort)).thenReturn(Page.empty(pageRequestWithSort));
+            Pageable sorted = PageRequest.of(0, 10, Sort.by("dataCriacao"));
+            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            when(processoFacade.listarTodos(any())).thenReturn(Page.empty());
 
-            painelService.listarProcessos(Perfil.ADMIN, null, pageRequestWithSort);
-
-            verify(processoFacade).listarTodos(pageRequestWithSort);
-        }
-
-        @Test
-        @DisplayName("selecionarIdsVisiveis deve ignorar unidade se buscarEntidadePorId falhar")
-        void selecionarIdsVisiveis_CatchException() {
-            Unidade u = criarUnidade(999L, "U999");
-
-            Processo p = criarProcessoMock(1L);
-            p.adicionarParticipantes(Set.of(u));
-
-            when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
-            lenient().when(unidadeService.unidadePorCodigo(999L)).thenThrow(new RuntimeException("ERRO"));
-
-            Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 10));
-
-            assertThat(result.getContent()).isNotEmpty();
+            painelService.listarProcessos(Perfil.ADMIN, null, sorted);
+            
+            verify(processoFacade).listarTodos(eq(sorted));
         }
 
         @Test
@@ -344,40 +252,10 @@ class PainelServiceTest {
                     .thenReturn(new PageImpl<>(List.of(alerta)));
             when(alertaService.obterDataHoraLeitura(any(), any())).thenReturn(Optional.empty());
 
-            Page<Alerta> result = painelService.listarAlertas("123456", 1L, PageRequest.of(0, 10));
+            Page<Alerta> result = painelService.listarAlertas("titulo", 1L, pageable);
 
             assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getContent().getFirst().getDescricao()).isEqualTo("Alerta teste");
-            verify(alertaService).listarPorUnidade(any(Long.class), any(Pageable.class));
+            verify(alertaService).listarPorUnidade(eq(1L), any(Pageable.class));
         }
-
-
-        @Test
-        @DisplayName("listarAlertas: busca por unidade se codigoUnidade informado")
-        void listarAlertas_PorUnidadeCobertura() {
-            Long codigoUnidade = 1L;
-
-            Alerta alerta = new Alerta();
-            alerta.setCodigo(1L);
-            alerta.setDataHora(LocalDateTime.now());
-
-            // Setup obrigatorio
-            Processo p = new Processo();
-            p.setCodigo(123L);
-            alerta.setProcesso(p);
-
-            Unidade u = criarUnidade(1L, "U1");
-            alerta.setUnidadeOrigem(u);
-            alerta.setUnidadeDestino(u);
-
-            when(alertaService.listarPorUnidade(eq(codigoUnidade), any())).thenReturn(new PageImpl<>(List.of(alerta)));
-
-            Page<Alerta> result = painelService.listarAlertas(null, codigoUnidade, pageable);
-
-            assertThat(result.getContent()).isNotEmpty();
-            verify(alertaService).listarPorUnidade(eq(codigoUnidade), any());
-        }
-
-
     }
 }

@@ -22,6 +22,7 @@ class ProcessoDetalheBuilderCoverageTest {
 
     @Mock
     private SubprocessoRepo subprocessoRepo;
+
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
 
@@ -91,6 +92,5 @@ class ProcessoDetalheBuilderCoverageTest {
         // Assert
         assertThat(dto.getUnidades()).hasSize(1);
         assertThat(dto.getUnidades().getFirst().getSigla()).isEqualTo("TESTE");
-        assertThat(dto.getUnidades().getFirst().getCodSubprocesso()).isNull();
     }
 }

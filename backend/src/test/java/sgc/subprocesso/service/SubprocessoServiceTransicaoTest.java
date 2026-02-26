@@ -70,7 +70,7 @@ class SubprocessoServiceTransicaoTest {
         Usuario usuario = new Usuario();
 
         // Ensure template engine is mocked to avoid NPE if email logic is triggered
-        lenient().when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
+        when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
 
         // Act
         service.registrarTransicao(RegistrarTransicaoCommand.builder()
@@ -106,7 +106,7 @@ class SubprocessoServiceTransicaoTest {
         Unidade destino = mock(Unidade.class);
         Usuario usuario = new Usuario();
 
-        lenient().when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
+        when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
 
         // Act
         service.registrarTransicao(RegistrarTransicaoCommand.builder()
@@ -136,7 +136,6 @@ class SubprocessoServiceTransicaoTest {
 
         Usuario usuarioAutenticado = new Usuario();
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuarioAutenticado);
-        lenient().when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
 
         // Act
         service.registrarTransicao(RegistrarTransicaoCommand.builder()
@@ -163,32 +162,6 @@ class SubprocessoServiceTransicaoTest {
 
         // Act & Assert
         Assertions.assertThrows(ErroAcessoNegado.class, () -> service.registrarTransicao(cmd));
-    }
-
-    @Test
-    @DisplayName("Deve lidar com unidades nulas")
-    void deveLidarComUnidadesNulas() {
-        // Arrange
-        Subprocesso subprocesso = mock(Subprocesso.class);
-        Unidade unidade = mock(Unidade.class);
-        when(unidade.getSigla()).thenReturn("U1");
-        when(subprocesso.getUnidade()).thenReturn(unidade);
-
-        Processo processo = mock(Processo.class);
-        when(subprocesso.getProcesso()).thenReturn(processo);
-
-        Usuario usuario = new Usuario();
-        lenient().when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");
-
-        // Act
-        service.registrarTransicao(RegistrarTransicaoCommand.builder()
-                .sp(subprocesso)
-                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
-                .usuario(usuario)
-                .build());
-
-        // Assert
-        verify(movimentacaoRepo).save(any(Movimentacao.class));
     }
 
     @Test

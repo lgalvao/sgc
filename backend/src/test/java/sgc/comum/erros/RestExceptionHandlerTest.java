@@ -146,7 +146,9 @@ class RestExceptionHandlerTest {
     void deveTratarHttpMessageNotReadableException() {
         HttpMessageNotReadableException ex = new HttpMessageNotReadableException("JSON Error", Mockito.mock(HttpInputMessage.class));
         ResponseEntity<Object> response = restExceptionHandler.handleHttpMessageNotReadable(ex, new HttpHeaders(), HttpStatus.BAD_REQUEST, null);
+        assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals("Requisição JSON malformada", ((ErroApi) response.getBody()).getMessage());
     }
 
@@ -161,8 +163,9 @@ class RestExceptionHandlerTest {
         MethodArgumentNotValidException ex = new MethodArgumentNotValidException(methodParameter, bindingResult);
 
         ResponseEntity<Object> response = restExceptionHandler.handleMethodArgumentNotValid(ex, new HttpHeaders(), HttpStatus.BAD_REQUEST, null);
-
+        assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals("A requisição contém dados de entrada inválidos.", ((ErroApi) response.getBody()).getMessage());
     }
 
@@ -173,7 +176,9 @@ class RestExceptionHandlerTest {
         ErroNegocioBase ex = new ErroNegocioBase("Erro Base", "CODE", HttpStatus.BAD_REQUEST) {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
+        assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals("Erro Base", ((ErroApi) response.getBody()).getMessage());
     }
 
@@ -183,7 +188,9 @@ class RestExceptionHandlerTest {
         Map<String, String> details = Map.of("campo", "erro");
         ErroNegocioBase ex = new ErroNegocioBase("Erro Com Detalhe", "CODE", HttpStatus.BAD_REQUEST, details) {};
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
+        assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals(details, ((ErroApi) response.getBody()).getDetails());
     }
 

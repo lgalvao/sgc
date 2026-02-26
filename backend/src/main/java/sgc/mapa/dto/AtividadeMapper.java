@@ -5,7 +5,6 @@ import org.springframework.stereotype.*;
 import sgc.comum.config.*;
 import sgc.mapa.model.*;
 
-@SuppressWarnings("NullableProblems")
 @Component
 @Mapper(config = CentralMapperConfig.class)
 public abstract class AtividadeMapper {

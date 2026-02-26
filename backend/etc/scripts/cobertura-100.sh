@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script principal para alcançar 100% de cobertura de testes
-# Este script orquestra todo o processo de análise e melhoria de cobertura
+# Este script orquestra o processo de análise e melhoria de cobertura
 
 set -e  # Sai em caso de erro
 

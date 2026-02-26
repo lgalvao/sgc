@@ -4,8 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.thymeleaf.*;
-import sgc.alerta.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
@@ -15,7 +13,6 @@ import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
-import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
@@ -26,21 +23,20 @@ import static org.mockito.Mockito.*;
 @DisplayName("SubprocessoService - Atividades")
 @ExtendWith(MockitoExtension.class)
 class SubprocessoServiceAtividadeTest {
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private MovimentacaoRepo movimentacaoRepo;
-    @Mock private ComumRepo repo;
-    @Mock private AnaliseRepo analiseRepo;
-    @Mock private AlertaFacade alertaService;
-    @Mock private OrganizacaoFacade organizacaoFacade;
-    @Mock private UsuarioFacade usuarioService; // Renamed to match field usage in original test (was usuarioService)
-    @Mock private ImpactoMapaService impactoMapaService;
-    @Mock private CopiaMapaService copiaMapaService;
-    @Mock private EmailService emailService;
-    @Mock private TemplateEngine templateEngine;
-    @Mock private MapaManutencaoService mapaManutencaoService;
-    @Mock private MapaSalvamentoService mapaSalvamentoService;
-    @Mock private MapaAjusteMapper mapaAjusteMapper;
-    @Mock private SgcPermissionEvaluator permissionEvaluator;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private MovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private ComumRepo repo;
+    @Mock
+    private UsuarioFacade usuarioFacade;
+    @Mock
+    private CopiaMapaService copiaMapaService;
+    @Mock
+    private MapaManutencaoService mapaManutencaoService;
+    @Mock
+    private SgcPermissionEvaluator permissionEvaluator;
 
     @InjectMocks
     private SubprocessoService service;
@@ -113,7 +109,7 @@ class SubprocessoServiceAtividadeTest {
 
             when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
             when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
-            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
 
             doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spDestino), eq("EDITAR_CADASTRO"));
             doReturn(false).when(permissionEvaluator).checkPermission(any(), eq(spOrigem), eq("CONSULTAR_PARA_IMPORTACAO"));
@@ -140,7 +136,7 @@ class SubprocessoServiceAtividadeTest {
 
             when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
             when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
-            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
             doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spDestino), eq("EDITAR_CADASTRO"));
             doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spOrigem), eq("CONSULTAR_PARA_IMPORTACAO"));
@@ -171,7 +167,7 @@ class SubprocessoServiceAtividadeTest {
             when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
             when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
             when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(spDestino);
-            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
             doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spDestino), eq("EDITAR_CADASTRO"));
             doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spOrigem), eq("CONSULTAR_PARA_IMPORTACAO"));
@@ -186,7 +182,7 @@ class SubprocessoServiceAtividadeTest {
             Subprocesso subprocessoSalvo = subprocessoCaptor.getValue();
             assertThat(subprocessoSalvo.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-            verify(usuarioService).usuarioAutenticado();
+            verify(usuarioFacade).usuarioAutenticado();
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
             verify(movimentacaoRepo).save(any(Movimentacao.class));
         }
@@ -208,7 +204,7 @@ class SubprocessoServiceAtividadeTest {
             when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
             when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
             when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(spDestino);
-            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
             doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spDestino), eq("EDITAR_CADASTRO"));
             doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spOrigem), eq("CONSULTAR_PARA_IMPORTACAO"));
@@ -223,7 +219,7 @@ class SubprocessoServiceAtividadeTest {
             Subprocesso subprocessoSalvo = subprocessoCaptor.getValue();
             assertThat(subprocessoSalvo.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
-            verify(usuarioService).usuarioAutenticado();
+            verify(usuarioFacade).usuarioAutenticado();
             verify(copiaMapaService).importarAtividadesDeOutroMapa(10L, 20L);
             verify(movimentacaoRepo).save(any(Movimentacao.class));
         }
@@ -245,7 +241,7 @@ class SubprocessoServiceAtividadeTest {
             when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
             when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
             when(subprocessoRepo.save(any(Subprocesso.class))).thenReturn(spDestino);
-            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
             doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spDestino), eq("EDITAR_CADASTRO"));
             doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spOrigem), eq("CONSULTAR_PARA_IMPORTACAO"));
@@ -275,7 +271,7 @@ class SubprocessoServiceAtividadeTest {
 
             when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
             when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
-            when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
             when(movimentacaoRepo.save(any(Movimentacao.class))).thenReturn(new Movimentacao());
             doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spDestino), eq("EDITAR_CADASTRO"));
             doReturn(true).when(permissionEvaluator).checkPermission(any(), eq(spOrigem), eq("CONSULTAR_PARA_IMPORTACAO"));

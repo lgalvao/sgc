@@ -133,7 +133,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     private void autenticarUsuario(Usuario usuario, Perfil perfil) {
         usuario.setPerfilAtivo(perfil);
         // Tenta pegar o código da unidade do usuário ou da unidade de lotação
-        Long codUnidade = usuario.getUnidadeLotacao() != null ? usuario.getUnidadeLotacao().getCodigo() : 1L;
+        Long codUnidade = usuario.getUnidadeLotacao().getCodigo();
         usuario.setUnidadeAtivaCodigo(codUnidade);
 
         usuario.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_" + perfil.name())));

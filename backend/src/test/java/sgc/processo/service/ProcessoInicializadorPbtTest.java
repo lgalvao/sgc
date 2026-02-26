@@ -16,7 +16,7 @@ class ProcessoInicializadorPbtTest {
     @Property
     void iniciar_criaSubprocessosParaCadaParticipante(@ForAll("processosEAgumentos") ProcessoArgs args,
                                                      @ForAll("usuarioQualquer") Usuario usuario) {
-        // Mock dependencies
+
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
         ComumRepo repo = mock(ComumRepo.class);
         UnidadeRepo unidadeRepo = mock(UnidadeRepo.class);

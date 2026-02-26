@@ -20,6 +20,7 @@ class RestExceptionHandlerCoverageTest {
         ResponseEntity<?> response = handler.handleErroInterno(ex);
 
         // Assert
+        assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         ErroApi body = (ErroApi) response.getBody();
         assertThat(body).isNotNull();
@@ -43,8 +44,10 @@ class RestExceptionHandlerCoverageTest {
         ResponseEntity<?> response = handler.handleErroNegocio(ex);
 
         // Assert
+        assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         ErroApi body = (ErroApi) response.getBody();
+        assertThat(body).isNotNull();
         assertThat(body.getMessage()).isEmpty(); // Deve retornar "" por causa do sanitizar(null)
     }
 }

@@ -16,9 +16,9 @@ public record RegistrarWorkflowCommand(
         TipoAnalise tipoAnalise,
         TipoAcaoAnalise tipoAcaoAnalise,
         Unidade unidadeAnalise,
-        @Nullable Unidade unidadeOrigemTransicao,
-        @Nullable Unidade unidadeDestinoTransicao,
-        @Nullable Usuario usuario,
+        @org.jspecify.annotations.Nullable Unidade unidadeOrigemTransicao,
+        @org.jspecify.annotations.Nullable Unidade unidadeDestinoTransicao,
+        @org.jspecify.annotations.Nullable Usuario usuario,
         @Nullable String motivoAnalise,
         @Nullable String observacoes
 ) {

@@ -75,7 +75,7 @@ public class ProcessoInicializador {
         criarSubprocessos(processo, tipo, codigosUnidades, unidadesParaProcessar, unidadesMapas, admin, usuario);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processoRepo.save(processo);
-        notificacaoService.emailInicioProcesso(processo.getCodigo(), codigosUnidades);
+        notificacaoService.emailInicioProcesso(processo.getCodigo());
 
         int contagemUnidades = codigosUnidades.size();
         log.info("Processo de {} {} iniciado para {} unidade(s).", tipo.name().toLowerCase(), codigo, contagemUnidades);

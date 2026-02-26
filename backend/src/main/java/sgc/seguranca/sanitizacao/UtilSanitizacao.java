@@ -1,5 +1,6 @@
 package sgc.seguranca.sanitizacao;
 
+import org.jspecify.annotations.*;
 import org.owasp.html.*;
 
 /**
@@ -16,7 +17,7 @@ public final class UtilSanitizacao {
     /**
      * Sanitiza o texto fornecido, removendo todas as tags HTML.
      */
-    public static String sanitizar(String entrada) {
+    public static String sanitizar(@Nullable String entrada) {
         return POLITICA_PADRAO.sanitize(entrada);
     }
 }
