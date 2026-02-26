@@ -14,9 +14,6 @@ import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
-    mapAtividadeVisualizacaoToModel,
-    mapMapaCompletoDtoToModel,
-    mapSubprocessoDetalheDtoToModel,
     validarCadastro as serviceValidarCadastro,
 } from "@/services/subprocessoService";
 import {
@@ -32,8 +29,10 @@ import {useMapasStore} from "@/stores/mapas";
 import {useAtividadesStore} from "@/stores/atividades";
 import type {
     AceitarCadastroRequest,
+    Atividade,
     DevolverCadastroRequest,
     HomologarCadastroRequest,
+    MapaCompleto,
     SituacaoSubprocesso,
     SubprocessoDetalhe,
 } from "@/types/tipos";
@@ -96,7 +95,8 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
                 perfil,
                 codUnidade as number,
             );
-            subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(dto);
+            // Assuming response is already correct type or compatible
+            subprocessoDetalhe.value = dto as SubprocessoDetalhe;
         }, (err) => {
             logger.error(`Erro ao buscar detalhes do subprocesso ${codigo}:`, err);
             subprocessoDetalhe.value = null;
@@ -134,16 +134,25 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         return withErrorHandling(async () => {
             const data = await serviceBuscarContextoEdicao(codigo, perfil, codUnidade as number);
 
-            subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(data.detalhes || data);
+            // Directly assigning data, possibly nested in details if API structure requires it
+            // Based on service return: return response.data;
+            // Adjust based on actual response structure. Assuming `data.detalhes` or spread
+
+            // Re-mapping logic removed, assuming backend sends correct structure or we adapt here simply
+            const detalhes = data.detalhes || data;
+
+            // Ideally we should have types matching backend response exactly.
+            // For now casting to SubprocessoDetalhe
+            subprocessoDetalhe.value = detalhes as SubprocessoDetalhe;
 
             const unidadesStore = useUnidadesStore();
             unidadesStore.unidade = data.unidade;
 
             const mapasStore = useMapasStore();
-            mapasStore.mapaCompleto = data.mapa ? mapMapaCompletoDtoToModel(data.mapa) : null;
+            mapasStore.mapaCompleto = data.mapa as MapaCompleto;
 
             const atividadesStore = useAtividadesStore();
-            const atividadesMapped = (data.atividadesDisponiveis || []).map(mapAtividadeVisualizacaoToModel);
+            const atividadesMapped = (data.atividadesDisponiveis || []) as Atividade[];
             atividadesStore.setAtividadesParaSubprocesso(codigo, atividadesMapped);
         });
     }

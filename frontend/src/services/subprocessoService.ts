@@ -2,10 +2,7 @@ import type {
     AnaliseCadastro,
     AnaliseValidacao,
     Atividade,
-    AtividadeOperacaoResponse,
     Competencia,
-    CompetenciaCompleta,
-    CompetenciaImpactada,
     Conhecimento,
     CriarConhecimentoRequest,
     DisponibilizarMapaRequest,
@@ -15,228 +12,14 @@ import type {
     MapaCompleto,
     MapaVisualizacao,
     SubprocessoDetalhe,
-    SubprocessoStatus,
     ValidacaoCadastro
 } from "@/types/tipos";
-import type {
-    AtividadeDto,
-    AtividadeImpactadaDto,
-    AtividadeOperacaoResponseDto,
-    ConhecimentoDto,
-    ImpactoMapaDto,
-    SubprocessoSituacaoDto
-} from "@/types/dtos";
 import {getOrNull} from "@/utils/apiError";
 import apiClient from "../axios-setup";
 
 interface ImportarAtividadesRequest {
     codSubprocessoOrigem: number;
 }
-
-// ------------------------------------------------------------------------------------------------
-// Mappers Internos (formerly in /mappers)
-// ------------------------------------------------------------------------------------------------
-
-export function mapMapaDtoToModel(dto: any): Mapa {
-    return {
-        codigo: dto.codigo,
-        codProcesso: dto.codProcesso,
-        unidade: dto.unidade,
-        situacao: dto.situacao,
-        dataCriacao: dto.dataCriacao,
-        dataDisponibilizacao: dto.dataDisponibilizacao,
-        dataFinalizacao: dto.dataFinalizacao,
-        competencias: dto.competencias || [],
-        descricao: dto.descricao,
-    };
-}
-
-export function mapMapaCompletoDtoToModel(dto: any): MapaCompleto {
-    return {
-        codigo: dto.codigo,
-        subprocessoCodigo: dto.subprocessoCodigo,
-        observacoes: dto.observacoes,
-        competencias: (dto.competencias || []).map(
-            (c: any): CompetenciaCompleta => ({
-                codigo: c.codigo,
-                descricao: c.descricao,
-                atividadesAssociadas: c.atividadesCodigos || (c.atividades || []).map((a: any) => a.codigo) || [],
-                atividades: (c.atividades || []).map((a: any) => ({
-                    codigo: a.codigo,
-                    descricao: a.descricao,
-                    conhecimentos: (a.conhecimentos || []).map((k: any) => ({
-                        codigo: k.codigo,
-                        descricao: k.descricao,
-                    })),
-                })),
-            }),
-        ),
-        situacao: dto.situacao || "",
-    };
-}
-
-export function mapImpactoMapaDtoToModel(dto: ImpactoMapaDto): ImpactoMapa {
-    const inseridas = dto.inseridas || [];
-    const removidas = dto.removidas || [];
-    const alteradas = dto.alteradas || [];
-    const competencias = dto.competenciasImpactadas || [];
-
-    return {
-        temImpactos: dto.temImpactos,
-        totalAtividadesInseridas: inseridas.length,
-        totalAtividadesRemovidas: removidas.length,
-        totalAtividadesAlteradas: alteradas.length,
-        totalCompetenciasImpactadas: competencias.length,
-        // Arrays de atividades impactadas - sem mapeamento trivial
-        atividadesInseridas: (inseridas as unknown as any[]).map((i: any) => ({ ...i, tipoImpacto: 'INSERIDA' })),
-        atividadesRemovidas: (removidas as unknown as any[]).map((i: any) => ({ ...i, tipoImpacto: 'REMOVIDA' })),
-        atividadesAlteradas: (alteradas as unknown as any[]).map((i: any) => ({ ...i, tipoImpacto: 'ALTERADA' })),
-        competenciasImpactadas: competencias.map(
-            (c: any): CompetenciaImpactada => ({
-                codigo: c.codigo,
-                descricao: c.descricao,
-                atividadesAfetadas: c.atividadesAfetadas || [],
-                tiposImpacto: c.tiposImpacto,
-            }),
-        ),
-    };
-}
-
-export function mapMapaAjusteDtoToModel(dto: any): MapaAjuste {
-    return {
-        codigo: dto.codigo,
-        descricao: dto.descricao,
-        competencias: dto.competencias || [],
-    };
-}
-
-export function mapAnaliseDtoToModel(dto: any): AnaliseCadastro { // Reusing Type for now
-    return {
-        dataHora: dto.dataHora,
-        observacoes: dto.observacoes || "",
-        acao: dto.acao,
-        unidadeSigla: dto.unidadeSigla,
-        unidadeNome: dto.unidadeNome,
-        analistaUsuarioTitulo: dto.analistaUsuarioTitulo,
-        motivo: dto.motivo || "",
-        tipo: dto.tipo
-    };
-}
-
-export function mapAnalisesArray(dtos: any[]): AnaliseCadastro[] {
-    if (!dtos) return [];
-    return dtos.map(mapAnaliseDtoToModel);
-}
-
-export function mapAtividadeToModel(dto: AtividadeDto | null | undefined): Atividade | null {
-    if (!dto) return null;
-    return {
-        codigo: dto.codigo,
-        descricao: dto.descricao,
-        conhecimentos: (dto.conhecimentos || [])
-            .map(mapConhecimentoToModel)
-            .filter((c): c is Conhecimento => c !== null),
-    };
-}
-
-// Alias for backwards compatibility
-export const mapAtividadeVisualizacaoToModel = mapAtividadeToModel;
-
-export function mapConhecimentoToModel(dto: ConhecimentoDto | null | undefined): Conhecimento | null {
-    if (!dto) return null;
-    return {
-        codigo: dto.codigo,
-        descricao: dto.descricao,
-    };
-}
-
-export const mapConhecimentoVisualizacaoToModel = mapConhecimentoToModel;
-
-export function mapSubprocessoSituacaoToModel(dto: SubprocessoSituacaoDto): SubprocessoStatus {
-    return {
-        codigo: dto.codigo,
-        situacao: dto.situacao,
-    };
-}
-
-export function mapAtividadeOperacaoResponseToModel(dto: AtividadeOperacaoResponseDto): AtividadeOperacaoResponse {
-    return {
-        atividade: dto.atividade ? mapAtividadeToModel(dto.atividade) : null,
-        subprocesso: mapSubprocessoSituacaoToModel(dto.subprocesso || { codigo: 0, situacao: 'NAO_INICIADO' as any }),
-        atividadesAtualizadas: (dto.atividadesAtualizadas || [])
-            .map(mapAtividadeToModel)
-            .filter((a): a is Atividade => a !== null),
-        permissoes: dto.permissoes,
-    };
-}
-
-export function mapCriarAtividadeRequestToDto(
-    request: any,
-    codMapa: number,
-): any {
-    return {
-        ...request,
-        mapaCodigo: codMapa,
-    };
-}
-
-export function mapAtualizarAtividadeToDto(request: Atividade): any {
-    return {
-        descricao: request.descricao,
-    };
-}
-
-export function mapCriarConhecimentoRequestToDto(
-    request: CriarConhecimentoRequest,
-    atividadeCodigo: number,
-): any {
-    return {
-        descricao: request.descricao,
-        atividadeCodigo,
-    };
-}
-
-export function mapAtualizarConhecimentoToDto(
-    request: Conhecimento,
-    atividadeCodigo: number
-): any {
-    return {
-        codigo: request.codigo,
-        atividadeCodigo: atividadeCodigo,
-        descricao: request.descricao,
-    };
-}
-
-export function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe {
-    if (!dto) {
-        throw new Error("DTO de detalhes do subprocesso é nulo ou indefinido.");
-    }
-
-    // O backend retorna SubprocessoDetalheResponse que aninha a entidade Subprocesso
-    const sp = dto.subprocesso || dto || {};
-
-    // Fallback para unidade para evitar "Cannot read properties of undefined (reading 'sigla')"
-    const unidadeDefault = { codigo: 0, nome: 'Não informada', sigla: 'N/I' };
-    const unidade = sp.unidade || dto.unidade || unidadeDefault;
-
-    return {
-        codigo: sp.codigo || dto.codigo || 0,
-        unidade: unidade,
-        titular: dto.titular || null,
-        responsavel: dto.responsavel || null,
-        situacao: sp.situacao || dto.situacao || 'NAO_INICIADO',
-        localizacaoAtual: dto.localizacaoAtual || '',
-        processoDescricao: (sp.processo?.descricao) || dto.processoDescricao || '',
-        tipoProcesso: (sp.processo?.tipo) || dto.tipoProcesso || 'MAPEAMENTO',
-        prazoEtapaAtual: sp.dataLimiteEtapa1 || dto.prazoEtapaAtual || '',
-        isEmAndamento: typeof sp.isEmAndamento === 'boolean' ? sp.isEmAndamento : (dto.isEmAndamento || false),
-        etapaAtual: sp.etapaAtual || dto.etapaAtual || 1,
-        movimentacoes: dto.movimentacoes || [],
-        elementosProcesso: dto.elementosProcesso || [],
-        permissoes: dto.permissoes || {},
-    } as SubprocessoDetalhe;
-}
-
 
 // ------------------------------------------------------------------------------------------------
 // Subprocesso Services
@@ -257,7 +40,9 @@ export async function importarAtividades(
 
 export async function listarAtividades(codSubprocesso: number): Promise<Atividade[]> {
     const response = await apiClient.get<any>(`/subprocessos/${codSubprocesso}/contexto-edicao`);
-    return (response.data.atividadesDisponiveis || []).map(mapAtividadeVisualizacaoToModel).filter((a: Atividade | null): a is Atividade => a !== null);
+    // Assuming backend returns Atividade[] compatible structure in atividadesDisponiveis
+    // or we accept that strict typing might require adjustment if backend DTO differs significantly
+    return response.data.atividadesDisponiveis as Atividade[];
 }
 
 export async function validarCadastro(codSubprocesso: number): Promise<ValidacaoCadastro> {
@@ -278,7 +63,7 @@ export async function buscarSubprocessoDetalhe(
     const response = await apiClient.get(`/subprocessos/${codSubprocesso}`, {
         params: {perfil, unidadeUsuario: unidadeCodigo},
     });
-    return response.data;
+    return response.data as SubprocessoDetalhe;
 }
 
 export async function buscarContextoEdicao(
@@ -317,12 +102,12 @@ export async function obterMapaVisualizacao(
 
 export async function verificarImpactosMapa(codSubprocesso: number): Promise<ImpactoMapa> {
     const response = await apiClient.get(`/subprocessos/${codSubprocesso}/impactos-mapa`);
-    return mapImpactoMapaDtoToModel(response.data);
+    return response.data as ImpactoMapa;
 }
 
 export async function obterMapaCompleto(codSubprocesso: number): Promise<MapaCompleto> {
     const response = await apiClient.get(`/subprocessos/${codSubprocesso}/mapa-completo`);
-    return mapMapaCompletoDtoToModel(response.data);
+    return response.data as MapaCompleto;
 }
 
 export async function salvarMapaCompleto(
@@ -333,12 +118,12 @@ export async function salvarMapaCompleto(
         `/subprocessos/${codSubprocesso}/mapa-completo`,
         data,
     );
-    return mapMapaCompletoDtoToModel(response.data);
+    return response.data as MapaCompleto;
 }
 
 export async function obterMapaAjuste(codSubprocesso: number): Promise<MapaAjuste> {
     const response = await apiClient.get(`/subprocessos/${codSubprocesso}/mapa-ajuste`);
-    return mapMapaAjusteDtoToModel(response.data);
+    return response.data as MapaAjuste;
 }
 
 export async function salvarMapaAjuste(
@@ -382,7 +167,7 @@ export async function adicionarCompetencia(
         `/subprocessos/${codSubprocesso}/competencia`,
         requestBody,
     );
-    return mapMapaCompletoDtoToModel(response.data);
+    return response.data as MapaCompleto;
 }
 
 export async function atualizarCompetencia(
@@ -397,7 +182,7 @@ export async function atualizarCompetencia(
         `/subprocessos/${codSubprocesso}/competencia/${competencia.codigo}`,
         requestBody,
     );
-    return mapMapaCompletoDtoToModel(response.data);
+    return response.data as MapaCompleto;
 }
 
 export async function removerCompetencia(
@@ -407,7 +192,7 @@ export async function removerCompetencia(
     const response = await apiClient.post(
         `/subprocessos/${codSubprocesso}/competencia/${codCompetencia}/remover`,
     );
-    return mapMapaCompletoDtoToModel(response.data);
+    return response.data as MapaCompleto;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -475,7 +260,7 @@ export const listarAnalisesCadastro = async (
     const response = await apiClient.get(
         `/subprocessos/${codSubprocesso}/historico-cadastro`,
     );
-    return mapAnalisesArray(response.data);
+    return response.data as AnaliseCadastro[];
 };
 
 export const listarAnalisesValidacao = async (
@@ -484,5 +269,5 @@ export const listarAnalisesValidacao = async (
     const response = await apiClient.get(
         `/subprocessos/${codSubprocesso}/historico-validacao`,
     );
-    return mapAnalisesArray(response.data);
+    return response.data as AnaliseValidacao[];
 };

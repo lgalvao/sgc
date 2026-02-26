@@ -158,7 +158,7 @@ class SubprocessoControllerTest {
                     .build();
 
             when(subprocessoService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-            when(subprocessoService.criarAnalise(any(), any())).thenReturn(new Analise());
+            when(subprocessoService.criarAnalise(any(), any(), any())).thenReturn(new Analise());
 
             mockMvc.perform(post("/api/subprocessos/1/analises-cadastro")
                             .with(csrf())
@@ -166,7 +166,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isCreated());
 
-            verify(subprocessoService).criarAnalise(any(), any());
+            verify(subprocessoService).criarAnalise(any(), any(), any());
         }
     }
 }

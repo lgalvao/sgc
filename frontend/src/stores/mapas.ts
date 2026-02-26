@@ -1,11 +1,11 @@
 import {
-    adicionarCompetencia,
-    atualizarCompetencia,
-    disponibilizarMapa,
+    adicionarCompetencia as adicionarCompetenciaService,
+    atualizarCompetencia as atualizarCompetenciaService,
+    disponibilizarMapa as disponibilizarMapaService,
     obterMapaAjuste,
     obterMapaCompleto,
     obterMapaVisualizacao,
-    removerCompetencia,
+    removerCompetencia as removerCompetenciaService,
     salvarMapaAjuste,
     salvarMapaCompleto,
     verificarImpactosMapa,
@@ -121,7 +121,7 @@ export const useMapasStore = defineStore("mapas", () => {
         carregando.value = true;
         erro.value = null;
         try {
-            await disponibilizarMapa(codSubprocesso, request);
+            await disponibilizarMapaService(codSubprocesso, request);
         } catch (e: any) {
             erro.value = e.message || "Erro ao disponibilizar mapa.";
             throw e;
@@ -137,7 +137,7 @@ export const useMapasStore = defineStore("mapas", () => {
         carregando.value = true;
         erro.value = null;
         try {
-            mapaCompleto.value = await adicionarCompetencia(
+            mapaCompleto.value = await adicionarCompetenciaService(
                 codSubprocesso,
                 competencia,
             );
@@ -156,7 +156,7 @@ export const useMapasStore = defineStore("mapas", () => {
         carregando.value = true;
         erro.value = null;
         try {
-            mapaCompleto.value = await atualizarCompetencia(
+            mapaCompleto.value = await atualizarCompetenciaService(
                 codSubprocesso,
                 competencia,
             );
@@ -175,7 +175,7 @@ export const useMapasStore = defineStore("mapas", () => {
         carregando.value = true;
         erro.value = null;
         try {
-            mapaCompleto.value = await removerCompetencia(
+            mapaCompleto.value = await removerCompetenciaService(
                 codSubprocesso,
                 codCompetencia,
             );
