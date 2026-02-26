@@ -175,7 +175,7 @@ import {
 import {computed, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
-import type {PerfilUnidade} from "@/mappers/sgrh";
+import type {PerfilUnidade} from "@/services/usuarioService";
 import {logger} from "@/utils";
 
 import {usePerfilStore} from "@/stores/perfil";

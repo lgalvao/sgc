@@ -1,6 +1,5 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import {mapUnidadesArray} from "@/mappers/unidades";
 import {
     buscarArvoreComElegibilidade,
     buscarArvoreUnidade as serviceBuscarArvoreUnidade,
@@ -37,7 +36,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
                     tipoProcesso,
                     codProcesso,
                 );
-                unidades.value = mapUnidadesArray(response as any) as Unidade[];
+                unidades.value = response as Unidade[];
             }).catch((err: any) => {
                 error.value = lastError.value?.message || "Erro ao buscar unidades";
                 throw err;
@@ -50,7 +49,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         await loading.withLoading(async () => {
             await withErrorHandling(async () => {
                 const response = await serviceBuscarTodasUnidades();
-                unidades.value = mapUnidadesArray(response as any) as Unidade[];
+                unidades.value = response as Unidade[];
             }).catch((err: any) => {
                 error.value = lastError.value?.message || "Erro ao buscar todas as unidades";
                 throw err;

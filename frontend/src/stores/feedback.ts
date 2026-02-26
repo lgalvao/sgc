@@ -49,7 +49,7 @@ export const useFeedbackStore = defineStore('feedback', () => {
             // Libera o lock após um curto período
             setTimeout(() => {
                 isProcessing.value = false;
-            }, 100);
+            }, 500);
         } else {
             // Se o toast ainda não foi injetado (ex: erro na inicialização do app), enfileira
             messageQueue.value.push({ title, message, variant, autoHideDelay });

@@ -9,13 +9,6 @@ vi.mock("@/axios-setup", () => ({
     },
 }));
 
-vi.mock("@/mappers/mapas", () => ({
-    mapMapaCompletoDtoToModel: vi.fn(d => d)
-}));
-
-vi.mock("@/mappers/atividades", () => ({
-    mapAtividadeVisualizacaoToModel: vi.fn(d => d)
-}));
 
 describe("subprocessoService", () => {
     it("importarAtividades chama o endpoint correto", async () => {

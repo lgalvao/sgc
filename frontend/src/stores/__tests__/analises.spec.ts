@@ -1,11 +1,11 @@
 import {describe, expect, it, vi} from "vitest";
-import * as analiseService from "@/services/analiseService";
+import * as subprocessoService from "@/services/subprocessoService";
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 import {useAnalisesStore} from "../analises";
 import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 
 // Mock do service
-vi.mock("@/services/analiseService", () => ({
+vi.mock("@/services/subprocessoService", () => ({
     listarAnalisesCadastro: vi.fn(),
     listarAnalisesValidacao: vi.fn(),
 }));
@@ -84,13 +84,13 @@ describe("useAnalisesStore", () => {
         ];
 
         it("buscarAnalisesCadastro deve chamar o serviço e atualizar o estado", async () => {
-            vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue(
+            vi.mocked(subprocessoService.listarAnalisesCadastro).mockResolvedValue(
                 mockAnalisesCadastro,
             );
 
             await context.store.buscarAnalisesCadastro(codSubprocesso);
 
-            expect(analiseService.listarAnalisesCadastro).toHaveBeenCalledWith(
+            expect(subprocessoService.listarAnalisesCadastro).toHaveBeenCalledWith(
                 codSubprocesso,
             );
             expect(context.store.obterAnalisesPorSubprocesso(codSubprocesso)).toEqual(
@@ -99,13 +99,13 @@ describe("useAnalisesStore", () => {
         });
 
         it("buscarAnalisesValidacao deve chamar o serviço e atualizar o estado", async () => {
-            vi.mocked(analiseService.listarAnalisesValidacao).mockResolvedValue(
+            vi.mocked(subprocessoService.listarAnalisesValidacao).mockResolvedValue(
                 mockAnalisesValidacao,
             );
 
             await context.store.buscarAnalisesValidacao(codSubprocesso);
 
-            expect(analiseService.listarAnalisesValidacao).toHaveBeenCalledWith(
+            expect(subprocessoService.listarAnalisesValidacao).toHaveBeenCalledWith(
                 codSubprocesso,
             );
             expect(context.store.obterAnalisesPorSubprocesso(codSubprocesso)).toEqual(
@@ -114,10 +114,10 @@ describe("useAnalisesStore", () => {
         });
 
         it("deve mesclar resultados ao buscar análises de cadastro e validação", async () => {
-            vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue(
+            vi.mocked(subprocessoService.listarAnalisesCadastro).mockResolvedValue(
                 mockAnalisesCadastro,
             );
-            vi.mocked(analiseService.listarAnalisesValidacao).mockResolvedValue(
+            vi.mocked(subprocessoService.listarAnalisesValidacao).mockResolvedValue(
                 mockAnalisesValidacao,
             );
 
@@ -138,7 +138,7 @@ describe("useAnalisesStore", () => {
         });
 
         it("deve lidar com erro em buscarAnalisesCadastro", async () => {
-            vi.mocked(analiseService.listarAnalisesCadastro).mockRejectedValue(
+            vi.mocked(subprocessoService.listarAnalisesCadastro).mockRejectedValue(
                 new Error("Fail"),
             );
             await expect(
@@ -149,7 +149,7 @@ describe("useAnalisesStore", () => {
         });
 
         it("deve lidar com erro em buscarAnalisesValidacao", async () => {
-            vi.mocked(analiseService.listarAnalisesValidacao).mockRejectedValue(
+            vi.mocked(subprocessoService.listarAnalisesValidacao).mockRejectedValue(
                 new Error("Fail"),
             );
             await expect(

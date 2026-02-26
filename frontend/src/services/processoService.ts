@@ -79,8 +79,9 @@ export async function executarAcaoEmBloco(
     payload: { unidadeCodigos: number[]; acao: "aceitar" | "homologar" | "disponibilizar"; dataLimite?: string },
 ): Promise<void> {
     await apiClient.post(`/processos/${codProcesso}/acao-em-bloco`, {
-        ...payload,
         acao: payload.acao.toUpperCase(),
+        subprocessos: payload.unidadeCodigos,
+        dataLimite: payload.dataLimite,
     });
 }
 

@@ -8,12 +8,7 @@ import {useUnidadesStore} from '../unidades';
 import {useMapasStore} from '../mapas';
 import {useAtividadesStore} from '../atividades';
 import {useFeedbackStore} from '../feedback';
-import {
-    buscarContextoEdicao,
-    buscarSubprocessoDetalhe,
-    buscarSubprocessoPorProcessoEUnidade,
-    validarCadastro,
-} from '@/services/subprocessoService';
+import * as subprocessoService from '@/services/subprocessoService';
 import {
     aceitarCadastro,
     aceitarRevisaoCadastro,
@@ -52,13 +47,6 @@ vi.mock('@/services/cadastroService', () => ({
     homologarRevisaoCadastro: vi.fn(),
 }));
 
-vi.mock('@/mappers/mapas', () => ({
-    mapMapaCompletoDtoToModel: vi.fn((data) => ({ ...data, mapped: true })),
-}));
-
-vi.mock('@/mappers/atividades', () => ({
-    mapAtividadeVisualizacaoToModel: vi.fn((data) => ({ ...data, mapped: true })),
-}));
 
 // Mock Stores
 vi.mock('../processos', () => ({
@@ -140,7 +128,7 @@ describe('Subprocessos Store', () => {
     describe('buscarSubprocessoDetalhe', () => {
         it('deve limpar o estado anterior antes de buscar novo detalhe', async () => {
             store.subprocessoDetalhe = { codigo: 1 } as any;
-            (buscarSubprocessoDetalhe as any).mockReturnValue(new Promise(() => { }));
+            (subprocessoService.buscarSubprocessoDetalhe as any).mockReturnValue(new Promise(() => { }));
 
             store.buscarSubprocessoDetalhe(2);
 
@@ -154,17 +142,17 @@ describe('Subprocessos Store', () => {
 
             expect(store.lastError).toBeTruthy();
             expect(store.lastError?.message).toBe("Informações de perfil ou unidade não disponíveis.");
-            expect(buscarSubprocessoDetalhe).not.toHaveBeenCalled();
+            expect(subprocessoService.buscarSubprocessoDetalhe).not.toHaveBeenCalled();
         });
 
         it('deve buscar com sucesso para ADMIN (global)', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
             mockPerfilStore.unidadeAtual = null;
-            (buscarSubprocessoDetalhe as any).mockResolvedValue({ codigo: 1, situacao: 'CRIADO' });
+            (subprocessoService.buscarSubprocessoDetalhe as any).mockResolvedValue({ codigo: 1, situacao: 'CRIADO' });
 
             await store.buscarSubprocessoDetalhe(1);
 
-            expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(1, 'ADMIN', null);
+            expect(subprocessoService.buscarSubprocessoDetalhe).toHaveBeenCalledWith(1, 'ADMIN', null);
             expect(store.subprocessoDetalhe).toMatchObject({ codigo: 1, situacao: 'CRIADO' });
             expect(store.lastError).toBeNull();
         });
@@ -175,16 +163,16 @@ describe('Subprocessos Store', () => {
             mockPerfilStore.perfisUnidades = [{ perfil: 'SERVIDOR', unidade: { codigo: 10 } }] as any;
             mockPerfilStore.unidadeAtual = 10;
 
-            (buscarSubprocessoDetalhe as any).mockResolvedValue({ codigo: 1, situacao: 'CRIADO' });
+            (subprocessoService.buscarSubprocessoDetalhe as any).mockResolvedValue({ codigo: 1, situacao: 'CRIADO' });
 
             await store.buscarSubprocessoDetalhe(1);
 
-            expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(1, 'SERVIDOR', 10);
+            expect(subprocessoService.buscarSubprocessoDetalhe).toHaveBeenCalledWith(1, 'SERVIDOR', 10);
         });
 
         it('deve lidar com erro do serviço', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
-            (buscarSubprocessoDetalhe as any).mockRejectedValue(new Error('Erro backend'));
+            (subprocessoService.buscarSubprocessoDetalhe as any).mockRejectedValue(new Error('Erro backend'));
 
             await expect(store.buscarSubprocessoDetalhe(1)).rejects.toThrow('Erro backend');
 
@@ -199,7 +187,7 @@ describe('Subprocessos Store', () => {
 
     describe('buscarSubprocessoPorProcessoEUnidade', () => {
         it('deve retornar codigo em caso de sucesso', async () => {
-            (buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue({ codigo: 123 });
+            (subprocessoService.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue({ codigo: 123 });
 
             const result = await store.buscarSubprocessoPorProcessoEUnidade(1, 'SESEL');
 
@@ -208,7 +196,7 @@ describe('Subprocessos Store', () => {
         });
 
         it('deve retornar null em caso de erro', async () => {
-            (buscarSubprocessoPorProcessoEUnidade as any).mockRejectedValue(new Error('Não encontrado'));
+            (subprocessoService.buscarSubprocessoPorProcessoEUnidade as any).mockRejectedValue(new Error('Não encontrado'));
 
             const result = await store.buscarSubprocessoPorProcessoEUnidade(1, 'SESEL');
 
@@ -224,7 +212,7 @@ describe('Subprocessos Store', () => {
     describe('buscarContextoEdicao', () => {
         it('deve limpar o estado anterior antes de buscar novo contexto', async () => {
             store.subprocessoDetalhe = { codigo: 1 } as any;
-            (buscarContextoEdicao as any).mockReturnValue(new Promise(() => { }));
+            (subprocessoService.buscarContextoEdicao as any).mockReturnValue(new Promise(() => { }));
 
             store.buscarContextoEdicao(2);
 
@@ -239,17 +227,16 @@ describe('Subprocessos Store', () => {
                 mapa: { id: 5 },
                 atividadesDisponiveis: [{ id: 100 }]
             };
-            (buscarContextoEdicao as any).mockResolvedValue(mockData);
+            (subprocessoService.buscarContextoEdicao as any).mockResolvedValue(mockData);
 
             await store.buscarContextoEdicao(1);
 
             expect(store.subprocessoDetalhe).toMatchObject(mockData.subprocesso);
             expect(mockUnidadesStore.unidade).toEqual(mockData.unidade);
-            // Verifica mapper
-            expect(mockMapasStore.mapaCompleto).toEqual({ id: 5, mapped: true });
+            expect(mockMapasStore.mapaCompleto).toEqual({ id: 5 });
             expect(mockAtividadesStore.setAtividadesParaSubprocesso).toHaveBeenCalledWith(
                 1,
-                [{ id: 100, mapped: true }]
+                [{ id: 100 }]
             );
         });
 
@@ -403,7 +390,7 @@ describe('Subprocessos Store', () => {
         it('deve delegar para apiClient e recarregar detalhes', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
             mockPerfilStore.unidadeAtual = null;
-            (buscarSubprocessoDetalhe as any).mockResolvedValue({});
+            (subprocessoService.buscarSubprocessoDetalhe as any).mockResolvedValue({});
             (alterarDataLimiteSubprocesso as any).mockResolvedValue(undefined);
 
             const dados = { novaData: '2024-12-31' };
@@ -411,7 +398,7 @@ describe('Subprocessos Store', () => {
             await store.alterarDataLimiteSubprocesso(123, dados);
 
             expect(alterarDataLimiteSubprocesso).toHaveBeenCalledWith(123, dados);
-            expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(123, 'ADMIN', null);
+            expect(subprocessoService.buscarSubprocessoDetalhe).toHaveBeenCalledWith(123, 'ADMIN', null);
         });
 
         it('deve lidar com erro na API', async () => {
@@ -439,9 +426,9 @@ describe('Subprocessos Store', () => {
 
     describe('validarCadastro', () => {
         it('deve chamar serviceValidarCadastro', async () => {
-            (validarCadastro as any).mockResolvedValue({ valido: true });
+            (subprocessoService.validarCadastro as any).mockResolvedValue({ valido: true });
             const res = await store.validarCadastro(1);
-            expect(validarCadastro).toHaveBeenCalledWith(1);
+            expect(subprocessoService.validarCadastro).toHaveBeenCalledWith(1);
             expect(res).toEqual({ valido: true });
         });
     });

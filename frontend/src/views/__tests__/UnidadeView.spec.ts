@@ -76,7 +76,7 @@ vi.mock('@/services/atribuicaoTemporariaService', () => ({
     buscarTodasAtribuicoes: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock('@/services/mapaService', () => ({
+vi.mock('@/services/subprocessoService', () => ({
     obterMapaCompleto: vi.fn().mockResolvedValue(null),
 }));
 

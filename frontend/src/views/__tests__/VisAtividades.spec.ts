@@ -70,9 +70,6 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoDetalhe: vi.fn().mockImplementation((cod) => Promise.resolve({
         codigo: cod,
     })),
-}));
-
-vi.mock("@/services/mapaService", () => ({
     verificarImpactosMapa: vi.fn().mockResolvedValue({ temImpactos: false, impactos: [] }),
 }));
 

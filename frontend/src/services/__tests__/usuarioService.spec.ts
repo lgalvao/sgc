@@ -1,15 +1,9 @@
 import {describe, expect, it, vi} from "vitest";
 import {setupServiceTest, testErrorHandling, testGetEndpoint, testPostEndpoint} from "@/test-utils/serviceTestHelpers";
-import * as mappers from "@/mappers/sgrh";
 import * as service from "../usuarioService";
-
-vi.mock("@/mappers/sgrh", () => ({
-    mapPerfilUnidadeToFrontend: vi.fn((dto) => ({ ...dto, mapped: true })),
-}));
 
 describe("usuarioService", () => {
     const { mockApi } = setupServiceTest();
-    const mockMappers = vi.mocked(mappers);
 
     describe("autenticar", () => {
         it("deve fazer POST e retornar booleano", async () => {
@@ -26,9 +20,9 @@ describe("usuarioService", () => {
     });
 
     describe("autorizar", () => {
-        it("deve fazer POST, mapear e retornar resposta", async () => {
+        it("deve fazer POST e retornar resposta", async () => {
             const tituloEleitoral = "123";
-            const responseDto = [{ perfil: "CHEFE", unidade: "UNIT" }];
+            const responseDto = [{ perfil: "CHEFE", unidade: { codigo: 1, nome: 'U', sigla: 'U' } }];
             mockApi.post.mockResolvedValue({ data: responseDto });
 
             const result = await service.autorizar(tituloEleitoral);
@@ -37,11 +31,7 @@ describe("usuarioService", () => {
                 "/usuarios/autorizar",
                 { tituloEleitoral },
             );
-            expect(mockMappers.mapPerfilUnidadeToFrontend).toHaveBeenCalled();
-            expect(mockMappers.mapPerfilUnidadeToFrontend.mock.calls[0][0]).toEqual(
-                responseDto[0],
-            );
-            expect(result[0]).toHaveProperty("mapped", true);
+            expect(result[0].perfil).toBe("CHEFE");
         });
 
         testErrorHandling(() => service.autorizar("123"), 'post');

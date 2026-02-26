@@ -39,16 +39,13 @@ vi.mock("@/services/processoService", () => ({
     }),
 }));
 
-vi.mock("@/services/mapaService", () => ({
-    verificarImpactosMapa: vi.fn().mockResolvedValue({ temImpactos: false, impactos: [] }),
-}));
-
 vi.mock("@/services/subprocessoService", () => ({
+    verificarImpactosMapa: vi.fn().mockResolvedValue({ temImpactos: false, impactos: [] }),
     listarAtividades: vi.fn().mockResolvedValue([]),
     buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({
         codigo: 10,
     }),
-    homologarRevisaoCadastro: vi.fn(), // Already mocking in store spy, but good to have
+    homologarRevisaoCadastro: vi.fn(),
     devolverRevisaoCadastro: vi.fn(),
 }));
 

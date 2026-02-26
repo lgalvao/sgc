@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaViews;
+import sgc.mapa.service.MapaManutencaoService;
 
 import java.net.URI;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Mapas", description = "Endpoints para gerenciamento de mapas de competências")
 public class MapaController {
-    private final MapaFacade mapaFacade;
+    private final MapaManutencaoService mapaManutencaoService;
 
     /**
      * Retorna uma lista com todos os mapas de competências.
@@ -34,7 +35,7 @@ public class MapaController {
     @Operation(summary = "Lista todos os mapas")
     @JsonView(MapaViews.Publica.class)
     public List<Mapa> listar() {
-        return mapaFacade.todosMapas();
+        return mapaManutencaoService.listarTodosMapas();
     }
 
     /**
@@ -48,7 +49,7 @@ public class MapaController {
     @Operation(summary = "Obtém um mapa pelo código")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> obterPorId(@PathVariable Long codigo) {
-        var mapa = mapaFacade.mapaPorCodigo(codigo);
+        var mapa = mapaManutencaoService.buscarMapaPorCodigo(codigo);
         return ResponseEntity.ok(mapa);
     }
 
@@ -57,7 +58,7 @@ public class MapaController {
     @Operation(summary = "Cria um mapa")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> criar(@Valid @RequestBody Mapa mapa) {
-        var salvo = mapaFacade.salvar(mapa);
+        var salvo = mapaManutencaoService.salvarMapa(mapa);
 
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(salvo);
@@ -68,7 +69,12 @@ public class MapaController {
     @Operation(summary = "Atualiza um mapa existente")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> atualizar(@PathVariable Long codMapa, @Valid @RequestBody Mapa mapa) {
-        var atualizado = mapaFacade.atualizar(codMapa, mapa);
+        Mapa existente = mapaManutencaoService.buscarMapaPorCodigo(codMapa)
+                .setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado())
+                .setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao())
+                .setDataHoraHomologado(mapa.getDataHoraHomologado());
+
+        var atualizado = mapaManutencaoService.salvarMapa(existente);
         return ResponseEntity.ok(atualizado);
     }
 
@@ -76,7 +82,7 @@ public class MapaController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Exclui um mapa")
     public ResponseEntity<Void> excluir(@PathVariable Long codMapa) {
-        mapaFacade.excluir(codMapa);
+        mapaManutencaoService.excluirMapa(codMapa);
         return ResponseEntity.noContent().build();
     }
 }

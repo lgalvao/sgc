@@ -22,7 +22,7 @@ import sgc.relatorio.PdfFactory;
 import sgc.relatorio.RelatorioFacade;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoFacade;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -39,7 +39,7 @@ class RelatorioFacadeTest {
     @Mock
     private ProcessoFacade processoFacade;
     @Mock
-    private SubprocessoFacade subprocessoFacade;
+    private SubprocessoService subprocessoService;
     @Mock
     private OrganizacaoFacade unidadeService;
     @Mock
@@ -56,7 +56,7 @@ class RelatorioFacadeTest {
 
     @Test
     @DisplayName("Deve gerar relatório de andamento")
-    void deveGerarRelatorioAndamento() {
+    void deveGerarRelatorioAndamento() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         p.setDescricao("Proc Teste");
@@ -71,7 +71,7 @@ class RelatorioFacadeTest {
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(unidadeService.buscarResponsavelUnidade(1L)).thenReturn(UnidadeResponsavelDto.builder().titularNome("Resp").build());
 
         OutputStream out = new ByteArrayOutputStream();
@@ -82,7 +82,7 @@ class RelatorioFacadeTest {
 
     @Test
     @DisplayName("Deve gerar relatório de mapas completo")
-    void deveGerarRelatorioMapasCompleto() {
+    void deveGerarRelatorioMapasCompleto() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         p.setDescricao("Proc Teste");
@@ -109,7 +109,7 @@ class RelatorioFacadeTest {
         c.setAtividades(Set.of(a));
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -119,7 +119,7 @@ class RelatorioFacadeTest {
 
     @Test
     @DisplayName("Deve filtrar por unidade no relatório de mapas")
-    void deveFiltrarPorUnidadeNoRelatorioMapas() {
+    void deveFiltrarPorUnidadeNoRelatorioMapas() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         p.setDescricao("Proc Teste");
@@ -141,7 +141,7 @@ class RelatorioFacadeTest {
         sp2.getMapa().setCodigo(20L);
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
         when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
 
         OutputStream out = new ByteArrayOutputStream();
@@ -153,7 +153,7 @@ class RelatorioFacadeTest {
 
     @Test
     @DisplayName("Deve processar competência sem atividades")
-    void deveProcessarCompetenciaSemAtividades() {
+    void deveProcessarCompetenciaSemAtividades() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         Unidade u = new Unidade();
@@ -170,7 +170,7 @@ class RelatorioFacadeTest {
         c.setAtividades(Set.of()); // Atividades vazias
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -180,7 +180,7 @@ class RelatorioFacadeTest {
 
     @Test
     @DisplayName("Deve processar atividade sem conhecimentos")
-    void deveProcessarAtividadeSemConhecimentos() {
+    void deveProcessarAtividadeSemConhecimentos() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
         Unidade u = new Unidade();
@@ -200,7 +200,7 @@ class RelatorioFacadeTest {
         c.setAtividades(Set.of(a));
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -213,7 +213,7 @@ class RelatorioFacadeTest {
     @DisplayName("Deve cobrir erro ao gerar PDF")
     void deveCobrirErroGerarPdf() throws DocumentException {
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(new Processo());
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
         when(pdfFactory.createDocument()).thenReturn(document);
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 
@@ -227,7 +227,7 @@ class RelatorioFacadeTest {
     @DisplayName("Deve cobrir erro ao gerar PDF de mapas")
     void deveCobrirErroGerarPdfMapas() throws DocumentException {
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(new Processo());
-        when(subprocessoFacade.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
         when(pdfFactory.createDocument()).thenReturn(document);
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 

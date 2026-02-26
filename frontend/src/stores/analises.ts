@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import * as analiseService from "@/services/analiseService";
+import * as subprocessoService from "@/services/subprocessoService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useSingleLoading} from "@/composables/useLoadingManager";
 
@@ -22,7 +22,7 @@ export const useAnalisesStore = defineStore("analises", () => {
         
         await loading.withLoading(async () => {
             await withErrorHandling(async () => {
-                const analises = await analiseService.listarAnalisesCadastro(codSubprocesso);
+                const analises = await subprocessoService.listarAnalisesCadastro(codSubprocesso);
                 const atuais = analisesPorSubprocesso.value.get(codSubprocesso) || [];
                 const outras = atuais.filter((a) => a.tipo !== "CADASTRO");
                 analisesPorSubprocesso.value.set(codSubprocesso, [...outras, ...analises]);
@@ -36,7 +36,7 @@ export const useAnalisesStore = defineStore("analises", () => {
         await loading.withLoading(async () => {
             await withErrorHandling(async () => {
                 const analises =
-                    await analiseService.listarAnalisesValidacao(codSubprocesso);
+                    await subprocessoService.listarAnalisesValidacao(codSubprocesso);
                 const atuais = analisesPorSubprocesso.value.get(codSubprocesso) || [];
                 const outras = atuais.filter((a) => a.tipo !== "VALIDACAO");
                 analisesPorSubprocesso.value.set(codSubprocesso, [...outras, ...analises]);

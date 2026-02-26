@@ -36,6 +36,7 @@
     "@pinia/testing": "^1.0.3",
     "@storybook/addon-docs": "^10.2.11",
     "@storybook/addon-links": "^10.2.11",
+    "@storybook/test": "^8.6.15",
     "@storybook/vue3-vite": "^10.2.11",
     "@types/bootstrap": "^5.2.10",
     "@types/node": "^25.3.0",

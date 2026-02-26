@@ -1,12 +1,34 @@
-import {
-    type AutenticacaoRequest,
-    type EntrarRequest,
-    type LoginResponse,
-    mapPerfilUnidadeToFrontend,
-    type PerfilUnidade,
-} from "@/mappers/sgrh";
 import type {Usuario} from "@/types/tipos";
 import apiClient from "../axios-setup";
+
+export interface AutenticacaoRequest {
+    tituloEleitoral: string;
+    senha: string;
+}
+
+export interface EntrarRequest {
+    tituloEleitoral: string;
+    perfil: string;
+    unidadeCodigo: number;
+}
+
+export interface LoginResponse {
+    tituloEleitoral: string;
+    nome: string;
+    perfil: string;
+    unidadeCodigo: number;
+    token: string;
+}
+
+export interface PerfilUnidade {
+    perfil: string;
+    unidade: {
+        codigo: number;
+        nome: string;
+        sigla: string;
+    };
+    siglaUnidade: string;
+}
 
 export async function autenticar(
     request: AutenticacaoRequest,
@@ -25,7 +47,7 @@ export async function autorizar(
         "/usuarios/autorizar",
         { tituloEleitoral },
     );
-    return response.data.map(mapPerfilUnidadeToFrontend);
+    return response.data.map(mapPerfilUnidade);
 }
 
 export async function entrar(request: EntrarRequest): Promise<LoginResponse> {
@@ -53,4 +75,16 @@ export async function buscarUsuarioPorTitulo(
 ): Promise<Usuario> {
     const response = await apiClient.get(`/usuarios/${titulo}`);
     return response.data;
+}
+
+function mapPerfilUnidade(dto: any): PerfilUnidade {
+    return {
+        perfil: dto.perfil,
+        unidade: {
+            codigo: dto.unidade.codigo,
+            nome: dto.unidade.nome,
+            sigla: dto.unidade.sigla,
+        },
+        siglaUnidade: dto.siglaUnidade || dto.unidade.sigla,
+    };
 }

@@ -1,6 +1,5 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useFeedbackStore} from "@/stores/feedback";
 import type {
@@ -28,7 +27,7 @@ export const useMapasStore = defineStore("mapas", () => {
         return withErrorHandling(async () => {
             mapaVisualizacao.value = null; // Limpa estado anterior
             mapaVisualizacao.value =
-                await mapaService.obterMapaVisualizacao(codSubprocesso);
+                await subprocessoService.obterMapaVisualizacao(codSubprocesso);
         }, () => {
             mapaVisualizacao.value = null;
         });
@@ -37,7 +36,7 @@ export const useMapasStore = defineStore("mapas", () => {
     async function buscarMapaCompleto(codSubprocesso: number) {
         return withErrorHandling(async () => {
             mapaCompleto.value = null; // Limpa estado anterior
-            mapaCompleto.value = await mapaService.obterMapaCompleto(codSubprocesso);
+            mapaCompleto.value = await subprocessoService.obterMapaCompleto(codSubprocesso);
         }, () => {
             mapaCompleto.value = null;
         });
@@ -45,7 +44,7 @@ export const useMapasStore = defineStore("mapas", () => {
 
     async function salvarMapa(codSubprocesso: number, request: SalvarMapaRequest) {
         return withErrorHandling(async () => {
-            mapaCompleto.value = await mapaService.salvarMapaCompleto(
+            mapaCompleto.value = await subprocessoService.salvarMapaCompleto(
                 codSubprocesso,
                 request,
             );
@@ -96,7 +95,7 @@ export const useMapasStore = defineStore("mapas", () => {
 
     async function buscarMapaAjuste(codSubprocesso: number) {
         return withErrorHandling(async () => {
-            mapaAjuste.value = await mapaService.obterMapaAjuste(codSubprocesso);
+            mapaAjuste.value = await subprocessoService.obterMapaAjuste(codSubprocesso);
         }, () => {
             mapaAjuste.value = null;
         });
@@ -104,14 +103,14 @@ export const useMapasStore = defineStore("mapas", () => {
 
     async function salvarAjustes(codSubprocesso: number, request: SalvarAjustesRequest) {
         return withErrorHandling(async () => {
-            await mapaService.salvarMapaAjuste(codSubprocesso, request);
+            await subprocessoService.salvarMapaAjuste(codSubprocesso, request);
         });
     }
 
     async function buscarImpactoMapa(codSubprocesso: number) {
         return withErrorHandling(async () => {
             impactoMapa.value =
-                await mapaService.verificarImpactosMapa(codSubprocesso);
+                await subprocessoService.verificarImpactosMapa(codSubprocesso);
         }, () => {
             impactoMapa.value = null;
         });
@@ -122,7 +121,7 @@ export const useMapasStore = defineStore("mapas", () => {
         request: DisponibilizarMapaRequest,
     ) {
         return withErrorHandling(async () => {
-            await mapaService.disponibilizarMapa(codSubprocesso, request);
+            await subprocessoService.disponibilizarMapa(codSubprocesso, request);
             feedbackStore.show(
                 "Mapa disponibilizado",
                 "O mapa de competências foi disponibilizado com sucesso.",

@@ -24,6 +24,7 @@ import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.Processo;
+import sgc.processo.model.TipoProcesso;
 import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.model.*;
@@ -69,7 +70,10 @@ class SubprocessoServiceTransicaoTest {
         Unidade unidade = mock(Unidade.class);
         when(unidade.getSigla()).thenReturn("U1");
         when(subprocesso.getUnidade()).thenReturn(unidade);
-        when(subprocesso.getProcesso()).thenReturn(mock(Processo.class));
+
+        Processo processo = mock(Processo.class);
+        when(processo.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+        when(subprocesso.getProcesso()).thenReturn(processo);
 
         Unidade origem = mock(Unidade.class);
         when(origem.getSigla()).thenReturn("O");
@@ -105,7 +109,10 @@ class SubprocessoServiceTransicaoTest {
         Unidade unidade = mock(Unidade.class);
         when(unidade.getSigla()).thenReturn("U1");
         when(subprocesso.getUnidade()).thenReturn(unidade);
-        when(subprocesso.getProcesso()).thenReturn(mock(Processo.class));
+
+        Processo processo = mock(Processo.class);
+        when(processo.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+        when(subprocesso.getProcesso()).thenReturn(processo);
 
         Unidade origem = mock(Unidade.class);
         Unidade destino = mock(Unidade.class);
@@ -135,7 +142,9 @@ class SubprocessoServiceTransicaoTest {
         Unidade unidade = mock(Unidade.class);
         when(unidade.getSigla()).thenReturn("U1");
         when(subprocesso.getUnidade()).thenReturn(unidade);
-        when(subprocesso.getProcesso()).thenReturn(mock(Processo.class));
+
+        Processo processo = mock(Processo.class);
+        when(subprocesso.getProcesso()).thenReturn(processo);
 
         Usuario usuarioAutenticado = new Usuario();
         when(usuarioFacade.usuarioAutenticado()).thenReturn(usuarioAutenticado);
@@ -176,7 +185,9 @@ class SubprocessoServiceTransicaoTest {
         Unidade unidade = mock(Unidade.class);
         when(unidade.getSigla()).thenReturn("U1");
         when(subprocesso.getUnidade()).thenReturn(unidade);
-        when(subprocesso.getProcesso()).thenReturn(mock(Processo.class));
+
+        Processo processo = mock(Processo.class);
+        when(subprocesso.getProcesso()).thenReturn(processo);
 
         Usuario usuario = new Usuario();
         lenient().when(templateEngine.process(anyString(), any(Context.class))).thenReturn("html");

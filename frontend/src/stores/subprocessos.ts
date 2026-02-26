@@ -27,9 +27,6 @@ import {useFeedbackStore} from "@/stores/feedback";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useMapasStore} from "@/stores/mapas";
 import {useAtividadesStore} from "@/stores/atividades";
-import {mapMapaCompletoDtoToModel} from "@/mappers/mapas";
-import {mapAtividadeVisualizacaoToModel} from "@/mappers/atividades";
-import {mapSubprocessoDetalheDtoToModel} from "@/mappers/subprocessos";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,
@@ -91,12 +88,11 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         }
 
         await withErrorHandling(async () => {
-            const dto = await serviceFetchSubprocessoDetalhe(
+            subprocessoDetalhe.value = await serviceFetchSubprocessoDetalhe(
                 codigo,
                 perfil,
                 codUnidade as number,
             );
-            subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(dto);
         }, (err) => {
             logger.error(`Erro ao buscar detalhes do subprocesso ${codigo}:`, err);
             subprocessoDetalhe.value = null;
@@ -134,16 +130,16 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         return withErrorHandling(async () => {
             const data = await serviceBuscarContextoEdicao(codigo, perfil, codUnidade as number);
 
-            subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(data.detalhes || data);
+            subprocessoDetalhe.value = data.detalhes || data;
 
             const unidadesStore = useUnidadesStore();
             unidadesStore.unidade = data.unidade;
 
             const mapasStore = useMapasStore();
-            mapasStore.mapaCompleto = data.mapa ? mapMapaCompletoDtoToModel(data.mapa) : null;
+            mapasStore.mapaCompleto = data.mapa;
 
             const atividadesStore = useAtividadesStore();
-            const atividadesMapped = (data.atividadesDisponiveis || []).map(mapAtividadeVisualizacaoToModel);
+            const atividadesMapped = (data.atividadesDisponiveis || []);
             atividadesStore.setAtividadesParaSubprocesso(codigo, atividadesMapped);
         });
     }

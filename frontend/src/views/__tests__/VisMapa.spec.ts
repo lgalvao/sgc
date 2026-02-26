@@ -31,11 +31,7 @@ vi.mock("@/services/processoService", () => ({
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({ 
     }),
-}));
-vi.mock("@/services/mapaService", () => ({
     obterMapaVisualizacao: vi.fn().mockResolvedValue({ competencias: [] }),
-}));
-vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn().mockResolvedValue([]),
     listarAnalisesValidacao: vi.fn().mockResolvedValue([]),
 }));

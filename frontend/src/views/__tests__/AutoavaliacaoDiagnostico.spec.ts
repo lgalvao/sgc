@@ -13,7 +13,7 @@ vi.mock('@/services/diagnosticoService', () => ({
   }
 }));
 
-vi.mock('@/services/mapaService', () => ({
+vi.mock('@/services/subprocessoService', () => ({
   obterMapaCompleto: vi.fn(),
 }));
 
@@ -68,7 +68,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
   };
 
   let diagnosticoService: any;
-  let mapaService: any;
+  let subprocessoService: any;
   let unidadeService: any;
 
   beforeEach(async () => {
@@ -78,11 +78,11 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     
     // Importar os mocks após vi.clearAllMocks
     const diagMod = await import('@/services/diagnosticoService');
-    const mapaMod = await import('@/services/mapaService');
+    const mapaMod = await import('@/services/subprocessoService');
     const unidMod = await import('@/services/unidadeService');
     
     diagnosticoService = diagMod.diagnosticoService;
-    mapaService = mapaMod;
+    subprocessoService = mapaMod;
     unidadeService = unidMod;
     
     // Configurar mocks padrão ANTES de qualquer montagem
@@ -93,7 +93,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     ]);
     (diagnosticoService.salvarAvaliacao as any).mockResolvedValue({});
     (diagnosticoService.concluirAutoavaliacao as any).mockResolvedValue({});
-    (mapaService.obterMapaCompleto as any).mockResolvedValue({ 
+    (subprocessoService.obterMapaCompleto as any).mockResolvedValue({
       competencias: [
         {codigo: 1, descricao: 'Competencia 1' },
         {codigo: 2, descricao: 'Competencia 2' }
@@ -114,7 +114,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
       { competenciaCodigo: 2, importancia: '', dominio: '', observacoes: '' }
     ];
     
-    (mapaService.obterMapaCompleto as any).mockResolvedValue({ competencias: compData });
+    (subprocessoService.obterMapaCompleto as any).mockResolvedValue({ competencias: compData });
     (diagnosticoService.buscarMinhasAvaliacoes as any).mockResolvedValue(avalData);
 
     ctx.wrapper = mount(AutoavaliacaoDiagnostico, {
@@ -137,7 +137,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     await mountComponent();
     
     expect(unidadeService.buscarUnidadePorSigla).toHaveBeenCalledWith('TEST');
-    expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(10);
+    expect(subprocessoService.obterMapaCompleto).toHaveBeenCalledWith(10);
     expect(diagnosticoService.buscarMinhasAvaliacoes).toHaveBeenCalledWith(10, undefined);
   });
   

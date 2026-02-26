@@ -3,7 +3,6 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 import {computed, defineComponent, nextTick, ref} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
-import * as mapaService from "@/services/mapaService";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as unidadesService from "@/services/unidadeService";
 import {useAtividadesStore} from "@/stores/atividades";
@@ -43,17 +42,6 @@ vi.mock("@/composables/usePerfil", () => ({
 }));
 
 // Mock services explicitly
-vi.mock("@/services/mapaService", () => ({
-    obterMapaCompleto: vi.fn(),
-    obterMapaVisualizacao: vi.fn(),
-    disponibilizarMapa: vi.fn(),
-    salvarMapaCompleto: vi.fn(),
-    adicionarCompetencia: vi.fn(),
-    atualizarCompetencia: vi.fn(),
-    removerCompetencia: vi.fn(),
-    verificarImpactosMapa: vi.fn(),
-}));
-
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
@@ -62,6 +50,11 @@ vi.mock("@/services/subprocessoService", () => ({
     atualizarCompetencia: vi.fn(),
     removerCompetencia: vi.fn(),
     listarAtividades: vi.fn(),
+    obterMapaCompleto: vi.fn(),
+    obterMapaVisualizacao: vi.fn(),
+    disponibilizarMapa: vi.fn(),
+    salvarMapaCompleto: vi.fn(),
+    verificarImpactosMapa: vi.fn(),
 }));
 
 vi.mock("@/services/unidadeService", () => ({
@@ -356,10 +349,10 @@ describe("CadMapa.vue", () => {
             unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
         } as any);
 
-        vi.mocked(mapaService.obterMapaCompleto).mockResolvedValue(
+        vi.mocked(subprocessoService.obterMapaCompleto).mockResolvedValue(
             mockMapaCompleto as any,
         );
-        vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue({
+        vi.mocked(subprocessoService.obterMapaVisualizacao).mockResolvedValue({
             competencias: [{atividades: mockAtividades}],
         } as any);
         vi.mocked(subprocessoService.listarAtividades).mockResolvedValue(
@@ -371,7 +364,7 @@ describe("CadMapa.vue", () => {
         vi.mocked(subprocessoService.atualizarCompetencia).mockResolvedValue(mockMapaCompleto as any);
         vi.mocked(subprocessoService.removerCompetencia).mockResolvedValue(mockMapaCompleto as any);
 
-        vi.mocked(mapaService.disponibilizarMapa).mockResolvedValue();
+        vi.mocked(subprocessoService.disponibilizarMapa).mockResolvedValue();
     });
 
     afterEach(() => {
@@ -518,7 +511,7 @@ describe("CadMapa.vue", () => {
         await wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(mapaService.disponibilizarMapa).toHaveBeenCalledWith(123, {
+        expect(subprocessoService.disponibilizarMapa).toHaveBeenCalledWith(123, {
             dataLimite: "2023-12-31",
             observacoes: "Obs",
         });
@@ -611,7 +604,7 @@ describe("CadMapa.vue", () => {
                 }
             }
         };
-        vi.mocked(mapaService.disponibilizarMapa).mockRejectedValueOnce(axiosError);
+        vi.mocked(subprocessoService.disponibilizarMapa).mockRejectedValueOnce(axiosError);
 
         const {wrapper} = createWrapper();
         await flushPromises();

@@ -108,7 +108,7 @@ describe('processoService', () => {
             dataLimite: '2026-12-31'
         });
         expect(apiClient.post).toHaveBeenCalledWith('/processos/1/acao-em-bloco', {
-            unidadeCodigos: [10],
+            subprocessos: [10],
             acao: 'ACEITAR',
             dataLimite: '2026-12-31'
         });
