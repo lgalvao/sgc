@@ -99,26 +99,31 @@
       variant="danger"
       :loading="loadingDevolucao"
       :auto-close="false"
+      :ok-disabled="!observacaoDevolucao.trim()"
       test-id-confirmar="btn-devolucao-cadastro-confirmar"
       @confirmar="confirmarDevolucao"
     >
       <p>{{
           isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?'
         }}</p>
-      <BFormGroup label="Observação" label-for="observacaoDevolucao" class="mb-3">
+      <BFormGroup label="Observação (obrigatório)" label-for="observacaoDevolucao" class="mb-3">
         <BFormTextarea
             id="observacaoDevolucao"
             v-model="observacaoDevolucao"
             data-testid="inp-devolucao-cadastro-obs"
+            :state="estadoObservacaoDevolucao"
             rows="3"
         />
+        <BFormInvalidFeedback :state="estadoObservacaoDevolucao">
+          A justificativa é obrigatória para a devolução.
+        </BFormInvalidFeedback>
       </BFormGroup>
     </ModalConfirmacao>
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BFormGroup, BFormTextarea} from "bootstrap-vue-next";
+import {BButton, BFormGroup, BFormTextarea, BFormInvalidFeedback} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
@@ -227,6 +232,11 @@ const mostrarModalDevolver = ref(false);
 const mostrarModalHistoricoAnalise = ref(false);
 const observacaoValidacao = ref("");
 const observacaoDevolucao = ref("");
+const validacaoDevolucaoSubmetida = ref(false);
+
+const estadoObservacaoDevolucao = computed(() => {
+  return validacaoDevolucaoSubmetida.value && !observacaoDevolucao.value.trim() ? false : null;
+});
 
 // Ações de validação/devolução
 const loadingValidacao = ref(false);
@@ -275,6 +285,7 @@ function fecharModalValidar() {
 function fecharModalDevolver() {
   mostrarModalDevolver.value = false;
   observacaoDevolucao.value = "";
+  validacaoDevolucaoSubmetida.value = false;
 }
 
 async function confirmarValidacao() {
@@ -325,7 +336,9 @@ async function confirmarValidacao() {
 }
 
 async function confirmarDevolucao() {
-  if (!codSubprocesso.value) return;
+  validacaoDevolucaoSubmetida.value = true;
+  if (!codSubprocesso.value || !observacaoDevolucao.value.trim()) return;
+
   loadingDevolucao.value = true;
 
   try {

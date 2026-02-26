@@ -67,6 +67,7 @@ function onSubmit() {
   validacaoSubmetida.value = true;
   if (!modelValue.value.trim()) return;
   emit('submit');
+  validacaoSubmetida.value = false;
 }
 
 watch(
