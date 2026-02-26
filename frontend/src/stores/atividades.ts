@@ -11,7 +11,6 @@ import type {
 } from "@/types/tipos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {mapAtividadeVisualizacaoToModel} from "@/services/subprocessoService";
 
 export const useAtividadesStore = defineStore("atividades", () => {
     const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());
@@ -32,9 +31,8 @@ export const useAtividadesStore = defineStore("atividades", () => {
     async function atualizarDadosLocais(codSubprocesso: number, response: AtividadeOperacaoResponse) {
         // Atualizar lista de atividades no cache local
         if (response.atividadesAtualizadas) {
-            const atividades = response.atividadesAtualizadas
-                .map(mapAtividadeVisualizacaoToModel)
-                .filter((a): a is Atividade => a !== null);
+            // Simplified: Direct assignment, response should already be Atividade[]
+            const atividades = response.atividadesAtualizadas as Atividade[];
             atividadesPorSubprocesso.value.set(codSubprocesso, atividades);
         }
         

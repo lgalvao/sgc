@@ -1066,15 +1066,15 @@ public class SubprocessoService {
         if (proximaUnidade == null) {
             String siglaUnidade = unidadeAtual.getSigla();
 
-            criarAnalise(sp, CriarAnaliseCommand.builder()
-                    .codSubprocesso(codSubprocesso)
+            CriarAnaliseRequest request = CriarAnaliseRequest.builder()
                     .observacoes("Aceite da validação")
-                    .tipo(TipoAnalise.VALIDACAO)
                     .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
                     .siglaUnidade(siglaUnidade)
                     .tituloUsuario(usuario.getTituloEleitoral())
                     .motivo(null)
-                    .build());
+                    .build();
+
+            criarAnalise(sp, request, TipoAnalise.VALIDACAO);
 
             sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
             subprocessoRepo.save(sp);
@@ -1450,18 +1450,18 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public Analise criarAnalise(Subprocesso sp, CriarAnaliseCommand cmd) {
-        var unidadeDto = organizacaoFacade.buscarPorSigla(cmd.siglaUnidade());
+    public Analise criarAnalise(Subprocesso sp, CriarAnaliseRequest request, TipoAnalise tipo) {
+        var unidadeDto = organizacaoFacade.buscarPorSigla(request.siglaUnidade());
 
         Analise analise = Analise.builder()
                 .subprocesso(sp)
                 .dataHora(LocalDateTime.now())
-                .observacoes(cmd.observacoes())
-                .tipo(cmd.tipo())
-                .acao(cmd.acao())
+                .observacoes(request.observacoes())
+                .tipo(tipo)
+                .acao(request.acao())
                 .unidadeCodigo(unidadeDto.getCodigo())
-                .usuarioTitulo(cmd.tituloUsuario())
-                .motivo(cmd.motivo())
+                .usuarioTitulo(request.tituloUsuario())
+                .motivo(request.motivo())
                 .build();
 
         return salvarAnalise(analise);
@@ -1525,15 +1525,15 @@ public class SubprocessoService {
         Subprocesso sp = cmd.sp();
         Usuario usuario = cmd.usuario() != null ? cmd.usuario() : usuarioFacade.usuarioAutenticado();
 
-        criarAnalise(sp, CriarAnaliseCommand.builder()
-                .codSubprocesso(sp.getCodigo())
+        CriarAnaliseRequest request = CriarAnaliseRequest.builder()
                 .observacoes(cmd.observacoes())
-                .tipo(cmd.tipoAnalise())
                 .acao(cmd.tipoAcaoAnalise())
                 .siglaUnidade(cmd.unidadeAnalise().getSigla())
                 .tituloUsuario(usuario.getTituloEleitoral())
                 .motivo(cmd.motivoAnalise())
-                .build());
+                .build();
+
+        criarAnalise(sp, request, cmd.tipoAnalise());
 
         sp.setSituacao(cmd.novaSituacao());
 

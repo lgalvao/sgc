@@ -13,6 +13,9 @@ Currently, the frontend separates logic into multiple service files (`subprocess
 - **Merge** `mapaService.ts` and `analiseService.ts` into `subprocessoService.ts`.
 - Rename `subprocessoService.ts` to simply `api.ts` or `domain.ts` if it becomes the primary entry point for domain logic, or keep it as `subprocessoService.ts` but make it comprehensive.
 
+**Status:**
+- [x] `mapaService.ts` and `analiseService.ts` have been merged into `subprocessoService.ts`.
+
 ### 1.2 Removal of Manual Mappers
 The `frontend/src/mappers/` directory contains manual mapping logic (e.g., `mapSubprocessoDetalheDtoToModel`) that duplicates data structures already present in the backend DTOs. This adds a layer of maintenance without providing significant value in a small app.
 
@@ -21,6 +24,10 @@ The `frontend/src/mappers/` directory contains manual mapping logic (e.g., `mapS
 - **Directly consume** backend DTOs in the frontend components.
 - Use tools like `openapi-generator` or simple interface definitions that match the JSON response.
 - If transformation is needed for UI specific logic (e.g., formatting dates), do it within the component or a shared utility, not a dedicated mapper layer.
+
+**Status:**
+- [x] `frontend/src/mappers/` directory has been deleted.
+- [ ] Internal mapper functions (e.g. `mapMapaDtoToModel`) in `subprocessoService.ts` are pending removal.
 
 ### 1.3 Simplification of Types
 The `frontend/src/types/tipos.ts` file likely contains types that are mirror images of the backend DTOs but manually maintained.
@@ -39,6 +46,9 @@ The `sgc.subprocesso.dto` package contains a large number of DTOs (e.g., `CriarA
 - Reuse DTOs where appropriate. If `CriarAnaliseRequest` and `CriarAnaliseCommand` are identical, remove one.
 - Avoid "Command" vs "Request" separation unless using CQRS (which is likely overkill here).
 
+**Status:**
+- [ ] `CriarAnaliseCommand` identified as redundant with `CriarAnaliseRequest`. Pending consolidation.
+
 ### 2.2 Simplify Security Logic
 The `SgcPermissionEvaluator` is a good step towards standard Spring Security, but it still contains complex business logic (e.g., `checkSituacaoImpactos`).
 
@@ -53,6 +63,10 @@ The `backend` structure seems to follow a standard Controller -> Service -> Repo
 **Recommendation:**
 - **Avoid** creating interfaces for Services (e.g., `SubprocessoService` interface + `SubprocessoServiceImpl`) unless there are multiple implementations (unlikely).
 - **Avoid** Facades if they just delegate to Services. The `SubprocessoController` should call `SubprocessoService` directly.
+
+**Status:**
+- [x] `SubprocessoFacade` removed.
+- [x] `SubprocessoController` calls `SubprocessoService` directly.
 
 ## 3. General Architecture
 

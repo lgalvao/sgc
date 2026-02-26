@@ -561,20 +561,7 @@ public class SubprocessoController {
 
     private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {
         Subprocesso sp = subprocessoService.buscarSubprocesso(codSubprocesso);
-        // UtilSanitizacao not strictly needed if stripped, but good practice. Assuming StringUtils logic:
-        String obs = request.observacoes().trim();
-
-        CriarAnaliseCommand criarAnaliseCommand = CriarAnaliseCommand.builder()
-                .codSubprocesso(codSubprocesso)
-                .observacoes(obs)
-                .tipo(tipo)
-                .acao(request.acao())
-                .siglaUnidade(request.siglaUnidade())
-                .tituloUsuario(request.tituloUsuario())
-                .motivo(request.motivo())
-                .build();
-
-        Analise analise = subprocessoService.criarAnalise(sp, criarAnaliseCommand);
+        Analise analise = subprocessoService.criarAnalise(sp, request, tipo);
         return subprocessoService.paraHistoricoDto(analise);
     }
 }
