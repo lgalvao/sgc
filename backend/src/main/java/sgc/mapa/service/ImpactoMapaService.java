@@ -58,7 +58,8 @@ public class ImpactoMapaService {
         }
 
         Mapa mapaVigente = mapaVigenteOpt.get();
-        Mapa mapaSubprocesso = repo.buscar(Mapa.class, "subprocesso.codigo", subprocesso.getCodigo());
+        Mapa mapaSubprocesso = mapaRepo.findBySubprocessoCodigo(subprocesso.getCodigo())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa (por subprocesso)", subprocesso.getCodigo()));
         List<Atividade> atividadesAtuais = obterAtividadesDoMapa(mapaSubprocesso);
         List<Atividade> atividadesVigentes = obterAtividadesDoMapa(mapaVigente);
         List<Competencia> competenciasMapa = competenciaRepo.findByMapa_Codigo(mapaVigente.getCodigo());

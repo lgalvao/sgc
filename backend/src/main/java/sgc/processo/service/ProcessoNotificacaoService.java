@@ -2,6 +2,7 @@ package sgc.processo.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
@@ -19,10 +20,6 @@ import java.util.stream.*;
 
 import static sgc.organizacao.model.TipoUnidade.*;
 
-/**
- * Serviço de notificação para eventos de processo.
- * Chamado diretamente por ProcessoInicializador e ProcessoFinalizador.
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -71,8 +68,7 @@ public class ProcessoNotificacaoService {
             Unidade superior = sp.getUnidade().getUnidadeSuperior();
             while (superior != null) {
                 Long codSuperior = superior.getCodigo();
-                gestoresSubordinadasMap.computeIfAbsent(codSuperior, k -> new HashSet<>())
-                        .add(sp.getUnidade().getSigla());
+                gestoresSubordinadasMap.computeIfAbsent(codSuperior, k -> new HashSet<>()).add(sp.getUnidade().getSigla());
                 superior = superior.getUnidadeSuperior();
             }
         }
@@ -94,7 +90,7 @@ public class ProcessoNotificacaoService {
         for (Long codUnidade : todosCodigosNotificar) {
             Unidade unidade = organizacaoFacade.unidadePorCodigo(codUnidade);
             Subprocesso sp = participantesMap.get(codUnidade);
-            Set<String> subordinadasNoProcesso = gestoresSubordinadasMap.get(codUnidade);
+            Set<String> subordinadasNoProcesso = gestoresSubordinadasMap.getOrDefault(codUnidade, Collections.emptySet());
 
             enviarEmailConsolidado(processo, unidade, sp, subordinadasNoProcesso, responsaveisMap.get(codUnidade), usuariosMap);
         }
@@ -146,7 +142,7 @@ public class ProcessoNotificacaoService {
                 enviarEmailUnidadeIntermediaria(processo, unidade, emailUnidade, subordinadas);
             }
 
-            if (responsavel != null && responsavel.substitutoTitulo() != null) {
+            if (responsavel.substitutoTitulo() != null) {
                 String assunto = String.format("SGC: Finalização do processo %s", processo.getDescricao());
                 String html = emailModelosService.criarEmailProcessoFinalizadoPorUnidade(
                         unidade.getSigla(),
@@ -184,7 +180,7 @@ public class ProcessoNotificacaoService {
                 .toList();
 
         if (siglasSubordinadas.isEmpty()) {
-            log.warn("Unidade intermediária {} sem unidades subordinadas participantes para notificar na finalização do processo {}.", 
+            log.warn("Unidade intermediária {} sem unidades subordinadas participantes para notificar na finalização do processo {}.",
                     unidade.getSigla(), processo.getCodigo());
             return;
         }
@@ -202,21 +198,19 @@ public class ProcessoNotificacaoService {
     private void enviarEmailConsolidado(
             Processo processo,
             Unidade unidade,
-            Subprocesso sp,
+            @Nullable Subprocesso sp,
             Set<String> subordinadas,
             UnidadeResponsavelDto responsavel,
             Map<String, Usuario> usuarios) {
 
         boolean isParticipante = sp != null;
-        boolean isGestor = subordinadas != null && !subordinadas.isEmpty();
-
-        if (!isParticipante && !isGestor) return;
+        boolean isGestor = !subordinadas.isEmpty();
 
         try {
             List<String> siglasSubordinadas = isGestor ? subordinadas.stream().sorted().toList() : Collections.emptyList();
             LocalDateTime dataLimite = sp != null ? sp.getDataLimiteEtapa1() : processo.getDataLimite();
 
-            String assunto = isParticipante 
+            String assunto = isParticipante
                     ? "SGC: Início de processo de mapeamento de competências"
                     : "SGC: Início de processo de mapeamento de competências em unidades subordinadas";
 
@@ -229,8 +223,8 @@ public class ProcessoNotificacaoService {
         }
     }
 
-    private void enviarEmailEParaSubstituto(Unidade unidade, UnidadeResponsavelDto responsavel, 
-                                            Map<String, Usuario> usuarios, String assunto, 
+    private void enviarEmailEParaSubstituto(Unidade unidade, UnidadeResponsavelDto responsavel,
+                                            Map<String, Usuario> usuarios, String assunto,
                                             String corpoHtml, String nomeUnidade) {
         String emailUnidade = String.format("%s@tre-pe.jus.br", unidade.getSigla().toLowerCase());
         emailService.enviarEmailHtml(emailUnidade, assunto, corpoHtml);

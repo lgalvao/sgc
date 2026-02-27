@@ -1,13 +1,11 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
+import sgc.organizacao.model.*;
+import sgc.subprocesso.model.*;
 
 import java.time.*;
-import java.util.*;
 
-/**
- * DTO de resposta representando uma movimentação no histórico.
- */
 @Builder
 public record MovimentacaoDto(
         Long codigo,
@@ -18,23 +16,27 @@ public record MovimentacaoDto(
         Long unidadeDestinoCodigo,
         String unidadeDestinoSigla,
         String unidadeDestinoNome,
-    String descricao
+        String usuarioTitulo,
+        String usuarioNome,
+        String descricao
 ) {
-    public static MovimentacaoDto from(sgc.subprocesso.model.Movimentacao m) {
+    public static MovimentacaoDto from(Movimentacao m) {
+        Unidade unidadeOrigem = m.getUnidadeOrigem();
+        Unidade unidadeDestino = m.getUnidadeDestino();
+        Usuario usuario = m.getUsuario();
+
         return MovimentacaoDto.builder()
                 .codigo(m.getCodigo())
                 .dataHora(m.getDataHora())
-                .unidadeOrigemCodigo(m.getUnidadeOrigem() != null ? m.getUnidadeOrigem().getCodigo() : null)
-                .unidadeOrigemSigla(m.getUnidadeOrigem() != null ? mapUnidadeSiglaParaUsuario(m.getUnidadeOrigem()) : null)
-                .unidadeOrigemNome(m.getUnidadeOrigem() != null ? m.getUnidadeOrigem().getNome() : null)
-                .unidadeDestinoCodigo(m.getUnidadeDestino() != null ? m.getUnidadeDestino().getCodigo() : null)
-                .unidadeDestinoSigla(m.getUnidadeDestino() != null ? mapUnidadeSiglaParaUsuario(m.getUnidadeDestino()) : null)
-                .unidadeDestinoNome(m.getUnidadeDestino() != null ? m.getUnidadeDestino().getNome() : null)
+                .unidadeOrigemCodigo(unidadeOrigem.getCodigo())
+                .unidadeOrigemSigla(unidadeOrigem.getSigla())
+                .unidadeOrigemNome(unidadeOrigem.getNome())
+                .unidadeDestinoCodigo(unidadeDestino.getCodigo())
+                .unidadeDestinoSigla(unidadeDestino.getSigla())
+                .unidadeDestinoNome(unidadeDestino.getNome())
+                .usuarioTitulo(usuario.getTituloEleitoral())
+                .usuarioNome(usuario.getNome())
                 .descricao(m.getDescricao())
                 .build();
-    }
-
-    private static String mapUnidadeSiglaParaUsuario(sgc.organizacao.model.Unidade unidade) {
-        return Objects.equals(unidade.getCodigo(), 1L) ? "ADMIN" : unidade.getSigla();
     }
 }

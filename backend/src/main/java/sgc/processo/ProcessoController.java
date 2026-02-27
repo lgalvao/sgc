@@ -9,6 +9,7 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.erros.*;
@@ -42,7 +43,13 @@ public class ProcessoController {
     @JsonView(ProcessoViews.Publica.class)
     public ResponseEntity<Processo> criar(@Valid @RequestBody CriarProcessoRequest requisicao) {
         Processo criado = processoFacade.criar(requisicao);
-        URI uri = URI.create("/api/processos/%d".formatted(criado.getCodigo()));
+        Long codigo = Objects.requireNonNull(criado.getCodigo(), "Código do processo não pode ser nulo");
+
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{codigo}")
+                .buildAndExpand(codigo)
+                .toUri();
+
         return ResponseEntity.created(uri).body(criado);
     }
 

@@ -149,7 +149,8 @@ public class SubprocessoService {
 
     @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
-        return repo.buscar(Subprocesso.class, "mapa.codigo", codMapa);
+        return subprocessoRepo.findByMapa_Codigo(codMapa)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso (por mapa)", codMapa));
     }
 
     @Transactional(readOnly = true)
@@ -414,8 +415,8 @@ public class SubprocessoService {
         // da última movimentação que trouxe o processo para a unidade atual a partir de uma subordinada.
         Unidade unidadeDevolucao = movs.stream()
                 .filter(m -> Objects.equals(m.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
-                .filter(m -> hierarquiaService.isSubordinada(m.getUnidadeOrigem(), unidadeAnalise))
                 .map(Movimentacao::getUnidadeOrigem)
+                .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
                 .findFirst()
                 .orElse(sp.getUnidade());
 
@@ -515,8 +516,8 @@ public class SubprocessoService {
 
         Unidade unidadeDevolucao = movs.stream()
                 .filter(m -> Objects.equals(m.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
-                .filter(m -> hierarquiaService.isSubordinada(m.getUnidadeOrigem(), unidadeAnalise))
                 .map(Movimentacao::getUnidadeOrigem)
+                .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
                 .findFirst()
                 .orElse(sp.getUnidade());
 
@@ -695,7 +696,8 @@ public class SubprocessoService {
 
     @Transactional
     public void atualizarParaEmAndamento(Long mapaCodigo) {
-        var subprocesso = repo.buscar(Subprocesso.class, "mapa.codigo", mapaCodigo);
+        var subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso (por mapa)", mapaCodigo));
         if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             var tipoProcesso = subprocesso.getProcesso().getTipo();
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
@@ -1053,8 +1055,8 @@ public class SubprocessoService {
 
         Unidade unidadeDevolucao = movs.stream()
                 .filter(m -> Objects.equals(m.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
-                .filter(m -> hierarquiaService.isSubordinada(m.getUnidadeOrigem(), unidadeAnalise))
                 .map(Movimentacao::getUnidadeOrigem)
+                .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
                 .findFirst()
                 .orElse(sp.getUnidade());
 
@@ -1286,13 +1288,17 @@ public class SubprocessoService {
         Usuario responsavel = usuarioFacade.buscarResponsavelAtual(siglaUnidade);
         Usuario titular = usuarioFacade.buscarPorLogin(sp.getUnidade().getTituloTitular());
 
-        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
-        if (!movimentacoes.isEmpty()) {
-            Unidade destino = movimentacoes.getFirst().getUnidadeDestino();
+        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        if (!movs.isEmpty()) {
+            Unidade destino = movs.getFirst().getUnidadeDestino();
             if (destino != null) {
                 localizacaoAtual = destino.getSigla();
             }
         }
+
+        List<MovimentacaoDto> movimentacoes = movs.stream()
+                .map(MovimentacaoDto::from)
+                .toList();
 
         PermissoesSubprocessoDto permissoes = obterPermissoesUI(sp, usuarioAutenticado);
 
@@ -1341,6 +1347,8 @@ public class SubprocessoService {
         boolean isGestor = perfil == Perfil.GESTOR;
         boolean isAdmin = perfil == Perfil.ADMIN;
 
+        boolean temMapaVigente = organizacaoFacade.verificarMapaVigente(sp.getUnidade().getCodigo());
+
         return PermissoesSubprocessoDto.builder()
                 .podeEditarCadastro(mesmaUnidade && isChefe && Set.of(
                         SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
@@ -1374,10 +1382,11 @@ public class SubprocessoService {
                 .podeHomologarMapa(mesmaUnidade && isAdmin && Set.of(
                         SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
                         SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_MAPA_VALIDADO).contains(situacao))
-                .podeVisualizarImpacto(isAdmin || (mesmaUnidade && (isChefe || isGestor) && Set.of(
-                        SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
-                        SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
-                        SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).contains(situacao)))
+                .podeVisualizarImpacto(temMapaVigente && (
+                        (mesmaUnidade && isChefe && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) ||
+                        (mesmaUnidade && isGestor && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) ||
+                        (isAdmin && Set.of(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).contains(situacao))
+                ))
                 .podeAlterarDataLimite(isAdmin)
                 .podeReabrirCadastro(isAdmin)
                 .podeReabrirRevisao(isAdmin)

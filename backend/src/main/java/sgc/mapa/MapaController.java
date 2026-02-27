@@ -8,6 +8,7 @@ import lombok.*;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 
@@ -58,8 +59,13 @@ public class MapaController {
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> criar(@Valid @RequestBody Mapa mapa) {
         var salvo = mapaManutencaoService.salvarMapa(mapa);
+        Long codigo = Objects.requireNonNull(salvo.getCodigo(), "Código do mapa não pode ser nulo");
 
-        URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{codigo}")
+                .buildAndExpand(codigo)
+                .toUri();
+
         return ResponseEntity.created(uri).body(salvo);
     }
 

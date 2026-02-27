@@ -641,6 +641,8 @@
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoNotificacaoService usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Analise usuarioTitulo" />
       <entry_point TYPE="field" FQNAME="sgc.parametros.model.Parametro valor" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService hierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.TipoUnidade SEM_EQUIPE" />
     </entry_points>
     <list size="3">
       <item index="0" class="java.lang.String" itemvalue="com.tngtech.archunit.junit.ArchTest" />
@@ -1372,6 +1374,19 @@
     <pattern value="sgc.parametros.model.ConfiguracaoViews" method="ConfiguracaoViews" />
     <pattern value="sgc.comum.util.FormatadorData" method="FormatadorData" />
     <pattern value="sgc.seguranca.SgcPermissionEvaluator" method="hasPermission" />
+    <pattern value="sgc.subprocesso.dto.AnaliseHistoricoDto" />
+    <pattern value="sgc.subprocesso.dto.AnaliseHistoricoDto" method="AnaliseHistoricoDto" />
+    <pattern value="sgc.subprocesso.model.AnaliseRepo" />
+    <pattern value="sgc.organizacao.dto.AtribuicaoDto" />
+    <pattern value="sgc.mapa.service.MapaManutencaoService" method="buscarIdsAssociacoesCompetenciaAtividade" />
+    <pattern value="sgc.organizacao.service.UnidadeHierarquiaService" method="buscarNaHierarquia" />
+    <pattern value="sgc.alerta.EmailModelosService" method="criarEmailProcessoIniciado" />
+    <pattern value="sgc.e2e.E2eController" method="limparProcessoCompleto" />
+    <pattern value="sgc.subprocesso.dto.PermissoesSubprocessoDto" />
+    <pattern value="sgc.subprocesso.dto.PermissoesSubprocessoDto" method="PermissoesSubprocessoDto" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoDetalheResponse" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoDetalheResponse" method="SubprocessoDetalheResponse" />
+    <pattern value="sgc.organizacao.model.TipoUnidade" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">

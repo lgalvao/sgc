@@ -11,7 +11,7 @@ public record SubprocessoDetalheResponse(
     Subprocesso subprocesso,
     Usuario responsavel,
     Usuario titular,
-    List<Movimentacao> movimentacoes,
+    List<MovimentacaoDto> movimentacoes,
     String localizacaoAtual,
     PermissoesSubprocessoDto permissoes
 ) {}

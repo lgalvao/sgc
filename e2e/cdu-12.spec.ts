@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
+import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {
     abrirModalImpacto,
     adicionarAtividade,
@@ -56,11 +56,13 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)});
         await expect(linhaProcesso).toBeVisible();
         await linhaProcesso.click();
-        codProcessoMapeamento = Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
-        if (codProcessoMapeamento > 0) cleanupAutomatico.registrar(codProcessoMapeamento);
+        
+        codProcessoMapeamento = await extrairProcessoId(page);
+        // Não registrar cleanup aqui para permitir que os próximos testes usem o Mapa Vigente
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
+        await expect(page.getByText(/Processo iniciado/i).first()).toBeVisible();
         await limparNotificacoes(page);
 
         // 2. FASE CADASTRO: Chefe preenche atividades e disponibiliza (Localização: SECAO_211 -> COORD_21)
@@ -148,6 +150,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
+        await expect(page.getByText(/Processo finalizado/i).first()).toBeVisible();
 
         // 6. Iniciar Processo de Revisão
         await criarProcesso(page, {
@@ -158,10 +161,12 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
             expandir: ['SECRETARIA_2', 'COORD_21']
         });
         await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
-        processoRevisaoId = Number.parseInt(new RegExp(/(?:codProcesso=|\/cadastro\/)(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
+        processoRevisaoId = await extrairProcessoId(page);
+        // O registro será feito no último cenário do teste serial
+        
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
+        await expect(page.getByText(/Processo iniciado/i).first()).toBeVisible();
     });
 
     // ========================================================================
@@ -210,7 +215,11 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
     });
 
-    test('Fluxo GESTOR e ADMIN: Verificar visualização de impactos', async ({page}) => {
+    test('Fluxo GESTOR e ADMIN: Verificar visualização de impactos', async ({page, cleanupAutomatico}) => {
+        // Registrar cleanup aqui para ambos os processos, pois este é o último teste
+        if (codProcessoMapeamento > 0) cleanupAutomatico.registrar(codProcessoMapeamento);
+        if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
+
         // 1. GESTOR verifica na visualização (Localização: COORD_21)
         await login(page, USUARIO_GESTOR_COORD, SENHA_GESTOR_COORD);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);

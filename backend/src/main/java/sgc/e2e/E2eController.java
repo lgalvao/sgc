@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
+@SuppressWarnings("JvmTaintAnalysis")
 @RestController
 @RequestMapping("/e2e")
 @Profile("e2e")
@@ -108,6 +109,54 @@ public class E2eController {
         return seedResource;
     }
 
+    @PostMapping("/processo/{codigo}/limpar-completo")
+    @Transactional
+    public void limparProcessoCompleto(@PathVariable Long codigo) {
+        log.info("Limpando processo {} (modo robusto)", codigo);
+        DataSource dataSource = jdbcTemplate.getDataSource();
+        if (dataSource == null) return;
+
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+            
+            stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
+            
+            String subquerySubprocessos = "(SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = " + codigo + ")";
+            String subqueryMapas = "(SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN " + subquerySubprocessos + ")";
+
+            // 1. Limpar Alertas
+            jdbcTemplate.update("DELETE FROM sgc.alerta_usuario WHERE alerta_codigo IN (SELECT codigo FROM sgc.alerta WHERE processo_codigo = ?)", codigo);
+            jdbcTemplate.update("DELETE FROM sgc.alerta WHERE processo_codigo = ?", codigo);
+
+            // 2. Limpar dependentes de Mapa
+            jdbcTemplate.update("DELETE FROM sgc.conhecimento WHERE atividade_codigo IN (SELECT codigo FROM sgc.atividade WHERE mapa_codigo IN " + subqueryMapas + ")");
+            jdbcTemplate.update("DELETE FROM sgc.competencia_atividade WHERE atividade_codigo IN (SELECT codigo FROM sgc.atividade WHERE mapa_codigo IN " + subqueryMapas + ")");
+            jdbcTemplate.update("DELETE FROM sgc.competencia_atividade WHERE competencia_codigo IN (SELECT codigo FROM sgc.competencia WHERE mapa_codigo IN " + subqueryMapas + ")");
+            jdbcTemplate.update("DELETE FROM sgc.atividade WHERE mapa_codigo IN " + subqueryMapas);
+            jdbcTemplate.update("DELETE FROM sgc.competencia WHERE mapa_codigo IN " + subqueryMapas);
+            
+            // Limpar referências de Mapa Vigente antes de excluir o Mapa
+            jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE mapa_vigente_codigo IN " + subqueryMapas);
+            jdbcTemplate.update("DELETE FROM sgc.mapa WHERE subprocesso_codigo IN " + subquerySubprocessos);
+
+            // 3. Limpar dependentes de Subprocesso
+            jdbcTemplate.update("DELETE FROM sgc.analise WHERE subprocesso_codigo IN " + subquerySubprocessos);
+            jdbcTemplate.update("DELETE FROM sgc.notificacao WHERE subprocesso_codigo IN " + subquerySubprocessos);
+            jdbcTemplate.update("DELETE FROM sgc.movimentacao WHERE subprocesso_codigo IN " + subquerySubprocessos);
+            jdbcTemplate.update("DELETE FROM sgc.subprocesso WHERE processo_codigo = ?", codigo);
+
+            // 4. Limpar UnidadeProcesso e Processo
+            jdbcTemplate.update("DELETE FROM sgc.unidade_processo WHERE processo_codigo = ?", codigo);
+            jdbcTemplate.update("DELETE FROM sgc.processo WHERE codigo = ?", codigo);
+            
+            stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
+            log.info("Limpeza robusta do processo {} concluída.", codigo);
+        } catch (Exception e) {
+            log.error("Erro na limpeza robusta do processo {}", codigo, e);
+            throw new RuntimeException("Falha na limpeza do processo: " + e.getMessage());
+        }
+    }
+
     @PostMapping("/processo/{codigo}/limpar")
     @Transactional
     public void limparProcessoComDependentes(@PathVariable Long codigo) {
@@ -147,7 +196,6 @@ public class E2eController {
             namedJdbcTemplate.update("DELETE FROM sgc.competencia WHERE mapa_codigo IN (:ids)", params);
             namedJdbcTemplate.update("DELETE FROM sgc.mapa WHERE codigo IN (:ids)", params);
         }
-        jdbcTemplate.update("DELETE FROM sgc.subprocesso WHERE processo_codigo = ?", codigo);
         jdbcTemplate.update("""
                 DELETE FROM sgc.alerta_usuario
                 WHERE alerta_codigo IN (SELECT codigo FROM sgc.alerta WHERE processo_codigo = ?)""", codigo);

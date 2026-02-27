@@ -13,7 +13,6 @@ public record PermissoesSubprocessoDto(
     boolean podeDevolverCadastro,
     boolean podeAceitarCadastro,
     boolean podeHomologarCadastro,
-    
     boolean podeEditarMapa,
     boolean podeDisponibilizarMapa,
     boolean podeValidarMapa,
@@ -21,9 +20,7 @@ public record PermissoesSubprocessoDto(
     boolean podeDevolverMapa,
     boolean podeAceitarMapa,
     boolean podeHomologarMapa,
-    
     boolean podeVisualizarImpacto,
-    
     boolean podeAlterarDataLimite,
     boolean podeReabrirCadastro,
     boolean podeReabrirRevisao,

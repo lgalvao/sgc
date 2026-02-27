@@ -25,7 +25,7 @@ public class CopiaMapaService {
     public Mapa copiarMapaParaUnidade(Long codMapaOrigem) {
         Mapa fonte = repo.buscar(Mapa.class, codMapaOrigem);
 
-        Mapa novoMapa = criarNovoMapa(fonte);
+        Mapa novoMapa = criarNovoMapa();
         Mapa mapaSalvo = mapaRepo.save(novoMapa);
 
         Map<Long, Atividade> mapaAtividades = copiarAtividades(fonte.getCodigo(), mapaSalvo);
@@ -52,7 +52,7 @@ public class CopiaMapaService {
         if (!atividadesParaSalvar.isEmpty()) atividadeRepo.saveAll(atividadesParaSalvar);
     }
 
-    private Mapa criarNovoMapa(Mapa fonte) {
+    private Mapa criarNovoMapa() {
         return Mapa.builder()
                 .dataHoraDisponibilizado(null)
                 .observacoesDisponibilizacao(null)

@@ -41,7 +41,7 @@ export function useProcessoCleanup() {
         limpar: async (request: APIRequestContext) => {
             for (const codigo of processosParaLimpar) {
                 try {
-                    await request.post(`/e2e/processo/${codigo}/limpar`);
+                    await request.post(`/e2e/processo/${codigo}/limpar-completo`);
                 } catch (error) {
                     logger.warn(`Falha ao limpar processo ${codigo}: ${error}`);
                 }
