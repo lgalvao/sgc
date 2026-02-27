@@ -102,7 +102,11 @@ export interface Competencia {
     codigo: number;
     descricao: string;
     atividades: Atividade[];
-    atividadesAssociadas?: number[];
+}
+
+export interface SalvarCompetenciaRequest {
+    descricao: string;
+    atividadesIds: number[];
 }
 
 // Mantendo para retrocompatibilidade se necessário, mas marcando como depreciado se possível

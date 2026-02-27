@@ -43,21 +43,21 @@
     <BCardBody class="position-relative">
       <div class="d-flex flex-wrap gap-2">
         <BCard
-            v-for="atvCodigo in competencia.atividadesAssociadas"
-            :key="atvCodigo"
+            v-for="atividade in competencia.atividades"
+            :key="atividade.codigo"
             class="atividade-associada-card-item d-flex align-items-center group-atividade-associada"
             no-body
         >
           <BCardBody class="d-flex align-items-center">
                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
-                    {{ getDescricaoAtividade(atvCodigo) }}
+                    {{ atividade.descricao }}
                     <span
-                        v-if="(getAtividadeCompleta(atvCodigo)?.conhecimentos.length ?? 0) > 0"
-                        v-b-tooltip.html.top="getConhecimentosTooltip(atvCodigo)"
+                        v-if="(atividade.conhecimentos?.length ?? 0) > 0"
+                        v-b-tooltip.html.top="getConhecimentosTooltip(atividade.codigo)"
                         class="badge bg-secondary ms-2"
                         data-testid="cad-mapa__txt-badge-conhecimentos-1"
                     >
-                      {{ getAtividadeCompleta(atvCodigo)?.conhecimentos.length }}
+                      {{ atividade.conhecimentos.length }}
                     </span>
                   </span>
             <BButton
@@ -67,9 +67,9 @@
                 data-testid="btn-remover-atividade-associada"
                 size="sm"
                 title="Remover Atividade"
-                :aria-label="`Remover atividade ${getDescricaoAtividade(atvCodigo)}`"
+                :aria-label="`Remover atividade ${atividade.descricao}`"
                 variant="outline-secondary"
-                @click="emit('removerAtividade', competencia.codigo, atvCodigo)"
+                @click="emit('removerAtividade', competencia.codigo, atividade.codigo)"
             >
               <i class="bi bi-trash" aria-hidden="true"/>
             </BButton>

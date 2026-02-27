@@ -41,8 +41,7 @@ const mockAtividades: Atividade[] = [
 const mockCompetencia: Competencia = {
   codigo: 10,
   descricao: 'Desenvolvimento Fullstack',
-  atividades: [],
-  atividadesAssociadas: [1, 2],
+  atividades: [mockAtividades[0], mockAtividades[1]],
 };
 
 export const Default: Story = {
@@ -65,7 +64,7 @@ export const ComAtividadeSemConhecimento: Story = {
   args: {
     competencia: {
       ...mockCompetencia,
-      atividadesAssociadas: [3],
+      atividades: [mockAtividades[2]],
     },
     atividades: mockAtividades,
     podeEditar: true,

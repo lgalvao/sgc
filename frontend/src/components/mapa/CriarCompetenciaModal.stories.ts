@@ -64,7 +64,6 @@ export const Edicao: Story = {
     competenciaParaEditar: {
       codigo: 1,
       descricao: 'Competência Existente',
-      atividadesAssociadas: [1, 3],
       atividades: [],
     },
   },

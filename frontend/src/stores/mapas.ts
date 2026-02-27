@@ -17,7 +17,8 @@ import type {
     ImpactoMapa,
     MapaAjuste,
     MapaCompleto,
-    MapaVisualizacao
+    MapaVisualizacao,
+    SalvarCompetenciaRequest
 } from "@/types/tipos";
 import {defineStore} from "pinia";
 import {ref} from "vue";
@@ -132,7 +133,7 @@ export const useMapasStore = defineStore("mapas", () => {
 
     async function adicionarCompetencia(
         codSubprocesso: number,
-        competencia: Competencia,
+        competencia: SalvarCompetenciaRequest,
     ) {
         carregando.value = true;
         erro.value = null;
@@ -151,13 +152,15 @@ export const useMapasStore = defineStore("mapas", () => {
 
     async function atualizarCompetencia(
         codSubprocesso: number,
-        competencia: Competencia,
+        codCompetencia: number,
+        competencia: SalvarCompetenciaRequest,
     ) {
         carregando.value = true;
         erro.value = null;
         try {
             mapaCompleto.value = await atualizarCompetenciaService(
                 codSubprocesso,
+                codCompetencia,
                 competencia,
             );
         } catch (e: any) {

@@ -9,7 +9,8 @@ import type {
     MapaCompleto,
     MapaVisualizacao,
     SubprocessoDetalhe,
-    ValidacaoCadastro
+    ValidacaoCadastro,
+    SalvarCompetenciaRequest
 } from "@/types/tipos";
 import {getOrNull} from "@/utils/apiError";
 import apiClient from "../axios-setup";
@@ -154,11 +155,11 @@ export async function disponibilizarMapa(
 
 export async function adicionarCompetencia(
     codSubprocesso: number,
-    competencia: Competencia,
+    competencia: SalvarCompetenciaRequest,
 ): Promise<MapaCompleto> {
     const requestBody = {
         descricao: competencia.descricao,
-        atividadesIds: competencia.atividadesAssociadas,
+        atividadesIds: competencia.atividadesIds,
     };
     const response = await apiClient.post(
         `/subprocessos/${codSubprocesso}/competencia`,
@@ -169,14 +170,15 @@ export async function adicionarCompetencia(
 
 export async function atualizarCompetencia(
     codSubprocesso: number,
-    competencia: Competencia,
+    codCompetencia: number,
+    competencia: SalvarCompetenciaRequest,
 ): Promise<MapaCompleto> {
     const requestBody = {
         descricao: competencia.descricao,
-        atividadesIds: competencia.atividadesAssociadas,
+        atividadesIds: competencia.atividadesIds,
     };
     const response = await apiClient.post(
-        `/subprocessos/${codSubprocesso}/competencia/${competencia.codigo}`,
+        `/subprocessos/${codSubprocesso}/competencia/${codCompetencia}`,
         requestBody,
     );
     return response.data as MapaCompleto;

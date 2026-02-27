@@ -44,7 +44,7 @@ const fields = computed(() => {
 });
 
 const internalSortBy = computed({
-  get: () => [{key: props.criterioOrdenacao, order: props.direcaoOrdenacaoAsc ? 'asc' : 'desc'}],
+  get: () => [{key: props.criterioOrdenacao, order: (props.direcaoOrdenacaoAsc ? 'asc' : 'desc') as any}],
   set: (val: any) => {
     const sortBy = Array.isArray(val) ? val[0] : val;
     if (sortBy?.key) {

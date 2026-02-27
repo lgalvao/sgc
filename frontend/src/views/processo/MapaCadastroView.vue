@@ -103,7 +103,7 @@ import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
-import type {Atividade, Competencia} from "@/types/tipos";
+import type {Atividade, Competencia, SalvarCompetenciaRequest} from "@/types/tipos";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 
@@ -227,16 +227,16 @@ function iniciarEdicaoCompetencia(competencia: Competencia) {
 }
 
 async function adicionarCompetenciaEFecharModal(dados: { descricao: string; atividadesSelecionadas: number[] }) {
-  const competencia: Competencia = {
-    codigo: competenciaSendoEditada.value?.codigo ?? undefined,
+  const request: SalvarCompetenciaRequest = {
     descricao: dados.descricao,
-    atividadesAssociadas: dados.atividadesSelecionadas} as any;
+    atividadesIds: dados.atividadesSelecionadas,
+  };
 
   try {
     if (competenciaSendoEditada.value) {
-      await mapasStore.atualizarCompetencia(codSubprocesso.value as number, competencia);
+      await mapasStore.atualizarCompetencia(codSubprocesso.value as number, competenciaSendoEditada.value.codigo, request);
     } else {
-      await mapasStore.adicionarCompetencia(codSubprocesso.value as number, competencia);
+      await mapasStore.adicionarCompetencia(codSubprocesso.value as number, request);
     }
 
     await subprocessosStore.buscarContextoEdicao(codSubprocesso.value as number);
@@ -283,14 +283,17 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
       (comp) => comp.codigo === competenciaId,
   );
   if (competencia) {
-    const competenciaAtualizada = {
-      ...competencia,
-      atividadesAssociadas: (competencia.atividadesAssociadas || []).filter(
-          (id) => id !== atividadeId,
-      )};
+    const atividadesIds = competencia.atividades.map((a) => a.codigo).filter((id) => id !== atividadeId);
+    
+    const request: SalvarCompetenciaRequest = {
+      descricao: competencia.descricao,
+      atividadesIds: atividadesIds,
+    };
+    
     mapasStore.atualizarCompetencia(
         codSubprocesso.value as number,
-        competenciaAtualizada,
+        competencia.codigo,
+        request,
     );
   }
 }

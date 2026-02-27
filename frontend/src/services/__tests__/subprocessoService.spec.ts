@@ -84,7 +84,7 @@ describe("subprocessoService", () => {
 
     it("atualizarCompetencia chama o endpoint correto", async () => {
         vi.mocked(apiClient.post).mockResolvedValue({ data: {} });
-        await service.atualizarCompetencia(1, { codigo: 50, descricao: "D2", atividadesAssociadas: [20] } as any);
+        await service.atualizarCompetencia(1, 50, { descricao: "D2", atividadesIds: [20] });
         expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/competencia/50", {
             descricao: "D2",
             atividadesIds: [20]

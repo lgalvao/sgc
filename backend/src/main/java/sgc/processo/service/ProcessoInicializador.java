@@ -50,7 +50,7 @@ public class ProcessoInicializador {
             // Para REVISAO, as unidades a processar são as que receberão subprocessos
             unidadesParaProcessar = new HashSet<>(unidadeRepo.findAllById(codigosUnidades));
 
-            // 7. Snapshot da árvore de unidades no momento da iniciação (Apenas para REVISAO conforme CDU-05)
+            // Snapshot da árvore de unidades no momento da iniciação (Apenas para REVISAO conforme CDU-05)
             Set<Unidade> snapshotArvore = carregarArvoreUnidades(unidadesParaProcessar);
             processo.sincronizarParticipantes(snapshotArvore);
         } else {

@@ -84,7 +84,6 @@ describe("useMapasStore", () => {
                     {
                         codigo: 1,
                         descricao: "Nova",
-                        atividadesAssociadas: [],
                         atividades: [],
                     },
                 ],
@@ -169,9 +168,7 @@ describe("useMapasStore", () => {
         it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const competencia = {
                 descricao: "Nova Competencia",
-                codigo: 0,
-                atividades: [],
-                atividadesAssociadas: [],
+                atividadesIds: [],
             };
             const mockResponse: MapaCompleto = {
                 codigo: 1,
@@ -181,7 +178,6 @@ describe("useMapasStore", () => {
                     {
                         codigo: 1,
                         descricao: "Nova",
-                        atividadesAssociadas: [],
                         atividades: [],
                     },
                 ],
@@ -203,11 +199,10 @@ describe("useMapasStore", () => {
 
     describe("atualizarCompetencia", () => {
         it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
+            const codCompetencia = 1;
             const competencia = {
-                codigo: 1,
                 descricao: "Competencia Atualizada",
-                atividades: [],
-                atividadesAssociadas: [],
+                atividadesIds: [],
             };
             const mockResponse: MapaCompleto = {
                 codigo: 1,
@@ -217,7 +212,6 @@ describe("useMapasStore", () => {
                     {
                         codigo: 1,
                         descricao: "Nova",
-                        atividadesAssociadas: [],
                         atividades: [],
                     },
                 ],
@@ -227,10 +221,11 @@ describe("useMapasStore", () => {
                 mockResponse,
             );
 
-            await context.store.atualizarCompetencia(codSubprocesso, competencia);
+            await context.store.atualizarCompetencia(codSubprocesso, codCompetencia, competencia);
 
             expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(
                 codSubprocesso,
+                codCompetencia,
                 competencia,
             );
             expect(context.store.mapaCompleto).toEqual(mockResponse);
@@ -248,7 +243,6 @@ describe("useMapasStore", () => {
                     {
                         codigo: 1,
                         descricao: "Nova",
-                        atividadesAssociadas: [],
                         atividades: [],
                     },
                 ],

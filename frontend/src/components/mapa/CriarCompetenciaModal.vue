@@ -132,7 +132,7 @@ watch(
         if (props.competenciaParaEditar) {
           novaCompetencia.value.descricao = props.competenciaParaEditar.descricao;
           atividadesSelecionadas.value = [
-            ...(props.competenciaParaEditar.atividadesAssociadas || []),
+            ...(props.competenciaParaEditar.atividades?.map(a => a.codigo) || []),
           ];
           competenciaSendoEditada.value = props.competenciaParaEditar;
         } else {

@@ -29,8 +29,10 @@ describe("CompetenciaCard.vue", () => {
   const mockCompetencia: Competencia = {
     codigo: 10,
     descricao: "Competencia Teste",
-    atividades: [],
-    atividadesAssociadas: [101, 102],
+    atividades: [
+      {codigo: 101, descricao: "Atividade 1", conhecimentos: []},
+      {codigo: 102, descricao: "Atividade 2", conhecimentos: [{descricao: "Java", codigo: 1}]}
+    ],
   };
 
   it("deve renderizar descrição da competência", () => {
