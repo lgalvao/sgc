@@ -88,10 +88,10 @@ defineExpose({ fields });
 <template>
   <div class="table-responsive">
     <BTable
+        v-model:sort-by="internalSortBy"
         aria-label="Lista de processos cadastrados"
         :fields="fields"
         :items="processos"
-        v-model:sort-by="internalSortBy"
         :tbody-tr-attr="rowAttr"
         :tbody-tr-class="rowClass"
         data-testid="tbl-processos"

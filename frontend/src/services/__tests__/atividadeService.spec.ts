@@ -42,7 +42,7 @@ describe("atividadeService", () => {
 
         const result = await service.criarAtividade(request, 100);
 
-        expect(mockApi.post).toHaveBeenCalledWith("/atividades", { ...request, codMapa: 100 });
+        expect(mockApi.post).toHaveBeenCalledWith("/atividades", { ...request, mapaCodigo: 100 });
         expect(result).toEqual(responseDto);
     });
 
@@ -98,7 +98,7 @@ describe("atividadeService", () => {
 
         expect(mockApi.post).toHaveBeenCalledWith(
             "/atividades/1/conhecimentos",
-            { ...request, codAtividade: 1 },
+            { ...request, atividadeCodigo: 1 },
         );
         expect(result).toEqual(responseDto);
     });
@@ -119,7 +119,7 @@ describe("atividadeService", () => {
 
         expect(mockApi.post).toHaveBeenCalledWith(
             `/atividades/1/conhecimentos/${request.codigo}/atualizar`,
-            { ...request, codAtividade: 1 },
+            { descricao: request.descricao },
         );
         expect(result).toEqual(responseDto);
     });

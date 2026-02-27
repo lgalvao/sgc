@@ -100,11 +100,6 @@ function getAtividadeCompleta(codigo: number): Atividade | undefined {
   return props.atividades.find((a) => a.codigo === codigo);
 }
 
-function getDescricaoAtividade(codigo: number): string {
-  const atv = getAtividadeCompleta(codigo);
-  return atv ? atv.descricao : "Atividade não encontrada";
-}
-
 function getConhecimentosTooltip(atividadeCodigo: number): string {
   const atividade = getAtividadeCompleta(atividadeCodigo);
   if (!atividade || !atividade.conhecimentos.length) {

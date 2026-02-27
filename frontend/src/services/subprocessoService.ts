@@ -2,7 +2,6 @@ import type {
     AnaliseCadastro,
     AnaliseValidacao,
     Atividade,
-    Competencia,
     DisponibilizarMapaRequest,
     ImpactoMapa,
     MapaAjuste,

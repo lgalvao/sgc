@@ -12,7 +12,6 @@ import {
     verificarMapaVigente
 } from "@/services/subprocessoService";
 import type {
-    Competencia,
     DisponibilizarMapaRequest,
     ImpactoMapa,
     MapaAjuste,

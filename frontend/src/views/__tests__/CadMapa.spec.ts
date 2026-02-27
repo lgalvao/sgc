@@ -178,7 +178,7 @@ describe("CadMapa.vue", () => {
     ];
 
     const mockCompetencias = [
-        {codigo: 10, descricao: "Competencia A", atividadesAssociadas: [101]},
+        {codigo: 10, descricao: "Competencia A", atividades: [{codigo: 101, descricao: "Atividade 1", conhecimentos: []}]},
     ];
 
     const mockMapaCompleto = {
@@ -426,7 +426,7 @@ describe("CadMapa.vue", () => {
             123,
             expect.objectContaining({
                 descricao: "Nova Competencia Teste",
-                atividadesAssociadas: [101],
+                atividadesIds: [101],
             }),
         );
     });
@@ -451,8 +451,8 @@ describe("CadMapa.vue", () => {
 
         expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(
             123,
+            10,
             expect.objectContaining({
-                codigo: 10,
                 descricao: "Nova Competencia Teste", // From mock modal
             }),
         );
@@ -489,9 +489,9 @@ describe("CadMapa.vue", () => {
 
         expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(
             123,
+            10,
             expect.objectContaining({
-                codigo: 10,
-                atividadesAssociadas: [],
+                atividadesIds: [],
             }),
         );
     });
@@ -686,13 +686,14 @@ describe("CadMapa.vue", () => {
         (wrapper.vm as any).mapasStore.mapaCompleto.competencias.push({
             codigo: 20,
             descricao: 'Sem Atv',
-            atividadesAssociadas: null
+            atividades: null
         });
         
         await (wrapper.vm as any).removerAtividadeAssociada(20, 999);
         expect(mapasStore.atualizarCompetencia).toHaveBeenCalledWith(
             expect.anything(),
-            expect.objectContaining({ codigo: 20, atividadesAssociadas: [] })
+            20,
+            expect.objectContaining({ atividadesIds: [] })
         );
     });
 
