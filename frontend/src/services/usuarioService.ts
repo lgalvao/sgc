@@ -48,7 +48,9 @@ export function mapPerfilUnidadeToFrontend(
 }
 
 export function mapUsuarioToFrontend(usuarioDto: UsuarioDto): Usuario {
+    const codigo = /^\d+$/.test(usuarioDto.tituloEleitoral) ? Number(usuarioDto.tituloEleitoral) : 0;
     return {
+        codigo,
         tituloEleitoral: usuarioDto.tituloEleitoral,
         nome: usuarioDto.nome,
         email: usuarioDto.email,

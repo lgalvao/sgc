@@ -161,7 +161,7 @@ const processosStore = useProcessosStore();
 const analisesStore = useAnalisesStore();
 const mapasStore = useMapasStore();
 const subprocessosStore = useSubprocessosStore();
-const {impactos} = storeToRefs(mapasStore);
+const {impactoMapa: impactos} = storeToRefs(mapasStore);
 
 const unidadeId = computed(() => props.sigla);
 const codProcesso = computed(() => Number(props.codProcesso));
@@ -246,7 +246,7 @@ async function abrirModalImpacto() {
   if (codSubprocesso.value) {
     loadingImpacto.value = true;
     try {
-      await mapasStore.verificarImpactos(codSubprocesso.value);
+      await mapasStore.buscarImpactoMapa(codSubprocesso.value);
     } finally {
       loadingImpacto.value = false;
     }

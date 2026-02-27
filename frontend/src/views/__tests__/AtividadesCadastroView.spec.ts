@@ -143,7 +143,7 @@ describe("AtividadesCadastroView.vue", () => {
         await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
 
         expect(subprocessosStore.validarCadastro).toHaveBeenCalledWith(123);
-        expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
+        expect((wrapper.vm as any).mostrarModalConfirmacao).toBe(true);
     });
 
     it("confirma disponibilização e redireciona", async () => {
@@ -172,17 +172,17 @@ describe("AtividadesCadastroView.vue", () => {
         await wrapper.find('[data-testid="btn-cad-atividades-historico"]').trigger("click");
 
         expect(analisesStore.carregarHistorico).toHaveBeenCalledWith(123);
-        expect(wrapper.vm.mostrarModalHistorico).toBe(true);
+        expect((wrapper.vm as any).mostrarModalHistorico).toBe(true);
     });
 
     it("carrega impacto ao abrir modal", async () => {
         const wrapper = createWrapper();
         const mapasStore = useMapasStore();
-        mapasStore.verificarImpactos = vi.fn().mockResolvedValue(null);
+        mapasStore.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
 
         await wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa-edicao"]').trigger("click");
 
-        expect(mapasStore.verificarImpactos).toHaveBeenCalledWith(123);
-        expect(wrapper.vm.mostrarModalImpacto).toBe(true);
+        expect(mapasStore.buscarImpactoMapa).toHaveBeenCalledWith(123);
+        expect((wrapper.vm as any).mostrarModalImpacto).toBe(true);
     });
 });
