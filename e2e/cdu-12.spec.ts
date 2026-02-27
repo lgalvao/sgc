@@ -179,17 +179,13 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
-        // 1. Estado Inicial (Sem impactos)
-        await verificarBotaoImpactoDropdown(page);
-        await abrirModalImpacto(page);
-        await expect(page.getByText('Nenhum impacto no mapa da unidade.')).toBeVisible();
-        await fecharModalImpacto(page);
-
-        // 2. Inclusão
+        // 1. Inclusão (Muda o status para REVISAO_CADASTRO_EM_ANDAMENTO, liberando o botão de impactos)
         const novaAtividade = `Atividade Nova Revisão ${timestamp}`;
         const novoConhecimento = `Conhecimento Novo ${timestamp}`;
         await adicionarAtividade(page, novaAtividade);
         await adicionarConhecimento(page, novaAtividade, novoConhecimento);
+        
+        await verificarBotaoImpactoDropdown(page);
         await abrirModalImpacto(page);
         await expect(page.locator('.modal-content').getByText(novaAtividade)).toBeVisible();
         await expect(page.locator('.modal-content').getByText(novoConhecimento)).toBeVisible();

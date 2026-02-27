@@ -6,14 +6,7 @@ Embora algumas simplificações já tenham sido aplicadas (como a consolidação
 
 ## 1. Simplificação do Frontend (Vue/TypeScript)
 
-### 1.1 Geração Automática de Tipos TypeScript
-Atualmente, o arquivo `frontend/src/types/tipos.ts` é imenso (mais de 450 linhas) e contém definições TypeScript manuais que espelham os DTOs em Java do backend. Isso é propenso a dessincronização e exige esforço manual sempre que a API do backend muda.
-
-**Recomendação:**
-- Utilize uma ferramenta como `openapi-generator-cli` ou `typescript-generator-maven-plugin` para gerar automaticamente as interfaces TypeScript a partir do backend Spring Boot.
-- Substitua o conteúdo estático de `tipos.ts` por esses tipos gerados automaticamente.
-
-### 1.2 Reavaliar o Uso do Padrão Store (Pinia)
+### 1.1 Reavaliar o Uso do Padrão Store (Pinia)
 O diretório `frontend/src/stores` contém 14 arquivos diferentes (`mapas.ts`, `subprocessos.ts`, `atividades.ts`, etc.). Para um aplicativo CRUD simples, espelhar o estado do servidor em stores globais complexos geralmente é um exagero e pode levar a bugs difíceis de "dados obsoletos" (stale data).
 
 **Recomendação:**
@@ -35,4 +28,4 @@ O `SgcPermissionEvaluator` executa verificações complexas de estado de negóci
 
 **Recomendação:**
 - A camada `@PreAuthorize` deve idealmente responder apenas: "O Usuário X possui a Role/Localização Y para acessar o Recurso Z?".
-- Regras de negócio como "Posso editar este subprocesso agora?" (que dependem de sua `Situacao`) devem ser aplicadas e validadas dentro da camada de **Service**. Isso torna a lógica de domínio muito mais fácil de testar unitariamente fora do contexto do Spring Security.
+- Regras de negócio como "Posso editar este subprocesso agora?" (que dependem de sua Situacao e sua Localização) devem ser aplicadas e validadas dentro da camada de **Service**. Isso torna a lógica de domínio muito mais fácil de testar unitariamente fora do contexto do Spring Security.
