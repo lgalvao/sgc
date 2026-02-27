@@ -10,14 +10,13 @@ describe('CompetenciaCard Coverage', () => {
         BButton: { template: '<button><slot /></button>' }
     };
 
-    it('renders "Atividade não encontrada" for invalid activity ID', () => {
+    it('renders "Atividade 999" for activity ID 999', () => {
         const wrapper = mount(CompetenciaCard, {
             props: {
                 competencia: {
                     codigo: 1,
                     descricao: 'Competencia Teste',
-                    atividades: [],
-                    atividadesAssociadas: [999] // Invalid ID
+                    atividades: [{codigo: 999, descricao: 'Atividade 999', conhecimentos: []}],
                 },
                 atividades: [], // Empty list
                 podeEditar: true
@@ -27,7 +26,7 @@ describe('CompetenciaCard Coverage', () => {
             }
         });
 
-        expect(wrapper.text()).toContain('Atividade não encontrada');
+        expect(wrapper.text()).toContain('Atividade 999');
     });
 
     it('getConhecimentosTooltip handles invalid activity gracefully', () => {
@@ -36,8 +35,7 @@ describe('CompetenciaCard Coverage', () => {
                 competencia: {
                     codigo: 1,
                     descricao: 'Competencia Teste',
-                    atividades: [],
-                    atividadesAssociadas: [999]
+                    atividades: [{codigo: 999, descricao: 'Atividade 999', conhecimentos: []}],
                 },
                 atividades: [],
                 podeEditar: true

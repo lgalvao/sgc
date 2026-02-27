@@ -61,7 +61,7 @@ describe("subprocessoService", () => {
 
     it("adicionarCompetencia chama o endpoint correto", async () => {
         vi.mocked(apiClient.post).mockResolvedValue({ data: {} });
-        await service.adicionarCompetencia(1, { descricao: "D", atividadesAssociadas: [10] } as any);
+        await service.adicionarCompetencia(1, { descricao: "D", atividadesIds: [10] } as any);
         expect(apiClient.post).toHaveBeenCalledWith("/subprocessos/1/competencia", {
             descricao: "D",
             atividadesIds: [10]

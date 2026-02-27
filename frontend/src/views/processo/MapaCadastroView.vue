@@ -283,13 +283,13 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
       (comp) => comp.codigo === competenciaId,
   );
   if (competencia) {
-    const atividadesIds = competencia.atividades.map((a) => a.codigo).filter((id) => id !== atividadeId);
-    
+    const atividadesIds = (competencia.atividades || []).map((a) => a.codigo).filter((id) => id !== atividadeId);
+
     const request: SalvarCompetenciaRequest = {
       descricao: competencia.descricao,
       atividadesIds: atividadesIds,
     };
-    
+
     mapasStore.atualizarCompetencia(
         codSubprocesso.value as number,
         competencia.codigo,

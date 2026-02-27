@@ -95,7 +95,7 @@ describe("TabelaProcessos.vue", () => {
             ...getCommonMountOptions({}, {
                 BTable: {
                     template: "<table><slot></slot></table>",
-                    emits: ["sort-changed"],
+                    emits: ["update:sort-by"],
                 }
             }),
             props: {
@@ -107,7 +107,7 @@ describe("TabelaProcessos.vue", () => {
 
         await (
             context.wrapper.findComponent(_BTable as any) as any
-        ).vm.$emit("sort-changed", {sortBy: "tipo"});
+        ).vm.$emit("update:sort-by", [{key: "tipo", order: "asc"}]);
 
         expect(context.wrapper.emitted("ordenar")).toBeTruthy();
         expect(context.wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);
@@ -316,7 +316,7 @@ describe("TabelaProcessos.vue", () => {
                 ...getCommonMountOptions({}, {
                     BTable: {
                         template: "<table><slot></slot></table>",
-                        emits: ["sort-changed"],
+                        emits: ["update:sort-by"],
                     }
                 }),
                 props: {
@@ -329,7 +329,7 @@ describe("TabelaProcessos.vue", () => {
 
             await (
                 context.wrapper.findComponent(_BTable as any) as any
-            ).vm.$emit("sort-changed", {sortBy: "tipo"});
+            ).vm.$emit("update:sort-by", [{key: "tipo", order: "asc"}]);
 
             expect(context.wrapper.emitted("ordenar")).toBeTruthy();
             expect(context.wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);

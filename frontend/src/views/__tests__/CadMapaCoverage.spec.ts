@@ -40,7 +40,7 @@ describe('CadMapa Coverage', () => {
             initialState: {
                 mapas: {
                     mapaCompleto: {
-                        competencias: [{ codigo: 1, descricao: 'Comp 1', atividadesAssociadas: [10] }]
+                        competencias: [{ codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}] }]
                     }
                 }
             }
@@ -122,7 +122,7 @@ describe('CadMapa Coverage', () => {
             initialState: {
                 mapas: {
                     mapaCompleto: {
-                        competencias: [{ codigo: 1, descricao: 'Comp 1', atividadesAssociadas: [10, 20] }]
+                        competencias: [{ codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}, {codigo: 20}] }]
                     }
                 }
             }
@@ -141,10 +141,9 @@ describe('CadMapa Coverage', () => {
         // Call
         await (wrapper.vm as any).removerAtividadeAssociada(1, 10);
 
-        expect(mapasStore.atualizarCompetencia).toHaveBeenCalledWith(456, {
-            codigo: 1,
+        expect(mapasStore.atualizarCompetencia).toHaveBeenCalledWith(456, 1, {
             descricao: 'Comp 1',
-            atividadesAssociadas: [20]
+            atividadesIds: [20]
         });
     });
 
