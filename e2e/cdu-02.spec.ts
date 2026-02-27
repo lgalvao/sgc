@@ -23,11 +23,11 @@ test.describe('CDU-02 - Visualizar Painel', () => {
                 const cabecalhoDescricao = page.getByTestId('tbl-processos').getByRole('columnheader', {name: 'Descrição'});
                 await expect(cabecalhoDescricao).toHaveClass(/b-table-sortable-column/);
 
-                await cabecalhoDescricao.click();
-                await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'descending');
+                // O estado inicial no PainelView.vue é 'ascending' para Descrição
+                await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'ascending');
 
                 await cabecalhoDescricao.click();
-                await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'none');
+                await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'descending');
 
                 await cabecalhoDescricao.click();
                 await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'ascending');

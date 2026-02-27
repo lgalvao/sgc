@@ -43,9 +43,18 @@ const fields = computed(() => {
   return baseFields;
 });
 
-function handleSortChange(ctx: any) {
-  emit("ordenar", ctx.sortBy);
-}
+const internalSortBy = computed({
+  get: () => [{key: props.criterioOrdenacao, order: props.direcaoOrdenacaoAsc ? 'asc' : 'desc'}],
+  set: (val: any) => {
+    const sortBy = Array.isArray(val) ? val[0] : val;
+    if (sortBy?.key) {
+      emit("ordenar", sortBy.key);
+    } else {
+      // Se val for vazio (estado 'none'), forçamos a alternância no critério atual
+      emit("ordenar", props.criterioOrdenacao);
+    }
+  }
+});
 
 function handleSelecionarProcesso(processo: any) {
   // O BTable do bootstrap-vue-next pode emitir o item diretamente ou um objeto com {item, index, event}
@@ -82,8 +91,7 @@ defineExpose({ fields });
         aria-label="Lista de processos cadastrados"
         :fields="fields"
         :items="processos"
-        :sort-by="[{key: criterioOrdenacao, order: direcaoOrdenacaoAsc ? 'asc' : 'desc'}]"
-        :sort-desc="[!direcaoOrdenacaoAsc]"
+        v-model:sort-by="internalSortBy"
         :tbody-tr-attr="rowAttr"
         :tbody-tr-class="rowClass"
         data-testid="tbl-processos"
@@ -92,7 +100,7 @@ defineExpose({ fields });
         show-empty
         stacked="md"
         @row-clicked="handleSelecionarProcesso"
-        @sort-changed="handleSortChange">
+    >
 
       <template #empty>
         <EmptyState

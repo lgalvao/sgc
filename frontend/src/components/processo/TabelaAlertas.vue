@@ -68,9 +68,12 @@ const rowClass = (item: Alerta | null) => {
 };
 
 const handleSortChange = (ctx: any) => {
-  if (ctx.sortBy === "dataHora") {
+  const sortBy = Array.isArray(ctx.sortBy) ? ctx.sortBy[0] : ctx.sortBy;
+  const key = sortBy?.key || (typeof sortBy === 'string' ? sortBy : null);
+
+  if (key === "dataHora") {
     emit("ordenar", "data");
-  } else if (ctx.sortBy === "processo") {
+  } else if (key === "processo") {
     emit("ordenar", "processo");
   }
 };
