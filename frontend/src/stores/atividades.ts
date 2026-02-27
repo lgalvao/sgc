@@ -24,15 +24,10 @@ export const useAtividadesStore = defineStore("atividades", () => {
         atividadesPorSubprocesso.value.set(codSubprocesso, atividades);
     }
 
-    /**
-     * Atualiza o estado local com dados retornados pela operação CRUD.
-     * Elimina a necessidade de chamadas extras ao backend.
-     */
     async function atualizarDadosLocais(codSubprocesso: number, response: AtividadeOperacaoResponse) {
         // Atualizar lista de atividades no cache local
         if (response.atividadesAtualizadas) {
-            // Simplified: Direct assignment, response should already be Atividade[]
-            const atividades = response.atividadesAtualizadas as Atividade[];
+            const atividades = response.atividadesAtualizadas;
             atividadesPorSubprocesso.value.set(codSubprocesso, atividades);
         }
         
@@ -61,7 +56,6 @@ export const useAtividadesStore = defineStore("atividades", () => {
     ) {
         return withErrorHandling(async () => {
             const response = await atividadeService.criarAtividade(request, codMapa);
-            // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
             await atualizarDadosLocais(codSubprocesso, response);
             return response.subprocesso;
         });
@@ -70,7 +64,6 @@ export const useAtividadesStore = defineStore("atividades", () => {
     async function removerAtividade(codSubprocesso: number, atividadeId: number) {
         return withErrorHandling(async () => {
             const response = await atividadeService.excluirAtividade(atividadeId);
-            // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
             await atualizarDadosLocais(codSubprocesso, response);
             return response.subprocesso;
         });
@@ -83,7 +76,6 @@ export const useAtividadesStore = defineStore("atividades", () => {
     ) {
         return withErrorHandling(async () => {
             const response = await atividadeService.criarConhecimento(atividadeId, request);
-            // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
             await atualizarDadosLocais(codSubprocesso, response);
             return response.subprocesso;
         });
@@ -96,7 +88,6 @@ export const useAtividadesStore = defineStore("atividades", () => {
     ) {
         return withErrorHandling(async () => {
             const response = await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
-            // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
             await atualizarDadosLocais(codSubprocesso, response);
             return response.subprocesso;
         });
@@ -107,8 +98,6 @@ export const useAtividadesStore = defineStore("atividades", () => {
         codSubprocessoOrigem: number,
     ) {
         return withErrorHandling(async () => {
-            // Nota: importarAtividades não retorna AtividadeOperacaoResponse,
-            // então mantemos as chamadas de reload aqui
             await subprocessoService.importarAtividades(codSubprocessoDestino, codSubprocessoOrigem);
             await buscarAtividadesParaSubprocesso(codSubprocessoDestino);
             const subprocessosStore = useSubprocessosStore();
@@ -123,7 +112,6 @@ export const useAtividadesStore = defineStore("atividades", () => {
     ) {
         return withErrorHandling(async () => {
             const response = await atividadeService.atualizarAtividade(atividadeId, data);
-            // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
             await atualizarDadosLocais(codSubprocesso, response);
             return response.subprocesso;
         });
@@ -137,7 +125,6 @@ export const useAtividadesStore = defineStore("atividades", () => {
     ) {
         return withErrorHandling(async () => {
             const response = await atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, data);
-            // ✅ Usar dados da resposta para atualizar estado local (elimina 2 chamadas HTTP)
             await atualizarDadosLocais(codSubprocesso, response);
             return response.subprocesso;
         });

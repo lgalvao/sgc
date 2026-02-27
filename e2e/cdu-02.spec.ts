@@ -7,16 +7,31 @@ import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 test.describe('CDU-02 - Visualizar Painel', () => {
     test.describe('Como ADMIN', () => {
-        test('Deve exibir seções de Processos e Alertas', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
-            await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();
-            await expect(page.getByTestId('txt-painel-titulo-processos')).toHaveText('Processos');
+        test('Deve exibir estrutura básica do painel e testar ordenação', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
+            await test.step('Verificar seções principais', async () => {
+                await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();
+                await expect(page.getByTestId('txt-painel-titulo-processos')).toHaveText('Processos');
+                await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();
+                await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');
+            });
 
-            await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();
-            await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');
-        });
+            await test.step('Verificar botão de criação', async () => {
+                await expect(page.getByTestId('btn-painel-criar-processo')).toBeVisible();
+            });
 
-        test('Deve exibir botão "Criar processo"', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
-            await expect(page.getByTestId('btn-painel-criar-processo')).toBeVisible();
+            await test.step('Testar ordenação da tabela de processos', async () => {
+                const cabecalhoDescricao = page.getByTestId('tbl-processos').getByRole('columnheader', {name: 'Descrição'});
+                await expect(cabecalhoDescricao).toHaveClass(/b-table-sortable-column/);
+
+                await cabecalhoDescricao.click();
+                await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'descending');
+
+                await cabecalhoDescricao.click();
+                await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'none');
+
+                await cabecalhoDescricao.click();
+                await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'ascending');
+            });
         });
 
         test('Deve criar processo e visualizá-lo na tabela', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: ReturnType<typeof useProcessoCleanup>}) => {
@@ -76,19 +91,6 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso)).not.toBeVisible();
         });
 
-        test('Deve alternar ordenação da coluna Descrição na tabela de processos', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
-            const cabecalhoDescricao = page.getByTestId('tbl-processos').getByRole('columnheader', {name: 'Descrição'});
-            await expect(cabecalhoDescricao).toHaveClass(/b-table-sortable-column/);
-
-            await cabecalhoDescricao.click();
-            await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'descending');
-
-            await cabecalhoDescricao.click();
-            await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'none');
-
-            await cabecalhoDescricao.click();
-            await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', 'ascending');
-        });
 
         test('Não deve incluir unidades INTERMEDIARIAS na seleção', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: ReturnType<typeof useProcessoCleanup>}) => {
             await page.getByTestId('btn-painel-criar-processo').click();
@@ -152,33 +154,29 @@ test.describe('CDU-02 - Visualizar Painel', () => {
     });
 
     test.describe('Como GESTOR', () => {
-        test('Não deve exibir botão "Criar processo"', async ({page, autenticadoComoGestor}: {page: Page, autenticadoComoGestor: void}) => {
-            await expect(page.getByTestId('btn-painel-criar-processo')).not.toBeVisible();
-        });
+        test('Deve validar visualização, alertas e ordenação', async ({page, autenticadoComoGestor}: {page: Page, autenticadoComoGestor: void}) => {
+            await test.step('Verificar restrições de botões e mensagens de tabela vazia', async () => {
+                await expect(page.getByTestId('btn-painel-criar-processo')).not.toBeVisible();
+                await expect(page.getByTestId('tbl-processos')).toBeVisible();
+                await expect(page.getByTestId('empty-state-processos')).toBeVisible();
+            });
 
-        test('Deve exibir mensagem quando não há processos', async ({page, autenticadoComoGestor}: {page: Page, autenticadoComoGestor: void}) => {
-            const tabela = page.getByTestId('tbl-processos');
-            await expect(tabela).toBeVisible();
-            await expect(page.getByTestId('empty-state-processos')).toBeVisible();
-        });
+            await test.step('Verificar tabela de alertas vazia', async () => {
+                const tabelaAlertas = page.getByTestId('tbl-alertas');
+                await expect(tabelaAlertas).toBeVisible();
+                const linhasAlertas = await tabelaAlertas.getByRole('row').count();
+                expect(linhasAlertas).toBeLessThanOrEqual(2);
+                await expect(tabelaAlertas).toContainText('Nenhum alerta');
+            });
 
-        test('Deve exibir tabela de alertas vazia', async ({page, autenticadoComoGestor}: {page: Page, autenticadoComoGestor: void}) => {
-            const tabelaAlertas = page.getByTestId('tbl-alertas');
-            await expect(tabelaAlertas).toBeVisible();
+            await test.step('Testar ordenação de alertas', async () => {
+                const cabecalhoProcesso = page.getByTestId('tbl-alertas').getByRole('columnheader', {name: 'Processo'});
+                await cabecalhoProcesso.click();
+                await expect(cabecalhoProcesso).toHaveAttribute('aria-sort', 'ascending');
 
-            // Como não há alertas, a tabela deve estar vazia e exibir a mensagem
-            const linhasAlertas = await tabelaAlertas.getByRole('row').count();
-            expect(linhasAlertas).toBeLessThanOrEqual(2);
-            await expect(tabelaAlertas).toContainText('Nenhum alerta');
-        });
-
-        test('Deve alternar ordenação de alertas por Processo', async ({page, autenticadoComoGestor}: {page: Page, autenticadoComoGestor: void}) => {
-            const cabecalhoProcesso = page.getByTestId('tbl-alertas').getByRole('columnheader', {name: 'Processo'});
-            await cabecalhoProcesso.click();
-            await expect(cabecalhoProcesso).toHaveAttribute('aria-sort', 'ascending');
-
-            await cabecalhoProcesso.click();
-            await expect(cabecalhoProcesso).toHaveAttribute('aria-sort', 'descending');
+                await cabecalhoProcesso.click();
+                await expect(cabecalhoProcesso).toHaveAttribute('aria-sort', 'descending');
+            });
         });
     });
 });

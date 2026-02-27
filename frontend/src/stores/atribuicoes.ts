@@ -15,7 +15,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
     () => {
         const atribuicoes = ref<AtribuicaoTemporaria[]>([]);
         const loading = useSingleLoading();
-        const error = ref<string | null>(null); // Keeping for backward compatibility
+        const error = ref<string | null>(null);
         const { lastError, clearError: clearNormalizedError, withErrorHandling } = useErrorHandler();
 
         function clearError() {
@@ -40,8 +40,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
             await loading.withLoading(async () => {
                 await withErrorHandling(async () => {
                     const response = await buscarTodasAtribuicoes();
-                    // response is the array directly from the service
-                    const data = Array.isArray(response) ? response : (response as any).data;
+                    const data = Array.isArray(response) ? response : (response).data;
                     
                     if (Array.isArray(data)) {
                         atribuicoes.value = data.map((a: any) => ({
@@ -49,7 +48,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
                             dataInicio: new Date(a.dataInicio).toISOString(),
                             dataFim: new Date(a.dataTermino).toISOString(),
                             dataTermino: new Date(a.dataTermino).toISOString(),
-                            usuario: a.usuario || a.servidor, // Handle both just in case
+                            usuario: a.usuario || a.servidor,
                             unidade: a.unidade,
                             justificativa: a.justificativa
                         })) as AtribuicaoTemporaria[];

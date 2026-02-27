@@ -13,22 +13,15 @@ import sgc.subprocesso.service.*;
 
 import java.util.*;
 
-/**
- * Serviço responsável pelas validações de regras de negócio de Processo.
- */
 @Service
 @Slf4j
 @RequiredArgsConstructor
 class ProcessoValidador {
-
     private final OrganizacaoFacade organizacaoFacade;
     private final ConsultasSubprocessoService queryService;
 
     /**
      * Valida se todas as unidades especificadas possuem mapa vigente.
-     *
-     * @param codigosUnidades lista de códigos de unidades a validar
-     * @return Optional com mensagem de erro se alguma unidade não possuir mapa vigente
      */
     public Optional<String> getMensagemErroUnidadesSemMapa(@Nullable List<Long> codigosUnidades) {
         if (codigosUnidades == null || codigosUnidades.isEmpty()) {
@@ -80,7 +73,6 @@ class ProcessoValidador {
     /**
      * Valida se as unidades participantes são elegíveis (não são INTERMEDIARIA).
      *
-     * @param unidades lista de unidades a validar
      * @return Optional com mensagem de erro se houver unidade inválida
      */
     public Optional<String> validarTiposUnidades(List<Unidade> unidades) {
