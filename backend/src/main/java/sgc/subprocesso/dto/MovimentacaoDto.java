@@ -3,6 +3,7 @@ package sgc.subprocesso.dto;
 import lombok.*;
 
 import java.time.*;
+import java.util.*;
 
 /**
  * DTO de resposta representando uma movimentação no histórico.
@@ -11,7 +12,6 @@ import java.time.*;
 public record MovimentacaoDto(
         Long codigo,
         LocalDateTime dataHora,
-
         Long unidadeOrigemCodigo,
         String unidadeOrigemSigla,
         String unidadeOrigemNome,
@@ -21,8 +21,6 @@ public record MovimentacaoDto(
     String descricao
 ) {
     public static MovimentacaoDto from(sgc.subprocesso.model.Movimentacao m) {
-        if (m == null) return null;
-        
         return MovimentacaoDto.builder()
                 .codigo(m.getCodigo())
                 .dataHora(m.getDataHora())
@@ -37,7 +35,6 @@ public record MovimentacaoDto(
     }
 
     private static String mapUnidadeSiglaParaUsuario(sgc.organizacao.model.Unidade unidade) {
-        if (unidade == null || unidade.getCodigo() == null) return null;
-        return java.util.Objects.equals(unidade.getCodigo(), 1L) ? "ADMIN" : unidade.getSigla();
+        return Objects.equals(unidade.getCodigo(), 1L) ? "ADMIN" : unidade.getSigla();
     }
 }

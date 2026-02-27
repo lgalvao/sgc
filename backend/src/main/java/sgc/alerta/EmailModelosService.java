@@ -55,10 +55,10 @@ public class EmailModelosService {
         context.setVariable(VAR_TITULO, assunto);
         context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
-        context.setVariable(VAR_DATA_LIMITE, dataLimite != null ? dataLimite.format(FORMATADOR) : "N/A");
+        context.setVariable(VAR_DATA_LIMITE, dataLimite.format(FORMATADOR));
         context.setVariable("isParticipante", isParticipante);
         context.setVariable("siglasSubordinadas", siglasSubordinadas);
-        context.setVariable("hasSubordinadas", siglasSubordinadas != null && !siglasSubordinadas.isEmpty());
+        context.setVariable("hasSubordinadas", !siglasSubordinadas.isEmpty());
 
         return templateEngine.process("email-inicio-processo-consolidado", context);
     }

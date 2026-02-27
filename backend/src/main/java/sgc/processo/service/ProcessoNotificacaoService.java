@@ -13,10 +13,9 @@ import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 import static sgc.organizacao.model.TipoUnidade.*;
 
@@ -237,7 +236,7 @@ public class ProcessoNotificacaoService {
         emailService.enviarEmailHtml(emailUnidade, assunto, corpoHtml);
         log.info("E-mail enviado para {}", unidade.getSigla());
 
-        if (responsavel != null && responsavel.substitutoTitulo() != null) {
+        if (responsavel.substitutoTitulo() != null) {
             enviarEmailParaSubstituto(responsavel.substitutoTitulo(), usuarios, assunto, corpoHtml, nomeUnidade);
         }
     }

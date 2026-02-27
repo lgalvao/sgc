@@ -23,6 +23,7 @@ import type {
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import {useErrorHandler} from "@/composables/useErrorHandler";
+import {useFeedbackStore} from "@/stores/feedback";
 
 export const useMapasStore = defineStore("mapas", () => {
     const mapaVisualizacao = ref<MapaVisualizacao | null>(null);
@@ -32,6 +33,7 @@ export const useMapasStore = defineStore("mapas", () => {
     const carregando = ref(false);
     const erro = ref<string | null>(null);
     const { lastError, clearError } = useErrorHandler();
+    const feedbackStore = useFeedbackStore();
 
     async function buscarMapaVisualizacao(codSubprocesso: number) {
         carregando.value = true;
@@ -123,6 +125,7 @@ export const useMapasStore = defineStore("mapas", () => {
         erro.value = null;
         try {
             await disponibilizarMapaService(codSubprocesso, request);
+            feedbackStore.show("Mapa disponibilizado", "Mapa de competências disponibilizado.", "success");
         } catch (e: any) {
             erro.value = e.message || "Erro ao disponibilizar mapa.";
             throw e;
@@ -142,6 +145,7 @@ export const useMapasStore = defineStore("mapas", () => {
                 codSubprocesso,
                 competencia,
             );
+            feedbackStore.show("Competência adicionada", "Competência adicionada com sucesso.", "success");
         } catch (e: any) {
             erro.value = e.message || "Erro ao adicionar competência.";
             throw e;
@@ -163,6 +167,7 @@ export const useMapasStore = defineStore("mapas", () => {
                 codCompetencia,
                 competencia,
             );
+            feedbackStore.show("Competência atualizada", "Competência atualizada com sucesso.", "success");
         } catch (e: any) {
             erro.value = e.message || "Erro ao atualizar competência.";
             throw e;
@@ -182,6 +187,7 @@ export const useMapasStore = defineStore("mapas", () => {
                 codSubprocesso,
                 codCompetencia,
             );
+            feedbackStore.show("Competência removida", "Competência removida com sucesso.", "success");
         } catch (e: any) {
             erro.value = e.message || "Erro ao remover competência.";
             throw e;

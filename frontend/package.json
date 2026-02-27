@@ -20,7 +20,7 @@
     "quality:all": "npm run quality:test && npm run quality:lint && npm run quality:typecheck"
   },
   "dependencies": {
-    "axios": "^1.13.5",
+    "axios": "^1.13.6",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "bootstrap-vue-next": "^0.43.7",
@@ -34,11 +34,11 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@pinia/testing": "^1.0.3",
-    "@storybook/addon-docs": "^10.2.11",
-    "@storybook/addon-links": "^10.2.11",
-    "@storybook/vue3-vite": "^10.2.11",
+    "@storybook/addon-docs": "^10.2.13",
+    "@storybook/addon-links": "^10.2.13",
+    "@storybook/vue3-vite": "^10.2.13",
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^25.3.0",
+    "@types/node": "^25.3.2",
     "@types/papaparse": "^5.5.2",
     "@vitejs/plugin-vue": "^6.0.4",
     "@vitest/browser": "^4.0.0",
@@ -60,7 +60,7 @@
     "jsdom": "^28.1.0",
     "openapi-typescript": "^7.13.0",
     "playwright": "^1.58.2",
-    "storybook": "^10.2.11",
+    "storybook": "^10.2.13",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1",

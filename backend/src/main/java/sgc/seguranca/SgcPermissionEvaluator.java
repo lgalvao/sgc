@@ -104,9 +104,8 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
             return !isAcaoEscrita(acao);
         }
-        Perfil perfil = usuario.getPerfilAtivo();
-        if (perfil == null) return false;
 
+        Perfil perfil = usuario.getPerfilAtivo();
         boolean isAdmin = perfil == ADMIN;
         boolean isEscrita = isAcaoEscrita(acao);
 
@@ -185,11 +184,8 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         }
 
         Perfil perfil = usuario.getPerfilAtivo();
-        if (perfil == null) return false;
-
         // Regras para Processo (baseadas em Perfil)
         boolean isAdmin = perfil == ADMIN;
-
         if (isAdmin) return true; // Admin faz tudo no Processo
 
         // Gestor e Chefe podem ver e realizar ações em bloco

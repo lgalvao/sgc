@@ -46,8 +46,14 @@ public class SubprocessoService {
     private static final String SIGLA_ADMIN = "ADMIN";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    @Setter @Autowired @Lazy private SubprocessoRepo subprocessoRepo;
-    @Setter @Autowired @Lazy private MovimentacaoRepo movimentacaoRepo;
+    @Setter
+    @Autowired
+    @Lazy
+    private SubprocessoRepo subprocessoRepo;
+    @Setter
+    @Autowired
+    @Lazy
+    private MovimentacaoRepo movimentacaoRepo;
 
     private final ComumRepo repo;
     private final AnaliseRepo analiseRepo;
@@ -57,14 +63,20 @@ public class SubprocessoService {
     private final UsuarioFacade usuarioFacade;
     private final ImpactoMapaService impactoMapaService;
 
-    @Setter @Autowired @Lazy private CopiaMapaService copiaMapaService;
+    @Setter
+    @Autowired
+    @Lazy
+    private CopiaMapaService copiaMapaService;
     private final EmailService emailService;
     private final TemplateEngine templateEngine;
     private final MapaSalvamentoService mapaSalvamentoService;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final MapaVisualizacaoService mapaVisualizacaoService;
 
-    @Lazy @Autowired @Setter private MapaManutencaoService mapaManutencaoService;
+    @Lazy
+    @Autowired
+    @Setter
+    private MapaManutencaoService mapaManutencaoService;
 
     private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_DISPONIBILIZADO = new EnumMap<>(Map.of(
             TipoProcesso.MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO,
@@ -1609,7 +1621,7 @@ public class SubprocessoService {
 
     private String getEmailUnidade(Unidade unidade) {
         String sigla = unidade.getSigla();
-        return (sigla != null ? sigla.toLowerCase() : "desconhecida") + "@tre-pe.jus.br";
+        return sigla.toLowerCase() + "@tre-pe.jus.br";
     }
 
     private void enviarNotificacaoDireta(Subprocesso sp,
@@ -1629,14 +1641,13 @@ public class SubprocessoService {
 
     private void notificarResponsavelPessoal(Unidade unidade, String assunto, String corpo, TipoTransicao tipo) {
         UnidadeResponsavelDto responsavel = organizacaoFacade.buscarResponsavelUnidade(unidade.getCodigo());
-        if (responsavel != null && responsavel.substitutoTitulo() != null) {
-            usuarioFacade.buscarUsuarioPorTitulo(responsavel.substitutoTitulo())
-                    .ifPresent(u -> {
-                        if (!u.getEmail().isBlank()) {
-                            emailService.enviarEmailHtml(u.getEmail(), assunto, corpo);
-                            log.info("Notificação operacional '{}' enviada a e-mail pessoal de {}", tipo, u.getNome());
-                        }
-                    });
+        if (responsavel.substitutoTitulo() != null) {
+            usuarioFacade.buscarUsuarioPorTitulo(responsavel.substitutoTitulo()).ifPresent(u -> {
+                if (!u.getEmail().isBlank()) {
+                    emailService.enviarEmailHtml(u.getEmail(), assunto, corpo);
+                    log.info("Notificação operacional '{}' enviada a e-mail pessoal de {}", tipo, u.getNome());
+                }
+            });
         }
     }
 

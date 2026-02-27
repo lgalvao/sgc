@@ -54,7 +54,8 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcessoMapeamento);
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
         processoMapeamentoId = await extrairProcessoId(page);
-        if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
+        // Não registrar cleanup aqui pois os testes seguintes dependem deste processo (serial)
+        // O registro será feito no último cenário.
 
         // Iniciar processo
         await page.getByTestId('btn-processo-iniciar').click();
@@ -293,7 +294,10 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByText(atividadeB)).toBeVisible();
     });
 
-    test('Cenario 4: CHEFE visualiza cadastro de processo finalizado', async ({page, autenticadoComoChefeSecao211}) => {
+    test('Cenario 4: CHEFE visualiza cadastro de processo finalizado', async ({page, autenticadoComoChefeSecao211, cleanupAutomatico}) => {
+        // Registrar cleanup aqui pois é o último teste que depende deste processo
+        if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
+
         // Mesmo cenário mas com perfil CHEFE - deve ir direto para subprocesso
         
 
