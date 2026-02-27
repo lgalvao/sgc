@@ -101,7 +101,8 @@ class MapaControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mapa)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", API_MAPAS_1));
+                // Assert suffix instead of exact match to ignore host/port differences
+                .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith(API_MAPAS_1)));
     }
 
     @Test
