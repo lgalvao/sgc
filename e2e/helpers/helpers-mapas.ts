@@ -60,8 +60,8 @@ export async function criarCompetencia(page: Page, descricao: string, atividades
     await page.getByTestId('inp-criar-competencia-descricao').fill(descricao);
 
     for (const atividade of atividades) {
-        // Click on the label containing the activity text to toggle the checkbox
-        await modal.locator('label').filter({hasText: atividade}).click();
+        const cardAtividade = modal.locator('.atividade-card-item', {hasText: atividade});
+        await cardAtividade.getByRole('checkbox').click();
     }
 
     await page.getByTestId('btn-criar-competencia-salvar').click();
