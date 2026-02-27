@@ -20,7 +20,7 @@ A senha padrão para todos os usuários populados pelo script de seed é: `senha
 
 1. Acesse a página de login da aplicação (geralmente em `/login`).
 2. No campo **Título**, insira o número do título do usuário desejado (ex: `191919`).
-3. No campo **Senha**, insira `senha`.
+3. No campo **Senha**, pode ser qualquer coisa.
 4. Clique em **Entrar**.
 5. **Seleção de Perfil:** Caso o usuário possua mais de um perfil vinculado (como o usuário `111111`), será exibida uma tela para seleção do perfil e da unidade que deseja utilizar na sessão atual.
 
