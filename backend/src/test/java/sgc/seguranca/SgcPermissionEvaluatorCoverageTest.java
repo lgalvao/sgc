@@ -176,6 +176,20 @@ class SgcPermissionEvaluatorCoverageTest {
     }
 
     @Test
+    @DisplayName("checkHierarquia - GESTOR nega acesso se nao subordinada")
+    void checkHierarquia_Gestor_NaoSubordinada() {
+        Subprocesso sp = criarSubprocesso(1L, 20L);
+        sp.setProcesso(new Processo());
+
+        Usuario user = usuario(Perfil.GESTOR, 10L);
+
+        when(hierarquiaService.isMesmaOuSubordinada(any(), any())).thenReturn(false);
+
+        boolean result = evaluator.checkPermission(user, sp, "VISUALIZAR");
+        assertThat(result).isFalse();
+    }
+
+    @Test
     @DisplayName("hasPermission - Collection")
     void hasPermission_Collection() {
         Subprocesso sp1 = criarSubprocesso(1L, 10L);
@@ -194,5 +208,66 @@ class SgcPermissionEvaluatorCoverageTest {
 
         boolean result = evaluator.hasPermission(auth, List.of(sp1, sp2), "EDITAR_CADASTRO");
         assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("hasPermission - ById Subprocesso")
+    void hasPermission_ById_Subprocesso() {
+        Long spId = 1L;
+        Subprocesso sp = criarSubprocesso(spId, 10L);
+        sp.setProcesso(new Processo());
+        sp.setLocalizacaoAtual(Unidade.builder().codigo(10L).build());
+
+        Usuario user = usuario(Perfil.CHEFE, 10L);
+
+        when(subprocessoRepo.findById(spId)).thenReturn(Optional.of(sp));
+
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        when(auth.getPrincipal()).thenReturn(user);
+
+        boolean result = evaluator.hasPermission(auth, spId, "Subprocesso", "EDITAR_CADASTRO");
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("hasPermission - ById Processo")
+    void hasPermission_ById_Processo() {
+        Long procId = 1L;
+        Processo p = new Processo();
+        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+        Usuario user = usuario(Perfil.GESTOR, 10L);
+
+        when(processoRepo.findById(procId)).thenReturn(Optional.of(p));
+
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        when(auth.getPrincipal()).thenReturn(user);
+
+        boolean result = evaluator.hasPermission(auth, procId, "Processo", "HOMOLOGAR_CADASTRO_EM_BLOCO");
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("checkPerfil - ADMIN actions")
+    void checkPerfil_MapActions_Admin() {
+        Usuario user = usuario(Perfil.ADMIN, 10L);
+        Subprocesso sp = criarSubprocesso(1L, 10L);
+        sp.setProcesso(new Processo());
+        sp.setLocalizacaoAtual(Unidade.builder().codigo(10L).build());
+
+        assertThat(evaluator.checkPermission(user, sp, "EDITAR_MAPA")).isTrue();
+        assertThat(evaluator.checkPermission(user, sp, "HOMOLOGAR_MAPA")).isTrue();
+    }
+
+    @Test
+    @DisplayName("checkPerfil - CHEFE actions")
+    void checkPerfil_MapActions_Chefe() {
+        Usuario user = usuario(Perfil.CHEFE, 10L);
+        Subprocesso sp = criarSubprocesso(1L, 10L);
+        sp.setProcesso(new Processo());
+        sp.setLocalizacaoAtual(Unidade.builder().codigo(10L).build());
+
+        assertThat(evaluator.checkPermission(user, sp, "VALIDAR_MAPA")).isTrue();
+        assertThat(evaluator.checkPermission(user, sp, "HOMOLOGAR_MAPA")).isFalse();
     }
 }

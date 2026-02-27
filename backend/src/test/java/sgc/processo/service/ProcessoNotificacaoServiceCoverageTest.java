@@ -48,6 +48,54 @@ class ProcessoNotificacaoServiceCoverageTest {
     }
 
     @Test
+    @DisplayName("processarInicioProcesso - sem subprocessos")
+    void processarInicioProcesso_SemSubprocessos() {
+        Long codProcesso = 1L;
+        Processo p = new Processo();
+        p.setCodigo(codProcesso);
+
+        when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(p));
+        when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(Collections.emptyList());
+
+        service.emailInicioProcesso(codProcesso);
+
+        verifyNoInteractions(alertaService);
+        verifyNoInteractions(emailService);
+    }
+
+    @Test
+    @DisplayName("processarInicioProcesso - com subprocessos e notificacao")
+    void processarInicioProcesso_ComSubprocessos() {
+        Long codProcesso = 1L;
+        Processo p = new Processo();
+        p.setCodigo(codProcesso);
+        p.setDescricao("P1");
+
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        u.setSigla("U1");
+        u.setTipo(TipoUnidade.OPERACIONAL);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+        sp.setProcesso(p);
+
+        when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(p));
+        when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+        when(organizacaoFacade.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, new UnidadeResponsavelDto(10L, "Titular", "Nome Titular", "Substituto", "Nome Substituto")));
+        when(organizacaoFacade.unidadePorCodigo(10L)).thenReturn(u);
+        when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("Titular", new Usuario()));
+
+        when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
+            .thenReturn("HTML");
+
+        service.emailInicioProcesso(codProcesso);
+
+        verify(emailService, atLeastOnce()).enviarEmailHtml(anyString(), anyString(), anyString());
+        verify(alertaService).criarAlertasProcessoIniciado(any(), anyList());
+    }
+
+    @Test
     @DisplayName("enviarEmailFinalizacao - deve enviar para unidade INTERMEDIARIA com subordinadas")
     void enviarEmailFinalizacao_Intermediaria() {
         Long codProcesso = 1L;
