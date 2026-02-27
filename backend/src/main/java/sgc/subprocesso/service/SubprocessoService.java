@@ -35,9 +35,6 @@ import java.util.stream.*;
 import static java.util.Collections.*;
 import static sgc.organizacao.model.TipoUnidade.*;
 
-/**
- * Service unificado para todas as operações do domínio de Subprocesso.
- */
 @Service
 @Slf4j
 @RequiredArgsConstructor

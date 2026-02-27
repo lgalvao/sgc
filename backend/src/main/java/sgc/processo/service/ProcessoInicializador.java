@@ -26,12 +26,6 @@ public class ProcessoInicializador {
     private final SubprocessoService subprocessoService;
     private final ProcessoValidador processoValidador;
 
-    /**
-     * Inicia um processo de qualquer tipo.
-     *
-     * @param codsUnidadesParam Lista de códigos de unidades (usada apenas para REVISAO)
-     * @return Lista de erros (vazia se sucesso)
-     */
     public List<String> iniciar(Long codigo, List<Long> codsUnidadesParam, Usuario usuario) {
         Processo processo = repo.buscar(Processo.class, codigo);
 
@@ -41,20 +35,16 @@ public class ProcessoInicializador {
         List<Long> codigosUnidades;
         Set<Unidade> unidadesParaProcessar;
 
-        // Determinar unidades baseado no tipo de processo
         if (tipo == TipoProcesso.REVISAO) {
             if (codsUnidadesParam.isEmpty()) {
                 throw new ErroUnidadesNaoDefinidas("A lista de unidades é obrigatória para iniciar o processo de revisão.");
             }
             codigosUnidades = codsUnidadesParam;
-            // Para REVISAO, as unidades a processar são as que receberão subprocessos
             unidadesParaProcessar = new HashSet<>(unidadeRepo.findAllById(codigosUnidades));
 
-            // Snapshot da árvore de unidades no momento da iniciação (Apenas para REVISAO conforme CDU-05)
             Set<Unidade> snapshotArvore = carregarArvoreUnidades(unidadesParaProcessar);
             processo.sincronizarParticipantes(snapshotArvore);
         } else {
-            // Mapeamento e Diagnóstico usam participantes do processo definidos na criação
             List<Long> codsParticipantes = processo.getCodigosParticipantes();
             if (codsParticipantes.isEmpty()) {
                 throw new ErroUnidadesNaoDefinidas("Não há unidades participantes definidas para este processo.");
@@ -63,13 +53,11 @@ public class ProcessoInicializador {
             unidadesParaProcessar = new HashSet<>(unidadeRepo.findAllById(codigosUnidades));
         }
 
-        // Validar unidades (Batch)
         List<String> erros = validarUnidades(tipo, codigosUnidades);
         if (!erros.isEmpty()) {
             return erros;
         }
 
-        // Se for REVISAO ou DIAGNOSTICO, precisamos carregar os mapas vigentes em lote
         List<UnidadeMapa> unidadesMapas = List.of();
         if (tipo == TipoProcesso.REVISAO || tipo == TipoProcesso.DIAGNOSTICO) {
             unidadesMapas = unidadeMapaRepo.findAllById(codigosUnidades);

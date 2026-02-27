@@ -9,16 +9,6 @@ import sgc.alerta.model.*;
 import java.time.*;
 import java.util.*;
 
-/**
- * Service responsável pelas operações de persistência de alertas.
- *
- * <p>Este service encapsula o acesso aos repositórios {@link AlertaRepo} e {@link AlertaUsuarioRepo},
- * permitindo que {@link AlertaFacade} delegue operações de dados sem acessar repositórios diretamente.
- *
- * @see AlertaFacade
- * @see AlertaRepo
- * @see AlertaUsuarioRepo
- */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

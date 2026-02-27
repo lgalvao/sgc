@@ -16,9 +16,6 @@ import sgc.subprocesso.service.*;
 
 import java.util.*;
 
-/**
- * Centraliza consultas envolvendo processos e subprocessos, incluindo listagens filtradas e verificações de elegibilidade.
- */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -81,9 +78,6 @@ public class ProcessoConsultaService {
         return processoRepo.findUnidadeCodigosBySituacaoAndTipo(SituacaoProcesso.EM_ANDAMENTO, tipoProcesso);
     }
 
-    /**
-     * Lista subprocessos elegíveis para o usuário atual no contexto do processo especificado
-     */
     public List<SubprocessoElegivelDto> subprocessosElegiveis(Long codProcesso) {
         Usuario usuario = usuarioService.usuarioAutenticado();
 

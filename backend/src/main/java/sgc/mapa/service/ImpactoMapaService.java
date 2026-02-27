@@ -17,10 +17,6 @@ import java.util.stream.*;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
-/**
- * Serviço responsável por detectar impactos no mapa de competências causados
- * por alterações no cadastro de atividades durante processos de revisão.
- */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -31,18 +27,6 @@ public class ImpactoMapaService {
     private final SgcPermissionEvaluator permissionEvaluator;
     private final ComumRepo repo;
 
-    /**
-     * Realiza a verificação de impactos no mapa de competências, comparando o mapa
-     * em revisão de um subprocesso com o mapa vigente da unidade.
-     * <p>
-     * Analisa as diferenças entre os dois mapas, identificando atividades
-     * inseridas, removidas ou alteradas, e as competências que são afetadas por essas
-     * mudanças.
-     * <p>
-     * O acesso a esta funcionalidade é restrito por perfil e pela situação atual do
-     * subprocesso para garantir que a análise de impacto seja feita no momento correto do fluxo
-     * de trabalho.
-     */
     @Transactional(readOnly = true)
     public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
         if (!permissionEvaluator.checkPermission(usuario, subprocesso, "VERIFICAR_IMPACTOS")) {
@@ -94,22 +78,11 @@ public class ImpactoMapaService {
 
         boolean situacaoValida;
 
-        // Regras de negócio migradas do SgcPermissionEvaluator (CDU-12)
         if (perfil == Perfil.CHEFE) {
-            // CHEFE - Revisão do cadastro em andamento na sua unidade (ou NAO_INICIADO se aplicável)
             situacaoValida = (situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO);
         } else if (perfil == Perfil.GESTOR) {
-            // GESTOR - Revisão do cadastro disponibilizada
-            // Nota: O checkHierarquia já garantiu que é da unidade/subordinada,
-            // mas aqui validamos se o momento do fluxo é adequado para o Gestor ver impactos.
-            // Para visualização (VERIFICAR_IMPACTOS), GESTOR também pode ver em outras fases se desejar?
-            // A regra original era estrita:
-            // "if (situacao == REVISAO_CADASTRO_DISPONIBILIZADA) { if (perfil == GESTOR ... "
-            // Isso implicava que GESTOR só via impactos SE estivesse DISPONIBILIZADA.
-            // Vamos manter a regra original para fidelidade.
             situacaoValida = (situacao == REVISAO_CADASTRO_DISPONIBILIZADA);
         } else if (perfil == Perfil.ADMIN) {
-            // ADMIN - Várias fases
             situacaoValida = Set.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO,
                     REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA,
                     REVISAO_MAPA_AJUSTADO).contains(situacao);
@@ -124,17 +97,10 @@ public class ImpactoMapaService {
         }
     }
 
-    /**
-     * Obtém todas as atividades associadas a um mapa, com seus conhecimentos.
-     */
     private List<Atividade> obterAtividadesDoMapa(Mapa mapa) {
         return mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(mapa.getCodigo());
     }
 
-    /**
-     * Detecta atividades que foram inseridas no mapa atual em comparação com o
-     * vigente.
-     */
     private List<AtividadeImpactadaDto> detectarInseridas(List<Atividade> atuais, Set<String> descVigentes) {
         List<AtividadeImpactadaDto> inseridas = new ArrayList<>();
         for (Atividade atual : atuais) {
@@ -154,9 +120,6 @@ public class ImpactoMapaService {
         return inseridas;
     }
 
-    /**
-     * Detecta atividades que foram removidas do mapa atual em comparação com o vigente.
-     */
     private List<AtividadeImpactadaDto> detectarRemovidas(
             Map<String, Atividade> atuaisMap,
             List<Atividade> vigentes,
@@ -182,10 +145,6 @@ public class ImpactoMapaService {
         return removidas;
     }
 
-    /**
-     * Detecta atividades que foram alteradas (em seus conhecimentos) no mapa atual
-     * em comparação com o vigente.
-     */
     private List<AtividadeImpactadaDto> detectarAlteradas(
             List<Atividade> atuais,
             Map<String, Atividade> vigentesMap,
@@ -217,14 +176,11 @@ public class ImpactoMapaService {
         return alteradas;
     }
 
-    /**
-     * Constrói um mapa de Atividades indexado pela descrição.
-     */
     private Map<String, Atividade> atividadesPorDescricao(List<Atividade> atividades) {
         return atividades.stream().collect(Collectors.toMap(
                 Atividade::getDescricao,
                 atividade -> atividade,
-                (existente, substituto) -> existente // Mantém a primeira ocorrência em caso de duplicata
+                (existente, substituto) -> existente
         ));
     }
 
@@ -253,9 +209,6 @@ public class ImpactoMapaService {
                 .toList();
     }
 
-    /**
-     * Identifica quais competências foram impactadas pelas atividades removidas ou alteradas.
-     */
     private List<CompetenciaImpactadaDto> competenciasImpactadas(
             List<Competencia> competenciasDoMapa,
             List<AtividadeImpactadaDto> removidas,
@@ -336,9 +289,6 @@ public class ImpactoMapaService {
                 acc.obterTiposImpacto());
     }
 
-    /**
-     * Constrói um mapa invertido de Atividade ID → Lista de Competências.
-     */
     private Map<Long, List<Competencia>> construirMapaAtividadeCompetencias(List<Competencia> competencias) {
         Map<Long, List<Competencia>> mapa = new HashMap<>();
         for (Competencia comp : competencias) {

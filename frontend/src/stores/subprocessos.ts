@@ -68,7 +68,6 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     ) {
         return withErrorHandling(async () => {
             await serviceAlterarDataLimite(codigo, dados);
-            // Recarregar os detalhes para refletir a nova data
             await buscarSubprocessoDetalhe(codigo);
         });
     }
@@ -95,7 +94,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     }
 
     async function buscarSubprocessoDetalhe(codigo: number) {
-        subprocessoDetalhe.value = null; // Limpa estado anterior
+        subprocessoDetalhe.value = null;
         const perfilStore = usePerfilStore();
         const perfil = perfilStore.perfilSelecionado;
         const codUnidade = perfilStore.unidadeAtual;
@@ -139,7 +138,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     }
 
     async function buscarContextoEdicao(codigo: number) {
-        subprocessoDetalhe.value = null; // Limpa estado anterior
+        subprocessoDetalhe.value = null;
         const perfilStore = usePerfilStore();
         const perfil = perfilStore.perfilSelecionado;
         const codUnidade = perfilStore.unidadeAtual;
@@ -168,10 +167,6 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         });
     }
 
-    /**
-     * Atualiza o status e as permissões do subprocesso localmente, sem fazer chamada HTTP.
-     * Usado após operações CRUD que retornam o status e as permissões atualizadas.
-     */
     function atualizarStatusLocal(status: { 
         codigo: number; 
         situacao: SituacaoSubprocesso;

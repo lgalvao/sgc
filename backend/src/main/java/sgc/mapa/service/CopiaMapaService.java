@@ -8,10 +8,6 @@ import sgc.mapa.model.*;
 
 import java.util.*;
 
-/**
- * Realiza cópias profundas de mapas de competências. Duplica toda a estrutura hierárquica de um mapa:
- * competências, atividades e conhecimentos, mantendo as associações entre eles.
- */
 @Service
 @RequiredArgsConstructor
 public class CopiaMapaService {
@@ -34,10 +30,6 @@ public class CopiaMapaService {
         return mapaSalvo;
     }
 
-    /**
-     * Importa atividades de um mapa de origem para um mapa de destino.
-     * Apenas atividades que ainda não existem no destino serão importadas.
-     */
     @Transactional
     public void importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId) {
         List<Atividade> atividadesOrigem = atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId);
