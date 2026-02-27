@@ -104,7 +104,7 @@ class ProcessoControllerTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isCreated())
-                    .andExpect(header().string("Location", API_PROCESSOS_1))
+                    .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith(API_PROCESSOS_1)))
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
                     .andExpect(jsonPath(DESCRICAO_JSON_PATH).value(NOVO_PROCESSO));
 

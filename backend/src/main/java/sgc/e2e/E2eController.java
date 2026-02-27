@@ -200,6 +200,7 @@ public class E2eController {
                 DELETE FROM sgc.alerta_usuario
                 WHERE alerta_codigo IN (SELECT codigo FROM sgc.alerta WHERE processo_codigo = ?)""", codigo);
         jdbcTemplate.update("DELETE FROM sgc.alerta WHERE processo_codigo = ?", codigo);
+        jdbcTemplate.update("DELETE FROM sgc.subprocesso WHERE processo_codigo = ?", codigo);
         jdbcTemplate.update("DELETE FROM sgc.unidade_processo WHERE processo_codigo = ?", codigo);
         jdbcTemplate.update("DELETE FROM sgc.processo WHERE codigo = ?", codigo);
     }
