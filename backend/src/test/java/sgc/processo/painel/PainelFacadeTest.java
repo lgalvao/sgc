@@ -234,6 +234,7 @@ class PainelFacadeTest {
         when(p.getParticipantes()).thenReturn(List.of(up1, up2));
 
         Map<Long, List<Long>> hierarquia = new HashMap<>();
+        hierarquia.put(0L, List.of(1L)); // 0L é a raiz, 1L é o nível abaixo da raiz
         hierarquia.put(1L, List.of(2L)); // U1 tem U2 como filho
         hierarquia.put(2L, new ArrayList<>());
 

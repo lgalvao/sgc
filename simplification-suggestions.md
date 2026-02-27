@@ -30,15 +30,6 @@ Atualmente, o `SubprocessoController` possui regras de negócio vazando para a c
 - **Mover validações para o Service:** O Controller deve apenas delegar a intenção do usuário (`subprocessoService.disponibilizarCadastro(codSubprocesso, usuario)`).
 - **Isolar a Web Layer:** Qualquer verificação de "falta de conhecimento na atividade" ou "situação inválida" deve estar encapsulada dentro do método do Service, que por sua vez lança a exceção adequada baseada no Domínio. Isso facilita muito escrever testes unitários para as regras de negócio sem envolver o contexto HTTP.
 
-### 2.2 Reavaliar o Uso do MapStruct
-O projeto utiliza o MapStruct em 5 pontos: `AtividadeMapper`, `ConhecimentoMapper`, `ParametroMapper`, `MovimentacaoMapper` e `MapaAjusteMapper`, além de uma configuração central rigorosa (`CentralMapperConfig`).
-
-**Recomendação:**
-A remoção do MapStruct é **altamente viável e recomendada** para um projeto desse escopo, pois reduz dependências de build e "magia" no código. 
-- Mappers como `AtividadeMapper`, `ConhecimentoMapper` e `ParametroMapper` ignoram a maioria dos campos complexos e apenas copiam propriedades simples (requests para entidades). Podem ser facilmente substituídos por métodos construtores simples na Entidade ou factory methods (ex: `Parametro.atualizarCom(request)`).
-- `MovimentacaoMapper` é um DTO simples e a formatação de unidade e data é trivial.
-- `MapaAjusteMapper` tem a lógica mais complexa (vários loops para agrupar conhecimentos), mas ironicamente, a maior parte dessa lógica _já está_ escrita à mão em um método `default` (`mapCompetencias`) dentro do próprio mapper! Portanto, mover esse método manual para um fluxo puramente Java seria quase um copiar e colar.
-
 ### 2.3 Refinar a Fronteira de Segurança vs. Regra de Negócio
 O `SgcPermissionEvaluator` executa verificações complexas de estado de negócio (ex: verificar a `SituacaoSubprocesso` ou se um Processo está finalizado) para determinar se um usuário tem permissão.
 

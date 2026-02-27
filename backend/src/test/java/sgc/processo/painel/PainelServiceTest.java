@@ -155,7 +155,7 @@ class PainelServiceTest {
                     .comSuperior(pai)
                     .build();
 
-            when(unidadeService.buscarMapaHierarquia()).thenReturn(Map.of(1L, List.of(2L)));
+            when(unidadeService.buscarMapaHierarquia()).thenReturn(Map.of(0L, List.of(1L), 1L, List.of(2L)));
 
             Processo p = new Processo();
             p.setCodigo(100L);

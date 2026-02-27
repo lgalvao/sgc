@@ -369,7 +369,6 @@ public class SubprocessoService {
 
         sp.setSituacao(novaSituacao);
         sp.setDataFimEtapa1(LocalDateTime.now());
-        subprocessoRepo.save(sp);
 
         removerAnalisesPorSubprocesso(sp.getCodigo());
 
@@ -483,7 +482,6 @@ public class SubprocessoService {
 
         Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-        subprocessoRepo.save(sp);
 
         registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(sp)
@@ -566,7 +564,6 @@ public class SubprocessoService {
         if (impactos.temImpactos()) {
             Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
-            subprocessoRepo.save(sp);
             registrarTransicao(RegistrarTransicaoCommand.builder()
                     .sp(sp)
                     .tipo(TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA)
@@ -617,7 +614,6 @@ public class SubprocessoService {
 
         sp.setSituacao(novaSituacao);
         sp.setDataFimEtapa1(null);
-        subprocessoRepo.save(sp);
 
         registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(sp)
@@ -936,7 +932,6 @@ public class SubprocessoService {
 
         sp.setDataLimiteEtapa2(request.dataLimite().atStartOfDay());
         sp.setDataFimEtapa1(LocalDateTime.now());
-        subprocessoRepo.save(sp);
 
         Unidade unidadeRaiz = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
         RegistrarTransicaoCommand transicaoCommand = RegistrarTransicaoCommand.builder()
@@ -991,7 +986,6 @@ public class SubprocessoService {
         sp.setSituacao(SITUACAO_MAPA_COM_SUGESTOES.get(sp.getProcesso().getTipo()));
 
         sp.setDataFimEtapa2(LocalDateTime.now());
-        subprocessoRepo.save(sp);
 
         removerAnalisesPorSubprocesso(sp.getCodigo());
 
@@ -1018,7 +1012,6 @@ public class SubprocessoService {
         sp.setSituacao(SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo()));
 
         sp.setDataFimEtapa2(LocalDateTime.now());
-        subprocessoRepo.save(sp);
 
         Unidade destino = sp.getUnidade().getUnidadeSuperior();
         if (destino == null) {
@@ -1131,7 +1124,6 @@ public class SubprocessoService {
                 SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_MAPA_VALIDADO);
 
         sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
-        subprocessoRepo.save(sp);
 
         Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
         registrarTransicao(RegistrarTransicaoCommand.builder()
@@ -1155,8 +1147,6 @@ public class SubprocessoService {
         if (request.dataLimiteEtapa2() != null) {
             sp.setDataLimiteEtapa2(request.dataLimiteEtapa2());
         }
-
-        subprocessoRepo.save(sp);
 
         registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(sp)
