@@ -38,4 +38,6 @@ This approach will likely result in fewer lines of test code (less setup/mocking
 
 ## Status
 
-**Implemented.** The `SubprocessoServiceIntegrationTest` has been created, and the highly-mocked `SubprocessoServiceTest` (including `SubprocessoServiceTransicaoTest`, `SubprocessoServiceAjusteTest`, `SubprocessoServiceAtividadeTest`, `SubprocessoServiceContextoTest`, `SubprocessoServiceCoverageTest`, and `SubprocessoServiceEmailTest`) has been removed, significantly reducing test code brittleness and relying on the real H2 database for validation logic and workflow transitions.
+**Implemented.**
+- The `SubprocessoServiceIntegrationTest` has been created, and the highly-mocked `SubprocessoServiceTest` (including `SubprocessoServiceTransicaoTest`, `SubprocessoServiceAjusteTest`, `SubprocessoServiceAtividadeTest`, `SubprocessoServiceContextoTest`, `SubprocessoServiceCoverageTest`, and `SubprocessoServiceEmailTest`) has been removed, significantly reducing test code brittleness and relying on the real H2 database for validation logic and workflow transitions.
+- The `MapaManutencaoServiceTest` and `ProcessoManutencaoServiceTest` heavily-mocked unit tests have been migrated to the `MapaManutencaoServiceIntegrationTest` and `ProcessoManutencaoServiceIntegrationTest` integration tests respectively.
