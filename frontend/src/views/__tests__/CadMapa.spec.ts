@@ -650,7 +650,7 @@ describe("CadMapa.vue", () => {
     });
 
     it('limpa erro ao emitir dismiss no ErrorAlert', async () => {
-        const { wrapper, mapasStore } = createWrapper();
+        const { wrapper } = createWrapper();
         await flushPromises();
         const errorAlert = wrapper.findComponent({ name: 'ErrorAlert' });
         await errorAlert.vm.$emit('dismiss');
@@ -721,7 +721,7 @@ describe("CadMapa.vue", () => {
     });
 
     it('disponibilizarMapa não faz nada se codSubprocesso for nulo', async () => {
-        const { wrapper, mapasStore } = createWrapper();
+        const { wrapper } = createWrapper();
         (wrapper.vm as any).codSubprocesso = null;
         await (wrapper.vm as any).disponibilizarMapa({ dataLimite: '2023-12-31', observacoes: 'Obs' });
         // Expect no error clearing or service call

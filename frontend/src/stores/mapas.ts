@@ -191,7 +191,7 @@ export const useMapasStore = defineStore("mapas", () => {
         // Não gerencia estado de carregando/erro global aqui para ser mais leve
         try {
             return await verificarMapaVigente(codigoUnidade);
-        } catch (_e) {
+        } catch {
             return false;
         }
     }
