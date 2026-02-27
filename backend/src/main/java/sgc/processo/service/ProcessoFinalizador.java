@@ -15,11 +15,6 @@ import sgc.subprocesso.service.*;
 import java.time.*;
 import java.util.*;
 
-/**
- * Serviço responsável pela finalização de processos.
- * Coordena todas as etapas necessárias para finalizar um processo,
- * incluindo validações, publicação de mapas vigentes e eventos.
- */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -32,10 +27,6 @@ public class ProcessoFinalizador {
     private final ProcessoValidador processoValidador;
     private final ProcessoNotificacaoService notificacaoService;
 
-
-    /**
-     * Finaliza um processo, validando e tornando os mapas vigentes.
-     */
     @Transactional
     public void finalizar(Long codigo) {
         Processo processo = repo.buscar(Processo.class, codigo);
@@ -54,9 +45,6 @@ public class ProcessoFinalizador {
         log.info("Processo {} finalizado", codigo);
     }
 
-    /**
-     * Torna os mapas de todos os subprocessos do processo como vigentes.
-     */
     private void tornarMapasVigentes(Processo processo) {
         log.info("Mapa vigente definido para o processo {}", processo.getCodigo());
         List<Subprocesso> subprocessos = queryService.listarEntidadesPorProcesso(processo.getCodigo());

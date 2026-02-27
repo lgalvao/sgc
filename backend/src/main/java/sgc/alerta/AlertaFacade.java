@@ -13,9 +13,6 @@ import sgc.processo.model.*;
 import java.time.*;
 import java.util.*;
 
-/**
- * Facade para gerenciamento de alertas do sistema.
- */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -91,8 +88,6 @@ public class AlertaFacade {
                 codsIntermediarias.add(unidade.getCodigo());
             }
 
-            // Unidades superiores (intermediárias) que não necessariamente participam do processo
-            // mas precisam de alerta se tiverem subordinadas participando
             Unidade superior = unidade.getUnidadeSuperior();
             while (superior != null) {
                 todasUnidadesMap.put(superior.getCodigo(), superior);

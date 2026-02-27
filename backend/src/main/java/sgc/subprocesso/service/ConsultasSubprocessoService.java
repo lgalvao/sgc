@@ -10,19 +10,12 @@ import java.util.*;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
-/**
- * Serviço de consulta compartilhado para queries que envolvem Processo e Subprocesso.
- */
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ConsultasSubprocessoService {
     private final SubprocessoRepo subprocessoRepo;
 
-    /**
-     * Verifica se todas as unidades especificadas participam do processo através de subprocessos.
-     *
-     */
     public boolean verificarAcessoUnidadeAoProcesso(Long processoId, List<Long> unidadeCodigos) {
         if (unidadeCodigos.isEmpty()) {
             return false;
@@ -30,9 +23,6 @@ public class ConsultasSubprocessoService {
         return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(processoId, unidadeCodigos);
     }
 
-    /**
-     * Valida se todos os subprocessos de um processo estão homologados.
-     */
     public ValidationResult validarSubprocessosParaFinalizacao(Long processoId) {
         long total = subprocessoRepo.countByProcessoCodigo(processoId);
 
@@ -71,12 +61,6 @@ public class ConsultasSubprocessoService {
                 processoId, unidadeId, situacoes);
     }
 
-    /**
-     * Resultado de validação imutável.
-     *
-     * @param valido   indica se a validação passou
-     * @param mensagem mensagem de erro (presente apenas se inválido)
-     */
     public record ValidationResult(boolean valido, @Nullable String mensagem) {
         public static ValidationResult ofValido() {
             return new ValidationResult(true, null);

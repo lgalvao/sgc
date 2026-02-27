@@ -14,12 +14,6 @@ import sgc.subprocesso.service.*;
 import java.util.*;
 import java.util.stream.*;
 
-/**
- * Serviço responsável pelo controle de acesso a processos.
- * <p>
- * Implementa a lógica de verificação hierárquica de acesso baseada
- * em unidades organizacionais e perfis de usuário.
- */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -28,13 +22,6 @@ public class ProcessoAcessoService {
     private final UsuarioFacade usuarioService;
     private final ConsultasSubprocessoService consultas;
 
-    /**
-     * Verifica se o usuário autenticado tem acesso ao processo.
-     *
-     * @param authentication contexto de autenticação do usuário
-     * @param codProcesso    código do processo
-     * @return true se o usuário tem acesso, false caso contrário
-     */
     @Transactional(readOnly = true)
     public boolean checarAcesso(@Nullable Authentication authentication, Long codProcesso) {
         if (authentication == null || !authentication.isAuthenticated() || authentication.getName() == null) {
@@ -66,12 +53,6 @@ public class ProcessoAcessoService {
         return consultas.verificarAcessoUnidadeAoProcesso(codProcesso, new ArrayList<>(todasUnidadesAcesso));
     }
 
-    /**
-     * Busca todos os códigos de unidades descendentes (hierarquia completa).
-     *
-     * @param codUnidade código da unidade raiz
-     * @return lista de códigos incluindo a unidade raiz e todos os descendentes
-     */
     @Transactional(readOnly = true)
     public List<Long> buscarCodigosDescendentes(Long codUnidade) {
         List<Unidade> todasUnidades = organizacaoFacade.unidadesComHierarquia();

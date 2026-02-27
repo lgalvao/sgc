@@ -10,9 +10,6 @@ import sgc.processo.model.*;
 
 import java.time.*;
 
-/**
- * Representa um alerta ou notificação dentro do sistema.
- */
 @Entity
 @Table(name = "ALERTA", schema = "sgc")
 @Getter

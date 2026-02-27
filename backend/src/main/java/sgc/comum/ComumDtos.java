@@ -4,9 +4,6 @@ import jakarta.validation.constraints.*;
 
 import java.time.*;
 
-/**
- * DTOs genéricos para requisições de campo único, reduzindo boilerplate.
- */
 public final class ComumDtos {
 
     public record TextoRequest(

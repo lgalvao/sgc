@@ -25,18 +25,12 @@ public class EmailService {
     private final JavaMailSender enviadorEmail;
     private final ConfigAplicacao config;
 
-    /**
-     * Envia um email de texto simples.
-     */
     @Async
     @Transactional
     public void enviarEmail(String para, String assunto, String corpo) {
         processarEnvioEmail(para, assunto, corpo, false);
     }
 
-    /**
-     * Envia um email com HTML.
-     */
     @Async
     @Transactional
     public void enviarEmailHtml(String para, String assunto, String corpoHtml) {

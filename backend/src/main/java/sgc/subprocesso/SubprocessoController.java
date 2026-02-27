@@ -34,11 +34,7 @@ import java.util.*;
 public class SubprocessoController {
 
     private final SubprocessoService subprocessoService;
-    private final OrganizacaoFacade organizacaoFacade; // Mantido para suporte a busca por sigla
-
-    // ============================================================================================
-    // LEITURA / CRUD (Migrado de SubprocessoCrudController)
-    // ============================================================================================
+    private final OrganizacaoFacade organizacaoFacade;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -123,10 +119,6 @@ public class SubprocessoController {
         subprocessoService.reabrirRevisaoCadastro(codigo, request.justificativa());
         return ResponseEntity.ok().build();
     }
-
-    // ============================================================================================
-    // CADASTRO / ATIVIDADES (Migrado de SubprocessoCadastroController)
-    // ============================================================================================
 
     @GetMapping("/{codigo}/historico-cadastro")
     @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
@@ -310,10 +302,6 @@ public class SubprocessoController {
         subprocessoService.homologarCadastroEmBloco(request.subprocessos(), usuario);
     }
 
-    // ============================================================================================
-    // MAPA (Migrado de SubprocessoMapaController)
-    // ============================================================================================
-
     @GetMapping("/{codigo}/impactos-mapa")
     @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'VERIFICAR_IMPACTOS')")
     @JsonView(MapaViews.Publica.class)
@@ -447,10 +435,6 @@ public class SubprocessoController {
         return ResponseEntity.ok(mapa);
     }
 
-    // ============================================================================================
-    // VALIDACAO / SUGESTOES (Migrado de SubprocessoValidacaoController)
-    // ============================================================================================
-
     @PostMapping("/{codigo}/apresentar-sugestoes")
     @PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'APRESENTAR_SUGESTOES')")
     @Operation(summary = "Apresenta sugestões de melhoria para o mapa")
@@ -536,10 +520,6 @@ public class SubprocessoController {
             @AuthenticationPrincipal Usuario usuario) {
         subprocessoService.homologarValidacaoEmBloco(request.subprocessos(), usuario);
     }
-
-    // ============================================================================================
-    // ANALISES (Migrado de AnaliseController)
-    // ============================================================================================
 
     @PostMapping("/{codigo}/analises-cadastro")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")

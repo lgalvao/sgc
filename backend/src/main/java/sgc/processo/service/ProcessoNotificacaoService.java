@@ -32,17 +32,11 @@ public class ProcessoNotificacaoService {
     private final ProcessoRepo processoRepo;
     private final SubprocessoService subprocessoService;
 
-    /**
-     * Notifica sobre o início de um processo (alertas + e-mails).
-     */
     @Transactional
     public void emailInicioProcesso(Long codProcesso) {
         processarInicioProcesso(codProcesso);
     }
 
-    /**
-     * Notifica sobre a finalização de um processo (alertas + e-mails).
-     */
     @Transactional
     public void emailFinalizacaoProcesso(Long codProcesso) {
         processarFinalizacaoProcesso(codProcesso);
@@ -58,11 +52,9 @@ public class ProcessoNotificacaoService {
             return;
         }
 
-        // 1. Identificar quem são os participantes (12.1)
         Map<Long, Subprocesso> participantesMap = subprocessos.stream()
                 .collect(Collectors.toMap(s -> s.getUnidade().getCodigo(), s -> s));
 
-        // 2. Identificar quem são os gestores de participantes (12.2) e coletar subordinadas imediatas
         Map<Long, Set<String>> gestoresSubordinadasMap = new HashMap<>();
         for (Subprocesso sp : subprocessos) {
             Unidade superior = sp.getUnidade().getUnidadeSuperior();
@@ -73,11 +65,9 @@ public class ProcessoNotificacaoService {
             }
         }
 
-        // 3. Unir todas as unidades que precisam ser notificadas
         Set<Long> todosCodigosNotificar = new HashSet<>(participantesMap.keySet());
         todosCodigosNotificar.addAll(gestoresSubordinadasMap.keySet());
 
-        // 4. Buscar dados auxiliares em lote
         Map<Long, UnidadeResponsavelDto> responsaveisMap = organizacaoFacade.buscarResponsaveisUnidades(new ArrayList<>(todosCodigosNotificar));
         List<String> todosTitulosUsuarios = responsaveisMap.values().stream()
                 .flatMap(r -> Stream.of(r.titularTitulo(), r.substitutoTitulo()))
@@ -86,7 +76,6 @@ public class ProcessoNotificacaoService {
                 .toList();
         Map<String, Usuario> usuariosMap = usuarioService.buscarUsuariosPorTitulos(todosTitulosUsuarios);
 
-        // 5. Enviar e-mails consolidados
         for (Long codUnidade : todosCodigosNotificar) {
             Unidade unidade = organizacaoFacade.unidadePorCodigo(codUnidade);
             Subprocesso sp = participantesMap.get(codUnidade);
@@ -95,7 +84,6 @@ public class ProcessoNotificacaoService {
             enviarEmailConsolidado(processo, unidade, sp, subordinadasNoProcesso, responsaveisMap.get(codUnidade), usuariosMap);
         }
 
-        // 6. Criar alertas conforme 13.1, 13.2 e 13.3 (mantendo a lógica especificada)
         List<Unidade> unidadesParticipantes = subprocessos.stream().map(Subprocesso::getUnidade).toList();
         servicoAlertas.criarAlertasProcessoIniciado(processo, unidadesParticipantes);
     }

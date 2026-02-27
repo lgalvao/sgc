@@ -47,7 +47,6 @@ public class ProcessoDetalheBuilder {
         Map<Long, UnidadeParticipanteDto> mapaUnidades = new HashMap<>();
         Map<Long, Subprocesso> mapaSubprocessos = new HashMap<>();
 
-        // Criar índice de subprocessos por unidade para lookup O(1)
         for (Subprocesso sp : subprocessos) {
             mapaSubprocessos.put(sp.getUnidade().getCodigo(), sp);
         }
@@ -72,7 +71,6 @@ public class ProcessoDetalheBuilder {
             else dto.getUnidades().add(unidadeDto);
         }
 
-        // Ordenação
         Comparator<UnidadeParticipanteDto> comparator = Comparator.comparing(UnidadeParticipanteDto::getSigla);
         dto.getUnidades().sort(comparator);
         mapaUnidades.values().forEach(unidadeDto -> unidadeDto.getFilhos().sort(comparator));
