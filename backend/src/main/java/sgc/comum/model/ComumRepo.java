@@ -53,7 +53,7 @@ public class ComumRepo {
         var root = cq.from(classe);
 
         var predicates = filtros.entrySet().stream()
-                .map(f -> cb.equal(root.get(f.getKey()), f.getValue()))
+                .map(f -> cb.equal(getPath(root, f.getKey()), f.getValue()))
                 .toArray(Predicate[]::new);
 
         cq.where(predicates);
@@ -63,6 +63,14 @@ public class ComumRepo {
         } catch (NoResultException e) {
             throw new ErroEntidadeNaoEncontrada(classe.getSimpleName(), filtros.values().toString());
         }
+    }
+
+    private Path<?> getPath(Root<?> root, String attributeName) {
+        Path<?> path = root;
+        for (String part : attributeName.split("\\.")) {
+            path = path.get(part);
+        }
+        return path;
     }
 
     /**
