@@ -99,8 +99,21 @@ export async function obterMapaVisualizacao(
 }
 
 export async function verificarImpactosMapa(codSubprocesso: number): Promise<ImpactoMapa> {
-    const response = await apiClient.get(`/subprocessos/${codSubprocesso}/impactos-mapa`);
-    return response.data as ImpactoMapa;
+    const response = await apiClient.get<any>(`/subprocessos/${codSubprocesso}/impactos-mapa`);
+    const data = response.data;
+
+    // Mapeamento manual para garantir compatibilidade com a interface do frontend
+    return {
+        temImpactos: data.temImpactos,
+        atividadesInseridas: data.inseridas || [],
+        atividadesRemovidas: data.removidas || [],
+        atividadesAlteradas: data.alteradas || [],
+        competenciasImpactadas: data.competenciasImpactadas || [],
+        totalAtividadesInseridas: data.totalInseridas || 0,
+        totalAtividadesRemovidas: data.totalRemovidas || 0,
+        totalAtividadesAlteradas: data.totalAlteradas || 0,
+        totalCompetenciasImpactadas: data.totalCompetenciasImpactadas || 0
+    };
 }
 
 export async function obterMapaCompleto(codSubprocesso: number): Promise<MapaCompleto> {
