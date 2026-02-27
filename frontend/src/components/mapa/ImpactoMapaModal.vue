@@ -23,7 +23,7 @@
 
       <div v-else class="mt-3">
         <!-- Inseridas -->
-        <div v-if="impacto.atividadesInseridas.length > 0" class="mb-4">
+        <div v-if="impacto.atividadesInseridas && impacto.atividadesInseridas.length > 0" class="mb-4">
           <h5 class="text-success mb-3">
             <i aria-hidden="true" class="bi bi-plus-circle me-2"/>Atividades Inseridas
           </h5>
@@ -55,7 +55,7 @@
         </div>
 
         <!-- Removidas -->
-        <div v-if="impacto.atividadesRemovidas.length > 0" class="mb-4">
+        <div v-if="impacto.atividadesRemovidas && impacto.atividadesRemovidas.length > 0" class="mb-4">
           <h5 class="text-danger mb-3">
             <i aria-hidden="true" class="bi bi-dash-circle me-2"/>Atividades Removidas
           </h5>
@@ -68,7 +68,7 @@
 
         <!-- Alteradas -->
         <div
-            v-if="impacto.atividadesAlteradas.length > 0"
+            v-if="impacto.atividadesAlteradas && impacto.atividadesAlteradas.length > 0"
             class="mb-4"
         >
           <h5 class="text-primary mb-3">
@@ -92,7 +92,7 @@
 
         <!-- Competencias -->
         <div
-            v-if="impacto.competenciasImpactadas.length > 0"
+            v-if="impacto.competenciasImpactadas && impacto.competenciasImpactadas.length > 0"
             class="mb-4"
             data-testid="lista-competencias-impactadas"
         >
