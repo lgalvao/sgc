@@ -146,9 +146,10 @@ public class PainelFacade {
             Long candidate = pId;
             Long parent = mapaFilhoPai.get(candidate);
 
-            while (parent != null) {
-                // Só agrupa no pai se o pai também participar e estiver coberto
-                if (participantesIds.contains(parent) && isCovered(parent, participantesIds, mapaPaiFilhos, coveredCache)) {
+            while (parent != null && mapaFilhoPai.get(parent) != null) {
+                // Agrupa no pai se ele estiver totalmente coberto pelas unidades participantes.
+                // Interrompe o agrupamento no nível imediatamente abaixo da unidade raiz.
+                if (isCovered(parent, participantesIds, mapaPaiFilhos, coveredCache)) {
                     candidate = parent;
                     parent = mapaFilhoPai.get(candidate);
                 } else {

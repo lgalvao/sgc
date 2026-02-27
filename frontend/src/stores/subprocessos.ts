@@ -73,6 +73,27 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         });
     }
 
+    function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe {
+        if (!dto) return null as any;
+        const sp = dto.subprocesso || dto;
+        return {
+            codigo: sp.codigo,
+            unidade: sp.unidade,
+            titular: dto.titular,
+            responsavel: dto.responsavel,
+            situacao: sp.situacao,
+            localizacaoAtual: dto.localizacaoAtual || sp.unidade?.sigla,
+            processoDescricao: sp.processoDescricao || (sp.processo?.descricao),
+            tipoProcesso: sp.tipoProcesso || (sp.processo?.tipo),
+            prazoEtapaAtual: sp.prazoEtapaAtual || sp.dataLimite,
+            isEmAndamento: sp.isEmAndamento ?? true,
+            etapaAtual: sp.etapaAtual || 1,
+            movimentacoes: dto.movimentacoes || [],
+            elementosProcesso: [],
+            permissoes: dto.permissoes || {}
+        };
+    }
+
     async function buscarSubprocessoDetalhe(codigo: number) {
         subprocessoDetalhe.value = null; // Limpa estado anterior
         const perfilStore = usePerfilStore();
@@ -95,8 +116,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
                 perfil,
                 codUnidade as number,
             );
-            // Assuming response is already correct type or compatible
-            subprocessoDetalhe.value = dto as SubprocessoDetalhe;
+            subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(dto);
         }, (err) => {
             logger.error(`Erro ao buscar detalhes do subprocesso ${codigo}:`, err);
             subprocessoDetalhe.value = null;
@@ -133,17 +153,8 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
 
         return withErrorHandling(async () => {
             const data = await serviceBuscarContextoEdicao(codigo, perfil, codUnidade as number);
-
-            // Directly assigning data, possibly nested in details if API structure requires it
-            // Based on service return: return response.data;
-            // Adjust based on actual response structure. Assuming `data.detalhes` or spread
-
-            // Re-mapping logic removed, assuming backend sends correct structure or we adapt here simply
-            const detalhes = data.detalhes || data;
-
-            // Ideally we should have types matching backend response exactly.
-            // For now casting to SubprocessoDetalhe
-            subprocessoDetalhe.value = detalhes as SubprocessoDetalhe;
+            const detalhesDto = data.detalhes || data;
+            subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(detalhesDto);
 
             const unidadesStore = useUnidadesStore();
             unidadesStore.unidade = data.unidade;
