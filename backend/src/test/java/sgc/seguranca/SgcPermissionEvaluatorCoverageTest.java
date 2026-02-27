@@ -9,7 +9,6 @@ import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
-import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;

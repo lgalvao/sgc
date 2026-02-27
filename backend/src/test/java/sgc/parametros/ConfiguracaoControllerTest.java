@@ -31,9 +31,6 @@ class ConfiguracaoControllerTest {
 
     @MockitoBean
     private ConfiguracaoService configuracaoService;
-    
-    @MockitoBean
-    private ParametroMapper parametroMapper;
 
     @Test
     @DisplayName("GET /api/configuracoes - Deve listar configurações com sucesso")
@@ -59,7 +56,6 @@ class ConfiguracaoControllerTest {
     @DisplayName("GET /api/configuracoes - Deve retornar lista vazia quando não há configurações")
     @WithMockUser(roles = "ADMIN")
     void deveRetornarListaVaziaQuandoNaoHaConfiguracoes() throws Exception {
-        // Pattern 1: Empty list validation
         when(configuracaoService.buscarTodos()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/configuracoes")
@@ -80,6 +76,7 @@ class ConfiguracaoControllerTest {
                 .valor("NEW_VALUE")
                 .build();
         
+        when(configuracaoService.buscarPorId(1L)).thenReturn(new Parametro());
         when(configuracaoService.salvar(any())).thenReturn(List.of(response));
 
         mockMvc.perform(post("/api/configuracoes")

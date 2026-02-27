@@ -52,14 +52,6 @@ vi.mock('@/services/cadastroService', () => ({
     homologarRevisaoCadastro: vi.fn(),
 }));
 
-vi.mock('@/mappers/mapas', () => ({
-    mapMapaCompletoDtoToModel: vi.fn((data) => ({ ...data, mapped: true })),
-}));
-
-vi.mock('@/mappers/atividades', () => ({
-    mapAtividadeVisualizacaoToModel: vi.fn((data) => ({ ...data, mapped: true })),
-}));
-
 // Mock Stores
 vi.mock('../processos', () => ({
     useProcessosStore: vi.fn(),
@@ -234,7 +226,7 @@ describe('Subprocessos Store', () => {
         it('deve popular stores relacionados com dados retornados', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
             const mockData = {
-                subprocesso: { codigo: 1 },
+                detalhes: { codigo: 1 },
                 unidade: { codigo: 10, nome: 'Teste' },
                 mapa: { id: 5 },
                 atividadesDisponiveis: [{ id: 100 }]
@@ -243,13 +235,13 @@ describe('Subprocessos Store', () => {
 
             await store.buscarContextoEdicao(1);
 
-            expect(store.subprocessoDetalhe).toMatchObject(mockData.subprocesso);
+            expect(store.subprocessoDetalhe).toMatchObject(mockData.detalhes);
             expect(mockUnidadesStore.unidade).toEqual(mockData.unidade);
-            // Verifica mapper
-            expect(mockMapasStore.mapaCompleto).toEqual({ id: 5, mapped: true });
+            // Verifica se os dados foram passados corretamente para os outros stores
+            expect(mockMapasStore.mapaCompleto).toEqual(mockData.mapa);
             expect(mockAtividadesStore.setAtividadesParaSubprocesso).toHaveBeenCalledWith(
                 1,
-                [{ id: 100, mapped: true }]
+                mockData.atividadesDisponiveis
             );
         });
 

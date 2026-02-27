@@ -66,12 +66,12 @@ describe("useAnalisesStore", () => {
             expect(context.store.analisesValidacao).toEqual(mockAnalisesValidacao);
         });
 
-        it("deve lidar com erro em listarAnalisesCadastro", async () => {
+        it("deve lidar com erro em buscarAnalisesCadastro", async () => {
             vi.mocked(subprocessoService.listarAnalisesCadastro).mockRejectedValue(
                 new Error("Fail"),
             );
 
-            await context.store.carregarHistorico(codSubprocesso);
+            await context.store.buscarAnalisesCadastro(codSubprocesso);
 
             expect(context.store.erro).toBe("Fail");
             expect(context.store.analisesCadastro).toEqual([]);

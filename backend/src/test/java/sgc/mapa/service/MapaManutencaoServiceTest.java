@@ -30,10 +30,7 @@ class MapaManutencaoServiceTest {
     private MapaRepo mapaRepo;
     @Mock
     private ComumRepo repo;
-    @Mock
-    private AtividadeMapper atividadeMapper;
-    @Mock
-    private ConhecimentoMapper conhecimentoMapper;
+
     @Mock
     private SubprocessoService subprocessoService;
 
@@ -133,7 +130,6 @@ class MapaManutencaoServiceTest {
             mapa.setSubprocesso(sub);
 
             when(repo.buscar(Mapa.class, 1L)).thenReturn(mapa);
-            when(atividadeMapper.toEntity(request)).thenReturn(new Atividade());
             when(atividadeRepo.save(any())).thenReturn(new Atividade());
 
             Atividade res = service.criarAtividade(request);
@@ -176,7 +172,6 @@ class MapaManutencaoServiceTest {
             atividadeAtualizada.setDescricao("Nova Descrição");
 
             when(repo.buscar(Atividade.class, id)).thenReturn(atividade);
-            when(atividadeMapper.toEntity(request)).thenReturn(atividadeAtualizada);
             when(atividadeRepo.save(any())).thenReturn(atividade);
 
             service.atualizarAtividade(id, request);
@@ -553,14 +548,13 @@ class MapaManutencaoServiceTest {
             conhecimento.setCodigo(1L);
 
             when(repo.buscar(Atividade.class, 1L)).thenReturn(atividade);
-            when(conhecimentoMapper.toEntity(request)).thenReturn(conhecimento);
             when(conhecimentoRepo.save(any())).thenReturn(conhecimento);
 
             Conhecimento resultado = service.criarConhecimento(1L, request);
 
             assertThat(resultado).isNotNull();
             verify(subprocessoService).atualizarParaEmAndamento(10L);
-            verify(conhecimentoRepo).save(conhecimento);
+            verify(conhecimentoRepo).save(any(Conhecimento.class));
         }
 
 
@@ -593,7 +587,6 @@ class MapaManutencaoServiceTest {
             paraAtualizar.setDescricao("Conhecimento Atualizado");
 
             when(repo.buscar(eq(Conhecimento.class), any())).thenReturn(conhecimento);
-            when(conhecimentoMapper.toEntity(request)).thenReturn(paraAtualizar);
 
             service.atualizarConhecimento(1L, 1L, request);
 

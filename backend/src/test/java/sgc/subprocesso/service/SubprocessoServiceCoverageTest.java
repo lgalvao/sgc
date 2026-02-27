@@ -16,8 +16,6 @@ import sgc.processo.model.*;
 import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
-import sgc.testutils.*;
-
 import java.time.*;
 import java.util.*;
 

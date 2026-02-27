@@ -1,21 +1,9 @@
-import {describe, expect, it, vi} from "vitest";
+import {describe, expect, it} from "vitest";
 import {setupServiceTest, testErrorHandling, testGetEndpoint, testPostEndpoint} from "@/test-utils/serviceTestHelpers";
 import * as service from "../usuarioService";
 
-// Mock das funções internas/exportadas que eram mappers
-vi.mock("../usuarioService", async () => {
-    const actual = await vi.importActual("../usuarioService");
-    return {
-        ...actual,
-        mapPerfilUnidadeToFrontend: vi.fn((dto) => ({ ...dto, mapped: true })),
-    };
-});
-
 describe("usuarioService", () => {
     const { mockApi } = setupServiceTest();
-
-    // We access the mocked function from the module import
-    const mockMapPerfilUnidade = vi.mocked(service.mapPerfilUnidadeToFrontend);
 
     describe("autenticar", () => {
         it("deve fazer POST e retornar booleano", async () => {
@@ -34,7 +22,11 @@ describe("usuarioService", () => {
     describe("autorizar", () => {
         it("deve fazer POST, mapear e retornar resposta", async () => {
             const tituloEleitoral = "123";
-            const responseDto = [{ perfil: "CHEFE", unidade: "UNIT" }];
+            const responseDto = [{ 
+                perfil: "CHEFE", 
+                unidade: { codigo: 1, nome: "UNIT", sigla: "UNIT" },
+                siglaUnidade: "UNIT"
+            }];
             mockApi.post.mockResolvedValue({ data: responseDto });
 
             const result = await service.autorizar(tituloEleitoral);
@@ -43,11 +35,8 @@ describe("usuarioService", () => {
                 "/usuarios/autorizar",
                 { tituloEleitoral },
             );
-            expect(mockMapPerfilUnidade).toHaveBeenCalled();
-            expect(mockMapPerfilUnidade.mock.calls[0][0]).toEqual(
-                responseDto[0],
-            );
-            expect(result[0]).toHaveProperty("mapped", true);
+            expect(result[0]).toHaveProperty("perfil", "CHEFE");
+            expect(result[0].unidade).toHaveProperty("codigo", 1);
         });
 
         testErrorHandling(() => service.autorizar("123"), 'post');

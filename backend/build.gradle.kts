@@ -46,12 +46,8 @@ dependencies {
     compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
     annotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
     testCompileOnly("org.projectlombok:lombok:${property("lombok.version")}")
-    testAnnotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
-
-    // MapStruct
-    implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
-    annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstruct.version")}")
-    annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+    annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor("org.hibernate.validator:hibernate-validator-annotation-processor:8.0.1.Final")
 
     // Relatórios
     implementation("com.github.librepdf:openpdf:3.0.0")

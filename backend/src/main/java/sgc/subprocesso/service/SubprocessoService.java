@@ -59,7 +59,6 @@ public class SubprocessoService {
     private final EmailService emailService;
     private final TemplateEngine templateEngine;
     private final MapaSalvamentoService mapaSalvamentoService;
-    private final MapaAjusteMapper mapaAjusteMapper;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final MapaVisualizacaoService mapaVisualizacaoService;
 
@@ -1187,9 +1186,8 @@ public class SubprocessoService {
         List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapaSemRelacionamentos(codMapa);
         List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoSemRelacionamentos(codMapa);
         List<Conhecimento> conhecimentos = mapaManutencaoService.listarConhecimentosPorMapa(codMapa);
-        Map<Long, Set<Long>> associacoes = mapaManutencaoService.buscarIdsAssociacoesCompetenciaAtividade(codMapa);
 
-        return mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes);
+        return MapaAjusteDto.of(sp, analise, competencias, atividades, conhecimentos);
     }
 
     private void validarSituacaoParaAjuste(Subprocesso sp) {

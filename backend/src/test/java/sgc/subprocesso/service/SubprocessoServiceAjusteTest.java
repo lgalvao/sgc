@@ -32,8 +32,7 @@ class SubprocessoServiceAjusteTest {
     private CopiaMapaService copiaMapaService;
     @Mock
     private MapaManutencaoService mapaManutencaoService;
-    @Mock
-    private MapaAjusteMapper mapaAjusteMapper;
+
     @InjectMocks
     private SubprocessoService service;
 
@@ -182,10 +181,7 @@ class SubprocessoServiceAjusteTest {
 
             List<Competencia> competencias = List.of(Competencia.builder().codigo(1L).build());
             List<Atividade> atividades = List.of(Atividade.builder().codigo(1L).build());
-            List<Conhecimento> conhecimentos = List.of(Conhecimento.builder().codigo(1L).build());
-            Map<Long, Set<Long>> associacoes = Map.of(1L, Set.of(1L));
-
-            MapaAjusteDto expected = MapaAjusteDto.builder().build();
+            List<Conhecimento> conhecimentos = List.of(Conhecimento.builder().codigo(1L).atividade(atividades.get(0)).build());
 
             when(subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso)).thenReturn(Optional.of(sp));
             when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso))
@@ -196,17 +192,13 @@ class SubprocessoServiceAjusteTest {
                     .thenReturn(atividades);
             when(mapaManutencaoService.listarConhecimentosPorMapa(codMapa))
                     .thenReturn(conhecimentos);
-            when(mapaManutencaoService.buscarIdsAssociacoesCompetenciaAtividade(codMapa))
-                    .thenReturn(associacoes);
-            when(mapaAjusteMapper.toDto(sp, analise, competencias, atividades, conhecimentos, associacoes))
-                    .thenReturn(expected);
 
             // Act
             MapaAjusteDto result = service.obterMapaParaAjuste(codSubprocesso);
 
             // Assert
-            assertThat(result).isEqualTo(expected);
-            verify(mapaAjusteMapper).toDto(sp, analise, competencias, atividades, conhecimentos, associacoes);
+            assertThat(result).isNotNull();
+
         }
 
         @Test
@@ -229,17 +221,15 @@ class SubprocessoServiceAjusteTest {
                     .thenReturn(Collections.emptyList());
             when(mapaManutencaoService.listarConhecimentosPorMapa(codMapa))
                     .thenReturn(Collections.emptyList());
-            when(mapaManutencaoService.buscarIdsAssociacoesCompetenciaAtividade(codMapa))
-                    .thenReturn(Collections.emptyMap());
-            when(mapaAjusteMapper.toDto(eq(sp), isNull(), anyList(), anyList(), anyList(), anyMap()))
-                    .thenReturn(MapaAjusteDto.builder().build());
+
+
 
             // Act
             MapaAjusteDto result = service.obterMapaParaAjuste(codSubprocesso);
 
             // Assert
             assertThat(result).isNotNull();
-            verify(mapaAjusteMapper).toDto(eq(sp), isNull(), anyList(), anyList(), anyList(), anyMap());
+
         }
     }
 }

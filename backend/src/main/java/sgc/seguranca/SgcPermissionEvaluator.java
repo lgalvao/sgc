@@ -15,7 +15,6 @@ import java.io.*;
 import java.util.*;
 
 import static sgc.organizacao.model.Perfil.*;
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**
  * Avaliador central de permissões do SGC.

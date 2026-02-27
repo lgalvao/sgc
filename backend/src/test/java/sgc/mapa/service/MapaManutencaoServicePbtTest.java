@@ -23,22 +23,19 @@ class MapaManutencaoServicePbtTest {
         ConhecimentoRepo conhecimentoRepo = mock(ConhecimentoRepo.class);
         MapaRepo mapaRepo = mock(MapaRepo.class);
         ComumRepo repo = mock(ComumRepo.class);
-        AtividadeMapper atividadeMapper = mock(AtividadeMapper.class);
-        ConhecimentoMapper conhecimentoMapper = mock(ConhecimentoMapper.class);
+
         SubprocessoService subprocessoService = mock(SubprocessoService.class);
 
         MapaManutencaoService service = new MapaManutencaoService(
                 atividadeRepo, competenciaRepo, conhecimentoRepo, mapaRepo, repo,
-                atividadeMapper, conhecimentoMapper, subprocessoService
+                subprocessoService
         );
 
         Long mapaCodigo = 1L;
         Mapa mapa = Mapa.builder().codigo(mapaCodigo).build();
         when(repo.buscar(Mapa.class, mapaCodigo)).thenReturn(mapa);
         
-        Atividade novaAtiv = new Atividade();
-        novaAtiv.setDescricao(descricoes[1]);
-        when(atividadeMapper.toEntity(any(CriarAtividadeRequest.class))).thenReturn(novaAtiv);
+        when(repo.buscar(Mapa.class, mapaCodigo)).thenReturn(mapa);
 
         // Simular que já existe uma atividade com a mesma descrição
         Atividade existente = new Atividade();
@@ -58,13 +55,12 @@ class MapaManutencaoServicePbtTest {
         ConhecimentoRepo conhecimentoRepo = mock(ConhecimentoRepo.class);
         MapaRepo mapaRepo = mock(MapaRepo.class);
         ComumRepo repo = mock(ComumRepo.class);
-        AtividadeMapper atividadeMapper = mock(AtividadeMapper.class);
-        ConhecimentoMapper conhecimentoMapper = mock(ConhecimentoMapper.class);
+
         SubprocessoService subprocessoService = mock(SubprocessoService.class);
 
         MapaManutencaoService service = new MapaManutencaoService(
                 atividadeRepo, competenciaRepo, conhecimentoRepo, mapaRepo, repo,
-                atividadeMapper, conhecimentoMapper, subprocessoService
+                subprocessoService
         );
 
         Long ativCodigo = 10L;

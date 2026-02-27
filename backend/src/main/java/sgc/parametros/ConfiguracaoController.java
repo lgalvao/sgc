@@ -19,7 +19,6 @@ import java.util.*;
 @Validated
 public class ConfiguracaoController {
     private final ConfiguracaoService configuracaoService;
-    private final ParametroMapper parametroMapper;
 
     @JsonView(ConfiguracaoViews.Publica.class)
     @GetMapping
@@ -38,7 +37,7 @@ public class ConfiguracaoController {
         List<Parametro> parametrosAtualizados = parametros.stream()
                 .map(request -> {
                     Parametro parametro = configuracaoService.buscarPorId(request.codigo());
-                    parametroMapper.atualizarEntidade(request, parametro);
+                    parametro.atualizarDe(request);
                     return parametro;
                 })
                 .toList();

@@ -49,4 +49,14 @@ public class Atividade extends EntidadeBase {
     public Long getMapaCodigo() {
         return mapa.getCodigo();
     }
+
+    public static Atividade criarDe(sgc.mapa.dto.CriarAtividadeRequest request) {
+        return Atividade.builder()
+                .descricao(request.descricao())
+                .build();
+    }
+
+    public void atualizarDe(sgc.mapa.dto.AtualizarAtividadeRequest request) {
+        this.descricao = request.descricao();
+    }
 }

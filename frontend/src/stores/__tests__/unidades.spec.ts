@@ -53,6 +53,7 @@ vi.mock("@/services/unidadeService", () => ({
     buscarArvoreUnidade: vi.fn(),
     buscarSubordinadas: vi.fn(),
     buscarSuperior: vi.fn(),
+    mapUnidadesArray: vi.fn((arr) => arr),
 }));
 
 describe("useUnidadesStore", () => {

@@ -8,6 +8,9 @@ import {useAnalisesStore} from "@/stores/analises";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
 import AtividadesCadastroView from "@/views/processo/AtividadesCadastroView.vue";
+import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDisponibilizacaoModal.vue";
+import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
+import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import * as useAcessoModule from '@/composables/useAcesso';
 import {Perfil} from "@/types/tipos";
 
@@ -50,23 +53,23 @@ vi.mock("@/services/processoService", () => ({
 const stubs = {
     LayoutPadrao: { template: '<div><slot /></div>' },
     PageHeader: { template: '<div><slot /><slot name="actions" /></div>' },
-    LoadingButton: { template: '<button><slot /></button>' },
-    BButton: { template: '<button><slot /></button>' },
+    LoadingButton: { template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>' },
+    BButton: { template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>' },
     BDropdown: { template: '<div><slot /></div>' },
-    BDropdownItem: { template: '<div @click="$emit(\'click\')"><slot /></div>' },
+    BDropdownItem: { template: '<div :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></div>' },
     ErrorAlert: { template: '<div></div>' },
     CadAtividadeForm: { template: '<div></div>', expose: ['inputRef'] },
     EmptyState: { template: '<div><slot /></div>' },
     AtividadeItem: { template: '<div></div>', props: ['atividade'] },
     ImportarAtividadesModal: { template: '<div></div>', props: ['mostrar'] },
-    ImpactoMapaModal: { template: '<div></div>', props: ['mostrar'] },
+    ImpactoMapaModal: { template: '<div v-if="mostrar" data-testid="modal-impacto"></div>', props: ['mostrar'] },
     ConfirmacaoDisponibilizacaoModal: {
-        template: '<div v-if="mostrar">Confirmacao <button @click="$emit(\'confirmar\')">Confirmar</button></div>',
+        template: '<div v-if="mostrar" data-testid="modal-confirmacao">Confirmacao <button data-testid="btn-confirmar-disponibilizacao" @click="$emit(\'confirmar\')">Confirmar</button></div>',
         props: ['mostrar'],
         emits: ['confirmar', 'fechar']
     },
-    HistoricoAnaliseModal: { template: '<div></div>', props: ['mostrar'] },
-    ModalConfirmacao: { template: '<div></div>', props: ['modelValue'] },
+    HistoricoAnaliseModal: { template: '<div v-if="mostrar" data-testid="modal-historico"></div>', props: ['mostrar'] },
+    ModalConfirmacao: { template: '<div v-if="modelValue"></div>', props: ['modelValue'] },
 };
 
 function createWrapper(customState = {}, accessOverrides = {}) {
@@ -78,10 +81,10 @@ function createWrapper(customState = {}, accessOverrides = {}) {
     } as any);
 
     vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
-        perfilSelecionado: {value: Perfil.CHEFE},
+        perfilSelecionado: ref(Perfil.CHEFE),
     } as any);
 
-    return mount(AtividadesCadastroView, {
+    const wrapper = mount(AtividadesCadastroView, {
         global: {
             plugins: [createTestingPinia({
                 createSpy: vi.fn,
@@ -97,7 +100,8 @@ function createWrapper(customState = {}, accessOverrides = {}) {
                         subprocessoDetalhe: {
                             codigo: 123,
                             unidade: {sigla: "TESTE"},
-                            situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO"
+                            situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
+                            tipoProcesso: "MAPEAMENTO"
                         }
                     },
                     mapas: {
@@ -113,6 +117,11 @@ function createWrapper(customState = {}, accessOverrides = {}) {
             sigla: "TESTE"
         }
     });
+
+    // Manually set codSubprocesso to ensure buttons depending on it are rendered
+    (wrapper.vm as any).codSubprocesso = 123;
+    
+    return wrapper;
 }
 
 describe("AtividadesCadastroView.vue", () => {
@@ -120,10 +129,14 @@ describe("AtividadesCadastroView.vue", () => {
         vi.clearAllMocks();
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
-            subprocesso: {situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO"},
+            detalhes: {
+                codigo: 123,
+                situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
+                unidade: {sigla: "TESTE"}
+            },
             mapa: {codigo: 100},
             atividadesDisponiveis: [],
-            unidade: {sigla: "TESTE"}
+            unidade: {sigla: "TESTE", nome: "Teste"}
         } as any);
     });
 
@@ -135,6 +148,7 @@ describe("AtividadesCadastroView.vue", () => {
 
     it("chama validação antes de disponibilizar", async () => {
         const wrapper = createWrapper();
+        await wrapper.vm.$nextTick();
         const subprocessosStore = useSubprocessosStore();
         subprocessosStore.validarCadastro = vi.fn().mockResolvedValue({valido: true});
 
@@ -146,6 +160,7 @@ describe("AtividadesCadastroView.vue", () => {
 
     it("confirma disponibilização e redireciona", async () => {
         const wrapper = createWrapper();
+        await wrapper.vm.$nextTick();
         const subprocessosStore = useSubprocessosStore();
         subprocessosStore.validarCadastro = vi.fn().mockResolvedValue({valido: true});
         subprocessosStore.disponibilizarCadastro = vi.fn().mockResolvedValue(true);
@@ -155,7 +170,7 @@ describe("AtividadesCadastroView.vue", () => {
         await flushPromises();
 
         // Confirm in modal
-        const modal = wrapper.findComponent({name: 'ConfirmacaoDisponibilizacaoModal'});
+        const modal = wrapper.findComponent(ConfirmacaoDisponibilizacaoModal);
         await modal.vm.$emit('confirmar');
 
         expect(subprocessosStore.disponibilizarCadastro).toHaveBeenCalledWith(123);
@@ -164,23 +179,27 @@ describe("AtividadesCadastroView.vue", () => {
 
     it("carrega histórico ao abrir modal", async () => {
         const wrapper = createWrapper();
+        await wrapper.vm.$nextTick();
         const analisesStore = useAnalisesStore();
         analisesStore.carregarHistorico = vi.fn();
 
         await wrapper.find('[data-testid="btn-cad-atividades-historico"]').trigger("click");
+        await flushPromises();
 
         expect(analisesStore.carregarHistorico).toHaveBeenCalledWith(123);
-        expect((wrapper.vm as any).mostrarModalHistorico).toBe(true);
+        expect(wrapper.findComponent(HistoricoAnaliseModal).exists()).toBe(true);
     });
 
     it("carrega impacto ao abrir modal", async () => {
         const wrapper = createWrapper();
+        await wrapper.vm.$nextTick();
         const mapasStore = useMapasStore();
         mapasStore.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
 
         await wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa-edicao"]').trigger("click");
+        await flushPromises();
 
         expect(mapasStore.buscarImpactoMapa).toHaveBeenCalledWith(123);
-        expect((wrapper.vm as any).mostrarModalImpacto).toBe(true);
+        expect(wrapper.findComponent(ImpactoMapaModal).exists()).toBe(true);
     });
 });

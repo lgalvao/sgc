@@ -51,8 +51,7 @@ class SubprocessoServiceEmailTest {
     private ImpactoMapaService impactoMapaService;
     @Mock
     private MapaSalvamentoService mapaSalvamentoService;
-    @Mock
-    private MapaAjusteMapper mapaAjusteMapper;
+
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
     @Mock

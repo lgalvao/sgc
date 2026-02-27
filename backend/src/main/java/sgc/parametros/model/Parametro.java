@@ -28,4 +28,9 @@ public class Parametro extends EntidadeBase {
     @Column(name = "valor", nullable = false)
     @NotBlank(message = "O valor não pode estar vazio")
     private String valor;
+
+    public void atualizarDe(sgc.parametros.ParametroRequest request) {
+        this.descricao = request.descricao();
+        this.valor = request.valor();
+    }
 }

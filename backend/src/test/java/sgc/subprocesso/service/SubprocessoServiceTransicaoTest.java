@@ -36,7 +36,7 @@ class SubprocessoServiceTransicaoTest {
     @Mock private TemplateEngine templateEngine;
     @Mock private MapaManutencaoService mapaManutencaoService;
     @Mock private MapaSalvamentoService mapaSalvamentoService;
-    @Mock private MapaAjusteMapper mapaAjusteMapper;
+
     @Mock private SgcPermissionEvaluator permissionEvaluator;
 
     @InjectMocks

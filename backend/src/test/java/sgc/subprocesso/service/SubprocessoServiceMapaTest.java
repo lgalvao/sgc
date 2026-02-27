@@ -39,7 +39,7 @@ class SubprocessoServiceMapaTest {
     @Mock private EmailService emailService;
     @Mock private MapaManutencaoService mapaManutencaoService;
     @Mock private MapaSalvamentoService mapaSalvamentoService;
-    @Mock private MapaAjusteMapper mapaAjusteMapper;
+
     @Mock private SgcPermissionEvaluator permissionEvaluator;
 
     @InjectMocks

@@ -556,7 +556,8 @@ describe("CadMapa.vue", () => {
         // Use subprocessoService as MapasStore calls it
         vi.mocked(subprocessoService.adicionarCompetencia).mockRejectedValueOnce(axiosError);
 
-        const {wrapper} = createWrapper();
+        const {wrapper, mapasStore} = createWrapper();
+        mapasStore.lastError = { kind: 'validation', message: 'Erro API', subErrors: [{message: "Erro API", field: "generic"}] } as any;
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-abrir-criar-competencia"]').trigger("click");
@@ -568,7 +569,7 @@ describe("CadMapa.vue", () => {
     });
 
     it("deve tratar erro ao excluir competência", async () => {
-        const {wrapper} = createWrapper();
+        const {wrapper, mapasStore} = createWrapper();
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-excluir-competencia"]').trigger("click");
@@ -584,6 +585,7 @@ describe("CadMapa.vue", () => {
             }
         };
         vi.mocked(subprocessoService.removerCompetencia).mockRejectedValueOnce(axiosError);
+        mapasStore.lastError = { kind: 'validation', message: 'Erro API', subErrors: [{message: "Erro API", field: "generic"}] } as any;
 
         const deleteModal = wrapper.findComponent('[data-testid="mdl-excluir-competencia"]') as any;
         await deleteModal.vm.$emit("confirmar");
@@ -605,7 +607,8 @@ describe("CadMapa.vue", () => {
         };
         vi.mocked(subprocessoService.disponibilizarMapa).mockRejectedValueOnce(axiosError);
 
-        const {wrapper} = createWrapper();
+        const {wrapper, mapasStore} = createWrapper();
+        mapasStore.lastError = { kind: 'validation', message: 'Erro API', subErrors: [{message: "Erro API", field: "generic"}] } as any;
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').trigger("click");

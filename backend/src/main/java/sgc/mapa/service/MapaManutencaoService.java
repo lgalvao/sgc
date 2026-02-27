@@ -21,8 +21,6 @@ public class MapaManutencaoService {
     private final ConhecimentoRepo conhecimentoRepo;
     private final MapaRepo mapaRepo;
     private final ComumRepo repo;
-    private final AtividadeMapper atividadeMapper;
-    private final ConhecimentoMapper conhecimentoMapper;
     private final SubprocessoService subprocessoService;
 
     public MapaManutencaoService(
@@ -31,16 +29,12 @@ public class MapaManutencaoService {
             ConhecimentoRepo conhecimentoRepo,
             MapaRepo mapaRepo,
             ComumRepo repo,
-            AtividadeMapper atividadeMapper,
-            ConhecimentoMapper conhecimentoMapper,
             @Lazy SubprocessoService subprocessoService) {
         this.atividadeRepo = atividadeRepo;
         this.competenciaRepo = competenciaRepo;
         this.conhecimentoRepo = conhecimentoRepo;
         this.mapaRepo = mapaRepo;
         this.repo = repo;
-        this.atividadeMapper = atividadeMapper;
-        this.conhecimentoMapper = conhecimentoMapper;
         this.subprocessoService = subprocessoService;
     }
 
@@ -140,7 +134,7 @@ public class MapaManutencaoService {
         Mapa mapa = repo.buscar(Mapa.class, request.mapaCodigo());
         notificarAlteracaoMapa(request.mapaCodigo());
 
-        Atividade entidade = atividadeMapper.toEntity(request);
+        Atividade entidade = Atividade.criarDe(request);
         entidade.setMapa(mapa);
 
         return atividadeRepo.save(entidade);
@@ -155,8 +149,7 @@ public class MapaManutencaoService {
         }
         notificarAlteracaoMapa(existente.getMapa().getCodigo());
 
-        var entidadeParaAtualizar = atividadeMapper.toEntity(request);
-        existente.setDescricao(entidadeParaAtualizar.getDescricao());
+        existente.atualizarDe(request);
         atividadeRepo.save(existente);
     }
 
@@ -268,7 +261,7 @@ public class MapaManutencaoService {
         var mapa = atividade.getMapa();
         notificarAlteracaoMapa(mapa.getCodigo());
 
-        var conhecimento = conhecimentoMapper.toEntity(request);
+        var conhecimento = Conhecimento.criarDe(request);
         conhecimento.setAtividade(atividade);
         atividade.getConhecimentos().add(conhecimento);
         return conhecimentoRepo.save(conhecimento);
@@ -286,8 +279,7 @@ public class MapaManutencaoService {
         var mapa = existente.getAtividade().getMapa();
         notificarAlteracaoMapa(mapa.getCodigo());
 
-        var paraAtualizar = conhecimentoMapper.toEntity(request);
-        existente.setDescricao(paraAtualizar.getDescricao());
+        existente.atualizarDe(request);
         conhecimentoRepo.save(existente);
     }
 

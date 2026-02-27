@@ -12,7 +12,6 @@ import sgc.processo.model.*;
 import sgc.subprocesso.service.*;
 import sgc.subprocesso.model.Subprocesso;
 
-import java.time.*;
 import java.util.*;
 
 import static org.mockito.Mockito.*;

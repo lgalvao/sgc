@@ -198,7 +198,7 @@ describe('CadAtividades.vue Coverage', () => {
         const analisesStore = useAnalisesStore(pinia);
         (wrapper.vm as any).codSubprocesso = 123;
 
-        const spy = vi.spyOn(analisesStore, 'buscarAnalisesCadastro').mockResolvedValue();
+        const spy = vi.spyOn(analisesStore, 'carregarHistorico').mockResolvedValue();
 
         await (wrapper.vm as any).abrirModalHistorico();
 

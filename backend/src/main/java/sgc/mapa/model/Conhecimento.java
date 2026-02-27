@@ -28,4 +28,14 @@ public class Conhecimento extends EntidadeBase {
     public Long getCodigoAtividade() {
         return atividade.getCodigo();
     }
+
+    public static Conhecimento criarDe(sgc.mapa.dto.CriarConhecimentoRequest request) {
+        return Conhecimento.builder()
+                .descricao(request.descricao())
+                .build();
+    }
+
+    public void atualizarDe(sgc.mapa.dto.AtualizarConhecimentoRequest request) {
+        this.descricao = request.descricao();
+    }
 }
