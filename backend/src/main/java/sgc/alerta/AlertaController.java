@@ -19,12 +19,11 @@ import java.util.*;
 @RequestMapping("/api/alertas")
 @RequiredArgsConstructor
 @Tag(name = "Alertas", description = "Gerenciamento de alertas para usuários")
-// Autorização por autenticação é suficiente: cada endpoint filtra pela lotação/título do próprio usuário.
+@PreAuthorize("isAuthenticated()")
 public class AlertaController {
     private final AlertaFacade alertaFacade;
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     @JsonView(ComumViews.Publica.class)
     @Operation(summary = "Lista todos os alertas do usuário autenticado")
     public ResponseEntity<List<Alerta>> listarAlertas(@AuthenticationPrincipal Object principal) {
@@ -35,7 +34,6 @@ public class AlertaController {
     }
 
     @GetMapping("/nao-lidos")
-    @PreAuthorize("isAuthenticated()")
     @JsonView(ComumViews.Publica.class)
     @Operation(summary = "Lista alertas não lidos do usuário autenticado")
     public ResponseEntity<List<Alerta>> listarNaoLidos(@AuthenticationPrincipal Object principal) {
@@ -46,7 +44,6 @@ public class AlertaController {
     }
 
     @PostMapping("/marcar-como-lidos")
-    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Marca múltiplos alertas como lidos")
     public ResponseEntity<Map<String, String>> marcarComoLidos(
             @RequestBody List<Long> codigos,
@@ -54,6 +51,7 @@ public class AlertaController {
 
         String usuarioTitulo = extractTituloUsuario(principal);
         alertaFacade.marcarComoLidos(usuarioTitulo, codigos);
+
         return ResponseEntity.ok(Map.of("message", "Alertas marcados como lidos."));
     }
 
@@ -64,6 +62,5 @@ public class AlertaController {
             case UserDetails userDetails -> userDetails.getUsername();
             default -> principal.toString();
         };
-
     }
 }

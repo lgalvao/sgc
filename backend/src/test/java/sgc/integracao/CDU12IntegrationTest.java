@@ -34,35 +34,35 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 })
 @DisplayName("CDU-12: Verificar impactos no mapa de competências")
 class CDU12IntegrationTest extends BaseIntegrationTest {
+    private static final String API_SUBPROCESSOS_ID_IMPACTOS_MAPA = "/api/subprocessos/{codigo}/impactos-mapa";
 
-    private static final String API_SUBPROCESSOS_ID_IMPACTOS_MAPA =
-            "/api/subprocessos/{codigo}/impactos-mapa";
     private static final String CHEFE_TITULO = "121212121212";
     private static final String GESTOR_TITULO = "666666666666";
+
     private static final String TEM_IMPACTOS_JSON_PATH = "$.temImpactos";
     private static final String TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH = "$.inseridas.length()";
     private static final String TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH = "$.removidas.length()";
 
-    // Repositories
     @Autowired
     private UnidadeMapaRepo unidadeMapaRepo;
+
     @Autowired
     private CompetenciaRepo competenciaRepo;
+
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-
     private Atividade atividadeVigente1;
     private Atividade atividadeVigente2;
-    private Subprocesso subprocessoRevisao;
+    private Subprocesso sp;
     private Mapa mapaSubprocesso;
     private Unidade unidade;
 
     @BeforeEach
     void setUp() {
-
         unidade = UnidadeFixture.unidadeComSigla("IMPACT_TEST");
         unidade.setCodigo(null);
         unidade = unidadeRepo.save(unidade);
@@ -97,26 +97,19 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente1);
         vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente2);
 
-        subprocessoRevisao = SubprocessoFixture.subprocessoPadrao(processoRevisao, unidade);
-        subprocessoRevisao.setCodigo(null);
-        subprocessoRevisao.setMapa(null); // Initially null, set later
-        subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-        subprocessoRevisao.setDataLimiteEtapa1(processoRevisao.getDataLimite());
-        subprocessoRevisao = subprocessoRepo.save(subprocessoRevisao);
+        sp = SubprocessoFixture.subprocessoPadrao(processoRevisao, unidade);
+        sp.setCodigo(null);
+        sp.setMapa(null);
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        sp.setDataLimiteEtapa1(processoRevisao.getDataLimite());
+        sp = subprocessoRepo.save(sp);
 
         mapaSubprocesso = new Mapa();
-        mapaSubprocesso.setSubprocesso(subprocessoRevisao);
+        mapaSubprocesso.setSubprocesso(sp);
         mapaSubprocesso = mapaRepo.save(mapaSubprocesso);
 
-        subprocessoRevisao.setMapa(mapaSubprocesso);
-        subprocessoRevisao = subprocessoRepo.save(subprocessoRevisao);
-
-        // Setup user for security check if needed (Chefe with unit)
-        // Note: WithMockChefe uses a default user or checks DB.
-        // We might need to ensure user '121212121212' exists and is Chefe of 'unidade'.
-        // For now, we rely on WithMockChefe mocking the Principal/Authorities,
-        // but if the service checks DB (UsuarioFacade), we need data.
-        // Assuming test mocks UsuarioFacade or we add data if it fails.
+        sp.setMapa(mapaSubprocesso);
+        sp = subprocessoRepo.save(sp);
     }
 
     private void vincularAtividadeCompetencia(Competencia competencia, Atividade atividade) {
@@ -132,18 +125,14 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
             usuario.setUnidadeAtivaCodigo(unidadeCodigo);
         }
     }
-    
-    // Helper to insert User/Profile data for security checks that hit the DB (or View)
+
     private void setupChefeForUnidade(String titulo, Unidade unidade) {
-        jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                titulo, unidade.getCodigo(), Perfil.CHEFE.name());
+        jdbcTemplate.update(
+                "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
+                titulo, unidade.getCodigo(), Perfil.CHEFE.name()
+        );
 
-        // Also update the Authentication in the SecurityContext to reflect this new unit
-        // because the AccessPolicy uses usuario.getUnidadeAtivaCodigo() from the Principal.
-        // The Principal was created by @WithMockChefe with a default (or old) unit.
-        Authentication auth =
-                SecurityContextHolder.getContext().getAuthentication();
-
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof Usuario usuario) {
             usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
         }
@@ -169,18 +158,23 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     @Nested
     @DisplayName("Cenários de Sucesso")
     class Sucesso {
-
         @Test
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Não deve detectar impactos quando o cadastro de atividades é idêntico ao mapa vigente")
         void semImpactos_QuandoCadastroIdentico() throws Exception {
-            // Need to setup the MockChefe properly linked to the Unidade for permission checks
             setupChefeForUnidade(CHEFE_TITULO, unidade);
 
-            atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente1.getDescricao()).build());
-            atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente2.getDescricao()).build());
+            atividadeRepo.save(Atividade.builder()
+                    .mapa(mapaSubprocesso)
+                    .descricao(atividadeVigente1.getDescricao())
+                    .build());
 
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
+            atividadeRepo.save(Atividade.builder()
+                    .mapa(mapaSubprocesso)
+                    .descricao(atividadeVigente2.getDescricao())
+                    .build());
+
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, sp.getCodigo()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(false)))
                     .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(0)));
@@ -196,7 +190,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
             atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente2.getDescricao()).build());
             atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao("Realizar auditorias internas.").build());
 
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, sp.getCodigo()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
                     .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(1)))
@@ -211,7 +205,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
             atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente1.getDescricao()).build());
 
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, sp.getCodigo()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
                     .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(1)))
@@ -228,7 +222,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
             atividadeRepo.save(atividadeAlterada);
             atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente1.getDescricao()).build());
 
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, sp.getCodigo()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
                     .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(1)))
@@ -241,10 +235,14 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         void deveIdentificarCompetenciasImpactadas() throws Exception {
             setupChefeForUnidade(CHEFE_TITULO, unidade);
 
-            Atividade atividadeNova = Atividade.builder().mapa(mapaSubprocesso).descricao("Elaborar relatórios gerenciais e estratégicos.").build();
+            Atividade atividadeNova = Atividade.builder()
+                    .mapa(mapaSubprocesso)
+                    .descricao("Elaborar relatórios gerenciais e estratégicos.")
+                    .build();
+
             atividadeRepo.save(atividadeNova);
 
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, sp.getCodigo()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.competenciasImpactadas.length()", is(1)));
         }
@@ -253,7 +251,6 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
     @Nested
     @DisplayName("Cenários de Borda e Falhas")
     class BordaEfalhas {
-
         @Test
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Não deve detectar impactos se a unidade não possui mapa vigente")
@@ -261,26 +258,24 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
             setupChefeForUnidade(CHEFE_TITULO, unidade);
             unidadeMapaRepo.deleteById(unidade.getCodigo());
 
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, sp.getCodigo()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(false)));
         }
-
     }
 
     @Nested
     @DisplayName("Testes de Controle de Acesso por Perfil e Situação")
     class Acesso {
-
         @Test
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("CHEFE pode acessar se subprocesso está em 'Revisão do cadastro em andamento'")
         void chefePodeAcessar_EmRevisaoCadastro() throws Exception {
             setupChefeForUnidade(CHEFE_TITULO, unidade);
-            subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-            subprocessoRepo.save(subprocessoRevisao);
+            sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            subprocessoRepo.save(sp);
 
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, sp.getCodigo()))
                     .andExpect(status().isOk());
         }
 
@@ -289,12 +284,12 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @DisplayName("GESTOR pode acessar se subprocesso está em 'Revisão do cadastro disponibilizada'")
         void gestorPodeAcessar_EmRevisaoDisponibilizada() throws Exception {
             setupGestorForUnidadeSuperior(GESTOR_TITULO, unidade);
-            subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-            subprocessoRepo.save(subprocessoRevisao);
+            sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+            subprocessoRepo.save(sp);
 
             // Simular envio para unidade superior (onde está o gestor)
             Movimentacao movimentacao = Movimentacao.builder()
-                    .subprocesso(subprocessoRevisao)
+                    .subprocesso(sp)
                     .unidadeOrigem(unidade)
                     .unidadeDestino(unidade.getUnidadeSuperior())
                     .descricao("Enviado para Gestor")
@@ -302,7 +297,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
                     .build();
             movimentacaoRepo.save(movimentacao);
 
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, sp.getCodigo()))
                     .andExpect(status().isOk());
         }
 
@@ -312,19 +307,10 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         void adminPodeAcessar_EmRevisaoHomologada() throws Exception {
             configurarUnidadeAdministrador(unidade.getCodigo());
 
-            // Simular movimento para ADMIN (Unidade 1)
-            // Mas espera, aqui o teste configuraAdmin na unidade do subprocesso?
-            // "configurarUnidadeAdministrador(unidade.getCodigo())" sets the user's unit to the subprocess unit.
-            // If user is in subprocess unit, Location check passes.
-            // So we don't strictly need movement if we force user location.
-            // But strict logic says Admin works in Admin Unit.
-            // However, this test seems to force admin into local unit for simplicity.
-            // I will leave it as is if it passes (it passed before).
+            sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+            subprocessoRepo.save(sp);
 
-            subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
-            subprocessoRepo.save(subprocessoRevisao);
-
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, sp.getCodigo()))
                     .andExpect(status().isOk());
         }
 
@@ -333,33 +319,23 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @DisplayName("ADMIN pode acessar se subprocesso está em 'Mapa Ajustado'")
         void adminPodeAcessar_EmMapaAjustado() throws Exception {
             configurarUnidadeAdministrador(unidade.getCodigo());
-            subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
-            subprocessoRepo.save(subprocessoRevisao);
+            sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+            subprocessoRepo.save(sp);
 
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, sp.getCodigo()))
                     .andExpect(status().isOk());
         }
 
         @Test
         @WithMockChefe(CHEFE_TITULO)
-        @DisplayName("CHEFE recebe erro de validação (422) se subprocesso está em situação diferente de 'Revisão do cadastro em andamento' mas tem permissão visual")
+        @DisplayName("CHEFE recebe erro 422 se sp em situação diferente de 'Revisão do cadastro em andamento' mas com permissão de vis.")
         void chefeRecebeErroValidacao_EmSituacaoIncorreta() throws Exception {
             setupChefeForUnidade(CHEFE_TITULO, unidade);
-            subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-            subprocessoRepo.save(subprocessoRevisao);
+            sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+            subprocessoRepo.save(sp);
 
-            // Agora, o acesso para verificar impactos é liberado via segurança (status().isForbidden() -> status().isOk() [na segurança]),
-            // mas o serviço deve bloquear por regra de negócio (checkSituacao).
-            // A implementação atual do serviço lança ErroValidacao -> 422 Unprocessable Entity
-            // ou pode ser 400 Bad Request, dependendo do handler. Assumindo 422 ou 400.
-            // O RestExceptionHandlerSecurityTest sugere que ErroValidacao pode ser 422.
-
-            // Nota: O teste original esperava Forbidden porque a regra estava no PermissionEvaluator.
-            // Agora a regra "VERIFICAR_IMPACTOS" retorna true no Evaluator, mas o serviço valida o estado.
-            // O serviço ImpactoMapaService lança ErroValidacao se o estado não for permitido.
-
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
-                    .andExpect(status().isUnprocessableEntity()); // Espera 422
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, sp.getCodigo()))
+                    .andExpect(status().isUnprocessableContent()); // Espera 422
         }
     }
 }
