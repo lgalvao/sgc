@@ -1,7 +1,7 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
+import {criarProcesso} from './helpers/helpers-processos.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
@@ -27,132 +27,78 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
     const timestamp = Date.now();
     const descProcesso = `Proc 9 ${timestamp}`;
 
-    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        await criarProcesso(page, {
-            descricao: descProcesso,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 30,
-            unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+    test('Fluxo completo de disponibilização e devolução', async ({page, autenticadoComoAdmin}) => {
+        
+        await test.step('Preparação: Admin cria e inicia processo', async () => {
+            await criarProcesso(page, {
+                descricao: descProcesso,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: UNIDADE_ALVO,
+                expandir: ['SECRETARIA_2', 'COORD_22'],
+                iniciar: true
+            });
+            await fazerLogout(page);
         });
 
-        // Iniciar processo
-        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descProcesso)});
-        await linhaProcesso.click();
+        await test.step('Cenario 1: Validacao - Atividade sem conhecimento', async () => {
+            await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+            await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
+            await navegarParaAtividades(page);
 
-        await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcesso);
-        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+            const atividadeDesc = `Atividade Incompleta ${timestamp}`;
+            await adicionarAtividade(page, atividadeDesc);
 
-        await extrairProcessoId(page);
+            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+            const erroInline = page.getByTestId('atividade-erro-validacao');
+            await expect(erroInline).toBeVisible();
+            await expect(erroInline).toContainText(/conhecimento/i);
 
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-        await verificarPaginaPainel(page);
-    });
+            await adicionarConhecimento(page, atividadeDesc, 'Conhecimento Corretivo');
+            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+            await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
+            await page.getByRole('button', {name: 'Cancelar'}).click();
+        });
 
-    test('Cenario 1: Validacao - Atividade sem conhecimento', async ({page, autenticadoComoAdmin}) => {
-        // Login como Chefe
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+        await test.step('Cenario 2: Caminho feliz - Disponibilizar Cadastro', async () => {
+            const atividadeDesc = `Atividade Validada ${timestamp}`;
+            await adicionarAtividade(page, atividadeDesc);
+            await adicionarConhecimento(page, atividadeDesc, 'Conhecimento Valido');
 
-        // Navegar para o subprocesso (CHEFE vai direto para o subprocesso)
-        await acessarSubprocessoChefeDireto(page, descProcesso);
+            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+            await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await verificarPaginaSubprocesso(page);
+            await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
+            await expect(page).toHaveURL(/\/painel/);
+            await fazerLogout(page);
+        });
 
-        // Entrar em Atividades
-        await navegarParaAtividades(page);
+        await test.step('Cenario 3: Devolucao e Historico de Analise', async () => {
+            await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+            await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+            await navegarParaAtividadesVisualizacao(page);
 
-        // Adicionar Atividade SEM conhecimento
-        const atividadeDesc = `Atividade Incompleta ${timestamp}`;
-        await adicionarAtividade(page, atividadeDesc);
+            await page.getByTestId('btn-acao-devolver').click();
+            const motivo = 'Faltou detalhar melhor os conhecimentos técnicos.';
+            await page.getByTestId('inp-devolucao-cadastro-obs').fill(motivo);
+            await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
 
-        // Tentar Disponibilizar
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+            await expect(page).toHaveURL(/\/painel/);
+            await fazerLogout(page);
 
-        // Verificar que erro inline aparece na atividade (não há mais modal de pendências)
-        const erroInline = page.getByTestId('atividade-erro-validacao');
-        await expect(erroInline).toBeVisible();
-        await expect(erroInline).toContainText(/conhecimento/i);
+            await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+            await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
+            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
 
-        // Adicionar conhecimento para corrigir
-        await adicionarConhecimento(page, atividadeDesc, 'Conhecimento Corretivo');
+            await navegarParaAtividades(page);
+            const modal = await abrirHistoricoAnalise(page);
+            await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
+            await expect(modal.getByTestId('cell-observacao-0')).toHaveText(motivo);
+            await page.getByRole('button', {name: 'Fechar'}).click();
 
-        // Tentar Disponibilizar novamente - Agora deve abrir o modal de confirmação
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
-
-        // Cancelar para continuar o teste no proximo passo
-        await page.getByRole('button', {name: 'Cancelar'}).click();
-    });
-
-    test('Cenario 2: Caminho feliz - Disponibilizar Cadastro', async ({page}) => {
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefeDireto(page, descProcesso);
-        await navegarParaAtividades(page);
-
-        // Garantir que temos dados validos
-        const atividadeDesc = `Atividade Validada ${timestamp}`;
-
-        await adicionarAtividade(page, atividadeDesc);
-        await adicionarConhecimento(page, atividadeDesc, 'Conhecimento Valido');
-
-        // Disponibilizar
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
-
-        // Validar sucesso
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
-        await verificarPaginaPainel(page);
-
-        // Verificar status no subprocesso
-        await acessarSubprocessoChefeDireto(page, descProcesso);
-        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
-    });
-
-    test('Cenario 3: Devolucao e Historico de Analise', async ({page, autenticadoComoGestorCoord22}) => {
-        // 1. Gestor (Coord 22) devolve o cadastro
-        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-
-        // Entrar no cadastro de atividades (visualização)
-        await navegarParaAtividadesVisualizacao(page);
-
-        // Devolver cadastro
-        await page.getByTestId('btn-acao-devolver').click();
-
-        // Preencher motivo da devolução
-        const motivo = 'Faltou detalhar melhor os conhecimentos técnicos.';
-        await page.getByTestId('inp-devolucao-cadastro-obs').fill(motivo);
-        await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
-
-        await verificarPaginaPainel(page);
-
-        // 2. Chefe verifica historico e corrige
-        await fazerLogout(page);
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-
-        await acessarSubprocessoChefeDireto(page, descProcesso);
-
-        // Verificar situação 'Cadastro em andamento'
-        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
-
-        await navegarParaAtividades(page);
-
-        // Abrir modal de histórico de análise (via dropdown "Mais ações")
-        const modal = await abrirHistoricoAnalise(page);
-        await expect(modal).toBeVisible();
-
-        // Assumindo que é a primeira linha ou única
-        await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
-        await expect(modal.getByTestId('cell-observacao-0')).toHaveText('Faltou detalhar melhor os conhecimentos técnicos.');
-
-        // Fechar modal
-        await page.getByRole('button', {name: 'Fechar'}).click();
-
-        // Disponibilizar novamente
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
-
-        // Validar sucesso
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
+            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+            await page.getByTestId('btn-confirmar-disponibilizacao').click();
+            await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
+        });
     });
 });

@@ -249,7 +249,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         homologarCadastro: async (codSubprocesso: number, req: HomologarCadastroRequest) => {
             const ok = await _executarAcao(
                 () => homologarCadastro(codSubprocesso, req),
-                "Cadastro homologado",
+                "Homologação efetivada",
                 "Erro ao homologar",
             );
             if (ok) await buscarSubprocessoDetalhe(codSubprocesso);

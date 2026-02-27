@@ -11,6 +11,7 @@ import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
@@ -36,6 +37,8 @@ class SubprocessoServiceTest {
     private AlertaFacade alertaService;
     @Mock
     private OrganizacaoFacade organizacaoFacade;
+    @Mock
+    private HierarquiaService hierarquiaService;
     @Mock
     private UsuarioFacade usuarioFacade;
     @Mock

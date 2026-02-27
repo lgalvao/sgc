@@ -155,7 +155,10 @@ onMounted(async () => {
 
   if (id) {
     codSubprocesso.value = id;
-    await subprocessosStore.buscarContextoEdicao(id);
+    await Promise.all([
+      subprocessosStore.buscarContextoEdicao(id),
+      atividadesStore.buscarAtividadesSubprocesso(id)
+    ]);
   }
 });
 

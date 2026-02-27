@@ -19,6 +19,7 @@ import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
@@ -52,6 +53,7 @@ public class SubprocessoService {
     private final AnaliseRepo analiseRepo;
     private final AlertaFacade alertaService;
     private final OrganizacaoFacade organizacaoFacade;
+    private final HierarquiaService hierarquiaService;
     private final UsuarioFacade usuarioFacade;
     private final ImpactoMapaService impactoMapaService;
 
@@ -396,8 +398,15 @@ public class SubprocessoService {
 
         Unidade unidadeAnalise = obterUnidadeLocalizacao(sp);
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
-        Unidade unidadeDevolucao = movs.isEmpty() ? sp.getUnidade() : movs.get(0).getUnidadeOrigem();
-        if (unidadeDevolucao == null) unidadeDevolucao = sp.getUnidade();
+
+        // CDU-13 9.6: Identifica a unidade de devolução como sendo a unidade de origem
+        // da última movimentação que trouxe o processo para a unidade atual a partir de uma subordinada.
+        Unidade unidadeDevolucao = movs.stream()
+                .filter(m -> Objects.equals(m.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
+                .filter(m -> hierarquiaService.isSubordinada(m.getUnidadeOrigem(), unidadeAnalise))
+                .map(Movimentacao::getUnidadeOrigem)
+                .findFirst()
+                .orElse(sp.getUnidade());
 
         SituacaoSubprocesso novaSituacao = SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
         if (Objects.equals(unidadeDevolucao.getCodigo(), sp.getUnidade().getCodigo())) {
@@ -493,8 +502,13 @@ public class SubprocessoService {
 
         Unidade unidadeAnalise = obterUnidadeLocalizacao(sp);
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
-        Unidade unidadeDevolucao = movs.isEmpty() ? sp.getUnidade() : movs.get(0).getUnidadeOrigem();
-        if (unidadeDevolucao == null) unidadeDevolucao = sp.getUnidade();
+
+        Unidade unidadeDevolucao = movs.stream()
+                .filter(m -> Objects.equals(m.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
+                .filter(m -> hierarquiaService.isSubordinada(m.getUnidadeOrigem(), unidadeAnalise))
+                .map(Movimentacao::getUnidadeOrigem)
+                .findFirst()
+                .orElse(sp.getUnidade());
 
         SituacaoSubprocesso novaSituacao = SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
         if (Objects.equals(unidadeDevolucao.getCodigo(), sp.getUnidade().getCodigo())) {
@@ -1031,8 +1045,13 @@ public class SubprocessoService {
 
         Unidade unidadeAnalise = obterUnidadeLocalizacao(sp);
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
-        Unidade unidadeDevolucao = movs.isEmpty() ? sp.getUnidade() : movs.get(0).getUnidadeOrigem();
-        if (unidadeDevolucao == null) unidadeDevolucao = sp.getUnidade();
+
+        Unidade unidadeDevolucao = movs.stream()
+                .filter(m -> Objects.equals(m.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
+                .filter(m -> hierarquiaService.isSubordinada(m.getUnidadeOrigem(), unidadeAnalise))
+                .map(Movimentacao::getUnidadeOrigem)
+                .findFirst()
+                .orElse(sp.getUnidade());
 
         SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo());
         sp.setDataFimEtapa2(null);
@@ -1521,6 +1540,7 @@ public class SubprocessoService {
         movimentacaoRepo.save(movimentacao);
 
         cmd.sp().setLocalizacaoAtual(cmd.destino() != null ? cmd.destino() : cmd.sp().getUnidade());
+        subprocessoRepo.save(cmd.sp());
         notificarTransicao(cmd.sp(), cmd.tipo(), cmd.origem(), cmd.destino(), cmd.observacoes());
     }
 

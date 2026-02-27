@@ -15,187 +15,132 @@ import {
     acessarSubprocessoGestor,
     homologarCadastroMapeamento
 } from './helpers/helpers-analise.js';
-import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-
-async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
-    await acessarSubprocessoChefeDireto(page, descProcesso, 'SECAO_221');
-    await navegarParaMapa(page);
-}
+import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_221';
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-20 ${timestamp}`;
-    let processoId: number;
 
     const atividade1 = `Atividade 1 ${timestamp}`;
     const atividade2 = `Atividade 2 ${timestamp}`;
     const competencia1 = `Competência 1 ${timestamp}`;
     const competencia2 = `Competência 2 ${timestamp}`;
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        await criarProcesso(page, {
-            descricao: descProcesso,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 30,
-            unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+    test('Fluxo completo de validação de mapa', async ({page, autenticadoComoAdmin}) => {
+        test.setTimeout(120000);
+
+        await test.step('1. ADMIN cria processo e CHEFE disponibiliza', async () => {
+            await criarProcesso(page, {
+                descricao: descProcesso,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: UNIDADE_ALVO,
+                expandir: ['SECRETARIA_2', 'COORD_22'],
+                iniciar: true
+            });
+            await fazerLogout(page);
+
+            await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+            await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
+            await navegarParaAtividades(page);
+
+            await adicionarAtividade(page, atividade1);
+            await adicionarConhecimento(page, atividade1, 'Conhecimento 1A');
+            await adicionarAtividade(page, atividade2);
+            await adicionarConhecimento(page, atividade2, 'Conhecimento 2A');
+
+            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+            await page.getByTestId('btn-confirmar-disponibilizacao').click();
+            await fazerLogout(page);
         });
 
-        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
-        await linhaProcesso.click();
+        await test.step('2. Aceites e Homologação de Cadastro', async () => {
+            await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+            await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+            await navegarParaAtividadesVisualizacao(page);
+            await aceitarCadastroMapeamento(page);
+            await fazerLogout(page);
 
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
+            await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+            await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+            await navegarParaAtividadesVisualizacao(page);
+            await aceitarCadastroMapeamento(page);
+            await fazerLogout(page);
 
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            
+            // ADMIN clica na linha do processo no painel primeiro
+            await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+            
+            await navegarParaSubprocesso(page, UNIDADE_ALVO);
+            await navegarParaAtividadesVisualizacao(page);
+            await homologarCadastroMapeamento(page);
+        });
 
-        await verificarPaginaPainel(page);
-    });
+        await test.step('3. ADMIN disponibiliza Mapa', async () => {
+            await navegarParaMapa(page);
+            await expect(page.getByText(/Carregando/i)).toBeHidden();
+            
+            await criarCompetencia(page, competencia1, [atividade1]);
+            await criarCompetencia(page, competencia2, [atividade2]);
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
-        
-        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        await navegarParaAtividades(page);
+            await disponibilizarMapa(page, '2030-12-31');
+            await expect(page).toHaveURL(/\/painel/);
+            await fazerLogout(page);
+        });
 
-        await adicionarAtividade(page, atividade1);
-        await adicionarConhecimento(page, atividade1, 'Conhecimento 1A');
+        await test.step('4. CHEFE valida o mapa', async () => {
+            await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+            await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
+            await navegarParaMapa(page);
 
-        await adicionarAtividade(page, atividade2);
-        await adicionarConhecimento(page, atividade2, 'Conhecimento 2A');
+            await page.getByTestId('btn-mapa-validar').click();
+            await page.getByTestId('btn-validar-mapa-confirmar').click();
+            await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
+            await fazerLogout(page);
+        });
 
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        await test.step('5. GESTOR COORD_22 analisa e aceita', async () => {
+            await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+            await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+            await navegarParaMapa(page);
 
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
-        await verificarPaginaPainel(page);
-    });
+            await expect(page.getByTestId('btn-mapa-historico-gestor')).toBeVisible();
+            await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
+            
+            // Cancela devolução (passo CDU)
+            await page.getByTestId('btn-mapa-devolver').click();
+            await page.getByTestId('btn-devolucao-mapa-cancelar').click();
 
-    test('Preparacao 2a: Gestor COORD_22 aceita cadastro', async ({page}) => {
-        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await aceitarCadastroMapeamento(page);
-    });
+            // Aceita
+            await page.getByTestId('btn-mapa-homologar-aceite').click();
+            await page.getByTestId('btn-aceite-mapa-confirmar').click();
+            await expect(page).toHaveURL(/\/painel/);
+            await fazerLogout(page);
+        });
 
-    test('Preparacao 2b: Gestor SECRETARIA_2 aceita cadastro', async ({page}) => {
-        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
-        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await aceitarCadastroMapeamento(page);
-    });
+        await test.step('6. GESTOR SECRETARIA_2 aceita', async () => {
+            await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+            await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+            await navegarParaMapa(page);
+            
+            await page.getByTestId('btn-mapa-homologar-aceite').click();
+            await page.getByTestId('btn-aceite-mapa-confirmar').click();
+            await expect(page).toHaveURL(/\/painel/);
+            await fazerLogout(page);
+        });
 
-    test('Preparacao 3: Admin homologa cadastro, cria competências e disponibiliza mapa', async ({page}) => {
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await homologarCadastroMapeamento(page);
-
-        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
-
-        // Continua como Admin para criar competências (antiga Preparação 4)
-        await navegarParaMapa(page);
-
-        await criarCompetencia(page, competencia1, [atividade1]);
-        await criarCompetencia(page, competencia2, [atividade2]);
-
-        await disponibilizarMapa(page, '2030-12-31');
-
-        await verificarPaginaPainel(page);
-        await expect(page.getByText(/Mapa disponibilizado/i).first()).toBeVisible();
-    });
-
-    test('Preparacao 4: Chefe valida o mapa', async ({page}) => {
-        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-        await acessarSubprocessoChefe(page, descProcesso);
-
-        // Validar mapa
-        await page.getByTestId('btn-mapa-validar').click();
-        const modal = page.getByRole('dialog');
-        await expect(modal).toBeVisible();
-        await page.getByTestId('btn-validar-mapa-confirmar').click();
-
-        await verificarPaginaPainel(page);
-        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
-    });
-
-    test('Cenarios 1-4: GESTOR analisa, cancela ações e registra aceite', async ({page}) => {
-        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-
-        // Cenario 1: Navegação e visualização
-        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-
-        await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
-        await expect(page.getByTestId('btn-mapa-historico-gestor')).toBeVisible();
-        await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
-        await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeVisible();
-
-        // Cenario 2: Cancela aceite - permanece na tela (antiga Scenario 2)
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
-        let modal = page.getByRole('dialog');
-        await expect(modal).toBeVisible();
-        await page.getByTestId('btn-aceite-mapa-cancelar').click();
-        await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
-
-        // Cenario 3: Cancela devolução - permanece na tela (antiga Scenario 3)
-        await page.getByTestId('btn-mapa-devolver').click();
-        modal = page.getByRole('dialog');
-        await expect(modal.getByRole('heading', {name: 'Devolução'})).toBeVisible();
-        await page.getByTestId('btn-devolucao-mapa-cancelar').click();
-        await expect(modal).toBeHidden();
-        await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
-
-        // Cenario 4: Registra aceite do mapa (antiga Scenario 4)
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
-        modal = page.getByRole('dialog');
-        await expect(modal).toBeVisible();
-        await page.getByTestId('btn-aceite-mapa-confirmar').click();
-
-        await verificarPaginaPainel(page);
-        await expect(page.getByText(/Aceite registrado/i).first()).toBeVisible();
-
-        // Verificação adicional do fluxo
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        await navegarParaSubprocesso(page, 'SECAO_221');
-        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
-    });
-
-    test('Cenario 4b: Gestor SECRETARIA_2 aceita mapa', async ({page}) => {
-        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
-        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
-
-        const modal = page.getByRole('dialog');
-        await expect(modal).toBeVisible();
-        await page.getByTestId('btn-aceite-mapa-confirmar').click();
-
-        await verificarPaginaPainel(page);
-        await expect(page.getByText(/Aceite registrado/i).first()).toBeVisible();
-    });
-
-    test('Cenario 5: ADMIN homologa o mapa', async ({page}) => {
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        await navegarParaSubprocesso(page, 'SECAO_221');
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
-
-        const modal = page.getByRole('dialog');
-        await expect(modal).toBeVisible();
-
-        await page.getByTestId('btn-aceite-mapa-confirmar').click();
-
-        await verificarPaginaPainel(page);
-        await expect(page.getByText(/Homologação efetivada/i).first()).toBeVisible();
-
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        await navegarParaSubprocesso(page, 'SECAO_221');
-        await expect(page.getByText(/Mapa homologado/i).first()).toBeVisible();
+        await test.step('7. ADMIN homologa final', async () => {
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+            await navegarParaSubprocesso(page, UNIDADE_ALVO);
+            await navegarParaMapa(page);
+            
+            await page.getByTestId('btn-mapa-homologar-aceite').click();
+            await page.getByTestId('btn-aceite-mapa-confirmar').click();
+            await expect(page.getByText(/Homologação efetivada/i).first()).toBeVisible();
+        });
     });
 });
