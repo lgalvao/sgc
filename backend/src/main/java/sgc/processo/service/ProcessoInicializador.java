@@ -82,7 +82,9 @@ public class ProcessoInicializador {
         notificacaoService.emailInicioProcesso(processo.getCodigo());
 
         int contagemUnidades = codigosUnidades.size();
-        log.info("Processo de {} {} iniciado para {} unidade(s).", tipo.name().toLowerCase(), codigo, contagemUnidades);
+        List<String> siglas = unidadeRepo.findSiglasByCodigos(codigosUnidades);
+        log.info("Processo de {} {} iniciado para {} unidade(s): {}.", 
+                tipo.name().toLowerCase(), codigo, contagemUnidades, String.join(", ", siglas));
         return List.of();
     }
 

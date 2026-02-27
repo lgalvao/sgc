@@ -57,11 +57,16 @@ class SubprocessoServiceTest {
         service.setCopiaMapaService(copiaMapaService);
     }
 
-    private Unidade criarUnidade(String sigla) {
+    private Unidade criarUnidade(Long codigo, String sigla) {
         Unidade u = new Unidade();
+        u.setCodigo(codigo);
         u.setSigla(sigla);
         u.setSituacao(SituacaoUnidade.ATIVA);
         return u;
+    }
+
+    private Unidade criarUnidade(String sigla) {
+        return criarUnidade(new Random().nextLong(), sigla);
     }
 
     @Test

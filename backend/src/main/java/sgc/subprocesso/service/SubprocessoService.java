@@ -394,22 +394,26 @@ public class SubprocessoService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validarSituacaoPermitida(sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
-        Unidade unidadeSubprocesso = sp.getUnidade();
-        Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
-        if (unidadeAnalise == null) {
-            unidadeAnalise = unidadeSubprocesso;
+        Unidade unidadeAnalise = obterUnidadeLocalizacao(sp);
+        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        Unidade unidadeDevolucao = movs.isEmpty() ? sp.getUnidade() : movs.get(0).getUnidadeOrigem();
+        if (unidadeDevolucao == null) unidadeDevolucao = sp.getUnidade();
+
+        SituacaoSubprocesso novaSituacao = SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
+        if (Objects.equals(unidadeDevolucao.getCodigo(), sp.getUnidade().getCodigo())) {
+            novaSituacao = SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+            sp.setDataFimEtapa1(null);
         }
 
-        sp.setDataFimEtapa1(null);
         registrarAnaliseETransicao(RegistrarWorkflowCommand.builder()
                 .sp(sp)
-                .novaSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                .novaSituacao(novaSituacao)
                 .tipoTransicao(TipoTransicao.CADASTRO_DEVOLVIDO)
                 .tipoAnalise(TipoAnalise.CADASTRO)
                 .tipoAcaoAnalise(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
                 .unidadeAnalise(unidadeAnalise)
                 .unidadeOrigemTransicao(unidadeAnalise)
-                .unidadeDestinoTransicao(sp.getUnidade())
+                .unidadeDestinoTransicao(unidadeDevolucao)
                 .usuario(usuario)
                 .motivoAnalise(observacoes)
                 .observacoes(observacoes)
@@ -487,22 +491,26 @@ public class SubprocessoService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validarSituacaoPermitida(sp, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
-        Unidade unidadeSubprocesso = sp.getUnidade();
-        Unidade unidadeAnalise = unidadeSubprocesso.getUnidadeSuperior();
-        if (unidadeAnalise == null) {
-            unidadeAnalise = unidadeSubprocesso;
+        Unidade unidadeAnalise = obterUnidadeLocalizacao(sp);
+        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        Unidade unidadeDevolucao = movs.isEmpty() ? sp.getUnidade() : movs.get(0).getUnidadeOrigem();
+        if (unidadeDevolucao == null) unidadeDevolucao = sp.getUnidade();
+
+        SituacaoSubprocesso novaSituacao = SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
+        if (Objects.equals(unidadeDevolucao.getCodigo(), sp.getUnidade().getCodigo())) {
+            novaSituacao = SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
+            sp.setDataFimEtapa1(null);
         }
 
-        sp.setDataFimEtapa1(null);
         registrarAnaliseETransicao(RegistrarWorkflowCommand.builder()
                 .sp(sp)
-                .novaSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO)
+                .novaSituacao(novaSituacao)
                 .tipoTransicao(TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA)
                 .tipoAnalise(TipoAnalise.CADASTRO)
                 .tipoAcaoAnalise(TipoAcaoAnalise.DEVOLUCAO_REVISAO)
                 .unidadeAnalise(unidadeAnalise)
                 .unidadeOrigemTransicao(unidadeAnalise)
-                .unidadeDestinoTransicao(sp.getUnidade())
+                .unidadeDestinoTransicao(unidadeDevolucao)
                 .usuario(usuario)
                 .motivoAnalise(observacoes)
                 .observacoes(observacoes)
@@ -1021,15 +1029,13 @@ public class SubprocessoService {
                 SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES,
                 SituacaoSubprocesso.REVISAO_MAPA_VALIDADO);
 
+        Unidade unidadeAnalise = obterUnidadeLocalizacao(sp);
+        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        Unidade unidadeDevolucao = movs.isEmpty() ? sp.getUnidade() : movs.get(0).getUnidadeOrigem();
+        if (unidadeDevolucao == null) unidadeDevolucao = sp.getUnidade();
+
         SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo());
         sp.setDataFimEtapa2(null);
-
-        Unidade unidadeSp = sp.getUnidade();
-        Unidade unidadeSuperior = unidadeSp.getUnidadeSuperior();
-
-        if (unidadeSuperior == null) {
-            unidadeSuperior = unidadeSp;
-        }
 
         RegistrarWorkflowCommand workflowCommand = RegistrarWorkflowCommand.builder()
                 .sp(sp)
@@ -1037,9 +1043,9 @@ public class SubprocessoService {
                 .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA)
                 .tipoAnalise(TipoAnalise.VALIDACAO)
                 .tipoAcaoAnalise(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
-                .unidadeAnalise(unidadeSuperior)
-                .unidadeOrigemTransicao(unidadeSuperior)
-                .unidadeDestinoTransicao(unidadeSp)
+                .unidadeAnalise(unidadeAnalise)
+                .unidadeOrigemTransicao(unidadeAnalise)
+                .unidadeDestinoTransicao(unidadeDevolucao)
                 .usuario(usuario)
                 .motivoAnalise(justificativa)
                 .observacoes(justificativa)

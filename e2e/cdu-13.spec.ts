@@ -17,7 +17,7 @@ import {
     devolverCadastroMapeamento,
     fecharHistoricoAnalise,
 } from './helpers/helpers-analise.js';
-import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_211';
@@ -35,12 +35,13 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
-            unidade: UNIDADE_ALVO,
+            unidade: [UNIDADE_ALVO, 'SECRETARIA_2'],
             expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
         // Iniciar processo
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descProcesso)});
+        await expect(linhaProcesso).toBeVisible();
         await linhaProcesso.click();
 
         // Capturar ID do processo para cleanup
@@ -50,6 +51,9 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
         await verificarPaginaPainel(page);
+        
+        // Logout para garantir que o próximo teste (com outra fixture) não tenha conflito de sessão
+        await fazerLogout(page);
     });
 
     test('Preparacao 2: CHEFE preenche atividades e disponibiliza', async ({page, autenticadoComoChefeSecao211}) => {
@@ -134,12 +138,43 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
     });
 
-    test('Cenario 5: GESTOR registra aceite COM observação', async ({page, autenticadoComoGestorCoord21}) => {
+    test('Cenario 5: GESTOR COORD_21 registra aceite COM observação', async ({page, autenticadoComoGestorCoord21}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
 
-        // Aceitar com observação
-        await aceitarCadastroMapeamento(page, 'Cadastro aprovado conforme análise');
+        // Aceitar com observação - Isso move para a SECRETARIA_2
+        await aceitarCadastroMapeamento(page, 'Cadastro aprovado pela COORD_21');
+    });
+
+    test('Cenario 6: ADMIN devolve para COORD_21 (Devolução Gradual - Nível Superior)', async ({page, autenticadoComoAdmin}) => {
+        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+
+        // Como ADMIN na visualização, verificamos que a localização atual é SECRETARIA_2 (ou superior da COORD)
+        // No momento o subprocesso está "localizado" na SECRETARIA_2 aguardando análise.
+        
+        await devolverCadastroMapeamento(page, 'Dados insuficientes para a Secretaria');
+
+        // VERIFICAÇÃO 1: Deve ter voltado para a COORD_21
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-localizacao')).toHaveText(/COORD_21/i);
+        
+        // VERIFICAÇÃO 2: A situação deve continuar como "Cadastro disponibilizado" (pois não chegou na unidade dona)
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
+    });
+
+    test('Cenario 7: GESTOR COORD_21 devolve para SECAO_211 (Devolução Gradual - Chegada na Origem)', async ({page, autenticadoComoGestorCoord21}) => {
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+
+        await devolverCadastroMapeamento(page, 'Corrigir conforme orientações da Secretaria');
+
+        // VERIFICAÇÃO 1: Deve ter voltado para a SECAO_211
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-localizacao')).toHaveText(/SECAO_211/i);
+        
+        // VERIFICAÇÃO 2: Agora sim a situação deve ser "Cadastro em andamento"
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
     });
 
     test('Cenario 8: ADMIN visualiza histórico com múltiplas análises', async ({page, autenticadoComoAdmin}) => {
