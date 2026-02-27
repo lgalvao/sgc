@@ -35,3 +35,7 @@ Create a new integration test class `SubprocessoServiceIntegrationTest` that loa
 3.  **Validation Logic**: Ensure that validation rules (e.g., "cannot move to state Y from X") are enforced correctly by the actual service logic interacting with real data states.
 
 This approach will likely result in fewer lines of test code (less setup/mocking) and higher confidence in the system's correctness.
+
+## Status
+
+**Implemented.** The `SubprocessoServiceIntegrationTest` has been created, and the highly-mocked `SubprocessoServiceTest` (including `SubprocessoServiceTransicaoTest`, `SubprocessoServiceAjusteTest`, `SubprocessoServiceAtividadeTest`, `SubprocessoServiceContextoTest`, `SubprocessoServiceCoverageTest`, and `SubprocessoServiceEmailTest`) has been removed, significantly reducing test code brittleness and relying on the real H2 database for validation logic and workflow transitions.
