@@ -30,7 +30,7 @@ export const useMapasStore = defineStore("mapas", () => {
     const impactoMapa = ref<ImpactoMapa | null>(null);
     const carregando = ref(false);
     const erro = ref<string | null>(null);
-    const { lastError, clearError, withErrorHandling } = useErrorHandler();
+    const { lastError, clearError } = useErrorHandler();
 
     async function buscarMapaVisualizacao(codSubprocesso: number) {
         carregando.value = true;
@@ -191,7 +191,7 @@ export const useMapasStore = defineStore("mapas", () => {
         // Não gerencia estado de carregando/erro global aqui para ser mais leve
         try {
             return await verificarMapaVigente(codigoUnidade);
-        } catch (e) {
+        } catch (_e) {
             return false;
         }
     }

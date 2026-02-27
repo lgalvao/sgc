@@ -47,7 +47,7 @@ export const useAnalisesStore = defineStore("analises", () => {
         await buscarAnalisesValidacao(codSubprocesso);
     }
 
-    function obterAnalisesPorSubprocesso(codSubprocesso: number): (AnaliseCadastro | AnaliseValidacao)[] {
+    function obterAnalisesPorSubprocesso(): (AnaliseCadastro | AnaliseValidacao)[] {
         // Simplificação: Retorna a concatenação das listas carregadas.
         // Assume-se que o contexto do subprocesso é mantido pelo componente que chama buscarAnalisesCadastro/Validacao.
         return [...analisesCadastro.value, ...analisesValidacao.value];
