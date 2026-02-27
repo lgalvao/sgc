@@ -115,7 +115,7 @@ const ModalMapaDisponibilizar = defineAsyncComponent(() => import("@/components/
 const route = useRoute();
 const router = useRouter();
 const mapasStore = useMapasStore();
-const {mapaCompleto, impacts: impactos} = storeToRefs(mapasStore);
+const {mapaCompleto, impactoMapa: impactos} = storeToRefs(mapasStore);
 const atividadesStore = useAtividadesStore();
 const subprocessosStore = useSubprocessosStore();
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
@@ -135,7 +135,7 @@ function abrirModalImpacto() {
   mostrarModalImpacto.value = true;
   if (codSubprocesso.value) {
     loadingImpacto.value = true;
-    mapasStore.verificarImpactos(codSubprocesso.value)
+    mapasStore.buscarImpactoMapa(codSubprocesso.value)
         .finally(() => loadingImpacto.value = false);
   }
 }
@@ -298,7 +298,7 @@ async function disponibilizarMapa(payload: { dataLimite: string; observacoes: st
   loadingDisponibilizacao.value = true;
 
   try {
-    await mapasStore.disponibilizar(codSubprocesso.value, payload);
+    await mapasStore.disponibilizarMapa(codSubprocesso.value, payload);
     fecharModalDisponibilizar();
     await router.push({name: "Painel"});
   } catch {

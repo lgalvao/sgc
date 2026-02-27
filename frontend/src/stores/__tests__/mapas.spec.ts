@@ -24,7 +24,7 @@ describe("useMapasStore", () => {
     it("deve inicializar com valores nulos", () => {
         expect(context.store.mapaCompleto).toBeNull();
         expect(context.store.mapaAjuste).toBeNull();
-        expect(context.store.impactos).toBeNull();
+        expect(context.store.impactoMapa).toBeNull();
     });
 
     describe("buscarMapaCompleto", () => {
@@ -32,9 +32,9 @@ describe("useMapasStore", () => {
             context.store.mapaCompleto = { codigo: 1 } as any;
             vi.mocked(subprocessoService.obterMapaCompleto).mockReturnValue(new Promise(() => { }));
 
-            context.store.carregarMapaCompleto(2);
+            context.store.buscarMapaCompleto(2);
 
-            // Note: In the store, carregarMapaCompleto doesn't clear state synchronously before await,
+            // Note: In the store, buscarMapaCompleto doesn't clear state synchronously before await,
             // but the test expectation was probably about final state or loading behavior.
             // Adjusting based on store implementation:
             // "carregando.value = true; erro.value = null;" is called.
@@ -57,7 +57,7 @@ describe("useMapasStore", () => {
             };
             vi.mocked(subprocessoService.obterMapaCompleto).mockResolvedValue(mockMapa);
 
-            await context.store.carregarMapaCompleto(codSubprocesso);
+            await context.store.buscarMapaCompleto(codSubprocesso);
 
             expect(subprocessoService.obterMapaCompleto).toHaveBeenCalledWith(codSubprocesso);
             expect(context.store.mapaCompleto).toEqual(mockMapa);
@@ -68,7 +68,7 @@ describe("useMapasStore", () => {
                 new Error("Failed"),
             );
 
-            await context.store.carregarMapaCompleto(codSubprocesso);
+            await context.store.buscarMapaCompleto(codSubprocesso);
             expect(context.store.erro).toBe("Failed");
         });
     });
@@ -92,7 +92,7 @@ describe("useMapasStore", () => {
             };
             vi.mocked(subprocessoService.salvarMapaCompleto).mockResolvedValue(mockResponse);
 
-            await context.store.salvar(codSubprocesso, request);
+            await context.store.salvarMapa(codSubprocesso, request);
 
             expect(subprocessoService.salvarMapaCompleto).toHaveBeenCalledWith(
                 codSubprocesso,
@@ -105,7 +105,7 @@ describe("useMapasStore", () => {
             const request = { competencias: [] };
             vi.mocked(subprocessoService.salvarMapaCompleto).mockRejectedValue(new Error("Fail"));
 
-            await expect(context.store.salvar(codSubprocesso, request)).rejects.toThrow("Fail");
+            await expect(context.store.salvarMapa(codSubprocesso, request)).rejects.toThrow("Fail");
         });
     });
 
@@ -118,7 +118,7 @@ describe("useMapasStore", () => {
             };
             vi.mocked(subprocessoService.obterMapaAjuste).mockResolvedValue(mockMapa);
 
-            await context.store.carregarMapaAjuste(codSubprocesso);
+            await context.store.buscarMapaAjuste(codSubprocesso);
 
             expect(subprocessoService.obterMapaAjuste).toHaveBeenCalledWith(codSubprocesso);
             expect(context.store.mapaAjuste).toEqual(mockMapa);
@@ -156,12 +156,12 @@ describe("useMapasStore", () => {
                 mockImpacto,
             );
 
-            await context.store.verificarImpactos(codSubprocesso);
+            await context.store.buscarImpactoMapa(codSubprocesso);
 
             expect(subprocessoService.verificarImpactosMapa).toHaveBeenCalledWith(
                 codSubprocesso,
             );
-            expect(context.store.impactos).toEqual(mockImpacto);
+            expect(context.store.impactoMapa).toEqual(mockImpacto);
         });
     });
 
@@ -277,7 +277,7 @@ describe("useMapasStore", () => {
             };
             vi.mocked(subprocessoService.obterMapaVisualizacao).mockResolvedValue(mockMapa);
 
-            await context.store.carregarMapaVisualizacao(codSubprocesso);
+            await context.store.buscarMapaVisualizacao(codSubprocesso);
 
             expect(subprocessoService.obterMapaVisualizacao).toHaveBeenCalledWith(
                 codSubprocesso,
@@ -291,7 +291,7 @@ describe("useMapasStore", () => {
             const request = { observacoes: "teste", dataLimite: "2025-12-31" };
             vi.mocked(subprocessoService.disponibilizarMapa).mockResolvedValue(undefined);
 
-            await context.store.disponibilizar(codSubprocesso, request);
+            await context.store.disponibilizarMapa(codSubprocesso, request);
 
             expect(subprocessoService.disponibilizarMapa).toHaveBeenCalledWith(
                 codSubprocesso,

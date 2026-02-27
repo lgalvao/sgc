@@ -201,7 +201,7 @@ const subprocessosStore = useSubprocessosStore();
 const analisesStore = useAnalisesStore();
 const mapasStore = useMapasStore();
 const feedbackStore = useFeedbackStore();
-const {impactos} = storeToRefs(mapasStore);
+const {impactoMapa: impactos} = storeToRefs(mapasStore);
 
 const {perfilSelecionado} = usePerfil();
 const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
