@@ -9,12 +9,16 @@
             </h5>
             <div v-if="titularDetalhes" class="d-flex flex-column">
               <span v-if="titularDetalhes.ramal">
-                Ramal: <a :aria-label="`Ligar para ${titularDetalhes.ramal}`"
-                          :href="`tel:${titularDetalhes.ramal}`">{{ titularDetalhes.ramal }}</a>
+                Ramal: <a
+                  :aria-label="`Ligar para ${titularDetalhes.ramal}`"
+                  :href="`tel:${titularDetalhes.ramal}`"
+              >{{ titularDetalhes.ramal }}</a>
               </span>
               <span v-if="titularDetalhes.email">
-                E-mail: <a :aria-label="`Enviar e-mail para ${titularDetalhes.email}`"
-                           :href="`mailto:${titularDetalhes.email}`">{{ titularDetalhes.email }}</a>
+                E-mail: <a
+                  :aria-label="`Enviar e-mail para ${titularDetalhes.email}`"
+                  :href="`mailto:${titularDetalhes.email}`"
+              >{{ titularDetalhes.email }}</a>
               </span>
             </div>
           </div>

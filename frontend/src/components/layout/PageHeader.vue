@@ -5,7 +5,8 @@
       <p v-if="subtitle || $slots.default" class="text-muted mb-0 mt-1">
         <slot>{{ subtitle }}</slot>
       </p>
-      <div v-if="etapa || proximaAcao" class="d-flex flex-wrap align-items-center gap-2 mt-2"
+      <div
+v-if="etapa || proximaAcao" class="d-flex flex-wrap align-items-center gap-2 mt-2"
            data-testid="contexto-page-header">
         <span v-if="etapa" class="badge bg-light text-dark border">{{ etapa }}</span>
         <small v-if="proximaAcao" class="text-muted">{{ proximaAcao }}</small>
