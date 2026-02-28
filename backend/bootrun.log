@@ -1,0 +1,15 @@
+Calculating task graph as configuration cache cannot be reused because the set of Gradle properties has changed: the value of 'ENV' was changed.
+Perfil Spring ativado: e2e
+Carregando configurações de: .env.e2e
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:compileJava UP-TO-DATE
+> Task :backend:classes UP-TO-DATE
+
+> Task :backend:bootRun
+INFO  Sgc.logStarting:54: Starting Sgc using Java 21.0.9 with PID 21953 (/app/backend/build/classes/java/main started by jules in /app/backend)
+INFO  Sgc.logStartupProfileInfo:658: The following 1 profile is active: "e2e"
+INFO  StandardService.log:168: Starting service [Tomcat]
+INFO  StandardEngine.log:168: Starting Servlet engine: [Apache Tomcat/11.0.18]
+INFO  Sgc.logStarted:60: Started Sgc in 22.427 seconds (process running for 23.431)
+INFO  ValidadorDadosOrgService.run:80: Dados organizacionais validados com sucesso. 18 unidades verificadas.
+INFO  [/].log:168: Initializing Spring DispatcherServlet 'dispatcherServlet'
