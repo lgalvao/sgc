@@ -50,7 +50,7 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve criar uma atribuição temporária com sucesso")
     @WithMockAdmin
     void criarAtribuicaoTemporaria_sucesso() throws Exception {
-        // Given
+
         CriarAtribuicaoRequest request = new CriarAtribuicaoRequest(
                 usuario.getTituloEleitoral(),
                 LocalDate.now(),
@@ -58,7 +58,7 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
                 "Férias do titular"
         );
 
-        // When
+
         mockMvc.perform(
                         post("/api/unidades/{codUnidade}/atribuicoes-temporarias", unidade.getCodigo())
                                 .with(csrf())
@@ -66,13 +66,6 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
 
-        // Then
-        // We need to flush changes because we are in the same transaction and the service might rely on DB state or queries that need flushed data?
-        // Actually, creating calls save, so it should be there.
-        // However, AtribuicaoTemporaria.usuario is mapped with insertable=false, updatable=false
-        // And populated via @JoinColumn(name = "usuario_titulo", ...).
-        // If we just save with usuarioTitulo set, the 'usuario' relation might be null in the managed entity until refreshed or reloaded?
-        // Let's force a clear/flush to ensure full reload.
         entityManager.flush();
         entityManager.clear();
 
@@ -82,8 +75,6 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
                 .andDo(result -> {
                     String content = result.getResponse().getContentAsString();
                     assertThat(content).contains("Férias do titular");
-                    // The DTO mapping uses 'usuario' relationship. If it was null initially, it might be null here.
-                    // But we cleared the context, so it should fetch eagerly or lazily from DB.
                     assertThat(content).contains(usuario.getNome());
                 });
     }
@@ -92,7 +83,7 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Não deve permitir criar atribuição com datas inválidas")
     @WithMockAdmin
     void criarAtribuicaoTemporaria_datasInvalidas_erro() throws Exception {
-        // Given: Data término antes do início
+
         CriarAtribuicaoRequest request = new CriarAtribuicaoRequest(
                 usuario.getTituloEleitoral(),
                 LocalDate.now().plusDays(10),

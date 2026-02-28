@@ -152,9 +152,6 @@ describe("LoginView.vue", () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
 
-        // Configura estado inicial como se já tivesse passado do passo 1
-        // Para testar o passo 2, precisamos simular o fluxo ou manipular o estado interno
-        // Como loginStep é ref interna, vamos fazer o fluxo completo
 
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
         perfilStore.selecionarPerfilUnidade = vi.fn().mockResolvedValue(true);
@@ -168,9 +165,6 @@ describe("LoginView.vue", () => {
         // Passo 2
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);
 
-        // Selecionar opção. O select stub emite change.
-        // O watcher no componente seleciona o primeiro automaticamente.
-        // Vamos garantir que o valor está setado.
 
         // Trigger submit novamente para confirmar seleção
         await wrapper.find('form').trigger('submit');
@@ -270,14 +264,6 @@ describe("LoginView.vue", () => {
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
 
-        // Forçar parSelecionado a null para testar a validação
-        // Precisamos acessar a instancia do componente ou manipular via UI se possível.
-        // O watcher seleciona automaticamente o primeiro.
-        // Vamos tentar setar null diretamente na variável reativa interna se exposta ou mockar o watcher.
-        // Como é difícil via wrapper de integração, podemos simular que o watcher não rodou ou array veio vazio depois.
-        // Mas o watcher roda na mount.
-        // Alternativa: Setar perfisUnidadesDisponiveis para vazio momentaneamente?
-        // Ou melhor, apenas validar o else do "if (parSelecionado.value)".
 
         // Verifica se mudou para o passo 2
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);

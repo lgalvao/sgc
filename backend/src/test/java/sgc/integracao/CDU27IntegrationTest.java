@@ -65,11 +65,11 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve alterar a data limite e gerar alerta quando ADMIN")
     @WithMockAdmin
     void alterarDataLimite_comoAdmin_sucesso() throws Exception {
-        // Given
+
         LocalDate novaData = LocalDate.now().plusDays(20);
         DataRequest request = new DataRequest(novaData);
 
-        // When
+
         mockMvc.perform(
                         post("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
                                 .with(csrf())
@@ -77,7 +77,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        // Then
+
         entityManager.flush();
         entityManager.clear();
 
@@ -96,7 +96,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Não deve permitir alterar data limite se não for ADMIN")
     @WithMockUser(roles = "GESTOR")
     void alterarDataLimite_semPermissao_proibido() throws Exception {
-        // Given
+
         LocalDate novaData = LocalDate.now().plusDays(20);
         DataRequest request = new DataRequest(novaData);
 

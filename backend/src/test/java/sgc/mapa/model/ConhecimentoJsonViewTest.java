@@ -32,7 +32,7 @@ class ConhecimentoJsonViewTest {
         assertThat(json).contains("\"descricao\":\"Conhecimento Teste\"");
         assertThat(json).contains("\"atividadeCodigo\":1");
 
-        // Relacionamentos devem ser ignorados
+
         assertThat(json).doesNotContain("\"atividade\"");
     }
 }

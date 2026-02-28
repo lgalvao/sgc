@@ -91,7 +91,7 @@ class ConfiguracaoControllerTest {
     @DisplayName("POST /api/configuracoes - Deve retornar lista vazia quando atualização não retorna dados")
     @WithMockUser(roles = "ADMIN")
     void deveRetornarListaVaziaAposAtualizacao() throws Exception {
-        // Pattern 1: Empty list validation
+
         when(configuracaoService.salvar(any())).thenReturn(Collections.emptyList());
 
         mockMvc.perform(post("/api/configuracoes")

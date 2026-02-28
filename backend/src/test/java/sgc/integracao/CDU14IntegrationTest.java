@@ -218,7 +218,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(6);
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
 
-            // Assert: Verificar envio de e-mail (GreenMail herdado de BaseIntegrationTest)
+
             // Esperamos pelo menos 2 e-mails: Início de Processo e Aceite
             aguardarEmail(2);
             assertThat(algumEmailContem("submetid")).isTrue();
@@ -375,7 +375,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         void naoPodeHomologarEmEstadoInvalido() throws Exception {
             Long subprocessoId = criarEComecarProcessoDeRevisao();
 
-            // Após refatoração de segurança, a validação de estado é feita no
             // AccessControlService
             // Retorna 403 (Forbidden) em vez de 422 (Unprocessable Entity)
             // Isso é mais correto do ponto de vista de segurança: verificar permissões

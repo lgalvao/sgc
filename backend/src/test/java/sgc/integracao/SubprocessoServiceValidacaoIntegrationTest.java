@@ -33,18 +33,16 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private CompetenciaRepo competenciaRepo;
 
-    private Unidade unidade;
-    private Processo processo;
     private Subprocesso subprocesso;
 
     @BeforeEach
     void setUp() {
-        unidade = UnidadeFixture.unidadePadrao();
+        Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_VAL");
         unidade = unidadeRepo.save(unidade);
 
-        processo = Processo.builder()
+        Processo processo = Processo.builder()
                 .descricao("Processo Teste Val")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
@@ -97,7 +95,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
         ValidacaoCadastroDto dto = subprocessoService.validarCadastro(subprocesso.getCodigo());
         assertThat(dto.valido()).isFalse();
         assertThat(dto.erros()).hasSize(1);
-        assertThat(dto.erros().get(0).tipo()).isEqualTo("SEM_ATIVIDADES");
+        assertThat(dto.erros().getFirst().tipo()).isEqualTo("SEM_ATIVIDADES");
     }
 
     @Test
@@ -108,7 +106,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
 
         ValidacaoCadastroDto dto = subprocessoService.validarCadastro(subprocesso.getCodigo());
         assertThat(dto.valido()).isFalse();
-        assertThat(dto.erros().get(0).tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
+        assertThat(dto.erros().getFirst().tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
     }
 
     @Test

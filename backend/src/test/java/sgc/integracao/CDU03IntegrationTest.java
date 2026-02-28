@@ -139,7 +139,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
     // Teste para edição de processo (requer um processo existente)
     @Test
     void testEditarProcesso_sucesso() throws Exception {
-        // 1. Criar um processo para ser editado
+
         List<Long> unidadesIniciais = List.of(unidade1.getCodigo());
         CriarProcessoRequest criarRequestDTO = criarCriarProcessoReq(
                 "Processo para Edição", unidadesIniciais, LocalDateTime.now().plusDays(20));
@@ -202,7 +202,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testRemoverProcesso_sucesso() throws Exception {
-        // 1. Criar um processo para ser removido
+
         List<Long> unidadesIniciais = List.of(unidade1.getCodigo());
         CriarProcessoRequest criarRequestDTO = criarCriarProcessoReq(
                 "Processo para Remoção",
@@ -226,7 +226,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", processoId).with(csrf()))
                 .andExpect(status().isNoContent()); // 204 No Content para remoção bem-sucedida
 
-        // 3. Tentar buscar o processo removido para confirmar que não existe mais
+
         mockMvc.perform(get(API_PROCESSOS_ID, processoId)).andExpect(status().isNotFound());
     }
 }

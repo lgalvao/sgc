@@ -70,12 +70,12 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve enviar lembrete de prazo para unidade quando ADMIN")
     @WithMockAdmin
     void enviarLembrete_comoAdmin_sucesso() throws Exception {
-        // Given
+
         EnviarLembreteRequest request = EnviarLembreteRequest.builder()
                 .unidadeCodigo(unidade.getCodigo())
                 .build();
 
-        // When
+
         mockMvc.perform(
                         post("/api/processos/{codigo}/enviar-lembrete", processo.getCodigo())
                                 .with(csrf())
@@ -84,7 +84,7 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
 
-        // Then
+
         entityManager.flush();
         entityManager.clear();
 
@@ -106,7 +106,7 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Não deve permitir enviar lembrete sem ser ADMIN")
     @WithMockUser(roles = "GESTOR")
     void enviarLembrete_semPermissao_proibido() throws Exception {
-        // Given
+
         EnviarLembreteRequest request = EnviarLembreteRequest.builder()
                 .unidadeCodigo(unidade.getCodigo())
                 .build();
@@ -124,7 +124,7 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve retornar erro ao enviar lembrete para unidade inexistente")
     @WithMockAdmin
     void enviarLembrete_unidadeInexistente_erro() throws Exception {
-        // Given
+
         EnviarLembreteRequest request = EnviarLembreteRequest.builder()
                 .unidadeCodigo(99999L)
                 .build();

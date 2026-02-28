@@ -200,8 +200,6 @@ describe('Subprocesso Coverage', () => {
         // Wait for onMounted to set codSubprocesso
         await (wrapper.vm as any).$nextTick();
 
-        // Ensure codSubprocesso is set (though mocked return above should handle it, we can force it if needed)
-        // (wrapper.vm as any).codSubprocesso = 123;
 
         // Call with empty justification
         (wrapper.vm as any).justificativaReabertura = '';

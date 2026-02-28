@@ -172,7 +172,7 @@ class MapaSalvamentoServiceTest {
 
         mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
 
-        // Apenas para cobrir os logs de warn nas linhas 177 e 183
+
         assertThat(ativ.getCompetencias()).isEmpty();
     }
 

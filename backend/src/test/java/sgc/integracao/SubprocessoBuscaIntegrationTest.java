@@ -26,7 +26,7 @@ class SubprocessoBuscaIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // 1. Criar Unidade
+
         Unidade raiz = unidadeRepo.findById(1L).orElseThrow();
         unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
@@ -35,7 +35,7 @@ class SubprocessoBuscaIntegrationTest extends BaseIntegrationTest {
         unidade.setUnidadeSuperior(raiz);
         unidade = unidadeRepo.save(unidade);
 
-        // 2. Criar Processo
+
         processo = Processo.builder()
                 .descricao("Processo Busca")
                 .tipo(TipoProcesso.MAPEAMENTO)
@@ -44,7 +44,7 @@ class SubprocessoBuscaIntegrationTest extends BaseIntegrationTest {
                 .build();
         processoRepo.save(processo);
 
-        // 3. Criar Subprocesso
+
         subprocesso = Subprocesso.builder()
                 .unidade(unidade)
                 .processo(processo)

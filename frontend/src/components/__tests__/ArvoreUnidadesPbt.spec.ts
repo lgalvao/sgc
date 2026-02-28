@@ -59,10 +59,10 @@ describe('ArvoreUnidades Property-Based Tests', () => {
 
                 const targetNode = allNodes[nodeIndex];
 
-                // Act: Toggle On
+
                 vm.toggle(targetNode, true);
 
-                // Assert: All eligible children must be selected (and the node itself)
+
                 expect(vm.isChecked(targetNode.codigo)).toBe(true);
 
                 const checkChildren = (node: Unidade) => {

@@ -33,7 +33,7 @@ class MovimentacaoRepoPerformanceTest {
     @Test
     @DisplayName("Deve buscar movimentações com join fetch")
     void deveBuscarMovimentacoesComJoinFetch() {
-        // Given
+
         Unidade uOrigem = new Unidade();
         uOrigem.setSigla("UO");
         uOrigem.setNome("Unidade Origem");
@@ -74,10 +74,10 @@ class MovimentacaoRepoPerformanceTest {
                 .build();
         movimentacaoRepo.save(m2);
 
-        // When
+
         List<Movimentacao> result = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
 
-        // Then
+
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getDescricao()).isEqualTo("Mov 2");
         assertThat(result.get(1).getDescricao()).isEqualTo("Mov 1");

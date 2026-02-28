@@ -30,19 +30,17 @@ class SubprocessoServiceDeletarIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    private Unidade unidade;
-    private Processo processo;
     private Subprocesso subprocesso;
 
     @BeforeEach
     void setUp() {
-        unidade = UnidadeFixture.unidadePadrao();
+        Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_DEL");
         unidade.setNome("Unidade Del");
         unidade = unidadeRepo.save(unidade);
 
-        processo = Processo.builder()
+        Processo processo = Processo.builder()
                 .descricao("Processo Teste Del")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)

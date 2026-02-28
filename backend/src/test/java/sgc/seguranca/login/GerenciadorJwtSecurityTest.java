@@ -27,7 +27,7 @@ class GerenciadorJwtSecurityTest {
     @Test
     @DisplayName("Deve lançar erro crítico se usar secret padrão em ambiente produtivo")
     void deveLancarErroEmProducaoComSecretPadrao() {
-        // Given
+
         when(jwtProperties.secret()).thenReturn(DEFAULT_SECRET);
         // Simula que NÃO é um ambiente de teste/dev (retorna false para os perfis
         // seguros)

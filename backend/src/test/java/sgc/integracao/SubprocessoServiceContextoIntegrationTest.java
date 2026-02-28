@@ -31,7 +31,6 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
     private Unidade unidade;
     private Usuario admin;
-    private Processo processo;
     private Subprocesso subprocesso;
 
     @BeforeEach
@@ -48,7 +47,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
                 new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(admin, null, List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN")))
         );
 
-        processo = Processo.builder()
+        Processo processo = Processo.builder()
                 .descricao("Processo Teste Contexto")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)

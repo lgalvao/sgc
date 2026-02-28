@@ -17,8 +17,6 @@ export const Default: Story = {
         components: {AdministradoresSection},
         setup() {
             const pinia = createTestingPinia({createSpy: vi.fn});
-            // In a real Storybook, we would mock the service calls.
-            // For this demo, we're showing the component structure.
             return {pinia};
         },
         template: '<AdministradoresSection />',

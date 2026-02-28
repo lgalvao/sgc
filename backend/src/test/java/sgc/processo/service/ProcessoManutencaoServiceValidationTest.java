@@ -30,7 +30,7 @@ class ProcessoManutencaoServiceValidationTest {
     @Test
     @DisplayName("Deve impedir criação de processo com unidade INTERMEDIARIA")
     void deveImpedirCriacaoComUnidadeIntermediaria() {
-        // Given
+
         CriarProcessoRequest request = CriarProcessoRequest.builder()
                 .descricao("Processo Teste")
                 .tipo(TipoProcesso.MAPEAMENTO)

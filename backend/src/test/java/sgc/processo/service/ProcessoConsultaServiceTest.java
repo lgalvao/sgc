@@ -48,7 +48,7 @@ class ProcessoConsultaServiceTest {
     @Test
     @DisplayName("Deve buscar IDs de unidades em processos ativos")
     void buscarIdsUnidadesComProcessosAtivos_sucesso() {
-        // Arrange
+
         Long processoIgnorar = 100L;
         List<Long> unidadesMock = List.of(1L, 2L, 3L);
 
@@ -56,10 +56,10 @@ class ProcessoConsultaServiceTest {
                 anyList(), eq(processoIgnorar)
         )).thenReturn(unidadesMock);
 
-        // Act
+
         Set<Long> resultado = processoConsultaService.buscarIdsUnidadesComProcessosAtivos(processoIgnorar);
 
-        // Assert
+
         assertThat(resultado).hasSize(3).containsExactlyInAnyOrder(1L, 2L, 3L);
 
         verify(processoRepo).findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
@@ -71,17 +71,17 @@ class ProcessoConsultaServiceTest {
     @Test
     @DisplayName("Deve retornar conjunto vazio se não houver processos ativos")
     void buscarIdsUnidadesEmProcessosAndamento_vazio() {
-        // Arrange
+
         Long processoIgnorar = 100L;
 
         when(processoRepo.findUnidadeCodigosBySituacaoInAndProcessoCodigoNot(
                 anyList(), eq(processoIgnorar)
         )).thenReturn(List.of());
 
-        // Act
+
         Set<Long> resultado = processoConsultaService.buscarIdsUnidadesComProcessosAtivos(processoIgnorar);
 
-        // Assert
+
         assertThat(resultado).isEmpty();
     }
 
@@ -99,14 +99,14 @@ class ProcessoConsultaServiceTest {
     @Test
     @DisplayName("Deve retornar lista vazia quando não há unidades bloqueadas por tipo")
     void deveRetornarListaVaziaQuandoNaoHaUnidadesBloqueadasPorTipo() {
-        // Arrange
+
         when(processoRepo.findUnidadeCodigosBySituacaoAndTipo(SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.REVISAO))
                 .thenReturn(List.of());
 
-        // Act
+
         List<Long> ids = processoConsultaService.unidadesBloqueadasPorTipo(TipoProcesso.REVISAO);
 
-        // Assert
+
         assertThat(ids).isEmpty();
     }
 
@@ -167,13 +167,13 @@ class ProcessoConsultaServiceTest {
     @Test
     @DisplayName("Deve retornar lista vazia quando não há processos ativos")
     void deveRetornarListaVaziaQuandoNaoHaProcessosAtivos() {
-        // Arrange
+
         when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
 
-        // Act
+
         List<Processo> resultado = processoConsultaService.processosAndamento();
 
-        // Assert
+
         assertThat(resultado).isEmpty();
         verify(processoRepo).findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
     }
@@ -181,17 +181,17 @@ class ProcessoConsultaServiceTest {
     @Test
     @DisplayName("Deve retornar lista vazia quando não há processos finalizados")
     void deveRetornarListaVaziaQuandoNaoHaProcessosFinalizados() {
-        // Arrange
+
         Usuario admin = Usuario.builder().perfilAtivo(Perfil.ADMIN).build();
         when(usuarioService.usuarioAutenticado()).thenReturn(admin);
 
         when(processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO))
                 .thenReturn(List.of());
 
-        // Act
+
         List<Processo> resultado = processoConsultaService.processosFinalizados();
 
-        // Assert
+
         assertThat(resultado).isEmpty();
         verify(processoRepo).listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
     }

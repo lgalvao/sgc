@@ -104,7 +104,6 @@ class AlertaControllerTest {
         @Test
         @DisplayName("Deve extrair titulo quando principal é String")
         void deveExtrairTituloQuandoPrincipalString() throws Exception {
-            // Este caso já é coberto pelos testes acima usando .with(user(TITULO_TESTE))
             // que passa uma String como principal
 
             when(alertaFacade.alertasPorUsuario(TITULO_TESTE))

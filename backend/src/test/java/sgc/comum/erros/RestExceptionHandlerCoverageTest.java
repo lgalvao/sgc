@@ -13,14 +13,14 @@ class RestExceptionHandlerCoverageTest {
     @Test
     @DisplayName("handleErroInterno deve tratar ErroInterno corretamente")
     void deveTratarErroInterno() {
-        // Arrange
+
         ErroInterno ex = new ErroInterno("Messagem interna de teste") {
         };
 
-        // Act
+
         ResponseEntity<?> response = handler.handleErroInterno(ex);
 
-        // Assert
+
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         ErroApi body = (ErroApi) response.getBody();
@@ -33,7 +33,7 @@ class RestExceptionHandlerCoverageTest {
     @Test
     @DisplayName("sanitizar deve lidar com texto nulo")
     void deveLidarComTextoNuloNoSanitizar() {
-        // Arrange
+
         class ErroTeste extends ErroNegocioBase {
             public ErroTeste() {
                 super(null, "ERRO_TESTE", HttpStatus.BAD_REQUEST);
@@ -41,10 +41,10 @@ class RestExceptionHandlerCoverageTest {
         }
         ErroTeste ex = new ErroTeste();
 
-        // Act
+
         ResponseEntity<?> response = handler.handleErroNegocio(ex);
 
-        // Assert
+
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         ErroApi body = (ErroApi) response.getBody();

@@ -45,7 +45,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         Long SP_CODIGO = 60000L;
         Subprocesso sp = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
 
-        // --- ETAPA 1: Visualizar Detalhes e Histórico de Análise (Passos 1 a 5) ---
 
         // Simula uma análise anterior (que deve ser exibida no histórico)
         analiseRepo.saveAndFlush(Analise.builder()
@@ -68,7 +67,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].observacoes", is("Favor ajustar atividades")));
 
-        // --- ETAPA 2: Validação de Pendências (Passo 7) ---
 
         // Limpa mapa para garantir que falhe por falta de atividades
         competenciaRepo.deleteByMapa_Codigo(sp.getMapa().getCodigo());
@@ -79,7 +77,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.message").value("O mapa de competências deve ter ao menos uma atividade cadastrada."));
 
-        // --- ETAPA 3: Preparar Dados e Disponibilizar (Passos 9 a 16) ---
 
         var spEtapa3 = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
         var competencia = competenciaRepo.save(Competencia.builder().descricao("Java").mapa(spEtapa3.getMapa()).build());
@@ -100,7 +97,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.mensagem", is("Cadastro de atividades disponibilizado")));
 
-        // --- ETAPA 4: Verificações Pós-Ação ---
 
         Subprocesso atualizado = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
 

@@ -28,13 +28,12 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private MapaRepo mapaRepo;
 
-    private Unidade unidade;
     private Processo processo;
     private Subprocesso subprocesso;
 
     @BeforeEach
     void setUp() {
-        unidade = UnidadeFixture.unidadePadrao();
+        Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_MET");
         unidade.setNome("Unidade Met");
@@ -105,6 +104,6 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
     void listarEntidadesPorProcesso() {
         List<Subprocesso> list = subprocessoService.listarEntidadesPorProcesso(processo.getCodigo());
         assertThat(list).hasSize(1);
-        assertThat(list.get(0).getCodigo()).isEqualTo(subprocesso.getCodigo());
+        assertThat(list.getFirst().getCodigo()).isEqualTo(subprocesso.getCodigo());
     }
 }

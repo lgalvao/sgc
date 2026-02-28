@@ -89,11 +89,11 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve reabrir cadastro com justificativa válida quando ADMIN")
     @WithMockAdmin
     void reabrirCadastro_comoAdmin_sucesso() throws Exception {
-        // Given
+
         JustificativaRequest request = new JustificativaRequest(
                 "Necessário ajustar informações do cadastro");
 
-        // When
+
         mockMvc.perform(
                         post(API_REABRIR_CADASTRO, subprocesso.getCodigo())
                                 .with(csrf())
@@ -101,7 +101,7 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        // Then
+
         entityManager.flush();
         entityManager.clear();
 
@@ -133,7 +133,7 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Não deve permitir reabrir cadastro sem ser ADMIN")
     @WithMockUser(roles = "GESTOR")
     void reabrirCadastro_semPermissao_proibido() throws Exception {
-        // Given
+
         JustificativaRequest request = new JustificativaRequest("Tentativa sem permissão");
 
         // When/Then
@@ -149,7 +149,7 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Não deve permitir reabrir cadastro sem justificativa")
     @WithMockAdmin
     void reabrirCadastro_semJustificativa_erro() throws Exception {
-        // Given
+
         JustificativaRequest request = new JustificativaRequest("");
 
         // When/Then

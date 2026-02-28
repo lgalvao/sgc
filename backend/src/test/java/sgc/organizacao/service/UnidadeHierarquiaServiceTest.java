@@ -73,9 +73,9 @@ class UnidadeHierarquiaServiceTest {
         List<UnidadeDto> resultado = service.buscarArvoreComElegibilidade(soOperacional);
 
         assertThat(resultado).hasSize(1);
-        // A raiz não é elegível mas aparece na árvore
+
         assertThat(resultado.getFirst().isElegivel()).isFalse();
-        // A operacional é elegível
+
         UnidadeDto operacionalDto = resultado.getFirst().getSubunidades().getFirst().getSubunidades().getFirst();
         assertThat(operacionalDto.isElegivel()).isTrue();
     }

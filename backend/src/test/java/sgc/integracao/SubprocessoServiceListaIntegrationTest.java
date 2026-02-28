@@ -81,7 +81,7 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
     void listarEntidadesPorProcessoEUnidades() {
         List<Subprocesso> list = subprocessoService.listarEntidadesPorProcessoEUnidades(processo.getCodigo(), List.of(unidade.getCodigo()));
         assertThat(list).hasSize(1);
-        assertThat(list.get(0).getCodigo()).isEqualTo(subprocesso.getCodigo());
+        assertThat(list.getFirst().getCodigo()).isEqualTo(subprocesso.getCodigo());
     }
 
     @Test

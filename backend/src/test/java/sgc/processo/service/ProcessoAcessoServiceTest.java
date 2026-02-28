@@ -143,7 +143,7 @@ class ProcessoAcessoServiceTest {
     @Test
     @DisplayName("Deve lidar com ciclos na hierarquia (evitar loop infinito)")
     void deveEvitarCicloInifinitoEmHierarquia() {
-        // U1 -> U2 -> U1
+
         Unidade u1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
         Unidade u2 = UnidadeTestBuilder.umaDe().comCodigo("2").build();
 
@@ -166,7 +166,7 @@ class ProcessoAcessoServiceTest {
         when(auth.getName()).thenReturn("multi_perfil_user");
         when(auth.getAuthorities()).thenAnswer(m -> List.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
 
-        // Mock: Retorna Unidade 1 (Sem acesso) e depois Unidade 200 (Com acesso)
+
         // A implementação com bug pegaria apenas o primeiro (1) e negaria o acesso.
         when(usuarioService.buscarPerfisUsuario("multi_perfil_user")).thenReturn(List.of(
                 PerfilDto.builder().unidadeCodigo(1L).build(),
@@ -178,7 +178,7 @@ class ProcessoAcessoServiceTest {
 
         when(unidadeService.unidadesComHierarquia()).thenReturn(List.of(u100, u200));
 
-        // Mock verification:
+
         // Se a lista de IDs conter 200, acesso é permitido. Se tiver apenas 100, negado.
         when(queryService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {
             List<Long> ids = invocation.getArgument(1);

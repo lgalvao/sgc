@@ -63,7 +63,7 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar lista ao buscar todas as unidades")
     @WithMockUser
     void deveRetornarListaAoBuscarTodasUnidades() throws Exception {
-        // Arrange
+
         when(unidadeService.buscarTodasUnidades()).thenReturn(Collections.emptyList());
 
         // Act & Assert
@@ -77,7 +77,7 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar árvore de elegibilidade")
     @WithMockUser
     void deveRetornarArvoreDeElegibilidade() throws Exception {
-        // Arrange
+
         when(processoFacade.buscarIdsUnidadesEmProcessosAtivos(any()))
                 .thenReturn(Collections.emptySet());
         when(unidadeService.buscarArvoreComElegibilidade(anyBoolean(), any()))
@@ -93,7 +93,7 @@ class UnidadeControllerTest {
     @DisplayName("Deve verificar mapa vigente e retornar boolean")
     @WithMockUser
     void deveVerificarMapaVigente() throws Exception {
-        // Arrange
+
         when(unidadeService.verificarMapaVigente(1L)).thenReturn(true);
 
         // Act & Assert
@@ -106,7 +106,7 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar lista de usuários por unidade")
     @WithMockUser(roles = "CHEFE")
     void deveRetornarListaDeUsuariosPorUnidade() throws Exception {
-        // Arrange
+
         Usuario usuario = Usuario.builder()
                 .tituloEleitoral("123")
                 .nome("Teste")
@@ -122,7 +122,7 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar unidade por sigla")
     @WithMockUser
     void deveRetornarUnidadePorSigla() throws Exception {
-        // Arrange
+
         when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(UnidadeDto.builder().build());
 
         // Act & Assert
@@ -133,7 +133,7 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar unidade por ID")
     @WithMockUser
     void deveRetornarUnidadePorId() throws Exception {
-        // Arrange
+
         when(unidadeService.dtoPorCodigo(1L)).thenReturn(UnidadeDto.builder().build());
 
         // Act & Assert
@@ -144,7 +144,7 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar árvore de unidade quando existente")
     @WithMockUser
     void deveRetornarArvoreDeUnidadeExistente() throws Exception {
-        // Arrange
+
         when(unidadeService.buscarArvore(1L)).thenReturn(UnidadeDto.builder().build());
 
         // Act & Assert
@@ -156,7 +156,7 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar siglas subordinadas")
     @WithMockUser
     void deveRetornarSiglasSubordinadas() throws Exception {
-        // Arrange
+
         when(unidadeService.buscarSiglasSubordinadas("SIGLA")).thenReturn(List.of("SIGLA", "FILHA"));
 
         // Act & Assert
@@ -168,7 +168,7 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar sigla superior")
     @WithMockUser
     void deveRetornarSiglaSuperior() throws Exception {
-        // Arrange
+
         when(unidadeService.buscarSiglaSuperior("FILHA")).thenReturn(Optional.of("SIGLA"));
 
         // Act & Assert
@@ -180,7 +180,7 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar 204 ao buscar sigla superior de raiz")
     @WithMockUser
     void deveRetornar204AoBuscarSiglaSuperiorDeRaiz() throws Exception {
-        // Arrange
+
         when(unidadeService.buscarSiglaSuperior("RAIZ")).thenReturn(Optional.empty());
 
         // Act & Assert

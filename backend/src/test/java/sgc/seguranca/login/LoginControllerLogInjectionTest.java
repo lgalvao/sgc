@@ -56,8 +56,6 @@ class LoginControllerLogInjectionTest {
         // O valor original poderia ser algo como: "10.0.0.1\nINFO User logged in as admin"
         String ipMalicioso = "10.0.0.1\nINFO User logged in as admin";
 
-        // O valor sanitizado deve ter a nova linha removida ou substituída
-        // Vamos assumir que substituímos por sublinhado ou removemos.
 
         AutenticarRequest req = AutenticarRequest.builder()
                 .tituloEleitoral("123")

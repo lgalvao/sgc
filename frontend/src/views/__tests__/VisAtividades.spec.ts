@@ -206,8 +206,6 @@ describe("VisAtividades.vue Coverage", () => {
         try {
             await (wrapper.vm as any).confirmarValidacao();
         } catch {
-            // Error is caught in component or propagates? Component uses try/finally but doesn't catch explicitly.
-            // If it propagates, we catch it here.
         }
 
         expect(subprocessosStore.homologarRevisaoCadastro).toHaveBeenCalled();
@@ -270,8 +268,6 @@ describe("VisAtividades.vue Coverage", () => {
             unidades: [] // Empty units in process
         });
 
-        // Setup state where unidade exists in store but NOT in processoDetalhe.unidades
-        // resulting in computed 'subprocesso' being undefined, and thus 'codSubprocesso' being undefined.
         const initialState = {
             processos: {
                 processoDetalhe: {

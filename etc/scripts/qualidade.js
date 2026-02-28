@@ -158,8 +158,6 @@ function parsePlaywrightStats(output) {
     const skippedMatch = output.match(/(\d+)\s+skipped/);
     if (skippedMatch) stats.skipped = parseInt(skippedMatch[1], 10);
 
-    // Playwright might say "169 did not run", which we can count as skipped or just ignore?
-    // Let's count "did not run" as skipped for simplicity if skipped is 0
     const didNotRunMatch = output.match(/(\d+)\s+did not run/);
     if (didNotRunMatch) stats.skipped += parseInt(didNotRunMatch[1], 10);
 

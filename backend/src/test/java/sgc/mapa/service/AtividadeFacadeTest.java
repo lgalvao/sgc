@@ -237,7 +237,7 @@ class AtividadeFacadeTest {
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(mapaManutencaoService.criarConhecimento(atividadeCodigo, request)).thenReturn(conhecimentoSalvo);
 
-            // Mocking for response creation
+
             when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(

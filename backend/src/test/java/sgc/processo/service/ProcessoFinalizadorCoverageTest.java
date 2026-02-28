@@ -31,7 +31,7 @@ class ProcessoFinalizadorCoverageTest {
     @Test
     @DisplayName("finalizar deve ignorar mapas se tipo for DIAGNOSTICO")
     void deveIgnorarMapasSeDiagnostico() {
-        // Arrange
+
         Long codigo = 1L;
         Processo processo = new Processo();
         processo.setCodigo(codigo);
@@ -39,10 +39,10 @@ class ProcessoFinalizadorCoverageTest {
 
         when(repo.buscar(Processo.class, codigo)).thenReturn(processo);
 
-        // Act
+
         finalizador.finalizar(codigo);
 
-        // Assert
+
         verify(queryService, never()).listarEntidadesPorProcesso(any());
         verify(processoRepo).save(processo);
         verify(notificacaoService).emailFinalizacaoProcesso(codigo);

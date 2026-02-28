@@ -78,7 +78,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar 201 Created quando processo é válido")
         void deveRetornarCreatedQuandoProcessoValido() throws Exception {
-            // Arrange
+
             var req =
                     new CriarProcessoRequest(
                             NOVO_PROCESSO,
@@ -116,7 +116,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar 400 Bad Request quando processo é inválido (descrição vazia)")
         void deveRetornarBadRequestQuandoProcessoInvalido() throws Exception {
-            // Arrange
+
             var req =
                     new CriarProcessoRequest(
                             "", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(30), List.of(1L));
@@ -138,7 +138,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar 200 OK quando processo existe")
         void deveRetornarOkQuandoProcessoExiste() throws Exception {
-            // Arrange
+
             var processo =
                     Processo.builder()
                             .codigo(1L)
@@ -163,7 +163,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar detalhes do processo com 200 OK")
         void deveRetornarOkAoObterDetalhesQuandoProcessoExiste() throws Exception {
-            // Arrange
+
             var dto =
                     ProcessoDetalheDto.builder()
                             .codigo(1L)
@@ -188,7 +188,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar 403 Forbidden ao obter detalhes se acesso negado")
         void deveRetornarForbiddenAoObterDetalhesQuandoAcessoNegado() throws Exception {
-            // Arrange
+
             doThrow(new ErroAcessoNegado("Acesso negado")).when(processoFacade).obterDetalhes(eq(1L), any(Usuario.class));
 
             // Act & Assert
@@ -199,7 +199,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar 404 Not Found quando processo não existe")
         void deveRetornarNotFoundQuandoProcessoNaoExiste() throws Exception {
-            // Arrange
+
             when(processoFacade.obterPorId(999L)).thenReturn(Optional.empty());
 
             // Act & Assert
@@ -217,7 +217,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar 200 OK ao atualizar processo existente")
         void deveRetornarOkAoAtualizarQuandoProcessoExiste() throws Exception {
-            // Arrange
+
             var req =
                     new AtualizarProcessoRequest(
                             1L,
@@ -259,7 +259,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar 200 OK ao iniciar mapeamento com sucesso")
         void deveRetornarOkAoIniciarMapeamentoQuandoValido() throws Exception {
-            // Arrange
+
             var req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
             var processo = Processo.builder().codigo(1L).descricao("Processo Teste").build();
 
@@ -283,7 +283,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar 200 OK ao finalizar processo com sucesso")
         void deveRetornarOkAoFinalizarQuandoValido() throws Exception {
-            // Arrange
+
             doNothing().when(processoFacade).finalizar(1L);
 
             // Act & Assert
@@ -300,7 +300,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar lista de processos finalizados")
         void deveRetornarListaDeProcessosFinalizados() throws Exception {
-            // Arrange
+
             when(processoFacade.listarFinalizados())
                     .thenReturn(List.of(Processo.builder().codigo(1L).build()));
 
@@ -315,7 +315,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar lista de subprocessos")
         void deveRetornarListaDeSubprocessos() throws Exception {
-            // Arrange
+
             when(processoFacade.listarEntidadesSubprocessos(1L))
                     .thenReturn(
                             List.of(Subprocesso.builder().codigo(10L).build()));

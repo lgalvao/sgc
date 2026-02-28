@@ -51,7 +51,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
     @BeforeEach
     void setUp() {
 
-        // 1. Criar unidades (DISTINTAS)
+
         Unidade raiz = unidadeRepo.findById(1L).orElseThrow();
         Unidade unidadeOrigem = UnidadeFixture.unidadePadrao();
         unidadeOrigem.setCodigo(null);
@@ -67,7 +67,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         unidadeDestino.setUnidadeSuperior(raiz);
         unidadeDestino = unidadeRepo.save(unidadeDestino);
 
-        // 2. Criar chefe para unidade destino (para validação de segurança)
+
         chefe = UsuarioFixture.usuarioPadrao();
         chefe.setTituloEleitoral("888888888888");
         chefe.setNome("Chefe Destino");

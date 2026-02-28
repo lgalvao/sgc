@@ -15,7 +15,7 @@ test.describe('CDU-04 - Iniciar Processo', () => {
     }) => {
         const descricao = `CDU-04 Iniciar - ${Date.now()}`;
 
-        // 1. Criar processo (sem iniciar)
+
         await criarProcesso(page, {
             descricao: descricao,
             tipo: 'MAPEAMENTO',
@@ -46,14 +46,14 @@ test.describe('CDU-04 - Iniciar Processo', () => {
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
-        // 5. Validar redirecionamento e situação
+
         await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByText(/Processo iniciado/i).first()).toBeVisible();
 
         const linha = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descricao)});
         await expect(linha.getByText('Em andamento')).toBeVisible();
 
-        // 6. Validar que não é mais editável (clicar redireciona para detalhes e não para cadastro)
+
         await linha.click();
         await page.waitForURL(new RegExp(`\\/processo\\/${processoId}$`));
 

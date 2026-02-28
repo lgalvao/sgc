@@ -32,21 +32,18 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private AtividadeRepo atividadeRepo;
 
-    private Unidade unidade;
-    private Usuario admin;
-    private Processo processo;
     private Subprocesso subprocessoDestino;
     private Subprocesso subprocessoOrigem;
 
     @BeforeEach
     void setUp() {
-        unidade = UnidadeFixture.unidadePadrao();
+        Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_ATIV");
         unidade.setNome("Unidade de Atividade");
         unidade = unidadeRepo.save(unidade);
 
-        admin = usuarioRepo.findById("111111111111").orElseThrow();
+        Usuario admin = usuarioRepo.findById("111111111111").orElseThrow();
         admin.setUnidadeAtivaCodigo(unidade.getCodigo());
         admin.setPerfilAtivo(Perfil.CHEFE);
 
@@ -54,7 +51,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
                 new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(admin, null, List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_CHEFE")))
         );
 
-        processo = Processo.builder()
+        Processo processo = Processo.builder()
                 .descricao("Processo Teste Ativ")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)

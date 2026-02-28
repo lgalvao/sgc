@@ -23,7 +23,7 @@ class AlertaFacadeCoverageTest {
     @Test
     @DisplayName("criarAlertaCadastroDisponibilizado deve usar sigla da unidade de origem na descrição")
     void deveUsarSiglaDaUnidadeOrigemNaDescricao() {
-        // Arrange
+
         Processo processo = Processo.builder().codigo(10L).descricao("Processo Teste").build();
 
         Unidade unidadeOrigem = new Unidade();
@@ -36,10 +36,10 @@ class AlertaFacadeCoverageTest {
 
         when(alertaService.salvar(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
+
         alertaFacade.criarAlertaCadastroDisponibilizado(processo, unidadeOrigem, unidadeDestino);
 
-        // Assert
+
         ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
         verify(alertaService).salvar(captor.capture());
         assertThat(captor.getValue().getDescricao()).contains("pela unidade ADMIN");

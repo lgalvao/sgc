@@ -102,7 +102,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
     @WithMockGestor("666666666666")
         // GESTOR of unit 6 (parent of units 8 and 9)
     void aceitarValidacaoEmBloco_deveAceitarSucesso() throws Exception {
-        // Given
+
         Long codigoContexto = processo.getCodigo();
         List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
@@ -111,7 +111,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                 .subprocessos(subprocessosSelecionados)
                 .build();
 
-        // When
+
         mockMvc.perform(
                         post("/api/subprocessos/{id}/aceitar-validacao-bloco", codigoContexto)
                                 .with(csrf())
@@ -119,7 +119,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        // Then
+
         entityManager.flush();
         entityManager.clear();
 

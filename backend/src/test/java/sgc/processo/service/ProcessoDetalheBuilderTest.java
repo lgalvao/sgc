@@ -50,7 +50,7 @@ class ProcessoDetalheBuilderTest {
     @Test
     @DisplayName("Deve construir DTO com dados básicos e unidades quando dados válidos")
     void deveConstruirDtoQuandoDadosValidos() {
-        // Arrange
+
         Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -73,10 +73,10 @@ class ProcessoDetalheBuilderTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
 
-        // Act
+
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
-        // Assert
+
         assertThat(dto).isNotNull();
         assertThat(dto.getCodigo()).isEqualTo(1L);
         assertThat(dto.getDescricao()).isEqualTo("Processo Teste");
@@ -91,7 +91,7 @@ class ProcessoDetalheBuilderTest {
     @Test
     @DisplayName("Deve permitir finalizar quando usuário é admin")
     void devePermitirFinalizarQuandoUsuarioAdmin() {
-        // Arrange
+
         Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -101,17 +101,17 @@ class ProcessoDetalheBuilderTest {
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
         doReturn(true).when(permissionEvaluator).checkPermission(usuario, processo, "FINALIZAR_PROCESSO");
 
-        // Act
+
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
-        // Assert
+
         assertThat(dto.isPodeFinalizar()).isTrue();
     }
 
     @Test
     @DisplayName("Não deve permitir finalizar quando usuário não é admin")
     void naoDevePermitirFinalizarQuandoUsuarioNaoAdmin() {
-        // Arrange
+
         Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -121,17 +121,17 @@ class ProcessoDetalheBuilderTest {
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
         doReturn(false).when(permissionEvaluator).checkPermission(usuario, processo, "FINALIZAR_PROCESSO");
 
-        // Act
+
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
-        // Assert
+
         assertThat(dto.isPodeFinalizar()).isFalse();
     }
 
     @Test
     @DisplayName("Deve verificar ordenação das unidades")
     void deveVerificarOrdenacaoDasUnidades() {
-        // Arrange
+
         Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -144,10 +144,10 @@ class ProcessoDetalheBuilderTest {
         processo.adicionarParticipantes(Set.of(u1, u2));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
-        // Act
+
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
-        // Assert
+
         assertThat(dto.getUnidades()).hasSize(2);
         assertThat(dto.getUnidades().get(0).getSigla()).isEqualTo("A");
         assertThat(dto.getUnidades().get(1).getSigla()).isEqualTo("B");
@@ -156,7 +156,7 @@ class ProcessoDetalheBuilderTest {
     @Test
     @DisplayName("Deve construir DTO com hierarquia de participantes")
     void deveConstruirDtoComHierarquiaParticipantes() {
-        // Arrange
+
         Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -183,10 +183,10 @@ class ProcessoDetalheBuilderTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(spPai, spFilho));
 
-        // Act
+
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
-        // Assert
+
         assertThat(dto.getUnidades()).hasSize(1); // Somente o pai na raiz
         ProcessoDetalheDto.UnidadeParticipanteDto paiDto = dto.getUnidades().getFirst();
         assertThat(paiDto.getMapaCodigo()).isEqualTo(100L);
@@ -240,13 +240,13 @@ class ProcessoDetalheBuilderTest {
         Unidade filho = criarUnidade(2L, "FILHO", "FILHO");
         filho.setUnidadeSuperior(pai);
 
-        // Apenas filho participa
+
         processo.adicionarParticipantes(Set.of(filho));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
-        // Filho deve aparecer na raiz pois pai não participa
+
         assertThat(dto.getUnidades()).hasSize(1);
         assertThat(dto.getUnidades().getFirst().getSigla()).isEqualTo("FILHO");
     }
@@ -254,7 +254,7 @@ class ProcessoDetalheBuilderTest {
     @Test
     @DisplayName("Deve lidar com subprocesso sem mapa")
     void deveLidarComSubprocessoSemMapa() {
-        // Arrange
+
         Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -276,17 +276,17 @@ class ProcessoDetalheBuilderTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
 
-        // Act
+
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
-        // Assert
+
         assertThat(dto.getUnidades()).hasSize(1);
     }
 
     @Test
     @DisplayName("Deve lidar com subprocesso sem unidade correspondente nos participantes")
     void deveLidarComSubprocessoSemUnidadeCorrespondente() {
-        // Arrange
+
         Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -305,10 +305,10 @@ class ProcessoDetalheBuilderTest {
         // Subprocesso existe mas unidade não está em participantes
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
 
-        // Act
+
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
-        // Assert
+
         assertThat(dto.getUnidades()).isEmpty();
     }
 

@@ -30,18 +30,16 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private AtividadeRepo atividadeRepo;
 
-    private Unidade unidade;
-    private Processo processo;
     private Subprocesso subprocesso;
 
     @BeforeEach
     void setUp() {
-        unidade = UnidadeFixture.unidadePadrao();
+        Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_SALV");
         unidade = unidadeRepo.save(unidade);
 
-        processo = Processo.builder()
+        Processo processo = Processo.builder()
                 .descricao("Processo Teste Salvar")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)

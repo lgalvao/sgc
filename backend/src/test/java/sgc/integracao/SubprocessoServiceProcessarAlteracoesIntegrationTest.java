@@ -27,7 +27,6 @@ class SubprocessoServiceProcessarAlteracoesIntegrationTest extends BaseIntegrati
     private MapaRepo mapaRepo;
 
     private Unidade unidade;
-    private Processo processo;
     private Subprocesso subprocesso;
 
     @BeforeEach
@@ -37,7 +36,7 @@ class SubprocessoServiceProcessarAlteracoesIntegrationTest extends BaseIntegrati
         unidade.setSigla("TEST_PROC");
         unidade = unidadeRepo.save(unidade);
 
-        processo = Processo.builder()
+        Processo processo = Processo.builder()
                 .descricao("Processo Teste")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)

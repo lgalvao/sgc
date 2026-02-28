@@ -144,8 +144,6 @@ describe('Unidade.vue', () => {
         usuariosStore = useUsuariosStore();
         mapasStore = useMapasStore();
 
-        // Spies are already created by Pinia for actions if stubActions: true, 
-        // but since we used false, we should only mock those we want to change behavior
         vi.spyOn(unidadesStore, 'buscarArvoreUnidade').mockResolvedValue(null);
         vi.spyOn(atribuicaoStore, 'buscarAtribuicoes').mockResolvedValue(null);
 

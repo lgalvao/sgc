@@ -60,7 +60,6 @@ async function run() {
             const {chromium} = await import('@playwright/test');
             const candidatePath = chromium.executablePath();
 
-            // Check if the candidate path actually exists
             if (fs.existsSync(candidatePath)) {
                 chromePath = candidatePath;
                 console.log(`Found valid Playwright Chrome at: ${chromePath}`);
@@ -68,8 +67,6 @@ async function run() {
                 console.warn(`Playwright reported Chrome at ${candidatePath}, but it does not exist.`);
                 // Fallback search in cache directory
 
-                // Actually safer to look relative to home if we can, but let's try to search the cache dir we know exists
-                // typically ~/.cache/ms-playwright/
                 const homeDir = process.env.HOME || process.env.USERPROFILE;
                 const playwrightCache = path.join(homeDir, '.cache', 'ms-playwright');
 

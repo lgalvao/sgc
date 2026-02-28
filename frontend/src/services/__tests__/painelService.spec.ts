@@ -9,8 +9,6 @@ import * as service from "../painelService";
 // A recomendação é centralizar. Se eu uso setupServiceTest, deveria confiar nele.
 // Mas ele exporta mockApi.
 
-// Vamos usar o setupServiceTest que já mocka o axios-setup
-// Porém, precisamos mockar os mappers que são dependencias específicas deste service
 vi.mock("@/mappers/processos", () => ({
     mapProcessoResumoDtoToFrontend: vi.fn((dto) => ({...dto, mapped: true})),
 }));

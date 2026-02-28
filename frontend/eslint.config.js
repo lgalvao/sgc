@@ -64,9 +64,6 @@ export default [// 1. Ignore files
         },
         rules: {
             "vue/multi-word-component-names": "off",
-            // The no-useless-assignment rule currently produces false positives in Vue 3 <script setup>
-            // because it doesn't recognize that variables are used in the template.
-            // no-unused-vars already covers actually unused variables.
             "no-useless-assignment": "off",
             "vuejs-accessibility/label-has-for": [
                 "error",

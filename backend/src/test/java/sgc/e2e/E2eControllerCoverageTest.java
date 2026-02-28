@@ -22,10 +22,10 @@ class E2eControllerCoverageTest {
     @Test
     @DisplayName("resetDatabase deve retornar imediatamente se dataSource for nulo")
     void deveRetornarSeDataSourceForNulo() {
-        // Arrange
+
         when(jdbcTemplate.getDataSource()).thenReturn(null);
 
-        // Act
+
         controller.resetDatabase();
 
         // Assert - Não deve lançar exceção nem fazer nada (cobertura da linha 62)
@@ -35,7 +35,7 @@ class E2eControllerCoverageTest {
     @Test
     @DisplayName("criarProcessoMapeamento deve falhar se unidadeSigla for vazia")
     void deveFalharSeUnidadeSiglaVazia() {
-        // Arrange
+
         E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
                 "desc", "", false, 30);
 

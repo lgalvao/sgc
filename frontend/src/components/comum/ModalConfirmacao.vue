@@ -112,7 +112,7 @@ function onShown() {
 </script>
 
 <style scoped>
-@media (max-width: 575.98px) {
+@media (max-width: 576px) {
   .footer-confirmacao {
     flex-direction: column-reverse;
     gap: 0.5rem;

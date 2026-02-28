@@ -37,8 +37,6 @@ export async function importarAtividades(
 
 export async function listarAtividades(codSubprocesso: number): Promise<Atividade[]> {
     const response = await apiClient.get<any>(`/subprocessos/${codSubprocesso}/contexto-edicao`);
-    // Assuming backend returns Atividade[] compatible structure in atividadesDisponiveis
-    // or we accept that strict typing might require adjustment if backend DTO differs significantly
     return response.data.atividadesDisponiveis as Atividade[];
 }
 

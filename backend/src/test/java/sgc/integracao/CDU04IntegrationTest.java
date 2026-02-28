@@ -76,7 +76,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve iniciar processo de mapeamento com sucesso e gerar subprocessos, alertas e notificações")
     void deveIniciarProcessoMapeamento() throws Exception {
-        // 1. Arrange: Criar um processo em estado 'CRIADO'
+
         CriarProcessoRequest criarReq = new CriarProcessoRequest(
                 "Processo Mapeamento Teste CDU-04",
                 TipoProcesso.MAPEAMENTO,
@@ -92,7 +92,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
 
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
-        // 2. Act: Iniciar Processo
+
         IniciarProcessoRequest iniciarReq = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO,
                 List.of(unidadeLivre.getCodigo()));
 
@@ -102,11 +102,11 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
                         .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
-        // 3. Assert: Mudança de Status do Processo
+
         Processo processo = processoRepo.findById(processoId).orElseThrow();
         assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
 
-        // 4. Assert: Criação de Subprocessos
+
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processoId);
         assertThat(subprocessos).hasSize(1);
 
@@ -121,11 +121,11 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
         List<Competencia> competencias = competenciaRepo.findByMapa_Codigo(sub.getMapa().getCodigo());
         assertThat(competencias).isEmpty();
 
-        // 5. Assert: Geração de Alertas
+
         long alertasCount = alertaRepo.count();
         assertThat(alertasCount).isGreaterThan(0);
 
-        // 6. Assert: Notificações por email são mockadas em ambiente de teste
+
         // e não podem ser verificadas diretamente via Mockito
         // O teste de envio de emails está em NotificacaoEmailServiceTest
     }

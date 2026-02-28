@@ -36,14 +36,14 @@ class OrganizacaoFacadeTest {
     @Test
     @DisplayName("Deve testar elegibilidade com unidades que possuem pai")
     void deveTestarElegibilidadeComPai() {
-        // Arrange
+
         UnidadeDto dto = UnidadeDto.builder().codigo(2L).build();
         when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
-        // Act
+
         facade.buscarArvoreComElegibilidade(false, Collections.emptySet());
 
-        // Assert
+
         verify(hierarquiaService).buscarArvoreComElegibilidade(any());
     }
 
@@ -65,14 +65,14 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve retornar hierarquia ao buscar todas as unidades")
         void deveRetornarHierarquiaAoBuscarTodasUnidades() {
-            // Arrange
+
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
             when(hierarquiaService.buscarArvoreHierarquica()).thenReturn(List.of(dto));
 
-            // Act
+
             List<UnidadeDto> result = facade.buscarTodasUnidades();
 
-            // Assert
+
             assertThat(result).hasSize(1);
             verify(hierarquiaService).buscarArvoreHierarquica();
         }
@@ -80,7 +80,7 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve buscar unidade por sigla")
         void deveBuscarPorSigla() {
-            // Arrange
+
             Unidade u = criarUnidade(1L, "U1");
             when(unidadeService.buscarPorSigla("U1")).thenReturn(u);
 
@@ -91,7 +91,7 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve buscar unidade por código")
         void deveBuscarPorCodigo() {
-            // Arrange
+
             Unidade unidade = criarUnidade(1L, "U1");
             when(unidadeService.buscarPorId(1L)).thenReturn(unidade);
 
@@ -102,7 +102,7 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve buscar árvore de unidades")
         void deveBuscarArvore() {
-            // Arrange
+
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
             when(hierarquiaService.buscarArvore(1L)).thenReturn(dto);
 
@@ -114,13 +114,13 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve buscar siglas subordinadas")
         void deveBuscarSiglasSubordinadas() {
-            // Arrange
+
             when(hierarquiaService.buscarSiglasSubordinadas("U1")).thenReturn(List.of("U1", "U1-1"));
 
-            // Act
+
             List<String> result = facade.buscarSiglasSubordinadas("U1");
 
-            // Assert
+
             assertThat(result).contains("U1", "U1-1");
             verify(hierarquiaService).buscarSiglasSubordinadas("U1");
         }
@@ -128,7 +128,7 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve buscar sigla da unidade superior")
         void deveBuscarSiglaSuperior() {
-            // Arrange
+
             when(hierarquiaService.buscarSiglaSuperior("FILHO")).thenReturn(Optional.of("PAI"));
 
             // Act & Assert
@@ -143,14 +143,14 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve buscar árvore com elegibilidade")
         void deveBuscarArvoreComElegibilidade() {
-            // Arrange
+
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
-            // Act
+
             List<UnidadeDto> result = facade.buscarArvoreComElegibilidade(false, Collections.emptySet());
 
-            // Assert
+
             assertThat(result).hasSize(1);
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
         }
@@ -158,15 +158,15 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve buscar árvore com elegibilidade considerando mapa vigente")
         void deveBuscarArvoreComElegibilidadeComMapa() {
-            // Arrange
+
             UnidadeDto dto = UnidadeDto.builder().codigo(1L).build();
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(List.of(dto));
 
-            // Act
+
             List<UnidadeDto> result = facade.buscarArvoreComElegibilidade(true, Collections.emptySet());
 
-            // Assert
+
             assertThat(result).hasSize(1);
             verify(unidadeService).buscarTodosCodigosUnidadesComMapa();
             verify(hierarquiaService).buscarArvoreComElegibilidade(any());
@@ -175,7 +175,7 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve verificar se tem mapa vigente")
         void deveVerificarMapaVigente() {
-            // Arrange
+
             when(unidadeService.verificarMapaVigente(1L)).thenReturn(true);
 
             // Act & Assert
@@ -190,21 +190,21 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve criar atribuição temporária com sucesso")
         void deveCriarAtribuicaoTemporariaComSucesso() {
-            // Arrange
+
             CriarAtribuicaoRequest req = new CriarAtribuicaoRequest(
                     "123", LocalDate.now(), LocalDate.now().plusDays(1), "Justificativa");
 
-            // Act
+
             facade.criarAtribuicaoTemporaria(1L, req);
 
-            // Assert
+
             verify(responsavelService).criarAtribuicaoTemporaria(1L, req);
         }
 
         @Test
         @DisplayName("Deve buscar usuários por unidade")
         void deveBuscarUsuariosPorUnidade() {
-            // Arrange
+
             when(usuarioService.buscarPorUnidadeLotacao(1L)).thenReturn(List.of(new Usuario()));
 
             // Act & Assert
@@ -214,14 +214,14 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve buscar todas as atribuições")
         void deveBuscarTodasAtribuicoes() {
-            // Arrange
+
             AtribuicaoDto dto = AtribuicaoDto.builder().build();
             when(responsavelService.buscarTodasAtribuicoes()).thenReturn(List.of(dto));
 
-            // Act
+
             List<AtribuicaoDto> result = facade.buscarTodasAtribuicoes();
 
-            // Assert
+
             assertThat(result).hasSize(1);
             verify(responsavelService).buscarTodasAtribuicoes();
         }
@@ -233,13 +233,13 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Buscar IDs descendentes recursivamente")
         void buscarIdsDescendentes() {
-            // Arrange
+
             when(hierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L, 3L));
 
-            // Act
+
             List<Long> result = facade.buscarIdsDescendentes(1L);
 
-            // Assert
+
             assertThat(result).containsExactlyInAnyOrder(2L, 3L);
             verify(hierarquiaService).buscarIdsDescendentes(1L);
         }
@@ -274,7 +274,7 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve buscar IDs descendentes com mapa de hierarquia fornecido")
         void deveBuscarIdsDescendentesComMapa() {
-            // Arrange
+
             Map<Long, List<Long>> mapPaiFilhos = new HashMap<>();
             mapPaiFilhos.put(1L, List.of(2L, 3L));
             mapPaiFilhos.put(2L, List.of(4L));
@@ -282,10 +282,10 @@ class OrganizacaoFacadeTest {
             when(hierarquiaService.buscarDescendentes(1L, mapPaiFilhos))
                     .thenReturn(List.of(2L, 3L, 4L));
 
-            // Act
+
             List<Long> resultado = facade.buscarIdsDescendentes(1L, mapPaiFilhos);
 
-            // Assert
+
             assertThat(resultado).containsExactlyInAnyOrder(2L, 3L, 4L);
             verify(hierarquiaService).buscarDescendentes(1L, mapPaiFilhos);
         }
@@ -293,16 +293,16 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve buscar mapa de hierarquia completo")
         void deveBuscarMapaHierarquia() {
-            // Arrange
+
             Map<Long, List<Long>> mapaEsperado = new HashMap<>();
             mapaEsperado.put(1L, List.of(2L, 3L));
 
             when(hierarquiaService.buscarMapaHierarquia()).thenReturn(mapaEsperado);
 
-            // Act
+
             Map<Long, List<Long>> resultado = facade.buscarMapaHierarquia();
 
-            // Assert
+
             assertThat(resultado).isEqualTo(mapaEsperado);
             verify(hierarquiaService).buscarMapaHierarquia();
         }
@@ -310,7 +310,7 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve buscar unidades subordinadas diretas")
         void deveBuscarSubordinadas() {
-            // Arrange
+
             UnidadeDto subordinada1 = UnidadeDto.builder()
                     .codigo(2L)
                     .build();
@@ -318,10 +318,10 @@ class OrganizacaoFacadeTest {
             when(hierarquiaService.buscarSubordinadas(1L))
                     .thenReturn(List.of(subordinada1));
 
-            // Act
+
             List<UnidadeDto> resultado = facade.buscarSubordinadas(1L);
 
-            // Assert
+
             assertThat(resultado).hasSize(1);
             verify(hierarquiaService).buscarSubordinadas(1L);
         }
@@ -334,17 +334,17 @@ class OrganizacaoFacadeTest {
         @Test
         @DisplayName("Deve buscar responsável atual por sigla de unidade")
         void deveBuscarResponsavelAtual() {
-            // Arrange
+
             Usuario responsavel = new Usuario();
             responsavel.setMatricula("12345");
 
             when(responsavelService.buscarResponsavelAtual("UNIDADE-01"))
                     .thenReturn(responsavel);
 
-            // Act
+
             Usuario resultado = facade.buscarResponsavelAtual("UNIDADE-01");
 
-            // Assert
+
             assertThat(resultado).isEqualTo(responsavel);
             verify(responsavelService).buscarResponsavelAtual("UNIDADE-01");
         }

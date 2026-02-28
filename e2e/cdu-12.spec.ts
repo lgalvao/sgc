@@ -43,7 +43,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
     test('Preparacao: Setup Mapeamento e Início da Revisão', async ({page, cleanupAutomatico}) => {
         test.slow();
-        // 1. Criar Processo Mapeamento (ADMIN)
+
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await criarProcesso(page, {
             descricao: descProcessoMapeamento,

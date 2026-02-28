@@ -25,7 +25,7 @@ class ProcessoManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve criar processo do tipo REVISAO com sucesso")
         void deveCriarProcessoRevisaoComSucesso() {
-            // Unidade 8 já possui mapa vigente através do Processo 50000 -> Subprocesso 60000 (Mapa 1001) no data.sql
+
             LocalDateTime dataLimite = LocalDateTime.now().plusDays(30);
             CriarProcessoRequest request = CriarProcessoRequest.builder()
                     .descricao("Processo de Revisão")
@@ -46,7 +46,7 @@ class ProcessoManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve criar processo do tipo DIAGNOSTICO com sucesso")
         void deveCriarProcessoDiagnosticoComSucesso() {
-            // Unidade 8 já possui mapa vigente através do Processo 50000 -> Subprocesso 60000 (Mapa 1001) no data.sql
+
             LocalDateTime dataLimite = LocalDateTime.now().plusDays(30);
             CriarProcessoRequest request = CriarProcessoRequest.builder()
                     .descricao("Processo de Diagnóstico")
@@ -86,7 +86,7 @@ class ProcessoManutencaoServiceIntegrationTest extends BaseIntegrationTest {
                     .descricao("Processo de Revisão Falho")
                     .tipo(TipoProcesso.REVISAO)
                     .dataLimiteEtapa1(dataLimite)
-                    // ADMIN unit usually does not have a map in tests
+
                     .unidades(List.of(1L))
                     .build();
 
@@ -128,7 +128,7 @@ class ProcessoManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve lançar erro ao atualizar processo fora da situação CRIADO")
         void deveLancarErroAoAtualizarProcessoEmAndamento() {
             Processo p = processoRepo.findById(50000L).orElseThrow();
-            // Processo 50000 is EM_ANDAMENTO in data.sql
+
 
             AtualizarProcessoRequest request = AtualizarProcessoRequest.builder()
                     .codigo(p.getCodigo())
@@ -166,7 +166,7 @@ class ProcessoManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve lançar erro ao apagar processo fora da situação CRIADO")
         void deveLancarErroAoApagarProcessoEmAndamento() {
             Processo p = processoRepo.findById(50000L).orElseThrow();
-            // Processo 50000 is EM_ANDAMENTO in data.sql
+
 
             assertThatThrownBy(() -> service.apagar(p.getCodigo()))
                     .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);

@@ -53,7 +53,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     @BeforeEach
     void setUp() {
 
-        // 1. Criar Unidades (Superior e Chefe)
+
         unidadeSuperior = UnidadeFixture.unidadeComSigla("COSIS");
         unidadeSuperior.setCodigo(null);
         unidadeSuperior = unidadeRepo.save(unidadeSuperior);
@@ -63,7 +63,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         unidadeChefe.setUnidadeSuperior(unidadeSuperior);
         unidadeChefe = unidadeRepo.save(unidadeChefe);
 
-        // 2. Criar Usuários
+
         Usuario usuarioChefe = UsuarioFixture.usuarioComTitulo("333333333333");
         usuarioChefe.setUnidadeLotacao(unidadeChefe);
         usuarioChefe = usuarioRepo.saveAndFlush(usuarioChefe);
@@ -77,7 +77,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         definirTitular(unidadeChefe, usuarioChefe);
         definirTitular(unidadeSuperior, usuarioSuperior);
 
-        // 4. Criar Processo, Mapa e Subprocesso
+
         Processo processoRevisao = ProcessoFixture.processoPadrao();
         processoRevisao.setCodigo(null);
         processoRevisao.setTipo(TipoProcesso.REVISAO);
@@ -183,7 +183,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId))
                 .andExpect(status().isOk());
 
-        // 2. Criar análise de "Aceite" manualmente
+
         Analise analiseAceite = new Analise();
         analiseAceite.setSubprocesso(subprocessoRevisao);
         analiseAceite.setUnidadeCodigo(unidadeSuperior.getCodigo());
@@ -191,7 +191,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         analiseAceite.setDataHora(LocalDateTime.now());
         analiseRepo.saveAndFlush(analiseAceite);
 
-        // 3. Criar análise de "Devolução" manualmente
+
         Analise analiseDevolucao = new Analise();
         analiseDevolucao.setSubprocesso(subprocessoRevisao);
         analiseDevolucao.setUnidadeCodigo(unidadeSuperior.getCodigo());
@@ -200,7 +200,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         analiseDevolucao.setDataHora(LocalDateTime.now());
         analiseRepo.saveAndFlush(analiseDevolucao);
 
-        // 4. Simular devolução
+
         Subprocesso sp = subprocessoRepo.findById(subprocessoId).get();
         sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         sp.setDataFimEtapa1(null);
@@ -224,7 +224,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId))
                 .andExpect(status().isOk());
 
-        // 6. Verificar que histórico foi excluído
+
         List<Analise> analisesDepois = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
         assertThat(analisesDepois).isEmpty();
     }

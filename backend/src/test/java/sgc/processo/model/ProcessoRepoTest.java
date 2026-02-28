@@ -56,7 +56,7 @@ class ProcessoRepoTest {
     @Test
     @DisplayName("Deve excluir processos com situação CRIADO")
     void deveExcluirProcessosComSituacaoCriado() {
-        // Arrange
+
         Unidade u1 = criarUnidade("Unidade 1", "U1");
 
         criarProcesso("Processo Criado", SituacaoProcesso.CRIADO, u1);
@@ -64,14 +64,14 @@ class ProcessoRepoTest {
 
         entityManager.flush(); // Ensure Persistence
 
-        // Act
+
         Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 List.of(u1.getCodigo()),
                 SituacaoProcesso.CRIADO,
                 PageRequest.of(0, 10)
         );
 
-        // Assert
+
         assertThat(resultado.getContent())
                 .hasSize(1)
                 .extracting(Processo::getDescricao)
@@ -85,7 +85,7 @@ class ProcessoRepoTest {
     @Test
     @DisplayName("Deve filtrar corretamente por códigos de unidade")
     void deveFiltrarPorCodigosDeUnidade() {
-        // Arrange
+
         Unidade u1 = criarUnidade("Unidade 1", "U1");
         Unidade u2 = criarUnidade("Unidade 2", "U2");
 
@@ -95,14 +95,14 @@ class ProcessoRepoTest {
 
         entityManager.flush();
 
-        // Act
+
         Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 List.of(u1.getCodigo()),
                 SituacaoProcesso.CRIADO,
                 PageRequest.of(0, 10)
         );
 
-        // Assert
+
         assertThat(resultado.getContent())
                 .hasSize(2)
                 .extracting(Processo::getDescricao)
@@ -112,7 +112,7 @@ class ProcessoRepoTest {
     @Test
     @DisplayName("Deve verificar se DISTINCT evita duplicatas")
     void deveVerificarDistinct() {
-        // Arrange
+
         Unidade u1 = criarUnidade("Unidade 1", "U1");
         Unidade u2 = criarUnidade("Unidade 2", "U2");
 
@@ -121,14 +121,14 @@ class ProcessoRepoTest {
 
         entityManager.flush();
 
-        // Act
+
         Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 List.of(u1.getCodigo(), u2.getCodigo()), // Busco por AMBAS
                 SituacaoProcesso.CRIADO,
                 PageRequest.of(0, 10)
         );
 
-        // Assert
+
         assertThat(resultado.getContent())
                 .hasSize(1) // DISTINCT deve garantir apenas 1 resultado
                 .extracting(Processo::getDescricao)
@@ -138,7 +138,7 @@ class ProcessoRepoTest {
     @Test
     @DisplayName("Deve verificar contagem total correta na paginação")
     void deveVerificarContagemPaginacao() {
-        // Arrange
+
         Unidade u1 = criarUnidade("Unidade 1", "U1");
 
         for (int i = 0; i < 5; i++) {
@@ -154,7 +154,7 @@ class ProcessoRepoTest {
                 PageRequest.of(0, 2)
         );
 
-        // Assert
+
         assertThat(resultado.getTotalElements()).isEqualTo(5);
         assertThat(resultado.getTotalPages()).isEqualTo(3);
         assertThat(resultado.getContent()).hasSize(2);
@@ -163,7 +163,7 @@ class ProcessoRepoTest {
     @Test
     @DisplayName("Deve incluir status diferentes do excluído")
     void deveIncluirStatusDiferentes() {
-        // Arrange
+
         Unidade u1 = criarUnidade("Unidade 1", "U1");
 
         criarProcesso("P Finalizado", SituacaoProcesso.FINALIZADO, u1);
@@ -172,14 +172,14 @@ class ProcessoRepoTest {
 
         entityManager.flush();
 
-        // Act
+
         Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 List.of(u1.getCodigo()),
                 SituacaoProcesso.CRIADO,
                 PageRequest.of(0, 10)
         );
 
-        // Assert
+
         assertThat(resultado.getContent())
                 .hasSize(2)
                 .extracting(Processo::getSituacao)

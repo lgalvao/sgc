@@ -34,7 +34,6 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
     private Unidade unidade;
     private Unidade unidadeDestino;
     private Usuario admin;
-    private Processo processo;
     private Subprocesso subprocesso;
 
     @BeforeEach
@@ -53,7 +52,7 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
 
         admin = usuarioRepo.findById("111111111111").orElseThrow();
 
-        processo = Processo.builder()
+        Processo processo = Processo.builder()
                 .descricao("Processo Teste Email")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)

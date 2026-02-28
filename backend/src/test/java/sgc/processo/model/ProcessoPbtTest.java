@@ -12,15 +12,15 @@ class ProcessoPbtTest {
     @Property
     void sincronizarParticipantes_mantemInvariante(@ForAll("conjuntoDeUnidades") Set<Unidade> unidadesIniciais,
                                                    @ForAll("conjuntoDeUnidades") Set<Unidade> novasUnidades) {
-        // Arrange
+
         Processo processo = new Processo();
         processo.setParticipantes(new ArrayList<>()); // Inicializa lista vazia
         processo.adicionarParticipantes(unidadesIniciais);
 
-        // Act
+
         processo.sincronizarParticipantes(novasUnidades);
 
-        // Assert
+
         List<Long> codigosParticipantes = processo.getCodigosParticipantes();
         List<Long> codigosNovasUnidades = novasUnidades.stream()
                 .map(Unidade::getCodigo)

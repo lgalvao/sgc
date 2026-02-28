@@ -143,8 +143,6 @@ describe('CadProcesso.vue Coverage', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        // Trigger initiation to open modal
-        // Call the method directly to avoid issues with disabled button state in test environment
         await (wrapper.vm as any).abrirModalConfirmacao();
         expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
 

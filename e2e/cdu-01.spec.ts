@@ -16,7 +16,6 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         // Usuário 222222 (GESTOR_COORD_11) tem apenas um perfil
         await autenticar(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
 
-        // Verifica que o usuário está logado
         await expect(page.getByText('GESTOR - COORD_11')).toBeVisible();
     });
 
@@ -28,7 +27,6 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
             USUARIOS.ADMIN_2_PERFIS.perfil
         );
 
-        // Verifica que o perfil selecionado está visível
         await expect(page.getByText('ADMIN - ADMIN')).toBeVisible();
     });
 
@@ -38,7 +36,6 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     }) => {
         // Login como ADMIN (191919) via fixture
 
-        // Verifica Barra de Navegação
         await expect(page.getByRole('link', {name: 'SGC'})).toBeVisible();
         await expect(page.getByText('Painel')).toBeVisible();
         await expect(page.getByRole('link', {name: 'Unidades'})).toBeVisible();
@@ -52,22 +49,16 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     }) => {
         // Login como ADMIN (191919)
 
-
-        // Verifica Informações do Usuário
         await expect(page.getByText('ADMIN - ADMIN')).toBeVisible();
 
-        // Verifica Ícone de Configurações de Admin
         await expect(page.getByTestId('btn-configuracoes')).toBeVisible();
 
-        // Verifica Logout
         await expect(page.getByTestId('btn-logout')).toBeVisible();
     });
 
     test('Deve exibir rodapé', async ({page, autenticadoComoAdmin}: { page: Page, autenticadoComoAdmin: void }) => {
         // Login como ADMIN (191919)
 
-
-        // Verifica Rodapé
         await expect(page.getByText('© SESEL/COSIS/TRE-PE')).toBeVisible();
     });
 });

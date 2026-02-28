@@ -185,7 +185,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
             List<Competencia> comps = service.buscarCompetenciasPorCodMapa(1001L);
             assertThat(comps).isNotEmpty();
 
-            Competencia comp = service.buscarCompetenciaPorCodigo(comps.get(0).getCodigo());
+            Competencia comp = service.buscarCompetenciaPorCodigo(comps.getFirst().getCodigo());
             assertThat(comp).isNotNull();
         }
 
@@ -200,7 +200,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
 
             List<Competencia> criadas = service.buscarCompetenciasPorCodMapa(mapa.getCodigo());
             assertThat(criadas).hasSize(1);
-            Competencia novaComp = criadas.get(0);
+            Competencia novaComp = criadas.getFirst();
             assertThat(novaComp.getDescricao()).isEqualTo("Comp Nova");
 
             service.atualizarCompetencia(novaComp.getCodigo(), "Comp Atualizada", List.of(a1.getCodigo()));
@@ -244,7 +244,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
 
             List<Conhecimento> conhecs = service.listarConhecimentosPorAtividade(atividade.getCodigo());
             assertThat(conhecs).hasSize(1);
-            assertThat(conhecs.get(0).getDescricao()).isEqualTo("Conhec Atualizado");
+            assertThat(conhecs.getFirst().getDescricao()).isEqualTo("Conhec Atualizado");
 
             service.excluirConhecimento(atividade.getCodigo(), c1.getCodigo());
 

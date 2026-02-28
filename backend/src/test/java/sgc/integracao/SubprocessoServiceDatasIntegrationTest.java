@@ -25,13 +25,12 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private MapaRepo mapaRepo;
 
-    private Unidade unidade;
     private Processo processo;
     private Subprocesso subprocesso;
 
     @BeforeEach
     void setUp() {
-        unidade = UnidadeFixture.unidadePadrao();
+        Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_DAT");
         unidade = unidadeRepo.save(unidade);

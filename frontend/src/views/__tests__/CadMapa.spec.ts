@@ -419,8 +419,6 @@ describe("CadMapa.vue", () => {
         const textarea = wrapper.find('[data-testid="inp-criar-competencia-descricao"]');
         await textarea.setValue("Nova Competencia Teste");
 
-        // The mock template has the button that emits salvar.
-        // We simulate the flow.
         await wrapper
             .find('[data-testid="btn-criar-competencia-salvar"]')
             .trigger("click");
@@ -679,15 +677,6 @@ describe("CadMapa.vue", () => {
         await flushPromises();
         const errorAlert = wrapper.findComponent({name: 'ErrorAlert'});
         await errorAlert.vm.$emit('dismiss');
-        // Check if store state for erro is cleared via action
-        // Note: MapasStore does not have a clearError action exposed directly that clears 'erro' state
-        // in the implementation provided in previous turn, it has 'erro' ref and actions clear it on start.
-        // BUT the test expects mapsStore.clearError() to be called.
-        // Let's check mapsStore implementation:
-        // "const erro = ref<string | null>(null);"
-        // It DOES NOT export clearError function in the previous turn's implementation of useMapasStore.
-        // However, useErrorHandler composable might provide it?
-        // Wait, the store implementation I wrote:
         /*
         return {
             ...
@@ -695,9 +684,6 @@ describe("CadMapa.vue", () => {
             ...
         };
         */
-        // It seems I missed re-exporting clearError or similar mechanism if the component relies on it.
-        // The component calls `mapasStore.clearError()`.
-        // I should add `clearError` to the returned object in `useMapasStore`.
     });
 
     it('removerAtividadeAssociada lida com atividades nulas', async () => {

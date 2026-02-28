@@ -206,7 +206,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve retornar NotFound ao obter atividade inexistente")
         void deveRetornarNotFoundAoObterAtividadeInexistente() throws Exception {
-            // Pattern 2: Testing error branch
+
             Mockito.when(atividadeFacade.obterAtividadePorId(999L))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
 
@@ -220,7 +220,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve retornar NotFound ao excluir atividade inexistente")
         void deveRetornarNotFoundAoExcluirAtividadeInexistente() throws Exception {
-            // Pattern 2: Testing error branch
+
             Mockito.when(atividadeFacade.excluirAtividade(999L))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
 
@@ -235,7 +235,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve retornar NotFound ao atualizar atividade inexistente")
         void deveRetornarNotFoundAoAtualizarAtividadeInexistente() throws Exception {
-            // Pattern 2: Testing error branch
+
             Mockito.when(atividadeFacade.atualizarAtividade(eq(999L), any()))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
 
@@ -252,7 +252,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve retornar NotFound ao excluir conhecimento de atividade inexistente")
         void deveRetornarNotFoundAoExcluirConhecimentoDeAtividadeInexistente() throws Exception {
-            // Pattern 2: Testing error branch
+
             Mockito.when(atividadeFacade.excluirConhecimento(999L, 2L))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
 

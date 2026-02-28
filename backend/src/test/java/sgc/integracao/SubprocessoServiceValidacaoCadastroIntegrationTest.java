@@ -32,18 +32,16 @@ class SubprocessoServiceValidacaoCadastroIntegrationTest extends BaseIntegration
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
 
-    private Unidade unidade;
-    private Processo processo;
     private Subprocesso subprocesso;
 
     @BeforeEach
     void setUp() {
-        unidade = UnidadeFixture.unidadePadrao();
+        Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_VAL_CAD");
         unidade = unidadeRepo.save(unidade);
 
-        processo = Processo.builder()
+        Processo processo = Processo.builder()
                 .descricao("Processo Teste")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
@@ -70,7 +68,7 @@ class SubprocessoServiceValidacaoCadastroIntegrationTest extends BaseIntegration
         ValidacaoCadastroDto dto = subprocessoService.validarCadastro(subprocesso.getCodigo());
         assertThat(dto.valido()).isFalse();
         assertThat(dto.erros()).hasSize(1);
-        assertThat(dto.erros().get(0).tipo()).isEqualTo("SEM_ATIVIDADES");
+        assertThat(dto.erros().getFirst().tipo()).isEqualTo("SEM_ATIVIDADES");
     }
 
     @Test
@@ -82,8 +80,8 @@ class SubprocessoServiceValidacaoCadastroIntegrationTest extends BaseIntegration
         ValidacaoCadastroDto dto = subprocessoService.validarCadastro(subprocesso.getCodigo());
         assertThat(dto.valido()).isFalse();
         assertThat(dto.erros()).hasSize(1);
-        assertThat(dto.erros().get(0).tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
-        assertThat(dto.erros().get(0).atividadeCodigo()).isEqualTo(a.getCodigo());
+        assertThat(dto.erros().getFirst().tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
+        assertThat(dto.erros().getFirst().atividadeCodigo()).isEqualTo(a.getCodigo());
     }
 
     @Test

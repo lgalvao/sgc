@@ -184,7 +184,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve falhar ao tentar autorizar com usuário não autenticado")
         void testAutorizar_falhaUsuarioNaoAutenticado() throws Exception {
-            // Arrange
+
             String tituloEleitoral = "888888888888"; // Usuário inexistente
 
             // Não realizamos a autenticação prévia para simular um usuário não autenticado.
@@ -205,7 +205,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve falhar ao tentar entrar com unidade inexistente")
         void testEntrar_falhaUnidadeInexistente() throws Exception {
-            // Arrange
+
             String tituloEleitoral = usuarioAdmin.getTituloEleitoral();
             long codigoUnidadeInexistente = 999999L;
 

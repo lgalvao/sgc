@@ -51,7 +51,7 @@ class AlertaFacadeTest {
         @Test
         @DisplayName("Deve criar alerta com sucesso")
         void deveCriarAlertaComSucesso() {
-            // Given
+
             criarUnidadeRaizMock();
             Processo p = new Processo();
             Unidade u = new Unidade();
@@ -61,10 +61,10 @@ class AlertaFacadeTest {
             alertaSalvo.setCodigo(100L);
             when(alertaService.salvar(any())).thenReturn(alertaSalvo);
 
-            // When
+
             Alerta resultado = service.criarAlertaAdmin(p, u, "desc");
 
-            // Then
+
             assertThat(resultado).isNotNull();
             verify(alertaService).salvar(any());
         }
@@ -76,7 +76,7 @@ class AlertaFacadeTest {
         @Test
         @DisplayName("Deve criar alerta operacional com texto fixo")
         void deveCriarAlertaOperacional() {
-            // Given
+
             criarUnidadeRaizMock();
             Processo p = new Processo();
             p.setDescricao("Proc");
@@ -86,17 +86,17 @@ class AlertaFacadeTest {
 
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
-            // When
+
             service.criarAlertasProcessoIniciado(p, List.of(u));
 
-            // Then
+
             verify(alertaService).salvar(argThat(a -> "Início do processo".equals(a.getDescricao())));
         }
 
         @Test
         @DisplayName("Deve criar 2 alertas para interoperacional participante")
         void deveCriarDoisAlertasInteroperacional() {
-            // Given
+
             criarUnidadeRaizMock();
             Processo p = new Processo();
             Unidade u = Unidade.builder().tipo(TipoUnidade.INTEROPERACIONAL).build();
@@ -104,10 +104,10 @@ class AlertaFacadeTest {
 
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
-            // When
+
             List<Alerta> resultado = service.criarAlertasProcessoIniciado(p, List.of(u));
 
-            // Then
+
             assertThat(resultado).hasSize(2);
             verify(alertaService, times(2)).salvar(any());
         }
@@ -119,7 +119,7 @@ class AlertaFacadeTest {
         @Test
         @DisplayName("Deve criar alerta de cadastro disponibilizado com sucesso")
         void deveCriarAlertaCadastroDisponibilizado() {
-            // Given
+
             Processo p = new Processo();
             p.setDescricao("P");
             Unidade uOrigem = new Unidade();
@@ -128,17 +128,17 @@ class AlertaFacadeTest {
 
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
-            // When
+
             service.criarAlertaCadastroDisponibilizado(p, uOrigem, uDestino);
 
-            // Then
+
             verify(alertaService).salvar(any());
         }
 
         @Test
         @DisplayName("Deve criar alerta de cadastro devolvido com sucesso")
         void deveCriarAlertaCadastroDevolvido() {
-            // Given
+
             criarUnidadeRaizMock();
             Processo p = new Processo();
             p.setDescricao("P");
@@ -146,10 +146,10 @@ class AlertaFacadeTest {
 
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
-            // When
+
             service.criarAlertaCadastroDevolvido(p, uDestino, "motivo");
 
-            // Then
+
             verify(alertaService).salvar(any());
         }
 
@@ -205,7 +205,7 @@ class AlertaFacadeTest {
         @Test
         @DisplayName("Deve listar alertas com sucesso")
         void deveListarAlertas() {
-            // Given
+
             String usuarioTitulo = "123";
             Long codUnidade = 1L;
 
@@ -223,10 +223,10 @@ class AlertaFacadeTest {
             when(alertaService.porUnidadeDestino(codUnidade)).thenReturn(List.of(alerta));
             when(alertaService.alertasUsuarios(eq(usuarioTitulo), anyList())).thenReturn(List.of());
 
-            // When
+
             List<Alerta> resultado = service.alertasPorUsuario(usuarioTitulo);
 
-            // Then
+
             assertThat(resultado).hasSize(1);
             assertThat(resultado.getFirst().getCodigo()).isEqualTo(100L);
             // Não deve salvar pois listar agora é somente leitura
@@ -236,7 +236,7 @@ class AlertaFacadeTest {
         @Test
         @DisplayName("Deve listar com dataHoraLeitura se AlertaUsuario existente")
         void deveListarComDataHoraLeitura() {
-            // Given
+
             String usuarioTitulo = "123";
             Long codUnidade = 1L;
 
@@ -259,10 +259,10 @@ class AlertaFacadeTest {
             when(alertaService.porUnidadeDestino(codUnidade)).thenReturn(List.of(alerta));
             when(alertaService.alertasUsuarios(eq(usuarioTitulo), anyList())).thenReturn(List.of(alertaUsuarioExistente));
 
-            // When
+
             List<Alerta> resultado = service.alertasPorUsuario(usuarioTitulo);
 
-            // Then
+
             assertThat(resultado).hasSize(1);
             assertThat(resultado.getFirst().getDataHoraLeitura()).isNotNull();
             verify(alertaService, never()).salvarAlertaUsuario(any());

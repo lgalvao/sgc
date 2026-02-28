@@ -52,7 +52,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     void setup() {
         // Setup Programático - Não depende do data.sql
 
-        // 1. Criar Unidades (Hierarquia)
+
         // Raiz
         unidadeRaiz = UnidadeFixture.unidadePadrao();
         unidadeRaiz.setCodigo(null); // Auto-increment
@@ -73,7 +73,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         unidadeFilha2.setUnidadeSuperior(unidadeRaiz);
         unidadeFilha2 = unidadeRepo.save(unidadeFilha2);
 
-        // 2. Criar Processos e Vincular a Unidades
+
 
         processoRaiz = ProcessoFixture.processoEmAndamento();
         processoRaiz.setCodigo(null);
@@ -186,7 +186,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         void testListarProcessosNaoAdminNaoVeProcessosCriados() throws Exception {
             setupSecurityContext("99003", unidadeRaiz, GESTOR);
 
-            // Vamos replicar o cenário: Processo Criado numa unidade FILHA.
             Processo processoCriadoFilha = ProcessoFixture.processoPadrao();
             processoCriadoFilha.setCodigo(null);
             processoCriadoFilha.setDescricao("Processo Criado Filha");

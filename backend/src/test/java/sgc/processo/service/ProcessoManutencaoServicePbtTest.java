@@ -65,10 +65,10 @@ class ProcessoManutencaoServicePbtTest {
         when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
         when(processoRepo.saveAndFlush(any(Processo.class))).thenAnswer(i -> i.getArgument(0));
 
-        // Act
+
         service.criar(req);
 
-        // Assert
+
         verify(processoRepo).saveAndFlush(any(Processo.class));
     }
 

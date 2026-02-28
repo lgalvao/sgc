@@ -30,7 +30,7 @@ class CopiaMapaServiceCoverageTest {
     @Test
     @DisplayName("copiarMapaParaUnidade deve lidar com atividade não encontrada no mapa de destino")
     void deveLidarComAtividadeNaoEncontrada() {
-        // Arrange
+
         Long codMapaOrigem = 1L;
         Mapa fonte = new Mapa();
         fonte.setCodigo(codMapaOrigem);
@@ -54,17 +54,17 @@ class CopiaMapaServiceCoverageTest {
 
         when(competenciaRepo.findByMapa_Codigo(codMapaOrigem)).thenReturn(List.of(compFonte));
 
-        // Act
+
         service.copiarMapaParaUnidade(codMapaOrigem);
 
-        // Assert
+
         verify(competenciaRepo).saveAll(anyList());
     }
 
     @Test
     @DisplayName("importarAtividadesDeOutroMapa deve importar atividades que não existem no destino")
     void deveImportarAtividadesNaoExistentes() {
-        // Arrange
+
         Long mapaOrigemId = 1L;
         Long mapaDestinoId = 2L;
 
@@ -77,17 +77,17 @@ class CopiaMapaServiceCoverageTest {
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of()); // Destino vazio
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
 
-        // Act
+
         service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId);
 
-        // Assert
+
         verify(atividadeRepo).saveAll(anyList());
     }
 
     @Test
     @DisplayName("importarAtividadesDeOutroMapa não deve importar atividades com descrição já existente")
     void naoDeveImportarAtividadesExistentes() {
-        // Arrange
+
         Long mapaOrigemId = 1L;
         Long mapaDestinoId = 2L;
 
@@ -98,10 +98,10 @@ class CopiaMapaServiceCoverageTest {
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of(ativDestino));
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
 
-        // Act
+
         service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId);
 
-        // Assert
+
         verify(atividadeRepo, never()).saveAll(anyList());
     }
 }

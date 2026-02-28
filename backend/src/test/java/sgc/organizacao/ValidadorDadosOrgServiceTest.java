@@ -57,7 +57,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve validar com sucesso quando todos os dados estão corretos")
         void deveValidarComSucesso() {
-            // Arrange
+
             Unidade u1 = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             Usuario titular = criarUsuarioValido("TITULO_1");
 
@@ -71,7 +71,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve ignorar unidades inativas")
         void deveIgnorarUnidadesInativas() {
-            // Arrange
+
             // Como o repositório agora filtra por situação ATIVA no banco,
             // unidades inativas não seriam retornadas pelo método simulado.
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of());
@@ -83,7 +83,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve ignorar unidades SEM_EQUIPE e RAIZ")
         void deveIgnorarUnidadesNaoParticipantes() {
-            // Arrange
+
             // Como o repositório agora filtra por tipo participante no banco,
             // unidades SEM_EQUIPE e RAIZ não seriam retornadas.
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of());
@@ -95,7 +95,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve validar intermediária com subordinadas")
         void deveValidarIntermediariaComSubordinadas() {
-            // Arrange
+
             Unidade pai = criarUnidadeValida(1L, "PAI", TipoUnidade.INTERMEDIARIA);
             Unidade filha = criarUnidadeValida(2L, "FILHA", TipoUnidade.OPERACIONAL);
             filha.setUnidadeSuperior(pai);
@@ -114,7 +114,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve lidar com lista de unidades sem titulares (não quebra e não gera erro na busca de usuarios, mas detecta violação)")
         void deveLidarComListaDeTitulosVazia() {
-            // Arrange
+
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             u.setTituloTitular(""); // Sem titular
 
@@ -129,7 +129,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve lidar com duplicidade de usuários (merge function coverage)")
         void deveLidarComDuplicidadeUsuarios() {
-            // Arrange
+
             Unidade u1 = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             Usuario titular1 = criarUsuarioValido("TITULO_1");
             Usuario titular2 = criarUsuarioValido("TITULO_1"); // Duplicado
@@ -150,7 +150,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve falhar quando unidade não tem titular")
         void deveFalharSemTitular() {
-            // Arrange
+
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             u.setTituloTitular("");
 
@@ -165,7 +165,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve falhar quando titular não existe na base de usuários")
         void deveFalharTitularNaoEncontrado() {
-            // Arrange
+
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
 
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u));
@@ -180,7 +180,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve falhar quando titular tem email em branco")
         void deveFailharTitularEmailEmBranco() {
-            // Arrange
+
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             Usuario titular = criarUsuarioValido("TITULO_1");
             titular.setEmail("   ");
@@ -196,7 +196,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve falhar quando intermediária não tem subordinadas")
         void deveFalharIntermediariaSemSubordinadas() {
-            // Arrange
+
             Unidade intermediaria = criarUnidadeValida(1L, "INT", TipoUnidade.INTERMEDIARIA);
             Usuario titular = criarUsuarioValido("TITULO_1");
 
@@ -212,7 +212,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve ignorar unidade sem titular no loop de validação de emails")
         void deveIgnorarUnidadeSemTitularNoLoopDeEmail() {
-            // Arrange
+
             Unidade semTitular = criarUnidadeValida(2L, "SEM", TipoUnidade.OPERACIONAL);
             semTitular.setTituloTitular("");
 
@@ -240,7 +240,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve falhar com título vazio")
         void deveFalharComTituloNulo() {
-            // Arrange
+
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             u.setTituloTitular("");
 
@@ -255,7 +255,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve limitar mensagem de erro quando houver muitas violações")
         void deveGerarExceptionComMuitasViolacoes() {
-            // Arrange
+
             List<Unidade> unidades = new ArrayList<>();
             for (long i = 1; i <= 4; i++) {
                 Unidade u = criarUnidadeValida(i, "U" + i, TipoUnidade.OPERACIONAL);
@@ -277,7 +277,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve falhar quando responsabilidade tem usuário em branco")
         void deveFalharResponsabilidadeUsuarioEmBranco() {
-            // Arrange
+
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             Usuario titular = criarUsuarioValido("TITULO_1");
 
@@ -295,7 +295,7 @@ class ValidadorDadosOrgServiceTest {
         @Test
         @DisplayName("Deve falhar quando responsabilidade é nula")
         void deveFalharResponsabilidadeNula() {
-            // Arrange
+
             Unidade u = criarUnidadeValida(1L, "U1", TipoUnidade.OPERACIONAL);
             Usuario titular = criarUsuarioValido("TITULO_1");
 

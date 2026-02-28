@@ -128,7 +128,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve devolver cadastro, registrar análise corretamente e alterar situação")
     void devolverCadastro_deveFuncionarCorretamente() throws Exception {
-        // Given
+
         Usuario gestor = usuarioRepo.findById("132313231323").orElseThrow();
         gestor.setPerfilAtivo(Perfil.GESTOR);
         gestor.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo());
@@ -137,7 +137,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         String observacoes = "Favor revisar a atividade X e Y.";
         JustificativaRequest requestBody = new JustificativaRequest(observacoes);
 
-        // When
+
         mockMvc.perform(
                         post(
                                 "/api/subprocessos/{id}/devolver-cadastro",
@@ -148,7 +148,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk());
 
-        // Then
+
         entityManager.flush();
         entityManager.clear();
 
@@ -252,9 +252,6 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         assertThat(movimentacoes).hasSize(2);
         Movimentacao movimentacaoHomologacao = movimentacoes.getFirst();
 
-        // O sistema (MockAdmin) parece usar uma unidade chamada ADMIN.
-        // Para não quebrar o teste, vamos aceitar ADMIN ou COSIS-TEST
-        // (unidadeSuperior).
         String siglaOrigem = movimentacaoHomologacao.getUnidadeOrigem().getSigla();
         assertThat(siglaOrigem).isIn("ADMIN", unidadeSuperior.getSigla());
     }

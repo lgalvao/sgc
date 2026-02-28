@@ -35,7 +35,7 @@ class PainelServiceIntegrationTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Admin deve ver processo de revisão recém-criado na listagem")
         void deveVerProcessoRevisaoNaListagem() {
-            // Arrange: Criar processo de mapeamento
+
             CriarProcessoRequest reqMapeamento = new CriarProcessoRequest(
                     "Processo Mapeamento Teste",
                     TipoProcesso.MAPEAMENTO,
@@ -44,7 +44,7 @@ class PainelServiceIntegrationTest {
             );
             processoFacade.criar(reqMapeamento);
 
-            // Arrange: Criar processo de revisão
+
             CriarProcessoRequest reqRevisao = new CriarProcessoRequest(
                     "Processo Revisão Teste",
                     TipoProcesso.REVISAO,
@@ -54,14 +54,14 @@ class PainelServiceIntegrationTest {
             Processo processoRevisao = processoFacade.criar(reqRevisao);
             Long codigoProcessoRevisao = processoRevisao.getCodigo();
 
-            // Act: Listar processos como ADMIN
+
             Page<ProcessoResumoDto> processos = painelService.listarProcessos(
                     Perfil.ADMIN,
                     null,
                     PageRequest.of(0, 20) // Página 0, 20 itens por página
             );
 
-            // Assert: Verificar que o processo de revisão está na lista
+
             List<ProcessoResumoDto> listaProcessos = processos.getContent();
 
             // Verificar que existe pelo menos um processo com a descrição esperada
@@ -91,7 +91,7 @@ class PainelServiceIntegrationTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Paginação deve incluir todos os processos quando tamanho da página é suficiente")
         void deveIncluirTodosProcessosNaPaginacao() {
-            // Arrange: Criar múltiplos processos
+
             for (int i = 1; i <= 5; i++) {
                 CriarProcessoRequest req = new CriarProcessoRequest(
                         "Processo Teste " + i,
@@ -102,14 +102,14 @@ class PainelServiceIntegrationTest {
                 processoFacade.criar(req);
             }
 
-            // Act: Listar processos com página grande o suficiente
+
             Page<ProcessoResumoDto> processos = painelService.listarProcessos(
                     Perfil.ADMIN,
                     null,
                     PageRequest.of(0, 50) // Página grande
             );
 
-            // Assert: Verificar que todos os 5 processos criados estão na lista
+
             // (Mais os 2 processos seed do banco)
             assertThat(processos.getTotalElements())
                     .withFailMessage("Total de processos incorreto")
@@ -120,7 +120,7 @@ class PainelServiceIntegrationTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar links corretos quando existem processos finalizados e em andamento")
         void deveRetornarLinksCorretosComMixDeProcessos() {
-            // Arrange: Simular o Processo 99 (Finalizado)
+
             CriarProcessoRequest reqSeedLike = new CriarProcessoRequest(
                     "Processo Like",
                     TipoProcesso.MAPEAMENTO,
@@ -138,7 +138,7 @@ class PainelServiceIntegrationTest {
             );
             Processo processoRevisao = processoFacade.criar(reqRevisao);
 
-            // Act: Buscar processos
+
             Page<ProcessoResumoDto> page = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 50));
             List<ProcessoResumoDto> lista = page.getContent();
 
@@ -150,7 +150,7 @@ class PainelServiceIntegrationTest {
                     .filter(p -> p.codigo().equals(processoRevisao.getCodigo()))
                     .findFirst().orElseThrow();
 
-            // Assert: Links devem corresponder aos seus IDs
+
             assertThat(dtoSeed.linkDestino()).contains(processoSeed.getCodigo().toString());
             assertThat(dtoRevisao.linkDestino()).contains(processoRevisao.getCodigo().toString());
 

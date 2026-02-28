@@ -93,7 +93,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve homologar validação de mapas em bloco")
     @WithMockAdmin
     void homologarValidacaoEmBloco_deveHomologarSucesso() throws Exception {
-        // Given
+
         Long codigoContexto = processo.getCodigo();
         List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
@@ -125,7 +125,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
                 .subprocessos(subprocessosSelecionados)
                 .build();
 
-        // When
+
         mockMvc.perform(
                         post("/api/subprocessos/{id}/homologar-validacao-bloco", codigoContexto)
                                 .with(csrf())
@@ -133,7 +133,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        // Then
+
         entityManager.flush();
         entityManager.clear();
 

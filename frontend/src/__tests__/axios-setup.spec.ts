@@ -181,9 +181,6 @@ describe("axios-setup", () => {
         expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", expect.stringContaining("Generic failure"), "danger", 60000);
     });
 
-    // Keeping this test but I need to update axios-setup.ts to handle the exception if I want it to pass.
-    // Or I can update expectation if I don't want to swallow the error.
-    // I'll update axios-setup.ts to swallow the error.
     it("interceptor de erro de resposta deve tratar erros da store graciosamente", async () => {
         const feedbackStore = useFeedbackStore();
         // Simular erro ao chamar show

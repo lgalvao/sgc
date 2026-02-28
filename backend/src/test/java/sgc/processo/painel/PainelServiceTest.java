@@ -239,7 +239,7 @@ class PainelServiceTest {
             alerta.setDescricao("Alerta teste");
             alerta.setDataHora(LocalDateTime.now());
 
-            // Setup obrigatorio para evitar NPE
+
             Processo p = new Processo();
             p.setCodigo(123L);
             alerta.setProcesso(p);

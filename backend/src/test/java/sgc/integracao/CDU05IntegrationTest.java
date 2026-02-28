@@ -43,13 +43,11 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
     private Unidade unidade;
     private Mapa mapaOriginal;
     private Competencia competenciaOriginal;
-    private Atividade atividadeOriginal;
-    private Conhecimento conhecimentoOriginal;
 
     @BeforeEach
     void setUp() {
 
-        // 1. Criar unidade
+
         unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("U_REV");
@@ -66,13 +64,13 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                 .build();
         competenciaRepo.save(competenciaOriginal);
 
-        atividadeOriginal = Atividade.builder()
+        Atividade atividadeOriginal = Atividade.builder()
                 .mapa(mapaOriginal)
                 .descricao("Atividade Original")
                 .build();
         atividadeRepo.save(atividadeOriginal);
 
-        conhecimentoOriginal = Conhecimento.builder()
+        Conhecimento conhecimentoOriginal = Conhecimento.builder()
                 .descricao("Conhecimento Original")
                 .atividade(atividadeOriginal)
                 .build();
@@ -92,7 +90,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testIniciarProcessoRevisao_sucesso() throws Exception {
-        // 1. Criar hierarquia de unidades
+
         Unidade unidadeSuperior = UnidadeFixture.unidadePadrao();
         unidadeSuperior.setCodigo(null);
         unidadeSuperior.setSigla("U_SUP");
@@ -107,7 +105,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         mapaOriginal.setObservacoesDisponibilizacao("Observações Legadas");
         mapaRepo.save(mapaOriginal);
 
-        // 2. Criar um processo de revisão para ser iniciado
+
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidade.getCodigo());
         CriarProcessoRequest criarRequestDTO = criarCriarProcessoReq("Processo de Revisão para Iniciar",
@@ -132,13 +130,13 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                         .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
-        // 4. Buscar o processo e verificar snapshot da hierarquia (Passo 7)
+
         Processo processo = processoRepo.findByIdComParticipantes(processoId).orElseThrow();
         assertThat(processo.getParticipantes()).hasSize(2); // Unidade alvo + Unidade Superior
-        assertThat(processo.getParticipantes().stream().map(up -> up.getSigla()).toList())
+        assertThat(processo.getParticipantes().stream().map(UnidadeProcesso::getSigla).toList())
                 .containsExactlyInAnyOrder("U_REV", "U_SUP");
 
-        // 5. Buscar o subprocesso criado e verificar a cópia do mapa
+
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processoId);
         assertThat(subprocessos).hasSize(1);
         Subprocesso subprocessoCriado = subprocessos.getFirst();
@@ -158,7 +156,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         assertThat(competenciasCopiadas.getFirst().getDescricao())
                 .isEqualTo(competenciaOriginal.getDescricao());
 
-        // 6. Verificar movimentação (Passo 11)
+
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigo(subprocessoCriado.getCodigo());
         assertThat(movs).hasSize(1);
         assertThat(movs.getFirst().getDescricao()).isEqualTo("Processo iniciado");
@@ -166,7 +164,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testIniciarProcessoRevisao_unidadeSemMapaVigente_falha() throws Exception {
-        // 1. Criar unidade SEM mapa vigente
+
         Unidade unidadeSemMapa = UnidadeFixture.unidadePadrao();
         unidadeSemMapa.setCodigo(null);
         unidadeSemMapa.setSigla("U_SEM_MAPA");
@@ -199,7 +197,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testIniciarProcessoRevisao_processoJaIniciado_falha() throws Exception {
-        // 1. Criar e iniciar um processo de revisão
+
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidade.getCodigo());
         CriarProcessoRequest criarRequestDTO = criarCriarProcessoReq(
@@ -224,7 +222,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                         .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
-        // 2. Tentar iniciar o processo novamente
+
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)

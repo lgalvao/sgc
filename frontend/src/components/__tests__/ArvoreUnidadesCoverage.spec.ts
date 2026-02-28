@@ -69,18 +69,8 @@ describe("ArvoreUnidades.vue Coverage", () => {
         // Update modelValue with same values (different reference)
         await wrapper.setProps({modelValue: [1]});
 
-        // Reference should ideally stay the same if logic checks equality
-        // But watch creates a new array: `unidadesSelecionadasLocal.value = [...novoValor];` if strings differ.
-        // `JSON.stringify([1])` === `JSON.stringify([1])`. So it should NOT update.
 
-        // However, `unidadesSelecionadasLocal` is a ref.
-        // If it is NOT updated, the ref value remains the same array instance (if it was initialized with one).
-        // Wait, `ref([...props.modelValue])`.
-        // If I update prop, check if `unidadesSelecionadasLocal` changed.
 
-        // Let's spy on the setter or just check behavior.
-        // Or checking coverage is enough.
-        // The branch `if (JSON.stringify(...) !== ...)` is what we want to hit (false case).
 
         // The test above hit the true case.
         // This test hits the false case.

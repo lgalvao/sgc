@@ -24,14 +24,14 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve criar processo com Builder (setando código manualmente)")
         void deveCriarProcessoComBuilderCompleto() {
-            // Arrange
+
             Long codigo = 1L;
             String descricao = "Processo Teste";
             TipoProcesso tipo = TipoProcesso.MAPEAMENTO;
             SituacaoProcesso situacao = SituacaoProcesso.CRIADO;
             LocalDateTime dataCriacao = LocalDateTime.now();
 
-            // Act
+
             Processo novoProcesso = Processo.builder()
                     .descricao(descricao)
                     .tipo(tipo)
@@ -40,7 +40,7 @@ class ProcessoTest {
                     .build();
             novoProcesso.setCodigo(codigo);
 
-            // Assert
+
             assertThat(novoProcesso.getCodigo()).isEqualTo(codigo);
             assertThat(novoProcesso.getDescricao()).isEqualTo(descricao);
             assertThat(novoProcesso.getTipo()).isEqualTo(tipo);
@@ -51,13 +51,13 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve criar processo com Builder (sem código)")
         void deveCriarProcessoComBuilderParcial() {
-            // Arrange
+
             String descricao = "Processo Novo";
             TipoProcesso tipo = TipoProcesso.REVISAO;
             SituacaoProcesso situacao = SituacaoProcesso.CRIADO;
             LocalDateTime dataLimite = LocalDateTime.now().plusDays(30);
 
-            // Act
+
             Processo novoProcesso = Processo.builder()
                     .descricao(descricao)
                     .tipo(tipo)
@@ -65,7 +65,7 @@ class ProcessoTest {
                     .dataLimite(dataLimite)
                     .build();
 
-            // Assert
+
             assertThat(novoProcesso.getDescricao()).isEqualTo(descricao);
             assertThat(novoProcesso.getTipo()).isEqualTo(tipo);
             assertThat(novoProcesso.getSituacao()).isEqualTo(situacao);
@@ -76,7 +76,7 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve criar processo com Builder AllArgs")
         void deveCriarProcessoComBuilderAllArgs() {
-            // Arrange
+
             LocalDateTime dataCriacao = LocalDateTime.now();
             LocalDateTime dataFinalizacao = LocalDateTime.now().plusDays(10);
             LocalDateTime dataLimite = LocalDateTime.now().plusDays(5);
@@ -85,7 +85,7 @@ class ProcessoTest {
             TipoProcesso tipo = TipoProcesso.MAPEAMENTO;
             List<UnidadeProcesso> participantes = new ArrayList<>();
 
-            // Act
+
             Processo novoProcesso = Processo.builder()
                     .dataCriacao(dataCriacao)
                     .dataFinalizacao(dataFinalizacao)
@@ -96,7 +96,7 @@ class ProcessoTest {
                     .participantes(participantes)
                     .build();
 
-            // Assert
+
             assertThat(novoProcesso.getDataCriacao()).isEqualTo(dataCriacao);
             assertThat(novoProcesso.getDataFinalizacao()).isEqualTo(dataFinalizacao);
             assertThat(novoProcesso.getDataLimite()).isEqualTo(dataLimite);
@@ -114,10 +114,10 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve inicializar participantes como lista vazia")
         void deveInicializarParticipantesComoListaVazia() {
-            // Act
+
             List<UnidadeProcesso> participantes = processo.getParticipantes();
 
-            // Assert
+
             assertThat(participantes)
                     .isNotNull()
                     .isEmpty();
@@ -126,7 +126,7 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve adicionar unidades participantes (criando snapshots)")
         void deveAdicionarUnidadesParticipantes() {
-            // Arrange
+
             Unidade unidade1 = UnidadeFixture.unidadePadrao();
             unidade1.setCodigo(1L);
             unidade1.setNome("Unidade 1");
@@ -135,11 +135,11 @@ class ProcessoTest {
             unidade2.setCodigo(2L);
             unidade2.setNome("Unidade 2");
 
-            // Act
+
             processo.adicionarParticipantes(Set.of(unidade1));
             processo.adicionarParticipantes(Set.of(unidade2));
 
-            // Assert
+
             assertThat(processo.getParticipantes()).hasSize(2);
             assertThat(processo.getParticipantes())
                     .extracting(UnidadeProcesso::getUnidadeCodigo)
@@ -152,7 +152,7 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve substituir lista de participantes")
         void deveSubstituirListaDeParticipantes() {
-            // Arrange
+
             List<UnidadeProcesso> novosParticipantes = new ArrayList<>();
             Unidade unidade = UnidadeFixture.unidadePadrao();
             unidade.setCodigo(1L);
@@ -161,10 +161,10 @@ class ProcessoTest {
             UnidadeProcesso snapshot = UnidadeProcesso.criarSnapshot(processo, unidade);
             novosParticipantes.add(snapshot);
 
-            // Act
+
             processo.setParticipantes(novosParticipantes);
 
-            // Assert
+
             assertThat(processo.getParticipantes())
                     .isEqualTo(novosParticipantes)
                     .hasSize(1);
@@ -177,13 +177,13 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve configurar data de criação")
         void deveConfigurarDataDeCriacao() {
-            // Arrange
+
             LocalDateTime dataCriacao = LocalDateTime.now();
 
-            // Act
+
             processo.setDataCriacao(dataCriacao);
 
-            // Assert
+
             assertThat(processo.getDataCriacao())
                     .isNotNull()
                     .isEqualTo(dataCriacao);
@@ -192,26 +192,26 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve configurar data de finalização")
         void deveConfigurarDataDeFinalizacao() {
-            // Arrange
+
             LocalDateTime dataFinalizacao = LocalDateTime.now().plusDays(30);
 
-            // Act
+
             processo.setDataFinalizacao(dataFinalizacao);
 
-            // Assert
+
             assertThat(processo.getDataFinalizacao()).isEqualTo(dataFinalizacao);
         }
 
         @Test
         @DisplayName("Deve configurar data limite")
         void deveConfigurarDataLimite() {
-            // Arrange
+
             LocalDateTime dataLimite = LocalDateTime.now().plusDays(15);
 
-            // Act
+
             processo.setDataLimite(dataLimite);
 
-            // Assert
+
             assertThat(processo.getDataLimite())
                     .isEqualTo(dataLimite);
         }
@@ -223,20 +223,20 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve configurar situação do processo")
         void deveConfigurarSituacaoDoProcesso() {
-            // Act
+
             processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-            // Assert
+
             assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
         }
 
         @Test
         @DisplayName("Deve configurar tipo do processo")
         void deveConfigurarTipoDoProcesso() {
-            // Act
+
             processo.setTipo(TipoProcesso.REVISAO);
 
-            // Assert
+
             assertThat(processo.getTipo()).isEqualTo(TipoProcesso.REVISAO);
         }
 
@@ -267,13 +267,13 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve configurar descrição do processo")
         void deveConfigurarDescricaoDoProcesso() {
-            // Arrange
+
             String descricao = "Mapeamento de Competências 2024";
 
-            // Act
+
             processo.setDescricao(descricao);
 
-            // Assert
+
             assertThat(processo.getDescricao()).isEqualTo(descricao);
         }
     }

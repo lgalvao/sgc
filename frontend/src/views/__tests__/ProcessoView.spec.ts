@@ -565,8 +565,6 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         processosStore.finalizarProcesso.mockRejectedValue(new Error("Erro original"));
-        // Mock lastError is usually reactive, but in testing-pinia with stubActions:true it's just a ref if we want
-        // But here we just set it on the mock store
         processosStore.lastError = {message: "Erro customizado da store"};
 
         const acoes = wrapper.findComponent(ProcessoAcoesStub);

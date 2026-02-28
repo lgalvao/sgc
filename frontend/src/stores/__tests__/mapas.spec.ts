@@ -35,17 +35,6 @@ describe("useMapasStore", () => {
 
             context.store.buscarMapaCompleto(2);
 
-            // Note: In the store, buscarMapaCompleto doesn't clear state synchronously before await,
-            // but the test expectation was probably about final state or loading behavior.
-            // Adjusting based on store implementation:
-            // "carregando.value = true; erro.value = null;" is called.
-            // If the mock is pending, state is not yet cleared unless store does it.
-            // The store implementation does NOT clear mapaCompleto = null at start.
-            // It just overwrites it on success.
-            // So if I want to test it clears on start, I should update the store or update the test.
-            // Given I am refactoring, I will assume the store behavior is correct and update the test expectation if needed,
-            // or simply skip this specific "clear state" check if it wasn't implemented that way.
-            // However, let's stick to simple "calls service".
         });
 
         it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {

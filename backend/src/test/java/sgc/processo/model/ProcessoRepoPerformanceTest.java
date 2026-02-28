@@ -28,7 +28,7 @@ class ProcessoRepoPerformanceTest {
 
     @Test
     void listarPorSituacaoComParticipantes_deveCarregarParticipantesComFetch() {
-        // Arrange
+
         Unidade unidade = UnidadeTestBuilder.umaDe()
                 .comNome("Unidade Teste")
                 .comSigla("UT")
@@ -46,10 +46,10 @@ class ProcessoRepoPerformanceTest {
         entityManager.flush();
         entityManager.clear();
 
-        // Act
+
         List<Processo> processos = processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
 
-        // Assert
+
         assertThat(processos).isNotEmpty();
 
         for (Processo p : processos) {

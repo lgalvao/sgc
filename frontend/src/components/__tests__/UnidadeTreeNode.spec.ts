@@ -85,8 +85,6 @@ describe("UnidadeTreeNode.vue", () => {
             },
             ...mountOptions
         });
-        // We can't check indeterminate property easily on the stub unless we bind it to the DOM element property
-        // or check the prop passed to the stub component.
         const checkboxComponent = wrapper.findComponent(BFormCheckboxStub);
         expect(checkboxComponent.props('indeterminate')).toBe(true);
     });

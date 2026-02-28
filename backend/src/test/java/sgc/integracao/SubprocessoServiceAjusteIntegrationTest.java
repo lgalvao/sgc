@@ -30,21 +30,19 @@ class SubprocessoServiceAjusteIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private AtividadeRepo atividadeRepo;
 
-    private Unidade unidade;
-    private Processo processo;
     private Subprocesso subprocesso;
     private Competencia competencia;
     private Atividade atividade;
 
     @BeforeEach
     void setUp() {
-        unidade = UnidadeFixture.unidadePadrao();
+        Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_AJUSTE");
         unidade.setNome("Unidade de Ajuste");
         unidade = unidadeRepo.save(unidade);
 
-        processo = Processo.builder()
+        Processo processo = Processo.builder()
                 .descricao("Processo Teste Ajuste")
                 .tipo(TipoProcesso.REVISAO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)

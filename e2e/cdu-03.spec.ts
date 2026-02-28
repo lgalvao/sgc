@@ -77,8 +77,6 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByText(novaDescricao)).toBeVisible();
 
-        // Para manter o banco consistente para os próximos testes sequenciais,
-        // vamos remover este processo agora que a edição foi validada.
         await page.getByTestId('tbl-processos').getByText(novaDescricao).first().click();
         await page.getByTestId('btn-processo-remover').click();
         await page.getByRole('dialog').getByRole('button', {name: 'Remover'}).click();
@@ -258,7 +256,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByText(descricao)).not.toBeVisible();
 
-        // 2. Criar e validar mensagem de sucesso
+
         await criarProcesso(page, {
             descricao: descricao,
             tipo: 'MAPEAMENTO',

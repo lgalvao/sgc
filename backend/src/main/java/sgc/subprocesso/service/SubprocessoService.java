@@ -399,8 +399,6 @@ public class SubprocessoService {
         Unidade unidadeAnalise = obterUnidadeLocalizacao(sp);
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
 
-        // CDU-13 9.6: Identifica a unidade de devolução como sendo a unidade de origem
-        // da última movimentação que trouxe o processo para a unidade atual a partir de uma subordinada.
         Unidade unidadeDevolucao = movs.stream()
                 .filter(m -> Objects.equals(m.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
                 .map(Movimentacao::getUnidadeOrigem)
@@ -605,10 +603,9 @@ public class SubprocessoService {
 
     private void executarReabertura(Long codigo, String justificativa, SituacaoSubprocesso situacaoMinima,
                                     SituacaoSubprocesso novaSituacao, TipoTransicao tipoTransicao, boolean isRevisao) {
-        Subprocesso sp = buscarSubprocesso(codigo);
 
-        validarSituacaoMinima(sp, situacaoMinima,
-                "Subprocesso ainda está em fase de " + (isRevisao ? "revisão" : "cadastro") + ".");
+        Subprocesso sp = buscarSubprocesso(codigo);
+        validarSituacaoMinima(sp, situacaoMinima, "Subprocesso ainda está em fase de " + (isRevisao ? "revisão" : "cadastro") + ".");
 
         Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
@@ -666,34 +663,28 @@ public class SubprocessoService {
 
         subprocessoRepo.save(sp);
 
-        try {
-            String novaDataStr = novaDataLimite.format(DATE_FORMATTER);
-            String assunto = "SGC: Data limite alterada";
-            String corpo = ("Prezado(a) responsável pela %s," + "%n%n" +
-                    "A data limite da etapa atual no processo %s foi alterada para %s.%n")
-                    .formatted(sp.getUnidade().getSigla(), sp.getProcesso().getDescricao(), novaDataStr);
+        String novaDataStr = novaDataLimite.format(DATE_FORMATTER);
+        String assunto = "SGC: Data limite alterada";
+        String corpo = ("Prezado(a) responsável pela %s," + "%n%n" +
+                "A data limite da etapa atual no processo %s foi alterada para %s.%n")
+                .formatted(sp.getUnidade().getSigla(), sp.getProcesso().getDescricao(), novaDataStr);
 
-            emailService.enviarEmail(sp.getUnidade().getSigla(), assunto, corpo);
+        emailService.enviarEmail(sp.getUnidade().getSigla(), assunto, corpo);
 
-            int etapa = situacaoSp.contains("MAPA") ? 2 : 1;
-            alertaService.criarAlertaAlteracaoDataLimite(sp.getProcesso(), sp.getUnidade(), novaDataStr, etapa);
-        } catch (Exception e) {
-            log.error("Erro ao enviar notificações de alteração de prazo: {}", e.getMessage());
-        }
+        int etapa = situacaoSp.contains("MAPA") ? 2 : 1;
+        alertaService.criarAlertaAlteracaoDataLimite(sp.getProcesso(), sp.getUnidade(), novaDataStr, etapa);
     }
 
     @Transactional
     public void atualizarParaEmAndamento(Long mapaCodigo) {
-        var subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso (por mapa)", mapaCodigo));
+        var subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo).orElseThrow();
         if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             var tipoProcesso = subprocesso.getProcesso().getTipo();
+
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
-                log.debug("Atualizando subprocesso {} p/ MAPEAMENTO_CADASTRO_EM_ANDAMENTO", subprocesso.getCodigo());
                 subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
                 subprocessoRepo.save(subprocesso);
             } else if (tipoProcesso == TipoProcesso.REVISAO) {
-                log.debug("Atualizando subprocesso {} p/ REVISAO_CADASTRO_EM_ANDAMENTO", subprocesso.getCodigo());
                 subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
                 subprocessoRepo.save(subprocesso);
             }
@@ -1505,6 +1496,7 @@ public class SubprocessoService {
 
     public AnaliseHistoricoDto paraHistoricoDto(Analise analise) {
         UnidadeDto unidade = organizacaoFacade.dtoPorCodigo(analise.getUnidadeCodigo());
+
         return AnaliseHistoricoDto.builder()
                 .dataHora(analise.getDataHora())
                 .observacoes(analise.getObservacoes())
@@ -1573,46 +1565,29 @@ public class SubprocessoService {
     }
 
     private void notificarTransicao(Subprocesso sp, TipoTransicao tipo,
-                                    @org.jspecify.annotations.Nullable Unidade origem,
-                                    @org.jspecify.annotations.Nullable Unidade destino,
-                                    @org.jspecify.annotations.Nullable String observacoes) {
-        try {
-            if (tipo.geraAlerta()) {
-                String sigla = sp.getUnidade().getSigla();
-                String descricao = tipo.formatarAlerta(sigla);
-                alertaService.criarAlertaTransicao(sp.getProcesso(), descricao, origem, destino);
-            }
-            if (tipo.enviaEmail()) {
-                notificarMovimentacaoEmail(sp, tipo, origem, destino, Objects.requireNonNullElse(observacoes, ""));
-            }
-        } catch (Exception e) {
-            log.error("Falha ao enviar notificação de movimentação {}: {}", tipo, e.getMessage(), e);
+                                    Unidade origem,
+                                    Unidade destino,
+                                    @Nullable String observacoes) {
+        if (tipo.geraAlerta()) {
+            String sigla = sp.getUnidade().getSigla();
+            String descricao = tipo.formatarAlerta(sigla);
+            alertaService.criarAlertaTransicao(sp.getProcesso(), descricao, origem, destino);
+        }
+        if (tipo.enviaEmail()) {
+            notificarMovimentacaoEmail(sp, tipo, origem, destino, Objects.requireNonNullElse(observacoes, "-"));
         }
     }
 
     private void notificarMovimentacaoEmail(Subprocesso sp, TipoTransicao tipo,
-                                            @org.jspecify.annotations.Nullable Unidade unidadeOrigem,
-                                            @org.jspecify.annotations.Nullable Unidade unidadeDestino,
-                                            String observacoes) {
+                                            Unidade unidadeOrigem,
+                                            Unidade unidadeDestino,
+                                            @Nullable String observacoes) {
         if (!tipo.enviaEmail()) return;
 
-        if (unidadeOrigem == null || unidadeDestino == null) {
-            log.warn("Notificação de e-mail cancelada para transição {}: unidade de origem ou destino nula. Origem: {}, Destino: {}",
-                    tipo,
-                    unidadeOrigem != null ? unidadeOrigem.getSigla() : "null",
-                    unidadeDestino != null ? unidadeDestino.getSigla() : "null");
-            return;
-        }
-
-        try {
-            Map<String, Object> variaveis = criarVariaveisTemplateDireto(sp, unidadeOrigem, unidadeDestino, observacoes);
-            enviarNotificacaoDireta(sp, tipo, unidadeDestino, variaveis);
-
-            if (tipo.notificacaoSuperior()) {
-                enviarNotificacaoSuperior(unidadeOrigem, sp, tipo, variaveis, unidadeDestino);
-            }
-        } catch (Exception e) {
-            log.error("Erro ao processar comunicações da movimentação {}: {}", tipo, e.getMessage(), e);
+        Map<String, Object> variaveis = criarVariaveisTemplateDireto(sp, unidadeOrigem, unidadeDestino, observacoes);
+        enviarNotificacaoDireta(sp, tipo, unidadeDestino, variaveis);
+        if (tipo.notificacaoSuperior()) {
+            enviarNotificacaoSuperior(unidadeOrigem, sp, tipo, variaveis, unidadeDestino);
         }
     }
 
@@ -1662,25 +1637,23 @@ public class SubprocessoService {
                 superior = superior.getUnidadeSuperior();
                 continue;
             }
-            try {
-                Map<String, Object> variaveis = new HashMap<>(variaveisBase);
-                variaveis.put("siglaUnidadeSuperior", superior.getSigla());
 
-                String corpo = processarTemplate(tipo.getTemplateEmailSuperior(), variaveis);
-                String emailSuperior = getEmailUnidade(superior);
+            Map<String, Object> variaveis = new HashMap<>(variaveisBase);
+            variaveis.put("siglaUnidadeSuperior", superior.getSigla());
 
-                emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
-                log.info("Notificação de acompanhamento {} enviada para unidade {}", tipo, superior.getSigla());
-            } catch (Exception e) {
-                log.warn("Falha ao notificar unidade superior {}: {}", superior.getSigla(), e.getMessage());
-            }
+            String corpo = processarTemplate(tipo.getTemplateEmailSuperior(), variaveis);
+            String emailSuperior = getEmailUnidade(superior);
+
+            emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
+            log.info("Notificação de acompanhamento {} enviada para unidade {}", tipo, superior.getSigla());
+
             superior = superior.getUnidadeSuperior();
         }
     }
 
     private Map<String, Object> criarVariaveisTemplateDireto(Subprocesso sp,
-                                                             @org.jspecify.annotations.Nullable Unidade unidadeOrigem, Unidade unidadeDestino,
-                                                             @org.jspecify.annotations.Nullable String observacoes) {
+                                                             Unidade unidadeOrigem, Unidade unidadeDestino,
+                                                             @Nullable String observacoes) {
         Map<String, Object> variaveis = new HashMap<>();
 
         variaveis.put("siglaUnidade", sp.getUnidade().getSigla());

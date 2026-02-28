@@ -33,7 +33,7 @@ class ResponsavelUnidadeServiceTest {
         @Test
         @DisplayName("Deve buscar todas as atribuições temporárias")
         void deveBuscarTodasAtribuicoes() {
-            // Given
+
             Unidade unidade = new Unidade();
             unidade.setCodigo(10L);
             unidade.setSigla("UNIT");
@@ -52,10 +52,10 @@ class ResponsavelUnidadeServiceTest {
             when(atribuicaoTemporariaRepo.findAll()).thenReturn(List.of(atribuicao));
             when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuario);
 
-            // When
+
             List<AtribuicaoDto> resultado = service.buscarTodasAtribuicoes();
 
-            // Then
+
             assertThat(resultado).hasSize(1);
             assertThat(resultado.getFirst().unidadeCodigo()).isEqualTo(10L);
             assertThat(resultado.getFirst().usuario()).isEqualTo(usuario);
@@ -69,7 +69,7 @@ class ResponsavelUnidadeServiceTest {
         @Test
         @DisplayName("Deve criar atribuição com dataInicio explícita")
         void deveCriarAtribuicaoComDataInicioExplicita() {
-            // Given
+
             Long codUnidade = 1L;
             LocalDate dataInicio = LocalDate.of(2024, 1, 15);
             LocalDate dataTermino = LocalDate.of(2024, 2, 15);
@@ -91,10 +91,10 @@ class ResponsavelUnidadeServiceTest {
             when(repo.buscar(Unidade.class, codUnidade)).thenReturn(unidade);
             when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuario);
 
-            // When
+
             service.criarAtribuicaoTemporaria(codUnidade, request);
 
-            // Then
+
             ArgumentCaptor<AtribuicaoTemporaria> captor = ArgumentCaptor.forClass(AtribuicaoTemporaria.class);
             verify(atribuicaoTemporariaRepo).save(captor.capture());
 
@@ -115,7 +115,7 @@ class ResponsavelUnidadeServiceTest {
         @Test
         @DisplayName("Deve buscar responsável atual com sucesso")
         void deveBuscarResponsavelAtualComSucesso() {
-            // Given
+
             String siglaUnidade = "ABC";
 
             Unidade unidade = new Unidade();
@@ -134,10 +134,10 @@ class ResponsavelUnidadeServiceTest {
             when(repo.buscar(Responsabilidade.class, 1L)).thenReturn(resp);
             when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuarioCompleto);
 
-            // When
+
             Usuario resultado = service.buscarResponsavelAtual(siglaUnidade);
 
-            // Then
+
             assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo("123456789012");
         }
@@ -150,7 +150,7 @@ class ResponsavelUnidadeServiceTest {
         @Test
         @DisplayName("Deve buscar responsável com titular e substituto")
         void deveBuscarResponsavelComTitularESubstituto() {
-            // Given
+
             Long unidadeCodigo = 1L;
 
             Usuario titularOficial = new Usuario();
@@ -174,10 +174,10 @@ class ResponsavelUnidadeServiceTest {
             when(repo.buscar(Usuario.class, "222222222222")).thenReturn(substituto);
             when(repo.buscar(Usuario.class, "111111111111")).thenReturn(titularOficial);
 
-            // When
+
             UnidadeResponsavelDto resultado = service.buscarResponsavelUnidade(unidadeCodigo);
 
-            // Then
+
             assertThat(resultado).isNotNull();
             assertThat(resultado.titularTitulo()).isEqualTo("111111111111");
             assertThat(resultado.substitutoTitulo()).isEqualTo("222222222222");

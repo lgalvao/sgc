@@ -98,7 +98,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve homologar cadastro de múltiplas unidades em bloco")
     @WithMockAdmin
     void homologarCadastroEmBloco_deveHomologarTodasSelecionadas() throws Exception {
-        // Given
+
         Long codigoContexto = processo.getCodigo();
         List<Long> subprocessosSelecionados = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
@@ -128,7 +128,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
                 .subprocessos(subprocessosSelecionados)
                 .build();
 
-        // When
+
         mockMvc.perform(
                         post("/api/subprocessos/{id}/homologar-cadastro-bloco", codigoContexto)
                                 .with(csrf())
@@ -136,7 +136,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        // Then
+
         entityManager.flush();
         entityManager.clear();
 

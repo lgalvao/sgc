@@ -55,8 +55,6 @@ describe("MainNavbar.vue Coverage", () => {
             }
         });
 
-        // Initial state (assuming default window.innerWidth is 1024 or similar in JSDOM)
-        // JSDOM usually defaults to 1024x768
         expect((wrapper.vm as any).isMobile).toBe(false);
 
         // Resize to mobile

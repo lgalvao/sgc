@@ -22,7 +22,6 @@ extra["lombok.version"] = "1.18.42"
 extra["jjwt.version"] = "0.13.0"
 
 dependencies {
-    // Spring
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-aspectj")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -38,27 +37,22 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
-    // Banco de Dados
     runtimeOnly("com.oracle.database.jdbc:ojdbc11:23.26.1.0.0")
     implementation("com.h2database:h2")
 
-    // Lombok
     compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
     annotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
     testCompileOnly("org.projectlombok:lombok:${property("lombok.version")}")
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("org.hibernate.validator:hibernate-validator-annotation-processor:8.0.1.Final")
 
-    // Relatórios
     implementation("com.github.librepdf:openpdf:3.0.0")
 
-    // Segurança
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260102.1")
     implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
 
-    // Testes
     testImplementation("org.awaitility:awaitility")
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
@@ -69,10 +63,8 @@ dependencies {
     testImplementation("org.apache.groovy:groovy-all:5.0.4")
     testImplementation("com.icegreen:greenmail-junit5:2.1.3")
 
-    // Testes de Mutação
     testImplementation("org.pitest:pitest-junit5-plugin:1.2.3")
 
-    // Documentação da API
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
     testImplementation("io.swagger.parser.v3:swagger-parser:2.1.37")
     implementation("org.mozilla:rhino:1.9.0")
@@ -82,7 +74,6 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.20.0")
     testImplementation("org.assertj:assertj-core:3.27.7")
 
-    // Analise Estatica
     implementation("org.jspecify:jspecify:1.0.0")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
@@ -238,7 +229,6 @@ jacoco {
 
 tasks.jacocoTestReport {
     dependsOn(tasks.named("test"))
-    // Relatório consome dados de qualquer tarefa de teste que rodou
     executionData.setFrom(fileTree(layout.buildDirectory).include("jacoco/*.exec"))
 
     reports {
@@ -251,22 +241,17 @@ tasks.jacocoTestReport {
         files(classDirectories.files.map {
             fileTree(it) {
                 exclude(
-                    // Bootstrap e configuração
                     "sgc/Sgc.class",
                     "sgc/**/*Config.class",
                     "sgc/**/*Properties.class",
 
-                    // Exceções (maioria simples)
                     "sgc/**/Erro*.class",
 
-                    // Mocks de teste
                     "sgc/notificacao/NotificacaoModelosServiceMock.class",
 
-                    // Enums simples sem lógica de negócio
                     "sgc/**/Status*.class",
                     "sgc/**/Tipo*.class",
 
-                    // Classes geradas pelo MapStruct
                     "sgc/**/*Impl.class"
                 )
             }

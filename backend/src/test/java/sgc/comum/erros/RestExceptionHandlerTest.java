@@ -172,7 +172,6 @@ class RestExceptionHandlerTest {
     @Test
     @DisplayName("Deve tratar ErroNegocioBase genérico (400)")
     void deveTratarErroNegocioBase() {
-        // ErroNegocioBase is abstract or base, let's use a subclass or anonymous
         ErroNegocioBase ex = new ErroNegocioBase("Erro Base", "CODE", HttpStatus.BAD_REQUEST) {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);

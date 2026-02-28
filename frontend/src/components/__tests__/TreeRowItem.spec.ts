@@ -94,7 +94,6 @@ describe("TreeRowItem.vue", () => {
     });
 
     it("deve emitir o evento row-click ao clicar na linha se clickable for undefined (default true logic check)", async () => {
-        // Since clickable? is optional, if it's undefined, the check `props.item.clickable === false` is false, so it should emit.
         const item = {codigo: 1, nome: "Item 1"};
         const columns = [{key: "nome", label: "Nome"}];
         const wrapper = mount(TreeRowItem, {

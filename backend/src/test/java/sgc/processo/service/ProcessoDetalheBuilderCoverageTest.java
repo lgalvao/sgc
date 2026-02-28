@@ -33,7 +33,7 @@ class ProcessoDetalheBuilderCoverageTest {
     @Test
     @DisplayName("build deve mapear subprocesso e mapa quando existem")
     void deveMapearSubprocessoEMapa() {
-        // Arrange
+
         Long codProcesso = 1L;
         Processo processo = new Processo();
         processo.setCodigo(codProcesso);
@@ -57,10 +57,10 @@ class ProcessoDetalheBuilderCoverageTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
 
-        // Act
+
         ProcessoDetalheDto dto = builder.build(processo, new Usuario());
 
-        // Assert
+
         assertThat(dto.getUnidades()).hasSize(1);
         ProcessoDetalheDto.UnidadeParticipanteDto result = dto.getUnidades().getFirst();
         assertThat(result.getCodSubprocesso()).isEqualTo(500L);
@@ -70,7 +70,7 @@ class ProcessoDetalheBuilderCoverageTest {
     @Test
     @DisplayName("build deve manter unidadeDto quando sp é nulo")
     void deveManterUnidadeDtoQuandoSpNulo() {
-        // Arrange
+
         Long codProcesso = 1L;
         Processo processo = new Processo();
         processo.setCodigo(codProcesso);
@@ -86,10 +86,10 @@ class ProcessoDetalheBuilderCoverageTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(new ArrayList<>());
 
-        // Act
+
         ProcessoDetalheDto dto = builder.build(processo, new Usuario());
 
-        // Assert
+
         assertThat(dto.getUnidades()).hasSize(1);
         assertThat(dto.getUnidades().getFirst().getSigla()).isEqualTo("TESTE");
     }

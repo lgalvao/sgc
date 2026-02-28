@@ -32,16 +32,16 @@ class AutenticarReqValidationTest {
     @Test
     @DisplayName("Deve aceitar inputs normais")
     void deveAceitarInputsNormais() {
-        // Arrange
+
         AutenticarRequest req = AutenticarRequest.builder()
                 .tituloEleitoral("123456789012")
                 .senha("senha123")
                 .build();
 
-        // Act
+
         Set<ConstraintViolation<AutenticarRequest>> violations = validator.validate(req);
 
-        // Assert
+
         assertThat(violations).isEmpty();
     }
 
@@ -53,7 +53,7 @@ class AutenticarReqValidationTest {
     })
     @DisplayName("Deve rejeitar inputs excessivamente longos")
     void deveRejeitarInputsExcessivamenteLongos(int tamanhoTitulo, int tamanhoSenha) {
-        // Arrange
+
         String tituloLongo = "a".repeat(tamanhoTitulo);
         String senhaLonga = "b".repeat(tamanhoSenha);
 
@@ -62,10 +62,10 @@ class AutenticarReqValidationTest {
                 .senha(senhaLonga)
                 .build();
 
-        // Act
+
         Set<ConstraintViolation<AutenticarRequest>> violations = validator.validate(req);
 
-        // Assert
+
         assertThat(violations).isNotEmpty();
     }
 }

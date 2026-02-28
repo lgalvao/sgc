@@ -36,15 +36,15 @@ class LoginControllerCoverageTest {
     @Test
     @DisplayName("autenticar deve retornar false e não gerar cookie se falhar")
     void deveRetornarFalseSeFalharAutenticacao() {
-        // Arrange
+
         AutenticarRequest request = new AutenticarRequest("111111", "senha_errada");
         when(loginFacade.autenticar("111111", "senha_errada")).thenReturn(false);
         when(httpRequest.getRemoteAddr()).thenReturn("127.0.0.1");
 
-        // Act
+
         ResponseEntity<Boolean> result = controller.autenticar(request, httpRequest, httpResponse);
 
-        // Assert
+
         assertThat(result.getBody()).isFalse();
         verify(httpResponse, never()).addCookie(any()); // Cobertura da linha 64 (branch false)
     }

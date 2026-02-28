@@ -45,13 +45,13 @@ class OrganizacaoFacadeElegibilidadePredicateTest {
         @Test
         @DisplayName("Deve aceitar unidade FINAL")
         void deveAceitarUnidadeFinal() {
-            // Arrange
+
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
 
-            // Act
+
             facade.buscarArvoreComElegibilidade(false, Collections.emptySet());
 
-            // Assert
+
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
             Predicate<Unidade> predicate = predicateCaptor.getValue();
 
@@ -65,13 +65,13 @@ class OrganizacaoFacadeElegibilidadePredicateTest {
         @Test
         @DisplayName("Deve rejeitar unidade INTERMEDIARIA")
         void deveRejeitarUnidadeIntermediaria() {
-            // Arrange
+
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
 
-            // Act
+
             facade.buscarArvoreComElegibilidade(false, Collections.emptySet());
 
-            // Assert
+
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
             Predicate<Unidade> predicate = predicateCaptor.getValue();
 
@@ -90,13 +90,13 @@ class OrganizacaoFacadeElegibilidadePredicateTest {
         @Test
         @DisplayName("Se mapa NÃO requerido: deve aceitar unidade sem mapa")
         void semMapaRequerido_DeveAceitarUnidadeSemMapa() {
-            // Arrange
+
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
 
-            // Act
+
             facade.buscarArvoreComElegibilidade(false, Collections.emptySet());
 
-            // Assert
+
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
             Predicate<Unidade> predicate = predicateCaptor.getValue();
 
@@ -110,14 +110,14 @@ class OrganizacaoFacadeElegibilidadePredicateTest {
         @Test
         @DisplayName("Se mapa REQUERIDO e unidade TEM mapa: deve aceitar")
         void comMapaRequerido_UnidadeComMapa_DeveAceitar() {
-            // Arrange
+
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L, 2L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
 
-            // Act
+
             facade.buscarArvoreComElegibilidade(true, Collections.emptySet());
 
-            // Assert
+
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
             Predicate<Unidade> predicate = predicateCaptor.getValue();
 
@@ -131,14 +131,14 @@ class OrganizacaoFacadeElegibilidadePredicateTest {
         @Test
         @DisplayName("Se mapa REQUERIDO e unidade NÃO TEM mapa: deve rejeitar")
         void comMapaRequerido_UnidadeSemMapa_DeveRejeitar() {
-            // Arrange
+
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(2L, 3L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
 
-            // Act
+
             facade.buscarArvoreComElegibilidade(true, Collections.emptySet());
 
-            // Assert
+
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
             Predicate<Unidade> predicate = predicateCaptor.getValue();
 
@@ -157,17 +157,17 @@ class OrganizacaoFacadeElegibilidadePredicateTest {
         @Test
         @DisplayName("Deve aceitar unidade NÃO bloqueada")
         void deveAceitarUnidadeNaoBloqueada() {
-            // Arrange
+
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
 
             Set<Long> unidadesBloqueadas = new HashSet<>();
             unidadesBloqueadas.add(2L);
             unidadesBloqueadas.add(3L);
 
-            // Act
+
             facade.buscarArvoreComElegibilidade(false, unidadesBloqueadas);
 
-            // Assert
+
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
             Predicate<Unidade> predicate = predicateCaptor.getValue();
 
@@ -181,17 +181,17 @@ class OrganizacaoFacadeElegibilidadePredicateTest {
         @Test
         @DisplayName("Deve rejeitar unidade bloqueada")
         void deveRejeitarUnidadeBloqueada() {
-            // Arrange
+
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
 
             Set<Long> unidadesBloqueadas = new HashSet<>();
             unidadesBloqueadas.add(1L);
             unidadesBloqueadas.add(2L);
 
-            // Act
+
             facade.buscarArvoreComElegibilidade(false, unidadesBloqueadas);
 
-            // Assert
+
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
             Predicate<Unidade> predicate = predicateCaptor.getValue();
 
@@ -210,14 +210,14 @@ class OrganizacaoFacadeElegibilidadePredicateTest {
         @Test
         @DisplayName("Todas condições verdadeiras: mapa requerido + tem mapa + não bloqueada + FINAL")
         void todasCondicoesVerdadeiras() {
-            // Arrange
+
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
 
-            // Act
+
             facade.buscarArvoreComElegibilidade(true, Collections.emptySet());
 
-            // Assert
+
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
             Predicate<Unidade> predicate = predicateCaptor.getValue();
 
@@ -231,14 +231,14 @@ class OrganizacaoFacadeElegibilidadePredicateTest {
         @Test
         @DisplayName("Unidade FINAL + mapa requerido + sem mapa + não bloqueada = FALSO")
         void finalComMapaRequeridoSemMapa() {
-            // Arrange
+
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(2L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
 
-            // Act
+
             facade.buscarArvoreComElegibilidade(true, Collections.emptySet());
 
-            // Assert
+
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
             Predicate<Unidade> predicate = predicateCaptor.getValue();
 
@@ -252,16 +252,16 @@ class OrganizacaoFacadeElegibilidadePredicateTest {
         @Test
         @DisplayName("Unidade FINAL + sem mapa requerido + bloqueada = FALSO")
         void finalSemMapaRequeridoMasBloqueada() {
-            // Arrange
+
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
 
             Set<Long> bloqueadas = new HashSet<>();
             bloqueadas.add(1L);
 
-            // Act
+
             facade.buscarArvoreComElegibilidade(false, bloqueadas);
 
-            // Assert
+
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
             Predicate<Unidade> predicate = predicateCaptor.getValue();
 
@@ -275,14 +275,14 @@ class OrganizacaoFacadeElegibilidadePredicateTest {
         @Test
         @DisplayName("Unidade INTERMEDIARIA (todas outras condições OK) = FALSO")
         void intermediariaSempreRejeitada() {
-            // Arrange
+
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L));
             when(hierarquiaService.buscarArvoreComElegibilidade(any())).thenReturn(Collections.emptyList());
 
-            // Act
+
             facade.buscarArvoreComElegibilidade(true, Collections.emptySet());
 
-            // Assert
+
             verify(hierarquiaService).buscarArvoreComElegibilidade(predicateCaptor.capture());
             Predicate<Unidade> predicate = predicateCaptor.getValue();
 

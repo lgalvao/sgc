@@ -519,8 +519,6 @@ describe('CadProcesso.vue', () => {
         await btn.trigger('click');
 
         expect(btn.text()).toContain('Salvando...'); // Button content might be replaced by "Salvando..."
-        // In the template: {{ isLoading ? 'Salvando...' : 'Salvar' }}
-        // And BSpinner is shown.
     });
 
     it('handles error when loading process details on mount', async () => {

@@ -254,18 +254,15 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({page, autenticadoComoAdmin}) => {
         // Issue #1220: Garantir que botões de ação não aparecem para processos finalizados
 
-        // Navegar para o histórico ou buscar o processo finalizado
-        // Nota: O processo finalizado pode não estar no painel inicial. 
-        // Vamos forçar a navegação para os detalhes dele usando o ID capturado anteriormente.
         await page.goto(`/processo/${processoId}`);
 
-        // 1. Verificar que a mensagem de "Processo concluído" aparece (via useProximaAcao)
+
         await expect(page.getByText(/Processo concluído/i)).toBeVisible();
 
-        // 2. Verificar que o botão "Finalizar processo" NÃO está visível
+
         await expect(page.getByTestId('btn-processo-finalizar')).not.toBeVisible();
 
-        // 3. Verificar que as ações em bloco NÃO estão visíveis
+
         await expect(page.getByTestId('btn-acao-bloco-aceitar')).not.toBeVisible();
         await expect(page.getByTestId('btn-acao-bloco-homologar')).not.toBeVisible();
 
@@ -276,7 +273,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByTestId('btn-reabrir-revisao')).not.toBeVisible();
         await expect(page.getByTestId('btn-alterar-data-limite')).not.toBeVisible();
 
-        // 5. Verificar que botões de edição de atividades não aparecem nos cards
+
         await expect(page.getByTestId('card-subprocesso-atividades')).not.toBeVisible();
         // Deve aparecer o de visualização
         await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();

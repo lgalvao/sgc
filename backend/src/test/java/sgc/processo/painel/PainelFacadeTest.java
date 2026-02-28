@@ -113,7 +113,7 @@ class PainelFacadeTest {
     @Test
     @DisplayName("Deve listar alertas com ordenação definida (não paged ou unsorted)")
     void deveListarAlertasComOrdenacaoDefinida() {
-        // Caso 2: Sorted.
+
         Pageable sorted = PageRequest.of(0, 10, Sort.by("dataHora"));
 
         Alerta a = new Alerta();
@@ -186,7 +186,7 @@ class PainelFacadeTest {
     @Test
     @DisplayName("Deve cobrir merge function do toMap com participantes duplicados")
     void deveCobrirMergeFunctionComParticipantesDuplicados() {
-        // Arrange
+
         Processo p = mock(Processo.class);
         when(p.getCodigo()).thenReturn(1L);
         when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
@@ -200,29 +200,29 @@ class PainelFacadeTest {
         when(up2.getUnidadeCodigo()).thenReturn(10L); // Mesmo código
         when(up2.getSigla()).thenReturn("U1"); // Mock de sigla
 
-        // Retorna lista com duplicados
+
         when(p.getParticipantes()).thenReturn(List.of(up1, up2));
 
         when(OrganizacaoFacade.buscarMapaHierarquia()).thenReturn(new HashMap<>());
         when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        // Act
+
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
 
-        // Assert
+
         assertThat(result.getContent().getFirst().unidadesParticipantes()).contains("U1");
     }
 
     @Test
     @DisplayName("Deve cobrir lógica de hierarquia visível profunda")
     void deveCobrirLogicaHierarquiaVisivelProfunda() {
-        // Arrange
+
         Processo p = mock(Processo.class);
         when(p.getCodigo()).thenReturn(1L);
         when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
         when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
 
-        // U1 (Pai) -> U2 (Filho)
+
         UnidadeProcesso up1 = mock(UnidadeProcesso.class);
         when(up1.getUnidadeCodigo()).thenReturn(1L);
         when(up1.getSigla()).thenReturn("U1");
@@ -241,10 +241,10 @@ class PainelFacadeTest {
         when(OrganizacaoFacade.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        // Act
+
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
 
-        // Assert
+
         // Se U2 participa e U1 participa, e U2 é única subordinada de U1, deve mostrar apenas U1
         assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("U1");
     }

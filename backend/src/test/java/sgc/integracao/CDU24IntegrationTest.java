@@ -106,7 +106,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve disponibilizar mapas de competências em bloco (sucesso)")
     @WithMockAdmin
     void disponibilizarMapaEmBloco_deveDisponibilizarSucesso() throws Exception {
-        // Given
+
         Long codigoContexto = processo.getCodigo();
         List<Long> unidadesSelecionadas = List.of(subprocesso1.getCodigo(), subprocesso2.getCodigo());
 
@@ -139,7 +139,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                 .dataLimite(LocalDate.now().plusDays(10))
                 .build();
 
-        // When
+
         mockMvc.perform(
                         post("/api/subprocessos/{id}/disponibilizar-mapa-bloco", codigoContexto)
                                 .with(csrf())
@@ -147,7 +147,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        // Then
+
         entityManager.flush();
         entityManager.clear();
 

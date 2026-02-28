@@ -186,7 +186,7 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve negar acesso quando usuário não autenticado")
         void deveNegarAcessoQuandoNaoAutenticado() {
-            // Arrange
+
             Authentication auth = mock(Authentication.class);
             when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
             when(processoAcessoService.checarAcesso(null, 1L)).thenReturn(false);
@@ -323,7 +323,7 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve criar processo quando dados válidos")
         void deveCriarProcessoQuandoDadosValidos() {
-            // Arrange
+
             CriarProcessoRequest req = new CriarProcessoRequest(
                     "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
 
@@ -337,10 +337,10 @@ class ProcessoFacadeTest {
                         p.setSituacao(SituacaoProcesso.CRIADO);
                         return p;
                     });
-            // Act
+
             Processo resultado = processoFacade.criar(req);
 
-            // Assert
+
             assertThat(resultado).isNotNull();
             verify(processoManutencaoService).criar(req);
         }
@@ -348,7 +348,7 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve lançar exceção quando unidade não encontrada (propagada do serviço)")
         void deveLancarExcecaoQuandoUnidadeNaoEncontrada() {
-            // Arrange
+
             CriarProcessoRequest req = new CriarProcessoRequest(
                     "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(99L));
 
@@ -375,17 +375,17 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve retornar detalhes do processo (DTO)")
         void deveRetornarDetalhesDoProcesso() {
-            // Arrange
+
             Usuario usuario = criarUsuarioMock();
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
             when(processoConsultaService.buscarProcessoCodigo(id)).thenReturn(processo);
             when(processoDetalheBuilder.build(eq(processo), any(Usuario.class))).thenReturn(ProcessoDetalheDto.builder().build());
 
-            // Act
+
             var res = processoFacade.obterDetalhes(id, usuario);
 
-            // Assert
+
             assertThat(res).isNotNull();
         }
 
@@ -414,7 +414,7 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve listar processos finalizados e ativos")
         void deveListarProcessosFinalizadosEAtivos() {
-            // Arrange
+
             when(processoConsultaService.processosFinalizados())
                     .thenReturn(List.of(ProcessoFixture.processoPadrao()));
             when(processoConsultaService.processosAndamento())
@@ -437,21 +437,21 @@ class ProcessoFacadeTest {
         @Test
         @DisplayName("Deve listar unidades bloqueadas por tipo")
         void deveListarUnidadesBloqueadasPorTipo() {
-            // Arrange
+
             when(processoConsultaService.unidadesBloqueadasPorTipo(TipoProcesso.MAPEAMENTO))
                     .thenReturn(List.of(1L));
 
-            // Act
+
             List<Long> bloqueadas = processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
 
-            // Assert
+
             assertThat(bloqueadas).contains(1L);
         }
 
         @Test
         @DisplayName("Deve retornar contexto completo do processo")
         void deveRetornarContextoCompleto() {
-            // Arrange
+
             Usuario usuario = criarUsuarioMock();
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
@@ -462,10 +462,10 @@ class ProcessoFacadeTest {
             when(processoConsultaService.subprocessosElegiveis(id))
                     .thenReturn(List.of());
 
-            // Act
+
             var res = processoFacade.obterContextoCompleto(id, usuario);
 
-            // Assert
+
             assertThat(res)
                     .isNotNull()
                     .isEqualTo(detalhes);
@@ -515,7 +515,7 @@ class ProcessoFacadeTest {
             @Test
             @DisplayName("Deve disponibilizar mapas em bloco quando ação é DISPONIBILIZAR")
             void deveDisponibilizarMapasEmBloco() {
-                // Arrange
+
                 Usuario usuario = new Usuario();
                 usuario.setTituloEleitoral("12345678901");
                 when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
@@ -533,10 +533,10 @@ class ProcessoFacadeTest {
                 when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(1L, 2L, 3L))).thenReturn(List.of(sp1, sp2, sp3));
                 doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("DISPONIBILIZAR_MAPA"));
 
-                // Act
+
                 processoFacade.executarAcaoEmBloco(100L, req);
 
-                // Assert
+
                 ArgumentCaptor<DisponibilizarMapaRequest> captor =
                         ArgumentCaptor.forClass(DisponibilizarMapaRequest.class);
                 verify(subprocessoService).disponibilizarMapaEmBloco(
@@ -557,7 +557,7 @@ class ProcessoFacadeTest {
             @Test
             @DisplayName("Deve aceitar cadastro quando subprocessos estão em MAPEAMENTO_CADASTRO_DISPONIBILIZADO")
             void deveAceitarCadastroQuandoMapeamentoCadastro() {
-                // Arrange
+
                 Usuario usuario = new Usuario();
                 when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
@@ -581,17 +581,17 @@ class ProcessoFacadeTest {
                         null
                 );
 
-                // Act
+
                 processoFacade.executarAcaoEmBloco(100L, req);
 
-                // Assert
+
                 verify(subprocessoService).aceitarCadastroEmBloco(List.of(1L, 2L), usuario);
             }
 
             @Test
             @DisplayName("Deve aceitar validação quando subprocessos estão em situação de mapa disponibilizado")
             void deveAceitarValidacaoQuandoMapaDisponibilizado() {
-                // Arrange
+
                 Usuario usuario = new Usuario();
                 when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
@@ -610,10 +610,10 @@ class ProcessoFacadeTest {
                         null
                 );
 
-                // Act
+
                 processoFacade.executarAcaoEmBloco(100L, req);
 
-                // Assert
+
                 verify(subprocessoService).aceitarValidacaoEmBloco(List.of(1L), usuario);
             }
         }
@@ -624,7 +624,7 @@ class ProcessoFacadeTest {
             @Test
             @DisplayName("Deve homologar cadastro quando subprocessos estão em situação de cadastro")
             void deveHomologarCadastroQuandoCadastro() {
-                // Arrange
+
                 Usuario usuario = new Usuario();
                 when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
@@ -643,17 +643,17 @@ class ProcessoFacadeTest {
                         null
                 );
 
-                // Act
+
                 processoFacade.executarAcaoEmBloco(100L, req);
 
-                // Assert
+
                 verify(subprocessoService).homologarCadastroEmBloco(List.of(1L), usuario);
             }
 
             @Test
             @DisplayName("Deve homologar validação quando subprocessos estão em validação")
             void deveHomologarValidacaoQuandoValidacao() {
-                // Arrange
+
                 Usuario usuario = new Usuario();
                 when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
@@ -672,10 +672,10 @@ class ProcessoFacadeTest {
                         null
                 );
 
-                // Act
+
                 processoFacade.executarAcaoEmBloco(100L, req);
 
-                // Assert
+
                 verify(subprocessoService).homologarValidacaoEmBloco(List.of(1L), usuario);
             }
         }

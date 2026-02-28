@@ -52,11 +52,6 @@ describe("ArvoreUnidades.vue", () => {
             },
             global: {
                 stubs: {
-                    // We don't stub UnidadeTreeNode completely because we want to see it calling callbacks,
-                    // but since it's recursive, shallowMount might be better?
-                    // Actually, let's keep it real or use a smart stub.
-                    // For coverage of ArvoreUnidades, we need to trigger its methods.
-                    // Let's rely on the props passed to children.
                     UnidadeTreeNode: true,
                     RouterLink: RouterLinkStub
                 }
@@ -135,12 +130,7 @@ describe("ArvoreUnidades.vue", () => {
         const emitted = wrapper.emitted("update:modelValue");
         const selection = emitted![emitted!.length - 1][0] as number[];
 
-        // 21 is eligible child of 20, so it should be selected
         expect(selection).toContain(21);
-        // 20 itself is not eligible but logic might add it if we passed true?
-        // Logic: if (u.isElegivel) newSelection.add
-        // 20 is not eligible. So it shouldn't be in selection unless updateAncestors adds it?
-        // updateAncestors checks if all children selected.
         expect(selection).not.toContain(20);
     });
 
@@ -160,19 +150,9 @@ describe("ArvoreUnidades.vue", () => {
         const wrapper = createWrapper({modelValue: [21]});
         const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
-        // Node 20 has child 21 selected. So it should be indeterminate?
-        // Logic: descendentesElegiveis = [21]. descendentesSelecionadas = 1.
-        // If equal, return true.
-        // So node 20 should be "true" (selected) because all its eligible descendants are selected?
         const node20 = mockUnidades[0].filhas![1];
         expect(root.props("getEstadoSelecao")(node20)).toBe(true);
 
-        // What if we have another child of 20 that is eligible but not selected?
-        // Let's modify data for this test case specifically?
-        // Or check Root. Root has 10 (not selected) and 20 (fully selected).
-        // Root has descendants: 10, 21. Eligible: 10, 21.
-        // Selected: 21.
-        // So Root should be indeterminate.
         expect(root.props("getEstadoSelecao")(mockUnidades[0])).toBe("indeterminate");
     });
 
@@ -224,9 +204,6 @@ describe("ArvoreUnidades.vue", () => {
     });
 
     it("não deve deselecionar pai INTEROPERACIONAL se filhos desmarcados", async () => {
-        // Logic: if (parent.tipo !== 'INTEROPERACIONAL') selectionSet.delete(parent.codigo);
-        // So if it IS INTEROPERACIONAL, it should NOT delete parent from selection?
-        // Wait, if allChildrenSelected is false.
 
         const unidadesTeste: Unidade[] = [
             {
@@ -254,8 +231,6 @@ describe("ArvoreUnidades.vue", () => {
 
         // Child should be gone
         expect(lastEmission).not.toContain(201);
-        // Parent should stay because it is INTEROPERACIONAL?
-        // Code: if (parent.tipo !== 'INTEROPERACIONAL') { selectionSet.delete(parent.codigo); }
         expect(lastEmission).toContain(200);
     });
 

@@ -82,7 +82,7 @@ class E2eControllerTest {
     @Test
     @DisplayName("Deve limpar dados do processo e suas dependências")
     void deveLimparDadosDoProcessoComDependentes() {
-        // Arrange
+
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
         jdbcTemplate.execute("TRUNCATE TABLE sgc.processo");
         jdbcTemplate.execute("TRUNCATE TABLE sgc.subprocesso");
@@ -105,7 +105,6 @@ class E2eControllerTest {
                 "INSERT INTO sgc.processo (codigo, descricao, situacao, tipo) VALUES (100,"
                         + " 'Processo Teste', 'CRIADO', 'MAPEAMENTO')");
 
-        // Circular dependency handling: Subprocesso -> Mapa -> Subprocesso
         jdbcTemplate.execute(
                 "INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao) VALUES (300, 100, 999, 'NAO_INICIADO')");
 
@@ -138,10 +137,10 @@ class E2eControllerTest {
         assertCount("sgc.vw_unidade", 1);
         assertCount("sgc.vw_usuario", 1);
 
-        // Act
+
         controller.limparProcessoComDependentes(100L);
 
-        // Assert
+
         assertCount("sgc.processo", 0);
         assertCount("sgc.subprocesso", 0);
         assertCount("sgc.mapa", 0);
@@ -160,7 +159,7 @@ class E2eControllerTest {
     @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @DisplayName("Deve resetar o banco de dados truncando tabelas")
     void deveResetarBancoTruncandoTabelas() {
-        // Arrange
+
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
 
         jdbcTemplate.execute(
@@ -172,15 +171,14 @@ class E2eControllerTest {
         assertCount("sgc.vw_unidade WHERE codigo=888", 1);
         assertCount("sgc.processo WHERE codigo=888", 1);
 
-        // Act
+
         try {
             controller.resetDatabase();
         } catch (RuntimeException e) {
-            // Ignored - pode ocorrer erro de integridade referencial se não limpar na ordem, mas o teste foca no truncate
             // Na implementação real do resetDatabase, ele desativa constraints.
         }
 
-        // Assert
+
         assertCount("sgc.vw_unidade WHERE codigo=888", 0);
         assertCount("sgc.processo WHERE codigo=888", 0);
     }
@@ -188,7 +186,6 @@ class E2eControllerTest {
     @Test
     @DisplayName("Deve usar segundo caminho se primeiro falhar para seed.sql")
     void deveUsarSegundoCaminhoParaSeedSql() throws Exception {
-        // Usa mocks de DB para focar na lógica de recursos e evitar erros de SQL
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
         DataSource mockDataSource = Mockito.mock(DataSource.class);
         Connection mockConnection = Mockito.mock(Connection.class);
@@ -230,7 +227,7 @@ class E2eControllerTest {
     @Test
     @DisplayName("Deve criar processo de mapeamento fixture com descrição padrão e não iniciado")
     void deveCriarProcessoMapeamentoFixture() {
-        // Arrange
+
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 null, "SIGLA", false, null);
 
@@ -242,10 +239,10 @@ class E2eControllerTest {
         proc.setCodigo(100L);
         when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
 
-        // Act
+
         Processo result = controller.criarProcessoMapeamento(req);
 
-        // Assert
+
         assertEquals(100L, result.getCodigo());
         verify(processoFacade).criar(any(CriarProcessoRequest.class));
     }
@@ -253,7 +250,7 @@ class E2eControllerTest {
     @Test
     @DisplayName("Deve criar processo de revisão fixture com descrição informada e iniciado")
     void deveCriarProcessoRevisaoFixture() {
-        // Arrange
+
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "Desc", "SIGLA", true, 10);
 
@@ -266,10 +263,10 @@ class E2eControllerTest {
         when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
         when(processoFacade.obterEntidadePorId(100L)).thenReturn(proc);
 
-        // Act
+
         Processo result = controller.criarProcessoRevisao(req);
 
-        // Assert
+
         assertEquals(100L, result.getCodigo());
         verify(processoFacade).iniciarProcessoRevisao(100L, List.of(1L));
     }
@@ -277,7 +274,7 @@ class E2eControllerTest {
     @Test
     @DisplayName("Deve criar processo de mapeamento fixture e iniciar")
     void deveCriarProcessoMapeamentoFixtureIniciado() {
-        // Arrange
+
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "Desc", "SIGLA", true, 10);
 
@@ -290,10 +287,10 @@ class E2eControllerTest {
         when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
         when(processoFacade.obterEntidadePorId(100L)).thenReturn(proc);
 
-        // Act
+
         Processo result = controller.criarProcessoMapeamento(req);
 
-        // Assert
+
         assertEquals(100L, result.getCodigo());
         verify(processoFacade).iniciarProcessoMapeamento(100L, List.of(1L));
     }
@@ -325,7 +322,7 @@ class E2eControllerTest {
     @Test
     @DisplayName("Deve cobrir else em criarProcessoFixture")
     void deveCobrirElseEmCriarProcessoFixture() throws Exception {
-        // Arrange
+
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "Desc", "SIGLA", true, 10);
 
@@ -343,10 +340,10 @@ class E2eControllerTest {
                 E2eController.ProcessoFixtureRequest.class, TipoProcesso.class);
         method.setAccessible(true);
 
-        // Act
+
         method.invoke(controller, req, TipoProcesso.DIAGNOSTICO);
 
-        // Assert
+
         verify(processoFacade, never()).iniciarProcessoMapeamento(anyLong(), anyList());
         verify(processoFacade, never()).iniciarProcessoRevisao(anyLong(), anyList());
     }
@@ -354,7 +351,7 @@ class E2eControllerTest {
     @Test
     @DisplayName("Deve cobrir branches de erros em iniciar no fixture")
     void deveCobrirBranchesErrosIniciar() throws Exception {
-        // Arrange
+
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "   ", "SIGLA", true, 10); // Blank description
 
@@ -374,10 +371,10 @@ class E2eControllerTest {
                 E2eController.ProcessoFixtureRequest.class, TipoProcesso.class);
         method.setAccessible(true);
 
-        // Act
+
         method.invoke(controller, req, TipoProcesso.MAPEAMENTO);
 
-        // Assert
+
         verify(processoFacade).iniciarProcessoMapeamento(eq(100L), anyList());
     }
 

@@ -44,17 +44,17 @@ class EmailModelosServiceTest {
         @Test
         @DisplayName("Deve criar email de processo iniciado com os dados corretos")
         void criarEmailDeProcessoIniciado() {
-            // Given
+
             String nomeUnidade = "Unidade Teste";
             String nomeProcesso = "Processo Teste";
             String tipoProcesso = "REVISAO";
             LocalDateTime dataLimite = LocalDateTime.now();
 
-            // When
+
             emailModelosService.criarEmailProcessoIniciado(
                     nomeUnidade, nomeProcesso, tipoProcesso, dataLimite);
 
-            // Then
+
             assertEquals("processo-iniciado", templateNameCaptor.getValue());
             Context context = contextCaptor.getValue();
             assertEquals("Processo iniciado - " + tipoProcesso, context.getVariable("titulo"));
@@ -71,16 +71,16 @@ class EmailModelosServiceTest {
         @Test
         @DisplayName("Deve criar email de cadastro disponibilizado com os dados corretos")
         void criarEmailCadastroDisponibilizado() {
-            // Given
+
             String nomeUnidade = "Unidade Teste";
             String nomeProcesso = "Processo Teste";
             int quantidadeAtividades = 10;
 
-            // When
+
             emailModelosService.criarEmailCadastroDisponibilizado(
                     nomeUnidade, nomeProcesso, quantidadeAtividades);
 
-            // Then
+
             assertEquals("cadastro-disponibilizado", templateNameCaptor.getValue());
             Context context = contextCaptor.getValue();
             assertEquals("Cadastro disponibilizado para análise", context.getVariable("titulo"));
@@ -92,17 +92,17 @@ class EmailModelosServiceTest {
         @Test
         @DisplayName("Deve criar email de cadastro devolvido com os dados corretos")
         void criarEmailCadastroDevolvido() {
-            // Given
+
             String nomeUnidade = "Unidade Teste";
             String nomeProcesso = "Processo Teste";
             String motivo = "Motivo Teste";
             String observacoes = "Observações Teste";
 
-            // When
+
             emailModelosService.criarEmailCadastroDevolvido(
                     nomeUnidade, nomeProcesso, motivo, observacoes);
 
-            // Then
+
             assertEquals("cadastro-devolvido", templateNameCaptor.getValue());
             Context context = contextCaptor.getValue();
             assertEquals("Cadastro devolvido para ajustes", context.getVariable("titulo"));
@@ -119,16 +119,16 @@ class EmailModelosServiceTest {
         @Test
         @DisplayName("Deve criar email de mapa disponibilizado com os dados corretos")
         void criarEmailMapaDisponibilizado() {
-            // Given
+
             String nomeUnidade = "Unidade Teste";
             String nomeProcesso = "Processo Teste";
             LocalDateTime dataLimite = LocalDateTime.now();
 
-            // When
+
             emailModelosService.criarEmailMapaDisponibilizado(
                     nomeUnidade, nomeProcesso, dataLimite);
 
-            // Then
+
             assertEquals("mapa-disponibilizado", templateNameCaptor.getValue());
             Context context = contextCaptor.getValue();
             assertEquals("Mapa de Competências disponibilizado", context.getVariable("titulo"));
@@ -140,14 +140,14 @@ class EmailModelosServiceTest {
         @Test
         @DisplayName("Deve criar email de mapa validado com os dados corretos")
         void criarEmailMapaValidado() {
-            // Given
+
             String nomeUnidade = "Unidade Teste";
             String nomeProcesso = "Processo Teste";
 
-            // When
+
             emailModelosService.criarEmailMapaValidado(nomeUnidade, nomeProcesso);
 
-            // Then
+
             assertEquals("mapa-validado", templateNameCaptor.getValue());
             Context context = contextCaptor.getValue();
             assertEquals("Mapa de Competências validado", context.getVariable("titulo"));
@@ -162,16 +162,16 @@ class EmailModelosServiceTest {
         @Test
         @DisplayName("Deve criar email de processo finalizado com os dados corretos")
         void criarEmailProcessoFinalizado() {
-            // Given
+
             String nomeProcesso = "Processo Teste";
             LocalDateTime dataFinalizacao = LocalDateTime.now();
             int quantidadeMapas = 5;
 
-            // When
+
             emailModelosService.criarEmailProcessoFinalizado(
                     nomeProcesso, dataFinalizacao, quantidadeMapas);
 
-            // Then
+
             assertEquals("processo-finalizado", templateNameCaptor.getValue());
             Context context = contextCaptor.getValue();
             assertEquals("Processo finalizado - Mapas Vigentes", context.getVariable("titulo"));
@@ -183,15 +183,15 @@ class EmailModelosServiceTest {
         @Test
         @DisplayName("Deve criar email de processo finalizado por unidade com os dados corretos")
         void criarEmailProcessoFinalizadoPorUnidade() {
-            // Given
+
             String siglaUnidade = "UT";
             String nomeProcesso = "Processo Teste";
 
-            // When
+
             emailModelosService.criarEmailProcessoFinalizadoPorUnidade(
                     siglaUnidade, nomeProcesso);
 
-            // Then
+
             assertEquals("processo-finalizado-por-unidade", templateNameCaptor.getValue());
             Context context = contextCaptor.getValue();
             assertEquals("Conclusão do processo " + nomeProcesso, context.getVariable("titulo"));
@@ -202,16 +202,16 @@ class EmailModelosServiceTest {
         @Test
         @DisplayName("Deve criar email de processo finalizado para unidades subordinadas")
         void criarEmailProcessoFinalizadoUnidadesSubordinadas() {
-            // Given
+
             String siglaUnidade = "UT";
             String nomeProcesso = "Processo Teste";
             List<String> siglas = List.of("SUB1", "SUB2");
 
-            // When
+
             emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
                     siglaUnidade, nomeProcesso, siglas);
 
-            // Then
+
             assertEquals("processo-finalizado-unidades-subordinadas", templateNameCaptor.getValue());
             Context context = contextCaptor.getValue();
             assertEquals(
