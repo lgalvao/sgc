@@ -51,3 +51,27 @@ se um Processo está finalizado) para determinar se um usuário tem permissão.
 - Regras de negócio como "Posso editar este subprocesso agora?" (que dependem de sua Situacao e sua Localização) devem
   ser aplicadas e validadas dentro da camada de **Service**. Isso torna a lógica de domínio muito mais fácil de testar
   unitariamente fora do contexto do Spring Security.
+
+### 2.4 Mover Validações de Disponibilização para o Service
+
+Atualmente, `SubprocessoController.disponibilizarCadastro` e `disponibilizarRevisao` buscam ativamente por atividades sem conhecimento (`obterAtividadesSemConhecimento`) e lançam `ErroValidacao` com uma lista formatada. Isso vaza a regra de negócio para o Controller.
+
+**Recomendação:**
+- Mover a lógica que formata o payload de erro para `SubprocessoService.validarRequisitosNegocioParaDisponibilizacao`.
+- Simplificar os métodos do Controller para apenas chamarem o Service, removendo a lógica de validação da camada Web.
+
+### 2.5 Remover "Facades" Restantes
+
+O uso de "Facades" (`OrganizacaoFacade`, `UsuarioFacade`, `LoginFacade`) é redundante para uma aplicação deste porte. Eles apenas delegam chamadas para os serviços subjacentes, adicionando uma camada desnecessária.
+
+**Recomendação:**
+- Remover `OrganizacaoFacade`, `UsuarioFacade` e `LoginFacade`.
+- Atualizar os Controllers (ex: `UsuarioController`, `UnidadeController`) para injetarem e utilizarem diretamente os Services apropriados (`UsuarioService`, `UnidadeService`, `UnidadeHierarquiaService`, `ResponsavelUnidadeService`).
+
+### 1.2 Simplificar Stores Redundantes do Pinia
+
+A arquitetura atual possui dezenas de stores do Pinia (14 stores, como `usuarios.ts`, `alertas.ts`, etc.) que espelham o estado do servidor com mapeadores manuais complexos, adicionando considerável overhead em um aplicativo projetado para pouquíssimos usuários.
+
+**Recomendação:**
+- Substituir stores complexos (como `usuarios.ts`) e seus mapeadores manuais por chamadas diretas de API via os serviços já unificados do frontend ou pelo uso de gerenciamento de estado mais leve.
+- Componentes devem buscar dados dos serviços de domínio (ex: `usuarioService.ts`) e gerenciar o estado localmente ou através de abstrações simples.
