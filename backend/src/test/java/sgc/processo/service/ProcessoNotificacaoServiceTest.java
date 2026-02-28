@@ -119,7 +119,6 @@ class ProcessoNotificacaoServiceTest {
         service.emailInicioProcesso(1L);
 
         verifyNoInteractions(emailService);
-        // Na nova lógica, se subprocessos.isEmpty(), retorna imediatamente, então alertaService não é chamado.
         verifyNoInteractions(alertaService);
     }
 

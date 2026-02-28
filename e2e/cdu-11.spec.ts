@@ -105,10 +105,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
                                                                                            page,
                                                                                            autenticadoComoAdmin
                                                                                        }) => {
-        // Fluxo principal passo 2 - ADMIN/GESTOR: 
-        // 2.1 Sistema mostra tela Detalhes do processo
-        // 2.2 Usuário clica em unidade subordinada operacional/interoperacional
-        // 2.3 Sistema mostra tela Detalhes do subprocesso
 
 
         await expect(page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first()).toBeVisible();
@@ -118,7 +114,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page).toHaveURL(/\/processo\/\d+$/);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        // Passo 2.2: Clicar na unidade subordinada - esperar a tabela de dados carregar
         const tabela = page.getByTestId('tbl-tree');
         await expect(tabela).toBeVisible();
 
@@ -130,11 +125,9 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         // Aguardar navegação para Detalhes do subprocesso
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
 
-        // Passo 2.3: Verificar visualização
         await navegarParaAtividadesVisualizacao(page);
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', exact: true})).toBeVisible();
 
-        // Passo 5 e 6: Verificar tela de atividades com dados da unidade
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 
         // Verificar que continua no subprocesso da unidade alvo
@@ -155,20 +148,15 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
                                                                                                   page,
                                                                                                   autenticadoComoChefeSecao211
                                                                                               }) => {
-        // Fluxo principal passo 3 - CHEFE/SERVIDOR:
-        // 3.1 Sistema exibe diretamente a tela Detalhes do subprocesso
 
 
-        // Passo 1: Clicar no processo em andamento
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
 
         // Verifica que foi diretamente para o subprocesso (sem passar pela lista de unidades)
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
 
-        // Passo 4: Clicar no card Atividades e conhecimentos
         await navegarParaAtividadesVisualizacao(page);
 
-        // Passo 5 e 6: Verificar tela de atividades
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 
         // Verificar que continua no subprocesso da unidade alvo

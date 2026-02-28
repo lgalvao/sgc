@@ -123,7 +123,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath("$[0].perfil").value("ADMIN"))
                     .andExpect(jsonPath("$[0].unidade.sigla").value(unidadeAdmin.getSigla()));
 
-            // Act & Assert: Etapa 3 - Entrar
             EntrarRequest entrarReq = EntrarRequest.builder()
                     .tituloEleitoral(tituloEleitoral)
                     .perfil("ADMIN")

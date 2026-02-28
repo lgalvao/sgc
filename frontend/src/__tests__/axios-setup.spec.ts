@@ -190,7 +190,6 @@ describe("axios-setup", () => {
 
         const error = new Error("Generic failure");
 
-        // O interceptor deve rejeitar o erro mesmo quando feedbackStore.show falha
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
 
         // Verificar que tentou exibir o erro (e falhou)

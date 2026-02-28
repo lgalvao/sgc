@@ -50,7 +50,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-            // Passo 9.11/10.9: Redireciona para o Painel
             await expect(page).toHaveURL(/\/painel/);
             await fazerLogout(page);
         });
@@ -60,10 +59,8 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
             await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
 
-            // Conforme CDU-13 Passo 10
             await aceitarCadastroMapeamento(page, 'Ok pela Coordenação');
 
-            // Passo 10.9: Redireciona para o Painel
             await expect(page).toHaveURL(/\/painel/);
             await fazerLogout(page);
         });
@@ -73,10 +70,8 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
             await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
 
-            // Conforme CDU-13 Passo 9 (Devolução)
             await devolverCadastroMapeamento(page, 'Dados incompletos para a Secretaria');
 
-            // Passo 9.11: Redireciona para o Painel
             await expect(page).toHaveURL(/\/painel/);
             await fazerLogout(page);
         });
@@ -97,10 +92,8 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
             await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
 
-            // Passo 9.8: Chegou na unidade do subprocesso, muda para 'Cadastro em andamento'
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
 
-            // Verificar histórico (Passo 7)
             await navegarParaAtividades(page);
             const modal = await abrirHistoricoAnalise(page);
             await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
@@ -128,7 +121,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
             await aceitarCadastroMapeamento(page, 'Ok final 2');
             await fazerLogout(page);
 
-            // ADMIN homologa (Passo 11)
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
@@ -138,7 +130,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
             await page.getByTestId('btn-acao-analisar-principal').click();
             await page.getByRole('dialog').getByRole('button', {name: 'Confirmar'}).click();
 
-            // Passo 11.7: Redireciona para Detalhes do Subprocesso
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
             await expect(page.getByText(/Homologa[çcl]ão efetivada/i).first()).toBeVisible();
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);

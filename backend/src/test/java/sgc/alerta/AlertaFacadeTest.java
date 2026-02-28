@@ -445,8 +445,6 @@ class AlertaFacadeTest {
 
             // Segunda chamada: busca novamente (sem cache lazy - simplificação para sistema pequeno)
             service.criarAlertaAdmin(new Processo(), new Unidade(), "Teste 2");
-            // No mockito, verify acumula as chamadas, mas como é lazy, a segunda chamada não deve invocar o metodo no service.
-            // Então verify(times(1)) deve ser correto para o total.
             verify(unidadeService, times(2)).unidadePorCodigo(1L);
         }
     }

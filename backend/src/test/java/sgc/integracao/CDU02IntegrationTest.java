@@ -74,7 +74,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         unidadeFilha2 = unidadeRepo.save(unidadeFilha2);
 
 
-
         processoRaiz = ProcessoFixture.processoEmAndamento();
         processoRaiz.setCodigo(null);
         processoRaiz.setDescricao("Processo Raiz");

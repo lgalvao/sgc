@@ -1,6 +1,5 @@
 import {CLASSES_BADGE_SITUACAO} from "@/constants/situacoes";
 
-// ===== CLASSES DE BADGE =====
 export function badgeClass(situacao: string): string {
     return (
         CLASSES_BADGE_SITUACAO[situacao as keyof typeof CLASSES_BADGE_SITUACAO] ||
@@ -8,8 +7,6 @@ export function badgeClass(situacao: string): string {
     );
 }
 
-// ===== ÍCONES DE NOTIFICAÇÃO =====
-// Define local type for iconeTipo since TipoNotificacao was removed
 export type LocalTipoNotificacao = "success" | "error" | "warning" | "info";
 
 export const iconeTipo = (tipo: LocalTipoNotificacao): string => {

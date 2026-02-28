@@ -291,9 +291,6 @@ describe('ArvoreUnidades.vue', () => {
         const rootNode = wrapper.findComponent(UnidadeTreeNodeStub);
         const toggle = rootNode.props('onToggle');
 
-        // Selecionar ROOT (que deve selecionar CHILD1, CHILD2 e GRANDCHILD pois são elegíveis)
-        // ROOT não é elegível, então não entra.
-        // CHILD1 (2), CHILD2 (3), GRANDCHILD (4) entram.
         await toggle(mockUnidades[0], true);
 
         const emitted = wrapper.emitted('update:modelValue')![0][0] as number[];

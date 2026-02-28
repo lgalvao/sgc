@@ -258,7 +258,6 @@ describe("Processo.vue", () => {
         expect(modal.props("titulo")).toBe("Aceitar em Bloco");
     });
 
-    // --- Testes para Aceitar em Bloco ---
 
     it("deve executar ação em bloco com sucesso (Aceitar Cadastro)", async () => {
         wrapper = createWrapper();
@@ -307,7 +306,6 @@ describe("Processo.vue", () => {
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('aceitar', [103], undefined);
     });
 
-    // --- Testes para Homologar em Bloco ---
 
     it("deve executar ação em bloco com sucesso (Homologar Cadastro)", async () => {
         wrapper = createWrapper();
@@ -347,7 +345,6 @@ describe("Processo.vue", () => {
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('homologar', [103], undefined);
     });
 
-    // --- Teste para Disponibilizar em Bloco ---
 
     it("deve executar ação em bloco com sucesso (Disponibilizar)", async () => {
         wrapper = createWrapper();
@@ -482,7 +479,6 @@ describe("Processo.vue", () => {
         });
     });
 
-    // --- Finalização ---
 
     it("deve abrir modal de finalização de processo", async () => {
         wrapper = createWrapper();

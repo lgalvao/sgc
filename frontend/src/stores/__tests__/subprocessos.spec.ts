@@ -263,7 +263,6 @@ describe('Subprocessos Store', () => {
     });
 
     describe('Ações de Workflow', () => {
-        // --- Disponibilizar Cadastro ---
         it('disponibilizarCadastro deve executar com sucesso e feedback', async () => {
             (disponibilizarCadastro as any).mockResolvedValue({});
             const result = await store.disponibilizarCadastro(1);
@@ -279,7 +278,6 @@ describe('Subprocessos Store', () => {
             expect(store.lastError).toBeTruthy();
         });
 
-        // --- Disponibilizar Revisão ---
         it('disponibilizarRevisaoCadastro deve executar com sucesso', async () => {
             (disponibilizarRevisaoCadastro as any).mockResolvedValue({});
             const result = await store.disponibilizarRevisaoCadastro(1);
@@ -295,7 +293,6 @@ describe('Subprocessos Store', () => {
             expect(store.lastError).toBeTruthy();
         });
 
-        // --- Devolver Cadastro ---
         it('devolverCadastro deve executar com sucesso', async () => {
             (devolverCadastro as any).mockResolvedValue({});
             const result = await store.devolverCadastro(1, {observacoes: 'Erro'});
@@ -311,7 +308,6 @@ describe('Subprocessos Store', () => {
             expect(store.lastError).toBeTruthy();
         });
 
-        // --- Aceitar Cadastro ---
         it('aceitarCadastro deve executar com sucesso', async () => {
             (aceitarCadastro as any).mockResolvedValue({});
             const result = await store.aceitarCadastro(1, {aprovado: true} as any);
@@ -325,7 +321,6 @@ describe('Subprocessos Store', () => {
             expect(result).toBe(false);
         });
 
-        // --- Homologar Cadastro ---
         it('homologarCadastro deve recarregar detalhes após sucesso', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
             mockPerfilStore.unidadeAtual = null;
@@ -345,7 +340,6 @@ describe('Subprocessos Store', () => {
             expect(store.lastError).toBeTruthy();
         });
 
-        // --- Devolver Revisão ---
         it('devolverRevisaoCadastro deve executar com sucesso', async () => {
             (devolverRevisaoCadastro as any).mockResolvedValue({});
             const result = await store.devolverRevisaoCadastro(1, {observacoes: 'Erro'});
@@ -359,7 +353,6 @@ describe('Subprocessos Store', () => {
             expect(result).toBe(false);
         });
 
-        // --- Aceitar Revisão ---
         it('aceitarRevisaoCadastro deve executar com sucesso', async () => {
             (aceitarRevisaoCadastro as any).mockResolvedValue({});
             const result = await store.aceitarRevisaoCadastro(1, {aprovado: true} as any);
@@ -373,7 +366,6 @@ describe('Subprocessos Store', () => {
             expect(result).toBe(false);
         });
 
-        // --- Homologar Revisão ---
         it('homologarRevisaoCadastro deve executar com sucesso e recarregar', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
             mockPerfilStore.unidadeAtual = null;

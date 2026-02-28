@@ -194,11 +194,9 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         // CDU-21: Passos 1-2
 
 
-        // Passo 1: ADMIN clica no processo
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
-        // Passo 2: Sistema exibe tela Detalhes do processo
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         // Botão Finalizar visível
@@ -206,20 +204,16 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     });
 
     test('Cenario 2: ADMIN cancela finalização - permanece na tela', async ({page, autenticadoComoAdmin}) => {
-        // CDU-21: Passo 6.1
 
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
-        // Passo 3: Clicar em Finalizar processo
         await page.getByTestId('btn-processo-finalizar').click();
 
-        // Passo 6: Modal de confirmação
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await expect(modal.getByText(/Confirma a finalização/i)).toBeVisible();
 
-        // Passo 6.1: Cancelar
         await page.getByTestId('btn-finalizar-processo-cancelar').click();
 
         // Permanece na tela de detalhes do processo
@@ -233,17 +227,13 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
-        // Passo 3: Clicar em Finalizar processo
         await page.getByTestId('btn-processo-finalizar').click();
 
-        // Passo 6: Modal de confirmação
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
 
-        // Passo 7: ADMIN escolhe Confirmar
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
 
-        // Passo 10: Redireciona para Painel com mensagem de sucesso
         await verificarPaginaPainel(page);
         await expect(page.getByText(/Processo finalizado/i)).toBeVisible();
 

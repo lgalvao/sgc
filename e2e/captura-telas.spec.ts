@@ -467,7 +467,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const descricao = `Proc Mapa ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_121';
 
-            // Setup: criar processo e disponibilizar atividades
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             await criarProcesso(page, {

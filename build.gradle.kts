@@ -118,4 +118,3 @@ tasks.register<Exec>("qualityCheckFast") {
     isIgnoreExitValue = true
 }
 
-

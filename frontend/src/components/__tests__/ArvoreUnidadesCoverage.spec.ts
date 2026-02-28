@@ -25,7 +25,6 @@ describe("ArvoreUnidades.vue Coverage", () => {
             unidades: [{codigo: 1, sigla: "A", nome: "A", filhas: []}]
         });
 
-        // Watcher should run
         expect((wrapper.vm as any).expandedUnits.has(1)).toBe(true);
     });
 
@@ -48,7 +47,6 @@ describe("ArvoreUnidades.vue Coverage", () => {
         // Update modelValue prop
         await wrapper.setProps({modelValue: [1]});
 
-        // Watcher should run
         expect((wrapper.vm as any).unidadesSelecionadasLocal).toEqual([1]);
     });
 
@@ -68,8 +66,6 @@ describe("ArvoreUnidades.vue Coverage", () => {
 
         // Update modelValue with same values (different reference)
         await wrapper.setProps({modelValue: [1]});
-
-
 
 
         // The test above hit the true case.

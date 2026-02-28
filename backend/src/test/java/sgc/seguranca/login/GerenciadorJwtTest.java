@@ -64,7 +64,6 @@ class GerenciadorJwtTest {
     @Test
     @DisplayName("Deve falhar se segredo muito curto")
     void failShortSecret() {
-        // Mock secret() calls in verification and generation
         when(jwtProperties.secret()).thenReturn(DEFAULT_SECRET_SHORT);
 
         // init check doesn't check length, only equality to default.

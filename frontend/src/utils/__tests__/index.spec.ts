@@ -183,8 +183,6 @@ describe("utilitários", () => {
         });
 
         it("deve lidar com objetos Date com tempo válido, mas componentes inválidos", () => {
-            // Cria uma data que seria inválida (como 30 de fevereiro)
-            // JavaScript corrige automaticamente isso para 1º de março, então este teste valida o comportamento corrigido
             const edgeCaseDate = new Date(2024, 1, 30); // 30 de fevereiro se torna 1º de março
             expect(ensureValidDate(edgeCaseDate)).toBeInstanceOf(Date);
             expect(ensureValidDate(edgeCaseDate)?.getMonth()).toBe(2); // Março

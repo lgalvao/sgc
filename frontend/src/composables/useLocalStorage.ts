@@ -18,7 +18,6 @@ export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
         try {
             return JSON.parse(item) as T;
         } catch {
-            // Se falhar o parse (ex: dado legado não-JSON), retorna o item como-está se T for string
             return item as unknown as T;
         }
     };

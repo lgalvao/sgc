@@ -481,7 +481,6 @@ describe('CadProcesso.vue', () => {
         expect(wrapper.vm.fieldErrors.unidades).toBe('');
     });
 
-    // --- New tests to improve coverage ---
 
     it('shows loading spinner when units are loading', async () => {
         const {wrapper} = createWrapper({

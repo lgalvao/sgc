@@ -128,4 +128,3 @@ export interface AtividadeOperacaoResponseDto {
     permissoes?: any;
 }
 
-

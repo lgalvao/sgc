@@ -21,10 +21,8 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
         // CDU-29: Passos 1-2
 
 
-        // Passo 1: Clicar em Histórico na navbar
         await page.getByRole('link', {name: /Histórico/i}).click();
 
-        // Passo 2: Sistema apresenta tela de histórico
         await expect(page).toHaveURL(/\/historico/);
         await expect(page.getByRole('heading', {name: /Histórico/i})).toBeVisible();
     });
@@ -54,7 +52,6 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
     // ========================================================================
 
     test('Cenario 4: Tabela apresenta colunas corretas', async ({page, autenticadoComoAdmin}) => {
-        // CDU-29: Passo 2 - Verificar colunas da tabela
 
 
         await page.getByRole('link', {name: /Histórico/i}).click();

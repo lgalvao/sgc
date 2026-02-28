@@ -62,7 +62,6 @@ class MapaAjusteDtoTest {
         @Test
         @DisplayName("Deve mapear hierarquia de competências e atividades")
         void deveMapearHierarquia() {
-            // Setup
             Atividade ativ = new Atividade();
             ativ.setCodigo(2L);
             ativ.setDescricao("Ativ 1");

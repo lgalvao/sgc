@@ -40,7 +40,6 @@ export interface ProcessoContext {
  */
 export const test = base.extend<ProcessoContext>({
     processoFixture: async ({page, autenticadoComoAdmin}, use, testInfo) => {
-        // Setup: criar processo padrão
         const descricao = `Fixture ${testInfo.title} - ${Date.now()}`;
 
         await page.getByTestId('btn-painel-criar-processo').click();

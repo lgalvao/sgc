@@ -82,5 +82,3 @@ Object.defineProperty(globalThis, "location", {
     value: locationMock,
 });
 
-
-

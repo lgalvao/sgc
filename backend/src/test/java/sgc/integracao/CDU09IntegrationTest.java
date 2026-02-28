@@ -122,7 +122,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                     assertThat(alertas.stream().anyMatch(a -> a.getUnidadeDestino() != null && a.getUnidadeDestino().getCodigo() == 6L)).isTrue();
                 });
 
-        // 14. Data de Fim Etapa 1
         assertThat(atualizado.getDataFimEtapa1()).isNotNull();
 
         // 15. Exclusão do Histórico de Análise

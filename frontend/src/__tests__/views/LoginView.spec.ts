@@ -70,7 +70,6 @@ describe("LoginView.vue", () => {
         expect(wrapper.find('[data-testid="inp-login-usuario"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="inp-login-senha"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-login-entrar"]').exists()).toBe(true);
-        // Passo 2 deve estar oculto
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(false);
     });
 
@@ -157,12 +156,10 @@ describe("LoginView.vue", () => {
         perfilStore.selecionarPerfilUnidade = vi.fn().mockResolvedValue(true);
         perfilStore.perfisUnidades = MOCK_PERFIS;
 
-        // Passo 1
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
 
-        // Passo 2
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);
 
 
@@ -232,12 +229,10 @@ describe("LoginView.vue", () => {
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {
         });
 
-        // Passo 1
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
 
-        // Passo 2 - Tentar selecionar
         await wrapper.find('form').trigger('submit');
 
         // Aguarda a promise rejeitada ser processada
@@ -259,13 +254,11 @@ describe("LoginView.vue", () => {
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
         perfilStore.perfisUnidades = MOCK_PERFIS;
 
-        // Passo 1
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
 
 
-        // Verifica se mudou para o passo 2
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);
 
         // Encontra o select pelo componente para emitir o evento

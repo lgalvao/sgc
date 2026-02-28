@@ -12,7 +12,6 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
 
-        // Verifica que botões estão desativados quando formulário está vazio
         await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
         await expect(page.getByTestId('btn-processo-iniciar')).toBeDisabled();
 

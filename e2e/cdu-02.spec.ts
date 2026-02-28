@@ -127,8 +127,6 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             dataLimite.setDate(dataLimite.getDate() + 30);
             await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
 
-            // Expande a hierarquia de forma sequencial e natural: SECRETARIA_1 -> COORD_11
-            // OBS: SEDOC é oculta na árvore, então SECRETARIA_1 aparece na raiz
 
             // Aguarda a animação/renderização e expande SECRETARIA_1
             const btnSecretaria = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
