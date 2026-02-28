@@ -1,5 +1,5 @@
 {
-  "globalLineCoverage": "96.49%",
+  "globalLineCoverage": "96.76%",
   "totalFilesWithGaps": 23,
   "gaps": [
     {
@@ -249,48 +249,6 @@
       "score": 11
     },
     {
-      "class": "sgc.processo.ProcessoFacade",
-      "coverage": "95.58%",
-      "missed": [
-        205,
-        245,
-        251,
-        257,
-        263
-      ],
-      "partial": [
-        "153(1/2)",
-        "204(1/2)",
-        "225(1/2)",
-        "244(1/2)",
-        "250(1/2)",
-        "256(1/2)",
-        "262(1/2)",
-        "310(1/6)"
-      ],
-      "score": 9
-    },
-    {
-      "class": "sgc.processo.service.ProcessoInicializador",
-      "coverage": "91.43%",
-      "missed": [
-        40,
-        50,
-        58,
-        144,
-        145,
-        146
-      ],
-      "partial": [
-        "39(1/2)",
-        "49(1/2)",
-        "57(1/2)",
-        "118(1/4)",
-        "143(1/2)"
-      ],
-      "score": 8.5
-    },
-    {
       "class": "sgc.mapa.AtividadeFacade",
       "coverage": "96.00%",
       "missed": [
@@ -397,6 +355,17 @@
       "score": 1.5
     },
     {
+      "class": "sgc.processo.ProcessoFacade",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "153(1/2)",
+        "225(1/2)",
+        "310(1/6)"
+      ],
+      "score": 1.5
+    },
+    {
       "class": "sgc.alerta.AlertaFacade",
       "coverage": "100.00%",
       "missed": [],
@@ -434,6 +403,15 @@
         "193(1/4)"
       ],
       "score": 1
+    },
+    {
+      "class": "sgc.processo.service.ProcessoInicializador",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "118(1/4)"
+      ],
+      "score": 0.5
     },
     {
       "class": "sgc.organizacao.UnidadeController",
