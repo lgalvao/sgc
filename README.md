@@ -86,7 +86,7 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 | **Integração Backend** | `./gradlew :backend:integrationTest` | Executa apenas fluxos completos (Mais lento).    |
 | **Unitários Frontend** | `cd frontend && npm run test:unit`   | Vitest para componentes e lógica.                |
 | **End-to-End (E2E)**   | `npm run test:e2e`                   | Playwright simulando fluxos reais.               |
-| **Type Check **        | `npm run typecheck`                  | Verificação de erros de tipos.                   |
+| **Type Check**        | `npm run typecheck`                  | Verificação de erros de tipos.                   |
 
 ### Verificação de Qualidade (Quality Gate)
 
