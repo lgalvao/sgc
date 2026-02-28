@@ -1,22 +1,11 @@
 {
-  "globalLineCoverage": "91.07%",
+  "globalLineCoverage": "91.57%",
   "totalFilesWithGaps": 23,
   "gaps": [
     {
       "class": "sgc.subprocesso.service.SubprocessoService",
-      "coverage": "78.01%",
+      "coverage": "79.73%",
       "missed": [
-        111,
-        116,
-        121,
-        130,
-        140,
-        141,
-        142,
-        143,
-        144,
-        149,
-        150,
         155,
         166,
         167,
@@ -137,12 +126,6 @@
         827,
         828,
         829,
-        832,
-        833,
-        835,
-        836,
-        838,
-        839,
         840,
         841,
         842,
@@ -150,7 +133,6 @@
         844,
         845,
         846,
-        850,
         867,
         868,
         869,
@@ -262,6 +244,8 @@
         "698(1/2)",
         "732(2/6)",
         "735(1/2)",
+        "836(1/2)",
+        "839(2/4)",
         "862(1/2)",
         "864(1/2)",
         "1004(1/2)",
@@ -308,7 +292,7 @@
         "1712(1/2)",
         "1721(1/2)"
       ],
-      "score": 264.5
+      "score": 247.5
     },
     {
       "class": "sgc.e2e.E2eController",
@@ -429,7 +413,7 @@
     },
     {
       "class": "sgc.mapa.service.MapaManutencaoService",
-      "coverage": "87.18%",
+      "coverage": "88.46%",
       "missed": [
         58,
         74,
@@ -443,8 +427,6 @@
         85,
         94,
         98,
-        118,
-        119,
         205,
         206,
         295,
@@ -460,7 +442,7 @@
         "322(1/2)",
         "331(1/2)"
       ],
-      "score": 23
+      "score": 21
     },
     {
       "class": "sgc.processo.service.ProcessoNotificacaoService",
