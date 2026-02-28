@@ -34,7 +34,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @Tag("integration")
 public abstract class BaseIntegrationTest {
     protected MockMvc mockMvc;
-    
+
     @Autowired(required = false)
     protected GreenMail greenMail;
 
@@ -70,8 +70,8 @@ public abstract class BaseIntegrationTest {
         Awaitility.await()
                 .atMost(Duration.ofSeconds(5))
                 .pollInterval(Duration.ofMillis(100))
-                .untilAsserted(() -> 
-                    assertThat(greenMail.getReceivedMessages()).hasSizeGreaterThanOrEqualTo(quantidade)
+                .untilAsserted(() ->
+                        assertThat(greenMail.getReceivedMessages()).hasSizeGreaterThanOrEqualTo(quantidade)
                 );
     }
 

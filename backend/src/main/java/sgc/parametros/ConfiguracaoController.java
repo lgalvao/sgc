@@ -41,7 +41,7 @@ public class ConfiguracaoController {
                     return parametro;
                 })
                 .toList();
-        
+
         return configuracaoService.salvar(parametrosAtualizados);
     }
 }

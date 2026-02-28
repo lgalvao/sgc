@@ -22,13 +22,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Testes do ConfiguracaoController")
 class ConfiguracaoControllerTest {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private MockMvc mockMvc;
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @MockitoBean
     private ConfiguracaoService configuracaoService;
 
@@ -41,7 +39,7 @@ class ConfiguracaoControllerTest {
                 .descricao("Description")
                 .valor("VALUE")
                 .build();
-        
+
         when(configuracaoService.buscarTodos()).thenReturn(List.of(param));
 
         mockMvc.perform(get("/api/configuracoes")
@@ -75,7 +73,7 @@ class ConfiguracaoControllerTest {
                 .descricao("Description")
                 .valor("NEW_VALUE")
                 .build();
-        
+
         when(configuracaoService.buscarPorId(1L)).thenReturn(new Parametro());
         when(configuracaoService.salvar(any())).thenReturn(List.of(response));
 

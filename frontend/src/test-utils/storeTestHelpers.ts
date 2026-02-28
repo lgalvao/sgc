@@ -7,7 +7,7 @@ import {beforeEach, expect, it, vi} from "vitest";
  * @returns Objeto de contexto contendo a store (populada no beforeEach)
  */
 export function setupStoreTest<T>(useStore: () => T) {
-    const context = { store: undefined as unknown as T };
+    const context = {store: undefined as unknown as T};
 
     beforeEach(() => {
         setActivePinia(createPinia());

@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { execSync } = require('node:child_process');
+const {execSync} = require('node:child_process');
 const xml2js = require('xml2js');
 
 // Configuração
@@ -16,7 +16,7 @@ async function main() {
     console.log('Aguarde, isso pode levar alguns minutos...\n');
 
     try {
-        execSync(GRADLE_CMD, { cwd: GRADLE_DIR, stdio: 'inherit' });
+        execSync(GRADLE_CMD, {cwd: GRADLE_DIR, stdio: 'inherit'});
     } catch (error) {
         console.warn('\nA execução do Gradle falhou (possivelmente devido a testes falhando).', error.message);
         console.warn('Tentando ler o relatório mesmo assim...\n');

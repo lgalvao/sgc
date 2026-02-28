@@ -47,6 +47,17 @@ class OrganizacaoFacadeTest {
         verify(hierarquiaService).buscarArvoreComElegibilidade(any());
     }
 
+    // Métodos auxiliares
+    private Unidade criarUnidade(Long codigo, String sigla) {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(codigo);
+        unidade.setSigla(sigla);
+        unidade.setNome("Unidade Teste");
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        return unidade;
+    }
+
     @Nested
     @DisplayName("Busca de Unidades e Hierarquia")
     class BuscaUnidades {
@@ -337,16 +348,5 @@ class OrganizacaoFacadeTest {
             assertThat(resultado).isEqualTo(responsavel);
             verify(responsavelService).buscarResponsavelAtual("UNIDADE-01");
         }
-    }
-
-    // Métodos auxiliares
-    private Unidade criarUnidade(Long codigo, String sigla) {
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(codigo);
-        unidade.setSigla(sigla);
-        unidade.setNome("Unidade Teste");
-        unidade.setSituacao(SituacaoUnidade.ATIVA);
-        unidade.setTipo(TipoUnidade.OPERACIONAL);
-        return unidade;
     }
 }

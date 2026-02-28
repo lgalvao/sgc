@@ -3,13 +3,13 @@
       v-model="modelValueComputed"
       :centered="centralizado"
       :fade="fade"
-      modal-class="modal-responsivo"
       :size="tamanho"
       :title="titulo"
+      modal-class="modal-responsivo"
       @hide="fechar"
       @shown="emit('shown')"
   >
-    <slot />
+    <slot/>
     <template #footer>
       <div class="d-flex justify-content-between w-100 footer-modal-padrao">
         <BButton

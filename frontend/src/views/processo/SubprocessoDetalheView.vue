@@ -2,17 +2,17 @@
   <LayoutPadrao>
     <div v-if="subprocesso">
       <PageHeader
-          :title="`Subprocesso - ${subprocesso.unidade.sigla}`"
-          :subtitle="subprocesso.processoDescricao"
           :etapa="`Etapa atual: ${formatSituacaoSubprocesso(subprocesso.situacao)}`"
           :proxima-acao="proximaAcaoSubprocesso"
+          :subtitle="subprocesso.processoDescricao"
+          :title="`Subprocesso - ${subprocesso.unidade.sigla}`"
       />
 
       <SubprocessoHeader
           :pode-alterar-data-limite="podeAlterarDataLimite && !isProcessoFinalizado"
+          :pode-enviar-lembrete="podeEnviarLembrete && !isProcessoFinalizado"
           :pode-reabrir-cadastro="podeReabrirCadastro && !isProcessoFinalizado"
           :pode-reabrir-revisao="podeReabrirRevisao && !isProcessoFinalizado"
-          :pode-enviar-lembrete="podeEnviarLembrete && !isProcessoFinalizado"
           :processo-descricao="subprocesso.processoDescricao || ''"
           :responsavel-email="subprocesso.responsavel?.email || ''"
           :responsavel-nome="subprocesso.responsavel?.nome || ''"
@@ -48,7 +48,7 @@
       />
     </div>
     <div v-else class="text-center py-5">
-      <BSpinner label="Carregando informações da unidade..." variant="primary" />
+      <BSpinner label="Carregando informações da unidade..." variant="primary"/>
       <p class="mt-2 text-muted">Carregando informações da unidade...</p>
     </div>
   </LayoutPadrao>
@@ -65,16 +65,18 @@
   <!-- Modal para reabrir cadastro/revisão -->
   <ModalConfirmacao
       v-model="modals.modals.reabrir.value.isOpen"
-      :titulo="tipoReabertura === 'cadastro' ? 'Reabrir cadastro' : 'Reabrir Revisão'"
-      variant="warning"
-      ok-title="Confirmar Reabertura"
+      :auto-close="false"
       :loading="loading.isLoading('reabertura')"
       :ok-disabled="!justificativaReabertura.trim()"
-      :auto-close="false"
+      :titulo="tipoReabertura === 'cadastro' ? 'Reabrir cadastro' : 'Reabrir Revisão'"
+      ok-title="Confirmar Reabertura"
       test-id-confirmar="btn-confirmar-reabrir"
+      variant="warning"
       @confirmar="confirmarReabertura"
   >
-    <p>Informe a justificativa para reabrir o {{ tipoReabertura === 'cadastro' ? 'cadastro' : 'revisão de cadastro' }}:</p>
+    <p>Informe a justificativa para reabrir o {{
+        tipoReabertura === 'cadastro' ? 'cadastro' : 'revisão de cadastro'
+      }}:</p>
     <BFormTextarea
         v-model="justificativaReabertura"
         data-testid="inp-justificativa-reabrir"
@@ -85,11 +87,11 @@
 
   <ModalConfirmacao
       v-model="modalLembreteAberto"
+      :auto-close="false"
+      ok-title="Confirmar envio"
+      test-id-confirmar="btn-confirmar-enviar-lembrete"
       titulo="Enviar lembrete"
       variant="info"
-      ok-title="Confirmar envio"
-      :auto-close="false"
-      test-id-confirmar="btn-confirmar-enviar-lembrete"
       @confirmar="enviarLembreteConfirmado"
   >
     <p data-testid="txt-modelo-lembrete">
@@ -152,19 +154,19 @@ const subprocesso = computed<SubprocessoDetalhe | null>(
     () => subprocessosStore.subprocessoDetalhe,
 );
 
-const { 
-  podeAlterarDataLimite, 
-  podeReabrirCadastro, 
-  podeReabrirRevisao, 
+const {
+  podeAlterarDataLimite,
+  podeReabrirCadastro,
+  podeReabrirRevisao,
   podeEnviarLembrete,
   podeDisponibilizarCadastro,
   podeEditarCadastro
 } = useAcesso(subprocesso);
 
 const isProcessoFinalizado = computed(() => {
-  return subprocesso.value?.situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO || 
-         subprocesso.value?.situacao === SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO ||
-         processosStore.processoDetalhe?.situacao === SituacaoProcesso.FINALIZADO;
+  return subprocesso.value?.situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO ||
+      subprocesso.value?.situacao === SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO ||
+      processosStore.processoDetalhe?.situacao === SituacaoProcesso.FINALIZADO;
 });
 
 const mapa = computed(() => mapaStore.mapaCompleto);

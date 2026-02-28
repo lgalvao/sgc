@@ -8,7 +8,7 @@ describe("ProcessoAcoes.vue", () => {
     const context = setupComponentTest();
 
     const mountOptions = getCommonMountOptions();
-    mountOptions.global.components = { BButton };
+    mountOptions.global.components = {BButton};
 
     it('deve renderizar botão "Aceitar em bloco" quando podeAceitarBloco é true', async () => {
         context.wrapper = mount(ProcessoAcoes, {

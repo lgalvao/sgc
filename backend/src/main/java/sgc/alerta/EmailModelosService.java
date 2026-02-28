@@ -48,10 +48,10 @@ public class EmailModelosService {
             List<String> siglasSubordinadas) {
 
         Context context = new Context();
-        String assunto = isParticipante 
+        String assunto = isParticipante
                 ? "SGC: Início de processo de mapeamento de competências"
                 : "SGC: Início de processo de mapeamento de competências em unidades subordinadas";
-        
+
         context.setVariable(VAR_TITULO, assunto);
         context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);

@@ -54,64 +54,101 @@ FROM SGC.PARAMETRO;
 -- VW_UNIDADE - simulada como tabela no H2
 -- -------------------------------------------------------------------------------------------------
 -- Unidade ADMIN (id=1) - não é uma unidade real, serve como raiz da hierarquia
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES ('1', 'ADMIN', 'ADMIN', 'RAIZ', 'ATIVA', NULL, '7', '00000007', CURRENT_TIMESTAMP);
 
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('2', 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', 'ATIVA', 1, '777', '00000777', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES ('2', 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', 'ATIVA', 1, '777', '00000777',
+        CURRENT_TIMESTAMP);
 
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('200', 'Secretaria de Gestao de Pessoas', 'SGP', 'INTERMEDIARIA', 'ATIVA', 1, '2', '00000002', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES ('200', 'Secretaria de Gestao de Pessoas', 'SGP', 'INTERMEDIARIA', 'ATIVA', 1, '2', '00000002',
+        CURRENT_TIMESTAMP);
 
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('3', 'Coordenadoria de Administracao', 'COAD', 'INTERMEDIARIA', 'ATIVA', 2, '777', '00000777', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('6', 'Coordenadoria de Sistemas', 'COSIS', 'INTERMEDIARIA', 'ATIVA', 2, '666666666666', '66666666', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('7', 'Coordenadoria de Suporte e Infraestrutura', 'COSINF', 'INTERMEDIARIA', 'ATIVA', 2, '777', '00000777', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES ('3', 'Coordenadoria de Administracao', 'COAD', 'INTERMEDIARIA', 'ATIVA', 2, '777', '00000777',
+        CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES ('6', 'Coordenadoria de Sistemas', 'COSIS', 'INTERMEDIARIA', 'ATIVA', 2, '666666666666', '66666666',
+        CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES ('7', 'Coordenadoria de Suporte e Infraestrutura', 'COSINF', 'INTERMEDIARIA', 'ATIVA', 2, '777', '00000777',
+        CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES ('14', 'Coordenadoria Jurídica', 'COJUR', 'INTERMEDIARIA', 'ATIVA', 2, '777', '00000777', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('101', 'GESTOR-UNIT', 'GESTOR-UNIT', 'INTERMEDIARIA', 'ATIVA', 1, '222222222222', '22222222', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES ('101', 'GESTOR-UNIT', 'GESTOR-UNIT', 'INTERMEDIARIA', 'ATIVA', 1, '222222222222', '22222222',
+        CURRENT_TIMESTAMP);
 
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('201', 'Coordenadoria de Atenção ao Servidor', 'CAS', 'INTEROPERACIONAL', 'ATIVA', 200, '2', '00000002', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES ('201', 'Coordenadoria de Atenção ao Servidor', 'CAS', 'INTEROPERACIONAL', 'ATIVA', 200, '2', '00000002',
+        CURRENT_TIMESTAMP);
 
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('4', 'Coordenadoria de Educação Especial', 'COEDE', 'INTERMEDIARIA', 'ATIVA', 3, '777', '00000777', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES ('4', 'Coordenadoria de Educação Especial', 'COEDE', 'INTERMEDIARIA', 'ATIVA', 3, '777', '00000777',
+        CURRENT_TIMESTAMP);
 
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('5', 'Seção Magistrados e Requisitados', 'SEMARE', 'OPERACIONAL', 'ATIVA', 4, '5', '00000005', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('8', 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 'ATIVA', 6, '3', '00000003', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('9', 'Seção de Dados e Inteligência Artificial', 'SEDIA', 'OPERACIONAL', 'ATIVA', 6, '333333333333', '33333333', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES ('5', 'Seção Magistrados e Requisitados', 'SEMARE', 'OPERACIONAL', 'ATIVA', 4, '5', '00000005',
+        CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES ('8', 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 'ATIVA', 6, '3', '00000003',
+        CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES ('9', 'Seção de Dados e Inteligência Artificial', 'SEDIA', 'OPERACIONAL', 'ATIVA', 6, '333333333333', '33333333',
+        CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES ('10', 'Seção de Sistemas Eleitorais', 'SESEL', 'OPERACIONAL', 'ATIVA', 6, '1', '00000001', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES ('11', 'Seção de Infraestrutura', 'SENIC', 'OPERACIONAL', 'ATIVA', 7, '12', '00000012', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES ('12', 'Seção Jurídica', 'SEJUR', 'OPERACIONAL', 'ATIVA', 14, '777', '00000777', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES ('13', 'Seção de Processos', 'SEPRO', 'OPERACIONAL', 'ATIVA', 14, '777', '00000777', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES ('15', 'Seção de Documentação', 'SEDOC', 'OPERACIONAL', 'ATIVA', 2, '777', '00000777', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES ('102', 'SUB-UNIT', 'SUB-UNIT', 'OPERACIONAL', 'ATIVA', 101, '222222222222', '22222222', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES ('202', 'Seção de Atenção ao Servidor', 'SAS', 'OPERACIONAL', 'ATIVA', 201, '2', '00000002', CURRENT_TIMESTAMP);
 
 -- Unidades para testes específicos
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES ('900', 'CDU04-UNIT', 'CDU04-UNIT', 'OPERACIONAL', 'ATIVA', 2, '777', '00000777', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES ('901', 'CDU05-REV-UNIT', 'CDU05-REV-UNIT', 'OPERACIONAL', 'ATIVA', 2, '777', '00000777', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES ('902', 'CDU05-SUB-UNIT', 'CDU05-SUB-UNIT', 'OPERACIONAL', 'ATIVA', 2, '777', '00000777', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES ('903', 'CDU05-ALERT-UNIT', 'CDU05-ALERT-UNIT', 'OPERACIONAL', 'ATIVA', 2, '777', '00000777', CURRENT_TIMESTAMP);
-INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('904', 'CDU05-READONLY-UNIT', 'CDU05-READONLY-UNIT', 'OPERACIONAL', 'ATIVA', 2, '777', '00000777', CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES ('904', 'CDU05-READONLY-UNIT', 'CDU05-READONLY-UNIT', 'OPERACIONAL', 'ATIVA', 2, '777', '00000777',
+        CURRENT_TIMESTAMP);
 
 -- -------------------------------------------------------------------------------------------------
 -- UNIDADE_MAPA (relaciona unidades com mapas vigentes)
@@ -319,20 +356,27 @@ VALUES ('999999999999');
 
 INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo)
 VALUES ('50000', 'Processo Teste A', 'EM_ANDAMENTO', CURRENT_TIMESTAMP, 'MAPEAMENTO');
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('50000', 8, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 'ATIVA', 6, '3', '00000003', CURRENT_TIMESTAMP);
-INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_destino_titulo, descricao, data_hora)
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo,
+                                  titulo_titular, matricula_titular, data_inicio_titularidade)
+VALUES ('50000', 8, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 'ATIVA', 6, '3', '00000003',
+        CURRENT_TIMESTAMP);
+INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_destino_titulo,
+                        descricao, data_hora)
 VALUES ('70000', 50000, 1, 8, 50001, 'Alerta de teste para processo A', CURRENT_TIMESTAMP);
 
 INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo)
 VALUES ('50001', 'Processo Teste B', 'FINALIZADO', CURRENT_TIMESTAMP, 'MAPEAMENTO');
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('50001', 9, 'Seção de Dados e Inteligência Artificial', 'SEDIA', 'OPERACIONAL', 'ATIVA', 6, '333333333333', '33333333', CURRENT_TIMESTAMP);
-INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_destino_titulo, descricao, data_hora)
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo,
+                                  titulo_titular, matricula_titular, data_inicio_titularidade)
+VALUES ('50001', 9, 'Seção de Dados e Inteligência Artificial', 'SEDIA', 'OPERACIONAL', 'ATIVA', 6, '333333333333',
+        '33333333', CURRENT_TIMESTAMP);
+INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_destino_titulo,
+                        descricao, data_hora)
 VALUES ('70001', 50001, 1, 9, 50003, 'Alerta de teste para processo B', CURRENT_TIMESTAMP);
 
 -- Alertas específicos para CDU-02
-INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_destino_titulo, descricao, data_hora)
+INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_destino_titulo,
+                        descricao, data_hora)
 VALUES ('70002', 50000, 1, 8, '8', 'Alerta para Gestor', CURRENT_TIMESTAMP);
 
 INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, descricao, data_hora)
@@ -349,15 +393,18 @@ VALUES ('10001', 1001, 'Desenvolvimento em Java');
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10002', 1001, 'Desenvolvimento em Vue.js');
 
-INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_titulo, descricao, data_hora, unidade_origem_codigo, unidade_destino_codigo)
+INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_titulo, descricao, data_hora, unidade_origem_codigo,
+                              unidade_destino_codigo)
 VALUES ('80000', 60000, '50001', 'INICIADO', CURRENT_TIMESTAMP, 1, 8);
 
 -- DADOS ADICIONAIS PARA CDU-17 e CDU-19 e CDU-02
 -- Processo 1700 (para CDU-17)
 INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)
 VALUES ('1700', 'Processo para CDU-17', 'EM_ANDAMENTO', CURRENT_TIMESTAMP, 'MAPEAMENTO', '2025-12-31 23:59:59');
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('1700', 8, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 'ATIVA', 6, '3', '00000003', CURRENT_TIMESTAMP);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo,
+                                  titulo_titular, matricula_titular, data_inicio_titularidade)
+VALUES ('1700', 8, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 'ATIVA', 6, '3', '00000003',
+        CURRENT_TIMESTAMP);
 
 -- Mapa e Subprocesso para CDU-17
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
@@ -376,8 +423,10 @@ VALUES ('17001', 17001);
 -- Processo CRIADO (para CDU-02 teste de Admin)
 INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)
 VALUES ('2000', 'Processo Criado', 'CRIADO', CURRENT_TIMESTAMP, 'MAPEAMENTO', '2025-12-31 23:59:59');
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('2000', 8, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 'ATIVA', 6, '3', '00000003', CURRENT_TIMESTAMP);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo,
+                                  titulo_titular, matricula_titular, data_inicio_titularidade)
+VALUES ('2000', 8, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 'ATIVA', 6, '3', '00000003',
+        CURRENT_TIMESTAMP);
 
 -- Vincula Mapa 1001 ao Subprocesso 60000 (já existente, Processo 50000 - EM ANDAMENTO)
 UPDATE SGC.MAPA
@@ -401,8 +450,10 @@ INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10004', 1002, 'Machine Learning');
 
 -- Mapa 1003 (Unidade 10) -> Processo 50002 (FINALIZADO)
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('50002', 10, 'Seção de Sistemas Eleitorais', 'SESEL', 'OPERACIONAL', 'ATIVA', 6, '1', '00000001', CURRENT_TIMESTAMP);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo,
+                                  titulo_titular, matricula_titular, data_inicio_titularidade)
+VALUES ('50002', 10, 'Seção de Sistemas Eleitorais', 'SESEL', 'OPERACIONAL', 'ATIVA', 6, '1', '00000001',
+        CURRENT_TIMESTAMP);
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
 VALUES ('60003', 50002, 10, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
 
@@ -415,8 +466,10 @@ INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10006', 1003, 'Gestão de Projetos');
 
 -- Mapa 1004 (Unidade 102) -> Processo 50002 (FINALIZADO)
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('50002', 102, 'SUB-UNIT', 'SUB-UNIT', 'OPERACIONAL', 'ATIVA', 101, '222222222222', '22222222', CURRENT_TIMESTAMP);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo,
+                                  titulo_titular, matricula_titular, data_inicio_titularidade)
+VALUES ('50002', 102, 'SUB-UNIT', 'SUB-UNIT', 'OPERACIONAL', 'ATIVA', 101, '222222222222', '22222222',
+        CURRENT_TIMESTAMP);
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
 VALUES ('60004', 50002, 102, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
 
@@ -434,8 +487,10 @@ INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo)
 VALUES ('30000', 10007);
 
 -- Mapa 201 (Unidade 201) -> Processo 50002 (FINALIZADO)
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES ('50002', 201, 'Coordenadoria de Atenção ao Servidor', 'CAS', 'INTEROPERACIONAL', 'ATIVA', 200, '2', '00000002', CURRENT_TIMESTAMP);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo,
+                                  titulo_titular, matricula_titular, data_inicio_titularidade)
+VALUES ('50002', 201, 'Coordenadoria de Atenção ao Servidor', 'CAS', 'INTEROPERACIONAL', 'ATIVA', 200, '2', '00000002',
+        CURRENT_TIMESTAMP);
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
 VALUES ('60201', 50002, 201, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
 

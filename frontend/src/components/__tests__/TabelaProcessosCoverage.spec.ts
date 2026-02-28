@@ -51,14 +51,14 @@ describe('TabelaProcessos Coverage', () => {
 
         const row = wrapper.find('tr');
         // Trigger space key
-        await row.trigger('keydown', { key: ' ' });
+        await row.trigger('keydown', {key: ' '});
 
         expect(wrapper.emitted('selecionarProcesso')).toBeTruthy();
         expect(wrapper.emitted('selecionarProcesso')![0]).toEqual([mockProcessos[0]]);
     });
 
     it('returns empty class/attr for invalid inputs in row functions', async () => {
-         const BTableStub = {
+        const BTableStub = {
             props: ['items', 'tbodyTrClass', 'tbodyTrAttr'],
             template: `
                 <div>

@@ -509,7 +509,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // 1. GESTOR COORD_12 - Primeiro Aceite
             await page.getByTestId('btn-logout').click({force: true});
             await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
-            
+
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
             await capturarTela(page, '05-mapa', '00a-analise-gestor-coordenadoria', {fullPage: true});
@@ -663,7 +663,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
 
 
-
             await capturarTela(page, '07-estados', '02-processo-em-andamento');
             await capturarComponente(page.getByTestId('tbl-processos'), '07-estados', '03-tabela-com-multiplos-estados');
         });
@@ -718,7 +717,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await navegarParaSubprocesso(page, 'SECAO_111');
             await expect(page).toHaveURL(/processo\/\d+/);
-            
+
             // Capturar ID para cleanup (após navegar para o subprocesso)
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
@@ -988,7 +987,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                         await capturarTela(page, '14-relatorios', '04-botao-exportacao');
                     }
 
-                    await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {});
+                    await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {
+                    });
                     await page.waitForTimeout(300);
                 }
 
@@ -998,7 +998,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                     await cardMapas.click();
                     await page.waitForTimeout(300);
                     await capturarTela(page, '14-relatorios', '05-modal-relatorio-mapas');
-                    await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {});
+                    await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {
+                    });
                 }
             }
         });

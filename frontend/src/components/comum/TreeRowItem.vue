@@ -14,16 +14,16 @@
     >
       <button
           v-if="index === 0 && item.children && item.children.length > 0"
-          type="button"
-          class="btn btn-link p-0 toggle-icon text-decoration-none border-0"
-          :data-testid="`btn-toggle-expand-${item.codigo}`"
           :aria-expanded="item.expanded"
           :aria-label="item.expanded ? 'Recolher' : 'Expandir'"
+          :data-testid="`btn-toggle-expand-${item.codigo}`"
+          class="btn btn-link p-0 toggle-icon text-decoration-none border-0"
+          type="button"
           @click.stop="toggleExpand(item.codigo)"
           @keydown.enter.stop="toggleExpand(item.codigo)"
           @keydown.space.stop="toggleExpand(item.codigo)"
       >
-        <i aria-hidden="true" :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']"/>
+        <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']" aria-hidden="true"/>
       </button>
       {{ item[column.key] }}
     </td>

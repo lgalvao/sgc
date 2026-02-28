@@ -23,12 +23,62 @@ class UsuarioFacadeTest {
 
     @Mock
     private UsuarioService usuarioService;
-    
+
     @Mock
     private ResponsavelUnidadeService responsavelUnidadeService;
-    
+
     @InjectMocks
     private UsuarioFacade facade;
+
+    @Test
+    @DisplayName("extrairTituloUsuario deve lidar com tipos diferentes")
+    void deveExtrairTituloUsuario() {
+        assertThat(facade.extrairTituloUsuario("123")).isEqualTo("123");
+        Usuario u = new Usuario();
+        u.setTituloEleitoral("456");
+        assertThat(facade.extrairTituloUsuario(u)).isEqualTo("456");
+        assertThat(facade.extrairTituloUsuario(123L)).isEqualTo("123");
+        assertThat(facade.extrairTituloUsuario(null)).isNull();
+    }
+
+    // Métodos auxiliares
+    private Usuario criarUsuario(String titulo) {
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(titulo);
+        usuario.setNome("Usuário Teste");
+        usuario.setEmail("usuario@test.com");
+        usuario.setMatricula("12345");
+        usuario.setUnidadeLotacao(criarUnidade(1L, "UNID1"));
+        return usuario;
+    }
+
+    private Unidade criarUnidade(Long codigo, String sigla) {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(codigo);
+        unidade.setSigla(sigla);
+        unidade.setNome("Unidade Teste");
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        return unidade;
+    }
+
+    private UsuarioPerfil criarAtribuicao(Usuario usuario, Unidade unidade, Perfil perfil) {
+        UsuarioPerfil atribuicao = new UsuarioPerfil();
+        atribuicao.setUsuario(usuario);
+        atribuicao.setUsuarioTitulo(usuario.getTituloEleitoral());
+        atribuicao.setUnidade(unidade);
+        atribuicao.setUnidadeCodigo(unidade.getCodigo());
+        atribuicao.setPerfil(perfil);
+        return atribuicao;
+    }
+
+    private void configurarAutenticacao(String titulo) {
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                titulo, null, Collections.emptyList());
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(auth);
+        SecurityContextHolder.setContext(context);
+    }
 
     @Nested
     @DisplayName("Autenticação e Contexto")
@@ -40,7 +90,7 @@ class UsuarioFacadeTest {
             // Arrange
             String titulo = "123456";
             Usuario usuario = criarUsuario(titulo);
-            
+
             configurarAutenticacao(titulo);
             when(usuarioService.buscarComAtribuicoes(titulo)).thenReturn(usuario);
 
@@ -116,7 +166,7 @@ class UsuarioFacadeTest {
             // Arrange
             String titulo = "123456";
             Usuario usuario = criarUsuario(titulo);
-            
+
             when(usuarioService.buscarComAtribuicoesOpt(titulo))
                     .thenReturn(Optional.of(usuario));
 
@@ -306,54 +356,5 @@ class UsuarioFacadeTest {
             // Assert
             assertThat(resultado).hasSize(2).containsKeys("111111", "222222");
         }
-    }
-
-    @Test
-    @DisplayName("extrairTituloUsuario deve lidar com tipos diferentes")
-    void deveExtrairTituloUsuario() {
-        assertThat(facade.extrairTituloUsuario("123")).isEqualTo("123");
-        Usuario u = new Usuario(); u.setTituloEleitoral("456");
-        assertThat(facade.extrairTituloUsuario(u)).isEqualTo("456");
-        assertThat(facade.extrairTituloUsuario(123L)).isEqualTo("123");
-        assertThat(facade.extrairTituloUsuario(null)).isNull();
-    }
-
-    // Métodos auxiliares
-    private Usuario criarUsuario(String titulo) {
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral(titulo);
-        usuario.setNome("Usuário Teste");
-        usuario.setEmail("usuario@test.com");
-        usuario.setMatricula("12345");
-        usuario.setUnidadeLotacao(criarUnidade(1L, "UNID1"));
-        return usuario;
-    }
-
-    private Unidade criarUnidade(Long codigo, String sigla) {
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(codigo);
-        unidade.setSigla(sigla);
-        unidade.setNome("Unidade Teste");
-        unidade.setSituacao(SituacaoUnidade.ATIVA);
-        unidade.setTipo(TipoUnidade.OPERACIONAL);
-        return unidade;
-    }
-
-    private UsuarioPerfil criarAtribuicao(Usuario usuario, Unidade unidade, Perfil perfil) {
-        UsuarioPerfil atribuicao = new UsuarioPerfil();
-        atribuicao.setUsuario(usuario);
-        atribuicao.setUsuarioTitulo(usuario.getTituloEleitoral());
-        atribuicao.setUnidade(unidade);
-        atribuicao.setUnidadeCodigo(unidade.getCodigo());
-        atribuicao.setPerfil(perfil);
-        return atribuicao;
-    }
-
-    private void configurarAutenticacao(String titulo) {
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                titulo, null, Collections.emptyList());
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(auth);
-        SecurityContextHolder.setContext(context);
     }
 }

@@ -12,7 +12,7 @@ describe("Unidades.vue", () => {
     });
 
     const mockUnidades = [
-        { codigo: 1, sigla: "ROOT", nome: "Raiz", filhas: [] }
+        {codigo: 1, sigla: "ROOT", nome: "Raiz", filhas: []}
     ];
 
     const createWrapper = (initialStateOverride = {}) => {
@@ -28,20 +28,20 @@ describe("Unidades.vue", () => {
                 },
                 {
                     PageHeader: {
-                         template: "<div><h1>Page Header</h1><slot name='description' /></div>" 
+                        template: "<div><h1>Page Header</h1><slot name='description' /></div>"
                     },
-                    ArvoreUnidades: { 
+                    ArvoreUnidades: {
                         name: "ArvoreUnidades",
                         template: "<div data-testid='arvore-unidades'></div>",
                         props: ["unidades", "modelValue", "modoSelecao", "ocultarRaiz"]
                     },
-                    BContainer: { template: "<div><slot /></div>" },
-                    BAlert: { 
+                    BContainer: {template: "<div><slot /></div>"},
+                    BAlert: {
                         name: "BAlert",
                         template: "<div><slot /><button @click=\"$emit('dismissed')\">Close</button></div>",
                         props: ["modelValue", "variant", "dismissible"]
                     },
-                    BSpinner: { 
+                    BSpinner: {
                         name: "BSpinner",
                         template: "<div class='spinner'></div>",
                         props: ["variant", "label"]
@@ -59,39 +59,39 @@ describe("Unidades.vue", () => {
     });
 
     it("deve exibir spinner durante carregamento", () => {
-        const wrapper = createWrapper({ isLoading: true });
+        const wrapper = createWrapper({isLoading: true});
         expect(wrapper.find(".spinner").exists()).toBe(true);
         expect(wrapper.text()).toContain("Carregando árvore de unidades...");
     });
 
     it("deve exibir erro se houver erro no store", () => {
-        const wrapper = createWrapper({ error: "Erro de API" });
+        const wrapper = createWrapper({error: "Erro de API"});
         expect(wrapper.text()).toContain("Erro de API");
     });
 
     it("deve chamar clearError ao fechar o alerta", async () => {
-        const wrapper = createWrapper({ error: "Erro de API" });
+        const wrapper = createWrapper({error: "Erro de API"});
         const store = useUnidadesStore();
-        
+
         const closeButton = wrapper.find("button");
         await closeButton.trigger("click");
-        
+
         expect(store.clearError).toHaveBeenCalled();
     });
 
     it("deve exibir ArvoreUnidades quando houver unidades", () => {
-        const wrapper = createWrapper({ unidades: mockUnidades });
+        const wrapper = createWrapper({unidades: mockUnidades});
         const arvore = wrapper.find("[data-testid='arvore-unidades']");
         expect(arvore.exists()).toBe(true);
-        
-        const arvoreComponent = wrapper.findComponent({ name: "ArvoreUnidades" });
+
+        const arvoreComponent = wrapper.findComponent({name: "ArvoreUnidades"});
         expect(arvoreComponent.props("unidades")).toEqual(mockUnidades);
         expect(arvoreComponent.props("modoSelecao")).toBe(false);
         expect(arvoreComponent.props("ocultarRaiz")).toBe(false);
     });
 
     it("deve exibir mensagem quando não houver unidades", () => {
-        const wrapper = createWrapper({ unidades: [] });
+        const wrapper = createWrapper({unidades: []});
         expect(wrapper.text()).toContain("Nenhuma unidade encontrada.");
         expect(wrapper.find("[data-testid='arvore-unidades']").exists()).toBe(false);
     });

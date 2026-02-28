@@ -182,7 +182,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<ErroApi> handleGenericException(Exception ex) {
         String traceId = UUID.randomUUID().toString();
         log.error("[{}] ERRO NÃO TRATADO DETECTADO: {}", traceId, ex.getMessage(), ex);
-        
+
         String message = "ERRO INESPERADO: " + (ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName());
         ErroApi erroApi = new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, message, "ERRO_INTERNO", traceId);
         erroApi.setStackTrace(getStackTrace(ex));

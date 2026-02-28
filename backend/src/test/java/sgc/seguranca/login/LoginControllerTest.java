@@ -310,6 +310,7 @@ class LoginControllerTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isUnauthorized());
     }
+
     @Nested
     @DisplayName("Unit Tests (Isolated)")
     class UnitTests {
@@ -326,10 +327,10 @@ class LoginControllerTest {
             gerenciadorJwtMock = mock(GerenciadorJwt.class);
 
             controller = new LoginController(
-                loginFacadeMock,
+                    loginFacadeMock,
                     organizacaoFacadeMock,
                     limitadorMock,
-                gerenciadorJwtMock
+                    gerenciadorJwtMock
             );
         }
 
@@ -370,12 +371,12 @@ class LoginControllerTest {
         void entrar_CookieInvalido() {
             EntrarRequest req = new EntrarRequest("user", "ADMIN", 1L);
             HttpServletRequest httpReq = mock(HttpServletRequest.class);
-            
+
             // No cookies
             when(httpReq.getCookies()).thenReturn(null);
 
-            Assertions.assertThrows(ErroAutenticacao.class, 
-                () -> controller.entrar(req, httpReq));
+            Assertions.assertThrows(ErroAutenticacao.class,
+                    () -> controller.entrar(req, httpReq));
         }
 
         @Test
@@ -384,26 +385,26 @@ class LoginControllerTest {
             EntrarRequest req = new EntrarRequest("user", "ADMIN", 1L);
             HttpServletRequest httpReq = mock(HttpServletRequest.class);
             Cookie cookie = new Cookie("SGC_PRE_AUTH", "token");
-            
+
             when(httpReq.getCookies()).thenReturn(new Cookie[]{cookie});
             when(gerenciadorJwtMock.validarTokenPreAuth("token")).thenReturn(Optional.of("otherUser"));
 
-            Assertions.assertThrows(ErroAutenticacao.class, 
-                () -> controller.entrar(req, httpReq));
+            Assertions.assertThrows(ErroAutenticacao.class,
+                    () -> controller.entrar(req, httpReq));
         }
-        
+
         @Test
         @DisplayName("entrar deve lidar com sessao invalida (token empty)")
         void entrar_TokenEmpty() {
             EntrarRequest req = new EntrarRequest("user", "ADMIN", 1L);
             HttpServletRequest httpReq = mock(HttpServletRequest.class);
             Cookie cookie = new Cookie("SGC_PRE_AUTH", "token");
-            
+
             when(httpReq.getCookies()).thenReturn(new Cookie[]{cookie});
             when(gerenciadorJwtMock.validarTokenPreAuth("token")).thenReturn(Optional.empty());
 
-            Assertions.assertThrows(ErroAutenticacao.class, 
-                () -> controller.entrar(req, httpReq));
+            Assertions.assertThrows(ErroAutenticacao.class,
+                    () -> controller.entrar(req, httpReq));
         }
     }
 }

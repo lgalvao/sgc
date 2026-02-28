@@ -7,11 +7,12 @@ import java.time.*;
 import java.util.*;
 
 public record AcaoEmBlocoRequest(
-    @NotEmpty(message = "Pelo menos uma unidade deve ser selecionada")
-    List<Long> unidadeCodigos,
+        @NotEmpty(message = "Pelo menos uma unidade deve ser selecionada")
+        List<Long> unidadeCodigos,
 
-    @NotNull(message = "A ação deve ser informada")
-    AcaoProcesso acao,
+        @NotNull(message = "A ação deve ser informada")
+        AcaoProcesso acao,
 
-    LocalDate dataLimite
-) {}
+        LocalDate dataLimite
+) {
+}

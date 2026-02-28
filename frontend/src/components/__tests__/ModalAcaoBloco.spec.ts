@@ -3,7 +3,7 @@ import {mount} from "@vue/test-utils";
 import ModalAcaoBloco from "../processo/ModalAcaoBloco.vue";
 
 // Mock Bootstrap Modal with hoisted variables
-const { mockShow, mockHide } = vi.hoisted(() => ({
+const {mockShow, mockHide} = vi.hoisted(() => ({
     mockShow: vi.fn(),
     mockHide: vi.fn(),
 }));
@@ -20,8 +20,8 @@ vi.mock("bootstrap", () => {
 
 describe("ModalAcaoBloco.vue", () => {
     const mockUnidades = [
-        { codigo: 1, sigla: "U1", nome: "Unidade 1", situacao: "Pendente" },
-        { codigo: 2, sigla: "U2", nome: "Unidade 2", situacao: "Pendente" },
+        {codigo: 1, sigla: "U1", nome: "Unidade 1", situacao: "Pendente"},
+        {codigo: 2, sigla: "U2", nome: "Unidade 2", situacao: "Pendente"},
     ];
 
     const defaultProps = {
@@ -35,7 +35,7 @@ describe("ModalAcaoBloco.vue", () => {
 
     const createWrapper = (props = {}) => {
         return mount(ModalAcaoBloco, {
-            props: { ...defaultProps, ...props },
+            props: {...defaultProps, ...props},
         });
     };
 
@@ -67,14 +67,14 @@ describe("ModalAcaoBloco.vue", () => {
     });
 
     it("deve inicializar com unidades pré-selecionadas", () => {
-        const wrapper = createWrapper({ unidadesPreSelecionadas: [1] });
+        const wrapper = createWrapper({unidadesPreSelecionadas: [1]});
         const checkboxes = wrapper.findAll('tbody input[type="checkbox"]');
         expect((checkboxes[0].element as HTMLInputElement).checked).toBe(true); // U1
         expect((checkboxes[1].element as HTMLInputElement).checked).toBe(false); // U2
     });
 
     it("deve emitir 'confirmar' com os IDs selecionados", async () => {
-        const wrapper = createWrapper({ unidadesPreSelecionadas: [2] });
+        const wrapper = createWrapper({unidadesPreSelecionadas: [2]});
 
         await wrapper.find('.btn-primary').trigger('click');
 

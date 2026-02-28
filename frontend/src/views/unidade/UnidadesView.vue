@@ -12,32 +12,32 @@
     />
 
     <div v-if="unidadesStore.isLoading" class="text-center py-5">
-      <BSpinner variant="primary" label="Carregando unidades..." />
+      <BSpinner label="Carregando unidades..." variant="primary"/>
       <p class="mt-2 text-muted">Carregando árvore de unidades...</p>
     </div>
 
     <div v-else-if="unidades.length > 0" class="card shadow-sm">
       <div class="card-body">
         <ArvoreUnidades
-          :unidades="unidades"
-          :model-value="[]"
-          :modo-selecao="false"
-          :ocultar-raiz="false"
-          @update:model-value="() => {}"
+            :model-value="[]"
+            :modo-selecao="false"
+            :ocultar-raiz="false"
+            :unidades="unidades"
+            @update:model-value="() => {}"
         />
       </div>
     </div>
 
     <EmptyState
         v-else
+        description="Nenhuma unidade retornada. Tente atualizar a listagem."
         icon="bi-diagram-3"
         title="Nenhuma unidade encontrada."
-        description="Nenhuma unidade retornada. Tente atualizar a listagem."
     >
       <BButton
-          variant="outline-primary"
-          size="sm"
           data-testid="btn-unidades-recarregar"
+          size="sm"
+          variant="outline-primary"
           @click="carregarUnidades"
       >
         Atualizar unidades

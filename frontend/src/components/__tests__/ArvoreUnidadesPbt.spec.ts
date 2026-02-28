@@ -6,24 +6,24 @@ import type {Unidade} from '@/types/tipos';
 
 // Helper to generate a tree of units with unique IDs
 const generateTree = (depth: number, breadth: number, startId = 1): Unidade[] => {
-  if (depth === 0) return [];
+    if (depth === 0) return [];
 
-  const units: Unidade[] = [];
-  for (let i = 0; i < breadth; i++) {
-    const id = startId * 10 + i + 1;
-    const children = generateTree(depth - 1, breadth, id);
+    const units: Unidade[] = [];
+    for (let i = 0; i < breadth; i++) {
+        const id = startId * 10 + i + 1;
+        const children = generateTree(depth - 1, breadth, id);
 
-    units.push({
-      codigo: id,
-      sigla: `U${id}`,
-      nome: `Unidade ${id}`,
-      isElegivel: true,
-      filhas: children.length > 0 ? children : undefined,
-      tipo: 'OPERACIONAL',
-      unidadeSuperiorCodigo: Math.floor(startId / 10) // Approx
-    });
-  }
-  return units;
+        units.push({
+            codigo: id,
+            sigla: `U${id}`,
+            nome: `Unidade ${id}`,
+            isElegivel: true,
+            filhas: children.length > 0 ? children : undefined,
+            tipo: 'OPERACIONAL',
+            unidadeSuperiorCodigo: Math.floor(startId / 10) // Approx
+        });
+    }
+    return units;
 };
 
 // Flatten tree to list
@@ -38,187 +38,187 @@ const flatten = (nodes: Unidade[]): Unidade[] => {
 
 describe('ArvoreUnidades Property-Based Tests', () => {
 
-  it('should satisfy Monotonicity: Selecting a parent selects all eligible children', () => {
-    // We generate a fixed structure but vary the interactions
-    const tree = generateTree(3, 2, 0);
-    const allNodes = flatten(tree);
+    it('should satisfy Monotonicity: Selecting a parent selects all eligible children', () => {
+        // We generate a fixed structure but vary the interactions
+        const tree = generateTree(3, 2, 0);
+        const allNodes = flatten(tree);
 
-    const wrapper = mount(ArvoreUnidades, {
-      props: {
-        unidades: tree,
-        modelValue: []
-      }
+        const wrapper = mount(ArvoreUnidades, {
+            props: {
+                unidades: tree,
+                modelValue: []
+            }
+        });
+
+        const vm = wrapper.vm as any;
+
+        fc.assert(
+            fc.property(fc.nat({max: allNodes.length - 1}), (nodeIndex) => {
+                // Reset selection
+                vm.deselecionarTodas();
+
+                const targetNode = allNodes[nodeIndex];
+
+                // Act: Toggle On
+                vm.toggle(targetNode, true);
+
+                // Assert: All eligible children must be selected (and the node itself)
+                expect(vm.isChecked(targetNode.codigo)).toBe(true);
+
+                const checkChildren = (node: Unidade) => {
+                    if (node.filhas) {
+                        node.filhas.forEach(child => {
+                            if (child.isElegivel) {
+                                expect(vm.isChecked(child.codigo)).toBe(true);
+                            }
+                            checkChildren(child);
+                        });
+                    }
+                };
+                checkChildren(targetNode);
+            })
+        );
     });
 
-    const vm = wrapper.vm as any;
+    it('should satisfy Selection State Invariant: Parent is checked iff all eligible children are checked', () => {
+        const tree = generateTree(3, 2, 0);
+        const allNodes = flatten(tree);
 
-    fc.assert(
-      fc.property(fc.nat({ max: allNodes.length - 1 }), (nodeIndex) => {
-          // Reset selection
-          vm.deselecionarTodas();
+        const wrapper = mount(ArvoreUnidades, {
+            props: {
+                unidades: tree,
+                modelValue: []
+            }
+        });
+        const vm = wrapper.vm as any;
 
-          const targetNode = allNodes[nodeIndex];
+        fc.assert(
+            fc.property(fc.array(fc.nat({max: allNodes.length - 1})), (indicesToSelect) => {
+                // Reset
+                vm.deselecionarTodas();
 
-          // Act: Toggle On
-          vm.toggle(targetNode, true);
+                // Select random nodes
+                indicesToSelect.forEach(idx => {
+                    const node = allNodes[idx];
+                    vm.toggle(node, true);
+                });
 
-          // Assert: All eligible children must be selected (and the node itself)
-          expect(vm.isChecked(targetNode.codigo)).toBe(true);
+                // Verify Invariant for all parents
+                allNodes.forEach(node => {
+                    if (node.filhas && node.filhas.length > 0) {
+                        const allEligibleChildren = flatten(node.filhas).filter(n => n.isElegivel);
+                        if (allEligibleChildren.length === 0) return; // Leaf effectively
 
-          const checkChildren = (node: Unidade) => {
-              if (node.filhas) {
-                  node.filhas.forEach(child => {
-                      if (child.isElegivel) {
-                          expect(vm.isChecked(child.codigo)).toBe(true);
-                      }
-                      checkChildren(child);
-                  });
-              }
-          };
-          checkChildren(targetNode);
-      })
-    );
-  });
+                        const childrenDirect = node.filhas;
+                        const allChildrenChecked = childrenDirect.every(child => {
+                            if (!child.isElegivel) return true;
+                            return vm.isChecked(child.codigo);
+                        });
 
-  it('should satisfy Selection State Invariant: Parent is checked iff all eligible children are checked', () => {
-      const tree = generateTree(3, 2, 0);
-      const allNodes = flatten(tree);
-
-      const wrapper = mount(ArvoreUnidades, {
-        props: {
-            unidades: tree,
-            modelValue: []
-        }
-      });
-      const vm = wrapper.vm as any;
-
-      fc.assert(
-        fc.property(fc.array(fc.nat({ max: allNodes.length - 1 })), (indicesToSelect) => {
-            // Reset
-            vm.deselecionarTodas();
-
-            // Select random nodes
-            indicesToSelect.forEach(idx => {
-                const node = allNodes[idx];
-                vm.toggle(node, true);
-            });
-
-            // Verify Invariant for all parents
-            allNodes.forEach(node => {
-                if (node.filhas && node.filhas.length > 0) {
-                    const allEligibleChildren = flatten(node.filhas).filter(n => n.isElegivel);
-                    if (allEligibleChildren.length === 0) return; // Leaf effectively
-
-                    const childrenDirect = node.filhas;
-                    const allChildrenChecked = childrenDirect.every(child => {
-                         if (!child.isElegivel) return true; 
-                         return vm.isChecked(child.codigo);
-                    });
-
-                    if (allChildrenChecked && node.isElegivel) {
-                        expect(vm.isChecked(node.codigo)).toBe(true);
-                    } else {
-                        if (node.tipo !== 'INTEROPERACIONAL') {
-                            expect(vm.isChecked(node.codigo)).toBe(false);
+                        if (allChildrenChecked && node.isElegivel) {
+                            expect(vm.isChecked(node.codigo)).toBe(true);
+                        } else {
+                            if (node.tipo !== 'INTEROPERACIONAL') {
+                                expect(vm.isChecked(node.codigo)).toBe(false);
+                            }
                         }
                     }
+                });
+            })
+        );
+    });
+
+    it('should satisfy Eligibility Invariant: Only eligible units can be selected', () => {
+        // Generate base structure
+        const treeStructure = generateTree(3, 2, 0); // ~14 nodes
+        const allNodesStructure = flatten(treeStructure);
+
+        // We need as many random properties as nodes
+        const numNodes = allNodesStructure.length;
+
+        fc.assert(
+            fc.property(
+                fc.array(fc.record({
+                    isElegivel: fc.boolean(),
+                    tipo: fc.constantFrom('OPERACIONAL', 'INTERMEDIARIA', 'INTEROPERACIONAL')
+                }), {minLength: numNodes, maxLength: numNodes}),
+                fc.array(fc.nat({max: numNodes - 1})), // User interactions (toggles)
+                (randomProps, indicesToToggle) => {
+                    // Clone tree structure to avoid mutation across runs
+                    const tree = structuredClone(treeStructure);
+                    const allNodes = flatten(tree);
+
+                    // Apply random properties
+                    allNodes.forEach((node, i) => {
+                        const props = randomProps[i];
+                        node.tipo = props.tipo as any;
+                        node.isElegivel = props.isElegivel;
+
+                        // Enforce domain rule: INTERMEDIARIA is never eligible
+                        if (node.tipo === 'INTERMEDIARIA') {
+                            node.isElegivel = false;
+                        }
+                    });
+
+                    const wrapper = mount(ArvoreUnidades, {
+                        props: {
+                            unidades: tree,
+                            modelValue: []
+                        }
+                    });
+                    const vm = wrapper.vm as any;
+
+                    // Perform interactions
+                    indicesToToggle.forEach(idx => {
+                        const node = allNodes[idx];
+                        // Toggle state (simulate check/uncheck)
+                        const isSelected = vm.isChecked(node.codigo);
+                        vm.toggle(node, !isSelected);
+                    });
+
+                    // Assert Invariant: All selected units must be eligible
+                    const selectedNodes = allNodes.filter(n => vm.isChecked(n.codigo));
+
+                    selectedNodes.forEach(node => {
+                        expect(node.isElegivel).toBe(true);
+                        // Implicitly checks INTERMEDIARIA is not selected because we forced isElegivel=false for them.
+                        expect(node.tipo).not.toBe('INTERMEDIARIA');
+                    });
                 }
-            });
-        })
-      );
-  });
+            )
+        );
+    });
 
-  it('should satisfy Eligibility Invariant: Only eligible units can be selected', () => {
-    // Generate base structure
-    const treeStructure = generateTree(3, 2, 0); // ~14 nodes
-    const allNodesStructure = flatten(treeStructure);
+    it('should satisfy Idempotence: Selecting an already selected unit (or tree) should result in the same state', () => {
+        fc.assert(
+            fc.property(fc.nat({max: 100}), (seed) => { // Using seed to generate deterministic tree
+                // Generate tree
+                const tree = generateTree(3, 2, seed);
+                const allNodes = flatten(tree);
+                if (allNodes.length === 0) return;
 
-    // We need as many random properties as nodes
-    const numNodes = allNodesStructure.length;
+                const wrapper = mount(ArvoreUnidades, {
+                    props: {
+                        unidades: tree,
+                        modelValue: []
+                    }
+                });
+                const vm = wrapper.vm as any;
 
-    fc.assert(
-      fc.property(
-        fc.array(fc.record({
-          isElegivel: fc.boolean(),
-          tipo: fc.constantFrom('OPERACIONAL', 'INTERMEDIARIA', 'INTEROPERACIONAL')
-        }), { minLength: numNodes, maxLength: numNodes }),
-        fc.array(fc.nat({ max: numNodes - 1 })), // User interactions (toggles)
-        (randomProps, indicesToToggle) => {
-          // Clone tree structure to avoid mutation across runs
-          const tree = structuredClone(treeStructure);
-          const allNodes = flatten(tree);
+                // Pick a random node
+                const nodeIndex = seed % allNodes.length;
+                const node = allNodes[nodeIndex];
 
-          // Apply random properties
-          allNodes.forEach((node, i) => {
-             const props = randomProps[i];
-             node.tipo = props.tipo as any;
-             node.isElegivel = props.isElegivel;
+                // Select it once
+                vm.toggle(node, true);
+                const stateAfterFirst = [...vm.modelValue].sort((a: number, b: number) => a - b);
 
-             // Enforce domain rule: INTERMEDIARIA is never eligible
-             if (node.tipo === 'INTERMEDIARIA') {
-                 node.isElegivel = false;
-             }
-          });
+                // Select it again
+                vm.toggle(node, true);
+                const stateAfterSecond = [...vm.modelValue].sort((a: number, b: number) => a - b);
 
-          const wrapper = mount(ArvoreUnidades, {
-            props: {
-              unidades: tree,
-              modelValue: []
-            }
-          });
-          const vm = wrapper.vm as any;
-
-          // Perform interactions
-          indicesToToggle.forEach(idx => {
-             const node = allNodes[idx];
-             // Toggle state (simulate check/uncheck)
-             const isSelected = vm.isChecked(node.codigo);
-             vm.toggle(node, !isSelected);
-          });
-
-          // Assert Invariant: All selected units must be eligible
-          const selectedNodes = allNodes.filter(n => vm.isChecked(n.codigo));
-
-          selectedNodes.forEach(node => {
-              expect(node.isElegivel).toBe(true);
-              // Implicitly checks INTERMEDIARIA is not selected because we forced isElegivel=false for them.
-              expect(node.tipo).not.toBe('INTERMEDIARIA');
-          });
-        }
-      )
-    );
-  });
-
-  it('should satisfy Idempotence: Selecting an already selected unit (or tree) should result in the same state', () => {
-    fc.assert(
-      fc.property(fc.nat({ max: 100 }), (seed) => { // Using seed to generate deterministic tree
-         // Generate tree
-         const tree = generateTree(3, 2, seed);
-         const allNodes = flatten(tree);
-         if (allNodes.length === 0) return;
-
-         const wrapper = mount(ArvoreUnidades, {
-            props: {
-              unidades: tree,
-              modelValue: []
-            }
-         });
-         const vm = wrapper.vm as any;
-
-         // Pick a random node
-         const nodeIndex = seed % allNodes.length;
-         const node = allNodes[nodeIndex];
-
-         // Select it once
-         vm.toggle(node, true);
-         const stateAfterFirst = [...vm.modelValue].sort((a: number, b: number) => a - b);
-
-         // Select it again
-         vm.toggle(node, true);
-         const stateAfterSecond = [...vm.modelValue].sort((a: number, b: number) => a - b);
-
-         expect(stateAfterFirst).toEqual(stateAfterSecond);
-      })
-    );
-  });
+                expect(stateAfterFirst).toEqual(stateAfterSecond);
+            })
+        );
+    });
 });

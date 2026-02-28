@@ -6,8 +6,8 @@
             id="filtro-tipo"
             :model-value="tipo"
             :options="opcoesTipo"
-            data-testid="filtro-tipo"
             aria-label="Filtrar por Tipo"
+            data-testid="filtro-tipo"
             @update:model-value="$emit('update:tipo', $event as string)"
         />
       </BFormGroup>
@@ -17,9 +17,9 @@
         <BFormInput
             id="filtro-data-inicio"
             :model-value="dataInicio"
+            aria-label="Data Início"
             data-testid="filtro-data-inicio"
             type="date"
-            aria-label="Data Início"
             @update:model-value="$emit('update:dataInicio', $event as string)"
         />
       </BFormGroup>
@@ -29,9 +29,9 @@
         <BFormInput
             id="filtro-data-fim"
             :model-value="dataFim"
+            aria-label="Data Fim"
             data-testid="filtro-data-fim"
             type="date"
-            aria-label="Data Fim"
             @update:model-value="$emit('update:dataFim', $event as string)"
         />
       </BFormGroup>
@@ -56,11 +56,11 @@ defineEmits<{
 }>();
 
 const opcoesTipo = [
-  { value: "", text: "Todos os Tipos" },
-  { value: TipoProcesso.MAPEAMENTO, text: "Mapeamento" },
-  { value: TipoProcesso.REVISAO, text: "Revisão" },
-  { value: TipoProcesso.DIAGNOSTICO, text: "Diagnóstico" },
+  {value: "", text: "Todos os Tipos"},
+  {value: TipoProcesso.MAPEAMENTO, text: "Mapeamento"},
+  {value: TipoProcesso.REVISAO, text: "Revisão"},
+  {value: TipoProcesso.DIAGNOSTICO, text: "Diagnóstico"},
 ];
 
-defineExpose({ opcoesTipo });
+defineExpose({opcoesTipo});
 </script>

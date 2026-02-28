@@ -2,7 +2,7 @@ import {expect, type Page} from '@playwright/test';
 
 /**
  * Helpers para navegação e verificação de páginas nos testes E2E.
- * 
+ *
  * Este arquivo centraliza funções comuns de navegação que eram duplicadas
  * em múltiplos arquivos de teste.
  */
@@ -18,7 +18,7 @@ import {expect, type Page} from '@playwright/test';
  */
 export async function limparNotificacoes(page: Page): Promise<void> {
     const notificacao = page.locator('.toast, [data-testid="global-alert"]');
-    
+
     if (await notificacao.count() > 0) {
         // Tentar clicar no botão de fechar se estiver visível
         const btnFechar = notificacao.locator('.btn-close').first();
@@ -72,7 +72,7 @@ export async function verificarPaginaPainel(page: Page): Promise<void> {
 /**
  * Navega para um subprocesso clicando na célula da unidade na tabela TreeTable.
  * Se já estiver na página do subprocesso (redirecionamento direto), apenas valida.
- * 
+ *
  * @param page - Instância da página do Playwright
  * @param siglaUnidade - Sigla da unidade a clicar (ex: 'SECAO_221')
  */
@@ -81,7 +81,7 @@ export async function navegarParaSubprocesso(
     siglaUnidade: string
 ): Promise<void> {
     const urlSubprocesso = new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`);
-    
+
     // Se já estivermos na URL do subprocesso, não precisamos navegar
     if (urlSubprocesso.test(page.url())) {
         return;
@@ -89,10 +89,10 @@ export async function navegarParaSubprocesso(
 
     // Aguardar o cabeçalho do processo (v-if="processo") para garantir carregamento inicial
     await expect(page.getByText('Carregando detalhes do processo...').first()).toBeHidden();
-    
+
     // Se ainda não estivermos na URL, verificamos se o redirecionamento está em curso
     try {
-        await page.waitForURL(urlSubprocesso, { timeout: 1000 });
+        await page.waitForURL(urlSubprocesso, {timeout: 1000});
         return;
     } catch (e) {
         // Se não redirecionou em 1s, prossegue com clique manual
@@ -102,10 +102,10 @@ export async function navegarParaSubprocesso(
 
     const tabela = page.getByTestId('tbl-tree');
     await expect(tabela).toBeVisible();
-    
+
     const celula = tabela.getByRole('cell', {name: siglaUnidade}).first();
     await expect(celula).toBeVisible();
     await celula.click();
-    
+
     await expect(page).toHaveURL(urlSubprocesso);
 }

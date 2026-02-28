@@ -20,8 +20,8 @@ describe('ParametrosSection', () => {
         notificacoesStore = useNotificacoesStore(pinia);
 
         configuracoesStore.parametros = storeParams !== null ? storeParams : [
-            { codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', valor: '30', descricao: 'Desc 1' },
-            { codigo: 2, chave: 'DIAS_ALERTA_NOVO', valor: '5', descricao: 'Desc 2' }
+            {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', valor: '30', descricao: 'Desc 1'},
+            {codigo: 2, chave: 'DIAS_ALERTA_NOVO', valor: '5', descricao: 'Desc 2'}
         ];
         configuracoesStore.getDiasInativacaoProcesso = vi.fn().mockReturnValue(30);
         configuracoesStore.getDiasAlertaNovo = vi.fn().mockReturnValue(5);
@@ -30,7 +30,7 @@ describe('ParametrosSection', () => {
 
         const App = {
             template: '<main><ParametrosSection /></main>',
-            components: { ParametrosSection }
+            components: {ParametrosSection}
         };
 
         wrapper = mount(App, {
@@ -87,7 +87,7 @@ describe('ParametrosSection', () => {
 
     it('deve mostrar loading state', async () => {
         setupWrapper({
-            configuracoes: { loading: true }
+            configuracoes: {loading: true}
         });
         await wrapper.vm.$nextTick();
         expect(wrapper.find('.spinner-border').exists()).toBe(true);
@@ -95,7 +95,7 @@ describe('ParametrosSection', () => {
 
     it('deve mostrar erro state da store', async () => {
         setupWrapper({
-            configuracoes: { error: 'Erro de teste', loading: false }
+            configuracoes: {error: 'Erro de teste', loading: false}
         });
         await wrapper.vm.$nextTick();
         expect(wrapper.find('.alert-stub').text()).toContain('Erro de teste');
@@ -112,8 +112,8 @@ describe('ParametrosSection', () => {
         await wrapper.vm.$nextTick();
         await wrapper.find('form').trigger('submit.prevent');
         expect(configuracoesStore.salvarConfiguracoes).toHaveBeenCalledWith([
-            { codigo: undefined, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: expect.any(String), valor: '30' },
-            { codigo: undefined, chave: 'DIAS_ALERTA_NOVO', descricao: expect.any(String), valor: '5' }
+            {codigo: undefined, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: expect.any(String), valor: '30'},
+            {codigo: undefined, chave: 'DIAS_ALERTA_NOVO', descricao: expect.any(String), valor: '5'}
         ]);
     });
 });

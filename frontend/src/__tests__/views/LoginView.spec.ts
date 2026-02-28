@@ -188,7 +188,8 @@ describe("LoginView.vue", () => {
         perfilStore.loginCompleto = vi.fn().mockRejectedValue(new Error("Erro de rede"));
 
         // Precisamos mockar console.error para não poluir o output do teste
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {
+        });
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
@@ -234,7 +235,8 @@ describe("LoginView.vue", () => {
         perfilStore.perfisUnidades = MOCK_PERFIS;
 
         // Precisamos mockar console.error para não poluir o output do teste
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {
+        });
 
         // Passo 1
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
@@ -281,11 +283,11 @@ describe("LoginView.vue", () => {
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);
 
         // Encontra o select pelo componente para emitir o evento
-        const select = wrapper.findComponent({ name: 'BFormSelect' });
+        const select = wrapper.findComponent({name: 'BFormSelect'});
         if (select.exists()) {
             await select.vm.$emit('update:modelValue', null);
         } else {
-             await wrapper.find('[data-testid="sel-login-perfil"]').trigger('change');
+            await wrapper.find('[data-testid="sel-login-perfil"]').trigger('change');
         }
 
         await wrapper.find('form').trigger('submit');
@@ -304,7 +306,7 @@ describe("LoginView.vue", () => {
         expect(inputWrapper.exists()).toBe(true);
 
         // Disparar evento nativo com mock do getModifierState
-        const eventOn = new KeyboardEvent("keydown", { bubbles: true });
+        const eventOn = new KeyboardEvent("keydown", {bubbles: true});
         Object.defineProperty(eventOn, "getModifierState", {
             value: (key: string) => key === "CapsLock",
         });
@@ -315,7 +317,7 @@ describe("LoginView.vue", () => {
         expect(wrapper.find('[data-testid="alert-caps-lock"]').text()).toContain("Caps Lock ativado");
 
         // Simula evento keyup com caps lock desativado
-        const eventOff = new KeyboardEvent("keyup", { bubbles: true });
+        const eventOff = new KeyboardEvent("keyup", {bubbles: true});
         Object.defineProperty(eventOff, "getModifierState", {
             value: () => false,
         });

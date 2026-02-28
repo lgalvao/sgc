@@ -12,17 +12,6 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("ConfigCors - Testes de Configuração CORS")
 class ConfigCorsTest {
-    @Test
-    @DisplayName("Deve configurar origem CORS com origens permitidas")
-    void deveConfigurarOrigemCorsComOrigensPermitidas() {
-        CorsConfiguration configuration = createCorsConfiguration();
-        assertThat(configuration).isNotNull();
-        assertThat(configuration.getAllowedOrigins()).containsExactly("https://example.com");
-        assertThat(configuration.getAllowedMethods()).containsExactly("GET", "POST");
-        assertThat(configuration.getAllowedHeaders()).containsExactly("*");
-        assertThat(configuration.getAllowCredentials()).isTrue();
-    }
-
     private static @Nullable CorsConfiguration createCorsConfiguration() {
         ConfigCorsProperties properties = new ConfigCorsProperties(
                 List.of("https://example.com"),
@@ -39,6 +28,17 @@ class ConfigCorsTest {
         request.setRequestURI("/api/test");
 
         return source.getCorsConfiguration(request);
+    }
+
+    @Test
+    @DisplayName("Deve configurar origem CORS com origens permitidas")
+    void deveConfigurarOrigemCorsComOrigensPermitidas() {
+        CorsConfiguration configuration = createCorsConfiguration();
+        assertThat(configuration).isNotNull();
+        assertThat(configuration.getAllowedOrigins()).containsExactly("https://example.com");
+        assertThat(configuration.getAllowedMethods()).containsExactly("GET", "POST");
+        assertThat(configuration.getAllowedHeaders()).containsExactly("*");
+        assertThat(configuration.getAllowCredentials()).isTrue();
     }
 
     @Test

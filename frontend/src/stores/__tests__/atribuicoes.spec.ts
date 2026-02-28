@@ -10,12 +10,12 @@ import {logger} from "@/utils";
 const serviceMockData = [
     {
         codigo: 1,
-        unidade: { codigo: 1, nome: "A", sigla: "A" },
+        unidade: {codigo: 1, nome: "A", sigla: "A"},
         usuario: {
             codigo: 1,
             nome: "Servidor 1",
             tituloEleitoral: "123",
-            unidade: { codigo: 1, nome: "A", sigla: "A" },
+            unidade: {codigo: 1, nome: "A", sigla: "A"},
         },
         dataInicio: "2025-01-01",
         dataTermino: "2025-01-31",
@@ -23,12 +23,12 @@ const serviceMockData = [
     },
     {
         codigo: 2,
-        unidade: { codigo: 2, nome: "B", sigla: "B" },
+        unidade: {codigo: 2, nome: "B", sigla: "B"},
         servidor: { // Different field name to test 'usuario || servidor' logic
             codigo: 2,
             nome: "Servidor 2",
             tituloEleitoral: "456",
-            unidade: { codigo: 2, nome: "B", sigla: "B" },
+            unidade: {codigo: 2, nome: "B", sigla: "B"},
         },
         dataInicio: "2025-02-01",
         dataTermino: "2025-02-28",
@@ -119,35 +119,35 @@ describe("useAtribuicaoTemporariaStore", () => {
     describe("getters", () => {
         // Populating store manually for getter tests
         beforeEach(() => {
-             context.store.atribuicoes = [
-                 {
-                     codigo: 1,
-                     unidade: { codigo: 1, nome: "A", sigla: "A" },
-                     usuario: { codigo: 1, nome: "S1" },
-                     dataInicio: "2025-01-01",
-                     dataFim: "2025-01-31",
-                     dataTermino: "2025-01-31",
-                     justificativa: "J1"
-                 },
-                 {
-                     codigo: 2,
-                     unidade: { codigo: 2, nome: "B", sigla: "B" },
-                     usuario: { codigo: 2, nome: "S2" },
-                     dataInicio: "2025-02-01",
-                     dataFim: "2025-02-28",
-                     dataTermino: "2025-02-28",
-                     justificativa: "J2"
-                 },
-                  {
-                     codigo: 3,
-                     unidade: { codigo: 3, nome: "C", sigla: "C" },
-                     usuario: { codigo: 1, nome: "S1" },
-                     dataInicio: "2025-03-01",
-                     dataFim: "2025-03-31",
-                     dataTermino: "2025-03-31",
-                     justificativa: "J3"
-                 },
-             ] as unknown as AtribuicaoTemporaria[];
+            context.store.atribuicoes = [
+                {
+                    codigo: 1,
+                    unidade: {codigo: 1, nome: "A", sigla: "A"},
+                    usuario: {codigo: 1, nome: "S1"},
+                    dataInicio: "2025-01-01",
+                    dataFim: "2025-01-31",
+                    dataTermino: "2025-01-31",
+                    justificativa: "J1"
+                },
+                {
+                    codigo: 2,
+                    unidade: {codigo: 2, nome: "B", sigla: "B"},
+                    usuario: {codigo: 2, nome: "S2"},
+                    dataInicio: "2025-02-01",
+                    dataFim: "2025-02-28",
+                    dataTermino: "2025-02-28",
+                    justificativa: "J2"
+                },
+                {
+                    codigo: 3,
+                    unidade: {codigo: 3, nome: "C", sigla: "C"},
+                    usuario: {codigo: 1, nome: "S1"},
+                    dataInicio: "2025-03-01",
+                    dataFim: "2025-03-31",
+                    dataTermino: "2025-03-31",
+                    justificativa: "J3"
+                },
+            ] as unknown as AtribuicaoTemporaria[];
         });
 
         it("obterAtribuicoesPorServidor deve retornar as atribuições corretas por ID do servidor", () => {

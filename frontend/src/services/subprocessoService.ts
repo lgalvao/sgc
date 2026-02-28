@@ -7,9 +7,9 @@ import type {
     MapaAjuste,
     MapaCompleto,
     MapaVisualizacao,
+    SalvarCompetenciaRequest,
     SubprocessoDetalhe,
-    ValidacaoCadastro,
-    SalvarCompetenciaRequest
+    ValidacaoCadastro
 } from "@/types/tipos";
 import {getOrNull} from "@/utils/apiError";
 import apiClient from "../axios-setup";

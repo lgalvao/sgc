@@ -7,7 +7,7 @@ import {
     navegarParaAtividadesVisualizacao
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
-import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
     aceitarCadastroMapeamento,
     aceitarRevisao,
@@ -20,9 +20,9 @@ import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
 /**
  * CDU-33 - Reabrir revisão de cadastro
- * 
+ *
  * Ator: ADMIN
- * 
+ *
  * Pré-condições:
  * - Subprocesso de revisão com cadastro homologado
  */
@@ -79,7 +79,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await homologarCadastroMapeamento(page);
-        
+
         await navegarParaMapa(page);
         await criarCompetencia(page, `Comp Map ${timestamp}`, [`Ativ Map ${timestamp}`]);
         await disponibilizarMapa(page, '2030-12-31');
@@ -121,7 +121,11 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     // PREPARAÇÃO REVISÃO
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de REVISAO', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Preparacao 1: Admin cria e inicia processo de REVISAO', async ({
+                                                                             page,
+                                                                             autenticadoComoAdmin,
+                                                                             cleanupAutomatico
+                                                                         }) => {
         await criarProcesso(page, {
             descricao: descRevisao,
             tipo: 'REVISAO',

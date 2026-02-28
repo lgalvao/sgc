@@ -39,7 +39,7 @@ class ProcessoDetalheBuilderCoverageTest {
         processo.setCodigo(codProcesso);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        
+
         UnidadeProcesso participante = new UnidadeProcesso();
         participante.setUnidadeCodigo(100L);
         processo.setParticipantes(List.of(participante));
@@ -54,7 +54,7 @@ class ProcessoDetalheBuilderCoverageTest {
         sp.setMapa(Mapa.builder().codigo(900L).build());
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
-        
+
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
 
         // Act
@@ -76,14 +76,14 @@ class ProcessoDetalheBuilderCoverageTest {
         processo.setCodigo(codProcesso);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        
+
         UnidadeProcesso participante = new UnidadeProcesso();
         participante.setUnidadeCodigo(100L);
         participante.setSigla("TESTE");
         processo.setParticipantes(List.of(participante));
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(new ArrayList<>());
-        
+
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(new ArrayList<>());
 
         // Act

@@ -2,60 +2,60 @@
   <div class="d-flex align-items-center w-100">
     <template v-if="isEditing">
       <BFormInput
-        ref="inputRef"
-        v-model="editValue"
-        :size="size"
-        class="me-2 flex-grow-1"
-        :aria-label="ariaLabel"
-        :data-testid="testIdInput"
-        @keydown.enter="save"
-        @keydown.esc="cancel"
-        @vue:mounted="(el: any) => { if(el?.focus) el.focus(); else if(el?.$el?.focus) el.$el.focus(); }"
+          ref="inputRef"
+          v-model="editValue"
+          :aria-label="ariaLabel"
+          :data-testid="testIdInput"
+          :size="size"
+          class="me-2 flex-grow-1"
+          @keydown.enter="save"
+          @keydown.esc="cancel"
+          @vue:mounted="(el: any) => { if(el?.focus) el.focus(); else if(el?.$el?.focus) el.$el.focus(); }"
       />
       <BButton
-        variant="outline-success"
-        :size="size"
-        class="me-1"
-        :data-testid="testIdSave"
-        :aria-label="ariaLabelSave"
-        @click="save"
+          :aria-label="ariaLabelSave"
+          :data-testid="testIdSave"
+          :size="size"
+          class="me-1"
+          variant="outline-success"
+          @click="save"
       >
-        <i aria-hidden="true" class="bi bi-save" />
+        <i aria-hidden="true" class="bi bi-save"/>
       </BButton>
       <BButton
-        variant="outline-secondary"
-        :size="size"
-        :data-testid="testIdCancel"
-        :aria-label="ariaLabelCancel"
-        @click="cancel"
+          :aria-label="ariaLabelCancel"
+          :data-testid="testIdCancel"
+          :size="size"
+          variant="outline-secondary"
+          @click="cancel"
       >
-        <i aria-hidden="true" class="bi bi-x" />
+        <i aria-hidden="true" class="bi bi-x"/>
       </BButton>
     </template>
 
     <template v-else>
       <div class="flex-grow-1 text-break me-2">
-        <slot />
+        <slot/>
       </div>
-      
+
       <div v-if="canEdit" class="d-flex align-items-center fade-controls">
         <BButton
-          variant="outline-primary"
-          :size="size"
-          class="me-1"
-          :data-testid="testIdEdit"
-          :aria-label="ariaLabelEdit"
-          @click="startEdit"
+            :aria-label="ariaLabelEdit"
+            :data-testid="testIdEdit"
+            :size="size"
+            class="me-1"
+            variant="outline-primary"
+            @click="startEdit"
         >
-          <i aria-hidden="true" class="bi bi-pencil" />
+          <i aria-hidden="true" class="bi bi-pencil"/>
         </BButton>
-        <slot name="extra-actions" />
+        <slot name="extra-actions"/>
       </div>
     </template>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {ref} from 'vue';
 import {BButton, BFormInput} from 'bootstrap-vue-next';
 

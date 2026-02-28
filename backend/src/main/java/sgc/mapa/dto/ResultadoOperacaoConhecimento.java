@@ -8,6 +8,6 @@ import sgc.subprocesso.dto.*;
  */
 @Builder
 public record ResultadoOperacaoConhecimento(
-                Long novoConhecimentoId,
-                AtividadeOperacaoResponse response) {
+        Long novoConhecimentoId,
+        AtividadeOperacaoResponse response) {
 }

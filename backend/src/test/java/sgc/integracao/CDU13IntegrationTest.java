@@ -54,17 +54,17 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         Long idUnidade = 3001L;
 
         String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        
+
         Integer countSuperior = jdbcTemplate.queryForObject("SELECT count(*) FROM SGC.VW_UNIDADE WHERE codigo = ?", Integer.class, idSuperior);
         if (countSuperior != null && countSuperior == 0) {
             jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação de Sistemas Teste", "COSIS-TEST",
-                "INTERMEDIARIA", "ATIVA", null, null);
+                    "INTERMEDIARIA", "ATIVA", null, null);
         }
 
         Integer countUnidade = jdbcTemplate.queryForObject("SELECT count(*) FROM SGC.VW_UNIDADE WHERE codigo = ?", Integer.class, idUnidade);
         if (countUnidade != null && countUnidade == 0) {
             jdbcTemplate.update(sqlInsertUnidade, idUnidade, "Serviço de Desenvolvimento Teste", "SEDESENV-TEST",
-                "OPERACIONAL", "ATIVA", idSuperior, null);
+                    "OPERACIONAL", "ATIVA", idSuperior, null);
         }
 
         // Carregar via Repo
@@ -77,8 +77,8 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
 
         String tituloAdmin = "101010101010";
         if (usuarioRepo.findById(tituloAdmin).isEmpty()) {
-             jdbcTemplate.update(sqlInsertUsuario, tituloAdmin, "Admin Mock", "admin@test.com", "1010", idSuperior, "");
-             jdbcTemplate.update(sqlInsertPerfil, tituloAdmin, "ADMIN", idSuperior);
+            jdbcTemplate.update(sqlInsertUsuario, tituloAdmin, "Admin Mock", "admin@test.com", "1010", idSuperior, "");
+            jdbcTemplate.update(sqlInsertPerfil, tituloAdmin, "ADMIN", idSuperior);
         }
 
         String tituloGestor = "132313231323";
@@ -227,9 +227,9 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         admin.setPerfilAtivo(Perfil.ADMIN);
         admin.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo()); // Or default admin unit
         admin.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
- 
+
         TextoRequest requestBody = new TextoRequest("Homologado via teste.");
- 
+
         mockMvc.perform(
                         post(
                                 "/api/subprocessos/{id}/homologar-cadastro",
@@ -239,19 +239,19 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk());
- 
+
         entityManager.flush();
         entityManager.clear();
- 
+
         Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
         assertThat(subprocessoAtualizado.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
- 
+
         List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
                 subprocesso.getCodigo());
         assertThat(movimentacoes).hasSize(2);
         Movimentacao movimentacaoHomologacao = movimentacoes.getFirst();
- 
+
         // O sistema (MockAdmin) parece usar uma unidade chamada ADMIN.
         // Para não quebrar o teste, vamos aceitar ADMIN ou COSIS-TEST
         // (unidadeSuperior).

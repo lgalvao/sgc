@@ -14,7 +14,9 @@
             variant="outline-secondary"
             @click="abrirModalImpacto"
         >
-          <i aria-hidden="true" class="bi bi-arrow-right-circle me-2"/>{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
+          <i aria-hidden="true" class="bi bi-arrow-right-circle me-2"/>{{
+            isRevisao ? 'Ver impactos' : 'Impacto no mapa'
+          }}
         </BButton>
         <BButton
             data-testid="btn-vis-atividades-historico"
@@ -69,19 +71,19 @@
 
     <!-- Modal de Validação -->
     <ModalConfirmacao
-      v-model="mostrarModalValidar"
-      :titulo="isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
-      ok-title="Confirmar"
-      variant="success"
-      :loading="loadingValidacao"
-      :auto-close="false"
-      test-id-confirmar="btn-aceite-cadastro-confirmar"
-      @confirmar="confirmarValidacao"
+        v-model="mostrarModalValidar"
+        :auto-close="false"
+        :loading="loadingValidacao"
+        :titulo="isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
+        ok-title="Confirmar"
+        test-id-confirmar="btn-aceite-cadastro-confirmar"
+        variant="success"
+        @confirmar="confirmarValidacao"
     >
       <p>{{
           isHomologacao ? 'Confirma a homologação do cadastro de atividades e conhecimentos?' : (isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?')
         }}</p>
-      <BFormGroup label="Observação" label-for="observacaoValidacao" class="mb-3">
+      <BFormGroup class="mb-3" label="Observação" label-for="observacaoValidacao">
         <BFormTextarea
             id="observacaoValidacao"
             v-model="observacaoValidacao"
@@ -93,25 +95,25 @@
 
     <!-- Modal de Devolução -->
     <ModalConfirmacao
-      v-model="mostrarModalDevolver"
-      :titulo="isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro'"
-      ok-title="Confirmar"
-      variant="danger"
-      :loading="loadingDevolucao"
-      :auto-close="false"
-      :ok-disabled="!observacaoDevolucao.trim()"
-      test-id-confirmar="btn-devolucao-cadastro-confirmar"
-      @confirmar="confirmarDevolucao"
+        v-model="mostrarModalDevolver"
+        :auto-close="false"
+        :loading="loadingDevolucao"
+        :ok-disabled="!observacaoDevolucao.trim()"
+        :titulo="isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro'"
+        ok-title="Confirmar"
+        test-id-confirmar="btn-devolucao-cadastro-confirmar"
+        variant="danger"
+        @confirmar="confirmarDevolucao"
     >
       <p>{{
           isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?'
         }}</p>
-      <BFormGroup label="Observação (obrigatório)" label-for="observacaoDevolucao" class="mb-3">
+      <BFormGroup class="mb-3" label="Observação (obrigatório)" label-for="observacaoDevolucao">
         <BFormTextarea
             id="observacaoDevolucao"
             v-model="observacaoDevolucao"
-            data-testid="inp-devolucao-cadastro-obs"
             :state="estadoObservacaoDevolucao"
+            data-testid="inp-devolucao-cadastro-obs"
             rows="3"
         />
         <BFormInvalidFeedback :state="estadoObservacaoDevolucao">
@@ -123,7 +125,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BFormGroup, BFormTextarea, BFormInvalidFeedback} from "bootstrap-vue-next";
+import {BButton, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
@@ -176,6 +178,7 @@ const unidade = computed(() => {
       }
     }
   }
+
   return buscarUnidade(unidadesStore.unidades as Unidade[], unidadeId.value);
 });
 

@@ -24,7 +24,7 @@ class UtilSanitizacaoTest {
     @DisplayName("Deve remover tags html mas manter conteudo se politica padrao for usada")
     void deveRemoverTagsHtml() {
         String input = "<b>Negrito</b>";
-        String expected = "Negrito"; 
+        String expected = "Negrito";
         assertEquals(expected, UtilSanitizacao.sanitizar(input));
     }
 }

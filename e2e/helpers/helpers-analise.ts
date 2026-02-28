@@ -61,14 +61,14 @@ export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: st
 export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcesso: string, siglaUnidade: string = '') {
     // Garantir que estamos no painel e que carregou
     await expect(page).toHaveURL(/\/painel$/);
-    
+
     // Aguardar o processo aparecer na tabela antes de clicar
     const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descricaoProcesso)});
     await expect(linhaProcesso).toBeVisible();
-    
+
     // Clicar na linha da tabela que contém o processo
     await linhaProcesso.click();
-    
+
     // Aguardar navegação para uma página de processo
     await expect(page).toHaveURL(/\/processo\/\d+/);
 
@@ -80,7 +80,7 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
             const targetUrl = `/processo/${processoId}/${siglaUnidade}`;
             // Se ainda não estiver na URL correta, forçar navegação
             if (!page.url().endsWith(`/${siglaUnidade}`)) {
-                 await page.goto(targetUrl);
+                await page.goto(targetUrl);
             }
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
         }

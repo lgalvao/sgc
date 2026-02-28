@@ -22,7 +22,7 @@ import java.util.stream.*;
 public class Processo extends EntidadeBase {
     @Serial
     private static final long serialVersionUID = 1L;
-    
+
     @Builder.Default
     @Column(name = "data_criacao", nullable = false)
     @JsonView(ProcessoViews.Publica.class)
@@ -64,7 +64,7 @@ public class Processo extends EntidadeBase {
     public void adicionarParticipantes(Set<Unidade> unidades) {
         for (Unidade unidade : unidades) {
             boolean jaParticipa = participantes.stream()
-                .anyMatch(up -> Objects.equals(up.getUnidadeCodigo(), unidade.getCodigo()));
+                    .anyMatch(up -> Objects.equals(up.getUnidadeCodigo(), unidade.getCodigo()));
             if (!jaParticipa) {
                 UnidadeProcesso snapshot = UnidadeProcesso.criarSnapshot(this, unidade);
                 participantes.add(snapshot);
@@ -73,17 +73,17 @@ public class Processo extends EntidadeBase {
     }
 
     /**
-     * Sincroniza as unidades participantes, mantendo snapshosts existentes 
+     * Sincroniza as unidades participantes, mantendo snapshosts existentes
      * e adicionando novos apenas para unidades que ainda não participam.
      */
     public void sincronizarParticipantes(Set<Unidade> novasUnidades) {
         // 1. Remover quem não está mais na nova lista
         Set<Long> novosCodigos = novasUnidades.stream()
-            .map(Unidade::getCodigo)
-            .collect(Collectors.toSet());
-            
+                .map(Unidade::getCodigo)
+                .collect(Collectors.toSet());
+
         participantes.removeIf(up -> !novosCodigos.contains(up.getUnidadeCodigo()));
-        
+
         // 2. Adicionar apenas quem é novo
         adicionarParticipantes(novasUnidades);
     }

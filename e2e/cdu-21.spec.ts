@@ -34,7 +34,11 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     // PREPARAÇÃO - Criar mapa homologado para ADMIN finalizar processo
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
+                                                                                page,
+                                                                                autenticadoComoAdmin,
+                                                                                cleanupAutomatico
+                                                                            }) => {
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -56,8 +60,11 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
-        
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({
+                                                                                        page,
+                                                                                        autenticadoComoChefeSecao221
+                                                                                    }) => {
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
@@ -89,7 +96,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     });
 
     test('Preparacao 3: Admin homologa cadastro', async ({page, autenticadoComoAdmin}) => {
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
@@ -101,7 +108,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     });
 
     test('Preparacao 4: Admin cria competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
@@ -117,7 +124,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     });
 
     test('Preparacao 5: Chefe valida o mapa', async ({page, autenticadoComoChefeSecao221}) => {
-        
+
 
         await acessarSubprocessoChefe(page, descProcesso);
 
@@ -131,7 +138,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     });
 
     test('Preparacao 6: Gestor registra aceite do mapa', async ({page, autenticadoComoGestorCoord22}) => {
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
@@ -159,7 +166,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     });
 
     test('Preparacao 7: Admin homologa o mapa', async ({page, autenticadoComoAdmin}) => {
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
@@ -185,7 +192,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
     test('Cenario 1: ADMIN navega para detalhes do processo', async ({page, autenticadoComoAdmin}) => {
         // CDU-21: Passos 1-2
-        
+
 
         // Passo 1: ADMIN clica no processo
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
@@ -200,7 +207,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
     test('Cenario 2: ADMIN cancela finalização - permanece na tela', async ({page, autenticadoComoAdmin}) => {
         // CDU-21: Passo 6.1
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
@@ -222,7 +229,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
     test('Cenario 3: ADMIN finaliza processo com sucesso', async ({page, autenticadoComoAdmin}) => {
         // CDU-21: Passos 7-10
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 

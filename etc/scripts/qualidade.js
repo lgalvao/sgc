@@ -77,7 +77,7 @@ function cleanLog(output) {
 }
 
 function parseGradleStats(step) {
-    let stats = { passed: 0, failed: 0, skipped: 0, total: 0 };
+    let stats = {passed: 0, failed: 0, skipped: 0, total: 0};
 
     if (!step.reportDir || !fs.existsSync(step.reportDir)) {
         return stats;
@@ -110,7 +110,7 @@ function parseGradleStats(step) {
 }
 
 function parseVitestStats(output) {
-    let stats = { passed: 0, failed: 0, skipped: 0, total: 0 };
+    let stats = {passed: 0, failed: 0, skipped: 0, total: 0};
 
     // Pattern: Tests  1101 passed (1101)
     const passedMatch = output.match(/Tests\s+(\d+)\s+passed\s+\((\d+)\)/);
@@ -144,7 +144,7 @@ function parseVitestStats(output) {
 }
 
 function parsePlaywrightStats(output) {
-    let stats = { passed: 0, failed: 0, skipped: 0, total: 0 };
+    let stats = {passed: 0, failed: 0, skipped: 0, total: 0};
 
     // Matches lines like: "  12 passed (20s)" or "  10 failed"
     // Playwright prints summaries at the end usually
@@ -179,16 +179,16 @@ function getStats(step, output) {
     } catch (e) {
         console.error(`Erro ao processar estatísticas de ${step.name}:`, e);
     }
-    return { passed: '-', failed: '-', skipped: '-', total: '-' };
+    return {passed: '-', failed: '-', skipped: '-', total: '-'};
 }
 
 async function runCommand(step) {
     return new Promise((resolve) => {
         console.log(`\n🚀 Iniciando: ${step.name}...`);
         const startTime = Date.now();
-        
+
         const cmd = process.platform === 'win32' ? `${step.command}` : step.command;
-        
+
         // No Windows, npm/npx são .cmd
         let finalCmd = cmd;
         if (process.platform === 'win32' && (cmd === 'npm' || cmd === 'npx')) {
@@ -241,7 +241,7 @@ async function runCommand(step) {
                 code: -1,
                 duration: 0,
                 output: err.message,
-                stats: { passed: '-', failed: '-', skipped: '-', total: '-' }
+                stats: {passed: '-', failed: '-', skipped: '-', total: '-'}
             });
         });
     });
@@ -249,7 +249,7 @@ async function runCommand(step) {
 
 function generateReport(results) {
     const date = new Date().toLocaleString('pt-BR');
-    
+
     let md = `# Relatório de Testes Automatizados\n\n`;
     md += `**Data:** ${date}\n`;
     md += `**Sistema:** ${os.type()} ${os.release()}\n\n`;
@@ -259,7 +259,7 @@ function generateReport(results) {
     // Status Table
     md += `| Teste | Status | Duração (s) |\n`;
     md += `| :--- | :---: | :---: |\n`;
-    
+
     let allPassed = true;
     results.forEach(r => {
         md += `| ${r.name} | ${r.status} | ${r.duration}s |\n`;
@@ -289,7 +289,7 @@ function generateReport(results) {
 
         const s = r.stats;
         md += `- **Resultados:** ${s.total} testes, ${s.passed} aprovados, ${s.failed} falhas\n\n`;
-        
+
         md += '<details>\n<summary>Ver Logs de Saída</summary>\n\n';
         md += '```text\n';
 
@@ -310,7 +310,7 @@ function generateReport(results) {
 
 async function main() {
     const results = [];
-    
+
     console.log('Iniciando bateria de testes...\n');
 
     for (const step of steps) {

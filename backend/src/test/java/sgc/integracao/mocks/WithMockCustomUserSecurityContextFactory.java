@@ -34,7 +34,7 @@ public class WithMockCustomUserSecurityContextFactory
         } else {
             principal.setPerfilAtivo(Perfil.SERVIDOR);
         }
-        
+
         principal.setUnidadeAtivaCodigo(unidade.getCodigo());
 
         UsernamePasswordAuthenticationToken authentication =

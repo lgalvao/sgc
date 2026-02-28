@@ -4,12 +4,12 @@ import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-n
 
 /**
  * CDU-27 - Alterar data limite de subprocesso
- * 
+ *
  * Ator: ADMIN
- * 
+ *
  * Pré-condições:
  * - Unidade participante com subprocesso iniciado e ainda não finalizado
- * 
+ *
  * Fluxo principal:
  * 1. ADMIN acessa processo ativo e clica em uma unidade
  * 2. Sistema mostra tela Detalhes do subprocesso
@@ -29,7 +29,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     // ========================================================================
 
     test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        
+
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -57,7 +57,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
 
     test('Cenario 1: ADMIN navega para detalhes do subprocesso', async ({page, autenticadoComoAdmin}) => {
         // CDU-27: Passos 1-2
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);

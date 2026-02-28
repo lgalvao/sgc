@@ -13,10 +13,10 @@ import * as useAcessoModule from '@/composables/useAcesso';
 
 // Mocks for services
 vi.mock("@/services/unidadeService", () => ({
-    buscarUnidadePorSigla: vi.fn().mockResolvedValue({ sigla: 'TEST', nome: 'Unidade' }),
+    buscarUnidadePorSigla: vi.fn().mockResolvedValue({sigla: 'TEST', nome: 'Unidade'}),
 }));
 vi.mock("@/services/processoService", () => ({
-    obterDetalhesProcesso: vi.fn().mockResolvedValue({ 
+    obterDetalhesProcesso: vi.fn().mockResolvedValue({
         codigo: 1,
         unidades: [
             {
@@ -29,12 +29,11 @@ vi.mock("@/services/processoService", () => ({
     }),
 }));
 vi.mock("@/services/subprocessoService", () => ({
-    buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({ 
-    }),
+    buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({}),
     mapSubprocessoDetalheDtoToModel: vi.fn((dto) => dto),
 }));
 vi.mock("@/services/mapaService", () => ({
-    obterMapaVisualizacao: vi.fn().mockResolvedValue({ competencias: [] }),
+    obterMapaVisualizacao: vi.fn().mockResolvedValue({competencias: []}),
 }));
 vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn().mockResolvedValue([]),
@@ -44,7 +43,7 @@ vi.mock("@/services/analiseService", () => ({
 const router = createRouter({
     history: createMemoryHistory(),
     routes: [
-        { path: "/", component: { template: "<div>Home</div>" } },
+        {path: "/", component: {template: "<div>Home</div>"}},
         {
             path: "/processo/:codProcesso/:siglaUnidade/vis-mapa",
             name: "SubprocessoVisMapa",
@@ -53,12 +52,12 @@ const router = createRouter({
         {
             path: "/painel",
             name: "Painel",
-            component: { template: "<div>Painel</div>" },
+            component: {template: "<div>Painel</div>"},
         },
         {
             path: "/processo/:codProcesso/:siglaUnidade",
             name: "Subprocesso",
-            component: { template: "<div>Subprocesso</div>" },
+            component: {template: "<div>Subprocesso</div>"},
         },
     ],
 });
@@ -74,13 +73,13 @@ describe("VisMapa.vue", () => {
 
     const mountComponent = (initialState: any = {}, siglaUnidade = "TEST", accessOverrides: any = {}) => {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeValidarMapa: { value: true },
-            podeApresentarSugestoes: { value: true },
-            podeAceitarMapa: { value: true },
-            podeDevolverMapa: { value: true },
-            podeHomologarMapa: { value: false },
-            podeVerPagina: { value: true },
-            podeVisualizarMapa: { value: true },
+            podeValidarMapa: {value: true},
+            podeApresentarSugestoes: {value: true},
+            podeAceitarMapa: {value: true},
+            podeDevolverMapa: {value: true},
+            podeHomologarMapa: {value: false},
+            podeVerPagina: {value: true},
+            podeVisualizarMapa: {value: true},
             ...accessOverrides
         } as any);
 
@@ -104,7 +103,7 @@ describe("VisMapa.vue", () => {
                                                     codigo: 1,
                                                     descricao: "Atividade 1",
                                                     conhecimentos: [
-                                                        { codigo: 1, descricao: "Conhecimento 1" },
+                                                        {codigo: 1, descricao: "Conhecimento 1"},
                                                     ],
                                                 },
                                             ],
@@ -116,9 +115,9 @@ describe("VisMapa.vue", () => {
                             },
                             unidades: {
                                 unidades: [
-                                    { sigla: "TEST", nome: "Unidade de Teste", filhas: [] },
+                                    {sigla: "TEST", nome: "Unidade de Teste", filhas: []},
                                 ],
-                                unidade: { sigla: "TEST", nome: "Unidade de Teste", filhas: [] },
+                                unidade: {sigla: "TEST", nome: "Unidade de Teste", filhas: []},
                                 ...initialState["unidades"],
                             },
                             processos: {
@@ -129,7 +128,7 @@ describe("VisMapa.vue", () => {
                                             codUnidade: 10,
                                             codSubprocesso: 10,
                                             situacaoSubprocesso:
-                                                SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO,
+                                            SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO,
                                         },
                                     ],
                                 },
@@ -173,11 +172,11 @@ describe("VisMapa.vue", () => {
         });
 
         const feedbackStore = useFeedbackStore();
-        return { wrapper: context.wrapper, feedbackStore };
+        return {wrapper: context.wrapper, feedbackStore};
     };
 
     it("renders correctly with data from store", async () => {
-        const { wrapper } = mountComponent();
+        const {wrapper} = mountComponent();
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find('[data-testid="vis-mapa__txt-competencia-descricao"]').text()).toBe(
@@ -193,17 +192,17 @@ describe("VisMapa.vue", () => {
 
     it("resolves nested unit from store", async () => {
         await router.push("/processo/1/CHILD/vis-mapa");
-        const { wrapper } = mountComponent(
+        const {wrapper} = mountComponent(
             {
                 unidades: {
                     unidades: [
                         {
                             sigla: "PARENT",
                             nome: "Parent Unit",
-                            filhas: [{ sigla: "CHILD", nome: "Child Unit", filhas: [] }],
+                            filhas: [{sigla: "CHILD", nome: "Child Unit", filhas: []}],
                         },
                     ],
-                    unidade: { sigla: "CHILD", nome: "Child Unit", filhas: [] },
+                    unidade: {sigla: "CHILD", nome: "Child Unit", filhas: []},
                 },
                 processos: {
                     processoDetalhe: {
@@ -227,8 +226,8 @@ describe("VisMapa.vue", () => {
     });
 
     it("shows buttons for CHEFE when MAPEAMENTO_CONCLUIDO", async () => {
-        const { wrapper } = mountComponent({
-            perfil: { perfilSelecionado: "CHEFE" },
+        const {wrapper} = mountComponent({
+            perfil: {perfilSelecionado: "CHEFE"},
             processos: {
                 processoDetalhe: {
                     unidades: [
@@ -250,8 +249,8 @@ describe("VisMapa.vue", () => {
     });
 
     it("shows buttons for GESTOR when MAPA_VALIDADO", async () => {
-        const { wrapper } = mountComponent({
-            perfil: { perfilSelecionado: "GESTOR" },
+        const {wrapper} = mountComponent({
+            perfil: {perfilSelecionado: "GESTOR"},
             processos: {
                 processoDetalhe: {
                     unidades: [
@@ -276,7 +275,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("opens validar modal and confirms", async () => {
-        const { wrapper, feedbackStore } = mountComponent({}, "TEST", { podeValidarMapa: { value: true } });
+        const {wrapper, feedbackStore} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
         const store = useProcessosStore();
 
         await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
@@ -293,7 +292,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("opens sugestoes modal and confirms", async () => {
-        const { wrapper, feedbackStore } = mountComponent({}, "TEST", { podeValidarMapa: { value: true } });
+        const {wrapper, feedbackStore} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
         const store = useProcessosStore();
 
         await wrapper
@@ -317,8 +316,8 @@ describe("VisMapa.vue", () => {
     });
 
     it("opens devolucao modal and confirms (GESTOR)", async () => {
-        const { wrapper, feedbackStore } = mountComponent({
-            perfil: { perfilSelecionado: "GESTOR" },
+        const {wrapper, feedbackStore} = mountComponent({
+            perfil: {perfilSelecionado: "GESTOR"},
             processos: {
                 processoDetalhe: {
                     unidades: [
@@ -355,8 +354,8 @@ describe("VisMapa.vue", () => {
     });
 
     it("opens aceitar modal and confirms (GESTOR)", async () => {
-        const { wrapper } = mountComponent({
-            perfil: { perfilSelecionado: "GESTOR" },
+        const {wrapper} = mountComponent({
+            perfil: {perfilSelecionado: "GESTOR"},
             processos: {
                 processoDetalhe: {
                     unidades: [
@@ -386,8 +385,8 @@ describe("VisMapa.vue", () => {
     });
 
     it("confirms homologacao (ADMIN)", async () => {
-        const { wrapper } = mountComponent({
-            perfil: { perfilSelecionado: "ADMIN" },
+        const {wrapper} = mountComponent({
+            perfil: {perfilSelecionado: "ADMIN"},
             processos: {
                 processoDetalhe: {
                     tipo: TipoProcesso.REVISAO,
@@ -401,7 +400,7 @@ describe("VisMapa.vue", () => {
                     ],
                 },
             },
-        }, "TEST", { podeHomologarMapa: { value: true } });
+        }, "TEST", {podeHomologarMapa: {value: true}});
         const store = useSubprocessosStore();
 
         await wrapper
@@ -418,8 +417,8 @@ describe("VisMapa.vue", () => {
     });
 
     it("shows historico de analise", async () => {
-        const { wrapper } = mountComponent({
-            perfil: { perfilSelecionado: "GESTOR" }, // GESTOR tem podeAnalisar
+        const {wrapper} = mountComponent({
+            perfil: {perfilSelecionado: "GESTOR"}, // GESTOR tem podeAnalisar
         });
 
         await wrapper.vm.$nextTick();
@@ -438,8 +437,8 @@ describe("VisMapa.vue", () => {
     });
 
     it("view suggestions (GESTOR)", async () => {
-        const { wrapper } = mountComponent({
-            perfil: { perfilSelecionado: "GESTOR" },
+        const {wrapper} = mountComponent({
+            perfil: {perfilSelecionado: "GESTOR"},
             processos: {
                 processoDetalhe: {
                     unidades: [
@@ -465,7 +464,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("does not show content if unit not found", async () => {
-        const { wrapper } = mountComponent({
+        const {wrapper} = mountComponent({
             unidades: {
                 unidades: [], // empty list
                 unidade: null
@@ -476,9 +475,9 @@ describe("VisMapa.vue", () => {
     });
 
     it("shows empty state if no map", async () => {
-        const { wrapper } = mountComponent({
+        const {wrapper} = mountComponent({
             mapas: {
-                mapaVisualizacao: { competencias: [] } // empty
+                mapaVisualizacao: {competencias: []} // empty
             }
         });
         await wrapper.vm.$nextTick();
@@ -486,8 +485,8 @@ describe("VisMapa.vue", () => {
     });
 
     it("confirms homologacao (ADMIN) for Mapeamento", async () => {
-        const { wrapper } = mountComponent({
-            perfil: { perfilSelecionado: "ADMIN" },
+        const {wrapper} = mountComponent({
+            perfil: {perfilSelecionado: "ADMIN"},
             processos: {
                 processoDetalhe: {
                     tipo: TipoProcesso.MAPEAMENTO,
@@ -516,8 +515,8 @@ describe("VisMapa.vue", () => {
     });
 
     it("handles error in confirmarAceitacao", async () => {
-        const { wrapper, feedbackStore } = mountComponent({
-            perfil: { perfilSelecionado: "GESTOR" },
+        const {wrapper, feedbackStore} = mountComponent({
+            perfil: {perfilSelecionado: "GESTOR"},
             processos: {
                 processoDetalhe: {
                     unidades: [
@@ -548,8 +547,8 @@ describe("VisMapa.vue", () => {
     });
 
     it("handles error in confirmarDevolucao", async () => {
-        const { wrapper, feedbackStore } = mountComponent({
-            perfil: { perfilSelecionado: "GESTOR" },
+        const {wrapper, feedbackStore} = mountComponent({
+            perfil: {perfilSelecionado: "GESTOR"},
             processos: {
                 processoDetalhe: {
                     unidades: [
@@ -577,7 +576,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("handles error in confirmarValidacao", async () => {
-        const { wrapper, feedbackStore } = mountComponent({}, "TEST", { podeValidarMapa: { value: true } });
+        const {wrapper, feedbackStore} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
         const store = useProcessosStore();
         (store.validarMapa as any).mockRejectedValue(new Error("Fail"));
         vi.spyOn(feedbackStore, "show");
@@ -591,9 +590,9 @@ describe("VisMapa.vue", () => {
     });
 
     it("handles error in confirmarSugestoes", async () => {
-        const { wrapper, feedbackStore } = mountComponent({
-            perfil: { perfilSelecionado: "CHEFE" }
-        }, "TEST", { podeValidarMapa: { value: true } });
+        const {wrapper, feedbackStore} = mountComponent({
+            perfil: {perfilSelecionado: "CHEFE"}
+        }, "TEST", {podeValidarMapa: {value: true}});
         const store = useProcessosStore();
         (store.apresentarSugestoes as any).mockRejectedValue(new Error("Fail"));
         vi.spyOn(feedbackStore, "show");
@@ -606,9 +605,13 @@ describe("VisMapa.vue", () => {
     });
 
     it("closes ver sugestoes modal", async () => {
-        const { wrapper } = mountComponent({
-            perfil: { perfilSelecionado: "GESTOR" },
-        }, "TEST", { podeAnalisar: { value: true }, podeApresentarSugestoes: { value: true }, podeAceitarMapa: { value: true } });
+        const {wrapper} = mountComponent({
+            perfil: {perfilSelecionado: "GESTOR"},
+        }, "TEST", {
+            podeAnalisar: {value: true},
+            podeApresentarSugestoes: {value: true},
+            podeAceitarMapa: {value: true}
+        });
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-mapa-ver-sugestoes"]').trigger("click");
@@ -619,38 +622,38 @@ describe("VisMapa.vue", () => {
     });
 
     it("closes historico modal", async () => {
-        const { wrapper } = mountComponent({
-            perfil: { perfilSelecionado: "GESTOR" }
-        }, "TEST", { podeAceitarMapa: { value: true } });
+        const {wrapper} = mountComponent({
+            perfil: {perfilSelecionado: "GESTOR"}
+        }, "TEST", {podeAceitarMapa: {value: true}});
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-mapa-historico-gestor"]').trigger("click");
         await flushPromises();
         expect(wrapper.vm.mostrarModalHistorico).toBe(true);
 
-        const modal = wrapper.findComponent({ name: 'HistoricoAnaliseModal' });
+        const modal = wrapper.findComponent({name: 'HistoricoAnaliseModal'});
         await modal.vm.$emit('fechar');
         expect(wrapper.vm.mostrarModalHistorico).toBe(false);
     });
     it("triggers focus on shown in sugestoes modal", async () => {
-        const { wrapper } = mountComponent({}, "TEST", { podeValidarMapa: { value: true } });
+        const {wrapper} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
         await wrapper.vm.$nextTick();
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
-        
-        const modal = wrapper.findAllComponents({ name: 'ModalConfirmacao' }).find(c => c.props('titulo') === 'Apresentar Sugestões');
+
+        const modal = wrapper.findAllComponents({name: 'ModalConfirmacao'}).find(c => c.props('titulo') === 'Apresentar Sugestões');
         await modal?.vm.$emit('shown');
     });
 
     it("triggers focus on shown in devolucao modal", async () => {
-        const { wrapper } = mountComponent({
-            perfil: { perfilSelecionado: "GESTOR" }
-        }, "TEST", { podeDevolverMapa: { value: true } });
+        const {wrapper} = mountComponent({
+            perfil: {perfilSelecionado: "GESTOR"}
+        }, "TEST", {podeDevolverMapa: {value: true}});
         await flushPromises();
         await wrapper.vm.$nextTick();
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
-        
-        const modal = wrapper.findAllComponents({ name: 'ModalConfirmacao' }).find(c => c.props('titulo') === 'Devolução');
+
+        const modal = wrapper.findAllComponents({name: 'ModalConfirmacao'}).find(c => c.props('titulo') === 'Devolução');
         await modal?.vm.$emit('shown');
     });
 });

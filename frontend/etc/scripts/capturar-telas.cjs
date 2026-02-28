@@ -1,5 +1,5 @@
 /* eslint-disable */
-const { spawn } = require('child_process');
+const {spawn} = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
@@ -51,11 +51,11 @@ const screenshotsDir = path.join(__dirname, '../../../screenshots');
 if (category === 'all') {
     if (fs.existsSync(screenshotsDir)) {
         console.log('Limpando screenshots antigas...');
-        fs.rmSync(screenshotsDir, { recursive: true, force: true });
+        fs.rmSync(screenshotsDir, {recursive: true, force: true});
     }
 }
 if (!fs.existsSync(screenshotsDir)) {
-    fs.mkdirSync(screenshotsDir, { recursive: true });
+    fs.mkdirSync(screenshotsDir, {recursive: true});
 }
 
 console.log(`

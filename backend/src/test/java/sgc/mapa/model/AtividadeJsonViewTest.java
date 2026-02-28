@@ -25,13 +25,13 @@ class AtividadeJsonViewTest {
                 .descricao("Atividade Teste")
                 .mapa(mapa)
                 .build();
-        
+
         Conhecimento conhecimento = Conhecimento.builder()
                 .codigo(100L)
                 .descricao("K1")
                 .atividade(atividade)
                 .build();
-        
+
         atividade.setConhecimentos(Set.of(conhecimento));
 
         String json = objectMapper

@@ -1,8 +1,8 @@
 <template>
   <LayoutPadrao>
     <PageHeader
-        title="Autoavaliação de Competências"
         :subtitle="`${siglaUnidade} - ${nomeUnidade}`"
+        title="Autoavaliação de Competências"
     >
       <template #actions>
         <BButton

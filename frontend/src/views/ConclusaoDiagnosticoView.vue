@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Conclusão do Diagnóstico" />
+    <PageHeader title="Conclusão do Diagnóstico"/>
     <div class="row justify-content-center">
       <div class="col-md-8">
         <BCard class="shadow-sm">

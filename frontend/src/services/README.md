@@ -1,6 +1,7 @@
 # Diretório de Serviços (Services)
 
-Este diretório contém a camada de abstração de rede. Os serviços são responsáveis por realizar as comunicações HTTP com o backend.
+Este diretório contém a camada de abstração de rede. Os serviços são responsáveis por realizar as comunicações HTTP com
+o backend.
 
 ## Padrão de Implementação
 
@@ -34,5 +35,6 @@ export const exemploService = {
 ## Configuração do Axios (`axios-setup.ts`)
 
 O arquivo central de configuração trata:
+
 1. **Base URL**: Definida via variáveis de ambiente.
 2. **Interceptors**: Injeção de token Bearer e tratamento global de erros (401, 403, 500).

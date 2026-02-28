@@ -73,7 +73,7 @@ class MapaVisualizacaoServiceTest {
         Atividade ativ = new Atividade();
         ativ.setCodigo(1L);
         ativ.setDescricao("A1");
-        
+
         Conhecimento k = Conhecimento.builder()
                 .codigo(100L)
                 .descricao("K1")

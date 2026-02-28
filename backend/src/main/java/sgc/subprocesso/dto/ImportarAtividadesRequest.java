@@ -8,6 +8,6 @@ import lombok.*;
  */
 @Builder
 public record ImportarAtividadesRequest(
-        @NotNull(message = "O código do subprocesso de origem é obrigatório") 
+        @NotNull(message = "O código do subprocesso de origem é obrigatório")
         Long codSubprocessoOrigem) {
 }

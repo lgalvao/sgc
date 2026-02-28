@@ -4,7 +4,7 @@
 
 /**
  * Achata uma estrutura de árvore hierárquica em uma lista plana.
- * 
+ *
  * @example
  * // Com subordinadas (unidades)
  * const arvore = [
@@ -13,7 +13,7 @@
  * ];
  * const plano = flattenTree(arvore, 'subordinadas');
  * // Resultado: [{ codigo: 1, ... }, { codigo: 2 }, { codigo: 3 }]
- * 
+ *
  * @example
  * // Com filhos (processos)
  * const arvore = [
@@ -24,18 +24,18 @@
  * // Resultado: [{ id: 1, ... }, { id: 2 }, { id: 3 }]
  */
 export function flattenTree<T extends Record<string, any>>(
-  items: T[],
-  childrenKey: string = 'subordinadas'
+    items: T[],
+    childrenKey: string = 'subordinadas'
 ): T[] {
-  const result: T[] = [];
-  
-  for (const item of items) {
-    result.push(item);
-    
-    if (item[childrenKey] && Array.isArray(item[childrenKey])) {
-      result.push(...flattenTree(item[childrenKey], childrenKey));
+    const result: T[] = [];
+
+    for (const item of items) {
+        result.push(item);
+
+        if (item[childrenKey] && Array.isArray(item[childrenKey])) {
+            result.push(...flattenTree(item[childrenKey], childrenKey));
+        }
     }
-  }
-  
-  return result;
+
+    return result;
 }

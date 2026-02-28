@@ -30,19 +30,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("SubprocessoController")
 class SubprocessoControllerTest {
 
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     @MockitoBean
     private SubprocessoService subprocessoService;
-
     @MockitoBean
     private OrganizacaoFacade organizacaoFacade;
-
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
-
     @Autowired
     private MockMvc mockMvc;
-
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
 
     @Nested
     @DisplayName("CRUD Operations")
@@ -115,9 +111,9 @@ class SubprocessoControllerTest {
         void deveDisponibilizarMapa() throws Exception {
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(java.time.LocalDate.now().plusDays(1), "Obs");
             mockMvc.perform(post("/api/subprocessos/1/disponibilizar-mapa")
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(req)))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isOk());
 
             verify(subprocessoService).disponibilizarMapa(eq(1L), any(), any());

@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AtividadeController.class)
-@Import({ TestSecurityConfig.class, RestExceptionHandler.class })
+@Import({TestSecurityConfig.class, RestExceptionHandler.class})
 @Tag("integration")
 @DisplayName("Testes do Controlador de Atividades")
 class AtividadeControllerTest {
@@ -74,10 +74,10 @@ class AtividadeControllerTest {
             Mockito.when(atividadeFacade.criarAtividade(any())).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades")
-                    .with(user("123").roles("CHEFE"))
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
+                            .with(user("123").roles("CHEFE"))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
                     .andExpect(status().isCreated())
                     .andExpect(header().exists("Location"));
 
@@ -90,9 +90,9 @@ class AtividadeControllerTest {
             // Sem @WithMockUser, o contexto de segurança está vazio
             // O controller deve retornar 401
             mockMvc.perform(post("/api/atividades")
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
                     .andExpect(status().isUnauthorized());
         }
 
@@ -100,10 +100,10 @@ class AtividadeControllerTest {
         @DisplayName("Deve retornar 403 se usuário não tem role adequada")
         void deveRetornar403SeUsuarioSemRole() throws Exception {
             mockMvc.perform(post("/api/atividades")
-                    .with(user("123").roles("SERVIDOR"))
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
+                            .with(user("123").roles("SERVIDOR"))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
                     .andExpect(status().isForbidden());
         }
 
@@ -114,10 +114,10 @@ class AtividadeControllerTest {
             Mockito.when(atividadeFacade.atualizarAtividade(eq(1L), any())).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/atualizar")
-                    .with(user("123").roles("CHEFE"))
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
+                            .with(user("123").roles("CHEFE"))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
                     .andExpect(status().isOk());
 
             Mockito.verify(atividadeFacade).atualizarAtividade(eq(1L), any());
@@ -130,8 +130,8 @@ class AtividadeControllerTest {
             Mockito.when(atividadeFacade.excluirAtividade(1L)).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/excluir")
-                    .with(user("123").roles("CHEFE"))
-                    .with(csrf()))
+                            .with(user("123").roles("CHEFE"))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             Mockito.verify(atividadeFacade).excluirAtividade(1L);
@@ -159,10 +159,10 @@ class AtividadeControllerTest {
             Mockito.when(atividadeFacade.criarConhecimento(eq(1L), any())).thenReturn(resultado);
 
             mockMvc.perform(post("/api/atividades/1/conhecimentos")
-                    .with(user("123").roles("CHEFE"))
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"atividadeCodigo\": 1, \"descricao\": \"C1\"}"))
+                            .with(user("123").roles("CHEFE"))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"atividadeCodigo\": 1, \"descricao\": \"C1\"}"))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", Matchers.containsString("/999")));
 
@@ -176,10 +176,10 @@ class AtividadeControllerTest {
             Mockito.when(atividadeFacade.atualizarConhecimento(eq(1L), eq(2L), any())).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/conhecimentos/2/atualizar")
-                    .with(user("123").roles("CHEFE"))
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"atividadeCodigo\": 1, \"descricao\": \"C1 Update\"}"))
+                            .with(user("123").roles("CHEFE"))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"atividadeCodigo\": 1, \"descricao\": \"C1 Update\"}"))
                     .andExpect(status().isOk());
 
             Mockito.verify(atividadeFacade).atualizarConhecimento(eq(1L), eq(2L), any());
@@ -192,8 +192,8 @@ class AtividadeControllerTest {
             Mockito.when(atividadeFacade.excluirConhecimento(1L, 2L)).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/conhecimentos/2/excluir")
-                    .with(user("123").roles("CHEFE"))
-                    .with(csrf()))
+                            .with(user("123").roles("CHEFE"))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             Mockito.verify(atividadeFacade).excluirConhecimento(1L, 2L);
@@ -211,7 +211,7 @@ class AtividadeControllerTest {
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
 
             mockMvc.perform(get("/api/atividades/999")
-                    .with(user("123")))
+                            .with(user("123")))
                     .andExpect(status().isNotFound());
 
             Mockito.verify(atividadeFacade).obterAtividadePorId(999L);
@@ -225,8 +225,8 @@ class AtividadeControllerTest {
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
 
             mockMvc.perform(post("/api/atividades/999/excluir")
-                    .with(user("123").roles("CHEFE"))
-                    .with(csrf()))
+                            .with(user("123").roles("CHEFE"))
+                            .with(csrf()))
                     .andExpect(status().isNotFound());
 
             Mockito.verify(atividadeFacade).excluirAtividade(999L);
@@ -240,10 +240,10 @@ class AtividadeControllerTest {
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
 
             mockMvc.perform(post("/api/atividades/999/atualizar")
-                    .with(user("123").roles("CHEFE"))
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
+                            .with(user("123").roles("CHEFE"))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
                     .andExpect(status().isNotFound());
 
             Mockito.verify(atividadeFacade).atualizarAtividade(eq(999L), any());
@@ -257,8 +257,8 @@ class AtividadeControllerTest {
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
 
             mockMvc.perform(post("/api/atividades/999/conhecimentos/2/excluir")
-                    .with(user("123").roles("CHEFE"))
-                    .with(csrf()))
+                            .with(user("123").roles("CHEFE"))
+                            .with(csrf()))
                     .andExpect(status().isNotFound());
 
             Mockito.verify(atividadeFacade).excluirConhecimento(999L, 2L);

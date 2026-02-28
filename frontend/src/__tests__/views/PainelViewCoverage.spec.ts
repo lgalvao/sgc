@@ -31,7 +31,7 @@ describe('PainelView Coverage', () => {
     });
 
     const commonStubs = {
-        PageHeader: { template: '<div><slot name="actions" /></div>' },
+        PageHeader: {template: '<div><slot name="actions" /></div>'},
         TabelaProcessos: {
             template: '<div></div>',
             props: ['processos', 'criterioOrdenacao', 'direcaoOrdenacaoAsc'],
@@ -42,8 +42,8 @@ describe('PainelView Coverage', () => {
             props: ['alertas'],
             emits: ['ordenar']
         },
-        BContainer: { template: '<div><slot /></div>' },
-        BButton: { template: '<button />' }
+        BContainer: {template: '<div><slot /></div>'},
+        BButton: {template: '<button />'}
     };
 
     it('carregarDados calls only buscarProcessosPainel when usuarioCodigo is missing', async () => {
@@ -55,8 +55,8 @@ describe('PainelView Coverage', () => {
                     unidadeSelecionada: 1,
                     usuarioCodigo: null // Simulating missing user code
                 },
-                processos: { processosPainel: [] },
-                alertas: { alertas: [] }
+                processos: {processosPainel: []},
+                alertas: {alertas: []}
             }
         });
 
@@ -86,8 +86,8 @@ describe('PainelView Coverage', () => {
                     unidadeSelecionada: 1,
                     usuarioCodigo: null
                 },
-                processos: { processosPainel: [] },
-                alertas: { alertas: [] }
+                processos: {processosPainel: []},
+                alertas: {alertas: []}
             }
         });
 
@@ -107,7 +107,7 @@ describe('PainelView Coverage', () => {
     });
 
     it('ordenarPor toggles asc/desc correctly', async () => {
-         const pinia = createTestingPinia({
+        const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {
                 perfil: {
@@ -115,8 +115,8 @@ describe('PainelView Coverage', () => {
                     unidadeSelecionada: 1,
                     usuarioCodigo: 1
                 },
-                processos: { processosPainel: [] },
-                alertas: { alertas: [] }
+                processos: {processosPainel: []},
+                alertas: {alertas: []}
             }
         });
 

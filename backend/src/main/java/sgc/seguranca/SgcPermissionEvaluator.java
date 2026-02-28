@@ -28,11 +28,6 @@ import static sgc.organizacao.model.Perfil.*;
 @Slf4j
 public class SgcPermissionEvaluator implements PermissionEvaluator {
 
-    private final SubprocessoRepo subprocessoRepo;
-    private final MovimentacaoRepo movimentacaoRepo;
-    private final HierarquiaService hierarquiaService;
-    private final ProcessoRepo processoRepo;
-
     // Ações de Escrita que exigem Localização
     private static final Set<String> ACOES_ESCRITA = Set.of(
             "EDITAR_CADASTRO", "DISPONIBILIZAR_CADASTRO", "DEVOLVER_CADASTRO", "ACEITAR_CADASTRO", "HOMOLOGAR_CADASTRO",
@@ -40,6 +35,10 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
             "EDITAR_MAPA", "DISPONIBILIZAR_MAPA", "APRESENTAR_SUGESTOES", "VALIDAR_MAPA", "DEVOLVER_MAPA", "ACEITAR_MAPA", "HOMOLOGAR_MAPA", "AJUSTAR_MAPA",
             "REALIZAR_AUTOAVALIACAO", "IMPORTAR_ATIVIDADES", "ALTERAR_DATA_LIMITE", "REABRIR_CADASTRO", "REABRIR_REVISAO", "ENVIAR_LEMBRETE_PROCESSO"
     );
+    private final SubprocessoRepo subprocessoRepo;
+    private final MovimentacaoRepo movimentacaoRepo;
+    private final HierarquiaService hierarquiaService;
+    private final ProcessoRepo processoRepo;
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
@@ -69,7 +68,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         }
 
         if (targetId instanceof Collection<?> collection) {
-             return collection.stream().allMatch(id -> hasPermission(authentication, (Serializable) id, targetType, permission));
+            return collection.stream().allMatch(id -> hasPermission(authentication, (Serializable) id, targetType, permission));
         }
 
         String acao = (String) permission;
@@ -79,7 +78,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
                     .map(sp -> checkSubprocesso(usuario, sp, acao))
                     .orElse(false);
         } else if ("Processo".equals(targetType)) {
-             return processoRepo.findById((Long) targetId)
+            return processoRepo.findById((Long) targetId)
                     .map(p -> checkProcesso(usuario, p, acao))
                     .orElse(false);
         }
@@ -195,7 +194,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
                     "HOMOLOGAR_CADASTRO_EM_BLOCO",
                     "HOMOLOGAR_MAPA_EM_BLOCO",
                     "ACEITAR_CADASTRO_EM_BLOCO",
-                    "DISPONIBILIZAR_MAPA_EM_BLOCO" 
+                    "DISPONIBILIZAR_MAPA_EM_BLOCO"
             ).contains(acao);
         }
 

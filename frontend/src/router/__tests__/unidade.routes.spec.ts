@@ -3,10 +3,10 @@ import unidadeRoutes from "../unidade.routes";
 import type {RouteLocationNormalized} from "vue-router";
 
 // Mock views to avoid loading real components which might have dependencies causing timeouts
-vi.mock("@/views/unidade/UnidadesView.vue", () => ({ default: { name: 'UnidadesView' } }));
-vi.mock("@/views/unidade/UnidadeDetalheView.vue", () => ({ default: { name: 'UnidadeDetalheView' } }));
-vi.mock("@/views/processo/MapaCadastroView.vue", () => ({ default: { name: 'MapaCadastroView' } }));
-vi.mock("@/views/unidade/AtribuicaoTemporariaView.vue", () => ({ default: { name: 'AtribuicaoTemporariaView' } }));
+vi.mock("@/views/unidade/UnidadesView.vue", () => ({default: {name: 'UnidadesView'}}));
+vi.mock("@/views/unidade/UnidadeDetalheView.vue", () => ({default: {name: 'UnidadeDetalheView'}}));
+vi.mock("@/views/processo/MapaCadastroView.vue", () => ({default: {name: 'MapaCadastroView'}}));
+vi.mock("@/views/unidade/AtribuicaoTemporariaView.vue", () => ({default: {name: 'AtribuicaoTemporariaView'}}));
 
 describe("unidade.routes", () => {
     it("deve exportar um array de rotas", () => {

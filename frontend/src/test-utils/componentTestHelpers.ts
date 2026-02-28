@@ -10,10 +10,12 @@ export interface ComponentTestContext {
  * Utilitário para limpar o wrapper após cada teste
  */
 export function setupComponentTest(): ComponentTestContext {
-    const context: ComponentTestContext = { wrapper: undefined };
+    const context: ComponentTestContext = {wrapper: undefined};
 
     afterEach(() => {
-        if (context.wrapper) { context.wrapper.unmount(); }
+        if (context.wrapper) {
+            context.wrapper.unmount();
+        }
     });
 
     return context;

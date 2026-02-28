@@ -2,29 +2,34 @@
 
 ## Finalidade
 
-Esta view é o **coração do sistema de autorização** do SGC. Estabelece o mapeamento completo entre usuários, perfis e unidades, determinando quais perfis cada usuário pode assumir e em quais unidades pode atuar. É consultada imediatamente após o login para determinar as opções de acesso do usuário e é a base para todas as validações de permissão no sistema.
+Esta view é o **coração do sistema de autorização** do SGC. Estabelece o mapeamento completo entre usuários, perfis e
+unidades, determinando quais perfis cada usuário pode assumir e em quais unidades pode atuar. É consultada imediatamente
+após o login para determinar as opções de acesso do usuário e é a base para todas as validações de permissão no sistema.
 
 ## Origem dos Dados
 
 **Tabelas do SGC:**
+
 - `ADMINISTRADOR`: Usuários com perfil ADMIN
 
 **Views do Sistema:**
+
 - `VW_USUARIO`: Usuários ativos com lotação
 - `VW_RESPONSABILIDADE`: Responsáveis por unidades
 - `VW_UNIDADE`: Unidades e suas classificações
 
 ## Estrutura da View
 
-| Coluna | Tipo | Descrição | Origem |
-|--------|------|-----------|--------|
-| `usuario_titulo` | VARCHAR2(12) | Título de eleitor do usuário (PK) | Consolidado de todas as fontes |
-| `perfil` | VARCHAR2(20) | Perfil do usuário (PK) | Calculado (ver RN-VIEW06-02) |
-| `unidade_codigo` | NUMBER | Código da unidade onde o perfil se aplica (PK) | Calculado por perfil |
+| Coluna           | Tipo         | Descrição                                      | Origem                         |
+|------------------|--------------|------------------------------------------------|--------------------------------|
+| `usuario_titulo` | VARCHAR2(12) | Título de eleitor do usuário (PK)              | Consolidado de todas as fontes |
+| `perfil`         | VARCHAR2(20) | Perfil do usuário (PK)                         | Calculado (ver RN-VIEW06-02)   |
+| `unidade_codigo` | NUMBER       | Código da unidade onde o perfil se aplica (PK) | Calculado por perfil           |
 
 **Chave primária composta:** (`usuario_titulo`, `perfil`, `unidade_codigo`)
 
 **Justificativa da PK:**
+
 - Um usuário pode ter múltiplos perfis
 - Um usuário pode atuar em múltiplas unidades
 - Cada combinação (usuário, perfil, unidade) é única
@@ -46,6 +51,7 @@ FROM (
 ```
 
 **Características:**
+
 - Cada query é independente e determina um perfil específico
 - UNION combina todos os resultados, eliminando duplicatas
 - Ordem das queries não afeta o resultado
@@ -59,11 +65,13 @@ JOIN vw_usuario u ON u.titulo = a.usuario_titulo
 ```
 
 **Critérios:**
+
 - Usuário deve estar cadastrado em `ADMINISTRADOR`
 - Usuário deve existir em `VW_USUARIO` (lotação ativa)
 - Unidade é sempre 1 (ADMIN - unidade raiz virtual)
 
 **Características do perfil ADMIN:**
+
 - Acesso total ao sistema
 - Cria, configura e monitora processos
 - Homologa cadastros e mapas de competências
@@ -72,6 +80,7 @@ JOIN vw_usuario u ON u.titulo = a.usuario_titulo
 - Atua no contexto da unidade ADMIN (código 1)
 
 **Perda do perfil:**
+
 - Remoção da tabela `ADMINISTRADOR`
 - Encerramento de lotação (desaparece de `VW_USUARIO`)
 
@@ -85,11 +94,13 @@ WHERE u.tipo IN ('INTERMEDIARIA', 'INTEROPERACIONAL')
 ```
 
 **Critérios:**
+
 - Usuário deve ser responsável por uma unidade (titular, substituto ou atribuição temporária)
 - Unidade deve ser do tipo `INTERMEDIARIA` ou `INTEROPERACIONAL`
 - Responsabilidade deve estar vigente (implícito em `VW_RESPONSABILIDADE`)
 
 **Características do perfil GESTOR:**
+
 - Validação de informações de unidades subordinadas
 - Submissão para análise da unidade superior
 - Devolução para unidade subordinada (quando há ajustes)
@@ -97,10 +108,12 @@ WHERE u.tipo IN ('INTERMEDIARIA', 'INTEROPERACIONAL')
 - Não cadastra atividades próprias (se unidade for INTERMEDIARIA)
 
 **Unidades elegíveis:**
+
 - **INTERMEDIARIA**: Tem subordinadas operacionais, mas apenas titular lotado
 - **INTEROPERACIONAL**: Tem subordinadas operacionais E servidores próprios (acumula GESTOR + CHEFE)
 
 **Múltiplas unidades:**
+
 - Usuário pode ser GESTOR de várias unidades simultaneamente
 - Cada entrada na view representa uma unidade diferente
 - Após login, usuário seleciona em qual unidade vai atuar
@@ -115,11 +128,13 @@ WHERE u.tipo IN ('INTEROPERACIONAL', 'OPERACIONAL')
 ```
 
 **Critérios:**
+
 - Usuário deve ser responsável por uma unidade
 - Unidade deve ser do tipo `INTEROPERACIONAL` ou `OPERACIONAL`
 - Responsabilidade deve estar vigente
 
 **Características do perfil CHEFE:**
+
 - Cadastro de atividades e conhecimentos da unidade
 - Submissão de cadastro para validação
 - Validação de mapas de competências
@@ -127,10 +142,12 @@ WHERE u.tipo IN ('INTEROPERACIONAL', 'OPERACIONAL')
 - Gestão de equipe da unidade
 
 **Unidades elegíveis:**
+
 - **OPERACIONAL**: Unidade-folha com equipe (2+ servidores), sem subordinadas
 - **INTEROPERACIONAL**: Tem subordinadas E equipe própria (acumula CHEFE + GESTOR)
 
 **Acumulação GESTOR+CHEFE:**
+
 - Usuários de unidades INTEROPERACIONAL têm ambos os perfis
 - Podem alternar entre perfis conforme necessidade
 - Ações diferentes disponíveis em cada perfil
@@ -145,21 +162,25 @@ WHERE usu.titulo <> uni.titulo_titular
 ```
 
 **Critérios:**
+
 - Usuário deve existir em `VW_USUARIO`
 - Usuário NÃO deve ser o titular da unidade de competência
 - Unidade de competência determina a unidade do perfil
 
 **Características do perfil SERVIDOR:**
+
 - Participa apenas de processos de DIAGNÓSTICO
 - Não cadastra atividades em processos de Mapeamento/Revisão
 - Não valida informações de outras unidades
 - Avalia importância e domínio de competências (em diagnósticos)
 
 **Unidade aplicável:**
+
 - Sempre a `unidade_comp_codigo` do usuário (de `VW_USUARIO`)
 - Pode ser diferente da unidade de lotação (casos de unidades SEM_EQUIPE)
 
 **Exclusão de titulares:**
+
 - Titulares já têm perfil CHEFE ou GESTOR
 - Condição `usu.titulo <> uni.titulo_titular` evita duplicação
 - Substitutos e atribuídos temporariamente também são excluídos (pois aparecem como titulares em `VW_RESPONSABILIDADE`)
@@ -169,6 +190,7 @@ WHERE usu.titulo <> uni.titulo_titular
 Um usuário pode aparecer múltiplas vezes na view:
 
 **Exemplo 1 - Administrador que também é CHEFE:**
+
 ```
 usuario_titulo: 001234567890
 Registros:
@@ -178,6 +200,7 @@ Registros:
 ```
 
 **Exemplo 2 - GESTOR de múltiplas unidades:**
+
 ```
 usuario_titulo: 002345678901
 Registros:
@@ -187,6 +210,7 @@ Registros:
 ```
 
 **Exemplo 3 - Servidor comum:**
+
 ```
 usuario_titulo: 003456789012
 Registros:
@@ -198,11 +222,13 @@ Registros:
 Todas as queries fazem JOIN com `VW_USUARIO`:
 
 **Implicações:**
+
 - Usuário sem lotação ativa não aparece na view
 - Perda de lotação = perda imediata de todos os perfis
 - Dados sempre sincronizados com SGRH
 
 **Exceção - Perfil ADMIN:**
+
 - Cadastro em `ADMINISTRADOR` persiste após perda de lotação
 - Mas usuário não consegue logar se não estiver em `VW_USUARIO`
 - Requer correção: ou remover de `ADMINISTRADOR` ou reativar lotação
@@ -228,12 +254,14 @@ ORDER BY perfil, unidade_codigo;
 ```
 
 **Tela de seleção:**
+
 - Agrupar por perfil
 - Para cada perfil, listar unidades aplicáveis
 - Usuário seleciona par (perfil, unidade)
 - Sistema armazena na sessão
 
 **Exemplo de interface:**
+
 ```
 Selecione seu perfil e unidade:
 
@@ -270,6 +298,7 @@ WHERE usuario_titulo = :titulo_usuario
 ```
 
 **Validações comuns:**
+
 - Criar processo: Requer perfil ADMIN
 - Cadastrar atividades: Requer perfil CHEFE na unidade do subprocesso
 - Validar cadastro: Requer perfil GESTOR na unidade superior
@@ -301,6 +330,7 @@ WHERE up.unidade_codigo IN (:lista_unidades_usuario)
 ```
 
 **Lógica:**
+
 - ADMIN: Vê todos os processos (unidade 1 é raiz de todas)
 - GESTOR/CHEFE: Vê processos da sua unidade e subordinadas
 - SERVIDOR: Vê processos da sua unidade de competência
@@ -348,6 +378,7 @@ WHERE p.usuario_titulo = :titulo_usuario_acao
 ```
 
 **Limitação:** View mostra estado atual, não histórico. Para auditoria completa:
+
 - Registrar perfil usado no momento da ação
 - Ou reconstituir permissões históricas através de `VW_RESPONSABILIDADE` + `ATRIBUICAO_TEMPORARIA`
 
@@ -391,33 +422,40 @@ HAVING COUNT(DISTINCT perfil) > 1;
 ### Dependências
 
 **VW_USUARIO:**
+
 - Valida que usuários têm lotação ativa
 - Fornece `unidade_comp_codigo` para perfil SERVIDOR
 - JOIN em todos os perfis
 
 **VW_RESPONSABILIDADE:**
+
 - Determina perfis GESTOR e CHEFE
 - Filtra por tipo de unidade
 
 **VW_UNIDADE:**
+
 - Filtra unidades por tipo para GESTOR e CHEFE
 - Fornece `titulo_titular` para exclusão em SERVIDOR
 
 **ADMINISTRADOR:**
+
 - Determina perfil ADMIN
 - Tabela gerenciada manualmente
 
 ### Consumidores da View
 
 **CDU-01 (Login):**
+
 - Determinação de perfis disponíveis
 - Seleção de perfil/unidade
 
 **CDU-02 (Painel):**
+
 - Filtragem de processos visíveis
 - Controle de exibição de botões
 
 **Todos os casos de uso:**
+
 - Validações de autorização
 - Controle de acesso
 
@@ -426,6 +464,7 @@ HAVING COUNT(DISTINCT perfil) > 1;
 ### Permissões Necessárias
 
 Todas as permissões são herdadas das views dependentes:
+
 - Permissões do SGRH (via `VW_USUARIO`, `VW_RESPONSABILIDADE`, `VW_UNIDADE`)
 - Acesso à tabela `ADMINISTRADOR` (própria do SGC)
 
@@ -443,10 +482,12 @@ Todas as permissões são herdadas das views dependentes:
 A view usa UNION (não UNION ALL), eliminando duplicatas:
 
 **Duplicatas possíveis:**
+
 - Teoricamente não devem ocorrer (perfis são mutuamente exclusivos por construção)
 - UNION garante que mesmo com dados inconsistentes não haverá duplicatas
 
 **Considerar UNION ALL:**
+
 - Se garantido que não há sobreposição
 - Eliminaria overhead de remoção de duplicatas
 - Requer análise cuidadosa das queries
@@ -454,16 +495,19 @@ A view usa UNION (não UNION ALL), eliminando duplicatas:
 ### Materialização
 
 **Argumentos a favor:**
+
 - View consultada em CADA login (alta frequência)
 - Consultas em validações de permissão (muito frequentes)
 - Dados mudam relativamente pouco
 
 **Argumentos contra:**
+
 - Dados dependem de múltiplas fontes (SGRH, ADMINISTRADOR, ATRIBUICAO_TEMPORARIA)
 - Mudanças devem refletir imediatamente (substituições, atribuições)
 - Lógica relativamente simples
 
 **Recomendação:**
+
 - Inicialmente manter como view regular
 - Monitorar performance
 - Se necessário, criar materialized view com refresh frequente (ex: a cada 5 minutos)
@@ -500,29 +544,29 @@ CREATE INDEX idx_admin_titulo ON ADMINISTRADOR(usuario_titulo);
 **Interpretação:**
 
 1. **001234567890:**
-   - Administrador do sistema (pode atuar na unidade ADMIN)
-   - Também é CHEFE da unidade 150
-   - Após login, escolhe entre ADMIN ou CHEFE-150
+    - Administrador do sistema (pode atuar na unidade ADMIN)
+    - Também é CHEFE da unidade 150
+    - Após login, escolhe entre ADMIN ou CHEFE-150
 
 2. **002345678901:**
-   - GESTOR e CHEFE da unidade 100
-   - Unidade 100 é INTEROPERACIONAL (acumula perfis)
-   - Pode atuar como gestor (validando subordinadas) ou chefe (cadastrando atividades)
+    - GESTOR e CHEFE da unidade 100
+    - Unidade 100 é INTEROPERACIONAL (acumula perfis)
+    - Pode atuar como gestor (validando subordinadas) ou chefe (cadastrando atividades)
 
 3. **003456789012:**
-   - Apenas SERVIDOR da unidade 200
-   - Não é responsável pela unidade
-   - Participa apenas de diagnósticos
+    - Apenas SERVIDOR da unidade 200
+    - Não é responsável pela unidade
+    - Participa apenas de diagnósticos
 
 4. **004567890123:**
-   - CHEFE da unidade 250 (responsável)
-   - Também aparece como SERVIDOR (mas não deveria, há um erro lógico aqui*)
-   - *Nota: Isso indica inconsistência - titular não deveria ter perfil SERVIDOR
+    - CHEFE da unidade 250 (responsável)
+    - Também aparece como SERVIDOR (mas não deveria, há um erro lógico aqui*)
+    - *Nota: Isso indica inconsistência - titular não deveria ter perfil SERVIDOR
 
 5. **005678901234:**
-   - GESTOR de duas unidades (120 e 130)
-   - É responsável (titular, substituto ou atribuição) de ambas
-   - Após login, escolhe em qual unidade vai atuar
+    - GESTOR de duas unidades (120 e 130)
+    - É responsável (titular, substituto ou atribuição) de ambas
+    - Após login, escolhe em qual unidade vai atuar
 
 ## Notas de Implementação
 
@@ -539,6 +583,7 @@ CREATE INDEX idx_admin_titulo ON ADMINISTRADOR(usuario_titulo);
 ```
 
 **Solução:**
+
 ```sql
 -- Query SERVIDOR corrigida:
 SELECT usu.titulo, 'SERVIDOR', uni.codigo
@@ -556,42 +601,45 @@ WHERE usu.titulo NOT IN (
 **Eventos que afetam perfis:**
 
 1. **Nomeação/Dispensa de titular:**
-   - Ganha/perde perfil GESTOR ou CHEFE
-   - `VW_UNIDADE.titulo_titular` muda → `VW_RESPONSABILIDADE` muda
+    - Ganha/perde perfil GESTOR ou CHEFE
+    - `VW_UNIDADE.titulo_titular` muda → `VW_RESPONSABILIDADE` muda
 
 2. **Início/Fim de substituição:**
-   - Substituto ganha perfil ao iniciar
-   - Perde perfil ao terminar
-   - `VW_RESPONSABILIDADE` reflete automaticamente
+    - Substituto ganha perfil ao iniciar
+    - Perde perfil ao terminar
+    - `VW_RESPONSABILIDADE` reflete automaticamente
 
 3. **Atribuição temporária:**
-   - Usuário atribuído ganha perfil
-   - Ao expirar, perde perfil (se não for titular/substituto)
-   - `VW_RESPONSABILIDADE` filtra por vigência
+    - Usuário atribuído ganha perfil
+    - Ao expirar, perde perfil (se não for titular/substituto)
+    - `VW_RESPONSABILIDADE` filtra por vigência
 
 4. **Mudança de tipo de unidade:**
-   - Unidade muda de OPERACIONAL para INTERMEDIARIA
-   - Responsável perde perfil CHEFE, ganha apenas GESTOR
-   - `VW_UNIDADE.tipo` muda → perfis se ajustam
+    - Unidade muda de OPERACIONAL para INTERMEDIARIA
+    - Responsável perde perfil CHEFE, ganha apenas GESTOR
+    - `VW_UNIDADE.tipo` muda → perfis se ajustam
 
 5. **Encerramento de lotação:**
-   - Usuário desaparece de `VW_USUARIO`
-   - Perde todos os perfis
-   - Não consegue mais fazer login
+    - Usuário desaparece de `VW_USUARIO`
+    - Perde todos os perfis
+    - Não consegue mais fazer login
 
 ### Sessão e Cache
 
 **Armazenamento em sessão:**
+
 - Após login, armazenar perfis disponíveis
 - Ao selecionar perfil/unidade, armazenar na sessão
 - Não reconsultar view a cada requisição
 
 **Atualização de sessão:**
+
 - Considerar TTL para sessão
 - Revalidar perfis periodicamente (ex: a cada 1 hora)
 - Ou forçar logout ao detectar mudança de permissões
 
 **Segurança:**
+
 - Sempre validar permissões no backend
 - Não confiar apenas em dados da sessão
 - Reconsultar view para operações críticas

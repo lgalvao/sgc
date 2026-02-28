@@ -184,7 +184,7 @@ class ProcessoConsultaServiceTest {
         // Arrange
         Usuario admin = Usuario.builder().perfilAtivo(Perfil.ADMIN).build();
         when(usuarioService.usuarioAutenticado()).thenReturn(admin);
-        
+
         when(processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO))
                 .thenReturn(List.of());
 
@@ -201,7 +201,7 @@ class ProcessoConsultaServiceTest {
     void deveBuscarProcessoCodigoOpt() {
         Processo p = new Processo();
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
-        
+
         Optional<Processo> res = processoConsultaService.buscarProcessoCodigoOpt(1L);
         assertThat(res).isPresent().contains(p);
     }
@@ -211,7 +211,7 @@ class ProcessoConsultaServiceTest {
     void deveListarProcessosPaginados() {
         Pageable pageable = Pageable.unpaged();
         when(processoRepo.findAll(pageable)).thenReturn(Page.empty());
-        
+
         Page<Processo> res = processoConsultaService.processos(pageable);
         assertThat(res).isEmpty();
     }

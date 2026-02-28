@@ -17,14 +17,14 @@ describe('Propriedades de Validação (validators.ts)', () => {
         });
 
         it('deve aceitar emails válidos gerados', () => {
-             fc.assert(
+            fc.assert(
                 fc.property(
                     fc.stringMatching(/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,4}$/),
                     (email) => {
-                         return validarEmail(email);
+                        return validarEmail(email);
                     }
                 )
-             );
+            );
         });
 
         it('deve rejeitar nulos ou undefined', () => {
@@ -46,7 +46,7 @@ describe('Propriedades de Validação (validators.ts)', () => {
         });
 
         it('senhas válidas devem ter letras', () => {
-             fc.assert(
+            fc.assert(
                 fc.property(
                     fc.string(),
                     (s) => {
@@ -57,7 +57,7 @@ describe('Propriedades de Validação (validators.ts)', () => {
                         return true; // Se tem letra, pode ser verdadeiro ou falso dependendo de outras regras
                     }
                 )
-             );
+            );
         });
     });
 });

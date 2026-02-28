@@ -105,13 +105,13 @@
     </fieldset>
     <template #footer>
       <BButton
+          :disabled="importando"
           data-testid="importar-atividades-modal__btn-modal-cancelar"
           type="button"
           variant="secondary"
-          :disabled="importando"
           @click="fechar"
       >
-        <i class="bi bi-x-circle me-1" aria-hidden="true"/>
+        <i aria-hidden="true" class="bi bi-x-circle me-1"/>
         Cancelar
       </BButton>
       <BButton
@@ -123,10 +123,10 @@
       >
         <BSpinner
             v-if="importando"
-            small
             class="me-1"
+            small
         />
-        <i v-else class="bi bi-box-arrow-in-down me-1" aria-hidden="true"/>
+        <i v-else aria-hidden="true" class="bi bi-box-arrow-in-down me-1"/>
         {{ importando ? 'Importando...' : 'Importar' }}
       </BButton>
     </template>

@@ -17,10 +17,12 @@ export const useExemploStore = defineStore('exemplo', () => {
 ## Stores Disponíveis
 
 ### Autenticação e Perfil
+
 * **`perfil.ts` (`usePerfilStore`)**: Sessão, token JWT, perfis e unidade selecionada.
 * **`usuarios.ts` (`useUsuariosStore`)**: Dados do usuário logado e busca de usuários.
 
 ### Processos e Fluxo
+
 * **`processos/`**: Pasta com lógica dividida para o domínio de processos.
     - **`core.ts`**: Listagem, filtros e operações CRUD de processos.
     - **`context.ts`**: Estado do processo atualmente selecionado/aberto.
@@ -28,6 +30,7 @@ export const useExemploStore = defineStore('exemplo', () => {
 * **`subprocessos.ts` (`useSubprocessosStore`)**: Gestão de subprocessos de unidades.
 
 ### Funcionalidades Específicas
+
 * **`atividades.ts`**: CRUD de atividades.
 * **`mapas.ts`**: Estado do mapa de competências e revisões.
 * **`diagnosticos.ts`**: Dados de autoavaliação e monitoramento.
@@ -37,6 +40,7 @@ export const useExemploStore = defineStore('exemplo', () => {
 * **`configuracoes.ts`**: Parâmetros globais do sistema.
 
 ### UI e Feedback
+
 * **`feedback.ts` (`useFeedbackStore`)**: Centralização de Toasts, alertas e estados de carregamento globais.
 * **`alertas.ts`**: Notificações e alertas contextuais para o usuário.
 

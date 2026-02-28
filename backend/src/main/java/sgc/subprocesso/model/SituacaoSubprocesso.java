@@ -33,11 +33,10 @@ public enum SituacaoSubprocesso {
     DIAGNOSTICO_MONITORAMENTO("Monitoramento"),
     DIAGNOSTICO_CONCLUIDO("Concluído");
 
-    private final String descricao;
-
     private static final String PREFIXO_MAPEAMENTO = "MAPEAMENTO";
     private static final String PREFIXO_REVISAO = "REVISAO";
     private static final String PREFIXO_DIAGNOSTICO = "DIAGNOSTICO";
+    private final String descricao;
 
     public boolean podeTransicionarPara(SituacaoSubprocesso nova, TipoProcesso tipo) {
         if (this == nova) return true;
@@ -66,14 +65,13 @@ public enum SituacaoSubprocesso {
 
     private boolean podeIniciar(SituacaoSubprocesso nova, TipoProcesso tipo) {
         return (tipo == TipoProcesso.MAPEAMENTO && nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO) ||
-               (tipo == TipoProcesso.REVISAO && nova == REVISAO_CADASTRO_EM_ANDAMENTO) ||
-               (tipo == TipoProcesso.DIAGNOSTICO && nova == DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+                (tipo == TipoProcesso.REVISAO && nova == REVISAO_CADASTRO_EM_ANDAMENTO) ||
+                (tipo == TipoProcesso.DIAGNOSTICO && nova == DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
     }
 
     private boolean transicaoMapeamento(SituacaoSubprocesso nova) {
         return switch (this) {
-            case MAPEAMENTO_CADASTRO_EM_ANDAMENTO ->
-                    nova == MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
+            case MAPEAMENTO_CADASTRO_EM_ANDAMENTO -> nova == MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
             case MAPEAMENTO_CADASTRO_DISPONIBILIZADO ->
                     nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO || nova == MAPEAMENTO_CADASTRO_HOMOLOGADO;
             case MAPEAMENTO_CADASTRO_HOMOLOGADO ->
@@ -92,30 +90,24 @@ public enum SituacaoSubprocesso {
 
     private boolean transicaoRevisao(SituacaoSubprocesso nova) {
         return switch (this) {
-            case REVISAO_CADASTRO_EM_ANDAMENTO ->
-                    nova == REVISAO_CADASTRO_DISPONIBILIZADA;
+            case REVISAO_CADASTRO_EM_ANDAMENTO -> nova == REVISAO_CADASTRO_DISPONIBILIZADA;
             case REVISAO_CADASTRO_DISPONIBILIZADA ->
                     nova == REVISAO_CADASTRO_EM_ANDAMENTO || nova == REVISAO_CADASTRO_HOMOLOGADA || nova == REVISAO_MAPA_HOMOLOGADO;
             case REVISAO_CADASTRO_HOMOLOGADA ->
                     nova == REVISAO_MAPA_AJUSTADO || nova == REVISAO_MAPA_DISPONIBILIZADO || nova == REVISAO_CADASTRO_EM_ANDAMENTO;
-            case REVISAO_MAPA_AJUSTADO ->
-                    nova == REVISAO_MAPA_DISPONIBILIZADO || nova == REVISAO_CADASTRO_HOMOLOGADA;
+            case REVISAO_MAPA_AJUSTADO -> nova == REVISAO_MAPA_DISPONIBILIZADO || nova == REVISAO_CADASTRO_HOMOLOGADA;
             case REVISAO_MAPA_DISPONIBILIZADO ->
                     nova == REVISAO_MAPA_COM_SUGESTOES || nova == REVISAO_MAPA_VALIDADO || nova == REVISAO_MAPA_AJUSTADO;
-            case REVISAO_MAPA_COM_SUGESTOES ->
-                    nova == REVISAO_MAPA_DISPONIBILIZADO || nova == REVISAO_MAPA_AJUSTADO;
-            case REVISAO_MAPA_VALIDADO ->
-                    nova == REVISAO_MAPA_HOMOLOGADO || nova == REVISAO_MAPA_DISPONIBILIZADO;
+            case REVISAO_MAPA_COM_SUGESTOES -> nova == REVISAO_MAPA_DISPONIBILIZADO || nova == REVISAO_MAPA_AJUSTADO;
+            case REVISAO_MAPA_VALIDADO -> nova == REVISAO_MAPA_HOMOLOGADO || nova == REVISAO_MAPA_DISPONIBILIZADO;
             default -> false;
         };
     }
 
     private boolean transicaoDiagnostico(SituacaoSubprocesso nova) {
         return switch (this) {
-            case DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO ->
-                    nova == DIAGNOSTICO_MONITORAMENTO;
-            case DIAGNOSTICO_MONITORAMENTO ->
-                    nova == DIAGNOSTICO_CONCLUIDO;
+            case DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO -> nova == DIAGNOSTICO_MONITORAMENTO;
+            case DIAGNOSTICO_MONITORAMENTO -> nova == DIAGNOSTICO_CONCLUIDO;
             default -> false;
         };
     }

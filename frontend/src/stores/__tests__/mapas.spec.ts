@@ -29,8 +29,9 @@ describe("useMapasStore", () => {
 
     describe("buscarMapaCompleto", () => {
         it("deve limpar o estado anterior antes de buscar novo mapa completo", async () => {
-            context.store.mapaCompleto = { codigo: 1 } as any;
-            vi.mocked(subprocessoService.obterMapaCompleto).mockReturnValue(new Promise(() => { }));
+            context.store.mapaCompleto = {codigo: 1} as any;
+            vi.mocked(subprocessoService.obterMapaCompleto).mockReturnValue(new Promise(() => {
+            }));
 
             context.store.buscarMapaCompleto(2);
 
@@ -75,7 +76,7 @@ describe("useMapasStore", () => {
 
     describe("salvarMapa", () => {
         it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
-            const request = { competencias: [] };
+            const request = {competencias: []};
             const mockResponse: MapaCompleto = {
                 codigo: 1,
                 subprocessoCodigo: 1,
@@ -101,7 +102,7 @@ describe("useMapasStore", () => {
         });
 
         it("deve lançar erro em caso de falha", async () => {
-            const request = { competencias: [] };
+            const request = {competencias: []};
             vi.mocked(subprocessoService.salvarMapaCompleto).mockRejectedValue(new Error("Fail"));
 
             await expect(context.store.salvarMapa(codSubprocesso, request)).rejects.toThrow("Fail");
@@ -126,7 +127,7 @@ describe("useMapasStore", () => {
 
     describe("salvarAjustes", () => {
         it("deve chamar o serviço com sucesso", async () => {
-            const request = { competencias: [], atividades: [], sugestoes: "" };
+            const request = {competencias: [], atividades: [], sugestoes: ""};
             vi.mocked(subprocessoService.salvarMapaAjuste).mockResolvedValue(undefined);
 
             await context.store.salvarAjustes(codSubprocesso, request);
@@ -282,7 +283,7 @@ describe("useMapasStore", () => {
 
     describe("disponibilizarMapa", () => {
         it("deve chamar o serviço com sucesso", async () => {
-            const request = { observacoes: "teste", dataLimite: "2025-12-31" };
+            const request = {observacoes: "teste", dataLimite: "2025-12-31"};
             vi.mocked(subprocessoService.disponibilizarMapa).mockResolvedValue(undefined);
 
             await context.store.disponibilizarMapa(codSubprocesso, request);

@@ -44,16 +44,16 @@ public class Atividade extends EntidadeBase {
     @JsonIgnoreProperties("atividades")
     private Set<Competencia> competencias = new HashSet<>();
 
-    @JsonView(MapaViews.Publica.class)
-    @JsonProperty("mapaCodigo")
-    public Long getMapaCodigo() {
-        return mapa.getCodigo();
-    }
-
     public static Atividade criarDe(sgc.mapa.dto.CriarAtividadeRequest request) {
         return Atividade.builder()
                 .descricao(request.descricao())
                 .build();
+    }
+
+    @JsonView(MapaViews.Publica.class)
+    @JsonProperty("mapaCodigo")
+    public Long getMapaCodigo() {
+        return mapa.getCodigo();
     }
 
     public void atualizarDe(sgc.mapa.dto.AtualizarAtividadeRequest request) {

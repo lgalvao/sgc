@@ -2,7 +2,7 @@
   <div class="card mb-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
       <h5 class="mb-0">Administradores do Sistema</h5>
-      <BButton variant="light" size="sm" @click="abrirModalAdicionarAdmin">
+      <BButton size="sm" variant="light" @click="abrirModalAdicionarAdmin">
         <i aria-hidden="true" class="bi bi-person-plus"></i> Adicionar administrador
       </BButton>
     </div>
@@ -19,40 +19,40 @@
 
       <div v-else-if="administradores.length === 0">
         <EmptyState
-          icon="bi-people"
-          title="Nenhum administrador cadastrado"
-          description="Utilize o botão 'Adicionar administrador' para cadastrar novos administradores."
+            description="Utilize o botão 'Adicionar administrador' para cadastrar novos administradores."
+            icon="bi-people"
+            title="Nenhum administrador cadastrado"
         />
       </div>
 
       <div v-else class="table-responsive">
         <table class="table table-striped table-hover">
           <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Título Eleitoral</th>
-              <th>Matrícula</th>
-              <th>Unidade</th>
-              <th class="text-end">Ações</th>
-            </tr>
+          <tr>
+            <th>Nome</th>
+            <th>Título Eleitoral</th>
+            <th>Matrícula</th>
+            <th>Unidade</th>
+            <th class="text-end">Ações</th>
+          </tr>
           </thead>
           <tbody>
-            <tr v-for="admin in administradores" :key="admin.tituloEleitoral">
-              <td>{{ admin.nome }}</td>
-              <td>{{ admin.tituloEleitoral }}</td>
-              <td>{{ admin.matricula }}</td>
-              <td>{{ admin.unidadeSigla }}</td>
-              <td class="text-end">
-                <LoadingButton
-                    :loading="removendoAdmin === admin.tituloEleitoral"
-                    variant="outline-danger"
-                    size="sm"
-                    icon="trash"
-                    text="Remover"
-                    @click="confirmarRemocao(admin)"
-                />
-              </td>
-            </tr>
+          <tr v-for="admin in administradores" :key="admin.tituloEleitoral">
+            <td>{{ admin.nome }}</td>
+            <td>{{ admin.tituloEleitoral }}</td>
+            <td>{{ admin.matricula }}</td>
+            <td>{{ admin.unidadeSigla }}</td>
+            <td class="text-end">
+              <LoadingButton
+                  :loading="removendoAdmin === admin.tituloEleitoral"
+                  icon="trash"
+                  size="sm"
+                  text="Remover"
+                  variant="outline-danger"
+                  @click="confirmarRemocao(admin)"
+              />
+            </td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -70,7 +70,8 @@
         @shown="() => inputTituloRef?.focus()"
     >
       <div class="mb-3">
-        <label for="usuarioTitulo" class="form-label">Título <span class="text-danger" aria-hidden="true">*</span></label>
+        <label class="form-label" for="usuarioTitulo">Título <span aria-hidden="true"
+                                                                   class="text-danger">*</span></label>
         <input
             id="usuarioTitulo"
             ref="inputTituloRef"
@@ -102,7 +103,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {onMounted, ref} from 'vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';

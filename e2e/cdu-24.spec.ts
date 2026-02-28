@@ -13,12 +13,12 @@ import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
 /**
  * CDU-24 - Disponibilizar mapas de competências em bloco
- * 
+ *
  * Ator: ADMIN
- * 
+ *
  * Pré-condições:
  * - Processo de mapeamento com ao menos uma unidade com subprocesso na situação 'Mapa criado'
- * 
+ *
  * Fluxo principal:
  * 1. ADMIN acessa processo de mapeamento em andamento
  * 2. Sistema mostra tela Detalhes do processo
@@ -43,7 +43,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        
+
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -66,7 +66,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     });
 
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
@@ -95,7 +95,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     });
 
     test('Preparacao 3: Admin homologa cadastro e cria competências', async ({page, autenticadoComoAdmin}) => {
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);

@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 class ProcessoInicializadorPbtTest {
     @Property
     void iniciar_criaSubprocessosParaCadaParticipante(@ForAll("processosEAgumentos") ProcessoArgs args,
-                                                     @ForAll("usuarioQualquer") Usuario usuario) {
+                                                      @ForAll("usuarioQualquer") Usuario usuario) {
 
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
         ComumRepo repo = mock(ComumRepo.class);
@@ -42,7 +42,7 @@ class ProcessoInicializadorPbtTest {
                 return u;
             }).toList();
         });
-        
+
         when(repo.buscar(eq(Unidade.class), anyLong())).thenAnswer(inv -> {
             Unidade u = new Unidade();
             u.setCodigo(inv.getArgument(1));
@@ -66,48 +66,38 @@ class ProcessoInicializadorPbtTest {
         }
     }
 
-    static class ProcessoArgs {
-        final Processo processo;
-        final List<Long> codsUnidadesParam;
-        
-        ProcessoArgs(Processo p, List<Long> params) {
-            this.processo = p;
-            this.codsUnidadesParam = params;
-        }
-    }
-
     @Provide
     Arbitrary<ProcessoArgs> processosEAgumentos() {
         return Arbitraries.of(TipoProcesso.values()).flatMap(tipo ->
-            Arbitraries.longs().between(1, 100).flatMap(codigo ->
-                Arbitraries.longs().between(100, 200).set().ofMinSize(1).ofMaxSize(5).map(unidadesIds -> {
-                    Processo p = Processo.builder()
-                            .codigo(codigo)
-                            .descricao("Processo " + codigo)
-                            .tipo(tipo)
-                            .situacao(SituacaoProcesso.CRIADO)
-                            .dataLimite(LocalDateTime.now().plusDays(10))
-                            .participantes(new ArrayList<>())
-                            .build();
-                    
-                    List<Long> params = new ArrayList<>();
-                    if (tipo != TipoProcesso.REVISAO) {
-                        Set<Unidade> unidades = new HashSet<>();
-                        for (Long id : unidadesIds) {
-                    Unidade u = new Unidade();
-                    u.setCodigo(id);
-                    u.setSigla("U" + id);
-                    u.setTipo(TipoUnidade.OPERACIONAL);
-                    u.setSituacao(SituacaoUnidade.ATIVA);
-                    unidades.add(u);
-                }
-                        p.adicionarParticipantes(unidades);
-                    } else {
-                        params.addAll(unidadesIds);
-                    }
-                    return new ProcessoArgs(p, params);
-                })
-            )
+                Arbitraries.longs().between(1, 100).flatMap(codigo ->
+                        Arbitraries.longs().between(100, 200).set().ofMinSize(1).ofMaxSize(5).map(unidadesIds -> {
+                            Processo p = Processo.builder()
+                                    .codigo(codigo)
+                                    .descricao("Processo " + codigo)
+                                    .tipo(tipo)
+                                    .situacao(SituacaoProcesso.CRIADO)
+                                    .dataLimite(LocalDateTime.now().plusDays(10))
+                                    .participantes(new ArrayList<>())
+                                    .build();
+
+                            List<Long> params = new ArrayList<>();
+                            if (tipo != TipoProcesso.REVISAO) {
+                                Set<Unidade> unidades = new HashSet<>();
+                                for (Long id : unidadesIds) {
+                                    Unidade u = new Unidade();
+                                    u.setCodigo(id);
+                                    u.setSigla("U" + id);
+                                    u.setTipo(TipoUnidade.OPERACIONAL);
+                                    u.setSituacao(SituacaoUnidade.ATIVA);
+                                    unidades.add(u);
+                                }
+                                p.adicionarParticipantes(unidades);
+                            } else {
+                                params.addAll(unidadesIds);
+                            }
+                            return new ProcessoArgs(p, params);
+                        })
+                )
         );
     }
 
@@ -119,5 +109,15 @@ class ProcessoInicializadorPbtTest {
             u.setTituloEleitoral("12345");
             return u;
         });
+    }
+
+    static class ProcessoArgs {
+        final Processo processo;
+        final List<Long> codsUnidadesParam;
+
+        ProcessoArgs(Processo p, List<Long> params) {
+            this.processo = p;
+            this.codsUnidadesParam = params;
+        }
     }
 }

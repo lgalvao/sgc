@@ -181,9 +181,9 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                             .findFirst()
                             .orElse(null);
             assertThat(atividade1Importada).isNotNull();
-                    List<Conhecimento> conhecimentos1 =
-                            conhecimentoRepo.findByAtividade_Codigo(atividade1Importada.getCodigo());
-                        assertThat(conhecimentos1).hasSize(1);
+            List<Conhecimento> conhecimentos1 =
+                    conhecimentoRepo.findByAtividade_Codigo(atividade1Importada.getCodigo());
+            assertThat(conhecimentos1).hasSize(1);
             assertThat(conhecimentos1.getFirst().getDescricao()).isEqualTo("Conhecimento 1.1");
 
             Atividade atividade2Importada =
@@ -192,9 +192,9 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                             .findFirst()
                             .orElse(null);
             assertThat(atividade2Importada).isNotNull();
-                    List<Conhecimento> conhecimentos2 =
-                            conhecimentoRepo.findByAtividade_Codigo(atividade2Importada.getCodigo());
-            
+            List<Conhecimento> conhecimentos2 =
+                    conhecimentoRepo.findByAtividade_Codigo(atividade2Importada.getCodigo());
+
             assertThat(conhecimentos2).hasSize(2);
             assertThat(conhecimentos2.stream().map(Conhecimento::getDescricao).toList())
                     .containsExactlyInAnyOrder("Conhecimento 2.1", "Conhecimento 2.2");

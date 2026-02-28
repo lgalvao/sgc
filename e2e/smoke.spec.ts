@@ -1,4 +1,3 @@
-import type {Locator, Page} from '@playwright/test';
 import {expect, test} from './fixtures/base.js';
 import logger from '../frontend/src/utils/logger.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
@@ -855,7 +854,8 @@ test.describe('Smoke Test - Sistema SGC', () => {
                     if (await btnExportar.isVisible().catch(() => false)) {
                     }
 
-                    await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {});
+                    await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {
+                    });
                     await page.waitForTimeout(300);
                 }
 
@@ -864,7 +864,8 @@ test.describe('Smoke Test - Sistema SGC', () => {
                 if (await cardMapas.isVisible().catch(() => false)) {
                     await cardMapas.click();
                     await page.waitForTimeout(300);
-                    await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {});
+                    await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {
+                    });
                 }
             }
         });

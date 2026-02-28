@@ -51,25 +51,25 @@ vi.mock("@/services/processoService", () => ({
 }));
 
 const stubs = {
-    LayoutPadrao: { template: '<div><slot /></div>' },
-    PageHeader: { template: '<div><slot /><slot name="actions" /></div>' },
-    LoadingButton: { template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>' },
-    BButton: { template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>' },
-    BDropdown: { template: '<div><slot /></div>' },
-    BDropdownItem: { template: '<div :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></div>' },
-    ErrorAlert: { template: '<div></div>' },
-    CadAtividadeForm: { template: '<div></div>', expose: ['inputRef'] },
-    EmptyState: { template: '<div><slot /></div>' },
-    AtividadeItem: { template: '<div></div>', props: ['atividade'] },
-    ImportarAtividadesModal: { template: '<div></div>', props: ['mostrar'] },
-    ImpactoMapaModal: { template: '<div v-if="mostrar" data-testid="modal-impacto"></div>', props: ['mostrar'] },
+    LayoutPadrao: {template: '<div><slot /></div>'},
+    PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
+    LoadingButton: {template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>'},
+    BButton: {template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>'},
+    BDropdown: {template: '<div><slot /></div>'},
+    BDropdownItem: {template: '<div :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></div>'},
+    ErrorAlert: {template: '<div></div>'},
+    CadAtividadeForm: {template: '<div></div>', expose: ['inputRef']},
+    EmptyState: {template: '<div><slot /></div>'},
+    AtividadeItem: {template: '<div></div>', props: ['atividade']},
+    ImportarAtividadesModal: {template: '<div></div>', props: ['mostrar']},
+    ImpactoMapaModal: {template: '<div v-if="mostrar" data-testid="modal-impacto"></div>', props: ['mostrar']},
     ConfirmacaoDisponibilizacaoModal: {
         template: '<div v-if="mostrar" data-testid="modal-confirmacao">Confirmacao <button data-testid="btn-confirmar-disponibilizacao" @click="$emit(\'confirmar\')">Confirmar</button></div>',
         props: ['mostrar'],
         emits: ['confirmar', 'fechar']
     },
-    HistoricoAnaliseModal: { template: '<div v-if="mostrar" data-testid="modal-historico"></div>', props: ['mostrar'] },
-    ModalConfirmacao: { template: '<div v-if="modelValue"></div>', props: ['modelValue'] },
+    HistoricoAnaliseModal: {template: '<div v-if="mostrar" data-testid="modal-historico"></div>', props: ['mostrar']},
+    ModalConfirmacao: {template: '<div v-if="modelValue"></div>', props: ['modelValue']},
 };
 
 function createWrapper(customState = {}, accessOverrides = {}) {
@@ -120,7 +120,7 @@ function createWrapper(customState = {}, accessOverrides = {}) {
 
     // Manually set codSubprocesso to ensure buttons depending on it are rendered
     (wrapper.vm as any).codSubprocesso = 123;
-    
+
     return wrapper;
 }
 

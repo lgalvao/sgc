@@ -1,4 +1,10 @@
-import type {Atividade, AtividadeOperacaoResponse, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest,} from "@/types/tipos";
+import type {
+    Atividade,
+    AtividadeOperacaoResponse,
+    Conhecimento,
+    CriarAtividadeRequest,
+    CriarConhecimentoRequest,
+} from "@/types/tipos";
 import apiClient from "@/axios-setup";
 
 export async function listarAtividades(): Promise<Atividade[]> {
@@ -15,7 +21,7 @@ export async function criarAtividade(
     request: CriarAtividadeRequest,
     codMapa: number,
 ): Promise<AtividadeOperacaoResponse> {
-    const payload = { ...request, mapaCodigo: codMapa };
+    const payload = {...request, mapaCodigo: codMapa};
     const response = await apiClient.post<AtividadeOperacaoResponse>("/atividades", payload);
     return response.data;
 }
@@ -49,7 +55,7 @@ export async function criarConhecimento(
     codAtividade: number,
     request: CriarConhecimentoRequest,
 ): Promise<AtividadeOperacaoResponse> {
-    const payload = { ...request, atividadeCodigo: codAtividade };
+    const payload = {...request, atividadeCodigo: codAtividade};
     const response = await apiClient.post<AtividadeOperacaoResponse>(
         `/atividades/${codAtividade}/conhecimentos`,
         payload,
@@ -62,7 +68,7 @@ export async function atualizarConhecimento(
     codConhecimento: number,
     request: Conhecimento,
 ): Promise<AtividadeOperacaoResponse> {
-    const payload = { descricao: request.descricao };
+    const payload = {descricao: request.descricao};
     const response = await apiClient.post<AtividadeOperacaoResponse>(
         `/atividades/${codAtividade}/conhecimentos/${codConhecimento}/atualizar`,
         payload,

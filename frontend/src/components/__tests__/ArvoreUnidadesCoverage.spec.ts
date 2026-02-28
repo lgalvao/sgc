@@ -22,7 +22,7 @@ describe("ArvoreUnidades.vue Coverage", () => {
 
         // Update prop
         await wrapper.setProps({
-            unidades: [{ codigo: 1, sigla: "A", nome: "A", filhas: [] }]
+            unidades: [{codigo: 1, sigla: "A", nome: "A", filhas: []}]
         });
 
         // Watcher should run
@@ -32,7 +32,7 @@ describe("ArvoreUnidades.vue Coverage", () => {
     it("deve atualizar unidadesSelecionadasLocal quando modelValue muda externamente", async () => {
         const wrapper = mount(ArvoreUnidades, {
             props: {
-                unidades: [{ codigo: 1, sigla: "A", nome: "A", filhas: [] }],
+                unidades: [{codigo: 1, sigla: "A", nome: "A", filhas: []}],
                 modelValue: []
             },
             global: {
@@ -46,7 +46,7 @@ describe("ArvoreUnidades.vue Coverage", () => {
         expect((wrapper.vm as any).unidadesSelecionadasLocal).toEqual([]);
 
         // Update modelValue prop
-        await wrapper.setProps({ modelValue: [1] });
+        await wrapper.setProps({modelValue: [1]});
 
         // Watcher should run
         expect((wrapper.vm as any).unidadesSelecionadasLocal).toEqual([1]);
@@ -67,7 +67,7 @@ describe("ArvoreUnidades.vue Coverage", () => {
         });
 
         // Update modelValue with same values (different reference)
-        await wrapper.setProps({ modelValue: [1] });
+        await wrapper.setProps({modelValue: [1]});
 
         // Reference should ideally stay the same if logic checks equality
         // But watch creates a new array: `unidadesSelecionadasLocal.value = [...novoValor];` if strings differ.

@@ -28,7 +28,7 @@ describe("CriarCompetenciaModal.vue", () => {
     ];
 
     const createWrapper = (propsOverride = {}) => {
-        const options = getCommonMountOptions({}, { BModal: BModalStub });
+        const options = getCommonMountOptions({}, {BModal: BModalStub});
 
         context.wrapper = mount(CriarCompetenciaModal, {
             ...options,
@@ -53,12 +53,12 @@ describe("CriarCompetenciaModal.vue", () => {
     };
 
     it("não deve renderizar o modal quando mostrar for falso", () => {
-        const wrapper = createWrapper({ mostrar: false, atividades: [] });
+        const wrapper = createWrapper({mostrar: false, atividades: []});
         expect(wrapper.find('[data-testid="inp-criar-competencia-descricao"]').exists()).toBe(false);
     });
 
     it("deve renderizar o modal no modo de criação", () => {
-        const wrapper = createWrapper({ mostrar: true, atividades });
+        const wrapper = createWrapper({mostrar: true, atividades});
 
         expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe("");
         expect(
@@ -75,7 +75,7 @@ describe("CriarCompetenciaModal.vue", () => {
             atividadesAssociadas: [1],
         };
 
-        const wrapper = createWrapper({ mostrar: true, atividades, competenciaParaEditar });
+        const wrapper = createWrapper({mostrar: true, atividades, competenciaParaEditar});
 
         await wrapper.vm.$nextTick();
 
@@ -83,7 +83,7 @@ describe("CriarCompetenciaModal.vue", () => {
     });
 
     it("deve habilitar o botão de salvar quando a descrição e pelo menos uma atividade forem selecionadas", async () => {
-        const wrapper = createWrapper({ mostrar: true, atividades });
+        const wrapper = createWrapper({mostrar: true, atividades});
 
         await wrapper.findComponent(BFormTextarea).setValue("Nova competência");
         await wrapper.find('input[type="checkbox"]').trigger("click");
@@ -96,14 +96,14 @@ describe("CriarCompetenciaModal.vue", () => {
     });
 
     it("deve emitir o evento fechar ao clicar no botão de cancelar", async () => {
-        const wrapper = createWrapper({ mostrar: true, atividades });
+        const wrapper = createWrapper({mostrar: true, atividades});
 
         await wrapper.find('[data-testid="btn-criar-competencia-cancelar"]').trigger("click");
         expect(wrapper.emitted("fechar")).toBeTruthy();
     });
 
     it("deve emitir o evento salvar com os dados corretos", async () => {
-        const wrapper = createWrapper({ mostrar: true, atividades });
+        const wrapper = createWrapper({mostrar: true, atividades});
 
         const descricao = "Competência de teste";
         await wrapper.findComponent(BFormTextarea).setValue(descricao);

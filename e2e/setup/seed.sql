@@ -1,38 +1,56 @@
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (1, 'Administração', 'ADMIN', 'RAIZ', 'ATIVA', NULL, '111111', '00111111', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (2, 'Secretaria 1', 'SECRETARIA_1', 'INTEROPERACIONAL', 'ATIVA', 1, '202020', '00202020', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (3, 'Assessoria 11', 'ASSESSORIA_11', 'OPERACIONAL', 'ATIVA', 2, '555555', '00555555', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (4, 'Assessoria 12', 'ASSESSORIA_12', 'OPERACIONAL', 'ATIVA', 2, '151515', '00151515', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (5, 'Coordenadoria 11', 'COORD_11', 'INTERMEDIARIA', 'ATIVA', 2, '222222', '00222222', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (6, 'Seção 111', 'SECAO_111', 'OPERACIONAL', 'ATIVA', 5, '333333', '00333333', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (7, 'Seção 112', 'SECAO_112', 'OPERACIONAL', 'ATIVA', 5, '444444', '00444444', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (8, 'Seção 113', 'SECAO_113', 'OPERACIONAL', 'ATIVA', 5, '303030', '00303030', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (9, 'Coordenadoria 12', 'COORD_12', 'INTERMEDIARIA', 'ATIVA', 2, '222223', '00222223', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (10, 'Seção 121', 'SECAO_121', 'OPERACIONAL', 'ATIVA', 9, '171717', '00171717', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (11, 'Secretaria 2', 'SECRETARIA_2', 'INTEROPERACIONAL', 'ATIVA', 1, '212121', '00212121', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (12, 'Assessoria 21', 'ASSESSORIA_21', 'OPERACIONAL', 'ATIVA', 11, '777777', '00777777', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (13, 'Assessoria 22', 'ASSESSORIA_22', 'OPERACIONAL', 'ATIVA', 11, '888888', '00888888', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (14, 'Coordenadoria 21', 'COORD_21', 'INTERMEDIARIA', 'ATIVA', 11, '999999', '00999999', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (15, 'Seção 211', 'SECAO_211', 'OPERACIONAL', 'ATIVA', 14, '101010', '00101010', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (16, 'Seção 212', 'SECAO_212', 'OPERACIONAL', 'ATIVA', 14, '181818', '00181818', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (17, 'Coordenadoria 22', 'COORD_22', 'INTERMEDIARIA', 'ATIVA', 11, '131313', '00131313', CURRENT_TIMESTAMP);
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
 VALUES (18, 'Seção 221', 'SECAO_221', 'OPERACIONAL', 'ATIVA', 17, '141414', '00141414', CURRENT_TIMESTAMP);
 
 -- Users with full details (titulo, matricula, nome, email, ramal, unidade_lot, unidade_comp)
@@ -186,8 +204,10 @@ INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codig
 VALUES ('303030', 'CHEFE', 8);
 
 -- Administradores do Sistema (necessário para listar em configurações)
-INSERT INTO sgc.administrador (usuario_titulo) VALUES ('191919');
-INSERT INTO sgc.administrador (usuario_titulo) VALUES ('111111');
+INSERT INTO sgc.administrador (usuario_titulo)
+VALUES ('191919');
+INSERT INTO sgc.administrador (usuario_titulo)
+VALUES ('111111');
 
 -- Inserir Mapa vigente para Assessoria 12 (Unit 4) para testes de Revisão
 -- Processo 99
@@ -195,8 +215,10 @@ INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, d
 VALUES (99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo 99', 'FINALIZADO', 'MAPEAMENTO');
 
 -- UnidadeProcesso (Unit 4)
-INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao, nome, sigla, tipo, matricula_titular, titulo_titular, data_inicio_titularidade, unidade_superior_codigo)
-VALUES (99, 4, 'CONCLUIDA', 'Assessoria 12', 'ASSESSORIA_12', 'OPERACIONAL', '00151515', '151515', CURRENT_TIMESTAMP, 2);
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao, nome, sigla, tipo, matricula_titular,
+                                  titulo_titular, data_inicio_titularidade, unidade_superior_codigo)
+VALUES (99, 4, 'CONCLUIDA', 'Assessoria 12', 'ASSESSORIA_12', 'OPERACIONAL', '00151515', '151515', CURRENT_TIMESTAMP,
+        2);
 
 -- Subprocesso 99
 INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
@@ -249,8 +271,10 @@ INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, d
 VALUES (200, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo Seed 200', 'FINALIZADO', 'MAPEAMENTO');
 
 -- UnidadeProcesso (Unit 2)
-INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao, nome, sigla, tipo, matricula_titular, titulo_titular, data_inicio_titularidade, unidade_superior_codigo)
-VALUES (200, 2, 'CONCLUIDA', 'Secretaria 1', 'SECRETARIA_1', 'INTEROPERACIONAL', '00202020', '202020', CURRENT_TIMESTAMP, 1);
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao, nome, sigla, tipo, matricula_titular,
+                                  titulo_titular, data_inicio_titularidade, unidade_superior_codigo)
+VALUES (200, 2, 'CONCLUIDA', 'Secretaria 1', 'SECRETARIA_1', 'INTEROPERACIONAL', '00202020', '202020',
+        CURRENT_TIMESTAMP, 1);
 
 -- Subprocesso 200
 INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
@@ -284,8 +308,10 @@ VALUES (2001, 200001);
 
 -- Unidade Isolada para Teste de Diagnóstico (Garante 100% de conclusão com Mock User)
 
-INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular, matricula_titular, data_inicio_titularidade)
-VALUES (99, 'Unit Test Diag', 'UNIT_TEST_DIAG', 'OPERACIONAL', 'ATIVA', 11, '123456789012', '56789012', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES (99, 'Unit Test Diag', 'UNIT_TEST_DIAG', 'OPERACIONAL', 'ATIVA', 11, '123456789012', '56789012',
+        CURRENT_TIMESTAMP);
 
 INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
 VALUES ('123456789012', '56789012', 'Usuario Diagnostico Mock', 'mock.diagnostico@tre-pe.jus.br', '9999', 99, 99);
@@ -341,9 +367,15 @@ VALUES ('212121', 'GESTOR', 11);
 
 -- Reset identity sequences to prevent ID conflicts with test data
 -- This ensures auto-generated IDs start above the manually inserted ones
-ALTER TABLE sgc.processo ALTER COLUMN codigo RESTART WITH 201;
-ALTER TABLE sgc.subprocesso ALTER COLUMN codigo RESTART WITH 201;
-ALTER TABLE sgc.mapa ALTER COLUMN codigo RESTART WITH 201;
-ALTER TABLE sgc.atividade ALTER COLUMN codigo RESTART WITH 3000;
-ALTER TABLE sgc.conhecimento ALTER COLUMN codigo RESTART WITH 300000;
-ALTER TABLE sgc.competencia ALTER COLUMN codigo RESTART WITH 3000;
+ALTER TABLE sgc.processo
+    ALTER COLUMN codigo RESTART WITH 201;
+ALTER TABLE sgc.subprocesso
+    ALTER COLUMN codigo RESTART WITH 201;
+ALTER TABLE sgc.mapa
+    ALTER COLUMN codigo RESTART WITH 201;
+ALTER TABLE sgc.atividade
+    ALTER COLUMN codigo RESTART WITH 3000;
+ALTER TABLE sgc.conhecimento
+    ALTER COLUMN codigo RESTART WITH 300000;
+ALTER TABLE sgc.competencia
+    ALTER COLUMN codigo RESTART WITH 3000;

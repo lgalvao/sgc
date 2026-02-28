@@ -24,10 +24,10 @@ interface ModalManager {
 
 /**
  * Composable para gerenciar estado de múltiplas modals
- * 
+ *
  * Simplifica o gerenciamento de múltiplas modals em um componente,
  * eliminando a necessidade de criar refs individuais para cada modal.
- * 
+ *
  * @example
  * ```ts
  * const { modals, open, close, isOpen } = useModalManager([
@@ -35,13 +35,13 @@ interface ModalManager {
  *     'editItem',
  *     'viewDetails'
  * ]);
- * 
+ *
  * // Abrir modal com dados
  * open('editItem', { id: 123, name: 'Test' });
- * 
+ *
  * // Verificar se está aberta
  * if (isOpen('confirmDelete')) { ... }
- * 
+ *
  * // Fechar modal
  * close('editItem');
  * ```
@@ -50,7 +50,7 @@ export function useModalManager(modalNames: string[]): ModalManager {
     // Cria refs para cada modal
     const modals: Record<string, Ref<ModalState>> = {};
     modalNames.forEach(name => {
-        modals[name] = ref<ModalState>({ isOpen: false });
+        modals[name] = ref<ModalState>({isOpen: false});
     });
 
     /**
@@ -61,7 +61,7 @@ export function useModalManager(modalNames: string[]): ModalManager {
             logger.warn(`Modal "${name}" não foi registrada`);
             return;
         }
-        modals[name].value = { isOpen: true, data };
+        modals[name].value = {isOpen: true, data};
     };
 
     /**
@@ -72,7 +72,7 @@ export function useModalManager(modalNames: string[]): ModalManager {
             logger.warn(`Modal "${name}" não foi registrada`);
             return;
         }
-        modals[name].value = { isOpen: false, data: undefined };
+        modals[name].value = {isOpen: false, data: undefined};
     };
 
     /**
@@ -84,7 +84,7 @@ export function useModalManager(modalNames: string[]): ModalManager {
             return;
         }
         const currentState = modals[name].value;
-        modals[name].value = { 
+        modals[name].value = {
             isOpen: !currentState.isOpen,
             data: currentState.isOpen ? undefined : currentState.data
         };

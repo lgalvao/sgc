@@ -5,7 +5,10 @@ import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 test.describe('CDU-03 - Manter Processo', () => {
 
-    test('Deve validar campos obrigatórios', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
+    test('Deve validar campos obrigatórios', async ({page, autenticadoComoAdmin}: {
+        page: Page,
+        autenticadoComoAdmin: void
+    }) => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
 
@@ -35,7 +38,11 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page.getByTestId('btn-processo-iniciar')).toBeEnabled();
     });
 
-    test('Deve editar um processo existente', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: ReturnType<typeof useProcessoCleanup>}) => {
+    test('Deve editar um processo existente', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {
+        page: Page,
+        autenticadoComoAdmin: void,
+        cleanupAutomatico: ReturnType<typeof useProcessoCleanup>
+    }) => {
         const descricaoOriginal = `Processo para Edição - ${Date.now()}`;
         // Cria um processo inicial
         await criarProcesso(page, {
@@ -78,7 +85,10 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page).toHaveURL(/\/painel/);
     });
 
-    test('Deve remover um processo', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
+    test('Deve remover um processo', async ({page, autenticadoComoAdmin}: {
+        page: Page,
+        autenticadoComoAdmin: void
+    }) => {
         const descricao = `Processo para Remoção - ${Date.now()}`;
         await criarProcesso(page, {
             descricao: descricao,
@@ -99,17 +109,20 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page.getByTestId('tbl-processos').getByText(descricao)).not.toBeVisible();
     });
 
-    test('Deve validar regras de seleção em cascata na árvore de unidades', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
+    test('Deve validar regras de seleção em cascata na árvore de unidades', async ({page, autenticadoComoAdmin}: {
+        page: Page,
+        autenticadoComoAdmin: void
+    }) => {
         await page.getByTestId('btn-painel-criar-processo').click();
 
         // Seleciona tipo para carregar a árvore
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
-        
+
         const btnExpandSecretaria = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
         await expect(btnExpandSecretaria).toBeVisible();
         await btnExpandSecretaria.click();
-        
+
         const btnExpandCoord = page.getByTestId('btn-arvore-expand-COORD_11');
         await expect(btnExpandCoord).toBeVisible();
         await btnExpandCoord.click();
@@ -118,7 +131,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         const chkCoord = page.getByTestId('chk-arvore-unidade-COORD_11');
         await expect(chkCoord).toBeVisible();
         await chkCoord.click();
-        
+
         // Locators flexíveis para o input interno
         const input111 = page.getByTestId('chk-arvore-unidade-SECAO_111').locator('input').or(page.getByTestId('chk-arvore-unidade-SECAO_111'));
         const input112 = page.getByTestId('chk-arvore-unidade-SECAO_112').locator('input').or(page.getByTestId('chk-arvore-unidade-SECAO_112'));
@@ -152,13 +165,21 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('chk-arvore-unidade-SECAO_111').click();
         await page.getByTestId('chk-arvore-unidade-SECAO_112').click();
         await page.getByTestId('chk-arvore-unidade-SECAO_113').click();
-        
+
     });
 
-    test('Deve avaliar unidades ocupadas por processos em andamento e restringi-las', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: any}) => {
+    test('Deve avaliar unidades ocupadas por processos em andamento e restringi-las', async ({
+                                                                                                 page,
+                                                                                                 autenticadoComoAdmin,
+                                                                                                 cleanupAutomatico
+                                                                                             }: {
+        page: Page,
+        autenticadoComoAdmin: void,
+        cleanupAutomatico: any
+    }) => {
         // "A lista de unidades deve deixar desativadas as unidades que já estejam participando de um processo ativo do tipo"
         const descricaoProcessoBase = `Restrito base - ${Date.now()}`;
-        
+
         await criarProcesso(page, {
             descricao: descricaoProcessoBase,
             tipo: 'MAPEAMENTO',
@@ -180,22 +201,28 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page).toHaveURL(/\/processo\/cadastro/);
 
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
-        
+
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
-        
+
         const chkOcupada = page.getByTestId('chk-arvore-unidade-ASSESSORIA_12');
         await expect(chkOcupada).toBeVisible();
         await expect(chkOcupada.locator('input').or(chkOcupada)).toBeDisabled(); // Deve estar inativa pois está alocada no processoBase do tipo Mapeamento
     });
 
-    test('Deve validar restrições de unidades sem mapa para REVISAO e DIAGNOSTICO', async ({page, autenticadoComoAdmin}: {page: Page, autenticadoComoAdmin: void}) => {
+    test('Deve validar restrições de unidades sem mapa para REVISAO e DIAGNOSTICO', async ({
+                                                                                               page,
+                                                                                               autenticadoComoAdmin
+                                                                                           }: {
+        page: Page,
+        autenticadoComoAdmin: void
+    }) => {
         await page.getByTestId('btn-painel-criar-processo').click();
 
         // Seleciona tipo REVISÃO
         await page.getByTestId('sel-processo-tipo').selectOption('REVISAO');
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
-        
+
         const btnExpandSecretaria = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
         await expect(btnExpandSecretaria).toBeVisible();
         await btnExpandSecretaria.click();
@@ -213,7 +240,15 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(chkValida.locator('input').or(chkValida)).toBeEnabled();
     });
 
-    test('Deve validar fluxos de cancelamento e mensagens de feedback', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: any}) => {
+    test('Deve validar fluxos de cancelamento e mensagens de feedback', async ({
+                                                                                   page,
+                                                                                   autenticadoComoAdmin,
+                                                                                   cleanupAutomatico
+                                                                               }: {
+        page: Page,
+        autenticadoComoAdmin: void,
+        cleanupAutomatico: any
+    }) => {
         const descricao = `Processo Feedback - ${Date.now()}`;
 
         // 1. Cancelar criação
@@ -231,7 +266,7 @@ test.describe('CDU-03 - Manter Processo', () => {
             unidade: 'ASSESSORIA_12',
             expandir: ['SECRETARIA_1']
         });
-        
+
         // Mensagem de sucesso deve estar em um toast
         await expect(page.getByText(/Processo criado/i).first()).toBeVisible();
 
@@ -254,17 +289,25 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page.getByText(/removido/i).first()).toBeVisible();
     });
 
-    test('Deve validar fluxo alternativo (Botão Iniciar invés de Salvar)', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {page: Page, autenticadoComoAdmin: void, cleanupAutomatico: any}) => {
+    test('Deve validar fluxo alternativo (Botão Iniciar invés de Salvar)', async ({
+                                                                                      page,
+                                                                                      autenticadoComoAdmin,
+                                                                                      cleanupAutomatico
+                                                                                  }: {
+        page: Page,
+        autenticadoComoAdmin: void,
+        cleanupAutomatico: any
+    }) => {
         const descricaoAlt = `Processo Alternativo - ${Date.now()}`;
-        
+
         await page.getByTestId('btn-painel-criar-processo').click();
         await page.getByTestId('inp-processo-descricao').fill(descricaoAlt);
-        
+
         const dataLimite = new Date();
         dataLimite.setDate(dataLimite.getDate() + 30);
         await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
-        
+
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
         await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').click();
@@ -279,7 +322,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.waitForURL(/\/processo\/\d+/);
         const idAlt = await extrairProcessoId(page);
         if (idAlt) cleanupAutomatico.registrar(idAlt);
-        
+
         // Processo iniciado (Situacao 'Andamento') não pode mais ser editado
         await expect(page).toHaveURL(/\/processo\/\d+$/);
     });

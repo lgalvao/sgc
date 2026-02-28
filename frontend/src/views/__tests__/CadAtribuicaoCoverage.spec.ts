@@ -21,7 +21,7 @@ vi.mock('vue-router', () => ({
 describe('CadAtribuicao Coverage', () => {
     let pinia: any;
 
-    function criarWrapper(props = { codUnidade: 1 }) {
+    function criarWrapper(props = {codUnidade: 1}) {
         return mount(CadAtribuicao, {
             ...getCommonMountOptions(),
             props,
@@ -56,7 +56,8 @@ describe('CadAtribuicao Coverage', () => {
     it('deve lidar com erro no onMounted', async () => {
         const unidadesStore = useUnidadesStore();
         vi.spyOn(unidadesStore, 'buscarUnidadePorCodigo').mockRejectedValue(new Error('Erro ao buscar unidade'));
-        vi.spyOn(console, 'error').mockImplementation(() => {});
+        vi.spyOn(console, 'error').mockImplementation(() => {
+        });
 
         const wrapper = criarWrapper();
         await flushPromises();

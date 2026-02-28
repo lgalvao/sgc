@@ -1,16 +1,16 @@
 <template>
   <div class="container-fluid mt-4">
-    <PageHeader title="Configurações" />
+    <PageHeader title="Configurações"/>
 
     <!-- Seção de Administradores -->
-    <AdministradoresSection v-if="podeGerenciarAdministradores" />
+    <AdministradoresSection v-if="podeGerenciarAdministradores"/>
 
     <!-- Seção de Configurações de Parâmetros -->
-    <ParametrosSection />
+    <ParametrosSection/>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed} from 'vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import AdministradoresSection from '@/components/configuracoes/AdministradoresSection.vue';

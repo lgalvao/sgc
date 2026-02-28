@@ -22,5 +22,6 @@ public record SalvarMapaRequest(
 
             @NotBlank(message = "A descrição da competência é obrigatória") String descricao,
             List<Long> atividadesCodigos
-    ) {}
+    ) {
+    }
 }

@@ -1,6 +1,7 @@
 # Diretório de Suporte (etc)
 
-Contém recursos auxiliares que não fazem parte do código-fonte da aplicação, mas são essenciais para o desenvolvimento e manutenção.
+Contém recursos auxiliares que não fazem parte do código-fonte da aplicação, mas são essenciais para o desenvolvimento e
+manutenção.
 
 ## Estrutura
 
@@ -13,4 +14,5 @@ Contém recursos auxiliares que não fazem parte do código-fonte da aplicação
 
 ## Uso dos Scripts
 
-A maioria dos scripts pode ser executada via `node etc/scripts/<nome-do-script>.cjs`. Consulte o arquivo `package.json` para ver os atalhos disponíveis via `npm run`.
+A maioria dos scripts pode ser executada via `node etc/scripts/<nome-do-script>.cjs`. Consulte o arquivo `package.json`
+para ver os atalhos disponíveis via `npm run`.

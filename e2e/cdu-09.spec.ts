@@ -13,7 +13,7 @@ import {
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor
 } from './helpers/helpers-analise.js';
-import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {fazerLogout} from './helpers/helpers-navegacao.js';
 
 async function verificarPaginaSubprocesso(page: Page) {
     await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_221$/);
@@ -28,7 +28,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
     const descProcesso = `Proc 9 ${timestamp}`;
 
     test('Fluxo completo de disponibilização e devolução', async ({page, autenticadoComoAdmin}) => {
-        
+
         await test.step('Preparação: Admin cria e inicia processo', async () => {
             await criarProcesso(page, {
                 descricao: descProcesso,

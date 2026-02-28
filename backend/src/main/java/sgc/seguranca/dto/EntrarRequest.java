@@ -9,9 +9,9 @@ import sgc.comum.model.*;
  */
 @Builder
 public record EntrarRequest(
-                @TituloEleitoral String tituloEleitoral,
+        @TituloEleitoral String tituloEleitoral,
 
-                @NotNull(message = "O perfil é obrigatório.") @Size(max = 50, message = "O perfil deve ter no máximo 50 caracteres.") String perfil,
+        @NotNull(message = "O perfil é obrigatório.") @Size(max = 50, message = "O perfil deve ter no máximo 50 caracteres.") String perfil,
 
-                @NotNull(message = "O código da unidade é obrigatório.") Long unidadeCodigo) {
+        @NotNull(message = "O código da unidade é obrigatório.") Long unidadeCodigo) {
 }

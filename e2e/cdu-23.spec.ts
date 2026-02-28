@@ -12,13 +12,13 @@ import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
 /**
  * CDU-23 - Homologar cadastros em bloco
- * 
+ *
  * Ator: ADMIN
- * 
+ *
  * Pré-condições:
  * - Processo de mapeamento ou revisão com unidades subordinadas
  * - Subprocessos na situação 'Cadastro disponibilizado' ou 'Cadastro aceito'
- * 
+ *
  * Fluxo principal:
  * 1. No Painel, ADMIN acessa processo em andamento
  * 2. Sistema mostra tela Detalhes do processo
@@ -42,7 +42,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        
+
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -65,7 +65,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     });
 
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);

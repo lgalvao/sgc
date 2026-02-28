@@ -22,9 +22,9 @@ defineEmits<{
 }>();
 
 const colunas = [
-  { key: "unidadeAtual", label: "Unidade", width: "40%" },
-  { key: "situacao", label: "Situação", width: "30%" },
-  { key: "dataLimite", label: "Data Limite", width: "30%" },
+  {key: "unidadeAtual", label: "Unidade", width: "40%"},
+  {key: "situacao", label: "Situação", width: "30%"},
+  {key: "dataLimite", label: "Data Limite", width: "30%"},
 ];
 
 const mapeamentoHierarquia = computed(() => {

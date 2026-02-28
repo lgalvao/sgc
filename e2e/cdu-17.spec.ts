@@ -29,7 +29,11 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     // PREPARAÇÃO - Criar mapa pronto para disponibilização
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
+                                                                                page,
+                                                                                autenticadoComoAdmin,
+                                                                                cleanupAutomatico
+                                                                            }) => {
         await criarProcesso(page, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
@@ -50,7 +54,10 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao211}) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({
+                                                                                        page,
+                                                                                        autenticadoComoChefeSecao211
+                                                                                    }) => {
         await page.goto(`/processo/${processoId}/${UNIDADE_ALVO}`);
         await navegarParaAtividades(page);
 
@@ -105,7 +112,10 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     // TESTES PRINCIPAIS - CDU-17
     // ========================================================================
 
-    test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({page, autenticadoComoAdmin}) => {
+    test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({
+                                                                                              page,
+                                                                                              autenticadoComoAdmin
+                                                                                          }) => {
         // Cenario 1: Navegação
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

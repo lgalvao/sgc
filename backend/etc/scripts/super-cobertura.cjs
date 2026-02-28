@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { execSync } = require('node:child_process');
+const {execSync} = require('node:child_process');
 const xml2js = require('xml2js');
 
 // Configuração
@@ -23,7 +23,7 @@ function calculatePercentage(covered, missed) {
 async function runCoverage() {
     console.log('🚀 Executando :backend:jacocoTestReport...');
     try {
-        execSync(GRADLE_CMD, { cwd: BASE_DIR, stdio: 'inherit' });
+        execSync(GRADLE_CMD, {cwd: BASE_DIR, stdio: 'inherit'});
     } catch (error) {
         console.warn('⚠️ Gradle terminou com avisos/erros (testes falhando?), mas prosseguindo para análise do relatório.');
     }

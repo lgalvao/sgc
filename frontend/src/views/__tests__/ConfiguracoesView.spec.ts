@@ -43,8 +43,8 @@ describe('Configuracoes', () => {
                 plugins: [pinia],
                 stubs: {
                     PageHeader: true,
-                    AdministradoresSection: { template: '<div>AdministradoresSection</div>' },
-                    ParametrosSection: { template: '<div>ParametrosSection</div>' }
+                    AdministradoresSection: {template: '<div>AdministradoresSection</div>'},
+                    ParametrosSection: {template: '<div>ParametrosSection</div>'}
                 }
             }
         });

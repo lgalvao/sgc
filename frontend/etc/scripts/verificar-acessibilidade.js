@@ -31,13 +31,13 @@ async function run() {
             console.log('Stopping lifecycle...');
             lifecycle.kill('SIGINT');
             setTimeout(() => {
-                 try {
-                     if (process.kill(lifecycle.pid, 0)) {
-                         lifecycle.kill('SIGKILL');
-                     }
-                 } catch (e) {
-                     console.log('Informação: Processo de limpeza já encerrado ou sem permissão:', e.message);
-                 }
+                try {
+                    if (process.kill(lifecycle.pid, 0)) {
+                        lifecycle.kill('SIGKILL');
+                    }
+                } catch (e) {
+                    console.log('Informação: Processo de limpeza já encerrado ou sem permissão:', e.message);
+                }
             }, 2000);
         }
     };
@@ -57,7 +57,7 @@ async function run() {
 
         let chromePath;
         try {
-            const { chromium } = await import('@playwright/test');
+            const {chromium} = await import('@playwright/test');
             const candidatePath = chromium.executablePath();
 
             // Check if the candidate path actually exists
@@ -80,14 +80,14 @@ async function run() {
                     const chromiumDirs = entries.filter(e => e.startsWith('chromium-')).sort().reverse(); // Use latest version found
 
                     for (const dir of chromiumDirs) {
-                         // Common paths: chrome-linux/chrome or chrome-linux64/chrome or chrome-win/chrome.exe etc.
-                         // Based on ls output: chromium-1187/chrome-linux/chrome
-                         const potentialPath = path.join(playwrightCache, dir, 'chrome-linux', 'chrome');
-                         if (fs.existsSync(potentialPath)) {
-                             chromePath = potentialPath;
-                             console.log(`Found fallback Chrome at: ${chromePath}`);
-                             break;
-                         }
+                        // Common paths: chrome-linux/chrome or chrome-linux64/chrome or chrome-win/chrome.exe etc.
+                        // Based on ls output: chromium-1187/chrome-linux/chrome
+                        const potentialPath = path.join(playwrightCache, dir, 'chrome-linux', 'chrome');
+                        if (fs.existsSync(potentialPath)) {
+                            chromePath = potentialPath;
+                            console.log(`Found fallback Chrome at: ${chromePath}`);
+                            break;
+                        }
                     }
                 }
             }

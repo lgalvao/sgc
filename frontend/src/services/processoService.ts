@@ -184,7 +184,7 @@ export async function reabrirCadastro(
     codSubprocesso: number,
     justificativa: string,
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/reabrir-cadastro`, { justificativa });
+    await apiClient.post(`/subprocessos/${codSubprocesso}/reabrir-cadastro`, {justificativa});
 }
 
 // CDU-33: Reabrir revisão de cadastro
@@ -192,7 +192,7 @@ export async function reabrirRevisaoCadastro(
     codSubprocesso: number,
     justificativa: string,
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/reabrir-revisao-cadastro`, { justificativa });
+    await apiClient.post(`/subprocessos/${codSubprocesso}/reabrir-revisao-cadastro`, {justificativa});
 }
 
 // CDU-34: Enviar lembrete de prazo
@@ -200,5 +200,5 @@ export async function enviarLembrete(
     codProcesso: number,
     unidadeCodigo: number,
 ): Promise<void> {
-    await apiClient.post(`/processos/${codProcesso}/enviar-lembrete`, { unidadeCodigo });
+    await apiClient.post(`/processos/${codProcesso}/enviar-lembrete`, {unidadeCodigo});
 }

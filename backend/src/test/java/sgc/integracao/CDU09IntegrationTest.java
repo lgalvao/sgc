@@ -24,12 +24,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-09: Fluxo Completo de Disponibilização")
 class CDU09IntegrationTest extends BaseIntegrationTest {
 
-    @Autowired private CompetenciaRepo competenciaRepo;
-    @Autowired private MovimentacaoRepo movimentacaoRepo;
-    @Autowired private ConhecimentoRepo conhecimentoRepo;
-    @Autowired private AlertaRepo alertaRepo;
-    @Autowired private AnaliseRepo analiseRepo;
-    @Autowired private EntityManager entityManager;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
+    @Autowired
+    private AlertaRepo alertaRepo;
+    @Autowired
+    private AnaliseRepo analiseRepo;
+    @Autowired
+    private EntityManager entityManager;
 
     @Test
     @WithMockChefe("3") // Fernanda Oliveira - Chefe da Unidade 8 no data.sql
@@ -38,9 +44,9 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         // SEDESENV (Unidade 8) no data.sql
         Long SP_CODIGO = 60000L;
         Subprocesso sp = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
-        
+
         // --- ETAPA 1: Visualizar Detalhes e Histórico de Análise (Passos 1 a 5) ---
-        
+
         // Simula uma análise anterior (que deve ser exibida no histórico)
         analiseRepo.saveAndFlush(Analise.builder()
                 .subprocesso(sp)
@@ -63,7 +69,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$[0].observacoes", is("Favor ajustar atividades")));
 
         // --- ETAPA 2: Validação de Pendências (Passo 7) ---
-        
+
         // Limpa mapa para garantir que falhe por falta de atividades
         competenciaRepo.deleteByMapa_Codigo(sp.getMapa().getCodigo());
         entityManager.flush();
@@ -74,13 +80,13 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.message").value("O mapa de competências deve ter ao menos uma atividade cadastrada."));
 
         // --- ETAPA 3: Preparar Dados e Disponibilizar (Passos 9 a 16) ---
-        
+
         var spEtapa3 = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
         var competencia = competenciaRepo.save(Competencia.builder().descricao("Java").mapa(spEtapa3.getMapa()).build());
         var atividade = Atividade.builder().mapa(spEtapa3.getMapa()).descricao("Desenvolver APIs").build();
         atividade.getCompetencias().add(competencia);
         atividade = atividadeRepo.save(atividade);
-        
+
         conhecimentoRepo.save(Conhecimento.builder()
                 .descricao("Spring Boot")
                 .atividade(atividade)
@@ -97,10 +103,10 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         // --- ETAPA 4: Verificações Pós-Ação ---
 
         Subprocesso atualizado = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
-        
+
         // 10. Alteração de Situação
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-        
+
         // 11. Registro de Movimentação
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(SP_CODIGO);
         assertThat(movs).isNotEmpty();

@@ -22,10 +22,14 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AtividadeFacade")
 class AtividadeFacadeTest {
-    @Mock private MapaManutencaoService mapaManutencaoService;
-    @Mock private SubprocessoService subprocessoService;
-    @Mock private SgcPermissionEvaluator permissionEvaluator;
-    @Mock private UsuarioFacade usuarioService;
+    @Mock
+    private MapaManutencaoService mapaManutencaoService;
+    @Mock
+    private SubprocessoService subprocessoService;
+    @Mock
+    private SgcPermissionEvaluator permissionEvaluator;
+    @Mock
+    private UsuarioFacade usuarioService;
 
     @InjectMocks
     private AtividadeFacade atividadeFacade;
@@ -33,7 +37,7 @@ class AtividadeFacadeTest {
     @Nested
     @DisplayName("obterAtividadePorId")
     class ObterAtividadePorIdTests {
-        
+
         @Test
         @DisplayName("deve obter atividade por ID com sucesso")
         void deveObterAtividadePorId() {
@@ -42,11 +46,11 @@ class AtividadeFacadeTest {
                     .codigo(atividadeCodigo)
                     .descricao("Atividade")
                     .build();
-            
+
             when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(expected);
-            
+
             Atividade result = atividadeFacade.obterAtividadePorId(atividadeCodigo);
-            
+
             assertNotNull(result);
             assertEquals(expected, result);
             verify(mapaManutencaoService).obterAtividadePorCodigo(atividadeCodigo);
@@ -56,7 +60,7 @@ class AtividadeFacadeTest {
     @Nested
     @DisplayName("listarConhecimentosPorAtividade")
     class ListarConhecimentosPorAtividadeTests {
-        
+
         @Test
         @DisplayName("deve listar conhecimentos por atividade")
         void deveListarConhecimentosPorAtividade() {
@@ -65,11 +69,11 @@ class AtividadeFacadeTest {
                     Conhecimento.builder().codigo(1L).descricao("Conhecimento 1").build(),
                     Conhecimento.builder().codigo(2L).descricao("Conhecimento 2").build()
             );
-            
+
             when(mapaManutencaoService.listarConhecimentosPorAtividade(atividadeCodigo)).thenReturn(expected);
-            
+
             List<Conhecimento> result = atividadeFacade.listarConhecimentosPorAtividade(atividadeCodigo);
-            
+
             assertNotNull(result);
             assertEquals(2, result.size());
             verify(mapaManutencaoService).listarConhecimentosPorAtividade(atividadeCodigo);
@@ -79,7 +83,7 @@ class AtividadeFacadeTest {
     @Nested
     @DisplayName("criarAtividade")
     class CriarAtividadeTests {
-        
+
         @Test
         @DisplayName("deve criar atividade com sucesso")
         void deveCriarAtividade() {
@@ -87,20 +91,20 @@ class AtividadeFacadeTest {
             Long subCodigo = 200L;
             Long atividadeCodigo = 300L;
             CriarAtividadeRequest request = new CriarAtividadeRequest(mapaCodigo, "Desc");
-            
+
             Usuario usuario = new Usuario();
             Mapa mapa = new Mapa();
             mapa.setCodigo(mapaCodigo);
             Subprocesso subprocesso = new Subprocesso();
             subprocesso.setCodigo(subCodigo);
             mapa.setSubprocesso(subprocesso);
-            
+
             Atividade salvo = Atividade.builder()
                     .codigo(atividadeCodigo)
                     .mapa(mapa)
                     .descricao("Desc")
                     .build();
-            
+
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(mapaManutencaoService.criarAtividade(request)).thenReturn(salvo);
             when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
@@ -121,23 +125,23 @@ class AtividadeFacadeTest {
     @Nested
     @DisplayName("atualizarAtividade")
     class AtualizarAtividadeTests {
-        
+
         @Test
         @DisplayName("deve atualizar atividade com sucesso")
         void deveAtualizarAtividade() {
             Long atividadeCodigo = 300L;
             Long mapaCodigo = 100L;
             Long subCodigo = 200L;
-            
+
             AtualizarAtividadeRequest request = new AtualizarAtividadeRequest("Nova Desc");
-            
+
             Usuario usuario = new Usuario();
             Mapa mapa = new Mapa();
             mapa.setCodigo(mapaCodigo);
             Subprocesso subprocesso = new Subprocesso();
             subprocesso.setCodigo(subCodigo);
             mapa.setSubprocesso(subprocesso);
-            
+
             Atividade atividade = new Atividade();
             atividade.setCodigo(atividadeCodigo);
             atividade.setMapa(mapa);
@@ -165,25 +169,25 @@ class AtividadeFacadeTest {
     @Nested
     @DisplayName("excluirAtividade")
     class ExcluirAtividadeTests {
-        
+
         @Test
         @DisplayName("deve excluir atividade com sucesso")
         void deveExcluirAtividade() {
             Long atividadeCodigo = 300L;
             Long mapaCodigo = 100L;
             Long subCodigo = 200L;
-            
+
             Usuario usuario = new Usuario();
             Mapa mapa = new Mapa();
             mapa.setCodigo(mapaCodigo);
             Subprocesso subprocesso = new Subprocesso();
             subprocesso.setCodigo(subCodigo);
             mapa.setSubprocesso(subprocesso);
-            
+
             Atividade atividade = new Atividade();
             atividade.setCodigo(atividadeCodigo);
             atividade.setMapa(mapa);
-            
+
             when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(atividade);
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
@@ -203,7 +207,7 @@ class AtividadeFacadeTest {
     @Nested
     @DisplayName("criarConhecimento")
     class CriarConhecimentoTests {
-        
+
         @Test
         @DisplayName("deve criar conhecimento com sucesso")
         void deveCriarConhecimento() {
@@ -211,28 +215,28 @@ class AtividadeFacadeTest {
             Long mapaCodigo = 100L;
             Long subCodigo = 200L;
             CriarConhecimentoRequest request = new CriarConhecimentoRequest(atividadeCodigo, "Conhecimento");
-            
+
             Usuario usuario = new Usuario();
             Mapa mapa = new Mapa();
             mapa.setCodigo(mapaCodigo);
             Subprocesso subprocesso = new Subprocesso();
             subprocesso.setCodigo(subCodigo);
             mapa.setSubprocesso(subprocesso);
-            
+
             Atividade atividade = new Atividade();
             atividade.setCodigo(atividadeCodigo);
             atividade.setMapa(mapa);
-            
+
             Conhecimento conhecimentoSalvo = Conhecimento.builder()
                     .codigo(500L)
                     .atividade(atividade)
                     .descricao("Conhecimento")
                     .build();
-            
+
             when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(atividade);
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(mapaManutencaoService.criarConhecimento(atividadeCodigo, request)).thenReturn(conhecimentoSalvo);
-            
+
             // Mocking for response creation
             when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
@@ -253,7 +257,7 @@ class AtividadeFacadeTest {
     @Nested
     @DisplayName("atualizarConhecimento")
     class AtualizarConhecimentoTests {
-        
+
         @Test
         @DisplayName("deve atualizar conhecimento com sucesso")
         void deveAtualizarConhecimento() {
@@ -262,18 +266,18 @@ class AtividadeFacadeTest {
             Long mapaCodigo = 100L;
             Long subCodigo = 200L;
             AtualizarConhecimentoRequest request = new AtualizarConhecimentoRequest("Conhecimento Atualizado");
-            
+
             Usuario usuario = new Usuario();
             Mapa mapa = new Mapa();
             mapa.setCodigo(mapaCodigo);
             Subprocesso subprocesso = new Subprocesso();
             subprocesso.setCodigo(subCodigo);
             mapa.setSubprocesso(subprocesso);
-            
+
             Atividade atividade = new Atividade();
             atividade.setCodigo(atividadeCodigo);
             atividade.setMapa(mapa);
-            
+
             when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(atividade);
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
@@ -296,7 +300,7 @@ class AtividadeFacadeTest {
     @Nested
     @DisplayName("excluirConhecimento")
     class ExcluirConhecimentoTests {
-        
+
         @Test
         @DisplayName("deve excluir conhecimento com sucesso")
         void deveExcluirConhecimento() {
@@ -304,18 +308,18 @@ class AtividadeFacadeTest {
             Long conhecimentoCodigo = 500L;
             Long mapaCodigo = 100L;
             Long subCodigo = 200L;
-            
+
             Usuario usuario = new Usuario();
             Mapa mapa = new Mapa();
             mapa.setCodigo(mapaCodigo);
             Subprocesso subprocesso = new Subprocesso();
             subprocesso.setCodigo(subCodigo);
             mapa.setSubprocesso(subprocesso);
-            
+
             Atividade atividade = new Atividade();
             atividade.setCodigo(atividadeCodigo);
             atividade.setMapa(mapa);
-            
+
             when(mapaManutencaoService.obterAtividadePorCodigo(atividadeCodigo)).thenReturn(atividade);
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);

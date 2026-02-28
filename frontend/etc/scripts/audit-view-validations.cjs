@@ -7,21 +7,21 @@ const AUDIT_FILE = path.join(__dirname, '../../../view-validations-audit.md');
 
 const GUARANTEED_FIELDS = [
     // Unidade
-    { getter: 'getSigla', entity: 'Unidade', source: 'VW_UNIDADE' },
-    { getter: 'getNome', entity: 'Unidade', source: 'VW_UNIDADE' },
-    { getter: 'getTipo', entity: 'Unidade', source: 'VW_UNIDADE' },
+    {getter: 'getSigla', entity: 'Unidade', source: 'VW_UNIDADE'},
+    {getter: 'getNome', entity: 'Unidade', source: 'VW_UNIDADE'},
+    {getter: 'getTipo', entity: 'Unidade', source: 'VW_UNIDADE'},
 
     // Usuario
-    { getter: 'getUnidadeLotacao', entity: 'Usuario', source: 'VW_USUARIO' },
-    { getter: 'getTituloEleitoral', entity: 'Usuario', source: 'VW_USUARIO' },
-    { getter: 'getUnidadeCompetencia', entity: 'Usuario', source: 'VW_USUARIO' },
+    {getter: 'getUnidadeLotacao', entity: 'Usuario', source: 'VW_USUARIO'},
+    {getter: 'getTituloEleitoral', entity: 'Usuario', source: 'VW_USUARIO'},
+    {getter: 'getUnidadeCompetencia', entity: 'Usuario', source: 'VW_USUARIO'},
 ];
 
 function getAllFiles(dirPath, arrayOfFiles) {
     const files = fs.readdirSync(dirPath);
     arrayOfFiles = arrayOfFiles || [];
 
-    files.forEach(function(file) {
+    files.forEach(function (file) {
         if (fs.statSync(dirPath + "/" + file).isDirectory()) {
             arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
         } else {
@@ -89,7 +89,7 @@ function generateReport(results) {
             md += '`' + filePath + '`\n\n';
             md += "| Line | Field | Source View | Code |\n";
             md += "|------|-------|-------------|------|\n";
-            
+
             files[filePath].forEach(item => {
                 let content = item.content.replace(/\|/g, '\\|');
                 // Use concatenation to avoid template literal issues

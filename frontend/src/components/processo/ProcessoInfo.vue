@@ -19,25 +19,25 @@
 import {formatDate, formatSituacaoProcesso, formatTipoProcesso} from '@/utils/formatters';
 
 withDefaults(
-  defineProps<{
-    tipo?: string;
-    situacao?: string;
-    dataLimite?: string;
-    numUnidades?: number;
-    showTipo?: boolean;
-    showSituacao?: boolean;
-    showDataLimite?: boolean;
-    showUnidades?: boolean;
-  }>(),
-  {
-    tipo: '',
-    situacao: '',
-    dataLimite: '',
-    numUnidades: 0,
-    showTipo: true,
-    showSituacao: true,
-    showDataLimite: true,
-    showUnidades: false
-  }
+    defineProps<{
+      tipo?: string;
+      situacao?: string;
+      dataLimite?: string;
+      numUnidades?: number;
+      showTipo?: boolean;
+      showSituacao?: boolean;
+      showDataLimite?: boolean;
+      showUnidades?: boolean;
+    }>(),
+    {
+      tipo: '',
+      situacao: '',
+      dataLimite: '',
+      numUnidades: 0,
+      showTipo: true,
+      showSituacao: true,
+      showDataLimite: true,
+      showUnidades: false
+    }
 );
 </script>

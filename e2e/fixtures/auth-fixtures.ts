@@ -3,13 +3,13 @@ import {login, loginComPerfil, USUARIOS} from '../helpers/helpers-auth.js';
 
 /**
  * Fixtures de autenticação para testes E2E.
- * 
+ *
  * Elimina a duplicação de código de login em testes.
- * 
+ *
  * @example
  * ```typescript
  * import {test, expect} from './fixtures/auth-fixtures.js';
- * 
+ *
  * test('Deve criar processo', async ({page, autenticadoComoAdmin}) => {
  *   // Já está logado como ADMIN!
  *   await page.getByTestId('btn-painel-criar-processo').click();

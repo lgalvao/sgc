@@ -429,7 +429,7 @@ class AlertaFacadeTest {
     @Nested
     @DisplayName("Método: getUnidadeRaiz (Lazy Load)")
     class GetUnidadeRaiz {
-    @Test
+        @Test
         @DisplayName("Deve buscar unidadeRaiz para cada operação (sem cache lazy para sistema pequeno)")
         void deveBuscarUnidadeRaizParaCadaOperacao() {
             Unidade unidadeRaizMock = new Unidade();

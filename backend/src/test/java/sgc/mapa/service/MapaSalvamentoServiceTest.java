@@ -34,7 +34,7 @@ class MapaSalvamentoServiceTest {
     void deveSalvarComCompetenciaExistente() {
         Long codMapa = 1L;
         Long codComp = 50L;
-        
+
         SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
                 .codigo(codComp)
                 .descricao("Comp 1")
@@ -65,7 +65,7 @@ class MapaSalvamentoServiceTest {
     @DisplayName("Deve salvar mapa com nova competência")
     void deveSalvarComNovaCompetencia() {
         Long codMapa = 1L;
-        
+
         SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
                 .codigo(0L)
                 .descricao("Nova Comp")
@@ -95,7 +95,7 @@ class MapaSalvamentoServiceTest {
     void deveBuscarNoRepoSeNaoNoContexto() {
         Long codMapa = 1L;
         Long codComp = 50L;
-        
+
         SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
                 .codigo(codComp)
                 .descricao("Comp 1")
@@ -127,7 +127,7 @@ class MapaSalvamentoServiceTest {
     void deveRemoverObsoleta() {
         Long codMapa = 1L;
         Long codCompObsoleto = 50L;
-        
+
         SalvarMapaRequest request = SalvarMapaRequest.builder()
                 .competencias(List.of())
                 .build();
@@ -151,7 +151,7 @@ class MapaSalvamentoServiceTest {
     @DisplayName("Deve validar integridade com avisos quando há itens desvinculados")
     void deveValidarIntegridadeComAvisos() {
         Long codMapa = 1L;
-        
+
         SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
                 .codigo(0L)
                 .descricao("Comp")
@@ -171,7 +171,7 @@ class MapaSalvamentoServiceTest {
         when(competenciaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
 
         mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
-        
+
         // Apenas para cobrir os logs de warn nas linhas 177 e 183
         assertThat(ativ.getCompetencias()).isEmpty();
     }
@@ -180,7 +180,7 @@ class MapaSalvamentoServiceTest {
     @DisplayName("Deve lançar erro ao associar atividade de outro mapa")
     void deveLancarErroAtividadeOutroMapa() {
         Long codMapa = 1L;
-        
+
         SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
                 .codigo(0L)
                 .descricao("Nova Comp")

@@ -45,7 +45,7 @@ class MapaAjusteDtoTest {
     @Nested
     @DisplayName("Método de criação estático of")
     class OfMethodTests {
-       @Test
+        @Test
         @DisplayName("Deve mapear corretamente os dados básicos")
         void deveMapearDadosBasicos() {
             Analise analise = new Analise();

@@ -1,4 +1,3 @@
-import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
@@ -42,7 +41,11 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     // PREPARAÇÃO - Criar mapa vigente (processo de mapeamento completo)
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
+                                                                                page,
+                                                                                autenticadoComoAdmin,
+                                                                                cleanupAutomatico
+                                                                            }) => {
         await criarProcesso(page, {
             descricao: descProcessoMapeamento,
             tipo: 'MAPEAMENTO',
@@ -63,7 +66,10 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao211}) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({
+                                                                                        page,
+                                                                                        autenticadoComoChefeSecao211
+                                                                                    }) => {
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
         await navegarParaAtividades(page);
 
@@ -97,7 +103,10 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await aceitarCadastroMapeamento(page);
     });
 
-    test('Preparacao 4: Admin homologa cadastro, cria competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 4: Admin homologa cadastro, cria competências e disponibiliza mapa', async ({
+                                                                                                     page,
+                                                                                                     autenticadoComoAdmin
+                                                                                                 }) => {
         // Homologação do cadastro
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -144,7 +153,11 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 7: Admin homologa mapa, finaliza e inicia revisão', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Preparacao 7: Admin homologa mapa, finaliza e inicia revisão', async ({
+                                                                                    page,
+                                                                                    autenticadoComoAdmin,
+                                                                                    cleanupAutomatico
+                                                                                }) => {
         // Homologação e finalização do Mapeamento
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);

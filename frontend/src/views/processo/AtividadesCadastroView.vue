@@ -25,10 +25,10 @@
       <template #actions>
         <BDropdown
             v-if="codSubprocesso && (podeVerImpacto || isChefe)"
+            class="me-2"
             data-testid="btn-mais-acoes"
             text="Mais ações"
             variant="outline-secondary"
-            class="me-2"
         >
           <BDropdownItem
               v-if="podeVerImpacto"
@@ -57,10 +57,10 @@
             v-if="!!podeDisponibilizarCadastro"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
-            variant="success"
             icon="check-lg"
-            text="Disponibilizar"
             loading-text="Validando..."
+            text="Disponibilizar"
+            variant="success"
             @click="disponibilizarCadastro"
         />
       </template>
@@ -83,16 +83,16 @@
     <!-- Empty State -->
     <EmptyState
         v-if="atividades?.length === 0"
-        icon="bi-list-check"
-        title="Lista de atividades"
         :description="`Não há atividades cadastradas. Utilize o campo acima para adicionar uma nova atividade${isChefe ? ' ou importe de outro processo' : ''}.`"
         data-testid="cad-atividades-empty-state"
+        icon="bi-list-check"
+        title="Lista de atividades"
     >
       <BButton
           v-if="isChefe"
-          variant="outline-primary"
-          size="sm"
           data-testid="btn-empty-state-importar"
+          size="sm"
+          variant="outline-primary"
           @click="mostrarModalImportar = true"
       >
         <i aria-hidden="true" class="bi bi-upload me-2"/> Importar atividades
@@ -106,8 +106,8 @@
     >
       <AtividadeItem
           :atividade="atividade"
-          :pode-editar="!!podeEditarCadastro"
           :erro-validacao="obterErroParaAtividade(atividade.codigo)"
+          :pode-editar="!!podeEditarCadastro"
           @atualizar-atividade="(desc) => salvarEdicaoAtividade(atividade.codigo, desc)"
           @remover-atividade="() => removerAtividade(idx)"
           @adicionar-conhecimento="(desc) => adicionarConhecimento(idx, desc)"
@@ -132,10 +132,10 @@
     />
 
     <ConfirmacaoDisponibilizacaoModal
-        :mostrar="mostrarModalConfirmacao"
         :is-revisao="!!isRevisao"
-        @fechar="mostrarModalConfirmacao = false"
+        :mostrar="mostrarModalConfirmacao"
         @confirmar="confirmarDisponibilizacao"
+        @fechar="mostrarModalConfirmacao = false"
     />
 
     <HistoricoAnaliseModal
@@ -146,8 +146,8 @@
 
     <ModalConfirmacao
         v-model="mostrarModalConfirmacaoRemocao"
-        :titulo="dadosRemocao?.tipo === 'atividade' ? 'Remover Atividade' : 'Remover Conhecimento'"
         :mensagem="dadosRemocao?.tipo === 'atividade' ? 'Confirma a remoção desta atividade e todos os conhecimentos associados?' : 'Confirma a remoção deste conhecimento?'"
+        :titulo="dadosRemocao?.tipo === 'atividade' ? 'Remover Atividade' : 'Remover Conhecimento'"
         variant="danger"
         @confirmar="confirmarRemocao"
     />
@@ -187,7 +187,7 @@ import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import logger from "@/utils/logger";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 
-type DadosRemocao = {tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number} | null;
+type DadosRemocao = { tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number } | null;
 
 const props = defineProps<{
   codProcesso: number | string;
@@ -210,7 +210,7 @@ const codSubprocesso = ref<number | null>(null);
 const codMapa = computed(() => mapasStore.mapaCompleto?.codigo || null);
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const nomeUnidade = computed(() => unidadesStore.unidade?.nome || "");
-const { podeEditarCadastro, podeDisponibilizarCadastro, podeVisualizarImpacto } = useAcesso(subprocesso);
+const {podeEditarCadastro, podeDisponibilizarCadastro, podeVisualizarImpacto} = useAcesso(subprocesso);
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 
@@ -253,7 +253,7 @@ const mapaErros = computed(() => {
 
 const atividadeFormRef = ref<InstanceType<typeof CadAtividadeForm> | null>(null);
 const erroGlobalFormatado = computed(() =>
-  erroGlobal.value ? {message: erroGlobal.value} : null
+    erroGlobal.value ? {message: erroGlobal.value} : null
 );
 
 async function adicionarAtividade(): Promise<boolean> {
@@ -336,10 +336,10 @@ async function salvarEdicaoConhecimento(atividadeCodigo: number, conhecimentoCod
       descricao: descricao.trim(),
     };
     await atividadesStore.atualizarConhecimento(
-      codSubprocesso.value,
-      atividadeCodigo,
-      conhecimentoCodigo,
-      conhecimentoAtualizado,
+        codSubprocesso.value,
+        atividadeCodigo,
+        conhecimentoCodigo,
+        conhecimentoAtualizado,
     );
   }
 }
@@ -376,14 +376,14 @@ function scrollParaPrimeiroErro() {
 
 async function disponibilizarCadastro() {
   const situacaoEsperada = isRevisao.value
-    ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-    : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+      ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+      : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
 
   if (subprocesso.value?.situacao !== situacaoEsperada) {
     feedbackStore.show(
-      "Ação não permitida",
-      `Ação permitida apenas na situação: "${situacaoEsperada}".`,
-      "danger",
+        "Ação não permitida",
+        `Ação permitida apenas na situação: "${situacaoEsperada}".`,
+        "danger",
     );
     return;
   }

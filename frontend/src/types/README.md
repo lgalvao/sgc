@@ -4,7 +4,8 @@ Centraliza as definições de tipos TypeScript utilizadas em toda a aplicação.
 
 ## Arquivos Principais
 
-* **`dtos.ts`**: Define os objetos de transferência de dados (Data Transfer Objects) que refletem exatamente a estrutura enviada/recebida pela API.
+* **`dtos.ts`**: Define os objetos de transferência de dados (Data Transfer Objects) que refletem exatamente a estrutura
+  enviada/recebida pela API.
 * **`tipos.ts`**: Define modelos de domínio internos do frontend, enums, e tipos utilitários complexos.
 
 ## Convenções

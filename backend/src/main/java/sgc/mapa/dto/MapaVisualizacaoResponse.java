@@ -12,15 +12,16 @@ import java.util.*;
  */
 @Builder
 public record MapaVisualizacaoResponse(
-    @JsonView(MapaViews.Publica.class)
-    Unidade unidade,
-    
-    @JsonView(MapaViews.Publica.class)
-    List<Competencia> competencias,
-    
-    @JsonView(MapaViews.Publica.class)
-    List<Atividade> atividadesSemCompetencia,
-    
-    @JsonView(MapaViews.Publica.class)
-    String sugestoes
-) {}
+        @JsonView(MapaViews.Publica.class)
+        Unidade unidade,
+
+        @JsonView(MapaViews.Publica.class)
+        List<Competencia> competencias,
+
+        @JsonView(MapaViews.Publica.class)
+        List<Atividade> atividadesSemCompetencia,
+
+        @JsonView(MapaViews.Publica.class)
+        String sugestoes
+) {
+}

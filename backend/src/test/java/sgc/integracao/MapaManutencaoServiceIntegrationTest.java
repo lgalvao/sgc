@@ -1,28 +1,17 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.dto.AtualizarAtividadeRequest;
-import sgc.mapa.dto.AtualizarConhecimentoRequest;
-import sgc.mapa.dto.CriarAtividadeRequest;
-import sgc.mapa.dto.CriarConhecimentoRequest;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Conhecimento;
-import jakarta.persistence.EntityManager;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.subprocesso.model.Subprocesso;
+import jakarta.persistence.*;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import sgc.comum.erros.*;
+import sgc.mapa.dto.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.subprocesso.model.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Testes de Integração - MapaManutencaoService")
 class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
@@ -102,8 +91,6 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve criar atividade com sucesso e atualizar estado do subprocesso")
         void deveCriarAtividade() {
-            // Utilizando o subprocesso 60000 e mapa 1001 existente no data.sql
-            Subprocesso sub = subprocessoRepo.findById(60000L).orElseThrow();
             Mapa mapa = mapaRepo.findById(1001L).orElseThrow();
 
             CriarAtividadeRequest request = CriarAtividadeRequest.builder()
@@ -158,7 +145,8 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
 
             service.excluirAtividade(atividade.getCodigo());
 
-            assertThatThrownBy(() -> service.obterAtividadePorCodigo(atividade.getCodigo()))
+            Long codigo = atividade.getCodigo();
+            assertThatThrownBy(() -> service.obterAtividadePorCodigo(codigo))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
@@ -221,7 +209,8 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
             assertThat(atualizada.getDescricao()).isEqualTo("Comp Atualizada");
 
             service.removerCompetencia(novaComp.getCodigo());
-            assertThatThrownBy(() -> service.buscarCompetenciaPorCodigo(novaComp.getCodigo()))
+            Long codigo = novaComp.getCodigo();
+            assertThatThrownBy(() -> service.buscarCompetenciaPorCodigo(codigo))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }

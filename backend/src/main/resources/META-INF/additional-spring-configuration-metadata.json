@@ -1,5 +1,9 @@
-{"properties": [{
-  "name": "sgc.validacao.startup",
-  "type": "java.lang.String",
-  "description": "A description for 'sgc.validacao.startup'."
-}]}
+{
+  "properties": [
+    {
+      "name": "sgc.validacao.startup",
+      "type": "java.lang.String",
+      "description": "A description for 'sgc.validacao.startup'."
+    }
+  ]
+}

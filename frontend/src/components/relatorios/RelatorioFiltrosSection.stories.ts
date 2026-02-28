@@ -1,31 +1,31 @@
-import type { Meta, StoryObj } from '@storybook/vue3-vite';
+import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import RelatorioFiltrosSection from './RelatorioFiltrosSection.vue';
-import { ref } from 'vue';
+import {ref} from 'vue';
 
 const meta: Meta<typeof RelatorioFiltrosSection> = {
-  title: 'Relatorios/RelatorioFiltrosSection',
-  component: RelatorioFiltrosSection,
-  tags: ['autodocs'],
+    title: 'Relatorios/RelatorioFiltrosSection',
+    component: RelatorioFiltrosSection,
+    tags: ['autodocs'],
 };
 
 export default meta;
 type Story = StoryObj<typeof RelatorioFiltrosSection>;
 
 export const Default: Story = {
-  args: {
-    tipo: '',
-    dataInicio: '',
-    dataFim: '',
-  },
-  render: (args) => ({
-    components: { RelatorioFiltrosSection },
-    setup() {
-      const tipo = ref(args.tipo);
-      const dataInicio = ref(args.dataInicio);
-      const dataFim = ref(args.dataFim);
-      return { args, tipo, dataInicio, dataFim };
+    args: {
+        tipo: '',
+        dataInicio: '',
+        dataFim: '',
     },
-    template: `
+    render: (args) => ({
+        components: {RelatorioFiltrosSection},
+        setup() {
+            const tipo = ref(args.tipo);
+            const dataInicio = ref(args.dataInicio);
+            const dataFim = ref(args.dataFim);
+            return {args, tipo, dataInicio, dataFim};
+        },
+        template: `
       <div class="p-3 border rounded bg-light">
         <RelatorioFiltrosSection 
           v-bind="args" 
@@ -41,13 +41,13 @@ export const Default: Story = {
         </div>
       </div>
     `,
-  }),
+    }),
 };
 
 export const Preenchido: Story = {
-  args: {
-    tipo: 'MAPEAMENTO',
-    dataInicio: '2025-01-01',
-    dataFim: '2025-12-31',
-  },
+    args: {
+        tipo: 'MAPEAMENTO',
+        dataInicio: '2025-01-01',
+        dataFim: '2025-12-31',
+    },
 };

@@ -4,10 +4,10 @@
       <h5 class="mb-0">Configurações do Sistema</h5>
       <LoadingButton
           :loading="store.loading"
-          variant="light"
-          size="sm"
           icon="arrow-clockwise"
+          size="sm"
           text="Recarregar"
+          variant="light"
           @click="recarregar"
       />
     </div>
@@ -24,17 +24,18 @@
 
       <form v-else @submit.prevent="salvar">
         <div class="mb-3">
-          <label for="diasInativacao" class="form-label">
-            Dias para inativação de processos (DIAS_INATIVACAO_PROCESSO) <span class="text-danger" aria-hidden="true">*</span>
+          <label class="form-label" for="diasInativacao">
+            Dias para inativação de processos (DIAS_INATIVACAO_PROCESSO) <span aria-hidden="true"
+                                                                               class="text-danger">*</span>
           </label>
           <input
-            id="diasInativacao"
-            v-model="form.diasInativacao"
-            type="number"
-            class="form-control"
-            min="1"
-            required
-            aria-describedby="diasInativacaoHelp"
+              id="diasInativacao"
+              v-model="form.diasInativacao"
+              aria-describedby="diasInativacaoHelp"
+              class="form-control"
+              min="1"
+              required
+              type="number"
           />
           <div id="diasInativacaoHelp" class="form-text">
             Dias depois da finalização de um processo para que seja considerado inativo.
@@ -42,17 +43,18 @@
         </div>
 
         <div class="mb-3">
-          <label for="diasAlertaNovo" class="form-label">
-            Dias para indicação de alerta como novo (DIAS_ALERTA_NOVO) <span class="text-danger" aria-hidden="true">*</span>
+          <label class="form-label" for="diasAlertaNovo">
+            Dias para indicação de alerta como novo (DIAS_ALERTA_NOVO) <span aria-hidden="true"
+                                                                             class="text-danger">*</span>
           </label>
           <input
-            id="diasAlertaNovo"
-            v-model="form.diasAlertaNovo"
-            type="number"
-            class="form-control"
-            min="1"
-            required
-            aria-describedby="diasAlertaNovoHelp"
+              id="diasAlertaNovo"
+              v-model="form.diasAlertaNovo"
+              aria-describedby="diasAlertaNovoHelp"
+              class="form-control"
+              min="1"
+              required
+              type="number"
           />
           <div id="diasAlertaNovoHelp" class="form-text">
             Dias depois de um alerta ser enviado para que deixe de ser marcado como novo.
@@ -61,11 +63,11 @@
 
         <div class="d-flex justify-content-end">
           <LoadingButton
-              type="submit"
-              variant="success"
               :loading="salvando"
               icon="check-lg"
               text="Salvar Configurações"
+              type="submit"
+              variant="success"
           />
         </div>
       </form>
@@ -73,7 +75,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {onMounted, reactive, ref} from 'vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';
 import {BAlert} from 'bootstrap-vue-next';

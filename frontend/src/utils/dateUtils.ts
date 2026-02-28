@@ -34,8 +34,8 @@ export function parseDate(dateInput: any): Date | null {
     }
 
     // Suporte para objetos de contexto do BTable (bootstrap-vue-next)
-    const val = (typeof dateInput === 'object' && !Array.isArray(dateInput) && 'value' in dateInput) 
-        ? dateInput.value 
+    const val = (typeof dateInput === 'object' && !Array.isArray(dateInput) && 'value' in dateInput)
+        ? dateInput.value
         : dateInput;
 
     if (val instanceof Date) {
@@ -69,7 +69,7 @@ export function formatDateBR(
     const dateObj = parseDate(date);
     if (!dateObj) return "Data inválida";
     try {
-        return format(dateObj, pattern, { locale: ptBR });
+        return format(dateObj, pattern, {locale: ptBR});
     } catch {
         return "Data inválida";
     }

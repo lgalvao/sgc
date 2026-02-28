@@ -77,7 +77,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
             // Criar Competência e Disponibilizar Mapa
             await navegarParaMapa(page);
             await expect(page.getByText(/Carregando/i)).toBeHidden();
-            
+
             // Garantir que atividades homologadas apareçam na lista de seleção (esperar componente estabilizar)
             await page.waitForResponse(resp => resp.url().includes('/atividades-elegiveis') || resp.url().includes('/mapa'));
 
@@ -181,7 +181,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
             await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
             await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
-            
+
             await cancelarDevolucao(page);
             await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 

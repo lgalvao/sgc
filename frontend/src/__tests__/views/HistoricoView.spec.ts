@@ -5,21 +5,21 @@ import {createTestingPinia} from "@pinia/testing";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mock router
-const { mockPush } = vi.hoisted(() => {
+const {mockPush} = vi.hoisted(() => {
     return {
         mockPush: vi.fn(),
     }
 });
 
 vi.mock("vue-router", () => ({
-    useRouter: () => ({ push: mockPush }),
+    useRouter: () => ({push: mockPush}),
     createRouter: vi.fn(() => ({
         beforeEach: vi.fn(),
         afterEach: vi.fn(),
         push: mockPush,
         replace: vi.fn(),
         resolve: vi.fn(),
-        currentRoute: { value: {} },
+        currentRoute: {value: {}},
     })),
     createWebHistory: vi.fn(),
     createMemoryHistory: vi.fn(),
@@ -78,7 +78,7 @@ describe("HistoricoView.vue", () => {
     it("deve carregar processos finalizados ao montar", async () => {
         context.wrapper = mount(HistoricoView, mountOptions());
         await flushPromises();
-        
+
         // The component uses the store, so the data should be rendered from initial state
         expect(context.wrapper.findAll('tbody tr').length).toBe(2);
     });
@@ -113,7 +113,7 @@ describe("HistoricoView.vue", () => {
                 },
             },
         };
-        
+
         context.wrapper = mount(HistoricoView, emptyOptions);
         await flushPromises();
 

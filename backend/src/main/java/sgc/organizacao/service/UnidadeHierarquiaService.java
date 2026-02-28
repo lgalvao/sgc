@@ -90,10 +90,10 @@ public class UnidadeHierarquiaService {
     public List<String> buscarSiglasSubordinadas(String sigla) {
         List<UnidadeDto> todas = buscarArvoreHierarquica();
         Optional<UnidadeDto> found = buscarNaHierarquiaPorSigla(todas, sigla);
-        
+
         if (found.isEmpty()) {
             repo.buscarPorSigla(Unidade.class, sigla);
-            return List.of(); 
+            return List.of();
         }
 
         List<String> resultado = new ArrayList<>();

@@ -34,7 +34,7 @@ public class WithMockAdminSecurityContextFactory
         }
 
         principal.setPerfilAtivo(Perfil.ADMIN);
-        
+
         // ADMIN atua na unidade raiz (id=1) conforme acesso.md
         principal.setUnidadeAtivaCodigo(1L);
 

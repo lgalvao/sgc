@@ -3,7 +3,7 @@ import {test as base} from '@playwright/test';
 import logger from '../../frontend/src/utils/logger.js';
 
 export const test = base.extend({
-    page: async ({ page }, use) => {
+    page: async ({page}, use) => {
         // Listener para logs do console
         page.on('console', async msg => {
             const text = msg.text();
@@ -76,4 +76,4 @@ export const test = base.extend({
     },
 });
 
-export { expect } from '@playwright/test';
+export {expect} from '@playwright/test';

@@ -47,8 +47,7 @@ public class ProcessoConsultaService {
 
         if (perfil == Perfil.ADMIN) {
             return processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
-        }
-        else {
+        } else {
             List<Long> unidadesAcesso = processoAcessoService.buscarCodigosDescendentes(unidadeCodigo);
             return processoRepo.listarPorSituacaoEUnidadeCodigos(SituacaoProcesso.FINALIZADO, unidadesAcesso);
         }

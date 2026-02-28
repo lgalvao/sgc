@@ -17,7 +17,7 @@ class ConfigOpenApiCoverageTest {
         ConfigAplicacao.OpenApi openapi = new ConfigAplicacao.OpenApi();
 
         when(config.getOpenapi()).thenReturn(openapi);
-        
+
         ConfigOpenApi configOpenApi = new ConfigOpenApi(config);
 
         // Act
@@ -38,9 +38,9 @@ class ConfigOpenApiCoverageTest {
         openapi.setTitle("Meu Titulo");
         openapi.setDescription("Minha Descricao");
         openapi.setVersion("v2");
-        
+
         when(config.getOpenapi()).thenReturn(openapi);
-        
+
         ConfigOpenApi configOpenApi = new ConfigOpenApi(config);
 
         // Act

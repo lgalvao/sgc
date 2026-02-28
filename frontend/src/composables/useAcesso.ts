@@ -1,9 +1,9 @@
-import { computed, type Ref, unref } from 'vue';
-import type { SubprocessoDetalhe } from '@/types/tipos';
+import {computed, type Ref, unref} from 'vue';
+import type {SubprocessoDetalhe} from '@/types/tipos';
 
 /**
  * Hook to access permissions calculated by the backend.
- * 
+ *
  * The backend is the single source of truth for security and workflow rules.
  * This hook simplifies access to those rules in Vue components.
  */

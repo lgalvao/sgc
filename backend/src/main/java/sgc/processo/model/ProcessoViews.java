@@ -1,10 +1,11 @@
 package sgc.processo.model;
 
-import sgc.comum.model.ComumViews;
+import sgc.comum.model.*;
 
 /**
  * Views para controle de serialização JSON da entidade Processo.
  */
 public interface ProcessoViews {
-    interface Publica extends ComumViews.Publica {}
+    interface Publica extends ComumViews.Publica {
+    }
 }

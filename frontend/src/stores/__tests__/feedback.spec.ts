@@ -18,7 +18,7 @@ describe("Feedback Store", () => {
 
     it("deve enfileirar mensagens se não inicializado", () => {
         store.show("Teste", "Mensagem", "info");
-        
+
         expect(mockToast.create).not.toHaveBeenCalled();
     });
 
@@ -45,7 +45,7 @@ describe("Feedback Store", () => {
         // Chamada antes do init
         store.show("Fila 1", "Msg 1");
         store.show("Fila 2", "Msg 2");
-        
+
         expect(mockToast.create).not.toHaveBeenCalled();
 
         // Inicializa
@@ -53,7 +53,7 @@ describe("Feedback Store", () => {
 
         // Only the first queued message should be created due to debounce
         expect(mockToast.create).toHaveBeenCalledTimes(1);
-        
+
         // Verifica argumentos da primeira chamada
         expect(mockToast.create).toHaveBeenNthCalledWith(1, expect.objectContaining({
             props: expect.objectContaining({
@@ -61,11 +61,11 @@ describe("Feedback Store", () => {
             })
         }));
     });
-    
+
     it("deve usar defaults corretamente", () => {
         store.init(mockToast);
         store.show("Título", "Mensagem"); // Sem variant e delay
-        
+
         expect(mockToast.create).toHaveBeenCalledWith(expect.objectContaining({
             props: expect.objectContaining({
                 variant: 'info',
@@ -80,13 +80,13 @@ describe("Feedback Store", () => {
 
     it("deve ignorar chamadas subsequentes enquanto um toast está ativo (debounce)", () => {
         store.init(mockToast);
-        
+
         // Primeiro toast
         store.show("Toast 1", "Mensagem 1");
-        
+
         // Segundo toast (should be ignored due to debounce)
         store.show("Toast 2", "Mensagem 2");
-        
+
         // Only the first toast should be created
         expect(mockToast.create).toHaveBeenCalledTimes(1);
         expect(mockToast.create).toHaveBeenCalledWith(

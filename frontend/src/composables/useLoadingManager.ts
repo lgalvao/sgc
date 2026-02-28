@@ -16,31 +16,31 @@ interface LoadingManager {
 
 /**
  * Composable para gerenciar múltiplos estados de loading
- * 
+ *
  * Simplifica o gerenciamento de estados de carregamento em componentes
  * com múltiplas operações assíncronas.
- * 
+ *
  * @param names - Lista de nomes de estados de loading
  * @returns Gerenciador de loading
- * 
+ *
  * @example
  * ```ts
  * const loading = useLoadingManager(['fetch', 'save', 'delete']);
- * 
+ *
  * // Iniciar loading
  * loading.start('fetch');
- * 
+ *
  * // Verificar estado
  * if (loading.isLoading('fetch')) { ... }
- * 
+ *
  * // Parar loading
  * loading.stop('fetch');
- * 
+ *
  * // Usar wrapper para async
  * await loading.withLoading('save', async () => {
  *     await saveData();
  * });
- * 
+ *
  * // Verificar se qualquer loading está ativo
  * if (loading.anyLoading.value) { ... }
  * ```
@@ -120,17 +120,17 @@ export function useLoadingManager(names: string[]): LoadingManager {
 
 /**
  * Versão simplificada para um único estado de loading
- * 
+ *
  * @param initialValue - Valor inicial do loading (padrão: false)
- * 
+ *
  * @example
  * ```ts
  * const loading = useSingleLoading();
- * 
+ *
  * loading.start();
  * if (loading.isLoading.value) { ... }
  * loading.stop();
- * 
+ *
  * // Ou usar wrapper
  * await loading.withLoading(async () => {
  *     await fetchData();

@@ -16,9 +16,9 @@ import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-n
 
 /**
  * CDU-32 - Reabrir cadastro
- * 
+ *
  * Ator: ADMIN
- * 
+ *
  * Pré-condições:
  * - Subprocesso com cadastro já disponibilizado ou aceito
  */
@@ -69,7 +69,10 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Gestores e ADMIN aceitam e homologam cadastro', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Preparacao 3: Gestores e ADMIN aceitam e homologam cadastro', async ({
+                                                                                   page,
+                                                                                   autenticadoComoGestorCoord22
+                                                                               }) => {
         // Aceite COORD_22
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);

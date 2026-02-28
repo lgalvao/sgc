@@ -14,16 +14,16 @@ export const usePerfilStore = defineStore("perfil", () => {
     const unidadeSelecionadaSigla = useLocalStorage<string | null>("unidadeSelecionadaSigla", null);
     const usuarioNome = useLocalStorage<string | null>("usuarioNome", null);
     const perfis = useLocalStorage<Perfil[]>("perfis", []);
-    
+
     // Estados não persistidos
     const perfisUnidades = ref<PerfilUnidade[]>([]);
-    const { lastError, clearError, withErrorHandling } = useErrorHandler();
+    const {lastError, clearError, withErrorHandling} = useErrorHandler();
 
     const isAdmin = computed(() => perfis.value.includes("ADMIN" as Perfil));
     const isGestor = computed(() => perfis.value.includes("GESTOR" as Perfil));
 
     // Map para lookup O(1) de perfil -> unidade
-    const perfilUnidadeMap = computed(() => 
+    const perfilUnidadeMap = computed(() =>
         new Map(perfisUnidades.value.map(pu => [pu.perfil, pu]))
     );
 
@@ -93,7 +93,7 @@ export const usePerfilStore = defineStore("perfil", () => {
                         loginResponse.nome,
                     );
                     definirUsuarioCodigo(loginResponse.tituloEleitoral);
-                    definirToken(loginResponse.token); 
+                    definirToken(loginResponse.token);
                 }
                 return true;
             }
@@ -136,7 +136,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         usuarioNome.value = null;
         perfisUnidades.value = [];
         perfis.value = [];
-        
+
         // Apenas jwtToken precisa de remoção manual (não é gerenciado pelo composable)
         localStorage.removeItem("jwtToken");
     }

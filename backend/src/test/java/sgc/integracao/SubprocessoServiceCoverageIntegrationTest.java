@@ -1,27 +1,19 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroValidacao;
-import sgc.fixture.UnidadeFixture;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
+import sgc.fixture.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
 @Transactional
@@ -70,7 +62,8 @@ class SubprocessoServiceCoverageIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("validarExistenciaAtividades: deve lançar erro se mapa sem atividades")
     void validarExistenciaAtividades_SemAtividades() {
-        assertThatThrownBy(() -> subprocessoService.validarExistenciaAtividades(subprocesso.getCodigo()))
+        Long subprocessoCodigo = subprocesso.getCodigo();
+        assertThatThrownBy(() -> subprocessoService.validarExistenciaAtividades(subprocessoCodigo))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessage("O mapa de competências deve ter ao menos uma atividade cadastrada.");
     }
@@ -81,7 +74,8 @@ class SubprocessoServiceCoverageIntegrationTest extends BaseIntegrationTest {
         Atividade atividade = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Sem conhecimento").build();
         atividadeRepo.save(atividade);
 
-        assertThatThrownBy(() -> subprocessoService.validarExistenciaAtividades(subprocesso.getCodigo()))
+        Long subprocessoCodigo = subprocesso.getCodigo();
+        assertThatThrownBy(() -> subprocessoService.validarExistenciaAtividades(subprocessoCodigo))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessage("Todas as atividades devem possuir conhecimentos vinculados. Verifique as atividades pendentes.");
     }

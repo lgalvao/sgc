@@ -66,18 +66,18 @@ describe("ArvoreUnidades.vue", () => {
 
     it("deve renderizar as unidades", () => {
         const wrapper = createWrapper();
-        expect(wrapper.findComponent({ name: "UnidadeTreeNode" }).exists()).toBe(true);
+        expect(wrapper.findComponent({name: "UnidadeTreeNode"}).exists()).toBe(true);
     });
 
     it("deve expandir unidades iniciais", () => {
         const wrapper = createWrapper();
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
         expect(root.props("isExpanded")(mockUnidades[0])).toBe(true);
     });
 
     it("deve alternar expansão", async () => {
         const wrapper = createWrapper();
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
         // Toggle expand via prop function
         await root.props("onToggleExpand")(mockUnidades[0]);
@@ -90,8 +90,8 @@ describe("ArvoreUnidades.vue", () => {
     });
 
     it("deve calcular estado de seleção (checked)", async () => {
-        const wrapper = createWrapper({ modelValue: [10] });
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const wrapper = createWrapper({modelValue: [10]});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
         // 10 is checked
         expect(root.props("isChecked")(10)).toBe(true);
@@ -100,7 +100,7 @@ describe("ArvoreUnidades.vue", () => {
     });
 
     it("deve selecionar todas as unidades elegíveis", async () => {
-        const wrapper = createWrapper({ modoSelecao: true });
+        const wrapper = createWrapper({modoSelecao: true});
 
         await wrapper.find('button[aria-label="Selecionar todas as unidades elegíveis"]').trigger("click");
 
@@ -115,7 +115,7 @@ describe("ArvoreUnidades.vue", () => {
     });
 
     it("deve limpar seleção", async () => {
-        const wrapper = createWrapper({ modelValue: [10, 21], modoSelecao: true });
+        const wrapper = createWrapper({modelValue: [10, 21], modoSelecao: true});
 
         await wrapper.find('button[aria-label="Desmarcar todas as unidades"]').trigger("click");
 
@@ -125,8 +125,8 @@ describe("ArvoreUnidades.vue", () => {
     });
 
     it("deve lidar com toggle de unidade (selecionar)", async () => {
-        const wrapper = createWrapper({ modelValue: [], modoSelecao: true });
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const wrapper = createWrapper({modelValue: [], modoSelecao: true});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
         // Select node 20 (which should select descendants 21)
         const node20 = mockUnidades[0].filhas![1];
@@ -145,8 +145,8 @@ describe("ArvoreUnidades.vue", () => {
     });
 
     it("deve lidar com toggle de unidade (deselecionar)", async () => {
-        const wrapper = createWrapper({ modelValue: [10], modoSelecao: true });
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const wrapper = createWrapper({modelValue: [10], modoSelecao: true});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
         const node10 = mockUnidades[0].filhas![0];
         await root.props("onToggle")(node10, false);
@@ -157,8 +157,8 @@ describe("ArvoreUnidades.vue", () => {
     });
 
     it("deve calcular estado indeterminado", () => {
-        const wrapper = createWrapper({ modelValue: [21] });
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const wrapper = createWrapper({modelValue: [21]});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
         // Node 20 has child 21 selected. So it should be indeterminate?
         // Logic: descendentesElegiveis = [21]. descendentesSelecionadas = 1.
@@ -178,17 +178,17 @@ describe("ArvoreUnidades.vue", () => {
 
     it("isHabilitado deve retornar false se não elegível e sem filhas", () => {
         const wrapper = createWrapper();
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
-        const leafNotEligible: Unidade = { codigo: 99, sigla: "X", nome: "X", isElegivel: false, filhas: [] };
+        const leafNotEligible: Unidade = {codigo: 99, sigla: "X", nome: "X", isElegivel: false, filhas: []};
         expect(root.props("isHabilitado")(leafNotEligible)).toBe(false);
     });
 
     it("isHabilitado deve retornar true se elegível", () => {
         const wrapper = createWrapper();
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
-        const leafEligible: Unidade = { codigo: 99, sigla: "X", nome: "X", isElegivel: true, filhas: [] };
+        const leafEligible: Unidade = {codigo: 99, sigla: "X", nome: "X", isElegivel: true, filhas: []};
         expect(root.props("isHabilitado")(leafEligible)).toBe(true);
     });
 
@@ -200,23 +200,23 @@ describe("ArvoreUnidades.vue", () => {
                 nome: "Pai",
                 isElegivel: true, // Pai elegível
                 filhas: [
-                    { codigo: 101, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL" },
-                    { codigo: 102, sigla: "F2", nome: "F2", isElegivel: true, filhas: [], tipo: "OPERACIONAL" }
+                    {codigo: 101, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL"},
+                    {codigo: 102, sigla: "F2", nome: "F2", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}
                 ],
                 tipo: "ADMINISTRATIVA"
             }
         ];
-        
-        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [101] });
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
-        
+
+        const wrapper = createWrapper({unidades: unidadesTeste, modelValue: [101]});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
+
         // Select the other child
         const child2 = unidadesTeste[0].filhas![1];
         await root.props("onToggle")(child2, true);
-        
+
         const emitted = wrapper.emitted("update:modelValue");
         const lastEmission = emitted![emitted!.length - 1][0] as number[];
-        
+
         // Should contain children and parent (since parent is eligible and all children selected)
         expect(lastEmission).toContain(101);
         expect(lastEmission).toContain(102);
@@ -227,7 +227,7 @@ describe("ArvoreUnidades.vue", () => {
         // Logic: if (parent.tipo !== 'INTEROPERACIONAL') selectionSet.delete(parent.codigo);
         // So if it IS INTEROPERACIONAL, it should NOT delete parent from selection?
         // Wait, if allChildrenSelected is false.
-        
+
         const unidadesTeste: Unidade[] = [
             {
                 codigo: 200,
@@ -236,29 +236,29 @@ describe("ArvoreUnidades.vue", () => {
                 isElegivel: true,
                 tipo: "INTEROPERACIONAL",
                 filhas: [
-                    { codigo: 201, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL" }
+                    {codigo: 201, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}
                 ]
             }
         ];
-        
+
         // Start with parent selected (and child)
-        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [200, 201] });
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
-        
+        const wrapper = createWrapper({unidades: unidadesTeste, modelValue: [200, 201]});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
+
         // Deselect child
         const child = unidadesTeste[0].filhas![0];
         await root.props("onToggle")(child, false);
-        
+
         const emitted = wrapper.emitted("update:modelValue");
         const lastEmission = emitted![emitted!.length - 1][0] as number[];
-        
+
         // Child should be gone
         expect(lastEmission).not.toContain(201);
         // Parent should stay because it is INTEROPERACIONAL?
         // Code: if (parent.tipo !== 'INTEROPERACIONAL') { selectionSet.delete(parent.codigo); }
         expect(lastEmission).toContain(200);
     });
-    
+
     it("deve atualizar ancestrais: não selecionar pai se não for elegível, mesmo se todos filhos selecionados", async () => {
         const unidadesTeste: Unidade[] = [
             {
@@ -267,21 +267,21 @@ describe("ArvoreUnidades.vue", () => {
                 nome: "Pai Inelegivel",
                 isElegivel: false, // Inelegível
                 filhas: [
-                    { codigo: 301, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL" }
+                    {codigo: 301, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}
                 ],
                 tipo: "ADMINISTRATIVA"
             }
         ];
-        
-        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [] });
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
-        
+
+        const wrapper = createWrapper({unidades: unidadesTeste, modelValue: []});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
+
         const child = unidadesTeste[0].filhas![0];
         await root.props("onToggle")(child, true);
-        
+
         const emitted = wrapper.emitted("update:modelValue");
         const lastEmission = emitted![emitted!.length - 1][0] as number[];
-        
+
         expect(lastEmission).toContain(301);
         expect(lastEmission).not.toContain(300); // Parent should NOT be selected
     });
@@ -297,18 +297,18 @@ describe("ArvoreUnidades.vue", () => {
                 tipo: "OPERACIONAL"
             }
         ];
-        
-        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [], modoSelecao: true });
-        
+
+        const wrapper = createWrapper({unidades: unidadesTeste, modelValue: [], modoSelecao: true});
+
         await wrapper.find('button[aria-label="Selecionar todas as unidades elegíveis"]').trigger("click");
-        
+
         const emitted = wrapper.emitted("update:modelValue");
         expect(emitted).toBeTruthy();
         expect(emitted![0][0]).toContain(400);
     });
 
     it("deve exibir a raiz quando ocultarRaiz é false", () => {
-        const wrapper = createWrapper({ ocultarRaiz: false });
+        const wrapper = createWrapper({ocultarRaiz: false});
         expect((wrapper.vm as any).unidadesExibidas[0].codigo).toBe(1);
     });
 
@@ -322,8 +322,8 @@ describe("ArvoreUnidades.vue", () => {
     });
 
     it("não deve permitir seleção se modoSelecao é false", async () => {
-        const wrapper = createWrapper({ modoSelecao: false });
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const wrapper = createWrapper({modoSelecao: false});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
         expect(root.props("isChecked")(10)).toBe(false);
         expect(root.props("isHabilitado")(mockUnidades[0].filhas![0])).toBe(false);
@@ -335,15 +335,15 @@ describe("ArvoreUnidades.vue", () => {
     });
 
     it("deve atualizar unidadesSelecionadasLocal quando modelValue muda", async () => {
-        const wrapper = createWrapper({ modelValue: [10] });
-        await wrapper.setProps({ modelValue: [20] });
+        const wrapper = createWrapper({modelValue: [10]});
+        await wrapper.setProps({modelValue: [20]});
         expect((wrapper.vm as any).unidadesSelecionadasLocal).toContain(20);
     });
 
     it("deve atualizar expandedUnits quando unidades muda", async () => {
         const wrapper = createWrapper();
-        const novasUnidades = [{ codigo: 999, sigla: 'N', nome: 'N' }];
-        await wrapper.setProps({ unidades: novasUnidades });
+        const novasUnidades = [{codigo: 999, sigla: 'N', nome: 'N'}];
+        await wrapper.setProps({unidades: novasUnidades});
         expect((wrapper.vm as any).isExpanded(novasUnidades[0])).toBe(true);
     });
 
@@ -356,20 +356,20 @@ describe("ArvoreUnidades.vue", () => {
                 isElegivel: true,
                 tipo: "INTEROPERACIONAL",
                 filhas: [
-                    { codigo: 501, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL" },
-                    { codigo: 502, sigla: "F2", nome: "F2", isElegivel: true, filhas: [], tipo: "OPERACIONAL" }
+                    {codigo: 501, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL"},
+                    {codigo: 502, sigla: "F2", nome: "F2", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}
                 ]
             }
         ];
 
         // INTEROPERACIONAL self selected but no children selected -> should return true
-        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [500] });
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const wrapper = createWrapper({unidades: unidadesTeste, modelValue: [500]});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
         expect(root.props("getEstadoSelecao")(unidadesTeste[0])).toBe(true);
 
         // INTEROPERACIONAL not selected but some children selected -> indeterminate
-        const wrapper2 = createWrapper({ unidades: unidadesTeste, modelValue: [501] });
-        const root2 = wrapper2.findComponent({ name: "UnidadeTreeNode" });
+        const wrapper2 = createWrapper({unidades: unidadesTeste, modelValue: [501]});
+        const root2 = wrapper2.findComponent({name: "UnidadeTreeNode"});
         expect(root2.props("getEstadoSelecao")(unidadesTeste[0])).toBe("indeterminate");
     });
 
@@ -382,13 +382,13 @@ describe("ArvoreUnidades.vue", () => {
                 isElegivel: true,
                 tipo: "OPERACIONAL",
                 filhas: [
-                    { codigo: 601, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL" }
+                    {codigo: 601, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}
                 ]
             }
         ];
 
-        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [600, 601] });
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const wrapper = createWrapper({unidades: unidadesTeste, modelValue: [600, 601]});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
         await root.props("onToggle")(unidadesTeste[0].filhas![0], false);
         const emitted = wrapper.emitted("update:modelValue");
@@ -396,23 +396,23 @@ describe("ArvoreUnidades.vue", () => {
     });
 
     it("deve cobrir watcher de modelValue quando não há mudança real", async () => {
-        const wrapper = createWrapper({ modelValue: [10] });
-        await wrapper.setProps({ modelValue: [10] });
+        const wrapper = createWrapper({modelValue: [10]});
+        await wrapper.setProps({modelValue: [10]});
         expect((wrapper.vm as any).unidadesSelecionadasLocal).toEqual([10]);
     });
 
     it("deve lidar com unidades sem propriedade filhas", async () => {
         const unidadesSemFilhas: Unidade[] = [
-            { codigo: 700, sigla: "SOLO", nome: "Solo", isElegivel: true } as any
+            {codigo: 700, sigla: "SOLO", nome: "Solo", isElegivel: true} as any
         ];
-        const wrapper = createWrapper({ unidades: unidadesSemFilhas, modelValue: [700] });
+        const wrapper = createWrapper({unidades: unidadesSemFilhas, modelValue: [700]});
         expect((wrapper.vm as any).isHabilitado(unidadesSemFilhas[0])).toBe(true);
     });
 
     it("getEstadoSelecao deve retornar selfSelected se não houver filhas", () => {
         const wrapper = createWrapper();
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
-        const leaf: Unidade = { codigo: 999, sigla: "L", nome: "L", isElegivel: true, filhas: undefined };
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
+        const leaf: Unidade = {codigo: 999, sigla: "L", nome: "L", isElegivel: true, filhas: undefined};
         expect(root.props("getEstadoSelecao")(leaf)).toBe(false);
     });
 
@@ -424,33 +424,33 @@ describe("ArvoreUnidades.vue", () => {
                 nome: "Pai",
                 isElegivel: true,
                 filhas: [
-                    { codigo: 801, sigla: "F1", nome: "F1", isElegivel: false, filhas: [] }
+                    {codigo: 801, sigla: "F1", nome: "F1", isElegivel: false, filhas: []}
                 ]
             }
         ];
-        const wrapper = createWrapper({ unidades: unidadesTeste, modelValue: [800] });
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const wrapper = createWrapper({unidades: unidadesTeste, modelValue: [800]});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
         expect(root.props("getEstadoSelecao")(unidadesTeste[0])).toBe(true);
     });
 
     it("watch unidades deve lidar com lista vazia", async () => {
         const wrapper = createWrapper();
-        await wrapper.setProps({ unidades: [] });
+        await wrapper.setProps({unidades: []});
     });
 
     it("unidadesExibidas lida com ocultarRaiz true e unidade sem filhas", () => {
-        const units: Unidade[] = [{ codigo: 1, sigla: "R", nome: "R", filhas: undefined }];
-        const wrapper = createWrapper({ unidades: units, ocultarRaiz: true });
+        const units: Unidade[] = [{codigo: 1, sigla: "R", nome: "R", filhas: undefined}];
+        const wrapper = createWrapper({unidades: units, ocultarRaiz: true});
         expect((wrapper.vm as any).unidadesExibidas).toHaveLength(0);
     });
 
     it("isHabilitado deve ser recursivo", () => {
         const units: Unidade[] = [{
             codigo: 1, sigla: "R", nome: "R", isElegivel: false,
-            filhas: [{ codigo: 2, sigla: "F", nome: "F", isElegivel: true, filhas: [] }]
+            filhas: [{codigo: 2, sigla: "F", nome: "F", isElegivel: true, filhas: []}]
         }];
-        const wrapper = createWrapper({ unidades: units, modoSelecao: true });
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const wrapper = createWrapper({unidades: units, modoSelecao: true});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
         expect(root.props("isHabilitado")(units[0])).toBe(true);
     });
 
@@ -458,12 +458,12 @@ describe("ArvoreUnidades.vue", () => {
         const units: Unidade[] = [{
             codigo: 1000, sigla: "INTER", nome: "Inter", isElegivel: true, tipo: "INTEROPERACIONAL",
             filhas: [
-                { codigo: 1001, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL" },
-                { codigo: 1002, sigla: "F2", nome: "F2", isElegivel: true, filhas: [], tipo: "OPERACIONAL" }
+                {codigo: 1001, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL"},
+                {codigo: 1002, sigla: "F2", nome: "F2", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}
             ]
         }];
-        const wrapper = createWrapper({ unidades: units, modelValue: [1000, 1001] });
-        const root = wrapper.findComponent({ name: "UnidadeTreeNode" });
+        const wrapper = createWrapper({unidades: units, modelValue: [1000, 1001]});
+        const root = wrapper.findComponent({name: "UnidadeTreeNode"});
         // Self selected AND some children selected -> true
         expect(root.props("getEstadoSelecao")(units[0])).toBe(true);
     });

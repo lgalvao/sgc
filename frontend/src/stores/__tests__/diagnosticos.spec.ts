@@ -23,7 +23,7 @@ describe("Diagnosticos Store", () => {
 
     it("buscarDiagnostico com sucesso", async () => {
         const store = useDiagnosticosStore();
-        const mockData = { codigo: 1, situacao: 'EM_ANDAMENTO' };
+        const mockData = {codigo: 1, situacao: 'EM_ANDAMENTO'};
         vi.mocked(diagnosticoService.buscarDiagnostico).mockResolvedValue(mockData as any);
 
         await store.buscarDiagnostico(1);
@@ -34,7 +34,7 @@ describe("Diagnosticos Store", () => {
 
     it("buscarDiagnostico com erro limpa diagnostico", async () => {
         const store = useDiagnosticosStore();
-        store.diagnostico = { codigo: 1 } as any;
+        store.diagnostico = {codigo: 1} as any;
         vi.mocked(diagnosticoService.buscarDiagnostico).mockRejectedValue(new Error("Erro"));
 
         try {
@@ -48,7 +48,7 @@ describe("Diagnosticos Store", () => {
 
     it("buscarMinhasAvaliacoes com sucesso", async () => {
         const store = useDiagnosticosStore();
-        const mockData = [{ competenciaCodigo: 1, dominio: 'ALTO' }];
+        const mockData = [{competenciaCodigo: 1, dominio: 'ALTO'}];
         vi.mocked(diagnosticoService.buscarMinhasAvaliacoes).mockResolvedValue(mockData as any);
 
         await store.buscarMinhasAvaliacoes(1, "123");
@@ -59,7 +59,7 @@ describe("Diagnosticos Store", () => {
 
     it("salvarAvaliacao adiciona nova se não existir", async () => {
         const store = useDiagnosticosStore();
-        const novaAvaliacao = { competenciaCodigo: 1, dominio: 'ALTO' };
+        const novaAvaliacao = {competenciaCodigo: 1, dominio: 'ALTO'};
         vi.mocked(diagnosticoService.salvarAvaliacao).mockResolvedValue(novaAvaliacao as any);
 
         await store.salvarAvaliacao(1, 1, 'MUITO', 'ALTO');
@@ -69,8 +69,8 @@ describe("Diagnosticos Store", () => {
 
     it("salvarAvaliacao atualiza se já existir", async () => {
         const store = useDiagnosticosStore();
-        store.avaliacoes = [{ competenciaCodigo: 1, dominio: 'BAIXO' } as any];
-        const novaAvaliacao = { competenciaCodigo: 1, dominio: 'ALTO' };
+        store.avaliacoes = [{competenciaCodigo: 1, dominio: 'BAIXO'} as any];
+        const novaAvaliacao = {competenciaCodigo: 1, dominio: 'ALTO'};
         vi.mocked(diagnosticoService.salvarAvaliacao).mockResolvedValue(novaAvaliacao as any);
 
         await store.salvarAvaliacao(1, 1, 'MUITO', 'ALTO');
@@ -90,7 +90,7 @@ describe("Diagnosticos Store", () => {
 
     it("concluirDiagnostico", async () => {
         const store = useDiagnosticosStore();
-        const mockResult = { codigo: 1, situacao: 'CONCLUIDO' };
+        const mockResult = {codigo: 1, situacao: 'CONCLUIDO'};
         vi.mocked(diagnosticoService.concluirDiagnostico).mockResolvedValue(mockResult as any);
 
         await store.concluirDiagnostico(1, "justificativa");
@@ -100,7 +100,7 @@ describe("Diagnosticos Store", () => {
 
     it("buscarOcupacoes", async () => {
         const store = useDiagnosticosStore();
-        const mockData = [{ competenciaCodigo: 1 }];
+        const mockData = [{competenciaCodigo: 1}];
         vi.mocked(diagnosticoService.buscarOcupacoes).mockResolvedValue(mockData as any);
 
         await store.buscarOcupacoes(1);
@@ -110,7 +110,7 @@ describe("Diagnosticos Store", () => {
 
     it("salvarOcupacao adiciona ou atualiza", async () => {
         const store = useDiagnosticosStore();
-        const novaOcupacao = { competenciaCodigo: 1, situacao: 'OK' };
+        const novaOcupacao = {competenciaCodigo: 1, situacao: 'OK'};
         vi.mocked(diagnosticoService.salvarOcupacao).mockResolvedValue(novaOcupacao as any);
 
         // Adiciona
@@ -118,7 +118,7 @@ describe("Diagnosticos Store", () => {
         expect(store.ocupacoes).toContainEqual(novaOcupacao);
 
         // Atualiza
-        const atualizada = { competenciaCodigo: 1, situacao: 'NOK' };
+        const atualizada = {competenciaCodigo: 1, situacao: 'NOK'};
         vi.mocked(diagnosticoService.salvarOcupacao).mockResolvedValue(atualizada as any);
         await store.salvarOcupacao(1, "tit", 1, "NOK");
 

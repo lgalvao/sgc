@@ -15,16 +15,16 @@ vi.mock('@/services/processoService', () => ({
 }));
 
 // Mock router
-const { mockPush, mockRoute } = vi.hoisted(() => {
+const {mockPush, mockRoute} = vi.hoisted(() => {
     return {
         mockPush: vi.fn(),
-        mockRoute: { query: {} as Record<string, string> }
+        mockRoute: {query: {} as Record<string, string>}
     }
 });
 
 vi.mock('vue-router', () => {
     return {
-        useRouter: () => ({ push: mockPush }),
+        useRouter: () => ({push: mockPush}),
         useRoute: () => mockRoute,
         createRouter: vi.fn(() => ({
             beforeEach: vi.fn(),
@@ -32,7 +32,7 @@ vi.mock('vue-router', () => {
             push: mockPush,
             replace: vi.fn(),
             resolve: vi.fn(),
-            currentRoute: { value: mockRoute },
+            currentRoute: {value: mockRoute},
         })),
         createWebHistory: vi.fn(),
         createMemoryHistory: vi.fn(),
@@ -67,10 +67,13 @@ describe('CadProcesso.vue', () => {
                     ...initialState
                 },
                 {
-                    BContainer: { template: '<div><slot /></div>' },
-                    BAlert: { template: '<div class="alert"><slot /></div>', props: ['modelValue', 'variant'] },
-                    BForm: { template: '<form @submit.prevent><slot /></form>' },
-                    BFormGroup: { template: '<div><slot name="label">{{ label }}</slot><slot /></div>', props: ['label'] },
+                    BContainer: {template: '<div><slot /></div>'},
+                    BAlert: {template: '<div class="alert"><slot /></div>', props: ['modelValue', 'variant']},
+                    BForm: {template: '<form @submit.prevent><slot /></form>'},
+                    BFormGroup: {
+                        template: '<div><slot name="label">{{ label }}</slot><slot /></div>',
+                        props: ['label']
+                    },
                     BFormInput: {
                         template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
                         props: ['modelValue']
@@ -84,14 +87,14 @@ describe('CadProcesso.vue', () => {
                         template: '<option :value="value" :disabled="disabled"><slot /></option>',
                         props: ['value', 'disabled']
                     },
-                    BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
+                    BButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
                     BModal: {
                         template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
                         props: ['modelValue']
                     },
-                    BSpinner: { template: '<span>Loading...</span>' },
+                    BSpinner: {template: '<span>Loading...</span>'},
                     ArvoreUnidades: ArvoreUnidadesStub,
-                    BFormInvalidFeedback: { template: '<div><slot /></div>' }
+                    BFormInvalidFeedback: {template: '<div><slot /></div>'}
                 }
             )
         });
@@ -99,7 +102,7 @@ describe('CadProcesso.vue', () => {
         processosStore = useProcessosStore();
         unidadesStore = useUnidadesStore();
 
-        return { wrapper: context.wrapper, processosStore, unidadesStore };
+        return {wrapper: context.wrapper, processosStore, unidadesStore};
     };
 
     beforeEach(async () => {
@@ -113,11 +116,12 @@ describe('CadProcesso.vue', () => {
         window.scrollTo = vi.fn();
 
         // Suppress console.error
-        vi.spyOn(console, 'error').mockImplementation(() => {});
+        vi.spyOn(console, 'error').mockImplementation(() => {
+        });
     });
 
     it('renders correctly in creation mode', async () => {
-        const { wrapper } = createWrapper();
+        const {wrapper} = createWrapper();
         expect(wrapper.find('h2').text()).toBe('Cadastro de processo');
         expect(unidadesStore.buscarUnidadesParaProcesso).not.toHaveBeenCalled();
         expect(wrapper.find('[data-testid="btn-processo-salvar"]').exists()).toBe(true);
@@ -125,7 +129,7 @@ describe('CadProcesso.vue', () => {
     });
 
     it('disables action buttons when form is incomplete and enables when complete', async () => {
-        const { wrapper } = createWrapper();
+        const {wrapper} = createWrapper();
         const salvarBtn = wrapper.find('[data-testid="btn-processo-salvar"]');
         const iniciarBtn = wrapper.find('[data-testid="btn-processo-iniciar"]');
 
@@ -162,16 +166,16 @@ describe('CadProcesso.vue', () => {
     });
 
     it('loads process data for editing', async () => {
-        mockRoute.query = { codProcesso: '123' };
-        const { processosStore } = createWrapper();
+        mockRoute.query = {codProcesso: '123'};
+        const {processosStore} = createWrapper();
         expect(processosStore.buscarProcessoDetalhe).toHaveBeenCalledWith(123);
     });
 
     it('redirects if process is not editable', async () => {
-        mockRoute.query = { codProcesso: '123' };
-        const { processosStore } = createWrapper({
+        mockRoute.query = {codProcesso: '123'};
+        const {processosStore} = createWrapper({
             processos: {
-                processoDetalhe: { codigo: 123, situacao: 'EM_ANDAMENTO', unidades: [] },
+                processoDetalhe: {codigo: 123, situacao: 'EM_ANDAMENTO', unidades: []},
                 lastError: null
             }
         });
@@ -181,7 +185,7 @@ describe('CadProcesso.vue', () => {
     });
 
     it('creates a new process', async () => {
-        const { wrapper, processosStore } = createWrapper();
+        const {wrapper, processosStore} = createWrapper();
 
         const descricaoInput = wrapper.find('[data-testid="inp-processo-descricao"]');
         await descricaoInput.setValue('Novo Processo');
@@ -210,10 +214,10 @@ describe('CadProcesso.vue', () => {
     });
 
     it('handles creation error', async () => {
-        const { wrapper, processosStore } = createWrapper();
+        const {wrapper, processosStore} = createWrapper();
 
         processosStore.criarProcesso.mockRejectedValue(new Error('Erro API'));
-        processosStore.lastError = { message: 'Erro validacao', subErrors: [] };
+        processosStore.lastError = {message: 'Erro validacao', subErrors: []};
 
         wrapper.vm.descricao = 'Teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
@@ -229,9 +233,9 @@ describe('CadProcesso.vue', () => {
     });
 
     it('updates an existing process', async () => {
-        const { wrapper, processosStore } = createWrapper();
+        const {wrapper, processosStore} = createWrapper();
 
-        wrapper.vm.processoEditando = { codigo: 123 };
+        wrapper.vm.processoEditando = {codigo: 123};
         wrapper.vm.descricao = 'Editado';
         wrapper.vm.tipo = 'MAPEAMENTO';
         wrapper.vm.dataLimite = '2023-12-31';
@@ -252,7 +256,7 @@ describe('CadProcesso.vue', () => {
     });
 
     it('initiates a process (confirmation flow)', async () => {
-        const { wrapper, processosStore } = createWrapper();
+        const {wrapper, processosStore} = createWrapper();
 
         wrapper.vm.descricao = 'Iniciar Teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
@@ -263,7 +267,7 @@ describe('CadProcesso.vue', () => {
         await wrapper.find('[data-testid="btn-processo-iniciar"]').trigger('click');
         expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
 
-        processosStore.criarProcesso.mockResolvedValue({ codigo: 999 });
+        processosStore.criarProcesso.mockResolvedValue({codigo: 999});
 
         await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
 
@@ -274,9 +278,9 @@ describe('CadProcesso.vue', () => {
     });
 
     it('initiates an existing process', async () => {
-        const { wrapper, processosStore } = createWrapper();
+        const {wrapper, processosStore} = createWrapper();
 
-        wrapper.vm.processoEditando = { codigo: 123 };
+        wrapper.vm.processoEditando = {codigo: 123};
         wrapper.vm.descricao = 'Existente';
         wrapper.vm.tipo = 'MAPEAMENTO';
         wrapper.vm.dataLimite = '2023-12-31';
@@ -294,10 +298,10 @@ describe('CadProcesso.vue', () => {
     });
 
     it('removes a process', async () => {
-        const { wrapper, processosStore } = createWrapper();
+        const {wrapper, processosStore} = createWrapper();
         processosStore.removerProcesso.mockResolvedValue(undefined);
 
-        wrapper.vm.processoEditando = { codigo: 123 };
+        wrapper.vm.processoEditando = {codigo: 123};
         wrapper.vm.mostrarModalRemocao = true;
 
         await wrapper.vm.confirmarRemocao();
@@ -308,14 +312,14 @@ describe('CadProcesso.vue', () => {
     });
 
     it('updates unit list when type changes', async () => {
-        const { wrapper, unidadesStore } = createWrapper();
+        const {wrapper, unidadesStore} = createWrapper();
         wrapper.vm.tipo = 'REVISAO';
         await nextTick();
         expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('REVISAO', undefined);
     });
 
     it('handles error when starting a new process (creation fail)', async () => {
-        const { wrapper, processosStore } = createWrapper();
+        const {wrapper, processosStore} = createWrapper();
 
         wrapper.vm.processoEditando = null;
         wrapper.vm.descricao = 'Novo Processo Fail';
@@ -326,7 +330,7 @@ describe('CadProcesso.vue', () => {
         await nextTick();
 
         processosStore.criarProcesso.mockRejectedValue(new Error('Erro Criacao'));
-        processosStore.lastError = { message: 'Erro ao criar', subErrors: [] };
+        processosStore.lastError = {message: 'Erro ao criar', subErrors: []};
 
         await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
         await flushPromises();
@@ -336,14 +340,14 @@ describe('CadProcesso.vue', () => {
     });
 
     it('handles error when starting a process (initiation fail)', async () => {
-        const { wrapper, processosStore } = createWrapper();
+        const {wrapper, processosStore} = createWrapper();
 
-        wrapper.vm.processoEditando = { codigo: 123 };
+        wrapper.vm.processoEditando = {codigo: 123};
         wrapper.vm.mostrarModalConfirmacao = true;
         await nextTick();
 
         processosStore.iniciarProcesso.mockRejectedValue(new Error('Erro Inicio'));
-        processosStore.lastError = { message: 'Erro ao iniciar', subErrors: [] };
+        processosStore.lastError = {message: 'Erro ao iniciar', subErrors: []};
 
         await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
         await flushPromises();
@@ -353,21 +357,21 @@ describe('CadProcesso.vue', () => {
     });
 
     it('handles error when removing a process', async () => {
-         const { wrapper, processosStore } = createWrapper();
-         processosStore.removerProcesso.mockRejectedValue(new Error('Erro Remocao'));
+        const {wrapper, processosStore} = createWrapper();
+        processosStore.removerProcesso.mockRejectedValue(new Error('Erro Remocao'));
 
-         wrapper.vm.processoEditando = { codigo: 123 };
-         wrapper.vm.mostrarModalRemocao = true;
+        wrapper.vm.processoEditando = {codigo: 123};
+        wrapper.vm.mostrarModalRemocao = true;
 
-         await wrapper.vm.confirmarRemocao();
-         await flushPromises();
+        await wrapper.vm.confirmarRemocao();
+        await flushPromises();
 
-         expect(wrapper.vm.alertState.show).toBe(true);
-         expect(wrapper.vm.alertState.title).toContain('Erro ao remover processo');
+        expect(wrapper.vm.alertState.show).toBe(true);
+        expect(wrapper.vm.alertState.title).toContain('Erro ao remover processo');
     });
 
     it('closes confirmation modal when cancel button is clicked', async () => {
-        const { wrapper } = createWrapper();
+        const {wrapper} = createWrapper();
 
         wrapper.vm.descricao = 'Teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
@@ -383,18 +387,18 @@ describe('CadProcesso.vue', () => {
     });
 
     it('maps field-specific validation errors from subErrors', async () => {
-        const { wrapper, processosStore } = createWrapper();
+        const {wrapper, processosStore} = createWrapper();
         processosStore.lastError = null;
 
         processosStore.criarProcesso.mockImplementation(async () => {
-             processosStore.lastError = {
+            processosStore.lastError = {
                 message: 'Erro de validação',
                 subErrors: [
-                    { field: 'descricao', message: 'Descrição é obrigatória' },
-                    { field: 'tipo', message: 'Tipo inválido' },
-                    { field: 'dataLimiteEtapa1', message: 'Data inválida' },
-                    { field: 'unidades', message: 'Selecione ao menos uma unidade' },
-                    { field: null, message: 'Erro genérico' }
+                    {field: 'descricao', message: 'Descrição é obrigatória'},
+                    {field: 'tipo', message: 'Tipo inválido'},
+                    {field: 'dataLimiteEtapa1', message: 'Data inválida'},
+                    {field: 'unidades', message: 'Selecione ao menos uma unidade'},
+                    {field: null, message: 'Erro genérico'}
                 ]
             };
             throw new Error('Validation Error');
@@ -418,7 +422,7 @@ describe('CadProcesso.vue', () => {
     });
 
     it('handles error without lastError (network/runtime error)', async () => {
-        const { wrapper, processosStore } = createWrapper();
+        const {wrapper, processosStore} = createWrapper();
 
         processosStore.criarProcesso.mockRejectedValue(new Error('Network Error'));
         processosStore.lastError = null;
@@ -437,7 +441,7 @@ describe('CadProcesso.vue', () => {
     });
 
     it('does nothing when confirmarRemocao is called without processoEditando', async () => {
-        const { wrapper } = createWrapper();
+        const {wrapper} = createWrapper();
         vi.spyOn(processoService, 'excluirProcesso');
 
         wrapper.vm.processoEditando = null;
@@ -452,7 +456,7 @@ describe('CadProcesso.vue', () => {
     });
 
     it('clears field errors when fields are updated', async () => {
-        const { wrapper } = createWrapper();
+        const {wrapper} = createWrapper();
 
         wrapper.vm.fieldErrors.descricao = 'Erro';
         wrapper.vm.fieldErrors.tipo = 'Erro';
@@ -480,7 +484,7 @@ describe('CadProcesso.vue', () => {
     // --- New tests to improve coverage ---
 
     it('shows loading spinner when units are loading', async () => {
-        const { wrapper } = createWrapper({
+        const {wrapper} = createWrapper({
             unidades: {
                 isLoading: true,
                 unidades: []
@@ -490,7 +494,7 @@ describe('CadProcesso.vue', () => {
     });
 
     it('shows alert with multiple errors', async () => {
-        const { wrapper } = createWrapper();
+        const {wrapper} = createWrapper();
         // Trigger alert manually or via error handling
         (wrapper.vm as any).mostrarAlerta('danger', 'Titulo', 'Corpo', ['Erro 1', 'Erro 2']);
         await nextTick();
@@ -501,7 +505,7 @@ describe('CadProcesso.vue', () => {
     });
 
     it('shows saving spinner on button', async () => {
-        const { wrapper, processosStore } = createWrapper();
+        const {wrapper, processosStore} = createWrapper();
         // Mock slow promise
         processosStore.criarProcesso.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
 
@@ -520,26 +524,26 @@ describe('CadProcesso.vue', () => {
     });
 
     it('handles error when loading process details on mount', async () => {
-        mockRoute.query = { codProcesso: '123' };
+        mockRoute.query = {codProcesso: '123'};
 
-        const pinia = createTestingPinia({ stubActions: true });
+        const pinia = createTestingPinia({stubActions: true});
         const store = useProcessosStore(pinia);
         (store.buscarProcessoDetalhe as any).mockRejectedValue(new Error('Load Error'));
 
         const wrapper = mount(CadProcesso, {
             ...getCommonMountOptions({}, {
-                BContainer: { template: '<div><slot /></div>' },
-                BAlert: { template: '<div class="alert"><slot /></div>', props: ['modelValue', 'variant'] },
-                BForm: { template: '<form @submit.prevent><slot /></form>' },
-                BFormGroup: { template: '<div><slot name="label">{{ label }}</slot><slot /></div>', props: ['label'] },
-                BFormInput: { template: '<input />', props: ['modelValue'] },
-                BFormSelect: { template: '<select></select>', props: ['modelValue'] },
-                BButton: { template: '<button></button>' },
-                BModal: { template: '<div><slot /></div>' },
-                BSpinner: { template: '<span></span>' },
-                ArvoreUnidades: { template: '<div></div>', props: ['unidades', 'modelValue'] },
-                BFormInvalidFeedback: { template: '<div></div>' },
-                LoadingButton: { template: '<button><slot /></button>' }
+                BContainer: {template: '<div><slot /></div>'},
+                BAlert: {template: '<div class="alert"><slot /></div>', props: ['modelValue', 'variant']},
+                BForm: {template: '<form @submit.prevent><slot /></form>'},
+                BFormGroup: {template: '<div><slot name="label">{{ label }}</slot><slot /></div>', props: ['label']},
+                BFormInput: {template: '<input />', props: ['modelValue']},
+                BFormSelect: {template: '<select></select>', props: ['modelValue']},
+                BButton: {template: '<button></button>'},
+                BModal: {template: '<div><slot /></div>'},
+                BSpinner: {template: '<span></span>'},
+                ArvoreUnidades: {template: '<div></div>', props: ['unidades', 'modelValue']},
+                BFormInvalidFeedback: {template: '<div></div>'},
+                LoadingButton: {template: '<button><slot /></button>'}
             }),
             global: {
                 plugins: [pinia]
@@ -553,18 +557,18 @@ describe('CadProcesso.vue', () => {
     });
 
     it('focuses on the first invalid field when validation errors occur', async () => {
-        const { wrapper, processosStore } = createWrapper();
+        const {wrapper, processosStore} = createWrapper();
 
         // Mock document.querySelector to return a mock element with focus method
         const focusMock = vi.fn();
-        const mockElement = { focus: focusMock } as unknown as HTMLElement;
+        const mockElement = {focus: focusMock} as unknown as HTMLElement;
         const querySelectorSpy = vi.spyOn(document, 'querySelector').mockReturnValue(mockElement);
 
         processosStore.criarProcesso.mockImplementation(async () => {
             processosStore.lastError = {
                 message: 'Erro de validação',
                 subErrors: [
-                    { field: 'descricao', message: 'Descrição é obrigatória' }
+                    {field: 'descricao', message: 'Descrição é obrigatória'}
                 ]
             };
             throw new Error('Validation Error');

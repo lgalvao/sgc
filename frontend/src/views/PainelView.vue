@@ -27,7 +27,7 @@
     </div>
 
     <div>
-      <PageHeader title="Alertas" title-test-id="txt-painel-titulo-alertas" />
+      <PageHeader title="Alertas" title-test-id="txt-painel-titulo-alertas"/>
       <TabelaAlertas
           :alertas="alertas"
           @ordenar="ordenarAlertasPor"

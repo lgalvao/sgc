@@ -1,6 +1,5 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import {mapUnidadesArray} from "@/services/unidadeService";
 import {
     buscarArvoreComElegibilidade,
     buscarArvoreUnidade as serviceBuscarArvoreUnidade,
@@ -9,6 +8,7 @@ import {
     buscarTodasUnidades as serviceBuscarTodasUnidades,
     buscarUnidadePorCodigo as serviceBuscarUnidadePorCodigo,
     buscarUnidadePorSigla,
+    mapUnidadesArray
 } from "@/services/unidadeService";
 import type {Unidade} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
@@ -19,7 +19,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
     const unidade = ref<Unidade | null>(null);
     const loading = useSingleLoading();
     const error = ref<string | null>(null);
-    const { lastError, clearError: clearNormalizedError, withErrorHandling } = useErrorHandler();
+    const {lastError, clearError: clearNormalizedError, withErrorHandling} = useErrorHandler();
 
     function clearError() {
         clearNormalizedError();

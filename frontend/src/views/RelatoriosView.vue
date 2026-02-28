@@ -1,16 +1,16 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Relatórios" />
+    <PageHeader title="Relatórios"/>
 
     <RelatorioFiltrosSection
-        v-model:tipo="filtroTipo"
-        v-model:data-inicio="filtroDataInicio"
         v-model:data-fim="filtroDataFim"
+        v-model:data-inicio="filtroDataInicio"
+        v-model:tipo="filtroTipo"
     />
 
     <RelatorioCardsSection
-        :mapas-vigentes-count="mapasVigentes.length"
         :diagnosticos-gaps-count="diagnosticosGapsFiltrados.length"
+        :mapas-vigentes-count="mapasVigentes.length"
         :processos-filtrados-count="processosFiltrados.length"
         @abrir-mapas-vigentes="abrirModalMapasVigentes"
         @abrir-diagnosticos-gaps="abrirModalDiagnosticosGaps"
@@ -65,10 +65,50 @@ const mostrarModalDiagnosticosGaps = ref(false);
 const mostrarModalAndamentoGeral = ref(false);
 
 const diagnosticosGaps = ref([
-  { codigo: 1, processo: "Processo A", unidade: "Unidade 1", gaps: 5, importanciaMedia: 4.5, dominioMedio: 2.1, competenciasCriticas: ["Java", "SQL"], data: new Date("2024-08-15"), status: "Finalizado" },
-  { codigo: 2, processo: "Processo B", unidade: "Unidade 2", gaps: 3, importanciaMedia: 4, dominioMedio: 3.5, competenciasCriticas: ["Vue"], data: new Date("2024-08-20"), status: "Em análise" },
-  { codigo: 3, processo: "Processo C", unidade: "Unidade 3", gaps: 8, importanciaMedia: 4.8, dominioMedio: 1.5, competenciasCriticas: ["Spring"], data: new Date("2024-09-05"), status: "Pendente" },
-  { codigo: 4, processo: "Processo D", unidade: "Unidade 4", gaps: 0, importanciaMedia: 3, dominioMedio: 4.5, competenciasCriticas: [], data: new Date("2024-09-10"), status: "Finalizado" },
+  {
+    codigo: 1,
+    processo: "Processo A",
+    unidade: "Unidade 1",
+    gaps: 5,
+    importanciaMedia: 4.5,
+    dominioMedio: 2.1,
+    competenciasCriticas: ["Java", "SQL"],
+    data: new Date("2024-08-15"),
+    status: "Finalizado"
+  },
+  {
+    codigo: 2,
+    processo: "Processo B",
+    unidade: "Unidade 2",
+    gaps: 3,
+    importanciaMedia: 4,
+    dominioMedio: 3.5,
+    competenciasCriticas: ["Vue"],
+    data: new Date("2024-08-20"),
+    status: "Em análise"
+  },
+  {
+    codigo: 3,
+    processo: "Processo C",
+    unidade: "Unidade 3",
+    gaps: 8,
+    importanciaMedia: 4.8,
+    dominioMedio: 1.5,
+    competenciasCriticas: ["Spring"],
+    data: new Date("2024-09-05"),
+    status: "Pendente"
+  },
+  {
+    codigo: 4,
+    processo: "Processo D",
+    unidade: "Unidade 4",
+    gaps: 0,
+    importanciaMedia: 3,
+    dominioMedio: 4.5,
+    competenciasCriticas: [],
+    data: new Date("2024-09-10"),
+    status: "Finalizado"
+  },
 ]);
 
 const processosFiltrados = computed(() => {
@@ -83,7 +123,7 @@ const processosFiltrados = computed(() => {
       const date = parseISO(p.dataCriacao);
       const start = filtroDataInicio.value ? startOfDay(parseISO(filtroDataInicio.value)) : new Date(0);
       const end = filtroDataFim.value ? endOfDay(parseISO(filtroDataFim.value)) : new Date(8640000000000000);
-      return isWithinInterval(date, { start, end });
+      return isWithinInterval(date, {start, end});
     });
   }
 
@@ -93,11 +133,11 @@ const processosFiltrados = computed(() => {
 const mapasVigentes = computed(() => {
   const mapa = mapasStore.mapaCompleto as any;
   if (mapa?.unidade) {
-      return [{
-          codigo: mapa.codigo || 1,
-          unidade: mapa.unidade.sigla,
-          competencias: mapa.competencias || []
-      }];
+    return [{
+      codigo: mapa.codigo || 1,
+      unidade: mapa.unidade.sigla,
+      competencias: mapa.competencias || []
+    }];
   }
   return [];
 });
@@ -106,37 +146,43 @@ const diagnosticosGapsFiltrados = computed(() => {
   let list = diagnosticosGaps.value;
 
   if (filtroTipo.value) {
-      if (filtroTipo.value !== TipoProcesso.DIAGNOSTICO) {
-          return [];
-      }
+    if (filtroTipo.value !== TipoProcesso.DIAGNOSTICO) {
+      return [];
+    }
   }
 
   if (filtroDataInicio.value || filtroDataFim.value) {
-      list = list.filter(d => {
-          const date = d.data;
-          const start = filtroDataInicio.value ? startOfDay(parseISO(filtroDataInicio.value)) : new Date(0);
-          const end = filtroDataFim.value ? endOfDay(parseISO(filtroDataFim.value)) : new Date(8640000000000000);
-          return isWithinInterval(date, { start, end });
-      });
+    list = list.filter(d => {
+      const date = d.data;
+      const start = filtroDataInicio.value ? startOfDay(parseISO(filtroDataInicio.value)) : new Date(0);
+      const end = filtroDataFim.value ? endOfDay(parseISO(filtroDataFim.value)) : new Date(8640000000000000);
+      return isWithinInterval(date, {start, end});
+    });
   }
 
   return list;
 });
 
-const abrirModalMapasVigentes = () => { mostrarModalMapasVigentes.value = true; };
-const abrirModalDiagnosticosGaps = () => { mostrarModalDiagnosticosGaps.value = true; };
-const abrirModalAndamentoGeral = () => { mostrarModalAndamentoGeral.value = true; };
+const abrirModalMapasVigentes = () => {
+  mostrarModalMapasVigentes.value = true;
+};
+const abrirModalDiagnosticosGaps = () => {
+  mostrarModalDiagnosticosGaps.value = true;
+};
+const abrirModalAndamentoGeral = () => {
+  mostrarModalAndamentoGeral.value = true;
+};
 
 onMounted(async () => {
   if (!processosStore.processosPainel || processosStore.processosPainel.length === 0) {
-      if (perfilStore.perfilSelecionado && perfilStore.unidadeSelecionada) {
-          await processosStore.buscarProcessosPainel(
-              perfilStore.perfilSelecionado,
-              perfilStore.unidadeSelecionada,
-              0,
-              100
-          );
-      }
+    if (perfilStore.perfilSelecionado && perfilStore.unidadeSelecionada) {
+      await processosStore.buscarProcessosPainel(
+          perfilStore.perfilSelecionado,
+          perfilStore.unidadeSelecionada,
+          0,
+          100
+      );
+    }
   }
 });
 </script>

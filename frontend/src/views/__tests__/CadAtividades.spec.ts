@@ -15,7 +15,7 @@ import * as useAcessoModule from '@/composables/useAcesso';
 // Mocks
 const mocks = vi.hoisted(() => ({
     push: vi.fn(),
-    mockRoute: { query: {} as Record<string, string> }
+    mockRoute: {query: {} as Record<string, string>}
 }));
 
 vi.mock("vue-router", async (importOriginal) => {
@@ -25,7 +25,7 @@ vi.mock("vue-router", async (importOriginal) => {
         useRouter: () => ({
             push: mocks.push,
             back: vi.fn(),
-            currentRoute: { value: mocks.mockRoute }
+            currentRoute: {value: mocks.mockRoute}
         }),
         useRoute: () => mocks.mockRoute,
     };
@@ -78,10 +78,10 @@ const BFormInputStub = {
     template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
     props: ['modelValue'],
     emits: ['update:modelValue'],
-    setup(_props: any, { expose }: any) {
+    setup(_props: any, {expose}: any) {
         const focus = vi.fn();
-        expose({ focus, $el: { focus } });
-        return { focus };
+        expose({focus, $el: {focus}});
+        return {focus};
     }
 };
 
@@ -115,11 +115,11 @@ describe("CadAtividades.vue", () => {
                     processoDetalhe: {
                         codigo: 1,
                         tipo: isRevisao ? TipoProcesso.REVISAO : TipoProcesso.MAPEAMENTO,
-                        unidades: [{ codUnidade: 1, sigla: "TESTE", codSubprocesso: 123 }]
+                        unidades: [{codUnidade: 1, sigla: "TESTE", codSubprocesso: 123}]
                     }
                 },
                 mapas: {
-                    mapaCompleto: { codigo: 456, competencias: [] },
+                    mapaCompleto: {codigo: 456, competencias: []},
                     impactoMapa: null
                 },
                 subprocessos: {
@@ -135,7 +135,7 @@ describe("CadAtividades.vue", () => {
                     atividadesPorSubprocesso: new Map([[123, atividades]])
                 },
                 unidades: {
-                    unidade: { codigo: 1, sigla: "TESTE", nome: "Teste" }
+                    unidade: {codigo: 1, sigla: "TESTE", nome: "Teste"}
                 }
             },
             stubActions: true
@@ -149,11 +149,11 @@ describe("CadAtividades.vue", () => {
         subprocessosStore.disponibilizarRevisaoCadastro.mockResolvedValue(true);
         // Mock validarCadastro to call through to service mock
         subprocessosStore.validarCadastro.mockImplementation((cod: number) => subprocessoService.validarCadastro(cod));
-        
+
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeVisualizarImpacto: { value: true },
-            podeEditarCadastro: { value: true },
-            podeDisponibilizarCadastro: { value: true }
+            podeVisualizarImpacto: {value: true},
+            podeEditarCadastro: {value: true},
+            podeDisponibilizarCadastro: {value: true}
         } as any);
 
         atividadesStore = useAtividadesStore(pinia) as any;
@@ -187,10 +187,10 @@ describe("CadAtividades.vue", () => {
                     HistoricoAnaliseModal: HistoricoAnaliseModalStub,
                     AtividadeItem: AtividadeItemStub,
                     ImportarAtividadesModal: {
-                         name: 'ImportarAtividadesModal',
-                         template: '<div v-if="mostrar"></div>',
-                         props: ['mostrar'],
-                         emits: ['importar', 'fechar']
+                        name: 'ImportarAtividadesModal',
+                        template: '<div v-if="mostrar"></div>',
+                        props: ['mostrar'],
+                        emits: ['importar', 'fechar']
                     },
                     ImpactoMapaModal: true,
                     ModalConfirmacao: {
@@ -199,15 +199,18 @@ describe("CadAtividades.vue", () => {
                         props: ['modelValue'],
                         emits: ['confirmar', 'update:modelValue']
                     },
-                    BContainer: { template: '<div><slot /></div>' },
-                    BButton: { template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>', props: ['disabled'] },
-                    BForm: { template: '<form @submit="$emit(\'submit\', $event)"><slot /></form>' },
+                    BContainer: {template: '<div><slot /></div>'},
+                    BButton: {
+                        template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+                        props: ['disabled']
+                    },
+                    BForm: {template: '<form @submit="$emit(\'submit\', $event)"><slot /></form>'},
                     BFormInput: BFormInputStub, // Use our smart stub
-                    BCol: { template: '<div><slot /></div>' },
-                    BDropdown: { template: '<div><slot /></div>' },
-                    BDropdownItem: { template: '<div><slot /></div>' },
-                    BAlert: { template: '<div><slot /></div>' },
-                    EmptyState: { template: '<div><slot /></div>' }
+                    BCol: {template: '<div><slot /></div>'},
+                    BDropdown: {template: '<div><slot /></div>'},
+                    BDropdownItem: {template: '<div><slot /></div>'},
+                    BAlert: {template: '<div><slot /></div>'},
+                    EmptyState: {template: '<div><slot /></div>'}
                 },
             },
             props: {
@@ -216,7 +219,7 @@ describe("CadAtividades.vue", () => {
             },
         });
 
-        return { wrapper, subprocessosStore, atividadesStore, feedbackStore };
+        return {wrapper, subprocessosStore, atividadesStore, feedbackStore};
     };
 
     beforeEach(() => {
@@ -224,7 +227,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve renderizar a lista de atividades", async () => {
-        const { wrapper } = createWrapper();
+        const {wrapper} = createWrapper();
         await flushPromises();
 
         expect(wrapper.findAllComponents(AtividadeItemStub)).toHaveLength(1);
@@ -232,7 +235,7 @@ describe("CadAtividades.vue", () => {
 
     // Test case removed/simplified because asserting focus on stubs in VTU/JSDOM is flaky without specific setup
     it("deve adicionar nova atividade", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
 
         const input = wrapper.find('input');
@@ -251,7 +254,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("não deve adicionar atividade vazia", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
 
         const input = wrapper.find('input');
@@ -263,14 +266,14 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve remover atividade após confirmação", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
         await item.vm.$emit('remover-atividade');
         await flushPromises();
 
-        const modal = wrapper.findComponent({ name: 'ModalConfirmacao' });
+        const modal = wrapper.findComponent({name: 'ModalConfirmacao'});
         await modal.vm.$emit('confirmar');
         await flushPromises();
 
@@ -278,14 +281,14 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve remover um conhecimento", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
         await item.vm.$emit('remover-conhecimento', 101);
         await flushPromises();
 
-        const modal = wrapper.findComponent({ name: 'ModalConfirmacao' });
+        const modal = wrapper.findComponent({name: 'ModalConfirmacao'});
         await modal.vm.$emit('confirmar');
         await flushPromises();
 
@@ -293,7 +296,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve adicionar conhecimento", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
@@ -308,7 +311,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("não deve adicionar conhecimento vazio", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
@@ -319,9 +322,9 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve disponibilizar o cadastro", async () => {
-        vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({ valido: true, erros: [] });
+        vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({valido: true, erros: []});
 
-        const { wrapper, subprocessosStore } = createWrapper();
+        const {wrapper, subprocessosStore} = createWrapper();
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
@@ -338,9 +341,9 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve disponibilizar revisao de cadastro", async () => {
-        vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({ valido: true, erros: [] });
+        vi.mocked(subprocessoService.validarCadastro).mockResolvedValue({valido: true, erros: []});
 
-        const { wrapper, subprocessosStore } = createWrapper(true); // isRevisao=true
+        const {wrapper, subprocessosStore} = createWrapper(true); // isRevisao=true
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
@@ -354,7 +357,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("não deve permitir disponibilizar se status incorreto", async () => {
-        const { wrapper, subprocessosStore } = createWrapper();
+        const {wrapper, subprocessosStore} = createWrapper();
         await flushPromises();
 
         // Change state
@@ -368,7 +371,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve permitir edição inline de atividade", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
@@ -383,7 +386,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("não deve salvar edição de atividade vazia", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
@@ -394,7 +397,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve permitir edição inline de conhecimento", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
@@ -410,7 +413,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("não deve salvar edição de conhecimento vazio", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
 
         const item = wrapper.findComponent(AtividadeItemStub);
@@ -428,7 +431,7 @@ describe("CadAtividades.vue", () => {
             ]
         });
 
-        const { wrapper } = createWrapper();
+        const {wrapper} = createWrapper();
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
@@ -446,7 +449,7 @@ describe("CadAtividades.vue", () => {
             ]
         });
 
-        const { wrapper } = createWrapper();
+        const {wrapper} = createWrapper();
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
@@ -456,7 +459,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve exibir e fechar modal de impacto", async () => {
-        const { wrapper } = createWrapper();
+        const {wrapper} = createWrapper();
         await flushPromises();
 
         // Dropdown actions
@@ -471,7 +474,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve exibir e fechar modal de historico", async () => {
-        const { wrapper } = createWrapper(); // isChefe=true in setup
+        const {wrapper} = createWrapper(); // isChefe=true in setup
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-mais-acoes"]').trigger("click");
@@ -482,7 +485,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve processar importação de atividades", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
 
         // Open modal
@@ -490,7 +493,7 @@ describe("CadAtividades.vue", () => {
         await wrapper.find('[data-testid="btn-cad-atividades-importar"]').trigger("click");
         expect((wrapper.vm as any).mostrarModalImportar).toBe(true);
 
-        const modal = wrapper.findComponent({ name: "ImportarAtividadesModal" });
+        const modal = wrapper.findComponent({name: "ImportarAtividadesModal"});
         await modal.vm.$emit("importar");
         await flushPromises();
 
@@ -502,7 +505,7 @@ describe("CadAtividades.vue", () => {
         const scrollIntoViewMock = vi.fn();
         Element.prototype.scrollIntoView = scrollIntoViewMock;
 
-        const { wrapper } = createWrapper();
+        const {wrapper} = createWrapper();
         await flushPromises();
 
         // Force errors
@@ -519,7 +522,7 @@ describe("CadAtividades.vue", () => {
     });
 
     it("deve tratar erro ao remover atividade", async () => {
-        const { wrapper, atividadesStore, feedbackStore } = createWrapper();
+        const {wrapper, atividadesStore, feedbackStore} = createWrapper();
 
         atividadesStore.removerAtividade.mockRejectedValue(new Error("Erro ao remover"));
 
@@ -529,7 +532,7 @@ describe("CadAtividades.vue", () => {
         await item.vm.$emit('remover-atividade');
         await flushPromises();
 
-        const modal = wrapper.findComponent({ name: 'ModalConfirmacao' });
+        const modal = wrapper.findComponent({name: 'ModalConfirmacao'});
         await modal.vm.$emit('confirmar');
         await flushPromises();
 
@@ -537,39 +540,39 @@ describe("CadAtividades.vue", () => {
     });
 
     it("não deve remover atividade se codSubprocesso nulo", async () => {
-        const { wrapper } = createWrapper();
+        const {wrapper} = createWrapper();
         await flushPromises();
         (wrapper.vm as any).codSubprocesso = null;
-        
+
         const item = wrapper.findComponent(AtividadeItemStub);
         await item.vm.$emit('remover-atividade');
         expect((wrapper.vm as any).mostrarModalConfirmacaoRemocao).toBe(false);
     });
 
     it("não deve salvar edição de atividade se codSubprocesso nulo", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
         (wrapper.vm as any).codSubprocesso = null;
-        
+
         await (wrapper.vm as any).salvarEdicaoAtividade(1, "Desc");
         expect(atividadesStore.atualizarAtividade).not.toHaveBeenCalled();
     });
 
     it("não deve adicionar conhecimento se codSubprocesso nulo", async () => {
-        const { wrapper, atividadesStore } = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
         (wrapper.vm as any).codSubprocesso = null;
-        
+
         const item = wrapper.findComponent(AtividadeItemStub);
         await item.vm.$emit('adicionar-conhecimento', 'Novo');
         expect(atividadesStore.adicionarConhecimento).not.toHaveBeenCalled();
     });
 
     it("não deve disponibilizar se codSubprocesso nulo", async () => {
-        const { wrapper } = createWrapper();
+        const {wrapper} = createWrapper();
         await flushPromises();
         (wrapper.vm as any).codSubprocesso = null;
-        
+
         await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
         expect((wrapper.vm as any).mostrarModalConfirmacao).toBe(false);
     });

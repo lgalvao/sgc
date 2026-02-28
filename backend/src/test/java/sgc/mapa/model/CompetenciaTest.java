@@ -15,7 +15,7 @@ class CompetenciaTest {
                 .descricao("desc")
                 .mapa(mapa)
                 .build();
-        
+
         c.setCodigo(1L);
         assertThat(c.getCodigo()).isEqualTo(1L);
         assertThat(c.getDescricao()).isEqualTo("desc");

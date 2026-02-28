@@ -2,9 +2,9 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 
 /**
  * CDU-30 - Manter Administradores
- * 
+ *
  * Ator: ADMIN
- * 
+ *
  * Pré-condições:
  * - Usuário logado como ADMIN
  */

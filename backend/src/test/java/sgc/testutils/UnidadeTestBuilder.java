@@ -6,7 +6,7 @@ import sgc.organizacao.model.*;
  * Builder para criação de objetos Unidade em testes.
  */
 public class UnidadeTestBuilder {
-    private String codigo = "1"; 
+    private String codigo = "1";
     private String sigla = "UNIDADE_TEST";
     private String nome = "Unidade de Teste";
     private TipoUnidade tipo = TipoUnidade.OPERACIONAL;
@@ -22,11 +22,11 @@ public class UnidadeTestBuilder {
      */
     public static UnidadeTestBuilder operacional() {
         return new UnidadeTestBuilder()
-            .comCodigo("11")
-            .comSigla("ASSESSORIA_11")
-            .comNome("Assessoria 11")
-            .comTipo(TipoUnidade.OPERACIONAL)
-            .comTituloTitular("555555");
+                .comCodigo("11")
+                .comSigla("ASSESSORIA_11")
+                .comNome("Assessoria 11")
+                .comTipo(TipoUnidade.OPERACIONAL)
+                .comTituloTitular("555555");
     }
 
     /**
@@ -34,11 +34,11 @@ public class UnidadeTestBuilder {
      */
     public static UnidadeTestBuilder intermediaria() {
         return new UnidadeTestBuilder()
-            .comCodigo("12")
-            .comSigla("COORD_11")
-            .comNome("Coordenadoria 11")
-            .comTipo(TipoUnidade.INTERMEDIARIA)
-            .comTituloTitular("222222");
+                .comCodigo("12")
+                .comSigla("COORD_11")
+                .comNome("Coordenadoria 11")
+                .comTipo(TipoUnidade.INTERMEDIARIA)
+                .comTituloTitular("222222");
     }
 
     /**
@@ -46,11 +46,11 @@ public class UnidadeTestBuilder {
      */
     public static UnidadeTestBuilder raiz() {
         return new UnidadeTestBuilder()
-            .comCodigo("1")
-            .comSigla("ADMIN")
-            .comNome("Administração")
-            .comTipo(TipoUnidade.RAIZ)
-            .comTituloTitular("191919");
+                .comCodigo("1")
+                .comSigla("ADMIN")
+                .comNome("Administração")
+                .comTipo(TipoUnidade.RAIZ)
+                .comTituloTitular("191919");
     }
 
     public UnidadeTestBuilder comCodigo(String codigo) {

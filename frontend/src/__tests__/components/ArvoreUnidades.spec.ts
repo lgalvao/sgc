@@ -201,7 +201,7 @@ describe('ArvoreUnidades.vue', () => {
     });
 
     it('deve calcular estado de seleção indeterminado (getEstadoSelecao)', () => {
-         const wrapper = mount(ArvoreUnidades, {
+        const wrapper = mount(ArvoreUnidades, {
             props: {
                 unidades: mockUnidades,
                 modelValue: [2], // Apenas CHILD1 selecionado, mas ROOT tem CHILD1 e CHILD2

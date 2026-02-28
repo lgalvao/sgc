@@ -19,7 +19,7 @@ describe("AceitarMapaModal.vue", () => {
     const context = setupComponentTest();
 
     const createWrapper = (propsOverride = {}) => {
-        const options = getCommonMountOptions({}, { BModal: BModalStub });
+        const options = getCommonMountOptions({}, {BModal: BModalStub});
 
         context.wrapper = mount(AceitarMapaModal, {
             ...options,
@@ -41,12 +41,12 @@ describe("AceitarMapaModal.vue", () => {
     };
 
     it("não deve renderizar o modal quando mostrarModal for falso", () => {
-        const wrapper = createWrapper({ mostrarModal: false });
+        const wrapper = createWrapper({mostrarModal: false});
         expect(wrapper.find('[data-testid="modal-stub"]').exists()).toBe(false);
     });
 
     it("deve renderizar o modal com o perfil padrão (não ADMIN)", () => {
-        const wrapper = createWrapper({ perfil: "CHEFE" });
+        const wrapper = createWrapper({perfil: "CHEFE"});
 
         const corpoModal = wrapper.find('[data-testid="body-aceite-mapa"]');
         expect(corpoModal.exists()).toBe(true);
@@ -57,7 +57,7 @@ describe("AceitarMapaModal.vue", () => {
     });
 
     it("deve renderizar o modal com o perfil ADMIN", () => {
-        const wrapper = createWrapper({ perfil: "ADMIN" });
+        const wrapper = createWrapper({perfil: "ADMIN"});
 
         const corpoModal = wrapper.find('[data-testid="body-aceite-mapa"]');
         expect(corpoModal.exists()).toBe(true);
@@ -107,7 +107,7 @@ describe("AceitarMapaModal.vue", () => {
     });
 
     it("deve desabilitar botões e mostrar spinner quando loading for true", () => {
-        const wrapper = createWrapper({ loading: true });
+        const wrapper = createWrapper({loading: true});
 
         const btnCancelar = wrapper.find('[data-testid="btn-aceite-mapa-cancelar"]');
         const btnConfirmar = wrapper.find('[data-testid="btn-aceite-mapa-confirmar"]');

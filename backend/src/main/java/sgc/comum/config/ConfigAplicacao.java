@@ -15,16 +15,13 @@ import sgc.seguranca.login.*;
 @Component
 @ConfigurationProperties("aplicacao")
 public class ConfigAplicacao {
+    @NestedConfigurationProperty
+    private final OpenApi openapi = new OpenApi();
+    @NestedConfigurationProperty
+    private final Email email = new Email();
     private boolean ambienteTestes;
     private String urlAcessoHom;
     private String urlAcessoProd;
-    
-    @NestedConfigurationProperty
-    private final OpenApi openapi = new OpenApi();
-    
-    @NestedConfigurationProperty
-    private final Email email = new Email();
-
     @NestedConfigurationProperty
     private JwtProperties jwt;
 
@@ -34,14 +31,16 @@ public class ConfigAplicacao {
     @NestedConfigurationProperty
     private PropriedadesAcessoAd acessoAd;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     public static class OpenApi {
         private String title;
         private String version;
         private String description;
     }
 
-    @Getter @Setter
+    @Getter
+    @Setter
     public static class Email {
         private String remetente;
         private String remetenteNome;

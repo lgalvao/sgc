@@ -1,43 +1,43 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Histórico de processos" subtitle="Lista de processos finalizados." />
+    <PageHeader subtitle="Lista de processos finalizados." title="Histórico de processos"/>
 
-    <BCard no-body class="shadow-sm">
+    <BCard class="shadow-sm" no-body>
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
           <thead class="table-light">
-            <tr>
-              <th scope="col" style="width: 60%">Processo</th>
-              <th scope="col" style="width: 20%">Tipo</th>
-              <th scope="col" style="width: 20%">Finalizado em</th>
-            </tr>
+          <tr>
+            <th scope="col" style="width: 60%">Processo</th>
+            <th scope="col" style="width: 20%">Tipo</th>
+            <th scope="col" style="width: 20%">Finalizado em</th>
+          </tr>
           </thead>
           <tbody>
-            <tr v-if="loading">
-              <td colspan="3" class="text-center py-4">
-                <BSpinner label="Carregando..." variant="primary" />
-              </td>
-            </tr>
-            <tr v-else-if="processos.length === 0">
-              <td colspan="3">
-                <EmptyState
-                    icon="bi-folder2-open"
-                    title="Nenhum processo finalizado"
-                    description="Ainda não há processos finalizados para exibir."
-                    class="border-0 bg-transparent mb-0"
+          <tr v-if="loading">
+            <td class="text-center py-4" colspan="3">
+              <BSpinner label="Carregando..." variant="primary"/>
+            </td>
+          </tr>
+          <tr v-else-if="processos.length === 0">
+            <td colspan="3">
+              <EmptyState
+                  class="border-0 bg-transparent mb-0"
+                  description="Ainda não há processos finalizados para exibir."
+                  icon="bi-folder2-open"
+                  title="Nenhum processo finalizado"
+              >
+                <BButton
+                    data-testid="btn-historico-atualizar"
+                    size="sm"
+                    variant="outline-primary"
+                    @click="carregarHistorico"
                 >
-                  <BButton
-                      variant="outline-primary"
-                      size="sm"
-                      data-testid="btn-historico-atualizar"
-                      @click="carregarHistorico"
-                  >
-                    Atualizar lista
-                  </BButton>
-                </EmptyState>
-              </td>
-            </tr>
-            <tr
+                  Atualizar lista
+                </BButton>
+              </EmptyState>
+            </td>
+          </tr>
+          <tr
               v-for="proc in processos"
               v-else
               :key="proc.codigo"
@@ -46,17 +46,17 @@
               @click="verDetalhes(proc.codigo)"
               @keydown.enter.prevent="verDetalhes(proc.codigo)"
               @keydown.space.prevent="verDetalhes(proc.codigo)"
-            >
-              <td>
-                <div class="fw-bold">{{ proc.descricao }}</div>
-              </td>
-              <td>
+          >
+            <td>
+              <div class="fw-bold">{{ proc.descricao }}</div>
+            </td>
+            <td>
                 <span :class="['badge', getBadgeClass(proc.tipo)]">
                   {{ proc.tipo }}
                 </span>
-              </td>
-              <td>{{ formatDateBR(proc.dataFinalizacao) }}</td>
-            </tr>
+            </td>
+            <td>{{ formatDateBR(proc.dataFinalizacao) }}</td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -64,7 +64,7 @@
   </LayoutPadrao>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {BButton, BCard, BSpinner} from 'bootstrap-vue-next';

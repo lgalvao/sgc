@@ -7,11 +7,11 @@ Responsável por: mostrar caminho atual na hierarquia, botão voltar
     <BButton
         v-if="shouldShowBackButton"
         v-b-tooltip.hover="'Voltar'"
-        variant="outline-secondary"
-        class="btn-voltar"
-        size="lg"
-        data-testid="btn-nav-voltar"
         aria-label="Voltar"
+        class="btn-voltar"
+        data-testid="btn-nav-voltar"
+        size="lg"
+        variant="outline-secondary"
         @click="goBack"
     >
       <i aria-hidden="true" class="bi bi-arrow-left-circle"/>
@@ -30,9 +30,9 @@ Responsável por: mostrar caminho atual na hierarquia, botão voltar
       >
         <i
             v-if="crumb.isHome"
+            aria-hidden="true"
             class="bi bi-house-door"
             data-testid="btn-nav-home"
-            aria-hidden="true"
         />
         <span v-if="crumb.isHome" class="visually-hidden">Início</span>
         <span v-else>{{ crumb.label }}</span>
@@ -50,7 +50,7 @@ import {useBreadcrumbs} from "@/composables/useBreadcrumbs";
 const route = useRoute();
 const router = useRouter();
 
-const { breadcrumbs: crumbs } = useBreadcrumbs(route);
+const {breadcrumbs: crumbs} = useBreadcrumbs(route);
 
 function goBack() {
   router.back();

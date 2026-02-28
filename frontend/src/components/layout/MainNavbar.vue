@@ -1,10 +1,10 @@
 <template>
-  <BNavbar toggleable="lg" variant="dark" bg-variant="dark" class="navbar-dark bg-dark border-bottom sticky-top">
-    <BNavbarBrand to="/painel" class="fw-bold fs-5 me-4 text-white">
+  <BNavbar bg-variant="dark" class="navbar-dark bg-dark border-bottom sticky-top" toggleable="lg" variant="dark">
+    <BNavbarBrand class="fw-bold fs-5 me-4 text-white" to="/painel">
       SGC
     </BNavbarBrand>
 
-    <BNavbarToggle target="nav-collapse" />
+    <BNavbarToggle target="nav-collapse"/>
 
     <BCollapse id="nav-collapse" is-nav>
       <BNavbarNav class="me-auto">
@@ -12,7 +12,7 @@
           <i aria-hidden="true" class="bi bi-house-door me-1"/> Painel
         </BNavItem>
         <BNavItem :to="linkUnidade" @click="setNavbarNavigation">
-          <i aria-hidden="true" :class="iconUnidade"/> {{ labelUnidade }}
+          <i :class="iconUnidade" aria-hidden="true"/> {{ labelUnidade }}
         </BNavItem>
         <BNavItem to="/relatorios" @click="setNavbarNavigation">
           <i aria-hidden="true" class="bi bi-bar-chart-line me-1"/> Relatórios
@@ -27,9 +27,9 @@
         <!-- Divisor visível apenas quando colapsado -->
         <div class="d-lg-none border-top border-secondary my-2 w-100"></div>
 
-        <BNavItem 
-          v-b-tooltip.hover.bottom="{ title: perfilStore.usuarioNome || 'Usuário', disabled: isMobile }"
-          class="me-2 user-profile-item"
+        <BNavItem
+            v-b-tooltip.hover.bottom="{ title: perfilStore.usuarioNome || 'Usuário', disabled: isMobile }"
+            class="me-2 user-profile-item"
         >
           <div class="d-flex align-items-center">
             <i aria-hidden="true" class="bi bi-person-circle me-2"/>
@@ -38,26 +38,26 @@
             </div>
           </div>
         </BNavItem>
-        
-        <BNavItem 
-          v-if="perfilStore.perfilSelecionado === 'ADMIN'" 
-          class="me-lg-1"
-          title="Configurações do sistema"
-          aria-label="Configurações do sistema"
-          data-testid="btn-configuracoes"
-          to="/configuracoes"
-          @click="setNavbarNavigation"
+
+        <BNavItem
+            v-if="perfilStore.perfilSelecionado === 'ADMIN'"
+            aria-label="Configurações do sistema"
+            class="me-lg-1"
+            data-testid="btn-configuracoes"
+            title="Configurações do sistema"
+            to="/configuracoes"
+            @click="setNavbarNavigation"
         >
           <i aria-hidden="true" class="bi bi-gear me-lg-0 me-1"/>
           <span class="d-lg-none">Configurações</span>
         </BNavItem>
 
-        <BNavItem 
-          class="me-lg-0"
-          title="Sair"
-          aria-label="Sair"
-          data-testid="btn-logout"
-          @click.prevent="handleLogout"
+        <BNavItem
+            aria-label="Sair"
+            class="me-lg-0"
+            data-testid="btn-logout"
+            title="Sair"
+            @click.prevent="handleLogout"
         >
           <i aria-hidden="true" class="bi bi-box-arrow-right me-lg-0 me-1"/>
           <span class="d-lg-none">Sair</span>
@@ -81,7 +81,9 @@ const {perfilSelecionado, unidadeSelecionada} = usePerfil();
 
 // Controle reativo de largura para desabilitar tooltips no mobile
 const windowWidth = ref(window.innerWidth);
-const updateWidth = () => { windowWidth.value = window.innerWidth; };
+const updateWidth = () => {
+  windowWidth.value = window.innerWidth;
+};
 onMounted(() => window.addEventListener('resize', updateWidth));
 onUnmounted(() => window.removeEventListener('resize', updateWidth));
 const isMobile = computed(() => windowWidth.value < 992);

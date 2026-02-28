@@ -6,24 +6,29 @@ import java.time.*;
 
 public final class ComumDtos {
 
+    private ComumDtos() {
+    }
+
     public record TextoRequest(
-        @NotBlank(message = "O campo texto é obrigatório")
-        String texto
-    ) {}
+            @NotBlank(message = "O campo texto é obrigatório")
+            String texto
+    ) {
+    }
 
     public record TextoOpcionalRequest(
-        String texto
-    ) {}
+            String texto
+    ) {
+    }
 
     public record JustificativaRequest(
-        @NotBlank(message = "A justificativa é obrigatória")
-        String justificativa
-    ) {}
+            @NotBlank(message = "A justificativa é obrigatória")
+            String justificativa
+    ) {
+    }
 
     public record DataRequest(
-        @NotNull(message = "A data é obrigatória")
-        LocalDate data
-    ) {}
-
-    private ComumDtos() {}
+            @NotNull(message = "A data é obrigatória")
+            LocalDate data
+    ) {
+    }
 }

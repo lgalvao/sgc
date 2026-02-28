@@ -22,13 +22,13 @@ interface ErrorObject {
 }
 
 withDefaults(
-  defineProps<{
-    error: ErrorObject | null;
-    variant?: 'danger' | 'warning' | 'info';
-  }>(),
-  {
-    variant: 'danger'
-  }
+    defineProps<{
+      error: ErrorObject | null;
+      variant?: 'danger' | 'warning' | 'info';
+    }>(),
+    {
+      variant: 'danger'
+    }
 );
 
 defineEmits<{

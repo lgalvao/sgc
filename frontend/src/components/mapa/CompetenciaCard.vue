@@ -15,28 +15,28 @@
         <BButton
             v-if="podeEditar !== false"
             v-b-tooltip.hover
+            :aria-label="`Editar competência ${competencia.descricao}`"
             class="botao-acao"
             data-testid="btn-editar-competencia"
             size="sm"
             title="Editar"
-            :aria-label="`Editar competência ${competencia.descricao}`"
             variant="outline-primary"
             @click="emit('editar', competencia)"
         >
-          <i class="bi bi-pencil" aria-hidden="true"/>
+          <i aria-hidden="true" class="bi bi-pencil"/>
         </BButton>
         <BButton
             v-if="podeEditar !== false"
             v-b-tooltip.hover
+            :aria-label="`Excluir competência ${competencia.descricao}`"
             class="botao-acao"
             data-testid="btn-excluir-competencia"
             size="sm"
             title="Excluir"
-            :aria-label="`Excluir competência ${competencia.descricao}`"
             variant="outline-danger"
             @click="emit('excluir', competencia.codigo)"
         >
-          <i class="bi bi-trash" aria-hidden="true"/>
+          <i aria-hidden="true" class="bi bi-trash"/>
         </BButton>
       </div>
     </BCardHeader>
@@ -63,15 +63,15 @@
             <BButton
                 v-if="podeEditar !== false"
                 v-b-tooltip.hover
+                :aria-label="`Remover atividade ${atividade.descricao}`"
                 class="botao-acao-inline"
                 data-testid="btn-remover-atividade-associada"
                 size="sm"
                 title="Remover Atividade"
-                :aria-label="`Remover atividade ${atividade.descricao}`"
                 variant="outline-secondary"
                 @click="emit('removerAtividade', competencia.codigo, atividade.codigo)"
             >
-              <i class="bi bi-trash" aria-hidden="true"/>
+              <i aria-hidden="true" class="bi bi-trash"/>
             </BButton>
           </BCardBody>
         </BCard>

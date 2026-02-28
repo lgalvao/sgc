@@ -75,7 +75,11 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     // TESTE PRINCIPAL
     // ========================================================================
 
-    test('Fase 1.1: ADMIN cria e inicia processo de Mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Fase 1.1: ADMIN cria e inicia processo de Mapeamento', async ({
+                                                                            page,
+                                                                            autenticadoComoAdmin,
+                                                                            cleanupAutomatico
+                                                                        }) => {
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
         // Capturar ID do processo para cleanup
         await page.goto('/painel');
@@ -123,7 +127,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     });
 
     test('Fase 1.5: ADMIN adiciona competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
-        
+
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await criarCompetencia(page, `Competência Teste ${timestamp}`, [`Atividade Teste ${timestamp}`]);
@@ -166,7 +170,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
     test('Fase 2: Iniciar processo de Revisão', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         // Login as Admin
-        
+
 
         // Criar processo de REVISÃO
         await criarProcesso(page, {

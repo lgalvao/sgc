@@ -24,12 +24,12 @@
 
     <template #footer>
       <BButton
+          :disabled="loading"
           data-testid="subprocesso-modal__btn-modal-cancelar"
           variant="secondary"
-          :disabled="loading"
           @click="$emit('fecharModal')"
       >
-        <i class="bi bi-x-circle me-1" aria-hidden="true"/>
+        <i aria-hidden="true" class="bi bi-x-circle me-1"/>
         Cancelar
       </BButton>
       <BButton
@@ -40,10 +40,10 @@
       >
         <output
             v-if="loading"
-            class="spinner-border spinner-border-sm me-1"
             aria-hidden="true"
+            class="spinner-border spinner-border-sm me-1"
         />
-        <i v-else class="bi bi-check-circle me-1" aria-hidden="true"/>
+        <i v-else aria-hidden="true" class="bi bi-check-circle me-1"/>
         {{ loading ? 'Processando...' : 'Confirmar' }}
       </BButton>
     </template>
@@ -63,7 +63,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    loading: false
+  loading: false
 });
 
 defineEmits<{

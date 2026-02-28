@@ -41,7 +41,7 @@ describe("TabelaAlertas.vue", () => {
             props: {alertas: mockAlertas},
             global: {
                 stubs: {BTable: true},
-                components: { EmptyState }
+                components: {EmptyState}
             }
         });
 
@@ -53,10 +53,10 @@ describe("TabelaAlertas.vue", () => {
     it("deve renderizar o texto 'Não lido' para alertas não lidos (acessibilidade)", () => {
         const wrapper = mount(TabelaAlertas, {
             props: {alertas: mockAlertas},
-             // Não stubbando BTable permite renderização real dos slots
-             global: {
-                 // stubs: { BTable: false }
-             }
+            // Não stubbando BTable permite renderização real dos slots
+            global: {
+                // stubs: { BTable: false }
+            }
         });
 
         // Verifica se o texto visualmente oculto está presente e associado ao alerta não lido
@@ -127,7 +127,7 @@ describe("TabelaAlertas.vue", () => {
         const wrapper = mount(TabelaAlertas, {
             props: {alertas: []},
             global: {
-                components: { EmptyState }
+                components: {EmptyState}
             }
         });
 

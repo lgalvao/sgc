@@ -288,8 +288,8 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'ACEITAR_CADASTRO')")
     @Operation(summary = "Aceita cadastros em bloco")
     public void aceitarCadastroEmBloco(@PathVariable Long codigo,
-            @RequestBody @Valid ProcessarEmBlocoRequest request,
-            @AuthenticationPrincipal Usuario usuario) {
+                                       @RequestBody @Valid ProcessarEmBlocoRequest request,
+                                       @AuthenticationPrincipal Usuario usuario) {
         subprocessoService.aceitarCadastroEmBloco(request.subprocessos(), usuario);
     }
 
@@ -297,8 +297,8 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'HOMOLOGAR_CADASTRO')")
     @Operation(summary = "Homologa cadastros em bloco")
     public void homologarCadastroEmBloco(@PathVariable Long codigo,
-            @RequestBody @Valid ProcessarEmBlocoRequest request,
-            @AuthenticationPrincipal Usuario usuario) {
+                                         @RequestBody @Valid ProcessarEmBlocoRequest request,
+                                         @AuthenticationPrincipal Usuario usuario) {
         subprocessoService.homologarCadastroEmBloco(request.subprocessos(), usuario);
     }
 
@@ -377,8 +377,8 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'DISPONIBILIZAR_MAPA')")
     @Operation(summary = "Disponibiliza mapas em bloco")
     public void disponibilizarMapaEmBloco(@PathVariable Long codigo,
-            @RequestBody @Valid ProcessarEmBlocoRequest request,
-            @AuthenticationPrincipal Usuario usuario) {
+                                          @RequestBody @Valid ProcessarEmBlocoRequest request,
+                                          @AuthenticationPrincipal Usuario usuario) {
         DisponibilizarMapaRequest dispoReq = DisponibilizarMapaRequest.builder()
                 .dataLimite(request.dataLimite())
                 .build();
@@ -507,8 +507,8 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'ACEITAR_MAPA')")
     @Operation(summary = "Aceita validação de mapas em bloco")
     public void aceitarValidacaoEmBloco(@PathVariable Long codigo,
-            @RequestBody @Valid ProcessarEmBlocoRequest request,
-            @AuthenticationPrincipal Usuario usuario) {
+                                        @RequestBody @Valid ProcessarEmBlocoRequest request,
+                                        @AuthenticationPrincipal Usuario usuario) {
         subprocessoService.aceitarValidacaoEmBloco(request.subprocessos(), usuario);
     }
 
@@ -516,8 +516,8 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'HOMOLOGAR_MAPA')")
     @Operation(summary = "Homologa validação de mapas em bloco")
     public void homologarValidacaoEmBloco(@PathVariable Long codigo,
-            @RequestBody @Valid ProcessarEmBlocoRequest request,
-            @AuthenticationPrincipal Usuario usuario) {
+                                          @RequestBody @Valid ProcessarEmBlocoRequest request,
+                                          @AuthenticationPrincipal Usuario usuario) {
         subprocessoService.homologarValidacaoEmBloco(request.subprocessos(), usuario);
     }
 

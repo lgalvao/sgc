@@ -139,7 +139,7 @@ export async function autorizar(
 ): Promise<PerfilUnidade[]> {
     const response = await apiClient.post<any[]>(
         "/usuarios/autorizar",
-        { tituloEleitoral },
+        {tituloEleitoral},
     );
     return response.data.map(mapPerfilUnidadeToFrontend);
 }

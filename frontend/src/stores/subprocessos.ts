@@ -42,7 +42,7 @@ import {logger} from "@/utils";
 
 export const useSubprocessosStore = defineStore("subprocessos", () => {
     const subprocessoDetalhe = ref<SubprocessoDetalhe | null>(null);
-    const { lastError, clearError, withErrorHandling } = useErrorHandler();
+    const {lastError, clearError, withErrorHandling} = useErrorHandler();
     const feedbackStore = useFeedbackStore();
 
     async function _executarAcao(acao: () => Promise<any>, sucessoMsg: string, _: string): Promise<boolean> {
@@ -167,8 +167,8 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         });
     }
 
-    function atualizarStatusLocal(status: { 
-        codigo: number; 
+    function atualizarStatusLocal(status: {
+        codigo: number;
         situacao: SituacaoSubprocesso;
         permissoes?: any;
     }) {
@@ -202,7 +202,6 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             "Erro ao reabrir revisão",
         );
     }
-
 
 
     return {

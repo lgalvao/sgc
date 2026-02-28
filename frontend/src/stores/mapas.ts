@@ -31,7 +31,7 @@ export const useMapasStore = defineStore("mapas", () => {
     const impactoMapa = ref<ImpactoMapa | null>(null);
     const carregando = ref(false);
     const erro = ref<string | null>(null);
-    const { lastError, clearError } = useErrorHandler();
+    const {lastError, clearError} = useErrorHandler();
     const feedbackStore = useFeedbackStore();
 
     async function buscarMapaVisualizacao(codSubprocesso: number) {

@@ -57,7 +57,8 @@ Fluxo principal:
     - Link `Painel`, para tela `Painel`
     - Menu das unidades, de acordo com essas regras:
         - Se ADMIN: Link `Unidades`, para a tela `Unidades`, que apresenta a hierarquia completa de unidades do TRE-PE
-        - Se GESTOR: CHEFE, ou SERVIDOR**: Link `Minha unidade`, para a tela `Detalhe da unidade`, que apresenta os dados
+        - Se GESTOR: CHEFE, ou SERVIDOR**: Link `Minha unidade`, para a tela `Detalhe da unidade`, que apresenta os
+          dados
           da unidade do usuário logado
     - Link `Relatórios`, para tela `Relatórios`
     - Link `Histórico`, para tela `Histórico de processos`

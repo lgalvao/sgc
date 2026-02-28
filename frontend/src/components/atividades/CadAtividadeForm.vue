@@ -8,13 +8,13 @@
       <BFormInput
           ref="inputRef"
           v-model="modelValue"
-          aria-label="Nova atividade"
-          data-testid="inp-nova-atividade"
           :disabled="loading"
           :state="estadoInput"
+          aria-label="Nova atividade"
+          data-testid="inp-nova-atividade"
           placeholder="Nova atividade"
-          type="text"
           required
+          type="text"
       />
       <BFormInvalidFeedback :state="estadoInput">
         {{ mensagemErro }}
@@ -22,14 +22,14 @@
     </BCol>
     <BCol cols="auto">
       <LoadingButton
-          aria-label="Adicionar atividade"
           :disabled="disabled || !modelValue.trim()"
           :loading="loading"
+          aria-label="Adicionar atividade"
           data-testid="btn-adicionar-atividade"
+          icon="plus-lg"
           size="sm"
           type="submit"
           variant="outline-primary"
-          icon="plus-lg"
       />
     </BCol>
   </BForm>
@@ -40,7 +40,7 @@ import {BCol, BForm, BFormInput, BFormInvalidFeedback} from "bootstrap-vue-next"
 import {computed, ref, watch} from "vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 
-const modelValue = defineModel<string>({ default: '' });
+const modelValue = defineModel<string>({default: ''});
 
 const props = defineProps<{
   loading?: boolean;

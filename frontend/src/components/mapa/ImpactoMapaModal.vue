@@ -8,7 +8,7 @@
       title="Impacto no Mapa de Competências"
       @hide="fechar">
     <div v-if="loading" class="text-center p-4">
-      <output class="spinner-border text-primary" aria-label="Verificando impactos">
+      <output aria-label="Verificando impactos" class="spinner-border text-primary">
         <span class="visually-hidden">Carregando...</span>
       </output>
       <p class="mt-2">

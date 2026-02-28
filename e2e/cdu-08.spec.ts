@@ -10,12 +10,16 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
-    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({
+                                                                                       page,
+                                                                                       autenticadoComoAdmin,
+                                                                                       cleanupAutomatico
+                                                                                   }) => {
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
 
         await test.step('1. Setup: Criar Processo de Mapeamento', async () => {
-            
+
             await criarProcesso(page, {
                 descricao: descricaoProcesso,
                 tipo: 'MAPEAMENTO',
@@ -36,7 +40,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
         await test.step('2. Acessar tela de Atividades', async () => {
             await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
-            
+
             // Navega para o subprocesso usando helper robusto
             await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);
 
@@ -96,7 +100,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const SENHA_REVISAO = USUARIOS.CHEFE_ASSESSORIA_12.senha;
 
         await test.step('Setup: Criar Processo de Revisão', async () => {
-            
+
             await criarProcesso(page, {
                 descricao,
                 tipo: 'REVISAO',
@@ -110,10 +114,10 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
         await test.step('Verificar Botão Impacto', async () => {
             await login(page, CHEFE_REVISAO, SENHA_REVISAO);
-            
+
             // Navega para o subprocesso usando helper robusto
             await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_REVISAO);
-            
+
             await AtividadeHelpers.navegarParaAtividades(page);
 
             // Adicionar uma atividade para garantir que o status mude para EM_ANDAMENTO e o botão apareça

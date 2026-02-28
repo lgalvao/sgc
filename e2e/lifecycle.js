@@ -26,16 +26,34 @@ const LOG_FILE = path.resolve(__dirname, 'server.log');
 // Writes to console and appends to LOG_FILE.
 const lifecycleLogger = {
     info: (msg) => {
-        try { console.log(msg); } catch {}
-        try { fs.appendFileSync(LOG_FILE, `[INFO] ${msg}\n`); } catch {}
+        try {
+            console.log(msg);
+        } catch {
+        }
+        try {
+            fs.appendFileSync(LOG_FILE, `[INFO] ${msg}\n`);
+        } catch {
+        }
     },
     warn: (msg) => {
-        try { console.warn(msg); } catch {}
-        try { fs.appendFileSync(LOG_FILE, `[WARN] ${msg}\n`); } catch {}
+        try {
+            console.warn(msg);
+        } catch {
+        }
+        try {
+            fs.appendFileSync(LOG_FILE, `[WARN] ${msg}\n`);
+        } catch {
+        }
     },
     error: (msg) => {
-        try { console.error(msg); } catch {}
-        try { fs.appendFileSync(LOG_FILE, `[ERROR] ${msg}\n`); } catch {}
+        try {
+            console.error(msg);
+        } catch {
+        }
+        try {
+            fs.appendFileSync(LOG_FILE, `[ERROR] ${msg}\n`);
+        } catch {
+        }
     }
 };
 
@@ -58,36 +76,36 @@ const LOG_FILTERS = [
     /WARNING:/,
 
     // Gradle
-    /^> Task :/, 
+    /^> Task :/,
     /logStarted/,
-    /UP-TO-DATE/, 
-    /Starting a Gradle Daemon.*Daemons could not be reused/, 
-    /Reusing configuration cache/, 
-    /Starting/, 
+    /UP-TO-DATE/,
+    /Starting a Gradle Daemon.*Daemons could not be reused/,
+    /Reusing configuration cache/,
+    /Starting/,
 
     // Spring Boot - Inicialização
-    /The following.*profile.*is active/, 
-    /Initializing Spring/, 
-    /Initializing Spring embedded WebApplicationContext/, 
-    /Initializing Spring DispatcherServlet/, 
-    /Started .* in .* seconds/, 
-    /Tomcat started on port/, 
-    /Tomcat initialized with port/, 
+    /The following.*profile.*is active/,
+    /Initializing Spring/,
+    /Initializing Spring embedded WebApplicationContext/,
+    /Initializing Spring DispatcherServlet/,
+    /Started .* in .* seconds/,
+    /Tomcat started on port/,
+    /Tomcat initialized with port/,
 
     // Vite - Inicialização
-    /^> sgc@.*dev$/, 
-    /^> vite$/, 
-    /VITE v.* ready in/, 
+    /^> sgc@.*dev$/,
+    /^> vite$/,
+    /VITE v.* ready in/,
     /➜ {2}Local:/,
     /➜ {2}Network:/,
-    /use --host to expose/, 
+    /use --host to expose/,
     /\[vite\] {2}connecting/,
     /\[vite\] {2}connected/,
     /debug:/,
 
     // Logs de serviços mockados
-    /NotificacaoEmailServiceMock.*ATIVADO/, 
-    /E-mails serão mockados/, 
+    /NotificacaoEmailServiceMock.*ATIVADO/,
+    /E-mails serão mockados/,
 
     // Linhas vazias
     /^\s*$/

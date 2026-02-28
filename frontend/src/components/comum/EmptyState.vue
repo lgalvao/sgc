@@ -1,8 +1,8 @@
 <template>
   <section
+      aria-label="Estado vazio"
       class="text-center py-4 border rounded bg-light mb-3 text-muted empty-state"
       data-testid="empty-state"
-      aria-label="Estado vazio"
   >
     <i
         v-if="icon"
@@ -25,7 +25,7 @@
     </p>
 
     <!-- Slot para botões de ação -->
-    <slot />
+    <slot/>
   </section>
 </template>
 

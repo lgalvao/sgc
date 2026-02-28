@@ -1,10 +1,10 @@
 <template>
   <ModalPadrao
       v-model="modelValueComputed"
-      tamanho="xl"
-      titulo="Diagnósticos de Gaps"
       :mostrar-botao-acao="false"
+      tamanho="xl"
       texto-cancelar="Fechar"
+      titulo="Diagnósticos de Gaps"
   >
     <div class="mb-3">
       <BButton

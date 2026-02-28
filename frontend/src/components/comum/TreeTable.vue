@@ -1,8 +1,8 @@
 <template>
   <div>
     <div
-      v-if="title"
-      class="d-flex justify-content-between align-items-center mb-3"
+        v-if="title"
+        class="d-flex justify-content-between align-items-center mb-3"
     >
       <h4 class="mb-0">
         {{ title }}
@@ -10,22 +10,22 @@
 
       <div>
         <BButton
-          aria-label="Expandir todas as linhas"
-          class="me-2"
-          data-testid="btn-expandir-todas"
-          size="sm"
-          variant="outline-primary"
-          @click="expandAll"
+            aria-label="Expandir todas as linhas"
+            class="me-2"
+            data-testid="btn-expandir-todas"
+            size="sm"
+            variant="outline-primary"
+            @click="expandAll"
         >
-          <i aria-hidden="true" class="bi bi-arrows-expand" />
+          <i aria-hidden="true" class="bi bi-arrows-expand"/>
         </BButton>
         <BButton
-          aria-label="Recolher todas as linhas"
-          size="sm"
-          variant="outline-secondary"
-          @click="collapseAll"
+            aria-label="Recolher todas as linhas"
+            size="sm"
+            variant="outline-secondary"
+            @click="collapseAll"
         >
-          <i aria-hidden="true" class="bi bi-arrows-collapse" />
+          <i aria-hidden="true" class="bi bi-arrows-collapse"/>
         </BButton>
       </div>
     </div>
@@ -34,22 +34,22 @@
       <table class="table table-striped table-hover m-0" data-testid="tbl-tree">
         <colgroup>
           <col
-            v-for="column in columns"
-            :key="column.key"
-            :style="{ width: column.width || 100 / columns.length + '%' }"
+              v-for="column in columns"
+              :key="column.key"
+              :style="{ width: column.width || 100 / columns.length + '%' }"
           />
         </colgroup>
 
         <thead v-if="!hideHeaders">
-          <tr>
-            <th v-for="column in columns" :key="column.key">
-              {{ column.label }}
-            </th>
-          </tr>
+        <tr>
+          <th v-for="column in columns" :key="column.key">
+            {{ column.label }}
+          </th>
+        </tr>
         </thead>
         <tbody>
-          <template v-if="flattenedData.length > 0">
-            <TreeRowItem
+        <template v-if="flattenedData.length > 0">
+          <TreeRowItem
               v-for="item in flattenedData"
               :key="item.codigo"
               :columns="columns"
@@ -57,18 +57,18 @@
               :level="item.level"
               @toggle="toggleExpand"
               @row-click="handleTreeRowClick"
-            />
-          </template>
-          <tr v-else>
-            <td :colspan="columns.length" class="p-0 border-0">
-              <EmptyState
-                :title="emptyTitle"
+          />
+        </template>
+        <tr v-else>
+          <td :colspan="columns.length" class="p-0 border-0">
+            <EmptyState
                 :description="emptyDescription"
                 :icon="emptyIcon"
+                :title="emptyTitle"
                 class="border-0 bg-transparent mb-0"
-              />
-            </td>
-          </tr>
+            />
+          </td>
+        </tr>
         </tbody>
       </table>
     </div>
@@ -133,20 +133,20 @@ const initializeExpanded = (items: TreeItem[]): TreeItem[] => {
 };
 
 watch(
-  () => props.data,
-  (newData) => {
-    internalData.value = initializeExpanded(
-      structuredClone(toRaw(newData)),
-    );
-  },
-  { immediate: true, deep: true },
+    () => props.data,
+    (newData) => {
+      internalData.value = initializeExpanded(
+          structuredClone(toRaw(newData)),
+      );
+    },
+    {immediate: true, deep: true},
 );
 
 const flattenedData = computed((): FlattenedTreeItem[] => {
   const flattened: FlattenedTreeItem[] = [];
   const flatten = (items: TreeItem[], level: number) => {
     for (const item of items) {
-      flattened.push({ ...item, level });
+      flattened.push({...item, level});
       if (item.expanded && item.children) {
         flatten(item.children, level + 1);
       }
@@ -157,8 +157,8 @@ const flattenedData = computed((): FlattenedTreeItem[] => {
 });
 
 const findItemByCodigo = (
-  items: TreeItem[],
-  codigo: number | string,
+    items: TreeItem[],
+    codigo: number | string,
 ): TreeItem | null => {
   for (const item of items) {
     if (item.codigo === codigo) return item;

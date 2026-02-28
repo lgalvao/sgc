@@ -2,9 +2,9 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 
 /**
  * CDU-29 - Consultar histórico de processos
- * 
+ *
  * Ator: ADMIN/GESTOR/CHEFE
- * 
+ *
  * Fluxo principal:
  * 1. Na navbar, usuário clica em Histórico
  * 2. Sistema apresenta tabela de processos finalizados
@@ -19,7 +19,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
 
     test('Cenario 1: ADMIN navega para página de histórico', async ({page, autenticadoComoAdmin}) => {
         // CDU-29: Passos 1-2
-        
+
 
         // Passo 1: Clicar em Histórico na navbar
         await page.getByRole('link', {name: /Histórico/i}).click();
@@ -30,7 +30,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
     });
 
     test('Cenario 2: GESTOR pode acessar histórico', async ({page, autenticadoComoGestor}) => {
-        
+
 
         // Navegar para histórico
         await page.getByRole('link', {name: /Histórico/i}).click();
@@ -40,7 +40,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
     });
 
     test('Cenario 3: CHEFE pode acessar histórico', async ({page, autenticadoComoChefeSecao121}) => {
-        
+
 
         // Navegar para histórico
         await page.getByRole('link', {name: /Histórico/i}).click();
@@ -55,7 +55,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
 
     test('Cenario 4: Tabela apresenta colunas corretas', async ({page, autenticadoComoAdmin}) => {
         // CDU-29: Passo 2 - Verificar colunas da tabela
-        
+
 
         await page.getByRole('link', {name: /Histórico/i}).click();
         await expect(page).toHaveURL(/\/historico/);

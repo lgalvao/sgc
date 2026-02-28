@@ -19,13 +19,13 @@ async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
 
 /**
  * CDU-25 - Aceitar validação de mapas de competências em bloco
- * 
+ *
  * Ator: GESTOR
- * 
+ *
  * Pré-condições:
  * - Subprocesso nas situações 'Mapa validado' ou 'Mapa com sugestões'
  * - Localização atual na unidade do usuário
- * 
+ *
  * Fluxo principal:
  * 1. GESTOR acessa processo em andamento
  * 2. Sistema mostra Detalhes do processo
@@ -50,7 +50,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        
+
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -73,7 +73,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     });
 
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
-        
+
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
@@ -103,7 +103,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     });
 
     test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page, autenticadoComoAdmin}) => {
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
@@ -120,7 +120,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     });
 
     test('Preparacao 4: Chefe valida o mapa', async ({page}) => {
-        
+
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
         await acessarSubprocessoChefe(page, descProcesso);

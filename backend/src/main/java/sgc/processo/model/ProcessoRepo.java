@@ -43,11 +43,11 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
             AND p.situacao <> :situacao
             """,
             countQuery = """
-            SELECT COUNT(DISTINCT p) FROM Processo p
-            JOIN p.participantes up
-            WHERE up.id.unidadeCodigo IN :codigos
-            AND p.situacao <> :situacao
-            """)
+                    SELECT COUNT(DISTINCT p) FROM Processo p
+                    JOIN p.participantes up
+                    WHERE up.id.unidadeCodigo IN :codigos
+                    AND p.situacao <> :situacao
+                    """)
     Page<Processo> findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
             @Param("codigos") List<Long> codigos,
             @Param("situacao") SituacaoProcesso situacao,

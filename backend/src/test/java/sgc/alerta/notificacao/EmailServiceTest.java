@@ -17,20 +17,16 @@ import static org.mockito.Mockito.*;
 class EmailServiceTest {
     private static final int LIMITE_CONTEUDO_NOTIFICACAO = 500;
     private static final int TAMANHO_CORPO_LONGO = 600;
-
+    private static final String DESTINATARIO = "recipient@test.com";
     @Mock
     private NotificacaoRepo notificacaoRepo;
-
     @Mock
     private JavaMailSender enviadorEmail;
-
     @Mock
     private ConfigAplicacao config;
-
     @InjectMocks
     private EmailService notificacaoServico;
 
-    private static final String DESTINATARIO = "recipient@test.com";
     private void setupMockEmail() {
         ConfigAplicacao.Email emailConfig = new ConfigAplicacao.Email();
         emailConfig.setRemetente("noreply@test.com");
@@ -80,7 +76,7 @@ class EmailServiceTest {
         String corpo = "This is plain text";
 
         notificacaoServico.enviarEmail(DESTINATARIO, assunto, corpo);
-        
+
         verify(notificacaoRepo, times(1)).save(any(Notificacao.class));
         verify(enviadorEmail, times(1)).send(any(MimeMessage.class));
     }

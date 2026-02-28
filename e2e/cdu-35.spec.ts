@@ -2,9 +2,9 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 
 /**
  * CDU-35 - Gerar relatório de andamento
- * 
+ *
  * Ator: ADMIN
- * 
+ *
  * Pré-condições:
  * - Usuário logado como ADMIN
  */

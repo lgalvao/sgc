@@ -139,11 +139,11 @@ describe("TreeRowItem.vue", () => {
         const item = {
             codigo: 1,
             nome: "Item 1",
-            children: [{ codigo: 2, nome: "Child 1" }],
+            children: [{codigo: 2, nome: "Child 1"}],
         };
-        const columns = [{ key: "nome", label: "Nome" }];
+        const columns = [{key: "nome", label: "Nome"}];
         const wrapper = mount(TreeRowItem, {
-            props: { item, columns, level: 0 },
+            props: {item, columns, level: 0},
         });
 
         const toggleIcon = wrapper.find(".toggle-icon");
@@ -159,11 +159,11 @@ describe("TreeRowItem.vue", () => {
         const item = {
             codigo: 1,
             nome: "Item 1",
-            children: [{ codigo: 2, nome: "Child 1" }],
+            children: [{codigo: 2, nome: "Child 1"}],
         };
-        const columns = [{ key: "nome", label: "Nome" }];
+        const columns = [{key: "nome", label: "Nome"}];
         const wrapper = mount(TreeRowItem, {
-            props: { item, columns, level: 0 },
+            props: {item, columns, level: 0},
         });
 
         const toggleIcon = wrapper.find(".toggle-icon");
@@ -176,10 +176,10 @@ describe("TreeRowItem.vue", () => {
     });
 
     it("deve emitir o evento row-click ao pressionar Enter na linha", async () => {
-        const item = { codigo: 1, nome: "Item 1", clickable: true };
-        const columns = [{ key: "nome", label: "Nome" }];
+        const item = {codigo: 1, nome: "Item 1", clickable: true};
+        const columns = [{key: "nome", label: "Nome"}];
         const wrapper = mount(TreeRowItem, {
-            props: { item, columns, level: 0 },
+            props: {item, columns, level: 0},
         });
 
         await wrapper.find("tr").trigger("keydown.enter");
@@ -189,10 +189,10 @@ describe("TreeRowItem.vue", () => {
     });
 
     it("deve emitir o evento row-click ao pressionar Space na linha", async () => {
-        const item = { codigo: 1, nome: "Item 1", clickable: true };
-        const columns = [{ key: "nome", label: "Nome" }];
+        const item = {codigo: 1, nome: "Item 1", clickable: true};
+        const columns = [{key: "nome", label: "Nome"}];
         const wrapper = mount(TreeRowItem, {
-            props: { item, columns, level: 0 },
+            props: {item, columns, level: 0},
         });
 
         await wrapper.find("tr").trigger("keydown.space");

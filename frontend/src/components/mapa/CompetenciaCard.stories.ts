@@ -3,70 +3,70 @@ import CompetenciaCard from './CompetenciaCard.vue';
 import type {Atividade, Competencia} from '@/types/tipos';
 
 const meta: Meta<typeof CompetenciaCard> = {
-  title: 'Mapa/CompetenciaCard',
-  component: CompetenciaCard,
-  tags: ['autodocs'],
-  argTypes: {
-    podeEditar: { control: 'boolean' },
-  },
+    title: 'Mapa/CompetenciaCard',
+    component: CompetenciaCard,
+    tags: ['autodocs'],
+    argTypes: {
+        podeEditar: {control: 'boolean'},
+    },
 };
 
 export default meta;
 type Story = StoryObj<typeof CompetenciaCard>;
 
 const mockAtividades: Atividade[] = [
-  {
-    codigo: 1,
-    descricao: 'Desenvolver API REST',
-    conhecimentos: [
-      { codigo: 1, descricao: 'Java' },
-      { codigo: 2, descricao: 'Spring Boot' },
-    ],
-  },
-  {
-    codigo: 2,
-    descricao: 'Criar componentes Vue',
-    conhecimentos: [
-      { codigo: 3, descricao: 'Vue.js' },
-      { codigo: 4, descricao: 'TypeScript' },
-    ],
-  },
-  {
-    codigo: 3,
-    descricao: 'Configurar CI/CD',
-    conhecimentos: [],
-  },
+    {
+        codigo: 1,
+        descricao: 'Desenvolver API REST',
+        conhecimentos: [
+            {codigo: 1, descricao: 'Java'},
+            {codigo: 2, descricao: 'Spring Boot'},
+        ],
+    },
+    {
+        codigo: 2,
+        descricao: 'Criar componentes Vue',
+        conhecimentos: [
+            {codigo: 3, descricao: 'Vue.js'},
+            {codigo: 4, descricao: 'TypeScript'},
+        ],
+    },
+    {
+        codigo: 3,
+        descricao: 'Configurar CI/CD',
+        conhecimentos: [],
+    },
 ];
 
 const mockCompetencia: Competencia = {
-  codigo: 10,
-  descricao: 'Desenvolvimento Fullstack',
-  atividades: [mockAtividades[0], mockAtividades[1]],
+    codigo: 10,
+    descricao: 'Desenvolvimento Fullstack',
+    atividades: [mockAtividades[0], mockAtividades[1]],
 };
 
 export const Default: Story = {
-  args: {
-    competencia: mockCompetencia,
-    atividades: mockAtividades,
-    podeEditar: true,
-  },
+    args: {
+        competencia: mockCompetencia,
+        atividades: mockAtividades,
+        podeEditar: true,
+    },
 };
 
 export const ReadOnly: Story = {
-  args: {
-    competencia: mockCompetencia,
-    atividades: mockAtividades,
-    podeEditar: false,
-  },
+    args: {
+        competencia: mockCompetencia,
+        atividades: mockAtividades,
+        podeEditar: false,
+    },
 };
 
 export const ComAtividadeSemConhecimento: Story = {
-  args: {
-    competencia: {
-      ...mockCompetencia,
-      atividades: [mockAtividades[2]],
+    args: {
+        competencia: {
+            ...mockCompetencia,
+            atividades: [mockAtividades[2]],
+        },
+        atividades: mockAtividades,
+        podeEditar: true,
     },
-    atividades: mockAtividades,
-    podeEditar: true,
-  },
 };

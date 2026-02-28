@@ -8,7 +8,7 @@ import {
     salvarConfiguracoes as serviceSalvarConfiguracoes,
 } from "@/services/configuracaoService";
 
-export type { Parametro };
+export type {Parametro};
 
 export const useConfiguracoesStore = defineStore("configuracoes", () => {
     const parametros = ref<Parametro[]>([]);
@@ -16,7 +16,7 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
     const error = ref<string | null>(null);
 
     // Map para lookup O(1) de chave -> parametro
-    const parametrosMap = computed(() => 
+    const parametrosMap = computed(() =>
         new Map(parametros.value.map(p => [p.chave, p]))
     );
 

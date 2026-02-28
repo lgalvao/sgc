@@ -33,12 +33,12 @@ class ValidadorDadosOrgServiceTest {
                 .comTipo(tipo)
                 .comTituloTitular("TITULO_" + codigo)
                 .build();
-        
+
         u.setResponsabilidade(Responsabilidade.builder()
                 .unidadeCodigo(codigo)
                 .usuarioTitulo("TITULO_" + codigo)
                 .build());
-        
+
         return u;
     }
 
@@ -125,6 +125,7 @@ class ValidadorDadosOrgServiceTest {
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("1 violação");
         }
+
         @Test
         @DisplayName("Deve lidar com duplicidade de usuários (merge function coverage)")
         void deveLidarComDuplicidadeUsuarios() {

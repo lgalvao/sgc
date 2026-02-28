@@ -11,32 +11,32 @@ import java.util.*;
  */
 @Builder
 public record ImpactoMapaResponse(
-    @JsonView(MapaViews.Publica.class)
-    boolean temImpactos,
-    
-    @JsonView(MapaViews.Publica.class)
-    List<AtividadeImpactadaDto> inseridas,
-    
-    @JsonView(MapaViews.Publica.class)
-    List<AtividadeImpactadaDto> removidas,
-    
-    @JsonView(MapaViews.Publica.class)
-    List<AtividadeImpactadaDto> alteradas,
-    
-    @JsonView(MapaViews.Publica.class)
-    List<CompetenciaImpactadaDto> competenciasImpactadas,
+        @JsonView(MapaViews.Publica.class)
+        boolean temImpactos,
 
-    @JsonView(MapaViews.Publica.class)
-    int totalInseridas,
+        @JsonView(MapaViews.Publica.class)
+        List<AtividadeImpactadaDto> inseridas,
 
-    @JsonView(MapaViews.Publica.class)
-    int totalRemovidas,
+        @JsonView(MapaViews.Publica.class)
+        List<AtividadeImpactadaDto> removidas,
 
-    @JsonView(MapaViews.Publica.class)
-    int totalAlteradas,
+        @JsonView(MapaViews.Publica.class)
+        List<AtividadeImpactadaDto> alteradas,
 
-    @JsonView(MapaViews.Publica.class)
-    int totalCompetenciasImpactadas
+        @JsonView(MapaViews.Publica.class)
+        List<CompetenciaImpactadaDto> competenciasImpactadas,
+
+        @JsonView(MapaViews.Publica.class)
+        int totalInseridas,
+
+        @JsonView(MapaViews.Publica.class)
+        int totalRemovidas,
+
+        @JsonView(MapaViews.Publica.class)
+        int totalAlteradas,
+
+        @JsonView(MapaViews.Publica.class)
+        int totalCompetenciasImpactadas
 ) {
     public static ImpactoMapaResponse semImpacto() {
         return ImpactoMapaResponse.builder()

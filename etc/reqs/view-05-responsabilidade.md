@@ -2,31 +2,37 @@
 
 ## Finalidade
 
-Esta view consolida todas as formas de responsabilidade sobre unidades organizacionais, identificando quem são os responsáveis efetivos por cada unidade em um determinado momento. Integra três fontes de responsabilidade: titularidade formal (do SGRH), substituição temporária (do SGRH) e atribuição temporária de responsabilidade (do próprio SGC), estabelecendo uma hierarquia de precedência entre elas.
+Esta view consolida todas as formas de responsabilidade sobre unidades organizacionais, identificando quem são os
+responsáveis efetivos por cada unidade em um determinado momento. Integra três fontes de responsabilidade: titularidade
+formal (do SGRH), substituição temporária (do SGRH) e atribuição temporária de responsabilidade (do próprio SGC),
+estabelecendo uma hierarquia de precedência entre elas.
 
 ## Origem dos Dados
 
 **Sistema de Gestão de Recursos Humanos (SRH2):**
+
 - `SRH2.QFC_OCUP_COM`: Ocupações de cargos comissionados (titulares)
 - `SRH2.QFC_SUBST_COM`: Substituições de cargos comissionados
 - `SRH2.SERVIDOR`: Dados dos servidores substitutos
 
 **Tabelas do SGC:**
+
 - `ATRIBUICAO_TEMPORARIA`: Atribuições temporárias cadastradas no sistema
 
 **Views do Sistema:**
+
 - `VW_UNIDADE`: Unidades e seus titulares formais
 
 ## Estrutura da View
 
-| Coluna | Tipo | Descrição | Origem |
-|--------|------|-----------|--------|
-| `unidade_codigo` | NUMBER | Código da unidade organizacional | `VW_UNIDADE.codigo` |
-| `usuario_matricula` | VARCHAR2(8) | Matrícula do responsável atual | Consolidado (ver RN-VIEW05-02) |
-| `usuario_titulo` | VARCHAR2(12) | Título de eleitor do responsável atual | Consolidado (ver RN-VIEW05-02) |
-| `tipo` | VARCHAR2(30) | Tipo de responsabilidade | Calculado (ver RN-VIEW05-03) |
-| `data_inicio` | DATE | Data de início da responsabilidade | Consolidado (ver RN-VIEW05-02) |
-| `data_fim` | DATE | Data de término da responsabilidade (NULL se indefinida) | Consolidado (ver RN-VIEW05-02) |
+| Coluna              | Tipo         | Descrição                                                | Origem                         |
+|---------------------|--------------|----------------------------------------------------------|--------------------------------|
+| `unidade_codigo`    | NUMBER       | Código da unidade organizacional                         | `VW_UNIDADE.codigo`            |
+| `usuario_matricula` | VARCHAR2(8)  | Matrícula do responsável atual                           | Consolidado (ver RN-VIEW05-02) |
+| `usuario_titulo`    | VARCHAR2(12) | Título de eleitor do responsável atual                   | Consolidado (ver RN-VIEW05-02) |
+| `tipo`              | VARCHAR2(30) | Tipo de responsabilidade                                 | Calculado (ver RN-VIEW05-03)   |
+| `data_inicio`       | DATE         | Data de início da responsabilidade                       | Consolidado (ver RN-VIEW05-02) |
+| `data_fim`          | DATE         | Data de término da responsabilidade (NULL se indefinida) | Consolidado (ver RN-VIEW05-02) |
 
 ## Regras de Negócio
 
@@ -44,10 +50,12 @@ FROM (
 ```
 
 **Critérios de elegibilidade:**
+
 - Situação: `ATIVA` (unidades inativas não têm responsáveis)
 - Tipo: `OPERACIONAL`, `INTEROPERACIONAL` ou `INTERMEDIARIA`
 
 **Exclusões:**
+
 - Unidade `RAIZ` (ADMIN): Não tem responsável individual
 - Unidades `SEM_EQUIPE`: Não participam de processos, logo não precisam de responsável
 - Unidades `INATIVA`: Extintas ou desativadas
@@ -73,21 +81,22 @@ usuario_titulo = COALESCE(
 **Ordem de precedência:**
 
 1. **ATRIBUIÇÃO TEMPORÁRIA** (maior prioridade)
-   - Cadastrada no SGC através da tabela `ATRIBUICAO_TEMPORARIA`
-   - Vigente no momento atual
-   - Sobrepõe qualquer outra forma de responsabilidade
+    - Cadastrada no SGC através da tabela `ATRIBUICAO_TEMPORARIA`
+    - Vigente no momento atual
+    - Sobrepõe qualquer outra forma de responsabilidade
 
 2. **SUBSTITUIÇÃO** (prioridade intermediária)
-   - Cadastrada no SGRH através de `QFC_SUBST_COM`
-   - Vigente no momento atual
-   - Sobrepõe apenas a titularidade formal
+    - Cadastrada no SGRH através de `QFC_SUBST_COM`
+    - Vigente no momento atual
+    - Sobrepõe apenas a titularidade formal
 
 3. **TITULARIDADE** (menor prioridade)
-   - Titular formal da unidade conforme `VW_UNIDADE`
-   - Sempre presente para unidades elegíveis
-   - É a responsabilidade padrão quando não há substituições ou atribuições
+    - Titular formal da unidade conforme `VW_UNIDADE`
+    - Sempre presente para unidades elegíveis
+    - É a responsabilidade padrão quando não há substituições ou atribuições
 
 **Justificativa da hierarquia:**
+
 - Atribuições temporárias permitem ao ADMIN designar responsáveis em casos excepcionais (afastamentos, vacâncias)
 - Substituições formais do SGRH têm precedência sobre titularidade por serem decisões oficiais
 - Titularidade é a forma normal e permanente de responsabilidade
@@ -106,11 +115,11 @@ END
 
 **Valores possíveis:**
 
-| Tipo | Descrição | Origem |
-|------|-----------|--------|
-| `TITULAR` | Responsável por titularidade formal do cargo | `VW_UNIDADE` |
-| `SUBSTITUTO` | Responsável por substituição formal no SGRH | `QFC_SUBST_COM` |
-| `ATRIBUICAO_TEMPORARIA` | Responsável por atribuição no SGC | `ATRIBUICAO_TEMPORARIA` |
+| Tipo                    | Descrição                                    | Origem                  |
+|-------------------------|----------------------------------------------|-------------------------|
+| `TITULAR`               | Responsável por titularidade formal do cargo | `VW_UNIDADE`            |
+| `SUBSTITUTO`            | Responsável por substituição formal no SGRH  | `QFC_SUBST_COM`         |
+| `ATRIBUICAO_TEMPORARIA` | Responsável por atribuição no SGC            | `ATRIBUICAO_TEMPORARIA` |
 
 ### RN-VIEW05-04: Vigência das Responsabilidades
 
@@ -125,6 +134,7 @@ LEFT JOIN (
 ```
 
 **Regras:**
+
 - Vigente se data atual está entre `data_inicio` e `data_termino`
 - `data_termino + 1` inclui todo o último dia do período
 - `TRUNC` remove horário, considerando apenas datas
@@ -148,6 +158,7 @@ LEFT JOIN (
 ```
 
 **Critérios:**
+
 - Substitui apenas titulares (`c.titular_com = 1`)
 - Vigente se data atual está no período de substituição
 - Vinculada ao cargo do titular, não à unidade diretamente
@@ -170,6 +181,7 @@ data_fim = COALESCE(
 ```
 
 **Características:**
+
 - Titularidade não tem data de término definida
 - `data_fim` é NULL para responsabilidades de titulares sem substituição ou atribuição
 - `data_inicio` para titularidade vem de `data_inicio_titularidade` em `VW_UNIDADE`
@@ -179,12 +191,14 @@ data_fim = COALESCE(
 Unidades elegíveis sem titular definido em `VW_UNIDADE`:
 
 **Comportamento:**
+
 - Aparecem na view com todos os campos de usuário NULL
 - `tipo` será NULL
 - `data_inicio` e `data_fim` serão NULL
 - Isso indica uma situação irregular que deve ser corrigida
 
 **Causas possíveis:**
+
 - Cargo vago aguardando nomeação
 - Dados inconsistentes no SGRH
 - Unidade recém-criada ainda sem titular designado
@@ -193,7 +207,8 @@ Unidades elegíveis sem titular definido em `VW_UNIDADE`:
 
 ### CU-VIEW05-01: Determinação de Perfis GESTOR e CHEFE
 
-**Contexto:** Após login, sistema determina se usuário tem perfil GESTOR ou CHEFE através de `VW_USUARIO_PERFIL_UNIDADE`.
+**Contexto:** Após login, sistema determina se usuário tem perfil GESTOR ou CHEFE através de
+`VW_USUARIO_PERFIL_UNIDADE`.
 
 **Implementação em VW_USUARIO_PERFIL_UNIDADE:**
 
@@ -212,6 +227,7 @@ WHERE u.tipo IN ('INTEROPERACIONAL', 'OPERACIONAL')
 ```
 
 **Dinâmica:**
+
 - Titular, substituto ou atribuído temporariamente → pode ter perfil GESTOR/CHEFE
 - Mudança de responsável → perfis são automaticamente reatribuídos
 - Fim de substituição/atribuição → responsabilidade volta ao titular
@@ -221,6 +237,7 @@ WHERE u.tipo IN ('INTEROPERACIONAL', 'OPERACIONAL')
 **Contexto:** Sistema precisa notificar o responsável atual de uma unidade.
 
 **Implementação:**
+
 ```sql
 SELECT u.nome, u.email, r.tipo
 FROM VW_RESPONSABILIDADE r
@@ -230,6 +247,7 @@ WHERE r.unidade_codigo = :codigo_unidade
 ```
 
 **Uso em alertas e notificações:**
+
 - Enviar e-mail ao responsável quando subprocesso chega na unidade
 - Notificar sobre prazos próximos ao vencimento
 - Alertar sobre pendências de validação
@@ -239,6 +257,7 @@ WHERE r.unidade_codigo = :codigo_unidade
 **Contexto:** Validar se usuário pode realizar ações (cadastro, validação, etc.) em um subprocesso.
 
 **Implementação:**
+
 ```sql
 -- Verificar se usuário é responsável pela unidade do subprocesso
 SELECT COUNT(*) > 0 AS pode_agir
@@ -251,6 +270,7 @@ WHERE s.codigo = :codigo_subprocesso
 ```
 
 **Regras:**
+
 - Apenas responsável atual pode agir em nome da unidade
 - Responsabilidade expirada não autoriza ação
 - Tipo de responsabilidade (titular/substituto/atribuição) é irrelevante para autorização
@@ -262,11 +282,13 @@ WHERE s.codigo = :codigo_subprocesso
 **Limitação:** A view mostra apenas o estado atual. Para auditoria completa:
 
 **Dados históricos disponíveis:**
+
 - `ATRIBUICAO_TEMPORARIA`: Histórico completo de atribuições (inclusive expiradas)
 - `QFC_SUBST_COM` (SGRH): Histórico de substituições
 - `VW_VINCULACAO_UNIDADE`: Histórico de mudanças organizacionais
 
 **Consulta de histórico de atribuições:**
+
 ```sql
 SELECT a.unidade_codigo, a.usuario_titulo, u.nome,
        a.data_inicio, a.data_termino, a.justificativa
@@ -281,6 +303,7 @@ ORDER BY a.data_inicio DESC;
 **Contexto:** Gerar relatório consolidado de responsabilidades do tribunal.
 
 **Exemplo de consulta:**
+
 ```sql
 SELECT u.sigla, u.nome, u.tipo,
        us.nome AS responsavel,
@@ -296,6 +319,7 @@ ORDER BY u.sigla;
 ```
 
 **Informações extraídas:**
+
 - Unidades com responsável definido
 - Unidades sem responsável (situação irregular)
 - Tipos de responsabilidade predominantes
@@ -308,6 +332,7 @@ ORDER BY u.sigla;
 **Fluxos possíveis:**
 
 **Substituição formal (SGRH):**
+
 1. Titular entra em férias/afastamento
 2. SGRH registra substituição em `QFC_SUBST_COM`
 3. Substituto aparece automaticamente em `VW_RESPONSABILIDADE`
@@ -315,6 +340,7 @@ ORDER BY u.sigla;
 5. Ao final, titular reassume automaticamente
 
 **Atribuição temporária (SGC):**
+
 1. Situação excepcional não coberta por substituição formal
 2. ADMIN cadastra em `ATRIBUICAO_TEMPORARIA`
 3. Atribuído aparece em `VW_RESPONSABILIDADE` (prioridade maior que substituto)
@@ -325,6 +351,7 @@ ORDER BY u.sigla;
 ### Views que Dependem de VW_RESPONSABILIDADE
 
 **VW_USUARIO_PERFIL_UNIDADE:**
+
 - Principal consumidor da view
 - Determina perfis GESTOR e CHEFE com base nas responsabilidades
 - Filtrada por tipo de unidade
@@ -332,21 +359,25 @@ ORDER BY u.sigla;
 ### Tabelas e Views Consultadas
 
 **VW_UNIDADE:**
+
 - Fonte dos dados de titularidade
 - Filtro de unidades elegíveis
 - Informações sobre tipo da unidade
 
 **ATRIBUICAO_TEMPORARIA:**
+
 - Fonte de responsabilidades atribuídas no SGC
 - Atualizada por perfil ADMIN
 - Filtrada por vigência
 
 **SGRH (QFC_OCUP_COM, QFC_SUBST_COM):**
+
 - Fonte de titularidades e substituições formais
 - Somente leitura
 - Filtradas por vigência
 
 **VW_USUARIO:**
+
 - Indiretamente (via VW_USUARIO_PERFIL_UNIDADE)
 - Para obter dados completos do responsável
 
@@ -363,11 +394,13 @@ GRANT SELECT ON SRH2.SERVIDOR TO SGC;
 ### Tabelas e Views de Origem
 
 **Do SGRH:**
+
 - `SRH2.QFC_OCUP_COM`: Ocupações de cargos
 - `SRH2.QFC_SUBST_COM`: Substituições
 - `SRH2.SERVIDOR`: Dados dos servidores
 
 **Do SGC:**
+
 - `ATRIBUICAO_TEMPORARIA`: Atribuições temporárias
 - `VW_UNIDADE`: Unidades e titulares
 
@@ -384,6 +417,7 @@ LEFT JOIN (... substituição ...) s
 ```
 
 **Subconsultas pré-filtradas:**
+
 - Atribuições: filtro de vigência reduz registros antes do JOIN
 - Substituições: filtros de vigência e `titular_com = 1` reduzem registros
 
@@ -429,32 +463,32 @@ A view é consultada principalmente através de `VW_USUARIO_PERFIL_UNIDADE`:
 **Interpretação:**
 
 1. **Unidade 100:**
-   - Responsável: Titular (matrícula 00012345)
-   - Início da titularidade: 01/01/2023
-   - Sem prazo de término (titularidade indefinida)
-   - Sem substituições ou atribuições vigentes
+    - Responsável: Titular (matrícula 00012345)
+    - Início da titularidade: 01/01/2023
+    - Sem prazo de término (titularidade indefinida)
+    - Sem substituições ou atribuições vigentes
 
 2. **Unidade 150:**
-   - Responsável: Substituto (matrícula 00023456)
-   - Período de substituição: Dezembro/2024
-   - Há um titular (não mostrado), mas está sendo substituído
-   - Após 31/12/2024, titular reassume automaticamente
+    - Responsável: Substituto (matrícula 00023456)
+    - Período de substituição: Dezembro/2024
+    - Há um titular (não mostrado), mas está sendo substituído
+    - Após 31/12/2024, titular reassume automaticamente
 
 3. **Unidade 200:**
-   - Responsável: Atribuição temporária (matrícula 00034567)
-   - Período: 15/11/2024 a 15/02/2025
-   - Pode haver titular E substituto, mas atribuição tem precedência
-   - Após 15/02/2025, responsabilidade volta ao substituto (se houver) ou titular
+    - Responsável: Atribuição temporária (matrícula 00034567)
+    - Período: 15/11/2024 a 15/02/2025
+    - Pode haver titular E substituto, mas atribuição tem precedência
+    - Após 15/02/2025, responsabilidade volta ao substituto (se houver) ou titular
 
 4. **Unidade 250:**
-   - Responsável: Titular (matrícula 00045678)
-   - Início da titularidade: 20/03/2023
-   - Situação normal sem substituições ou atribuições
+    - Responsável: Titular (matrícula 00045678)
+    - Início da titularidade: 20/03/2023
+    - Situação normal sem substituições ou atribuições
 
 5. **Unidade 300:**
-   - SEM RESPONSÁVEL DEFINIDO
-   - Situação irregular que precisa correção
-   - Pode ser cargo vago ou dados inconsistentes no SGRH
+    - SEM RESPONSÁVEL DEFINIDO
+    - Situação irregular que precisa correção
+    - Pode ser cargo vago ou dados inconsistentes no SGRH
 
 ## Notas de Implementação
 
@@ -463,11 +497,13 @@ A view é consultada principalmente através de `VW_USUARIO_PERFIL_UNIDADE`:
 A view integra dados de dois sistemas:
 
 **SGRH (externo):**
+
 - Titularidades: Sempre sincronizadas via `VW_UNIDADE`
 - Substituições: Atualizadas em tempo real
 - Fonte autoritativa para dados formais
 
 **SGC (interno):**
+
 - Atribuições temporárias: Controladas pelo próprio sistema
 - Cadastradas por perfil ADMIN
 - Sobrepõem dados do SGRH quando necessário
@@ -475,11 +511,13 @@ A view integra dados de dois sistemas:
 ### Validações de Integridade
 
 **Garantias fornecidas:**
+
 - Unidades elegíveis sempre têm entrada na view (mesmo que com responsável NULL)
 - Apenas uma responsabilidade vigente por unidade por vez
 - Precedência clara entre tipos de responsabilidade
 
 **Validações necessárias:**
+
 - Sistema deve validar que não existam múltiplas atribuições temporárias vigentes para mesma unidade
 - Sistema deve validar que datas de início < datas de término
 - Sistema deve validar que atribuições temporárias não se sobreponham
@@ -495,6 +533,7 @@ A view integra dados de dois sistemas:
 3. Nova atribuição/substituição inicia → Assume a responsabilidade
 
 **Impactos no sistema:**
+
 - Perfis de usuários mudam automaticamente
 - Notificações devem ir para novo responsável
 - Histórico em `ANALISE`, `MOVIMENTACAO` preserva usuário que realizou ação
@@ -502,16 +541,19 @@ A view integra dados de dois sistemas:
 ### Casos Especiais
 
 **Múltiplas responsabilidades:**
+
 - Usuário pode ser responsável por várias unidades simultaneamente
 - Cada unidade tem apenas um responsável
 - Após login, usuário seleciona qual unidade/perfil quer usar
 
 **Responsabilidade circular (improvável mas possível):**
+
 - A (substituto de B) e B (substituto de A)
 - Sistema deve prevenir ou alertar sobre esta situação
 - Validação deve ser feita em `ATRIBUICAO_TEMPORARIA`
 
 **Unidade sem tipo elegível:**
+
 - Se unidade mudar de tipo (ex: tornar-se SEM_EQUIPE)
 - Desaparece da view
 - Responsável perde perfil GESTOR/CHEFE para aquela unidade

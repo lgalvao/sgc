@@ -8,7 +8,7 @@ import {useSubprocessosStore} from '@/stores/subprocessos';
 // Mock router
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
-    useRoute: vi.fn(() => ({ params: { codProcesso: '1', siglaUnidade: 'TEST' } })),
+    useRoute: vi.fn(() => ({params: {codProcesso: '1', siglaUnidade: 'TEST'}})),
     createRouter: vi.fn(() => ({
         beforeEach: vi.fn(),
         afterEach: vi.fn(),
@@ -21,17 +21,17 @@ vi.mock("vue-router", () => ({
 
 describe('CadMapa Coverage', () => {
     const commonStubs = {
-        PageHeader: { template: '<div><slot /><slot name="actions" /></div>' },
-        BButton: { template: '<button />' },
-        BContainer: { template: '<div><slot /></div>' },
-        LoadingButton: { template: '<button />' },
-        EmptyState: { template: '<div><slot /></div>' },
-        CompetenciaCard: { template: '<div />' },
-        CriarCompetenciaModal: { template: '<div />' },
-        DisponibilizarMapaModal: { template: '<div />' },
-        ModalConfirmacao: { template: '<div />' },
-        ImpactoMapaModal: { template: '<div />' },
-        BAlert: { template: '<div />' }
+        PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
+        BButton: {template: '<button />'},
+        BContainer: {template: '<div><slot /></div>'},
+        LoadingButton: {template: '<button />'},
+        EmptyState: {template: '<div><slot /></div>'},
+        CompetenciaCard: {template: '<div />'},
+        CriarCompetenciaModal: {template: '<div />'},
+        DisponibilizarMapaModal: {template: '<div />'},
+        ModalConfirmacao: {template: '<div />'},
+        ImpactoMapaModal: {template: '<div />'},
+        BAlert: {template: '<div />'}
     };
 
     it('removerAtividadeAssociada does nothing if competency not found', async () => {
@@ -40,7 +40,7 @@ describe('CadMapa Coverage', () => {
             initialState: {
                 mapas: {
                     mapaCompleto: {
-                        competencias: [{ codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}] }]
+                        competencias: [{codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}]}]
                     }
                 }
             }
@@ -65,8 +65,8 @@ describe('CadMapa Coverage', () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {
-                subprocessos: { subprocessoDetalhe: null }, // ensures codSubprocesso setup might fail or return null
-                mapas: { mapaCompleto: { competencias: [] } }
+                subprocessos: {subprocessoDetalhe: null}, // ensures codSubprocesso setup might fail or return null
+                mapas: {mapaCompleto: {competencias: []}}
             }
         });
 
@@ -94,7 +94,7 @@ describe('CadMapa Coverage', () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {
-                mapas: { mapaCompleto: { competencias: [] } }
+                mapas: {mapaCompleto: {competencias: []}}
             }
         });
 
@@ -122,7 +122,7 @@ describe('CadMapa Coverage', () => {
             initialState: {
                 mapas: {
                     mapaCompleto: {
-                        competencias: [{ codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}, {codigo: 20}] }]
+                        competencias: [{codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}, {codigo: 20}]}]
                     }
                 }
             }
@@ -173,7 +173,7 @@ describe('CadMapa Coverage', () => {
 
         const store = {
             lastError: {
-                subErrors: [{ field: 'atividadesIds', message: 'Erro ID' }]
+                subErrors: [{field: 'atividadesIds', message: 'Erro ID'}]
             }
         };
 

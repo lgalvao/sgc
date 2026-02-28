@@ -68,7 +68,7 @@ dependencies {
     testImplementation("io.rest-assured:rest-assured-all:6.0.0")
     testImplementation("org.apache.groovy:groovy-all:5.0.4")
     testImplementation("com.icegreen:greenmail-junit5:2.1.3")
-    
+
     // Testes de Mutação
     testImplementation("org.pitest:pitest-junit5-plugin:1.2.3")
 
@@ -255,17 +255,17 @@ tasks.jacocoTestReport {
                     "sgc/Sgc.class",
                     "sgc/**/*Config.class",
                     "sgc/**/*Properties.class",
-                    
+
                     // Exceções (maioria simples)
                     "sgc/**/Erro*.class",
-                    
+
                     // Mocks de teste
                     "sgc/notificacao/NotificacaoModelosServiceMock.class",
-                    
+
                     // Enums simples sem lógica de negócio
                     "sgc/**/Status*.class",
                     "sgc/**/Tipo*.class",
-                    
+
                     // Classes geradas pelo MapStruct
                     "sgc/**/*Impl.class"
                 )
@@ -324,28 +324,32 @@ pitest {
     junit5PluginVersion.set("1.2.3")
     targetClasses.set(listOf("sgc.organizacao.*"))
     targetTests.set(listOf("sgc.organizacao.*"))
-    
-    excludedClasses.set(listOf(
-        "sgc.config.*",              // Configurações Spring
-        "sgc.*Exception",            // Classes de exceção
-        "sgc.*Erro*",                // Todas as classes de erro
-        "sgc.*MapperImpl",           // Mappers MapStruct (gerados)
-        "sgc.*Request",              // Request DTOs
-        "sgc.*Response",             // Response DTOs
-        "sgc.*Query",                // Query objects
-        "sgc.*Command",              // Command objects
-        "sgc.*View",                 // View objects
-        "sgc.*Evento*",               // Event classes (domain events)
-        "sgc.Sgc",                   // Classe main
-    ))
-    
+
+    excludedClasses.set(
+        listOf(
+            "sgc.config.*",              // Configurações Spring
+            "sgc.*Exception",            // Classes de exceção
+            "sgc.*Erro*",                // Todas as classes de erro
+            "sgc.*MapperImpl",           // Mappers MapStruct (gerados)
+            "sgc.*Request",              // Request DTOs
+            "sgc.*Response",             // Response DTOs
+            "sgc.*Query",                // Query objects
+            "sgc.*Command",              // Command objects
+            "sgc.*View",                 // View objects
+            "sgc.*Evento*",               // Event classes (domain events)
+            "sgc.Sgc",                   // Classe main
+        )
+    )
+
     // Métodos ignorados (getters/setters já são excluídos por padrão)
-    excludedMethods.set(listOf(
-        "hashCode",
-        "equals",
-        "toString"
-    ))
-    
+    excludedMethods.set(
+        listOf(
+            "hashCode",
+            "equals",
+            "toString"
+        )
+    )
+
     mutators.set(listOf("ALL"))
     outputFormats.set(listOf("CSV"))
     timestampedReports.set(false)
@@ -353,7 +357,7 @@ pitest {
     timeoutFactor.set(BigDecimal("5.0"))
     verbose.set(true)
     failWhenNoMutations.set(false)
-    
+
     val agentFile = project.configurations.getByName("testRuntimeClasspath").files.find {
         it.name.contains("byte-buddy-agent")
     }
@@ -380,10 +384,10 @@ fun isNonStable(version: String): Boolean {
     val nonStableKeywords = listOf("ALPHA", "BETA", "RC", "CR", "M", "PREVIEW", "BUILD", "SNAPSHOT")
     val upperVersion = version.uppercase()
     val hasNonStableKeyword = nonStableKeywords.any { upperVersion.contains(it) }
-    
+
     val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { upperVersion.contains(it) }
     val regex = "^[0-9,.v-]+(-r)?$".toRegex()
-    
+
     return hasNonStableKeyword || (!stableKeyword && !regex.matches(version))
 }
 
@@ -392,7 +396,7 @@ tasks.register("mutationTest") {
     group = "quality"
     description = "Executa mutation testing completo com PIT (gera relatório em build/reports/pitest)"
     dependsOn("pitest")
-    
+
     doLast {
         val reportDir = layout.buildDirectory.dir("reports/pitest").get().asFile
         println("════════════════════════════════════════════════════════════")
@@ -406,34 +410,34 @@ tasks.register("mutationTest") {
 tasks.register("mutationTestIncremental") {
     group = "quality"
     description = "Mutation testing incremental (apenas classes modificadas recentemente)"
-    
+
     doFirst {
         // Detectar classes modificadas via git
         val gitDiff = providers.exec {
             commandLine("git", "diff", "--name-only", "HEAD~1", "HEAD")
         }.standardOutput.asText.get()
-        
+
         val modifiedClasses = gitDiff.lines()
             .filter { it.startsWith("backend/src/main/java/") && it.endsWith(".java") }
-            .map { 
+            .map {
                 it.removePrefix("backend/src/main/java/")
-                  .removeSuffix(".java")
-                  .replace("/", ".")
+                    .removeSuffix(".java")
+                    .replace("/", ".")
             }
-        
+
         if (modifiedClasses.isEmpty()) {
             println("⚠️  Nenhuma classe Java modificada detectada")
         } else {
             println("🎯 Analisando ${modifiedClasses.size} classe(s) modificada(s):")
             modifiedClasses.forEach { println("   - $it") }
-            
+
             // Configurar PIT para analisar apenas classes modificadas
             tasks.named<PitestTask>("pitest") {
                 targetClasses.set(modifiedClasses)
             }
         }
     }
-    
+
     finalizedBy("pitest")
 }
 
@@ -441,17 +445,17 @@ tasks.register("mutationTestIncremental") {
 tasks.register("mutationTestModulo") {
     group = "quality"
     description = "Mutation testing de um módulo específico (use -PtargetModule=processo)"
-    
+
     doFirst {
         val targetModule = project.findProperty("targetModule")?.toString()
             ?: throw GradleException("Especifique o módulo com -PtargetModule=<modulo> (ex: processo, subprocesso, mapa)")
 
         println("🎯 Analisando módulo: sgc.$targetModule.*")
-        
+
         tasks.named<PitestTask>("pitest") {
             targetClasses.set(listOf("sgc.$targetModule.*"))
         }
     }
-    
+
     finalizedBy("pitest")
 }

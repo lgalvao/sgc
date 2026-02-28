@@ -35,7 +35,6 @@ public class ProcessoDetalheDto {
     private boolean podeDisponibilizarMapaBloco;
 
 
-
     @Getter
     @Setter
     @Builder

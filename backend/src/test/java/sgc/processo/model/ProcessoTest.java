@@ -156,7 +156,7 @@ class ProcessoTest {
             List<UnidadeProcesso> novosParticipantes = new ArrayList<>();
             Unidade unidade = UnidadeFixture.unidadePadrao();
             unidade.setCodigo(1L);
-            
+
             // Simular criação manual de snapshot já que não temos o ID do processo persistido ainda
             UnidadeProcesso snapshot = UnidadeProcesso.criarSnapshot(processo, unidade);
             novosParticipantes.add(snapshot);

@@ -14,18 +14,18 @@ import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentT
 import {logger} from "@/utils";
 
 // Mocks
-const { mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel } = vi.hoisted(() => {
+const {mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel} = vi.hoisted(() => {
     const u = {
         codigo: 10,
         nome: 'Titular Teste',
-        unidade: { codigo: 1, sigla: 'TEST' }
+        unidade: {codigo: 1, sigla: 'TEST'}
     };
     const ur = {
         codigo: 20,
         nome: 'Responsavel Teste',
-        unidade: { codigo: 1, sigla: 'TEST' }
+        unidade: {codigo: 1, sigla: 'TEST'}
     };
-    return { 
+    return {
         mockPush: vi.fn(),
         mockUnidadeData: {
             codigo: 1,
@@ -34,8 +34,8 @@ const { mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel } = vi.ho
             usuarioCodigo: 10,
             tituloTitular: '123456',
             filhas: [
-                { codigo: 2, sigla: 'SUB1', nome: 'Subordinada 1', filhas: [] },
-                { codigo: 3, sigla: 'SUB2', nome: 'Subordinada 2', filhas: [] }
+                {codigo: 2, sigla: 'SUB1', nome: 'Subordinada 1', filhas: []},
+                {codigo: 3, sigla: 'SUB2', nome: 'Subordinada 2', filhas: []}
             ]
         },
         mockUsuario: u,
@@ -125,13 +125,13 @@ describe('Unidade.vue', () => {
                     ...initialStateOverride
                 },
                 {
-                    BContainer: { template: '<div><slot /></div>' },
-                    BCard: { template: '<div><slot /></div>' },
-                    BCardBody: { template: '<div><slot /></div>' },
-                    BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
+                    BContainer: {template: '<div><slot /></div>'},
+                    BCard: {template: '<div><slot /></div>'},
+                    BCardBody: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
                     TreeTable: TreeTableStub,
                 },
-                { stubActions: false }
+                {stubActions: false}
             ),
             props: {
                 codUnidade: 1
@@ -148,24 +148,24 @@ describe('Unidade.vue', () => {
         // but since we used false, we should only mock those we want to change behavior
         vi.spyOn(unidadesStore, 'buscarArvoreUnidade').mockResolvedValue(null);
         vi.spyOn(atribuicaoStore, 'buscarAtribuicoes').mockResolvedValue(null);
-        
+
         usuariosStore.obterUsuarioPorId = vi.fn().mockImplementation((codigo: number) => {
             if (codigo === 10) return mockUsuario;
             if (codigo === 20) return mockUsuarioResponsavel;
             return null;
         });
 
-        return { wrapper: context.wrapper, unidadesStore, atribuicaoStore, perfilStore, usuariosStore, mapasStore };
+        return {wrapper: context.wrapper, unidadesStore, atribuicaoStore, perfilStore, usuariosStore, mapasStore};
     };
 
     it('fetches data on mount', async () => {
-        const { unidadesStore, atribuicaoStore } = createWrapper();
+        const {unidadesStore, atribuicaoStore} = createWrapper();
         expect(unidadesStore.buscarArvoreUnidade).toHaveBeenCalledWith(1);
         expect(atribuicaoStore.buscarAtribuicoes).toHaveBeenCalled();
     });
 
     it('renders unit details correctly', async () => {
-        const { wrapper } = createWrapper({
+        const {wrapper} = createWrapper({
             unidades: {
                 unidade: mockUnidade
             }
@@ -179,7 +179,7 @@ describe('Unidade.vue', () => {
     });
 
     it('renders "Criar atribuição" button only for ADMIN', async () => {
-        const { wrapper, perfilStore } = createWrapper({
+        const {wrapper, perfilStore} = createWrapper({
             unidades: {
                 unidade: mockUnidade
             }
@@ -194,7 +194,7 @@ describe('Unidade.vue', () => {
     });
 
     it('navigates to create assignment', async () => {
-        const { wrapper, perfilStore } = createWrapper({
+        const {wrapper, perfilStore} = createWrapper({
             unidades: {
                 unidade: mockUnidade
             }
@@ -203,7 +203,7 @@ describe('Unidade.vue', () => {
         await wrapper.vm.$nextTick();
 
         await wrapper.find('[data-testid="unidade-view__btn-criar-atribuicao"]').trigger('click');
-        expect(mockPush).toHaveBeenCalledWith({ path: '/unidade/1/atribuicao' });
+        expect(mockPush).toHaveBeenCalledWith({path: '/unidade/1/atribuicao'});
     });
 
     it('calculates dynamic responsible person correctly', async () => {
@@ -214,13 +214,13 @@ describe('Unidade.vue', () => {
         yesterday.setDate(today.getDate() - 1);
 
         const mockAtribuicao = {
-            usuario: { ...mockUsuarioResponsavel, unidade: { codigo: 1 } },
-            unidade: { ...mockUnidade },
+            usuario: {...mockUsuarioResponsavel, unidade: {codigo: 1}},
+            unidade: {...mockUnidade},
             dataInicio: yesterday.toISOString(),
             dataTermino: tomorrow.toISOString(),
         };
 
-        const { wrapper, atribuicaoStore } = createWrapper({
+        const {wrapper, atribuicaoStore} = createWrapper({
             unidades: {
                 unidade: mockUnidade
             },
@@ -240,7 +240,7 @@ describe('Unidade.vue', () => {
     });
 
     it('renders subordinate units tree table', async () => {
-        const { wrapper } = createWrapper({
+        const {wrapper} = createWrapper({
             unidades: {
                 unidade: mockUnidade
             }
@@ -252,7 +252,7 @@ describe('Unidade.vue', () => {
     });
 
     it('navigates to subordinate unit on row click', async () => {
-        const { wrapper } = createWrapper({
+        const {wrapper} = createWrapper({
             unidades: {
                 unidade: mockUnidade
             }
@@ -260,18 +260,18 @@ describe('Unidade.vue', () => {
         await wrapper.vm.$nextTick();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
-        treeTable.vm.$emit('row-click', { codigo: 2 });
+        treeTable.vm.$emit('row-click', {codigo: 2});
 
-        expect(mockPush).toHaveBeenCalledWith({ path: '/unidade/2' });
+        expect(mockPush).toHaveBeenCalledWith({path: '/unidade/2'});
     });
 
     it('renders and clicks "Mapa vigente" button when map exists', async () => {
-        const { wrapper, mapasStore } = createWrapper({
+        const {wrapper, mapasStore} = createWrapper({
             unidades: {
                 unidade: mockUnidade
             }
         });
-        mapasStore.mapaCompleto = { subprocessoCodigo: 99 };
+        mapasStore.mapaCompleto = {subprocessoCodigo: 99};
         await wrapper.vm.$nextTick();
 
         const btn = wrapper.find('[data-testid="btn-mapa-vigente"]');
@@ -280,19 +280,19 @@ describe('Unidade.vue', () => {
         await btn.trigger('click');
         expect(mockPush).toHaveBeenCalledWith({
             name: 'SubprocessoVisMapa',
-            params: { codProcesso: 99, siglaUnidade: 'TEST' }
+            params: {codProcesso: 99, siglaUnidade: 'TEST'}
         });
     });
 
     it('displays error alert when unidadesStore has error', async () => {
-        const { wrapper, unidadesStore } = createWrapper();
+        const {wrapper, unidadesStore} = createWrapper();
         // Since createTestingPinia is used, we can directly modify state or use patch
-        unidadesStore.lastError = { message: 'Erro ao carregar unidade' };
+        unidadesStore.lastError = {message: 'Erro ao carregar unidade'};
         await wrapper.vm.$nextTick();
 
         const alert = wrapper.findComponent(ErrorAlert);
         expect(alert.exists()).toBe(true);
-        expect(alert.props('error')).toEqual({ message: 'Erro ao carregar unidade' });
+        expect(alert.props('error')).toEqual({message: 'Erro ao carregar unidade'});
 
         // Test dismiss
         vi.spyOn(unidadesStore, 'clearError');
@@ -305,7 +305,7 @@ describe('Unidade.vue', () => {
 
         createWrapper({
             unidades: {
-                unidade: { ...mockUnidade, tituloTitular: '123' }
+                unidade: {...mockUnidade, tituloTitular: '123'}
             }
         });
         await flushPromises();
@@ -322,7 +322,7 @@ describe('Unidade.vue', () => {
         };
         (buscarUsuarioPorTitulo as any).mockResolvedValue(mockUserWithContact);
 
-        const { wrapper } = createWrapper({
+        const {wrapper} = createWrapper({
             unidades: {
                 unidade: mockUnidade
             }
@@ -352,13 +352,13 @@ describe('Unidade.vue', () => {
         yesterday.setDate(today.getDate() - 1);
 
         const mockAtribuicao = {
-            usuario: { ...mockUsuarioResponsavel, unidade: { codigo: 1 } },
-            unidade: { ...mockUnidade },
+            usuario: {...mockUsuarioResponsavel, unidade: {codigo: 1}},
+            unidade: {...mockUnidade},
             dataInicio: yesterday.toISOString(),
             dataFim: tomorrow.toISOString(), // Legacy field
         };
 
-        const { wrapper, atribuicaoStore } = createWrapper({
+        const {wrapper, atribuicaoStore} = createWrapper({
             unidades: {
                 unidade: mockUnidade
             },
@@ -382,7 +382,7 @@ describe('Unidade.vue', () => {
         };
         (buscarArvoreUnidade as any).mockResolvedValue(mockUnidadeSemFilhas);
 
-        const { wrapper, unidadesStore } = createWrapper();
+        const {wrapper, unidadesStore} = createWrapper();
         await wrapper.vm.$nextTick();
         await flushPromises();
 
@@ -398,7 +398,7 @@ describe('Unidade.vue', () => {
 
     it('handles null unit gracefully', async () => {
         (buscarArvoreUnidade as any).mockResolvedValue(null);
-        const { wrapper, unidadesStore } = createWrapper();
+        const {wrapper, unidadesStore} = createWrapper();
         await wrapper.vm.$nextTick();
         await flushPromises();
 

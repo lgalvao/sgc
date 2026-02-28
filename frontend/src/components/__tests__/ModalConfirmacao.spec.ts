@@ -66,7 +66,7 @@ describe('ModalConfirmacao.vue', () => {
         if (bModalComp.exists()) {
             await (bModalComp as any).vm.$emit('shown')
         } else {
-             await (wrapper.vm as any).onShown()
+            await (wrapper.vm as any).onShown()
         }
 
         const cancelBtn = wrapper.find('[data-testid="btn-modal-confirmacao-cancelar"]')

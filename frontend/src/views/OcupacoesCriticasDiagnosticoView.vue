@@ -1,8 +1,8 @@
 <template>
   <LayoutPadrao>
     <PageHeader
-        title="Ocupações Críticas"
         :subtitle="`${unidade?.sigla || ''} - ${unidade?.nome || ''}`"
+        title="Ocupações Críticas"
     >
       <template #actions>
         <BButton to="/painel" variant="primary">Voltar</BButton>

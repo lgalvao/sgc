@@ -27,6 +27,7 @@ public class AtividadeFacade {
     private final SubprocessoService subprocessoService;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final UsuarioFacade usuarioService;
+
     public AtividadeFacade(
             MapaManutencaoService mapaManutencaoService,
             @Lazy SubprocessoService subprocessoService,
@@ -113,15 +114,15 @@ public class AtividadeFacade {
         Subprocesso sp = subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo);
 
         if (!permissionEvaluator.checkPermission(usuario, sp, "EDITAR_CADASTRO")) {
-             throw new ErroAcessoNegado("Usuário não tem permissão para editar atividades neste subprocesso.");
+            throw new ErroAcessoNegado("Usuário não tem permissão para editar atividades neste subprocesso.");
         }
 
         if (!Set.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO,
                 MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES,
                 REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES).contains(sp.getSituacao())) {
             throw new ErroValidacao(
-                "Situação do subprocesso não permite esta operação. Situação atual: %s"
-                    .formatted(sp.getSituacao()));
+                    "Situação do subprocesso não permite esta operação. Situação atual: %s"
+                            .formatted(sp.getSituacao()));
         }
     }
 

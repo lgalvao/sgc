@@ -1,15 +1,15 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Cadastro de processo" />
+    <PageHeader title="Cadastro de processo"/>
 
     <BForm class="mt-4 col-md-6 col-sm-8 col-12">
       <FormErrorAlert
           v-model:show="alertState.show"
-          :variant="alertState.variant"
-          :title="alertState.title"
           :body="alertState.body"
           :errors="alertState.errors"
           :stack-trace="alertState.stackTrace"
+          :title="alertState.title"
+          :variant="alertState.variant"
       />
 
       <ProcessoFormFields
@@ -26,21 +26,21 @@
           <LoadingButton
               :disabled="isFormInvalid || isLoading"
               data-testid="btn-processo-iniciar"
-              variant="success"
               icon="play-fill"
               text="Iniciar processo"
+              variant="success"
               @click="abrirModalConfirmacao"
           />
           <LoadingButton
-              :loading="isLoading"
               :disabled="isFormInvalid"
+              :loading="isLoading"
               class="ms-2"
               data-testid="btn-processo-salvar"
+              icon="save"
+              loading-text="Salvando..."
+              text="Salvar"
               type="button"
               variant="outline-primary"
-              icon="save"
-              text="Salvar"
-              loading-text="Salvando..."
               @click="salvarProcesso"
           />
           <LoadingButton
@@ -48,9 +48,9 @@
               :disabled="isLoading"
               class="ms-2"
               data-testid="btn-processo-remover"
-              variant="outline-danger"
               icon="trash"
               text="Remover"
+              variant="outline-danger"
               @click="abrirModalRemocao"
           />
         </div>
@@ -277,7 +277,7 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
 async function salvarProcesso() {
   clearErrors();
   isLoading.value = true;
-  
+
   // Validações agora são feitas no backend via Bean Validation
   try {
     if (processoEditando.value) {

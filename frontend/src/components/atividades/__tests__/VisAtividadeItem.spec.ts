@@ -7,8 +7,8 @@ describe("VisAtividadeItem.vue", () => {
         codigo: 1,
         descricao: "Atividade de Teste",
         conhecimentos: [
-            { codigo: 10, descricao: "Conhecimento 1" },
-            { codigo: 11, descricao: "Conhecimento 2" }
+            {codigo: 10, descricao: "Conhecimento 1"},
+            {codigo: 11, descricao: "Conhecimento 2"}
         ]
     };
 
@@ -19,8 +19,8 @@ describe("VisAtividadeItem.vue", () => {
             },
             global: {
                 stubs: {
-                    BCard: { template: '<div><slot /></div>' },
-                    BCardBody: { template: '<div><slot /></div>' }
+                    BCard: {template: '<div><slot /></div>'},
+                    BCardBody: {template: '<div><slot /></div>'}
                 }
             }
         });
@@ -35,12 +35,12 @@ describe("VisAtividadeItem.vue", () => {
     it("deve renderizar corretamente mesmo sem conhecimentos", () => {
         const wrapper = mount(VisAtividadeItem, {
             props: {
-                atividade: { ...mockAtividade, conhecimentos: [] }
+                atividade: {...mockAtividade, conhecimentos: []}
             },
             global: {
                 stubs: {
-                    BCard: { template: '<div><slot /></div>' },
-                    BCardBody: { template: '<div><slot /></div>' }
+                    BCard: {template: '<div><slot /></div>'},
+                    BCardBody: {template: '<div><slot /></div>'}
                 }
             }
         });

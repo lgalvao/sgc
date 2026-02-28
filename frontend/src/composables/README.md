@@ -5,6 +5,7 @@ Este diretório contém funções que encapsulam lógica de estado e UI reutiliz
 ## Composables Disponíveis
 
 ### Lógica de UI e Estado
+
 * **`useApi.ts`**: Wrapper para chamadas de API com estados de `loading` e `error` integrados.
 * **`useErrorHandler.ts`**: Tratamento padronizado de erros de API e exibição de feedbacks.
 * **`useLoadingManager.ts`**: Controle centralizado de indicadores de carregamento.
@@ -13,11 +14,13 @@ Este diretório contém funções que encapsulam lógica de estado e UI reutiliz
 * **`useFormErrors.ts`**: Gestão e exibição de erros de validação em formulários.
 
 ### Domínio e Negócio
+
 * **`usePerfil.ts`**: Lógica para cálculo de permissões e contexto do usuário logado.
 * **`useBreadcrumbs.ts`**: Geração dinâmica da trilha de navegação (breadcrumbs).
 * **`useRelatorios.ts`**: Lógica de busca e filtros para a central de relatórios.
 
 ### Fluxos Específicos (Views)
+
 * **`useProcessoView.ts` / `useProcessoForm.ts`**: Lógica para telas de detalhes e cadastro de processos.
 * **`useUnidadeView.ts`**: Lógica para a tela de detalhes da unidade.
 * **`useCadAtividades.ts` / `useAtividadeForm.ts`**: Suporte ao fluxo de cadastro de atividades.

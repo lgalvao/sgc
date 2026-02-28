@@ -1,10 +1,10 @@
 <template>
   <ModalPadrao
       v-model="modelValueComputed"
-      tamanho="xl"
-      titulo="Mapas Vigentes"
       :mostrar-botao-acao="false"
+      tamanho="xl"
       texto-cancelar="Fechar"
+      titulo="Mapas Vigentes"
   >
     <div class="mb-3">
       <BButton

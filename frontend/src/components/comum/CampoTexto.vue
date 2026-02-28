@@ -5,12 +5,12 @@
     </template>
     <BFormInput
         :id="id"
-        :model-value="modelValue"
-        :state="erro ? false : null"
+        :data-testid="dataTestid"
         :disabled="disabled"
+        :model-value="modelValue"
         :placeholder="placeholder"
         :required="obrigatorio"
-        :data-testid="dataTestid"
+        :state="erro ? false : null"
         type="text"
         @update:model-value="emit('update:modelValue', String($event))"
     />

@@ -19,11 +19,16 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ImpactoMapaServiceTest {
-    @Mock private MapaRepo mapaRepo;
-    @Mock private CompetenciaRepo competenciaRepo;
-    @Mock private MapaManutencaoService mapaManutencaoService;
-    @Mock private SgcPermissionEvaluator permissionEvaluator;
-    @Mock private ComumRepo repo;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
+    @Mock
+    private MapaManutencaoService mapaManutencaoService;
+    @Mock
+    private SgcPermissionEvaluator permissionEvaluator;
+    @Mock
+    private ComumRepo repo;
 
     @InjectMocks
     private ImpactoMapaService impactoMapaService;
@@ -82,7 +87,7 @@ class ImpactoMapaServiceTest {
 
         // Vigente: vazio
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L)).thenReturn(Collections.emptyList());
-        
+
         // Atual: 1 atividade
         Atividade nova = new Atividade();
         nova.setCodigo(1L);
@@ -123,7 +128,7 @@ class ImpactoMapaServiceTest {
         antiga.setDescricao("Antiga");
         antiga.setConhecimentos(Collections.emptySet());
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L)).thenReturn(Collections.singletonList(antiga));
-        
+
         // Atual: vazio (foi removida)
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L)).thenReturn(Collections.emptyList());
 
@@ -138,7 +143,7 @@ class ImpactoMapaServiceTest {
 
         assertEquals(1, result.removidas().size());
         assertEquals("Antiga", result.removidas().getFirst().descricao());
-        
+
         assertEquals(1, result.competenciasImpactadas().size());
         assertEquals("Comp A", result.competenciasImpactadas().getFirst().descricao());
     }
@@ -169,9 +174,9 @@ class ImpactoMapaServiceTest {
         Conhecimento c1 = new Conhecimento();
         c1.setDescricao("C1");
         ativVigente.setConhecimentos(Set.of(c1));
-        
+
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L)).thenReturn(Collections.singletonList(ativVigente));
-        
+
         // Atual: Ativ A com Conhecimento C2 (alterado)
         Atividade ativAtual = new Atividade();
         ativAtual.setCodigo(2L);
@@ -179,7 +184,7 @@ class ImpactoMapaServiceTest {
         Conhecimento c2 = new Conhecimento();
         c2.setDescricao("C2");
         ativAtual.setConhecimentos(Set.of(c2));
-        
+
         when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L)).thenReturn(Collections.singletonList(ativAtual));
 
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
@@ -306,10 +311,10 @@ class ImpactoMapaServiceTest {
             Unidade u = new Unidade();
             u.setCodigo(100L);
             sp.setUnidade(u);
-            
+
             Mapa mapaVigente = new Mapa();
             mapaVigente.setCodigo(20L);
-            
+
             Mapa mapaSub = new Mapa();
             mapaSub.setCodigo(21L);
 
@@ -319,20 +324,20 @@ class ImpactoMapaServiceTest {
             Atividade a1 = new Atividade();
             a1.setCodigo(10L);
             a1.setDescricao("Mesma");
-            
+
             Atividade a2 = new Atividade();
             a2.setCodigo(11L);
             a2.setDescricao("Mesma");
-            
+
             when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(20L))
                     .thenReturn(List.of(a1, a2));
             when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(21L))
                     .thenReturn(List.of());
-            
+
             when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(Collections.emptyList());
 
             ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, usuarioAdmin());
-            
+
             assertEquals(2, response.removidas().size());
         }
 
@@ -345,10 +350,10 @@ class ImpactoMapaServiceTest {
             Unidade u = new Unidade();
             u.setCodigo(100L);
             sp.setUnidade(u);
-            
+
             Mapa mapaVigente = new Mapa();
             mapaVigente.setCodigo(20L);
-            
+
             Mapa mapaSub = new Mapa();
             mapaSub.setCodigo(21L);
 
@@ -374,11 +379,11 @@ class ImpactoMapaServiceTest {
             comp.setCodigo(50L);
             comp.setDescricao("Comp A");
             comp.setAtividades(Set.of(aVigente));
-            
+
             when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of(comp));
 
             ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, usuarioAdmin());
-            
+
             assertEquals(1, response.alteradas().size());
             assertEquals(1, response.competenciasImpactadas().size());
         }

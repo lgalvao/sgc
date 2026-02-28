@@ -118,9 +118,9 @@ public class E2eController {
 
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
-            
+
             stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
-            
+
             String subquerySubprocessos = "(SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = " + codigo + ")";
             String subqueryMapas = "(SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN " + subquerySubprocessos + ")";
 
@@ -134,7 +134,7 @@ public class E2eController {
             jdbcTemplate.update("DELETE FROM sgc.competencia_atividade WHERE competencia_codigo IN (SELECT codigo FROM sgc.competencia WHERE mapa_codigo IN " + subqueryMapas + ")");
             jdbcTemplate.update("DELETE FROM sgc.atividade WHERE mapa_codigo IN " + subqueryMapas);
             jdbcTemplate.update("DELETE FROM sgc.competencia WHERE mapa_codigo IN " + subqueryMapas);
-            
+
             // Limpar referências de Mapa Vigente antes de excluir o Mapa
             jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE mapa_vigente_codigo IN " + subqueryMapas);
             jdbcTemplate.update("DELETE FROM sgc.mapa WHERE subprocesso_codigo IN " + subquerySubprocessos);
@@ -148,7 +148,7 @@ public class E2eController {
             // 4. Limpar UnidadeProcesso e Processo
             jdbcTemplate.update("DELETE FROM sgc.unidade_processo WHERE processo_codigo = ?", codigo);
             jdbcTemplate.update("DELETE FROM sgc.processo WHERE codigo = ?", codigo);
-            
+
             stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
             log.info("Limpeza robusta do processo {} concluída.", codigo);
         } catch (Exception e) {

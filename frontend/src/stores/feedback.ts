@@ -52,7 +52,7 @@ export const useFeedbackStore = defineStore('feedback', () => {
             }, 100);
         } else {
             // Se o toast ainda não foi injetado (ex: erro na inicialização do app), enfileira
-            messageQueue.value.push({ title, message, variant, autoHideDelay });
+            messageQueue.value.push({title, message, variant, autoHideDelay});
         }
     }
 

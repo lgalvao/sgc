@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Criar atribuição temporária" />
+    <PageHeader title="Criar atribuição temporária"/>
     <BCard class="mb-4 mt-4">
       <BCardBody>
         <h5 class="card-title mb-3">
@@ -16,11 +16,11 @@
                 id="usuario"
                 v-model="usuarioSelecionado"
                 :options="usuarios"
+                :state="erroUsuario ? false : null"
                 data-testid="select-usuario"
                 required
                 text-field="nome"
                 value-field="tituloEleitoral"
-                :state="erroUsuario ? false : null"
             >
               <template #first>
                 <BFormSelectOption
@@ -73,19 +73,19 @@
             />
           </div>
           <LoadingButton
+              :loading="isLoading"
               data-testid="cad-atribuicao__btn-criar-atribuicao"
+              loading-text="Criando..."
+              text="Criar"
               type="submit"
               variant="primary"
-              :loading="isLoading"
-              text="Criar"
-              loading-text="Criando..."
           />
           <BButton
+              :disabled="isLoading"
               class="ms-2"
               data-testid="btn-cancelar-atribuicao"
               type="button"
               variant="secondary"
-              :disabled="isLoading"
               @click="router.push(`/unidade/${codUnidade}`)"
           >
             Cancelar
@@ -173,7 +173,8 @@ async function criarAtribuicao() {
       tituloEleitoralUsuario: usuarioSelecionado.value,
       dataInicio: dataInicio.value,
       dataTermino: dataTermino.value,
-      justificativa: justificativa.value});
+      justificativa: justificativa.value
+    });
 
     feedbackStore.show('Sucesso', 'Atribuição criada com sucesso!', 'success');
 

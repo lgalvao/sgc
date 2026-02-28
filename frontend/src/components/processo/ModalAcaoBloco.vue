@@ -1,10 +1,10 @@
 <template>
-  <div :id="id" ref="modalElement" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div :id="id" ref="modalElement" aria-hidden="true" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ titulo }}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          <button aria-label="Fechar" class="btn-close" data-bs-dismiss="modal" type="button"></button>
         </div>
         <div class="modal-body">
           <p class="mb-3">{{ texto }}</p>
@@ -14,39 +14,43 @@
           </div>
 
           <div v-if="mostrarDataLimite" class="mb-3">
-            <label for="dataLimiteBloco" class="form-label required">Data Limite</label>
-            <input id="dataLimiteBloco" v-model="dataLimite" type="date" class="form-control" required>
+            <label class="form-label required" for="dataLimiteBloco">Data Limite</label>
+            <input id="dataLimiteBloco" v-model="dataLimite" class="form-control" required type="date">
           </div>
 
           <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
             <table class="table table-sm table-hover">
               <thead>
-                <tr>
-                  <th style="width: 40px">
-                    <input type="checkbox" class="form-check-input" :checked="todosSelecionados" :disabled="processando" @change="toggleTodos">
-                  </th>
-                  <th>Sigla</th>
-                  <th>Nome</th>
-                  <th>Situação</th>
-                </tr>
+              <tr>
+                <th style="width: 40px">
+                  <input :checked="todosSelecionados" :disabled="processando" class="form-check-input" type="checkbox"
+                         @change="toggleTodos">
+                </th>
+                <th>Sigla</th>
+                <th>Nome</th>
+                <th>Situação</th>
+              </tr>
               </thead>
               <tbody>
-                <tr v-for="unidade in unidades" :key="unidade.codigo">
-                  <td>
-                    <input v-model="selecionadosLocal" type="checkbox" class="form-check-input" :value="unidade.codigo" :disabled="processando">
-                  </td>
-                  <td>{{ unidade.sigla }}</td>
-                  <td>{{ unidade.nome }}</td>
-                  <td>{{ unidade.situacao }}</td>
-                </tr>
+              <tr v-for="unidade in unidades" :key="unidade.codigo">
+                <td>
+                  <input v-model="selecionadosLocal" :disabled="processando" :value="unidade.codigo" class="form-check-input"
+                         type="checkbox">
+                </td>
+                <td>{{ unidade.sigla }}</td>
+                <td>{{ unidade.nome }}</td>
+                <td>{{ unidade.situacao }}</td>
+              </tr>
               </tbody>
             </table>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" :disabled="processando">Cancelar</button>
-          <button type="button" class="btn btn-primary" :disabled="processando || selecionadosLocal.length === 0" @click="confirmar">
-            <output v-if="processando" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></output>
+          <button :disabled="processando" class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancelar
+          </button>
+          <button :disabled="processando || selecionadosLocal.length === 0" class="btn btn-primary" type="button"
+                  @click="confirmar">
+            <output v-if="processando" aria-hidden="true" class="spinner-border spinner-border-sm me-2"></output>
             {{ rotuloBotao }}
           </button>
         </div>
@@ -55,7 +59,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, onMounted, ref, watch} from 'vue';
 import {Modal} from 'bootstrap';
 
@@ -118,22 +122,22 @@ function confirmar() {
 }
 
 function abrir() {
-    modalInstance.value?.show();
+  modalInstance.value?.show();
 }
 
 function fechar() {
-    modalInstance.value?.hide();
-    processando.value = false;
-    erro.value = null;
-    dataLimite.value = '';
+  modalInstance.value?.hide();
+  processando.value = false;
+  erro.value = null;
+  dataLimite.value = '';
 }
 
 function setProcessando(val: boolean) {
-    processando.value = val;
+  processando.value = val;
 }
 
 function setErro(msg: string | null) {
-    erro.value = msg;
+  erro.value = msg;
 }
 
 // Expor métodos para controle do pai e satisfazer o linter (uso no template)
@@ -148,7 +152,7 @@ defineExpose({
 
 watch(() => props.unidadesPreSelecionadas, (newVal) => {
   selecionadosLocal.value = [...newVal];
-}, { immediate: true });
+}, {immediate: true});
 
 onMounted(() => {
   if (modalElement.value) {

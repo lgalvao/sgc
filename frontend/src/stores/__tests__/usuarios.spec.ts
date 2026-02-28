@@ -8,7 +8,7 @@ const mockUsuarios: Usuario[] = [
     {
         codigo: 1,
         nome: "Ana Paula Souza",
-        unidade: { codigo: 1, nome: "Seção de Seleção", sigla: "SESEL" },
+        unidade: {codigo: 1, nome: "Seção de Seleção", sigla: "SESEL"},
         email: "ana.souza@tre-pe.jus.br",
         ramal: "1234",
         tituloEleitoral: "123456789",
@@ -16,7 +16,7 @@ const mockUsuarios: Usuario[] = [
     {
         codigo: 2,
         nome: "Carlos Henrique Lima",
-        unidade: { codigo: 2, nome: "Seção de Gestão de Pessoas", sigla: "SGP" },
+        unidade: {codigo: 2, nome: "Seção de Gestão de Pessoas", sigla: "SGP"},
         email: "carlos.lima@tre-pe.jus.br",
         ramal: "2345",
         tituloEleitoral: "987654321",
@@ -91,7 +91,7 @@ describe("useUsuariosStore", () => {
 
         it("clearError deve limpar erros normalizados e a string de erro", () => {
             context.store.error = "Algum erro";
-            context.store.lastError = { message: "Erro normalizado" } as any;
+            context.store.lastError = {message: "Erro normalizado"} as any;
 
             context.store.clearError();
 

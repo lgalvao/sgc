@@ -192,6 +192,7 @@ class GerenciadorJwtTest {
         Optional<String> result = gerenciador.validarTokenPreAuth("invalid.token");
         assertThat(result).isEmpty();
     }
+
     @Nested
     @DisplayName("Cobertura Extra")
     class CoberturaExtra {
@@ -230,11 +231,11 @@ class GerenciadorJwtTest {
         private String gerarTokenCustomizado(String sub, String perfil, Long unidade) {
             var builder = Jwts.builder()
                     .signWith(Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)));
-            
+
             if (sub != null) builder.subject(sub);
             if (perfil != null) builder.claim("perfil", perfil);
             if (unidade != null) builder.claim("unidade", unidade);
-            
+
             return builder.compact();
         }
     }

@@ -2,7 +2,7 @@
 
 /**
  * Script para gerar um plano de ação abrangente para alcançar 100% de cobertura
- * 
+ *
  * Este script:
  * 1. Analisa o relatório JaCoCo
  * 2. Identifica arquivos com cobertura < 100%
@@ -13,7 +13,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { execSync } = require('node:child_process');
+const {execSync} = require('node:child_process');
 const xml2js = require('xml2js');
 
 // Configuração
@@ -27,8 +27,8 @@ const GRADLE_CMD = isWindows ? 'gradlew.bat :backend:test :backend:jacocoTestRep
 const CATEGORIES = {
     P1_CRITICAL: {
         patterns: [/Service\.java$/, /Facade\.java$/, /Policy\.java$/, /Validator\.java$/,
-                  /Listener\.java$/, /Factory\.java$/, /Builder\.java$/,
-                  /Calculator\.java$/, /Finalizador\.java$/, /Inicializador\.java$/],
+            /Listener\.java$/, /Factory\.java$/, /Builder\.java$/,
+            /Calculator\.java$/, /Finalizador\.java$/, /Inicializador\.java$/],
         priority: 1,
         description: '🔴 CRÍTICO - Lógica de negócio central'
     },
@@ -48,28 +48,28 @@ const CATEGORIES = {
 const IGNORE_PATTERNS = [
     // Gerados automaticamente
     /MapperImpl/,
-    
+
     // Bootstrap e configuração
     /Sgc\.java$/,
     /Config.*\.java$/,
     /Properties\.java$/,
-    
+
     // DTOs e Request/Response (apenas dados)
     /Dto\.java$/,
     /Request\.java$/,
     /Response\.java$/,
-    
+
     // Exceções (maioria simples)
     /Erro.*\.java$/,
     /Exception\.java$/,
-    
+
     // Mocks de teste
     /Mock\.java$/,
     /Test\.java$/,
-    
+
     // Repositórios (interfaces JPA)
     /Repo\.java$/,
-    
+
     // Entidades JPA simples (sem lógica de negócio)
     /model\/Perfil\.java$/,
     /model\/Usuario\.java$/,
@@ -87,7 +87,7 @@ const IGNORE_PATTERNS = [
     /model\/Competencia.*\.java$/,
     /model\/Notificacao\.java$/,
     /model\/Processo\.java$/,
-    
+
     // Enums simples sem lógica de negócio
     /Status.*\.java$/,
     /Tipo.*\.java$/
@@ -113,7 +113,7 @@ function categorizeFile(className) {
     // Categorizar por prioridade
     for (const [categoryName, category] of Object.entries(CATEGORIES)) {
         if (category.patterns.some(pattern => pattern.test(className))) {
-            return { name: categoryName, ...category };
+            return {name: categoryName, ...category};
         }
     }
 
@@ -123,7 +123,7 @@ function categorizeFile(className) {
 async function runTests() {
     console.log('🚀 Executando testes e gerando relatório JaCoCo...');
     try {
-        execSync(GRADLE_CMD, { cwd: BASE_DIR, stdio: 'inherit' });
+        execSync(GRADLE_CMD, {cwd: BASE_DIR, stdio: 'inherit'});
     } catch (error) {
         console.warn('⚠️ Alguns testes falharam, mas prosseguindo com análise...');
     }
@@ -210,7 +210,7 @@ async function analyzeAndGeneratePlan() {
             // Se não tem 100% de cobertura
             if (lineCoverage < 100 || branchCoverage < 100) {
                 filesWithGaps++;
-                
+
                 const score = (linesTotal - linesCovered) + (branchesTotal - branchesCovered) * 0.5;
 
                 const categoryName = category.name || 'P3_NORMAL';
@@ -274,7 +274,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
     // Detalhar cada categoria
     Object.entries(CATEGORIES).forEach(([categoryName, category]) => {
         const items = results[categoryName];
-        
+
         if (items.length === 0) {
             markdown += `## ${category.description}\n\n✅ **Todos os arquivos desta categoria têm 100% de cobertura!**\n\n`;
             return;
@@ -287,7 +287,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
             markdown += `### ${index + 1}. \`${item.class}\`\n\n`;
             markdown += `- **Cobertura de Linhas:** ${item.lineCoverage}% (${item.missedLines} linha(s) não cobertas)\n`;
             markdown += `- **Cobertura de Branches:** ${item.branchCoverage}% (${item.missedBranches} branch(es) não cobertos)\n`;
-            
+
             if (item.missedLinesDetails.length > 0) {
                 markdown += `- **Linhas não cobertas:** ${item.missedLinesDetails.join(', ')}`;
                 if (item.missedLines > item.missedLinesDetails.length) {
@@ -322,7 +322,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 async function main() {
     const runTestsArg = process.argv.includes('--run');
-    
+
     if (runTestsArg) {
         await runTests();
     }

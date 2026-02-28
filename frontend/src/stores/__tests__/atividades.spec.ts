@@ -101,8 +101,8 @@ describe("useAtividadesStore", () => {
             ]);
             const novoConhecimento = {codigo: 1, descricao: "Novo Conhecimento"};
             const atividadeComConhecimento = {
-                codigo: 1, 
-                descricao: "Atividade Teste", 
+                codigo: 1,
+                descricao: "Atividade Teste",
                 conhecimentos: [novoConhecimento]
             };
             vi.mocked(atividadeService.criarConhecimento).mockResolvedValue({
@@ -147,8 +147,8 @@ describe("useAtividadesStore", () => {
                 },
             ]);
             const atividadeSemConhecimento = {
-                codigo: 1, 
-                descricao: "Atividade Teste", 
+                codigo: 1,
+                descricao: "Atividade Teste",
                 conhecimentos: []
             };
             vi.mocked(atividadeService.excluirConhecimento).mockResolvedValue({

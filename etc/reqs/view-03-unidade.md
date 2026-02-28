@@ -2,11 +2,15 @@
 
 ## Finalidade
 
-Esta view é a **principal fonte de informações sobre unidades organizacionais** no SGC. Ela consolida dados do SGRH sobre unidades do TRE-PE, enriquecendo-os com informações sobre titularidade, classificação hierárquica (tipo), situação operacional, e estrutura organizacional. É a base para toda a árvore de unidades do sistema, incluindo uma unidade virtual raiz (ADMIN) que não existe no SGRH.
+Esta view é a **principal fonte de informações sobre unidades organizacionais** no SGC. Ela consolida dados do SGRH
+sobre unidades do TRE-PE, enriquecendo-os com informações sobre titularidade, classificação hierárquica (tipo), situação
+operacional, e estrutura organizacional. É a base para toda a árvore de unidades do sistema, incluindo uma unidade
+virtual raiz (ADMIN) que não existe no SGRH.
 
 ## Origem dos Dados
 
 **Sistema de Gestão de Recursos Humanos (SRH2):**
+
 - `SRH2.UNIDADE_TSE`: Unidades organizacionais
 - `SRH2.LOTACAO`: Lotações de servidores
 - `SRH2.QFC_OCUP_COM`: Ocupações de cargos comissionados
@@ -14,21 +18,22 @@ Esta view é a **principal fonte de informações sobre unidades organizacionais
 - `SRH2.SERVIDOR`: Dados dos servidores
 
 **Views do Sistema:**
+
 - `VW_ZONA_RESP_CENTRAL`: Para determinar hierarquia de CAEs
 
 ## Estrutura da View
 
-| Coluna | Tipo | Descrição | Origem |
-|--------|------|-----------|--------|
-| `codigo` | NUMBER | Código único da unidade (PK) | `UNIDADE_TSE.CD` ou 1 (ADMIN) |
-| `nome` | VARCHAR2(255) | Nome completo da unidade | `UNIDADE_TSE.DS` |
-| `sigla` | VARCHAR2(20) | Sigla da unidade | `UNIDADE_TSE.SIGLA_UNID_TSE` |
-| `matricula_titular` | VARCHAR2(8) | Matrícula do servidor titular da unidade | Processado de `QFC_OCUP_COM` |
-| `titulo_titular` | VARCHAR2(12) | Título de eleitor do titular | `SERVIDOR.NUM_TIT_ELE` |
-| `data_inicio_titularidade` | DATE | Data de início da titularidade atual | `QFC_OCUP_COM.DT_INGRESSO` |
-| `tipo` | VARCHAR2(20) | Classificação da unidade | Calculado (ver RN-VIEW03-03) |
-| `situacao` | VARCHAR2(20) | Situação operacional | Derivado de `UNIDADE_TSE.SIT_UNID` |
-| `unidade_superior_codigo` | NUMBER | Código da unidade hierarquicamente superior | Processado (ver RN-VIEW03-04) |
+| Coluna                     | Tipo          | Descrição                                   | Origem                             |
+|----------------------------|---------------|---------------------------------------------|------------------------------------|
+| `codigo`                   | NUMBER        | Código único da unidade (PK)                | `UNIDADE_TSE.CD` ou 1 (ADMIN)      |
+| `nome`                     | VARCHAR2(255) | Nome completo da unidade                    | `UNIDADE_TSE.DS`                   |
+| `sigla`                    | VARCHAR2(20)  | Sigla da unidade                            | `UNIDADE_TSE.SIGLA_UNID_TSE`       |
+| `matricula_titular`        | VARCHAR2(8)   | Matrícula do servidor titular da unidade    | Processado de `QFC_OCUP_COM`       |
+| `titulo_titular`           | VARCHAR2(12)  | Título de eleitor do titular                | `SERVIDOR.NUM_TIT_ELE`             |
+| `data_inicio_titularidade` | DATE          | Data de início da titularidade atual        | `QFC_OCUP_COM.DT_INGRESSO`         |
+| `tipo`                     | VARCHAR2(20)  | Classificação da unidade                    | Calculado (ver RN-VIEW03-03)       |
+| `situacao`                 | VARCHAR2(20)  | Situação operacional                        | Derivado de `UNIDADE_TSE.SIT_UNID` |
+| `unidade_superior_codigo`  | NUMBER        | Código da unidade hierarquicamente superior | Processado (ver RN-VIEW03-04)      |
 
 ## Regras de Negócio
 
@@ -52,6 +57,7 @@ FROM DUAL
 ```
 
 **Características da unidade ADMIN:**
+
 - Código fixo: 1
 - Não possui titular
 - Não possui unidade superior (é a raiz da árvore)
@@ -59,7 +65,8 @@ FROM DUAL
 - Sempre ativa
 - Quantidade de servidores e unidades filhas = 0
 
-**Justificativa:** Esta unidade serve como ponto de partida para todos os processos de mapeamento, revisão e diagnóstico. Usuários com perfil ADMIN atuam no contexto desta unidade.
+**Justificativa:** Esta unidade serve como ponto de partida para todos os processos de mapeamento, revisão e
+diagnóstico. Usuários com perfil ADMIN atuam no contexto desta unidade.
 
 ### RN-VIEW03-02: Filtragem de Unidades do SGRH
 
@@ -70,20 +77,25 @@ WHERE cd NOT IN (1, 6, 19, 37, 634, 635, 637)
 ```
 
 **Justificativa:**
+
 - Código 1 é reservado para a unidade virtual ADMIN
-- Códigos 6, 19, 37, 634, 635, 637 são unidades que seriam mapeadas incorretamente para a unidade ADMIN (código 1) se não fossem filtradas
+- Códigos 6, 19, 37, 634, 635, 637 são unidades que seriam mapeadas incorretamente para a unidade ADMIN (código 1) se
+  não fossem filtradas
 
 ### RN-VIEW03-03: Determinação do Tipo da Unidade
 
 O tipo da unidade é calculado através de uma lógica complexa que considera múltiplos fatores:
 
 #### Unidades Extintas
+
 ```sql
 WHEN sit_unid LIKE 'E%' THEN ''
 ```
+
 Unidades extintas não recebem classificação de tipo.
 
 #### Unidades sem Unidades Filhas
+
 Para unidades que não possuem subordinadas (`qtd_unidades_filhas = 0`):
 
 ```sql
@@ -94,7 +106,8 @@ ELSE 'OPERACIONAL'
 - **SEM_EQUIPE**: Menos de 2 servidores lotados
 - **OPERACIONAL**: 2 ou mais servidores lotados
 
-**Observação importante:** A contagem de servidores inclui não apenas os servidores diretamente lotados, mas também servidores de unidades filhas que sejam únicas em suas respectivas unidades (ver RN-VIEW03-06).
+**Observação importante:** A contagem de servidores inclui não apenas os servidores diretamente lotados, mas também
+servidores de unidades filhas que sejam únicas em suas respectivas unidades (ver RN-VIEW03-06).
 
 #### Unidades com Unidades Filhas
 
@@ -120,18 +133,19 @@ ELSE 'INTERMEDIARIA'
 ```
 
 Se alguma filha tem >1 servidor ou tem subunidades:
+
 - **INTEROPERACIONAL**: A unidade atual tem mais de 1 servidor lotado
 - **INTERMEDIARIA**: A unidade atual tem no máximo 1 servidor lotado (apenas o titular)
 
 #### Resumo dos Tipos
 
-| Tipo | Definição | Perfis Aplicáveis |
-|------|-----------|-------------------|
-| `RAIZ` | Unidade virtual ADMIN | ADMIN |
-| `SEM_EQUIPE` | Unidade sem subordinadas e menos de 2 servidores | Nenhum (não participa de processos) |
-| `OPERACIONAL` | Unidade-folha com 2+ servidores OU unidade com filhas sem servidores/subfilhas | CHEFE, SERVIDOR |
-| `INTEROPERACIONAL` | Unidade com filhas operacionais E 2+ servidores próprios | GESTOR, CHEFE, SERVIDOR |
-| `INTERMEDIARIA` | Unidade com filhas operacionais mas apenas titular | GESTOR |
+| Tipo               | Definição                                                                      | Perfis Aplicáveis                   |
+|--------------------|--------------------------------------------------------------------------------|-------------------------------------|
+| `RAIZ`             | Unidade virtual ADMIN                                                          | ADMIN                               |
+| `SEM_EQUIPE`       | Unidade sem subordinadas e menos de 2 servidores                               | Nenhum (não participa de processos) |
+| `OPERACIONAL`      | Unidade-folha com 2+ servidores OU unidade com filhas sem servidores/subfilhas | CHEFE, SERVIDOR                     |
+| `INTEROPERACIONAL` | Unidade com filhas operacionais E 2+ servidores próprios                       | GESTOR, CHEFE, SERVIDOR             |
+| `INTERMEDIARIA`    | Unidade com filhas operacionais mas apenas titular                             | GESTOR                              |
 
 ### RN-VIEW03-04: Determinação da Unidade Superior
 
@@ -148,15 +162,18 @@ END AS cod_unid_super
 ```
 
 **Regra 1 - Centrais de Atendimento (CAE):**
+
 - Unidades CAE têm como superior a zona eleitoral sob sua responsabilidade
 - Busca em `VW_ZONA_RESP_CENTRAL` pelo `codigo_zona_resp`
 - Se não houver zona atribuída, retorna NULL
 
 **Regra 2 - Unidades Especiais:**
+
 - Unidades com superior nos códigos 6, 19, 37, 634, 635, 637 são remapeadas para a unidade ADMIN (código 1)
 - Torna essas unidades filhas diretas da raiz administrativa
 
 **Regra 3 - Demais Unidades:**
+
 - Mantêm a hierarquia original do SGRH (`cod_unid_super`)
 
 ### RN-VIEW03-05: Determinação do Titular
@@ -179,6 +196,7 @@ WHERE c.dt_dispensa IS NULL
 ```
 
 **Critérios para ser titular:**
+
 1. Ter ocupação de cargo comissionado (`qfc_ocup_com`)
 2. Cargo não dispensado (`dt_dispensa IS NULL`)
 3. Marcado como titular (`titular_com = 1`)
@@ -186,6 +204,7 @@ WHERE c.dt_dispensa IS NULL
 5. Vaga de comissionado ativa
 
 **Importante:** Uma unidade pode não ter titular se:
+
 - Não houver cargo comissionado associado
 - O cargo estiver vago
 - O titular estiver afastado/dispensado
@@ -195,6 +214,7 @@ WHERE c.dt_dispensa IS NULL
 A contagem de servidores de uma unidade é complexa e inclui dois grupos:
 
 **Grupo 1 - Servidores Diretamente Lotados:**
+
 ```sql
 SELECT l1.cod_unid_tse, COUNT(1) + nvl(...ajuste..., 0) as qtd_servidores
 FROM srh2.lotacao l1
@@ -203,6 +223,7 @@ GROUP BY l1.cod_unid_tse
 ```
 
 **Grupo 2 - Servidores Únicos de Filhas sem Subfilhas:**
+
 ```sql
 SELECT DECODE(qtd_servidores, 1, 1, 0)
 FROM (
@@ -217,11 +238,13 @@ WHERE cod_unid_super = [unidade_atual]
 ```
 
 **Lógica do Grupo 2:**
+
 - Se uma unidade filha tem exatamente 1 servidor
 - E essa filha não tem subunidades próprias
 - Então esse servidor é contado também para a unidade superior
 
-**Justificativa:** Um servidor único em uma unidade-folha é considerado como parte da equipe da unidade superior para fins de classificação.
+**Justificativa:** Um servidor único em uma unidade-folha é considerado como parte da equipe da unidade superior para
+fins de classificação.
 
 ### RN-VIEW03-07: Situação da Unidade
 
@@ -246,6 +269,7 @@ Unidades inativas não participam de processos e não aparecem na árvore de uni
 **Contexto:** Tela "Unidades" (perfil ADMIN) e "Minha unidade" (outros perfis).
 
 **Implementação:**
+
 ```sql
 SELECT codigo, nome, sigla, tipo, situacao, unidade_superior_codigo
 FROM VW_UNIDADE
@@ -262,6 +286,7 @@ ORDER SIBLINGS BY sigla;
 **Contexto:** Determinação de quais perfis um usuário pode ter (ver VW_USUARIO_PERFIL_UNIDADE).
 
 **Aplicação:**
+
 - **GESTOR**: `tipo IN ('INTERMEDIARIA', 'INTEROPERACIONAL')`
 - **CHEFE**: `tipo IN ('INTEROPERACIONAL', 'OPERACIONAL')`
 - **SERVIDOR**: Qualquer unidade com `tipo` diferente de 'SEM_EQUIPE' e 'RAIZ'
@@ -271,6 +296,7 @@ ORDER SIBLINGS BY sigla;
 **Contexto:** Ao criar um processo, selecionar quais unidades participarão.
 
 **Regras:**
+
 - Processos de Mapeamento/Revisão: Incluem unidades `OPERACIONAL` e `INTEROPERACIONAL`
 - Processos de Diagnóstico: Incluem unidades `OPERACIONAL` e `INTEROPERACIONAL`
 - Unidades `INTERMEDIARIA` não cadastram atividades, apenas validam
@@ -282,6 +308,7 @@ ORDER SIBLINGS BY sigla;
 **Contexto:** Ao iniciar um processo, os dados das unidades são copiados para `UNIDADE_PROCESSO`.
 
 **Implementação:**
+
 ```sql
 INSERT INTO UNIDADE_PROCESSO (
     processo_codigo, unidade_codigo, nome, sigla, 
@@ -295,13 +322,15 @@ FROM VW_UNIDADE
 WHERE codigo IN (:lista_unidades_selecionadas);
 ```
 
-**Justificativa:** Preserva o estado das unidades no momento do início do processo, mesmo que posteriormente haja mudanças organizacionais.
+**Justificativa:** Preserva o estado das unidades no momento do início do processo, mesmo que posteriormente haja
+mudanças organizacionais.
 
 ### CU-VIEW03-05: Breadcrumb de Navegação
 
 **Contexto:** Exibir o caminho hierárquico de uma unidade (ex: "ADMIN > Presidência > SESEL > COSIS").
 
 **Implementação:**
+
 ```sql
 SELECT LISTAGG(sigla, ' > ') WITHIN GROUP (ORDER BY LEVEL DESC)
 FROM VW_UNIDADE
@@ -314,6 +343,7 @@ CONNECT BY codigo = PRIOR unidade_superior_codigo;
 **Contexto:** Validar se uma movimentação de subprocesso está seguindo a hierarquia correta.
 
 **Aplicação:**
+
 - Movimentação para superior: `unidade_destino_codigo = unidade_superior_codigo`
 - Movimentação para subordinada: Verificar se `unidade_destino` tem `unidade_superior_codigo = unidade_origem`
 
@@ -322,32 +352,39 @@ CONNECT BY codigo = PRIOR unidade_superior_codigo;
 ### Dependências de Outras Views
 
 **VW_ZONA_RESP_CENTRAL:**
+
 - Essencial para determinar `unidade_superior_codigo` de CAEs
 - Consultada durante a construção de `tb_unidade` (CTE interna)
 
 ### Views que Dependem de VW_UNIDADE
 
 **VW_USUARIO:**
+
 - Usa `VW_UNIDADE` para determinar `unidade_comp_codigo` (unidade de competência)
 - Aplica regras especiais para unidades `SEM_EQUIPE`
 
 **VW_RESPONSABILIDADE:**
+
 - Filtra unidades por tipo: `tipo IN ('OPERACIONAL', 'INTEROPERACIONAL', 'INTERMEDIARIA')`
 - Usa `matricula_titular` e `titulo_titular`
 
 **VW_USUARIO_PERFIL_UNIDADE:**
+
 - Usa `tipo` para determinar perfis GESTOR e CHEFE
 - Filtra por `situacao = 'ATIVA'`
 
 ### Tabelas que Usam VW_UNIDADE
 
 **UNIDADE_PROCESSO:**
+
 - Snapshot dos dados de `VW_UNIDADE` no momento de criação do processo
 
 **ATRIBUICAO_TEMPORARIA:**
+
 - Valida `unidade_codigo` contra códigos existentes em `VW_UNIDADE`
 
 **ALERTA, NOTIFICACAO, MOVIMENTACAO, ANALISE:**
+
 - Referenciam códigos de unidades que devem existir em `VW_UNIDADE`
 
 ## Dependências
@@ -389,7 +426,8 @@ WITH tb_unidade AS (
 )
 ```
 
-**Benefício:** A CTE é executada uma vez e reutilizada em múltiplas subconsultas, evitando leituras repetidas da tabela `UNIDADE_TSE`.
+**Benefício:** A CTE é executada uma vez e reutilizada em múltiplas subconsultas, evitando leituras repetidas da tabela
+`UNIDADE_TSE`.
 
 ### Complexidade das Subconsultas
 
@@ -400,6 +438,7 @@ A view contém várias subconsultas correlacionadas que podem impactar performan
 3. Identificação do titular (com múltiplas junções)
 
 **Recomendações:**
+
 - Materializar a view se consultas forem muito frequentes
 - Criar índices em `LOTACAO.cod_unid_tse`, `LOTACAO.dt_fim_lotacao`
 - Índice composto em `QFC_OCUP_COM(mat_servidor, dt_dispensa, titular_com)`
@@ -428,6 +467,7 @@ Cada CAE executa uma subconsulta em `VW_ZONA_RESP_CENTRAL`. Para otimizar:
 ```
 
 **Interpretação:**
+
 - **Código 1 (ADMIN)**: Unidade raiz virtual, sem titular nem superior
 - **Código 10 (PRES)**: Intermediária, subordinada à ADMIN
 - **Código 100 (SAO)**: Interoperacional (tem filhas e servidores próprios), subordinada à Presidência
@@ -443,12 +483,14 @@ Cada CAE executa uma subconsulta em `VW_ZONA_RESP_CENTRAL`. Para otimizar:
 A view reflete sempre o estado atual do SGRH. Mudanças no SGRH se refletem imediatamente:
 
 **Mudanças que afetam a view:**
+
 - Criação/extinção de unidades
 - Mudança de lotações (afeta contagem de servidores e tipo)
 - Nomeação/dispensa de titulares (afeta titular e data de titularidade)
 - Reestruturação hierárquica (afeta `unidade_superior_codigo`)
 
 **Processos em andamento:**
+
 - Processos ativos usam o snapshot em `UNIDADE_PROCESSO`
 - Mudanças no SGRH não afetam processos já iniciados
 - Novos processos verão as mudanças
@@ -456,11 +498,13 @@ A view reflete sempre o estado atual do SGRH. Mudanças no SGRH se refletem imed
 ### Consistência de Dados
 
 **Possíveis inconsistências:**
+
 1. Unidade sem titular definido (campos NULL)
 2. CAE sem zona atribuída (superior NULL)
 3. Contagens de servidores divergentes (devido a atualizações assíncronas)
 
 **Tratamento:**
+
 - O sistema deve tolerar unidades sem titular
 - Validações de negócio devem verificar tipos antes de atribuir ações
 - Logs de auditoria devem registrar estados inconsistentes

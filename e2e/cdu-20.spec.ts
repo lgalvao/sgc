@@ -1,4 +1,3 @@
-import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {
@@ -15,7 +14,7 @@ import {
     acessarSubprocessoGestor,
     homologarCadastroMapeamento
 } from './helpers/helpers-analise.js';
-import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -70,10 +69,10 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
             await fazerLogout(page);
 
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-            
+
             // ADMIN clica na linha do processo no painel primeiro
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-            
+
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
             await homologarCadastroMapeamento(page);
@@ -82,7 +81,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await test.step('3. ADMIN disponibiliza Mapa', async () => {
             await navegarParaMapa(page);
             await expect(page.getByText(/Carregando/i)).toBeHidden();
-            
+
             await criarCompetencia(page, competencia1, [atividade1]);
             await criarCompetencia(page, competencia2, [atividade2]);
 
@@ -109,7 +108,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
             await expect(page.getByTestId('btn-mapa-historico-gestor')).toBeVisible();
             await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
-            
+
             // Cancela devolução (passo CDU)
             await page.getByTestId('btn-mapa-devolver').click();
             await page.getByTestId('btn-devolucao-mapa-cancelar').click();
@@ -125,7 +124,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
             await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
             await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
             await navegarParaMapa(page);
-            
+
             await page.getByTestId('btn-mapa-homologar-aceite').click();
             await page.getByTestId('btn-aceite-mapa-confirmar').click();
             await expect(page).toHaveURL(/\/painel/);
@@ -137,7 +136,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
             await navegarParaMapa(page);
-            
+
             await page.getByTestId('btn-mapa-homologar-aceite').click();
             await page.getByTestId('btn-aceite-mapa-confirmar').click();
             await expect(page.getByText(/Homologação efetivada/i).first()).toBeVisible();

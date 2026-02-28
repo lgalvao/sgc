@@ -8,7 +8,9 @@ determinados a partir do SGRH juntamente com atribuições temporárias cadastra
 
 ## Atribuição temporária
 
-Designação provisória da responsabilidade de uma unidade organizacional, realizada por usários com perfil ADMIN, com data de início e término definidas, sobrepondo temporariamente a informação de responsabilidade obtida do SGRH. Também referida como atribuição temporária de responsabilidade.
+Designação provisória da responsabilidade de uma unidade organizacional, realizada por usários com perfil ADMIN, com
+data de início e término definidas, sobrepondo temporariamente a informação de responsabilidade obtida do SGRH. Também
+referida como atribuição temporária de responsabilidade.
 
 ## Atividade
 
@@ -16,7 +18,8 @@ Ação desempenhada por uma unidade operacional ou interoperacional no exercíci
 
 ## Árvore de unidades
 
-Estrutura hierárquica das unidades organizacionais; no contexto dos processos de mapeamento, de revisão e de diagnóstico.
+Estrutura hierárquica das unidades organizacionais; no contexto dos processos de mapeamento, de revisão e de
+diagnóstico.
 
 ## Cadastro
 
@@ -30,7 +33,8 @@ conhecimento.
 
 ## Competência
 
-Elemento sintetizante das atribuições de uma unidade. É criado pelos perfis ADMIN a partir das atividades e conhecimentos cadastrados pelas unidades.
+Elemento sintetizante das atribuições de uma unidade. É criado pelos perfis ADMIN a partir das atividades e
+conhecimentos cadastrados pelas unidades.
 
 ## Devolução
 
@@ -42,7 +46,8 @@ Unidade destino da última movimentação registrada para o subprocesso.
 
 ## Mapa de competências
 
-Conjunto consolidado de competências criado pelos perfis ADMIN, para uma unidade. Também referido como mapa de competências
+Conjunto consolidado de competências criado pelos perfis ADMIN, para uma unidade. Também referido como mapa de
+competências
 técnicas.
 
 ## Movimentação
@@ -81,7 +86,9 @@ SGRH no momento da consulta.
 
 ## SEDOC
 
-Seção de desenvolvimento organizacional e capacitação. Principal unidade usuária do sistema no contexto dos processos de mapeamento, de revisão e de diagnóstico. Os seus servidores geralmente terão o perfil ADMIN, embora possam logar com na sua unidade (SEDOC), com outro perfil aplicavel (CHEFE, GESTOR ou SERVIDOR)
+Seção de desenvolvimento organizacional e capacitação. Principal unidade usuária do sistema no contexto dos processos de
+mapeamento, de revisão e de diagnóstico. Os seus servidores geralmente terão o perfil ADMIN, embora possam logar com na
+sua unidade (SEDOC), com outro perfil aplicavel (CHEFE, GESTOR ou SERVIDOR)
 
 ## SGRH
 
@@ -95,11 +102,14 @@ interoperacional.
 
 ## Unidade
 
-Elemento da estrutura hierárquica do tribunal (árvore de unidades) onde os servidores estão lotados. Para efeito do sistema, podem ser classificadas em intermediárias, operacionais ou interoperacionais. Também referido como unidade organizacional.
+Elemento da estrutura hierárquica do tribunal (árvore de unidades) onde os servidores estão lotados. Para efeito do
+sistema, podem ser classificadas em intermediárias, operacionais ou interoperacionais. Também referido como unidade
+organizacional.
 
 ## Unidade intermediária
 
-Unidade abaixo da unidade raiz (ADMIN), que possua uma ou mais unidades subordinadas a ela mas que não possua servidores lotados nela além do titular.
+Unidade abaixo da unidade raiz (ADMIN), que possua uma ou mais unidades subordinadas a ela mas que não possua servidores
+lotados nela além do titular.
 
 ## Unidade interoperacional
 
@@ -111,8 +121,10 @@ Unidade com mais de um servidor lotado e que não possui unidades subordinadas a
 
 ## Unidade raiz
 
-Unidade que não possui unidade superior na árvore de unidades do sistema. Com relação aos processos de mapeamento, de revisão e de diagnóstico, esse papel é exercido por uma unidade 'virtual', acima de todas as unidades, chamada 'ADMIN'.
+Unidade que não possui unidade superior na árvore de unidades do sistema. Com relação aos processos de mapeamento, de
+revisão e de diagnóstico, esse papel é exercido por uma unidade 'virtual', acima de todas as unidades, chamada 'ADMIN'.
 
 ## Validação
 
-Ato de ratificar, após análise, as informações fornecidas por uma unidade subordinada. A validação encaminha a análise para a unidade superior.
+Ato de ratificar, após análise, as informações fornecidas por uma unidade subordinada. A validação encaminha a análise
+para a unidade superior.

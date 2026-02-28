@@ -44,7 +44,7 @@ específicas** do projeto que diferem dos padrões genéricos.
 
 * **Padrão de componentes:** Use `<script setup lang="ts">` e **BootstrapVueNext**.
 * **Estado:** **Pinia** utilizando "Setup Stores" (com `ref` e `computed`).
-* **Camadas:** `View -> Store -> Service -> API`. 
+* **Camadas:** `View -> Store -> Service -> API`.
 * **Erros:** Use `normalizeError` em services/stores. Componentes decidem como exibir (preferencialmente `BAlert` inline
   para erros de negócio).
 * **Roteamento:** Modularizado (cada módulo tem seu arquivo `.routes.ts`).
@@ -66,7 +66,8 @@ específicas** do projeto que diferem dos padrões genéricos.
 * **Backend:** `./gradlew :backend:test` (JUnit 5 + Mockito + H2).
 * **Frontend:** `npm run typecheck`, `npm run lint`, `npm run test:unit` (Vitest).
 * **E2E:** Playwright (consulte `/e2e/README.md`).
-* **Git Hooks:** Existe um hook de `pre-push` local que impede o envio de código se os testes do backend falharem. Agentes de IA devem garantir que os testes passem antes de sugerir ou realizar um push.
+* **Git Hooks:** Existe um hook de `pre-push` local que impede o envio de código se os testes do backend falharem.
+  Agentes de IA devem garantir que os testes passem antes de sugerir ou realizar um push.
 
 ## 6. Referências e Padrões Detalhados
 
@@ -82,11 +83,17 @@ Para detalhes técnicos e exemplos de código, consulte:
     * `README.md` de cada módulo e diretório para responsabilidades específicas
 
 ## 7. Apêndice: Aprendizados do Ambiente (Local)
-- **Testes E2E Seriais**: Em testes marcados como `test.describe.serial`, não se deve executar cenários individualmente (ex: usando `-g "Cenario X"`), pois cada cenário depende do estado deixado pelo anterior. Execute sempre o arquivo de teste completo.
+
+- **Testes E2E Seriais**: Em testes marcados como `test.describe.serial`, não se deve executar cenários
+  individualmente (ex: usando `-g "Cenario X"`), pois cada cenário depende do estado deixado pelo anterior. Execute
+  sempre o arquivo de teste completo.
+
 * **Sistema Operacional:** Windows (win32).
 * **Shell:** PowerShell via `powershell.exe -NoProfile -Command`.
 * **Comandos de Shell:**
-    * Comandos `dir` com sintaxe legada do CMD (ex: `dir /s /b`) podem falhar se usados com múltiplos argumentos de busca simultâneos ou se mal interpretados pelo wrapper do PowerShell.
+    * Comandos `dir` com sintaxe legada do CMD (ex: `dir /s /b`) podem falhar se usados com múltiplos argumentos de
+      busca simultâneos ou se mal interpretados pelo wrapper do PowerShell.
     * Prefira comandos nativos do PowerShell como `Get-ChildItem` para buscas recursivas.
-* **Ferramenta `glob`:** Funciona bem para padrões simples, mas pode ser sensível a maiúsculas/minúsculas dependendo da configuração.
+* **Ferramenta `glob`:** Funciona bem para padrões simples, mas pode ser sensível a maiúsculas/minúsculas dependendo da
+  configuração.
 * **Deploy:** O script `release-hom.sh` é exclusivo para Linux/Bash e não deve ser executado localmente no Windows.

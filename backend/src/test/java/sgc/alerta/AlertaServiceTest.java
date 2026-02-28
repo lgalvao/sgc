@@ -125,7 +125,7 @@ class AlertaServiceTest {
         LocalDateTime now = LocalDateTime.now();
         AlertaUsuario alertaUsuario = new AlertaUsuario();
         alertaUsuario.setDataHoraLeitura(now);
-        
+
         when(alertaUsuarioRepo.findById(any(AlertaUsuario.Chave.class))).thenReturn(Optional.of(alertaUsuario));
 
         Optional<LocalDateTime> resultado = alertaService.dataHoraLeituraAlertaUsuario(codigoAlerta, usuario);

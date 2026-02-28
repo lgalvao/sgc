@@ -86,7 +86,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             const linhaUnidade = page.getByRole('row', {name: UNIDADE_ALVO});
             await expect(linhaUnidade).toContainText(/Disponibilizado/i);
             await linhaUnidade.click();
-            
+
             await navegarParaAtividadesVisualizacao(page);
             await homologarCadastroMapeamento(page);
 
@@ -234,7 +234,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
             await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaAtividades(page);
-            
+
             await disponibilizarCadastro(page);
             await expect(page.getByText(/Revisão do cadastro de atividades disponibilizada/i).first()).toBeVisible();
             await verificarPaginaPainel(page);

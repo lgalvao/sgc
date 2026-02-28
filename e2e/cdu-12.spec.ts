@@ -56,7 +56,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)});
         await expect(linhaProcesso).toBeVisible();
         await linhaProcesso.click();
-        
+
         codProcessoMapeamento = await extrairProcessoId(page);
         // Não registrar cleanup aqui para permitir que os próximos testes usem o Mapa Vigente
 
@@ -101,7 +101,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        
+
         // 4. FASE MAPA: Admin cria competências e disponibiliza (Localização: ADMIN -> SECAO_211)
         await navegarParaMapa(page);
         await criarCompetencia(page, `Competência 1 ${timestamp}`, [`Atividade Base 1 ${timestamp}`]);
@@ -163,7 +163,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
         processoRevisaoId = await extrairProcessoId(page);
         // O registro será feito no último cenário do teste serial
-        
+
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
         await expect(page.getByText(/Processo iniciado/i).first()).toBeVisible();
@@ -184,7 +184,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         const novoConhecimento = `Conhecimento Novo ${timestamp}`;
         await adicionarAtividade(page, novaAtividade);
         await adicionarConhecimento(page, novaAtividade, novoConhecimento);
-        
+
         await verificarBotaoImpactoDropdown(page);
         await abrirModalImpacto(page);
         await expect(page.locator('.modal-content').getByText(novaAtividade)).toBeVisible();

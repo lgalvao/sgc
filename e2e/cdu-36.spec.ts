@@ -2,9 +2,9 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 
 /**
  * CDU-36 - Gerar relatório de mapas
- * 
+ *
  * Ator: ADMIN
- * 
+ *
  * Pré-condições:
  * - Usuário logado como ADMIN
  */

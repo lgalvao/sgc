@@ -40,7 +40,7 @@ describe("usePerfil", () => {
         } as any);
 
         vi.mocked(useUsuariosStore).mockReturnValue({
-            obterUsuarioPorTitulo: (titulo: string) => ({ tituloEleitoral: titulo, nome: "Usuário Teste"}),
+            obterUsuarioPorTitulo: (titulo: string) => ({tituloEleitoral: titulo, nome: "Usuário Teste"}),
         } as any);
 
         const {servidorLogado} = usePerfil();
@@ -109,7 +109,7 @@ describe("usePerfil", () => {
                             codigo: 2,
                             sigla: "FILHO",
                             filhas: [
-                                { codigo: 3, sigla: "NETO" }
+                                {codigo: 3, sigla: "NETO"}
                             ]
                         }
                     ]

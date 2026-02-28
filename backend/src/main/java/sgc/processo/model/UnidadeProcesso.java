@@ -22,52 +22,33 @@ import java.time.*;
 public class UnidadeProcesso implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    
+
     @EmbeddedId
     private UnidadeProcessoId id = new UnidadeProcessoId();
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("processoCodigo")
     @JoinColumn(name = "processo_codigo")
     @JsonIgnore
     private Processo processo;
-    
-    public Long getUnidadeCodigo() {
-        return id != null ? id.getUnidadeCodigo() : null;
-    }
-
-    public void setUnidadeCodigo(Long unidadeCodigo) {
-        if (id == null) {
-            id = new UnidadeProcessoId();
-        }
-        id.setUnidadeCodigo(unidadeCodigo);
-    }
-    
     @Column(name = "nome")
     private String nome;
-    
     @Column(name = "sigla", length = 20)
     private String sigla;
-    
     @Column(name = "matricula_titular", length = 8)
     private String matriculaTitular;
-    
     @Column(name = "titulo_titular", length = 12)
     private String tituloTitular;
-    
     @Column(name = "data_inicio_titularidade")
     private LocalDateTime dataInicioTitularidade;
-    
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20)
     private TipoUnidade tipo;
-    
     @Column(name = "situacao", length = 20)
     private String situacao;
-    
     @Column(name = "unidade_superior_codigo")
     private @Nullable Long unidadeSuperiorCodigo;
-    
+
     /**
      * Cria um snapshot de uma unidade para um processo.
      */
@@ -83,8 +64,19 @@ public class UnidadeProcesso implements Serializable {
         snapshot.setTipo(unidade.getTipo());
         snapshot.setSituacao(unidade.getSituacao().name());
         snapshot.setUnidadeSuperiorCodigo(
-            unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null
+                unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null
         );
         return snapshot;
+    }
+
+    public Long getUnidadeCodigo() {
+        return id != null ? id.getUnidadeCodigo() : null;
+    }
+
+    public void setUnidadeCodigo(Long unidadeCodigo) {
+        if (id == null) {
+            id = new UnidadeProcessoId();
+        }
+        id.setUnidadeCodigo(unidadeCodigo);
     }
 }

@@ -16,7 +16,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
         const atribuicoes = ref<AtribuicaoTemporaria[]>([]);
         const loading = useSingleLoading();
         const error = ref<string | null>(null);
-        const { lastError, clearError: clearNormalizedError, withErrorHandling } = useErrorHandler();
+        const {lastError, clearError: clearNormalizedError, withErrorHandling} = useErrorHandler();
 
         function clearError() {
             clearNormalizedError();
@@ -41,7 +41,7 @@ export const useAtribuicaoTemporariaStore = defineStore(
                 await withErrorHandling(async () => {
                     const response = await buscarTodasAtribuicoes();
                     const data = Array.isArray(response) ? response : (response).data;
-                    
+
                     if (Array.isArray(data)) {
                         atribuicoes.value = data.map((a: any) => ({
                             codigo: a.codigo,

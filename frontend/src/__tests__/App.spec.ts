@@ -17,7 +17,7 @@ vi.mock("bootstrap-vue-next", async () => {
     return {
         ...actual,
         useToast: vi.fn(),
-        BOrchestrator: { template: '<div></div>' }
+        BOrchestrator: {template: '<div></div>'}
     };
 });
 
@@ -134,7 +134,7 @@ describe("App.vue", () => {
     });
 
     it("deve inicializar feedbackStore com instância do toast", () => {
-        const mockToast = { create: vi.fn() };
+        const mockToast = {create: vi.fn()};
         (useToast as any).mockReturnValue(mockToast);
         (useRoute as any).mockReturnValue({path: "/painel", fullPath: "/painel"});
 
@@ -150,7 +150,7 @@ describe("App.vue", () => {
                 }
             },
         });
-        
+
         const feedbackStore = useFeedbackStore();
         expect(feedbackStore.init).toHaveBeenCalled();
     });

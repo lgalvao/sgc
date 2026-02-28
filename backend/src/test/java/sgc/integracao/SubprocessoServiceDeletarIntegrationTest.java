@@ -1,27 +1,20 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.fixture.UnidadeFixture;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
-import jakarta.persistence.EntityManager;
+import jakarta.persistence.*;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
+import sgc.fixture.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
 @Transactional
@@ -74,6 +67,6 @@ class SubprocessoServiceDeletarIntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
 
         assertThatThrownBy(() -> subprocessoService.buscarSubprocesso(codigo))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

@@ -8,10 +8,10 @@ import {BAlert, BSpinner} from 'bootstrap-vue-next';
 import * as useAcessoModule from '@/composables/useAcesso';
 
 // Mock child components to avoid rendering them and their dependencies
-const SubprocessoHeaderStub = { template: '<div />' };
-const SubprocessoCardsStub = { template: '<div />' };
-const SubprocessoModalStub = { template: '<div />' };
-const TabelaMovimentacoesStub = { template: '<div />' };
+const SubprocessoHeaderStub = {template: '<div />'};
+const SubprocessoCardsStub = {template: '<div />'};
+const SubprocessoModalStub = {template: '<div />'};
+const TabelaMovimentacoesStub = {template: '<div />'};
 const ModalConfirmacaoStub = {
     template: '<div><slot /></div>',
     props: ['modelValue', 'titulo', 'loading', 'okDisabled'],
@@ -21,13 +21,13 @@ const ModalConfirmacaoStub = {
 describe('Subprocesso Coverage', () => {
     it('renders loading state when no data and no error', () => {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeAlterarDataLimite: { value: false },
-            podeReabrirCadastro: { value: false },
-            podeReabrirRevisao: { value: false },
-            podeEnviarLembrete: { value: false },
-            podeDisponibilizarCadastro: { value: false },
-            podeEditarCadastro: { value: false },
-            podeVisualizarMapa: { value: true },
+            podeAlterarDataLimite: {value: false},
+            podeReabrirCadastro: {value: false},
+            podeReabrirRevisao: {value: false},
+            podeEnviarLembrete: {value: false},
+            podeDisponibilizarCadastro: {value: false},
+            podeEditarCadastro: {value: false},
+            podeVisualizarMapa: {value: true},
         } as any);
 
         const pinia = createTestingPinia({
@@ -41,7 +41,7 @@ describe('Subprocesso Coverage', () => {
         });
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeVisualizarMapa: { value: true },
+            podeVisualizarMapa: {value: true},
         } as any);
 
         const wrapper = mount(Subprocesso, {
@@ -67,13 +67,13 @@ describe('Subprocesso Coverage', () => {
 
     it('renders error state when lastError is present', () => {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeAlterarDataLimite: { value: false },
-            podeReabrirCadastro: { value: false },
-            podeReabrirRevisao: { value: false },
-            podeEnviarLembrete: { value: false },
-            podeDisponibilizarCadastro: { value: false },
-            podeEditarCadastro: { value: false },
-            podeVisualizarMapa: { value: true },
+            podeAlterarDataLimite: {value: false},
+            podeReabrirCadastro: {value: false},
+            podeReabrirRevisao: {value: false},
+            podeEnviarLembrete: {value: false},
+            podeDisponibilizarCadastro: {value: false},
+            podeEditarCadastro: {value: false},
+            podeVisualizarMapa: {value: true},
         } as any);
 
         const pinia = createTestingPinia({
@@ -81,13 +81,13 @@ describe('Subprocesso Coverage', () => {
             initialState: {
                 subprocessos: {
                     subprocessoDetalhe: null,
-                    lastError: { message: 'Erro teste' }
+                    lastError: {message: 'Erro teste'}
                 }
             }
         });
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeVisualizarMapa: { value: true },
+            podeVisualizarMapa: {value: true},
         } as any);
 
         const wrapper = mount(Subprocesso, {
@@ -117,7 +117,7 @@ describe('Subprocesso Coverage', () => {
             initialState: {
                 subprocessos: {
                     subprocessoDetalhe: {
-                        unidade: { codigo: 1 }
+                        unidade: {codigo: 1}
                     }
                 }
             }
@@ -125,13 +125,13 @@ describe('Subprocesso Coverage', () => {
         const store = useSubprocessosStore(pinia);
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeAlterarDataLimite: { value: true },
-            podeReabrirCadastro: { value: false },
-            podeReabrirRevisao: { value: false },
-            podeEnviarLembrete: { value: false },
-            podeDisponibilizarCadastro: { value: false },
-            podeEditarCadastro: { value: false },
-            podeVisualizarMapa: { value: true },
+            podeAlterarDataLimite: {value: true},
+            podeReabrirCadastro: {value: false},
+            podeReabrirRevisao: {value: false},
+            podeEnviarLembrete: {value: false},
+            podeDisponibilizarCadastro: {value: false},
+            podeEditarCadastro: {value: false},
+            podeVisualizarMapa: {value: true},
         } as any);
 
         const wrapper = mount(Subprocesso, {
@@ -145,7 +145,7 @@ describe('Subprocesso Coverage', () => {
                     ModalConfirmacao: ModalConfirmacaoStub
                 }
             },
-            props: { codProcesso: 1, siglaUnidade: 'TEST' }
+            props: {codProcesso: 1, siglaUnidade: 'TEST'}
         });
 
         // Trigger manually
@@ -155,12 +155,12 @@ describe('Subprocesso Coverage', () => {
     });
 
     it('confirmarReabertura returns early if justification is empty', async () => {
-         const pinia = createTestingPinia({
+        const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {
                 subprocessos: {
                     subprocessoDetalhe: {
-                        unidade: { codigo: 1 },
+                        unidade: {codigo: 1},
                         movimentacoes: [],
                     }
                 }
@@ -168,13 +168,13 @@ describe('Subprocesso Coverage', () => {
         });
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeAlterarDataLimite: { value: false },
-            podeReabrirCadastro: { value: false },
-            podeReabrirRevisao: { value: false },
-            podeEnviarLembrete: { value: false },
-            podeDisponibilizarCadastro: { value: false },
-            podeEditarCadastro: { value: false },
-            podeVisualizarMapa: { value: true },
+            podeAlterarDataLimite: {value: false},
+            podeReabrirCadastro: {value: false},
+            podeReabrirRevisao: {value: false},
+            podeEnviarLembrete: {value: false},
+            podeDisponibilizarCadastro: {value: false},
+            podeEditarCadastro: {value: false},
+            podeVisualizarMapa: {value: true},
         } as any);
 
         const store = useSubprocessosStore(pinia);
@@ -191,10 +191,10 @@ describe('Subprocesso Coverage', () => {
                     TabelaMovimentacoes: TabelaMovimentacoesStub,
                     SubprocessoModal: SubprocessoModalStub,
                     ModalConfirmacao: ModalConfirmacaoStub,
-                    BFormTextarea: { template: '<textarea />' }
+                    BFormTextarea: {template: '<textarea />'}
                 }
             },
-            props: { codProcesso: 1, siglaUnidade: 'TEST' }
+            props: {codProcesso: 1, siglaUnidade: 'TEST'}
         });
 
         // Wait for onMounted to set codSubprocesso

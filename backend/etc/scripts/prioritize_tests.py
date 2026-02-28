@@ -21,9 +21,9 @@ def prioritize(input_file, output_file):
 
     # Structural patterns to ignore in P1/P2
     structural_patterns = [
-        r"AccessPolicy.java$", # Interface
-        r"SanitizarHtml.java$", # Annotation
-        r"Erro.*.java$" # Exceptions
+        r"AccessPolicy.java$",  # Interface
+        r"SanitizarHtml.java$",  # Annotation
+        r"Erro.*.java$"  # Exceptions
     ]
 
     prioritized = {
@@ -71,35 +71,41 @@ def prioritize(input_file, output_file):
             out.write("# Plano de Priorização de Testes Unitários\n\n")
 
             out.write("## 🔴 P1: Críticos (Lógica de Negócio e Segurança)\n")
-            out.write("Estas classes contêm regras de negócio, validações, segurança ou orquestração complexa. A falta de testes aqui representa alto risco.\n\n")
+            out.write(
+                "Estas classes contêm regras de negócio, validações, segurança ou orquestração complexa. A falta de testes aqui representa alto risco.\n\n")
             if not prioritized["P1"]:
                 out.write("✅ **Nenhuma pendência crítica de lógica encontrada.**\n")
             for f in prioritized["P1"]:
                 out.write(f"- [ ] `{f}`\n")
 
             out.write("\n## 🟡 P2: Importantes (Integração e Contratos)\n")
-            out.write("Controladores e Mappers. Importantes para garantir que a API respeite os contratos e que os dados sejam transformados corretamente.\n\n")
+            out.write(
+                "Controladores e Mappers. Importantes para garantir que a API respeite os contratos e que os dados sejam transformados corretamente.\n\n")
             if not prioritized["P2"]:
                 out.write("_Nenhum arquivo encontrado._\n")
             for f in prioritized["P2"]:
                 out.write(f"- [ ] `{f}`\n")
 
             out.write("\n## 🟢 P3: Baixa Prioridade (Dados e Infraestrutura)\n")
-            out.write("DTOs, Modelos (Getters/Setters), Repositórios (Interfaces) e Configurações. Geralmente cobertos por testes de integração ou seguros por natureza.\n\n")
+            out.write(
+                "DTOs, Modelos (Getters/Setters), Repositórios (Interfaces) e Configurações. Geralmente cobertos por testes de integração ou seguros por natureza.\n\n")
             if not prioritized["P3"]:
                 out.write("_Nenhum arquivo encontrado._\n")
             for f in prioritized["P3"]:
                 out.write(f"- [ ] `{f}`\n")
 
-        print(f"Priorização concluída. Encontrados {len(prioritized['P1'])} P1, {len(prioritized['P2'])} P2, {len(prioritized['P3'])} P3.")
+        print(
+            f"Priorização concluída. Encontrados {len(prioritized['P1'])} P1, {len(prioritized['P2'])} P2, {len(prioritized['P3'])} P3.")
         print(f"Plano gerado em: {output_file}")
 
     except Exception as e:
         print(f"Erro ao processar priorização: {e}")
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Prioriza a criação de testes baseado no relatório de análise.')
-    parser.add_argument('--input', default='unit-test-report.md', help='Arquivo de entrada (Markdown gerado pelo analyze_tests.py)')
+    parser.add_argument('--input', default='unit-test-report.md',
+                        help='Arquivo de entrada (Markdown gerado pelo analyze_tests.py)')
     parser.add_argument('--output', default='prioritized-tests.md', help='Arquivo de saída (Markdown)')
 
     args = parser.parse_args()

@@ -3,6 +3,7 @@
     <BTable
         :fields="fields"
         :items="alertas"
+        :striped="alertas.length > 0"
         :tbody-tr-attr="rowAttr"
         :tbody-tr-class="rowClass"
         data-testid="tbl-alertas"
@@ -10,7 +11,6 @@
         responsive
         show-empty
         stacked="md"
-        :striped="alertas.length > 0"
         @sort-changed="handleSortChange"
     >
       <template #cell(mensagem)="data">
@@ -20,16 +20,16 @@
 
       <template #empty>
         <EmptyState
+            class="border-0 bg-transparent mb-0"
+            data-testid="empty-state-alertas"
+            description="Não há alertas no momento. Atualize para verificar novas notificações."
             icon="bi-bell-slash"
             title="Nenhum alerta"
-            description="Não há alertas no momento. Atualize para verificar novas notificações."
-            data-testid="empty-state-alertas"
-            class="border-0 bg-transparent mb-0"
         >
           <BButton
+              data-testid="btn-empty-state-alertas-atualizar"
               size="sm"
               variant="outline-primary"
-              data-testid="btn-empty-state-alertas-atualizar"
               @click="$emit('recarregar')"
           >
             Atualizar alertas

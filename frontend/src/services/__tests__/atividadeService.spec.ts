@@ -5,7 +5,7 @@ import type {Conhecimento} from "@/types/tipos";
 import * as service from "../atividadeService";
 
 describe("atividadeService", () => {
-    const { mockApi } = setupServiceTest();
+    const {mockApi} = setupServiceTest();
 
     beforeEach(() => {
         setActivePinia(createPinia());
@@ -35,14 +35,18 @@ describe("atividadeService", () => {
         const request = {descricao: "Nova"};
         const responseDto = {
             atividade: {codigo: 1, descricao: "Nova", conhecimentos: []},
-            subprocesso: {codigo: 123, situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO", situacaoLabel: "Cadastro em andamento"},
+            subprocesso: {
+                codigo: 123,
+                situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
+                situacaoLabel: "Cadastro em andamento"
+            },
             atividadesAtualizadas: []
         };
         mockApi.post.mockResolvedValue({data: responseDto});
 
         const result = await service.criarAtividade(request, 100);
 
-        expect(mockApi.post).toHaveBeenCalledWith("/atividades", { ...request, mapaCodigo: 100 });
+        expect(mockApi.post).toHaveBeenCalledWith("/atividades", {...request, mapaCodigo: 100});
         expect(result).toEqual(responseDto);
     });
 
@@ -50,7 +54,11 @@ describe("atividadeService", () => {
         const request = {codigo: 1, descricao: "Editada", conhecimentos: []} as any;
         const responseDto = {
             atividade: request,
-            subprocesso: {codigo: 123, situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO", situacaoLabel: "Cadastro em andamento"},
+            subprocesso: {
+                codigo: 123,
+                situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
+                situacaoLabel: "Cadastro em andamento"
+            },
             atividadesAtualizadas: []
         };
         mockApi.post.mockResolvedValue({data: responseDto});
@@ -64,7 +72,11 @@ describe("atividadeService", () => {
     it("excluirAtividade deve enviar POST", async () => {
         const responseDto = {
             atividade: null,
-            subprocesso: {codigo: 123, situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO", situacaoLabel: "Cadastro em andamento"},
+            subprocesso: {
+                codigo: 123,
+                situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
+                situacaoLabel: "Cadastro em andamento"
+            },
             atividadesAtualizadas: []
         };
         mockApi.post.mockResolvedValue({data: responseDto});
@@ -98,7 +110,7 @@ describe("atividadeService", () => {
 
         expect(mockApi.post).toHaveBeenCalledWith(
             "/atividades/1/conhecimentos",
-            { ...request, atividadeCodigo: 1 },
+            {...request, atividadeCodigo: 1},
         );
         expect(result).toEqual(responseDto);
     });
@@ -119,7 +131,7 @@ describe("atividadeService", () => {
 
         expect(mockApi.post).toHaveBeenCalledWith(
             `/atividades/1/conhecimentos/${request.codigo}/atualizar`,
-            { descricao: request.descricao },
+            {descricao: request.descricao},
         );
         expect(result).toEqual(responseDto);
     });

@@ -4,7 +4,7 @@ import lombok.*;
 
 @Builder
 public record ErroSubApi(
-                String object,
-                String field,
-                String message) {
+        String object,
+        String field,
+        String message) {
 }

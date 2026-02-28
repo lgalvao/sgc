@@ -44,14 +44,14 @@ export async function prepareFreshAtividadesStore() {
         };
     const store = useAtividadesStoreActual();
     const initialAtividades = getMockAtividadesData();
-    
+
     // Populate the Map with a dummy subprocess ID (e.g., 1)
     const mockAtividades = initialAtividades.map((a: Atividade) => ({
         ...a,
         conhecimentos: a.conhecimentos.map((c: any) => ({...c})),
     }));
     store.atividadesPorSubprocesso.set(1, mockAtividades);
-    
+
     return store;
 }
 

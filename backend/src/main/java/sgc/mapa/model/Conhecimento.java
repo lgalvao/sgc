@@ -23,16 +23,16 @@ public class Conhecimento extends EntidadeBase {
     @Column(name = "descricao", nullable = false)
     private String descricao;
 
-    @JsonView(MapaViews.Publica.class)
-    @JsonProperty("atividadeCodigo")
-    public Long getCodigoAtividade() {
-        return atividade.getCodigo();
-    }
-
     public static Conhecimento criarDe(sgc.mapa.dto.CriarConhecimentoRequest request) {
         return Conhecimento.builder()
                 .descricao(request.descricao())
                 .build();
+    }
+
+    @JsonView(MapaViews.Publica.class)
+    @JsonProperty("atividadeCodigo")
+    public Long getCodigoAtividade() {
+        return atividade.getCodigo();
     }
 
     public void atualizarDe(sgc.mapa.dto.AtualizarConhecimentoRequest request) {

@@ -30,10 +30,10 @@ describe("utils/logger.ts", () => {
             expect(getLogLevel("staging")).toBe(4);
             expect(getLogLevel("")).toBe(4);
         });
-        
+
         it("deve usar import.meta.env.MODE como padrão", () => {
-             // Como estamos rodando em test, deve ser 1
-             expect(getLogLevel()).toBe(1);
+            // Como estamos rodando em test, deve ser 1
+            expect(getLogLevel()).toBe(1);
         });
     });
 });

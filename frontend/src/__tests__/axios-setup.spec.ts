@@ -25,7 +25,7 @@ vi.mock("@/router", () => ({
     default: {
         push: vi.fn().mockResolvedValue(undefined),
         currentRoute: {
-            value: { path: '/' }
+            value: {path: '/'}
         }
     },
 }));

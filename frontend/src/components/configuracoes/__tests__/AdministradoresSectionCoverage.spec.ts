@@ -12,14 +12,14 @@ vi.mock('@/services/administradorService', () => ({
 
 describe('AdministradoresSection.vue Coverage', () => {
     const commonStubs = {
-        EmptyState: { template: '<div />' },
+        EmptyState: {template: '<div />'},
         ModalConfirmacao: {
             template: '<div><slot /><button class="btn-confirmar" @click="$emit(\'confirmar\')">Confirm</button></div>',
             props: ['modelValue']
         },
-        LoadingButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
-        BAlert: { template: '<div><slot /></div>', props: ['modelValue'] },
-        BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
+        LoadingButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
+        BAlert: {template: '<div><slot /></div>', props: ['modelValue']},
+        BButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
     };
 
     beforeEach(() => {
@@ -31,7 +31,7 @@ describe('AdministradoresSection.vue Coverage', () => {
         const pinia = createTestingPinia();
 
         const wrapper = mount(AdministradoresSection, {
-            global: { plugins: [pinia], stubs: commonStubs }
+            global: {plugins: [pinia], stubs: commonStubs}
         });
 
         await flushPromises();
@@ -43,7 +43,7 @@ describe('AdministradoresSection.vue Coverage', () => {
         const pinia = createTestingPinia();
 
         const wrapper = mount(AdministradoresSection, {
-            global: { plugins: [pinia], stubs: commonStubs }
+            global: {plugins: [pinia], stubs: commonStubs}
         });
 
         await flushPromises();
@@ -60,7 +60,7 @@ describe('AdministradoresSection.vue Coverage', () => {
     it('adicionarAdmin retorna se título vazio', async () => {
         const pinia = createTestingPinia();
         const wrapper = mount(AdministradoresSection, {
-            global: { plugins: [pinia], stubs: commonStubs }
+            global: {plugins: [pinia], stubs: commonStubs}
         });
 
         (wrapper.vm as any).novoAdminTitulo = '  ';
@@ -70,12 +70,12 @@ describe('AdministradoresSection.vue Coverage', () => {
     });
 
     it('trata erro ao remover administrador', async () => {
-        const mockAdmin = { tituloEleitoral: '1', nome: 'Admin', matricula: 'A1', unidadeSigla: 'U', unidadeCodigo: 1 };
+        const mockAdmin = {tituloEleitoral: '1', nome: 'Admin', matricula: 'A1', unidadeSigla: 'U', unidadeCodigo: 1};
         vi.mocked(adminService.listarAdministradores).mockResolvedValue([mockAdmin]);
         const pinia = createTestingPinia();
 
         const wrapper = mount(AdministradoresSection, {
-            global: { plugins: [pinia], stubs: commonStubs }
+            global: {plugins: [pinia], stubs: commonStubs}
         });
 
         await flushPromises();
@@ -92,7 +92,7 @@ describe('AdministradoresSection.vue Coverage', () => {
     it('removerAdmin retorna se nenhum admin selecionado', async () => {
         const pinia = createTestingPinia();
         const wrapper = mount(AdministradoresSection, {
-            global: { plugins: [pinia], stubs: commonStubs }
+            global: {plugins: [pinia], stubs: commonStubs}
         });
 
         (wrapper.vm as any).adminParaRemover = null;
@@ -107,7 +107,7 @@ describe('AdministradoresSection.vue Coverage', () => {
         const pinia = createTestingPinia();
 
         const wrapper = mount(AdministradoresSection, {
-            global: { plugins: [pinia], stubs: commonStubs }
+            global: {plugins: [pinia], stubs: commonStubs}
         });
 
         (wrapper.vm as any).abrirModalAdicionarAdmin();
@@ -121,13 +121,13 @@ describe('AdministradoresSection.vue Coverage', () => {
     });
 
     it('confirma e remove administrador com sucesso', async () => {
-        const mockAdmin = { tituloEleitoral: '1', nome: 'Admin' };
+        const mockAdmin = {tituloEleitoral: '1', nome: 'Admin'};
         vi.mocked(adminService.listarAdministradores).mockResolvedValue([mockAdmin] as any);
         vi.mocked(adminService.removerAdministrador).mockResolvedValue({} as any);
         const pinia = createTestingPinia();
 
         const wrapper = mount(AdministradoresSection, {
-            global: { plugins: [pinia], stubs: commonStubs }
+            global: {plugins: [pinia], stubs: commonStubs}
         });
 
         await flushPromises();
@@ -146,7 +146,7 @@ describe('AdministradoresSection.vue Coverage', () => {
     it('modal close handlers', async () => {
         const pinia = createTestingPinia();
         const wrapper = mount(AdministradoresSection, {
-            global: { plugins: [pinia], stubs: commonStubs }
+            global: {plugins: [pinia], stubs: commonStubs}
         });
 
         (wrapper.vm as any).fecharModalAdicionarAdmin();

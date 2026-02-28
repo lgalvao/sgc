@@ -11,9 +11,14 @@ describe('processoService', () => {
     });
 
     it('criarProcesso deve fazer requisição POST', async () => {
-        const request: CriarProcessoRequest = { descricao: 'Teste', tipo: TipoProcesso.MAPEAMENTO, dataLimiteEtapa1: '2024-01-01', unidades: [] };
-        const responseData = { codigo: 1, ...request };
-        vi.mocked(apiClient.post).mockResolvedValue({ data: responseData });
+        const request: CriarProcessoRequest = {
+            descricao: 'Teste',
+            tipo: TipoProcesso.MAPEAMENTO,
+            dataLimiteEtapa1: '2024-01-01',
+            unidades: []
+        };
+        const responseData = {codigo: 1, ...request};
+        vi.mocked(apiClient.post).mockResolvedValue({data: responseData});
 
         const result = await processoService.criarProcesso(request);
 
@@ -22,8 +27,8 @@ describe('processoService', () => {
     });
 
     it('buscarProcessosFinalizados deve fazer requisição GET', async () => {
-        const responseData = [{ codigo: 1, descricao: 'Finalizado' }];
-        vi.mocked(apiClient.get).mockResolvedValue({ data: responseData });
+        const responseData = [{codigo: 1, descricao: 'Finalizado'}];
+        vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
 
         const result = await processoService.buscarProcessosFinalizados();
 
@@ -52,8 +57,8 @@ describe('processoService', () => {
 
     it('obterProcessoPorCodigo deve fazer requisição GET', async () => {
         const codProcesso = 1;
-        const responseData = { codigo: 1, descricao: 'Teste' };
-        vi.mocked(apiClient.get).mockResolvedValue({ data: responseData });
+        const responseData = {codigo: 1, descricao: 'Teste'};
+        vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
 
         const result = await processoService.obterProcessoPorCodigo(codProcesso);
 
@@ -63,9 +68,15 @@ describe('processoService', () => {
 
     it('atualizarProcesso deve fazer requisição POST', async () => {
         const codProcesso = 1;
-        const request: AtualizarProcessoRequest = { codigo: 1, descricao: 'Atualizado', tipo: TipoProcesso.MAPEAMENTO, dataLimiteEtapa1: '2024-01-01', unidades: [] };
-        const responseData = { ...request };
-        vi.mocked(apiClient.post).mockResolvedValue({ data: responseData });
+        const request: AtualizarProcessoRequest = {
+            codigo: 1,
+            descricao: 'Atualizado',
+            tipo: TipoProcesso.MAPEAMENTO,
+            dataLimiteEtapa1: '2024-01-01',
+            unidades: []
+        };
+        const responseData = {...request};
+        vi.mocked(apiClient.post).mockResolvedValue({data: responseData});
 
         const result = await processoService.atualizarProcesso(codProcesso, request);
 
@@ -81,8 +92,8 @@ describe('processoService', () => {
 
     it('obterDetalhesProcesso deve fazer requisição GET', async () => {
         const codProcesso = 1;
-        const responseData = { codigo: 1, descricao: 'Detalhes' };
-        vi.mocked(apiClient.get).mockResolvedValue({ data: responseData });
+        const responseData = {codigo: 1, descricao: 'Detalhes'};
+        vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
 
         const result = await processoService.obterDetalhesProcesso(codProcesso);
 
@@ -116,8 +127,8 @@ describe('processoService', () => {
 
     it('buscarSubprocessosElegiveis deve fazer requisição GET', async () => {
         const codProcesso = 1;
-        const responseData = [{ codSubprocesso: 1, siglaUnidade: 'U1' }];
-        vi.mocked(apiClient.get).mockResolvedValue({ data: responseData });
+        const responseData = [{codSubprocesso: 1, siglaUnidade: 'U1'}];
+        vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
 
         const result = await processoService.buscarSubprocessosElegiveis(codProcesso);
 
@@ -127,7 +138,7 @@ describe('processoService', () => {
 
     it('alterarDataLimiteSubprocesso deve fazer requisição POST', async () => {
         const codSubprocesso = 1;
-        const dados = { novaData: '2024-12-31' };
+        const dados = {novaData: '2024-12-31'};
         await processoService.alterarDataLimiteSubprocesso(codSubprocesso, dados);
         expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/data-limite`, {
             data: dados.novaData
@@ -136,7 +147,7 @@ describe('processoService', () => {
 
     it('apresentarSugestoes deve fazer requisição POST', async () => {
         const codSubprocesso = 1;
-        const dados = { sugestoes: 'Texto' };
+        const dados = {sugestoes: 'Texto'};
         await processoService.apresentarSugestoes(codSubprocesso, dados);
         expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/apresentar-sugestoes`, {
             texto: dados.sugestoes
@@ -163,15 +174,15 @@ describe('processoService', () => {
 
     it('devolverValidacao deve fazer requisição POST', async () => {
         const codSubprocesso = 1;
-        const dados = { justificativa: 'Erro' };
+        const dados = {justificativa: 'Erro'};
         await processoService.devolverValidacao(codSubprocesso, dados);
         expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/devolver-validacao`, dados);
     });
 
     it('buscarSubprocessos deve fazer requisição GET', async () => {
         const codProcesso = 1;
-        const responseData = [{ codigo: 1, situacao: 'CRIADO' }];
-        vi.mocked(apiClient.get).mockResolvedValue({ data: responseData });
+        const responseData = [{codigo: 1, situacao: 'CRIADO'}];
+        vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
 
         const result = await processoService.buscarSubprocessos(codProcesso);
 
@@ -181,8 +192,8 @@ describe('processoService', () => {
 
     it('buscarContextoCompleto deve fazer requisição GET', async () => {
         const codProcesso = 1;
-        const responseData = { codigo: 1, contexto: 'completo' };
-        vi.mocked(apiClient.get).mockResolvedValue({ data: responseData });
+        const responseData = {codigo: 1, contexto: 'completo'};
+        vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
 
         const result = await processoService.buscarContextoCompleto(codProcesso);
 
@@ -194,20 +205,20 @@ describe('processoService', () => {
         const codSubprocesso = 1;
         const justificativa = 'Erro';
         await processoService.reabrirCadastro(codSubprocesso, justificativa);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/reabrir-cadastro`, { justificativa });
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/reabrir-cadastro`, {justificativa});
     });
 
     it('reabrirRevisaoCadastro deve fazer requisição POST', async () => {
         const codSubprocesso = 1;
         const justificativa = 'Erro';
         await processoService.reabrirRevisaoCadastro(codSubprocesso, justificativa);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/reabrir-revisao-cadastro`, { justificativa });
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/reabrir-revisao-cadastro`, {justificativa});
     });
 
     it('enviarLembrete deve fazer requisição POST', async () => {
         const codProcesso = 1;
         const unidadeCodigo = 2;
         await processoService.enviarLembrete(codProcesso, unidadeCodigo);
-        expect(apiClient.post).toHaveBeenCalledWith(`/processos/${codProcesso}/enviar-lembrete`, { unidadeCodigo });
+        expect(apiClient.post).toHaveBeenCalledWith(`/processos/${codProcesso}/enviar-lembrete`, {unidadeCodigo});
     });
 });

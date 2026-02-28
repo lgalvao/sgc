@@ -10,4 +10,5 @@ Este diretório contém testes que abrangem múltiplos componentes ou comportame
 
 ## Observação
 
-Testes específicos de componentes, stores ou services devem residir em suas respectivas pastas locais `__tests__` dentro de seus diretórios de origem.
+Testes específicos de componentes, stores ou services devem residir em suas respectivas pastas locais `__tests__` dentro
+de seus diretórios de origem.

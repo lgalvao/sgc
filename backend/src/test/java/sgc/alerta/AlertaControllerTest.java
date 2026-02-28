@@ -100,13 +100,13 @@ class AlertaControllerTest {
     @Nested
     @DisplayName("Extração de Título de Usuário - Switch Expression")
     class ExtracaoTituloUsuario {
-        
+
         @Test
         @DisplayName("Deve extrair titulo quando principal é String")
         void deveExtrairTituloQuandoPrincipalString() throws Exception {
             // Este caso já é coberto pelos testes acima usando .with(user(TITULO_TESTE))
             // que passa uma String como principal
-            
+
             when(alertaFacade.alertasPorUsuario(TITULO_TESTE))
                     .thenReturn(List.of());
 
@@ -117,7 +117,7 @@ class AlertaControllerTest {
 
             verify(alertaFacade).alertasPorUsuario(TITULO_TESTE);
         }
-        
+
         @Test
         @DisplayName("Deve extrair titulo quando principal é UserDetails")
         void deveExtrairTituloQuandoPrincipalUserDetails() throws Exception {
@@ -126,7 +126,7 @@ class AlertaControllerTest {
                     .password("password")
                     .authorities("ROLE_USER")
                     .build();
-            
+
             when(alertaFacade.listarNaoLidos("98765432100"))
                     .thenReturn(List.of());
 

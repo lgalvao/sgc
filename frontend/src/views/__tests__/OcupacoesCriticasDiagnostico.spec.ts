@@ -6,8 +6,8 @@ import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentT
 import {useFeedbackStore} from '@/stores/feedback';
 
 // Mocks
-const { mockRouteParams } = vi.hoisted(() => {
-    return { mockRouteParams: { value: { codSubprocesso: '10' } } };
+const {mockRouteParams} = vi.hoisted(() => {
+    return {mockRouteParams: {value: {codSubprocesso: '10'}}};
 });
 
 vi.mock('vue-router', async (importOriginal) => {
@@ -72,14 +72,14 @@ describe('OcupacoesCriticasDiagnostico.vue', () => {
         return mount(OcupacoesCriticasDiagnostico, {
             ...getCommonMountOptions(
                 {
-                    unidades: { unidade: { sigla: 'TEST', nome: 'Unidade Teste' } },
+                    unidades: {unidade: {sigla: 'TEST', nome: 'Unidade Teste'}},
                     ...initialState
                 },
                 {
-                    BContainer: { template: '<div><slot /></div>' },
-                    BAlert: { template: '<div><slot /></div>' },
-                    BButton: { template: '<button><slot /></button>' },
-                    BSpinner: { template: '<div data-testid="spinner"></div>' },
+                    BContainer: {template: '<div><slot /></div>'},
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button><slot /></button>'},
+                    BSpinner: {template: '<div data-testid="spinner"></div>'},
                     BFormSelect: {
                         template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value); $emit(\'change\', $event.target.value)"><option value="AC">A capacitar</option></select>',
                         props: ['modelValue', 'options']
@@ -92,7 +92,7 @@ describe('OcupacoesCriticasDiagnostico.vue', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        mockRouteParams.value = { codSubprocesso: '10' };
+        mockRouteParams.value = {codSubprocesso: '10'};
         (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnostico);
     });
 
@@ -128,7 +128,7 @@ describe('OcupacoesCriticasDiagnostico.vue', () => {
     });
 
     it('handles empty state', async () => {
-        const mockDiagnosticoVazio = { ...mockDiagnostico, servidores: [mockServidorSemGaps] };
+        const mockDiagnosticoVazio = {...mockDiagnostico, servidores: [mockServidorSemGaps]};
         (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoVazio);
 
         context.wrapper = createWrapper();

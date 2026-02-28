@@ -5,7 +5,8 @@ Utilitários e helpers para facilitar a escrita de testes unitários e de integr
 ## Utilitários Disponíveis
 
 * **`mockFactories.ts`**: Fábricas de objetos para criar dados fake consistentes (ex: `criarProcessoMock()`).
-* **`componentTestHelpers.ts`**: Wrappers em torno do Vue Test Utils para montar componentes com plugins (Pinia, Router) pré-configurados.
+* **`componentTestHelpers.ts`**: Wrappers em torno do Vue Test Utils para montar componentes com plugins (Pinia, Router)
+  pré-configurados.
 * **`storeTestHelpers.ts`**: Auxiliares para testar stores Pinia de forma isolada.
 * **`serviceTestHelpers.ts`**: Utilitários para mockar chamadas Axios em testes de serviço.
 * **`a11yTestHelpers.ts`**: Integração com `vitest-axe` para verificação de acessibilidade.
@@ -14,4 +15,5 @@ Utilitários e helpers para facilitar a escrita de testes unitários e de integr
 
 ## Uso Sugerido
 
-Sempre utilize as `mockFactories` para garantir que as alterações nos tipos/interfaces sejam propagadas automaticamente para todos os testes.
+Sempre utilize as `mockFactories` para garantir que as alterações nos tipos/interfaces sejam propagadas automaticamente
+para todos os testes.

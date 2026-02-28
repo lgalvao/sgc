@@ -28,7 +28,11 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     // PREPARAÇÃO - Criar mapa disponibilizado para CHEFE validar
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
+                                                                                page,
+                                                                                autenticadoComoAdmin,
+                                                                                cleanupAutomatico
+                                                                            }) => {
         await criarProcesso(page, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
@@ -49,7 +53,10 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({
+                                                                                        page,
+                                                                                        autenticadoComoChefeSecao221
+                                                                                    }) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
@@ -102,7 +109,10 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     // TESTES PRINCIPAIS - CDU-19
     // ========================================================================
 
-    test('Cenários CDU-19: Fluxo completo de validação do mapa pelo CHEFE', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Cenários CDU-19: Fluxo completo de validação do mapa pelo CHEFE', async ({
+                                                                                       page,
+                                                                                       autenticadoComoChefeSecao221
+                                                                                   }) => {
         // Cenario 1: Navegação para visualização do mapa
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

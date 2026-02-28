@@ -14,9 +14,9 @@
             v-if="podeVerImpacto"
             :loading="loadingImpacto"
             data-testid="cad-mapa__btn-impactos-mapa"
-            variant="outline-secondary"
             icon="arrow-right-circle"
             text="Impacto no mapa"
+            variant="outline-secondary"
             @click="abrirModalImpacto"
         />
         <BButton
@@ -37,10 +37,10 @@
     />
 
     <CompetenciasListSection
-        :unidade="unidade"
-        :competencias="competencias"
         :atividades="atividades"
+        :competencias="competencias"
         :pode-editar="podeEditarMapa"
+        :unidade="unidade"
         @criar="abrirModalCriarLimpo"
         @editar="iniciarEdicaoCompetencia"
         @excluir="excluirCompetencia"
@@ -68,11 +68,11 @@
     <ModalConfirmacao
         v-model="mostrarModalExcluirCompetencia"
         :loading="loadingExclusao"
-        data-testid="mdl-excluir-competencia"
-        titulo="Exclusão de competência"
         :mensagem="`Confirma a exclusão da competência '${competenciaParaExcluir?.descricao}'?`"
-        variant="danger"
+        data-testid="mdl-excluir-competencia"
         test-id-confirmar="btn-confirmar-exclusao-competencia"
+        titulo="Exclusão de competência"
+        variant="danger"
         @confirmar="confirmarExclusaoCompetencia"
     />
 

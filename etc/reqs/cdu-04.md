@@ -10,21 +10,25 @@ Fluxo principal:
 
 1. No Painel, ADMIN clica em um processo de mapeamento que esteja na situação 'Criado'.
 
-2. O sistema muda para a tela `Cadastro de processo`. Os campos aparecem preenchidos com as informações do processo selecionado.
+2. O sistema muda para a tela `Cadastro de processo`. Os campos aparecem preenchidos com as informações do processo
+   selecionado.
 
 3. ADMIN clica no botão Iniciar processo.
 
-4. O sistema mostra modal de confirmação: "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes serão notificadas por e-mail.", com botões `Confirmar` e `Cancelar`.
+4. O sistema mostra modal de confirmação: "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas
+   as unidades participantes serão notificadas por e-mail.", com botões `Confirmar` e `Cancelar`.
 
 5. Caso o usuário `Cancelar`, o sistema interrompe a operação de iniciação do processo, permanecendo na mesma tela.
 
 6. ADMIN confirma.
 
-7. O sistema armazena internamente uma cópia da árvore de unidades participantes e a vincula com o processo, a fim de preservar a representação hierárquica vigente no momento do início do processo.
+7. O sistema armazena internamente uma cópia da árvore de unidades participantes e a vincula com o processo, a fim de
+   preservar a representação hierárquica vigente no momento do início do processo.
 
 8. O sistema muda a situação do processo de mapeamento para 'Em andamento';
 
-9. O sistema cria internamente um subprocesso para cada unidade participante, que seja do tipo Operacional ou Interoperacional, com os seguintes campos e valores iniciais:
+9. O sistema cria internamente um subprocesso para cada unidade participante, que seja do tipo Operacional ou
+   Interoperacional, com os seguintes campos e valores iniciais:
 
     - `Data limite etapa 1`: Data copiada da data limite da etapa inicial do processo.
     - `Situação`: 'Não iniciado'
@@ -87,4 +91,5 @@ Fluxo principal:
     - Unidade de origem: ADMIN
     - Unidade de destino: [SIGLA_UNIDADE].
 
-    13.3. Para cada unidade **interoperacional** serão criados dois alertas: um de unidade operacional e outro de unidade intermediária, como especificado acima.
+    13.3. Para cada unidade **interoperacional** serão criados dois alertas: um de unidade operacional e outro de
+    unidade intermediária, como especificado acima.

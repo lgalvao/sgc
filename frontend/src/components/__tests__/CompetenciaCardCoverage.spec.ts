@@ -4,10 +4,10 @@ import CompetenciaCard from '@/components/mapa/CompetenciaCard.vue';
 
 describe('CompetenciaCard Coverage', () => {
     const commonStubs = {
-        BCard: { template: '<div><slot /></div>' },
-        BCardHeader: { template: '<div><slot /></div>' },
-        BCardBody: { template: '<div><slot /></div>' },
-        BButton: { template: '<button><slot /></button>' }
+        BCard: {template: '<div><slot /></div>'},
+        BCardHeader: {template: '<div><slot /></div>'},
+        BCardBody: {template: '<div><slot /></div>'},
+        BButton: {template: '<button><slot /></button>'}
     };
 
     it('renders "Atividade 999" for activity ID 999', () => {

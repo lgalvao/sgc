@@ -58,6 +58,7 @@ test('Deve criar processo', async ({page, autenticadoComoAdmin}) => {
 ```
 
 **Fixtures Disponíveis:**
+
 * `autenticadoComoAdmin` - Admin único perfil (191919)
 * `autenticadoComoGestor` - Gestor COORD_11 (222222)
 * `autenticadoComoChefeSecao111` - Chefe Seção 111 (333333)
@@ -109,4 +110,5 @@ Consulte `backend/src/main/java/sgc/e2e/README.md` para mais detalhes.
 * **Seletores Resilientes:** Use sempre `data-testid="..."` em vez de classes CSS ou XPaths frágeis.
 * **Idempotência:** Cada teste deve ser independente. Use os hooks `beforeEach` para limpar/resetar o estado.
 * **Determinismo:** Evite `page.waitForTimeout()`. Use esperas explícitas por elementos ou respostas de rede.
-* **Auth Fixtures:** Use sempre as fixtures de autenticação (`autenticadoComoAdmin`, etc.) em vez de chamar `login()` manualmente. Isso reduz duplicação e torna os testes mais legíveis.
+* **Auth Fixtures:** Use sempre as fixtures de autenticação (`autenticadoComoAdmin`, etc.) em vez de chamar `login()`
+  manualmente. Isso reduz duplicação e torna os testes mais legíveis.

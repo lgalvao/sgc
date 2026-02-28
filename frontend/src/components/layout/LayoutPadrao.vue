@@ -1,9 +1,9 @@
 <template>
   <BContainer class="mt-4">
-    <slot />
+    <slot/>
   </BContainer>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BContainer} from "bootstrap-vue-next";
 </script>

@@ -56,13 +56,20 @@ def analyze_tests(backend_dir='backend'):
         is_tested = any(t in test_files for t in expected_tests)
 
         category = "Others"
-        if "Controller" in class_name: category = "Controllers"
-        elif "Service" in class_name or "Policy" in class_name: category = "Services"
-        elif "Facade" in class_name: category = "Facades"
-        elif "Mapper" in class_name: category = "Mappers"
-        elif "Dto" in class_name or "Request" in class_name or "Response" in class_name: category = "DTOs"
-        elif "Repo" in class_name: category = "Repositories"
-        elif "/model/" in src_rel.replace('\\', '/') or "/dominio/" in src_rel.replace('\\', '/'): category = "Models"
+        if "Controller" in class_name:
+            category = "Controllers"
+        elif "Service" in class_name or "Policy" in class_name:
+            category = "Services"
+        elif "Facade" in class_name:
+            category = "Facades"
+        elif "Mapper" in class_name:
+            category = "Mappers"
+        elif "Dto" in class_name or "Request" in class_name or "Response" in class_name:
+            category = "DTOs"
+        elif "Repo" in class_name:
+            category = "Repositories"
+        elif "/model/" in src_rel.replace('\\', '/') or "/dominio/" in src_rel.replace('\\', '/'):
+            category = "Models"
 
         stats["total"] += 1
         if is_tested:
@@ -105,11 +112,12 @@ def analyze_tests(backend_dir='backend'):
 
     return "\n".join(output)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Analisa a cobertura de arquivos de teste no backend.')
     parser.add_argument('--dir', default='backend', help='Diretório raiz do backend')
     parser.add_argument('--output', default='unit-test-report.md', help='Arquivo de saída (Markdown)')
-    
+
     args = parser.parse_args()
 
     report_content = analyze_tests(args.dir)

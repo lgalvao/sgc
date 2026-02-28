@@ -86,11 +86,11 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
         // Configurar relacionamento bidirecional no lado owning (Atividade)
         atividade1.getCompetencias().add(competencia1);
         atividade2.getCompetencias().add(competencia2);
-        
+
         // Configurar o lado inverso para garantir consistência no teste transacional
         competencia1.getAtividades().add(atividade1);
         competencia2.getAtividades().add(atividade2);
-        
+
         atividadeRepo.saveAll(List.of(atividade1, atividade2));
         competenciaRepo.saveAll(List.of(competencia1, competencia2));
         mapaRepo.save(mapa);

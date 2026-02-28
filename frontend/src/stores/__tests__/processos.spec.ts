@@ -7,8 +7,8 @@ import {normalizeError} from "@/utils/apiError";
 
 vi.mock("@/services/painelService");
 vi.mock("@/services/processoService");
-vi.mock("../unidades", () => ({ useUnidadesStore: vi.fn(() => ({})) }));
-vi.mock("../alertas", () => ({ useAlertasStore: vi.fn(() => ({})) }));
+vi.mock("../unidades", () => ({useUnidadesStore: vi.fn(() => ({}))}));
+vi.mock("../alertas", () => ({useAlertasStore: vi.fn(() => ({}))}));
 
 describe("useProcessosStore", () => {
     const context = setupStoreTest(useProcessosStore);
@@ -50,9 +50,9 @@ describe("useProcessosStore", () => {
         } catch {
             // Ignore expected error
         }
-        
+
         expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
-        
+
         context.store.clearError();
         expect(context.store.lastError).toBeNull();
     });
@@ -60,7 +60,7 @@ describe("useProcessosStore", () => {
     describe("Actions", () => {
         describe("buscarProcessosPainel", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
-                const mockPage = { content: [{ codigo: 1 }], totalPages: 1 };
+                const mockPage = {content: [{codigo: 1}], totalPages: 1};
                 painelService.listarProcessos.mockResolvedValue(mockPage as any);
                 await context.store.buscarProcessosPainel("perfil", 1, 0, 10);
                 const calls = painelService.listarProcessos.mock.calls[0];
@@ -72,7 +72,7 @@ describe("useProcessosStore", () => {
             });
 
             it("deve respeitar ordenacao personalizada", async () => {
-                const mockPage = { content: [{ codigo: 2 }], totalPages: 1 };
+                const mockPage = {content: [{codigo: 2}], totalPages: 1};
                 painelService.listarProcessos.mockResolvedValue(mockPage as any);
                 await context.store.buscarProcessosPainel("perfil", 1, 0, 10, "descricao", "asc");
                 expect(painelService.listarProcessos).toHaveBeenCalledWith(
@@ -97,8 +97,8 @@ describe("useProcessosStore", () => {
 
         describe("devolverValidacao", () => {
             it("deve chamar service corretamente", async () => {
-                context.store.processoDetalhe = { codigo: 1 } as any;
-                const dados = { justificativa: 'Erro' };
+                context.store.processoDetalhe = {codigo: 1} as any;
+                const dados = {justificativa: 'Erro'};
                 processoService.devolverValidacao.mockResolvedValue(undefined);
                 processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
                 await context.store.devolverValidacao(10, dados);
@@ -108,15 +108,16 @@ describe("useProcessosStore", () => {
 
             it("deve lançar erro em caso de falha", async () => {
                 processoService.devolverValidacao.mockRejectedValue(MOCK_ERROR);
-                await expect(context.store.devolverValidacao(10, { justificativa: 'E' })).rejects.toThrow(MOCK_ERROR);
+                await expect(context.store.devolverValidacao(10, {justificativa: 'E'})).rejects.toThrow(MOCK_ERROR);
                 expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
 
         describe("buscarContextoCompleto", () => {
             it("deve limpar o estado anterior antes de buscar novo contexto", async () => {
-                context.store.processoDetalhe = { codigo: 1 } as any;
-                processoService.buscarContextoCompleto.mockReturnValue(new Promise(() => { })); // Nunca resolve
+                context.store.processoDetalhe = {codigo: 1} as any;
+                processoService.buscarContextoCompleto.mockReturnValue(new Promise(() => {
+                })); // Nunca resolve
 
                 context.store.buscarContextoCompleto(2);
 
@@ -126,7 +127,7 @@ describe("useProcessosStore", () => {
             it("deve atualizar processoDetalhe e subprocessosElegiveis", async () => {
                 const mockData = {
                     processo: MOCK_PROCESSO_DETALHE,
-                    elegiveis: [{ codigo: 1 }]
+                    elegiveis: [{codigo: 1}]
                 };
                 processoService.buscarContextoCompleto.mockResolvedValue(mockData as any);
 
@@ -134,7 +135,7 @@ describe("useProcessosStore", () => {
 
                 expect(processoService.buscarContextoCompleto).toHaveBeenCalledWith(1);
                 expect(context.store.processoDetalhe).toEqual(mockData);
-                expect(context.store.subprocessosElegiveis).toEqual([{ codigo: 1 }]);
+                expect(context.store.subprocessosElegiveis).toEqual([{codigo: 1}]);
             });
 
             it("deve lidar com erros", async () => {
@@ -146,8 +147,9 @@ describe("useProcessosStore", () => {
 
         describe("buscarProcessoDetalhe", () => {
             it("deve limpar o estado anterior antes de buscar novo detalhe", async () => {
-                context.store.processoDetalhe = { codigo: 1 } as any;
-                processoService.obterDetalhesProcesso.mockReturnValue(new Promise(() => { })); // Nunca resolve
+                context.store.processoDetalhe = {codigo: 1} as any;
+                processoService.obterDetalhesProcesso.mockReturnValue(new Promise(() => {
+                })); // Nunca resolve
 
                 context.store.buscarProcessoDetalhe(2);
 
@@ -255,7 +257,7 @@ describe("useProcessosStore", () => {
 
         describe("buscarProcessosFinalizados", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
-                const mockProcessos = [{ codigo: 1 }];
+                const mockProcessos = [{codigo: 1}];
                 processoService.buscarProcessosFinalizados.mockResolvedValue(
                     mockProcessos as any,
                 );
@@ -273,7 +275,7 @@ describe("useProcessosStore", () => {
 
         describe("buscarSubprocessosElegiveis", () => {
             it("deve atualizar o estado em caso de sucesso", async () => {
-                const mockSubprocessos = [{ codigo: 1 }];
+                const mockSubprocessos = [{codigo: 1}];
                 processoService.buscarSubprocessosElegiveis.mockResolvedValue(
                     mockSubprocessos as any,
                 );
@@ -329,7 +331,7 @@ describe("useProcessosStore", () => {
             });
 
             it("deve lançar erro em caso de falha", async () => {
-                const payload = { codProcesso: 1 } as any;
+                const payload = {codProcesso: 1} as any;
                 processoService.processarAcaoEmBloco.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.processarCadastroBloco(payload)).rejects.toThrow(MOCK_ERROR);
                 expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
@@ -339,7 +341,7 @@ describe("useProcessosStore", () => {
         describe("alterarDataLimiteSubprocesso", () => {
             it("deve chamar o processoService e recarregar os detalhes se disponíveis", async () => {
                 context.store.processoDetalhe = MOCK_PROCESSO_DETALHE;
-                const payload = { novaData: "2026-01-01" };
+                const payload = {novaData: "2026-01-01"};
                 processoService.alterarDataLimiteSubprocesso.mockResolvedValue(undefined);
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
@@ -353,7 +355,7 @@ describe("useProcessosStore", () => {
 
             it("não deve recarregar detalhes se processoDetalhe for nulo", async () => {
                 context.store.processoDetalhe = null;
-                const payload = { novaData: "2026-01-01" };
+                const payload = {novaData: "2026-01-01"};
                 processoService.alterarDataLimiteSubprocesso.mockResolvedValue(undefined);
 
                 await context.store.alterarDataLimiteSubprocesso(1, payload);
@@ -363,7 +365,7 @@ describe("useProcessosStore", () => {
             });
 
             it("deve lançar erro em caso de falha", async () => {
-                const payload = { novaData: "2026-01-01" };
+                const payload = {novaData: "2026-01-01"};
                 processoService.alterarDataLimiteSubprocesso.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.alterarDataLimiteSubprocesso(1, payload)).rejects.toThrow(MOCK_ERROR);
                 expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
@@ -373,7 +375,7 @@ describe("useProcessosStore", () => {
         describe("apresentarSugestoes", () => {
             it("deve chamar o processoService e recarregar os detalhes", async () => {
                 context.store.processoDetalhe = MOCK_PROCESSO_DETALHE;
-                const payload = { sugestoes: "sugestoes" };
+                const payload = {sugestoes: "sugestoes"};
                 processoService.apresentarSugestoes.mockResolvedValue(undefined);
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
@@ -388,7 +390,7 @@ describe("useProcessosStore", () => {
 
             it("não deve recarregar detalhes se processoDetalhe for nulo", async () => {
                 context.store.processoDetalhe = null;
-                const payload = { sugestoes: "sugestoes" };
+                const payload = {sugestoes: "sugestoes"};
                 processoService.apresentarSugestoes.mockResolvedValue(undefined);
 
                 await context.store.apresentarSugestoes(1, payload);
@@ -398,7 +400,7 @@ describe("useProcessosStore", () => {
             });
 
             it("deve lançar erro em caso de falha", async () => {
-                const payload = { sugestoes: "sugestoes" };
+                const payload = {sugestoes: "sugestoes"};
                 processoService.apresentarSugestoes.mockRejectedValue(MOCK_ERROR);
                 await expect(context.store.apresentarSugestoes(1, payload)).rejects.toThrow(MOCK_ERROR);
                 expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
@@ -465,7 +467,7 @@ describe("useProcessosStore", () => {
 
         describe("aceitarValidacao", () => {
             it("deve chamar service corretamente", async () => {
-                context.store.processoDetalhe = { codigo: 1 } as any;
+                context.store.processoDetalhe = {codigo: 1} as any;
                 processoService.aceitarValidacao.mockResolvedValue(undefined);
                 processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
                 await context.store.aceitarValidacao(10);
@@ -495,10 +497,20 @@ describe("useProcessosStore", () => {
             const MOCK_PROCESSO_WITH_UNITS = {
                 codigo: 1,
                 unidades: [
-                    { codUnidade: 101, situacaoSubprocesso: 'MAPEAMENTO_CADASTRO_DISPONIBILIZADO', codSubprocesso: 1001, filhos: [] },
-                    { codUnidade: 102, situacaoSubprocesso: 'MAPEAMENTO_MAPA_VALIDADO', codSubprocesso: 1002, filhos: [] },
-                    { codUnidade: 104, situacaoSubprocesso: 'MAPEAMENTO_MAPA_CRIADO', codSubprocesso: 1004, filhos: [] },
-                    { codUnidade: 105, situacaoSubprocesso: 'NAO_INICIADO', codSubprocesso: 1005, filhos: [] }
+                    {
+                        codUnidade: 101,
+                        situacaoSubprocesso: 'MAPEAMENTO_CADASTRO_DISPONIBILIZADO',
+                        codSubprocesso: 1001,
+                        filhos: []
+                    },
+                    {
+                        codUnidade: 102,
+                        situacaoSubprocesso: 'MAPEAMENTO_MAPA_VALIDADO',
+                        codSubprocesso: 1002,
+                        filhos: []
+                    },
+                    {codUnidade: 104, situacaoSubprocesso: 'MAPEAMENTO_MAPA_CRIADO', codSubprocesso: 1004, filhos: []},
+                    {codUnidade: 105, situacaoSubprocesso: 'NAO_INICIADO', codSubprocesso: 1005, filhos: []}
                 ]
             } as any;
 
@@ -556,15 +568,15 @@ describe("useProcessosStore", () => {
                 context.store.processoDetalhe = {
                     ...MOCK_PROCESSO_DETALHE,
                     codigo: 1,
-                    resumoSubprocessos: [{ codigo: 10 }]
+                    resumoSubprocessos: [{codigo: 10}]
                 } as any;
 
                 const unidades = context.store.obterUnidadesDoProcesso(1);
-                expect(unidades).toEqual([{ codigo: 10 }]);
+                expect(unidades).toEqual([{codigo: 10}]);
             });
 
             it("deve retornar lista vazia se processo não corresponder", () => {
-                context.store.processoDetalhe = { ...MOCK_PROCESSO_DETALHE, codigo: 2 } as any;
+                context.store.processoDetalhe = {...MOCK_PROCESSO_DETALHE, codigo: 2} as any;
 
                 const unidades = context.store.obterUnidadesDoProcesso(1);
                 expect(unidades).toEqual([]);

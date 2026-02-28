@@ -82,18 +82,18 @@ function rowAttr(item: ProcessoResumo | null, type: string) {
   return {};
 }
 
-defineExpose({ fields });
+defineExpose({fields});
 </script>
 
 <template>
   <div class="table-responsive">
     <BTable
         v-model:sort-by="internalSortBy"
-        aria-label="Lista de processos cadastrados"
         :fields="fields"
         :items="processos"
         :tbody-tr-attr="rowAttr"
         :tbody-tr-class="rowClass"
+        aria-label="Lista de processos cadastrados"
         data-testid="tbl-processos"
         hover
         responsive
@@ -104,11 +104,11 @@ defineExpose({ fields });
 
       <template #empty>
         <EmptyState
-            icon="bi-folder2-open"
-            title="Nenhum processo encontrado"
-            description="Os processos em que sua unidade participa aparecerão aqui."
+            class="border-0 bg-transparent mb-0"
             data-testid="empty-state-processos"
-            class="border-0 bg-transparent mb-0">
+            description="Os processos em que sua unidade participa aparecerão aqui."
+            icon="bi-folder2-open"
+            title="Nenhum processo encontrado">
           <BButton
               v-if="mostrarCtaVazio"
               data-testid="btn-empty-state-criar-processo"
@@ -126,7 +126,7 @@ defineExpose({ fields });
       </template>
 
       <template #cell(situacao)="{ item }">
-        <BadgeSituacao :situacao="item.situacao" :texto="formatSituacaoProcesso(item.situacao)" />
+        <BadgeSituacao :situacao="item.situacao" :texto="formatSituacaoProcesso(item.situacao)"/>
       </template>
 
       <template #cell(tipo)="{ item }">

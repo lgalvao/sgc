@@ -11,9 +11,9 @@ describe('AdministradorService', () => {
 
     it('listarAdministradores deve fazer uma requisição GET para /usuarios/administradores', async () => {
         const mockData = [
-            { tituloEleitoral: '123456789012', nome: 'Admin 1', matricula: '111', unidadeCodigo: 1, unidadeSigla: 'UN1' }
+            {tituloEleitoral: '123456789012', nome: 'Admin 1', matricula: '111', unidadeCodigo: 1, unidadeSigla: 'UN1'}
         ];
-        vi.mocked(apiClient.get).mockResolvedValue({ data: mockData });
+        vi.mocked(apiClient.get).mockResolvedValue({data: mockData});
 
         const result = await AdministradorService.listarAdministradores();
 
@@ -23,12 +23,18 @@ describe('AdministradorService', () => {
 
     it('adicionarAdministrador deve fazer uma requisição POST para /usuarios/administradores', async () => {
         const usuarioTitulo = '123456789012';
-        const mockResponse = { tituloEleitoral: '123456789012', nome: 'Admin 1', matricula: '111', unidadeCodigo: 1, unidadeSigla: 'UN1' };
-        vi.mocked(apiClient.post).mockResolvedValue({ data: mockResponse });
+        const mockResponse = {
+            tituloEleitoral: '123456789012',
+            nome: 'Admin 1',
+            matricula: '111',
+            unidadeCodigo: 1,
+            unidadeSigla: 'UN1'
+        };
+        vi.mocked(apiClient.post).mockResolvedValue({data: mockResponse});
 
         const result = await AdministradorService.adicionarAdministrador(usuarioTitulo);
 
-        expect(apiClient.post).toHaveBeenCalledWith('/usuarios/administradores', { usuarioTitulo });
+        expect(apiClient.post).toHaveBeenCalledWith('/usuarios/administradores', {usuarioTitulo});
         expect(result).toEqual(mockResponse);
     });
 

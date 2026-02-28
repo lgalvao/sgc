@@ -215,9 +215,9 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                     .senha("any")
                     .build();
             Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/autenticar")
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(testUtil.toJson(authRequest)))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(testUtil.toJson(authRequest)))
                     .andReturn().getResponse().getCookies();
 
             EntrarRequest entrarReq = EntrarRequest.builder()

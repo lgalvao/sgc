@@ -1,16 +1,16 @@
 <template>
   <ModalPadrao
-      :model-value="mostrar"
-      :loading="loading"
       :acao-desabilitada="!dataLimiteValidacao"
-      test-id-cancelar="btn-disponibilizar-mapa-cancelar"
-      titulo="Disponibilização do mapa de competências"
+      :loading="loading"
+      :model-value="mostrar"
       data-testid="mdl-disponibilizar-mapa"
-      variant-acao="success"
+      test-id-cancelar="btn-disponibilizar-mapa-cancelar"
       texto-acao="Disponibilizar"
       texto-acao-carregando="Disponibilizando..."
-      @fechar="fechar"
+      titulo="Disponibilização do mapa de competências"
+      variant-acao="success"
       @confirmar="disponibilizar"
+      @fechar="fechar"
   >
     <div v-if="fieldErrors?.generic" class="alert alert-danger mb-3">
       {{ fieldErrors.generic }}
@@ -60,12 +60,12 @@
     </BAlert>
     <template #acao>
       <LoadingButton
-          :loading="loading"
           :disabled="!dataLimiteValidacao"
+          :loading="loading"
           data-testid="btn-disponibilizar-mapa-confirmar"
-          variant="success"
-          text="Disponibilizar"
           loading-text="Disponibilizando..."
+          text="Disponibilizar"
+          variant="success"
           @click="disponibilizar"
       />
     </template>

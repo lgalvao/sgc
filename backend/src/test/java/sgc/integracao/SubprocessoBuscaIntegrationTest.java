@@ -1,25 +1,17 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.fixture.UnidadeFixture;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.transaction.annotation.*;
+import sgc.fixture.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Tag("integration")
 @Transactional
@@ -29,6 +21,8 @@ class SubprocessoBuscaIntegrationTest extends BaseIntegrationTest {
     private Unidade unidade;
     private Processo processo;
     private Subprocesso subprocesso;
+    @Autowired
+    private sgc.organizacao.model.UsuarioRepo usuarioRepo;
 
     @BeforeEach
     void setUp() {
@@ -60,9 +54,6 @@ class SubprocessoBuscaIntegrationTest extends BaseIntegrationTest {
         subprocessoRepo.save(subprocesso);
     }
 
-    @Autowired
-    private sgc.organizacao.model.UsuarioRepo usuarioRepo;
-
     @Test
     @DisplayName("buscarPorProcessoEUnidade - Deve encontrar subprocesso existente no banco")
     void buscarPorProcessoEUnidade_Sucesso() throws Exception {
@@ -71,7 +62,7 @@ class SubprocessoBuscaIntegrationTest extends BaseIntegrationTest {
         admin.setPerfilAtivo(sgc.organizacao.model.Perfil.ADMIN);
         admin.setUnidadeAtivaCodigo(1L);
         org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(
-            new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(admin, null, admin.getAuthorities())
+                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(admin, null, admin.getAuthorities())
         );
 
         mockMvc.perform(get("/api/subprocessos/buscar")

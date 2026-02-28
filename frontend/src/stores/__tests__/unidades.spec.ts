@@ -89,7 +89,7 @@ describe("useUnidadesStore", () => {
         });
 
         it("buscarUnidade deve definir estado da unidade", async () => {
-            const mockUnit = { sigla: "TEST", nome: "Test Unit" };
+            const mockUnit = {sigla: "TEST", nome: "Test Unit"};
             vi.mocked(unidadesService.buscarUnidadePorSigla).mockResolvedValue(
                 mockUnit as any,
             );
@@ -113,7 +113,7 @@ describe("useUnidadesStore", () => {
         });
 
         it("buscarUnidadePorCodigo deve definir estado da unidade", async () => {
-            const mockUnit = { codigo: 123, nome: "Test Unit" };
+            const mockUnit = {codigo: 123, nome: "Test Unit"};
             vi.mocked(unidadesService.buscarUnidadePorCodigo).mockResolvedValue(
                 mockUnit as any,
             );
@@ -137,7 +137,7 @@ describe("useUnidadesStore", () => {
         });
 
         it("buscarArvoreUnidade deve chamar serviço e definir unidade", async () => {
-            const mockUnit = { codigo: 1, filhas: [] };
+            const mockUnit = {codigo: 1, filhas: []};
             vi.mocked(unidadesService.buscarArvoreUnidade).mockResolvedValue(
                 mockUnit as any,
             );

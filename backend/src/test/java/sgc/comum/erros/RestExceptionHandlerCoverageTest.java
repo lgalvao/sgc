@@ -14,7 +14,8 @@ class RestExceptionHandlerCoverageTest {
     @DisplayName("handleErroInterno deve tratar ErroInterno corretamente")
     void deveTratarErroInterno() {
         // Arrange
-        ErroInterno ex = new ErroInterno("Messagem interna de teste") {};
+        ErroInterno ex = new ErroInterno("Messagem interna de teste") {
+        };
 
         // Act
         ResponseEntity<?> response = handler.handleErroInterno(ex);

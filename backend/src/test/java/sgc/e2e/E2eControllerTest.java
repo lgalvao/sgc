@@ -193,7 +193,7 @@ class E2eControllerTest {
         DataSource mockDataSource = Mockito.mock(DataSource.class);
         Connection mockConnection = Mockito.mock(Connection.class);
         Statement mockStatement = Mockito.mock(Statement.class);
-        
+
         when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
         when(mockConnection.createStatement()).thenReturn(mockStatement);
@@ -380,6 +380,7 @@ class E2eControllerTest {
         // Assert
         verify(processoFacade).iniciarProcessoMapeamento(eq(100L), anyList());
     }
+
     @Nested
     @DisplayName("Cobertura Extra Isolada")
     class CoberturaExtra {
@@ -404,7 +405,7 @@ class E2eControllerTest {
         void limparTabela_TruncateFalha_TentaDelete() throws Exception {
             try (Connection conn = mock(Connection.class);
                  Statement stmt = mock(Statement.class)) {
-                
+
                 when(stmt.execute(anyString())).thenReturn(true);
                 doThrow(new SQLException("Erro H2")).when(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
 
@@ -413,7 +414,7 @@ class E2eControllerTest {
                 when(ds.getConnection()).thenReturn(conn);
                 when(conn.createStatement()).thenReturn(stmt);
                 when(jdbcTemplateMock.queryForList(anyString(), eq(String.class))).thenReturn(List.of("TABELA_TESTE"));
-                
+
                 Resource resource = mock(Resource.class);
                 when(resourceLoaderMock.getResource(anyString())).thenReturn(resource);
                 when(resource.exists()).thenReturn(true);
@@ -435,20 +436,20 @@ class E2eControllerTest {
             assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
-        
+
         @Test
         @DisplayName("criarProcessoFixture: Falha ao iniciar processo devolve ErroValidacao")
         void criarProcessoFixture_FalhaIniciar() {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
-            
+
             UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
             when(organizacaoFacadeMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
-            
+
             Processo dto = Processo.builder().codigo(100L).build();
             when(processoFacadeMock.criar(any())).thenReturn(dto);
-            
+
             when(processoFacadeMock.iniciarProcessoMapeamento(100L, List.of(10L)))
-                .thenReturn(List.of("Erro 1", "Erro 2"));
+                    .thenReturn(List.of("Erro 1", "Erro 2"));
 
             assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
                     .isInstanceOf(ErroValidacao.class)
@@ -459,16 +460,16 @@ class E2eControllerTest {
         @DisplayName("criarProcessoFixture: Falha ao recarregar processo")
         void criarProcessoFixture_FalhaRecarregar() {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
-            
+
             UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
             when(organizacaoFacadeMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
-            
+
             Processo dto = Processo.builder().codigo(100L).build();
             when(processoFacadeMock.criar(any())).thenReturn(dto);
-            
+
             when(processoFacadeMock.iniciarProcessoMapeamento(100L, List.of(10L)))
-                .thenReturn(List.of()); // Sucesso
-                
+                    .thenReturn(List.of()); // Sucesso
+
             when(processoFacadeMock.obterEntidadePorId(100L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 100L)); // Falha ao recarregar
 
             assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))

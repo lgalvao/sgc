@@ -23,7 +23,7 @@ const mockLocalStorage = (() => {
     };
 })();
 
-Object.defineProperty(globalThis, "localStorage", { value: mockLocalStorage });
+Object.defineProperty(globalThis, "localStorage", {value: mockLocalStorage});
 
 describe("usePerfilStore", () => {
     beforeEach(() => {
@@ -71,7 +71,7 @@ describe("usePerfilStore", () => {
             expect(context.store.perfilSelecionado).toBe(Perfil.ADMIN);
             expect(context.store.unidadeSelecionada).toBe(unidadeCodigo);
             expect(context.store.unidadeSelecionadaSigla).toBe(unidadeSigla);
-            
+
             context.store.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla, "Nome Teste");
             expect(context.store.usuarioNome).toBe("Nome Teste");
         });
@@ -79,7 +79,7 @@ describe("usePerfilStore", () => {
         it("loginCompleto deve autenticar, buscar perfis e selecionar automaticamente se houver apenas um perfil", async () => {
             const perfilUnidade = {
                 perfil: Perfil.CHEFE,
-                unidade: { codigo: 1, sigla: "UT", nome: "Unidade UT" },
+                unidade: {codigo: 1, sigla: "UT", nome: "Unidade UT"},
                 siglaUnidade: "UT",
             };
             const mockLoginResponse = {
@@ -112,12 +112,12 @@ describe("usePerfilStore", () => {
             const perfis = [
                 {
                     perfil: Perfil.CHEFE,
-                    unidade: { codigo: 1, nome: "Unidade 1", sigla: "U1" },
+                    unidade: {codigo: 1, nome: "Unidade 1", sigla: "U1"},
                     siglaUnidade: "U1",
                 },
                 {
                     perfil: Perfil.GESTOR,
-                    unidade: { codigo: 2, nome: "Unidade 2", sigla: "U2" },
+                    unidade: {codigo: 2, nome: "Unidade 2", sigla: "U2"},
                     siglaUnidade: "U2",
                 },
             ];
@@ -136,7 +136,7 @@ describe("usePerfilStore", () => {
         it("selecionarPerfilUnidade deve chamar entrar e definir o perfil", async () => {
             const perfilUnidade = {
                 perfil: Perfil.GESTOR,
-                unidade: { codigo: 2, sigla: "XYZ", nome: "Unidade XYZ" },
+                unidade: {codigo: 2, sigla: "XYZ", nome: "Unidade XYZ"},
                 siglaUnidade: "XYZ",
             };
             const mockLoginResponse = {
@@ -173,7 +173,7 @@ describe("usePerfilStore", () => {
             mockUsuarioService.entrar.mockRejectedValue(new Error("Fail"));
             const perfilUnidade = {
                 perfil: Perfil.GESTOR,
-                unidade: { codigo: 2, sigla: "XYZ", nome: "Unidade XYZ" },
+                unidade: {codigo: 2, sigla: "XYZ", nome: "Unidade XYZ"},
                 siglaUnidade: "XYZ",
             };
             await expect(
@@ -197,19 +197,19 @@ describe("usePerfilStore", () => {
         });
 
         it("deve limpar o erro", () => {
-            context.store.lastError = { kind: "unexpected", message: "Error", subErrors: [] };
+            context.store.lastError = {kind: "unexpected", message: "Error", subErrors: []};
             context.store.clearError();
             expect(context.store.lastError).toBeNull();
         });
 
         it("loginCompleto deve retornar false para erros 401 ou 404", async () => {
             const mockUsuarioService = vi.mocked(usuarioService);
-            mockUsuarioService.autenticar.mockRejectedValue({ isAxiosError: true, response: { status: 401 } });
+            mockUsuarioService.autenticar.mockRejectedValue({isAxiosError: true, response: {status: 401}});
 
             const result = await context.store.loginCompleto("123", "pass");
             expect(result).toBe(false);
 
-            mockUsuarioService.autenticar.mockRejectedValue({ isAxiosError: true, response: { status: 404 } });
+            mockUsuarioService.autenticar.mockRejectedValue({isAxiosError: true, response: {status: 404}});
             const result2 = await context.store.loginCompleto("123", "pass");
             expect(result2).toBe(false);
 
@@ -229,7 +229,7 @@ describe("usePerfilStore", () => {
             context.store.perfilSelecionado = Perfil.CHEFE;
             context.store.unidadeSelecionada = null;
             context.store.perfisUnidades = [
-                { perfil: Perfil.CHEFE, unidade: { codigo: 60 } } as any
+                {perfil: Perfil.CHEFE, unidade: {codigo: 60}} as any
             ];
             expect(context.store.unidadeAtual).toBe(60);
         });

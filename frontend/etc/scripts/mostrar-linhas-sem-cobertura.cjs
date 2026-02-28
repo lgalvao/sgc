@@ -18,10 +18,10 @@ try {
     }
 
     const coverage = JSON.parse(fs.readFileSync(COVERAGE_PATH, 'utf8'));
-    
+
     // Tenta encontrar o arquivo no relatório
     let filePath = Object.keys(coverage).find(p => p.endsWith(targetFile));
-    
+
     if (!filePath) {
         console.error(`Arquivo '${targetFile}' não encontrado no relatório de cobertura.`);
         process.exit(1);

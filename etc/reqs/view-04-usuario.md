@@ -2,29 +2,33 @@
 
 ## Finalidade
 
-Esta view fornece as informações essenciais sobre todos os servidores do TRE-PE que são usuários potenciais do SGC. Consolida dados pessoais, de contato e de lotação, estabelecendo também a unidade de competência de cada servidor, que é a unidade operacional ou interoperacional à qual o servidor está efetivamente vinculado para fins de atuação no sistema.
+Esta view fornece as informações essenciais sobre todos os servidores do TRE-PE que são usuários potenciais do SGC.
+Consolida dados pessoais, de contato e de lotação, estabelecendo também a unidade de competência de cada servidor, que é
+a unidade operacional ou interoperacional à qual o servidor está efetivamente vinculado para fins de atuação no sistema.
 
 ## Origem dos Dados
 
 **Sistema de Gestão de Recursos Humanos (SRH2):**
+
 - `SRH2.SERVIDOR`: Dados cadastrais dos servidores
 - `SRH2.LOTACAO`: Lotações ativas dos servidores
 - `SRH2.LOT_RAMAIS_SERVIDORES`: Ramais telefônicos
 
 **Views do Sistema:**
+
 - `VW_UNIDADE`: Para determinar a unidade de competência
 
 ## Estrutura da View
 
-| Coluna | Tipo | Descrição | Origem |
-|--------|------|-----------|--------|
-| `titulo` | VARCHAR2(12) | Título de eleitor do servidor (PK, identificador único no sistema) | `SERVIDOR.NUM_TIT_ELE` |
-| `matricula` | VARCHAR2(8) | Matrícula funcional do servidor | `SERVIDOR.MAT_SERVIDOR` |
-| `nome` | VARCHAR2 | Nome completo do servidor | `SERVIDOR.NOM` |
-| `email` | VARCHAR2 | Endereço de e-mail institucional | `SERVIDOR.E_MAIL` |
-| `ramal` | VARCHAR2 | Ramal telefônico principal | `LOT_RAMAIS_SERVIDORES.RAMAL_SERVIDOR` |
-| `unidade_lot_codigo` | NUMBER | Código da unidade de lotação (onde está formalmente lotado) | `LOTACAO.COD_UNID_TSE` |
-| `unidade_comp_codigo` | NUMBER | Código da unidade de competência (onde atua no sistema) | Calculado (ver RN-VIEW04-03) |
+| Coluna                | Tipo         | Descrição                                                          | Origem                                 |
+|-----------------------|--------------|--------------------------------------------------------------------|----------------------------------------|
+| `titulo`              | VARCHAR2(12) | Título de eleitor do servidor (PK, identificador único no sistema) | `SERVIDOR.NUM_TIT_ELE`                 |
+| `matricula`           | VARCHAR2(8)  | Matrícula funcional do servidor                                    | `SERVIDOR.MAT_SERVIDOR`                |
+| `nome`                | VARCHAR2     | Nome completo do servidor                                          | `SERVIDOR.NOM`                         |
+| `email`               | VARCHAR2     | Endereço de e-mail institucional                                   | `SERVIDOR.E_MAIL`                      |
+| `ramal`               | VARCHAR2     | Ramal telefônico principal                                         | `LOT_RAMAIS_SERVIDORES.RAMAL_SERVIDOR` |
+| `unidade_lot_codigo`  | NUMBER       | Código da unidade de lotação (onde está formalmente lotado)        | `LOTACAO.COD_UNID_TSE`                 |
+| `unidade_comp_codigo` | NUMBER       | Código da unidade de competência (onde atua no sistema)            | Calculado (ver RN-VIEW04-03)           |
 
 ## Regras de Negócio
 
@@ -33,11 +37,13 @@ Esta view fornece as informações essenciais sobre todos os servidores do TRE-P
 O título de eleitor (`titulo`) é o identificador único dos usuários no SGC:
 
 **Justificativa:**
+
 - Matrícula pode mudar em casos de reintegração ou mudança de regime
 - Título de eleitor é permanente e único
 - Integração com sistema de autenticação (Acesso TRE-PE) usa título de eleitor
 
 **Implicações:**
+
 - Todas as tabelas que referenciam usuários usam `titulo` como FK
 - Login no sistema é feito com título de eleitor e senha
 - Perfis e permissões são associados ao título
@@ -54,18 +60,21 @@ JOIN srh2.lotacao l
 ```
 
 **Critérios:**
+
 - Servidor deve ter registro ativo em `SERVIDOR`
 - Lotação com `dt_fim_lotacao IS NULL` (não encerrada)
 - Um servidor pode ter apenas uma lotação ativa por vez
 
 **Exclusões:**
+
 - Servidores aposentados sem lotação ativa
 - Servidores cedidos/afastados sem lotação ativa
 - Servidores com lotação encerrada
 
 ### RN-VIEW04-03: Determinação da Unidade de Competência
 
-A unidade de competência (`unidade_comp_codigo`) é a unidade operacional ou interoperacional onde o servidor efetivamente atua no sistema. Difere da unidade de lotação em casos específicos:
+A unidade de competência (`unidade_comp_codigo`) é a unidade operacional ou interoperacional onde o servidor
+efetivamente atua no sistema. Difere da unidade de lotação em casos específicos:
 
 ```sql
 SELECT DECODE(tipo, 'SEM_EQUIPE',
@@ -121,6 +130,7 @@ ELSE unidade_superior_codigo  -- usa a unidade superior como competência
 Servidor atua no contexto da unidade hierarquicamente superior.
 
 **Exemplo prático:**
+
 - Servidor lotado em "Seção de Arquivo" (SEM_EQUIPE)
 - Unidade superior: "Coordenadoria de Documentação" (OPERACIONAL)
 - `unidade_comp_codigo` = código da Coordenadoria
@@ -131,7 +141,8 @@ Servidor atua no contexto da unidade hierarquicamente superior.
 ELSE codigo  -- unidade_comp_codigo = unidade_lot_codigo
 ```
 
-Embora unidades intermediárias não cadastrem atividades, seus titulares têm perfil GESTOR e atuam no contexto da própria unidade intermediária.
+Embora unidades intermediárias não cadastrem atividades, seus titulares têm perfil GESTOR e atuam no contexto da própria
+unidade intermediária.
 
 ### RN-VIEW04-04: Ramal Telefônico Principal
 
@@ -143,6 +154,7 @@ LEFT JOIN srh2.lot_ramais_servidores r
 ```
 
 **Regras:**
+
 - Considera apenas o ramal marcado como principal (`ramal_principal = 1`)
 - Ramal deve estar associado à lotação atual
 - Se não houver ramal, a coluna fica NULL
@@ -153,6 +165,7 @@ LEFT JOIN srh2.lot_ramais_servidores r
 O e-mail vem diretamente do campo `SERVIDOR.E_MAIL`:
 
 **Características:**
+
 - Deve ser e-mail institucional (@tre-pe.jus.br)
 - Pode estar NULL se não cadastrado no SGRH
 - É o e-mail usado para notificações do sistema
@@ -164,6 +177,7 @@ O e-mail vem diretamente do campo `SERVIDOR.E_MAIL`:
 **Contexto:** Usuário realiza login no sistema.
 
 **Fluxo:**
+
 1. Sistema valida título e senha via API Acesso TRE-PE
 2. Após autenticação, consulta `VW_USUARIO` para verificar se usuário existe:
    ```sql
@@ -174,6 +188,7 @@ O e-mail vem diretamente do campo `SERVIDOR.E_MAIL`:
 3. Se não encontrado, usuário não tem lotação ativa no TRE-PE
 
 **Validações:**
+
 - Usuário deve existir em `VW_USUARIO` para acessar o sistema
 - Se lotação for encerrada, usuário sai automaticamente da view e perde acesso
 
@@ -182,6 +197,7 @@ O e-mail vem diretamente do campo `SERVIDOR.E_MAIL`:
 **Contexto:** Após login, sistema determina perfis disponíveis através de `VW_USUARIO_PERFIL_UNIDADE`.
 
 **Utilização de dados:**
+
 - `titulo`: Chave para buscar perfis em `VW_USUARIO_PERFIL_UNIDADE`
 - `unidade_comp_codigo`: Unidade base para determinação de perfil SERVIDOR
 
@@ -190,6 +206,7 @@ O e-mail vem diretamente do campo `SERVIDOR.E_MAIL`:
 **Contexto:** Telas que mostram informações do usuário logado ou de responsáveis.
 
 **Aplicações:**
+
 - Barra de navegação: Nome e perfil do usuário
 - Detalhes de unidade: Nome e contato do titular
 - Histórico de análises: Nome do usuário que realizou a ação
@@ -200,6 +217,7 @@ O e-mail vem diretamente do campo `SERVIDOR.E_MAIL`:
 **Contexto:** Ao atribuir responsabilidade temporária, validar se usuário existe e está ativo.
 
 **Implementação:**
+
 ```sql
 -- Validar se título existe em VW_USUARIO
 SELECT COUNT(*) FROM VW_USUARIO WHERE titulo = :titulo_informado
@@ -219,6 +237,7 @@ WHERE u.titulo = :titulo_informado
 **Contexto:** Visualizar todos os servidores que atuam em uma unidade específica.
 
 **Implementação:**
+
 ```sql
 SELECT titulo, nome, matricula, email, ramal
 FROM VW_USUARIO
@@ -233,6 +252,7 @@ ORDER BY nome;
 **Contexto:** Sistema precisa enviar e-mail para usuários específicos.
 
 **Implementação:**
+
 ```sql
 -- E-mail para responsável de unidade
 SELECT u.email, u.nome
@@ -253,10 +273,12 @@ WHERE unidade_comp_codigo = :codigo_unidade
 ### Views que Dependem de VW_USUARIO
 
 **VW_RESPONSABILIDADE:**
+
 - Valida que `usuario_titulo` existe em `VW_USUARIO`
 - Usa dados do titular da unidade de `VW_UNIDADE` combinados com `VW_USUARIO`
 
 **VW_USUARIO_PERFIL_UNIDADE:**
+
 - Filtra administradores: `FROM administrador a JOIN vw_usuario u ON u.titulo = a.usuario_titulo`
 - Usa `titulo` como chave para todos os perfis
 - Vincula perfil SERVIDOR através de `unidade_comp_codigo`
@@ -264,20 +286,25 @@ WHERE unidade_comp_codigo = :codigo_unidade
 ### Tabelas que Referenciam VW_USUARIO
 
 **ADMINISTRADOR:**
+
 - `usuario_titulo` deve existir em `VW_USUARIO.titulo`
 - FK implícita
 
 **ALERTA_USUARIO:**
+
 - `usuario_titulo` referencia `VW_USUARIO.titulo`
 
 **ANALISE:**
+
 - `usuario_titulo` referencia `VW_USUARIO.titulo`
 
 **ATRIBUICAO_TEMPORARIA:**
+
 - `usuario_titulo` referencia `VW_USUARIO.titulo`
 - `usuario_matricula` deve corresponder a `VW_USUARIO.matricula`
 
 **MOVIMENTACAO:**
+
 - `usuario_titulo` referencia `VW_USUARIO.titulo`
 
 ### Uso em Conjunto com VW_UNIDADE
@@ -348,6 +375,7 @@ A subconsulta para calcular `unidade_comp_codigo` é executada para cada servido
 ```
 
 **Otimização possível:**
+
 - Converter em JOIN se performance for crítica
 - Ou usar CTE para pré-carregar dados de `VW_UNIDADE`
 
@@ -368,31 +396,31 @@ A subconsulta para calcular `unidade_comp_codigo` é executada para cada servido
 **Interpretação:**
 
 1. **João da Silva Santos:**
-   - Lotado e atua na unidade 200 (OPERACIONAL)
-   - Tem ramal e e-mail cadastrados
-   - `unidade_comp_codigo` = `unidade_lot_codigo` (caso padrão)
+    - Lotado e atua na unidade 200 (OPERACIONAL)
+    - Tem ramal e e-mail cadastrados
+    - `unidade_comp_codigo` = `unidade_lot_codigo` (caso padrão)
 
 2. **Maria Oliveira Costa:**
-   - Lotada e atua na unidade 100 (INTEROPERACIONAL)
-   - Tem ramal e e-mail cadastrados
-   - Caso padrão de lotação operacional
+    - Lotada e atua na unidade 100 (INTEROPERACIONAL)
+    - Tem ramal e e-mail cadastrados
+    - Caso padrão de lotação operacional
 
 3. **Pedro Souza Lima:**
-   - Lotado na unidade 201 (SEM_EQUIPE)
-   - Atua na unidade 150 (superior da 201, OPERACIONAL)
-   - Sem ramal cadastrado
-   - `unidade_comp_codigo` ≠ `unidade_lot_codigo` (caso especial)
+    - Lotado na unidade 201 (SEM_EQUIPE)
+    - Atua na unidade 150 (superior da 201, OPERACIONAL)
+    - Sem ramal cadastrado
+    - `unidade_comp_codigo` ≠ `unidade_lot_codigo` (caso especial)
 
 4. **Ana Paula Rodrigues:**
-   - Lotada na unidade 550, mas atua na 551
-   - Possível caso de unidade SEM_EQUIPE com superior operacional
-   - E-mail incompleto/inválido
+    - Lotada na unidade 550, mas atua na 551
+    - Possível caso de unidade SEM_EQUIPE com superior operacional
+    - E-mail incompleto/inválido
 
 5. **Carlos Alberto Ferreira:**
-   - Lotado em CAE (1001)
-   - Atua na própria CAE (OPERACIONAL)
-   - Sem e-mail cadastrado
-   - Tem ramal
+    - Lotado em CAE (1001)
+    - Atua na própria CAE (OPERACIONAL)
+    - Sem e-mail cadastrado
+    - Tem ramal
 
 ## Notas de Implementação
 
@@ -401,12 +429,14 @@ A subconsulta para calcular `unidade_comp_codigo` é executada para cada servido
 A view reflete sempre o estado atual do SGRH:
 
 **Mudanças automáticas:**
+
 - Servidor encerra lotação → desaparece da view → perde acesso ao sistema
 - Servidor transferido → `unidade_lot_codigo` e possivelmente `unidade_comp_codigo` mudam
 - Atualização de e-mail/ramal → reflete imediatamente
 - Mudança de nome → atualiza automaticamente
 
 **Impactos no sistema:**
+
 - Perda de lotação ativa = perda de acesso imediata
 - Transferência = mudança de perfis e permissões
 - Responsabilidades em `ATRIBUICAO_TEMPORARIA` não são afetadas (são por título, não por lotação)
@@ -414,15 +444,18 @@ A view reflete sempre o estado atual do SGRH:
 ### Validações de Integridade
 
 **Dados obrigatórios:**
+
 - `titulo`, `matricula`, `nome`: Sempre presentes (obrigatórios no SGRH)
 - `unidade_lot_codigo`: Sempre presente (lotação ativa requerida)
 - `unidade_comp_codigo`: Sempre presente (calculado a partir de lotação)
 
 **Dados opcionais:**
+
 - `email`: Pode ser NULL se não cadastrado no SGRH
 - `ramal`: Pode ser NULL se não há ramal principal
 
 **Validações no sistema:**
+
 - Ao enviar e-mails, verificar se `email IS NOT NULL`
 - Ao exibir contatos, considerar que ramal pode estar ausente
 - Garantir que toda referência a usuário use `titulo`, não `matricula`
@@ -430,16 +463,19 @@ A view reflete sempre o estado atual do SGRH:
 ### Casos Especiais
 
 **Usuário com múltiplas funções:**
+
 - Servidor pode ser titular de unidade E estar lotado em outra
 - Pode ter perfil ADMIN (cadastrado em `ADMINISTRADOR`) E outros perfis
 - Sistema deve permitir seleção de perfil/unidade após login
 
 **Substituição e Afastamentos:**
+
 - `VW_RESPONSABILIDADE` gerencia substituições formais
 - Servidor afastado com lotação ativa ainda aparece em `VW_USUARIO`
 - Servidor afastado sem lotação ativa desaparece da view
 
 **Servidores de unidades extintas:**
+
 - Unidade extinta → servidor deve ser transferido
 - Enquanto lotação não atualizada, pode haver `unidade_lot_codigo` apontando para unidade INATIVA
 - Sistema deve validar unidade ativa ao usar `unidade_comp_codigo`

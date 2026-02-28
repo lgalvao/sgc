@@ -5,13 +5,13 @@ import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 /**
  * CDU-22 - Aceitar cadastros em bloco
- * 
+ *
  * Ator: GESTOR
- * 
+ *
  * Pré-condições:
  * - Processo de mapeamento ou revisão com unidades subordinadas
  * - Subprocessos na situação 'Cadastro disponibilizado'
- * 
+ *
  * Fluxo principal:
  * 1. No Painel, GESTOR acessa processo em andamento
  * 2. Sistema mostra tela Detalhes do processo
@@ -33,8 +33,12 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     // PREPARAÇÃO
     // ========================================================================
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
+                                                                                page,
+                                                                                autenticadoComoAdmin,
+                                                                                cleanupAutomatico
+                                                                            }) => {
+
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -56,8 +60,11 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
-        
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({
+                                                                                        page,
+                                                                                        autenticadoComoChefeSecao221
+                                                                                    }) => {
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
@@ -95,7 +102,10 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 
-    test('Cenario 2: GESTOR confirma aceite em bloco e retorna ao painel', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 2: GESTOR confirma aceite em bloco e retorna ao painel', async ({
+                                                                                      page,
+                                                                                      autenticadoComoGestorCoord22
+                                                                                  }) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         const btnAceitar = page.getByRole('button', {name: /Aceitar em Bloco/i}).first();
         await expect(btnAceitar).toBeVisible();

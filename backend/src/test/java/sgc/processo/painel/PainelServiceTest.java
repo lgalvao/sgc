@@ -71,7 +71,7 @@ class PainelServiceTest {
         void listarProcessos_Gestor() {
             Long codigoUnidade = 1L;
             List<Long> subordinadas = List.of(2L, 3L);
-            
+
             when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
             when(unidadeService.buscarIdsDescendentes(eq(codigoUnidade), any())).thenReturn(subordinadas);
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
@@ -89,7 +89,7 @@ class PainelServiceTest {
         @DisplayName("CHEFE: deve listar processos apenas da própria unidade")
         void listarProcessos_Chefe() {
             Long codigoUnidade = 1L;
-            
+
             when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
                     .thenReturn(Page.empty());
@@ -112,7 +112,7 @@ class PainelServiceTest {
         void linkDestino_AdminCriado() {
             Processo p = criarProcessoMock(100L);
             p.setSituacao(SituacaoProcesso.CRIADO);
-            
+
             Unidade u = criarUnidade(1L, "SIGLA");
             p.adicionarParticipantes(Set.of(u));
 
@@ -135,7 +135,7 @@ class PainelServiceTest {
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
                     .thenReturn(new PageImpl<>(List.of(p)));
             when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
-            
+
             sgc.organizacao.dto.UnidadeDto dto = new sgc.organizacao.dto.UnidadeDto();
             dto.setSigla("SIGLA");
             when(unidadeService.dtoPorCodigo(codigoUnidade)).thenReturn(dto);
@@ -206,7 +206,7 @@ class PainelServiceTest {
             when(processoFacade.listarTodos(any())).thenReturn(Page.empty());
 
             painelService.listarProcessos(Perfil.ADMIN, null, sorted);
-            
+
             verify(processoFacade).listarTodos(eq(sorted));
         }
 

@@ -1,25 +1,25 @@
 <template>
-  <BCard 
-    class="mb-3 atividade-card" 
-    :class="{'atividade-com-erro': !!erroValidacao}"
-    no-body
+  <BCard
+      :class="{'atividade-com-erro': !!erroValidacao}"
+      class="mb-3 atividade-card"
+      no-body
   >
     <BCardBody class="py-2 position-relative">
       <div
-          class="card-title d-flex align-items-center atividade-titulo-card"
           :class="{'atividade-hover-row': !emEdicao}"
+          class="card-title d-flex align-items-center atividade-titulo-card"
       >
         <InlineEditor
-          :model-value="atividade.descricao"
-          :can-edit="podeEditar"
-          aria-label="Editar atividade"
-          test-id-input="inp-editar-atividade"
-          test-id-save="btn-salvar-edicao-atividade"
-          test-id-cancel="btn-cancelar-edicao-atividade"
-          test-id-edit="btn-editar-atividade"
-          @update:model-value="(val) => $emit('atualizar-atividade', val)"
-          @edit-start="emEdicao = true"
-          @edit-end="emEdicao = false"
+            :can-edit="podeEditar"
+            :model-value="atividade.descricao"
+            aria-label="Editar atividade"
+            test-id-cancel="btn-cancelar-edicao-atividade"
+            test-id-edit="btn-editar-atividade"
+            test-id-input="inp-editar-atividade"
+            test-id-save="btn-salvar-edicao-atividade"
+            @update:model-value="(val) => $emit('atualizar-atividade', val)"
+            @edit-start="emEdicao = true"
+            @edit-end="emEdicao = false"
         >
           <strong
               class="atividade-descricao"
@@ -28,15 +28,15 @@
 
           <template #extra-actions>
             <BButton
+                :aria-label="'Remover atividade: ' + atividade.descricao"
                 class="ms-1"
                 data-testid="btn-remover-atividade"
                 size="sm"
                 title="Remover"
-                :aria-label="'Remover atividade: ' + atividade.descricao"
                 variant="outline-danger"
                 @click="$emit('remover-atividade')"
             >
-              <i aria-hidden="true" class="bi bi-trash" />
+              <i aria-hidden="true" class="bi bi-trash"/>
             </BButton>
           </template>
         </InlineEditor>
@@ -46,9 +46,9 @@
       <BAlert
           v-if="erroValidacao"
           :model-value="true"
-          variant="danger"
           class="mt-2 py-2 mb-0"
           data-testid="atividade-erro-validacao"
+          variant="danger"
       >
         <i aria-hidden="true" class="bi bi-exclamation-circle-fill me-2"/>
         {{ erroValidacao }}
@@ -67,29 +67,29 @@
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
         >
           <InlineEditor
-            :model-value="conhecimento.descricao"
-            :can-edit="podeEditar"
-            size="sm"
-            aria-label="Editar conhecimento"
-            test-id-input="inp-editar-conhecimento"
-            test-id-save="btn-salvar-edicao-conhecimento"
-            test-id-cancel="btn-cancelar-edicao-conhecimento"
-            test-id-edit="btn-editar-conhecimento"
-            @update:model-value="(val) => $emit('atualizar-conhecimento', conhecimento.codigo, val)"
+              :can-edit="podeEditar"
+              :model-value="conhecimento.descricao"
+              aria-label="Editar conhecimento"
+              size="sm"
+              test-id-cancel="btn-cancelar-edicao-conhecimento"
+              test-id-edit="btn-editar-conhecimento"
+              test-id-input="inp-editar-conhecimento"
+              test-id-save="btn-salvar-edicao-conhecimento"
+              @update:model-value="(val) => $emit('atualizar-conhecimento', conhecimento.codigo, val)"
           >
             <span data-testid="cad-atividades__txt-conhecimento-descricao">{{ conhecimento?.descricao }}</span>
 
             <template #extra-actions>
               <BButton
+                  :aria-label="'Remover conhecimento: ' + conhecimento.descricao"
                   class="ms-1"
                   data-testid="btn-remover-conhecimento"
                   size="sm"
                   title="Remover"
-                  :aria-label="'Remover conhecimento: ' + conhecimento.descricao"
                   variant="outline-danger"
                   @click="$emit('remover-conhecimento', conhecimento.codigo)"
               >
-                <i aria-hidden="true" class="bi bi-trash" />
+                <i aria-hidden="true" class="bi bi-trash"/>
               </BButton>
             </template>
           </InlineEditor>
@@ -103,8 +103,8 @@
           <BCol>
             <BFormInput
                 v-model="novoConhecimento"
-                aria-label="Novo conhecimento"
                 :class="{ 'border-danger': !!erroValidacao }"
+                aria-label="Novo conhecimento"
                 data-testid="inp-novo-conhecimento"
                 placeholder="Novo conhecimento"
                 size="sm"

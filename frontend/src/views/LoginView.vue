@@ -37,21 +37,21 @@
                     aria-hidden="true"
                     class="bi bi-person-circle me-2"
                 />
-                Título eleitoral <span class="text-danger" aria-hidden="true">*</span>
+                Título eleitoral <span aria-hidden="true" class="text-danger">*</span>
               </label>
               <!-- eslint-disable vuejs-accessibility/no-autofocus -->
               <BFormInput
                   id="titulo"
                   v-model="titulo"
-                  name="titulo"
-                  autocomplete="username"
-                  data-testid="inp-login-usuario"
                   :disabled="loginStep > 1"
-                  placeholder="Digite seu título"
-                  type="text"
-                  inputmode="numeric"
-                  required
+                  autocomplete="username"
                   autofocus
+                  data-testid="inp-login-usuario"
+                  inputmode="numeric"
+                  name="titulo"
+                  placeholder="Digite seu título"
+                  required
+                  type="text"
               />
               <!-- eslint-enable vuejs-accessibility/no-autofocus -->
             </div>
@@ -65,18 +65,18 @@
                     aria-hidden="true"
                     class="bi bi-key me-2"
                 />
-                Senha <span class="text-danger" aria-hidden="true">*</span>
+                Senha <span aria-hidden="true" class="text-danger">*</span>
               </label>
               <BInputGroup>
                 <BFormInput
                     id="senha"
                     v-model="senha"
-                    name="senha"
                     :autocomplete="showPassword ? 'off' : 'current-password'"
-                    data-testid="inp-login-senha"
                     :disabled="loginStep > 1"
-                    placeholder="Digite sua senha"
                     :type="showPassword ? 'text' : 'password'"
+                    data-testid="inp-login-senha"
+                    name="senha"
+                    placeholder="Digite sua senha"
                     required
                     @keydown="verificarCapsLock"
                     @keyup="verificarCapsLock"
@@ -85,13 +85,13 @@
                   <BButton
                       :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
                       :disabled="loginStep > 1"
-                      variant="link"
                       class="text-secondary border-0"
+                      variant="link"
                       @click="showPassword = !showPassword"
                   >
                     <i
-                        aria-hidden="true"
                         :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+                        aria-hidden="true"
                     />
                   </BButton>
                 </template>
@@ -125,15 +125,15 @@
               <BFormSelect
                   id="par"
                   v-model="parSelecionado"
-                  data-testid="sel-login-perfil"
                   :options="perfisUnidadesOptions"
+                  data-testid="sel-login-perfil"
                   text-field="text"
                   value-field="value"
               >
                 <template #first>
                   <BFormSelectOption
-                      disabled
                       :value="null"
+                      disabled
                   >
                     -- Selecione uma opção --
                   </BFormSelectOption>
@@ -142,15 +142,15 @@
             </div>
 
             <LoadingButton
+                :loading="isLoading"
                 aria-label="Entrar"
                 class="w-100"
                 data-testid="btn-login-entrar"
-                :loading="isLoading"
+                icon="box-arrow-in-right"
+                loading-text="Entrando..."
+                text="Entrar"
                 type="submit"
                 variant="primary"
-                icon="box-arrow-in-right"
-                text="Entrar"
-                loading-text="Entrando..."
             />
           </BForm>
         </BCard>
@@ -223,59 +223,59 @@ const handleLogin = async () => {
 };
 
 const performInitialLogin = async () => {
-    if (!titulo.value || !senha.value) {
-      feedbackStore.show("Dados incompletos", "Por favor, preencha título e senha.", "danger");
-      return;
-    }
+  if (!titulo.value || !senha.value) {
+    feedbackStore.show("Dados incompletos", "Por favor, preencha título e senha.", "danger");
+    return;
+  }
 
-    isLoading.value = true;
-    try {
-      const sucessoAutenticacao = await perfilStore.loginCompleto(titulo.value, senha.value);
+  isLoading.value = true;
+  try {
+    const sucessoAutenticacao = await perfilStore.loginCompleto(titulo.value, senha.value);
 
-      if (sucessoAutenticacao) {
-          await handlePostAuth();
-      } else {
-        feedbackStore.show("Erro no login", "Título ou senha inválidos.", "danger");
-      }
-    } catch (error: any) {
-      logger.error("Erro no login:", error);
-      if (error.response?.status === 404 || error.response?.status === 401) {
-        feedbackStore.show("Erro no login", "Título ou senha inválidos.", "danger");
-      } else {
-        feedbackStore.show("Erro no sistema", "Ocorreu um erro ao tentar realizar o login.", "danger");
-      }
-    } finally {
-      isLoading.value = false;
+    if (sucessoAutenticacao) {
+      await handlePostAuth();
+    } else {
+      feedbackStore.show("Erro no login", "Título ou senha inválidos.", "danger");
     }
+  } catch (error: any) {
+    logger.error("Erro no login:", error);
+    if (error.response?.status === 404 || error.response?.status === 401) {
+      feedbackStore.show("Erro no login", "Título ou senha inválidos.", "danger");
+    } else {
+      feedbackStore.show("Erro no sistema", "Ocorreu um erro ao tentar realizar o login.", "danger");
+    }
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 const handlePostAuth = async () => {
-    if (perfilStore.perfisUnidades.length > 1) {
-        loginStep.value = 2;
-    } else if (perfilStore.perfisUnidades.length === 1) {
-        await router.push("/painel");
-    } else {
-        feedbackStore.show("Perfis indisponíveis", "Nenhum perfil/unidade disponível para este usuário.", "danger");
-    }
+  if (perfilStore.perfisUnidades.length > 1) {
+    loginStep.value = 2;
+  } else if (perfilStore.perfisUnidades.length === 1) {
+    await router.push("/painel");
+  } else {
+    feedbackStore.show("Perfis indisponíveis", "Nenhum perfil/unidade disponível para este usuário.", "danger");
+  }
 };
 
 const performProfileSelection = async () => {
-    if (parSelecionado.value) {
-      isLoading.value = true;
-      try {
+  if (parSelecionado.value) {
+    isLoading.value = true;
+    try {
       await perfilStore.selecionarPerfilUnidade(
           titulo.value,
           parSelecionado.value,
       );
-        await router.push("/painel");
-      } catch (error) {
-        logger.error("Erro ao selecionar perfil:", error);
-        feedbackStore.show("Erro", "Falha ao selecionar o perfil.", "danger");
-      } finally {
-        isLoading.value = false;
-      }
-    } else {
-      feedbackStore.show("Seleção necessária", "Por favor, selecione um perfil.", "danger");
+      await router.push("/painel");
+    } catch (error) {
+      logger.error("Erro ao selecionar perfil:", error);
+      feedbackStore.show("Erro", "Falha ao selecionar o perfil.", "danger");
+    } finally {
+      isLoading.value = false;
     }
+  } else {
+    feedbackStore.show("Seleção necessária", "Por favor, selecione um perfil.", "danger");
+  }
 };
 </script>

@@ -14,7 +14,7 @@ export const useDiagnosticosStore = defineStore("diagnosticos", () => {
     const avaliacoes = ref<AvaliacaoServidorDto[]>([]);
     const ocupacoes = ref<OcupacaoCriticaDto[]>([]);
     const loading = useSingleLoading();
-    const { lastError, clearError, withErrorHandling } = useErrorHandler();
+    const {lastError, clearError, withErrorHandling} = useErrorHandler();
 
     async function buscarDiagnostico(subprocessoId: number) {
         await loading.withLoading(async () => {
@@ -48,7 +48,7 @@ export const useDiagnosticosStore = defineStore("diagnosticos", () => {
                 dominio,
                 observacoes
             );
-            
+
             const index = avaliacoes.value.findIndex(
                 a => a.competenciaCodigo === competenciaCodigo
             );
@@ -94,7 +94,7 @@ export const useDiagnosticosStore = defineStore("diagnosticos", () => {
                 competenciaCodigo,
                 situacao
             );
-            
+
             const index = ocupacoes.value.findIndex(
                 o => o.competenciaCodigo === competenciaCodigo
             );

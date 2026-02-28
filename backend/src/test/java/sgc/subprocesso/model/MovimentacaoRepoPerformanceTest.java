@@ -50,28 +50,28 @@ class MovimentacaoRepoPerformanceTest {
         p = processoRepo.save(p);
 
         Subprocesso sp = Subprocesso.builder()
-            .processo(p)
-            .unidade(uOrigem)
-            .situacao(SituacaoSubprocesso.NAO_INICIADO)
-            .build();
+                .processo(p)
+                .unidade(uOrigem)
+                .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                .build();
         sp = subprocessoRepo.save(sp);
 
         Movimentacao m1 = Movimentacao.builder()
-            .subprocesso(sp)
-            .unidadeOrigem(uOrigem)
-            .unidadeDestino(uDestino)
-            .descricao("Mov 1")
-            .dataHora(LocalDateTime.now().minusHours(1))
-            .build();
+                .subprocesso(sp)
+                .unidadeOrigem(uOrigem)
+                .unidadeDestino(uDestino)
+                .descricao("Mov 1")
+                .dataHora(LocalDateTime.now().minusHours(1))
+                .build();
         movimentacaoRepo.save(m1);
 
         Movimentacao m2 = Movimentacao.builder()
-            .subprocesso(sp)
-            .unidadeOrigem(uOrigem)
-            .unidadeDestino(null)
-            .descricao("Mov 2")
-            .dataHora(LocalDateTime.now())
-            .build();
+                .subprocesso(sp)
+                .unidadeOrigem(uOrigem)
+                .unidadeDestino(null)
+                .descricao("Mov 2")
+                .dataHora(LocalDateTime.now())
+                .build();
         movimentacaoRepo.save(m2);
 
         // When

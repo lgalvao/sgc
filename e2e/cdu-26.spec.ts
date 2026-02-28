@@ -19,12 +19,12 @@ async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
 
 /**
  * CDU-26 - Homologar validação de mapas de competências em bloco
- * 
+ *
  * Ator: ADMIN
- * 
+ *
  * Pré-condições:
  * - Subprocesso nas situações 'Mapa validado' ou 'Mapa com sugestões'
- * 
+ *
  * Fluxo principal:
  * 1. ADMIN acessa processo em andamento
  * 2. Sistema mostra Detalhes do processo
@@ -49,7 +49,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        
+
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -72,7 +72,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
@@ -101,7 +101,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page, autenticadoComoAdmin}) => {
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
@@ -118,7 +118,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Preparacao 4: Chefe valida o mapa', async ({page, autenticadoComoChefeSecao221}) => {
-        
+
 
         await acessarSubprocessoChefe(page, descProcesso);
 
@@ -158,7 +158,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     // ========================================================================
 
     test('Cenario 1: ADMIN visualiza botão Homologar Mapa em Bloco', async ({page, autenticadoComoAdmin}) => {
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
@@ -169,7 +169,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({page, autenticadoComoAdmin}) => {
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
@@ -188,7 +188,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Cenario 3: Cancelar homologação de mapa em bloco', async ({page, autenticadoComoAdmin}) => {
-        
+
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 

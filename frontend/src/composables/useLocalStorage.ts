@@ -2,7 +2,7 @@ import {ref, type Ref, watch} from 'vue';
 
 /**
  * Composable para sincronizar ref com localStorage
- * 
+ *
  * @param key - Chave do localStorage
  * @param defaultValue - Valor padrão se não houver no localStorage
  * @returns Ref sincronizado com localStorage
@@ -14,7 +14,7 @@ export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
         if (item === null) {
             return defaultValue;
         }
-        
+
         try {
             return JSON.parse(item) as T;
         } catch {
@@ -33,14 +33,14 @@ export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
         } else {
             localStorage.setItem(key, JSON.stringify(newValue));
         }
-    }, { deep: true });
+    }, {deep: true});
 
     return storedValue;
 }
 
 /**
  * Composable para sincronizar múltiplas refs com localStorage
- * 
+ *
  * @param items - Mapa de chave -> valor padrão
  * @returns Mapa de chave -> Ref sincronizado
  */
@@ -48,11 +48,11 @@ export function useLocalStorageMultiple<T extends Record<string, any>>(
     items: T
 ): { [K in keyof T]: Ref<T[K]> } {
     const result = {} as { [K in keyof T]: Ref<T[K]> };
-    
+
     for (const [key, defaultValue] of Object.entries(items)) {
         result[key as keyof T] = useLocalStorage(key, defaultValue);
     }
-    
+
     return result;
 }
 

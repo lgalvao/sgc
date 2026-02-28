@@ -10,7 +10,7 @@ function getAllFiles(dirPath, ext, arrayOfFiles) {
     const files = fs.readdirSync(dirPath);
     arrayOfFiles = arrayOfFiles || [];
 
-    files.forEach(function(file) {
+    files.forEach(function (file) {
         if (fs.statSync(dirPath + "/" + file).isDirectory()) {
             arrayOfFiles = getAllFiles(dirPath + "/" + file, ext, arrayOfFiles);
         } else {
@@ -103,7 +103,7 @@ function generateReport(feData, beData) {
     md += "## Backend Validations (DTOs)\n";
     md += "| File | Line | Annotation | Code |\n";
     md += "|------|------|------------|------|\n";
-    
+
     beData.forEach(item => {
         const annotation = item.content.split('(')[0].split(' ')[0];
         // Using concatenation to avoid backtick hell
@@ -113,7 +113,7 @@ function generateReport(feData, beData) {
     md += "\n## Frontend Validations (Vue)\n";
     md += "| File | Line | Type | Code |\n";
     md += "|------|------|------|------|\n";
-    
+
     feData.forEach(item => {
         let content = item.content;
         if (content.length > 100) content = content.substring(0, 100) + '...';

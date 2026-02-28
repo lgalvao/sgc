@@ -3,12 +3,12 @@ import {setupServiceTest, testErrorHandling, testGetEndpoint, testPostEndpoint} 
 import * as service from "../usuarioService";
 
 describe("usuarioService", () => {
-    const { mockApi } = setupServiceTest();
+    const {mockApi} = setupServiceTest();
 
     describe("autenticar", () => {
         it("deve fazer POST e retornar booleano", async () => {
-            const request = { tituloEleitoral: "123", senha: "123" };
-            mockApi.post.mockResolvedValueOnce({ data: true });
+            const request = {tituloEleitoral: "123", senha: "123"};
+            mockApi.post.mockResolvedValueOnce({data: true});
 
             const result = await service.autenticar(request);
 
@@ -16,24 +16,24 @@ describe("usuarioService", () => {
             expect(result).toBe(true);
         });
 
-        testErrorHandling(() => service.autenticar({ tituloEleitoral: "123", senha: "123" }), 'post');
+        testErrorHandling(() => service.autenticar({tituloEleitoral: "123", senha: "123"}), 'post');
     });
 
     describe("autorizar", () => {
         it("deve fazer POST, mapear e retornar resposta", async () => {
             const tituloEleitoral = "123";
-            const responseDto = [{ 
-                perfil: "CHEFE", 
-                unidade: { codigo: 1, nome: "UNIT", sigla: "UNIT" },
+            const responseDto = [{
+                perfil: "CHEFE",
+                unidade: {codigo: 1, nome: "UNIT", sigla: "UNIT"},
                 siglaUnidade: "UNIT"
             }];
-            mockApi.post.mockResolvedValue({ data: responseDto });
+            mockApi.post.mockResolvedValue({data: responseDto});
 
             const result = await service.autorizar(tituloEleitoral);
 
             expect(mockApi.post).toHaveBeenCalledWith(
                 "/usuarios/autorizar",
-                { tituloEleitoral },
+                {tituloEleitoral},
             );
             expect(result[0]).toHaveProperty("perfil", "CHEFE");
             expect(result[0].unidade).toHaveProperty("codigo", 1);
@@ -58,7 +58,7 @@ describe("usuarioService", () => {
     });
 
     describe("buscarTodosUsuarios", () => {
-        const mockUsuarios = [{ codigo: 1, name: "Test User" }];
+        const mockUsuarios = [{codigo: 1, name: "Test User"}];
         testGetEndpoint(
             () => service.buscarTodosUsuarios(),
             "/usuarios",
@@ -69,7 +69,7 @@ describe("usuarioService", () => {
     });
 
     describe("buscarUsuariosPorUnidade", () => {
-        const mockUsuarios = [{ codigo: 1, name: "Test User" }];
+        const mockUsuarios = [{codigo: 1, name: "Test User"}];
         testGetEndpoint(
             () => service.buscarUsuariosPorUnidade(1),
             "/unidades/1/usuarios",
@@ -80,7 +80,7 @@ describe("usuarioService", () => {
     });
 
     describe("buscarUsuarioPorTitulo", () => {
-        const mockUsuario = { codigo: 1, name: "Test User", tituloEleitoral: "123" };
+        const mockUsuario = {codigo: 1, name: "Test User", tituloEleitoral: "123"};
         testGetEndpoint(
             () => service.buscarUsuarioPorTitulo("123"),
             "/usuarios/123",

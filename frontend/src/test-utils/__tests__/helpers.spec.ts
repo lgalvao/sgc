@@ -15,7 +15,7 @@ import {
 // Mock services to avoid side effects/heavy init when loading the store
 vi.mock("@/services/atividadeService", () => ({}));
 vi.mock("@/services/subprocessoService", () => ({}));
-vi.mock("@/stores/subprocessos", () => ({ useSubprocessosStore: vi.fn() }));
+vi.mock("@/stores/subprocessos", () => ({useSubprocessosStore: vi.fn()}));
 
 describe("test-utils/helpers", () => {
     it("getMockAtividadesData deve retornar um array não vazio", () => {

@@ -22,7 +22,7 @@ vi.mock("vue-router", () => ({
         beforeEach: vi.fn(),
         afterEach: vi.fn(),
         push: mocks.push,
-        currentRoute: { value: { path: "/" } }
+        currentRoute: {value: {path: "/"}}
     })),
     createWebHistory: vi.fn(),
     createMemoryHistory: vi.fn(),
@@ -40,14 +40,14 @@ describe("MainNavbar.vue Coverage", () => {
         // Mount component
         const wrapper = mount(MainNavbar, {
             global: {
-                plugins: [createTestingPinia({ stubActions: false })],
+                plugins: [createTestingPinia({stubActions: false})],
                 stubs: {
-                    BNavbar: { template: '<div><slot /></div>' },
-                    BNavbarBrand: { template: '<div></div>' },
-                    BNavbarToggle: { template: '<div></div>' },
-                    BCollapse: { template: '<div><slot /></div>' },
-                    BNavbarNav: { template: '<div><slot /></div>' },
-                    BNavItem: { template: '<div><slot /></div>' }
+                    BNavbar: {template: '<div><slot /></div>'},
+                    BNavbarBrand: {template: '<div></div>'},
+                    BNavbarToggle: {template: '<div></div>'},
+                    BCollapse: {template: '<div><slot /></div>'},
+                    BNavbarNav: {template: '<div><slot /></div>'},
+                    BNavItem: {template: '<div><slot /></div>'}
                 },
                 directives: {
                     'b-tooltip': {}
@@ -77,14 +77,14 @@ describe("MainNavbar.vue Coverage", () => {
 
         const wrapper = mount(MainNavbar, {
             global: {
-                plugins: [createTestingPinia({ stubActions: false })],
+                plugins: [createTestingPinia({stubActions: false})],
                 stubs: {
-                    BNavbar: { template: '<div><slot /></div>' },
-                    BNavbarBrand: { template: '<div></div>' },
-                    BNavbarToggle: { template: '<div></div>' },
-                    BCollapse: { template: '<div><slot /></div>' },
-                    BNavbarNav: { template: '<div><slot /></div>' },
-                    BNavItem: { template: '<div><slot /></div>' }
+                    BNavbar: {template: '<div><slot /></div>'},
+                    BNavbarBrand: {template: '<div></div>'},
+                    BNavbarToggle: {template: '<div></div>'},
+                    BCollapse: {template: '<div><slot /></div>'},
+                    BNavbarNav: {template: '<div><slot /></div>'},
+                    BNavItem: {template: '<div><slot /></div>'}
                 },
                 directives: {
                     'b-tooltip': {}

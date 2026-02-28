@@ -98,7 +98,7 @@ class ProcessoNotificacaoServiceTest {
                 "TITULAR", usuarioTitular,
                 "SUBSTITUTO", usuarioSubstituto
         ));
-        
+
         when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
                 .thenReturn("Conteúdo HTML");
 
@@ -176,13 +176,25 @@ class ProcessoNotificacaoServiceTest {
     @DisplayName("Deve processar múltiplas unidades")
     void deveProcessarMultiplasUnidades() {
         Processo processo = criarProcesso(1L);
-        Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL); u1.setSigla("U1");
-        Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL); u2.setSigla("U2");
-        Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL); u3.setSigla("U3");
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        u1.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        u1.setSigla("U1");
+        Unidade u2 = new Unidade();
+        u2.setCodigo(2L);
+        u2.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        u2.setSigla("U2");
+        Unidade u3 = new Unidade();
+        u3.setCodigo(3L);
+        u3.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        u3.setSigla("U3");
 
-        Subprocesso s1 = new Subprocesso(); s1.setUnidade(u1);
-        Subprocesso s2 = new Subprocesso(); s2.setUnidade(u2);
-        Subprocesso s3 = new Subprocesso(); s3.setUnidade(u3);
+        Subprocesso s1 = new Subprocesso();
+        s1.setUnidade(u1);
+        Subprocesso s2 = new Subprocesso();
+        s2.setUnidade(u2);
+        Subprocesso s3 = new Subprocesso();
+        s3.setUnidade(u3);
 
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1, s2, s3));
 
@@ -194,8 +206,10 @@ class ProcessoNotificacaoServiceTest {
         when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
                 .thenReturn("HTML");
 
-        Usuario user1 = new Usuario(); user1.setEmail("u1@t.com");
-        Usuario user2 = new Usuario(); user2.setEmail("u2@t.com");
+        Usuario user1 = new Usuario();
+        user1.setEmail("u1@t.com");
+        Usuario user2 = new Usuario();
+        user2.setEmail("u2@t.com");
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T1", user1, "T2", user2));
 
         service.emailInicioProcesso(1L);
@@ -211,12 +225,13 @@ class ProcessoNotificacaoServiceTest {
     @Nested
     @DisplayName("Cobertura Extra")
     class CoberturaExtra {
-        
+
         @Test
         @DisplayName("Deve lidar com map de responsáveis nulo ou incompleto")
         void deveLidarComMapResponsaveisIncompleto() {
             Processo p = criarProcesso(1L);
-            Unidade u = new Unidade(); u.setCodigo(1L);
+            Unidade u = new Unidade();
+            u.setCodigo(1L);
             u.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
             u.setSigla("U1");
             Subprocesso s = new Subprocesso();
@@ -250,7 +265,7 @@ class ProcessoNotificacaoServiceTest {
                     .unidadeCodigo(11L)
                     .titularTitulo("TITULAR")
                     .build();
-            
+
             Usuario usuarioTitular = new Usuario();
             usuarioTitular.setEmail("titular@mail.com");
 
@@ -260,7 +275,7 @@ class ProcessoNotificacaoServiceTest {
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("TITULAR", usuarioTitular));
             when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
                     .thenReturn("HTML");
-            
+
             service.emailInicioProcesso(codProcesso);
 
             verify(emailService).enviarEmailHtml(eq("u11@tre-pe.jus.br"), any(), any());
@@ -283,7 +298,7 @@ class ProcessoNotificacaoServiceTest {
                     .titularTitulo("TITULAR")
                     .substitutoTitulo("SUBSTITUTO")
                     .build();
-            
+
             Usuario usuarioSub = new Usuario();
             usuarioSub.setEmail("sub@mail.com");
 

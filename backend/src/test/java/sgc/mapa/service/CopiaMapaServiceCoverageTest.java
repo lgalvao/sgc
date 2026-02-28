@@ -34,24 +34,24 @@ class CopiaMapaServiceCoverageTest {
         Long codMapaOrigem = 1L;
         Mapa fonte = new Mapa();
         fonte.setCodigo(codMapaOrigem);
-        
+
         when(repo.buscar(Mapa.class, codMapaOrigem)).thenReturn(fonte);
         when(mapaRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        
+
         Atividade ativFonte = new Atividade();
         ativFonte.setCodigo(100L);
         ativFonte.setDescricao("Atividade Teste");
         when(atividadeRepo.findWithConhecimentosByMapa_Codigo(codMapaOrigem)).thenReturn(List.of(ativFonte));
-        
+
         Competencia compFonte = new Competencia();
         compFonte.setCodigo(200L);
         compFonte.setDescricao("Competencia Teste");
-        
+
         // Associada a uma atividade que NÃO existe no mapa de origem (ou ID errado no mock)
         Atividade ativFantasma = new Atividade();
         ativFantasma.setCodigo(999L);
         compFonte.setAtividades(Set.of(ativFantasma));
-        
+
         when(competenciaRepo.findByMapa_Codigo(codMapaOrigem)).thenReturn(List.of(compFonte));
 
         // Act
@@ -67,19 +67,19 @@ class CopiaMapaServiceCoverageTest {
         // Arrange
         Long mapaOrigemId = 1L;
         Long mapaDestinoId = 2L;
-        
+
         Atividade ativOrigem = Atividade.builder()
                 .descricao("Nova Atividade")
                 .conhecimentos(new HashSet<>())
                 .build();
-        
+
         when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of()); // Destino vazio
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
-        
+
         // Act
         service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId);
-        
+
         // Assert
         verify(atividadeRepo).saveAll(anyList());
     }
@@ -90,17 +90,17 @@ class CopiaMapaServiceCoverageTest {
         // Arrange
         Long mapaOrigemId = 1L;
         Long mapaDestinoId = 2L;
-        
+
         Atividade ativOrigem = Atividade.builder().descricao("Existente").build();
         Atividade ativDestino = Atividade.builder().descricao("Existente").build();
-        
+
         when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of(ativDestino));
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
-        
+
         // Act
         service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId);
-        
+
         // Assert
         verify(atividadeRepo, never()).saveAll(anyList());
     }

@@ -70,15 +70,17 @@
     </div>
     <div class="content">
         <p>Prezado(a) responsável pela <strong th:text="${siglaUnidadeSuperior}">UNIDADE SUPERIOR</strong>,</p>
-        <p>Informamos que o Mapa de Competências da unidade <strong th:text="${siglaUnidade}">UNIDADE</strong> foi disponibilizado para validação no processo <strong th:text="${nomeProcesso}">PROCESSO</strong>.</p>
-        
+        <p>Informamos que o Mapa de Competências da unidade <strong th:text="${siglaUnidade}">UNIDADE</strong> foi
+            disponibilizado para validação no processo <strong th:text="${nomeProcesso}">PROCESSO</strong>.</p>
+
         <div style="background-color: #f0f8ff; padding: 15px; margin: 15px 0; border-left: 4px solid #0066cc;">
             <p style="margin: 5px 0;"><strong>Unidade Subordinada:</strong> <span th:text="${nomeUnidade}"></span></p>
-            <p style="margin: 5px 0;"><strong>Data limite para validação:</strong> <span th:text="${dataLimiteValidacao}"></span></p>
+            <p style="margin: 5px 0;"><strong>Data limite para validação:</strong> <span
+                    th:text="${dataLimiteValidacao}"></span></p>
         </div>
-        
+
         <p>Acompanhe o progresso da etapa através do Sistema de Gestão de Competências.</p>
-        
+
         <p style="margin-top: 20px;">
             <a href="https://sgc.tre-pe.jus.br"
                style="background-color: #0066cc; color: white; padding: 10px 20px;

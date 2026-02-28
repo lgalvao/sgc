@@ -17,7 +17,7 @@ import {resetDatabase, useProcessoCleanup} from '../hooks/hooks-limpeza.js';
  *   // Database resetada, usuário logado, cleanup automático!
  *   const descricao = 'Processo Teste';
  *   await criarProcesso(page, {descricao, ...});
- *   
+ *
  *   // Capturar código para cleanup
  *   const codigo = await capturarCodigoProcesso(page);
  *   cleanupAutomatico.registrar(codigo);
@@ -42,7 +42,7 @@ const test = base.extend<{
     // Cleanup automático configurado para cada teste
     cleanupAutomatico: async ({request}, use) => {
         const cleanup = useProcessoCleanup();
-        
+
         // Use
         await use(cleanup);
 

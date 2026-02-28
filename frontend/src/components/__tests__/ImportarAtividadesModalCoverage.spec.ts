@@ -15,9 +15,9 @@ describe("ImportarAtividadesModal Coverage", () => {
     it("exibe mensagem quando não há processos finalizados", async () => {
         context.wrapper = mount(ImportarAtividadesModal, {
             ...getCommonMountOptions({
-                processos: { processosFinalizados: [] }
+                processos: {processosFinalizados: []}
             }),
-            props: { mostrar: true, codSubprocessoDestino: 999 },
+            props: {mostrar: true, codSubprocessoDestino: 999},
         });
 
         expect(context.wrapper.text()).toContain("Nenhum processo disponível para importação");
@@ -27,11 +27,11 @@ describe("ImportarAtividadesModal Coverage", () => {
         context.wrapper = mount(ImportarAtividadesModal, {
             ...getCommonMountOptions({
                 processos: {
-                    processosFinalizados: [{ codigo: 1 }],
-                    processoDetalhe: { unidades: [{ codUnidade: 10 }] }
+                    processosFinalizados: [{codigo: 1}],
+                    processoDetalhe: {unidades: [{codUnidade: 10}]}
                 }
             }),
-            props: { mostrar: true, codSubprocessoDestino: 999 },
+            props: {mostrar: true, codSubprocessoDestino: 999},
         });
 
         const vm = context.wrapper.vm as any;
@@ -42,7 +42,7 @@ describe("ImportarAtividadesModal Coverage", () => {
         expect(vm.erroImportacao).toBeNull();
 
         // Unit selected but no activities selected
-        vm.unidadeSelecionada = { codUnidade: 10, codSubprocesso: 100 };
+        vm.unidadeSelecionada = {codUnidade: 10, codSubprocesso: 100};
         vm.atividadesSelecionadas = [];
         await vm.importar();
         expect(vm.erroImportacao).toBe("Selecione ao menos uma atividade para importar.");
@@ -53,13 +53,13 @@ describe("ImportarAtividadesModal Coverage", () => {
         const processosStore = useProcessosStore(pinia);
 
         const wrapper = mount(ImportarAtividadesModal, {
-            props: { mostrar: false, codSubprocessoDestino: 999 },
-            global: { plugins: [pinia] }
+            props: {mostrar: false, codSubprocessoDestino: 999},
+            global: {plugins: [pinia]}
         });
 
         const spy = vi.spyOn(processosStore, 'buscarProcessosFinalizados');
 
-        await wrapper.setProps({ mostrar: true });
+        await wrapper.setProps({mostrar: true});
 
         expect(spy).toHaveBeenCalled();
         expect((wrapper.vm as any).processoSelecionadoId).toBeNull();
@@ -68,9 +68,9 @@ describe("ImportarAtividadesModal Coverage", () => {
     it("lida com seleção de processo e unidade nulos", async () => {
         context.wrapper = mount(ImportarAtividadesModal, {
             ...getCommonMountOptions({
-                processos: { processosFinalizados: [{ codigo: 1 }] }
+                processos: {processosFinalizados: [{codigo: 1}]}
             }),
-            props: { mostrar: true, codSubprocessoDestino: 999 },
+            props: {mostrar: true, codSubprocessoDestino: 999},
         });
 
         const vm = context.wrapper.vm as any;
@@ -93,17 +93,17 @@ describe("ImportarAtividadesModal Coverage", () => {
     });
 
     it("selecionarUnidade preenche atividades para importar", async () => {
-        const mockAtividades = [{ codigo: 1, descricao: 'A1' }];
+        const mockAtividades = [{codigo: 1, descricao: 'A1'}];
         const pinia = (getCommonMountOptions({}) as any).global.plugins[0];
         const atividadesStore = useAtividadesStore(pinia);
         atividadesStore.obterAtividadesPorSubprocesso = vi.fn().mockReturnValue(mockAtividades);
 
         const wrapper = mount(ImportarAtividadesModal, {
-            props: { mostrar: true, codSubprocessoDestino: 999 },
-            global: { plugins: [pinia] }
+            props: {mostrar: true, codSubprocessoDestino: 999},
+            global: {plugins: [pinia]}
         });
 
-        await (wrapper.vm as any).selecionarUnidade({ codSubprocesso: 100 });
+        await (wrapper.vm as any).selecionarUnidade({codSubprocesso: 100});
         expect((wrapper.vm as any).atividadesParaImportar).toEqual(mockAtividades);
 
         await (wrapper.vm as any).selecionarUnidade(null);
@@ -115,18 +115,18 @@ describe("ImportarAtividadesModal Coverage", () => {
         const processosStore = useProcessosStore(pinia);
         const atividadesStore = useAtividadesStore(pinia);
 
-        const mockProcesso = { codigo: 1, descricao: 'P1' };
-        const mockUnidade = { codUnidade: 10, sigla: 'U1', codSubprocesso: 100 };
-        const mockAtividade = { codigo: 1, descricao: 'A1' };
+        const mockProcesso = {codigo: 1, descricao: 'P1'};
+        const mockUnidade = {codUnidade: 10, sigla: 'U1', codSubprocesso: 100};
+        const mockAtividade = {codigo: 1, descricao: 'A1'};
 
         processosStore.processosFinalizados = [mockProcesso] as any;
-        processosStore.processoDetalhe = { unidades: [mockUnidade] } as any;
+        processosStore.processoDetalhe = {unidades: [mockUnidade]} as any;
         atividadesStore.obterAtividadesPorSubprocesso = vi.fn().mockReturnValue([mockAtividade]);
         (atividadesStore.importarAtividades as any).mockResolvedValue(undefined);
 
         const wrapper = mount(ImportarAtividadesModal, {
-            props: { mostrar: true, codSubprocessoDestino: 999 },
-            global: { plugins: [pinia] }
+            props: {mostrar: true, codSubprocessoDestino: 999},
+            global: {plugins: [pinia]}
         });
 
         const vm = wrapper.vm as any;
@@ -159,7 +159,7 @@ describe("ImportarAtividadesModal Coverage", () => {
     it("emite fechar ao chamar fechar()", async () => {
         const wrapper = mount(ImportarAtividadesModal, {
             ...getCommonMountOptions({}),
-            props: { mostrar: true, codSubprocessoDestino: 999 },
+            props: {mostrar: true, codSubprocessoDestino: 999},
         });
 
         await (wrapper.vm as any).fechar();

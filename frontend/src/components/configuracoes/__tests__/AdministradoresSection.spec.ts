@@ -13,8 +13,8 @@ vi.mock("@/services/administradorService", () => ({
 
 describe("AdministradoresSection.vue", () => {
     const mockAdmins = [
-        { nome: "Admin 1", tituloEleitoral: "111", matricula: "M1", unidadeSigla: "U1", unidadeCodigo: 1 },
-        { nome: "Admin 2", tituloEleitoral: "222", matricula: "M2", unidadeSigla: "U2", unidadeCodigo: 2 }
+        {nome: "Admin 1", tituloEleitoral: "111", matricula: "M1", unidadeSigla: "U1", unidadeCodigo: 1},
+        {nome: "Admin 2", tituloEleitoral: "222", matricula: "M2", unidadeSigla: "U2", unidadeCodigo: 2}
     ];
 
     beforeEach(() => {
@@ -25,10 +25,10 @@ describe("AdministradoresSection.vue", () => {
     const createWrapper = () => {
         return mount(AdministradoresSection, {
             global: {
-                plugins: [createTestingPinia({ createSpy: vi.fn })],
+                plugins: [createTestingPinia({createSpy: vi.fn})],
                 stubs: {
-                    BButton: { template: '<button><slot /></button>' },
-                    BAlert: { template: '<div><slot /></div>' },
+                    BButton: {template: '<button><slot /></button>'},
+                    BAlert: {template: '<div><slot /></div>'},
                     EmptyState: true,
                     ModalConfirmacao: {
                         props: ['modelValue', 'loading'],
@@ -69,12 +69,12 @@ describe("AdministradoresSection.vue", () => {
 
         const addButton = wrapper.findAll('button').find(b => b.text().includes('Adicionar administrador'));
         await addButton?.trigger("click"); // Abrir modal
-        
+
         const input = wrapper.find('input#usuarioTitulo');
         await input.setValue("333");
 
         vi.mocked(administradorService.adicionarAdministrador).mockResolvedValue({} as any);
-        
+
         await wrapper.find('button.confirm').trigger("click");
         await flushPromises();
 
@@ -89,7 +89,7 @@ describe("AdministradoresSection.vue", () => {
 
         const removeBtns = wrapper.findAll('button').filter(b => b.text().includes('Remover'));
         await removeBtns[0].trigger("click"); // Confirmar remoção
-        
+
         vi.mocked(administradorService.removerAdministrador).mockResolvedValue({} as any);
 
         await wrapper.find('button.confirm').trigger("click");
@@ -111,7 +111,7 @@ describe("AdministradoresSection.vue", () => {
         (wrapper.vm as any).novoAdminTitulo = "333";
 
         vi.mocked(administradorService.adicionarAdministrador).mockRejectedValue(new Error("Erro API"));
-        
+
         await (wrapper.vm as any).adicionarAdmin();
         await flushPromises();
 
@@ -123,9 +123,9 @@ describe("AdministradoresSection.vue", () => {
         const notificacoes = useNotificacoesStore();
         await flushPromises();
 
-        const node = { nome: "Admin 1", tituloEleitoral: "111" };
+        const node = {nome: "Admin 1", tituloEleitoral: "111"};
         (wrapper.vm as any).adminParaRemover = node;
-        
+
         vi.mocked(administradorService.removerAdministrador).mockRejectedValue(new Error("Erro Remover"));
 
         await (wrapper.vm as any).removerAdmin();

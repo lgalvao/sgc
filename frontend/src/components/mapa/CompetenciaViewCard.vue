@@ -8,24 +8,24 @@
 
     <div v-if="competencia.atividades && competencia.atividades.length > 0" class="mt-3">
       <div
-        v-for="atividade in competencia.atividades"
-        :key="atividade.codigo"
-        class="mb-3 p-2 bg-light rounded"
+          v-for="atividade in competencia.atividades"
+          :key="atividade.codigo"
+          class="mb-3 p-2 bg-light rounded"
       >
         <div class="d-flex align-items-baseline">
-          <i class="bi bi-gear-fill me-2 text-secondary small" aria-hidden="true"/>
+          <i aria-hidden="true" class="bi bi-gear-fill me-2 text-secondary small"/>
           <p class="atividade-associada-descricao mb-1 fw-medium">{{ atividade.descricao }}</p>
         </div>
 
         <div v-if="atividade.conhecimentos && atividade.conhecimentos.length > 0" class="ms-4 mt-2">
           <div class="d-flex flex-wrap gap-2">
             <span
-              v-for="c in atividade.conhecimentos"
-              :key="c.codigo"
-              class="badge bg-white text-dark border fw-normal py-1 px-2"
-              data-testid="txt-conhecimento-item"
+                v-for="c in atividade.conhecimentos"
+                :key="c.codigo"
+                class="badge bg-white text-dark border fw-normal py-1 px-2"
+                data-testid="txt-conhecimento-item"
             >
-              <i class="bi bi-book me-1 text-info" aria-hidden="true"/>
+              <i aria-hidden="true" class="bi bi-book me-1 text-info"/>
               {{ c.descricao }}
             </span>
           </div>

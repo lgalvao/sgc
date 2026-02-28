@@ -55,17 +55,20 @@ class CustomExceptionsTest {
     @Test
     @DisplayName("Deve testar construtores de ErroNegocioBase")
     void testErroNegocioBase() {
-        ErroNegocioBase erro1 = new ErroNegocioBase("msg", "CODE", HttpStatus.BAD_REQUEST) {};
+        ErroNegocioBase erro1 = new ErroNegocioBase("msg", "CODE", HttpStatus.BAD_REQUEST) {
+        };
         assertThat(erro1.getMessage()).isEqualTo("msg");
         assertThat(erro1.getCode()).isEqualTo("CODE");
         assertThat(erro1.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(erro1.getDetails()).isEmpty();
 
-        ErroNegocioBase erro2 = new ErroNegocioBase("msg", "CODE", HttpStatus.BAD_REQUEST, new HashMap<>()) {};
+        ErroNegocioBase erro2 = new ErroNegocioBase("msg", "CODE", HttpStatus.BAD_REQUEST, new HashMap<>()) {
+        };
         assertThat(erro2.getDetails()).isEmpty();
 
         RuntimeException cause = new RuntimeException("causa");
-        ErroNegocioBase erro3 = new ErroNegocioBase("msg", "CODE", HttpStatus.BAD_REQUEST, cause) {};
+        ErroNegocioBase erro3 = new ErroNegocioBase("msg", "CODE", HttpStatus.BAD_REQUEST, cause) {
+        };
         assertThat(erro3.getCause()).isEqualTo(cause);
         assertThat(erro3.getDetails()).isEmpty();
     }

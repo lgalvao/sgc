@@ -31,9 +31,9 @@
 
     <div class="mb-4">
       <h5>Atividades</h5>
-      <div 
-        class="d-flex flex-wrap gap-2 p-2 border rounded"
-        :class="{ 'border-danger': fieldErrors?.atividades }"
+      <div
+          :class="{ 'border-danger': fieldErrors?.atividades }"
+          class="d-flex flex-wrap gap-2 p-2 border rounded"
       >
         <BCard
             v-for="atividade in atividades"

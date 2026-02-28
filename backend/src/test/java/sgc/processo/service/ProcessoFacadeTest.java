@@ -77,7 +77,7 @@ class ProcessoFacadeTest {
             when(processoInicializador.iniciar(codigo, unidades, usuario)).thenReturn(List.of("OK"));
 
             var result = processoFacade.iniciarProcessoDiagnostico(codigo, unidades);
-            
+
             assertEquals(1, result.size());
             verify(processoInicializador).iniciar(codigo, unidades, usuario);
         }
@@ -88,13 +88,12 @@ class ProcessoFacadeTest {
             Long codigoIgnorar = 1L;
             Set<Long> unidades = Set.of(10L, 20L);
             when(processoConsultaService.buscarIdsUnidadesComProcessosAtivos(codigoIgnorar)).thenReturn(unidades);
-            
+
             Set<Long> resultado = processoFacade.buscarIdsUnidadesEmProcessosAtivos(codigoIgnorar);
-            
+
             assertThat(resultado).isEqualTo(unidades);
             verify(processoConsultaService).buscarIdsUnidadesComProcessosAtivos(codigoIgnorar);
         }
-
 
 
         @Test
@@ -119,7 +118,7 @@ class ProcessoFacadeTest {
             Usuario titular = new Usuario();
             titular.setEmail("titular@teste.com");
             when(usuarioService.buscarPorLogin("T1")).thenReturn(titular);
-            
+
             when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
 
             processoFacade.enviarLembrete(codProcesso, codUnidade);
@@ -127,9 +126,9 @@ class ProcessoFacadeTest {
             verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("15/03/2026"));
             verify(subprocessoService).registrarMovimentacaoLembrete(99L);
             verify(emailService).enviarEmailHtml(
-                eq("titular@teste.com"), 
-                contains("SGC: Lembrete de prazo"), 
-                anyString()
+                    eq("titular@teste.com"),
+                    contains("SGC: Lembrete de prazo"),
+                    anyString()
             );
         }
 
@@ -138,14 +137,14 @@ class ProcessoFacadeTest {
         void enviarLembrete_DeveLancarExcecaoQuandoUnidadeNaoParticipa() {
             Long codProcesso = 1L;
             Long codUnidade = 99L; // Unidade que não participa
-            
+
             Processo processo = new Processo();
             processo.setDescricao("Processo");
             Unidade unidadeParticipante = UnidadeFixture.unidadeComId(2L);
             processo.adicionarParticipantes(Set.of(unidadeParticipante));
-            
+
             when(processoConsultaService.buscarProcessoCodigo(codProcesso)).thenReturn(processo);
-            
+
             assertThatThrownBy(() -> processoFacade.enviarLembrete(codProcesso, codUnidade))
                     .isInstanceOf(ErroProcesso.class)
                     .hasMessageContaining("não participa");
@@ -156,14 +155,14 @@ class ProcessoFacadeTest {
         void executarAcaoEmBloco_IgnoraAcaoNull() {
             Long codProcesso = 1L;
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
-                List.of(10L),
-                ACEITAR, // Mock a valid action for the initial check, then we'll test categorization
-                LocalDate.now()
+                    List.of(10L),
+                    ACEITAR, // Mock a valid action for the initial check, then we'll test categorization
+                    LocalDate.now()
             );
 
             Usuario usuario = new Usuario();
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            
+
             Subprocesso sub = Subprocesso.builder()
                     .codigo(100L)
                     .unidade(Unidade.builder().codigo(10L).build())
@@ -171,8 +170,8 @@ class ProcessoFacadeTest {
                     .build();
 
             when(subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
-                .thenReturn(List.of(sub));
-            
+                    .thenReturn(List.of(sub));
+
             AcaoEmBlocoRequest reqNull = new AcaoEmBlocoRequest(List.of(10L), null, LocalDate.now());
             processoFacade.executarAcaoEmBloco(codProcesso, reqNull);
 
@@ -327,7 +326,7 @@ class ProcessoFacadeTest {
             // Arrange
             CriarProcessoRequest req = new CriarProcessoRequest(
                     "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
-            
+
             when(processoManutencaoService.criar(req)).thenAnswer(
                     i -> {
                         // Simula retorno do serviço
@@ -352,7 +351,7 @@ class ProcessoFacadeTest {
             // Arrange
             CriarProcessoRequest req = new CriarProcessoRequest(
                     "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(99L));
-            
+
             when(processoManutencaoService.criar(req))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 99L));
 
@@ -468,8 +467,8 @@ class ProcessoFacadeTest {
 
             // Assert
             assertThat(res)
-                .isNotNull()
-                .isEqualTo(detalhes);
+                    .isNotNull()
+                    .isEqualTo(detalhes);
         }
 
         @Test
@@ -523,9 +522,9 @@ class ProcessoFacadeTest {
 
                 LocalDate dataLimite = LocalDate.now().plusDays(30);
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
-                    List.of(1L, 2L, 3L),
-                    AcaoProcesso.DISPONIBILIZAR,
-                    dataLimite
+                        List.of(1L, 2L, 3L),
+                        AcaoProcesso.DISPONIBILIZAR,
+                        dataLimite
                 );
 
                 Subprocesso sp1 = Subprocesso.builder().codigo(1001L).unidade(Unidade.builder().codigo(1L).build()).build();
@@ -538,14 +537,14 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
                 // Assert
-                ArgumentCaptor<DisponibilizarMapaRequest> captor = 
-                    ArgumentCaptor.forClass(DisponibilizarMapaRequest.class);
+                ArgumentCaptor<DisponibilizarMapaRequest> captor =
+                        ArgumentCaptor.forClass(DisponibilizarMapaRequest.class);
                 verify(subprocessoService).disponibilizarMapaEmBloco(
-                    eq(List.of(1001L, 1002L, 1003L)),
-                    captor.capture(),
-                    eq(usuario)
+                        eq(List.of(1001L, 1002L, 1003L)),
+                        captor.capture(),
+                        eq(usuario)
                 );
-                
+
                 DisponibilizarMapaRequest captured = captor.getValue();
                 assertThat(captured.dataLimite()).isEqualTo(dataLimite);
                 assertThat(captured.observacoes()).isEqualTo("Disponibilização em bloco");
@@ -563,23 +562,23 @@ class ProcessoFacadeTest {
                 when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
                 Subprocesso sp1 = Subprocesso.builder()
-                    .codigo(1L)
-                    .unidade(Unidade.builder().codigo(10L).build())
-                    .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
-                    .build();
+                        .codigo(1L)
+                        .unidade(Unidade.builder().codigo(10L).build())
+                        .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
+                        .build();
                 Subprocesso sp2 = Subprocesso.builder()
-                    .codigo(2L)
-                    .unidade(Unidade.builder().codigo(20L).build())
-                    .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
-                    .build();
+                        .codigo(2L)
+                        .unidade(Unidade.builder().codigo(20L).build())
+                        .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
+                        .build();
 
                 when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L, 20L))).thenReturn(List.of(sp1, sp2));
                 doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("ACEITAR_CADASTRO"));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
-                    List.of(10L, 20L),
-                    ACEITAR,
-                    null
+                        List.of(10L, 20L),
+                        ACEITAR,
+                        null
                 );
 
                 // Act
@@ -597,18 +596,18 @@ class ProcessoFacadeTest {
                 when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
                 Subprocesso sp1 = Subprocesso.builder()
-                    .codigo(1L)
-                    .unidade(Unidade.builder().codigo(10L).build())
-                    .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO)
-                    .build();
+                        .codigo(1L)
+                        .unidade(Unidade.builder().codigo(10L).build())
+                        .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO)
+                        .build();
 
                 when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
                 doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("ACEITAR_MAPA"));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
-                    List.of(10L),
-                    ACEITAR,
-                    null
+                        List.of(10L),
+                        ACEITAR,
+                        null
                 );
 
                 // Act
@@ -630,18 +629,18 @@ class ProcessoFacadeTest {
                 when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
                 Subprocesso sp1 = Subprocesso.builder()
-                    .codigo(1L)
-                    .unidade(Unidade.builder().codigo(10L).build())
-                    .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA)
-                    .build();
+                        .codigo(1L)
+                        .unidade(Unidade.builder().codigo(10L).build())
+                        .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA)
+                        .build();
 
                 when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
                 doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("HOMOLOGAR_CADASTRO"));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
-                    List.of(10L),
-                    HOMOLOGAR,
-                    null
+                        List.of(10L),
+                        HOMOLOGAR,
+                        null
                 );
 
                 // Act

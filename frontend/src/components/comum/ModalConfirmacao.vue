@@ -2,8 +2,8 @@
   <BModal
       v-model="modelValueComputed"
       :title="titulo"
-      modal-class="modal-responsivo"
       centered
+      modal-class="modal-responsivo"
       @hide="fechar"
       @shown="onShown"
   >
@@ -11,8 +11,8 @@
       <div class="d-flex align-items-start">
         <i
             v-if="variant === 'danger'"
-            class="bi bi-exclamation-triangle-fill text-danger fs-3 me-3"
             aria-hidden="true"
+            class="bi bi-exclamation-triangle-fill text-danger fs-3 me-3"
         />
         <p class="mb-0 pt-1">{{ mensagem }}</p>
       </div>
@@ -22,22 +22,22 @@
         <BButton
             ref="btnCancelar"
             :data-testid="testIdCancelar || 'btn-modal-confirmacao-cancelar'"
-            variant="secondary"
             :disabled="loading"
+            variant="secondary"
             @click="fechar"
         >
           {{ cancelTitle }}
         </BButton>
         <BButton
-            :variant="(okVariant || variant || 'primary') as any"
             :data-testid="testIdConfirmar || 'btn-modal-confirmacao-confirmar'"
             :disabled="loading || okDisabled"
+            :variant="(okVariant || variant || 'primary') as any"
             @click="confirmar"
         >
           <output
               v-if="loading"
-              class="spinner-border spinner-border-sm me-1"
               aria-hidden="true"
+              class="spinner-border spinner-border-sm me-1"
           />
           {{ loading ? (okTitle === 'Confirmar' ? 'Processando...' : okTitle) : okTitle }}
         </BButton>
@@ -98,7 +98,7 @@ function fechar() {
 function confirmar() {
   emit('confirmar');
   if (props.autoClose) {
-     modelValueComputed.value = false;
+    modelValueComputed.value = false;
   }
 }
 

@@ -54,7 +54,8 @@ const shouldShowNavBarExtras = computed(() => {
 </script>
 
 <template>
-  <a href="#main-content" class="visually-hidden-focusable p-3 bg-white text-primary position-absolute start-0 top-0" style="z-index: 2050;">
+  <a class="visually-hidden-focusable p-3 bg-white text-primary position-absolute start-0 top-0" href="#main-content"
+     style="z-index: 2050;">
     Pular para o conteúdo principal
   </a>
   <BOrchestrator/>

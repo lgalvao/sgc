@@ -42,7 +42,32 @@ public class SubprocessoService {
 
     private static final String SIGLA_ADMIN = "ADMIN";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
+    private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_DISPONIBILIZADO = new EnumMap<>(Map.of(
+            TipoProcesso.MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO,
+            TipoProcesso.REVISAO, SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO));
+    private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_COM_SUGESTOES = new EnumMap<>(Map.of(
+            TipoProcesso.MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES,
+            TipoProcesso.REVISAO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES));
+    private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_VALIDADO = new EnumMap<>(Map.of(
+            TipoProcesso.MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+            TipoProcesso.REVISAO, SituacaoSubprocesso.REVISAO_MAPA_VALIDADO));
+    private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_HOMOLOGADO = new EnumMap<>(Map.of(
+            TipoProcesso.MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+            TipoProcesso.REVISAO, SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO));
+    private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
+            SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+    private final ComumRepo repo;
+    private final AnaliseRepo analiseRepo;
+    private final AlertaFacade alertaService;
+    private final OrganizacaoFacade organizacaoFacade;
+    private final HierarquiaService hierarquiaService;
+    private final UsuarioFacade usuarioFacade;
+    private final ImpactoMapaService impactoMapaService;
+    private final EmailService emailService;
+    private final TemplateEngine templateEngine;
+    private final MapaSalvamentoService mapaSalvamentoService;
+    private final SgcPermissionEvaluator permissionEvaluator;
+    private final MapaVisualizacaoService mapaVisualizacaoService;
     @Setter
     @Autowired
     @Lazy
@@ -51,48 +76,14 @@ public class SubprocessoService {
     @Autowired
     @Lazy
     private MovimentacaoRepo movimentacaoRepo;
-
-    private final ComumRepo repo;
-    private final AnaliseRepo analiseRepo;
-    private final AlertaFacade alertaService;
-    private final OrganizacaoFacade organizacaoFacade;
-    private final HierarquiaService hierarquiaService;
-    private final UsuarioFacade usuarioFacade;
-    private final ImpactoMapaService impactoMapaService;
-
     @Setter
     @Autowired
     @Lazy
     private CopiaMapaService copiaMapaService;
-    private final EmailService emailService;
-    private final TemplateEngine templateEngine;
-    private final MapaSalvamentoService mapaSalvamentoService;
-    private final SgcPermissionEvaluator permissionEvaluator;
-    private final MapaVisualizacaoService mapaVisualizacaoService;
-
     @Lazy
     @Autowired
     @Setter
     private MapaManutencaoService mapaManutencaoService;
-
-    private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_DISPONIBILIZADO = new EnumMap<>(Map.of(
-            TipoProcesso.MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO,
-            TipoProcesso.REVISAO, SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO));
-
-    private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_COM_SUGESTOES = new EnumMap<>(Map.of(
-            TipoProcesso.MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES,
-            TipoProcesso.REVISAO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES));
-
-    private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_VALIDADO = new EnumMap<>(Map.of(
-            TipoProcesso.MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
-            TipoProcesso.REVISAO, SituacaoSubprocesso.REVISAO_MAPA_VALIDADO));
-
-    private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_HOMOLOGADO = new EnumMap<>(Map.of(
-            TipoProcesso.MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-            TipoProcesso.REVISAO, SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO));
-
-    private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
-            SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
     @Transactional(readOnly = true)
     public MapaVisualizacaoResponse mapaParaVisualizacao(Long codSubprocesso) {
@@ -1381,8 +1372,8 @@ public class SubprocessoService {
                         SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_MAPA_VALIDADO).contains(situacao))
                 .podeVisualizarImpacto(temMapaVigente && (
                         (mesmaUnidade && isChefe && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) ||
-                        (mesmaUnidade && isGestor && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) ||
-                        (isAdmin && Set.of(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).contains(situacao))
+                                (mesmaUnidade && isGestor && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) ||
+                                (isAdmin && Set.of(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).contains(situacao))
                 ))
                 .podeAlterarDataLimite(isAdmin)
                 .podeReabrirCadastro(isAdmin)

@@ -14,7 +14,7 @@
     >
       <template #empty>
         <div class="text-center text-muted py-5" data-testid="empty-state-movimentacoes">
-          <i class="bi bi-arrow-left-right display-4 d-block mb-3" aria-hidden="true"></i>
+          <i aria-hidden="true" class="bi bi-arrow-left-right display-4 d-block mb-3"></i>
           <p class="h5">Nenhuma movimentação</p>
           <p class="small">O histórico de movimentações deste processo aparecerá aqui.</p>
         </div>

@@ -5,7 +5,6 @@ import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
-import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
@@ -25,8 +24,6 @@ public class ImpactoMapaService {
     private final CompetenciaRepo competenciaRepo;
     private final MapaManutencaoService mapaManutencaoService;
     private final SgcPermissionEvaluator permissionEvaluator;
-    private final ComumRepo repo;
-
     @Transactional(readOnly = true)
     public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
         if (!permissionEvaluator.checkPermission(usuario, subprocesso, "VERIFICAR_IMPACTOS")) {
@@ -76,19 +73,14 @@ public class ImpactoMapaService {
         SituacaoSubprocesso situacao = sp.getSituacao();
         Perfil perfil = usuario.getPerfilAtivo();
 
-        boolean situacaoValida;
-
-        if (perfil == Perfil.CHEFE) {
-            situacaoValida = (situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO);
-        } else if (perfil == Perfil.GESTOR) {
-            situacaoValida = (situacao == REVISAO_CADASTRO_DISPONIBILIZADA);
-        } else if (perfil == Perfil.ADMIN) {
-            situacaoValida = Set.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO,
-                    REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA,
-                    REVISAO_MAPA_AJUSTADO).contains(situacao);
-        } else {
-            situacaoValida = false;
-        }
+        boolean situacaoValida = switch (perfil) {
+          case Perfil.CHEFE -> (situacao == NAO_INICIADO || situacao == REVISAO_CADASTRO_EM_ANDAMENTO);
+          case Perfil.GESTOR -> (situacao == REVISAO_CADASTRO_DISPONIBILIZADA);
+          case Perfil.ADMIN -> Set.of(NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO,
+              REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA,
+              REVISAO_MAPA_AJUSTADO).contains(situacao);
+          default -> false;
+        };
 
         if (!situacaoValida) {
             throw new ErroValidacao(

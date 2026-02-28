@@ -26,7 +26,7 @@ describe("DisponibilizarMapaModal.vue", () => {
     const context = setupComponentTest();
 
     const createWrapper = (propsOverride = {}) => {
-        const options = getCommonMountOptions({}, { ModalPadrao: ModalPadraoStub });
+        const options = getCommonMountOptions({}, {ModalPadrao: ModalPadraoStub});
 
         context.wrapper = mount(DisponibilizarMapaModal, {
             ...options,
@@ -46,12 +46,12 @@ describe("DisponibilizarMapaModal.vue", () => {
     };
 
     it("não deve renderizar o modal quando mostrar for falso", () => {
-        const wrapper = createWrapper({ mostrar: false });
+        const wrapper = createWrapper({mostrar: false});
         expect(wrapper.find('[data-testid="modal-stub"]').exists()).toBe(false);
     });
 
     it("deve renderizar o modal com os campos iniciais", () => {
-        const wrapper = createWrapper({ mostrar: true });
+        const wrapper = createWrapper({mostrar: true});
 
         const dataInput = wrapper.find('[data-testid="inp-disponibilizar-mapa-data"]');
         expect(dataInput.exists()).toBe(true);
@@ -64,7 +64,7 @@ describe("DisponibilizarMapaModal.vue", () => {
     });
 
     it("deve habilitar o botão de disponibilizar quando a data for selecionada", async () => {
-        const wrapper = createWrapper({ mostrar: true });
+        const wrapper = createWrapper({mostrar: true});
 
         const inputWrapper = wrapper.findComponent(BFormInput);
         const nativeInput = inputWrapper.find("input");
@@ -77,14 +77,14 @@ describe("DisponibilizarMapaModal.vue", () => {
     });
 
     it("deve emitir o evento fechar ao clicar no botão de cancelar", async () => {
-        const wrapper = createWrapper({ mostrar: true });
+        const wrapper = createWrapper({mostrar: true});
 
         await wrapper.find('[data-testid="btn-disponibilizar-mapa-cancelar"]').trigger("click");
         expect(wrapper.emitted("fechar")).toBeTruthy();
     });
 
     it("deve emitir o evento disponibilizar com a data selecionada", async () => {
-        const wrapper = createWrapper({ mostrar: true });
+        const wrapper = createWrapper({mostrar: true});
 
         const dataLimite = "2024-12-31";
         const inputWrapper = wrapper.findComponent(BFormInput);
@@ -101,7 +101,7 @@ describe("DisponibilizarMapaModal.vue", () => {
     });
 
     it("deve exibir estado de carregamento quando loading for true", () => {
-        const wrapper = createWrapper({ mostrar: true, loading: true });
+        const wrapper = createWrapper({mostrar: true, loading: true});
 
         const btnConfirmar = wrapper.find('[data-testid="btn-disponibilizar-mapa-confirmar"]');
         expect(btnConfirmar.attributes("disabled")).toBeDefined();
@@ -128,7 +128,7 @@ describe("DisponibilizarMapaModal.vue", () => {
     });
 
     it("deve incluir observações no evento disponibilizar", async () => {
-        const wrapper = createWrapper({ mostrar: true });
+        const wrapper = createWrapper({mostrar: true});
         const dataLimite = "2024-12-31";
         const observacoes = "Teste observação";
 
@@ -148,24 +148,24 @@ describe("DisponibilizarMapaModal.vue", () => {
     });
 
     it("deve resetar campos quando mostrar mudar para true", async () => {
-        const wrapper = createWrapper({ mostrar: false });
-        await wrapper.setProps({ mostrar: true });
-        
+        const wrapper = createWrapper({mostrar: false});
+        await wrapper.setProps({mostrar: true});
+
         const inputWrapper = wrapper.findComponent(BFormInput);
         const nativeInput = inputWrapper.find("input");
         await nativeInput.setValue("2024-12-31");
-        
+
         const obsTextarea = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
         await obsTextarea.setValue("Obs");
-        
+
         // Hide
-        await wrapper.setProps({ mostrar: false });
-        
+        await wrapper.setProps({mostrar: false});
+
         // Show again
-        await wrapper.setProps({ mostrar: true });
-        
+        await wrapper.setProps({mostrar: true});
+
         expect(wrapper.findComponent(BFormInput).props().modelValue).toBe("");
-        
+
         // Re-find the element to ensure we have the latest state
         const updatedObsTextarea = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
         expect((updatedObsTextarea.element as HTMLTextAreaElement).value).toBe("");

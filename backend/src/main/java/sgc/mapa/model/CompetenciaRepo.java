@@ -8,17 +8,17 @@ import java.util.*;
 
 /**
  * Repositório JPA para a entidade Competencia.
- * 
+ *
  * <h2>Padrões de Consulta</h2>
  * Este repositório oferece 3 métodos para buscar competências por mapa,
  * cada um otimizado para um caso de uso específico:
- * 
+ *
  * <ul>
  * <li>{@link #findByMapa_Codigo(Long)} - Carrega competências com atividades (EntityGraph)</li>
  * <li>{@link #findCompetenciaAndAtividadeIdsByMapaCodigo(Long)} - Projeção SQL otimizada</li>
  * <li> - Sem relacionamentos (mais leve)</li>
  * </ul>
- * 
+ *
  */
 @Repository
 public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
@@ -37,13 +37,13 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
 
     /**
      * Busca dados projetados (id, descricao, id_atividade) das competências de um mapa.
-     * 
+     *
      * <p><b>Quando usar:</b> Para visualização/montagem de DTOs onde apenas IDs e descrições são necessários.
      * Esta é a abordagem mais eficiente quando múltiplas competências compartilham atividades.
-     * 
+     *
      * <p><b>Performance:</b> Minimiza transferência de dados e uso de memória ao retornar apenas
      * campos necessários. Ideal para {@link sgc.mapa.service.MapaVisualizacaoService}.
-     * 
+     *
      * <p><b>Trade-off:</b> Requer parsing manual de Object[] no código cliente.
      *
      * @param mapaCodigo Código do mapa
@@ -60,12 +60,12 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
 
     /**
      * Busca competências de um mapa sem carregar relacionamentos.
-     * 
+     *
      * <p><b>Quando usar:</b> Para operações que precisam apenas de metadados das competências
      * (código, descrição) sem atividades associadas. Exemplo: ajuste interno de mapa.
-     * 
+     *
      * <p><b>Performance:</b> Mais leve que EntityGraph, evita carregar dados desnecessários.
-     * 
+     *
      * <p><b>Atenção:</b> Acessar {@code competencia.getAtividades()} causará lazy loading
      * (N+1 queries) se fora de transação.
      *
@@ -78,6 +78,7 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
 
     /**
      * Remove todas as competências de um mapa.
+     *
      * @param mapaCodigo Código do mapa
      */
     void deleteByMapa_Codigo(Long mapaCodigo);

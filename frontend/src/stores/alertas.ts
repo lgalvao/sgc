@@ -9,7 +9,7 @@ import {useErrorHandler} from "@/composables/useErrorHandler";
 export const useAlertasStore = defineStore("alertas", () => {
     const alertas = ref<Alerta[]>([]);
     const alertasPage = ref<Page<Alerta>>({} as Page<Alerta>);
-    const { lastError, clearError, withErrorHandling } = useErrorHandler();
+    const {lastError, clearError, withErrorHandling} = useErrorHandler();
 
     async function buscarAlertas(
         usuarioCodigo: string,

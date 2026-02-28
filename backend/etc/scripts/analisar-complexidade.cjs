@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { createInterface } = require('node:readline');
+const {createInterface} = require('node:readline');
 
 // Configuração
 const CSV_PATH = path.join(__dirname, '../../backend/build/reports/jacoco/test/jacocoTestReport.csv');
@@ -23,11 +23,22 @@ class ClassMetrics {
         this.methodsMissed = Number.parseInt(data.METHOD_MISSED || 0, 10);
     }
 
-    get totalBranches() { return this.branchesCovered + this.branchesMissed; }
-    get totalLines() { return this.linesCovered + this.linesMissed; }
-    get totalComplexity() { return this.complexityCovered + this.complexityMissed; }
-    get totalMethods() { return this.methodsCovered + this.methodsMissed; }
-    
+    get totalBranches() {
+        return this.branchesCovered + this.branchesMissed;
+    }
+
+    get totalLines() {
+        return this.linesCovered + this.linesMissed;
+    }
+
+    get totalComplexity() {
+        return this.complexityCovered + this.complexityMissed;
+    }
+
+    get totalMethods() {
+        return this.methodsCovered + this.methodsMissed;
+    }
+
     get avgComplexityPerMethod() {
         return this.totalMethods === 0 ? 0 : this.totalComplexity / this.totalMethods;
     }
@@ -51,7 +62,9 @@ class ClassMetrics {
         );
     }
 
-    get fullName() { return `${this.package}.${this.name}`; }
+    get fullName() {
+        return `${this.package}.${this.name}`;
+    }
 }
 
 function categorizeClass(className) {
@@ -67,7 +80,7 @@ function categorizeClass(className) {
 
 async function parseJacocoCsv(filePath) {
     const fileStream = fs.createReadStream(filePath);
-    const rl = createInterface({ input: fileStream, crlfDelay: Infinity });
+    const rl = createInterface({input: fileStream, crlfDelay: Infinity});
 
     const metrics = [];
     let headers = null;
@@ -75,7 +88,7 @@ async function parseJacocoCsv(filePath) {
     for await (const line of rl) {
         if (!line.trim()) continue;
         const cols = line.split(',');
-        
+
         if (!headers) {
             headers = cols;
             continue;
@@ -106,7 +119,7 @@ function generateMarkdownReport(metrics, outputPath) {
 
     let md = `# Ranking de Complexidade do Backend - SGC\n\n`;
     md += `Este relatório apresenta uma análise detalhada da complexidade do código backend, baseado em métricas do Jacoco e análise de complexidade ciclomática.\n\n`;
-    
+
     md += `## Resumo Executivo\n\n`;
     md += `- **Total de Classes Analisadas:** ${totalClasses}\n`;
     md += `- **Complexidade Ciclomática Total:** ${totalComplexity}\n`;
@@ -140,12 +153,12 @@ function generateMarkdownReport(metrics, outputPath) {
         const classes = categories[cat];
         md += `### ${cat}\n\n`;
         md += `Total de classes: ${classes.length}\n\n`;
-        
+
         const top10 = classes.sort((a, b) => b.complexityScore - a.complexityScore).slice(0, 10);
-        
+
         md += `| Classe | Score | Complexity | Branches | Linhas | Cobertura Branches |\n`;
         md += `|--------|-------|------------|----------|--------|--------------------|\n`;
-        
+
         top10.forEach(m => {
             md += `| \`${m.name}\` | ${m.complexityScore.toFixed(1)} | ${m.totalComplexity} | ${m.totalBranches} | ${m.totalLines} | ${m.branchCoveragePercentage.toFixed(1)}% |\n`;
         });
@@ -165,7 +178,7 @@ function generateMarkdownReport(metrics, outputPath) {
     // Mais branches
     md += `\n## Top 20 Classes com Mais Branches\n\n`;
     const byBranches = [...metrics].sort((a, b) => b.totalBranches - a.totalBranches).slice(0, 20);
-    
+
     md += `| Rank | Classe | Branches | Covered | Missed | Coverage % | Categoria |\n`;
     md += `|------|--------|----------|---------|--------|------------|------------|\n`;
     byBranches.forEach((m, i) => {
@@ -192,7 +205,7 @@ async function main() {
 
     console.log("✓ Relatório gerado com sucesso!");
     console.log("\nTop 5 classes mais complexas:");
-    
+
     const sortedMetrics = [...metrics].sort((a, b) => b.complexityScore - a.complexityScore);
     sortedMetrics.slice(0, 5).forEach((m, i) => {
         console.log(`  ${i + 1}. ${m.fullName} (Score: ${m.complexityScore.toFixed(1)})`);

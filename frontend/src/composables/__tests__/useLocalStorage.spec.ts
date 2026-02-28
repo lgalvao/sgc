@@ -48,12 +48,12 @@ describe('useLocalStorage', () => {
     });
 
     it('deve funcionar com objetos complexos', async () => {
-        const defaultVal = { a: 1 };
+        const defaultVal = {a: 1};
         const val = useLocalStorage('test-key', defaultVal);
 
         val.value.a = 2;
         await nextTick();
-        expect(localStorage.getItem('test-key')).toBe(JSON.stringify({ a: 2 }));
+        expect(localStorage.getItem('test-key')).toBe(JSON.stringify({a: 2}));
     });
 });
 

@@ -10,6 +10,6 @@ import java.util.*;
  */
 @Builder
 public record SalvarAjustesRequest(
-        @NotEmpty(message = "A lista de competências não pode ser vazia") 
+        @NotEmpty(message = "A lista de competências não pode ser vazia")
         List<CompetenciaAjusteDto> competencias) {
 }

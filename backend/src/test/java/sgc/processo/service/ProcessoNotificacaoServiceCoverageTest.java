@@ -9,8 +9,8 @@ import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
-import sgc.subprocesso.model.Subprocesso;
 
 import java.util.*;
 
@@ -20,15 +20,23 @@ import static org.mockito.Mockito.*;
 @DisplayName("ProcessoNotificacaoService - Cobertura")
 class ProcessoNotificacaoServiceCoverageTest {
 
-    @Mock private AlertaFacade alertaService;
-    @Mock private EmailService emailService;
-    @Mock private EmailModelosService emailModelosService;
-    @Mock private OrganizacaoFacade organizacaoFacade;
-    @Mock private ProcessoRepo processoRepo;
-    @Mock private SubprocessoService subprocessoService;
-    @Mock private UsuarioFacade usuarioService;
+    @Mock
+    private AlertaFacade alertaService;
+    @Mock
+    private EmailService emailService;
+    @Mock
+    private EmailModelosService emailModelosService;
+    @Mock
+    private OrganizacaoFacade organizacaoFacade;
+    @Mock
+    private ProcessoRepo processoRepo;
+    @Mock
+    private SubprocessoService subprocessoService;
+    @Mock
+    private UsuarioFacade usuarioService;
 
-    @InjectMocks private ProcessoNotificacaoService service;
+    @InjectMocks
+    private ProcessoNotificacaoService service;
 
     @Test
     @DisplayName("processarFinalizacaoProcesso - deve ignorar se sem participantes")
@@ -86,7 +94,7 @@ class ProcessoNotificacaoServiceCoverageTest {
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("Titular", new Usuario()));
 
         when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
-            .thenReturn("HTML");
+                .thenReturn("HTML");
 
         service.emailInicioProcesso(codProcesso);
 
@@ -124,7 +132,7 @@ class ProcessoNotificacaoServiceCoverageTest {
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Collections.emptyMap());
 
         when(emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(eq("INTER"), eq("P1"), anyList()))
-            .thenReturn("HTML");
+                .thenReturn("HTML");
 
         service.emailFinalizacaoProcesso(codProcesso);
 
@@ -181,7 +189,7 @@ class ProcessoNotificacaoServiceCoverageTest {
         when(organizacaoFacade.unidadePorCodigo(10L)).thenReturn(u);
 
         when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
-            .thenReturn("HTML");
+                .thenReturn("HTML");
 
         doThrow(new RuntimeException("SMTP Error")).when(emailService).enviarEmailHtml(any(), any(), any());
 

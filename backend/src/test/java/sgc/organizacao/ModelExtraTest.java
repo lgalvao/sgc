@@ -27,16 +27,16 @@ class ModelExtraTest {
         String sigla = "U1";
         Unidade u = new Unidade();
         u.setSigla(sigla);
-        
+
         // Mocking the interface method that the default method calls
         when(unidadeRepo.findBySiglaAndSituacao(sigla, SituacaoUnidade.ATIVA))
                 .thenReturn(Optional.of(u));
-        
+
         // Call the default method
         doCallRealMethod().when(unidadeRepo).findBySigla(anyString());
-        
+
         Optional<Unidade> result = unidadeRepo.findBySigla(sigla);
-        
+
         assertThat(result).isPresent();
         assertThat(result.get().getSigla()).isEqualTo(sigla);
     }
@@ -46,9 +46,9 @@ class ModelExtraTest {
     void unidadeRepo_findByUnidadeSuperiorCodigo() {
         Long cod = 1L;
         doCallRealMethod().when(unidadeRepo).findByUnidadeSuperiorCodigo(anyLong());
-        
+
         unidadeRepo.findByUnidadeSuperiorCodigo(cod);
-        
+
         verify(unidadeRepo).findByUnidadeSuperiorCodigoAndSituacao(cod, SituacaoUnidade.ATIVA);
     }
 
@@ -57,9 +57,9 @@ class ModelExtraTest {
     void unidadeRepo_findByTituloTitular() {
         String titulo = "123";
         doCallRealMethod().when(unidadeRepo).findByTituloTitular(anyString());
-        
+
         unidadeRepo.findByTituloTitular(titulo);
-        
+
         verify(unidadeRepo).findByTituloTitularAndSituacao(titulo, SituacaoUnidade.ATIVA);
     }
 
@@ -68,11 +68,11 @@ class ModelExtraTest {
     void usuarioSecurityMethods() {
         Usuario u = new Usuario();
         u.setTituloEleitoral("123");
-        
+
         assertThat(u.getUsername()).isEqualTo("123");
         assertThat(u.getPassword()).isNull();
         assertThat(u.getAuthorities()).isEmpty();
-        
+
         u.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_USER")));
         Collection<? extends GrantedAuthority> authorities = u.getAuthorities();
         assertThat(authorities).hasSize(1);

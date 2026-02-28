@@ -84,9 +84,9 @@
       <div class="mb-4 mt-3">
         <EmptyState
             v-if="!mapa || mapa.competencias.length === 0"
+            description="Este mapa ainda não possui competências registradas."
             icon="bi-journal-x"
             title="Nenhuma competência cadastrada"
-            description="Este mapa ainda não possui competências registradas."
         />
         <CompetenciaViewCard
             v-for="comp in mapa?.competencias"
@@ -111,9 +111,9 @@
         v-model="mostrarModalSugestoes"
         :loading="isLoading"
         ok-title="Confirmar"
-        titulo="Apresentar Sugestões"
-        test-id-confirmar="btn-sugestoes-mapa-confirmar"
         test-id-cancelar="btn-sugestoes-mapa-cancelar"
+        test-id-confirmar="btn-sugestoes-mapa-confirmar"
+        titulo="Apresentar Sugestões"
         @confirmar="confirmarSugestoes"
         @shown="() => sugestoesTextareaRef?.$el?.focus()"
     >
@@ -168,8 +168,8 @@
         v-model="mostrarModalValidar"
         :loading="isLoading"
         ok-title="Validar"
-        test-id-confirmar="btn-validar-mapa-confirmar"
         test-id-cancelar="btn-validar-mapa-cancelar"
+        test-id-confirmar="btn-validar-mapa-confirmar"
         titulo="Validar Mapa de Competências"
         variant="success"
         @confirmar="confirmarValidacao"
@@ -181,8 +181,8 @@
         v-model="mostrarModalDevolucao"
         :loading="isLoading"
         ok-title="Confirmar"
-        test-id-confirmar="btn-devolucao-mapa-confirmar"
         test-id-cancelar="btn-devolucao-mapa-cancelar"
+        test-id-confirmar="btn-devolucao-mapa-confirmar"
         titulo="Devolução"
         variant="danger"
         @confirmar="confirmarDevolucao"
@@ -260,14 +260,20 @@ const subprocesso = computed(() => {
 const processo = computed(() => processosStore.processoDetalhe);
 const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 
-const { podeValidarMapa, podeAceitarMapa, podeDevolverMapa, podeHomologarMapa, podeApresentarSugestoes } = useAcesso(computed(() => subprocessosStore.subprocessoDetalhe));
+const {
+  podeValidarMapa,
+  podeAceitarMapa,
+  podeDevolverMapa,
+  podeHomologarMapa,
+  podeApresentarSugestoes
+} = useAcesso(computed(() => subprocessosStore.subprocessoDetalhe));
 
 const podeValidar = computed(() => podeValidarMapa.value);
 const podeAnalisar = computed(() => {
   return (
-    podeAceitarMapa.value ||
-    podeDevolverMapa.value ||
-    podeHomologarMapa.value
+      podeAceitarMapa.value ||
+      podeDevolverMapa.value ||
+      podeHomologarMapa.value
   );
 });
 const podeVerSugestoes = computed(() => podeApresentarSugestoes.value);
@@ -305,9 +311,9 @@ async function confirmarSugestoes() {
     });
     fecharModalSugestoes();
     feedbackStore.show(
-      "Sugestões apresentadas",
-      "Sugestões submetidas para análise da unidade superior",
-      "success"
+        "Sugestões apresentadas",
+        "Sugestões submetidas para análise da unidade superior",
+        "success"
     );
     await router.push({name: "Painel"});
   } catch {
@@ -351,9 +357,9 @@ async function confirmarAceitacao(observacoes?: string) {
     }
     fecharModalAceitar();
     feedbackStore.show(
-      "Sucesso",
-      isHomologacao ? "Homologação efetivada" : "Aceite registrado",
-      "success",
+        "Sucesso",
+        isHomologacao ? "Homologação efetivada" : "Aceite registrado",
+        "success",
     );
     await router.push({name: "Painel"});
   } catch (error) {

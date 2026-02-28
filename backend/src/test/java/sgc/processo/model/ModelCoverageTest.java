@@ -29,14 +29,14 @@ class ModelCoverageTest {
     @DisplayName("Processo deve remover participantes que não estão mais na lista ao sincronizar")
     void deveRemoverParticipantesAoSincronizar() {
         Processo processo = new Processo();
-        
+
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
         u1.setSigla("U1");
         u1.setSituacao(SituacaoUnidade.ATIVA);
         u1.setMatriculaTitular("1234");
         u1.setTituloTitular("123456");
-        
+
         Unidade u2 = new Unidade();
         u2.setCodigo(2L);
         u2.setSigla("U2");
@@ -51,7 +51,7 @@ class ModelCoverageTest {
         // Sincroniza apenas com o 2 (deve remover o 1 e manter o 2)
         // Isso cobre both true/false do removeIf em Proceso.java:86
         processo.sincronizarParticipantes(new HashSet<>(Collections.singletonList(u2)));
-        
+
         assertThat(processo.getParticipantes()).hasSize(1);
         assertThat(processo.getParticipantes().getFirst().getUnidadeCodigo()).isEqualTo(2L);
     }

@@ -37,11 +37,11 @@ class LoginFacadeTest {
     @BeforeEach
     void setUp() {
         loginFacade = new LoginFacade(
-            usuarioFacade, 
-            gerenciadorJwt, 
-            clienteAcessoAd, 
-            OrganizacaoFacade, 
-            usuarioServiceInterno
+                usuarioFacade,
+                gerenciadorJwt,
+                clienteAcessoAd,
+                OrganizacaoFacade,
+                usuarioServiceInterno
         );
         ReflectionTestUtils.setField(loginFacade, "ambienteTestes", false);
     }
@@ -95,11 +95,11 @@ class LoginFacadeTest {
         unidade.setCodigo(1L);
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
-        
+
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.ADMIN);
         up.setUnidade(unidade);
-        
+
         when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
         when(gerenciadorJwt.gerarToken("123", Perfil.ADMIN, 1L)).thenReturn("token");
         when(OrganizacaoFacade.unidadePorCodigo(1L)).thenReturn(unidade);
@@ -132,11 +132,11 @@ class LoginFacadeTest {
         unidade.setCodigo(1L);
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
-        
+
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.GESTOR);
         up.setUnidade(unidade);
-        
+
         when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
         when(gerenciadorJwt.gerarToken("123", Perfil.GESTOR, 1L)).thenReturn("token");
         when(OrganizacaoFacade.unidadePorCodigo(1L)).thenReturn(unidade);
@@ -156,11 +156,11 @@ class LoginFacadeTest {
         unidade.setCodigo(2L);
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
-        
+
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.GESTOR);
         up.setUnidade(unidade);
-        
+
         when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
 
         EntrarRequest req = new EntrarRequest("123", "GESTOR", 1L);
@@ -180,11 +180,11 @@ class LoginFacadeTest {
         unidade.setSigla("U1");
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
-        
+
         UsuarioPerfil up = new UsuarioPerfil();
         up.setPerfil(Perfil.GESTOR);
         up.setUnidade(unidade);
-        
+
         when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
 
         List<PerfilUnidadeDto> result = loginFacade.buscarAutorizacoesUsuario("123");

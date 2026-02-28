@@ -84,9 +84,9 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
                 List.of(unidadeLivre.getCodigo()));
 
         var result = mockMvc.perform(post("/api/processos")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(criarReq)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(criarReq)))
                 .andExpect(status().isCreated())
                 .andReturn();
 
@@ -97,9 +97,9 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
                 List.of(unidadeLivre.getCodigo()));
 
         mockMvc.perform(post("/api/processos/{id}/iniciar", processoId)
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(iniciarReq)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
         // 3. Assert: Mudança de Status do Processo

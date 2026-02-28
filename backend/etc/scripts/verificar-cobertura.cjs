@@ -88,7 +88,7 @@ function processPackage(pkg, filter) {
         });
     }
 
-    return { name: pkgName, metrics, classes };
+    return {name: pkgName, metrics, classes};
 }
 
 // Para modo detalhado (missed lines), precisamos iterar sourcefiles
@@ -178,7 +178,7 @@ async function main() {
 
         if (globalCounters.INSTRUCTION) {
             const inst = globalCounters.INSTRUCTION;
-            const line = globalCounters.LINE || { covered: 0, missed: 0 };
+            const line = globalCounters.LINE || {covered: 0, missed: 0};
             const pInst = calculatePercentage(inst.covered, inst.missed);
             const pLine = calculatePercentage(line.covered, line.missed);
             const totalInst = inst.covered + inst.missed;

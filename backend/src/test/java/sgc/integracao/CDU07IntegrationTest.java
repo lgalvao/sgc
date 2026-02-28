@@ -39,7 +39,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockCustomUser(tituloEleitoral = "333333333333", perfis = {"CHEFE"}, unidadeId = 9L) 
+    @WithMockCustomUser(tituloEleitoral = "333333333333", perfis = {"CHEFE"}, unidadeId = 9L)
     // Chefe Teste - Chefe da Unidade 9 no data.sql tentando ver subprocesso da 8
     @DisplayName("CHEFE NÃO pode visualizar o subprocesso de outra unidade")
     void chefeNaoPodeVisualizarOutraUnidade() throws Exception {

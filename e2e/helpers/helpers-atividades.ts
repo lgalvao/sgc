@@ -3,10 +3,10 @@ import {expect, type Page} from '@playwright/test';
 async function garantirContextoSubprocesso(page: Page) {
     const cardEdicao = page.getByTestId('card-subprocesso-atividades');
     const cardVisualizacao = page.getByTestId('card-subprocesso-atividades-vis');
-    
+
     // Tenta aguardar um pouco se não estiver no contexto, para evitar avisos falsos em navegações lentas
     try {
-        await expect(cardEdicao.or(cardVisualizacao).first()).toBeVisible({ timeout: 2000 });
+        await expect(cardEdicao.or(cardVisualizacao).first()).toBeVisible({timeout: 2000});
         return;
     } catch {
         // Se após 2s não estiver visível, verifica a URL
@@ -83,7 +83,7 @@ export async function removerAtividade(page: Page, descricao: string) {
 
     await row.hover();
     await card.getByTestId('btn-remover-atividade').click({force: true});
-    
+
     // Confirmar no modal
     await page.getByTestId('btn-modal-confirmacao-confirmar').click();
 
@@ -110,7 +110,7 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
 
     await linhaConhecimento.hover();
     await linhaConhecimento.getByTestId('btn-remover-conhecimento').click({force: true});
-    
+
     // Confirmar no modal
     await page.getByTestId('btn-modal-confirmacao-confirmar').click();
 
@@ -119,7 +119,7 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
 
 export async function disponibilizarCadastro(page: Page) {
     await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-    
+
     // Garantir que o modal apareça e o botão de confirmação esteja pronto
     const btnConfirmar = page.getByTestId('btn-confirmar-disponibilizacao');
     await expect(btnConfirmar).toBeVisible();
@@ -147,7 +147,7 @@ export async function verificarBotaoImpactoAusente(page: Page) {
     const btnImpactoEdicao = page.getByTestId('cad-atividades__btn-impactos-mapa-edicao');
     const btnImpactoVis = page.getByTestId('cad-atividades__btn-impactos-mapa-visualizacao');
     const btnImpacto = btnImpactoEdicao.or(btnImpactoVis);
-    
+
     const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
     if (await btnMaisAcoes.isVisible()) {
         await btnMaisAcoes.click();

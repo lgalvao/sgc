@@ -14,7 +14,7 @@ import {useErrorHandler} from "@/composables/useErrorHandler";
 
 export const useAtividadesStore = defineStore("atividades", () => {
     const atividadesPorSubprocesso = ref(new Map<number, Atividade[]>());
-    const { lastError, clearError, withErrorHandling } = useErrorHandler();
+    const {lastError, clearError, withErrorHandling} = useErrorHandler();
 
     function obterAtividadesPorSubprocesso(codSubprocesso: number): Atividade[] {
         return atividadesPorSubprocesso.value.get(codSubprocesso) || [];
@@ -30,14 +30,14 @@ export const useAtividadesStore = defineStore("atividades", () => {
             const atividades = response.atividadesAtualizadas;
             atividadesPorSubprocesso.value.set(codSubprocesso, atividades);
         }
-        
+
         // Atualizar status e permissões do subprocesso
         const subprocessosStore = useSubprocessosStore();
         subprocessosStore.atualizarStatusLocal({
             ...response.subprocesso,
             permissoes: response.permissoes
         });
-        
+
     }
 
     async function buscarAtividadesParaSubprocesso(codSubprocesso: number) {

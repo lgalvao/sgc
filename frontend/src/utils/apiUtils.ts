@@ -1,6 +1,6 @@
 /**
  * Utilitários genéricos para chamadas à API.
- * 
+ *
  * Fornece funções wrapper para operações comuns de API,
  * encapsulando o padrão de chamada e extração de dados.
  */
@@ -10,7 +10,7 @@ import apiClient from '@/axios-setup';
 
 /**
  * Realiza uma requisição GET genérica.
- * 
+ *
  * @example
  * const processo = await apiGet<Processo>(`/processos/${id}`);
  * const processos = await apiGet<Processo[]>('/processos', { status: 'ATIVO' });
@@ -22,7 +22,7 @@ export async function apiGet<T>(url: string, params?: Record<string, any>): Prom
 
 /**
  * Realiza uma requisição POST genérica.
- * 
+ *
  * @example
  * const processo = await apiPost<Processo, CriarProcessoRequest>('/processos', request);
  * await apiPost<void>(`/processos/${id}/finalizar`);

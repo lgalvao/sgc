@@ -1,34 +1,20 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.fixture.UnidadeFixture;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.ValidacaoCadastroDto;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
-import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.ConhecimentoRepo;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
+import sgc.fixture.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
 @Transactional
@@ -46,9 +32,6 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private CompetenciaRepo competenciaRepo;
-
-    @Autowired
-    private ConhecimentoRepo conhecimentoRepo;
 
     private Unidade unidade;
     private Processo processo;
@@ -90,9 +73,10 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
         c.setDescricao("Comp 1");
         competenciaRepo.save(c);
 
-        assertThatThrownBy(() -> subprocessoService.validarAssociacoesMapa(subprocesso.getMapa().getCodigo()))
-            .isInstanceOf(ErroValidacao.class)
-            .hasMessageContaining("Existem competências que não foram associadas a nenhuma atividade.");
+        Long mapaCodigo = subprocesso.getMapa().getCodigo();
+        assertThatThrownBy(() -> subprocessoService.validarAssociacoesMapa(mapaCodigo))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("Existem competências que não foram associadas a nenhuma atividade.");
     }
 
     @Test
@@ -101,9 +85,10 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
         Atividade a = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
         atividadeRepo.save(a);
 
-        assertThatThrownBy(() -> subprocessoService.validarAssociacoesMapa(subprocesso.getMapa().getCodigo()))
-            .isInstanceOf(ErroValidacao.class)
-            .hasMessageContaining("Existem atividades que não foram associadas a nenhuma competência.");
+        Long mapaCodigo = subprocesso.getMapa().getCodigo();
+        assertThatThrownBy(() -> subprocessoService.validarAssociacoesMapa(mapaCodigo))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("Existem atividades que não foram associadas a nenhuma competência.");
     }
 
     @Test
@@ -130,7 +115,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
     @DisplayName("validarSituacaoPermitida: throw se status diferente")
     void validarSituacaoPermitida_Throw() {
         assertThatThrownBy(() -> subprocessoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO))
-            .isInstanceOf(ErroValidacao.class);
+                .isInstanceOf(ErroValidacao.class);
     }
 
     @Test
@@ -138,6 +123,6 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
     void validarSituacaoPermitida_NullStatus() {
         Subprocesso sp = new Subprocesso();
         assertThatThrownBy(() -> subprocessoService.validarSituacaoPermitida(sp, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO))
-            .isInstanceOf(ErroValidacao.class);
+                .isInstanceOf(ErroValidacao.class);
     }
 }

@@ -91,7 +91,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                 .usuario(usuarioChefe)
                 .build();
         movimentacaoRepo.save(m);
-        
+
         subprocessoRepo.flush();
     }
 

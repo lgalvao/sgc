@@ -10,14 +10,14 @@ import {obterDetalhesProcesso} from "@/services/processoService";
 import * as useAcessoModule from '@/composables/useAcesso';
 
 // Hoist mocks
-const { mockApiClient } = vi.hoisted(() => {
+const {mockApiClient} = vi.hoisted(() => {
     const client = {
-        get: vi.fn().mockResolvedValue({ data: {} }),
-        post: vi.fn().mockResolvedValue({ data: {} }),
-        put: vi.fn().mockResolvedValue({ data: {} }),
-        delete: vi.fn().mockResolvedValue({ data: {} }),
+        get: vi.fn().mockResolvedValue({data: {}}),
+        post: vi.fn().mockResolvedValue({data: {}}),
+        put: vi.fn().mockResolvedValue({data: {}}),
+        delete: vi.fn().mockResolvedValue({data: {}}),
     };
-    return { mockApiClient: client };
+    return {mockApiClient: client};
 });
 
 vi.mock("vue-router", () => ({
@@ -40,7 +40,7 @@ vi.mock("@/services/processoService", () => ({
 }));
 
 vi.mock("@/services/mapaService", () => ({
-    verificarImpactosMapa: vi.fn().mockResolvedValue({ temImpactos: false, impactos: [] }),
+    verificarImpactosMapa: vi.fn().mockResolvedValue({temImpactos: false, impactos: []}),
 }));
 
 vi.mock("@/services/subprocessoService", () => ({
@@ -71,7 +71,7 @@ describe("VisAtividades.vue Coverage", () => {
         });
     });
 
-    const mountOptions = (initialState: any = {}, propsData: any = { codProcesso: "1", sigla: "U1" }) => ({
+    const mountOptions = (initialState: any = {}, propsData: any = {codProcesso: "1", sigla: "U1"}) => ({
         props: propsData,
         global: {
             plugins: [
@@ -85,7 +85,7 @@ describe("VisAtividades.vue Coverage", () => {
                                 unidades: []
                             }
                         },
-                        perfil: { perfilSelecionado: Perfil.ADMIN },
+                        perfil: {perfilSelecionado: Perfil.ADMIN},
                         ...initialState,
                     },
                     stubActions: false,
@@ -93,28 +93,31 @@ describe("VisAtividades.vue Coverage", () => {
             ],
             stubs: {
                 BModal: BModalStub,
-                ImpactoMapaModal: { template: '<div></div>' },
-                HistoricoAnaliseModal: { template: '<div></div>' },
+                ImpactoMapaModal: {template: '<div></div>'},
+                HistoricoAnaliseModal: {template: '<div></div>'},
                 ModalConfirmacao: {
                     template: '<div><slot></slot></div>',
                     props: ['loading'],
                     emits: ['confirmar']
                 },
-                BContainer: { template: '<div><slot/></div>' },
-                BCard: { template: '<div><slot/></div>' },
-                BCardBody: { template: '<div><slot/></div>' },
-                PageHeader: { template: '<div><slot/><slot name="subtitle"/><slot name="actions"/></div>' },
-                BButton: { template: '<button @click="$emit(\'click\')"><slot/></button>' },
-                BFormGroup: { template: '<div><slot/></div>' },
-                BFormTextarea: { template: '<textarea></textarea>' }
+                BContainer: {template: '<div><slot/></div>'},
+                BCard: {template: '<div><slot/></div>'},
+                BCardBody: {template: '<div><slot/></div>'},
+                PageHeader: {template: '<div><slot/><slot name="subtitle"/><slot name="actions"/></div>'},
+                BButton: {template: '<button @click="$emit(\'click\')"><slot/></button>'},
+                BFormGroup: {template: '<div><slot/></div>'},
+                BFormTextarea: {template: '<textarea></textarea>'}
             },
         },
     });
 
-    const mountComponent = (initialState: any = {}, propsData: any = { codProcesso: "1", sigla: "U1" }, accessOverrides: Record<string, any> = {}) => {
+    const mountComponent = (initialState: any = {}, propsData: any = {
+        codProcesso: "1",
+        sigla: "U1"
+    }, accessOverrides: Record<string, any> = {}) => {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
-            podeHomologarCadastro: { value: true },
-            podeVisualizarImpacto: { value: true },
+            podeHomologarCadastro: {value: true},
+            podeVisualizarImpacto: {value: true},
             ...accessOverrides
         } as any);
 
@@ -153,7 +156,7 @@ describe("VisAtividades.vue Coverage", () => {
             }
         };
 
-        const wrapper = mountComponent(initialState, { codProcesso: "1", sigla: "NESTED" });
+        const wrapper = mountComponent(initialState, {codProcesso: "1", sigla: "NESTED"});
         await flushPromises();
 
         expect(wrapper.text()).toContain("Nested Unit");
@@ -173,7 +176,7 @@ describe("VisAtividades.vue Coverage", () => {
         });
 
         const initialState = {
-             processos: {
+            processos: {
                 processoDetalhe: {
                     codigo: 1,
                     tipo: TipoProcesso.REVISAO,
@@ -212,7 +215,7 @@ describe("VisAtividades.vue Coverage", () => {
     });
 
     it("deve resetar loadingDevolucao quando ocorrer erro na devolução", async () => {
-         (obterDetalhesProcesso as any).mockResolvedValue({
+        (obterDetalhesProcesso as any).mockResolvedValue({
             codigo: 1,
             tipo: TipoProcesso.REVISAO,
             unidades: [
@@ -225,7 +228,7 @@ describe("VisAtividades.vue Coverage", () => {
         });
 
         const initialState = {
-             processos: {
+            processos: {
                 processoDetalhe: {
                     codigo: 1,
                     tipo: TipoProcesso.REVISAO,

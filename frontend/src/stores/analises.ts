@@ -13,7 +13,7 @@ export const useAnalisesStore = defineStore("analises", () => {
         carregando.value = true;
         erro.value = null;
         analisesCadastro.value = [];
-        
+
         try {
             if (codSubprocesso) {
                 const analises = await listarAnalisesCadastro(codSubprocesso);

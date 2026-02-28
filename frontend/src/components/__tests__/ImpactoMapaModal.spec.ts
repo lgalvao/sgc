@@ -29,7 +29,7 @@ describe("ImpactoMapaModal.vue", () => {
             competenciasImpactadas: [],
         };
 
-        const wrapper = createWrapper({ impacto });
+        const wrapper = createWrapper({impacto});
         await flushPromises();
 
         expect(wrapper.text()).toContain("Nenhum impacto no mapa da unidade.");
@@ -44,7 +44,7 @@ describe("ImpactoMapaModal.vue", () => {
             competenciasImpactadas: [],
         };
 
-        const wrapper = createWrapper({ impacto });
+        const wrapper = createWrapper({impacto});
         await flushPromises();
 
         expect(wrapper.text()).toContain("Atividades Inseridas");
@@ -61,7 +61,7 @@ describe("ImpactoMapaModal.vue", () => {
             competenciasImpactadas: [],
         };
 
-        const wrapper = createWrapper({ impacto });
+        const wrapper = createWrapper({impacto});
         await flushPromises();
 
         expect(wrapper.text()).toContain("Atividades Removidas");
@@ -83,7 +83,7 @@ describe("ImpactoMapaModal.vue", () => {
             competenciasImpactadas: [],
         };
 
-        const wrapper = createWrapper({ impacto });
+        const wrapper = createWrapper({impacto});
         await flushPromises();
 
         expect(wrapper.text()).toContain("Atividades Alteradas");
@@ -119,7 +119,7 @@ describe("ImpactoMapaModal.vue", () => {
             ],
         };
 
-        const wrapper = createWrapper({ impacto });
+        const wrapper = createWrapper({impacto});
         await flushPromises();
 
         expect(wrapper.text()).toContain("Competências Impactadas");
@@ -142,7 +142,7 @@ describe("ImpactoMapaModal.vue", () => {
             atividadesAlteradas: [],
             competenciasImpactadas: []
         };
-        const wrapper = createWrapper({ impacto });
+        const wrapper = createWrapper({impacto});
         await flushPromises();
 
         const btn = wrapper.find('[data-testid="btn-fechar-impacto"]');
@@ -152,7 +152,7 @@ describe("ImpactoMapaModal.vue", () => {
     });
 
     it("deve exibir estado de carregamento via prop", async () => {
-        const wrapper = createWrapper({ loading: true, impacto: null });
+        const wrapper = createWrapper({loading: true, impacto: null});
         expect(wrapper.text()).toContain("Verificando impactos...");
         expect(wrapper.find('.spinner-border').exists()).toBe(true);
     });

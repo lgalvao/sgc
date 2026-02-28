@@ -4,16 +4,16 @@
       <!-- Expansor ANTES do checkbox -->
       <button
           v-if="unidade.filhas && unidade.filhas.length > 0"
-          type="button"
-          :data-testid="`btn-arvore-expand-${unidade.sigla}`"
-          class="expansor"
           :aria-expanded="isExpanded(unidade)"
           :aria-label="isExpanded(unidade) ? `Recolher ${unidade.sigla}` : `Expandir ${unidade.sigla}`"
+          :data-testid="`btn-arvore-expand-${unidade.sigla}`"
+          class="expansor"
+          type="button"
           @click="onToggleExpand(unidade)"
       >
         <i
-          :class="isExpanded(unidade) ? 'bi bi-caret-down-fill' : 'bi bi-caret-right-fill'"
-          aria-hidden="true"
+            :class="isExpanded(unidade) ? 'bi bi-caret-down-fill' : 'bi bi-caret-right-fill'"
+            aria-hidden="true"
         />
       </button>
       <span v-else class="expansor-placeholder"></span>
@@ -32,8 +32,8 @@
         <span
             v-b-tooltip.hover="!isHabilitado(unidade) ? 'Esta unidade não está disponível para seleção' : ''"
             :class="{ 'text-muted': !isHabilitado(unidade) }"
-            class="unidade-label"
             :style="!isHabilitado(unidade) ? { cursor: 'help' } : {}"
+            class="unidade-label"
         >
           {{ unidade.sigla }}
         </span>
@@ -42,9 +42,9 @@
       <!-- Link para Unidade (Modo Navegação) -->
       <router-link
           v-else
+          :data-testid="`link-arvore-unidade-${unidade.sigla}`"
           :to="`/unidade/${unidade.codigo}`"
           class="unidade-link"
-          :data-testid="`link-arvore-unidade-${unidade.sigla}`"
       >
         <span class="sigla">{{ unidade.sigla }}</span>
         <span class="nome ms-2 text-muted small">- {{ unidade.nome }}</span>

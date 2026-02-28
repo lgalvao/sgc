@@ -13,12 +13,12 @@ function walkDir(dir, fileList = []) {
         if (file === '.git' || file === 'node_modules' || file === 'dist' || file === 'build' || file === '.gradle') continue;
 
         const filePath = path.join(dir, file);
-            const stat = fs.statSync(filePath);
-            if (stat.isDirectory()) {
-                walkDir(filePath, fileList);
-            } else {
-                fileList.push(filePath.replaceAll('\\', '/'));
-            }
+        const stat = fs.statSync(filePath);
+        if (stat.isDirectory()) {
+            walkDir(filePath, fileList);
+        } else {
+            fileList.push(filePath.replaceAll('\\', '/'));
+        }
     }
     return fileList;
 }

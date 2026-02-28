@@ -31,15 +31,15 @@
       </PageHeader>
 
       <UnidadeInfoCard
-          :unidade="unidadeComResponsavelDinamico"
           :titular-detalhes="titularDetalhes"
+          :unidade="unidadeComResponsavelDinamico"
       />
     </div>
     <EmptyState
         v-else
+        description="Não foi possível localizar os dados da unidade solicitada."
         icon="bi-building"
         title="Unidade não encontrada"
-        description="Não foi possível localizar os dados da unidade solicitada."
     />
 
     <div
@@ -89,60 +89,60 @@ const unidade = computed(() => unidadesStore.unidade);
 const mapaVigente = computed(() => mapasStore.mapaCompleto);
 
 const unidadeComResponsavelDinamico = computed(() => {
-    if (!unidade.value) return null;
+  if (!unidade.value) return null;
 
-    const atribuicoes = atribuicaoStore.obterAtribuicoesPorUnidade(unidade.value.sigla);
-    const agora = new Date();
-    const atribuicaoAtiva = atribuicoes.find(a => {
-        const inicio = new Date(a.dataInicio);
-        let fim = null;
-        if (a.dataTermino) {
-            fim = new Date(a.dataTermino);
-        } else if (a.dataFim) {
-            fim = new Date(a.dataFim);
-        }
-        return inicio <= agora && (!fim || fim >= agora);
-    });
+  const atribuicoes = atribuicaoStore.obterAtribuicoesPorUnidade(unidade.value.sigla);
+  const agora = new Date();
+  const atribuicaoAtiva = atribuicoes.find(a => {
+    const inicio = new Date(a.dataInicio);
+    let fim = null;
+    if (a.dataTermino) {
+      fim = new Date(a.dataTermino);
+    } else if (a.dataFim) {
+      fim = new Date(a.dataFim);
+    }
+    return inicio <= agora && (!fim || fim >= agora);
+  });
 
-    return {
-        ...unidade.value,
-        responsavel: atribuicaoAtiva ? atribuicaoAtiva.usuario : (unidade.value.responsavel || null)
-    };
+  return {
+    ...unidade.value,
+    responsavel: atribuicaoAtiva ? atribuicaoAtiva.usuario : (unidade.value.responsavel || null)
+  };
 });
 
 async function carregarDados() {
-    try {
-        await Promise.all([
-            unidadesStore.buscarArvoreUnidade(props.codUnidade),
-            atribuicaoStore.buscarAtribuicoes()
-        ]);
+  try {
+    await Promise.all([
+      unidadesStore.buscarArvoreUnidade(props.codUnidade),
+      atribuicaoStore.buscarAtribuicoes()
+    ]);
 
-        if (unidade.value?.tituloTitular) {
-            titularDetalhes.value = await buscarUsuarioPorTitulo(unidade.value.tituloTitular);
-        }
-    } catch (error) {
-        logger.error("Erro ao buscar titular:", error);
+    if (unidade.value?.tituloTitular) {
+      titularDetalhes.value = await buscarUsuarioPorTitulo(unidade.value.tituloTitular);
     }
+  } catch (error) {
+    logger.error("Erro ao buscar titular:", error);
+  }
 }
 
 function irParaCriarAtribuicao() {
-    router.push({ path: `/unidade/${props.codUnidade}/atribuicao` });
+  router.push({path: `/unidade/${props.codUnidade}/atribuicao`});
 }
 
 function navegarParaUnidadeSubordinada(row: any) {
-    router.push({ path: `/unidade/${row.codigo}` });
+  router.push({path: `/unidade/${row.codigo}`});
 }
 
 function visualizarMapa() {
-    if (mapaVigente.value) {
-        router.push({
-            name: "SubprocessoVisMapa",
-            params: {
-                codProcesso: mapaVigente.value.subprocessoCodigo,
-                siglaUnidade: unidade.value?.sigla
-            }
-        });
-    }
+  if (mapaVigente.value) {
+    router.push({
+      name: "SubprocessoVisMapa",
+      params: {
+        codProcesso: mapaVigente.value.subprocessoCodigo,
+        siglaUnidade: unidade.value?.sigla
+      }
+    });
+  }
 }
 
 onMounted(carregarDados);
@@ -176,7 +176,8 @@ function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
       codigo: item.codigo,
       nome: item.sigla + " - " + item.nome,
       expanded: true,
-      ...(children.length > 0 && {children})};
+      ...(children.length > 0 && {children})
+    };
   });
 }
 </script>

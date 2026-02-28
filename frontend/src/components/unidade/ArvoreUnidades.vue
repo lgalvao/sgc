@@ -2,20 +2,20 @@
   <div class="arvore-unidades">
     <div v-if="modoSelecao && unidadesExibidas.length > 0" class="d-flex gap-2 mb-2">
       <button
-          type="button"
-          class="btn btn-sm btn-outline-primary"
           aria-label="Selecionar todas as unidades elegíveis"
+          class="btn btn-sm btn-outline-primary"
+          type="button"
           @click="selecionarTodas"
       >
-        <i class="bi bi-check-all me-1" aria-hidden="true"/> Selecionar todas as unidades elegíveis
+        <i aria-hidden="true" class="bi bi-check-all me-1"/> Selecionar todas as unidades elegíveis
       </button>
       <button
-          type="button"
-          class="btn btn-sm btn-outline-secondary"
           aria-label="Desmarcar todas as unidades"
+          class="btn btn-sm btn-outline-secondary"
+          type="button"
           @click="deselecionarTodas"
       >
-        <i class="bi bi-x-lg me-1" aria-hidden="true"/> Desmarcar todas as unidades
+        <i aria-hidden="true" class="bi bi-x-lg me-1"/> Desmarcar todas as unidades
       </button>
     </div>
 
@@ -73,7 +73,7 @@ const maps = computed(() => {
   };
 
   props.unidades.forEach(u => traverse(u));
-  return { parentMap: pMap, unitMap: uMap };
+  return {parentMap: pMap, unitMap: uMap};
 });
 
 const parentMap = computed(() => maps.value.parentMap);
@@ -231,10 +231,10 @@ watch(
 const expandedUnits = ref<Set<number>>(new Set());
 
 watch(() => props.unidades, (newUnidades) => {
-   if (newUnidades && newUnidades.length > 0) {
-       expandedUnits.value = new Set(newUnidades.map(u => u.codigo));
-   }
-}, { immediate: true });
+  if (newUnidades && newUnidades.length > 0) {
+    expandedUnits.value = new Set(newUnidades.map(u => u.codigo));
+  }
+}, {immediate: true});
 
 function isExpanded(unidade: Unidade): boolean {
   return expandedUnits.value.has(unidade.codigo);
@@ -259,14 +259,14 @@ watch(
 );
 
 defineExpose({
-    getEstadoSelecao,
-    isChecked,
-    isExpanded,
-    isHabilitado,
-    toggle,
-    toggleExpand,
-    selecionarTodas,
-    deselecionarTodas
+  getEstadoSelecao,
+  isChecked,
+  isExpanded,
+  isHabilitado,
+  toggle,
+  toggleExpand,
+  selecionarTodas,
+  deselecionarTodas
 });
 </script>
 

@@ -5,7 +5,7 @@ import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService'
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
 // Mocks
-const { mockPush, mockFeedbackShow, mockBuscarUnidade, mockBuscarUsuarios } = vi.hoisted(() => {
+const {mockPush, mockFeedbackShow, mockBuscarUnidade, mockBuscarUsuarios} = vi.hoisted(() => {
     return {
         mockPush: vi.fn(),
         mockFeedbackShow: vi.fn(),
@@ -56,8 +56,8 @@ describe('CadAtribuicao.vue', () => {
     };
 
     const mockUsuarios = [
-        { codigo: '111', nome: 'Servidor 1', tituloEleitoral: '111' },
-        { codigo: '222', nome: 'Servidor 2', tituloEleitoral: '222' }
+        {codigo: '111', nome: 'Servidor 1', tituloEleitoral: '111'},
+        {codigo: '222', nome: 'Servidor 2', tituloEleitoral: '222'}
     ];
 
     function criarWrapper() {
@@ -69,16 +69,16 @@ describe('CadAtribuicao.vue', () => {
                     }
                 },
                 {
-                    LayoutPadrao: { template: '<div><slot /></div>' },
-                    BContainer: { template: '<div><slot /></div>' },
-                    BCard: { template: '<div><slot /></div>' },
-                    BCardBody: { template: '<div><slot /></div>' },
-                    BForm: { template: '<form @submit.prevent="$emit(\'submit\', { preventDefault: () => {} })"><slot /></form>' },
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    BContainer: {template: '<div><slot /></div>'},
+                    BCard: {template: '<div><slot /></div>'},
+                    BCardBody: {template: '<div><slot /></div>'},
+                    BForm: {template: '<form @submit.prevent="$emit(\'submit\', { preventDefault: () => {} })"><slot /></form>'},
                     BFormSelect: {
                         template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><slot name="first" /><option v-for="opt in options" :key="opt.codigo" :value="opt.codigo">{{ opt.nome }}</option></select>',
                         props: ['modelValue', 'options']
                     },
-                    BFormSelectOption: { template: '<option><slot /></option>' },
+                    BFormSelectOption: {template: '<option><slot /></option>'},
                     BFormInput: {
                         template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
                         props: ['modelValue']
@@ -87,10 +87,10 @@ describe('CadAtribuicao.vue', () => {
                         template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
                         props: ['modelValue']
                     },
-                    BButton: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
-                    BAlert: { template: '<div role="alert"><slot /></div>' },
+                    BButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
+                    BAlert: {template: '<div role="alert"><slot /></div>'},
                 },
-                { stubActions: false } // Permite que as stores chamem os serviços mockados
+                {stubActions: false} // Permite que as stores chamem os serviços mockados
             ),
             props: {
                 codUnidade: 1
@@ -100,7 +100,8 @@ describe('CadAtribuicao.vue', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.spyOn(console, 'error').mockImplementation(() => {});
+        vi.spyOn(console, 'error').mockImplementation(() => {
+        });
 
         mockBuscarUnidade.mockResolvedValue(mockUnidade);
         mockBuscarUsuarios.mockResolvedValue(mockUsuarios);
@@ -119,7 +120,7 @@ describe('CadAtribuicao.vue', () => {
         // Resetar e configurar o mock apenas para este teste
         (criarAtribuicaoTemporaria as any).mockReset();
         (criarAtribuicaoTemporaria as any).mockResolvedValue({});
-        
+
         // Remontar o componente para este teste
         context.wrapper = criarWrapper();
         await flushPromises();
@@ -154,7 +155,7 @@ describe('CadAtribuicao.vue', () => {
         // Resetar e configurar o mock apenas para este teste
         (criarAtribuicaoTemporaria as any).mockReset();
         (criarAtribuicaoTemporaria as any).mockRejectedValue(new Error('API Error'));
-        
+
         // Remontar o componente para este teste
         context.wrapper = criarWrapper();
         await flushPromises();

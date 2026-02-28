@@ -162,7 +162,7 @@ describe("TabelaProcessos.vue", () => {
         await context.wrapper.vm.$nextTick();
 
         const rows = context.wrapper.findAll("tbody tr");
-        await rows[0].trigger("keydown", { key: "Enter" });
+        await rows[0].trigger("keydown", {key: "Enter"});
 
         expect(context.wrapper.emitted("selecionarProcesso")).toBeTruthy();
         expect(context.wrapper.emitted("selecionarProcesso")![0]).toEqual([
@@ -245,7 +245,7 @@ describe("TabelaProcessos.vue", () => {
         context.wrapper = mount(TabelaProcessos, {
             ...getCommonMountOptions(),
             global: {
-                components: { EmptyState }
+                components: {EmptyState}
             },
             props: {
                 processos: [],

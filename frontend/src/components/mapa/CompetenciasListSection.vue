@@ -2,9 +2,9 @@
   <div v-if="unidade">
     <div v-if="competencias.length === 0" class="mb-4 mt-3">
       <EmptyState
+          description="Nenhuma competência cadastrada para esta unidade."
           icon="bi-journal-plus"
           title="Mapa de competências"
-          description="Nenhuma competência cadastrada para esta unidade."
       >
         <BButton
             v-if="podeEditar"
@@ -45,7 +45,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {BButton} from 'bootstrap-vue-next';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import CompetenciaCard from '@/components/mapa/CompetenciaCard.vue';

@@ -107,6 +107,7 @@ void deveValidarHierarquia() {
 ```
 
 **Problemas:**
+
 - 15 linhas de setup
 - Frágil (se adicionar campo em Usuario/Unidade, quebra)
 - Difícil de ler e manter
@@ -128,6 +129,7 @@ void deveValidarHierarquia() {
 ```
 
 **Benefícios:**
+
 - 2 linhas de setup (87% menos código)
 - Robusto (builders adaptam automaticamente a mudanças)
 - Legível e autodocumentado
@@ -156,6 +158,7 @@ void deveValidarHierarquia() {
 ### Padrão 1: Mock de Value Objects → Builder
 
 **❌ ANTES:**
+
 ```java
 Usuario usuario = mock(Usuario.class);
 when(usuario.getTitulo()).thenReturn("191919");
@@ -165,6 +168,7 @@ when(usuario.getPerfis()).thenReturn(Set.of(Perfil.ADMIN));
 ```
 
 **✅ DEPOIS:**
+
 ```java
 Usuario usuario = UsuarioTestBuilder.admin().build();
 ```
@@ -176,6 +180,7 @@ Usuario usuario = UsuarioTestBuilder.admin().build();
 ### Padrão 2: Setup Complexo → Builders Encadeados
 
 **❌ ANTES:**
+
 ```java
 Unidade unidade1 = mock(Unidade.class);
 when(unidade1.getCodigo()).thenReturn("ASSESSORIA_11");
@@ -191,6 +196,7 @@ when(usuario.getTitulo()).thenReturn("191919");
 ```
 
 **✅ DEPOIS:**
+
 ```java
 Unidade unidade1 = UnidadeTestBuilder.assessoria().build();
 Unidade unidade2 = UnidadeTestBuilder.secao().build();
@@ -225,13 +231,13 @@ Usuario usuario = UsuarioTestBuilder.admin().build();
 Migrar nesta ordem:
 
 1. **Alta prioridade**: Testes com 5+ mocks de value objects
-   - SubprocessoFacadeComplementaryTest (22 mocks)
-   - SubprocessoCadastroWorkflowServiceTest (13 mocks)
-   - SubprocessoMapaWorkflowServiceTest (12 mocks)
+    - SubprocessoFacadeComplementaryTest (22 mocks)
+    - SubprocessoCadastroWorkflowServiceTest (13 mocks)
+    - SubprocessoMapaWorkflowServiceTest (12 mocks)
 
 2. **Média prioridade**: Testes com 3-4 mocks de value objects
-   - SubprocessoFacadeTest (12 mocks)
-   - AtividadeFacadeTest (6 mocks)
+    - SubprocessoFacadeTest (12 mocks)
+    - AtividadeFacadeTest (6 mocks)
 
 3. **Baixa prioridade**: Testes com 1-2 mocks de value objects
 
@@ -241,4 +247,5 @@ Migrar nesta ordem:
 
 - **Padrão Builder**: [Effective Java - Item 2](https://www.oreilly.com/library/view/effective-java/9780134686097/)
 - **Test Data Builders**: [Growing Object-Oriented Software](http://www.growing-object-oriented-software.com/)
-- **Por que evitar over-mocking**: [Don't Mock What You Don't Own](https://github.com/testdouble/contributing-tests/wiki/Don't-mock-what-you-don't-own)
+- **Por que evitar over-mocking
+  **: [Don't Mock What You Don't Own](https://github.com/testdouble/contributing-tests/wiki/Don't-mock-what-you-don't-own)

@@ -137,25 +137,25 @@ export async function verificarDetalhesSubprocesso(page: Page, dados: {
  * - /processo/cadastro/{id}
  * - codProcesso={id}
  * - /processo/{id}
- * 
+ *
  * @throws {Error} Se não for possível extrair o ID da URL atual
  */
 export async function extrairProcessoId(page: Page): Promise<number> {
     const url = page.url();
-    
+
     const patterns = [
         /\/processo\/cadastro\/(\d+)/,
         /codProcesso=(\d+)/,
         /\/processo\/(\d+)/
     ];
-    
+
     for (const pattern of patterns) {
         const match = new RegExp(pattern).exec(url);
         if (match?.[1]) {
             return Number.parseInt(match[1]);
         }
     }
-    
+
     throw new Error(
         `Não foi possível extrair ID do processo da URL: ${url}`
     );

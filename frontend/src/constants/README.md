@@ -11,4 +11,5 @@ Armazena valores fixos e configurações estáticas que não mudam durante a exe
 ## Por que usar constantes?
 
 1. **Manutenibilidade**: Altere um valor em um único lugar em vez de fazer busca e substituição em todo o código.
-2. **Auto-documentação**: Nomes de constantes (ex: `MAX_FILE_SIZE_MB`) são mais claros que "números mágicos" ou strings soltas.
+2. **Auto-documentação**: Nomes de constantes (ex: `MAX_FILE_SIZE_MB`) são mais claros que "números mágicos" ou strings
+   soltas.

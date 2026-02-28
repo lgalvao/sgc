@@ -18,12 +18,17 @@ import static org.mockito.Mockito.*;
 @DisplayName("SgcPermissionEvaluator - Cobertura")
 class SgcPermissionEvaluatorCoverageTest {
 
-    @Mock private SubprocessoRepo subprocessoRepo;
-    @Mock private MovimentacaoRepo movimentacaoRepo;
-    @Mock private HierarquiaService hierarquiaService;
-    @Mock private ProcessoRepo processoRepo;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private MovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private HierarquiaService hierarquiaService;
+    @Mock
+    private ProcessoRepo processoRepo;
 
-    @InjectMocks private SgcPermissionEvaluator evaluator;
+    @InjectMocks
+    private SgcPermissionEvaluator evaluator;
 
     private Usuario usuario(Perfil perfil, Long codUnidade) {
         Usuario u = new Usuario();
@@ -36,7 +41,7 @@ class SgcPermissionEvaluatorCoverageTest {
     private Subprocesso criarSubprocesso(Long codigo, Long codUnidade) {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(codigo);
-        sp.setUnidade(Unidade.builder().codigo(codUnidade).sigla("U"+codUnidade).build());
+        sp.setUnidade(Unidade.builder().codigo(codUnidade).sigla("U" + codUnidade).build());
         return sp;
     }
 

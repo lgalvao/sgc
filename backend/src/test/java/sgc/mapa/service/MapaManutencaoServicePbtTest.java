@@ -34,7 +34,7 @@ class MapaManutencaoServicePbtTest {
         Long mapaCodigo = 1L;
         Mapa mapa = Mapa.builder().codigo(mapaCodigo).build();
         when(repo.buscar(Mapa.class, mapaCodigo)).thenReturn(mapa);
-        
+
         when(repo.buscar(Mapa.class, mapaCodigo)).thenReturn(mapa);
 
         // Simular que já existe uma atividade com a mesma descrição
@@ -43,7 +43,7 @@ class MapaManutencaoServicePbtTest {
         when(atividadeRepo.findByMapaCodigoSemFetch(mapaCodigo)).thenReturn(List.of(existente));
 
         CriarAtividadeRequest request = new CriarAtividadeRequest(mapaCodigo, descricoes[1]);
-        
+
         assertThatThrownBy(() -> service.criarAtividade(request))
                 .isInstanceOf(ErroValidacao.class);
     }
@@ -74,7 +74,7 @@ class MapaManutencaoServicePbtTest {
         when(conhecimentoRepo.findByAtividade_Codigo(ativCodigo)).thenReturn(List.of(existente));
 
         CriarConhecimentoRequest request = new CriarConhecimentoRequest(ativCodigo, descricoes[1]);
-        
+
         assertThatThrownBy(() -> service.criarConhecimento(ativCodigo, request))
                 .isInstanceOf(ErroValidacao.class);
     }
@@ -82,11 +82,11 @@ class MapaManutencaoServicePbtTest {
     @Provide
     Arbitrary<String[]> descricoesIguais() {
         return Arbitraries.strings().alpha().ofMinLength(3).flatMap(s ->
-            Arbitraries.of(
-                new String[]{s.toLowerCase(), s.toUpperCase()},
-                new String[]{s, s},
-                new String[]{s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase(), s.toLowerCase()}
-            )
+                Arbitraries.of(
+                        new String[]{s.toLowerCase(), s.toUpperCase()},
+                        new String[]{s, s},
+                        new String[]{s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase(), s.toLowerCase()}
+                )
         );
     }
 }

@@ -16,14 +16,14 @@ class SituacaoSubprocessoPbtTest {
     }
 
     @Property
-    void imutabilidadeTipo(@ForAll SituacaoSubprocesso s1, 
-                          @ForAll SituacaoSubprocesso s2, 
-                          @ForAll TipoProcesso tipo) {
+    void imutabilidadeTipo(@ForAll SituacaoSubprocesso s1,
+                           @ForAll SituacaoSubprocesso s2,
+                           @ForAll TipoProcesso tipo) {
         // Se a transição é permitida para um tipo, elas devem ser compatíveis
         if (s1.podeTransicionarPara(s2, tipo) && s1 != s2 && s2 != SituacaoSubprocesso.NAO_INICIADO) {
             String prefixoS1 = getPrefix(s1);
             String prefixoS2 = getPrefix(s2);
-            
+
             if (prefixoS1 != null && prefixoS2 != null) {
                 assertThat(prefixoS1)
                         .as("Transição proibida entre tipos diferentes: %s -> %s", s1, s2)

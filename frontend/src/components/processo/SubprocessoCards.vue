@@ -51,10 +51,10 @@
             v-if="podeEditarMapaFinal"
             :aria-disabled="!mapa"
             :class="{ 'disabled-card': !mapa }"
+            :tabindex="!mapa ? -1 : 0"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-mapa-edicao"
             role="button"
-            :tabindex="!mapa ? -1 : 0"
             @click="!mapa ? null : navegarPara('SubprocessoMapa')"
             @keydown="handleKeyDown($event, 'SubprocessoMapa')"
         >
@@ -71,10 +71,10 @@
             v-else
             :aria-disabled="!mapa"
             :class="{ 'disabled-card': !mapa }"
+            :tabindex="!mapa ? -1 : 0"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-mapa-visualizacao"
             role="button"
-            :tabindex="!mapa ? -1 : 0"
             @click="!mapa ? null : navegarPara('SubprocessoVisMapa')"
             @keydown="handleKeyDown($event, 'SubprocessoVisMapa')"
         >
@@ -185,11 +185,11 @@ const router = useRouter();
 const subprocessosStore = useSubprocessosStore();
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 
-const { podeEditarCadastro, podeEditarMapa } = useAcesso(subprocesso);
+const {podeEditarCadastro, podeEditarMapa} = useAcesso(subprocesso);
 
 const isProcessoFinalizado = computed(() => {
-  return props.situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO || 
-         props.situacao === SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
+  return props.situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO ||
+      props.situacao === SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO;
 });
 
 const podeEditarCadastroFinal = computed(() => podeEditarCadastro.value && !isProcessoFinalizado.value);
@@ -221,9 +221,9 @@ function handleKeyDown(event: KeyboardEvent, routeName: string, diag = false) {
     if (diag) {
       navegarParaDiag(routeName);
     } else if (routeName === 'SubprocessoMapa' || routeName === 'SubprocessoVisMapa') {
-        if (props.mapa) navegarPara(routeName);
+      if (props.mapa) navegarPara(routeName);
     } else {
-        navegarPara(routeName);
+      navegarPara(routeName);
     }
   }
 }

@@ -33,14 +33,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @DisplayName("ProcessoController")
 class ProcessoControllerTest {
-    private static final String NOVO_PROCESSO = "Novo Processo";
     protected static final String API_PROCESSOS = "/api/processos";
     protected static final String API_PROCESSOS_1 = "/api/processos/1";
     protected static final String API_PROCESSOS_999 = "/api/processos/999";
     protected static final String CODIGO_JSON_PATH = "$.codigo";
     protected static final String DESCRICAO_JSON_PATH = "$.descricao";
     protected static final String PROCESSO_ATUALIZADO = "Processo Atualizado";
-
+    private static final String NOVO_PROCESSO = "Novo Processo";
     @MockitoBean
     private ProcessoFacade processoFacade;
 
@@ -397,7 +396,7 @@ class ProcessoControllerTest {
         @DisplayName("enviarLembrete deve chamar facade")
         void deveEnviarLembrete() throws Exception {
             EnviarLembreteRequest req = new EnviarLembreteRequest(10L);
-            
+
             mockMvc.perform(post("/api/processos/1/enviar-lembrete")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -411,7 +410,7 @@ class ProcessoControllerTest {
     @Nested
     @DisplayName("Cobertura Extra")
     class CoberturaExtra {
-        
+
         // Usar mocks manuais para testes isolados
         private ProcessoController controller;
         private ProcessoFacade processoFacadeMock;
@@ -427,7 +426,7 @@ class ProcessoControllerTest {
         void deveLancarErroProcessoQuandoIniciarProcessoRetornaErros() {
             IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
             when(processoFacadeMock.iniciarProcessoMapeamento(anyLong(), anyList()))
-                .thenReturn(List.of("erro"));
+                    .thenReturn(List.of("erro"));
 
             ErroProcesso ex = assertThrows(ErroProcesso.class, () -> controller.iniciar(1L, req));
             assertEquals(HttpStatus.CONFLICT, ex.getStatus());

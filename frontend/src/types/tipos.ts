@@ -268,7 +268,6 @@ export interface UnidadeParticipante {
 }
 
 
-
 export interface PermissoesSubprocesso {
     podeEditarCadastro: boolean;
     podeDisponibilizarCadastro: boolean;

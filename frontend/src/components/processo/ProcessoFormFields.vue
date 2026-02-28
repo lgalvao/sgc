@@ -2,7 +2,7 @@
   <div>
     <BFormGroup class="mb-3" label-for="descricao">
       <template #label>
-        Descrição <span class="text-danger" aria-hidden="true">*</span>
+        Descrição <span aria-hidden="true" class="text-danger">*</span>
       </template>
       <BFormInput
           id="descricao"
@@ -11,8 +11,8 @@
           :state="fieldErrors.descricao ? false : null"
           data-testid="inp-processo-descricao"
           placeholder="Descreva o processo"
-          type="text"
           required
+          type="text"
           @update:model-value="(val) => updateField('descricao', String(val))"
       />
       <BFormInvalidFeedback :state="fieldErrors.descricao ? false : null">
@@ -22,7 +22,7 @@
 
     <BFormGroup class="mb-3" label-for="tipo">
       <template #label>
-        Tipo <span class="text-danger" aria-hidden="true">*</span>
+        Tipo <span aria-hidden="true" class="text-danger">*</span>
       </template>
       <BFormSelect
           id="tipo"
@@ -46,12 +46,12 @@
 
     <BFormGroup class="mb-3">
       <template #label>
-        Unidades participantes <span class="text-danger" aria-hidden="true">*</span>
+        Unidades participantes <span aria-hidden="true" class="text-danger">*</span>
       </template>
       <div
           ref="containerUnidadesRef"
-          class="border rounded p-3"
           :class="{ 'border-danger': fieldErrors.unidades }"
+          class="border rounded p-3"
           data-testid="container-processo-unidades"
           tabindex="-1"
       >
@@ -77,7 +77,7 @@
         label-for="dataLimite"
     >
       <template #label>
-        Data limite <span class="text-danger" aria-hidden="true">*</span>
+        Data limite <span aria-hidden="true" class="text-danger">*</span>
       </template>
       <BFormInput
           id="dataLimite"
@@ -85,8 +85,8 @@
           :model-value="modelValue.dataLimite"
           :state="fieldErrors.dataLimite ? false : null"
           data-testid="inp-processo-data-limite"
-          type="date"
           required
+          type="date"
           @update:model-value="(val) => updateField('dataLimite', String(val))"
       />
       <BFormInvalidFeedback :state="fieldErrors.dataLimite ? false : null">
@@ -137,9 +137,9 @@ const containerUnidadesRef = ref<HTMLElement | null>(null);
 const {obterPrimeiroCampoComErro, possuiErros} = useValidacao();
 
 const tipoOptions = [
-  { value: TipoProcesso.MAPEAMENTO, text: 'Mapeamento' },
-  { value: TipoProcesso.REVISAO, text: 'Revisão' },
-  { value: TipoProcesso.DIAGNOSTICO, text: 'Diagnóstico' }
+  {value: TipoProcesso.MAPEAMENTO, text: 'Mapeamento'},
+  {value: TipoProcesso.REVISAO, text: 'Revisão'},
+  {value: TipoProcesso.DIAGNOSTICO, text: 'Diagnóstico'}
 ];
 
 function updateField<K extends keyof ProcessoFormData>(field: K, value: ProcessoFormData[K]) {
@@ -189,8 +189,8 @@ watch(
         focarPrimeiroErro();
       }
     },
-    { immediate: true }
+    {immediate: true}
 );
 
-defineExpose({ inputDescricaoRef, focarPrimeiroErro });
+defineExpose({inputDescricaoRef, focarPrimeiroErro});
 </script>

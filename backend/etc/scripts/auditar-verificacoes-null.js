@@ -14,12 +14,12 @@ function getAllFiles(dirPath, arrayOfFiles) {
 
     arrayOfFiles = arrayOfFiles || [];
 
-    files.forEach(function(file) {
+    files.forEach(function (file) {
         if (fs.statSync(dirPath + "/" + file).isDirectory()) {
             arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
         } else if (file.endsWith('.java')) {
-                arrayOfFiles.push(path.join(dirPath, "/", file));
-            }
+            arrayOfFiles.push(path.join(dirPath, "/", file));
+        }
     });
 
     return arrayOfFiles;
@@ -74,7 +74,7 @@ function scanFiles() {
 
 function generateReport(results) {
     let auditContent = '';
-    
+
     Object.keys(results).forEach(filePath => {
         auditContent += `File: ${filePath}\n`;
         results[filePath].forEach(item => {

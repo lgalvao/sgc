@@ -84,7 +84,7 @@ describe("PainelView.vue", () => {
     it("deve renderizar tabelas e títulos", () => {
         const wrapper = mount(PainelView, mountOptions());
 
-        const headers = wrapper.findAllComponents({ name: 'PageHeader' });
+        const headers = wrapper.findAllComponents({name: 'PageHeader'});
         expect(headers).toHaveLength(2);
         expect(headers[0].props('title')).toBe('Processos');
         expect(headers[1].props('title')).toBe('Alertas');

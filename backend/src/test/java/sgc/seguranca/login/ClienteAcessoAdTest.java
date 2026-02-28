@@ -108,7 +108,7 @@ class ClienteAcessoAdTest {
 
         var errorHandler = handlerCaptor.getValue();
         var exception = assertThrows(ErroAutenticacao.class, () ->
-            errorHandler.handle(request, response)
+                errorHandler.handle(request, response)
         );
         assertNotNull(exception);
     }

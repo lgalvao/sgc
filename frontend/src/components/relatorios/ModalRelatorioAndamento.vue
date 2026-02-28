@@ -1,10 +1,10 @@
 <template>
   <ModalPadrao
       v-model="modelValueComputed"
-      tamanho="xl"
-      titulo="Andamento Geral dos Processos"
       :mostrar-botao-acao="false"
+      tamanho="xl"
       texto-cancelar="Fechar"
+      titulo="Andamento Geral dos Processos"
   >
     <div class="mb-3">
       <BButton

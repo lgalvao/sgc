@@ -15,8 +15,8 @@ vi.mock('@/axios-setup', () => ({
 
 describe('configuracaoService', () => {
     it('deve buscar configuracoes', async () => {
-        const mockData = [{ chave: 'test', valor: 'val', descricao: 'desc' }];
-        (apiClient.get as any).mockResolvedValue({ data: mockData });
+        const mockData = [{chave: 'test', valor: 'val', descricao: 'desc'}];
+        (apiClient.get as any).mockResolvedValue({data: mockData});
 
         const result = await buscarConfiguracoes();
         expect(apiClient.get).toHaveBeenCalledWith('/configuracoes');
@@ -24,8 +24,8 @@ describe('configuracaoService', () => {
     });
 
     it('deve salvar configuracoes', async () => {
-        const mockData = [{ chave: 'test', valor: 'val', descricao: 'desc' }];
-        (apiClient.post as any).mockResolvedValue({ data: mockData });
+        const mockData = [{chave: 'test', valor: 'val', descricao: 'desc'}];
+        (apiClient.post as any).mockResolvedValue({data: mockData});
 
         const result = await salvarConfiguracoes(mockData);
         expect(apiClient.post).toHaveBeenCalledWith('/configuracoes', mockData);

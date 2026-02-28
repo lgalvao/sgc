@@ -6,9 +6,9 @@
 
     <div v-if="processo">
       <PageHeader
-          :title="processo.descricao"
           :etapa="`Etapa atual: ${formatSituacaoProcesso(processo.situacao)}`"
           :proxima-acao="proximaAcaoProcesso"
+          :title="processo.descricao"
           title-test-id="processo-info"
       >
         <template #default>
@@ -17,9 +17,9 @@
           </BBadge>
 
           <ProcessoInfo
-              :tipo="processo.tipo"
+              :show-data-limite="false"
               :situacao="processo.situacao"
-              :show-data-limite="false"/>
+              :tipo="processo.tipo"/>
         </template>
 
         <template #actions>
@@ -28,14 +28,14 @@
           </BButton>
 
           <BButton
-v-if="mostrarBotoesBloco && podeHomologarBloco" variant="warning" class="text-white"
-                   @click="abrirModalBloco('homologar')">
+              v-if="mostrarBotoesBloco && podeHomologarBloco" class="text-white" variant="warning"
+              @click="abrirModalBloco('homologar')">
             Homologar em bloco
           </BButton>
 
           <BButton
-v-if="mostrarBotoesBloco && podeDisponibilizarBloco" variant="info" class="text-white"
-                   @click="abrirModalBloco('disponibilizar')">
+              v-if="mostrarBotoesBloco && podeDisponibilizarBloco" class="text-white" variant="info"
+              @click="abrirModalBloco('disponibilizar')">
             Disponibilizar mapas em bloco
           </BButton>
         </template>
@@ -47,8 +47,8 @@ v-if="mostrarBotoesBloco && podeDisponibilizarBloco" variant="info" class="text-
 
       <ProcessoAcoes
           :pode-aceitar-bloco="podeAceitarBloco"
-          :pode-homologar-bloco="podeHomologarBloco"
           :pode-finalizar="podeFinalizar"
+          :pode-homologar-bloco="podeHomologarBloco"
           @finalizar="finalizarProcesso"/>
     </div>
 
@@ -61,12 +61,12 @@ v-if="mostrarBotoesBloco && podeDisponibilizarBloco" variant="info" class="text-
     <ModalAcaoBloco
         :id="'modal-acao-bloco'"
         ref="modalBlocoRef"
-        :titulo="tituloModalBloco"
-        :texto="textoModalBloco"
+        :mostrar-data-limite="acaoBlocoAtual === 'disponibilizar'"
         :rotulo-botao="rotuloBotaoBloco"
+        :texto="textoModalBloco"
+        :titulo="tituloModalBloco"
         :unidades="unidadesElegiveis"
         :unidades-pre-selecionadas="idsElegiveis"
-        :mostrar-data-limite="acaoBlocoAtual === 'disponibilizar'"
         @confirmar="executarAcaoBloco"/>
 
     <ModalConfirmacao
@@ -139,17 +139,17 @@ const participantesHierarquia = computed(() => processo.value?.unidades || []);
 
 const podeAceitarBloco = computed(() => {
   return !isProcessoFinalizado.value && (processo.value?.podeAceitarCadastroBloco || false)
-    && unidadesElegiveisPorAcao.value.aceitar.length > 0;
+      && unidadesElegiveisPorAcao.value.aceitar.length > 0;
 });
 
 const podeHomologarBloco = computed(() => {
   return !isProcessoFinalizado.value && (processo.value?.podeHomologarCadastro || processo.value?.podeHomologarMapa || false)
-    && unidadesElegiveisPorAcao.value.homologar.length > 0;
+      && unidadesElegiveisPorAcao.value.homologar.length > 0;
 });
 
 const podeDisponibilizarBloco = computed(() => {
   return !isProcessoFinalizado.value && (processo.value?.podeDisponibilizarMapaBloco || false)
-    && unidadesElegiveisPorAcao.value.disponibilizar.length > 0;
+      && unidadesElegiveisPorAcao.value.disponibilizar.length > 0;
 });
 
 const mostrarBotoesBloco = computed(() => {
@@ -168,21 +168,21 @@ const unidadesElegiveisPorAcao = computed(() => {
   const unidades = flattenUnidades(participantesHierarquia.value);
   return {
     aceitar: unidades.filter(u =>
-      u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-      u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
-      u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
-      u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO
+        u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+        u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
+        u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
+        u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO
     ),
     homologar: unidades.filter(u =>
-      u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-      u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
-      u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
-      u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO
+        u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+        u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
+        u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
+        u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO
     ),
     disponibilizar: unidades.filter(u =>
-      u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO ||
-      u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO ||
-      u.situacaoSubprocesso === SituacaoSubprocesso.NAO_INICIADO
+        u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO ||
+        u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO ||
+        u.situacaoSubprocesso === SituacaoSubprocesso.NAO_INICIADO
     )
   };
 });
@@ -202,37 +202,53 @@ const idsElegiveis = computed(() => unidadesElegiveis.value.map(u => u.codigo));
 
 const tituloModalBloco = computed(() => {
   switch (acaoBlocoAtual.value) {
-    case "aceitar": return "Aceitar em Bloco";
-    case "homologar": return "Homologar em Bloco";
-    case "disponibilizar": return "Disponibilizar Mapas em Bloco";
-    default: return "";
+    case "aceitar":
+      return "Aceitar em Bloco";
+    case "homologar":
+      return "Homologar em Bloco";
+    case "disponibilizar":
+      return "Disponibilizar Mapas em Bloco";
+    default:
+      return "";
   }
 });
 
 const textoModalBloco = computed(() => {
   switch (acaoBlocoAtual.value) {
-    case "aceitar": return "Selecione as unidades para aceitar o cadastro/mapa em bloco:";
-    case "homologar": return "Selecione as unidades para homologar o cadastro/mapa em bloco:";
-    case "disponibilizar": return "Selecione as unidades para disponibilizar os mapas em bloco:";
-    default: return "";
+    case "aceitar":
+      return "Selecione as unidades para aceitar o cadastro/mapa em bloco:";
+    case "homologar":
+      return "Selecione as unidades para homologar o cadastro/mapa em bloco:";
+    case "disponibilizar":
+      return "Selecione as unidades para disponibilizar os mapas em bloco:";
+    default:
+      return "";
   }
 });
 
 const rotuloBotaoBloco = computed(() => {
   switch (acaoBlocoAtual.value) {
-    case "aceitar": return "Aceitar Selecionados";
-    case "homologar": return "Homologar Selecionados";
-    case "disponibilizar": return "Disponibilizar Selecionados";
-    default: return "";
+    case "aceitar":
+      return "Aceitar Selecionados";
+    case "homologar":
+      return "Homologar Selecionados";
+    case "disponibilizar":
+      return "Disponibilizar Selecionados";
+    default:
+      return "";
   }
 });
 
 const mensagemSucessoAcaoBloco = computed(() => {
   switch (acaoBlocoAtual.value) {
-    case "aceitar": return "Cadastros aceitos em bloco";
-    case "homologar": return "Cadastros homologados em bloco";
-    case "disponibilizar": return "Mapas de competências disponibilizados em bloco";
-    default: return "Ação em bloco realizada com sucesso";
+    case "aceitar":
+      return "Cadastros aceitos em bloco";
+    case "homologar":
+      return "Cadastros homologados em bloco";
+    case "disponibilizar":
+      return "Mapas de competências disponibilizados em bloco";
+    default:
+      return "Ação em bloco realizada com sucesso";
   }
 });
 

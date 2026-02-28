@@ -42,7 +42,7 @@ export const test = base.extend<ProcessoContext>({
     processoFixture: async ({page, autenticadoComoAdmin}, use, testInfo) => {
         // Setup: criar processo padrão
         const descricao = `Fixture ${testInfo.title} - ${Date.now()}`;
-        
+
         await page.getByTestId('btn-painel-criar-processo').click();
         await criarProcesso(page, {
             descricao,
@@ -88,7 +88,7 @@ export {expect} from './auth-fixtures.js';
 
 /**
  * Helper para criar múltiplos processos em um teste
- * 
+ *
  * @param page - Página do Playwright
  * @param count - Número de processos a criar
  * @param options - Opções para criação (tipo, unidade, etc.)
@@ -102,13 +102,13 @@ export async function criarMultiplosProcessos(
         unidade?: string;
         diasLimite?: number;
     } = {}
-): Promise<Array<{codigo: number; descricao: string}>> {
-    const processos: Array<{codigo: number; descricao: string}> = [];
+): Promise<Array<{ codigo: number; descricao: string }>> {
+    const processos: Array<{ codigo: number; descricao: string }> = [];
     const timestamp = Date.now();
 
     for (let i = 0; i < count; i++) {
         const descricao = `Processo Múltiplo ${i + 1} - ${timestamp}`;
-        
+
         await page.getByTestId('btn-painel-criar-processo').click();
         await criarProcesso(page, {
             descricao,

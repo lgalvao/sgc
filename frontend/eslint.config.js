@@ -11,88 +11,88 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import pluginVueA11y from "eslint-plugin-vuejs-accessibility";
 
 export default [// 1. Ignore files
-{
-    ignores: ["dist/", "node_modules/", "*.config.js"],
-}, {
-    languageOptions: {
-        ecmaVersion: "latest",
-        sourceType: "module",
-        globals: {
-            ...globals.browser,
-            ...globals.node,
-        },
-    },
-}, // 2b. Allow console in test files
-{
-    files: ["**/*.test.ts", "**/*.spec.ts", "**/__tests__/**"],
-    rules: {
-        "no-console": "off",
-    },
-}, // 3. ESLint's recommended rules
-pluginJs.configs.recommended, // 4. TypeScript-specific configuration
-...tseslint.configs.recommended, {
-    files: ["**/*.ts", "**/*.tsx", "**/*.vue"],
-    languageOptions: {
-        parser: tseslint.parser,
-        parserOptions: {
-            project: ["./tsconfig.json"],
-            tsconfigRootDir: import.meta.dirname,
-            extraFileExtensions: [".vue"],
-        },
-    },
-    rules: {
-        "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-unused-vars": [
-            "warn",
-            {
-                argsIgnorePattern: "^_+$",
-                varsIgnorePattern: "^_+$",
+    {
+        ignores: ["dist/", "node_modules/", "*.config.js"],
+    }, {
+        languageOptions: {
+            ecmaVersion: "latest",
+            sourceType: "module",
+            globals: {
+                ...globals.browser,
+                ...globals.node,
             },
-        ],
-    },
-}, // 5. Vue-specific configuration
-...pluginVue.configs["flat/recommended"], ...pluginVueA11y.configs["flat/recommended"], {
-    files: ["**/*.vue"],
-    languageOptions: {
-        parser: vueParser,
-        parserOptions: {
+        },
+    }, // 2b. Allow console in test files
+    {
+        files: ["**/*.test.ts", "**/*.spec.ts", "**/__tests__/**"],
+        rules: {
+            "no-console": "off",
+        },
+    }, // 3. ESLint's recommended rules
+    pluginJs.configs.recommended, // 4. TypeScript-specific configuration
+    ...tseslint.configs.recommended, {
+        files: ["**/*.ts", "**/*.tsx", "**/*.vue"],
+        languageOptions: {
             parser: tseslint.parser,
-            project: ["./tsconfig.json"],
-            tsconfigRootDir: import.meta.dirname,
-            extraFileExtensions: [".vue"],
-        },
-    },
-    rules: {
-        "vue/multi-word-component-names": "off",
-        // The no-useless-assignment rule currently produces false positives in Vue 3 <script setup>
-        // because it doesn't recognize that variables are used in the template.
-        // no-unused-vars already covers actually unused variables.
-        "no-useless-assignment": "off",
-        "vuejs-accessibility/label-has-for": [
-            "error",
-            {
-                components: ["Label"],
-                controlComponents: [
-                    "BFormInput",
-                    "BFormSelect",
-                    "BFormTextarea",
-                    "BFormCheckbox",
-                    "BFormDatepicker",
-                    "BFormSpinbutton",
-                    "BFormTags"
-                ],
-                required: {
-                    some: ["nesting", "id"],
-                },
+            parserOptions: {
+                project: ["./tsconfig.json"],
+                tsconfigRootDir: import.meta.dirname,
+                extraFileExtensions: [".vue"],
             },
-        ],
-    },
-}, // 6. Custom overrides
-{
-    rules: {
-        // Prevent console.* in production code (use logger instead)
-        // Allows console.error for critical errors that should always be visible
-        "no-console": ["error", { allow: ["error"] }],
-    },
-}, // 7. Prettier integration
-eslintConfigPrettier, ...storybook.configs["flat/recommended"]];
+        },
+        rules: {
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                {
+                    argsIgnorePattern: "^_+$",
+                    varsIgnorePattern: "^_+$",
+                },
+            ],
+        },
+    }, // 5. Vue-specific configuration
+    ...pluginVue.configs["flat/recommended"], ...pluginVueA11y.configs["flat/recommended"], {
+        files: ["**/*.vue"],
+        languageOptions: {
+            parser: vueParser,
+            parserOptions: {
+                parser: tseslint.parser,
+                project: ["./tsconfig.json"],
+                tsconfigRootDir: import.meta.dirname,
+                extraFileExtensions: [".vue"],
+            },
+        },
+        rules: {
+            "vue/multi-word-component-names": "off",
+            // The no-useless-assignment rule currently produces false positives in Vue 3 <script setup>
+            // because it doesn't recognize that variables are used in the template.
+            // no-unused-vars already covers actually unused variables.
+            "no-useless-assignment": "off",
+            "vuejs-accessibility/label-has-for": [
+                "error",
+                {
+                    components: ["Label"],
+                    controlComponents: [
+                        "BFormInput",
+                        "BFormSelect",
+                        "BFormTextarea",
+                        "BFormCheckbox",
+                        "BFormDatepicker",
+                        "BFormSpinbutton",
+                        "BFormTags"
+                    ],
+                    required: {
+                        some: ["nesting", "id"],
+                    },
+                },
+            ],
+        },
+    }, // 6. Custom overrides
+    {
+        rules: {
+            // Prevent console.* in production code (use logger instead)
+            // Allows console.error for critical errors that should always be visible
+            "no-console": ["error", {allow: ["error"]}],
+        },
+    }, // 7. Prettier integration
+    eslintConfigPrettier, ...storybook.configs["flat/recommended"]];

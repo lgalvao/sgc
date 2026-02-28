@@ -26,7 +26,7 @@ export function setupServiceTest() {
         vi.restoreAllMocks();
     });
 
-    return { mockApi };
+    return {mockApi};
 }
 
 /**
@@ -38,7 +38,7 @@ export function testGetEndpoint(
     response: any = {}
 ) {
     it(`deve fazer GET em ${url}`, async () => {
-        mockApi.get.mockResolvedValue({ data: response });
+        mockApi.get.mockResolvedValue({data: response});
         await action();
         expect(mockApi.get).toHaveBeenCalled();
         expect(mockApi.get.mock.calls[0][0]).toBe(url);
@@ -55,11 +55,11 @@ export function testPostEndpoint(
     response: any = {}
 ) {
     it(`deve fazer POST em ${url}`, async () => {
-        mockApi.post.mockResolvedValue({ data: response });
+        mockApi.post.mockResolvedValue({data: response});
         await action();
         expect(mockApi.post).toHaveBeenCalled();
         expect(mockApi.post.mock.calls[0][0]).toBe(url);
-        
+
         if (payload !== undefined) {
             expect(mockApi.post.mock.calls[0][1]).toEqual(payload);
         }
@@ -74,12 +74,12 @@ export function testErrorHandling(
     method: 'get' | 'post' | 'put' | 'delete' = 'get'
 ) {
     it(`deve lidar com erro 404`, async () => {
-        mockApi[method].mockRejectedValue({ isAxiosError: true, response: { status: 404 } });
+        mockApi[method].mockRejectedValue({isAxiosError: true, response: {status: 404}});
         await expect(action()).rejects.toHaveProperty("response.status", 404);
     });
 
     it(`deve lidar com erro 500`, async () => {
-        mockApi[method].mockRejectedValue({ isAxiosError: true, response: { status: 500 } });
+        mockApi[method].mockRejectedValue({isAxiosError: true, response: {status: 500}});
         await expect(action()).rejects.toHaveProperty("response.status", 500);
     });
 

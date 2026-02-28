@@ -11,13 +11,13 @@ import {
 } from "../unidadeService";
 
 describe("unidadesService", () => {
-    const { mockApi } = setupServiceTest();
+    const {mockApi} = setupServiceTest();
 
     describe("buscarTodasUnidades", () => {
         testGetEndpoint(
             () => buscarTodasUnidades(),
             "/unidades",
-            [{ codigo: 1 }]
+            [{codigo: 1}]
         );
         testErrorHandling(() => buscarTodasUnidades());
     });
@@ -26,7 +26,7 @@ describe("unidadesService", () => {
         testGetEndpoint(
             () => buscarUnidadePorSigla("TESTE"),
             "/unidades/sigla/TESTE",
-            { codigo: 1 }
+            {codigo: 1}
         );
         testErrorHandling(() => buscarUnidadePorSigla("TESTE"));
     });
@@ -35,15 +35,15 @@ describe("unidadesService", () => {
         testGetEndpoint(
             () => buscarUnidadePorCodigo(1),
             "/unidades/1",
-            { codigo: 1, nome: "Unit 1" }
+            {codigo: 1, nome: "Unit 1"}
         );
         testErrorHandling(() => buscarUnidadePorCodigo(1));
     });
 
     describe("buscarArvoreComElegibilidade", () => {
         it("deve fazer GET com código do processo", async () => {
-            const mockData = [{ codigo: 1 }];
-            mockApi.get.mockResolvedValue({ data: mockData });
+            const mockData = [{codigo: 1}];
+            mockApi.get.mockResolvedValue({data: mockData});
 
             const result = await buscarArvoreComElegibilidade("MAPEAMENTO", 1);
 
@@ -55,8 +55,8 @@ describe("unidadesService", () => {
         });
 
         it("deve fazer GET sem código do processo", async () => {
-            const mockData = [{ codigo: 1 }];
-            mockApi.get.mockResolvedValue({ data: mockData });
+            const mockData = [{codigo: 1}];
+            mockApi.get.mockResolvedValue({data: mockData});
 
             const result = await buscarArvoreComElegibilidade("MAPEAMENTO");
 
@@ -74,7 +74,7 @@ describe("unidadesService", () => {
         testGetEndpoint(
             () => buscarArvoreUnidade(10),
             "/unidades/10/arvore",
-            { codigo: 10, children: [] }
+            {codigo: 10, children: []}
         );
         testErrorHandling(() => buscarArvoreUnidade(10));
     });
@@ -83,7 +83,7 @@ describe("unidadesService", () => {
         testGetEndpoint(
             () => buscarSubordinadas("SIGLA"),
             "/unidades/sigla/SIGLA/subordinadas",
-            [{ codigo: 11 }, { codigo: 12 }]
+            [{codigo: 11}, {codigo: 12}]
         );
         testErrorHandling(() => buscarSubordinadas("SIGLA"));
     });
@@ -92,11 +92,11 @@ describe("unidadesService", () => {
         testGetEndpoint(
             () => buscarSuperior("SIGLA"),
             "/unidades/sigla/SIGLA/superior",
-            { codigo: 9 }
+            {codigo: 9}
         );
 
         it("deve retornar null se a resposta for vazia", async () => {
-            mockApi.get.mockResolvedValue({ data: null });
+            mockApi.get.mockResolvedValue({data: null});
 
             const result = await buscarSuperior("SIGLA");
 

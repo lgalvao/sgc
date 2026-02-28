@@ -7,14 +7,14 @@ import java.lang.annotation.*;
 
 /**
  * Anotação customizada para validação de título eleitoral brasileiro.
- * 
+ *
  * <p>Valida que o título eleitoral:
  * <ul>
  *   <li>Não é nulo</li>
  *   <li>Contém apenas dígitos numéricos</li>
  *   <li>Tem no máximo 12 caracteres</li>
  * </ul>
- * 
+ *
  * <p>Uso:
  * <pre>
  * public record MinhaRequest(
@@ -31,10 +31,10 @@ import java.lang.annotation.*;
 @Pattern(regexp = "^\\d+$", message = "O título eleitoral deve conter apenas números.")
 @Constraint(validatedBy = {})
 public @interface TituloEleitoral {
-    
+
     String message() default "Título eleitoral inválido.";
-    
+
     Class<?>[] groups() default {};
-    
+
     Class<? extends Payload>[] payload() default {};
 }

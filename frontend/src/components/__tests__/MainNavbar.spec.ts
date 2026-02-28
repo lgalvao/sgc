@@ -8,7 +8,7 @@ import {usePerfil} from "@/composables/usePerfil";
 // Mock usePerfil
 vi.mock("@/composables/usePerfil");
 
-const { mockPush } = vi.hoisted(() => ({
+const {mockPush} = vi.hoisted(() => ({
     mockPush: vi.fn()
 }));
 
@@ -22,7 +22,7 @@ vi.mock("vue-router", () => ({
         beforeEach: vi.fn(),
         afterEach: vi.fn(),
         push: mockPush,
-        currentRoute: { value: { path: "/" } }
+        currentRoute: {value: {path: "/"}}
     })),
     createWebHistory: vi.fn(),
     createMemoryHistory: vi.fn(),
@@ -37,17 +37,17 @@ describe("MainNavbar.vue", () => {
 
         // Default mock for usePerfil
         vi.mocked(usePerfil).mockReturnValue({
-            servidorLogado: ref({ nome: "Usuario Teste" }),
+            servidorLogado: ref({nome: "Usuario Teste"}),
             perfilSelecionado: ref("GESTOR"),
             unidadeSelecionada: ref("Unidade Teste"),
         } as any);
     });
 
     const checkLink = (text: string, to: string) => {
-         const links = ctx.wrapper!.findAllComponents(RouterLinkStub);
-         const link = links.find(w => w.text().includes(text));
-         expect(link?.exists()).toBe(true);
-         expect(link?.props().to).toBe(to);
+        const links = ctx.wrapper!.findAllComponents(RouterLinkStub);
+        const link = links.find(w => w.text().includes(text));
+        expect(link?.exists()).toBe(true);
+        expect(link?.props().to).toBe(to);
     };
 
     it("deve navegar para a rota correta ao clicar nos links do menu (ADMIN)", async () => {
@@ -118,7 +118,7 @@ describe("MainNavbar.vue", () => {
         const link = settingsNavItem.findComponent(RouterLinkStub);
 
         if (link.exists()) {
-             expect(link.props().to).toBe("/configuracoes");
+            expect(link.props().to).toBe("/configuracoes");
         } else {
             expect(settingsNavItem.attributes("to")).toBe("/configuracoes");
         }
@@ -139,7 +139,7 @@ describe("MainNavbar.vue", () => {
     });
 
     it("deve chamar router.push ao fazer logout", async () => {
-         const options = getCommonMountOptions({
+        const options = getCommonMountOptions({
             perfil: {
                 perfilSelecionado: "ADMIN",
                 unidadeSelecionada: 456
@@ -152,9 +152,9 @@ describe("MainNavbar.vue", () => {
         // Try finding 'a' tag inside if BNavItem renders it
         const anchor = logoutNavItem.find("a");
         if (anchor.exists()) {
-             await anchor.trigger("click");
+            await anchor.trigger("click");
         } else {
-             await logoutNavItem.trigger("click");
+            await logoutNavItem.trigger("click");
         }
 
 

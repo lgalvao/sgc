@@ -1,8 +1,8 @@
 <template>
   <div data-testid="header-subprocesso">
     <PageHeader
-        :title="unidadeSigla"
         :subtitle="unidadeNome"
+        :title="unidadeSigla"
         title-test-id="subprocesso-header__txt-header-unidade"
     >
       <template #actions>
@@ -51,7 +51,7 @@
       </template>
     </PageHeader>
 
-    <BCard class="mb-4" no-body data-testid="header-subprocesso-details">
+    <BCard class="mb-4" data-testid="header-subprocesso-details" no-body>
       <BCardBody>
         <p
             class="text-muted small mb-3"

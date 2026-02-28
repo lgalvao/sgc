@@ -10,7 +10,11 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
     const GESTOR_UNIDADE = USUARIOS.GESTOR_COORD_21.titulo;
     const SENHA_GESTOR = USUARIOS.GESTOR_COORD_21.senha;
 
-    test('Deve exibir detalhes do subprocesso para ADMIN, GESTOR e CHEFE', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Deve exibir detalhes do subprocesso para ADMIN, GESTOR e CHEFE', async ({
+                                                                                      page,
+                                                                                      autenticadoComoAdmin,
+                                                                                      cleanupAutomatico
+                                                                                  }) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-07 ${timestamp}`;
 

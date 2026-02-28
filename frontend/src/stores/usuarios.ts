@@ -13,14 +13,14 @@ export const useUsuariosStore = defineStore("usuarios", () => {
     const usuarios = ref<Usuario[]>([]);
     const loading = useSingleLoading();
     const error = ref<string | null>(null);
-    const { lastError, clearError: clearNormalizedError, withErrorHandling } = useErrorHandler();
+    const {lastError, clearError: clearNormalizedError, withErrorHandling} = useErrorHandler();
 
     // Maps para lookup O(1)
-    const usuariosPorTituloMap = computed(() => 
+    const usuariosPorTituloMap = computed(() =>
         new Map(usuarios.value.map(u => [u.tituloEleitoral, u]))
     );
 
-    const usuariosPorCodigoMap = computed(() => 
+    const usuariosPorCodigoMap = computed(() =>
         new Map(usuarios.value.map(u => [u.codigo, u]))
     );
 

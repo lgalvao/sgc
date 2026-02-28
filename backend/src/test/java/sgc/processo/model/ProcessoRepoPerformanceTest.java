@@ -54,8 +54,8 @@ class ProcessoRepoPerformanceTest {
 
         for (Processo p : processos) {
             assertThat(Hibernate.isInitialized(p.getParticipantes()))
-                .as("Participantes devem ser inicializados pelo JOIN FETCH. Processo: " + p.getCodigo())
-                .isTrue();
+                    .as("Participantes devem ser inicializados pelo JOIN FETCH. Processo: " + p.getCodigo())
+                    .isTrue();
         }
 
         Processo returnedProcess = processos.stream()

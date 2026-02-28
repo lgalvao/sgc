@@ -6,71 +6,71 @@ import type {Unidade} from '@/types/tipos';
 import {ref} from 'vue';
 
 const meta: Meta<typeof ArvoreUnidades> = {
-  title: 'Unidade/ArvoreUnidades',
-  component: ArvoreUnidades,
-  tags: ['autodocs'],
-  argTypes: {
-    modoSelecao: { control: 'boolean' },
-    ocultarRaiz: { control: 'boolean' },
-    'onUpdate:modelValue': { action: 'update:modelValue' },
-  },
+    title: 'Unidade/ArvoreUnidades',
+    component: ArvoreUnidades,
+    tags: ['autodocs'],
+    argTypes: {
+        modoSelecao: {control: 'boolean'},
+        ocultarRaiz: {control: 'boolean'},
+        'onUpdate:modelValue': {action: 'update:modelValue'},
+    },
 };
 
 export default meta;
 type Story = StoryObj<typeof ArvoreUnidades>;
 
 const mockUnidades: Unidade[] = [
-  {
-    codigo: 1,
-    nome: 'Presidência',
-    sigla: 'PRES',
-    isElegivel: false,
-    filhas: [
-      {
-        codigo: 2,
-        nome: 'Diretoria de Tecnologia',
-        sigla: 'DITEC',
-        isElegivel: true,
+    {
+        codigo: 1,
+        nome: 'Presidência',
+        sigla: 'PRES',
+        isElegivel: false,
         filhas: [
-          {
-            codigo: 3,
-            nome: 'Coordenação de Desenvolvimento',
-            sigla: 'CODES',
-            isElegivel: true,
-          },
-          {
-            codigo: 4,
-            nome: 'Coordenação de Infraestrutura',
-            sigla: 'COINF',
-            isElegivel: true,
-          },
+            {
+                codigo: 2,
+                nome: 'Diretoria de Tecnologia',
+                sigla: 'DITEC',
+                isElegivel: true,
+                filhas: [
+                    {
+                        codigo: 3,
+                        nome: 'Coordenação de Desenvolvimento',
+                        sigla: 'CODES',
+                        isElegivel: true,
+                    },
+                    {
+                        codigo: 4,
+                        nome: 'Coordenação de Infraestrutura',
+                        sigla: 'COINF',
+                        isElegivel: true,
+                    },
+                ],
+            },
+            {
+                codigo: 5,
+                nome: 'Diretoria Administrativa',
+                sigla: 'DIRAD',
+                isElegivel: true,
+                filhas: [],
+            },
         ],
-      },
-      {
-        codigo: 5,
-        nome: 'Diretoria Administrativa',
-        sigla: 'DIRAD',
-        isElegivel: true,
-        filhas: [],
-      },
-    ],
-  },
+    },
 ];
 
 export const Default: Story = {
-  args: {
-    unidades: mockUnidades,
-    modelValue: [],
-    modoSelecao: true,
-    ocultarRaiz: false,
-  },
-  render: (args) => ({
-    components: { ArvoreUnidades },
-    setup() {
-      const selected = ref(args.modelValue);
-      return { args, selected };
+    args: {
+        unidades: mockUnidades,
+        modelValue: [],
+        modoSelecao: true,
+        ocultarRaiz: false,
     },
-    template: `
+    render: (args) => ({
+        components: {ArvoreUnidades},
+        setup() {
+            const selected = ref(args.modelValue);
+            return {args, selected};
+        },
+        template: `
       <div>
         <ArvoreUnidades v-bind="args" v-model="selected" />
         <div class="mt-3 p-2 bg-light border rounded">
@@ -78,28 +78,28 @@ export const Default: Story = {
         </div>
       </div>
     `,
-  }),
-  play: async () => {
-    // Verifica se a árvore foi renderizada
-    const item = page.getByText('Presidência');
-    await expect.element(item).toBeVisible();
-  },
+    }),
+    play: async () => {
+        // Verifica se a árvore foi renderizada
+        const item = page.getByText('Presidência');
+        await expect.element(item).toBeVisible();
+    },
 };
 
 export const ComPreSelecao: Story = {
-  args: {
-    unidades: mockUnidades,
-    modelValue: [3, 5],
-    modoSelecao: true,
-    ocultarRaiz: false,
-  },
-  render: (args) => ({
-    components: { ArvoreUnidades },
-    setup() {
-      const selected = ref(args.modelValue);
-      return { args, selected };
+    args: {
+        unidades: mockUnidades,
+        modelValue: [3, 5],
+        modoSelecao: true,
+        ocultarRaiz: false,
     },
-    template: `
+    render: (args) => ({
+        components: {ArvoreUnidades},
+        setup() {
+            const selected = ref(args.modelValue);
+            return {args, selected};
+        },
+        template: `
       <div>
         <ArvoreUnidades v-bind="args" v-model="selected" />
         <div class="mt-3 p-2 bg-light border rounded">
@@ -107,32 +107,32 @@ export const ComPreSelecao: Story = {
         </div>
       </div>
     `,
-  }),
+    }),
 };
 
 export const ApenasVisualizacao: Story = {
-  args: {
-    unidades: mockUnidades,
-    modelValue: [2, 3, 4],
-    modoSelecao: false,
-    ocultarRaiz: false,
-  },
+    args: {
+        unidades: mockUnidades,
+        modelValue: [2, 3, 4],
+        modoSelecao: false,
+        ocultarRaiz: false,
+    },
 };
 
 export const OcultandoRaiz: Story = {
-  args: {
-    unidades: mockUnidades,
-    modelValue: [],
-    modoSelecao: true,
-    ocultarRaiz: true,
-  },
-  render: (args) => ({
-    components: { ArvoreUnidades },
-    setup() {
-      const selected = ref(args.modelValue);
-      return { args, selected };
+    args: {
+        unidades: mockUnidades,
+        modelValue: [],
+        modoSelecao: true,
+        ocultarRaiz: true,
     },
-    template: `
+    render: (args) => ({
+        components: {ArvoreUnidades},
+        setup() {
+            const selected = ref(args.modelValue);
+            return {args, selected};
+        },
+        template: `
       <div>
         <p class="text-muted small mb-2">A raiz "Presidência" deve estar oculta, mostrando apenas seus filhos diretos.</p>
         <ArvoreUnidades v-bind="args" v-model="selected" />
@@ -141,5 +141,5 @@ export const OcultandoRaiz: Story = {
         </div>
       </div>
     `,
-  }),
+    }),
 };

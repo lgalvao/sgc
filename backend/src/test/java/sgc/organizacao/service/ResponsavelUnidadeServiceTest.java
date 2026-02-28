@@ -73,7 +73,7 @@ class ResponsavelUnidadeServiceTest {
             Long codUnidade = 1L;
             LocalDate dataInicio = LocalDate.of(2024, 1, 15);
             LocalDate dataTermino = LocalDate.of(2024, 2, 15);
-            
+
             CriarAtribuicaoRequest request = new CriarAtribuicaoRequest(
                     "123456789012",
                     dataInicio,
@@ -117,7 +117,7 @@ class ResponsavelUnidadeServiceTest {
         void deveBuscarResponsavelAtualComSucesso() {
             // Given
             String siglaUnidade = "ABC";
-            
+
             Unidade unidade = new Unidade();
             unidade.setCodigo(1L);
             unidade.setSigla(siglaUnidade);

@@ -71,7 +71,7 @@ public class ProcessoInicializador {
 
         int contagemUnidades = codigosUnidades.size();
         List<String> siglas = unidadeRepo.findSiglasByCodigos(codigosUnidades);
-        log.info("Processo de {} {} iniciado para {} unidade(s): {}.", 
+        log.info("Processo de {} {} iniciado para {} unidade(s): {}.",
                 tipo.name().toLowerCase(), codigo, contagemUnidades, String.join(", ", siglas));
         return List.of();
     }

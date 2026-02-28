@@ -167,7 +167,7 @@ public class ProcessoFacade {
         // Enviar para o titular da unidade
         Usuario titular = usuarioService.buscarPorLogin(unidade.getTituloTitular());
         emailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
- 
+
         alertaService.criarAlertaAdmin(processo, unidade, descricao);
     }
 
@@ -242,32 +242,32 @@ public class ProcessoFacade {
         if (!idsAceitarCadastro.isEmpty()) {
             List<Subprocesso> alvos = idsAceitarCadastro.stream().map(mapSubprocessos::get).toList();
             if (!permissionEvaluator.checkPermission(usuario, alvos, "ACEITAR_CADASTRO")) {
-                 throw new ErroAcessoNegado("Sem permissão para aceitar alguns cadastros selecionados.");
+                throw new ErroAcessoNegado("Sem permissão para aceitar alguns cadastros selecionados.");
             }
         }
         if (!idsAceitarValidacao.isEmpty()) {
             List<Subprocesso> alvos = idsAceitarValidacao.stream().map(mapSubprocessos::get).toList();
             if (!permissionEvaluator.checkPermission(usuario, alvos, "ACEITAR_MAPA")) {
-                 throw new ErroAcessoNegado("Sem permissão para aceitar alguns mapas selecionados.");
+                throw new ErroAcessoNegado("Sem permissão para aceitar alguns mapas selecionados.");
             }
         }
         if (!idsHomologarCadastro.isEmpty()) {
             List<Subprocesso> alvos = idsHomologarCadastro.stream().map(mapSubprocessos::get).toList();
             if (!permissionEvaluator.checkPermission(usuario, alvos, "HOMOLOGAR_CADASTRO")) {
-                 throw new ErroAcessoNegado("Sem permissão para homologar alguns cadastros selecionados.");
+                throw new ErroAcessoNegado("Sem permissão para homologar alguns cadastros selecionados.");
             }
         }
         if (!idsHomologarValidacao.isEmpty()) {
             List<Subprocesso> alvos = idsHomologarValidacao.stream().map(mapSubprocessos::get).toList();
             if (!permissionEvaluator.checkPermission(usuario, alvos, "HOMOLOGAR_MAPA")) {
-                 throw new ErroAcessoNegado("Sem permissão para homologar alguns mapas selecionados.");
+                throw new ErroAcessoNegado("Sem permissão para homologar alguns mapas selecionados.");
             }
         }
     }
 
     private void categorizarPorAcao(AcaoEmBlocoRequest req, Subprocesso sp,
-                                           List<Long> idsAceitarCad, List<Long> idsAceitarVal,
-                                           List<Long> idsHomolCad, List<Long> idsHomolVal) {
+                                    List<Long> idsAceitarCad, List<Long> idsAceitarVal,
+                                    List<Long> idsHomolCad, List<Long> idsHomolVal) {
         Long codId = sp.getCodigo();
         boolean isCadastro = isSituacaoCadastro(sp.getSituacao());
 
@@ -291,7 +291,7 @@ public class ProcessoFacade {
                                     List<Long> idsAceitarValidacao,
                                     List<Long> idsHomologarCadastro,
                                     List<Long> idsHomologarValidacao) {
- 
+
         if (!idsAceitarCadastro.isEmpty()) {
             subprocessoService.aceitarCadastroEmBloco(idsAceitarCadastro, usuario);
         }

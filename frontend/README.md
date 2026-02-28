@@ -75,11 +75,13 @@ npm run test:e2e
 
 ## Autenticação
 
-A autenticação é feita via **JWT**. O token é armazenado no `localStorage` e injetado automaticamente pelo `axios-setup.ts`.
+A autenticação é feita via **JWT**. O token é armazenado no `localStorage` e injetado automaticamente pelo
+`axios-setup.ts`.
 
 ## Documentação Adicional
 
 Consulte a pasta `etc/docs/` para guias detalhados sobre:
+
 - [Diretrizes de Design](etc/docs/design-guidelines.md)
 - [Padrões do Frontend](etc/docs/frontend-padroes.md)
 - [Testes no Frontend](etc/docs/frontend-testes.md)
