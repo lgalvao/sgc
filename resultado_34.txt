@@ -1,0 +1,27 @@
+
+> sgc@1.0.0 test:e2e
+> playwright test e2e/cdu-34.spec.ts
+
+[2m[WebServer] [22m[SMTP] Servidor SMTP local executando na porta 1025
+[2m[WebServer] [22m[BACKEND] INFO  ValidadorDadosOrgService.run:80: Dados organizacionais validados com sucesso. 18 unidades verificadas.
+[2m[WebServer] [22m[FRONTEND]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m277[22m[2m[0m ms[22m
+[2m[WebServer] [22m[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[WebServer] [22m>>> Frontend, Backend e SMTP no ar.
+
+Running 3 tests using 1 worker
+
+[2m[WebServer] [22m[BACKEND] INFO  E2eController.resetDatabase:61: Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 191919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoManutencaoService.criar:56: Processo 201 criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailEParaSubstituto:219: E-mail enviado para ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailEParaSubstituto:219: E-mail enviado para SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailEParaSubstituto:219: E-mail enviado para ASSESSORIA_22
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoInicializador.iniciar:74: Processo de mapeamento 201 iniciado para 1 unidade(s): ASSESSORIA_22.
+  ✓  1 [chromium] › e2e/cdu-34.spec.ts:30:5 › CDU-34 - Enviar lembrete de prazo › Preparacao: Admin cria e inicia processo (3.7s)
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 191919 autorizado: ADMIN-ADMIN
+  ✓  2 [chromium] › e2e/cdu-34.spec.ts:54:5 › CDU-34 - Enviar lembrete de prazo › Cenario principal: ADMIN envia lembrete e sistema registra histórico/alerta (3.4s)
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 888888 autorizado: CHEFE-ASSESSORIA_22
+  ✓  3 [chromium] › e2e/cdu-34.spec.ts:73:5 › CDU-34 - Enviar lembrete de prazo › Cenario complementar: unidade de destino visualiza alerta de lembrete no painel (831ms)
+
+  3 passed (26.3s)
