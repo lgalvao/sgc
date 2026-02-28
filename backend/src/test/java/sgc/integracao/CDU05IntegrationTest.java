@@ -146,7 +146,6 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         assertThat(mapaCopiado.getCodigo()).isNotNull();
         assertThat(mapaCopiado.getCodigo()).isNotEqualTo(mapaOriginal.getCodigo());
 
-        // 5.2. Verificar se campos foram limpos (Passo 9/10)
         assertThat(mapaCopiado.getSugestoes()).isNull();
         assertThat(mapaCopiado.getObservacoesDisponibilizacao()).isNull();
 
