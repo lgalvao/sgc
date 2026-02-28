@@ -1,0 +1,79 @@
+
+> sgc@1.0.0 test:e2e
+> playwright test e2e/cdu-33.spec.ts
+
+[2m[WebServer] [22m[SMTP] Servidor SMTP local executando na porta 1025
+[2m[WebServer] [22m[BACKEND] INFO  ValidadorDadosOrgService.run:80: Dados organizacionais validados com sucesso. 18 unidades verificadas.
+[2m[WebServer] [22m[FRONTEND]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m279[22m[2m[0m ms[22m
+[2m[WebServer] [22m[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[WebServer] [22m>>> Frontend, Backend e SMTP no ar.
+
+Running 5 tests using 1 worker
+
+[2m[WebServer] [22m[BACKEND] INFO  E2eController.resetDatabase:61: Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 191919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoManutencaoService.criar:56: Processo 201 criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailEParaSubstituto:219: E-mail enviado para SECAO_212
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailEParaSubstituto:219: E-mail enviado para ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailEParaSubstituto:219: E-mail enviado para SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailEParaSubstituto:219: E-mail enviado para COORD_21
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 181818 autorizado: CHEFE-SECAO_212
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoInicializador.iniciar:74: Processo de mapeamento 201 iniciado para 1 unidade(s): SECAO_212.
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarAtividade:132: Criando atividade no mapa 201: Ativ Map 1772236537967
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarConhecimento:258: Criando conhecimento na atividade 3000: Conhecimento Unico Map
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoDireta:1644: Notificação operacional CADASTRO_DISPONIBILIZADO enviada para COORD_21
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoSuperior:1682: Notificação de acompanhamento CADASTRO_DISPONIBILIZADO enviada para unidade SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoSuperior:1682: Notificação de acompanhamento CADASTRO_DISPONIBILIZADO enviada para unidade ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 999999 autorizado: GESTOR-COORD_21
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoDireta:1644: Notificação operacional CADASTRO_ACEITO enviada para SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoSuperior:1682: Notificação de acompanhamento CADASTRO_ACEITO enviada para unidade ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 212121 autorizado: GESTOR-SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoDireta:1644: Notificação operacional CADASTRO_ACEITO enviada para ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 191919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarCompetenciaComAtividades:216: Criando competência no mapa 201: Comp Map 1772236537967 (1 atividades)
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoDireta:1644: Notificação operacional MAPA_DISPONIBILIZADO enviada para SECAO_212
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 181818 autorizado: CHEFE-SECAO_212
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoDireta:1644: Notificação operacional MAPA_VALIDADO enviada para COORD_21
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoSuperior:1682: Notificação de acompanhamento MAPA_VALIDADO enviada para unidade SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoSuperior:1682: Notificação de acompanhamento MAPA_VALIDADO enviada para unidade ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 999999 autorizado: GESTOR-COORD_21
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoDireta:1644: Notificação operacional MAPA_VALIDACAO_ACEITA enviada para SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoSuperior:1682: Notificação de acompanhamento MAPA_VALIDACAO_ACEITA enviada para unidade ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 212121 autorizado: GESTOR-SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoDireta:1644: Notificação operacional MAPA_VALIDACAO_ACEITA enviada para ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 191919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoValidador.validarTodosSubprocessosHomologados:70: Todos os subprocessos do processo 201 estão homologados
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoFinalizador.tornarMapasVigentes:49: Mapa vigente definido para o processo 201
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoFinalizador.tornarMapasVigentes:57: Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailUnidadeFinal:154: E-mail de finalização enviado para SECAO_212
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoFinalizador.finalizar:45: Processo 201 finalizado
+  ✓  1 [chromium] › e2e/cdu-33.spec.ts:39:5 › CDU-33 - Reabrir revisão de cadastro › Preparacao 0: Criar e finalizar Mapeamento (22.1s)
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 191919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoManutencaoService.criar:56: Processo 202 criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.criarParaRevisao:800: Subprocesso criado para unidade SECAO_212
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailEParaSubstituto:219: E-mail enviado para SECAO_212
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailEParaSubstituto:219: E-mail enviado para ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailEParaSubstituto:219: E-mail enviado para SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailEParaSubstituto:219: E-mail enviado para COORD_21
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoInicializador.iniciar:74: Processo de revisao 202 iniciado para 1 unidade(s): SECAO_212.
+  ✓  2 [chromium] › e2e/cdu-33.spec.ts:128:5 › CDU-33 - Reabrir revisão de cadastro › Preparacao 1: Admin cria e inicia processo de REVISAO (1.7s)
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 181818 autorizado: CHEFE-SECAO_212
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarAtividade:132: Criando atividade no mapa 202: Atividade Rev 1772236537967
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarConhecimento:258: Criando conhecimento na atividade 3002: Conhecimento Rev
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoDireta:1644: Notificação operacional REVISAO_CADASTRO_DISPONIBILIZADA enviada para COORD_21
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoSuperior:1682: Notificação de acompanhamento REVISAO_CADASTRO_DISPONIBILIZADA enviada para unidade SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoSuperior:1682: Notificação de acompanhamento REVISAO_CADASTRO_DISPONIBILIZADA enviada para unidade ADMIN
+  ✓  3 [chromium] › e2e/cdu-33.spec.ts:148:5 › CDU-33 - Reabrir revisão de cadastro › Preparacao 2: Chefe disponibiliza revisão de cadastro (1.7s)
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 999999 autorizado: GESTOR-COORD_21
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoDireta:1644: Notificação operacional REVISAO_CADASTRO_ACEITA enviada para SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoSuperior:1682: Notificação de acompanhamento REVISAO_CADASTRO_ACEITA enviada para unidade ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 212121 autorizado: GESTOR-SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoDireta:1644: Notificação operacional REVISAO_CADASTRO_ACEITA enviada para ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 191919 autorizado: ADMIN-ADMIN
+  ✓  4 [chromium] › e2e/cdu-33.spec.ts:161:5 › CDU-33 - Reabrir revisão de cadastro › Preparacao 3: Gestores e ADMIN aceitam revisão (5.7s)
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:115: Usuário 191919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.enviarNotificacaoDireta:1644: Notificação operacional REVISAO_CADASTRO_REABERTA enviada para SECAO_212
+  ✓  5 [chromium] › e2e/cdu-33.spec.ts:187:5 › CDU-33 - Reabrir revisão de cadastro › Cenários CDU-33: ADMIN reabre revisão de cadastro (2.2s)
+
+  5 passed (51.9s)
