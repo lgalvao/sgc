@@ -23,7 +23,6 @@ import static java.util.stream.Collectors.*;
  *   <li>Carregamento de perfis e atribuições de usuários</li>
  *   <li>Consultas em lote de responsáveis</li>
  * </ul>
- *
  */
 @Service
 @RequiredArgsConstructor

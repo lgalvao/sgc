@@ -145,7 +145,6 @@ public class ProcessoFacade {
         Processo processo = buscarEntidadePorId(codProcesso);
         Unidade unidade = organizacaoFacade.unidadePorCodigo(unidadeCodigo);
 
-        // Verifica se unidade participa do processo
         if (processo.getParticipantes().stream().noneMatch(u -> u.getUnidadeCodigo().equals(unidadeCodigo))) {
             throw new ErroProcesso("Unidade não participa deste processo.");
         }

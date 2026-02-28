@@ -152,7 +152,6 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await expect(page.getByTestId('chk-arvore-unidade-SECAO_112')).toBeChecked();
             await expect(page.getByTestId('chk-arvore-unidade-SECAO_113')).toBeChecked();
 
-            // Salva o processo
             await page.getByTestId('btn-processo-salvar').click();
 
             await expect(page).toHaveURL(/\/painel/);

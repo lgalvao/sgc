@@ -25,9 +25,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     const competencia1 = `Competência 1 ${timestamp}`;
     const competencia2 = `Competência 2 ${timestamp}`;
 
-    // ========================================================================
     // PREPARAÇÃO - Criar mapa pronto para disponibilização
-    // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
                                                                                 page,
@@ -78,12 +76,10 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     });
 
     test('Preparacao 3: Gestores aceitam cadastro', async ({page, autenticadoComoGestorCoord21}) => {
-        // Gestor COORD_21
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
 
-        // Gestor SECRETARIA_2
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -108,9 +104,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
     });
 
-    // ========================================================================
     // TESTES PRINCIPAIS - CDU-17
-    // ========================================================================
 
     test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({
                                                                                               page,

@@ -80,7 +80,6 @@ export const Default: Story = {
     `,
     }),
     play: async () => {
-        // Verifica se a árvore foi renderizada
         const item = page.getByText('Presidência');
         await expect.element(item).toBeVisible();
     },

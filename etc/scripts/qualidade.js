@@ -218,7 +218,6 @@ async function runCommand(step) {
             const status = code === 0 ? '✅ Sucesso' : '❌ Falha';
             console.log(`\n🏁 Finalizado: ${step.name} (${status}) - ${duration}s`);
 
-            // Collect stats
             const stats = getStats(step, output);
 
             resolve({
@@ -254,7 +253,6 @@ function generateReport(results) {
 
     md += `## Resumo Executivo\n\n`;
 
-    // Status Table
     md += `| Teste | Status | Duração (s) |\n`;
     md += `| :--- | :---: | :---: |\n`;
 
@@ -265,7 +263,6 @@ function generateReport(results) {
     });
     md += `\n`;
 
-    // Statistics Table
     md += `### Estatísticas Detalhadas\n\n`;
     md += `| Teste | Total | Passou | Falhou | Ignorado |\n`;
     md += `| :--- | :---: | :---: | :---: | :---: |\n`;

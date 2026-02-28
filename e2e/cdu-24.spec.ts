@@ -38,9 +38,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     const atividade1 = `Atividade Mapa ${timestamp}`;
     const competencia1 = `Competência Mapa ${timestamp}`;
 
-    // ========================================================================
     // PREPARAÇÃO - Criar processo com mapa criado
-    // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
 
@@ -105,7 +103,6 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
 
         await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
 
-        // Criar competências
         await navegarParaMapa(page);
         await criarCompetencia(page, competencia1, [atividade1]);
 
@@ -117,9 +114,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
             .toHaveText(/Mapa criado/i);
     });
 
-    // ========================================================================
     // TESTES PRINCIPAIS - CDU-24
-    // ========================================================================
 
     test('Cenario 1: ADMIN visualiza botão Disponibilizar Mapas em Bloco', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

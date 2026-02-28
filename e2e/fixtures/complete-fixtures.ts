@@ -43,7 +43,6 @@ const test = base.extend<{
     cleanupAutomatico: async ({request}, use) => {
         const cleanup = useProcessoCleanup();
 
-        // Use
         await use(cleanup);
 
         // Limpar após o teste

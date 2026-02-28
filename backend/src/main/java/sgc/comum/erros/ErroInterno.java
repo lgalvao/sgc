@@ -3,7 +3,6 @@ package sgc.comum.erros;
 /**
  * Exceção base para erros internos que indicam bugs, configuração incorreta ou violação de
  * invariantes do sistema.
- *
  */
 public abstract class ErroInterno extends RuntimeException {
     /**

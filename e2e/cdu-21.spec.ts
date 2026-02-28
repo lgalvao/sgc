@@ -30,9 +30,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     const competencia1 = `Competência 1 ${timestamp}`;
     const competencia2 = `Competência 2 ${timestamp}`;
 
-    // ========================================================================
     // PREPARAÇÃO - Criar mapa homologado para ADMIN finalizar processo
-    // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
                                                                                 page,
@@ -186,9 +184,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
             .toHaveText(/Mapa homologado/i);
     });
 
-    // ========================================================================
     // TESTES PRINCIPAIS - CDU-21
-    // ========================================================================
 
     test('Cenario 1: ADMIN navega para detalhes do processo', async ({page, autenticadoComoAdmin}) => {
         // CDU-21: Passos 1-2

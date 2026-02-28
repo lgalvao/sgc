@@ -44,9 +44,6 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     const atividade1 = `Atividade Homol ${timestamp}`;
     const competencia1 = `Competência Homol ${timestamp}`;
 
-    // ========================================================================
-    // PREPARAÇÃO
-    // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
 
@@ -153,9 +150,6 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    // ========================================================================
-    // TESTES PRINCIPAIS
-    // ========================================================================
 
     test('Cenario 1: ADMIN visualiza botão Homologar Mapa em Bloco', async ({page, autenticadoComoAdmin}) => {
 

@@ -73,7 +73,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
 
-            // Preenchendo formulário
             await page.getByTestId('inp-processo-descricao').fill(descricaoProcesso);
             await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
             const dataLimite = new Date();
@@ -95,7 +94,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').click();
             await page.getByTestId('chk-arvore-unidade-SECAO_111').click();
 
-            // Salvar processo
             await page.getByTestId('btn-processo-salvar').click();
             await expect(page).toHaveURL(/\/painel/);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
@@ -249,20 +247,17 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('btn-logout').click();
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
-            // Acessar subprocesso
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
 
             // Entrar em atividades
             await navegarParaAtividades(page);
 
-            // Adicionar atividade
             const atividadeDesc = `Atividade Teste ${Date.now()}`;
             await page.getByTestId('inp-nova-atividade').fill(atividadeDesc);
             await page.getByTestId('btn-adicionar-atividade').click();
             await expect(page.getByText(atividadeDesc, {exact: true})).toBeVisible();
 
-            // Adicionar conhecimentos
             const card = page.locator('.atividade-card', {has: page.getByText(atividadeDesc)});
             await card.getByTestId('inp-novo-conhecimento').fill('Java');
             await adicionarConhecimento(page, atividadeDesc, 'Java');
@@ -411,7 +406,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await acessarSubprocessoChefeDireto(page, descricao, 'SECAO_121');
             await navegarParaAtividades(page);
 
-            // Adicionar atividades
             await adicionarAtividade(page, 'Desenvolvimento Web');
             await adicionarConhecimento(page, 'Desenvolvimento Web', 'Vue.js');
             await adicionarConhecimento(page, 'Desenvolvimento Web', 'TypeScript');
@@ -456,7 +450,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
             // Entrar no cadastro de atividades (visualização)
             await navegarParaAtividadesVisualizacao(page);
 
-            // Homologar cadastro
             await page.getByTestId('btn-acao-analisar-principal').click();
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
             await page.waitForTimeout(100);
@@ -465,14 +458,12 @@ test.describe('Smoke Test - Sistema SGC', () => {
             // Navegar para mapa
             await navegarParaMapa(page);
 
-            // Criar competência
             await abrirModalCriarCompetencia(page);
             await page.waitForTimeout(100);
 
             const competenciaDesc = 'Desenvolvimento de Software';
             await page.getByTestId('inp-criar-competencia-descricao').fill(competenciaDesc);
 
-            // Selecionar atividades
             const modal = page.getByTestId('mdl-criar-competencia');
             await modal.locator('label').filter({hasText: 'Desenvolvimento Web'}).click();
             await modal.locator('label').filter({hasText: 'Desenvolvimento Backend'}).click();
@@ -486,7 +477,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await card.hover();
             await page.waitForTimeout(100);
 
-            // Disponibilizar mapa
             await page.getByTestId('btn-cad-mapa-disponibilizar').click();
             await page.waitForTimeout(100);
 
@@ -505,7 +495,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
         test('Captura elementos de navegação', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            // Menu principal
 
             // Configurações (se admin)
             await page.getByTestId('btn-configuracoes').click();
@@ -516,15 +505,12 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByText('Unidades').first().click();
             await page.waitForTimeout(100);
 
-            // Seção Relatórios
             await page.getByText('Relatórios').click();
             await page.waitForTimeout(100);
 
-            // Seção Histórico
             await page.getByText('Histórico').click();
             await page.waitForTimeout(100);
 
-            // Rodapé
             await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
             await page.waitForTimeout(100);
         });
@@ -534,7 +520,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
         test('Captura diferentes estados de processo', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            // Processo CRIADO
             const processosCriado = `Proc CRIADO ${Date.now()}`;
             await criarProcesso(page, {
                 descricao: processosCriado,
@@ -550,7 +535,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
             if (processoId1 > 0) cleanup.registrar(processoId1);
             await page.goto('/painel');
 
-            // Processo EM_ANDAMENTO
             const processosAndamento = `Proc ANDAMENTO ${Date.now()}`;
             await criarProcesso(page, {
                 descricao: processosAndamento,
@@ -574,17 +558,13 @@ test.describe('Smoke Test - Sistema SGC', () => {
             // Desktop médio (1366x768)
             await page.setViewportSize({width: 1366, height: 768});
 
-            // Tablet (768x1024)
             await page.setViewportSize({width: 768, height: 1024});
 
-            // Mobile (375x667)
             await page.setViewportSize({width: 375, height: 667});
         });
     });
 
-    // ========================================================================
     // SEÇÃO 09 - OPERAÇÕES EM BLOCO (CDUs 22-26)
-    // ========================================================================
     test.describe('09 - Operações em Bloco', () => {
         test('Captura fluxo de aceitar cadastros em bloco', async ({page}) => {
             // Prepara cenário: criar processo com unidades subordinadas e disponibilizar cadastros
@@ -676,9 +656,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
         });
     });
 
-    // ========================================================================
     // SEÇÃO 10 - GESTÃO DE SUBPROCESSOS (CDUs 27, 32-34)
-    // ========================================================================
     test.describe('10 - Gestão de Subprocessos', () => {
         test('Captura modais de gestão de subprocesso', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -701,7 +679,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
-            // Acessar subprocesso
             await page.getByRole('row', {name: /SECAO_121/i}).click();
             await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_121/);
 
@@ -729,9 +706,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
         });
     });
 
-    // ========================================================================
     // SEÇÃO 11 - GESTÃO DE UNIDADES E ATRIBUIÇÕES (CDU-28)
-    // ========================================================================
     test.describe('11 - Gestão de Unidades', () => {
         test('Captura página de unidades e atribuição temporária', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -767,9 +742,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
         });
     });
 
-    // ========================================================================
     // SEÇÃO 12 - HISTÓRICO DE PROCESSOS (CDU-29)
-    // ========================================================================
     test.describe('12 - Histórico', () => {
         test('Captura seção de histórico', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -788,14 +761,11 @@ test.describe('Smoke Test - Sistema SGC', () => {
         });
     });
 
-    // ========================================================================
     // SEÇÃO 13 - CONFIGURAÇÕES E ADMINISTRADORES (CDUs 30-31)
-    // ========================================================================
     test.describe('13 - Configurações', () => {
         test('Captura página de configurações e administradores', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            // Acessar configurações
             await page.getByTestId('btn-configuracoes').click();
             await page.waitForTimeout(500);
 
@@ -821,14 +791,11 @@ test.describe('Smoke Test - Sistema SGC', () => {
         });
     });
 
-    // ========================================================================
     // SEÇÃO 14 - RELATÓRIOS (CDUs 35-36)
-    // ========================================================================
     test.describe('14 - Relatórios', () => {
         test('Captura página e modais de relatórios', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            // Acessar relatórios
             const linkRelatorios = page.getByRole('link', {name: /Relatórios/i});
             if (await linkRelatorios.isVisible().catch(() => false)) {
                 await linkRelatorios.click();
@@ -843,7 +810,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
                     if (await modalRelatorio.isVisible().catch(() => false)) {
                     }
 
-                    // Verificar filtros
                     const filtroTipo = page.getByTestId('sel-filtro-tipo');
                     if (await filtroTipo.isVisible().catch(() => false)) {
                     }

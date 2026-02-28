@@ -1,9 +1,7 @@
 import type {Unidade, UnidadeSnapshot} from "@/types/tipos";
 import {apiGet} from "@/utils/apiUtils";
 
-// ------------------------------------------------------------------------------------------------
 // Mappers Internos (formerly in /mappers/unidades.ts)
-// ------------------------------------------------------------------------------------------------
 
 export function mapUnidadeSnapshot(obj: any): UnidadeSnapshot {
     return {
@@ -51,9 +49,6 @@ export function mapUnidadesArray(arr: any[] = []): Unidade[] {
     return arr.map(mapUnidade);
 }
 
-// ------------------------------------------------------------------------------------------------
-// Unidade Services
-// ------------------------------------------------------------------------------------------------
 
 export async function buscarTodasUnidades() {
     return apiGet("/unidades");

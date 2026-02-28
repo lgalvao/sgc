@@ -37,9 +37,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     const competencia3 = `Competência 3 ${timestamp}`;
     const atividadeNovaRevisao = `Atividade Nova Revisão ${timestamp}`;
 
-    // ========================================================================
     // PREPARAÇÃO - Criar mapa vigente (processo de mapeamento completo)
-    // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
                                                                                 page,
@@ -91,12 +89,10 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
     test('Preparacao 3: Gestores aceitam cadastro', async ({page, autenticadoComoGestorCoord21}) => {
         console.log('-> Gestores (COORD e SEC) aceitando cadastro...');
-        // Gestor COORD_21
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
 
-        // Gestor SECRETARIA_2
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -137,14 +133,12 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     });
 
     test('Preparacao 6: Gestores aceitam mapa', async ({page, autenticadoComoGestorCoord21}) => {
-        // Gestor COORD_21
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await verificarPaginaPainel(page);
 
-        // Gestor SECRETARIA_2
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -213,18 +207,15 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     });
 
     test('Preparacao 9: Gestores e Admin aceitam revisão', async ({page, autenticadoComoGestorCoord21}) => {
-        // Gestor COORD_21
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarRevisao(page);
 
-        // Gestor SECRETARIA_2
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarRevisao(page);
 
-        // Admin homologa
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -235,9 +226,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
             .toHaveText(/Revis[aã]o d[oe] cadastro homologada/i);
     });
 
-    // ========================================================================
     // TESTES PRINCIPAIS - CDU-16
-    // ========================================================================
 
     test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({page, autenticadoComoAdmin}) => {
         // Cenario 1: Navegação para tela de edição do mapa

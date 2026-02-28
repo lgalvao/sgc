@@ -30,9 +30,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     const descProcMapeamento = `Mapeamento Setup ${timestamp}`;
     const descProcRevisao = `Revisão Teste ${timestamp}`;
 
-    // ========================================================================
     // PASSOS DE PREPARAÇÃO - PROCESSO DE MAPEAMENTO
-    // ========================================================================
 
     async function passo1_AdminCriaEIniciaProcessoMapeamento(page: Page, descricao: string): Promise<void> {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -57,7 +55,6 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricao);
 
-        // Iniciar processo
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
@@ -71,9 +68,6 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     }
 
 
-    // ========================================================================
-    // TESTE PRINCIPAL
-    // ========================================================================
 
     test('Fase 1.1: ADMIN cria e inicia processo de Mapeamento', async ({
                                                                             page,

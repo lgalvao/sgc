@@ -20,8 +20,6 @@ interface LoadingManager {
  * Simplifica o gerenciamento de estados de carregamento em componentes
  * com múltiplas operações assíncronas.
  *
- * @param names - Lista de nomes de estados de loading
- * @returns Gerenciador de loading
  *
  * @example
  * ```ts
@@ -121,7 +119,6 @@ export function useLoadingManager(names: string[]): LoadingManager {
 /**
  * Versão simplificada para um único estado de loading
  *
- * @param initialValue - Valor inicial do loading (padrão: false)
  *
  * @example
  * ```ts

@@ -72,8 +72,6 @@ class ProcessoValidador {
 
     /**
      * Valida se as unidades participantes são elegíveis (não são INTERMEDIARIA).
-     *
-     * @return Optional com mensagem de erro se houver unidade inválida
      */
     public Optional<String> validarTiposUnidades(List<Unidade> unidades) {
         if (unidades.isEmpty()) {

@@ -7,19 +7,15 @@ function parseStringDate(s: string): Date | null {
     const trimmed = s.trim();
     if (!trimmed) return null;
 
-    // ISO Date/DateTime
     const isoDate = parseISO(trimmed);
     if (isValid(isoDate)) return isoDate;
 
-    // DD/MM/YYYY
     try {
         const ddmmyyyy = parse(trimmed, "dd/MM/yyyy", new Date());
         if (isValid(ddmmyyyy)) return ddmmyyyy;
     } catch {
-        // ignore
     }
 
-    // Numeric string
     if (/^\d{10,}$/.test(trimmed)) {
         const d = new Date(Number(trimmed));
         if (isValid(d)) return d;

@@ -7,9 +7,7 @@ import {expect, type Page} from '@playwright/test';
  * em múltiplos arquivos de teste.
  */
 
-// ============================================================================
 // Funções de Logout
-// ============================================================================
 
 /**
  * Limpa notificações (toasts e alertas) da tela.
@@ -54,9 +52,7 @@ export async function fazerLogout(page: Page): Promise<void> {
     await expect(page).toHaveURL(/\/login/);
 }
 
-// ============================================================================
 // Funções de Verificação de Página
-// ============================================================================
 
 /**
  * Verifica que está na página do painel principal.
@@ -65,16 +61,11 @@ export async function verificarPaginaPainel(page: Page): Promise<void> {
     await expect(page).toHaveURL(/\/painel/);
 }
 
-// ============================================================================
 // Funções de Navegação
-// ============================================================================
 
 /**
  * Navega para um subprocesso clicando na célula da unidade na tabela TreeTable.
  * Se já estiver na página do subprocesso (redirecionamento direto), apenas valida.
- *
- * @param page - Instância da página do Playwright
- * @param siglaUnidade - Sigla da unidade a clicar (ex: 'SECAO_221')
  */
 export async function navegarParaSubprocesso(
     page: Page,

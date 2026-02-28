@@ -31,9 +31,6 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
 
     const atividade1 = `Atividade Reabrir ${timestamp}`;
 
-    // ========================================================================
-    // PREPARAÇÃO
-    // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         await criarProcesso(page, {
@@ -73,18 +70,15 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
                                                                                    page,
                                                                                    autenticadoComoGestorCoord22
                                                                                }) => {
-        // Aceite COORD_22
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page, 'Aceite intermediário COORD_22');
 
-        // Aceite SECRETARIA_2
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page, 'Aceite intermediário SECRETARIA_2');
 
-        // ADMIN homologa
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
@@ -92,9 +86,6 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await homologarCadastroMapeamento(page);
     });
 
-    // ========================================================================
-    // TESTES PRINCIPAIS
-    // ========================================================================
 
     test('Cenários CDU-32: ADMIN reabre cadastro', async ({page, autenticadoComoAdmin}) => {
         // Cenario 1 & 2: Navegação e visualização do botão

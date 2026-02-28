@@ -2,7 +2,6 @@ import {config, RouterLinkStub} from "@vue/test-utils";
 import {createBootstrap} from "bootstrap-vue-next";
 import {vi} from "vitest";
 
-// Mock HTMLCanvasElement.prototype.getContext
 HTMLCanvasElement.prototype.getContext = vi.fn();
 
 
@@ -46,7 +45,6 @@ config.global.directives = {
 
 config.global.plugins.push(createBootstrap());
 
-// Mock localStorage
 const localStorageMock = (function () {
     let store: { [key: string]: string } = {};
     return {
@@ -70,7 +68,6 @@ Object.defineProperty(globalThis, "localStorage", {
 });
 
 
-// Mock window.location
 const locationMock = {
     href: "http://localhost/",
     assign: vi.fn(),

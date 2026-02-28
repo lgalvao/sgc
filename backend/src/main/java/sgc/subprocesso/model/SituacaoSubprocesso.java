@@ -8,7 +8,6 @@ import sgc.processo.model.*;
 public enum SituacaoSubprocesso {
     NAO_INICIADO("Não iniciado"),
 
-    // Mapeamento
     MAPEAMENTO_CADASTRO_EM_ANDAMENTO("Cadastro em andamento"),
     MAPEAMENTO_CADASTRO_DISPONIBILIZADO("Cadastro disponibilizado"),
     MAPEAMENTO_CADASTRO_HOMOLOGADO("Cadastro homologado"),
@@ -18,7 +17,6 @@ public enum SituacaoSubprocesso {
     MAPEAMENTO_MAPA_VALIDADO("Mapa validado"),
     MAPEAMENTO_MAPA_HOMOLOGADO("Mapa homologado"),
 
-    // Revisão
     REVISAO_CADASTRO_EM_ANDAMENTO("Revisão de cadastro em andamento"),
     REVISAO_CADASTRO_DISPONIBILIZADA("Revisão de cadastro disponibilizada"),
     REVISAO_CADASTRO_HOMOLOGADA("Revisão de cadastro homologada"),
@@ -28,7 +26,6 @@ public enum SituacaoSubprocesso {
     REVISAO_MAPA_VALIDADO("Mapa validado"),
     REVISAO_MAPA_HOMOLOGADO("Mapa homologado"),
 
-    // Diagnóstico
     DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO("Autoavaliação em andamento"),
     DIAGNOSTICO_MONITORAMENTO("Monitoramento"),
     DIAGNOSTICO_CONCLUIDO("Concluído");

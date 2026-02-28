@@ -18,7 +18,6 @@ import java.util.*;
  * <li>{@link #findCompetenciaAndAtividadeIdsByMapaCodigo(Long)} - Projeção SQL otimizada</li>
  * <li> - Sem relacionamentos (mais leve)</li>
  * </ul>
- *
  */
 @Repository
 public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
@@ -29,8 +28,6 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      *
      * <p><b>Performance:</b> EntityGraph evita N+1 queries mas pode duplicar dados em memória
      * se múltiplas competências compartilham atividades.
-     *
-     * @param mapaCodigo Código do mapa
      */
     @EntityGraph(attributePaths = {"atividades"})
     List<Competencia> findByMapa_Codigo(@Param("mapaCodigo") Long mapaCodigo);
@@ -46,8 +43,6 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      *
      * <p><b>Trade-off:</b> Requer parsing manual de Object[] no código cliente.
      *
-     * @param mapaCodigo Código do mapa
-     * @return Lista de arrays de objetos [Long competenciaId, String descricao, Long atividadeId]
      * @see sgc.mapa.service.MapaVisualizacaoService#obterMapaParaVisualizacao(sgc.subprocesso.model.Subprocesso)
      */
     @Query("""
@@ -69,8 +64,6 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      * <p><b>Atenção:</b> Acessar {@code competencia.getAtividades()} causará lazy loading
      * (N+1 queries) se fora de transação.
      *
-     * @param mapaCodigo Código do mapa
-     * @return Lista de competências sem relacionamentos carregados
      * @see sgc.mapa.service.MapaManutencaoService#buscarCompetenciasPorCodMapaSemRelacionamentos(Long)
      */
     @Query("SELECT c FROM Competencia c WHERE c.mapa.codigo = :mapaCodigo")
@@ -78,8 +71,6 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
 
     /**
      * Remove todas as competências de um mapa.
-     *
-     * @param mapaCodigo Código do mapa
      */
     void deleteByMapa_Codigo(Long mapaCodigo);
 }

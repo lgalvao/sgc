@@ -37,9 +37,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     let codProcessoMapeamento: number;
     let processoRevisaoId: number;
 
-    // ========================================================================
     // PREPARAÇÃO - Criar Mapa Vigente e Iniciar Revisão
-    // ========================================================================
 
     test('Preparacao: Setup Mapeamento e Início da Revisão', async ({page, cleanupAutomatico}) => {
         test.slow();
@@ -145,7 +143,6 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
-        // Finalizar Processo
         await page.goto('/painel');
         await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
         await page.getByTestId('btn-processo-finalizar').click();
@@ -169,9 +166,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(page.getByText(/Processo iniciado/i).first()).toBeVisible();
     });
 
-    // ========================================================================
     // FLUXO DE VERIFICAÇÃO DE IMPACTOS (Tramitação)
-    // ========================================================================
 
     test('Fluxo CHEFE: Realizar alterações e verificar impactos', async ({page}) => {
         // Debbie Harry possui apenas 1 perfil
@@ -200,7 +195,6 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await expect(page.locator('.modal-content').getByText(`Competência 1 ${timestamp}`)).toBeVisible();
         await fecharModalImpacto(page);
 
-        // 4. Remoção
         await removerAtividade(page, `Atividade Base 3 ${timestamp}`);
         await abrirModalImpacto(page);
         await expect(page.locator('.modal-content').getByText(`Competência 3 ${timestamp}`)).toBeVisible();

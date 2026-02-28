@@ -43,7 +43,6 @@ test.describe('CDU-03 - Manter Processo', () => {
         cleanupAutomatico: ReturnType<typeof useProcessoCleanup>
     }) => {
         const descricaoOriginal = `Processo para Edição - ${Date.now()}`;
-        // Cria um processo inicial
         await criarProcesso(page, {
             descricao: descricaoOriginal,
             tipo: 'MAPEAMENTO',
@@ -158,7 +157,6 @@ test.describe('CDU-03 - Manter Processo', () => {
 
         // 5. Teste Unidade Interoperacional (Raiz independente)
         // Requisito: "Se a raiz for interoperacional, ela poderá ser selecionada ainda que subordinadas não o sejam".
-        // Limpar filhos
         await page.getByTestId('chk-arvore-unidade-SECAO_111').click();
         await page.getByTestId('chk-arvore-unidade-SECAO_112').click();
         await page.getByTestId('chk-arvore-unidade-SECAO_113').click();
@@ -186,7 +184,6 @@ test.describe('CDU-03 - Manter Processo', () => {
             iniciar: true
         });
 
-        // Pegar cleanup
         await page.getByTestId('tbl-processos').getByText(descricaoProcessoBase).first().click();
         await page.waitForURL(/\/processo\/\d+/);
         const idProcesso = await extrairProcessoId(page);

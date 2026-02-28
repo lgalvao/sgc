@@ -29,9 +29,6 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
 
     const atividade1 = `Atividade Bloco ${timestamp}`;
 
-    // ========================================================================
-    // PREPARAÇÃO
-    // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
                                                                                 page,
@@ -78,9 +75,6 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    // ========================================================================
-    // TESTES PRINCIPAIS
-    // ========================================================================
 
     test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({page, autenticadoComoGestorCoord22}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

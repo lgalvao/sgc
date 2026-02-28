@@ -26,11 +26,6 @@ public class AtividadeController {
 
     /**
      * Busca e retorna uma atividade específica pelo seu código.
-     *
-     * @param codAtividade O código da atividade a ser buscada.
-     * @return Um {@link ResponseEntity} contendo a {@link Atividade}
-     * correspondente ou um status
-     * 404 Not Found se a atividade não for encontrada.
      */
     @GetMapping("/{codAtividade}")
     @PreAuthorize("isAuthenticated()")
@@ -76,10 +71,6 @@ public class AtividadeController {
 
     /**
      * Lista todos os conhecimentos associados a uma atividade específica.
-     *
-     * @param codAtividade O código da atividade pai.
-     * @return Um {@link ResponseEntity} com status 200 OK e a lista de
-     * {@link Conhecimento}.
      */
     @GetMapping("/{codAtividade}/conhecimentos")
     @PreAuthorize("isAuthenticated()")

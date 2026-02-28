@@ -37,9 +37,6 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
 
     const atividade1 = `Atividade Homol ${timestamp}`;
 
-    // ========================================================================
-    // PREPARAÇÃO
-    // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
 
@@ -93,9 +90,6 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await aceitarCadastroMapeamento(page);
     });
 
-    // ========================================================================
-    // TESTES PRINCIPAIS
-    // ========================================================================
 
     test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
