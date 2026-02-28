@@ -74,12 +74,9 @@ describe("ArvoreUnidades.vue", () => {
         const wrapper = createWrapper();
         const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
-        // Toggle expand via prop function
         await root.props("onToggleExpand")(mockUnidades[0]);
-        // Should be false now (it started true)
         expect(root.props("isExpanded")(mockUnidades[0])).toBe(false);
 
-        // Toggle again
         await root.props("onToggleExpand")(mockUnidades[0]);
         expect(root.props("isExpanded")(mockUnidades[0])).toBe(true);
     });
@@ -88,9 +85,7 @@ describe("ArvoreUnidades.vue", () => {
         const wrapper = createWrapper({modelValue: [10]});
         const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
-        // 10 is checked
         expect(root.props("isChecked")(10)).toBe(true);
-        // 20 is not
         expect(root.props("isChecked")(20)).toBe(false);
     });
 
@@ -99,14 +94,13 @@ describe("ArvoreUnidades.vue", () => {
 
         await wrapper.find('button[aria-label="Selecionar todas as unidades elegíveis"]').trigger("click");
 
-        // Emitted value should contain 10 and 21 (elegible ones)
         const emitted = wrapper.emitted("update:modelValue");
         expect(emitted).toBeTruthy();
         const selection = emitted![0][0] as number[];
         expect(selection).toContain(10);
         expect(selection).toContain(21);
-        expect(selection).not.toContain(1); // Root not eligible
-        expect(selection).not.toContain(20); // Filha2 not eligible
+        expect(selection).not.toContain(1);
+        expect(selection).not.toContain(20);
     });
 
     it("deve limpar seleção", async () => {
@@ -123,7 +117,6 @@ describe("ArvoreUnidades.vue", () => {
         const wrapper = createWrapper({modelValue: [], modoSelecao: true});
         const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
-        // Select node 20 (which should select descendants 21)
         const node20 = mockUnidades[0].filhas![1];
         await root.props("onToggle")(node20, true);
 
@@ -190,14 +183,12 @@ describe("ArvoreUnidades.vue", () => {
         const wrapper = createWrapper({unidades: unidadesTeste, modelValue: [101]});
         const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
-        // Select the other child
         const child2 = unidadesTeste[0].filhas![1];
         await root.props("onToggle")(child2, true);
 
         const emitted = wrapper.emitted("update:modelValue");
         const lastEmission = emitted![emitted!.length - 1][0] as number[];
 
-        // Should contain children and parent (since parent is eligible and all children selected)
         expect(lastEmission).toContain(101);
         expect(lastEmission).toContain(102);
         expect(lastEmission).toContain(100);
@@ -218,18 +209,15 @@ describe("ArvoreUnidades.vue", () => {
             }
         ];
 
-        // Start with parent selected (and child)
         const wrapper = createWrapper({unidades: unidadesTeste, modelValue: [200, 201]});
         const root = wrapper.findComponent({name: "UnidadeTreeNode"});
 
-        // Deselect child
         const child = unidadesTeste[0].filhas![0];
         await root.props("onToggle")(child, false);
 
         const emitted = wrapper.emitted("update:modelValue");
         const lastEmission = emitted![emitted!.length - 1][0] as number[];
 
-        // Child should be gone
         expect(lastEmission).not.toContain(201);
         expect(lastEmission).toContain(200);
     });
@@ -240,7 +228,7 @@ describe("ArvoreUnidades.vue", () => {
                 codigo: 300,
                 sigla: "PAI_INELEGIVEL",
                 nome: "Pai Inelegivel",
-                isElegivel: false, // Inelegível
+                isElegivel: false,
                 filhas: [
                     {codigo: 301, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}
                 ],
@@ -258,7 +246,7 @@ describe("ArvoreUnidades.vue", () => {
         const lastEmission = emitted![emitted!.length - 1][0] as number[];
 
         expect(lastEmission).toContain(301);
-        expect(lastEmission).not.toContain(300); // Parent should NOT be selected
+        expect(lastEmission).not.toContain(300);
     });
 
     it("selecionarTodas deve lidar com nós sem filhas definidas", async () => {
