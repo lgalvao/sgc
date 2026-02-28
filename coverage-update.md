@@ -30,20 +30,17 @@ target specific functional blocks of `SubprocessoService`:
 8. **`SubprocessoServiceSalvarIntegrationTest`**: Tested `salvarMapa` mapping and transition rules.
 9. **`SubprocessoServiceReaberturaIntegrationTest`**: Handled the complex workflow transitions for `reabrirCadastro` and
    `reabrirRevisao`.
+10. **`SubprocessoServiceEmailIntegrationTest`**: Covered the complex notifications logic when situations change, resolving missing entity configurations (`Responsabilidade`).
+11. **`SubprocessoServiceContextoIntegrationTest`**: Covered workflow UI permission fetch queries (`obterPermissoesUI`, `obterDetalhes`, `obterContextoEdicao`) matching all roles (CHEFE, GESTOR, ADMIN) and various `SituacaoSubprocesso` transitions.
+12. **`SubprocessoServiceAtividadeIntegrationTest`**: Covered complex Atividade & Conhecimento blocks (`importarAtividades`) verifying various system-state checks.
 
 ## Current Status
 
-The current overall line coverage for `SubprocessoService` has improved from **~78.01%** to **~84.70%** (and global line
-coverage rose slightly to **~92.96%**). The tests are now significantly more robust, relying on real JPA transactions
-rather than brittle Mockito verification checks.
+The current overall line coverage for `SubprocessoService` has improved from **~84.70%** to **~90.55%** (and global line coverage remains solid at **~94.41%**). The tests are now significantly more robust, relying on real JPA transactions rather than brittle Mockito verification checks. During the process of resolving coverage, we also discovered and resolved endpoint mismatch bugs causing 404 and 400 errors during cross-suite runs.
 
 ## Next Steps / Remaining Gaps
 
 To achieve near 100% coverage, future tasks should focus on:
 
-- **Atividade & Conhecimento blocks**: Complex list/map updates for `salvarTodasCompetencias` and
-  `atualizarDescricoesAtividadeEmLote`.
-- **Workflow / Transições (lines 1300-1700)**: Complex nested permissions (`obterPermissoesUI`) and UI detailed fetch
-  queries (`obterDetalhes`, `obterContextoEdicao`).
-- Ensure `@WithMockUser` setups accurately reflect all the permission permutations (CHEFE, GESTOR, ADMIN) during the
-  different `SituacaoSubprocesso` transitions.
+- **Complex batch processes**: Minor edge cases within batch saving/adjustments (e.g. mapping internal loops around `salvarAjustesMapa`).
+- **Edge cases in error scenarios**: A few lines dealing with internal DB constraint violation states or unmapped generic logic transitions (usually `default` case in switches).

@@ -36,6 +36,8 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
     private AtividadeRepo atividadeRepo;
     @Autowired
     private UnidadeService unidadeService;
+    @Autowired
+    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     private Unidade unidadeRaiz;
     private Unidade unidadeFilha;
@@ -53,6 +55,10 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         unidadeFilha.setNome("Unidade Filha");
         unidadeFilha.setUnidadeSuperior(unidadeRaiz);
         unidadeFilha = unidadeRepo.save(unidadeFilha);
+
+        // Add responsabilidade to prevent 404 during email notification
+        jdbcTemplate.update("INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, ?, ?)",
+                unidadeFilha.getCodigo(), "111111111111", "00000", "TITULAR", LocalDateTime.now());
 
         // 2. Usuários
         admin = usuarioRepo.findById("111111111111").orElseThrow(); // Admin padrão do seed (Admin Teste V2)

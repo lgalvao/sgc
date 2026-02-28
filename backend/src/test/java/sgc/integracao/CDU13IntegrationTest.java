@@ -58,13 +58,13 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         Integer countSuperior = jdbcTemplate.queryForObject("SELECT count(*) FROM SGC.VW_UNIDADE WHERE codigo = ?", Integer.class, idSuperior);
         if (countSuperior != null && countSuperior == 0) {
             jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação de Sistemas Teste", "COSIS-TEST",
-                    "INTERMEDIARIA", "ATIVA", null, null);
+                    "INTERMEDIARIA", "ATIVA", null, "132313231323");
         }
 
         Integer countUnidade = jdbcTemplate.queryForObject("SELECT count(*) FROM SGC.VW_UNIDADE WHERE codigo = ?", Integer.class, idUnidade);
         if (countUnidade != null && countUnidade == 0) {
             jdbcTemplate.update(sqlInsertUnidade, idUnidade, "Serviço de Desenvolvimento Teste", "SEDESENV-TEST",
-                    "OPERACIONAL", "ATIVA", idSuperior, null);
+                    "OPERACIONAL", "ATIVA", idSuperior, "101010101010");
         }
 
         // Carregar via Repo
@@ -74,18 +74,24 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         // Criar Usuários via JDBC (Usuario é @Immutable, não pode ser salvo via Repo)
         String sqlInsertUsuario = "INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo, MATRICULA) VALUES (?, ?, ?, ?, ?, ?)";
         String sqlInsertPerfil = "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)";
+        String sqlInsertResponsabilidade = "INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, ?, ?)";
 
         String tituloAdmin = "101010101010";
         if (usuarioRepo.findById(tituloAdmin).isEmpty()) {
-            jdbcTemplate.update(sqlInsertUsuario, tituloAdmin, "Admin Mock", "admin@test.com", "1010", idSuperior, "");
+            jdbcTemplate.update(sqlInsertUsuario, tituloAdmin, "Admin Mock", "admin@test.com", "1010", idSuperior, "12345");
             jdbcTemplate.update(sqlInsertPerfil, tituloAdmin, "ADMIN", idSuperior);
         }
 
         String tituloGestor = "132313231323";
         if (usuarioRepo.findById(tituloGestor).isEmpty()) {
-            jdbcTemplate.update(sqlInsertUsuario, tituloGestor, "Gestor Mock", "gestor@test.com", "2020", idSuperior, "");
+            jdbcTemplate.update(sqlInsertUsuario, tituloGestor, "Gestor Mock", "gestor@test.com", "2020", idSuperior, "67890");
             jdbcTemplate.update(sqlInsertPerfil, tituloGestor, "GESTOR", idSuperior);
+            // Definir gestor como titular da unidade superior para receber e-mails sem gerar 404
+            jdbcTemplate.update(sqlInsertResponsabilidade, idSuperior, tituloGestor, "67890", "TITULAR", LocalDateTime.now());
         }
+
+        // Definir admin como titular da unidade base
+        jdbcTemplate.update(sqlInsertResponsabilidade, idUnidade, tituloAdmin, "12345", "TITULAR", LocalDateTime.now());
 
         // Carregar usuários do banco
         Usuario adminUser = usuarioRepo.findById("101010101010").orElseThrow();

@@ -2,6 +2,7 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
@@ -28,6 +29,9 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UsuarioRepo usuarioRepo;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @MockitoBean
     private EmailService emailService;
 
@@ -51,6 +55,17 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
         unidadeDestino = unidadeRepo.save(unidadeDestino);
 
         admin = usuarioRepo.findById("111111111111").orElseThrow();
+
+        // Setup Responsabilidade for units using JDBC to bypass Hibernate @Immutable / null identifier issues
+        jdbcTemplate.update(
+                "INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, ?, ?)",
+                unidade.getCodigo(), admin.getTituloEleitoral(), admin.getMatricula(), "TITULAR", LocalDateTime.now()
+        );
+
+        jdbcTemplate.update(
+                "INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, ?, ?)",
+                unidadeDestino.getCodigo(), admin.getTituloEleitoral(), admin.getMatricula(), "TITULAR", LocalDateTime.now()
+        );
 
         Processo processo = Processo.builder()
                 .descricao("Processo Teste Email")
@@ -87,8 +102,8 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("registrarTransicao: Lida com exceção ao enviar email sem quebrar a transação")
-    void registrarTransicao_LidaComExcecaoEmail() {
+    @DisplayName("registrarTransicao: Lança exceção ao falhar envio de email (try-catch removido)")
+    void registrarTransicao_LancaExcecaoEmail() {
         doThrow(new RuntimeException("Erro ao enviar email")).when(emailService).enviarEmailHtml(anyString(), anyString(), anyString());
 
         RegistrarTransicaoCommand comando = RegistrarTransicaoCommand.builder()
@@ -99,7 +114,9 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
                 .usuario(admin)
                 .build();
 
-        assertThatCode(() -> subprocessoService.registrarTransicao(comando)).doesNotThrowAnyException();
+        assertThatThrownBy(() -> subprocessoService.registrarTransicao(comando))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Erro ao enviar email");
     }
 
     @Test

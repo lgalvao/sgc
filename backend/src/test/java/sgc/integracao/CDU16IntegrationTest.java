@@ -32,6 +32,8 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
     private CompetenciaRepo competenciaRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     private Subprocesso subprocesso;
     private Atividade atividade1;
@@ -44,6 +46,10 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
         unidade.setNome("Unidade CDU-16");
         unidade.setSigla("U16");
         unidade = unidadeRepo.save(unidade);
+
+        // Add responsabilidade to prevent 404 during email notification
+        jdbcTemplate.update("INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, ?, ?)",
+                unidade.getCodigo(), "111111111111", "00000", "TITULAR", LocalDateTime.now());
 
         // Criar Processo via Fixture
         Processo processo = ProcessoFixture.processoPadrao();

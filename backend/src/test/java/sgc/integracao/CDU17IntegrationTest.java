@@ -60,6 +60,10 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         unidade.setSigla("U17");
         unidade = unidadeRepo.save(unidade);
 
+        // Add responsabilidade to prevent 404 during email notification
+        jdbcTemplate.update("INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, ?, ?)",
+                unidade.getCodigo(), "111111111111", "00000", "TITULAR", LocalDateTime.now());
+
         // Criar Processo via Fixture
         Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
