@@ -41,11 +41,9 @@ export const Default: Story = {
         // Verifica estado inicial
         await expect.element(page.getByText('Texto para editar')).toBeVisible();
 
-        // Inicia edição
         const editBtn = page.getByRole('button', {name: /editar/i});
         await userEvent.click(editBtn);
 
-        // Verifica se o input apareceu
         const input = page.getByRole('textbox');
         await expect.element(input).toHaveValue('Texto para editar');
     },

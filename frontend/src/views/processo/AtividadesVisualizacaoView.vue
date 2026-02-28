@@ -226,7 +226,6 @@ const historicoAnalises = computed(() => {
   return analisesStore.analisesCadastro || [];
 });
 
-// Modais
 const loadingImpacto = ref(false);
 const mostrarModalImpacto = ref(false);
 const mostrarModalValidar = ref(false);

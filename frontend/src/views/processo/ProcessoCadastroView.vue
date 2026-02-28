@@ -308,7 +308,6 @@ async function abrirModalConfirmacao() {
 }
 
 async function confirmarIniciarProcesso() {
-  // Limpa erros
   clearErrors();
   isLoading.value = true;
 

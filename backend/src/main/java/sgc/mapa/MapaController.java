@@ -27,8 +27,6 @@ public class MapaController {
 
     /**
      * Retorna uma lista com todos os mapas de competências.
-     *
-     * @return Uma {@link List} de {@link Mapa}.
      */
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
@@ -40,9 +38,6 @@ public class MapaController {
 
     /**
      * Busca e retorna um mapa de competências específico pelo seu código.
-     *
-     * @param codigo O código do mapa a ser buscado.
-     * @return Um {@link ResponseEntity} contendo o {@link Mapa} correspondente.
      */
     @GetMapping("/{codigo}")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")

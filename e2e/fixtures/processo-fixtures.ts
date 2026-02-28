@@ -63,7 +63,6 @@ export const test = base.extend<ProcessoContext>({
 
         await page.goto('/painel');
 
-        // Use fixture
         await use({codigo, descricao});
 
         // Cleanup automático via endpoint E2E
@@ -87,11 +86,6 @@ export {expect} from './auth-fixtures.js';
 
 /**
  * Helper para criar múltiplos processos em um teste
- *
- * @param page - Página do Playwright
- * @param count - Número de processos a criar
- * @param options - Opções para criação (tipo, unidade, etc.)
- * @returns Array com códigos e descrições dos processos criados
  */
 export async function criarMultiplosProcessos(
     page: Page,

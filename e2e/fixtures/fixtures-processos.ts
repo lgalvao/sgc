@@ -33,9 +33,6 @@ export interface ProcessoFixtureOptions {
  * esteja implementado no backend. Se o endpoint não existir, use a criação
  * via UI com `criarProcesso()` do helpers-processos.ts.
  *
- * @param request - Contexto de requisição do Playwright
- * @param options - Opções de configuração do processo
- * @returns Dados do processo criado
  *
  * @example
  * ```typescript

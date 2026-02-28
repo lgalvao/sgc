@@ -69,17 +69,14 @@ export function useProcessoForm(initialData?: Processo) {
     }
 
     return {
-        // State
         descricao,
         tipo,
         dataLimite,
         unidadesSelecionadas,
         fieldErrors,
 
-        // Computed
         isFormInvalid,
 
-        // Actions
         setFromNormalizedError,
         clearErrors,
         hasErrors,

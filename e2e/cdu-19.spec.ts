@@ -24,9 +24,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     const competencia1 = `Competência 1 ${timestamp}`;
     const competencia2 = `Competência 2 ${timestamp}`;
 
-    // ========================================================================
     // PREPARAÇÃO - Criar mapa disponibilizado para CHEFE validar
-    // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
                                                                                 page,
@@ -74,12 +72,10 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     });
 
     test('Preparacao 3: Gestores aceitam cadastro', async ({page, autenticadoComoGestorCoord22}) => {
-        // Gestor COORD_22
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
 
-        // Gestor SECRETARIA_2
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -105,9 +101,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
     });
 
-    // ========================================================================
     // TESTES PRINCIPAIS - CDU-19
-    // ========================================================================
 
     test('Cenários CDU-19: Fluxo completo de validação do mapa pelo CHEFE', async ({
                                                                                        page,

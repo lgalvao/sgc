@@ -178,7 +178,6 @@ function isTestFile(filePath) {
     return testPatterns.some(pattern => pattern.test(normalizedPath));
 }
 
-// Execução
 const options = parseArgs();
 
 console.log("Gerando árvore de contagem de linhas...\n");

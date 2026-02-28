@@ -31,9 +31,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
     let processoMapeamentoId: number;
 
-    // ========================================================================
     // PREPARAÇÃO - Criar processo de mapeamento com atividades disponibilizadas
-    // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
                                                                                 page,
@@ -61,7 +59,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         // Não registrar cleanup aqui pois os testes seguintes dependem deste processo (serial)
         // O registro será feito no último cenário.
 
-        // Iniciar processo
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
@@ -89,7 +86,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await adicionarAtividade(page, atividadeB);
         await adicionarConhecimento(page, atividadeB, conhecimento3);
 
-        // Disponibilizar cadastro
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
@@ -97,9 +93,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaPainel(page);
     });
 
-    // ========================================================================
     // TESTES PRINCIPAIS - CDU-11
-    // ========================================================================
 
     test('Cenario 1: ADMIN visualiza cadastro clicando na unidade subordinada', async ({
                                                                                            page,
@@ -178,7 +172,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
 
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
-        // Aceitar cadastro
         await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Aceite para finalização do cenário');
@@ -311,7 +304,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         // Verificar que foi diretamente para subprocesso (perfil CHEFE)
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
 
-        // Visualizar atividades
         await navegarParaAtividadesVisualizacao(page);
 
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();

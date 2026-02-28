@@ -75,7 +75,6 @@ const LOG_FILTERS = [
     // Warnings do Lombok
     /WARNING:/,
 
-    // Gradle
     /^> Task :/,
     /logStarted/,
     /UP-TO-DATE/,
@@ -107,7 +106,6 @@ const LOG_FILTERS = [
     /NotificacaoEmailServiceMock.*ATIVADO/,
     /E-mails serão mockados/,
 
-    // Linhas vazias
     /^\s*$/
 ];
 
@@ -287,6 +285,5 @@ try {
     process.exit(1);
 }
 
-// Keep alive
 setInterval(() => {
 }, 1000);

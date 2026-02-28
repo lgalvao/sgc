@@ -45,9 +45,6 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     const atividade1 = `Atividade Val ${timestamp}`;
     const competencia1 = `Competência Val ${timestamp}`;
 
-    // ========================================================================
-    // PREPARAÇÃO
-    // ========================================================================
 
     test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
 
@@ -132,9 +129,6 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    // ========================================================================
-    // TESTES PRINCIPAIS
-    // ========================================================================
 
     test('Cenario 1: GESTOR acessa processo com mapa validado', async ({page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);

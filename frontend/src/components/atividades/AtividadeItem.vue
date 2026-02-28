@@ -154,10 +154,8 @@ const emit = defineEmits<{
   (e: "remover-conhecimento", conhecimentoCodigo: number): void;
 }>();
 
-// Estado de Edição da Atividade
 const emEdicao = ref(false);
 
-// Novo Conhecimento
 const novoConhecimento = ref("");
 
 function adicionarConhecimento() {

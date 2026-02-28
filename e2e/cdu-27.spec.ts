@@ -24,9 +24,6 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     const descProcesso = `Mapeamento CDU-27 ${timestamp}`;
     let processoId: number;
 
-    // ========================================================================
-    // PREPARAÇÃO
-    // ========================================================================
 
     test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
 
@@ -51,9 +48,6 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await verificarPaginaPainel(page);
     });
 
-    // ========================================================================
-    // TESTES PRINCIPAIS
-    // ========================================================================
 
     test('Cenario 1: ADMIN navega para detalhes do subprocesso', async ({page, autenticadoComoAdmin}) => {
         // CDU-27: Passos 1-2

@@ -67,7 +67,6 @@ export async function criarCompetencia(page: Page, descricao: string, atividades
     await page.getByTestId('btn-criar-competencia-salvar').click();
     await expect(modal).toBeHidden();
 
-    // Verify creation
     await verificarCompetenciaNoMapa(page, descricao, atividades);
 }
 

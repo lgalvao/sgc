@@ -113,7 +113,6 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
             await page.getByTestId('btn-mapa-devolver').click();
             await page.getByTestId('btn-devolucao-mapa-cancelar').click();
 
-            // Aceita
             await page.getByTestId('btn-mapa-homologar-aceite').click();
             await page.getByTestId('btn-aceite-mapa-confirmar').click();
             await expect(page).toHaveURL(/\/painel/);

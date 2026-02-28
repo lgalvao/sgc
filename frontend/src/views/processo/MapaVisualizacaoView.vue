@@ -284,7 +284,6 @@ const historicoAnalise = computed(() => {
 
 const temHistoricoAnalise = computed(() => historicoAnalise.value.length > 0);
 
-// Modais
 const mostrarModalAceitar = ref(false);
 const mostrarModalSugestoes = ref(false);
 const mostrarModalVerSugestoes = ref(false);
@@ -295,7 +294,6 @@ const sugestoes = ref("");
 const sugestoesVisualizacao = ref("");
 const observacaoDevolucao = ref("");
 
-// Loading
 const isLoading = ref(false);
 
 // Refs para foco

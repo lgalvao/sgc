@@ -17,9 +17,6 @@ export function useErrorHandler() {
     /**
      * Executa uma função assíncrona com tratamento automático de erros.
      *
-     * @param fn - Função assíncrona a ser executada
-     * @param onError - Callback opcional executado quando ocorre erro
-     * @returns Promise com resultado da função
      * @throws Re-lança o erro após tratamento
      */
     async function withErrorHandling<T>(

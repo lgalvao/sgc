@@ -305,7 +305,6 @@ export interface SubprocessoDetalhe {
     permissoes: PermissoesSubprocesso;
 }
 
-// Interfaces de visualização removidas (consolidadas no início do arquivo)
 
 export interface MapaVisualizacao {
     codigo: number;

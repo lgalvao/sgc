@@ -26,7 +26,6 @@ export const Default: Story = {
     play: async () => {
         const button = page.getByRole('button');
 
-        // Simula clique
         await userEvent.click(button);
     },
 };
@@ -40,7 +39,6 @@ export const Loading: Story = {
     play: async () => {
         const button = page.getByRole('button');
 
-        // Verifica se o texto de carregamento está visível
         await expect.element(button).toHaveTextContent('Carregando...');
         await expect.element(button).toBeDisabled();
     },

@@ -226,7 +226,6 @@ const historicoAnalises = computed(() => {
 const {novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction} = useAtividadeForm();
 const erroNovaAtividade = ref<string | null>(null);
 
-// Modais
 const mostrarModalImpacto = ref(false);
 const mostrarModalImportar = ref(false);
 const mostrarModalConfirmacao = ref(false);
@@ -235,7 +234,6 @@ const mostrarModalConfirmacaoRemocao = ref(false);
 const dadosRemocao = ref<DadosRemocao>(null);
 const loadingImpacto = ref(false);
 
-// Validação
 const loadingValidacao = ref(false);
 const errosValidacao = ref<ErroValidacao[]>([]);
 const erroGlobal = ref<string | null>(null);

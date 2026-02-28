@@ -107,7 +107,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         });
 
         await test.step('7. ACEITE FINAL -> ADMIN homologa', async () => {
-            // Coordenação aceita
             await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
             await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);

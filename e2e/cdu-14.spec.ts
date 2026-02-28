@@ -45,7 +45,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
             });
             await fazerLogout(page);
 
-            // Chefe disponibiliza
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
             await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
             await navegarParaAtividades(page);
@@ -113,7 +112,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
             await page.getByTestId('btn-mapa-homologar-aceite').click();
             await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
-            // Finalizar processo
             await page.goto('/painel');
             await page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descMapeamento)}).click();
             await page.getByTestId('btn-processo-finalizar').click();

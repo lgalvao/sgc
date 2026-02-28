@@ -78,7 +78,6 @@ export function normalizeError(err: unknown): NormalizedError {
         };
     }
 
-    // Fallback
     logger.error("[normalizeError] Erro não mapeado:", err);
     return {
         kind: 'unexpected',

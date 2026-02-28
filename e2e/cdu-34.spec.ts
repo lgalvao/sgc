@@ -23,9 +23,6 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     const descProcesso = `Mapeamento CDU-34 ${timestamp}`;
     let processoId: number;
 
-    // ========================================================================
-    // PREPARAÇÃO
-    // ========================================================================
 
     test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         await criarProcesso(page, {
@@ -47,9 +44,6 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         await verificarPaginaPainel(page);
     });
 
-    // ========================================================================
-    // TESTES PRINCIPAIS
-    // ========================================================================
 
     test('Cenario principal: ADMIN envia lembrete e sistema registra histórico/alerta', async ({
                                                                                                    page,

@@ -13,9 +13,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
  */
 test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
 
-    // ========================================================================
     // CENÁRIO 1: Navegação para página de histórico
-    // ========================================================================
 
     test('Cenario 1: ADMIN navega para página de histórico', async ({page, autenticadoComoAdmin}) => {
         // CDU-29: Passos 1-2
@@ -47,9 +45,7 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
         await expect(page.getByRole('heading', {name: /Histórico/i})).toBeVisible();
     });
 
-    // ========================================================================
     // CENÁRIO 4: Verificar estrutura da tabela de processos finalizados
-    // ========================================================================
 
     test('Cenario 4: Tabela apresenta colunas corretas', async ({page, autenticadoComoAdmin}) => {
 

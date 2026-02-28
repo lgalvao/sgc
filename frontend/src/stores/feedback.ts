@@ -65,7 +65,6 @@ export const useFeedbackStore = defineStore('feedback', () => {
 
 // Mantido para compatibilidade
 function close() {
-    // No-op
 }
 
 // Alias for compatibility if needed, or consumers should use useFeedbackStore

@@ -18,9 +18,6 @@ interface ImportarAtividadesRequest {
     codSubprocessoOrigem: number;
 }
 
-// ------------------------------------------------------------------------------------------------
-// Subprocesso Services
-// ------------------------------------------------------------------------------------------------
 
 export async function importarAtividades(
     codSubprocessoDestino: number,
@@ -82,9 +79,7 @@ export async function buscarSubprocessoPorProcessoEUnidade(
     return response.data;
 }
 
-// ------------------------------------------------------------------------------------------------
 // Mapa / Competencias
-// ------------------------------------------------------------------------------------------------
 
 export async function obterMapaVisualizacao(
     codSubprocesso: number,
@@ -204,9 +199,7 @@ export async function removerCompetencia(
     return response.data as MapaCompleto;
 }
 
-// ------------------------------------------------------------------------------------------------
 // Acoes em Bloco
-// ------------------------------------------------------------------------------------------------
 
 export async function aceitarCadastroEmBloco(
     codSubprocesso: number,
@@ -259,9 +252,7 @@ export async function disponibilizarMapaEmBloco(
     });
 }
 
-// ------------------------------------------------------------------------------------------------
 // Analises / Historico
-// ------------------------------------------------------------------------------------------------
 
 export const listarAnalisesCadastro = async (
     codSubprocesso: number,

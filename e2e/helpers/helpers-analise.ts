@@ -8,9 +8,7 @@ import {verificarPaginaPainel} from './helpers-navegacao.js';
  * Helpers para análise de cadastro de atividades (CDU-13 e CDU-14)
  */
 
-// ============================================================================
 // Funções de Navegação
-// ============================================================================
 
 /**
  * Acessa subprocesso como GESTOR (via lista de unidades)
@@ -126,9 +124,7 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
     }
 }
 
-// ============================================================================
 // Funções de Histórico de Análise
-// ============================================================================
 
 /**
  * Abre modal de histórico de análise (tela de edição - CadAtividades)
@@ -164,9 +160,7 @@ export async function fecharHistoricoAnalise(page: Page) {
     await expect(page.locator('.modal-content').filter({hasText: 'Histórico de Análise'})).toBeHidden();
 }
 
-// ============================================================================
 // Funções de Devolução
-// ============================================================================
 
 /**
  * Função genérica para devolução de cadastro/revisão
@@ -214,9 +208,7 @@ export async function cancelarDevolucao(page: Page) {
     await expect(page.getByRole('dialog')).toBeHidden();
 }
 
-// ============================================================================
 // Funções de Aceite (GESTOR)
-// ============================================================================
 
 /**
  * Função genérica para aceite de cadastro/revisão (GESTOR)
@@ -248,9 +240,7 @@ export async function aceitarRevisao(page: Page, observacao: string = '') {
     await realizarAceite(page, /Revisão aceita/i, observacao);
 }
 
-// ============================================================================
 // Funções de Homologação (ADMIN)
-// ============================================================================
 
 /**
  * Homologa cadastro (ADMIN) - Mapeamento

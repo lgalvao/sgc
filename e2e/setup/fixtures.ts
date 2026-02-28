@@ -1,5 +1,4 @@
 import {test as base} from '@playwright/test';
-// Import the project's logger so E2E logs go through the same formatting
 // Note: import uses .js extension because tests run with Node's ESM resolution (nodenext)
 import logger from '../../frontend/src/utils/logger.js';
 

@@ -17,7 +17,6 @@ const route = useRoute();
 const feedbackStore = useFeedbackStore();
 const toast = useToast();
 
-// Inicializa a store com a instância do toast para que possamos disparar toasts de qualquer lugar
 feedbackStore.init(toast);
 
 const hideExtrasOnce = ref(false);
@@ -27,14 +26,12 @@ function refreshHideFlag() {
   try {
     came = sessionStorage.getItem("cameFromNavbar") === "1";
   } catch {
-    //
   }
   hideExtrasOnce.value = came;
   if (came) {
     try {
       sessionStorage.removeItem("cameFromNavbar");
     } catch {
-      //
     }
   }
 }
