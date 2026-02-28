@@ -43,6 +43,49 @@ class SubprocessoControllerCoverageTest {
     private MockMvc mockMvc;
 
     @Test
+    @DisplayName("listar - deve retornar lista e 200")
+    @WithMockUser(roles = "ADMIN")
+    void listar() throws Exception {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        when(subprocessoService.listarEntidades()).thenReturn(List.of(sp));
+
+        mockMvc.perform(get("/api/subprocessos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].codigo").value(1L));
+    }
+
+    @Test
+    @DisplayName("obterStatus - deve retornar status e 200")
+    @WithMockUser
+    void obterStatus() throws Exception {
+        when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
+        when(subprocessoService.obterStatus(1L)).thenReturn(SubprocessoSituacaoDto.builder().situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO).build());
+
+        mockMvc.perform(get("/api/subprocessos/1/status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.situacao").value("MAPEAMENTO_MAPA_CRIADO"));
+    }
+
+    @Test
+    @DisplayName("buscarPorProcessoEUnidade - deve retornar subprocesso")
+    @WithMockUser
+    void buscarPorProcessoEUnidade() throws Exception {
+        sgc.organizacao.dto.UnidadeDto un = sgc.organizacao.dto.UnidadeDto.builder().codigo(2L).build();
+        when(organizacaoFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
+        when(subprocessoService.obterEntidadePorProcessoEUnidade(1L, 2L)).thenReturn(sp);
+        when(permissionEvaluator.hasPermission(any(), any(Subprocesso.class), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
+
+        mockMvc.perform(get("/api/subprocessos/buscar")
+                        .param("codProcesso", "1")
+                        .param("siglaUnidade", "SIGLA"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.codigo").value(1L));
+    }
+
+    @Test
     @DisplayName("criar - deve chamar servico e retornar 201")
     @WithMockUser(roles = "ADMIN")
     void criar() throws Exception {
@@ -98,6 +141,33 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(subprocessoService).alterarDataLimite(eq(1L), any());
+    }
+
+    @Test
+    @DisplayName("obterHistoricoCadastro - deve retornar lista e 200")
+    @WithMockUser
+    void obterHistoricoCadastro() throws Exception {
+        when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
+        when(subprocessoService.listarHistoricoCadastro(1L)).thenReturn(List.of(
+            new AnaliseHistoricoDto(sgc.subprocesso.model.TipoAnalise.CADASTRO, sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO, "obs", "nome", "justificativa", LocalDateTime.now(), "sigla", "unidade")
+        ));
+
+        mockMvc.perform(get("/api/subprocessos/1/historico-cadastro"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    @DisplayName("obterContextoEdicao - deve retornar contexto e 200")
+    @WithMockUser
+    void obterContextoEdicao() throws Exception {
+        when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
+        when(subprocessoService.obterContextoEdicao(1L)).thenReturn(
+            new ContextoEdicaoResponse(new sgc.organizacao.model.Unidade(), new Subprocesso(), null, null, List.of())
+        );
+
+        mockMvc.perform(get("/api/subprocessos/1/contexto-edicao"))
+                .andExpect(status().isOk());
     }
 
     @Test

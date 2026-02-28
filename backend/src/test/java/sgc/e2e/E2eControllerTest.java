@@ -320,6 +320,39 @@ class E2eControllerTest {
     }
 
     @Test
+    @DisplayName("Deve limpar processo completo (modo robusto) sem dados")
+    void deveLimparProcessoCompleto_SemDados() {
+        controller.limparProcessoCompleto(999L);
+        assertCount("sgc.processo WHERE codigo=999", 0);
+    }
+
+    @Test
+    @DisplayName("Deve limpar processo completo (modo robusto) com erro na conexão")
+    void deveLimparProcessoCompleto_ErroConexao() throws SQLException {
+        JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
+        DataSource mockDataSource = Mockito.mock(DataSource.class);
+        when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
+        when(mockDataSource.getConnection()).thenThrow(new SQLException("Erro simulado na conexao"));
+
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, organizacaoFacade, resourceLoader);
+
+        var exception = Assertions.assertThrows(RuntimeException.class, () -> controllerComErro.limparProcessoCompleto(999L));
+        Assertions.assertTrue(exception.getMessage().contains("Falha na limpeza do processo"));
+    }
+
+    @Test
+    @DisplayName("Deve limpar processo completo (modo robusto) com dataSource null")
+    void deveLimparProcessoCompleto_DataSourceNull() {
+        JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
+        when(mockJdbc.getDataSource()).thenReturn(null);
+
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, organizacaoFacade, resourceLoader);
+
+        // Deve retornar silenciosamente
+        Assertions.assertDoesNotThrow(() -> controllerComErro.limparProcessoCompleto(999L));
+    }
+
+    @Test
     @DisplayName("Deve cobrir else em criarProcessoFixture")
     void deveCobrirElseEmCriarProcessoFixture() throws Exception {
 
