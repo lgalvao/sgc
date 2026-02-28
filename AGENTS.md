@@ -31,7 +31,7 @@ específicas** do projeto que diferem dos padrões genéricos.
       `/api/processos/{id}/iniciar`, `/api/processos/{id}/excluir`).
 * **Persistence:** Tabelas em `UPPER_CASE`, colunas em `snake_case`. Enums como `STRING`.
 * **Controle de Acesso (Security):**
-    * Baseado nas regras documentadas em [`acesso.md`](/etc/regras-acesso.md):
+    * Baseado nas regras documentadas em [`acesso.md`](/etc/docs/regras-acesso.md):
         * **Leitura**: Hierarquia da Unidade Responsável
         * **Escrita**: Localização Atual do Subprocesso
     * **Implementação:** `SgcPermissionEvaluator` (implementa `PermissionEvaluator` do Spring Security)
