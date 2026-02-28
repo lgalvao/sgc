@@ -23,8 +23,13 @@
               <thead>
               <tr>
                 <th style="width: 40px">
-                  <input :checked="todosSelecionados" :disabled="processando" class="form-check-input" type="checkbox"
-                         @change="toggleTodos">
+                  <input
+                      :checked="todosSelecionados"
+                      :disabled="processando"
+                      class="form-check-input"
+                      type="checkbox"
+                      @change="toggleTodos"
+                  >
                 </th>
                 <th>Sigla</th>
                 <th>Nome</th>
@@ -34,8 +39,13 @@
               <tbody>
               <tr v-for="unidade in unidades" :key="unidade.codigo">
                 <td>
-                  <input v-model="selecionadosLocal" :disabled="processando" :value="unidade.codigo" class="form-check-input"
-                         type="checkbox">
+                  <input
+                      v-model="selecionadosLocal"
+                      :disabled="processando"
+                      :value="unidade.codigo"
+                      class="form-check-input"
+                      type="checkbox"
+                  >
                 </td>
                 <td>{{ unidade.sigla }}</td>
                 <td>{{ unidade.nome }}</td>
@@ -48,8 +58,12 @@
         <div class="modal-footer">
           <button :disabled="processando" class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancelar
           </button>
-          <button :disabled="processando || selecionadosLocal.length === 0" class="btn btn-primary" type="button"
-                  @click="confirmar">
+          <button
+              :disabled="processando || selecionadosLocal.length === 0"
+              class="btn btn-primary"
+              type="button"
+              @click="confirmar"
+          >
             <output v-if="processando" aria-hidden="true" class="spinner-border spinner-border-sm me-2"></output>
             {{ rotuloBotao }}
           </button>

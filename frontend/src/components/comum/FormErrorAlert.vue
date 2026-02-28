@@ -21,7 +21,8 @@
       >
         <small>{{ showStack ? 'Ocultar detalhes técnicos' : 'Mostrar detalhes técnicos' }}</small>
       </BButton>
-      <pre v-if="showStack" class="bg-dark text-light p-2 rounded small overflow-auto"
+      <pre
+v-if="showStack" class="bg-dark text-light p-2 rounded small overflow-auto"
            style="max-height: 200px; font-size: 0.75rem;">{{ stackTrace }}</pre>
     </div>
   </BAlert>

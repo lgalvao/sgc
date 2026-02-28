@@ -14,6 +14,7 @@ function parseStringDate(s: string): Date | null {
         const ddmmyyyy = parse(trimmed, "dd/MM/yyyy", new Date());
         if (isValid(ddmmyyyy)) return ddmmyyyy;
     } catch {
+        // ignore
     }
 
     if (/^\d{10,}$/.test(trimmed)) {

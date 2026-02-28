@@ -206,6 +206,7 @@ describe("VisAtividades.vue Coverage", () => {
         try {
             await (wrapper.vm as any).confirmarValidacao();
         } catch {
+            // ignore
         }
 
         expect(subprocessosStore.homologarRevisaoCadastro).toHaveBeenCalled();
