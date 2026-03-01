@@ -13,9 +13,10 @@ import org.springframework.security.test.web.servlet.request.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import org.springframework.test.web.servlet.request.*;
-import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.comum.erros.*;
 import sgc.seguranca.*;
 
 import java.util.*;
@@ -35,7 +36,10 @@ class UsuarioControllerTest {
     private SgcPermissionEvaluator permissionEvaluator;
 
     @MockitoBean
-    private UsuarioFacade usuarioService;
+    private UsuarioFacade usuarioFacade;
+
+    @MockitoBean
+    private UsuarioService usuarioService;
 
     @Test
     @DisplayName("GET /api/usuarios/{titulo} - Deve retornar usuário quando encontrado")
@@ -45,7 +49,7 @@ class UsuarioControllerTest {
         entity.setTituloEleitoral("123");
         entity.setNome("Teste");
         entity.setUnidadeLotacao(Unidade.builder().codigo(1L).build());
-        when(usuarioService.buscarUsuarioPorTitulo("123")).thenReturn(Optional.of(entity));
+        when(usuarioService.buscarOpt("123")).thenReturn(Optional.of(entity));
 
         mockMvc.perform(get("/api/usuarios/123"))
                 .andExpect(status().isOk())
@@ -57,7 +61,7 @@ class UsuarioControllerTest {
     @DisplayName("GET /api/usuarios/{titulo} - Deve retornar 404 quando não encontrado")
     @WithMockUser
     void buscarUsuarioPorTitulo_NaoEncontrado() throws Exception {
-        when(usuarioService.buscarUsuarioPorTitulo("999")).thenReturn(Optional.empty());
+        when(usuarioService.buscarOpt("999")).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/usuarios/999"))
                 .andExpect(status().isNotFound());
@@ -68,7 +72,7 @@ class UsuarioControllerTest {
     @WithMockUser(roles = "ADMIN")
     void listarAdministradores_Sucesso() throws Exception {
         AdministradorDto adm = AdministradorDto.builder().nome("Admin").build();
-        when(usuarioService.listarAdministradores()).thenReturn(List.of(adm));
+        when(usuarioFacade.listarAdministradores()).thenReturn(List.of(adm));
 
         mockMvc.perform(get("/api/usuarios/administradores"))
                 .andExpect(status().isOk())
@@ -80,7 +84,7 @@ class UsuarioControllerTest {
     @WithMockUser(roles = "ADMIN")
     void adicionarAdministrador_Sucesso() throws Exception {
         AdministradorDto adm = AdministradorDto.builder().tituloEleitoral("123").nome("Admin").build();
-        when(usuarioService.adicionarAdministrador("123")).thenReturn(adm);
+        when(usuarioFacade.adicionarAdministrador("123")).thenReturn(adm);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/usuarios/administradores")
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -105,7 +109,7 @@ class UsuarioControllerTest {
         ArgumentCaptor<String> captorTitulo = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> captorAutor = ArgumentCaptor.forClass(String.class);
 
-        Mockito.verify(usuarioService).removerAdministrador(captorTitulo.capture(), captorAutor.capture());
+        Mockito.verify(usuarioFacade).removerAdministrador(captorTitulo.capture(), captorAutor.capture());
 
         Assertions.assertThat(captorTitulo.getValue())
                 .as("Título do usuário a ser removido (PathVariable)")

@@ -49,7 +49,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar usuário por título")
         void deveBuscarUsuarioPorTitulo() {
 
-            Optional<Usuario> result = usuarioService.buscarUsuarioPorTitulo(TITULO_ADMIN);
+            Optional<Usuario> result = usuarioServiceInternal.buscarOpt(TITULO_ADMIN);
 
 
             assertTrue(result.isPresent());

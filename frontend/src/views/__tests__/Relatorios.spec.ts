@@ -11,16 +11,6 @@ const PageHeaderStub = {
     template: '<div data-testid="page-header">{{ title }}</div>',
     props: ['title']
 };
-const RelatorioFiltrosStub = {
-    template: '<div data-testid="relatorio-filtros"></div>',
-    props: ['tipo', 'dataInicio', 'dataFim'],
-    emits: ['update:tipo', 'update:dataInicio', 'update:dataFim']
-};
-const RelatorioCardsStub = {
-    template: '<div data-testid="relatorio-cards"></div>',
-    props: ['mapasVigentesCount', 'diagnosticosGapsCount', 'processosFiltradosCount'],
-    emits: ['abrir-mapas-vigentes', 'abrir-diagnosticos-gaps', 'abrir-andamento-geral']
-};
 const ModalMapasVigentesStub = {
     template: '<div data-testid="modal-mapas-vigentes" v-if="modelValue"></div>',
     props: ['modelValue', 'mapas'],
@@ -55,8 +45,6 @@ describe("Relatorios.vue", () => {
                 stubs: {
                     BContainer: {template: '<div><slot /></div>'},
                     PageHeader: PageHeaderStub,
-                    RelatorioFiltrosSection: RelatorioFiltrosStub,
-                    RelatorioCardsSection: RelatorioCardsStub,
                     ModalMapasVigentes: ModalMapasVigentesStub,
                     ModalDiagnosticosGaps: ModalDiagnosticosGapsStub,
                     ModalRelatorioAndamento: ModalAndamentoGeralStub,
@@ -96,12 +84,10 @@ describe("Relatorios.vue", () => {
             {codigo: 2, tipo: 'REVISAO', dataCriacao: '2024-01-01T10:00:00'}
         ];
 
-        const filtros = wrapper.findComponent(RelatorioFiltrosStub);
-        await filtros.vm.$emit('update:tipo', 'REVISAO');
+        wrapper.vm.filtroTipo = 'REVISAO';
         await nextTick();
 
-        const cards = wrapper.findComponent(RelatorioCardsStub);
-        expect(cards.props('processosFiltradosCount')).toBe(1);
+        expect(wrapper.vm.processosFiltrados).toHaveLength(1);
     });
 
     it("deve filtrar processos por data", async () => {
@@ -112,25 +98,25 @@ describe("Relatorios.vue", () => {
             {codigo: 2, tipo: 'MAPEAMENTO', dataCriacao: '2024-02-15T10:00:00'}
         ];
 
-        const filtros = wrapper.findComponent(RelatorioFiltrosStub);
-        await filtros.vm.$emit('update:dataInicio', '2024-02-01');
+        wrapper.vm.filtroDataInicio = '2024-02-01';
         await nextTick();
 
-        const cards = wrapper.findComponent(RelatorioCardsStub);
-        expect(cards.props('processosFiltradosCount')).toBe(1);
+        expect(wrapper.vm.processosFiltrados).toHaveLength(1);
     });
 
     it("deve abrir modais corretamente", async () => {
         wrapper = createWrapper();
-        const cards = wrapper.findComponent(RelatorioCardsStub);
 
-        await cards.vm.$emit('abrir-mapas-vigentes');
+        wrapper.vm.mostrarModalMapasVigentes = true;
+        await nextTick();
         expect(wrapper.findComponent(ModalMapasVigentesStub).exists()).toBe(true);
 
-        await cards.vm.$emit('abrir-diagnosticos-gaps');
+        wrapper.vm.mostrarModalDiagnosticosGaps = true;
+        await nextTick();
         expect(wrapper.findComponent(ModalDiagnosticosGapsStub).exists()).toBe(true);
 
-        await cards.vm.$emit('abrir-andamento-geral');
+        wrapper.vm.mostrarModalAndamentoGeral = true;
+        await nextTick();
         expect(wrapper.findComponent(ModalAndamentoGeralStub).exists()).toBe(true);
     });
 
@@ -144,31 +130,26 @@ describe("Relatorios.vue", () => {
         };
 
         await nextTick();
-        const cards = wrapper.findComponent(RelatorioCardsStub);
-        expect(cards.props('mapasVigentesCount')).toBe(1);
+        expect(wrapper.vm.mapasVigentes).toHaveLength(1);
     });
 
     it("deve filtrar diagnosticos de gaps por tipo", async () => {
         wrapper = createWrapper();
-        const filtros = wrapper.findComponent(RelatorioFiltrosStub);
 
         // Default has 4 diagnosticos
-        await filtros.vm.$emit('update:tipo', 'MAPEAMENTO'); // Not DIAGNOSTICO
+        wrapper.vm.filtroTipo = 'MAPEAMENTO'; // Not DIAGNOSTICO
         await nextTick();
 
-        const cards = wrapper.findComponent(RelatorioCardsStub);
-        expect(cards.props('diagnosticosGapsCount')).toBe(0);
+        expect(wrapper.vm.diagnosticosGapsFiltrados).toHaveLength(0);
     });
 
     it("deve filtrar diagnosticos de gaps por data", async () => {
         wrapper = createWrapper();
-        const filtros = wrapper.findComponent(RelatorioFiltrosStub);
 
-        // Mock diagnosticos in useRelatorios.ts have dates in Aug/Sep 2024
-        await filtros.vm.$emit('update:dataInicio', '2024-09-01');
+        // Mock diagnosticos in RelatoriosView.vue have dates in Aug/Sep 2024
+        wrapper.vm.filtroDataInicio = '2024-09-01';
         await nextTick();
 
-        const cards = wrapper.findComponent(RelatorioCardsStub);
-        expect(cards.props('diagnosticosGapsCount')).toBe(2); // 2024-09-05 and 2024-09-10
+        expect(wrapper.vm.diagnosticosGapsFiltrados).toHaveLength(2); // 2024-09-05 and 2024-09-10
     });
 });
