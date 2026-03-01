@@ -186,7 +186,7 @@ export const useProcessosStore = defineStore("processos", () => {
     }
 
     function obterUnidadesDoProcesso(codigoProcesso: number): ProcessoResumo[] {
-        if (processoDetalhe.value && processoDetalhe.value.codigo === codigoProcesso) {
+        if (processoDetalhe.value?.codigo === codigoProcesso) {
             return processoDetalhe.value.resumoSubprocessos;
         }
         return [];

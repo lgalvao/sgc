@@ -37,7 +37,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
                     tipoProcesso,
                     codProcesso,
                 );
-                unidades.value = mapUnidadesArray(response as any) as Unidade[];
+                unidades.value = mapUnidadesArray(response as any);
             }).catch((err: any) => {
                 error.value = lastError.value?.message || "Erro ao buscar unidades";
                 throw err;
@@ -50,7 +50,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         await loading.withLoading(async () => {
             await withErrorHandling(async () => {
                 const response = await serviceBuscarTodasUnidades();
-                unidades.value = mapUnidadesArray(response as any) as Unidade[];
+                unidades.value = mapUnidadesArray(response as any);
             }).catch((err: any) => {
                 error.value = lastError.value?.message || "Erro ao buscar todas as unidades";
                 throw err;
@@ -63,7 +63,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         await loading.withLoading(async () => {
             await withErrorHandling(async () => {
                 const response = await buscarUnidadePorSigla(sigla);
-                unidade.value = response as unknown as Unidade;
+                unidade.value = response as Unidade;
             }).catch((err: any) => {
                 error.value = lastError.value?.message || "Erro ao buscar unidade";
                 throw err;
@@ -76,7 +76,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         await loading.withLoading(async () => {
             await withErrorHandling(async () => {
                 const response = await serviceBuscarUnidadePorCodigo(codigo);
-                unidade.value = response as unknown as Unidade;
+                unidade.value = response as Unidade;
             }).catch((err: any) => {
                 error.value = lastError.value?.message || "Erro ao buscar unidade";
                 throw err;
@@ -89,7 +89,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
         await loading.withLoading(async () => {
             await withErrorHandling(async () => {
                 const response = await serviceBuscarArvoreUnidade(codigo);
-                unidade.value = response as unknown as Unidade;
+                unidade.value = response as Unidade;
             }).catch((err: any) => {
                 error.value = lastError.value?.message || "Erro ao buscar árvore";
                 throw err;
@@ -104,7 +104,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
             }).catch((err: any) => {
                 error.value = lastError.value?.message || "Erro ao buscar subordinadas";
                 throw err;
-            }) as Promise<string[]>;
+            });
         });
     }
 
@@ -115,7 +115,7 @@ export const useUnidadesStore = defineStore("unidades", () => {
             }).catch((err: any) => {
                 error.value = lastError.value?.message || "Erro ao buscar superior";
                 throw err;
-            }) as Promise<string | null>;
+            });
         });
     }
 
