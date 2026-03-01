@@ -1,6 +1,6 @@
 {
-  "globalLineCoverage": "97.93%",
-  "totalFilesWithGaps": 23,
+  "globalLineCoverage": "98.03%",
+  "totalFilesWithGaps": 22,
   "gaps": [
     {
       "class": "sgc.subprocesso.service.SubprocessoService",
@@ -161,20 +161,6 @@
       "score": 24.5
     },
     {
-      "class": "sgc.mapa.AtividadeFacade",
-      "coverage": "96.00%",
-      "missed": [
-        117,
-        123,
-        125
-      ],
-      "partial": [
-        "116(1/2)",
-        "122(1/2)"
-      ],
-      "score": 4
-    },
-    {
       "class": "sgc.subprocesso.SubprocessoController",
       "coverage": "96.90%",
       "missed": [
@@ -185,20 +171,6 @@
       ],
       "partial": [],
       "score": 4
-    },
-    {
-      "class": "sgc.mapa.service.ImpactoMapaService",
-      "coverage": "99.40%",
-      "missed": [
-        30
-      ],
-      "partial": [
-        "29(1/2)",
-        "76(1/4)",
-        "77(1/4)",
-        "78(1/2)"
-      ],
-      "score": 3
     },
     {
       "class": "sgc.processo.service.ProcessoManutencaoService",
@@ -298,6 +270,17 @@
       ],
       "partial": [
         "35(1/4)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.mapa.service.ImpactoMapaService",
+      "coverage": "100.00%",
+      "missed": [],
+      "partial": [
+        "76(1/4)",
+        "77(1/4)",
+        "78(1/2)"
       ],
       "score": 1.5
     },

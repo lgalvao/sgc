@@ -36,7 +36,19 @@ class ImpactoMapaServiceTest {
     @BeforeEach
     void setUp() {
         // Default permission behavior for tests unless overridden
-        doReturn(true).when(permissionEvaluator).checkPermission(any(), any(), any());
+        lenient().doReturn(true).when(permissionEvaluator).checkPermission(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("verificarImpactos - deve lancar ErroAcessoNegado quando nao tiver permissao")
+    void verificarImpactosDeveLancarErroAcessoNegado() {
+        Subprocesso subprocesso = new Subprocesso();
+        Usuario usuario = new Usuario();
+
+        doReturn(false).when(permissionEvaluator).checkPermission(usuario, subprocesso, "VERIFICAR_IMPACTOS");
+
+        assertThrows(sgc.comum.erros.ErroAcessoNegado.class, () ->
+            impactoMapaService.verificarImpactos(subprocesso, usuario));
     }
 
     // Helper para criar usuário ADMIN para testes genéricos
