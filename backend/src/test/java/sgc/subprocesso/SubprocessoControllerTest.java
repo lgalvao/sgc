@@ -11,8 +11,8 @@ import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import sgc.comum.ComumDtos.*;
 import sgc.comum.erros.*;
-import sgc.organizacao.*;
-import sgc.organizacao.dto.*;
+import sgc.organizacao.service.*;
+import sgc.organizacao.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -32,7 +32,7 @@ class SubprocessoControllerTest {
     @MockitoBean
     private SubprocessoService subprocessoService;
     @MockitoBean
-    private OrganizacaoFacade organizacaoFacade;
+    private UnidadeService unidadeService;
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
     @Autowired
@@ -45,8 +45,8 @@ class SubprocessoControllerTest {
         @DisplayName("deve buscar por processo e unidade")
         @WithMockUser
         void buscarPorProcessoEUnidade() throws Exception {
-            UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
-            when(organizacaoFacade.buscarPorSigla("U1")).thenReturn(unidade);
+            Unidade unidade = new Unidade(); unidade.setCodigo(10L);
+            when(unidadeService.buscarPorSigla("U1")).thenReturn(unidade);
             when(subprocessoService.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(Subprocesso.builder().codigo(100L).build());
 
             mockMvc.perform(get("/api/subprocessos/buscar")

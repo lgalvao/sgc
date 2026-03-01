@@ -26,7 +26,7 @@ public class LoginFacade {
     private final @Nullable ClienteAcessoAd clienteAcessoAd;
 
     private final UsuarioFacade usuarioFacade;
-    private final OrganizacaoFacade organizacaoFacade;
+    private final UnidadeService unidadeService;
     private final GerenciadorJwt gerenciadorJwt;
     private final UsuarioService usuarioService;
 
@@ -36,13 +36,13 @@ public class LoginFacade {
     public LoginFacade(UsuarioFacade usuarioFacade,
                        GerenciadorJwt gerenciadorJwt,
                        @Autowired(required = false) @Nullable ClienteAcessoAd clienteAcessoAd,
-                       OrganizacaoFacade organizacaoFacade,
+                       UnidadeService unidadeService,
                        UsuarioService usuarioService) {
 
         this.usuarioFacade = usuarioFacade;
         this.gerenciadorJwt = gerenciadorJwt;
         this.clienteAcessoAd = clienteAcessoAd;
-        this.organizacaoFacade = organizacaoFacade;
+        this.unidadeService = unidadeService;
         this.usuarioService = usuarioService;
     }
 
@@ -80,7 +80,7 @@ public class LoginFacade {
     @Transactional(readOnly = true)
     public String entrar(EntrarRequest request) {
         Long codUnidade = request.unidadeCodigo();
-        organizacaoFacade.unidadePorCodigo(codUnidade);
+        unidadeService.buscarPorId(codUnidade);
 
         String tituloEleitoral = request.tituloEleitoral();
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoes(tituloEleitoral);
@@ -103,7 +103,7 @@ public class LoginFacade {
             }
         }
 
-        String siglaUnidade = organizacaoFacade.unidadePorCodigo(codUnidade).getSigla();
+        String siglaUnidade = unidadeService.buscarPorId(codUnidade).getSigla();
         log.info("Usuário {} autorizado: {}-{}", tituloEleitoral, perfilSolicitado, siglaUnidade);
 
         return gerenciadorJwt.gerarToken(

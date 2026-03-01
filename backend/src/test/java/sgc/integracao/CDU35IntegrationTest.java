@@ -5,9 +5,9 @@ import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.transaction.annotation.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
-import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
@@ -25,7 +25,7 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
     private static final String API_REL_ANDAMENTO = "/api/relatorios/andamento/{codProcesso}";
 
     @MockitoBean
-    private OrganizacaoFacade facade;
+    private ResponsavelUnidadeService responsavelService;
 
     private Processo processo;
 
@@ -33,7 +33,7 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
     void setUp() {
         Unidade unidadeRaiz = unidadeRepo.findById(1L).orElseThrow();
 
-        when(facade.buscarResponsavelUnidade(anyLong())).thenReturn(UnidadeResponsavelDto.builder()
+        when(responsavelService.buscarResponsavelUnidade(anyLong())).thenReturn(UnidadeResponsavelDto.builder()
                 .titularNome("Responsável Teste")
                 .build());
 

@@ -14,8 +14,8 @@ import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.*;
-import sgc.organizacao.*;
-import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
@@ -38,16 +38,16 @@ public class E2eController {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final ProcessoFacade processoFacade;
-    private final OrganizacaoFacade organizacaoFacade;
+    private final UnidadeService unidadeService;
     private final ResourceLoader resourceLoader;
 
     public E2eController(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate,
-                         ProcessoFacade processoFacade, OrganizacaoFacade organizacaoFacade,
+                         ProcessoFacade processoFacade, UnidadeService unidadeService,
                          ResourceLoader resourceLoader) {
         this.jdbcTemplate = jdbcTemplate;
         this.namedJdbcTemplate = namedJdbcTemplate;
         this.processoFacade = processoFacade;
-        this.organizacaoFacade = organizacaoFacade;
+        this.unidadeService = unidadeService;
         this.resourceLoader = resourceLoader;
     }
 
@@ -247,7 +247,7 @@ public class E2eController {
             throw new ErroValidacao("Unidade é obrigatória");
         }
 
-        UnidadeDto unidade = organizacaoFacade.buscarPorSigla(request.unidadeSigla());
+        Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
 
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
         LocalDateTime dataLimite = LocalDate.now().plusDays(diasLimite).atStartOfDay();

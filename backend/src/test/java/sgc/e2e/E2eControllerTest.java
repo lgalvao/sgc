@@ -11,8 +11,8 @@ import org.springframework.test.context.*;
 import org.springframework.test.context.jdbc.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
-import sgc.organizacao.*;
-import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
@@ -43,7 +43,7 @@ class E2eControllerTest {
     private ProcessoFacade processoFacade;
 
     @Mock
-    private OrganizacaoFacade organizacaoFacade;
+    private UnidadeService unidadeService;
 
     @Mock
     private ResourceLoader resourceLoader;
@@ -56,7 +56,7 @@ class E2eControllerTest {
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
-        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoFacade, organizacaoFacade, resourceLoader);
+        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoFacade, unidadeService, resourceLoader);
     }
 
     @AfterEach
@@ -231,9 +231,9 @@ class E2eControllerTest {
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 null, "SIGLA", false, null);
 
-        UnidadeDto un = new UnidadeDto();
+        Unidade un = new Unidade();
         un.setCodigo(1L);
-        when(organizacaoFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -254,9 +254,9 @@ class E2eControllerTest {
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "Desc", "SIGLA", true, 10);
 
-        UnidadeDto un = new UnidadeDto();
+        Unidade un = new Unidade();
         un.setCodigo(1L);
-        when(organizacaoFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -278,9 +278,9 @@ class E2eControllerTest {
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "Desc", "SIGLA", true, 10);
 
-        UnidadeDto un = new UnidadeDto();
+        Unidade un = new Unidade();
         un.setCodigo(1L);
-        when(organizacaoFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -303,7 +303,7 @@ class E2eControllerTest {
         when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
         when(mockDataSource.getConnection()).thenThrow(new SQLException("Error"));
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, organizacaoFacade, resourceLoader);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, unidadeService, resourceLoader);
         var exception = Assertions.assertThrows(RuntimeException.class, controllerComErro::resetDatabase);
         Assertions.assertNotNull(exception);
     }
@@ -334,7 +334,7 @@ class E2eControllerTest {
         when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
         when(mockDataSource.getConnection()).thenThrow(new SQLException("Erro simulado na conexao"));
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, organizacaoFacade, resourceLoader);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, unidadeService, resourceLoader);
 
         var exception = Assertions.assertThrows(RuntimeException.class, () -> controllerComErro.limparProcessoCompleto(999L));
         Assertions.assertTrue(exception.getMessage().contains("Falha na limpeza do processo"));
@@ -346,7 +346,7 @@ class E2eControllerTest {
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
         when(mockJdbc.getDataSource()).thenReturn(null);
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, organizacaoFacade, resourceLoader);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoFacade, unidadeService, resourceLoader);
 
         // Deve retornar silenciosamente
         Assertions.assertDoesNotThrow(() -> controllerComErro.limparProcessoCompleto(999L));
@@ -359,9 +359,9 @@ class E2eControllerTest {
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "Desc", "SIGLA", true, 10);
 
-        UnidadeDto un = new UnidadeDto();
+        Unidade un = new Unidade();
         un.setCodigo(1L);
-        when(organizacaoFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -388,9 +388,9 @@ class E2eControllerTest {
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "   ", "SIGLA", true, 10); // Blank description
 
-        UnidadeDto un = new UnidadeDto();
+        Unidade un = new Unidade();
         un.setCodigo(1L);
-        when(organizacaoFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
 
         Processo proc = new Processo();
         proc.setCodigo(100L);
@@ -416,7 +416,7 @@ class E2eControllerTest {
     class CoberturaExtra {
         private JdbcTemplate jdbcTemplateMock;
         private ProcessoFacade processoFacadeMock;
-        private OrganizacaoFacade organizacaoFacadeMock;
+        private UnidadeService unidadeServiceMock;
         private ResourceLoader resourceLoaderMock;
         private E2eController controllerIsolado;
 
@@ -425,9 +425,9 @@ class E2eControllerTest {
             jdbcTemplateMock = mock(JdbcTemplate.class);
             var namedJdbcTemplateMock = mock(NamedParameterJdbcTemplate.class);
             processoFacadeMock = mock(ProcessoFacade.class);
-            organizacaoFacadeMock = mock(OrganizacaoFacade.class);
+            unidadeServiceMock = mock(UnidadeService.class);
             resourceLoaderMock = mock(ResourceLoader.class);
-            controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoFacadeMock, organizacaoFacadeMock, resourceLoaderMock);
+            controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoFacadeMock, unidadeServiceMock, resourceLoaderMock);
         }
 
         @Test
@@ -461,7 +461,7 @@ class E2eControllerTest {
         @DisplayName("criarProcessoFixture: Unidade não encontrada")
         void criarProcessoFixture_UnidadeNaoEncontrada() {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", false, 30);
-            when(organizacaoFacadeMock.buscarPorSigla("SIGLA")).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA"));
+            when(unidadeServiceMock.buscarPorSigla("SIGLA")).thenThrow(new ErroEntidadeNaoEncontrada("Unidade", "SIGLA"));
 
             assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -472,8 +472,9 @@ class E2eControllerTest {
         void criarProcessoFixture_FalhaIniciar() {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
 
-            UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
-            when(organizacaoFacadeMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            when(unidadeServiceMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
 
             Processo dto = Processo.builder().codigo(100L).build();
             when(processoFacadeMock.criar(any())).thenReturn(dto);
@@ -491,8 +492,9 @@ class E2eControllerTest {
         void criarProcessoFixture_FalhaRecarregar() {
             var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
 
-            UnidadeDto unidade = UnidadeDto.builder().codigo(10L).build();
-            when(organizacaoFacadeMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            when(unidadeServiceMock.buscarPorSigla("SIGLA")).thenReturn(unidade);
 
             Processo dto = Processo.builder().codigo(100L).build();
             when(processoFacadeMock.criar(any())).thenReturn(dto);

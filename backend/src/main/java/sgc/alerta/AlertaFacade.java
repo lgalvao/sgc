@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 
 import java.time.*;
@@ -20,10 +21,10 @@ import java.util.*;
 public class AlertaFacade {
     private final AlertaService alertaService;
     private final UsuarioFacade usuarioService;
-    private final OrganizacaoFacade organizacaoFacade;
+    private final UnidadeService unidadeService;
 
     private Unidade unidadeRaiz() {
-        return organizacaoFacade.unidadePorCodigo(1L);
+        return unidadeService.buscarPorId(1L);
     }
 
     public List<Alerta> alertasPorUsuario(String usuarioTitulo) {

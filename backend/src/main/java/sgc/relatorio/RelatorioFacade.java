@@ -6,9 +6,9 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
-import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
@@ -22,7 +22,7 @@ import java.util.List;
 public class RelatorioFacade {
     private final ProcessoFacade processoFacade;
     private final SubprocessoService subprocessoService;
-    private final OrganizacaoFacade organizacaoFacade;
+    private final ResponsavelUnidadeService responsavelService;
     private final MapaManutencaoService mapaManutencaoService;
     private final PdfFactory pdfFactory;
 
@@ -40,7 +40,7 @@ public class RelatorioFacade {
 
             for (Subprocesso sp : subprocessos) {
                 Unidade unidade = sp.getUnidade();
-                UnidadeResponsavelDto respDto = organizacaoFacade.buscarResponsavelUnidade(unidade.getCodigo());
+                UnidadeResponsavelDto respDto = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
                 String responsavel = respDto.titularNome();
 
                 String texto = String.format(

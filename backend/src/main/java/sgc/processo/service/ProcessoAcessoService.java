@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.subprocesso.service.*;
 
 import java.util.*;
@@ -18,7 +19,7 @@ import java.util.stream.*;
 @Slf4j
 @RequiredArgsConstructor
 public class ProcessoAcessoService {
-    private final OrganizacaoFacade organizacaoFacade;
+    private final UnidadeService unidadeService;
     private final UsuarioFacade usuarioService;
     private final ConsultasSubprocessoService consultas;
 
@@ -42,7 +43,7 @@ public class ProcessoAcessoService {
                 .collect(Collectors.toSet());
         if (unidadesUsuario.isEmpty()) return false;
 
-        List<Unidade> todasUnidades = organizacaoFacade.unidadesComHierarquia();
+        List<Unidade> todasUnidades = unidadeService.todasComHierarquia();
         Map<Long, List<Unidade>> mapaPorPai = buildMapaPorPai(todasUnidades);
 
         Set<Long> todasUnidadesAcesso = new HashSet<>();
@@ -55,7 +56,7 @@ public class ProcessoAcessoService {
 
     @Transactional(readOnly = true)
     public List<Long> buscarCodigosDescendentes(Long codUnidade) {
-        List<Unidade> todasUnidades = organizacaoFacade.unidadesComHierarquia();
+        List<Unidade> todasUnidades = unidadeService.todasComHierarquia();
         Map<Long, List<Unidade>> mapaPorPai = buildMapaPorPai(todasUnidades);
         return new ArrayList<>(buscarDescendentesNoMapa(codUnidade, mapaPorPai));
     }

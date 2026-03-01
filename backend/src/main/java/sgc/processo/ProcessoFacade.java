@@ -10,6 +10,7 @@ import sgc.alerta.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
 import sgc.processo.erros.*;
 import sgc.processo.model.*;
@@ -31,7 +32,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 public class ProcessoFacade {
     private final ProcessoConsultaService processoConsultaService;
     private final ProcessoManutencaoService processoManutencaoService;
-    private final OrganizacaoFacade organizacaoFacade;
+    private final UnidadeService unidadeService;
     private final SubprocessoService subprocessoService;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final UsuarioFacade usuarioService;
@@ -143,7 +144,7 @@ public class ProcessoFacade {
     @Transactional
     public void enviarLembrete(Long codProcesso, Long unidadeCodigo) {
         Processo processo = buscarEntidadePorId(codProcesso);
-        Unidade unidade = organizacaoFacade.unidadePorCodigo(unidadeCodigo);
+        Unidade unidade = unidadeService.buscarPorId(unidadeCodigo);
 
         if (processo.getParticipantes().stream().noneMatch(u -> u.getUnidadeCodigo().equals(unidadeCodigo))) {
             throw new ErroProcesso("Unidade não participa deste processo.");

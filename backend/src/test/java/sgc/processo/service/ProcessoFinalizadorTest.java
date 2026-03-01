@@ -7,7 +7,7 @@ import org.mockito.junit.jupiter.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.model.*;
-import sgc.organizacao.*;
+import sgc.organizacao.service.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
@@ -30,7 +30,7 @@ class ProcessoFinalizadorTest {
     @Mock
     private ComumRepo repo;
     @Mock
-    private OrganizacaoFacade unidadeService;
+    private UnidadeService unidadeService;
     @Mock
     private ConsultasSubprocessoService queryService;
     @Mock

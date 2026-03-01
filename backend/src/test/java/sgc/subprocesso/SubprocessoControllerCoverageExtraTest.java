@@ -13,7 +13,7 @@ import sgc.comum.ComumDtos.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.organizacao.*;
+
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -35,8 +35,7 @@ class SubprocessoControllerCoverageExtraTest {
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     @MockitoBean
     private SubprocessoService subprocessoService;
-    @MockitoBean
-    private OrganizacaoFacade organizacaoFacade;
+
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
     @Autowired
@@ -46,8 +45,8 @@ class SubprocessoControllerCoverageExtraTest {
     @DisplayName("disponibilizarCadastro - erro validacao")
     @WithMockUser
     void disponibilizarCadastroErro() throws Exception {
-        when(subprocessoService.disponibilizarCadastro(eq(1L), any()))
-                .thenThrow(new ErroValidacao("Existem atividades sem conhecimentos associados."));
+        doThrow(new ErroValidacao("Existem atividades sem conhecimentos associados."))
+                .when(subprocessoService).disponibilizarCadastro(eq(1L), any());
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/cadastro/disponibilizar").with(csrf()))
@@ -59,8 +58,8 @@ class SubprocessoControllerCoverageExtraTest {
     @DisplayName("disponibilizarRevisao - erro validacao")
     @WithMockUser
     void disponibilizarRevisaoErro() throws Exception {
-        when(subprocessoService.disponibilizarRevisao(eq(1L), any()))
-                .thenThrow(new ErroValidacao("Existem atividades sem conhecimentos associados."));
+        doThrow(new ErroValidacao("Existem atividades sem conhecimentos associados."))
+                .when(subprocessoService).disponibilizarRevisao(eq(1L), any());
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_REVISAO_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/disponibilizar-revisao").with(csrf()))

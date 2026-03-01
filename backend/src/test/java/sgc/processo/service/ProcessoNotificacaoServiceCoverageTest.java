@@ -5,7 +5,8 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.alerta.*;
-import sgc.organizacao.*;
+import sgc.organizacao.service.*;
+import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
@@ -27,7 +28,9 @@ class ProcessoNotificacaoServiceCoverageTest {
     @Mock
     private EmailModelosService emailModelosService;
     @Mock
-    private OrganizacaoFacade organizacaoFacade;
+    private UnidadeService unidadeService;
+    @Mock
+    private ResponsavelUnidadeService responsavelService;
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
@@ -50,7 +53,7 @@ class ProcessoNotificacaoServiceCoverageTest {
 
         service.emailFinalizacaoProcesso(codProcesso);
 
-        verifyNoInteractions(organizacaoFacade);
+        verifyNoInteractions(responsavelService);
         verifyNoInteractions(emailService);
     }
 
@@ -89,8 +92,8 @@ class ProcessoNotificacaoServiceCoverageTest {
 
         when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(p));
         when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
-        when(organizacaoFacade.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, new UnidadeResponsavelDto(10L, "Titular", "Nome Titular", "Substituto", "Nome Substituto")));
-        when(organizacaoFacade.unidadePorCodigo(10L)).thenReturn(u);
+        when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, new UnidadeResponsavelDto(10L, "Titular", "Nome Titular", "Substituto", "Nome Substituto")));
+        when(unidadeService.buscarPorId(10L)).thenReturn(u);
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("Titular", new Usuario()));
 
         when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
@@ -127,8 +130,8 @@ class ProcessoNotificacaoServiceCoverageTest {
         p.adicionarParticipantes(Set.of(inter, sub));
 
         when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(p));
-        when(organizacaoFacade.unidadesPorCodigos(any())).thenReturn(List.of(inter, sub));
-        when(organizacaoFacade.buscarResponsaveisUnidades(any())).thenReturn(Collections.emptyMap());
+        when(unidadeService.porCodigos(any())).thenReturn(List.of(inter, sub));
+        when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Collections.emptyMap());
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Collections.emptyMap());
 
         when(emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(eq("INTER"), eq("P1"), anyList()))
@@ -157,8 +160,8 @@ class ProcessoNotificacaoServiceCoverageTest {
         p.adicionarParticipantes(Set.of(inter));
 
         when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(p));
-        when(organizacaoFacade.unidadesPorCodigos(any())).thenReturn(List.of(inter));
-        when(organizacaoFacade.buscarResponsaveisUnidades(any())).thenReturn(Collections.emptyMap());
+        when(unidadeService.porCodigos(any())).thenReturn(List.of(inter));
+        when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Collections.emptyMap());
 
         service.emailFinalizacaoProcesso(codProcesso);
 
@@ -185,8 +188,8 @@ class ProcessoNotificacaoServiceCoverageTest {
         when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
 
         when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(p));
-        when(organizacaoFacade.buscarResponsaveisUnidades(any())).thenReturn(Collections.emptyMap());
-        when(organizacaoFacade.unidadePorCodigo(10L)).thenReturn(u);
+        when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Collections.emptyMap());
+        when(unidadeService.buscarPorId(10L)).thenReturn(u);
 
         when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
                 .thenReturn("HTML");

@@ -14,9 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import sgc.comum.ComumDtos.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.organizacao.*;
-import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.seguranca.sanitizacao.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -33,7 +32,7 @@ import java.util.*;
 public class SubprocessoController {
 
     private final SubprocessoService subprocessoService;
-    private final OrganizacaoFacade organizacaoFacade;
+    private final UnidadeService unidadeService;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -60,7 +59,7 @@ public class SubprocessoController {
     @JsonView(SubprocessoViews.Publica.class)
     public ResponseEntity<Subprocesso> buscarPorProcessoEUnidade(
             @RequestParam Long codProcesso, @RequestParam String siglaUnidade) {
-        UnidadeDto unidade = organizacaoFacade.buscarPorSigla(siglaUnidade);
+        Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
         Subprocesso sp = subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, unidade.getCodigo());
         return ResponseEntity.ok(sp);
     }

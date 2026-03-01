@@ -7,7 +7,7 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import sgc.alerta.*;
 import sgc.alerta.model.*;
-import sgc.organizacao.*;
+import sgc.organizacao.service.*;
 import sgc.organizacao.model.*;
 import sgc.processo.*;
 import sgc.processo.dto.*;
@@ -30,7 +30,9 @@ class PainelServiceTest {
     @Mock
     private AlertaFacade alertaService;
     @Mock
-    private OrganizacaoFacade unidadeService;
+    private UnidadeService unidadeService;
+    @Mock
+    private UnidadeHierarquiaService hierarquiaService;
     @InjectMocks
     private PainelFacade painelService;
 
@@ -58,7 +60,7 @@ class PainelServiceTest {
         @DisplayName("ADMIN: deve listar todos os processos")
         void listarProcessos_Admin() {
             when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(Page.empty());
-            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            when(hierarquiaService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
 
             painelService.listarProcessos(Perfil.ADMIN, null, pageable);
 
@@ -72,8 +74,8 @@ class PainelServiceTest {
             Long codigoUnidade = 1L;
             List<Long> subordinadas = List.of(2L, 3L);
 
-            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
-            when(unidadeService.buscarIdsDescendentes(eq(codigoUnidade), any())).thenReturn(subordinadas);
+            when(hierarquiaService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            when(hierarquiaService.buscarDescendentes(eq(codigoUnidade), any())).thenReturn(subordinadas);
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
                     .thenReturn(Page.empty());
 
@@ -90,7 +92,7 @@ class PainelServiceTest {
         void listarProcessos_Chefe() {
             Long codigoUnidade = 1L;
 
-            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            when(hierarquiaService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
                     .thenReturn(Page.empty());
 
@@ -117,7 +119,7 @@ class PainelServiceTest {
             p.adicionarParticipantes(Set.of(u));
 
             when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
-            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            when(hierarquiaService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, pageable);
 
@@ -134,11 +136,11 @@ class PainelServiceTest {
 
             when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class)))
                     .thenReturn(new PageImpl<>(List.of(p)));
-            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            when(hierarquiaService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
 
             sgc.organizacao.dto.UnidadeDto dto = new sgc.organizacao.dto.UnidadeDto();
             dto.setSigla("SIGLA");
-            when(unidadeService.dtoPorCodigo(codigoUnidade)).thenReturn(dto);
+            when(unidadeService.buscarPorId(codigoUnidade)).thenReturn(new Unidade());
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
 
@@ -155,7 +157,7 @@ class PainelServiceTest {
                     .comSuperior(pai)
                     .build();
 
-            when(unidadeService.buscarMapaHierarquia()).thenReturn(Map.of(0L, List.of(1L), 1L, List.of(2L)));
+            when(hierarquiaService.buscarMapaHierarquia()).thenReturn(Map.of(0L, List.of(1L), 1L, List.of(2L)));
 
             Processo p = new Processo();
             p.setCodigo(100L);
@@ -187,7 +189,7 @@ class PainelServiceTest {
             p.adicionarParticipantes(Set.of(filho));
 
             when(processoFacade.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
-            when(unidadeService.buscarMapaHierarquia()).thenReturn(Map.of(1L, List.of(2L)));
+            when(hierarquiaService.buscarMapaHierarquia()).thenReturn(Map.of(1L, List.of(2L)));
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.ADMIN, null, pageable);
 
@@ -202,12 +204,12 @@ class PainelServiceTest {
         @DisplayName("garantirOrdenacaoPadrao deve retornar pageable original se já estiver ordenado")
         void garantirOrdenacaoPadrao_JaOrdenado() {
             Pageable sorted = PageRequest.of(0, 10, Sort.by("dataCriacao"));
-            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            when(hierarquiaService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
             when(processoFacade.listarTodos(any())).thenReturn(Page.empty());
 
             painelService.listarProcessos(Perfil.ADMIN, null, sorted);
 
-            verify(processoFacade).listarTodos(eq(sorted));
+            verify(processoFacade).listarTodos(sorted);
         }
 
         @Test
@@ -218,13 +220,13 @@ class PainelServiceTest {
             when(processoFacade.listarPorParticipantesIgnorandoCriado(any(), any()))
                     .thenReturn(Page.empty());
 
-            when(unidadeService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
-            when(unidadeService.buscarIdsDescendentes(eq(raizId), any()))
+            when(hierarquiaService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
+            when(hierarquiaService.buscarDescendentes(eq(raizId), any()))
                     .thenReturn(List.of(2L, 3L, 4L, 5L));
 
             painelService.listarProcessos(Perfil.GESTOR, raizId, PageRequest.of(0, 10));
 
-            verify(unidadeService, times(1)).buscarIdsDescendentes(eq(raizId), any());
+            verify(hierarquiaService, times(1)).buscarDescendentes(eq(raizId), any());
         }
     }
 

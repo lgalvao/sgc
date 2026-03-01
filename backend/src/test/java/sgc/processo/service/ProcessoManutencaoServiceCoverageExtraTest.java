@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.organizacao.OrganizacaoFacade;
+import sgc.organizacao.service.UnidadeService;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.dto.CriarProcessoRequest;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class ProcessoManutencaoServiceCoverageExtraTest {
 
     @Mock private ProcessoRepo processoRepo;
-    @Mock private OrganizacaoFacade organizacaoFacade;
+    @Mock private UnidadeService unidadeService;
     @Mock private ProcessoValidador processoValidador;
     @Mock private ProcessoConsultaService processoConsultaService;
 
@@ -38,7 +38,7 @@ class ProcessoManutencaoServiceCoverageExtraTest {
         CriarProcessoRequest req = new CriarProcessoRequest("desc", TipoProcesso.REVISAO, LocalDateTime.now(), List.of(1L));
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        when(organizacaoFacade.unidadePorCodigo(1L)).thenReturn(u);
+        when(unidadeService.buscarPorId(1L)).thenReturn(u);
         when(processoValidador.validarTiposUnidades(anyList())).thenReturn(Optional.empty());
         when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.of("Erro"));
 

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import sgc.organizacao.*;
+import sgc.organizacao.service.*;
 import sgc.organizacao.model.*;
 import sgc.processo.erros.*;
 import sgc.processo.model.*;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 class ProcessoValidadorTest {
 
     @Mock
-    private OrganizacaoFacade unidadeService;
+    private UnidadeService unidadeService;
 
     @Mock
     private ConsultasSubprocessoService queryService;
@@ -41,7 +41,7 @@ class ProcessoValidadorTest {
         Unidade u = new Unidade();
         u.setCodigo(1L);
         when(unidadeService.verificarMapaVigente(1L)).thenReturn(false);
-        when(unidadeService.siglasUnidadesPorCodigos(List.of(1L))).thenReturn(List.of("SIGLA"));
+        when(unidadeService.buscarSiglasPorIds(List.of(1L))).thenReturn(List.of("SIGLA"));
 
         Optional<String> msg = validador.getMensagemErroUnidadesSemMapa(List.of(1L));
         assertThat(msg).isPresent();

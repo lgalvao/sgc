@@ -7,8 +7,8 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import sgc.alerta.*;
 import sgc.alerta.model.*;
-import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
@@ -29,7 +29,9 @@ class PainelFacadeTest {
     @Mock
     private AlertaFacade alertaFacade;
     @Mock
-    private OrganizacaoFacade OrganizacaoFacade;
+    private UnidadeHierarquiaService hierarquiaService;
+    @Mock
+    private UnidadeService unidadeService;
 
     @InjectMocks
     private PainelFacade painelFacade;
@@ -40,7 +42,7 @@ class PainelFacadeTest {
         Processo p = criarProcesso(1L, SituacaoProcesso.CRIADO);
         Page<Processo> page = new PageImpl<>(List.of(p));
         when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(page);
-        when(OrganizacaoFacade.buscarMapaHierarquia()).thenReturn(new HashMap<>());
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
 
@@ -53,8 +55,8 @@ class PainelFacadeTest {
     void deveListarProcessosGestor() {
         Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
         Page<Processo> page = new PageImpl<>(List.of(p));
-        when(OrganizacaoFacade.buscarMapaHierarquia()).thenReturn(new HashMap<>());
-        when(OrganizacaoFacade.buscarIdsDescendentes(eq(100L), anyMap())).thenReturn(List.of(101L));
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
+        when(hierarquiaService.buscarDescendentes(eq(100L), anyMap())).thenReturn(List.of(101L));
         when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class))).thenReturn(page);
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.GESTOR, 100L, PageRequest.of(0, 10));
@@ -73,9 +75,9 @@ class PainelFacadeTest {
         // Mas listarProcessos chama unidadeService.buscarIdsDescendentes para GESTOR.
         // Para CHEFE chama apenas para propria unidade.
 
-        when(OrganizacaoFacade.buscarMapaHierarquia()).thenReturn(new HashMap<>());
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
         when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class))).thenReturn(page);
-        when(OrganizacaoFacade.dtoPorCodigo(100L)).thenThrow(new RuntimeException("Erro"));
+        when(unidadeService.buscarPorId(100L)).thenThrow(new RuntimeException("Erro"));
 
         PageRequest pageRequest = PageRequest.of(0, 10);
         assertThatThrownBy(() -> painelFacade.listarProcessos(Perfil.CHEFE, 100L, pageRequest))
@@ -203,7 +205,7 @@ class PainelFacadeTest {
 
         when(p.getParticipantes()).thenReturn(List.of(up1, up2));
 
-        when(OrganizacaoFacade.buscarMapaHierarquia()).thenReturn(new HashMap<>());
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
         when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
 
@@ -238,7 +240,7 @@ class PainelFacadeTest {
         hierarquia.put(1L, List.of(2L)); // U1 tem U2 como filho
         hierarquia.put(2L, new ArrayList<>());
 
-        when(OrganizacaoFacade.buscarMapaHierarquia()).thenReturn(hierarquia);
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
 

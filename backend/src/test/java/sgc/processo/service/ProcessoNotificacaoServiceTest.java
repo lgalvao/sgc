@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.alerta.*;
+import sgc.organizacao.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
@@ -30,7 +31,10 @@ class ProcessoNotificacaoServiceTest {
     private EmailModelosService emailModelosService;
 
     @Mock
-    private OrganizacaoFacade organizacaoFacade;
+    private UnidadeService unidadeService;
+
+    @Mock
+    private ResponsavelUnidadeService responsavelService;
 
     @Mock
     private ProcessoRepo processoRepo;
@@ -55,7 +59,7 @@ class ProcessoNotificacaoServiceTest {
     @BeforeEach
     void setUp() {
         // Mock default para evitar NullPointerException nas novas lógicas de unidades superiores
-        lenient().when(organizacaoFacade.unidadePorCodigo(anyLong())).thenAnswer(invocation -> {
+        lenient().when(unidadeService.buscarPorId(anyLong())).thenAnswer(invocation -> {
             Long cod = invocation.getArgument(0);
             Unidade u = new Unidade();
             u.setCodigo(cod);
@@ -93,7 +97,7 @@ class ProcessoNotificacaoServiceTest {
         usuarioSubstituto.setEmail("substituto@teste.com");
 
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
-        when(organizacaoFacade.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
+        when(responsavelService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, responsavel));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
                 "TITULAR", usuarioTitular,
                 "SUBSTITUTO", usuarioSubstituto
@@ -135,7 +139,7 @@ class ProcessoNotificacaoServiceTest {
 
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
-        when(organizacaoFacade.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularTitulo("T").build()));
+        when(responsavelService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularTitulo("T").build()));
         when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("T", Usuario.builder().build()));
         when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
                 .thenReturn("HTML");
@@ -162,7 +166,7 @@ class ProcessoNotificacaoServiceTest {
 
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
-        when(organizacaoFacade.buscarResponsaveisUnidades(anyList())).thenReturn(Collections.emptyMap());
+        when(responsavelService.buscarResponsaveisUnidades(anyList())).thenReturn(Collections.emptyMap());
         when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
                 .thenReturn("HTML");
 
@@ -201,7 +205,7 @@ class ProcessoNotificacaoServiceTest {
         UnidadeResponsavelDto r2 = UnidadeResponsavelDto.builder().unidadeCodigo(2L).titularTitulo("T2").build();
 
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(processo));
-        when(organizacaoFacade.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1, 2L, r2));
+        when(responsavelService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(1L, r1, 2L, r2));
         when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
                 .thenReturn("HTML");
 
@@ -238,7 +242,7 @@ class ProcessoNotificacaoServiceTest {
 
             when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(p));
             when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s));
-            when(organizacaoFacade.buscarResponsaveisUnidades(any())).thenReturn(Collections.emptyMap());
+            when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Collections.emptyMap());
             when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
                     .thenReturn("HTML");
 
@@ -270,7 +274,7 @@ class ProcessoNotificacaoServiceTest {
 
             when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(processo));
             when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
-            when(organizacaoFacade.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(11L, resp));
+            when(responsavelService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(11L, resp));
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("TITULAR", usuarioTitular));
             when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
                     .thenReturn("HTML");
@@ -303,7 +307,7 @@ class ProcessoNotificacaoServiceTest {
 
             when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(processo));
             when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocesso));
-            when(organizacaoFacade.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(12L, resp));
+            when(responsavelService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(12L, resp));
             when(usuarioService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of("SUBSTITUTO", usuarioSub));
             when(emailModelosService.criarEmailInicioProcessoConsolidado(any(), any(), any(), anyBoolean(), anyList()))
                     .thenReturn("HTML");

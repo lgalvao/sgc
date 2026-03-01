@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.*;
+import sgc.organizacao.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
@@ -22,7 +23,8 @@ class ProcessoNotificacaoServiceCoverageExtraTest {
     @Mock private AlertaFacade servicoAlertas;
     @Mock private EmailService emailService;
     @Mock private EmailModelosService emailModelosService;
-    @Mock private OrganizacaoFacade organizacaoFacade;
+    @Mock private UnidadeService unidadeService;
+    @Mock private ResponsavelUnidadeService responsavelService;
     @Mock private UsuarioFacade usuarioService;
     @Mock private ProcessoRepo processoRepo;
     @Mock private SubprocessoService subprocessoService;
@@ -59,11 +61,11 @@ class ProcessoNotificacaoServiceCoverageExtraTest {
         proc.adicionarParticipantes(Set.of(u1, u2));
 
         when(processoRepo.findByIdComParticipantes(1L)).thenReturn(Optional.of(proc));
-        when(organizacaoFacade.unidadesPorCodigos(anyList())).thenReturn(List.of(u1, u2));
+        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(u1, u2));
 
         UnidadeResponsavelDto resp1 = new UnidadeResponsavelDto(10L, "titular1", "nome1", "sub1", "nomesub1");
         UnidadeResponsavelDto resp2 = new UnidadeResponsavelDto(20L, "titular2", "nome2", null, null);
-        when(organizacaoFacade.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, resp1, 20L, resp2));
+        when(responsavelService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(10L, resp1, 20L, resp2));
 
         Usuario userSub = new Usuario();
         userSub.setEmail("sub@test.com");

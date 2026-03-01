@@ -6,6 +6,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.security.core.*;
 import org.springframework.security.core.authority.*;
+import sgc.organizacao.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
@@ -25,7 +26,7 @@ class ProcessoAcessoServiceTest {
     private ProcessoAcessoService processoAcessoService;
 
     @Mock
-    private OrganizacaoFacade unidadeService;
+    private UnidadeService unidadeService;
 
     @Mock
     private UsuarioFacade usuarioService;
@@ -80,7 +81,7 @@ class ProcessoAcessoServiceTest {
         Unidade u101 = UnidadeTestBuilder.umaDe().comCodigo("101").comSuperior(u100).build();
         Unidade u102 = UnidadeTestBuilder.umaDe().comCodigo("102").comSuperior(u101).build();
 
-        when(unidadeService.unidadesComHierarquia()).thenReturn(List.of(u100, u101, u102));
+        when(unidadeService.todasComHierarquia()).thenReturn(List.of(u100, u101, u102));
 
         when(queryService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {
             List<Long> ids = invocation.getArgument(1);
@@ -99,7 +100,7 @@ class ProcessoAcessoServiceTest {
         Unidade u4 = UnidadeTestBuilder.umaDe().comCodigo("4").comSuperior(u2).build();
         Unidade u5 = UnidadeTestBuilder.umaDe().comCodigo("5").build(); // Independente
 
-        when(unidadeService.unidadesComHierarquia()).thenReturn(List.of(u1, u2, u3, u4, u5));
+        when(unidadeService.todasComHierarquia()).thenReturn(List.of(u1, u2, u3, u4, u5));
 
         List<Long> descendentes = processoAcessoService.buscarCodigosDescendentes(1L);
 
@@ -150,7 +151,7 @@ class ProcessoAcessoServiceTest {
         u1.setUnidadeSuperior(u2);
         u2.setUnidadeSuperior(u1);
 
-        when(unidadeService.unidadesComHierarquia()).thenReturn(List.of(u1, u2));
+        when(unidadeService.todasComHierarquia()).thenReturn(List.of(u1, u2));
 
         List<Long> descendentes = processoAcessoService.buscarCodigosDescendentes(1L);
 
@@ -176,7 +177,7 @@ class ProcessoAcessoServiceTest {
         Unidade u100 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
         Unidade u200 = UnidadeTestBuilder.umaDe().comCodigo("200").build();
 
-        when(unidadeService.unidadesComHierarquia()).thenReturn(List.of(u100, u200));
+        when(unidadeService.todasComHierarquia()).thenReturn(List.of(u100, u200));
 
 
         // Se a lista de IDs conter 200, acesso é permitido. Se tiver apenas 100, negado.

@@ -11,6 +11,8 @@ import sgc.organizacao.model.*;
 import java.util.*;
 import java.util.function.*;
 
+import static sgc.organizacao.model.TipoUnidade.*;
+
 /**
  * Serviço especializado para gerenciar a hierarquia de unidades organizacionais.
  */
@@ -18,6 +20,7 @@ import java.util.function.*;
 @RequiredArgsConstructor
 public class UnidadeHierarquiaService {
     private final UnidadeRepo unidadeRepo;
+    private final UnidadeService unidadeService;
     private final ComumRepo repo;
 
     /**
@@ -34,6 +37,23 @@ public class UnidadeHierarquiaService {
     public List<UnidadeDto> buscarArvoreComElegibilidade(Predicate<Unidade> elegibilidadeChecker) {
         List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
         return montarHierarquia(todasUnidades, elegibilidadeChecker);
+    }
+
+    /**
+     * Busca a árvore hierárquica com filtro de elegibilidade baseado em parâmetros de negócio.
+     */
+    public List<UnidadeDto> buscarArvoreComElegibilidade(
+            boolean requerMapaVigente, Set<Long> unidadesBloqueadas) {
+
+        Set<Long> unidadesComMapa = requerMapaVigente
+                ? new HashSet<>(unidadeService.buscarTodosCodigosUnidadesComMapa())
+                : Collections.emptySet();
+
+        return buscarArvoreComElegibilidade(u ->
+                u.getTipo() != INTERMEDIARIA
+                        && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
+                        && !unidadesBloqueadas.contains(u.getCodigo())
+        );
     }
 
     /**

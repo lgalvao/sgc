@@ -28,7 +28,7 @@ class LoginFacadeTest {
     @Mock
     private ClienteAcessoAd clienteAcessoAd;
     @Mock
-    private OrganizacaoFacade OrganizacaoFacade;
+    private UnidadeService unidadeService;
     @Mock
     private UsuarioService usuarioServiceInterno;
 
@@ -40,7 +40,7 @@ class LoginFacadeTest {
                 usuarioFacade,
                 gerenciadorJwt,
                 clienteAcessoAd,
-                OrganizacaoFacade,
+                unidadeService,
                 usuarioServiceInterno
         );
         ReflectionTestUtils.setField(loginFacade, "ambienteTestes", false);
@@ -56,7 +56,7 @@ class LoginFacadeTest {
     @Test
     @DisplayName("autenticar deve retornar false se clienteAcessoAd for null")
     void autenticar_ClienteAdNull() {
-        LoginFacade facadeSemAd = new LoginFacade(usuarioFacade, gerenciadorJwt, null, OrganizacaoFacade, usuarioServiceInterno);
+        LoginFacade facadeSemAd = new LoginFacade(usuarioFacade, gerenciadorJwt, null, unidadeService, usuarioServiceInterno);
         ReflectionTestUtils.setField(facadeSemAd, "ambienteTestes", false);
         assertThat(facadeSemAd.autenticar("123", "senha")).isFalse();
     }
@@ -102,7 +102,7 @@ class LoginFacadeTest {
 
         when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
         when(gerenciadorJwt.gerarToken("123", Perfil.ADMIN, 1L)).thenReturn("token");
-        when(OrganizacaoFacade.unidadePorCodigo(1L)).thenReturn(unidade);
+        when(unidadeService.buscarPorId(1L)).thenReturn(unidade);
 
         EntrarRequest req = new EntrarRequest("123", "ADMIN", 1L);
         assertThat(loginFacade.entrar(req)).isEqualTo("token");
@@ -139,7 +139,7 @@ class LoginFacadeTest {
 
         when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
         when(gerenciadorJwt.gerarToken("123", Perfil.GESTOR, 1L)).thenReturn("token");
-        when(OrganizacaoFacade.unidadePorCodigo(1L)).thenReturn(unidade);
+        when(unidadeService.buscarPorId(1L)).thenReturn(unidade);
 
         EntrarRequest req = new EntrarRequest("123", "GESTOR", 1L);
         assertThat(loginFacade.entrar(req)).isEqualTo("token");

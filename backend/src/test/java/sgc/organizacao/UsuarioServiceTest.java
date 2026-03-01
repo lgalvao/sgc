@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 
 import java.util.*;
 
@@ -30,7 +31,16 @@ class UsuarioServiceTest {
     private UsuarioFacade usuarioService;
 
     @Autowired
-    private OrganizacaoFacade orgFacade;
+    private UnidadeService unidadeService2;
+
+    @Autowired
+    private UnidadeHierarquiaService hierarquiaService;
+
+    @Autowired
+    private ResponsavelUnidadeService responsavelService;
+
+    @Autowired
+    private UsuarioService usuarioServiceInternal;
 
     @Nested
     @DisplayName("Consultas de Usuário")
@@ -94,7 +104,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar unidade por código")
         void deveBuscarUnidadePorCodigo() {
 
-            UnidadeDto result = orgFacade.dtoPorCodigo(COD_UNIT_SEC1);
+            Unidade result = unidadeService2.buscarPorId(COD_UNIT_SEC1);
 
 
             assertNotNull(result);
@@ -105,7 +115,7 @@ class UsuarioServiceTest {
         @Test
         @DisplayName("Deve buscar unidades ativas")
         void deveBuscarUnidadesAtivas() {
-            List<UnidadeDto> result = orgFacade.buscarTodasUnidades();
+            List<UnidadeDto> result = hierarquiaService.buscarArvoreHierarquica();
 
             assertNotNull(result);
             assertFalse(result.isEmpty());
@@ -115,7 +125,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar subunidades")
         void deveBuscarSubunidades() {
 
-            List<UnidadeDto> result = orgFacade.buscarSubordinadas(COD_UNIT_SEC1);
+            List<UnidadeDto> result = hierarquiaService.buscarSubordinadas(COD_UNIT_SEC1);
 
 
             assertNotNull(result);
@@ -129,7 +139,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve construir árvore hierárquica")
         void deveConstruirArvoreHierarquica() {
 
-            List<UnidadeDto> result = orgFacade.buscarArvoreHierarquica();
+            List<UnidadeDto> result = hierarquiaService.buscarArvoreHierarquica();
 
 
             assertNotNull(result);
@@ -148,15 +158,15 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar usuários por unidade de lotação")
         void deveBuscarPorUnidadeLotacao() {
 
-            List<Usuario> res = orgFacade.usuariosPorCodigoUnidade(2L);
+            List<Usuario> res = usuarioServiceInternal.buscarPorUnidadeLotacao(2L);
             assertFalse(res.isEmpty());
         }
 
         @Test
         @DisplayName("Deve lançar erro ao buscar unidade inexistente por código ou sigla")
         void deveRetornarErroAoBuscarUnidadeInexistente() {
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> orgFacade.dtoPorCodigo(9999L));
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> orgFacade.buscarPorSigla("SIGLA_NAO_EXISTE"));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService2.buscarPorId(9999L));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService2.buscarPorSigla("SIGLA_NAO_EXISTE"));
         }
     }
 
@@ -167,7 +177,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar responsável da unidade")
         void deveBuscarResponsavelUnidade() {
 
-            UnidadeResponsavelDto result = orgFacade.buscarResponsavelUnidade(2L);
+            UnidadeResponsavelDto result = responsavelService.buscarResponsavelUnidade(2L);
 
 
             assertNotNull(result);
@@ -194,7 +204,7 @@ class UsuarioServiceTest {
             List<Long> unidades = List.of(2L, 9L);
 
 
-            Map<Long, UnidadeResponsavelDto> result = orgFacade.buscarResponsaveisUnidades(unidades);
+            Map<Long, UnidadeResponsavelDto> result = responsavelService.buscarResponsaveisUnidades(unidades);
 
 
             assertNotNull(result);
@@ -260,7 +270,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar responsáveis ignorando unidades sem chefe")
         void deveBuscarResponsaveisIgnorandoSemChefe() {
 
-            Map<Long, UnidadeResponsavelDto> res = orgFacade.buscarResponsaveisUnidades(List.of(9999L));
+            Map<Long, UnidadeResponsavelDto> res = responsavelService.buscarResponsaveisUnidades(List.of(9999L));
             assertTrue(res.isEmpty());
         }
 

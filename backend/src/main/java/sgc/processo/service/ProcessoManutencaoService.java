@@ -4,8 +4,8 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
 import sgc.processo.erros.*;
 import sgc.processo.model.*;
@@ -22,14 +22,14 @@ import static sgc.processo.model.TipoProcesso.*;
 @RequiredArgsConstructor
 public class ProcessoManutencaoService {
     private final ProcessoRepo processoRepo;
-    private final OrganizacaoFacade organizacaoFacade;
+    private final UnidadeService unidadeService;
     private final ProcessoValidador processoValidador;
     private final ProcessoConsultaService processoConsultaService;
 
     @Transactional
     public Processo criar(CriarProcessoRequest req) {
         Set<Unidade> participantes = req.unidades().stream()
-                .map(organizacaoFacade::unidadePorCodigo)
+                .map(unidadeService::buscarPorId)
                 .collect(Collectors.toSet());
 
         processoValidador.validarTiposUnidades(new ArrayList<>(participantes)).ifPresent(msg -> {
@@ -78,7 +78,7 @@ public class ProcessoManutencaoService {
             });
         }
 
-        Set<Unidade> participantes = req.unidades().stream().map(organizacaoFacade::unidadePorCodigo).collect(Collectors.toSet());
+        Set<Unidade> participantes = req.unidades().stream().map(unidadeService::buscarPorId).collect(Collectors.toSet());
         processoValidador.validarTiposUnidades(new ArrayList<>(participantes)).ifPresent(msg -> {
             throw new ErroProcesso(msg);
         });

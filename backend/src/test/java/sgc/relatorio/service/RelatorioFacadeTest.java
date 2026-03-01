@@ -7,7 +7,7 @@ import org.mockito.junit.jupiter.*;
 import org.openpdf.text.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
-import sgc.organizacao.*;
+import sgc.organizacao.service.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.processo.*;
@@ -32,7 +32,9 @@ class RelatorioFacadeTest {
     @Mock
     private SubprocessoService subprocessoService;
     @Mock
-    private OrganizacaoFacade unidadeService;
+    private UnidadeService unidadeService;
+    @Mock
+    private ResponsavelUnidadeService responsavelService;
     @Mock
     private MapaManutencaoService mapaManutencaoService;
 
@@ -63,7 +65,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(unidadeService.buscarResponsavelUnidade(1L)).thenReturn(UnidadeResponsavelDto.builder().titularNome("Resp").build());
+        when(responsavelService.buscarResponsavelUnidade(1L)).thenReturn(UnidadeResponsavelDto.builder().titularNome("Resp").build());
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);

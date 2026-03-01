@@ -20,7 +20,7 @@ class LoginControllerCoverageTest {
     @Mock
     private LoginFacade loginFacade;
     @Mock
-    private OrganizacaoFacade organizacaoFacade;
+    private UsuarioFacade usuarioFacade;
     @Mock
     private LimitadorTentativasLogin limitadorTentativasLogin;
     @Mock

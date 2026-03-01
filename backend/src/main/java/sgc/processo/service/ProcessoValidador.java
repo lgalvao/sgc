@@ -5,8 +5,8 @@ import lombok.extern.slf4j.*;
 import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.erros.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.service.*;
@@ -17,7 +17,7 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 class ProcessoValidador {
-    private final OrganizacaoFacade organizacaoFacade;
+    private final UnidadeService unidadeService;
     private final ConsultasSubprocessoService queryService;
 
     /**
@@ -29,11 +29,11 @@ class ProcessoValidador {
         }
 
         List<Long> unidadesSemMapa = codigosUnidades.stream()
-                .filter(codigo -> !organizacaoFacade.verificarMapaVigente(codigo))
+                .filter(codigo -> !unidadeService.verificarMapaVigente(codigo))
                 .toList();
 
         if (!unidadesSemMapa.isEmpty()) {
-            List<String> siglasUnidadesSemMapa = organizacaoFacade.siglasUnidadesPorCodigos(unidadesSemMapa);
+            List<String> siglasUnidadesSemMapa = unidadeService.buscarSiglasPorIds(unidadesSemMapa);
             return Optional.of(("As seguintes unidades não possuem mapa vigente e não podem participar"
                     + " de um processo de revisão: %s").formatted(String.join(", ", siglasUnidadesSemMapa)));
         }

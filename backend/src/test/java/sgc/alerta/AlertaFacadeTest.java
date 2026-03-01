@@ -6,6 +6,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import sgc.alerta.model.*;
+import sgc.organizacao.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
@@ -33,7 +34,7 @@ class AlertaFacadeTest {
     private UsuarioFacade usuarioService;
 
     @Mock
-    private OrganizacaoFacade unidadeService;
+    private UnidadeService unidadeService;
 
     @InjectMocks
     private AlertaFacade service;
@@ -42,7 +43,7 @@ class AlertaFacadeTest {
         Unidade unidadeRaiz = new Unidade();
         unidadeRaiz.setCodigo(1L);
         unidadeRaiz.setSigla("ADMIN");
-        when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidadeRaiz);
+        when(unidadeService.buscarPorId(1L)).thenReturn(unidadeRaiz);
     }
 
     @Nested
@@ -436,16 +437,16 @@ class AlertaFacadeTest {
             unidadeRaizMock.setSigla("ADMIN");
             unidadeRaizMock.setCodigo(1L);
 
-            when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidadeRaizMock);
+            when(unidadeService.buscarPorId(1L)).thenReturn(unidadeRaizMock);
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             // Primeira chamada: deve buscar unidadeRaiz
             service.criarAlertaAdmin(new Processo(), new Unidade(), "Teste");
-            verify(unidadeService).unidadePorCodigo(1L);
+            verify(unidadeService).buscarPorId(1L);
 
             // Segunda chamada: busca novamente (sem cache lazy - simplificação para sistema pequeno)
             service.criarAlertaAdmin(new Processo(), new Unidade(), "Teste 2");
-            verify(unidadeService, times(2)).unidadePorCodigo(1L);
+            verify(unidadeService, times(2)).buscarPorId(1L);
         }
     }
 }

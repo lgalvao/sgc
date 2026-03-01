@@ -35,7 +35,7 @@ class LoginControllerLogInjectionTest {
     private LoginFacade loginFacade;
 
     @MockitoBean
-    private OrganizacaoFacade organizacaoFacade;
+    private UsuarioFacade usuarioFacade;
 
     @MockitoBean
     private LimitadorTentativasLogin limitadorTentativasLogin;

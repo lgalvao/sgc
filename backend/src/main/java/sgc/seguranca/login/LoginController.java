@@ -28,7 +28,7 @@ import java.util.*;
 @Tag(name = "Login", description = "Autenticação e autorização de usuários")
 public class LoginController {
     private final LoginFacade loginFacade;
-    private final OrganizacaoFacade organizacaoFacade;
+    private final UsuarioFacade usuarioFacade;
     private final LimitadorTentativasLogin limitadorTentativasLogin;
     private final GerenciadorJwt gerenciadorJwt;
 
@@ -90,7 +90,7 @@ public class LoginController {
 
         verificarTokenPreAuth(httpRequest, request.tituloEleitoral());
         String token = loginFacade.entrar(request);
-        Usuario usuario = organizacaoFacade.buscarPorLogin(request.tituloEleitoral());
+        Usuario usuario = usuarioFacade.buscarPorLogin(request.tituloEleitoral());
 
         EntrarResponse response = EntrarResponse.builder()
                 .tituloEleitoral(request.tituloEleitoral())

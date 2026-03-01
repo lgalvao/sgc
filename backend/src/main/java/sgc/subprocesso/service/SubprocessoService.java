@@ -59,7 +59,8 @@ public class SubprocessoService {
     private final ComumRepo repo;
     private final AnaliseRepo analiseRepo;
     private final AlertaFacade alertaService;
-    private final OrganizacaoFacade organizacaoFacade;
+    private final UnidadeService unidadeService;
+    private final ResponsavelUnidadeService responsavelService;
     private final HierarquiaService hierarquiaService;
     private final UsuarioFacade usuarioFacade;
     private final ImpactoMapaService impactoMapaService;
@@ -485,7 +486,7 @@ public class SubprocessoService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validarSituacaoPermitida(sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
-        Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
+        Unidade admin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
 
         registrarTransicao(RegistrarTransicaoCommand.builder()
@@ -567,7 +568,7 @@ public class SubprocessoService {
 
         var impactos = impactoMapaService.verificarImpactos(sp, usuario);
         if (impactos.temImpactos()) {
-            Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
+            Unidade admin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
             registrarTransicao(RegistrarTransicaoCommand.builder()
                     .sp(sp)
@@ -613,7 +614,7 @@ public class SubprocessoService {
         Subprocesso sp = buscarSubprocesso(codigo);
         validarSituacaoMinima(sp, situacaoMinima, "Subprocesso ainda está em fase de " + (isRevisao ? "revisão" : "cadastro") + ".");
 
-        Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
+        Unidade admin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
 
         sp.setSituacao(novaSituacao);
@@ -701,7 +702,7 @@ public class SubprocessoService {
     public void registrarMovimentacaoLembrete(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        var unidadeAdmin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
+        var unidadeAdmin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
 
         movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(subprocesso)
@@ -932,7 +933,7 @@ public class SubprocessoService {
         sp.setDataLimiteEtapa2(request.dataLimite().atStartOfDay());
         sp.setDataFimEtapa1(LocalDateTime.now());
 
-        Unidade unidadeRaiz = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
+        Unidade unidadeRaiz = unidadeService.buscarPorSigla(SIGLA_ADMIN);
         RegistrarTransicaoCommand transicaoCommand = RegistrarTransicaoCommand.builder()
                 .sp(sp)
                 .tipo(TipoTransicao.MAPA_DISPONIBILIZADO)
@@ -1124,7 +1125,7 @@ public class SubprocessoService {
 
         sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
 
-        Unidade admin = organizacaoFacade.buscarEntidadePorSigla(SIGLA_ADMIN);
+        Unidade admin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
         registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(sp)
                 .tipo(TipoTransicao.MAPA_HOMOLOGADO)
@@ -1332,7 +1333,7 @@ public class SubprocessoService {
         boolean isGestor = perfil == Perfil.GESTOR;
         boolean isAdmin = perfil == Perfil.ADMIN;
 
-        boolean temMapaVigente = organizacaoFacade.verificarMapaVigente(sp.getUnidade().getCodigo());
+        boolean temMapaVigente = unidadeService.verificarMapaVigente(sp.getUnidade().getCodigo());
 
         return PermissoesSubprocessoDto.builder()
                 .podeEditarCadastro(mesmaUnidade && isChefe && Set.of(
@@ -1470,7 +1471,8 @@ public class SubprocessoService {
 
     @Transactional
     public Analise criarAnalise(Subprocesso sp, CriarAnaliseRequest request, TipoAnalise tipo) {
-        var unidadeDto = organizacaoFacade.buscarPorSigla(request.siglaUnidade());
+        Unidade unidadeEntidade = unidadeService.buscarPorSigla(request.siglaUnidade());
+        var unidadeDto = UnidadeDto.fromEntity(unidadeEntidade);
 
         Analise analise = Analise.builder()
                 .subprocesso(sp)
@@ -1501,7 +1503,7 @@ public class SubprocessoService {
     }
 
     public AnaliseHistoricoDto paraHistoricoDto(Analise analise) {
-        UnidadeDto unidade = organizacaoFacade.dtoPorCodigo(analise.getUnidadeCodigo());
+        UnidadeDto unidade = UnidadeDto.fromEntity(unidadeService.buscarPorId(analise.getUnidadeCodigo()));
 
         return AnaliseHistoricoDto.builder()
                 .dataHora(analise.getDataHora())
@@ -1618,7 +1620,7 @@ public class SubprocessoService {
     }
 
     private void notificarResponsavelPessoal(Unidade unidade, String assunto, String corpo, TipoTransicao tipo) {
-        UnidadeResponsavelDto responsavel = organizacaoFacade.buscarResponsavelUnidade(unidade.getCodigo());
+        UnidadeResponsavelDto responsavel = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
         if (responsavel.substitutoTitulo() != null) {
             usuarioFacade.buscarUsuarioPorTitulo(responsavel.substitutoTitulo()).ifPresent(u -> {
                 if (!u.getEmail().isBlank()) {

@@ -41,7 +41,7 @@ class LoginControllerTest {
     private LoginFacade loginFacade;
 
     @MockitoBean
-    private OrganizacaoFacade organizacaoFacade;
+    private UsuarioFacade usuarioFacade;
 
     @MockitoBean
     private LimitadorTentativasLogin limitadorTentativasLogin;
@@ -255,7 +255,7 @@ class LoginControllerTest {
         usuario.setTituloEleitoral("123");
 
         when(loginFacade.entrar(any(EntrarRequest.class))).thenReturn("token-jwt");
-        when(organizacaoFacade.buscarPorLogin("123")).thenReturn(usuario);
+        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
         when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
 
         mockMvc.perform(post("/api/usuarios/entrar")
@@ -322,13 +322,13 @@ class LoginControllerTest {
         @BeforeEach
         void setUp() {
             loginFacadeMock = mock(LoginFacade.class);
-            OrganizacaoFacade organizacaoFacadeMock = mock(OrganizacaoFacade.class);
+            UsuarioFacade usuarioFacadeMock = mock(UsuarioFacade.class);
             LimitadorTentativasLogin limitadorMock = mock(LimitadorTentativasLogin.class);
             gerenciadorJwtMock = mock(GerenciadorJwt.class);
 
             controller = new LoginController(
                     loginFacadeMock,
-                    organizacaoFacadeMock,
+                    usuarioFacadeMock,
                     limitadorMock,
                     gerenciadorJwtMock
             );

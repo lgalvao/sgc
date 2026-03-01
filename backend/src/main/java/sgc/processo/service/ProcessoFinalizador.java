@@ -6,8 +6,8 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.model.*;
 import sgc.mapa.model.*;
-import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
@@ -22,7 +22,7 @@ public class ProcessoFinalizador {
 
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
-    private final OrganizacaoFacade organizacaoFacade;
+    private final UnidadeService unidadeService;
     private final ConsultasSubprocessoService queryService;
     private final ProcessoValidador processoValidador;
     private final ProcessoNotificacaoService notificacaoService;
@@ -52,7 +52,7 @@ public class ProcessoFinalizador {
         for (Subprocesso subprocesso : subprocessos) {
             Unidade unidade = subprocesso.getUnidade();
             Mapa mapa = subprocesso.getMapa();
-            organizacaoFacade.definirMapaVigente(unidade.getCodigo(), mapa);
+            unidadeService.definirMapaVigente(unidade.getCodigo(), mapa);
         }
         log.info("Mapa(s) de {} subprocesso(s) definidos como vigentes.", subprocessos.size());
     }

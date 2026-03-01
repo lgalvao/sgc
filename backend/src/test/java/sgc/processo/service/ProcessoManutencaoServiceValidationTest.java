@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import sgc.organizacao.*;
+import sgc.organizacao.service.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.erros.*;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 @DisplayName("ProcessoManutencaoServiceValidationTest")
 class ProcessoManutencaoServiceValidationTest {
     @Mock
-    private OrganizacaoFacade unidadeService;
+    private UnidadeService unidadeService;
     @Mock
     private ProcessoValidador processoValidador;
     @InjectMocks
@@ -42,7 +42,7 @@ class ProcessoManutencaoServiceValidationTest {
                 .comTipo(TipoUnidade.INTERMEDIARIA)
                 .build();
 
-        when(unidadeService.unidadePorCodigo(1L)).thenReturn(unidadeIntermediaria);
+        when(unidadeService.buscarPorId(1L)).thenReturn(unidadeIntermediaria);
 
         when(processoValidador.validarTiposUnidades(anyList()))
                 .thenReturn(Optional.of("Unidades do tipo INTERMEDIARIA não podem participar de processos: COORD_11"));

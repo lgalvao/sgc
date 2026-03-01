@@ -11,6 +11,7 @@ import org.springframework.security.core.*;
 import sgc.alerta.*;
 import sgc.comum.erros.*;
 import sgc.fixture.*;
+import sgc.organizacao.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.*;
@@ -44,7 +45,7 @@ class ProcessoFacadeTest {
     @Mock
     private ProcessoConsultaService processoConsultaService;
     @Mock
-    private OrganizacaoFacade unidadeService;
+    private UnidadeService unidadeService;
     @Mock
     private AlertaFacade alertaService;
     @Mock
@@ -111,7 +112,7 @@ class ProcessoFacadeTest {
             processo.adicionarParticipantes(Set.of(unidade));
 
             when(processoConsultaService.buscarProcessoCodigo(codProcesso)).thenReturn(processo);
-            when(unidadeService.unidadePorCodigo(codUnidade)).thenReturn(unidade);
+            when(unidadeService.buscarPorId(codUnidade)).thenReturn(unidade);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
             when(subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
             unidade.setTituloTitular("T1");
@@ -283,7 +284,7 @@ class ProcessoFacadeTest {
             p.adicionarParticipantes(Set.of(u));
 
             when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
-            when(unidadeService.unidadePorCodigo(10L)).thenReturn(u);
+            when(unidadeService.buscarPorId(10L)).thenReturn(u);
             Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
             when(subprocessoService.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
             u.setTituloTitular("T10");
@@ -308,7 +309,7 @@ class ProcessoFacadeTest {
             p.adicionarParticipantes(Set.of(outra));
 
             when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
-            when(unidadeService.unidadePorCodigo(10L)).thenReturn(u);
+            when(unidadeService.buscarPorId(10L)).thenReturn(u);
 
             assertThatThrownBy(() -> processoFacade.enviarLembrete(1L, 10L))
                     .isInstanceOf(ErroProcesso.class)

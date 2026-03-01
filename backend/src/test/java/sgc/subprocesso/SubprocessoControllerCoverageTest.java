@@ -13,7 +13,8 @@ import sgc.comum.ComumDtos.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.organizacao.*;
+import sgc.organizacao.service.*;
+import sgc.organizacao.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -36,7 +37,7 @@ class SubprocessoControllerCoverageTest {
     @MockitoBean
     private SubprocessoService subprocessoService;
     @MockitoBean
-    private OrganizacaoFacade organizacaoFacade;
+    private UnidadeService unidadeService;
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
     @Autowired
@@ -71,8 +72,8 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("buscarPorProcessoEUnidade - deve retornar subprocesso")
     @WithMockUser
     void buscarPorProcessoEUnidade() throws Exception {
-        sgc.organizacao.dto.UnidadeDto un = sgc.organizacao.dto.UnidadeDto.builder().codigo(2L).build();
-        when(organizacaoFacade.buscarPorSigla("SIGLA")).thenReturn(un);
+        Unidade un = new Unidade(); un.setCodigo(2L);
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(un);
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
         when(subprocessoService.obterEntidadePorProcessoEUnidade(1L, 2L)).thenReturn(sp);
@@ -182,7 +183,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).reabrirCadastro(eq(1L), eq("Justificativa"));
+        verify(subprocessoService).reabrirCadastro(1L, "Justificativa");
     }
 
     @Test
@@ -197,7 +198,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).reabrirRevisaoCadastro(eq(1L), eq("Justificativa"));
+        verify(subprocessoService).reabrirRevisaoCadastro(1L, "Justificativa");
     }
 
     @Test

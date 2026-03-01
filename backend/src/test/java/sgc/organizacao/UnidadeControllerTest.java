@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.*;
 import sgc.seguranca.*;
 
@@ -28,7 +29,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UnidadeControllerTest {
 
     @MockitoBean
-    private OrganizacaoFacade unidadeService;
+    private UnidadeService unidadeService;
+
+    @MockitoBean
+    private UnidadeHierarquiaService hierarquiaService;
+
+    @MockitoBean
+    private ResponsavelUnidadeService responsavelService;
+
+    @MockitoBean
+    private UsuarioService usuarioServiceBean;
 
     @MockitoBean
     private ProcessoFacade processoFacade;
@@ -55,7 +65,7 @@ class UnidadeControllerTest {
                         .content(conteudo))
                 .andExpect(status().isCreated());
 
-        verify(unidadeService)
+        verify(responsavelService)
                 .criarAtribuicaoTemporaria(eq(1L), any(CriarAtribuicaoRequest.class));
     }
 
@@ -64,7 +74,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornarListaAoBuscarTodasUnidades() throws Exception {
 
-        when(unidadeService.buscarTodasUnidades()).thenReturn(Collections.emptyList());
+        when(hierarquiaService.buscarArvoreHierarquica()).thenReturn(Collections.emptyList());
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades"))
@@ -80,7 +90,7 @@ class UnidadeControllerTest {
 
         when(processoFacade.buscarIdsUnidadesEmProcessosAtivos(any()))
                 .thenReturn(Collections.emptySet());
-        when(unidadeService.buscarArvoreComElegibilidade(anyBoolean(), any()))
+        when(hierarquiaService.buscarArvoreComElegibilidade(anyBoolean(), any()))
                 .thenReturn(Collections.emptyList());
 
         // Act & Assert
@@ -112,7 +122,7 @@ class UnidadeControllerTest {
                 .nome("Teste")
                 .unidadeLotacao(Unidade.builder().codigo(1L).build())
                 .build();
-        when(unidadeService.usuariosPorCodigoUnidade(1L)).thenReturn(List.of(usuario));
+        when(usuarioServiceBean.buscarPorUnidadeLotacao(1L)).thenReturn(List.of(usuario));
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/1/usuarios")).andExpect(status().isOk());
@@ -123,7 +133,9 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornarUnidadePorSigla() throws Exception {
 
-        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(UnidadeDto.builder().build());
+        Unidade u = new Unidade();
+        u.setSigla("SIGLA");
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(u);
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/sigla/SIGLA")).andExpect(status().isOk());
@@ -134,7 +146,9 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornarUnidadePorId() throws Exception {
 
-        when(unidadeService.dtoPorCodigo(1L)).thenReturn(UnidadeDto.builder().build());
+        Unidade un = new Unidade();
+        un.setCodigo(1L);
+        when(unidadeService.buscarPorId(1L)).thenReturn(un);
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/1")).andExpect(status().isOk());
@@ -145,7 +159,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornarArvoreDeUnidadeExistente() throws Exception {
 
-        when(unidadeService.buscarArvore(1L)).thenReturn(UnidadeDto.builder().build());
+        when(hierarquiaService.buscarArvore(1L)).thenReturn(UnidadeDto.builder().build());
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/1/arvore"))
@@ -157,7 +171,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornarSiglasSubordinadas() throws Exception {
 
-        when(unidadeService.buscarSiglasSubordinadas("SIGLA")).thenReturn(List.of("SIGLA", "FILHA"));
+        when(hierarquiaService.buscarSiglasSubordinadas("SIGLA")).thenReturn(List.of("SIGLA", "FILHA"));
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/sigla/SIGLA/subordinadas"))
@@ -169,7 +183,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornarSiglaSuperior() throws Exception {
 
-        when(unidadeService.buscarSiglaSuperior("FILHA")).thenReturn(Optional.of("SIGLA"));
+        when(hierarquiaService.buscarSiglaSuperior("FILHA")).thenReturn(Optional.of("SIGLA"));
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/sigla/FILHA/superior"))
@@ -181,7 +195,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornar204AoBuscarSiglaSuperiorDeRaiz() throws Exception {
 
-        when(unidadeService.buscarSiglaSuperior("RAIZ")).thenReturn(Optional.empty());
+        when(hierarquiaService.buscarSiglaSuperior("RAIZ")).thenReturn(Optional.empty());
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/sigla/RAIZ/superior"))

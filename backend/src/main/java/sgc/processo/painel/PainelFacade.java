@@ -7,8 +7,8 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
 import sgc.alerta.model.*;
-import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
@@ -26,7 +26,8 @@ import static java.util.stream.Collectors.*;
 public class PainelFacade {
     private final ProcessoFacade processoFacade;
     private final AlertaFacade alertaService;
-    private final OrganizacaoFacade organizacaoFacade;
+    private final UnidadeHierarquiaService hierarquiaService;
+    private final UnidadeService unidadeService;
 
     /**
      * Lista processos com base no perfil e na unidade do usuário.
@@ -41,13 +42,13 @@ public class PainelFacade {
         Pageable sortedPageable = garantirOrdenacaoPadrao(pageable);
         Page<Processo> processos;
 
-        Map<Long, List<Long>> mapaPaiFilhos = organizacaoFacade.buscarMapaHierarquia();
+        Map<Long, List<Long>> mapaPaiFilhos = hierarquiaService.buscarMapaHierarquia();
         if (perfil == Perfil.ADMIN) {
             processos = processoFacade.listarTodos(sortedPageable);
         } else {
             List<Long> codigosUnidades = new ArrayList<>();
             if (perfil == Perfil.GESTOR) {
-                codigosUnidades.addAll(organizacaoFacade.buscarIdsDescendentes(codigoUnidade, mapaPaiFilhos));
+                codigosUnidades.addAll(hierarquiaService.buscarDescendentes(codigoUnidade, mapaPaiFilhos));
             }
             codigosUnidades.add(codigoUnidade);
             processos = processoFacade.listarPorParticipantesIgnorandoCriado(codigosUnidades, sortedPageable);
@@ -173,7 +174,7 @@ public class PainelFacade {
         });
 
         if (!missingIds.isEmpty()) {
-            List<Unidade> missingUnidades = organizacaoFacade.unidadesPorCodigos(missingIds);
+            List<Unidade> missingUnidades = unidadeService.porCodigos(missingIds);
             missingUnidades.forEach(u -> siglas.add(u.getSigla()));
         }
 
@@ -216,7 +217,7 @@ public class PainelFacade {
             return "/processo/" + processo.getCodigo();
         }
 
-        var unidade = organizacaoFacade.dtoPorCodigo(codigoUnidade);
+        var unidade = unidadeService.buscarPorId(codigoUnidade);
         return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
     }
 }

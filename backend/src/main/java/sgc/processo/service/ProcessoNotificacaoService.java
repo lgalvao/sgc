@@ -10,6 +10,7 @@ import sgc.comum.erros.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
@@ -27,7 +28,8 @@ public class ProcessoNotificacaoService {
     private final AlertaFacade servicoAlertas;
     private final EmailService emailService;
     private final EmailModelosService emailModelosService;
-    private final OrganizacaoFacade organizacaoFacade;
+    private final UnidadeService unidadeService;
+    private final ResponsavelUnidadeService responsavelService;
     private final UsuarioFacade usuarioService;
     private final ProcessoRepo processoRepo;
     private final SubprocessoService subprocessoService;
@@ -68,7 +70,7 @@ public class ProcessoNotificacaoService {
         Set<Long> todosCodigosNotificar = new HashSet<>(participantesMap.keySet());
         todosCodigosNotificar.addAll(gestoresSubordinadasMap.keySet());
 
-        Map<Long, UnidadeResponsavelDto> responsaveisMap = organizacaoFacade.buscarResponsaveisUnidades(new ArrayList<>(todosCodigosNotificar));
+        Map<Long, UnidadeResponsavelDto> responsaveisMap = responsavelService.buscarResponsaveisUnidades(new ArrayList<>(todosCodigosNotificar));
         List<String> todosTitulosUsuarios = responsaveisMap.values().stream()
                 .flatMap(r -> Stream.of(r.titularTitulo(), r.substitutoTitulo()))
                 .filter(Objects::nonNull)
@@ -77,7 +79,7 @@ public class ProcessoNotificacaoService {
         Map<String, Usuario> usuariosMap = usuarioService.buscarUsuariosPorTitulos(todosTitulosUsuarios);
 
         for (Long codUnidade : todosCodigosNotificar) {
-            Unidade unidade = organizacaoFacade.unidadePorCodigo(codUnidade);
+            Unidade unidade = unidadeService.buscarPorId(codUnidade);
             Subprocesso sp = participantesMap.get(codUnidade);
             Set<String> subordinadasNoProcesso = gestoresSubordinadasMap.getOrDefault(codUnidade, Collections.emptySet());
 
@@ -99,10 +101,10 @@ public class ProcessoNotificacaoService {
             return;
         }
 
-        List<Unidade> unidadesParticipantes = organizacaoFacade.unidadesPorCodigos(codigosParticipantes);
+        List<Unidade> unidadesParticipantes = unidadeService.porCodigos(codigosParticipantes);
 
         List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
-        Map<Long, UnidadeResponsavelDto> responsaveis = organizacaoFacade.buscarResponsaveisUnidades(todosCodigosUnidades);
+        Map<Long, UnidadeResponsavelDto> responsaveis = responsavelService.buscarResponsaveisUnidades(todosCodigosUnidades);
 
         Map<String, Usuario> usuarios = usuarioService.buscarUsuariosPorTitulos(responsaveis.values().stream()
                 .map(UnidadeResponsavelDto::titularTitulo)
