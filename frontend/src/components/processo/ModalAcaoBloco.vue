@@ -153,8 +153,6 @@ function setProcessando(val: boolean) {
 function setErro(msg: string | null) {
   erro.value = msg;
 }
-
-// Expor métodos para controle do pai e satisfazer o linter (uso no template)
 defineExpose({
   abrir,
   fechar,

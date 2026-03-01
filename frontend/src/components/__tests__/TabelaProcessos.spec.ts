@@ -38,7 +38,6 @@ describe("TabelaProcessos.vue", () => {
     const context = setupComponentTest();
 
     it("deve renderizar a tabela e os cabeçalhos corretamente", async () => {
-        // Do not stub BTable so we can check headers rendered by it
         context.wrapper = mount(TabelaProcessos, {
             ...getCommonMountOptions(),
             props: {
@@ -90,7 +89,6 @@ describe("TabelaProcessos.vue", () => {
     });
 
     it("deve emitir o evento ordenar ao receber o evento sort-changed", async () => {
-        // Here we stub BTable to easily trigger sort-changed
         context.wrapper = mount(TabelaProcessos, {
             ...getCommonMountOptions({}, {
                 BTable: {
@@ -277,7 +275,6 @@ describe("TabelaProcessos.vue", () => {
 
     describe("Modo Compacto", () => {
         it("deve exibir o rótulo reduzido 'Unidades' quando compacto é true", async () => {
-            // Need real BTable to check headers
             context.wrapper = mount(TabelaProcessos, {
                 ...getCommonMountOptions(),
                 props: {

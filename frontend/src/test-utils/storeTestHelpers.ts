@@ -3,8 +3,6 @@ import {beforeEach, expect, it, vi} from "vitest";
 
 /**
  * Utilitário para configurar testes de Store com Pinia
- * @param useStore Função que retorna a store
- * @returns Objeto de contexto contendo a store (populada no beforeEach)
  */
 export function setupStoreTest<T>(useStore: () => T) {
     const context = {store: undefined as unknown as T};
@@ -41,7 +39,6 @@ export function testErrorHandling<T>(
     errorType?: Error | any
 ) {
     it("deve lançar um erro em caso de falha", async () => {
-        // Se errorType for passado, verifica o tipo, senão verifica apenas se lança
         if (errorType) {
             expect(action()).rejects.toThrow(errorType);
         } else {

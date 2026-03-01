@@ -103,10 +103,7 @@ class SituacaoSubprocessoTest {
         assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
         assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(DIAGNOSTICO_MONITORAMENTO, TipoProcesso.DIAGNOSTICO)).isTrue();
     }
-
-    // ===========================================
     // Testes mesclados de SituacaoSubprocessoCoverageTest
-    // ===========================================
 
     @Test
     @DisplayName("Mistura de tipos deve retornar false")
@@ -152,10 +149,7 @@ class SituacaoSubprocessoTest {
     void testTransicoesInvalidasAdicionais(SituacaoSubprocesso de, SituacaoSubprocesso para, TipoProcesso tipo, boolean esperado) {
         assertThat(de.podeTransicionarPara(para, tipo)).isEqualTo(esperado);
     }
-
-    // ===========================================
     // Testes mesclados de SituacaoSubprocessoGapTest
-    // ===========================================
 
     @Test
     @DisplayName("Deve cobrir todas as branches de podeIniciar (método privado)")
