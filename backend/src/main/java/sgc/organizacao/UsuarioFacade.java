@@ -94,33 +94,6 @@ public class UsuarioFacade {
                 .collect(toMap(Usuario::getTituloEleitoral, u -> u, (u1, u2) -> u1));
     }
 
-    @Transactional(readOnly = true)
-    public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
-        return usuarioService.buscarComAtribuicoesOpt(titulo)
-                .map(u -> {
-                    List<UsuarioPerfil> atribuicoes = usuarioService.buscarPerfis(u.getTituloEleitoral());
-                    return atribuicoes.stream()
-                            .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
-                            .anyMatch(a -> a.getPerfil().name().equals(perfil)
-                                    && a.getUnidadeCodigo().equals(unidadeCodigo));
-                })
-                .orElse(false);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
-        return usuarioService.buscarComAtribuicoesOpt(titulo)
-                .map(u -> {
-                    List<UsuarioPerfil> atribuicoes = usuarioService.buscarPerfis(u.getTituloEleitoral());
-                    return atribuicoes.stream()
-                            .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
-                            .filter(a -> a.getPerfil().name().equals(perfil))
-                            .map(a -> a.getUnidade().getCodigo())
-                            .toList();
-                })
-                .orElse(Collections.emptyList());
-    }
-
 
     private PerfilDto toPerfilDto(UsuarioPerfil atribuicao) {
         return PerfilDto.builder()
@@ -170,12 +143,5 @@ public class UsuarioFacade {
                 .unidadeCodigo(unidadeLotacao.getCodigo())
                 .unidadeSigla(unidadeLotacao.getSigla())
                 .build();
-    }
-
-    public @Nullable String extrairTituloUsuario(@Nullable Object principal) {
-        if (principal instanceof String string) return string;
-        if (principal instanceof Usuario usuario) return usuario.getTituloEleitoral();
-
-        return principal != null ? principal.toString() : null;
     }
 }

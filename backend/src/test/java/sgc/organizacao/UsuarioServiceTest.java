@@ -230,59 +230,17 @@ class UsuarioServiceTest {
             assertTrue(result.stream()
                     .anyMatch(p -> p.perfil().equals("CHEFE") && p.unidadeCodigo().equals(2L)));
         }
-
-        @Test
-        @DisplayName("Deve verificar se usuário tem perfil")
-        void deveVerificarUsuarioTemPerfil() {
-            // Act & Assert
-            assertTrue(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, String.valueOf(Perfil.CHEFE), 2L));
-            assertTrue(usuarioService.usuarioTemPerfil(TITULO_ADMIN, String.valueOf(Perfil.ADMIN), 1L));
-        }
-
-        @Test
-        @DisplayName("Deve buscar unidades por perfil")
-        void deveBuscarUnidadesPorPerfil() {
-
-            List<Long> adminUnits = usuarioService.buscarUnidadesPorPerfil(TITULO_ADMIN, String.valueOf(Perfil.ADMIN));
-
-
-            assertTrue(adminUnits.contains(1L));
-        }
     }
 
     @Nested
     @DisplayName("Cobertura Extra")
     class CoberturaExtra {
         @Test
-        @DisplayName("Deve extrair título de principal")
-        void deveExtrairTituloDePrincipal() {
-            assertNull(usuarioService.extrairTituloUsuario(null));
-            assertEquals("123", usuarioService.extrairTituloUsuario("123"));
-
-            Usuario u = new Usuario();
-            u.setTituloEleitoral("456");
-            assertEquals("456", usuarioService.extrairTituloUsuario(u));
-
-            assertEquals("100", usuarioService.extrairTituloUsuario(100L));
-        }
-
-        @Test
         @DisplayName("Deve buscar responsáveis ignorando unidades sem chefe")
         void deveBuscarResponsaveisIgnorandoSemChefe() {
 
             Map<Long, UnidadeResponsavelDto> res = responsavelService.buscarResponsaveisUnidades(List.of(9999L));
             assertTrue(res.isEmpty());
-        }
-
-        @Test
-        @DisplayName("Deve retornar false se usuário não tiver perfil na unidade")
-        void deveRetornarFalseSeNaoTiverPerfil() {
-
-            // Verifica se é CHEFE na unidade 99 (não é)
-            assertFalse(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, String.valueOf(Perfil.CHEFE), 99L));
-
-            // Verifica se é GESTOR na unidade 2 (não é)
-            assertFalse(usuarioService.usuarioTemPerfil(TITULO_CHEFE_UNIT2, String.valueOf(Perfil.GESTOR), 2L));
         }
     }
 
