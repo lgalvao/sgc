@@ -18,7 +18,7 @@ import java.util.*;
 @RequiredArgsConstructor
 class ProcessoValidador {
     private final UnidadeService unidadeService;
-    private final ConsultasSubprocessoService queryService;
+    private final SubprocessoValidacaoService validacaoService;
 
     /**
      * Valida se todas as unidades especificadas possuem mapa vigente.
@@ -59,7 +59,7 @@ class ProcessoValidador {
      * @throws ErroProcesso se algum subprocesso não estiver homologado
      */
     public void validarTodosSubprocessosHomologados(Processo processo) {
-        var resultado = queryService.validarSubprocessosParaFinalizacao(processo.getCodigo());
+        SubprocessoValidacaoService.ValidationResult resultado = validacaoService.validarSubprocessosParaFinalizacao(processo.getCodigo());
 
         if (!resultado.valido()) {
             log.warn("Validação de finalização falhou para processo {}: {}",

@@ -23,7 +23,7 @@ public class ProcessoFinalizador {
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
     private final UnidadeService unidadeService;
-    private final ConsultasSubprocessoService queryService;
+    private final SubprocessoService subprocessoService;
     private final ProcessoValidador processoValidador;
     private final ProcessoNotificacaoService notificacaoService;
 
@@ -47,7 +47,7 @@ public class ProcessoFinalizador {
 
     private void tornarMapasVigentes(Processo processo) {
         log.info("Mapa vigente definido para o processo {}", processo.getCodigo());
-        List<Subprocesso> subprocessos = queryService.listarEntidadesPorProcesso(processo.getCodigo());
+        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
             Unidade unidade = subprocesso.getUnidade();
