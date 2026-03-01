@@ -15,9 +15,9 @@
 | Backend – Facades | Total | **7** (`UsuarioFacade` + 6 com lógica real) |
 | Backend – Erros | Hierarquia total | **8 classes/interfaces** (era 18+) |
 | Backend – `processo/service` | Classes de serviço | **6 classes** (era 8) |
-| Backend – DTOs do módulo `subprocesso` | Arquivos | **27** (era 28) |
+| Backend – DTOs do módulo `subprocesso` | Arquivos | **26** (era 28) |
 | Frontend – Stores | Total | **13 stores** Pinia |
-| Frontend – Composables de async | `useAsyncAction` | ✅ em uso em `mapas.ts` e `analises.ts` |
+| Frontend – Composables de async | `useAsyncAction` | ✅ em uso em `mapas.ts`, `analises.ts` e `configuracoes.ts` |
 | Frontend – Componentes Vue | Total | **48** (era 49) |
 
 ---
@@ -57,14 +57,23 @@
   (remove dependência facade→facade); método `buscarPorTitulo` removido de `UsuarioFacade`.
 - [x] **Backend**: `SubprocessoNotificacaoService` passa a injetar `UsuarioService` diretamente em vez
   de `UsuarioFacade` (remove dependência cross-module desnecessária no facade).
+- [x] **Backend**: 3 métodos mortos removidos de `UsuarioFacade`: `usuarioTemPerfil`,
+  `buscarUnidadesPorPerfil`, `extrairTituloUsuario` (sem chamadores em produção).
+- [x] **Backend**: `AnaliseValidacaoDto` (sem chamadores em produção) removido junto com seu teste.
+- [x] **Backend**: 6 métodos mortos removidos de `EmailModelosService` junto com 6 constantes
+  e 6 testes (`criarEmailProcessoIniciado`, `criarEmailCadastroDisponibilizado`,
+  `criarEmailCadastroDevolvido`, `criarEmailMapaDisponibilizado`, `criarEmailMapaValidado`,
+  `criarEmailProcessoFinalizado`).
 - [x] **Frontend**: Componente `CampoTexto.vue` removido (sem uso em produção); story e teste
   associados também removidos (componentes Vue de 49 → 48).
+- [x] **Frontend**: Store `configuracoes.ts` migrado de try/catch manual para `useAsyncAction`
+  (consistente com `mapas.ts` e `analises.ts`).
 
 ### Em andamento / Próximos passos
 
 - [ ] **Migrar stores de leitura simples** para composables com estado local na view:
-  - Candidatos: `configuracoes` (1 consumidor), `unidades`, `usuarios`.
-- [ ] **Consolidar DTOs de `subprocesso`** de 27 → ~14, fundindo DTOs minúsculos de uso único.
+  - Candidatos: `unidades`, `usuarios`.
+- [ ] **Consolidar DTOs de `subprocesso`** de 26 → ~14, fundindo DTOs minúsculos de uso único.
 - [ ] **Inlinear componentes Vue single-use** para reduzir a contagem de ~48 componentes.
 - [ ] **Avaliar `UsuarioFacade`**: método `buscarUsuarioPorTitulo` ainda usado apenas por
   `UsuarioController`; avaliar inlining direto no controller.
@@ -94,3 +103,6 @@
    quando a operação é simples (buscar entidade por id), injetar o `Service` diretamente é mais limpo.
 10. Componentes Vue sem nenhum consumidor em produção (ex.: `CampoTexto`) devem ser removidos junto com
     seus testes e stories para evitar acúmulo de código morto.
+11. Métodos de serviço de email que foram substituídos por templates Thymeleaf (ex.: `EmailModelosService`)
+    podem acumular métodos obsoletos que servem apenas de lastro para testes de cobertura. Verificar
+    regularmente se o método tem chamador em produção antes de manter seu teste.
