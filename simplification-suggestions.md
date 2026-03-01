@@ -7,8 +7,8 @@ usuários simultâneos), sem quebrar contratos existentes.
 
 ### 1) Backend com concentração excessiva de responsabilidades
 
-- `backend/src/main/java/sgc/subprocesso/SubprocessoController.java` tem **549 linhas**.
-- `backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java` tem **1704 linhas**.
+- `backend/src/main/java/sgc/subprocesso/SubprocessoController.java` tem **549 linhas** (anteriormente).
+- `backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java` tem **1704 linhas** (anteriormente).
 - Foram identificados fluxos com regra de negócio duplicada entre Controller e Service (ex.: disponibilização de
   cadastro/revisão de cadastro).
 
@@ -39,6 +39,23 @@ Foram encontrados **13 stores** em `frontend/src/stores/*.ts`:
   `perfil`, `processos`, `subprocessos`, `unidades`, `usuarios`.
 
 **Risco atual:** estado espelhado do servidor, risco de stale data e maior custo para evoluir telas simples.
+
+---
+
+## Restrições de Design para Intranet de Baixa Concorrência (5-10 usuários)
+
+Devido ao escopo extremamente reduzido e controlado de uso da aplicação, várias práticas voltadas para sistemas de alta escalabilidade (multi-layered, cache distribuído, state management complexo) configuram **sobreengenharia** neste contexto. As seguintes diretrizes devem balizar refatorações futuras:
+
+1. **Eliminação do Padrão Facade no Backend:**
+   O fluxo deve ser puramente `Controller -> Service -> Repository`. As Facades identificadas (como `UsuarioFacade`, `OrganizacaoFacade`, etc.) criam camadas "pass-through" (que apenas delegam) e devem ser descontinuadas. Os Controllers devem injetar diretamente os Services apropriados.
+
+2. **Movimentação de Regras de Negócio para o Service:**
+   Controllers massivos (como o `SubprocessoController`) não devem possuir validações complexas. Sua responsabilidade é lidar apenas com a camada HTTP. A orquestração, regras e montagem de respostas complexas/erros de domínio devem ficar encapsuladas no Service correspondente.
+
+3. **Redução Drástica de Estado Global no Frontend:**
+   O uso de 13 stores (Pinia) para um sistema com esta concorrência gera risco desnecessário de cache stale e aumento de boilerplate. A maioria dos dados (`usuarios`, `atividades`, etc.) não requer estado global.
+   - Preferir chamadas de API diretas (`fetch` via services) montadas em estado local da view (`ref` ou `reactive`).
+   - Evitar duplicar o estado do banco de dados no frontend para fluxos que são estritamente CRUD.
 
 ---
 
