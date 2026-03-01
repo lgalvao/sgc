@@ -12,7 +12,6 @@ import org.springframework.security.core.annotation.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.ComumDtos.*;
-import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.*;

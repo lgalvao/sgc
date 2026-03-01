@@ -11,10 +11,7 @@ import sgc.mapa.dto.CriarConhecimentoRequest;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
-import sgc.mapa.model.Mapa;
 import sgc.mapa.model.*;
-import sgc.mapa.service.*;
-import sgc.mapa.dto.*;
 import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.List;

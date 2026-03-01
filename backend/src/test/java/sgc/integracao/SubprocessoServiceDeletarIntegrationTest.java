@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
 import sgc.fixture.*;
-import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
@@ -23,9 +22,6 @@ class SubprocessoServiceDeletarIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private SubprocessoService subprocessoService;
-
-    @Autowired
-    private MapaRepo mapaRepo;
 
     @Autowired
     private EntityManager entityManager;

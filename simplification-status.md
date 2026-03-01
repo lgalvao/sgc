@@ -20,15 +20,3 @@
 1. A principal fonte de complexidade local é a duplicação de regra entre Controller e Service.
 2. O módulo `subprocesso` concentra grande parte da complexidade estrutural (controller e service muito extensos).
 3. Simplificações pequenas e orientadas por fluxo reduzem risco e facilitam validação incremental.
-
-## Validação executada nesta etapa
-
-- `npm run lint` ✅
-- `npm run typecheck` ✅
-- `npm run test` (frontend unitário) ✅
-- `./gradlew :backend:test` ⚠️ não executado no ambiente por incompatibilidade de JDK local (`invalid source release: 21`).
-
-## Próxima validação obrigatória (merge gate)
-
-1. Executar `./gradlew :backend:test` em ambiente com JDK 21.
-2. Confirmar no CI que os testes do backend passaram para este commit antes do merge.

@@ -51,7 +51,7 @@ class SubprocessoControllerCoverageExtraTest {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/cadastro/disponibilizar").with(csrf()))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isUnprocessableContent());
 
     }
 
@@ -64,7 +64,7 @@ class SubprocessoControllerCoverageExtraTest {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_REVISAO_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/disponibilizar-revisao").with(csrf()))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isUnprocessableContent());
 
     }
 
