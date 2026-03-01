@@ -3,28 +3,65 @@ package sgc.processo.service;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
-import sgc.comum.model.*;
-import sgc.organizacao.model.*;
+import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.ErroValidacao;
+import sgc.comum.model.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
+import java.time.*;
 import java.util.*;
 import java.util.stream.*;
 
 import static sgc.processo.model.SituacaoProcesso.*;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
-public class ProcessoInicializador {
+@RequiredArgsConstructor
+public class ProcessoWorkflowService {
+
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
-    private final ProcessoNotificacaoService notificacaoService;
+    private final UnidadeService unidadeService;
     private final SubprocessoService subprocessoService;
     private final ProcessoValidador processoValidador;
+    private final ProcessoNotificacaoService notificacaoService;
+
+    @Transactional
+    public void finalizar(Long codigo) {
+        Processo processo = repo.buscar(Processo.class, codigo);
+        processoValidador.validarFinalizacaoProcesso(processo);
+
+        if (processo.getTipo() != TipoProcesso.DIAGNOSTICO) {
+            tornarMapasVigentes(processo);
+        }
+
+        processo.setSituacao(SituacaoProcesso.FINALIZADO);
+        processo.setDataFinalizacao(LocalDateTime.now());
+
+        processoRepo.save(processo);
+        notificacaoService.emailFinalizacaoProcesso(processo.getCodigo());
+
+        log.info("Processo {} finalizado", codigo);
+    }
+
+    private void tornarMapasVigentes(Processo processo) {
+        log.info("Mapa vigente definido para o processo {}", processo.getCodigo());
+        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(processo.getCodigo());
+
+        for (Subprocesso subprocesso : subprocessos) {
+            Unidade unidade = subprocesso.getUnidade();
+            Mapa mapa = subprocesso.getMapa();
+            unidadeService.definirMapaVigente(unidade.getCodigo(), mapa);
+        }
+        log.info("Mapa(s) de {} subprocesso(s) definidos como vigentes.", subprocessos.size());
+    }
 
     public List<String> iniciar(Long codigo, List<Long> codsUnidadesParam, Usuario usuario) {
         Processo processo = repo.buscar(Processo.class, codigo);
@@ -36,7 +73,7 @@ public class ProcessoInicializador {
         Set<Unidade> unidadesParaProcessar;
 
         if (tipo == TipoProcesso.REVISAO) {
-            if (codsUnidadesParam.isEmpty()) {
+            if (codsUnidadesParam == null || codsUnidadesParam.isEmpty()) {
                 throw new ErroValidacao("A lista de unidades é obrigatória para iniciar o processo de revisão.");
             }
             codigosUnidades = codsUnidadesParam;
@@ -97,12 +134,10 @@ public class ProcessoInicializador {
     private List<String> validarUnidades(TipoProcesso tipo, List<Long> codigosUnidades) {
         List<String> erros = new ArrayList<>();
 
-        // Validar mapa vigente para revisão e diagnóstico
         if (tipo == TipoProcesso.REVISAO || tipo == TipoProcesso.DIAGNOSTICO) {
             processoValidador.getMensagemErroUnidadesSemMapa(codigosUnidades).ifPresent(erros::add);
         }
 
-        // Validar se unidades já estão em uso
         getMensagemErroUnidadesEmProcessosAtivos(codigosUnidades).ifPresent(erros::add);
 
         return erros;

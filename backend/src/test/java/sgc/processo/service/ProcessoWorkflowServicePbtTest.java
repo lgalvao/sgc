@@ -3,6 +3,7 @@ package sgc.processo.service;
 import net.jqwik.api.*;
 import sgc.comum.model.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.service.*;
 
@@ -12,7 +13,7 @@ import java.util.*;
 import static org.mockito.Mockito.*;
 
 @Tag("PBT")
-class ProcessoInicializadorPbtTest {
+class ProcessoWorkflowServicePbtTest {
     @Property
     void iniciar_criaSubprocessosParaCadaParticipante(@ForAll("processosEAgumentos") ProcessoArgs args,
                                                       @ForAll("usuarioQualquer") Usuario usuario) {
@@ -21,12 +22,14 @@ class ProcessoInicializadorPbtTest {
         ComumRepo repo = mock(ComumRepo.class);
         UnidadeRepo unidadeRepo = mock(UnidadeRepo.class);
         UnidadeMapaRepo unidadeMapaRepo = mock(UnidadeMapaRepo.class);
+        UnidadeService unidadeService = mock(UnidadeService.class);
         ProcessoNotificacaoService notificacaoService = mock(ProcessoNotificacaoService.class);
         SubprocessoService subprocessoService = mock(SubprocessoService.class);
         ProcessoValidador processoValidador = mock(ProcessoValidador.class);
 
-        ProcessoInicializador inicializador = new ProcessoInicializador(
-                processoRepo, repo, unidadeRepo, unidadeMapaRepo, notificacaoService, subprocessoService, processoValidador
+        ProcessoWorkflowService workflowService = new ProcessoWorkflowService(
+                processoRepo, repo, unidadeRepo, unidadeMapaRepo, unidadeService,
+                subprocessoService, processoValidador, notificacaoService
         );
 
         Processo processo = args.processo;
@@ -54,7 +57,7 @@ class ProcessoInicializadorPbtTest {
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of());
 
 
-        inicializador.iniciar(processo.getCodigo(), codsUnidadesParam, usuario);
+        workflowService.iniciar(processo.getCodigo(), codsUnidadesParam, usuario);
 
 
         if (processo.getTipo() == TipoProcesso.MAPEAMENTO) {

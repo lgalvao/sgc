@@ -34,9 +34,8 @@ public class ProcessoFacade {
     private final SubprocessoTransicaoService transicaoService;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final UsuarioFacade usuarioService;
-    private final ProcessoInicializador processoInicializador;
+    private final ProcessoWorkflowService processoWorkflowService;
     private final ProcessoAcessoService processoAcessoService;
-    private final ProcessoFinalizador processoFinalizador;
     private final ProcessoNotificacaoService processoNotificacaoService;
     private final SgcPermissionEvaluator permissionEvaluator;
 
@@ -129,12 +128,12 @@ public class ProcessoFacade {
 
     private List<String> iniciarProcesso(Long codigo, List<Long> codsUnidades) {
         Usuario usuario = usuarioService.usuarioAutenticado();
-        return processoInicializador.iniciar(codigo, codsUnidades, usuario);
+        return processoWorkflowService.iniciar(codigo, codsUnidades, usuario);
     }
 
     @Transactional
     public void finalizar(Long codigo) {
-        processoFinalizador.finalizar(codigo);
+        processoWorkflowService.finalizar(codigo);
     }
 
     @Transactional
@@ -154,11 +153,6 @@ public class ProcessoFacade {
     @Transactional(readOnly = true)
     public List<SubprocessoElegivelDto> listarSubprocessosElegiveis(Long codProcesso) {
         return processoConsultaService.subprocessosElegiveis(codProcesso);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Subprocesso> listarTodosSubprocessos(Long codProcesso) {
-        return subprocessoService.listarEntidadesPorProcesso(codProcesso);
     }
 
     @Transactional(readOnly = true)

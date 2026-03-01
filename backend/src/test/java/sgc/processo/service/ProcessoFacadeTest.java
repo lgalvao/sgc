@@ -39,7 +39,7 @@ class ProcessoFacadeTest {
     @Mock
     private ProcessoManutencaoService processoManutencaoService;
     @Mock
-    private ProcessoInicializador processoInicializador;
+    private ProcessoWorkflowService processoWorkflowService;
     @Mock
     private ProcessoConsultaService processoConsultaService;
     @Mock
@@ -55,8 +55,6 @@ class ProcessoFacadeTest {
     @Mock
     private ProcessoDetalheBuilder processoDetalheBuilder;
     @Mock
-    private ProcessoFinalizador processoFinalizador;
-    @Mock
     private ProcessoNotificacaoService processoNotificacaoService;
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
@@ -71,12 +69,12 @@ class ProcessoFacadeTest {
             List<Long> unidades = List.of(2L, 3L);
             Usuario usuario = new Usuario();
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(processoInicializador.iniciar(codigo, unidades, usuario)).thenReturn(List.of("OK"));
+            when(processoWorkflowService.iniciar(codigo, unidades, usuario)).thenReturn(List.of("OK"));
 
             var result = processoFacade.iniciarProcessoDiagnostico(codigo, unidades);
 
             assertEquals(1, result.size());
-            verify(processoInicializador).iniciar(codigo, unidades, usuario);
+            verify(processoWorkflowService).iniciar(codigo, unidades, usuario);
         }
 
         @Test
@@ -175,12 +173,12 @@ class ProcessoFacadeTest {
             Long id = 100L;
             Usuario usuario = new Usuario();
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(processoInicializador.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
+            when(processoWorkflowService.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
 
             List<String> erros = processoFacade.iniciarProcessoMapeamento(id, List.of(1L));
 
             assertThat(erros).isEmpty();
-            verify(processoInicializador).iniciar(id, List.of(1L), usuario);
+            verify(processoWorkflowService).iniciar(id, List.of(1L), usuario);
         }
 
         @Test
@@ -190,7 +188,7 @@ class ProcessoFacadeTest {
             Usuario usuario = new Usuario();
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             String mensagemErro = "As seguintes unidades já participam de outro processo ativo: U1";
-            when(processoInicializador.iniciar(id, List.of(1L), usuario)).thenReturn(List.of(mensagemErro));
+            when(processoWorkflowService.iniciar(id, List.of(1L), usuario)).thenReturn(List.of(mensagemErro));
 
             List<String> erros = processoFacade.iniciarProcessoMapeamento(id, List.of(1L));
 
@@ -203,12 +201,12 @@ class ProcessoFacadeTest {
             Long id = 100L;
             Usuario usuario = new Usuario();
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(processoInicializador.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
+            when(processoWorkflowService.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
 
             List<String> erros = processoFacade.iniciarProcessoRevisao(id, List.of(1L));
 
             assertThat(erros).isEmpty();
-            verify(processoInicializador).iniciar(id, List.of(1L), usuario);
+            verify(processoWorkflowService).iniciar(id, List.of(1L), usuario);
         }
 
         @Test
@@ -216,7 +214,7 @@ class ProcessoFacadeTest {
         void deveFinalizarProcessoQuandoTudoHomologado() {
             Long id = 100L;
             processoFacade.finalizar(id);
-            verify(processoFinalizador).finalizar(id);
+            verify(processoWorkflowService).finalizar(id);
         }
     }
 
@@ -395,17 +393,6 @@ class ProcessoFacadeTest {
             var res = processoFacade.listarSubprocessosElegiveis(codProcesso);
             assertThat(res).isSameAs(lista);
             verify(processoConsultaService).subprocessosElegiveis(codProcesso);
-        }
-
-        @Test
-        @DisplayName("Deve listar todos os subprocessos delegando para service")
-        void deveListarTodosSubprocessosDelegandoParaService() {
-            Long codProcesso = 1L;
-            List<Subprocesso> lista = List.of(Subprocesso.builder().build());
-            when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(lista);
-
-            var res = processoFacade.listarTodosSubprocessos(codProcesso);
-            assertThat(res).isSameAs(lista);
         }
 
         @Test
