@@ -30,17 +30,6 @@ class UsuarioFacadeTest {
     @InjectMocks
     private UsuarioFacade facade;
 
-    @Test
-    @DisplayName("extrairTituloUsuario deve lidar com tipos diferentes")
-    void deveExtrairTituloUsuario() {
-        assertThat(facade.extrairTituloUsuario("123")).isEqualTo("123");
-        Usuario u = new Usuario();
-        u.setTituloEleitoral("456");
-        assertThat(facade.extrairTituloUsuario(u)).isEqualTo("456");
-        assertThat(facade.extrairTituloUsuario(123L)).isEqualTo("123");
-        assertThat(facade.extrairTituloUsuario(null)).isNull();
-    }
-
     // Métodos auxiliares
     private Usuario criarUsuario(String titulo) {
         Usuario usuario = new Usuario();
@@ -130,30 +119,6 @@ class UsuarioFacadeTest {
             assertThat(resultado).isSameAs(usuario);
             verifyNoInteractions(usuarioService);
             SecurityContextHolder.clearContext();
-        }
-
-        @Test
-        @DisplayName("Deve filtrar atribuições em unidades inativas")
-        void deveFiltrarUnidadesInativas() {
-
-            String titulo = "123456";
-            Usuario usuario = criarUsuario(titulo);
-            Unidade unidadeInativa = criarUnidade(1L, "INATIVA");
-            unidadeInativa.setSituacao(SituacaoUnidade.INATIVA);
-            UsuarioPerfil atribuicao = criarAtribuicao(usuario, unidadeInativa, Perfil.CHEFE);
-
-            when(usuarioService.buscarComAtribuicoesOpt(titulo))
-                    .thenReturn(Optional.of(usuario));
-            when(usuarioService.buscarPerfis(titulo))
-                    .thenReturn(List.of(atribuicao));
-
-
-            boolean resultado = facade.usuarioTemPerfil(titulo, "CHEFE", 1L);
-            List<Long> unidades = facade.buscarUnidadesPorPerfil(titulo, "CHEFE");
-
-
-            assertThat(resultado).isFalse();
-            assertThat(unidades).isEmpty();
         }
     }
 

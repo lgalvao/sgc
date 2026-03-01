@@ -39,7 +39,7 @@ describe('Configuracoes Store', () => {
         await store.carregarConfiguracoes();
 
         expect(store.parametros).toEqual([]);
-        expect(store.error).toBe('Não foi possível carregar as configurações.');
+        expect(store.error).toBe('Erro API');
         expect(store.loading).toBe(false);
     });
 
@@ -66,7 +66,7 @@ describe('Configuracoes Store', () => {
         const result = await store.salvarConfiguracoes(novosParametros);
 
         expect(result).toBe(false);
-        expect(store.error).toBe('Não foi possível salvar as configurações.');
+        expect(store.error).toBe('Erro API');
     });
 
     it('getValor deve retornar valor correto ou padrao', () => {

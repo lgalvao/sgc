@@ -6,7 +6,6 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
-import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
@@ -20,7 +19,7 @@ import java.util.*;
 @Transactional(readOnly = true)
 public class AlertaFacade {
     private final AlertaService alertaService;
-    private final UsuarioFacade usuarioService;
+    private final UsuarioService usuarioService;
     private final UnidadeService unidadeService;
 
     private Unidade unidadeRaiz() {
@@ -28,7 +27,7 @@ public class AlertaFacade {
     }
 
     public List<Alerta> alertasPorUsuario(String usuarioTitulo) {
-        Usuario usuario = usuarioService.buscarPorTitulo(usuarioTitulo);
+        Usuario usuario = usuarioService.buscar(usuarioTitulo);
         Unidade lotacao = usuario.getUnidadeLotacao();
 
         List<Alerta> alertas = alertaService.porUnidadeDestino(lotacao.getCodigo());
@@ -145,7 +144,7 @@ public class AlertaFacade {
 
     @Transactional
     public void marcarComoLidos(String usuarioTitulo, List<Long> alertaCodigos) {
-        Usuario usuario = usuarioService.buscarPorTitulo(usuarioTitulo);
+        Usuario usuario = usuarioService.buscar(usuarioTitulo);
         LocalDateTime agora = LocalDateTime.now();
 
         for (Long codigo : alertaCodigos) {

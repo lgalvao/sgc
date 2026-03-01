@@ -10,7 +10,7 @@ import sgc.alerta.EmailService;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.service.ResponsavelUnidadeService;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.service.UsuarioService;
 import sgc.subprocesso.dto.NotificacaoCommand;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.TipoTransicao;
@@ -29,7 +29,7 @@ public class SubprocessoNotificacaoService {
     private final AlertaFacade alertaService;
     private final EmailService emailService;
     private final ResponsavelUnidadeService responsavelService;
-    private final UsuarioFacade usuarioFacade;
+    private final UsuarioService usuarioService;
     private final SpringTemplateEngine templateEngine;
 
     public void notificarTransicao(NotificacaoCommand cmd) {
@@ -72,7 +72,7 @@ public class SubprocessoNotificacaoService {
     private void notificarResponsavelPessoal(Unidade unidade, String assunto, String corpo) {
         UnidadeResponsavelDto responsavel = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
         if (responsavel.substitutoTitulo() != null) {
-            usuarioFacade.buscarUsuarioPorTitulo(responsavel.substitutoTitulo()).ifPresent(u -> {
+            usuarioService.buscarOpt(responsavel.substitutoTitulo()).ifPresent(u -> {
                 if (!u.getEmail().isBlank()) {
                     emailService.enviarEmailHtml(u.getEmail(), assunto, corpo);
                 }

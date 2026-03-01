@@ -17,23 +17,13 @@ import java.util.*;
 public class EmailModelosService {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private static final String TITULO_PROCESSO_INICIADO = "Processo iniciado - ";
-    private static final String TITULO_CADASTRO_DISPONIBILIZADO = "Cadastro disponibilizado para análise";
-    private static final String TITULO_CADASTRO_DEVOLVIDO = "Cadastro devolvido para ajustes";
-    private static final String TITULO_MAPA_DISPONIBILIZADO = "Mapa de Competências disponibilizado";
-    private static final String TITULO_MAPA_VALIDADO = "Mapa de Competências validado";
-    private static final String TITULO_PROCESSO_FINALIZADO = "Processo finalizado - Mapas Vigentes";
     private static final String TITULO_PROCESSO_CONCLUSAO_SGC = "Conclusão do processo ";
     private static final String TITULO_LEMBRETE_PRAZO = "SGC: Lembrete de prazo - ";
 
     private static final String VAR_TITULO = "titulo";
-    private static final String VAR_NOME_UNIDADE = "nomeUnidade";
     private static final String VAR_NOME_PROCESSO = "nomeProcesso";
     private static final String VAR_SIGLA_UNIDADE = "siglaUnidade";
     private static final String VAR_DATA_LIMITE = "dataLimite";
-    private static final String VAR_TIPO_PROCESSO = "tipoProcesso";
-    private static final String VAR_MOTIVO = "motivo";
-    private static final String VAR_OBSERVACOES = "observacoes";
 
     private final SpringTemplateEngine templateEngine;
 
@@ -61,91 +51,6 @@ public class EmailModelosService {
         context.setVariable("hasSubordinadas", !siglasSubordinadas.isEmpty());
 
         return templateEngine.process("email-inicio-processo-consolidado", context);
-    }
-
-    /**
-     * Gera o conteúdo HTML para o email de notificação de início de processo (LEGACY/GENERIC).
-     */
-    public String criarEmailProcessoIniciado(
-            String nomeUnidade,
-            String nomeProcesso,
-            String tipoProcesso,
-            LocalDateTime dataLimite) {
-
-        Context context = new Context();
-        context.setVariable(VAR_TITULO, TITULO_PROCESSO_INICIADO + tipoProcesso);
-        context.setVariable(VAR_NOME_UNIDADE, nomeUnidade);
-        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
-        context.setVariable(VAR_TIPO_PROCESSO, tipoProcesso);
-        context.setVariable(VAR_DATA_LIMITE, dataLimite.format(FORMATADOR));
-
-        return templateEngine.process("processo-iniciado", context);
-    }
-
-    public void criarEmailCadastroDisponibilizado(
-            String nomeUnidade, String nomeProcesso, int quantidadeAtividades) {
-
-        Context context = new Context();
-        context.setVariable(VAR_TITULO, TITULO_CADASTRO_DISPONIBILIZADO);
-        context.setVariable(VAR_NOME_UNIDADE, nomeUnidade);
-        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
-        context.setVariable("quantidadeAtividades", quantidadeAtividades);
-
-        templateEngine.process("cadastro-disponibilizado", context);
-    }
-
-    public String criarEmailCadastroDevolvido(
-            String nomeUnidade, String nomeProcesso, String motivo, String observacoes) {
-
-        Context context = new Context();
-        context.setVariable(VAR_TITULO, TITULO_CADASTRO_DEVOLVIDO);
-        context.setVariable(VAR_NOME_UNIDADE, nomeUnidade);
-        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
-        context.setVariable(VAR_MOTIVO, motivo);
-        context.setVariable(VAR_OBSERVACOES, observacoes);
-
-        return templateEngine.process("cadastro-devolvido", context);
-    }
-
-    /**
-     * Gera o conteúdo HTML para o email que notifica a disponibilização de um mapa para validação.
-     */
-    public String criarEmailMapaDisponibilizado(
-            String nomeUnidade, String nomeProcesso, LocalDateTime dataLimiteValidacao) {
-
-        Context context = new Context();
-        context.setVariable(VAR_TITULO, TITULO_MAPA_DISPONIBILIZADO);
-        context.setVariable(VAR_NOME_UNIDADE, nomeUnidade);
-        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
-        context.setVariable("dataLimiteValidacao", dataLimiteValidacao.format(FORMATADOR));
-
-        return templateEngine.process("mapa-disponibilizado", context);
-    }
-
-    /**
-     * Gera o conteúdo HTML para o email que notifica a validação de um mapa.
-     */
-    public String criarEmailMapaValidado(String nomeUnidade, String nomeProcesso) {
-        Context context = new Context();
-        context.setVariable(VAR_TITULO, TITULO_MAPA_VALIDADO);
-        context.setVariable(VAR_NOME_UNIDADE, nomeUnidade);
-        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
-
-        return templateEngine.process("mapa-validado", context);
-    }
-
-    /**
-     * Gera o conteúdo HTML para o email que notifica a finalização de um processo.
-     */
-    public String criarEmailProcessoFinalizado(
-            String nomeProcesso, LocalDateTime dataFinalizacao, int quantidadeMapas) {
-        Context context = new Context();
-        context.setVariable(VAR_TITULO, TITULO_PROCESSO_FINALIZADO);
-        context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
-        context.setVariable("dataFinalizacao", dataFinalizacao.format(FORMATADOR));
-        context.setVariable("quantidadeMapas", quantidadeMapas);
-
-        return templateEngine.process("processo-finalizado", context);
     }
 
     /**

@@ -8,7 +8,6 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.service.MapaManutencaoService;
-import sgc.subprocesso.dto.ErroValidacaoDto;
 import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -98,10 +97,10 @@ public class SubprocessoValidacaoService {
     }
 
     public ValidacaoCadastroDto validarCadastro(Subprocesso sp) {
-        List<ErroValidacaoDto> erros = new ArrayList<>();
+        List<ValidacaoCadastroDto.Erro> erros = new ArrayList<>();
 
         if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
-            erros.add(ErroValidacaoDto.builder()
+            erros.add(ValidacaoCadastroDto.Erro.builder()
                     .tipo("SEM_MAPA")
                     .mensagem("O subprocesso não possui mapa associado.")
                     .build());
@@ -113,14 +112,14 @@ public class SubprocessoValidacaoService {
 
         List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
         if (atividades.isEmpty()) {
-            erros.add(ErroValidacaoDto.builder()
+            erros.add(ValidacaoCadastroDto.Erro.builder()
                     .tipo("SEM_ATIVIDADES")
                     .mensagem("O mapa não possui atividades cadastradas.")
                     .build());
         } else {
             for (Atividade atividade : atividades) {
                 if (atividade.getConhecimentos().isEmpty()) {
-                    erros.add(ErroValidacaoDto.builder()
+                    erros.add(ValidacaoCadastroDto.Erro.builder()
                             .tipo("ATIVIDADE_SEM_CONHECIMENTO")
                             .atividadeCodigo(atividade.getCodigo())
                             .descricaoAtividade(atividade.getDescricao())

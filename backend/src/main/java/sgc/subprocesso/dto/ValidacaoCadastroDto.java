@@ -10,6 +10,17 @@ import java.util.*;
 @Builder
 public record ValidacaoCadastroDto(
         Boolean valido,
-        List<ErroValidacaoDto> erros
+        List<Erro> erros
 ) {
+    /**
+     * DTO de erro de validação retornado na lista de erros.
+     */
+    @Builder
+    public record Erro(
+            String tipo,
+            Long atividadeCodigo,
+            String descricaoAtividade,
+            String mensagem
+    ) {
+    }
 }
