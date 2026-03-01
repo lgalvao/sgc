@@ -5,6 +5,8 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.alerta.*;
+import sgc.comum.erros.*;
+import sgc.fixture.*;
 import sgc.organizacao.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
@@ -13,8 +15,11 @@ import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
+import java.time.*;
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -315,6 +320,73 @@ class ProcessoNotificacaoServiceTest {
             service.emailInicioProcesso(codProcesso);
 
             verify(emailService).enviarEmailHtml(eq("sub@mail.com"), any(), any());
+        }
+    }
+
+    @Nested
+    @DisplayName("Envio de Lembrete")
+    class EnvioLembrete {
+
+        @Test
+        @DisplayName("Deve enviar lembrete com sucesso formatando data")
+        void deveEnviarLembrete() {
+            Long codProcesso = 1L;
+            Long codUnidade = 10L;
+            LocalDateTime dataLimite = LocalDateTime.of(2026, 3, 15, 23, 59);
+
+            Processo processo = new Processo();
+            processo.setCodigo(codProcesso);
+            processo.setDescricao("Processo com prazo");
+            processo.setDataLimite(dataLimite);
+            Unidade unidade = UnidadeFixture.unidadeComId(codUnidade);
+            unidade.setSigla("U1");
+            unidade.setTituloTitular("T1");
+            processo.adicionarParticipantes(Set.of(unidade));
+
+            Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
+            Usuario titular = new Usuario();
+            titular.setEmail("titular@teste.com");
+
+            when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(processo));
+            when(unidadeService.buscarPorId(codUnidade)).thenReturn(unidade);
+            when(subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
+            when(usuarioService.buscarPorLogin("T1")).thenReturn(titular);
+            when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
+
+            service.enviarLembrete(codProcesso, codUnidade);
+
+            verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("15/03/2026"));
+            verify(subprocessoService).registrarMovimentacaoLembrete(99L);
+            verify(emailService).enviarEmailHtml(eq("titular@teste.com"), contains("SGC: Lembrete de prazo"), anyString());
+        }
+
+        @Test
+        @DisplayName("Deve lançar ErroValidacao quando unidade não participa")
+        void deveLancarErroQuandoUnidadeNaoParticipa() {
+            Long codProcesso = 1L;
+            Long codUnidade = 99L;
+
+            Processo processo = new Processo();
+            processo.setCodigo(codProcesso);
+            processo.setDescricao("Processo");
+            Unidade outra = UnidadeFixture.unidadeComId(2L);
+            processo.adicionarParticipantes(Set.of(outra));
+
+            when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(processo));
+            when(unidadeService.buscarPorId(codUnidade)).thenReturn(UnidadeFixture.unidadeComId(codUnidade));
+
+            assertThatThrownBy(() -> service.enviarLembrete(codProcesso, codUnidade))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining("não participa");
+        }
+
+        @Test
+        @DisplayName("Deve lançar ErroEntidadeNaoEncontrada quando processo não existe")
+        void deveLancarErroQuandoProcessoNaoEncontrado() {
+            when(processoRepo.findByIdComParticipantes(999L)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> service.enviarLembrete(999L, 1L))
+                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
 }

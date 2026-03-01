@@ -6,13 +6,11 @@ import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.alerta.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
-import sgc.processo.erros.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
 import sgc.seguranca.*;
@@ -20,7 +18,6 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
-import java.time.format.*;
 import java.util.*;
 
 import static sgc.processo.model.AcaoProcesso.*;
@@ -38,11 +35,9 @@ public class ProcessoFacade {
     private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final UsuarioFacade usuarioService;
     private final ProcessoInicializador processoInicializador;
-    private final AlertaFacade alertaService;
-    private final EmailService emailService;
     private final ProcessoAcessoService processoAcessoService;
     private final ProcessoFinalizador processoFinalizador;
-    private final EmailModelosService emailModelosService;
+    private final ProcessoNotificacaoService processoNotificacaoService;
     private final SgcPermissionEvaluator permissionEvaluator;
 
     private Processo buscarPorId(Long id) {
@@ -144,32 +139,7 @@ public class ProcessoFacade {
 
     @Transactional
     public void enviarLembrete(Long codProcesso, Long unidadeCodigo) {
-        Processo processo = buscarEntidadePorId(codProcesso);
-        Unidade unidade = unidadeService.buscarPorId(unidadeCodigo);
-
-        if (processo.getParticipantes().stream().noneMatch(u -> u.getUnidadeCodigo().equals(unidadeCodigo))) {
-            throw new ErroProcesso("Unidade não participa deste processo.");
-        }
-
-        String dataLimiteText = processo.getDataLimite() != null
-                ? processo.getDataLimite().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                : "N/A";
-
-        String descricao = "Lembrete: Prazo do processo %s encerra em %s"
-                .formatted(processo.getDescricao(), dataLimiteText);
-        String assunto = "SGC: Lembrete de prazo - %s".formatted(processo.getDescricao());
-
-        String corpoHtml = emailModelosService.criarEmailLembretePrazo(
-                unidade.getSigla(), processo.getDescricao(), processo.getDataLimite());
-
-        Subprocesso subprocesso = subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, unidadeCodigo);
-        subprocessoService.registrarMovimentacaoLembrete(subprocesso.getCodigo());
-
-        // Enviar para o titular da unidade
-        Usuario titular = usuarioService.buscarPorLogin(unidade.getTituloTitular());
-        emailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
-
-        alertaService.criarAlertaAdmin(processo, unidade, descricao);
+        processoNotificacaoService.enviarLembrete(codProcesso, unidadeCodigo);
     }
 
     public List<Long> listarUnidadesBloqueadasPorTipo(String tipo) {
