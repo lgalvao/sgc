@@ -63,15 +63,15 @@ class ProcessoFacadeTest {
     @DisplayName("Cobertura e Casos de Borda")
     class CoverageTests {
         @Test
-        @DisplayName("iniciarProcessoDiagnostico deve delegar para inicializador")
-        void iniciarProcessoDiagnostico_DeveDelegar() {
+        @DisplayName("iniciarProcesso deve delegar para inicializador")
+        void iniciarProcesso_DeveDelegar() {
             Long codigo = 1L;
             List<Long> unidades = List.of(2L, 3L);
             Usuario usuario = new Usuario();
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(processoWorkflowService.iniciar(codigo, unidades, usuario)).thenReturn(List.of("OK"));
 
-            var result = processoFacade.iniciarProcessoDiagnostico(codigo, unidades);
+            var result = processoFacade.iniciarProcesso(codigo, unidades);
 
             assertEquals(1, result.size());
             verify(processoWorkflowService).iniciar(codigo, unidades, usuario);
@@ -175,7 +175,7 @@ class ProcessoFacadeTest {
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(processoWorkflowService.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
 
-            List<String> erros = processoFacade.iniciarProcessoMapeamento(id, List.of(1L));
+            List<String> erros = processoFacade.iniciarProcesso(id, List.of(1L));
 
             assertThat(erros).isEmpty();
             verify(processoWorkflowService).iniciar(id, List.of(1L), usuario);
@@ -190,7 +190,7 @@ class ProcessoFacadeTest {
             String mensagemErro = "As seguintes unidades já participam de outro processo ativo: U1";
             when(processoWorkflowService.iniciar(id, List.of(1L), usuario)).thenReturn(List.of(mensagemErro));
 
-            List<String> erros = processoFacade.iniciarProcessoMapeamento(id, List.of(1L));
+            List<String> erros = processoFacade.iniciarProcesso(id, List.of(1L));
 
             assertThat(erros).contains(mensagemErro);
         }
@@ -203,7 +203,7 @@ class ProcessoFacadeTest {
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             when(processoWorkflowService.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
 
-            List<String> erros = processoFacade.iniciarProcessoRevisao(id, List.of(1L));
+            List<String> erros = processoFacade.iniciarProcesso(id, List.of(1L));
 
             assertThat(erros).isEmpty();
             verify(processoWorkflowService).iniciar(id, List.of(1L), usuario);

@@ -18,7 +18,6 @@ import sgc.subprocesso.model.*;
 
 import java.net.*;
 import java.util.*;
-import java.util.function.*;
 
 /**
  * Controller REST para Processos. Implementa endpoints CRUD e ações de
@@ -30,13 +29,6 @@ import java.util.function.*;
 @Tag(name = "Processos", description = "Endpoints para gerenciamento de processos de mapeamento, revisão e diagnóstico")
 public class ProcessoController {
     private final ProcessoFacade processoFacade;
-
-    Map<TipoProcesso, BiFunction<Long, List<Long>, List<String>>> getProcessadoresInicio() {
-        return Map.of(
-                TipoProcesso.MAPEAMENTO, processoFacade::iniciarProcessoMapeamento,
-                TipoProcesso.REVISAO, processoFacade::iniciarProcessoRevisao,
-                TipoProcesso.DIAGNOSTICO, processoFacade::iniciarProcessoDiagnostico);
-    }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -124,9 +116,7 @@ public class ProcessoController {
     @Operation(summary = "Inicia um processo")
     @JsonView(ProcessoViews.Publica.class)
     public ResponseEntity<Processo> iniciar(@PathVariable Long codigo, @Valid @RequestBody IniciarProcessoRequest req) {
-        var processador = getProcessadoresInicio().get(req.tipo());
-
-        List<String> erros = processador.apply(codigo, req.unidades());
+        List<String> erros = processoFacade.iniciarProcesso(codigo, req.unidades());
         if (!erros.isEmpty()) {
             throw new ErroValidacao(String.join(". ", erros));
         }

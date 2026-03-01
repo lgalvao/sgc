@@ -268,7 +268,7 @@ class E2eControllerTest {
 
 
         assertEquals(100L, result.getCodigo());
-        verify(processoFacade).iniciarProcessoRevisao(100L, List.of(1L));
+        verify(processoFacade).iniciarProcesso(100L, List.of(1L));
     }
 
     @Test
@@ -292,7 +292,7 @@ class E2eControllerTest {
 
 
         assertEquals(100L, result.getCodigo());
-        verify(processoFacade).iniciarProcessoMapeamento(100L, List.of(1L));
+        verify(processoFacade).iniciarProcesso(100L, List.of(1L));
     }
 
     @Test
@@ -353,8 +353,8 @@ class E2eControllerTest {
     }
 
     @Test
-    @DisplayName("Deve cobrir else em criarProcessoFixture")
-    void deveCobrirElseEmCriarProcessoFixture() throws Exception {
+    @DisplayName("Deve iniciar processo ao criar fixture com iniciar=true")
+    void deveIniciarProcessoAoCriarFixtureComIniciarTrue() throws Exception {
 
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
                 "Desc", "SIGLA", true, 10);
@@ -366,6 +366,7 @@ class E2eControllerTest {
         Processo proc = new Processo();
         proc.setCodigo(100L);
         when(processoFacade.criar(any())).thenReturn(proc);
+        when(processoFacade.iniciarProcesso(100L, List.of(1L))).thenReturn(List.of());
         when(processoFacade.obterEntidadePorId(100L)).thenReturn(proc);
 
         // Use reflection to call private method
@@ -377,8 +378,7 @@ class E2eControllerTest {
         method.invoke(controller, req, TipoProcesso.DIAGNOSTICO);
 
 
-        verify(processoFacade, never()).iniciarProcessoMapeamento(anyLong(), anyList());
-        verify(processoFacade, never()).iniciarProcessoRevisao(anyLong(), anyList());
+        verify(processoFacade).iniciarProcesso(100L, List.of(1L));
     }
 
     @Test
@@ -398,7 +398,7 @@ class E2eControllerTest {
         when(processoFacade.obterEntidadePorId(100L)).thenReturn(proc);
 
         // Simular retorno de erros vazio (sucesso)
-        when(processoFacade.iniciarProcessoMapeamento(anyLong(), anyList())).thenReturn(List.of());
+        when(processoFacade.iniciarProcesso(anyLong(), anyList())).thenReturn(List.of());
 
         var method = E2eController.class.getDeclaredMethod("criarProcessoFixture",
                 E2eController.ProcessoFixtureRequest.class, TipoProcesso.class);
@@ -408,7 +408,7 @@ class E2eControllerTest {
         method.invoke(controller, req, TipoProcesso.MAPEAMENTO);
 
 
-        verify(processoFacade).iniciarProcessoMapeamento(eq(100L), anyList());
+        verify(processoFacade).iniciarProcesso(eq(100L), anyList());
     }
 
     @Nested
@@ -479,7 +479,7 @@ class E2eControllerTest {
             Processo dto = Processo.builder().codigo(100L).build();
             when(processoFacadeMock.criar(any())).thenReturn(dto);
 
-            when(processoFacadeMock.iniciarProcessoMapeamento(100L, List.of(10L)))
+            when(processoFacadeMock.iniciarProcesso(100L, List.of(10L)))
                     .thenReturn(List.of("Erro 1", "Erro 2"));
 
             assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
@@ -499,7 +499,7 @@ class E2eControllerTest {
             Processo dto = Processo.builder().codigo(100L).build();
             when(processoFacadeMock.criar(any())).thenReturn(dto);
 
-            when(processoFacadeMock.iniciarProcessoMapeamento(100L, List.of(10L)))
+            when(processoFacadeMock.iniciarProcesso(100L, List.of(10L)))
                     .thenReturn(List.of()); // Sucesso
 
             when(processoFacadeMock.obterEntidadePorId(100L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 100L)); // Falha ao recarregar

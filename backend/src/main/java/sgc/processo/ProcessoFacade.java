@@ -112,21 +112,7 @@ public class ProcessoFacade {
     }
 
     @Transactional
-    public List<String> iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
-        return iniciarProcesso(codigo, codsUnidades);
-    }
-
-    @Transactional
-    public List<String> iniciarProcessoRevisao(Long codigo, List<Long> codigosUnidades) {
-        return iniciarProcesso(codigo, codigosUnidades);
-    }
-
-    @Transactional
-    public List<String> iniciarProcessoDiagnostico(Long codigo, List<Long> codsUnidades) {
-        return iniciarProcesso(codigo, codsUnidades);
-    }
-
-    private List<String> iniciarProcesso(Long codigo, List<Long> codsUnidades) {
+    public List<String> iniciarProcesso(Long codigo, List<Long> codsUnidades) {
         Usuario usuario = usuarioService.usuarioAutenticado();
         return processoWorkflowService.iniciar(codigo, codsUnidades, usuario);
     }
