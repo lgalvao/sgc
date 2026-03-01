@@ -52,7 +52,7 @@
   `ProcessoController` (eliminado o mapa de funções).
 - [x] **Frontend**: `analises.ts` migrado de try/catch manual para `useAsyncAction`.
 - [x] **Backend**: `ErroValidacaoDto` embutido como record aninhado `ValidacaoCadastroDto.Erro`;
-  arquivo `ErroValidacaoDto.java` removido (DTOs de 28 → 27).
+  arquivo `ErroValidacaoDto.java` removido (DTOs de 28 → 26, junto com `AnaliseValidacaoDto`).
 - [x] **Backend**: `AlertaFacade` passa a injetar `UsuarioService` diretamente em vez de `UsuarioFacade`
   (remove dependência facade→facade); método `buscarPorTitulo` removido de `UsuarioFacade`.
 - [x] **Backend**: `SubprocessoNotificacaoService` passa a injetar `UsuarioService` diretamente em vez
@@ -73,7 +73,7 @@
 
 - [ ] **Migrar stores de leitura simples** para composables com estado local na view:
   - Candidatos: `unidades`, `usuarios`.
-- [ ] **Consolidar DTOs de `subprocesso`** de 26 → ~14, fundindo DTOs minúsculos de uso único.
+- [ ] **Consolidar DTOs de `subprocesso`** de 26 → ~20, fundindo DTOs minúsculos de uso único.
 - [ ] **Inlinear componentes Vue single-use** para reduzir a contagem de ~48 componentes.
 - [ ] **Avaliar `UsuarioFacade`**: método `buscarUsuarioPorTitulo` ainda usado apenas por
   `UsuarioController`; avaliar inlining direto no controller.

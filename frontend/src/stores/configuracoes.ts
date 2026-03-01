@@ -29,7 +29,7 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
             parametros.value = await serviceSalvarConfiguracoes(novosParametros);
             return true;
         }, "Não foi possível salvar as configurações.");
-        return result === true;
+        return result ?? false;
     }
 
     function getValor(chave: string, valorPadrao: string = ""): string {
