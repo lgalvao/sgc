@@ -196,11 +196,6 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
-    public List<Subprocesso> listarEntidadesPorProcesso(Long processoId) {
-        return subprocessoRepo.findByProcessoCodigoWithUnidade(processoId);
-    }
-
-    @Transactional(readOnly = true)
     public List<Subprocesso> listarPorProcessoUnidadeESituacoes(Long processoId, Long unidadeId, List<SituacaoSubprocesso> situacoes) {
         return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(processoId, unidadeId, situacoes);
     }
