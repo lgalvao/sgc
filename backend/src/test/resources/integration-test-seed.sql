@@ -1,6 +1,4 @@
--- ================================================================================
 -- SEED PARA TESTES DE INTEGRAÇÃO V2
--- ================================================================================
 -- 
 -- Este arquivo contém APENAS dados NÃO mantidos pelo sistema SGC:
 --   - Unidades (VW_UNIDADE)
@@ -13,11 +11,7 @@
 -- criados programaticamente em cada teste para garantir independência.
 --
 -- Última atualização: 2026-02-09
--- ================================================================================
-
--- ================================================================================
 -- UNIDADES
--- ================================================================================
 -- Hierarquia de Unidades para Testes
 --
 -- ADMIN (1)
@@ -110,10 +104,7 @@ VALUES (17, 'Coordenadoria 22', 'COORD_22', 'INTERMEDIARIA', 'ATIVA', 11, '13131
 INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
                             matricula_titular, data_inicio_titularidade)
 VALUES (18, 'Seção 221', 'SECAO_221', 'OPERACIONAL', 'ATIVA', 17, '141414', '00141414', CURRENT_TIMESTAMP);
-
--- ================================================================================
 -- USUÁRIOS
--- ================================================================================
 
 -- Administradores
 -- Admin principal para testes V2 (usado por @WithMockAdmin)
@@ -208,10 +199,7 @@ VALUES ('282828', '00282828', 'Eric Clapton', 'eric.clapton@tre-pe.jus.br', '202
 
 INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
 VALUES ('292929', '00292929', 'Flea', 'flea@tre-pe.jus.br', '2029', 18, 18);
-
--- ================================================================================
 -- PERFIS DE USUÁRIOS
--- ================================================================================
 
 -- Perfis ADMIN
 -- Perfil para Admin Teste V2 (usado por @WithMockAdmin)
@@ -314,10 +302,7 @@ VALUES ('282828', 'SERVIDOR', 15);
 
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('292929', 'SERVIDOR', 18);
-
--- ================================================================================
 -- RESPONSABILIDADES (Titulares das Unidades)
--- ================================================================================
 
 INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (1, '111111', '00111111', 'TITULAR', CURRENT_TIMESTAMP);
@@ -372,17 +357,11 @@ VALUES (17, '131313', '00131313', 'TITULAR', CURRENT_TIMESTAMP);
 
 INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (18, '141414', '00141414', 'TITULAR', CURRENT_TIMESTAMP);
-
--- ================================================================================
 -- PARÂMETROS DO SISTEMA
--- ================================================================================
 
 INSERT INTO sgc.parametro (codigo, chave, descricao, valor)
 VALUES (1, 'DIAS_INATIVACAO_PROCESSO', 'Dias para inativação de processos', '30');
 
 INSERT INTO sgc.parametro (codigo, chave, descricao, valor)
 VALUES (2, 'DIAS_ALERTA_NOVO', 'Dias para indicação de alerta como novo', '3');
-
--- ================================================================================
 -- FIM DO SEED
--- ================================================================================

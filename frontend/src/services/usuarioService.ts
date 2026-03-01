@@ -23,8 +23,6 @@ export interface Unidade {
     sigla: string;
 }
 
-// NOTE: 'Usuario' type is imported from "@/types/tipos" to avoid conflict/duplication
-
 export interface PerfilUnidade {
     perfil: Perfil;
     unidade: Unidade;
