@@ -204,6 +204,7 @@ public class SubprocessoService {
         if (dataFimEtapa2 != null) sp.setDataFimEtapa2(dataFimEtapa2);
     }
 
+    @Transactional(readOnly = true)
     public List<Atividade> obterAtividadesSemConhecimento(Long codSubprocesso) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         return obterAtividadesSemConhecimento(sp.getMapa());
@@ -219,6 +220,7 @@ public class SubprocessoService {
     }
 
 
+    @Transactional(readOnly = true)
     public ValidacaoCadastroDto validarCadastro(Long codSubprocesso) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         return validacaoService.validarCadastro(sp);
