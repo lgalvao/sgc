@@ -2,8 +2,6 @@ package sgc.comum.erros;
 
 import org.junit.jupiter.api.*;
 import org.springframework.http.*;
-import sgc.processo.painel.*;
-import sgc.subprocesso.erros.*;
 
 import java.util.*;
 
@@ -33,22 +31,6 @@ class CustomExceptionsTest {
     void testErroConfiguracao() {
         String message = "Erro de configuração";
         ErroConfiguracao exception = new ErroConfiguracao(message);
-        assertThat(exception.getMessage()).isEqualTo(message);
-    }
-
-    @Test
-    @DisplayName("Deve instanciar ErroMapaNaoAssociado")
-    void testErroMapaNaoAssociado() {
-        String message = "Mapa não associado";
-        ErroMapaNaoAssociado exception = new ErroMapaNaoAssociado(message);
-        assertThat(exception.getMessage()).isEqualTo(message);
-    }
-
-    @Test
-    @DisplayName("Deve instanciar ErroParametroPainelInvalido")
-    void testErroParametroPainelInvalido() {
-        String message = "Parâmetro inválido";
-        ErroParametroPainelInvalido exception = new ErroParametroPainelInvalido(message);
         assertThat(exception.getMessage()).isEqualTo(message);
     }
 

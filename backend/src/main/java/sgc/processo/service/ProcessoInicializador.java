@@ -5,7 +5,7 @@ import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
 import sgc.comum.model.*;
 import sgc.organizacao.model.*;
-import sgc.processo.erros.*;
+import sgc.comum.erros.ErroValidacao;
 import sgc.processo.model.*;
 import sgc.subprocesso.service.*;
 
@@ -37,7 +37,7 @@ public class ProcessoInicializador {
 
         if (tipo == TipoProcesso.REVISAO) {
             if (codsUnidadesParam.isEmpty()) {
-                throw new ErroUnidadesNaoDefinidas("A lista de unidades é obrigatória para iniciar o processo de revisão.");
+                throw new ErroValidacao("A lista de unidades é obrigatória para iniciar o processo de revisão.");
             }
             codigosUnidades = codsUnidadesParam;
             unidadesParaProcessar = new HashSet<>(unidadeRepo.findAllById(codigosUnidades));
@@ -47,7 +47,7 @@ public class ProcessoInicializador {
         } else {
             List<Long> codsParticipantes = processo.getCodigosParticipantes();
             if (codsParticipantes.isEmpty()) {
-                throw new ErroUnidadesNaoDefinidas("Não há unidades participantes definidas para este processo.");
+                throw new ErroValidacao("Não há unidades participantes definidas para este processo.");
             }
             codigosUnidades = codsParticipantes;
             unidadesParaProcessar = new HashSet<>(unidadeRepo.findAllById(codigosUnidades));
@@ -90,7 +90,7 @@ public class ProcessoInicializador {
 
     private void validarSituacaoProcesso(Processo processo) {
         if (processo.getSituacao() != CRIADO) {
-            throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser iniciados.");
+            throw new ErroValidacao("Apenas processos na situação 'CRIADO' podem ser iniciados.");
         }
     }
 

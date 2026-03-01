@@ -5,10 +5,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
 import sgc.comum.model.*;
+import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
-import sgc.subprocesso.erros.*;
 
 import java.time.*;
 import java.util.*;
@@ -87,7 +87,7 @@ public class Subprocesso extends EntidadeBase {
 
     public void setSituacao(SituacaoSubprocesso novaSituacao) {
         if (processo != null && situacao != null && situacao != novaSituacao && !situacao.podeTransicionarPara(novaSituacao, processo.getTipo())) {
-            throw new ErroTransicaoInvalida("Transição de situação inválida: %s -> %s".formatted(
+            throw new ErroValidacao("Transição de situação inválida: %s -> %s".formatted(
                     situacao.getDescricao(), novaSituacao.getDescricao())
             );
         }

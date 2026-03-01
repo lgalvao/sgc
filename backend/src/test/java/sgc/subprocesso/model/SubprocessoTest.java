@@ -1,15 +1,13 @@
 package sgc.subprocesso.model;
 
 import org.junit.jupiter.api.*;
+import sgc.comum.erros.ErroValidacao;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
-import sgc.subprocesso.erros.*;
-
 import java.time.*;
-
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Entidade: Subprocesso")
@@ -17,7 +15,7 @@ class SubprocessoTest {
 
     @Test
     @DisplayName("Deve lançar erro ao tentar transição inválida")
-    void deveLancarErroTransicaoInvalida() {
+    void deveLancarErroValidacao() {
         Processo p = Processo.builder().tipo(TipoProcesso.MAPEAMENTO).build();
         Subprocesso sp = Subprocesso.builder()
                 .processo(p)
@@ -25,7 +23,7 @@ class SubprocessoTest {
                 .build();
 
         assertThatThrownBy(() -> sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO))
-                .isInstanceOf(ErroTransicaoInvalida.class)
+                .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("Transição de situação inválida");
     }
 

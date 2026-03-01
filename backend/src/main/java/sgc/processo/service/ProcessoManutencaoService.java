@@ -8,6 +8,7 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
 import sgc.processo.erros.*;
+import sgc.comum.erros.ErroValidacao;
 import sgc.processo.model.*;
 
 import java.time.*;
@@ -64,7 +65,7 @@ public class ProcessoManutencaoService {
     public Processo atualizar(Long codigo, AtualizarProcessoRequest req) {
         Processo processo = processoConsultaService.buscarProcessoCodigo(codigo);
         if (processo.getSituacao() != CRIADO) {
-            throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser editados.");
+            throw new ErroValidacao("Apenas processos na situação 'CRIADO' podem ser editados.");
         }
 
         TipoProcesso tipoProcesso = req.tipo();
@@ -95,7 +96,7 @@ public class ProcessoManutencaoService {
     public void apagar(Long codigo) {
         Processo processo = processoConsultaService.buscarProcessoCodigo(codigo);
         if (processo.getSituacao() != CRIADO) {
-            throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser removidos.");
+            throw new ErroValidacao("Apenas processos na situação 'CRIADO' podem ser removidos.");
         }
         processoRepo.deleteById(codigo);
 

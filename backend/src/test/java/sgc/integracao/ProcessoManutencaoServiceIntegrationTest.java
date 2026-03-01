@@ -3,10 +3,10 @@ package sgc.integracao;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import sgc.processo.dto.*;
+import sgc.comum.erros.ErroValidacao;
 import sgc.processo.erros.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
-
 import java.time.*;
 import java.util.*;
 
@@ -139,7 +139,7 @@ class ProcessoManutencaoServiceIntegrationTest extends BaseIntegrationTest {
                     .build();
 
             assertThatThrownBy(() -> service.atualizar(p.getCodigo(), request))
-                    .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
+                    .isInstanceOf(ErroValidacao.class);
         }
     }
 
@@ -169,7 +169,7 @@ class ProcessoManutencaoServiceIntegrationTest extends BaseIntegrationTest {
 
 
             assertThatThrownBy(() -> service.apagar(p.getCodigo()))
-                    .isInstanceOf(ErroProcessoEmSituacaoInvalida.class);
+                    .isInstanceOf(ErroValidacao.class);
         }
     }
 }

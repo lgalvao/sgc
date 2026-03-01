@@ -49,7 +49,7 @@ public class RelatorioFacade {
                 document.add(new Paragraph(texto));
             }
         } catch (DocumentException e) {
-            throw new ErroRelatorio("Erro ao gerar PDF", e);
+            throw new RuntimeException("Erro ao gerar PDF", e);
         }
     }
 
@@ -89,7 +89,7 @@ public class RelatorioFacade {
                 document.add(new Paragraph("---------------------------"));
             }
         } catch (DocumentException e) {
-            throw new ErroRelatorio("Erro ao gerar PDF", e);
+            throw new RuntimeException("Erro ao gerar PDF", e);
         }
     }
 }

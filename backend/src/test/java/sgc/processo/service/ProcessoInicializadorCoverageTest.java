@@ -61,7 +61,7 @@ class ProcessoInicializadorCoverageTest {
 
         when(repo.buscar(Processo.class, 1L)).thenReturn(p);
 
-        assertThrows(sgc.processo.erros.ErroUnidadesNaoDefinidas.class, () ->
+        assertThrows(sgc.comum.erros.ErroValidacao.class, () ->
             inicializador.iniciar(1L, List.of(), new Usuario())
         );
     }
@@ -74,7 +74,7 @@ class ProcessoInicializadorCoverageTest {
 
         when(repo.buscar(Processo.class, 1L)).thenReturn(p);
 
-        assertThrows(sgc.processo.erros.ErroUnidadesNaoDefinidas.class, () ->
+        assertThrows(sgc.comum.erros.ErroValidacao.class, () ->
             inicializador.iniciar(1L, List.of(), new Usuario())
         );
     }

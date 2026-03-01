@@ -2,11 +2,11 @@ package sgc.processo.service;
 
 import net.jqwik.api.*;
 import sgc.organizacao.model.*;
+import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
 import sgc.processo.erros.*;
 import sgc.processo.model.*;
-
 import java.time.*;
 import java.util.*;
 
@@ -93,7 +93,7 @@ class ProcessoManutencaoServicePbtTest {
 
         // Act & Assert
         assertThatThrownBy(() -> service.atualizar(1L, req))
-                .isInstanceOf(ErroProcessoEmSituacaoInvalida.class)
+                .isInstanceOf(ErroValidacao.class)
                 .hasMessage("Apenas processos na situação 'CRIADO' podem ser editados.");
     }
 
@@ -117,7 +117,7 @@ class ProcessoManutencaoServicePbtTest {
 
         // Act & Assert
         assertThatThrownBy(() -> service.apagar(1L))
-                .isInstanceOf(ErroProcessoEmSituacaoInvalida.class)
+                .isInstanceOf(ErroValidacao.class)
                 .hasMessage("Apenas processos na situação 'CRIADO' podem ser removidos.");
     }
 

@@ -23,7 +23,6 @@ import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
-import sgc.subprocesso.erros.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
@@ -1208,7 +1207,7 @@ public class SubprocessoService {
     private void validarSituacaoParaAjuste(Subprocesso sp) {
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
                 && sp.getSituacao() != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
-            throw new ErroMapaEmSituacaoInvalida(
+            throw new ErroValidacao(
                     "Ajustes no mapa só podem ser feitos em estados específicos. "
                             + "Situação atual: %s".formatted(sp.getSituacao()));
         }
