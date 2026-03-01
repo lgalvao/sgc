@@ -34,6 +34,7 @@ public class ProcessoFacade {
     private final ProcessoManutencaoService processoManutencaoService;
     private final UnidadeService unidadeService;
     private final SubprocessoService subprocessoService;
+    private final SubprocessoTransicaoService transicaoService;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final UsuarioFacade usuarioService;
     private final ProcessoInicializador processoInicializador;
@@ -209,7 +210,7 @@ public class ProcessoFacade {
                     req.dataLimite(),
                     "Disponibilização em bloco"
             );
-            subprocessoService.disponibilizarMapaEmBloco(ids, dispReq, usuario);
+            transicaoService.disponibilizarMapaEmBloco(ids, dispReq, usuario);
             return;
         }
 
@@ -293,16 +294,16 @@ public class ProcessoFacade {
                                     List<Long> idsHomologarValidacao) {
 
         if (!idsAceitarCadastro.isEmpty()) {
-            subprocessoService.aceitarCadastroEmBloco(idsAceitarCadastro, usuario);
+            transicaoService.aceitarCadastroEmBloco(idsAceitarCadastro, usuario);
         }
         if (!idsAceitarValidacao.isEmpty()) {
-            subprocessoService.aceitarValidacaoEmBloco(idsAceitarValidacao, usuario);
+            transicaoService.aceitarValidacaoEmBloco(idsAceitarValidacao, usuario);
         }
         if (!idsHomologarCadastro.isEmpty()) {
-            subprocessoService.homologarCadastroEmBloco(idsHomologarCadastro, usuario);
+            transicaoService.homologarCadastroEmBloco(idsHomologarCadastro, usuario);
         }
         if (!idsHomologarValidacao.isEmpty()) {
-            subprocessoService.homologarValidacaoEmBloco(idsHomologarValidacao, usuario);
+            transicaoService.homologarValidacaoEmBloco(idsHomologarValidacao, usuario);
         }
     }
 

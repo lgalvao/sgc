@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private SubprocessoService subprocessoService;
+    private SubprocessoTransicaoService transicaoService;
 
     @Autowired
     private UsuarioRepo usuarioRepo;
@@ -96,7 +96,7 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
                 .observacoes("Testando email")
                 .build();
 
-        subprocessoService.registrarTransicao(comando);
+        transicaoService.registrarTransicao(comando);
 
         verify(emailService, atLeastOnce()).enviarEmailHtml(contains("test_email_dest"), anyString(), anyString());
     }
@@ -114,7 +114,7 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
                 .usuario(admin)
                 .build();
 
-        assertThatThrownBy(() -> subprocessoService.registrarTransicao(comando))
+        assertThatThrownBy(() -> transicaoService.registrarTransicao(comando))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Erro ao enviar email");
     }
@@ -130,7 +130,7 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
                 .usuario(admin)
                 .build();
 
-        subprocessoService.registrarTransicao(comando);
+        transicaoService.registrarTransicao(comando);
 
         verify(emailService, never()).enviarEmailHtml(anyString(), anyString(), anyString());
     }

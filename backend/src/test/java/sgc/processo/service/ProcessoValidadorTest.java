@@ -23,7 +23,7 @@ class ProcessoValidadorTest {
     private UnidadeService unidadeService;
 
     @Mock
-    private ConsultasSubprocessoService queryService;
+    private SubprocessoValidacaoService validacaoService;
 
     @InjectMocks
     private ProcessoValidador validador;
@@ -66,11 +66,11 @@ class ProcessoValidadorTest {
         p.setCodigo(1L);
         p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-        when(queryService.validarSubprocessosParaFinalizacao(1L))
-                .thenReturn(ConsultasSubprocessoService.ValidationResult.ofValido());
+        when(validacaoService.validarSubprocessosParaFinalizacao(1L))
+                .thenReturn(SubprocessoValidacaoService.ValidationResult.ofValido());
 
         Assertions.assertDoesNotThrow(() -> validador.validarFinalizacaoProcesso(p));
-        verify(queryService).validarSubprocessosParaFinalizacao(1L);
+        verify(validacaoService).validarSubprocessosParaFinalizacao(1L);
     }
 
     @Test
@@ -90,8 +90,8 @@ class ProcessoValidadorTest {
         Processo p = new Processo();
         p.setCodigo(1L);
 
-        when(queryService.validarSubprocessosParaFinalizacao(1L))
-                .thenReturn(ConsultasSubprocessoService.ValidationResult.ofValido());
+        when(validacaoService.validarSubprocessosParaFinalizacao(1L))
+                .thenReturn(SubprocessoValidacaoService.ValidationResult.ofValido());
 
         // Should not throw exception
         Assertions.assertDoesNotThrow(() -> validador.validarTodosSubprocessosHomologados(p));
@@ -103,8 +103,8 @@ class ProcessoValidadorTest {
         Processo p = new Processo();
         p.setCodigo(1L);
 
-        when(queryService.validarSubprocessosParaFinalizacao(1L))
-                .thenReturn(ConsultasSubprocessoService.ValidationResult.ofInvalido("Erro de validação"));
+        when(validacaoService.validarSubprocessosParaFinalizacao(1L))
+                .thenReturn(SubprocessoValidacaoService.ValidationResult.ofInvalido("Erro de validação"));
 
         assertThatThrownBy(() -> validador.validarTodosSubprocessosHomologados(p))
                 .isInstanceOf(ErroProcesso.class)

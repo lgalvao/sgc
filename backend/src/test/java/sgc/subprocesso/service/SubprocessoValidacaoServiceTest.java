@@ -1,32 +1,25 @@
-package sgc.subprocesso.service.query;
+package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.*;
 
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Testes unitários para ConsultasSubprocessoService.
- *
- * <p>Valida que o serviço de query funciona corretamente sem dependências circulares
- * e com queries otimizadas.
- */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ConsultasSubprocessoService")
-class ConsultasSubprocessoServiceTest {
+@DisplayName("SubprocessoValidacaoService")
+class SubprocessoValidacaoServiceTest {
 
     @Mock
     private SubprocessoRepo subprocessoRepo;
 
     @InjectMocks
-    private ConsultasSubprocessoService queryService;
+    private SubprocessoValidacaoService validacaoService;
 
     @Nested
     @DisplayName("verificarAcessoUnidadeAoProcesso")
@@ -41,9 +34,7 @@ class ConsultasSubprocessoServiceTest {
             when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(processoId, unidadeCodigos))
                     .thenReturn(true);
 
-
-            boolean resultado = queryService.verificarAcessoUnidadeAoProcesso(processoId, unidadeCodigos);
-
+            boolean resultado = validacaoService.verificarAcessoUnidadeAoProcesso(processoId, unidadeCodigos);
 
             assertThat(resultado).isTrue();
             verify(subprocessoRepo).existsByProcessoCodigoAndUnidadeCodigoIn(processoId, unidadeCodigos);
@@ -58,9 +49,7 @@ class ConsultasSubprocessoServiceTest {
             when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(processoId, unidadeCodigos))
                     .thenReturn(false);
 
-
-            boolean resultado = queryService.verificarAcessoUnidadeAoProcesso(processoId, unidadeCodigos);
-
+            boolean resultado = validacaoService.verificarAcessoUnidadeAoProcesso(processoId, unidadeCodigos);
 
             assertThat(resultado).isFalse();
         }
@@ -69,8 +58,7 @@ class ConsultasSubprocessoServiceTest {
         @DisplayName("deve retornar false quando lista de unidades está vazia")
         void deveRetornarFalseQuandoListaUnidadesVazia() {
 
-            boolean resultado = queryService.verificarAcessoUnidadeAoProcesso(1L, List.of());
-
+            boolean resultado = validacaoService.verificarAcessoUnidadeAoProcesso(1L, List.of());
 
             assertThat(resultado).isFalse();
             verifyNoInteractions(subprocessoRepo);
@@ -93,9 +81,7 @@ class ConsultasSubprocessoServiceTest {
                             && situacoes.contains(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO))
             )).thenReturn(3L);
 
-
-            var resultado = queryService.validarSubprocessosParaFinalizacao(processoId);
-
+            var resultado = validacaoService.validarSubprocessosParaFinalizacao(processoId);
 
             assertThat(resultado.valido()).isTrue();
             assertThat(resultado.mensagem()).isNull();
@@ -110,9 +96,7 @@ class ConsultasSubprocessoServiceTest {
             when(subprocessoRepo.countByProcessoCodigoAndSituacaoIn(anyLong(), anyList()))
                     .thenReturn(3L);
 
-
-            var resultado = queryService.validarSubprocessosParaFinalizacao(processoId);
-
+            var resultado = validacaoService.validarSubprocessosParaFinalizacao(processoId);
 
             assertThat(resultado.valido()).isFalse();
             assertThat(resultado.mensagem())
@@ -127,9 +111,7 @@ class ConsultasSubprocessoServiceTest {
             Long processoId = 1L;
             when(subprocessoRepo.countByProcessoCodigo(processoId)).thenReturn(0L);
 
-
-            var resultado = queryService.validarSubprocessosParaFinalizacao(processoId);
-
+            var resultado = validacaoService.validarSubprocessosParaFinalizacao(processoId);
 
             assertThat(resultado.valido()).isFalse();
             assertThat(resultado.mensagem())
@@ -146,9 +128,7 @@ class ConsultasSubprocessoServiceTest {
             when(subprocessoRepo.countByProcessoCodigoAndSituacaoIn(anyLong(), anyList()))
                     .thenReturn(100L);
 
-
-            queryService.validarSubprocessosParaFinalizacao(processoId);
-
+            validacaoService.validarSubprocessosParaFinalizacao(processoId);
 
             // Verifica que apenas queries de contagem foram chamadas, não findAll
             verify(subprocessoRepo).countByProcessoCodigo(processoId);
@@ -159,48 +139,13 @@ class ConsultasSubprocessoServiceTest {
     }
 
     @Nested
-    @DisplayName("Listagem de Subprocessos")
-    class ListagemSubprocessos {
-
-        @Test
-        @DisplayName("deve listar por processo e situações")
-        void deveListarPorProcessoESituacoes() {
-            Long processoId = 1L;
-            List<SituacaoSubprocesso> situacoes = List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            queryService.listarPorProcessoESituacoes(processoId, situacoes);
-            verify(subprocessoRepo).findByProcessoCodigoAndSituacaoInWithUnidade(processoId, situacoes);
-        }
-
-        @Test
-        @DisplayName("deve listar entidades por processo")
-        void deveListarEntidadesPorProcesso() {
-            Long processoId = 1L;
-            queryService.listarEntidadesPorProcesso(processoId);
-            verify(subprocessoRepo).findByProcessoCodigoWithUnidade(processoId);
-        }
-
-        @Test
-        @DisplayName("deve listar por processo, unidade e situações")
-        void deveListarPorProcessoUnidadeESituacoes() {
-            Long processoId = 1L;
-            Long unidadeId = 2L;
-            List<SituacaoSubprocesso> situacoes = List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            queryService.listarPorProcessoUnidadeESituacoes(processoId, unidadeId, situacoes);
-            verify(subprocessoRepo).findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(processoId, unidadeId, situacoes);
-        }
-    }
-
-    @Nested
     @DisplayName("ValidationResult")
     class ValidationResultTest {
 
         @Test
         @DisplayName("valido() deve criar resultado válido sem mensagem")
         void validoDeveCriarResultadoValidoSemMensagem() {
-
-            var resultado = ConsultasSubprocessoService.ValidationResult.ofValido();
-
-
+            var resultado = SubprocessoValidacaoService.ValidationResult.ofValido();
             assertThat(resultado.valido()).isTrue();
             assertThat(resultado.mensagem()).isNull();
         }
@@ -208,13 +153,8 @@ class ConsultasSubprocessoServiceTest {
         @Test
         @DisplayName("invalido() deve criar resultado inválido com mensagem")
         void invalidoDeveCriarResultadoInvalidoComMensagem() {
-
             String mensagem = "Erro de validação";
-
-
-            var resultado = ConsultasSubprocessoService.ValidationResult.ofInvalido(mensagem);
-
-
+            var resultado = SubprocessoValidacaoService.ValidationResult.ofInvalido(mensagem);
             assertThat(resultado.valido()).isFalse();
             assertThat(resultado.mensagem()).isEqualTo(mensagem);
         }

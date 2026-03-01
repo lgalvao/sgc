@@ -32,7 +32,7 @@ class ProcessoConsultaServiceTest {
     private ComumRepo repo;
 
     @Mock
-    private ConsultasSubprocessoService queryService;
+    private SubprocessoService subprocessoService;
 
     @Mock
     private UsuarioFacade usuarioService;
@@ -125,7 +125,7 @@ class ProcessoConsultaServiceTest {
                 .build();
         s1.setCodigo(1L);
 
-        when(queryService.listarPorProcessoESituacoes(eq(1L), anyList())).thenReturn(List.of(s1));
+        when(subprocessoService.listarPorProcessoESituacoes(eq(1L), anyList())).thenReturn(List.of(s1));
 
         List<SubprocessoElegivelDto> res = processoConsultaService.subprocessosElegiveis(1L);
 
@@ -149,7 +149,7 @@ class ProcessoConsultaServiceTest {
         Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(u1).build();
         s1.setCodigo(1L);
 
-        when(queryService.listarPorProcessoUnidadeESituacoes(eq(1L), eq(100L), anyList())).thenReturn(List.of(s1));
+        when(subprocessoService.listarPorProcessoUnidadeESituacoes(eq(1L), eq(100L), anyList())).thenReturn(List.of(s1));
 
         List<SubprocessoElegivelDto> res = processoConsultaService.subprocessosElegiveis(1L);
 

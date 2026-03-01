@@ -23,7 +23,7 @@ import java.util.*;
 public class ProcessoConsultaService {
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
-    private final ConsultasSubprocessoService servicoConsultas;
+    private final SubprocessoService subprocessoService;
     private final UsuarioFacade usuarioService;
     private final ProcessoAcessoService processoAcessoService;
 
@@ -81,7 +81,7 @@ public class ProcessoConsultaService {
         Usuario usuario = usuarioService.usuarioAutenticado();
 
         if (usuario.getPerfilAtivo() == Perfil.ADMIN) {
-            return servicoConsultas.listarPorProcessoESituacoes(codProcesso,
+            return subprocessoService.listarPorProcessoESituacoes(codProcesso,
                             List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
                                     SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
                                     SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
@@ -93,7 +93,7 @@ public class ProcessoConsultaService {
                     .toList();
         }
 
-        return servicoConsultas.listarPorProcessoUnidadeESituacoes(codProcesso, usuario.getUnidadeAtivaCodigo(),
+        return subprocessoService.listarPorProcessoUnidadeESituacoes(codProcesso, usuario.getUnidadeAtivaCodigo(),
                         List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
                                 SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA))
                 .stream()

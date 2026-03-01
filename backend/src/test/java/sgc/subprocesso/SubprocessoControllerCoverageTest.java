@@ -37,6 +37,8 @@ class SubprocessoControllerCoverageTest {
     @MockitoBean
     private SubprocessoService subprocessoService;
     @MockitoBean
+    private SubprocessoTransicaoService transicaoService;
+    @MockitoBean
     private UnidadeService unidadeService;
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
@@ -141,7 +143,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).alterarDataLimite(eq(1L), any());
+        verify(transicaoService).alterarDataLimite(eq(1L), any());
     }
 
     @Test
@@ -183,7 +185,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).reabrirCadastro(1L, "Justificativa");
+        verify(transicaoService).reabrirCadastro(1L, "Justificativa");
     }
 
     @Test
@@ -198,7 +200,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).reabrirRevisaoCadastro(1L, "Justificativa");
+        verify(transicaoService).reabrirRevisaoCadastro(1L, "Justificativa");
     }
 
     @Test
@@ -238,7 +240,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).aceitarCadastroEmBloco(anyList(), any());
+        verify(transicaoService).aceitarCadastroEmBloco(anyList(), any());
     }
 
     @Test
@@ -306,7 +308,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).disponibilizarMapa(eq(1L), any(), any());
+        verify(transicaoService).disponibilizarMapa(eq(1L), any(), any());
     }
 
     @Test
@@ -331,7 +333,7 @@ class SubprocessoControllerCoverageTest {
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).validarMapa(eq(1L), any());
+        verify(transicaoService).validarMapa(eq(1L), any());
     }
 
     @Test
@@ -346,7 +348,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).devolverValidacao(eq(1L), any(), any());
+        verify(transicaoService).devolverValidacao(eq(1L), any(), any());
     }
 
     @Test
@@ -357,7 +359,7 @@ class SubprocessoControllerCoverageTest {
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).aceitarValidacao(eq(1L), any());
+        verify(transicaoService).aceitarValidacao(eq(1L), any());
     }
 
     @Test
@@ -368,7 +370,7 @@ class SubprocessoControllerCoverageTest {
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).homologarValidacao(eq(1L), any());
+        verify(transicaoService).homologarValidacao(eq(1L), any());
     }
 
     @Test
@@ -383,7 +385,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).submeterMapaAjustado(eq(1L), any(), any());
+        verify(transicaoService).submeterMapaAjustado(eq(1L), any(), any());
     }
 
     @Test
@@ -398,7 +400,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).aceitarValidacaoEmBloco(anyList(), any());
+        verify(transicaoService).aceitarValidacaoEmBloco(anyList(), any());
     }
 
     @Test
@@ -413,6 +415,6 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).homologarValidacaoEmBloco(anyList(), any());
+        verify(transicaoService).homologarValidacaoEmBloco(anyList(), any());
     }
 }

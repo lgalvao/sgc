@@ -25,6 +25,9 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
     private SubprocessoService subprocessoService;
 
     @Autowired
+    private SubprocessoValidacaoService validacaoService;
+
+    @Autowired
     private MapaRepo mapaRepo;
 
     @Autowired
@@ -72,7 +75,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
         competenciaRepo.save(c);
 
         Long mapaCodigo = subprocesso.getMapa().getCodigo();
-        assertThatThrownBy(() -> subprocessoService.validarAssociacoesMapa(mapaCodigo))
+        assertThatThrownBy(() -> validacaoService.validarAssociacoesMapa(mapaCodigo))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("Existem competências que não foram associadas a nenhuma atividade.");
     }
@@ -84,7 +87,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
         atividadeRepo.save(a);
 
         Long mapaCodigo = subprocesso.getMapa().getCodigo();
-        assertThatThrownBy(() -> subprocessoService.validarAssociacoesMapa(mapaCodigo))
+        assertThatThrownBy(() -> validacaoService.validarAssociacoesMapa(mapaCodigo))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("Existem atividades que não foram associadas a nenhuma competência.");
     }
@@ -112,7 +115,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("validarSituacaoPermitida: throw se status diferente")
     void validarSituacaoPermitida_Throw() {
-        assertThatThrownBy(() -> subprocessoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO))
+        assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO))
                 .isInstanceOf(ErroValidacao.class);
     }
 
@@ -120,7 +123,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
     @DisplayName("validarSituacaoPermitida: throw IllegalArgumentException se status null")
     void validarSituacaoPermitida_NullStatus() {
         Subprocesso sp = new Subprocesso();
-        assertThatThrownBy(() -> subprocessoService.validarSituacaoPermitida(sp, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO))
+        assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO))
                 .isInstanceOf(ErroValidacao.class);
     }
 }

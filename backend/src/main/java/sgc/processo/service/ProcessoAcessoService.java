@@ -21,7 +21,7 @@ import java.util.stream.*;
 public class ProcessoAcessoService {
     private final UnidadeService unidadeService;
     private final UsuarioFacade usuarioService;
-    private final ConsultasSubprocessoService consultas;
+    private final SubprocessoValidacaoService validacaoService;
 
     @Transactional(readOnly = true)
     public boolean checarAcesso(@Nullable Authentication authentication, Long codProcesso) {
@@ -51,7 +51,7 @@ public class ProcessoAcessoService {
             todasUnidadesAcesso.addAll(buscarDescendentesNoMapa(codUnidade, mapaPorPai));
         }
 
-        return consultas.verificarAcessoUnidadeAoProcesso(codProcesso, new ArrayList<>(todasUnidadesAcesso));
+        return validacaoService.verificarAcessoUnidadeAoProcesso(codProcesso, new ArrayList<>(todasUnidadesAcesso));
     }
 
     @Transactional(readOnly = true)

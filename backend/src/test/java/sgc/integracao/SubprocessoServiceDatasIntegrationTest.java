@@ -23,6 +23,9 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
     private SubprocessoService subprocessoService;
 
     @Autowired
+    private SubprocessoTransicaoService transicaoService;
+
+    @Autowired
     private MapaRepo mapaRepo;
 
     private Processo processo;
@@ -67,7 +70,7 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
     @DisplayName("alterarDataLimite: deve alterar etapa 1 para CADASTRO")
     void alterarDataLimite_Etapa1() {
         LocalDate novaData = LocalDate.now().plusDays(5);
-        subprocessoService.alterarDataLimite(subprocesso.getCodigo(), novaData);
+        transicaoService.alterarDataLimite(subprocesso.getCodigo(), novaData);
 
         Subprocesso atualizado = subprocessoService.buscarSubprocesso(subprocesso.getCodigo());
         assertThat(atualizado.getDataLimiteEtapa1().toLocalDate()).isEqualTo(novaData);
@@ -84,7 +87,7 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
         subprocessoRepo.flush();
 
         LocalDate novaData = LocalDate.now().plusDays(5);
-        subprocessoService.alterarDataLimite(subprocesso.getCodigo(), novaData);
+        transicaoService.alterarDataLimite(subprocesso.getCodigo(), novaData);
 
         Subprocesso atualizado = subprocessoService.buscarSubprocesso(subprocesso.getCodigo());
         assertThat(atualizado.getDataLimiteEtapa2().toLocalDate()).isEqualTo(novaData);

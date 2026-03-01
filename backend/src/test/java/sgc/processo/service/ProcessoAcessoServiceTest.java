@@ -32,7 +32,7 @@ class ProcessoAcessoServiceTest {
     private UsuarioFacade usuarioService;
 
     @Mock
-    private ConsultasSubprocessoService queryService;
+    private SubprocessoValidacaoService validacaoService;
 
     @Test
     @DisplayName("Deve negar acesso se authentication for null")
@@ -83,7 +83,7 @@ class ProcessoAcessoServiceTest {
 
         when(unidadeService.todasComHierarquia()).thenReturn(List.of(u100, u101, u102));
 
-        when(queryService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {
+        when(validacaoService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {
             List<Long> ids = invocation.getArgument(1);
             return ids.contains(1L) && ids.contains(101L) && ids.contains(102L);
         });
@@ -181,7 +181,7 @@ class ProcessoAcessoServiceTest {
 
 
         // Se a lista de IDs conter 200, acesso é permitido. Se tiver apenas 100, negado.
-        when(queryService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {
+        when(validacaoService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {
             List<Long> ids = invocation.getArgument(1);
             return ids.contains(200L);
         });

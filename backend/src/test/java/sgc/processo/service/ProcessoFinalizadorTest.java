@@ -32,7 +32,7 @@ class ProcessoFinalizadorTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
-    private ConsultasSubprocessoService queryService;
+    private SubprocessoService subprocessoService;
     @Mock
     private ProcessoNotificacaoService processoNotificacaoService;
     @Mock
@@ -55,7 +55,7 @@ class ProcessoFinalizadorTest {
         Mapa m = new Mapa();
         s.setMapa(m);
 
-        when(queryService.listarEntidadesPorProcesso(codigo)).thenReturn(List.of(s));
+        when(subprocessoService.listarEntidadesPorProcesso(codigo)).thenReturn(List.of(s));
 
         finalizador.finalizar(codigo);
 

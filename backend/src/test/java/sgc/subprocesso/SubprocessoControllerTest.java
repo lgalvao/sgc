@@ -32,6 +32,8 @@ class SubprocessoControllerTest {
     @MockitoBean
     private SubprocessoService subprocessoService;
     @MockitoBean
+    private SubprocessoTransicaoService transicaoService;
+    @MockitoBean
     private UnidadeService unidadeService;
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
@@ -69,7 +71,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mensagem").value("Cadastro de atividades disponibilizado"));
 
-            verify(subprocessoService).disponibilizarCadastro(eq(1L), any());
+            verify(transicaoService).disponibilizarCadastro(eq(1L), any());
             verify(subprocessoService, never()).obterAtividadesSemConhecimento(anyLong());
         }
 
@@ -85,7 +87,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoService).devolverCadastro(eq(1L), any(), anyString());
+            verify(transicaoService).devolverCadastro(eq(1L), any(), anyString());
         }
     }
 
@@ -112,7 +114,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoService).disponibilizarMapa(eq(1L), any(), any());
+            verify(transicaoService).disponibilizarMapa(eq(1L), any(), any());
         }
     }
 
@@ -130,7 +132,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isOk());
 
-            verify(subprocessoService).apresentarSugestoes(eq(1L), eq("Sugestão"), any());
+            verify(transicaoService).apresentarSugestoes(eq(1L), eq("Sugestão"), any());
         }
     }
 
@@ -150,7 +152,7 @@ class SubprocessoControllerTest {
                     .build();
 
             when(subprocessoService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-            when(subprocessoService.criarAnalise(any(), any(), any())).thenReturn(new Analise());
+            when(transicaoService.criarAnalise(any(), any(), any())).thenReturn(new Analise());
 
             mockMvc.perform(post("/api/subprocessos/1/analises-cadastro")
                             .with(csrf())
@@ -158,7 +160,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isCreated());
 
-            verify(subprocessoService).criarAnalise(any(), any(), any());
+            verify(transicaoService).criarAnalise(any(), any(), any());
         }
     }
 }

@@ -55,6 +55,8 @@ class ProcessoFacadeTest {
     @Mock
     private SubprocessoService subprocessoService;
     @Mock
+    private SubprocessoTransicaoService transicaoService;
+    @Mock
     private UsuarioFacade usuarioService;
     @Mock
     private ProcessoAcessoService processoAcessoService;
@@ -176,8 +178,8 @@ class ProcessoFacadeTest {
             AcaoEmBlocoRequest reqNull = new AcaoEmBlocoRequest(List.of(10L), null, LocalDate.now());
             processoFacade.executarAcaoEmBloco(codProcesso, reqNull);
 
-            verify(subprocessoService, never()).aceitarCadastroEmBloco(any(), any());
-            verify(subprocessoService, never()).homologarCadastroEmBloco(any(), any());
+            verify(transicaoService, never()).aceitarCadastroEmBloco(any(), any());
+            verify(transicaoService, never()).homologarCadastroEmBloco(any(), any());
         }
     }
 
@@ -540,7 +542,7 @@ class ProcessoFacadeTest {
 
                 ArgumentCaptor<DisponibilizarMapaRequest> captor =
                         ArgumentCaptor.forClass(DisponibilizarMapaRequest.class);
-                verify(subprocessoService).disponibilizarMapaEmBloco(
+                verify(transicaoService).disponibilizarMapaEmBloco(
                         eq(List.of(1001L, 1002L, 1003L)),
                         captor.capture(),
                         eq(usuario)
@@ -586,7 +588,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
 
-                verify(subprocessoService).aceitarCadastroEmBloco(List.of(1L, 2L), usuario);
+                verify(transicaoService).aceitarCadastroEmBloco(List.of(1L, 2L), usuario);
             }
 
             @Test
@@ -615,7 +617,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
 
-                verify(subprocessoService).aceitarValidacaoEmBloco(List.of(1L), usuario);
+                verify(transicaoService).aceitarValidacaoEmBloco(List.of(1L), usuario);
             }
         }
 
@@ -648,7 +650,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
 
-                verify(subprocessoService).homologarCadastroEmBloco(List.of(1L), usuario);
+                verify(transicaoService).homologarCadastroEmBloco(List.of(1L), usuario);
             }
 
             @Test
@@ -677,7 +679,7 @@ class ProcessoFacadeTest {
                 processoFacade.executarAcaoEmBloco(100L, req);
 
 
-                verify(subprocessoService).homologarValidacaoEmBloco(List.of(1L), usuario);
+                verify(transicaoService).homologarValidacaoEmBloco(List.of(1L), usuario);
             }
         }
     }

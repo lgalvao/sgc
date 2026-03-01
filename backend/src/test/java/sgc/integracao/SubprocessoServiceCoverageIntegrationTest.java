@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 class SubprocessoServiceCoverageIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private SubprocessoService subprocessoService;
+    private SubprocessoValidacaoService validacaoService;
 
     @Autowired
     private AtividadeRepo atividadeRepo;
@@ -60,8 +60,7 @@ class SubprocessoServiceCoverageIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("validarExistenciaAtividades: deve lançar erro se mapa sem atividades")
     void validarExistenciaAtividades_SemAtividades() {
-        Long subprocessoCodigo = subprocesso.getCodigo();
-        assertThatThrownBy(() -> subprocessoService.validarExistenciaAtividades(subprocessoCodigo))
+        assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(subprocesso))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessage("O mapa de competências deve ter ao menos uma atividade cadastrada.");
     }
@@ -72,8 +71,7 @@ class SubprocessoServiceCoverageIntegrationTest extends BaseIntegrationTest {
         Atividade atividade = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Sem conhecimento").build();
         atividadeRepo.save(atividade);
 
-        Long subprocessoCodigo = subprocesso.getCodigo();
-        assertThatThrownBy(() -> subprocessoService.validarExistenciaAtividades(subprocessoCodigo))
+        assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(subprocesso))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessage("Todas as atividades devem possuir conhecimentos vinculados. Verifique as atividades pendentes.");
     }

@@ -36,6 +36,9 @@ class SubprocessoControllerCoverageExtraTest {
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     @MockitoBean
     private SubprocessoService subprocessoService;
+    
+    @MockitoBean
+    private SubprocessoTransicaoService transicaoService;
 
     @MockitoBean
     private UnidadeService unidadeService;
@@ -50,7 +53,7 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void disponibilizarCadastroErro() throws Exception {
         doThrow(new ErroValidacao("Existem atividades sem conhecimentos associados."))
-                .when(subprocessoService).disponibilizarCadastro(eq(1L), any());
+                .when(transicaoService).disponibilizarCadastro(eq(1L), any());
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/cadastro/disponibilizar").with(csrf()))
@@ -63,7 +66,7 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void disponibilizarRevisaoErro() throws Exception {
         doThrow(new ErroValidacao("Existem atividades sem conhecimentos associados."))
-                .when(subprocessoService).disponibilizarRevisao(eq(1L), any());
+                .when(transicaoService).disponibilizarRevisao(eq(1L), any());
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_REVISAO_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/disponibilizar-revisao").with(csrf()))
@@ -140,7 +143,7 @@ class SubprocessoControllerCoverageExtraTest {
         CriarAnaliseRequest req = new CriarAnaliseRequest("191919", "obs", "SGL", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
         when(subprocessoService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
         Analise a = new Analise();
-        when(subprocessoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO))).thenReturn(a);
+        when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO))).thenReturn(a);
         when(subprocessoService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(null, null, null, null, null, null, null, null));
 
         mockMvc.perform(post("/api/subprocessos/1/analises-validacao")
@@ -156,7 +159,7 @@ class SubprocessoControllerCoverageExtraTest {
         CriarAnaliseRequest req = new CriarAnaliseRequest("191919", "obs", "SGL", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
         when(subprocessoService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
         Analise a = new Analise();
-        when(subprocessoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO))).thenReturn(a);
+        when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO))).thenReturn(a);
         when(subprocessoService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(null, null, null, null, null, null, null, null));
 
         mockMvc.perform(post("/api/subprocessos/1/analises-cadastro")

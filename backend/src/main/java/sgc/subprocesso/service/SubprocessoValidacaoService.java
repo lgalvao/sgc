@@ -68,6 +68,35 @@ public class SubprocessoValidacaoService {
                 Map.of("atividadesNaoAssociadas", atividadesSemAssociacao));
     }
 
+    public void validarMapaParaDisponibilizacao(Subprocesso subprocesso) {
+        Long codMapa = subprocesso.getMapa().getCodigo();
+        var competencias = mapaManutencaoService.buscarCompetenciasPorCodMapa(codMapa);
+
+        if (competencias.stream().anyMatch(c -> c.getAtividades().isEmpty())) {
+            throw new ErroValidacao("Todas as competências devem estar associadas a pelo menos uma atividade.");
+        }
+
+        var atividadesDoSubprocesso = mapaManutencaoService.buscarAtividadesPorMapaCodigo(codMapa);
+        var atividadesAssociadas = competencias.stream()
+                .flatMap(c -> c.getAtividades().stream())
+                .map(Atividade::getCodigo)
+                .collect(java.util.stream.Collectors.toSet());
+
+        var atividadesNaoAssociadas = atividadesDoSubprocesso.stream()
+                .filter(a -> !atividadesAssociadas.contains(a.getCodigo()))
+                .toList();
+
+        if (!atividadesNaoAssociadas.isEmpty()) {
+            String nomesAtividades = atividadesNaoAssociadas.stream()
+                    .map(Atividade::getDescricao)
+                    .collect(java.util.stream.Collectors.joining(", "));
+
+            throw new ErroValidacao(
+                    "Todas as atividades devem estar associadas a pelo menos uma competência.%nAtividades pendentes: %s"
+                            .formatted(nomesAtividades));
+        }
+    }
+
     public ValidacaoCadastroDto validarCadastro(Subprocesso sp) {
         List<ErroValidacaoDto> erros = new ArrayList<>();
 

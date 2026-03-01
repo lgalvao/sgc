@@ -19,7 +19,7 @@ class ProcessoFinalizadorCoverageTest {
     @Mock
     private ComumRepo repo;
     @Mock
-    private ConsultasSubprocessoService queryService;
+    private SubprocessoService subprocessoService;
     @Mock
     private ProcessoNotificacaoService notificacaoService;
     @Mock
@@ -43,7 +43,7 @@ class ProcessoFinalizadorCoverageTest {
         finalizador.finalizar(codigo);
 
 
-        verify(queryService, never()).listarEntidadesPorProcesso(any());
+        verify(subprocessoService, never()).listarEntidadesPorProcesso(any());
         verify(processoRepo).save(processo);
         verify(notificacaoService).emailFinalizacaoProcesso(codigo);
     }
