@@ -27,3 +27,8 @@
 - `npm run typecheck` ✅
 - `npm run test` (frontend unitário) ✅
 - `./gradlew :backend:test` ⚠️ não executado no ambiente por incompatibilidade de JDK local (`invalid source release: 21`).
+
+## Próxima validação obrigatória (merge gate)
+
+1. Executar `./gradlew :backend:test` em ambiente com JDK 21.
+2. Confirmar no CI que os testes do backend passaram para este commit antes do merge.
