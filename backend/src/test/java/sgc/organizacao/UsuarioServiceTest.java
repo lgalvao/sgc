@@ -72,7 +72,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar usuários ativos")
         void deveBuscarUsuariosAtivos() {
 
-            List<Usuario> result = usuarioService.buscarUsuariosAtivos();
+            List<Usuario> result = usuarioServiceInternal.buscarTodos();
 
 
             assertNotNull(result);
@@ -189,7 +189,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar unidades onde usuário é responsável")
         void deveBuscarUnidadesOndeEhResponsavel() {
 
-            List<Long> result = usuarioService.buscarUnidadesOndeEhResponsavel(TITULO_CHEFE_UNIT2);
+            List<Long> result = responsavelService.buscarUnidadesOndeEhResponsavel(TITULO_CHEFE_UNIT2);
 
 
             assertNotNull(result);
@@ -297,7 +297,7 @@ class UsuarioServiceTest {
 
             // Adicionar
             usuarioService.adicionarAdministrador(tituloNovoAdmin);
-            assertTrue(usuarioService.isAdministrador(tituloNovoAdmin));
+            assertTrue(usuarioServiceInternal.isAdministrador(tituloNovoAdmin));
 
             // Listar
             List<AdministradorDto> admins = usuarioService.listarAdministradores();
@@ -309,7 +309,7 @@ class UsuarioServiceTest {
 
             // Remover
             usuarioService.removerAdministrador(tituloNovoAdmin, TITULO_ADMIN);
-            assertFalse(usuarioService.isAdministrador(tituloNovoAdmin));
+            assertFalse(usuarioServiceInternal.isAdministrador(tituloNovoAdmin));
         }
 
         @Test

@@ -181,41 +181,6 @@ class UsuarioFacadeTest {
     }
 
     @Nested
-    @DisplayName("Busca de Responsáveis de Unidades")
-    class BuscaResponsaveis {
-
-        @Test
-        @DisplayName("Deve buscar responsáveis de unidades com sucesso")
-        void deveBuscarResponsaveisComSucesso() {
-
-            Long codigoUnidade = 1L;
-            String titulo = "123456";
-            UnidadeResponsavelDto dto = UnidadeResponsavelDto.builder()
-                    .unidadeCodigo(codigoUnidade)
-                    .titularTitulo(titulo)
-                    .build();
-
-            when(responsavelUnidadeService.buscarResponsaveisUnidades(List.of(codigoUnidade)))
-                    .thenReturn(Map.of(codigoUnidade, dto));
-
-
-            Map<Long, UnidadeResponsavelDto> resultado = facade.buscarResponsaveisUnidades(List.of(codigoUnidade));
-
-
-            assertThat(resultado).hasSize(1);
-            assertThat(resultado.get(codigoUnidade).titularTitulo()).isEqualTo(titulo);
-        }
-
-        @Test
-        @DisplayName("buscarResponsaveisUnidades deve retornar mapa vazio se lista vazia")
-        void deveRetornarMapaVazioSeListaVazia() {
-            Map<Long, UnidadeResponsavelDto> resultado = facade.buscarResponsaveisUnidades(List.of());
-            assertThat(resultado).isEmpty();
-            verifyNoInteractions(responsavelUnidadeService);
-        }
-    }
-
-    @Nested
     @DisplayName("Gestão de Administradores")
     class GestaoAdministradores {
         @Test
@@ -275,13 +240,6 @@ class UsuarioFacadeTest {
             assertThatThrownBy(() -> facade.removerAdministrador("111", "111"))
                     .isInstanceOf(ErroValidacao.class);
         }
-
-        @Test
-        @DisplayName("Deve verificar se é administrador")
-        void deveVerificarSeAdministrador() {
-            when(usuarioService.isAdministrador("111")).thenReturn(true);
-            assertThat(facade.isAdministrador("111")).isTrue();
-        }
     }
 
     @Nested
@@ -304,39 +262,6 @@ class UsuarioFacadeTest {
 
             assertThat(resultado).isPresent();
             assertThat(resultado.get().getTituloEleitoral()).isEqualTo(titulo);
-        }
-
-        @Test
-        @DisplayName("Deve buscar usuários por unidade")
-        void deveBuscarUsuariosPorUnidade() {
-
-            Long codigoUnidade = 1L;
-            Usuario usuario = criarUsuario("123456");
-
-            when(usuarioService.buscarPorUnidadeLotacao(codigoUnidade))
-                    .thenReturn(List.of(usuario));
-
-
-            List<Usuario> resultado = facade.buscarUsuariosPorUnidade(codigoUnidade);
-
-
-            assertThat(resultado).hasSize(1);
-        }
-
-        @Test
-        @DisplayName("Deve buscar usuários ativos")
-        void deveBuscarUsuariosAtivos() {
-
-            Usuario usuario = criarUsuario("123456");
-
-            when(usuarioService.buscarTodos())
-                    .thenReturn(List.of(usuario));
-
-
-            List<Usuario> resultado = facade.buscarUsuariosAtivos();
-
-
-            assertThat(resultado).hasSize(1);
         }
 
         @Test

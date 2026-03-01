@@ -37,10 +37,6 @@ public class UsuarioFacade {
         return usuarioService.buscarOpt(titulo);
     }
 
-    public List<Usuario> buscarUsuariosPorUnidade(Long codigoUnidade) {
-        return usuarioService.buscarPorUnidadeLotacao(codigoUnidade);
-    }
-
     @Transactional(readOnly = true)
     public Usuario buscarPorTitulo(String titulo) {
         return usuarioService.buscar(titulo);
@@ -98,26 +94,9 @@ public class UsuarioFacade {
         usuarioService.carregarAuthorities(usuario);
     }
 
-    public List<Usuario> buscarUsuariosAtivos() {
-        return usuarioService.buscarTodos();
-    }
-
-    @Transactional(readOnly = true)
-    public Map<Long, UnidadeResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
-        if (unidadesCodigos.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        return responsavelUnidadeService.buscarResponsaveisUnidades(unidadesCodigos);
-    }
-
     public Map<String, Usuario> buscarUsuariosPorTitulos(List<String> titulos) {
         return usuarioService.buscarPorTitulos(titulos).stream()
                 .collect(toMap(Usuario::getTituloEleitoral, u -> u, (u1, u2) -> u1));
-    }
-
-    @Transactional(readOnly = true)
-    public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
-        return responsavelUnidadeService.buscarUnidadesOndeEhResponsavel(titulo);
     }
 
     @Transactional(readOnly = true)
@@ -184,11 +163,6 @@ public class UsuarioFacade {
 
         usuarioService.removerAdministrador(usuarioTitulo);
         log.info("Administrador {} removido com sucesso", usuarioTitulo);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean isAdministrador(String usuarioTitulo) {
-        return usuarioService.isAdministrador(usuarioTitulo);
     }
 
     private AdministradorDto toAdministradorDto(Usuario usuario) {
