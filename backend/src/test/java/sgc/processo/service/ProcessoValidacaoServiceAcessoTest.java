@@ -19,11 +19,11 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ProcessoAcessoService")
-class ProcessoAcessoServiceTest {
+@DisplayName("ProcessoValidacaoService - Acesso")
+class ProcessoValidacaoServiceAcessoTest {
 
     @InjectMocks
-    private ProcessoAcessoService processoAcessoService;
+    private ProcessoValidacaoService processoAcessoService;
 
     @Mock
     private UnidadeService unidadeService;

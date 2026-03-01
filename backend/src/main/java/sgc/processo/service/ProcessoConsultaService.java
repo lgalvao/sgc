@@ -25,7 +25,7 @@ public class ProcessoConsultaService {
     private final ComumRepo repo;
     private final SubprocessoService subprocessoService;
     private final UsuarioFacade usuarioService;
-    private final ProcessoAcessoService processoAcessoService;
+    private final ProcessoValidacaoService processoAcessoService;
 
     public Processo buscarProcessoCodigo(Long codigo) {
         return repo.buscar(Processo.class, codigo);

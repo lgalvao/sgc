@@ -32,7 +32,7 @@ class ProcessoWorkflowServiceTest {
     @Mock private UnidadeMapaRepo unidadeMapaRepo;
     @Mock private UnidadeService unidadeService;
     @Mock private SubprocessoService subprocessoService;
-    @Mock private ProcessoValidador processoValidador;
+    @Mock private ProcessoValidacaoService processoValidador;
     @Mock private ProcessoNotificacaoService notificacaoService;
 
     // ---- Finalizar ----

@@ -20,7 +20,7 @@ class ProcessoManutencaoServicePbtTest {
         // Mock dependencies
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
         UnidadeService unidadeService = mock(UnidadeService.class);
-        ProcessoValidador processoValidador = mock(ProcessoValidador.class);
+        ProcessoValidacaoService processoValidador = mock(ProcessoValidacaoService.class);
         ProcessoConsultaService processoConsultaService = mock(ProcessoConsultaService.class);
 
         ProcessoManutencaoService service = new ProcessoManutencaoService(
@@ -47,7 +47,7 @@ class ProcessoManutencaoServicePbtTest {
         // Mock dependencies
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
         UnidadeService unidadeService = mock(UnidadeService.class);
-        ProcessoValidador processoValidador = mock(ProcessoValidador.class);
+        ProcessoValidacaoService processoValidador = mock(ProcessoValidacaoService.class);
         ProcessoConsultaService processoConsultaService = mock(ProcessoConsultaService.class);
 
         ProcessoManutencaoService service = new ProcessoManutencaoService(
@@ -77,7 +77,7 @@ class ProcessoManutencaoServicePbtTest {
         // Mock dependencies
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
         UnidadeService unidadeService = mock(UnidadeService.class);
-        ProcessoValidador processoValidador = mock(ProcessoValidador.class);
+        ProcessoValidacaoService processoValidador = mock(ProcessoValidacaoService.class);
         ProcessoConsultaService processoConsultaService = mock(ProcessoConsultaService.class);
 
         ProcessoManutencaoService service = new ProcessoManutencaoService(
@@ -101,7 +101,7 @@ class ProcessoManutencaoServicePbtTest {
         // Mock dependencies
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
         UnidadeService unidadeService = mock(UnidadeService.class);
-        ProcessoValidador processoValidador = mock(ProcessoValidador.class);
+        ProcessoValidacaoService processoValidador = mock(ProcessoValidacaoService.class);
         ProcessoConsultaService processoConsultaService = mock(ProcessoConsultaService.class);
 
         ProcessoManutencaoService service = new ProcessoManutencaoService(

@@ -2,44 +2,29 @@ import {listarAnalisesCadastro, listarAnalisesValidacao} from "@/services/subpro
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 import {defineStore} from "pinia";
 import {ref} from "vue";
+import {useAsyncAction} from "@/composables/useAsyncAction";
 
 export const useAnalisesStore = defineStore("analises", () => {
     const analisesCadastro = ref<AnaliseCadastro[]>([]);
     const analisesValidacao = ref<AnaliseValidacao[]>([]);
-    const carregando = ref(false);
-    const erro = ref<string | null>(null);
+    const {carregando, erro, executarSilencioso} = useAsyncAction();
 
     async function buscarAnalisesCadastro(codSubprocesso: number) {
-        carregando.value = true;
-        erro.value = null;
         analisesCadastro.value = [];
-
-        try {
+        await executarSilencioso(async () => {
             if (codSubprocesso) {
-                const analises = await listarAnalisesCadastro(codSubprocesso);
-                analisesCadastro.value = analises;
+                analisesCadastro.value = await listarAnalisesCadastro(codSubprocesso);
             }
-        } catch (e: any) {
-            erro.value = e.message || "Erro ao carregar histórico de análises de cadastro.";
-        } finally {
-            carregando.value = false;
-        }
+        }, "Erro ao carregar histórico de análises de cadastro.");
     }
 
     async function buscarAnalisesValidacao(codSubprocesso: number) {
-        carregando.value = true;
-        erro.value = null;
         analisesValidacao.value = [];
-        try {
+        await executarSilencioso(async () => {
             if (codSubprocesso) {
-                const validacoes = await listarAnalisesValidacao(codSubprocesso);
-                analisesValidacao.value = validacoes;
+                analisesValidacao.value = await listarAnalisesValidacao(codSubprocesso);
             }
-        } catch (e: any) {
-            erro.value = e.message || "Erro ao carregar histórico de análises de validação.";
-        } finally {
-            carregando.value = false;
-        }
+        }, "Erro ao carregar histórico de análises de validação.");
     }
 
     async function carregarHistorico(codSubprocesso: number) {
@@ -48,8 +33,6 @@ export const useAnalisesStore = defineStore("analises", () => {
     }
 
     function obterAnalisesPorSubprocesso(): (AnaliseCadastro | AnaliseValidacao)[] {
-        // Simplificação: Retorna a concatenação das listas carregadas.
-        // Assume-se que o contexto do subprocesso é mantido pelo componente que chama buscarAnalisesCadastro/Validacao.
         return [...analisesCadastro.value, ...analisesValidacao.value];
     }
 

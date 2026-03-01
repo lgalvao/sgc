@@ -30,7 +30,7 @@ public class ProcessoWorkflowService {
     private final UnidadeMapaRepo unidadeMapaRepo;
     private final UnidadeService unidadeService;
     private final SubprocessoService subprocessoService;
-    private final ProcessoValidador processoValidador;
+    private final ProcessoValidacaoService processoValidador;
     private final ProcessoNotificacaoService notificacaoService;
 
     @Transactional

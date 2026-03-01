@@ -8,6 +8,8 @@ import org.springframework.security.core.*;
 import org.springframework.security.core.authority.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
+import sgc.organizacao.service.*;
+import sgc.subprocesso.service.*;
 
 import java.util.*;
 
@@ -15,14 +17,20 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ProcessoAcessoService - Cobertura de Mutações")
-class ProcessoAcessoServiceMutationTest {
+@DisplayName("ProcessoValidacaoService - Cobertura de Mutações")
+class ProcessoValidacaoServiceMutationTest {
 
     @InjectMocks
-    private ProcessoAcessoService service;
+    private ProcessoValidacaoService service;
+
+    @Mock
+    private UnidadeService unidadeService;
 
     @Mock
     private UsuarioFacade usuarioService;
+
+    @Mock
+    private SubprocessoValidacaoService validacaoService;
 
     @Test
     @DisplayName("checarAcesso deve retornar false se authentication for null")

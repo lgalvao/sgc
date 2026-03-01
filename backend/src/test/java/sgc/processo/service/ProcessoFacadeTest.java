@@ -51,7 +51,7 @@ class ProcessoFacadeTest {
     @Mock
     private UsuarioFacade usuarioService;
     @Mock
-    private ProcessoAcessoService processoAcessoService;
+    private ProcessoValidacaoService processoValidacaoService;
     @Mock
     private ProcessoDetalheBuilder processoDetalheBuilder;
     @Mock
@@ -136,8 +136,8 @@ class ProcessoFacadeTest {
         void deveNegarAcessoQuandoNaoAutenticado() {
 
             Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
-            when(processoAcessoService.checarAcesso(null, 1L)).thenReturn(false);
+            when(processoValidacaoService.checarAcesso(auth, 1L)).thenReturn(false);
+            when(processoValidacaoService.checarAcesso(null, 1L)).thenReturn(false);
 
             // Act & Assert
             assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
@@ -149,17 +149,17 @@ class ProcessoFacadeTest {
         @DisplayName("Deve delegar verificação de acesso para o ProcessoAcessoService")
         void deveDelegarVerificacaoDeAcesso(Long processoCodigo) {
             Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, processoCodigo)).thenReturn(true);
+            when(processoValidacaoService.checarAcesso(auth, processoCodigo)).thenReturn(true);
             assertThat(processoFacade.checarAcesso(auth, processoCodigo)).isTrue();
 
-            when(processoAcessoService.checarAcesso(auth, processoCodigo)).thenReturn(false);
+            when(processoValidacaoService.checarAcesso(auth, processoCodigo)).thenReturn(false);
             assertThat(processoFacade.checarAcesso(auth, processoCodigo)).isFalse();
         }
 
         @Test
         @DisplayName("Deve retornar false quando checarAcesso recebe null")
         void deveRetornarFalseQuandoAuthenticationForNull() {
-            when(processoAcessoService.checarAcesso(null, 1L)).thenReturn(false);
+            when(processoValidacaoService.checarAcesso(null, 1L)).thenReturn(false);
             assertThat(processoFacade.checarAcesso(null, 1L)).isFalse();
         }
     }

@@ -35,7 +35,7 @@ public class ProcessoFacade {
     private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final UsuarioFacade usuarioService;
     private final ProcessoWorkflowService processoWorkflowService;
-    private final ProcessoAcessoService processoAcessoService;
+    private final ProcessoValidacaoService processoValidacaoService;
     private final ProcessoNotificacaoService processoNotificacaoService;
     private final SgcPermissionEvaluator permissionEvaluator;
 
@@ -44,7 +44,7 @@ public class ProcessoFacade {
     }
 
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
-        return processoAcessoService.checarAcesso(authentication, codProcesso);
+        return processoValidacaoService.checarAcesso(authentication, codProcesso);
     }
 
     @Transactional

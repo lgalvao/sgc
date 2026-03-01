@@ -25,7 +25,7 @@ class ProcessoWorkflowServicePbtTest {
         UnidadeService unidadeService = mock(UnidadeService.class);
         ProcessoNotificacaoService notificacaoService = mock(ProcessoNotificacaoService.class);
         SubprocessoService subprocessoService = mock(SubprocessoService.class);
-        ProcessoValidador processoValidador = mock(ProcessoValidador.class);
+        ProcessoValidacaoService processoValidador = mock(ProcessoValidacaoService.class);
 
         ProcessoWorkflowService workflowService = new ProcessoWorkflowService(
                 processoRepo, repo, unidadeRepo, unidadeMapaRepo, unidadeService,
