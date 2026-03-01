@@ -118,7 +118,7 @@ public class SubprocessoTransicaoService {
                 .observacoes(cmd.observacoes())
                 .acao(cmd.tipoAcaoAnalise())
                 .siglaUnidade(cmd.unidadeAnalise().getSigla())
-                .tituloUsuario(usuario.getTituloEleitoral())
+                .tituloUsuario(usuario != null ? usuario.getTituloEleitoral() : null)
                 .motivo(cmd.motivoAnalise())
                 .build();
 

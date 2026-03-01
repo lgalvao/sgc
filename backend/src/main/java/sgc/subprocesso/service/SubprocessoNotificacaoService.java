@@ -66,10 +66,10 @@ public class SubprocessoNotificacaoService {
         String emailUnidade = getEmailUnidade(cmd.unidadeDestino());
         emailService.enviarEmailHtml(emailUnidade, assunto, corpo);
 
-        notificarResponsavelPessoal(cmd.unidadeDestino(), assunto, corpo, cmd.tipoTransicao());
+        notificarResponsavelPessoal(cmd.unidadeDestino(), assunto, corpo);
     }
 
-    private void notificarResponsavelPessoal(Unidade unidade, String assunto, String corpo, TipoTransicao tipo) {
+    private void notificarResponsavelPessoal(Unidade unidade, String assunto, String corpo) {
         UnidadeResponsavelDto responsavel = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
         if (responsavel.substitutoTitulo() != null) {
             usuarioFacade.buscarUsuarioPorTitulo(responsavel.substitutoTitulo()).ifPresent(u -> {

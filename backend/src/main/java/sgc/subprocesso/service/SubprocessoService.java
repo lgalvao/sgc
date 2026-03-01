@@ -35,6 +35,7 @@ import static sgc.organizacao.model.TipoUnidade.*;
 public class SubprocessoService {
 
     private static final String SIGLA_ADMIN = "ADMIN";
+    private static final String NOME_ENTIDADE = "Subprocesso";
     private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
             SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
     private final ComumRepo repo;
@@ -90,11 +91,13 @@ public class SubprocessoService {
         return Map.of("sugestoes", "");
     }
 
+    @Transactional(readOnly = true)
     public Subprocesso buscarSubprocesso(Long codigo) {
         return subprocessoRepo.findByIdWithMapaAndAtividades(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, codigo));
     }
 
+    @Transactional(readOnly = true)
     public Subprocesso buscarSubprocessoComMapa(Long codigo) {
         return buscarSubprocesso(codigo);
     }
@@ -116,7 +119,7 @@ public class SubprocessoService {
     @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
         return subprocessoRepo.findByMapa_Codigo(codMapa)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso (por mapa)", codMapa));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, "Mapa ID: " + codMapa));
     }
 
     @Transactional(readOnly = true)
@@ -124,10 +127,9 @@ public class SubprocessoService {
         return subprocessoRepo.findAllComFetch();
     }
 
-    @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorProcessoEUnidade(Long codProcesso, Long codUnidade) {
         return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoWithFetch(codProcesso, codUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", "P:%d U:%d".formatted(codProcesso, codUnidade)));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, "P:%d U:%d".formatted(codProcesso, codUnidade)));
     }
 
     @Transactional
@@ -157,12 +159,12 @@ public class SubprocessoService {
         return subprocessoRepo.save(subprocesso);
     }
 
+    @Transactional
     public void excluir(Long codigo) {
         buscarSubprocesso(codigo);
         subprocessoRepo.deleteById(codigo);
     }
 
-    @Transactional(readOnly = true)
     public List<Subprocesso> listarEntidadesPorProcessoEUnidades(Long codProcesso, List<Long> codUnidades) {
         if (codUnidades.isEmpty()) {
             return List.of();
@@ -170,7 +172,6 @@ public class SubprocessoService {
         return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(codProcesso, codUnidades);
     }
 
-    @Transactional(readOnly = true)
     public List<Subprocesso> listarPorProcessoESituacoes(Long processoId, List<SituacaoSubprocesso> situacoes) {
         return subprocessoRepo.findByProcessoCodigoAndSituacaoInWithUnidade(processoId, situacoes);
     }
@@ -470,7 +471,7 @@ public class SubprocessoService {
     @Transactional(readOnly = true)
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
         log.info("Recuperando mapa para ajustes do subprocesso {}", codSubprocesso);
-        Subprocesso sp = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
+        Subprocesso sp = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, codSubprocesso));
         Long codMapa = sp.getMapa().getCodigo();
 
         Analise analise = listarAnalisesPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO)
@@ -578,6 +579,7 @@ public class SubprocessoService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public ContextoEdicaoResponse obterContextoEdicao(Long codSubprocesso) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow();
@@ -608,56 +610,55 @@ public class SubprocessoService {
 
         Perfil perfil = usuario.getPerfilAtivo();
         SituacaoSubprocesso situacao = sp.getSituacao();
+        boolean temMapaVigente = unidadeService.verificarMapaVigente(sp.getUnidade().getCodigo());
 
+        return construirPermissoes(mesmaUnidade, perfil, situacao, temMapaVigente);
+    }
+
+    private PermissoesSubprocessoDto construirPermissoes(boolean mesmaUnidade, Perfil perfil, SituacaoSubprocesso situacao, boolean temMapaVigente) {
         boolean isChefe = perfil == Perfil.CHEFE;
         boolean isGestor = perfil == Perfil.GESTOR;
         boolean isAdmin = perfil == Perfil.ADMIN;
 
-        boolean temMapaVigente = unidadeService.verificarMapaVigente(sp.getUnidade().getCodigo());
-
         return PermissoesSubprocessoDto.builder()
-                .podeEditarCadastro(mesmaUnidade && isChefe && Set.of(
-                        SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
-                .podeDisponibilizarCadastro(mesmaUnidade && isChefe && Set.of(
-                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
-                .podeDevolverCadastro(mesmaUnidade && (isGestor || isAdmin) && Set.of(
-                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
-                .podeAceitarCadastro(mesmaUnidade && isGestor && Set.of(
-                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
-                .podeHomologarCadastro(mesmaUnidade && isAdmin && Set.of(
-                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
-                .podeEditarMapa(mesmaUnidade && isAdmin && Set.of(
-                        SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES,
-                        SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
-                        SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES,
-                        SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO).contains(situacao))
-                .podeDisponibilizarMapa(mesmaUnidade && isAdmin && Set.of(
-                        SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES,
-                        SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES).contains(situacao))
-                .podeValidarMapa(mesmaUnidade && isChefe && Set.of(
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO).contains(situacao))
-                .podeApresentarSugestoes(mesmaUnidade && isChefe && Set.of(
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO).contains(situacao))
-                .podeDevolverMapa(mesmaUnidade && (isGestor || isAdmin) && Set.of(
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
-                        SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_MAPA_VALIDADO).contains(situacao))
-                .podeAceitarMapa(mesmaUnidade && isGestor && Set.of(
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
-                        SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_MAPA_VALIDADO).contains(situacao))
-                .podeHomologarMapa(mesmaUnidade && isAdmin && Set.of(
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
-                        SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_MAPA_VALIDADO).contains(situacao))
-                .podeVisualizarImpacto(temMapaVigente && (
-                        (mesmaUnidade && isChefe && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) ||
-                                (mesmaUnidade && isGestor && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) ||
-                                (isAdmin && Set.of(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).contains(situacao))
-                ))
+                .podeEditarCadastro(mesmaUnidade && isChefe && Set.of(SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
+                .podeDisponibilizarCadastro(mesmaUnidade && isChefe && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
+                .podeDevolverCadastro(mesmaUnidade && (isGestor || isAdmin) && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
+                .podeAceitarCadastro(mesmaUnidade && isGestor && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
+                .podeHomologarCadastro(mesmaUnidade && isAdmin && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
+                .podeEditarMapa(verificarEditarMapa(mesmaUnidade, isAdmin, situacao))
+                .podeDisponibilizarMapa(mesmaUnidade && isAdmin && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES).contains(situacao))
+                .podeValidarMapa(mesmaUnidade && isChefe && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO).contains(situacao))
+                .podeApresentarSugestoes(mesmaUnidade && isChefe && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO).contains(situacao))
+                .podeDevolverMapa(verificarGerirMapa(mesmaUnidade, isGestor || isAdmin, situacao))
+                .podeAceitarMapa(verificarGerirMapa(mesmaUnidade, isGestor, situacao))
+                .podeHomologarMapa(verificarGerirMapa(mesmaUnidade, isAdmin, situacao))
+                .podeVisualizarImpacto(verificarVisualizarImpacto(temMapaVigente, mesmaUnidade, isChefe, isGestor, isAdmin, situacao))
                 .podeAlterarDataLimite(isAdmin)
                 .podeReabrirCadastro(isAdmin)
                 .podeReabrirRevisao(isAdmin)
                 .podeEnviarLembrete(isAdmin || isGestor)
                 .build();
+    }
+
+    private boolean verificarVisualizarImpacto(boolean temMapaVigente, boolean mesmaUnidade, boolean isChefe, boolean isGestor, boolean isAdmin, SituacaoSubprocesso situacao) {
+        return temMapaVigente && (
+                (mesmaUnidade && isChefe && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) ||
+                (mesmaUnidade && isGestor && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) ||
+                (isAdmin && Set.of(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).contains(situacao))
+        );
+    }
+
+    private boolean verificarEditarMapa(boolean mesmaUnidade, boolean isAdmin, SituacaoSubprocesso situacao) {
+        return mesmaUnidade && isAdmin && Set.of(
+                SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
+                SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+                SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES,
+                SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO).contains(situacao);
+    }
+
+    private boolean verificarGerirMapa(boolean mesmaUnidade, boolean isPermitido, SituacaoSubprocesso situacao) {
+        return mesmaUnidade && isPermitido && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_MAPA_VALIDADO).contains(situacao);
     }
 
     @Transactional
@@ -745,6 +746,7 @@ public class SubprocessoService {
     }
 
 
+    @Transactional(readOnly = true)
     public List<AnaliseHistoricoDto> listarHistoricoCadastro(Long codSubprocesso) {
         return listarAnalisesPorSubprocesso(codSubprocesso).stream()
                 .filter(a -> a.getTipo() == TipoAnalise.CADASTRO)
@@ -752,6 +754,7 @@ public class SubprocessoService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<AnaliseHistoricoDto> listarHistoricoValidacao(Long codSubprocesso) {
         return listarAnalisesPorSubprocesso(codSubprocesso).stream()
                 .filter(a -> a.getTipo() == TipoAnalise.VALIDACAO)
