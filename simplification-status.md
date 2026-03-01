@@ -13,7 +13,7 @@
 | Backend – `SubprocessoTransicaoService` | Linhas | **704** (extraído do service original) |
 | Backend – `SubprocessoController` | Linhas | **524** (era 549) |
 | Backend – Facades | Total | **7** (`UsuarioFacade` + 6 com lógica real) |
-| Backend – Erros | Hierarquia total | **9 classes/interfaces** (era 18+) |
+| Backend – Erros | Hierarquia total | **8 classes/interfaces** (era 18+) |
 | Backend – `processo/service` | Classes de serviço | **8 classes** |
 | Backend – DTOs do módulo `subprocesso` | Arquivos | **28** |
 | Frontend – Stores | Total | **13 stores** Pinia |
@@ -36,11 +36,11 @@
 - [x] Movimentação de `enviarLembrete` do `ProcessoFacade` para `ProcessoNotificacaoService`,
   removendo 3 dependências desnecessárias da facade (`AlertaFacade`, `EmailService`,
   `EmailModelosService`).
+- [x] Remoção de `ErroProcesso` no módulo `processo`, substituindo por `ErroValidacao` e
+  ajustando os testes afetados.
 
 ### Em andamento / Próximos passos
 
-- [ ] **Remover `ErroProcesso`** — a única subclasse remanescente em `processo/erros` (14 linhas).
-  Substituir pelo `ErroValidacao` comum e ajustar os 5 pontos de uso + testes.
 - [ ] **Consolidar serviços do módulo `processo`** de 8 → 4-5 classes:
   - `ProcessoFinalizador` (59 linhas) + `ProcessoInicializador` (150 linhas) → `ProcessoWorkflowService`.
   - `ProcessoValidador` (93 linhas) + `ProcessoAcessoService` (98 linhas) → unir em um único validador.
@@ -63,3 +63,5 @@
    os testes da Facade voltam a testar apenas delegação.
 4. O padrão `useAsyncAction()` no frontend elimina boilerplate de try/catch/loading sem alterar a API
    das stores.
+5. Unificar exceções de negócio no `ErroValidacao` reduziu a hierarquia de erros e deixou o contrato HTTP
+   mais consistente (422) para validações no módulo `processo`.

@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
-import sgc.processo.erros.*;
 import sgc.comum.erros.ErroValidacao;
 import sgc.processo.model.*;
 
@@ -34,13 +33,13 @@ public class ProcessoManutencaoService {
                 .collect(Collectors.toSet());
 
         processoValidador.validarTiposUnidades(new ArrayList<>(participantes)).ifPresent(msg -> {
-            throw new ErroProcesso(msg);
+            throw new ErroValidacao(msg);
         });
 
         TipoProcesso tipoProcesso = req.tipo();
         if (tipoProcesso == REVISAO || tipoProcesso == DIAGNOSTICO) {
             processoValidador.getMensagemErroUnidadesSemMapa(new ArrayList<>(req.unidades())).ifPresent(msg -> {
-                throw new ErroProcesso(msg);
+                throw new ErroValidacao(msg);
             });
         }
 
@@ -75,13 +74,13 @@ public class ProcessoManutencaoService {
 
         if (tipoProcesso == REVISAO || tipoProcesso == DIAGNOSTICO) {
             processoValidador.getMensagemErroUnidadesSemMapa(new ArrayList<>(req.unidades())).ifPresent(msg -> {
-                throw new ErroProcesso(msg);
+                throw new ErroValidacao(msg);
             });
         }
 
         Set<Unidade> participantes = req.unidades().stream().map(unidadeService::buscarPorId).collect(Collectors.toSet());
         processoValidador.validarTiposUnidades(new ArrayList<>(participantes)).ifPresent(msg -> {
-            throw new ErroProcesso(msg);
+            throw new ErroValidacao(msg);
         });
 
         processo.sincronizarParticipantes(participantes);

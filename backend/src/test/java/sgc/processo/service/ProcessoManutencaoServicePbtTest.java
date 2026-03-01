@@ -2,10 +2,9 @@ package sgc.processo.service;
 
 import net.jqwik.api.*;
 import sgc.organizacao.model.*;
-import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
-import sgc.processo.erros.*;
+import sgc.comum.erros.*;
 import sgc.processo.model.*;
 import java.time.*;
 import java.util.*;
@@ -39,7 +38,7 @@ class ProcessoManutencaoServicePbtTest {
 
         // Act & Assert
         assertThatThrownBy(() -> service.criar(req))
-                .isInstanceOf(ErroProcesso.class)
+                .isInstanceOf(ErroValidacao.class)
                 .hasMessage("Erro: Unidade sem mapa");
     }
 

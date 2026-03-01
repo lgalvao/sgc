@@ -7,7 +7,7 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
-import sgc.processo.erros.*;
+import sgc.comum.erros.ErroValidacao;
 import sgc.processo.model.*;
 import sgc.subprocesso.service.*;
 
@@ -43,12 +43,12 @@ class ProcessoValidador {
     /**
      * Valida se o processo pode ser finalizado.
      *
-     * @throws ErroProcesso se o processo não estiver em situação válida para finalização
+     * @throws ErroValidacao se o processo não estiver em situação válida para finalização
      */
     @Transactional(readOnly = true)
     public void validarFinalizacaoProcesso(Processo processo) {
         if (processo.getSituacao() != SituacaoProcesso.EM_ANDAMENTO) {
-            throw new ErroProcesso("Apenas processos 'EM ANDAMENTO' podem ser finalizados.");
+            throw new ErroValidacao("Apenas processos 'EM ANDAMENTO' podem ser finalizados.");
         }
         validarTodosSubprocessosHomologados(processo);
     }
@@ -56,7 +56,7 @@ class ProcessoValidador {
     /**
      * Valida se todos os subprocessos de um processo estão homologados.
      *
-     * @throws ErroProcesso se algum subprocesso não estiver homologado
+     * @throws ErroValidacao se algum subprocesso não estiver homologado
      */
     public void validarTodosSubprocessosHomologados(Processo processo) {
         SubprocessoValidacaoService.ValidationResult resultado = validacaoService.validarSubprocessosParaFinalizacao(processo.getCodigo());
@@ -64,7 +64,7 @@ class ProcessoValidador {
         if (!resultado.valido()) {
             log.warn("Validação de finalização falhou para processo {}: {}",
                     processo.getCodigo(), resultado.mensagem());
-            throw new ErroProcesso(resultado.mensagem());
+            throw new ErroValidacao(resultado.mensagem());
         }
 
         log.info("Todos os subprocessos do processo {} estão homologados", processo.getCodigo());

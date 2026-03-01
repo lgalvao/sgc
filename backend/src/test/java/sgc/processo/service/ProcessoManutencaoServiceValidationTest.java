@@ -7,7 +7,7 @@ import org.mockito.junit.jupiter.*;
 import sgc.organizacao.service.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
-import sgc.processo.erros.*;
+import sgc.comum.erros.*;
 import sgc.processo.model.*;
 import sgc.testutils.*;
 
@@ -49,7 +49,7 @@ class ProcessoManutencaoServiceValidationTest {
 
         // When/Then
         assertThatThrownBy(() -> service.criar(request))
-                .isInstanceOf(ErroProcesso.class)
+                .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("Unidades do tipo INTERMEDIARIA não podem participar de processos");
     }
 }
