@@ -66,15 +66,13 @@ class SubprocessoControllerTest {
         @DisplayName("deve disponibilizar cadastro")
         @WithMockUser(roles = "CHEFE")
         void deveDisponibilizarCadastro() throws Exception {
-            when(subprocessoService.obterAtividadesSemConhecimento(1L))
-                    .thenReturn(Collections.emptyList());
-
             mockMvc.perform(post("/api/subprocessos/1/cadastro/disponibilizar")
                             .with(csrf()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mensagem").value("Cadastro de atividades disponibilizado"));
 
             verify(subprocessoService).disponibilizarCadastro(eq(1L), any());
+            verify(subprocessoService, never()).obterAtividadesSemConhecimento(anyLong());
         }
 
         @Test

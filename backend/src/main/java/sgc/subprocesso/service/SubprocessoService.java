@@ -386,8 +386,14 @@ public class SubprocessoService {
     private void validarRequisitosNegocioParaDisponibilizacao(Long codSubprocesso) {
         validarExistenciaAtividades(codSubprocesso);
 
-        if (!obterAtividadesSemConhecimento(codSubprocesso).isEmpty()) {
-            throw new ErroValidacao("Existem atividades sem conhecimentos associados.");
+        List<Atividade> atividadesSemConhecimento = obterAtividadesSemConhecimento(codSubprocesso);
+        if (!atividadesSemConhecimento.isEmpty()) {
+            var atividades = atividadesSemConhecimento.stream()
+                    .map(atividade -> Map.of("codigo", atividade.getCodigo(), "descricao", atividade.getDescricao()))
+                    .toList();
+            throw new ErroValidacao(
+                    "Existem atividades sem conhecimentos associados.",
+                    Map.of("atividadesSemConhecimento", atividades));
         }
     }
 

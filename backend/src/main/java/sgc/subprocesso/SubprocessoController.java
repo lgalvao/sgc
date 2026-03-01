@@ -152,18 +152,6 @@ public class SubprocessoController {
     public ResponseEntity<MensagemResponse> disponibilizarCadastro(
             @PathVariable Long id,
             @AuthenticationPrincipal Usuario usuario) {
-
-        List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(id);
-        if (!faltando.isEmpty()) {
-            var lista = faltando.stream()
-                    .map(a -> Map.of("codigo", a.getCodigo(), "descricao", a.getDescricao()))
-                    .toList();
-
-            throw new ErroValidacao(
-                    "Existem atividades sem conhecimentos associados.",
-                    Map.of("atividadesSemConhecimento", lista));
-        }
-
         subprocessoService.disponibilizarCadastro(id, usuario);
         return ResponseEntity.ok(new MensagemResponse("Cadastro de atividades disponibilizado"));
     }
@@ -173,18 +161,6 @@ public class SubprocessoController {
     @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
     public ResponseEntity<MensagemResponse> disponibilizarRevisao(
             @PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-
-        List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(id);
-        if (!faltando.isEmpty()) {
-            var lista = faltando.stream()
-                    .map(a -> Map.of("codigo", a.getCodigo(), "descricao", a.getDescricao()))
-                    .toList();
-
-            throw new ErroValidacao(
-                    "Existem atividades sem conhecimentos associados.",
-                    Map.of("atividadesSemConhecimento", lista));
-        }
-
         subprocessoService.disponibilizarRevisao(id, usuario);
 
         return ResponseEntity.ok(new MensagemResponse("Revisão do cadastro de atividades disponibilizada"));
