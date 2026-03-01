@@ -60,6 +60,10 @@ public class UnidadeService {
         return unidadeMapaRepo.findAllUnidadeCodigos();
     }
 
+    public List<UnidadeMapa> buscarMapasPorUnidades(List<Long> codigosUnidades) {
+        return unidadeMapaRepo.findAllById(codigosUnidades);
+    }
+
     @Transactional
     public void definirMapaVigente(Long codigoUnidade, Mapa mapa) {
         UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(codigoUnidade).orElse(new UnidadeMapa());

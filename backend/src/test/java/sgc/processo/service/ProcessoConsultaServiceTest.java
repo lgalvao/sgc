@@ -37,6 +37,9 @@ class ProcessoConsultaServiceTest {
     @Mock
     private UsuarioFacade usuarioService;
 
+    @Mock
+    private ProcessoValidacaoService processoValidacaoService;
+
     @Test
     @DisplayName("Deve buscar processo por ID")
     void deveBuscarProcessoCodigo() {

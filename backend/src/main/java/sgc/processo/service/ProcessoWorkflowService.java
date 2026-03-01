@@ -26,8 +26,6 @@ public class ProcessoWorkflowService {
 
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
-    private final UnidadeRepo unidadeRepo;
-    private final UnidadeMapaRepo unidadeMapaRepo;
     private final UnidadeService unidadeService;
     private final SubprocessoService subprocessoService;
     private final ProcessoValidacaoService processoValidador;
@@ -77,7 +75,7 @@ public class ProcessoWorkflowService {
                 throw new ErroValidacao("A lista de unidades é obrigatória para iniciar o processo de revisão.");
             }
             codigosUnidades = codsUnidadesParam;
-            unidadesParaProcessar = new HashSet<>(unidadeRepo.findAllById(codigosUnidades));
+            unidadesParaProcessar = new HashSet<>(unidadeService.porCodigos(codigosUnidades));
 
             Set<Unidade> snapshotArvore = carregarArvoreUnidades(unidadesParaProcessar);
             processo.sincronizarParticipantes(snapshotArvore);
@@ -87,7 +85,7 @@ public class ProcessoWorkflowService {
                 throw new ErroValidacao("Não há unidades participantes definidas para este processo.");
             }
             codigosUnidades = codsParticipantes;
-            unidadesParaProcessar = new HashSet<>(unidadeRepo.findAllById(codigosUnidades));
+            unidadesParaProcessar = new HashSet<>(unidadeService.porCodigos(codigosUnidades));
         }
 
         List<String> erros = validarUnidades(tipo, codigosUnidades);
@@ -97,7 +95,7 @@ public class ProcessoWorkflowService {
 
         List<UnidadeMapa> unidadesMapas = List.of();
         if (tipo == TipoProcesso.REVISAO || tipo == TipoProcesso.DIAGNOSTICO) {
-            unidadesMapas = unidadeMapaRepo.findAllById(codigosUnidades);
+            unidadesMapas = unidadeService.buscarMapasPorUnidades(codigosUnidades);
         }
 
         Unidade admin = repo.buscarPorSigla(Unidade.class, "ADMIN");
@@ -107,7 +105,7 @@ public class ProcessoWorkflowService {
         notificacaoService.emailInicioProcesso(processo.getCodigo());
 
         int contagemUnidades = codigosUnidades.size();
-        List<String> siglas = unidadeRepo.findSiglasByCodigos(codigosUnidades);
+        List<String> siglas = unidadeService.buscarSiglasPorIds(codigosUnidades);
         log.info("Processo de {} {} iniciado para {} unidade(s): {}.",
                 tipo.name().toLowerCase(), codigo, contagemUnidades, String.join(", ", siglas));
         return List.of();
@@ -176,7 +174,7 @@ public class ProcessoWorkflowService {
                 SituacaoProcesso.EM_ANDAMENTO, codsUnidades);
 
         if (!unidadesBloqueadas.isEmpty()) {
-            List<String> siglasUnidadesBloqueadas = unidadeRepo.findSiglasByCodigos(unidadesBloqueadas);
+            List<String> siglasUnidadesBloqueadas = unidadeService.buscarSiglasPorIds(unidadesBloqueadas);
             return Optional.of("As seguintes unidades já participam de outro processo ativo: %s"
                     .formatted(String.join(", ", siglasUnidadesBloqueadas)));
         }

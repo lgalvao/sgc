@@ -28,8 +28,6 @@ class ProcessoWorkflowServiceTest {
 
     @Mock private ProcessoRepo processoRepo;
     @Mock private ComumRepo repo;
-    @Mock private UnidadeRepo unidadeRepo;
-    @Mock private UnidadeMapaRepo unidadeMapaRepo;
     @Mock private UnidadeService unidadeService;
     @Mock private SubprocessoService subprocessoService;
     @Mock private ProcessoValidacaoService processoValidador;
@@ -105,7 +103,7 @@ class ProcessoWorkflowServiceTest {
         Unidade admin = new Unidade();
 
         when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-        when(unidadeRepo.findAllById(any())).thenReturn(List.of(UnidadeTestBuilder.umaDe().comCodigo("10").build()));
+        when(unidadeService.porCodigos(any())).thenReturn(List.of(UnidadeTestBuilder.umaDe().comCodigo("10").build()));
         when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
 
         List<String> erros = workflowService.iniciar(1L, null, usuario);
@@ -131,15 +129,16 @@ class ProcessoWorkflowServiceTest {
 
         when(repo.buscar(Processo.class, 1L)).thenReturn(p);
         when(repo.buscar(Unidade.class, 10L)).thenReturn(u);
-        when(unidadeMapaRepo.findAllById(anyList())).thenReturn(List.of(um));
+        when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(um));
         when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
         when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
+        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(u));
         um.setUnidadeCodigo(10L);
 
         List<String> erros = workflowService.iniciar(1L, List.of(10L), usuario);
 
         assertThat(erros).isEmpty();
-        verify(unidadeMapaRepo).findAllById(anyList());
+        verify(unidadeService).buscarMapasPorUnidades(anyList());
         verify(subprocessoService).criarParaRevisao(p, u, um, admin, usuario);
         verify(notificacaoService).emailInicioProcesso(eq(1L));
     }
@@ -159,8 +158,8 @@ class ProcessoWorkflowServiceTest {
         um.setUnidadeCodigo(10L);
 
         when(repo.buscar(Processo.class, 1L)).thenReturn(p);
-        when(unidadeRepo.findAllById(any())).thenReturn(List.of(UnidadeTestBuilder.umaDe().comCodigo("10").build()));
-        when(unidadeMapaRepo.findAllById(any())).thenReturn(List.of(um));
+        when(unidadeService.porCodigos(any())).thenReturn(List.of(UnidadeTestBuilder.umaDe().comCodigo("10").build()));
+        when(unidadeService.buscarMapasPorUnidades(any())).thenReturn(List.of(um));
         when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
         when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
 
@@ -211,7 +210,7 @@ class ProcessoWorkflowServiceTest {
         when(repo.buscar(Processo.class, 1L)).thenReturn(p);
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(
                 eq(SituacaoProcesso.EM_ANDAMENTO), any())).thenReturn(List.of(2L));
-        when(unidadeRepo.findSiglasByCodigos(any())).thenReturn(List.of("UN1"));
+        when(unidadeService.buscarSiglasPorIds(any())).thenReturn(List.of("UN1"));
 
         List<String> erros = workflowService.iniciar(1L, List.of(), new Usuario());
         assertThat(erros).hasSize(1);

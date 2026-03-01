@@ -20,15 +20,13 @@ class ProcessoWorkflowServicePbtTest {
 
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
         ComumRepo repo = mock(ComumRepo.class);
-        UnidadeRepo unidadeRepo = mock(UnidadeRepo.class);
-        UnidadeMapaRepo unidadeMapaRepo = mock(UnidadeMapaRepo.class);
         UnidadeService unidadeService = mock(UnidadeService.class);
         ProcessoNotificacaoService notificacaoService = mock(ProcessoNotificacaoService.class);
         SubprocessoService subprocessoService = mock(SubprocessoService.class);
         ProcessoValidacaoService processoValidador = mock(ProcessoValidacaoService.class);
 
         ProcessoWorkflowService workflowService = new ProcessoWorkflowService(
-                processoRepo, repo, unidadeRepo, unidadeMapaRepo, unidadeService,
+                processoRepo, repo, unidadeService,
                 subprocessoService, processoValidador, notificacaoService
         );
 
@@ -36,7 +34,7 @@ class ProcessoWorkflowServicePbtTest {
         List<Long> codsUnidadesParam = args.codsUnidadesParam;
 
         when(repo.buscar(eq(Processo.class), anyLong())).thenReturn(processo);
-        when(unidadeRepo.findAllById(any())).thenAnswer(inv -> {
+        when(unidadeService.porCodigos(any())).thenAnswer(inv -> {
             List<Long> ids = inv.getArgument(0);
             return ids.stream().map(id -> {
                 Unidade u = new Unidade();
