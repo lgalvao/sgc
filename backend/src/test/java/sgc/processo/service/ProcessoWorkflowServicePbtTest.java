@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 @Tag("PBT")
 class ProcessoWorkflowServicePbtTest {
     @Property
-    void iniciar_criaSubprocessosParaCadaParticipante(@ForAll("processosEAgumentos") ProcessoArgs args,
+    void iniciar_criaSubprocessosParaCadaParticipante(@ForAll("processosEArgumentos") ProcessoArgs args,
                                                       @ForAll("usuarioQualquer") Usuario usuario) {
 
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
@@ -68,7 +68,7 @@ class ProcessoWorkflowServicePbtTest {
     }
 
     @Provide
-    Arbitrary<ProcessoArgs> processosEAgumentos() {
+    Arbitrary<ProcessoArgs> processosEArgumentos() {
         return Arbitraries.of(TipoProcesso.values()).flatMap(tipo ->
                 Arbitraries.longs().between(1, 100).flatMap(codigo ->
                         Arbitraries.longs().between(100, 200).set().ofMinSize(1).ofMaxSize(5).map(unidadesIds -> {

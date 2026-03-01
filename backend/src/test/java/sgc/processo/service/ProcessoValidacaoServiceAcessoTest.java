@@ -143,7 +143,7 @@ class ProcessoValidacaoServiceAcessoTest {
 
     @Test
     @DisplayName("Deve lidar com ciclos na hierarquia (evitar loop infinito)")
-    void deveEvitarCicloInifinitoEmHierarquia() {
+    void deveEvitarCicloInfinitoEmHierarquia() {
 
         Unidade u1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
         Unidade u2 = UnidadeTestBuilder.umaDe().comCodigo("2").build();
