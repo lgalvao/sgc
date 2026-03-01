@@ -138,9 +138,9 @@ class PainelServiceTest {
                     .thenReturn(new PageImpl<>(List.of(p)));
             when(hierarquiaService.buscarMapaHierarquia()).thenReturn(Collections.emptyMap());
 
-            sgc.organizacao.dto.UnidadeDto dto = new sgc.organizacao.dto.UnidadeDto();
-            dto.setSigla("SIGLA");
-            when(unidadeService.buscarPorId(codigoUnidade)).thenReturn(new Unidade());
+            Unidade unidade = new Unidade();
+            unidade.setSigla("SIGLA");
+            when(unidadeService.buscarPorId(codigoUnidade)).thenReturn(unidade);
 
             Page<ProcessoResumoDto> result = painelService.listarProcessos(Perfil.CHEFE, codigoUnidade, pageable);
 

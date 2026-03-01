@@ -14,6 +14,7 @@ import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 
+import sgc.organizacao.service.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -35,6 +36,9 @@ class SubprocessoControllerCoverageExtraTest {
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     @MockitoBean
     private SubprocessoService subprocessoService;
+
+    @MockitoBean
+    private UnidadeService unidadeService;
 
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
