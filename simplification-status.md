@@ -18,7 +18,7 @@
 | Backend – DTOs do módulo `subprocesso` | Arquivos | **26** (era 28) |
 | Frontend – Stores | Total | **13 stores** Pinia |
 | Frontend – Composables de async | `useAsyncAction` | ✅ em uso em `mapas.ts`, `analises.ts` e `configuracoes.ts` |
-| Frontend – Componentes Vue | Total | **48** (era 49) |
+| Frontend – Componentes Vue | Total | **46** (era 49) |
 
 ---
 
@@ -68,15 +68,20 @@
   associados também removidos (componentes Vue de 49 → 48).
 - [x] **Frontend**: Store `configuracoes.ts` migrado de try/catch manual para `useAsyncAction`
   (consistente com `mapas.ts` e `analises.ts`).
+- [x] **Backend**: `buscarUsuarioPorTitulo` removido de `UsuarioFacade`; `UsuarioController` agora
+  injeta `UsuarioService` diretamente para a busca por título, eliminando delegação desnecessária.
+- [x] **Frontend**: `RelatorioFiltrosSection` e `RelatorioCardsSection` inlineados em
+  `RelatoriosView.vue` (componentes single-use sem lógica própria; componentes Vue de 48 → 46).
 
 ### Em andamento / Próximos passos
 
 - [ ] **Migrar stores de leitura simples** para composables com estado local na view:
   - Candidatos: `unidades`, `usuarios`.
 - [ ] **Consolidar DTOs de `subprocesso`** de 26 → ~20, fundindo DTOs minúsculos de uso único.
-- [ ] **Inlinear componentes Vue single-use** para reduzir a contagem de ~48 componentes.
-- [ ] **Avaliar `UsuarioFacade`**: método `buscarUsuarioPorTitulo` ainda usado apenas por
-  `UsuarioController`; avaliar inlining direto no controller.
+- [ ] **Inlinear outros componentes Vue single-use** para reduzir a contagem.
+- [ ] **Avaliar remoção de `UsuarioFacade`**: com `buscarUsuarioPorTitulo` removido, os métodos
+  de admin (`listarAdministradores`, `adicionarAdministrador`, `removerAdministrador`) poderiam
+  ser movidos diretamente para `UsuarioService`, eliminando a facade por completo.
 
 ---
 
@@ -106,3 +111,10 @@
 11. Métodos de serviço de email que foram substituídos por templates Thymeleaf (ex.: `EmailModelosService`)
     podem acumular métodos obsoletos que servem apenas de lastro para testes de cobertura. Verificar
     regularmente se o método tem chamador em produção antes de manter seu teste.
+12. Quando um método de facade é pure pass-through (ex.: `buscarUsuarioPorTitulo` → `usuarioService.buscarOpt`)
+    e é usado por apenas um controller, é mais limpo injetar o service diretamente no controller e remover
+    o método da facade, mesmo que isso adicione uma segunda dependência ao controller.
+13. Componentes Vue single-use puramente presentacionais (sem lógica, apenas template com props/emits)
+    são melhores candidatos para inlining do que seções com estado próprio ou testes dedicados.
+    A ausência de testes próprios é um sinal de que o componente não tem valor isolado suficiente para
+    continuar separado.

@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 
 import java.util.*;
 
@@ -20,12 +21,13 @@ import java.util.*;
 @Slf4j
 @Tag(name = "Usuários", description = "Gerenciamento de usuários e administradores")
 public class UsuarioController {
-    private final UsuarioFacade usuarioService;
+    private final UsuarioFacade usuarioFacade;
+    private final UsuarioService usuarioService;
 
     @JsonView(OrganizacaoViews.Publica.class)
     @GetMapping("/{titulo}")
     public ResponseEntity<Usuario> buscarUsuarioPorTitulo(@PathVariable String titulo) {
-        return usuarioService.buscarUsuarioPorTitulo(titulo)
+        return usuarioService.buscarOpt(titulo)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -35,7 +37,7 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lista todos os administradores")
     public ResponseEntity<List<AdministradorDto>> listarAdministradores() {
-        return ResponseEntity.ok(usuarioService.listarAdministradores());
+        return ResponseEntity.ok(usuarioFacade.listarAdministradores());
     }
 
     @JsonView(OrganizacaoViews.Publica.class)
@@ -46,7 +48,7 @@ public class UsuarioController {
             @RequestBody Map<String, String> request) {
 
         String usuarioTitulo = request.get("usuarioTitulo");
-        AdministradorDto administrador = usuarioService.adicionarAdministrador(usuarioTitulo);
+        AdministradorDto administrador = usuarioFacade.adicionarAdministrador(usuarioTitulo);
         return ResponseEntity.ok(administrador);
     }
 
@@ -57,7 +59,7 @@ public class UsuarioController {
             @PathVariable String usuarioTitulo,
             @AuthenticationPrincipal Usuario usuarioAtual) {
 
-        usuarioService.removerAdministrador(usuarioTitulo, usuarioAtual.getTituloEleitoral());
+        usuarioFacade.removerAdministrador(usuarioTitulo, usuarioAtual.getTituloEleitoral());
         return ResponseEntity.ok().build();
     }
 }

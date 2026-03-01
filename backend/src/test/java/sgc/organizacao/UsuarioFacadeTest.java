@@ -212,24 +212,6 @@ class UsuarioFacadeTest {
     class BuscaUsuarios {
 
         @Test
-        @DisplayName("Deve buscar usuário por título")
-        void deveBuscarUsuarioPorTitulo() {
-
-            String titulo = "123456";
-            Usuario usuario = criarUsuario(titulo);
-
-            when(usuarioService.buscarOpt(titulo))
-                    .thenReturn(Optional.of(usuario));
-
-
-            Optional<Usuario> resultado = facade.buscarUsuarioPorTitulo(titulo);
-
-
-            assertThat(resultado).isPresent();
-            assertThat(resultado.get().getTituloEleitoral()).isEqualTo(titulo);
-        }
-
-        @Test
         @DisplayName("Deve buscar usuários por títulos")
         void deveBuscarUsuariosPorTitulos() {
 

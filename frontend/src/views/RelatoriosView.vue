@@ -2,20 +2,88 @@
   <LayoutPadrao>
     <PageHeader title="Relatórios"/>
 
-    <RelatorioFiltrosSection
-        v-model:data-fim="filtroDataFim"
-        v-model:data-inicio="filtroDataInicio"
-        v-model:tipo="filtroTipo"
-    />
+    <BRow class="mb-4">
+      <BCol md="4">
+        <BFormGroup label="Filtrar por Tipo" label-for="filtro-tipo">
+          <BFormSelect
+              id="filtro-tipo"
+              v-model="filtroTipo"
+              :options="opcoesTipo"
+              aria-label="Filtrar por Tipo"
+              data-testid="filtro-tipo"
+          />
+        </BFormGroup>
+      </BCol>
+      <BCol md="4">
+        <BFormGroup label="Data Início" label-for="filtro-data-inicio">
+          <BFormInput
+              id="filtro-data-inicio"
+              v-model="filtroDataInicio"
+              aria-label="Data Início"
+              data-testid="filtro-data-inicio"
+              type="date"
+          />
+        </BFormGroup>
+      </BCol>
+      <BCol md="4">
+        <BFormGroup label="Data Fim" label-for="filtro-data-fim">
+          <BFormInput
+              id="filtro-data-fim"
+              v-model="filtroDataFim"
+              aria-label="Data Fim"
+              data-testid="filtro-data-fim"
+              type="date"
+          />
+        </BFormGroup>
+      </BCol>
+    </BRow>
 
-    <RelatorioCardsSection
-        :diagnosticos-gaps-count="diagnosticosGapsFiltrados.length"
-        :mapas-vigentes-count="mapasVigentes.length"
-        :processos-filtrados-count="processosFiltrados.length"
-        @abrir-mapas-vigentes="abrirModalMapasVigentes"
-        @abrir-diagnosticos-gaps="abrirModalDiagnosticosGaps"
-        @abrir-andamento-geral="abrirModalAndamentoGeral"
-    />
+    <BRow>
+      <BCol md="4">
+        <BCard
+            class="mb-3 text-center h-100 cursor-pointer shadow-sm hover-shadow"
+            data-testid="card-relatorio-mapas"
+            @click="abrirModalMapasVigentes"
+        >
+          <div class="display-4 mb-2 text-primary">
+            <i class="bi bi-map"/>
+          </div>
+          <h3>Mapas Vigentes</h3>
+          <div class="h2 mb-0">{{ mapasVigentes.length }}</div>
+          <div class="text-muted">Unidades com mapas</div>
+        </BCard>
+      </BCol>
+
+      <BCol md="4">
+        <BCard
+            class="mb-3 text-center h-100 cursor-pointer shadow-sm hover-shadow"
+            data-testid="card-relatorio-gaps"
+            @click="abrirModalDiagnosticosGaps"
+        >
+          <div class="display-4 mb-2 text-danger">
+            <i class="bi bi-exclamation-triangle"/>
+          </div>
+          <h3>Diagnósticos de Gaps</h3>
+          <div class="h2 mb-0">{{ diagnosticosGapsFiltrados.length }}</div>
+          <div class="text-muted">Gaps identificados</div>
+        </BCard>
+      </BCol>
+
+      <BCol md="4">
+        <BCard
+            class="mb-3 text-center h-100 cursor-pointer shadow-sm hover-shadow"
+            data-testid="card-relatorio-andamento"
+            @click="abrirModalAndamentoGeral"
+        >
+          <div class="display-4 mb-2 text-success">
+            <i class="bi bi-graph-up"/>
+          </div>
+          <h3>Andamento Geral</h3>
+          <div class="h2 mb-0">{{ processosFiltrados.length }}</div>
+          <div class="text-muted">Processos em andamento</div>
+        </BCard>
+      </BCol>
+    </BRow>
 
     <!-- Modal Mapas Vigentes -->
     <ModalMapasVigentes
@@ -39,18 +107,24 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
+import {BCard, BCol, BFormGroup, BFormInput, BFormSelect, BRow} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ModalMapasVigentes from "@/components/relatorios/ModalMapasVigentes.vue";
 import ModalDiagnosticosGaps from "@/components/relatorios/ModalDiagnosticosGaps.vue";
 import ModalRelatorioAndamento from "@/components/relatorios/ModalRelatorioAndamento.vue";
-import RelatorioFiltrosSection from "@/components/relatorios/RelatorioFiltrosSection.vue";
-import RelatorioCardsSection from "@/components/relatorios/RelatorioCardsSection.vue";
 import {useProcessosStore} from "@/stores/processos";
 import {useMapasStore} from "@/stores/mapas";
 import {usePerfilStore} from "@/stores/perfil";
 import {endOfDay, isWithinInterval, parseISO, startOfDay} from "date-fns";
 import {TipoProcesso} from "@/types/tipos";
+
+const opcoesTipo = [
+  {value: "", text: "Todos os Tipos"},
+  {value: TipoProcesso.MAPEAMENTO, text: "Mapeamento"},
+  {value: TipoProcesso.REVISAO, text: "Revisão"},
+  {value: TipoProcesso.DIAGNOSTICO, text: "Diagnóstico"},
+];
 
 const processosStore = useProcessosStore();
 const mapasStore = useMapasStore();
@@ -186,3 +260,13 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+}
+</style>
