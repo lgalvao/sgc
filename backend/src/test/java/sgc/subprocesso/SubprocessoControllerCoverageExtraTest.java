@@ -46,10 +46,8 @@ class SubprocessoControllerCoverageExtraTest {
     @DisplayName("disponibilizarCadastro - erro validacao")
     @WithMockUser
     void disponibilizarCadastroErro() throws Exception {
-        Atividade a = new Atividade();
-        a.setCodigo(1L);
-        a.setDescricao("desc");
-        when(subprocessoService.obterAtividadesSemConhecimento(1L)).thenReturn(List.of(a));
+        when(subprocessoService.disponibilizarCadastro(eq(1L), any()))
+                .thenThrow(new ErroValidacao("Existem atividades sem conhecimentos associados."));
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/cadastro/disponibilizar").with(csrf()))
@@ -61,10 +59,8 @@ class SubprocessoControllerCoverageExtraTest {
     @DisplayName("disponibilizarRevisao - erro validacao")
     @WithMockUser
     void disponibilizarRevisaoErro() throws Exception {
-        Atividade a = new Atividade();
-        a.setCodigo(1L);
-        a.setDescricao("desc");
-        when(subprocessoService.obterAtividadesSemConhecimento(1L)).thenReturn(List.of(a));
+        when(subprocessoService.disponibilizarRevisao(eq(1L), any()))
+                .thenThrow(new ErroValidacao("Existem atividades sem conhecimentos associados."));
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_REVISAO_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/disponibilizar-revisao").with(csrf()))
