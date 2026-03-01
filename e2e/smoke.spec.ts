@@ -451,6 +451,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await navegarParaAtividadesVisualizacao(page);
 
             await page.getByTestId('btn-acao-analisar-principal').click();
+            await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
             await page.waitForTimeout(100);
 

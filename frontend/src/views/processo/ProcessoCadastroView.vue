@@ -24,7 +24,7 @@
       <div class="d-flex justify-content-between">
         <div>
           <LoadingButton
-              :disabled="isFormInvalid || isLoading"
+              :disabled="isFormInvalid || isLoading || isLoadingData"
               data-testid="btn-processo-iniciar"
               icon="play-fill"
               text="Iniciar processo"
@@ -32,7 +32,7 @@
               @click="abrirModalConfirmacao"
           />
           <LoadingButton
-              :disabled="isFormInvalid"
+              :disabled="isFormInvalid || isLoadingData"
               :loading="isLoading"
               class="ms-2"
               data-testid="btn-processo-salvar"
@@ -194,9 +194,12 @@ function mostrarAlerta(variant: AlertState['variant'], title: string, body: stri
   window.scrollTo(0, 0);
 }
 
+const isLoadingData = ref(false);
+
 onMounted(async () => {
   const codProcesso = route.query.codProcesso;
   if (codProcesso) {
+    isLoadingData.value = true;
     try {
       await processosStore.buscarProcessoDetalhe(Number(codProcesso));
       const processo = processosStore.processoDetalhe;
@@ -221,6 +224,8 @@ onMounted(async () => {
     } catch (error) {
       mostrarAlerta('danger', "Erro ao carregar processo", "Não foi possível carregar os detalhes do processo.");
       logger.error("Erro ao carregar processo:", error);
+    } finally {
+      isLoadingData.value = false;
     }
   } else if (tipo.value) {
     await unidadesStore.buscarUnidadesParaProcesso(tipo.value);
