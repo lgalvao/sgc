@@ -226,10 +226,6 @@ public class SubprocessoService {
         return validacaoService.validarCadastro(sp);
     }
 
-
-
-
-
     private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
         if (sp.getCodigo() == null) {
@@ -712,6 +708,7 @@ public class SubprocessoService {
     @Transactional(readOnly = true)
     public List<AtividadeDto> listarAtividadesSubprocesso(Long codSubprocesso) {
         Subprocesso subprocesso = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow();
+
         Long codMapa = subprocesso.getMapa().getCodigo();
         List<Atividade> todasAtividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(codMapa);
 

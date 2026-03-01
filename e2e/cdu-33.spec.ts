@@ -31,6 +31,8 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     const timestamp = Date.now();
     const descMapeamento = `Mapeamento Pre-CDU-33 ${timestamp}`;
     const descRevisao = `Revisão CDU-33 ${timestamp}`;
+    let mappingPid = 0;
+    let revisaoPid = 0;
 
     // PREPARAÇÃO 0 - CRIAR MAPA VIGENTE
 
@@ -46,8 +48,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         });
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descMapeamento)});
         await linhaProcesso.click();
-        const pid = await extrairProcessoId(page);
-        if (pid > 0) cleanupAutomatico.registrar(pid);
+        mappingPid = await extrairProcessoId(page);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
@@ -132,8 +133,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descRevisao)});
         await linhaProcesso.click();
 
-        const processoId = await extrairProcessoId(page);
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
+        revisaoPid = await extrairProcessoId(page);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
@@ -174,7 +174,10 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     });
 
 
-    test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({page, autenticadoComoAdmin}) => {
+    test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+        if (mappingPid > 0) cleanupAutomatico.registrar(mappingPid);
+        if (revisaoPid > 0) cleanupAutomatico.registrar(revisaoPid);
+
         // Cenario 1 & 2: Navegação e visualização do botão
         await acessarSubprocessoChefeDireto(page, descRevisao, UNIDADE_ALVO);
 

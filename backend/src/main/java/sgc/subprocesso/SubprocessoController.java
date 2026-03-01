@@ -185,7 +185,7 @@ public class SubprocessoController {
     @Operation(summary = "Aceita o cadastro de atividades")
     public void aceitarCadastro(
             @PathVariable Long id,
-            @Valid @RequestBody TextoRequest request,
+            @Valid @RequestBody TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
         String sanitizedObservacoes = Optional.ofNullable(request.texto())
                 .map(UtilSanitizacao::sanitizar)
@@ -199,7 +199,7 @@ public class SubprocessoController {
     @Operation(summary = "Homologa o cadastro de atividades")
     public void homologarCadastro(
             @PathVariable Long id,
-            @Valid @RequestBody TextoRequest request,
+            @Valid @RequestBody TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
 
         String sanitizedObservacoes = Optional.ofNullable(request.texto())
@@ -228,7 +228,7 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#id, 'Subprocesso', 'ACEITAR_REVISAO_CADASTRO')")
     public void aceitarRevisaoCadastro(
             @PathVariable Long id,
-            @Valid @RequestBody TextoRequest request,
+            @Valid @RequestBody TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
         String sanitizedObservacoes = Optional.ofNullable(request.texto())
                 .map(UtilSanitizacao::sanitizar)
@@ -242,7 +242,7 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#id, 'Subprocesso', 'HOMOLOGAR_REVISAO_CADASTRO')")
     public void homologarRevisaoCadastro(
             @PathVariable Long id,
-            @Valid @RequestBody TextoRequest request,
+            @Valid @RequestBody TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
         String sanitizedObservacoes = Optional.ofNullable(request.texto())
                 .map(UtilSanitizacao::sanitizar)
@@ -417,7 +417,7 @@ public class SubprocessoController {
     @Operation(summary = "Apresenta sugestões de melhoria para o mapa")
     public void apresentarSugestoes(
             @PathVariable Long id,
-            @RequestBody @Valid TextoRequest request,
+            @RequestBody @Valid TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
         transicaoService.apresentarSugestoes(id, request.texto(), usuario);
     }

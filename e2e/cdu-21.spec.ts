@@ -50,7 +50,6 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await linhaProcesso.click();
 
         processoId = await extrairProcessoId(page);
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
@@ -237,8 +236,9 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         // (Processo finalizado não aparece na lista de processos ativos)
     });
 
-    test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         // Issue #1220: Garantir que botões de ação não aparecem para processos finalizados
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.goto(`/processo/${processoId}`);
 
