@@ -38,11 +38,6 @@ public class UsuarioFacade {
     }
 
     @Transactional(readOnly = true)
-    public Usuario buscarPorTitulo(String titulo) {
-        return usuarioService.buscar(titulo);
-    }
-
-    @Transactional(readOnly = true)
     public Usuario buscarPorLogin(String login) {
         Usuario usuario = usuarioService.buscarComAtribuicoes(login);
         carregarAtribuicoes(usuario);

@@ -15,9 +15,10 @@
 | Backend – Facades | Total | **7** (`UsuarioFacade` + 6 com lógica real) |
 | Backend – Erros | Hierarquia total | **8 classes/interfaces** (era 18+) |
 | Backend – `processo/service` | Classes de serviço | **6 classes** (era 8) |
-| Backend – DTOs do módulo `subprocesso` | Arquivos | **28** |
+| Backend – DTOs do módulo `subprocesso` | Arquivos | **27** (era 28) |
 | Frontend – Stores | Total | **13 stores** Pinia |
 | Frontend – Composables de async | `useAsyncAction` | ✅ em uso em `mapas.ts` e `analises.ts` |
+| Frontend – Componentes Vue | Total | **48** (era 49) |
 
 ---
 
@@ -50,15 +51,23 @@
   + `iniciarProcessoDiagnostico` → `iniciarProcesso`; simplificação do dispatch no
   `ProcessoController` (eliminado o mapa de funções).
 - [x] **Frontend**: `analises.ts` migrado de try/catch manual para `useAsyncAction`.
+- [x] **Backend**: `ErroValidacaoDto` embutido como record aninhado `ValidacaoCadastroDto.Erro`;
+  arquivo `ErroValidacaoDto.java` removido (DTOs de 28 → 27).
+- [x] **Backend**: `AlertaFacade` passa a injetar `UsuarioService` diretamente em vez de `UsuarioFacade`
+  (remove dependência facade→facade); método `buscarPorTitulo` removido de `UsuarioFacade`.
+- [x] **Backend**: `SubprocessoNotificacaoService` passa a injetar `UsuarioService` diretamente em vez
+  de `UsuarioFacade` (remove dependência cross-module desnecessária no facade).
+- [x] **Frontend**: Componente `CampoTexto.vue` removido (sem uso em produção); story e teste
+  associados também removidos (componentes Vue de 49 → 48).
 
 ### Em andamento / Próximos passos
 
 - [ ] **Migrar stores de leitura simples** para composables com estado local na view:
   - Candidatos: `configuracoes` (1 consumidor), `unidades`, `usuarios`.
-- [ ] **Consolidar DTOs de `subprocesso`** de 28 → ~15, fundindo DTOs minúsculos de uso único.
-  - Candidato imediato: `ErroValidacaoDto` embutido como record aninhado em `ValidacaoCadastroDto`.
-- [ ] **Inlinear componentes Vue single-use** para reduzir a contagem de ~146 componentes.
-- [ ] **Avaliar `UsuarioFacade`** (~30% pass-through restante): `buscarUsuarioPorTitulo`, `buscarPorTitulo`.
+- [ ] **Consolidar DTOs de `subprocesso`** de 27 → ~14, fundindo DTOs minúsculos de uso único.
+- [ ] **Inlinear componentes Vue single-use** para reduzir a contagem de ~48 componentes.
+- [ ] **Avaliar `UsuarioFacade`**: método `buscarUsuarioPorTitulo` ainda usado apenas por
+  `UsuarioController`; avaliar inlining direto no controller.
 
 ---
 
@@ -81,3 +90,7 @@
    verificar regularmente com grep/análise estática.
 8. Múltiplos métodos de facade idênticos (como os 3 `iniciarProcesso*`) surgem quando o dispatcher
    foi movido para o service subjacente mas os métodos de fachada não foram consolidados.
+9. Dependências facade→facade (ex.: `AlertaFacade` injetando `UsuarioFacade`) são ruído arquitetural —
+   quando a operação é simples (buscar entidade por id), injetar o `Service` diretamente é mais limpo.
+10. Componentes Vue sem nenhum consumidor em produção (ex.: `CampoTexto`) devem ser removidos junto com
+    seus testes e stories para evitar acúmulo de código morto.
