@@ -8,7 +8,6 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
-import sgc.alerta.*;
 import sgc.comum.erros.*;
 import sgc.fixture.*;
 import sgc.organizacao.service.*;
@@ -16,7 +15,6 @@ import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.*;
 import sgc.processo.dto.*;
-import sgc.processo.erros.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
@@ -47,12 +45,6 @@ class ProcessoFacadeTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
-    private AlertaFacade alertaService;
-    @Mock
-    private EmailService emailService;
-    @Mock
-    private EmailModelosService emailModelosService;
-    @Mock
     private SubprocessoService subprocessoService;
     @Mock
     private SubprocessoTransicaoService transicaoService;
@@ -64,6 +56,8 @@ class ProcessoFacadeTest {
     private ProcessoDetalheBuilder processoDetalheBuilder;
     @Mock
     private ProcessoFinalizador processoFinalizador;
+    @Mock
+    private ProcessoNotificacaoService processoNotificacaoService;
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
 
@@ -100,57 +94,10 @@ class ProcessoFacadeTest {
 
 
         @Test
-        @DisplayName("enviarLembrete deve formatar data corretamente quando presente")
-        void enviarLembrete_DeveFormatarDataQuandoPresente() {
-            Long codProcesso = 1L;
-            Long codUnidade = 2L;
-            LocalDateTime dataLimite = LocalDateTime.of(2026, 3, 15, 23, 59);
-
-            Processo processo = new Processo();
-            processo.setDescricao("Processo com prazo");
-            processo.setDataLimite(dataLimite);
-            Unidade unidade = UnidadeFixture.unidadeComId(codUnidade);
-            unidade.setSigla("U1");
-            processo.adicionarParticipantes(Set.of(unidade));
-
-            when(processoConsultaService.buscarProcessoCodigo(codProcesso)).thenReturn(processo);
-            when(unidadeService.buscarPorId(codUnidade)).thenReturn(unidade);
-            Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
-            when(subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(subprocesso);
-            unidade.setTituloTitular("T1");
-            Usuario titular = new Usuario();
-            titular.setEmail("titular@teste.com");
-            when(usuarioService.buscarPorLogin("T1")).thenReturn(titular);
-
-            when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
-
-            processoFacade.enviarLembrete(codProcesso, codUnidade);
-
-            verify(alertaService).criarAlertaAdmin(eq(processo), eq(unidade), contains("15/03/2026"));
-            verify(subprocessoService).registrarMovimentacaoLembrete(99L);
-            verify(emailService).enviarEmailHtml(
-                    eq("titular@teste.com"),
-                    contains("SGC: Lembrete de prazo"),
-                    anyString()
-            );
-        }
-
-        @Test
-        @DisplayName("enviarLembrete deve lançar exceção quando unidade não participa")
-        void enviarLembrete_DeveLancarExcecaoQuandoUnidadeNaoParticipa() {
-            Long codProcesso = 1L;
-            Long codUnidade = 99L; // Unidade que não participa
-
-            Processo processo = new Processo();
-            processo.setDescricao("Processo");
-            Unidade unidadeParticipante = UnidadeFixture.unidadeComId(2L);
-            processo.adicionarParticipantes(Set.of(unidadeParticipante));
-
-            when(processoConsultaService.buscarProcessoCodigo(codProcesso)).thenReturn(processo);
-
-            assertThatThrownBy(() -> processoFacade.enviarLembrete(codProcesso, codUnidade))
-                    .isInstanceOf(ErroProcesso.class)
-                    .hasMessageContaining("não participa");
+        @DisplayName("enviarLembrete deve delegar para processoNotificacaoService")
+        void enviarLembrete_DeveDelegar() {
+            processoFacade.enviarLembrete(1L, 2L);
+            verify(processoNotificacaoService).enviarLembrete(1L, 2L);
         }
 
         @Test
@@ -277,47 +224,11 @@ class ProcessoFacadeTest {
     @DisplayName("Lembretes")
     class Lembretes {
         @Test
-        @DisplayName("Deve enviar lembrete com sucesso")
+        @DisplayName("Deve delegar enviarLembrete para processoNotificacaoService")
         void deveEnviarLembrete() {
-            Processo p = ProcessoFixture.processoEmAndamento();
-            p.setCodigo(1L);
-            Unidade u = UnidadeFixture.unidadeComId(10L);
-            u.setSigla("U1");
-            p.adicionarParticipantes(Set.of(u));
-
-            when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
-            when(unidadeService.buscarPorId(10L)).thenReturn(u);
-            Subprocesso subprocesso = Subprocesso.builder().codigo(99L).build();
-            when(subprocessoService.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
-            u.setTituloTitular("T10");
-            Usuario titular = new Usuario();
-            titular.setEmail("u10@teste.com");
-            when(usuarioService.buscarPorLogin("T10")).thenReturn(titular);
-            when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("HTML");
-
             processoFacade.enviarLembrete(1L, 10L);
-            verify(alertaService).criarAlertaAdmin(eq(p), eq(u), anyString());
-            verify(subprocessoService).registrarMovimentacaoLembrete(99L);
-            verify(emailService).enviarEmailHtml(eq("u10@teste.com"), contains(p.getDescricao()), anyString());
+            verify(processoNotificacaoService).enviarLembrete(1L, 10L);
         }
-
-        @Test
-        @DisplayName("Deve falhar ao enviar lembrete se unidade nao participa")
-        void deveFalharEnviarLembreteUnidadeNaoParticipa() {
-            Processo p = ProcessoFixture.processoEmAndamento();
-            p.setCodigo(1L);
-            Unidade u = UnidadeFixture.unidadeComId(10L);
-            Unidade outra = UnidadeFixture.unidadeComId(20L);
-            p.adicionarParticipantes(Set.of(outra));
-
-            when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
-            when(unidadeService.buscarPorId(10L)).thenReturn(u);
-
-            assertThatThrownBy(() -> processoFacade.enviarLembrete(1L, 10L))
-                    .isInstanceOf(ErroProcesso.class)
-                    .hasMessageContaining("não participa");
-        }
-
     }
 
     @Nested

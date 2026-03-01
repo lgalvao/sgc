@@ -16,6 +16,7 @@ import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
 import java.time.*;
+import java.time.format.*;
 import java.util.*;
 import java.util.stream.*;
 
@@ -42,6 +43,35 @@ public class ProcessoNotificacaoService {
     @Transactional
     public void emailFinalizacaoProcesso(Long codProcesso) {
         processarFinalizacaoProcesso(codProcesso);
+    }
+
+    @Transactional
+    public void enviarLembrete(Long codProcesso, Long unidadeCodigo) {
+        Processo processo = processoRepo.findByIdComParticipantes(codProcesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
+        Unidade unidade = unidadeService.buscarPorId(unidadeCodigo);
+
+        if (processo.getParticipantes().stream().noneMatch(u -> u.getUnidadeCodigo().equals(unidadeCodigo))) {
+            throw new ErroValidacao("Unidade não participa deste processo.");
+        }
+
+        String dataLimiteText = processo.getDataLimite() != null
+                ? processo.getDataLimite().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                : "N/A";
+        String descricao = "Lembrete: Prazo do processo %s encerra em %s"
+                .formatted(processo.getDescricao(), dataLimiteText);
+        String assunto = "SGC: Lembrete de prazo - %s".formatted(processo.getDescricao());
+
+        String corpoHtml = emailModelosService.criarEmailLembretePrazo(
+                unidade.getSigla(), processo.getDescricao(), processo.getDataLimite());
+
+        Subprocesso subprocesso = subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, unidadeCodigo);
+        subprocessoService.registrarMovimentacaoLembrete(subprocesso.getCodigo());
+
+        Usuario titular = usuarioService.buscarPorLogin(unidade.getTituloTitular());
+        emailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
+
+        servicoAlertas.criarAlertaAdmin(processo, unidade, descricao);
     }
 
     private void processarInicioProcesso(Long codProcesso) {
