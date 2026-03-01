@@ -23,7 +23,7 @@ class ProcessoManutencaoServiceValidationTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
-    private ProcessoValidador processoValidador;
+    private ProcessoValidacaoService processoValidador;
     @InjectMocks
     private ProcessoManutencaoService service;
 

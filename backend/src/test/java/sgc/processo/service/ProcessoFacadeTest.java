@@ -39,7 +39,7 @@ class ProcessoFacadeTest {
     @Mock
     private ProcessoManutencaoService processoManutencaoService;
     @Mock
-    private ProcessoInicializador processoInicializador;
+    private ProcessoWorkflowService processoWorkflowService;
     @Mock
     private ProcessoConsultaService processoConsultaService;
     @Mock
@@ -51,11 +51,9 @@ class ProcessoFacadeTest {
     @Mock
     private UsuarioFacade usuarioService;
     @Mock
-    private ProcessoAcessoService processoAcessoService;
+    private ProcessoValidacaoService processoValidacaoService;
     @Mock
     private ProcessoDetalheBuilder processoDetalheBuilder;
-    @Mock
-    private ProcessoFinalizador processoFinalizador;
     @Mock
     private ProcessoNotificacaoService processoNotificacaoService;
     @Mock
@@ -65,18 +63,18 @@ class ProcessoFacadeTest {
     @DisplayName("Cobertura e Casos de Borda")
     class CoverageTests {
         @Test
-        @DisplayName("iniciarProcessoDiagnostico deve delegar para inicializador")
-        void iniciarProcessoDiagnostico_DeveDelegar() {
+        @DisplayName("iniciarProcesso deve delegar para inicializador")
+        void iniciarProcesso_DeveDelegar() {
             Long codigo = 1L;
             List<Long> unidades = List.of(2L, 3L);
             Usuario usuario = new Usuario();
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(processoInicializador.iniciar(codigo, unidades, usuario)).thenReturn(List.of("OK"));
+            when(processoWorkflowService.iniciar(codigo, unidades, usuario)).thenReturn(List.of("OK"));
 
-            var result = processoFacade.iniciarProcessoDiagnostico(codigo, unidades);
+            var result = processoFacade.iniciarProcesso(codigo, unidades);
 
             assertEquals(1, result.size());
-            verify(processoInicializador).iniciar(codigo, unidades, usuario);
+            verify(processoWorkflowService).iniciar(codigo, unidades, usuario);
         }
 
         @Test
@@ -138,8 +136,8 @@ class ProcessoFacadeTest {
         void deveNegarAcessoQuandoNaoAutenticado() {
 
             Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, 1L)).thenReturn(false);
-            when(processoAcessoService.checarAcesso(null, 1L)).thenReturn(false);
+            when(processoValidacaoService.checarAcesso(auth, 1L)).thenReturn(false);
+            when(processoValidacaoService.checarAcesso(null, 1L)).thenReturn(false);
 
             // Act & Assert
             assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
@@ -151,17 +149,17 @@ class ProcessoFacadeTest {
         @DisplayName("Deve delegar verificação de acesso para o ProcessoAcessoService")
         void deveDelegarVerificacaoDeAcesso(Long processoCodigo) {
             Authentication auth = mock(Authentication.class);
-            when(processoAcessoService.checarAcesso(auth, processoCodigo)).thenReturn(true);
+            when(processoValidacaoService.checarAcesso(auth, processoCodigo)).thenReturn(true);
             assertThat(processoFacade.checarAcesso(auth, processoCodigo)).isTrue();
 
-            when(processoAcessoService.checarAcesso(auth, processoCodigo)).thenReturn(false);
+            when(processoValidacaoService.checarAcesso(auth, processoCodigo)).thenReturn(false);
             assertThat(processoFacade.checarAcesso(auth, processoCodigo)).isFalse();
         }
 
         @Test
         @DisplayName("Deve retornar false quando checarAcesso recebe null")
         void deveRetornarFalseQuandoAuthenticationForNull() {
-            when(processoAcessoService.checarAcesso(null, 1L)).thenReturn(false);
+            when(processoValidacaoService.checarAcesso(null, 1L)).thenReturn(false);
             assertThat(processoFacade.checarAcesso(null, 1L)).isFalse();
         }
     }
@@ -175,12 +173,12 @@ class ProcessoFacadeTest {
             Long id = 100L;
             Usuario usuario = new Usuario();
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(processoInicializador.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
+            when(processoWorkflowService.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
 
-            List<String> erros = processoFacade.iniciarProcessoMapeamento(id, List.of(1L));
+            List<String> erros = processoFacade.iniciarProcesso(id, List.of(1L));
 
             assertThat(erros).isEmpty();
-            verify(processoInicializador).iniciar(id, List.of(1L), usuario);
+            verify(processoWorkflowService).iniciar(id, List.of(1L), usuario);
         }
 
         @Test
@@ -190,9 +188,9 @@ class ProcessoFacadeTest {
             Usuario usuario = new Usuario();
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             String mensagemErro = "As seguintes unidades já participam de outro processo ativo: U1";
-            when(processoInicializador.iniciar(id, List.of(1L), usuario)).thenReturn(List.of(mensagemErro));
+            when(processoWorkflowService.iniciar(id, List.of(1L), usuario)).thenReturn(List.of(mensagemErro));
 
-            List<String> erros = processoFacade.iniciarProcessoMapeamento(id, List.of(1L));
+            List<String> erros = processoFacade.iniciarProcesso(id, List.of(1L));
 
             assertThat(erros).contains(mensagemErro);
         }
@@ -203,12 +201,12 @@ class ProcessoFacadeTest {
             Long id = 100L;
             Usuario usuario = new Usuario();
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(processoInicializador.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
+            when(processoWorkflowService.iniciar(id, List.of(1L), usuario)).thenReturn(List.of());
 
-            List<String> erros = processoFacade.iniciarProcessoRevisao(id, List.of(1L));
+            List<String> erros = processoFacade.iniciarProcesso(id, List.of(1L));
 
             assertThat(erros).isEmpty();
-            verify(processoInicializador).iniciar(id, List.of(1L), usuario);
+            verify(processoWorkflowService).iniciar(id, List.of(1L), usuario);
         }
 
         @Test
@@ -216,7 +214,7 @@ class ProcessoFacadeTest {
         void deveFinalizarProcessoQuandoTudoHomologado() {
             Long id = 100L;
             processoFacade.finalizar(id);
-            verify(processoFinalizador).finalizar(id);
+            verify(processoWorkflowService).finalizar(id);
         }
     }
 
@@ -395,17 +393,6 @@ class ProcessoFacadeTest {
             var res = processoFacade.listarSubprocessosElegiveis(codProcesso);
             assertThat(res).isSameAs(lista);
             verify(processoConsultaService).subprocessosElegiveis(codProcesso);
-        }
-
-        @Test
-        @DisplayName("Deve listar todos os subprocessos delegando para service")
-        void deveListarTodosSubprocessosDelegandoParaService() {
-            Long codProcesso = 1L;
-            List<Subprocesso> lista = List.of(Subprocesso.builder().build());
-            when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(lista);
-
-            var res = processoFacade.listarTodosSubprocessos(codProcesso);
-            assertThat(res).isSameAs(lista);
         }
 
         @Test

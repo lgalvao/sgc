@@ -14,10 +14,10 @@
 | Backend – `SubprocessoController` | Linhas | **524** (era 549) |
 | Backend – Facades | Total | **7** (`UsuarioFacade` + 6 com lógica real) |
 | Backend – Erros | Hierarquia total | **8 classes/interfaces** (era 18+) |
-| Backend – `processo/service` | Classes de serviço | **8 classes** |
+| Backend – `processo/service` | Classes de serviço | **6 classes** (era 8) |
 | Backend – DTOs do módulo `subprocesso` | Arquivos | **28** |
 | Frontend – Stores | Total | **13 stores** Pinia |
-| Frontend – Composables de async | `useAsyncAction` | ✅ criado e em uso em `mapas.ts` |
+| Frontend – Composables de async | `useAsyncAction` | ✅ em uso em `mapas.ts` e `analises.ts` |
 
 ---
 
@@ -38,18 +38,27 @@
   `EmailModelosService`).
 - [x] Remoção de `ErroProcesso` no módulo `processo`, substituindo por `ErroValidacao` e
   ajustando os testes afetados.
+- [x] **Consolidação de serviços do módulo `processo`** de 8 → 6 classes:
+  - `ProcessoFinalizador` + `ProcessoInicializador` → `ProcessoWorkflowService`.
+  - `ProcessoValidador` + `ProcessoAcessoService` → `ProcessoValidacaoService`.
+- [x] **Correção de violação de arquitetura**: acesso cross-module a `UnidadeRepo`/`UnidadeMapaRepo`
+  agora roteado via `UnidadeService`; adicionado método `buscarMapasPorUnidades`.
+- [x] **Remoção de 5 métodos mortos** de `UsuarioFacade` sem chamadores em produção:
+  `buscarUsuariosPorUnidade`, `buscarUsuariosAtivos`, `buscarResponsaveisUnidades`,
+  `buscarUnidadesOndeEhResponsavel`, `isAdministrador`.
+- [x] **Consolidação de 3 métodos idênticos** `iniciarProcessoMapeamento` + `iniciarProcessoRevisao`
+  + `iniciarProcessoDiagnostico` → `iniciarProcesso`; simplificação do dispatch no
+  `ProcessoController` (eliminado o mapa de funções).
+- [x] **Frontend**: `analises.ts` migrado de try/catch manual para `useAsyncAction`.
 
 ### Em andamento / Próximos passos
 
-- [ ] **Consolidar serviços do módulo `processo`** de 8 → 4-5 classes:
-  - `ProcessoFinalizador` (59 linhas) + `ProcessoInicializador` (150 linhas) → `ProcessoWorkflowService`.
-  - `ProcessoValidador` (93 linhas) + `ProcessoAcessoService` (98 linhas) → unir em um único validador.
 - [ ] **Migrar stores de leitura simples** para composables com estado local na view:
-  - Candidatos: `configuracoes`, `unidades`, `usuarios` (dados pouco voláteis, sem escrita complexa).
-- [ ] **Avaliar `UsuarioFacade`** (~50% pass-through): separar métodos de autenticação/contexto
-  (lógica real) dos métodos que apenas delegam a `UsuarioService`.
+  - Candidatos: `configuracoes` (1 consumidor), `unidades`, `usuarios`.
 - [ ] **Consolidar DTOs de `subprocesso`** de 28 → ~15, fundindo DTOs minúsculos de uso único.
+  - Candidato imediato: `ErroValidacaoDto` embutido como record aninhado em `ValidacaoCadastroDto`.
 - [ ] **Inlinear componentes Vue single-use** para reduzir a contagem de ~146 componentes.
+- [ ] **Avaliar `UsuarioFacade`** (~30% pass-through restante): `buscarUsuarioPorTitulo`, `buscarPorTitulo`.
 
 ---
 
@@ -65,3 +74,10 @@
    das stores.
 5. Unificar exceções de negócio no `ErroValidacao` reduziu a hierarquia de erros e deixou o contrato HTTP
    mais consistente (422) para validações no módulo `processo`.
+6. Serviços com nomes terminados em `Service` são sujeitos ao teste de arquitetura ArchUnit que proíbe
+   acesso cross-module a repositórios. Ao renomear `ProcessoInicializador` → `ProcessoWorkflowService`,
+   foi necessário mover o acesso a `UnidadeRepo`/`UnidadeMapaRepo` para dentro do `UnidadeService`.
+7. Métodos mortos (sem chamadores em produção) podem acumular nos facades ao longo do tempo. É vale
+   verificar regularmente com grep/análise estática.
+8. Múltiplos métodos de facade idênticos (como os 3 `iniciarProcesso*`) surgem quando o dispatcher
+   foi movido para o service subjacente mas os métodos de fachada não foram consolidados.

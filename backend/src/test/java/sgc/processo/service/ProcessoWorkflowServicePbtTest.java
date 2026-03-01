@@ -3,6 +3,7 @@ package sgc.processo.service;
 import net.jqwik.api.*;
 import sgc.comum.model.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.service.*;
 
@@ -12,28 +13,28 @@ import java.util.*;
 import static org.mockito.Mockito.*;
 
 @Tag("PBT")
-class ProcessoInicializadorPbtTest {
+class ProcessoWorkflowServicePbtTest {
     @Property
-    void iniciar_criaSubprocessosParaCadaParticipante(@ForAll("processosEAgumentos") ProcessoArgs args,
+    void iniciar_criaSubprocessosParaCadaParticipante(@ForAll("processosEArgumentos") ProcessoArgs args,
                                                       @ForAll("usuarioQualquer") Usuario usuario) {
 
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
         ComumRepo repo = mock(ComumRepo.class);
-        UnidadeRepo unidadeRepo = mock(UnidadeRepo.class);
-        UnidadeMapaRepo unidadeMapaRepo = mock(UnidadeMapaRepo.class);
+        UnidadeService unidadeService = mock(UnidadeService.class);
         ProcessoNotificacaoService notificacaoService = mock(ProcessoNotificacaoService.class);
         SubprocessoService subprocessoService = mock(SubprocessoService.class);
-        ProcessoValidador processoValidador = mock(ProcessoValidador.class);
+        ProcessoValidacaoService processoValidador = mock(ProcessoValidacaoService.class);
 
-        ProcessoInicializador inicializador = new ProcessoInicializador(
-                processoRepo, repo, unidadeRepo, unidadeMapaRepo, notificacaoService, subprocessoService, processoValidador
+        ProcessoWorkflowService workflowService = new ProcessoWorkflowService(
+                processoRepo, repo, unidadeService,
+                subprocessoService, processoValidador, notificacaoService
         );
 
         Processo processo = args.processo;
         List<Long> codsUnidadesParam = args.codsUnidadesParam;
 
         when(repo.buscar(eq(Processo.class), anyLong())).thenReturn(processo);
-        when(unidadeRepo.findAllById(any())).thenAnswer(inv -> {
+        when(unidadeService.porCodigos(any())).thenAnswer(inv -> {
             List<Long> ids = inv.getArgument(0);
             return ids.stream().map(id -> {
                 Unidade u = new Unidade();
@@ -54,7 +55,7 @@ class ProcessoInicializadorPbtTest {
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of());
 
 
-        inicializador.iniciar(processo.getCodigo(), codsUnidadesParam, usuario);
+        workflowService.iniciar(processo.getCodigo(), codsUnidadesParam, usuario);
 
 
         if (processo.getTipo() == TipoProcesso.MAPEAMENTO) {
@@ -67,7 +68,7 @@ class ProcessoInicializadorPbtTest {
     }
 
     @Provide
-    Arbitrary<ProcessoArgs> processosEAgumentos() {
+    Arbitrary<ProcessoArgs> processosEArgumentos() {
         return Arbitraries.of(TipoProcesso.values()).flatMap(tipo ->
                 Arbitraries.longs().between(1, 100).flatMap(codigo ->
                         Arbitraries.longs().between(100, 200).set().ofMinSize(1).ofMaxSize(5).map(unidadesIds -> {

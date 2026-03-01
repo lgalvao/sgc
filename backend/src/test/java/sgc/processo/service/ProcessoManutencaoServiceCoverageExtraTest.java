@@ -26,7 +26,7 @@ class ProcessoManutencaoServiceCoverageExtraTest {
 
     @Mock private ProcessoRepo processoRepo;
     @Mock private UnidadeService unidadeService;
-    @Mock private ProcessoValidador processoValidador;
+    @Mock private ProcessoValidacaoService processoValidador;
     @Mock private ProcessoConsultaService processoConsultaService;
 
     @InjectMocks

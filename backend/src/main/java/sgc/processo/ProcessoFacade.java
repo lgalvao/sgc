@@ -34,9 +34,8 @@ public class ProcessoFacade {
     private final SubprocessoTransicaoService transicaoService;
     private final ProcessoDetalheBuilder processoDetalheBuilder;
     private final UsuarioFacade usuarioService;
-    private final ProcessoInicializador processoInicializador;
-    private final ProcessoAcessoService processoAcessoService;
-    private final ProcessoFinalizador processoFinalizador;
+    private final ProcessoWorkflowService processoWorkflowService;
+    private final ProcessoValidacaoService processoValidacaoService;
     private final ProcessoNotificacaoService processoNotificacaoService;
     private final SgcPermissionEvaluator permissionEvaluator;
 
@@ -45,7 +44,7 @@ public class ProcessoFacade {
     }
 
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
-        return processoAcessoService.checarAcesso(authentication, codProcesso);
+        return processoValidacaoService.checarAcesso(authentication, codProcesso);
     }
 
     @Transactional
@@ -113,28 +112,14 @@ public class ProcessoFacade {
     }
 
     @Transactional
-    public List<String> iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
-        return iniciarProcesso(codigo, codsUnidades);
-    }
-
-    @Transactional
-    public List<String> iniciarProcessoRevisao(Long codigo, List<Long> codigosUnidades) {
-        return iniciarProcesso(codigo, codigosUnidades);
-    }
-
-    @Transactional
-    public List<String> iniciarProcessoDiagnostico(Long codigo, List<Long> codsUnidades) {
-        return iniciarProcesso(codigo, codsUnidades);
-    }
-
-    private List<String> iniciarProcesso(Long codigo, List<Long> codsUnidades) {
+    public List<String> iniciarProcesso(Long codigo, List<Long> codsUnidades) {
         Usuario usuario = usuarioService.usuarioAutenticado();
-        return processoInicializador.iniciar(codigo, codsUnidades, usuario);
+        return processoWorkflowService.iniciar(codigo, codsUnidades, usuario);
     }
 
     @Transactional
     public void finalizar(Long codigo) {
-        processoFinalizador.finalizar(codigo);
+        processoWorkflowService.finalizar(codigo);
     }
 
     @Transactional
@@ -154,11 +139,6 @@ public class ProcessoFacade {
     @Transactional(readOnly = true)
     public List<SubprocessoElegivelDto> listarSubprocessosElegiveis(Long codProcesso) {
         return processoConsultaService.subprocessosElegiveis(codProcesso);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Subprocesso> listarTodosSubprocessos(Long codProcesso) {
-        return subprocessoService.listarEntidadesPorProcesso(codProcesso);
     }
 
     @Transactional(readOnly = true)

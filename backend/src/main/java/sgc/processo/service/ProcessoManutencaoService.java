@@ -23,7 +23,7 @@ import static sgc.processo.model.TipoProcesso.*;
 public class ProcessoManutencaoService {
     private final ProcessoRepo processoRepo;
     private final UnidadeService unidadeService;
-    private final ProcessoValidador processoValidador;
+    private final ProcessoValidacaoService processoValidador;
     private final ProcessoConsultaService processoConsultaService;
 
     @Transactional

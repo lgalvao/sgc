@@ -19,11 +19,11 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ProcessoAcessoService")
-class ProcessoAcessoServiceTest {
+@DisplayName("ProcessoValidacaoService - Acesso")
+class ProcessoValidacaoServiceAcessoTest {
 
     @InjectMocks
-    private ProcessoAcessoService processoAcessoService;
+    private ProcessoValidacaoService processoAcessoService;
 
     @Mock
     private UnidadeService unidadeService;
@@ -143,7 +143,7 @@ class ProcessoAcessoServiceTest {
 
     @Test
     @DisplayName("Deve lidar com ciclos na hierarquia (evitar loop infinito)")
-    void deveEvitarCicloInifinitoEmHierarquia() {
+    void deveEvitarCicloInfinitoEmHierarquia() {
 
         Unidade u1 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
         Unidade u2 = UnidadeTestBuilder.umaDe().comCodigo("2").build();

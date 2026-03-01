@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ProcessoValidador - Testes Unitários")
-class ProcessoValidadorTest {
+@DisplayName("ProcessoValidacaoService - Validações")
+class ProcessoValidacaoServiceValidacaoTest {
 
     @Mock
     private UnidadeService unidadeService;
@@ -26,7 +26,7 @@ class ProcessoValidadorTest {
     private SubprocessoValidacaoService validacaoService;
 
     @InjectMocks
-    private ProcessoValidador validador;
+    private ProcessoValidacaoService validador;
 
     @Test
     @DisplayName("getMensagemErroUnidadesSemMapa deve retornar vazio se lista nula ou vazia")

@@ -263,7 +263,7 @@ class ProcessoControllerTest {
             var processo = Processo.builder().codigo(1L).descricao("Processo Teste").build();
 
             when(processoFacade.obterEntidadePorId(1L)).thenReturn(processo);
-            when(processoFacade.iniciarProcessoMapeamento(eq(1L), anyList())).thenReturn(List.of());
+            when(processoFacade.iniciarProcesso(eq(1L), anyList())).thenReturn(List.of());
 
             // Act & Assert
             mockMvc.perform(
@@ -275,7 +275,7 @@ class ProcessoControllerTest {
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.descricao").value("Processo Teste"));
 
-            verify(processoFacade).iniciarProcessoMapeamento(1L, List.of(1L));
+            verify(processoFacade).iniciarProcesso(1L, List.of(1L));
         }
 
         @Test
@@ -424,7 +424,7 @@ class ProcessoControllerTest {
         @DisplayName("Deve lançar ErroValidacao com status UNPROCESSABLE_CONTENT quando iniciar processo retorna lista de erros")
         void deveLancarErroValidacaoQuandoIniciarProcessoRetornaErros() {
             IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
-            when(processoFacadeMock.iniciarProcessoMapeamento(anyLong(), anyList()))
+            when(processoFacadeMock.iniciarProcesso(anyLong(), anyList()))
                     .thenReturn(List.of("erro"));
 
             ErroValidacao ex = assertThrows(ErroValidacao.class, () -> controller.iniciar(1L, req));

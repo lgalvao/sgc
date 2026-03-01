@@ -272,14 +272,7 @@ public class E2eController {
         if (Boolean.TRUE.equals(request.iniciar())) {
             List<Long> unidades = List.of(unidade.getCodigo());
             Long processoCodigo = processo.getCodigo();
-            List<String> erros;
-
-            switch (tipo) {
-                case TipoProcesso.MAPEAMENTO ->
-                        erros = processoFacade.iniciarProcessoMapeamento(processoCodigo, unidades);
-                case TipoProcesso.REVISAO -> erros = processoFacade.iniciarProcessoRevisao(processoCodigo, unidades);
-                default -> erros = List.of();
-            }
+            List<String> erros = processoFacade.iniciarProcesso(processoCodigo, unidades);
 
             if (!erros.isEmpty()) {
                 throw new ErroValidacao("Falha ao iniciar processo fixture: " + String.join("; ", erros));
