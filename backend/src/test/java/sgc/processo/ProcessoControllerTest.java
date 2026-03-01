@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
-import sgc.processo.erros.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
@@ -422,14 +421,14 @@ class ProcessoControllerTest {
         }
 
         @Test
-        @DisplayName("Deve lançar ErroProcesso com status CONFLICT quando iniciar processo retorna lista de erros")
-        void deveLancarErroProcessoQuandoIniciarProcessoRetornaErros() {
+        @DisplayName("Deve lançar ErroValidacao com status UNPROCESSABLE_CONTENT quando iniciar processo retorna lista de erros")
+        void deveLancarErroValidacaoQuandoIniciarProcessoRetornaErros() {
             IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
             when(processoFacadeMock.iniciarProcessoMapeamento(anyLong(), anyList()))
                     .thenReturn(List.of("erro"));
 
-            ErroProcesso ex = assertThrows(ErroProcesso.class, () -> controller.iniciar(1L, req));
-            assertEquals(HttpStatus.CONFLICT, ex.getStatus());
+            ErroValidacao ex = assertThrows(ErroValidacao.class, () -> controller.iniciar(1L, req));
+            assertEquals(HttpStatus.UNPROCESSABLE_CONTENT, ex.getStatus());
             assertEquals("erro", ex.getMessage());
         }
 

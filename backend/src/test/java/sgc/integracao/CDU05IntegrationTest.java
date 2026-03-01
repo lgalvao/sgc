@@ -181,7 +181,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(criarRequestDTO)))
-                .andExpect(status().isConflict()); // ErroProcesso mapeado para 409 Conflict
+                .andExpect(status().isUnprocessableContent()); // ErroValidacao mapeado para 422 Unprocessable Content
     }
 
     @Test

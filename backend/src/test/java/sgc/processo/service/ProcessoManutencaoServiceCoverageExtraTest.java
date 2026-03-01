@@ -8,7 +8,7 @@ import sgc.organizacao.service.UnidadeService;
 import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.AtualizarProcessoRequest;
 import sgc.processo.dto.CriarProcessoRequest;
-import sgc.processo.erros.ErroProcesso;
+import sgc.comum.erros.ErroValidacao;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
@@ -42,7 +42,7 @@ class ProcessoManutencaoServiceCoverageExtraTest {
         when(processoValidador.validarTiposUnidades(anyList())).thenReturn(Optional.empty());
         when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.of("Erro"));
 
-        assertThrows(ErroProcesso.class, () -> manutencaoService.criar(req));
+        assertThrows(ErroValidacao.class, () -> manutencaoService.criar(req));
     }
 
     @Test
@@ -54,6 +54,6 @@ class ProcessoManutencaoServiceCoverageExtraTest {
         when(processoConsultaService.buscarProcessoCodigo(1L)).thenReturn(p);
         when(processoValidador.getMensagemErroUnidadesSemMapa(anyList())).thenReturn(Optional.of("Erro"));
 
-        assertThrows(ErroProcesso.class, () -> manutencaoService.atualizar(1L, req));
+        assertThrows(ErroValidacao.class, () -> manutencaoService.atualizar(1L, req));
     }
 }

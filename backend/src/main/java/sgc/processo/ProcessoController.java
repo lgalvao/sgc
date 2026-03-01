@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
-import sgc.processo.erros.*;
+import sgc.comum.erros.ErroValidacao;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
@@ -128,7 +128,7 @@ public class ProcessoController {
 
         List<String> erros = processador.apply(codigo, req.unidades());
         if (!erros.isEmpty()) {
-            throw new ErroProcesso(String.join(". ", erros));
+            throw new ErroValidacao(String.join(". ", erros));
         }
 
         Processo processoAtualizado = processoFacade.obterEntidadePorId(codigo);

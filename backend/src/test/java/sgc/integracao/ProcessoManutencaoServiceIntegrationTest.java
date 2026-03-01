@@ -3,8 +3,7 @@ package sgc.integracao;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import sgc.processo.dto.*;
-import sgc.comum.erros.ErroValidacao;
-import sgc.processo.erros.*;
+import sgc.comum.erros.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
 import java.time.*;
@@ -91,7 +90,7 @@ class ProcessoManutencaoServiceIntegrationTest extends BaseIntegrationTest {
                     .build();
 
             assertThatThrownBy(() -> service.criar(request))
-                    .isInstanceOf(ErroProcesso.class)
+                    .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining("mapa vigente");
         }
     }
