@@ -15,7 +15,6 @@ test.describe('CDU-04 - Iniciar Processo', () => {
     }) => {
         const descricao = `CDU-04 Iniciar - ${Date.now()}`;
 
-
         await criarProcesso(page, {
             descricao: descricao,
             tipo: 'MAPEAMENTO',
@@ -25,10 +24,16 @@ test.describe('CDU-04 - Iniciar Processo', () => {
             iniciar: false
         });
 
-        // Capturar ID para cleanup
+        // Clica na tabela para abrir detalhes
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+
+        // Wait for page load and capture ID
+        await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/);
         const processoId = await extrairProcessoId(page);
         cleanupAutomatico.registrar(processoId);
+
+        // Aguarda carregamento dos dados
+        await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricao);
 
         // 2. Iniciar processo
         await page.getByTestId('btn-processo-iniciar').click();
@@ -46,14 +51,14 @@ test.describe('CDU-04 - Iniciar Processo', () => {
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
-
-        await expect(page).toHaveURL(/\/painel/);
+        // Wait for painel with process status update
+        await page.waitForURL(/\/painel/);
         await expect(page.getByText(/Processo iniciado/i).first()).toBeVisible();
 
         const linha = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descricao)});
         await expect(linha.getByText('Em andamento')).toBeVisible();
 
-
+        // 5. Verificar Detalhes
         await linha.click();
         await page.waitForURL(new RegExp(`\\/processo\\/${processoId}$`));
 
