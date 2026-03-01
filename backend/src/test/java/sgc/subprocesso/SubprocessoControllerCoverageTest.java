@@ -294,6 +294,35 @@ class SubprocessoControllerCoverageTest {
     }
 
     @Test
+    @DisplayName("disponibilizarMapa - deve chamar servico e retornar 200")
+    @WithMockUser
+    void disponibilizarMapa() throws Exception {
+        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(java.time.LocalDate.now().plusDays(10), "Obs");
+
+        mockMvc.perform(post("/api/subprocessos/1/disponibilizar-mapa")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk());
+
+        verify(subprocessoService).disponibilizarMapa(eq(1L), any(), any());
+    }
+
+    @Test
+    @DisplayName("salvarMapaCompleto - deve chamar servico e retornar 200")
+    @WithMockUser
+    void salvarMapaCompleto() throws Exception {
+        SalvarMapaRequest req = new SalvarMapaRequest("Obs", List.of());
+        when(subprocessoService.salvarMapaSubprocesso(eq(1L), any())).thenReturn(new Mapa());
+
+        mockMvc.perform(post("/api/subprocessos/1/mapa-completo")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     @DisplayName("validarMapa - deve chamar servico e retornar 200")
     @WithMockUser
     void validarMapa() throws Exception {

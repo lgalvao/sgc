@@ -335,4 +335,42 @@ class AtividadeFacadeTest {
             verify(mapaManutencaoService).excluirConhecimento(atividadeCodigo, conhecimentoCodigo);
         }
     }
+
+    @Nested
+    @DisplayName("verificarPermissaoEdicao")
+    class VerificarPermissaoEdicaoTests {
+        @Test
+        @DisplayName("Deve lancar ErroAcessoNegado quando nao houver permissao")
+        void deveLancarErroAcessoNegado() {
+            Long mapaCodigo = 1L;
+            Usuario usuario = new Usuario();
+            Subprocesso subprocesso = new Subprocesso();
+            subprocesso.setCodigo(2L);
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+            when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            when(permissionEvaluator.checkPermission(usuario, subprocesso, "EDITAR_CADASTRO")).thenReturn(false);
+
+            assertThrows(sgc.comum.erros.ErroAcessoNegado.class, () ->
+                atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")));
+        }
+
+        @Test
+        @DisplayName("Deve lancar ErroValidacao quando a situacao nao for permitida")
+        void deveLancarErroValidacaoSituacao() {
+            Long mapaCodigo = 1L;
+            Usuario usuario = new Usuario();
+            Subprocesso subprocesso = new Subprocesso();
+            subprocesso.setCodigo(2L);
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO); // Situacao nao permitida
+
+            when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            when(permissionEvaluator.checkPermission(usuario, subprocesso, "EDITAR_CADASTRO")).thenReturn(true);
+
+            assertThrows(sgc.comum.erros.ErroValidacao.class, () ->
+                atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")));
+        }
+    }
 }
