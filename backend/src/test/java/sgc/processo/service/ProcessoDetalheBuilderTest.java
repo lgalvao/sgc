@@ -10,6 +10,7 @@ import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 import sgc.testutils.*;
 
 import java.time.*;
@@ -28,6 +29,9 @@ class ProcessoDetalheBuilderTest {
 
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
+
+    @Mock
+    private SubprocessoValidacaoService subprocessoValidacaoService;
 
     @InjectMocks
     private ProcessoDetalheBuilder builder;
@@ -89,7 +93,7 @@ class ProcessoDetalheBuilderTest {
     }
 
     @Test
-    @DisplayName("Deve permitir finalizar quando usuário é admin")
+    @DisplayName("Deve permitir finalizar quando usuário é admin e todos subprocessos homologados")
     void devePermitirFinalizarQuandoUsuarioAdmin() {
 
         Usuario usuario = criarUsuarioMock();
@@ -100,6 +104,8 @@ class ProcessoDetalheBuilderTest {
         processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
         doReturn(true).when(permissionEvaluator).checkPermission(usuario, processo, "FINALIZAR_PROCESSO");
+        when(subprocessoValidacaoService.validarSubprocessosParaFinalizacao(1L))
+                .thenReturn(SubprocessoValidacaoService.ValidationResult.ofValido());
 
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
@@ -120,6 +126,28 @@ class ProcessoDetalheBuilderTest {
         processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
         doReturn(false).when(permissionEvaluator).checkPermission(usuario, processo, "FINALIZAR_PROCESSO");
+
+
+        ProcessoDetalheDto dto = builder.build(processo, usuario);
+
+
+        assertThat(dto.isPodeFinalizar()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Não deve permitir finalizar quando subprocessos não estão todos homologados")
+    void naoDevePermitirFinalizarQuandoSubprocessosNaoHomologados() {
+
+        Usuario usuario = criarUsuarioMock();
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.adicionarParticipantes(Set.of());
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
+        doReturn(true).when(permissionEvaluator).checkPermission(usuario, processo, "FINALIZAR_PROCESSO");
+        when(subprocessoValidacaoService.validarSubprocessosParaFinalizacao(1L))
+                .thenReturn(SubprocessoValidacaoService.ValidationResult.ofInvalido("Subprocessos não homologados"));
 
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);

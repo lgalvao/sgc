@@ -1,6 +1,7 @@
 package sgc.mapa.service;
 
 import lombok.*;
+import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.model.*;
@@ -10,6 +11,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CopiaMapaService {
     private final ComumRepo repo;
 
@@ -31,8 +33,22 @@ public class CopiaMapaService {
     }
 
     @Transactional
-    public void importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId) {
+    public void importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId, List<Long> codigosAtividades) {
         List<Atividade> atividadesOrigem = atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId);
+
+        if (codigosAtividades != null && !codigosAtividades.isEmpty()) {
+            Set<Long> filtro = new HashSet<>(codigosAtividades);
+            Set<Long> encontrados = atividadesOrigem.stream().map(Atividade::getCodigo).collect(java.util.stream.Collectors.toSet());
+            Set<Long> naoEncontrados = new HashSet<>(filtro);
+            naoEncontrados.removeAll(encontrados);
+            if (!naoEncontrados.isEmpty()) {
+                log.warn("Atividades solicitadas não encontradas no mapa de origem {}: {}", mapaOrigemId, naoEncontrados);
+            }
+            atividadesOrigem = atividadesOrigem.stream()
+                    .filter(a -> filtro.contains(a.getCodigo()))
+                    .toList();
+        }
+
         Set<String> descExistentes = obterDescExistentes(mapaDestinoId);
         Mapa mapaDestino = repo.buscar(Mapa.class, mapaDestinoId);
 

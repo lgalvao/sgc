@@ -9,6 +9,7 @@ import sgc.processo.dto.ProcessoDetalheDto.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
 import java.util.*;
 
@@ -17,6 +18,7 @@ import java.util.*;
 public class ProcessoDetalheBuilder {
     private final SubprocessoRepo subprocessoRepo;
     private final SgcPermissionEvaluator permissionEvaluator;
+    private final SubprocessoValidacaoService subprocessoValidacaoService;
 
     @Transactional(readOnly = true)
     public ProcessoDetalheDto build(Processo processo, Usuario usuario) {
@@ -28,7 +30,8 @@ public class ProcessoDetalheBuilder {
                 .dataCriacao(processo.getDataCriacao())
                 .dataFinalizacao(processo.getDataFinalizacao())
                 .dataLimite(processo.getDataLimite())
-                .podeFinalizar(permissionEvaluator.checkPermission(usuario, processo, "FINALIZAR_PROCESSO"))
+                .podeFinalizar(permissionEvaluator.checkPermission(usuario, processo, "FINALIZAR_PROCESSO")
+                        && subprocessoValidacaoService.validarSubprocessosParaFinalizacao(processo.getCodigo()).valido())
                 .podeHomologarCadastro(permissionEvaluator.checkPermission(usuario, processo, "HOMOLOGAR_CADASTRO_EM_BLOCO"))
                 .podeHomologarMapa(permissionEvaluator.checkPermission(usuario, processo, "HOMOLOGAR_MAPA_EM_BLOCO"))
                 .podeAceitarCadastroBloco(permissionEvaluator.checkPermission(usuario, processo, "ACEITAR_CADASTRO_EM_BLOCO"))

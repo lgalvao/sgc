@@ -25,6 +25,8 @@
           v-model="dataLimiteValidacao"
           :state="fieldErrors?.dataLimite ? false : null"
           data-testid="inp-disponibilizar-mapa-data"
+          max="2099-12-31"
+          min="2000-01-01"
           type="date"
       />
       <BFormInvalidFeedback :state="fieldErrors?.dataLimite ? false : null">

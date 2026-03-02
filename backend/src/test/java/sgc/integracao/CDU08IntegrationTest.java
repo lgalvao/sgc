@@ -158,7 +158,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve importar atividades e conhecimentos")
         void deveImportarAtividadesEConhecimentosComSucesso() throws Exception {
             ImportarAtividadesRequest request =
-                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo());
+                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), null);
 
             mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo())
                             .with(user(chefe))
@@ -213,7 +213,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             subprocessoRepo.save(subprocessoDestino);
 
             ImportarAtividadesRequest request =
-                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo());
+                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), null);
 
             mockMvc.perform(
                             post(
@@ -238,7 +238,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             subprocessoRepo.save(subprocessoDestino);
 
             ImportarAtividadesRequest request =
-                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo());
+                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), null);
 
             mockMvc.perform(
                             post(
@@ -254,7 +254,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve falhar ao importar de subprocesso inexistente")
         void deveFalharAoImportarDeSubprocessoInexistente() throws Exception {
-            ImportarAtividadesRequest request = new ImportarAtividadesRequest(99999L);
+            ImportarAtividadesRequest request = new ImportarAtividadesRequest(99999L, null);
 
             mockMvc.perform(
                             post(
@@ -275,7 +275,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             atividadeRepo.save(atividadeExistente);
 
             ImportarAtividadesRequest request =
-                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo());
+                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), null);
 
             mockMvc.perform(
                             post(

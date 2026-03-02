@@ -15,7 +15,7 @@
 
           <div v-if="mostrarDataLimite" class="mb-3">
             <label class="form-label required" for="dataLimiteBloco">Data Limite</label>
-            <input id="dataLimiteBloco" v-model="dataLimite" class="form-control" required type="date">
+            <input id="dataLimiteBloco" v-model="dataLimite" class="form-control" max="2099-12-31" min="2000-01-01" required type="date">
           </div>
 
           <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">

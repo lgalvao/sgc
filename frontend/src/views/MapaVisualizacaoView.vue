@@ -211,6 +211,7 @@
     <ModalConfirmacao
         v-model="mostrarModalDevolucao"
         :loading="isLoading"
+        :ok-disabled="!observacaoDevolucao.trim()"
         ok-title="Confirmar"
         test-id-cancelar="btn-devolucao-mapa-cancelar"
         test-id-confirmar="btn-devolucao-mapa-confirmar"
@@ -402,8 +403,8 @@ async function confirmarDevolucao() {
   if (!codSubprocesso.value) return;
   isLoading.value = true;
   try {
-    await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, {
-      observacoes: observacaoDevolucao.value,
+    await processosStore.devolverValidacao(codSubprocesso.value, {
+      justificativa: observacaoDevolucao.value,
     });
     fecharModalDevolucao();
     feedbackStore.show("Sucesso", "Devolução realizada", "success");

@@ -21,6 +21,8 @@
               v-model="filtroDataInicio"
               aria-label="Data Início"
               data-testid="filtro-data-inicio"
+              max="2099-12-31"
+              min="2000-01-01"
               type="date"
           />
         </BFormGroup>
@@ -32,6 +34,8 @@
               v-model="filtroDataFim"
               aria-label="Data Fim"
               data-testid="filtro-data-fim"
+              max="2099-12-31"
+              min="2000-01-01"
               type="date"
           />
         </BFormGroup>

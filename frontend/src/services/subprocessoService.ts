@@ -16,15 +16,18 @@ import apiClient from "../axios-setup";
 
 interface ImportarAtividadesRequest {
     codSubprocessoOrigem: number;
+    codigosAtividades?: number[];
 }
 
 
 export async function importarAtividades(
     codSubprocessoDestino: number,
     codSubprocessoOrigem: number,
+    codigosAtividades?: number[],
 ): Promise<void> {
     const request: ImportarAtividadesRequest = {
         codSubprocessoOrigem: codSubprocessoOrigem,
+        ...(codigosAtividades && codigosAtividades.length > 0 ? {codigosAtividades} : {}),
     };
     await apiClient.post(
         `/subprocessos/${codSubprocessoDestino}/importar-atividades`,
