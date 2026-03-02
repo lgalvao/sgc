@@ -167,10 +167,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     });
 
     test('Cenario 3: Visualizar processo finalizado', async ({page, autenticadoComoGestorCoord21}) => {
-        test.setTimeout(90000);
         // Preparar: Admin homologa o cadastro
-
-
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();

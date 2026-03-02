@@ -19,7 +19,6 @@ import {
 import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos', () => {
-    test.setTimeout(60000);
     const UNIDADE_ALVO = 'SECAO_211';
 
     const timestamp = Date.now();

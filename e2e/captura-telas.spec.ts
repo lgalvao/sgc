@@ -58,7 +58,6 @@ async function capturarComponente(elemento: Locator, categoria: string, nome: st
 }
 
 test.describe('Captura de Telas - Sistema SGC', () => {
-    test.setTimeout(20000); // Aumentar timeout para cenários longos
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
     test.beforeEach(async ({request}) => {

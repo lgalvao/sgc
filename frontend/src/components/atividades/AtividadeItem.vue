@@ -58,7 +58,6 @@
         <!-- Label com asterisco para conhecimentos obrigatórios -->
         <div class="mb-2 text-muted small">
           <strong>Conhecimentos <span class="text-danger">*</span></strong>
-          <span class="ms-1">(adicione pelo menos um)</span>
         </div>
 
         <div

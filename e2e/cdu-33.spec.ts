@@ -37,8 +37,6 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     // PREPARAÇÃO 0 - CRIAR MAPA VIGENTE
 
     test('Preparacao 0: Criar e finalizar Mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        test.setTimeout(90000);
-
         await criarProcesso(page, {
             descricao: descMapeamento,
             tipo: 'MAPEAMENTO',

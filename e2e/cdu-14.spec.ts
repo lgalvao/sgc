@@ -32,8 +32,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     const descMapeamento = `Mapeamento para CDU-14 ${timestamp}`;
 
     test('Fluxo completo de revisão e análise', async ({page, autenticadoComoAdmin}) => {
-        test.setTimeout(120000);
-
         await test.step('1. Preparação: Mapeamento completo e finalizado', async () => {
             await criarProcesso(page, {
                 descricao: descMapeamento,

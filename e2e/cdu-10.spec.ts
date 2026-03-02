@@ -29,9 +29,6 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
     const UNIDADE_ALVO = 'SECAO_221';
 
     test('Fluxo completo de revisão de cadastro', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        // Definir um timeout maior para este teste específico pois ele engloba muitos passos sequenciais
-        test.setTimeout(90000);
-
         const timestamp = Date.now();
         const descProcessoMapeamento = `Map 10 ${timestamp}`;
         const descProcessoRevisao = `Rev 10 ${timestamp}`;

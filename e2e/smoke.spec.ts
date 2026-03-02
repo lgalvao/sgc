@@ -24,7 +24,6 @@ import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
  */
 
 test.describe('Smoke Test - Sistema SGC', () => {
-    test.setTimeout(60000); // Aumentar timeout para cenários longos
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
     test.beforeEach(async ({request}) => {

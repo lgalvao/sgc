@@ -26,7 +26,6 @@ import {
 } from './helpers/helpers-mapas.js';
 
 test.describe.serial('CDU-15 - Manter mapa de competências', () => {
-    test.setTimeout(60000);
     const UNIDADE_ALVO = 'SECAO_211';
     const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
     const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
