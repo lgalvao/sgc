@@ -27,7 +27,7 @@ describe('TabelaProcessos Coverage', () => {
                     <tbody>
                         <tr v-for="item in items"
                             :key="item.codigo"
-                            v-bind="tbodyTrAttrs(item, 'row')">
+                            v-bind="tbodyTrAttrs ? tbodyTrAttrs(item, 'row') : {}">
                             <td>Row</td>
                         </tr>
                     </tbody>
