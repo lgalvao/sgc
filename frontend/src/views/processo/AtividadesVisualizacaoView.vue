@@ -47,11 +47,27 @@
     </PageHeader>
 
     <!-- Lista de atividades -->
-    <VisAtividadeItem
+    <BCard
         v-for="(atividade) in atividades"
         :key="atividade.codigo"
-        :atividade="atividade"
-    />
+        class="mb-3 atividade-card"
+        no-body
+    >
+      <BCardBody class="py-2">
+        <div class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card">
+          <strong class="atividade-descricao" data-testid="txt-atividade-descricao">{{ atividade.descricao }}</strong>
+        </div>
+        <div class="mt-3 ms-3">
+          <div
+              v-for="(conhecimento) in atividade.conhecimentos"
+              :key="conhecimento.codigo"
+              class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
+          >
+            <span data-testid="txt-conhecimento-descricao">{{ conhecimento.descricao }}</span>
+          </div>
+        </div>
+      </BCardBody>
+    </BCard>
 
     <!-- Modal de Impacto no Mapa -->
     <ImpactoMapaModal
@@ -125,7 +141,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
@@ -134,7 +150,6 @@ import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.v
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import VisAtividadeItem from "@/components/atividades/VisAtividadeItem.vue";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useProcessosStore} from "@/stores/processos";
@@ -380,26 +395,33 @@ defineExpose({
 });
 </script>
 
-<style>
-.unidade-nome {
-  color: var(--bs-body-color);
-  opacity: 0.85;
-  padding-right: 1rem;
+<style scoped>
+.atividade-card {
+  transition: box-shadow 0.2s;
 }
 
-.unidade-cabecalho {
-  font-size: 1.1rem;
-  font-weight: 500;
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
+.atividade-card:hover {
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
 }
 
-.unidade-sigla {
+.atividade-descricao {
+  word-break: break-word;
+  max-width: 100%;
+  display: inline-block;
+}
+
+.atividade-titulo-card {
   background: var(--bs-light);
-  color: var(--bs-dark);
-  font-weight: bold;
-  border-radius: 0.5rem;
-  letter-spacing: 1px;
+  border-bottom: 1px solid var(--bs-border-color);
+  padding: 0.5rem 0.75rem;
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+  margin-top: -0.5rem;
+  border-top-left-radius: 0.375rem;
+  border-top-right-radius: 0.375rem;
+}
+
+.atividade-titulo-card .atividade-descricao {
+  font-size: 1.1rem;
 }
 </style>

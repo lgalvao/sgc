@@ -11,11 +11,6 @@ import * as processoService from '@/services/processoService';
 import * as useAcessoModule from '@/composables/useAcesso';
 
 // Mock child components
-const SubprocessoHeaderStub = {
-    template: '<div data-testid="subprocesso-header"></div>',
-    props: ['podeAlterarDataLimite', 'processoDescricao', 'situacao', 'unidadeAtual'],
-    emits: ['alterar-data-limite', 'reabrir-cadastro', 'reabrir-revisao', 'enviar-lembrete']
-};
 const SubprocessoCardsStub = {
     template: '<div data-testid="subprocesso-cards"></div>',
     props: ['situacao', 'tipoProcesso']
@@ -25,10 +20,7 @@ const SubprocessoModalStub = {
     props: ['mostrarModal'],
     emits: ['confirmar-alteracao', 'fechar-modal']
 };
-const TabelaMovimentacoesStub = {
-    template: '<div data-testid="tabela-movimentacoes"></div>',
-    props: ['movimentacoes']
-};
+const TabelaMovimentacoesStub = undefined;
 
 // Mock Services
 vi.mock('@/services/processoService', () => ({
@@ -76,10 +68,8 @@ describe('Subprocesso.vue', () => {
 
     const additionalStubs = {
         BContainer: {template: '<div><slot /></div>'},
-        SubprocessoHeader: SubprocessoHeaderStub,
         SubprocessoCards: SubprocessoCardsStub,
         SubprocessoModal: SubprocessoModalStub,
-        TabelaMovimentacoes: TabelaMovimentacoesStub,
         BModal: {
             template: '<div><slot /><slot name="footer" /></div>',
             props: ['modelValue', 'title'],
@@ -204,9 +194,9 @@ describe('Subprocesso.vue', () => {
         await flushPromises();
         await (wrapper.vm as any).$nextTick();
 
-        expect(wrapper.findComponent(SubprocessoHeaderStub).exists()).toBe(true);
+        expect(wrapper.find('[data-testid="header-subprocesso"]').exists()).toBe(true);
         expect(wrapper.findComponent(SubprocessoCardsStub).exists()).toBe(true);
-        expect(wrapper.findComponent(TabelaMovimentacoesStub).exists()).toBe(true);
+        expect(wrapper.find('[data-testid="tbl-movimentacoes"]').exists()).toBe(true);
     });
 
     it('opens date limit modal when allowed', async () => {
@@ -214,8 +204,7 @@ describe('Subprocesso.vue', () => {
         await flushPromises();
         await (wrapper.vm as any).$nextTick();
 
-        const header = wrapper.findComponent(SubprocessoHeaderStub);
-        await header.vm.$emit('alterar-data-limite');
+        await wrapper.find('[data-testid="btn-alterar-data-limite"]').trigger('click');
         await (wrapper.vm as any).$nextTick();
 
         expect((wrapper.vm as any).modals.modals.alterarDataLimite.value.isOpen).toBe(true);
@@ -226,8 +215,7 @@ describe('Subprocesso.vue', () => {
         await flushPromises();
         await (wrapper.vm as any).$nextTick();
 
-        const header = wrapper.findComponent(SubprocessoHeaderStub);
-        await header.vm.$emit('alterar-data-limite');
+        (wrapper.vm as any).abrirModalAlterarDataLimite();
         await (wrapper.vm as any).$nextTick();
 
         expect((wrapper.vm as any).modals.modals.alterarDataLimite.value.isOpen).toBe(false);
@@ -272,8 +260,7 @@ describe('Subprocesso.vue', () => {
         await flushPromises();
 
         // Trigger Reabertura
-        const header = wrapper.findComponent(SubprocessoHeaderStub);
-        await header.vm.$emit('reabrir-cadastro');
+        await wrapper.find('[data-testid="btn-reabrir-cadastro"]').trigger('click');
         await (wrapper.vm as any).$nextTick();
 
         expect((wrapper.vm as any).tipoReabertura).toBe('cadastro');
@@ -297,8 +284,7 @@ describe('Subprocesso.vue', () => {
         const {wrapper, feedbackStore} = mountComponent();
         await flushPromises();
 
-        const header = wrapper.findComponent(SubprocessoHeaderStub);
-        await header.vm.$emit('reabrir-revisao');
+        await wrapper.find('[data-testid="btn-reabrir-revisao"]').trigger('click');
         expect((wrapper.vm as any).tipoReabertura).toBe('revisao');
 
         const textarea = wrapper.find('textarea');
@@ -316,8 +302,7 @@ describe('Subprocesso.vue', () => {
         const {wrapper} = mountComponent();
         await flushPromises();
 
-        const header = wrapper.findComponent(SubprocessoHeaderStub);
-        await header.vm.$emit('reabrir-cadastro');
+        await wrapper.find('[data-testid="btn-reabrir-cadastro"]').trigger('click');
 
         // O botão deve estar desabilitado se a justificativa for vazia
         const btn = wrapper.find('[data-testid="btn-confirmar-reabrir"]');
@@ -330,8 +315,7 @@ describe('Subprocesso.vue', () => {
         await flushPromises();
         vi.mocked(processoService.reabrirCadastro).mockRejectedValue(new Error('API Error'));
 
-        const header = wrapper.findComponent(SubprocessoHeaderStub);
-        await header.vm.$emit('reabrir-cadastro');
+        await wrapper.find('[data-testid="btn-reabrir-cadastro"]').trigger('click');
 
         const textarea = wrapper.find('textarea');
         await textarea.setValue('Justificativa');
@@ -347,8 +331,7 @@ describe('Subprocesso.vue', () => {
         const {wrapper, feedbackStore} = mountComponent();
         await flushPromises();
 
-        const header = wrapper.findComponent(SubprocessoHeaderStub);
-        await header.vm.$emit('enviar-lembrete');
+        await wrapper.find('[data-testid="btn-enviar-lembrete"]').trigger('click');
         await (wrapper.vm as any).$nextTick();
 
         const btn = wrapper.find('[data-testid="btn-confirmar-enviar-lembrete"]');
@@ -364,8 +347,7 @@ describe('Subprocesso.vue', () => {
         await flushPromises();
         vi.mocked(processoService.enviarLembrete).mockRejectedValue(new Error('Erro'));
 
-        const header = wrapper.findComponent(SubprocessoHeaderStub);
-        await header.vm.$emit('enviar-lembrete');
+        await wrapper.find('[data-testid="btn-enviar-lembrete"]').trigger('click');
         await (wrapper.vm as any).$nextTick();
 
         const btn = wrapper.find('[data-testid="btn-confirmar-enviar-lembrete"]');

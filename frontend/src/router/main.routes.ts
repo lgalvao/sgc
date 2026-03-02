@@ -30,10 +30,16 @@ const mainRoutes: RouteRecordRaw[] = [
         meta: {title: "Relatórios"},
     },
     {
-        path: "/configuracoes",
-        name: "Configuracoes",
-        component: () => import("@/views/ConfiguracoesView.vue"),
-        meta: {title: "Configurações"},
+        path: "/parametros",
+        name: "Parametros",
+        component: () => import("@/views/configuracoes/ParametrosView.vue"),
+        meta: {title: "Parâmetros"},
+    },
+    {
+        path: "/administradores",
+        name: "Administradores",
+        component: () => import("@/views/configuracoes/AdministradoresView.vue"),
+        meta: {title: "Administradores"},
     },
 ];
 

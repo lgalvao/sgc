@@ -28,27 +28,62 @@
 
     <div>
       <PageHeader title="Alertas" title-test-id="txt-painel-titulo-alertas"/>
-      <TabelaAlertas
-          :alertas="alertas"
-          @ordenar="ordenarAlertasPor"
-          @recarregar="carregarDados"
-      />
+      <div class="table-responsive">
+        <BTable
+            :fields="camposAlertas"
+            :items="alertas"
+            :striped="alertas.length > 0"
+            :tbody-tr-attr="rowAttrAlerta"
+            :tbody-tr-class="rowClassAlerta"
+            data-testid="tbl-alertas"
+            hover
+            responsive
+            show-empty
+            stacked="md"
+            @sort-changed="handleSortChangeAlertas"
+        >
+          <template #cell(mensagem)="data">
+            <span v-if="!data.item.dataHoraLeitura" class="visually-hidden">Não lido: </span>
+            {{ data.value }}
+          </template>
+          <template #empty>
+            <EmptyState
+                class="border-0 bg-transparent mb-0"
+                data-testid="empty-state-alertas"
+                description="Não há alertas no momento. Atualize para verificar novas notificações."
+                icon="bi-bell-slash"
+                title="Nenhum alerta"
+            >
+              <BButton
+                  data-testid="btn-empty-state-alertas-atualizar"
+                  size="sm"
+                  variant="outline-primary"
+                  @click="carregarDados"
+              >
+                Atualizar alertas
+              </BButton>
+            </EmptyState>
+          </template>
+        </BTable>
+      </div>
     </div>
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BButton} from "bootstrap-vue-next";
+import {BButton, BTable} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import TabelaAlertas from "@/components/processo/TabelaAlertas.vue";
+import EmptyState from "@/components/comum/EmptyState.vue";
+import {formatDateBR} from "@/utils";
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {useAlertasStore} from "@/stores/alertas";
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
+import type {Alerta} from "@/types/tipos";
 import type {ProcessoResumo} from "@/types/tipos";
 
 const perfil = usePerfilStore();
@@ -144,4 +179,33 @@ function ordenarAlertasPor(campo: "data" | "processo") {
     );
   }
 }
+
+const camposAlertas = [
+  {key: "dataHora", label: "Data/Hora", sortable: true, formatter: (v: any) => formatDateBR(v)},
+  {key: "mensagem", label: "Descrição"},
+  {key: "processo", label: "Processo", sortable: true},
+  {key: "origem", label: "Origem"},
+];
+
+const rowClassAlerta = (item: Alerta | null) => {
+  if (!item) return "";
+  return item.dataHoraLeitura ? "" : "fw-bold";
+};
+
+const handleSortChangeAlertas = (ctx: any) => {
+  const sortBy = Array.isArray(ctx.sortBy) ? ctx.sortBy[0] : ctx.sortBy;
+  const key = sortBy?.key || (typeof sortBy === 'string' ? sortBy : null);
+  if (key === "dataHora") {
+    ordenarAlertasPor("data");
+  } else if (key === "processo") {
+    ordenarAlertasPor("processo");
+  }
+};
+
+const rowAttrAlerta = (item: Alerta | null, type: string) => {
+  if (item && type === 'row') {
+    return {'data-testid': `row-alerta-${item.codigo}`};
+  }
+  return {};
+};
 </script>

@@ -45,11 +45,40 @@
           :participantes-hierarquia="participantesHierarquia"
           @row-click="abrirDetalhesUnidade"/>
 
-      <ProcessoAcoes
-          :pode-aceitar-bloco="podeAceitarBloco"
-          :pode-finalizar="podeFinalizar"
-          :pode-homologar-bloco="podeHomologarBloco"
-          @finalizar="finalizarProcesso"/>
+      <div>
+        <div
+            v-if="podeAceitarBloco || podeHomologarBloco"
+            class="mt-3 d-flex gap-2"
+        >
+          <BButton
+              v-if="podeAceitarBloco"
+              data-testid="btn-acao-bloco-aceitar"
+              variant="outline-primary"
+              @click="abrirModalBloco('aceitar')"
+          >
+            <i aria-hidden="true" class="bi bi-check-circle me-1"/>
+            Aceitar em bloco
+          </BButton>
+          <BButton
+              v-if="podeHomologarBloco"
+              data-testid="btn-acao-bloco-homologar"
+              variant="outline-success"
+              @click="abrirModalBloco('homologar')"
+          >
+            <i aria-hidden="true" class="bi bi-check-all me-1"/>
+            Homologar em bloco
+          </BButton>
+        </div>
+        <BButton
+            v-if="podeFinalizar"
+            class="mt-3"
+            data-testid="btn-processo-finalizar"
+            variant="danger"
+            @click="finalizarProcesso"
+        >
+          Finalizar processo
+        </BButton>
+      </div>
     </div>
 
     <div v-else class="text-center py-5">
@@ -99,7 +128,6 @@ import ModalAcaoBloco from "@/components/processo/ModalAcaoBloco.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import ProcessoAcoes from "@/components/processo/ProcessoAcoes.vue";
 import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";

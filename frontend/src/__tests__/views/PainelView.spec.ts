@@ -71,12 +71,6 @@ describe("PainelView.vue", () => {
                     emits: ['ordenar', 'selecionar-processo'],
                     template: '<div data-testid="tabela-processos"></div>'
                 },
-                TabelaAlertas: {
-                    name: 'TabelaAlertas',
-                    props: ['alertas'],
-                    emits: ['ordenar'],
-                    template: '<div data-testid="tabela-alertas"></div>'
-                }
             },
         },
     });
@@ -90,7 +84,7 @@ describe("PainelView.vue", () => {
         expect(headers[1].props('title')).toBe('Alertas');
 
         expect(wrapper.findComponent({name: 'TabelaProcessos'}).exists()).toBe(true);
-        expect(wrapper.findComponent({name: 'TabelaAlertas'}).exists()).toBe(true);
+        expect(wrapper.find('[data-testid="tbl-alertas"]').exists()).toBe(true);
     });
 
     it("deve carregar dados ao montar se perfil estiver selecionado", async () => {
@@ -168,7 +162,7 @@ describe("PainelView.vue", () => {
 
         vi.clearAllMocks(); // Limpa chamadas do onMounted
 
-        await wrapper.findComponent({name: 'TabelaAlertas'}).vm.$emit('ordenar', 'processo');
+        await (wrapper.vm as any).handleSortChangeAlertas({sortBy: {key: 'processo'}, sortDesc: false});
 
         expect(alertasStore.buscarAlertas).toHaveBeenLastCalledWith(
             100, 1, 0, 10, "processo", "asc"

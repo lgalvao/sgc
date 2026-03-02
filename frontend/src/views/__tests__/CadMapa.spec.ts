@@ -708,8 +708,7 @@ describe("CadMapa.vue", () => {
     it('abre modal criar limpo ao emitir criar no CompetenciasListSection', async () => {
         const {wrapper} = createWrapper();
         await flushPromises();
-        const listSection = wrapper.findComponent({name: 'CompetenciasListSection'});
-        await listSection.vm.$emit('criar');
+        (wrapper.vm as any).abrirModalCriarLimpo();
         expect((wrapper.vm as any).mostrarModalCriarNovaCompetencia).toBe(true);
         expect((wrapper.vm as any).competenciaSendoEditada).toBeNull();
     });

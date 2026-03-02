@@ -3,14 +3,35 @@
     <PageHeader title="Cadastro de processo"/>
 
     <BForm class="mt-4 col-md-6 col-sm-8 col-12">
-      <FormErrorAlert
-          v-model:show="alertState.show"
-          :body="alertState.body"
-          :errors="alertState.errors"
-          :stack-trace="alertState.stackTrace"
-          :title="alertState.title"
+      <BAlert
+          :fade="false"
+          :model-value="alertState.show"
           :variant="alertState.variant"
-      />
+          class="mb-3"
+          dismissible
+          @update:model-value="(val) => val === false && (alertState.show = false)"
+      >
+        <h4 v-if="alertState.title" class="alert-heading">{{ alertState.title }}</h4>
+        <p v-if="alertState.body" class="mb-0">{{ alertState.body }}</p>
+        <ul v-if="alertState.errors && alertState.errors.length > 0" class="mt-2 mb-0">
+          <li v-for="(error, index) in alertState.errors" :key="index">{{ error }}</li>
+        </ul>
+        <div v-if="alertState.stackTrace" class="mt-3">
+          <BButton
+              class="text-muted p-0 border-0 d-block mb-1 text-decoration-none"
+              size="sm"
+              variant="link"
+              @click="showStack = !showStack"
+          >
+            <small>{{ showStack ? 'Ocultar detalhes técnicos' : 'Mostrar detalhes técnicos' }}</small>
+          </BButton>
+          <pre
+              v-if="showStack"
+              class="bg-dark text-light p-2 rounded small overflow-auto"
+              style="max-height: 200px; font-size: 0.75rem;"
+          >{{ alertState.stackTrace }}</pre>
+        </div>
+      </BAlert>
 
       <ProcessoFormFields
           ref="formFieldsRef"
@@ -103,7 +124,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BForm} from "bootstrap-vue-next";
+import {BAlert, BButton, BForm} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -111,7 +132,6 @@ import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ProcessoFormFields from "@/components/processo/ProcessoFormFields.vue";
-import FormErrorAlert from "@/components/comum/FormErrorAlert.vue";
 import {logger} from "@/utils";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 
@@ -154,6 +174,7 @@ const formData = computed({
 const formFieldsRef = ref<InstanceType<typeof ProcessoFormFields> | null>(null);
 
 const isLoading = ref(false);
+const showStack = ref(false);
 const router = useRouter();
 const route = useRoute();
 const processosStore = useProcessosStore();

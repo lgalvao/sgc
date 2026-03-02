@@ -8,17 +8,17 @@ identifiquem gaps de competência e gerenciem o desenvolvimento de suas equipes.
 
 ---
 
-## 🏗️ Arquitetura e Stack Tecnológico
+## Arquitetura e Stack Tecnológico
 
 O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Based** no frontend.
 
 ### Stack Principal
 
-| Camada       | Tecnologias Principais                                                        |
-|--------------|-------------------------------------------------------------------------------|
-| **Backend**  | Java 21, Spring Boot 4, Hibernate 7, MapStruct, H2 (testes)/Oracle (produção) |
-| **Frontend** | Vue.js 3.5, TypeScript, Vite, Pinia, BootstrapVueNext                         |
-| **Testes**   | JUnit, Mockito, Vitest, Playwright                                            |
+| Camada       | Tecnologias Principais                                             |
+|--------------|--------------------------------------------------------------------|
+| **Backend**  | Java 21, Spring Boot 4, Hibernate 7, H2 (testes)/Oracle (produção) |
+| **Frontend** | Vue.js 3.5, TypeScript, Vite, Pinia, BootstrapVueNext              |
+| **Testes**   | JUnit, Mockito, Vitest, Playwright                                 |
 
 **Documentação Essencial:**
 
@@ -29,7 +29,7 @@ O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Ba
 
 ---
 
-## 📂 Estrutura do Repositório
+## Estrutura do Repositório
 
 ```text
 sgc/
@@ -43,7 +43,7 @@ sgc/
 
 ---
 
-## 🚀 Como Executar
+## Como executar
 
 ### Pré-requisitos
 
@@ -52,11 +52,11 @@ sgc/
 
 ### Desenvolvimento
 
-1. **Backend (Homologação):**
+1. **Backend (testes e2e):**
 
     ```bash
     cd backend
-    ./gradlew bootRun -PENV=hom
+    ./gradlew bootRun -PENV=e2e
     ```
 
    A API estará disponível em `http://localhost:10000`.
@@ -73,7 +73,7 @@ sgc/
 
 ---
 
-## 🧪 Testes e Qualidade
+## Testes e qualidade
 
 O projeto possui uma suite abrangente de testes e verificações de qualidade.
 
@@ -86,11 +86,11 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 | **Integração Backend** | `./gradlew :backend:integrationTest` | Executa apenas fluxos completos (Mais lento).    |
 | **Unitários Frontend** | `cd frontend && npm run test:unit`   | Vitest para componentes e lógica.                |
 | **End-to-End (E2E)**   | `npm run test:e2e`                   | Playwright simulando fluxos reais.               |
-| **Type Check**        | `npm run typecheck`                  | Verificação de erros de tipos.                   |
+| **Type Check**         | `npm run typecheck`                  | Verificação de erros de tipos.                   |
 
-### Verificação de Qualidade (Quality Gate)
+### Verificação de qualidade
 
-Para rodar todas as verificações (Checkstyle, PMD, SpotBugs, Testes, Lint, Typecheck) de uma só vez:
+Para rodar todas as verificações (SpotBugs, Testes, Lint, Typecheck) de uma só vez:
 
 ```bash
 ./quality-check.sh
@@ -101,7 +101,7 @@ Os relatórios são gerados em:
 * Backend: `backend/build/reports/`
 * Frontend: `frontend/coverage/`
 
-## 📚 Documentação de Negócio
+## Documentação de Negócio
 
 Os requisitos do sistema estão documentados em casos de uso (CDUs) no diretório `etc/reqs/`.
 

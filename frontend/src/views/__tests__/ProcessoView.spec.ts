@@ -98,7 +98,6 @@ describe("Processo.vue", () => {
     let router: any;
 
     const commonStubs = {
-        ProcessoAcoes: ProcessoAcoesStub,
         ModalAcaoBloco: ModalAcaoBlocoStub,
         TreeTable: TreeTableStub,
         ModalConfirmacao: ModalConfirmacaoStub,
@@ -488,8 +487,7 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
-        const acoes = wrapper.findComponent(ProcessoAcoesStub);
-        await acoes.vm.$emit("finalizar");
+        await wrapper.find('[data-testid="btn-processo-finalizar"]').trigger('click');
 
         const modalConfirmacao = wrapper.findComponent(ModalConfirmacaoStub);
         expect(modalConfirmacao.props("modelValue")).toBe(true);
@@ -505,8 +503,7 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
-        const acoes = wrapper.findComponent(ProcessoAcoesStub);
-        await acoes.vm.$emit("finalizar"); // Abre modal
+        await wrapper.find('[data-testid="btn-processo-finalizar"]').trigger('click'); // Abre modal
 
         const modalConfirmacao = wrapper.findComponent(ModalConfirmacaoStub);
         await modalConfirmacao.vm.$emit("confirmar");
@@ -529,8 +526,7 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
-        const acoes = wrapper.findComponent(ProcessoAcoesStub);
-        await acoes.vm.$emit("finalizar");
+        await wrapper.find('[data-testid="btn-processo-finalizar"]').trigger('click');
 
         const modalConfirmacao = wrapper.findComponent(ModalConfirmacaoStub);
         await modalConfirmacao.vm.$emit("confirmar");
@@ -563,8 +559,7 @@ describe("Processo.vue", () => {
         processosStore.finalizarProcesso.mockRejectedValue(new Error("Erro original"));
         processosStore.lastError = {message: "Erro customizado da store"};
 
-        const acoes = wrapper.findComponent(ProcessoAcoesStub);
-        await acoes.vm.$emit("finalizar"); // Abre modal
+        await wrapper.find('[data-testid="btn-processo-finalizar"]').trigger('click'); // Abre modal
         const modalConfirmacao = wrapper.findComponent(ModalConfirmacaoStub);
         await modalConfirmacao.vm.$emit("confirmar");
 

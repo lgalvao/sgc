@@ -102,7 +102,7 @@ describe("MainNavbar.vue", () => {
         expect(userItem.text()).toContain("CHEFE - TRE-PR");
     });
 
-    it("deve exibir e navegar pelo ícone de configurações para o perfil ADMIN", async () => {
+    it("deve exibir e navegar pelo ícone de parâmetros para o perfil ADMIN", async () => {
         const options = getCommonMountOptions({
             perfil: {
                 perfilSelecionado: "ADMIN",
@@ -112,19 +112,22 @@ describe("MainNavbar.vue", () => {
 
         ctx.wrapper = mount(NavBar, options);
 
-        const settingsNavItem = ctx.wrapper.find('[data-testid="btn-configuracoes"]');
-        expect(settingsNavItem.exists()).toBe(true);
+        const parametrosNavItem = ctx.wrapper.find('[data-testid="btn-parametros"]');
+        expect(parametrosNavItem.exists()).toBe(true);
 
-        const link = settingsNavItem.findComponent(RouterLinkStub);
+        const link = parametrosNavItem.findComponent(RouterLinkStub);
 
         if (link.exists()) {
-            expect(link.props().to).toBe("/configuracoes");
+            expect(link.props().to).toBe("/parametros");
         } else {
-            expect(settingsNavItem.attributes("to")).toBe("/configuracoes");
+            expect(parametrosNavItem.attributes("to")).toBe("/parametros");
         }
+
+        const administradoresNavItem = ctx.wrapper.find('[data-testid="btn-administradores"]');
+        expect(administradoresNavItem.exists()).toBe(true);
     });
 
-    it("NÃO deve exibir o ícone de configurações para perfis diferentes de ADMIN", async () => {
+    it("NÃO deve exibir os ícones de parâmetros e administradores para perfis diferentes de ADMIN", async () => {
         const options = getCommonMountOptions({
             perfil: {
                 perfilSelecionado: "GESTOR",
@@ -134,8 +137,9 @@ describe("MainNavbar.vue", () => {
 
         ctx.wrapper = mount(NavBar, options);
 
-        const settingsIcon = ctx.wrapper.find('[title="Configurações do sistema"]');
+        const settingsIcon = ctx.wrapper.find('[data-testid="btn-parametros"]');
         expect(settingsIcon.exists()).toBe(false);
+        expect(ctx.wrapper.find('[data-testid="btn-administradores"]').exists()).toBe(false);
     });
 
     it("deve chamar router.push ao fazer logout", async () => {

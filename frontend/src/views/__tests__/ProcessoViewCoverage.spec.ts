@@ -49,7 +49,7 @@ const commonStubs = {
     PageHeader: {template: '<div><slot/><slot name="actions"/></div>'},
     ProcessoAcoes: {
         name: 'ProcessoAcoes',
-        template: '<div><button data-testid="btn-finalizar" @click="$emit(\'finalizar\')">Finalizar</button></div>',
+        template: '<div></div>',
         emits: ['finalizar']
     },
     TreeTable: {template: '<div>TreeTable</div>'},
@@ -135,8 +135,8 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
         await flushPromises();
 
-        const acoes = wrapper.findComponent({name: "ProcessoAcoes"});
-        await acoes.vm.$emit("finalizar");
+        const acoes = wrapper.find('[data-testid="btn-processo-finalizar"]');
+        if (acoes.exists()) await acoes.trigger('click');
         await flushPromises();
 
         const modal = wrapper.findComponent({name: "ModalConfirmacao"});

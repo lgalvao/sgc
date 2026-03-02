@@ -88,11 +88,42 @@
             icon="bi-journal-x"
             title="Nenhuma competência cadastrada"
         />
-        <CompetenciaViewCard
+        <BCard
             v-for="comp in mapa?.competencias"
             :key="comp.codigo"
-            :competencia="comp"
-        />
+            class="mb-3 shadow-sm border-0 border-start border-4 border-primary"
+        >
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="mb-0" data-testid="vis-mapa__txt-competencia-descricao">
+              {{ comp.descricao }}
+            </h5>
+          </div>
+          <div v-if="comp.atividades && comp.atividades.length > 0" class="mt-3">
+            <div
+                v-for="atividade in comp.atividades"
+                :key="atividade.codigo"
+                class="mb-3 p-2 bg-light rounded"
+            >
+              <div class="d-flex align-items-baseline">
+                <i aria-hidden="true" class="bi bi-gear-fill me-2 text-secondary small"/>
+                <p class="atividade-associada-descricao mb-1 fw-medium">{{ atividade.descricao }}</p>
+              </div>
+              <div v-if="atividade.conhecimentos && atividade.conhecimentos.length > 0" class="ms-4 mt-2">
+                <div class="d-flex flex-wrap gap-2">
+                  <span
+                      v-for="c in atividade.conhecimentos"
+                      :key="c.codigo"
+                      class="badge bg-white text-dark border fw-normal py-1 px-2"
+                      data-testid="txt-conhecimento-item"
+                  >
+                    <i aria-hidden="true" class="bi bi-book me-1 text-info"/>
+                    {{ c.descricao }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </BCard>
       </div>
     </div>
     <div v-else>
@@ -214,7 +245,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BFormTextarea, BModal} from "bootstrap-vue-next";
+import {BButton, BCard, BFormTextarea, BModal} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
@@ -224,7 +255,6 @@ import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
-import CompetenciaViewCard from "@/components/mapa/CompetenciaViewCard.vue";
 import {useMapasStore} from "@/stores/mapas";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useProcessosStore} from "@/stores/processos";

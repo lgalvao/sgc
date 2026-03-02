@@ -41,15 +41,28 @@
 
         <BNavItem
             v-if="perfilStore.perfilSelecionado === 'ADMIN'"
-            aria-label="Configurações do sistema"
+            aria-label="Parâmetros do sistema"
             class="me-lg-1"
-            data-testid="btn-configuracoes"
-            title="Configurações do sistema"
-            to="/configuracoes"
+            data-testid="btn-parametros"
+            title="Parâmetros do sistema"
+            to="/parametros"
             @click="setNavbarNavigation"
         >
-          <i aria-hidden="true" class="bi bi-gear me-lg-0 me-1"/>
-          <span class="d-lg-none">Configurações</span>
+          <i aria-hidden="true" class="bi bi-sliders me-lg-0 me-1"/>
+          <span class="d-lg-none">Parâmetros</span>
+        </BNavItem>
+
+        <BNavItem
+            v-if="perfilStore.perfilSelecionado === 'ADMIN'"
+            aria-label="Administradores do sistema"
+            class="me-lg-1"
+            data-testid="btn-administradores"
+            title="Administradores do sistema"
+            to="/administradores"
+            @click="setNavbarNavigation"
+        >
+          <i aria-hidden="true" class="bi bi-people me-lg-0 me-1"/>
+          <span class="d-lg-none">Administradores</span>
         </BNavItem>
 
         <BNavItem

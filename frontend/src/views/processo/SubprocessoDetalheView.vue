@@ -8,26 +8,79 @@
           :title="`Subprocesso - ${subprocesso.unidade.sigla}`"
       />
 
-      <SubprocessoHeader
-          :pode-alterar-data-limite="podeAlterarDataLimite && !isProcessoFinalizado"
-          :pode-enviar-lembrete="podeEnviarLembrete && !isProcessoFinalizado"
-          :pode-reabrir-cadastro="podeReabrirCadastro && !isProcessoFinalizado"
-          :pode-reabrir-revisao="podeReabrirRevisao && !isProcessoFinalizado"
-          :processo-descricao="subprocesso.processoDescricao || ''"
-          :responsavel-email="subprocesso.responsavel?.email || ''"
-          :responsavel-nome="subprocesso.responsavel?.nome || ''"
-          :responsavel-ramal="subprocesso.responsavel?.ramal || ''"
-          :situacao="formatSituacaoSubprocesso(subprocesso.situacao)"
-          :titular-email="subprocesso.titular?.email || ''"
-          :titular-nome="subprocesso.titular?.nome || ''"
-          :titular-ramal="subprocesso.titular?.ramal || ''"
-          :unidade-nome="subprocesso.unidade.nome"
-          :unidade-sigla="subprocesso.unidade.sigla"
-          @alterar-data-limite="abrirModalAlterarDataLimite"
-          @reabrir-cadastro="abrirModalReabrirCadastro"
-          @reabrir-revisao="abrirModalReabrirRevisao"
-          @enviar-lembrete="confirmarEnviarLembrete"
-      />
+      <div data-testid="header-subprocesso">
+        <PageHeader
+            :subtitle="subprocesso.unidade.nome"
+            :title="subprocesso.unidade.sigla"
+            title-test-id="subprocesso-header__txt-header-unidade"
+        >
+          <template #actions>
+            <BButton
+                v-if="podeAlterarDataLimite && !isProcessoFinalizado"
+                data-testid="btn-alterar-data-limite"
+                variant="outline-primary"
+                @click="abrirModalAlterarDataLimite"
+            >
+              <i aria-hidden="true" class="bi bi-calendar me-1"/>
+              Alterar data limite
+            </BButton>
+            <BButton
+                v-if="podeReabrirCadastro && !isProcessoFinalizado"
+                data-testid="btn-reabrir-cadastro"
+                variant="outline-warning"
+                @click="abrirModalReabrirCadastro"
+            >
+              <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
+              Reabrir cadastro
+            </BButton>
+            <BButton
+                v-if="podeReabrirRevisao && !isProcessoFinalizado"
+                data-testid="btn-reabrir-revisao"
+                variant="outline-warning"
+                @click="abrirModalReabrirRevisao"
+            >
+              <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
+              Reabrir Revisão
+            </BButton>
+            <BButton
+                v-if="podeEnviarLembrete && !isProcessoFinalizado"
+                data-testid="btn-enviar-lembrete"
+                variant="outline-info"
+                @click="confirmarEnviarLembrete"
+            >
+              <i aria-hidden="true" class="bi bi-bell me-1"/>
+              Enviar lembrete
+            </BButton>
+          </template>
+        </PageHeader>
+
+        <BCard class="mb-4" data-testid="header-subprocesso-details" no-body>
+          <BCardBody>
+            <p
+                class="text-muted small mb-3"
+                data-testid="txt-header-processo"
+            >
+              Processo: {{ subprocesso.processoDescricao }}
+            </p>
+            <p>
+              <span class="fw-bold me-1">Situação:</span>
+              <span data-testid="subprocesso-header__txt-situacao">{{ formatSituacaoSubprocesso(subprocesso.situacao) }}</span>
+            </p>
+            <p><strong>Titular:</strong> {{ subprocesso.titular?.nome || '' }}</p>
+            <p class="ms-3">
+              <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ subprocesso.titular?.ramal || '' }}
+              <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ subprocesso.titular?.email || '' }}
+            </p>
+            <template v-if="subprocesso.responsavel?.nome && subprocesso.responsavel?.nome !== subprocesso.titular?.nome">
+              <p><strong>Responsável:</strong> {{ subprocesso.responsavel?.nome || '' }}</p>
+              <p class="ms-3">
+                <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ subprocesso.responsavel?.ramal || '' }}
+                <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ subprocesso.responsavel?.email || '' }}
+              </p>
+            </template>
+          </BCardBody>
+        </BCard>
+      </div>
 
       <SubprocessoCards
           v-if="codSubprocesso"
@@ -39,7 +92,43 @@
           :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
       />
 
-      <TabelaMovimentacoes :movimentacoes="movimentacoes"/>
+      <div class="mt-4">
+        <h4>Movimentações</h4>
+        <BTable
+            :fields="camposMovimentacoes"
+            :items="movimentacoes"
+            :tbody-tr-attr="rowAttrMovimentacao"
+            data-testid="tbl-movimentacoes"
+            primary-key="codigo"
+            responsive
+            show-empty
+            stacked="md"
+            striped
+        >
+          <template #empty>
+            <div class="text-center text-muted py-5" data-testid="empty-state-movimentacoes">
+              <i aria-hidden="true" class="bi bi-arrow-left-right display-4 d-block mb-3"></i>
+              <p class="h5">Nenhuma movimentação</p>
+              <p class="small">O histórico de movimentações deste processo aparecerá aqui.</p>
+            </div>
+          </template>
+          <template #cell(dataHora)="data">
+            {{ formatDateTimeBR(data.item.dataHora) }}
+          </template>
+          <template #cell(unidadeOrigem)="data">
+            {{ data.item.unidadeOrigem?.sigla || '-' }}
+          </template>
+          <template #cell(unidadeDestino)="data">
+            {{ data.item.unidadeDestino?.sigla || '-' }}
+          </template>
+          <template #cell(situacao)="data">
+            <BadgeSituacao
+                :situacao="data.item.subprocesso?.situacao || 'DESCONHECIDO'"
+                :texto="formatarSituacaoMovimentacao(data.item.subprocesso?.situacao)"
+            />
+          </template>
+        </BTable>
+      </div>
     </div>
     <div v-else-if="subprocessosStore.lastError" class="py-2">
       <ErrorAlert
@@ -102,14 +191,13 @@
 </template>
 
 <script lang="ts" setup>
-import {BFormTextarea, BSpinner} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BFormTextarea, BSpinner, BTable} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
-import SubprocessoHeader from "@/components/processo/SubprocessoHeader.vue";
 import SubprocessoModal from "@/components/processo/SubprocessoModal.vue";
-import TabelaMovimentacoes from "@/components/processo/TabelaMovimentacoes.vue";
+import BadgeSituacao from "@/components/comum/BadgeSituacao.vue";
 import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useProximaAcao} from "@/composables/useProximaAcao";
@@ -129,6 +217,7 @@ import {
   type SubprocessoDetalhe,
   TipoProcesso
 } from "@/types/tipos";
+import {formatDateTimeBR} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
 
@@ -149,6 +238,25 @@ const tipoReabertura = ref<'cadastro' | 'revisao'>('cadastro');
 const justificativaReabertura = ref('');
 const codSubprocesso = ref<number | null>(null);
 const modalLembreteAberto = ref(false);
+
+const camposMovimentacoes = [
+  {key: "dataHora", label: "Data/Hora"},
+  {key: "unidadeOrigem", label: "Unidade Origem"},
+  {key: "unidadeDestino", label: "Unidade Destino"},
+  {key: "situacao", label: "Situação"},
+  {key: "descricao", label: "Descrição"}
+];
+
+const rowAttrMovimentacao = (item: Movimentacao | null, type: string) => {
+  return item && type === 'row'
+      ? {'data-testid': `row-movimentacao-${item.codigo}`}
+      : {};
+};
+
+function formatarSituacaoMovimentacao(situacao?: string) {
+  if (!situacao) return "Desconhecido";
+  return situacao.replaceAll("_", " ");
+}
 
 const subprocesso = computed<SubprocessoDetalhe | null>(
     () => subprocessosStore.subprocessoDetalhe,
