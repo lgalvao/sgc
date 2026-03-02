@@ -74,8 +74,8 @@ describe('ConclusaoDiagnostico.vue', () => {
         diagnosticoService = diagMod.diagnosticoService;
 
         // Resposta válida padrão
-        (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoPronto);
-        (diagnosticoService.concluirDiagnostico as any).mockResolvedValue({});
+        (diagnosticoService.buscarDiagnostico).mockResolvedValue(mockDiagnosticoPronto);
+        (diagnosticoService.concluirDiagnostico).mockResolvedValue({});
     });
 
     const mountComponent = async () => {
@@ -98,7 +98,7 @@ describe('ConclusaoDiagnostico.vue', () => {
     });
 
     it('exibe estado pendente e requer justificativa', async () => {
-        (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoPendente);
+        (diagnosticoService.buscarDiagnostico).mockResolvedValue(mockDiagnosticoPendente);
         await mountComponent();
 
         expect(ctx.wrapper!.text()).toContain('Pendências existem');
@@ -117,7 +117,7 @@ describe('ConclusaoDiagnostico.vue', () => {
     });
 
     it('redireciona se já concluído', async () => {
-        (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoConcluido);
+        (diagnosticoService.buscarDiagnostico).mockResolvedValue(mockDiagnosticoConcluido);
         await mountComponent();
 
         expect(feedbackStore.show).toHaveBeenCalledWith('Aviso', expect.any(String), 'warning');
@@ -137,7 +137,7 @@ describe('ConclusaoDiagnostico.vue', () => {
     });
 
     it('conclui diagnóstico com justificativa', async () => {
-        (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoPendente);
+        (diagnosticoService.buscarDiagnostico).mockResolvedValue(mockDiagnosticoPendente);
         await mountComponent();
 
         const textarea = ctx.wrapper!.find('textarea');

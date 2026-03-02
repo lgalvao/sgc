@@ -68,7 +68,7 @@ describe('MonitoramentoDiagnostico.vue', () => {
         const diagMod = await import('@/services/diagnosticoService');
         diagnosticoService = diagMod.diagnosticoService;
 
-        (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnostico);
+        (diagnosticoService.buscarDiagnostico).mockResolvedValue(mockDiagnostico);
     });
 
     const mountComponent = async () => {
@@ -118,7 +118,7 @@ describe('MonitoramentoDiagnostico.vue', () => {
             podeSerConcluido: true,
             servidores: [mockServidorConcluido, {...mockServidorConcluido, nome: 'Servidor 3', tituloEleitoral: '333'}]
         };
-        (diagnosticoService.buscarDiagnostico as any).mockResolvedValue(mockDiagnosticoCompleto);
+        (diagnosticoService.buscarDiagnostico).mockResolvedValue(mockDiagnosticoCompleto);
         await mountComponent();
 
         const btnOcupacoes = ctx.wrapper!.findAll('button')[1];
@@ -166,7 +166,7 @@ describe('MonitoramentoDiagnostico.vue', () => {
             }
         ];
 
-        (diagnosticoService.buscarDiagnostico as any).mockResolvedValue({
+        (diagnosticoService.buscarDiagnostico).mockResolvedValue({
             ...mockDiagnostico,
             servidores: mockServidoresVariados
         });
@@ -179,7 +179,7 @@ describe('MonitoramentoDiagnostico.vue', () => {
     });
 
     it('trata erro ao buscar diagnóstico', async () => {
-        (diagnosticoService.buscarDiagnostico as any).mockRejectedValue(new Error('Falha'));
+        (diagnosticoService.buscarDiagnostico).mockRejectedValue(new Error('Falha'));
         await mountComponent();
 
         expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining('Falha'), 'danger');

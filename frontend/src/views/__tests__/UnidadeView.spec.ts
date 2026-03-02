@@ -145,6 +145,11 @@ describe('UnidadeView.vue', () => {
         usuariosStore = useUsuariosStore();
         mapasStore = useMapasStore();
 
+        const override = initialStateOverride as any;
+        if (override.unidades?.unidade) {
+            unidadesStore.unidade = override.unidades.unidade;
+        }
+
         vi.spyOn(unidadesStore, 'buscarArvoreUnidade').mockResolvedValue(null);
         vi.spyOn(atribuicaoStore, 'buscarAtribuicoes').mockResolvedValue(null);
 

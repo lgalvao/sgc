@@ -192,65 +192,65 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         const {wrapper, processosStore} = createWrapper();
 
         // Setup process being edited
-        (wrapper.vm as any).processoEditando = {codigo: 123, descricao: 'Processo Teste'};
+        (wrapper.vm).processoEditando = {codigo: 123, descricao: 'Processo Teste'};
         await nextTick();
 
         // Open modal
-        await (wrapper.vm as any).abrirModalRemocao();
-        expect((wrapper.vm as any).mostrarModalRemocao).toBe(true);
+        await (wrapper.vm).abrirModalRemocao();
+        expect((wrapper.vm).mostrarModalRemocao).toBe(true);
 
         // Confirm removal
         processosStore.removerProcesso.mockResolvedValue(undefined);
 
-        await (wrapper.vm as any).confirmarRemocao();
+        await (wrapper.vm).confirmarRemocao();
         await flushPromises();
 
         expect(processosStore.removerProcesso).toHaveBeenCalledWith(123);
         expect(mockPush).toHaveBeenCalledWith('/painel');
-        expect((wrapper.vm as any).mostrarModalRemocao).toBe(false);
+        expect((wrapper.vm).mostrarModalRemocao).toBe(false);
     });
 
     it('handles error during removal', async () => {
         const {wrapper, processosStore} = createWrapper();
 
-        (wrapper.vm as any).processoEditando = {codigo: 123, descricao: 'Processo Teste'};
+        (wrapper.vm).processoEditando = {codigo: 123, descricao: 'Processo Teste'};
         await nextTick();
 
         processosStore.removerProcesso.mockRejectedValue(new Error('Delete Error'));
         processosStore.lastError = {message: 'Failed to delete'};
 
-        await (wrapper.vm as any).confirmarRemocao();
+        await (wrapper.vm).confirmarRemocao();
         await flushPromises();
 
-        expect((wrapper.vm as any).mostrarModalRemocao).toBe(false);
-        expect((wrapper.vm as any).alertState.show).toBe(true);
-        expect((wrapper.vm as any).alertState.body).toContain('Failed to delete');
+        expect((wrapper.vm).mostrarModalRemocao).toBe(false);
+        expect((wrapper.vm).alertState.show).toBe(true);
+        expect((wrapper.vm).alertState.body).toContain('Failed to delete');
     });
 
     it('fecharModalRemocao closes the modal', async () => {
         const {wrapper} = createWrapper();
-        (wrapper.vm as any).mostrarModalRemocao = true;
+        (wrapper.vm).mostrarModalRemocao = true;
 
-        (wrapper.vm as any).fecharModalRemocao();
+        (wrapper.vm).fecharModalRemocao();
 
-        expect((wrapper.vm as any).mostrarModalRemocao).toBe(false);
+        expect((wrapper.vm).mostrarModalRemocao).toBe(false);
     });
 
     it('confirmarRemocao does nothing if no process editing', async () => {
         const {wrapper, processosStore} = createWrapper();
-        (wrapper.vm as any).processoEditando = null;
+        (wrapper.vm).processoEditando = null;
 
-        await (wrapper.vm as any).confirmarRemocao();
+        await (wrapper.vm).confirmarRemocao();
 
         expect(processosStore.removerProcesso).not.toHaveBeenCalled();
     });
 
     it('triggers search for units if type changes', async () => {
         const {wrapper} = createWrapper();
-        const unidadesStore = (wrapper.vm as any).unidadesStore;
+        const unidadesStore = (wrapper.vm).unidadesStore;
         vi.spyOn(unidadesStore, 'buscarUnidadesParaProcesso').mockResolvedValue(undefined);
 
-        (wrapper.vm as any).tipo = 'MAPEAMENTO';
+        (wrapper.vm).tipo = 'MAPEAMENTO';
         await nextTick();
 
         expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('MAPEAMENTO', undefined);
@@ -275,10 +275,10 @@ describe('ProcessoCadastroView.vue Coverage', () => {
 
         await flushPromises();
 
-        expect((wrapper.vm as any).descricao).toBe('Processo Existente');
-        expect((wrapper.vm as any).tipo).toBe('MAPEAMENTO');
-        expect((wrapper.vm as any).dataLimite).toBe('2023-12-31');
-        expect((wrapper.vm as any).unidadesSelecionadas).toEqual([1, 2]);
+        expect((wrapper.vm).descricao).toBe('Processo Existente');
+        expect((wrapper.vm).tipo).toBe('MAPEAMENTO');
+        expect((wrapper.vm).dataLimite).toBe('2023-12-31');
+        expect((wrapper.vm).unidadesSelecionadas).toEqual([1, 2]);
         expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('MAPEAMENTO', 123);
     });
 });

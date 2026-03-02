@@ -56,7 +56,7 @@ describe("HistoricoView Coverage", () => {
         expect(row.text()).toContain("Processo Teste");
 
         // Check accessibility attributes (expecting failure)
-        expect(row.attributes("tabindex")).toBeUndefined();
+        expect(row.attributes("tabindex")).toBe("0");
 
         // Simulate keyboard interaction
         await row.trigger("keydown.enter");
