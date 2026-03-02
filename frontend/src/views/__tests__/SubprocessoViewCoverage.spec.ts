@@ -1,7 +1,7 @@
 import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
-import Subprocesso from '@/views/processo/SubprocessoDetalheView.vue';
+import SubprocessoView from '@/views/SubprocessoView.vue';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useFeedbackStore} from '@/stores/feedback';
 import {BAlert, BSpinner} from 'bootstrap-vue-next';
@@ -18,7 +18,7 @@ const ModalConfirmacaoStub = {
     emits: ['update:modelValue', 'confirmar']
 };
 
-describe('Subprocesso Coverage', () => {
+describe('SubprocessoView Coverage', () => {
     it('renders loading state when no data and no error', () => {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeAlterarDataLimite: {value: false},
@@ -44,7 +44,7 @@ describe('Subprocesso Coverage', () => {
             podeVisualizarMapa: {value: true},
         } as any);
 
-        const wrapper = mount(Subprocesso, {
+        const wrapper = mount(SubprocessoView, {
             global: {
                 plugins: [pinia],
                 stubs: {
@@ -90,7 +90,7 @@ describe('Subprocesso Coverage', () => {
             podeVisualizarMapa: {value: true},
         } as any);
 
-        const wrapper = mount(Subprocesso, {
+        const wrapper = mount(SubprocessoView, {
             global: {
                 plugins: [pinia],
                 stubs: {
@@ -134,7 +134,7 @@ describe('Subprocesso Coverage', () => {
             podeVisualizarMapa: {value: true},
         } as any);
 
-        const wrapper = mount(Subprocesso, {
+        const wrapper = mount(SubprocessoView, {
             global: {
                 plugins: [pinia],
                 stubs: {
@@ -182,7 +182,7 @@ describe('Subprocesso Coverage', () => {
         (store.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue(123);
         const feedbackStore = useFeedbackStore(pinia);
 
-        const wrapper = mount(Subprocesso, {
+        const wrapper = mount(SubprocessoView, {
             global: {
                 plugins: [pinia],
                 stubs: {

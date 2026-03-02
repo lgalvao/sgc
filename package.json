@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "npm test --prefix frontend",
+    "test:unit": "npm run test:unit --prefix frontend",
     "test:e2e": "playwright test",
     "test:e2e:captura": "playwright test e2e/captura-telas.spec.ts",
     "typecheck": "npm run typecheck --prefix frontend && npm run typecheck:e2e",

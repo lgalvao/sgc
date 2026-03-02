@@ -193,12 +193,16 @@ export interface Alerta {
 
 export interface Movimentacao {
     codigo: number;
-    subprocesso: Subprocesso;
     dataHora: string;
-    unidadeOrigem: Unidade;
-    unidadeDestino: Unidade;
+    unidadeOrigemCodigo: number;
+    unidadeOrigemSigla: string;
+    unidadeOrigemNome: string;
+    unidadeDestinoCodigo: number;
+    unidadeDestinoSigla: string;
+    unidadeDestinoNome: string;
+    usuarioTitulo: string;
+    usuarioNome: string;
     descricao: string;
-    usuario: Usuario;
 }
 
 export interface Analise {

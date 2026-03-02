@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount, RouterLinkStub} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
-import Subprocesso from '@/views/processo/SubprocessoDetalheView.vue';
+import SubprocessoView from '@/views/SubprocessoView.vue';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useMapasStore} from '@/stores/mapas';
 import {useFeedbackStore} from '@/stores/feedback';
@@ -20,7 +20,6 @@ const SubprocessoModalStub = {
     props: ['mostrarModal'],
     emits: ['confirmar-alteracao', 'fechar-modal']
 };
-const TabelaMovimentacoesStub = undefined;
 
 // Mock Services
 vi.mock('@/services/processoService', () => ({
@@ -29,7 +28,7 @@ vi.mock('@/services/processoService', () => ({
     enviarLembrete: vi.fn(),
 }));
 
-describe('Subprocesso.vue', () => {
+describe('SubprocessoView.vue', () => {
     const mockSubprocesso = {
         codigo: 10,
         situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
@@ -162,7 +161,7 @@ describe('Subprocesso.vue', () => {
             }
         });
 
-        const wrapper = mount(Subprocesso, {
+        const wrapper = mount(SubprocessoView, {
             global: {
                 plugins: [pinia],
                 stubs: {

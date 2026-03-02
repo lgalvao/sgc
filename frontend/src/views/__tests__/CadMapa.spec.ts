@@ -10,7 +10,7 @@ import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
 import {Perfil} from "@/types/tipos";
-import CadMapa from "@/views/processo/MapaCadastroView.vue";
+import MapaView from "@/views/MapaView.vue";
 import * as useAcessoModule from '@/composables/useAcesso';
 
 const {pushMock} = vi.hoisted(() => {
@@ -170,7 +170,7 @@ const CompetenciaCardStub = {
 };
 
 
-describe("CadMapa.vue", () => {
+describe("MapaView.vue", () => {
     const mockAtividades = [
         {codigo: 101, descricao: "Atividade 1", conhecimentos: []},
         {
@@ -282,7 +282,7 @@ describe("CadMapa.vue", () => {
             unidadeSelecionada: {value: null},
         } as any);
 
-        const wrapper = mount(CadMapa, {
+        const wrapper = mount(MapaView, {
             global: {
                 plugins: [
                     createTestingPinia({

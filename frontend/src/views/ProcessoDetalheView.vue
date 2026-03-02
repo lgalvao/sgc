@@ -6,16 +6,10 @@
 
     <div v-if="processo">
       <PageHeader
-          :etapa="`Etapa atual: ${formatSituacaoProcesso(processo.situacao)}`"
-          :proxima-acao="proximaAcaoProcesso"
           :title="processo.descricao"
-          title-test-id="processo-info"
-      >
-        <template #default>
-          <BBadge class="mb-2" style="border-radius: 0" variant="secondary">
-            Detalhes do processo
-          </BBadge>
+          title-test-id="processo-info">
 
+        <template #default>
           <ProcessoInfo
               :show-data-limite="false"
               :situacao="processo.situacao"
@@ -121,7 +115,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BBadge, BButton, BSpinner} from "bootstrap-vue-next";
+import {BAlert, BButton, BSpinner} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ModalAcaoBloco from "@/components/processo/ModalAcaoBloco.vue";
@@ -136,7 +130,7 @@ import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
 import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
-import {formatSituacaoProcesso, formatSituacaoSubprocesso} from "@/utils/formatters";
+import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
 
 function flattenUnidades(unidades: any[]): any[] {
@@ -279,13 +273,6 @@ const mensagemSucessoAcaoBloco = computed(() => {
       return "Ação em bloco realizada com sucesso";
   }
 });
-
-const proximaAcaoProcesso = computed(() => obterProximaAcao({
-  perfil: perfilStore.perfilSelecionado,
-  situacao: processo.value?.situacao,
-  podeFinalizar: podeFinalizar.value,
-  isProcessoFinalizado: isProcessoFinalizado.value,
-}));
 
 async function abrirDetalhesUnidade(row: any) {
   if (!row.clickable) {

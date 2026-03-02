@@ -7,7 +7,7 @@ import * as subprocessoService from "@/services/subprocessoService";
 import {useAnalisesStore} from "@/stores/analises";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
-import AtividadesCadastroView from "@/views/processo/AtividadesCadastroView.vue";
+import CadastroView from "@/views/CadastroView.vue";
 import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDisponibilizacaoModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
@@ -84,7 +84,7 @@ function createWrapper(customState = {}, accessOverrides = {}) {
         perfilSelecionado: ref(Perfil.CHEFE),
     } as any);
 
-    const wrapper = mount(AtividadesCadastroView, {
+    const wrapper = mount(CadastroView, {
         global: {
             plugins: [createTestingPinia({
                 createSpy: vi.fn,
@@ -124,7 +124,7 @@ function createWrapper(customState = {}, accessOverrides = {}) {
     return wrapper;
 }
 
-describe("AtividadesCadastroView.vue", () => {
+describe("CadastroView.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as any);

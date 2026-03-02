@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
-import Processo from "@/views/processo/ProcessoDetalheView.vue";
+import Processo from "@/views/ProcessoDetalheView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useProcessosStore} from "@/stores/processos";
 import {useFeedbackStore} from "@/stores/feedback";
@@ -41,14 +41,6 @@ vi.mock("@/services/subprocessoService", () => ({
     homologarValidacaoEmBloco: vi.fn(),
     disponibilizarMapaEmBloco: vi.fn(),
 }));
-
-// Stubs definition
-const ProcessoAcoesStub = {
-    name: "ProcessoAcoes",
-    template: '<div data-testid="processo-acoes"></div>',
-    props: ["podeAceitarBloco", "podeHomologarBloco", "podeFinalizar"],
-    emits: ["finalizar"],
-};
 
 const modalSpies = {
     abrir: vi.fn(),

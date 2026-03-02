@@ -49,8 +49,8 @@ public class Usuario implements UserDetails {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @JsonView(OrganizacaoViews.Publica.class)
     @Column(name = "ramal", length = 20, nullable = false)
-    @JsonIgnore
     private String ramal;
 
     @ManyToOne(fetch = FetchType.LAZY)

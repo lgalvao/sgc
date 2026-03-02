@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import {nextTick} from 'vue';
-import CadProcesso from '@/views/processo/ProcessoCadastroView.vue';
+import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
 import {useProcessosStore} from '@/stores/processos';
 import {useUnidadesStore} from '@/stores/unidades';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
@@ -45,12 +45,12 @@ const ModalConfirmacaoStub = {
     emits: ['update:modelValue', 'confirmar']
 };
 
-describe('CadProcesso.vue Coverage', () => {
+describe('ProcessoCadastroView.vue Coverage', () => {
     const context = setupComponentTest();
     let processosStore: any;
 
     const createWrapper = (initialState = {}) => {
-        context.wrapper = mount(CadProcesso, {
+        context.wrapper = mount(ProcessoCadastroView, {
             ...getCommonMountOptions(
                 {
                     unidades: {

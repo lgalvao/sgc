@@ -4,7 +4,7 @@ const unidadeRoutes: RouteRecordRaw[] = [
     {
         path: "/unidades",
         name: "Unidades",
-        component: () => import("@/views/unidade/UnidadesView.vue"),
+        component: () => import("@/views/UnidadesView.vue"),
         meta: {
             title: "Unidades",
             breadcrumb: "Unidades",
@@ -13,7 +13,7 @@ const unidadeRoutes: RouteRecordRaw[] = [
     {
         path: "/unidade/:codUnidade",
         name: "Unidade",
-        component: () => import("@/views/unidade/UnidadeDetalheView.vue"),
+        component: () => import("@/views/UnidadeView.vue"),
         props: (route: RouteLocationNormalized) => ({
             codUnidade: Number(route.params.codUnidade),
         }),
@@ -26,7 +26,7 @@ const unidadeRoutes: RouteRecordRaw[] = [
     {
         path: "/unidade/:codUnidade/mapa",
         name: "Mapa",
-        component: () => import("@/views/processo/MapaCadastroView.vue"),
+        component: () => import("@/views/MapaView.vue"),
         props: (route: RouteLocationNormalized) => ({
             codUnidade: Number(route.params.codUnidade),
             codProcesso: Number(route.query.codProcesso),
@@ -36,7 +36,7 @@ const unidadeRoutes: RouteRecordRaw[] = [
     {
         path: "/unidade/:codUnidade/atribuicao",
         name: "AtribuicaoTemporariaForm",
-        component: () => import("@/views/unidade/AtribuicaoTemporariaView.vue"),
+        component: () => import("@/views/AtribuicaoTemporariaView.vue"),
         props: (route: RouteLocationNormalized) => ({
             codUnidade: Number(route.params.codUnidade),
         }),

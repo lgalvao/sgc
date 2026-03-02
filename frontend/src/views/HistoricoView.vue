@@ -1,83 +1,59 @@
 <template>
   <LayoutPadrao>
-    <PageHeader subtitle="Lista de processos finalizados." title="Histórico de processos"/>
+    <PageHeader title="Histórico"/>
 
-    <BCard class="shadow-sm" no-body>
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-light">
-          <tr>
-            <th scope="col" style="width: 60%">Processo</th>
-            <th scope="col" style="width: 20%">Tipo</th>
-            <th scope="col" style="width: 20%">Finalizado em</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr v-if="loading">
-            <td class="text-center py-4" colspan="3">
-              <BSpinner label="Carregando..." variant="primary"/>
-            </td>
-          </tr>
-          <tr v-else-if="processos.length === 0">
-            <td colspan="3">
-              <EmptyState
-                  class="border-0 bg-transparent mb-0"
-                  description="Ainda não há processos finalizados para exibir."
-                  icon="bi-folder2-open"
-                  title="Nenhum processo finalizado"
-              >
-                <BButton
-                    data-testid="btn-historico-atualizar"
-                    size="sm"
-                    variant="outline-primary"
-                    @click="carregarHistorico"
-                >
-                  Atualizar lista
-                </BButton>
-              </EmptyState>
-            </td>
-          </tr>
-          <tr
-              v-for="proc in processos"
-              v-else
-              :key="proc.codigo"
-              class="cursor-pointer"
-              tabindex="0"
-              @click="verDetalhes(proc.codigo)"
-              @keydown.enter.prevent="verDetalhes(proc.codigo)"
-              @keydown.space.prevent="verDetalhes(proc.codigo)"
-          >
-            <td>
-              <div class="fw-bold">{{ proc.descricao }}</div>
-            </td>
-            <td>
-                <span :class="['badge', getBadgeClass(proc.tipo)]">
-                  {{ proc.tipo }}
-                </span>
-            </td>
-            <td>{{ formatDateBR(proc.dataFinalizacao) }}</td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-    </BCard>
+    <div v-if="loading" class="text-center py-5">
+      <BSpinner label="Carregando..." variant="primary"/>
+    </div>
+
+    <TabelaProcessos
+        v-else
+        :compacto="true"
+        :criterio-ordenacao="criterio"
+        :direcao-ordenacao-asc="asc"
+        :processos="processosOrdenados"
+        @ordenar="ordenarPor"
+        @selecionar-processo="verDetalhes"
+    />
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
-import {BButton, BCard, BSpinner} from 'bootstrap-vue-next';
+import {BSpinner} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
-import EmptyState from '@/components/comum/EmptyState.vue';
+import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {useProcessosStore} from '@/stores/processos';
-import {formatDateBR, logger} from '@/utils';
+import type {ProcessoResumo} from "@/types/tipos";
+import {logger} from '@/utils';
 
 const router = useRouter();
 const processosStore = useProcessosStore();
 const processos = computed(() => processosStore.processosFinalizados);
 const loading = ref(false);
+
+const criterio = ref<keyof ProcessoResumo>("dataFinalizacao");
+const asc = ref(false);
+
+const processosOrdenados = computed(() => {
+  const lista = [...processos.value];
+  const campo = criterio.value;
+  const direcao = asc.value ? 1 : -1;
+
+  return lista.sort((a, b) => {
+    const valA = a[campo];
+    const valB = b[campo];
+
+    if (valA === undefined || valA === null) return 1;
+    if (valB === undefined || valB === null) return -1;
+
+    if (valA < valB) return -1 * direcao;
+    if (valA > valB) return 1 * direcao;
+    return 0;
+  });
+});
 
 async function carregarHistorico() {
   loading.value = true;
@@ -90,17 +66,20 @@ async function carregarHistorico() {
   }
 }
 
-function verDetalhes(codigo: number) {
-  router.push(`/processo/${codigo}`);
+function ordenarPor(campo: keyof ProcessoResumo) {
+  if (criterio.value === campo) {
+    asc.value = !asc.value;
+  } else {
+    criterio.value = campo;
+    asc.value = true;
+  }
 }
 
-function getBadgeClass(tipo: string): string {
-  const map: Record<string, string> = {
-    'MAPEAMENTO': 'bg-primary',
-    'REVISAO': 'bg-info text-dark',
-    'DIAGNOSTICO': 'bg-warning text-dark'
-  };
-  return map[tipo] || 'bg-secondary';
+function verDetalhes(proc: ProcessoResumo | undefined) {
+  if (proc) {
+    const path = proc.linkDestino || `/processo/${proc.codigo}`;
+    router.push(path);
+  }
 }
 
 onMounted(() => {
@@ -109,10 +88,4 @@ onMounted(() => {
 </script>
 
 <style scoped>
-tbody tr:focus-visible {
-  outline: 2px solid var(--bs-primary);
-  background-color: var(--bs-table-hover-bg);
-  z-index: 1; /* Ensure outline sits on top of adjacent borders */
-  position: relative;
-}
 </style>

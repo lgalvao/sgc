@@ -365,6 +365,41 @@ VALUES (99, '123456789012', '56789012', 'TITULAR', CURRENT_TIMESTAMP);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('212121', 'GESTOR', 11);
 
+-- -------------------------------------------------------------------------------------------------
+-- MOVIMENTAÇÕES (Logs de histórico dos processos)
+-- -------------------------------------------------------------------------------------------------
+-- Subprocesso 99 (Unidade 4 - ASSESSORIA_12)
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
+                              data_hora, descricao)
+VALUES (1, 99, 4, 4, '151515', CURRENT_TIMESTAMP - INTERVAL '5' DAY, 'Cadastro de atividades iniciado');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
+                              data_hora, descricao)
+VALUES (2, 99, 4, 2, '151515', CURRENT_TIMESTAMP - INTERVAL '4' DAY, 'Cadastro de atividades disponibilizado para revisão');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
+                              data_hora, descricao)
+VALUES (3, 99, 2, 4, '202020', CURRENT_TIMESTAMP - INTERVAL '3' DAY, 'Mapa de competências criado');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
+                              data_hora, descricao)
+VALUES (4, 99, 4, 2, '151515', CURRENT_TIMESTAMP - INTERVAL '2' DAY, 'Mapa de competências validado pela unidade');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
+                              data_hora, descricao)
+VALUES (5, 99, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '1' DAY, 'Mapa de competências homologado');
+
+-- Subprocesso 200 (Unidade 2 - SECRETARIA_1)
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
+                              data_hora, descricao)
+VALUES (6, 200, 2, 2, '202020', CURRENT_TIMESTAMP - INTERVAL '10' DAY, 'Cadastro de atividades iniciado');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
+                              data_hora, descricao)
+VALUES (7, 200, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '8' DAY, 'Cadastro de atividades disponibilizado');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
+                              data_hora, descricao)
+VALUES (8, 200, 1, 2, '111111', CURRENT_TIMESTAMP - INTERVAL '5' DAY,
+        'Mapa de competências disponibilizado para validação');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
+                              data_hora, descricao)
+VALUES (9, 200, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '2' DAY, 'Mapa de competências homologado');
+
 -- Reset identity sequences to prevent ID conflicts with test data
 -- This ensures auto-generated IDs start above the manually inserted ones
 ALTER TABLE sgc.processo
@@ -379,3 +414,5 @@ ALTER TABLE sgc.conhecimento
     ALTER COLUMN codigo RESTART WITH 300000;
 ALTER TABLE sgc.competencia
     ALTER COLUMN codigo RESTART WITH 3000;
+ALTER TABLE sgc.movimentacao
+    ALTER COLUMN codigo RESTART WITH 10;

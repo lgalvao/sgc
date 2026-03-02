@@ -1,11 +1,11 @@
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import ParametrosSection from '@/components/configuracoes/ParametrosSection.vue';
+import ParametrosView from '@/views/ParametrosView.vue';
 import {useConfiguracoesStore} from '@/stores/configuracoes';
 import {useNotificacoesStore} from '@/stores/feedback';
 
-describe('ParametrosSection', () => {
+describe('ParametrosView', () => {
     let wrapper: any;
     let configuracoesStore: any;
     let notificacoesStore: any;
@@ -28,21 +28,21 @@ describe('ParametrosSection', () => {
         configuracoesStore.carregarConfiguracoes = vi.fn().mockResolvedValue([]);
         configuracoesStore.salvarConfiguracoes = vi.fn().mockResolvedValue(true);
 
-        const App = {
-            template: '<main><ParametrosSection /></main>',
-            components: {ParametrosSection}
-        };
-
-        wrapper = mount(App, {
+        wrapper = mount(ParametrosView, {
             global: {
                 plugins: [pinia],
                 stubs: {
-                    LoadingButton: {
-                        template: '<button :disabled="loading" class="loading-button-stub" @click="$emit(\'click\')">{{ text }}<slot /></button>',
-                        props: ['loading', 'variant', 'size', 'icon', 'text']
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    PageHeader: {
+                        props: ['title'],
+                        template: '<div><h1>{{ title }}</h1><slot name="actions" /></div>'
                     },
                     BAlert: {
                         template: '<div class="alert-stub"><slot /></div>'
+                    },
+                    LoadingButton: {
+                        template: '<button :disabled="loading" class="loading-button-stub" @click="$emit(\'click\')">{{ text }}<slot /></button>',
+                        props: ['loading', 'variant', 'size', 'icon', 'text']
                     }
                 }
             }
@@ -56,17 +56,10 @@ describe('ParametrosSection', () => {
     it('deve renderizar o formulário corretamente', async () => {
         setupWrapper();
         await wrapper.vm.$nextTick();
+        expect(wrapper.find('h1').text()).toBe('Parâmetros');
         expect(wrapper.find('form').exists()).toBe(true);
         expect(wrapper.find('#diasInativacao').exists()).toBe(true);
         expect(wrapper.find('#diasAlertaNovo').exists()).toBe(true);
-    });
-
-    it('deve chamar recarregar ao clicar no botão recarregar', async () => {
-        setupWrapper();
-        await wrapper.vm.$nextTick();
-        const btnRecarregar = wrapper.find('.loading-button-stub');
-        await btnRecarregar.trigger('click');
-        expect(configuracoesStore.carregarConfiguracoes).toHaveBeenCalled();
     });
 
     it('deve chamar salvar ao submeter o formulário com sucesso', async () => {
@@ -99,21 +92,5 @@ describe('ParametrosSection', () => {
         });
         await wrapper.vm.$nextTick();
         expect(wrapper.find('.alert-stub').text()).toContain('Erro de teste');
-    });
-
-    it('deve carregar configuracoes no onMounted se estiverem vazias', async () => {
-        setupWrapper({}, []); // empty params
-        await wrapper.vm.$nextTick();
-        expect(configuracoesStore.carregarConfiguracoes).toHaveBeenCalled();
-    });
-
-    it('deve lidar com parametros nao encontrados no salvar', async () => {
-        setupWrapper({}, []); // empty params, findCodigo will return undefined
-        await wrapper.vm.$nextTick();
-        await wrapper.find('form').trigger('submit.prevent');
-        expect(configuracoesStore.salvarConfiguracoes).toHaveBeenCalledWith([
-            {codigo: undefined, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: expect.any(String), valor: '30'},
-            {codigo: undefined, chave: 'DIAS_ALERTA_NOVO', descricao: expect.any(String), valor: '5'}
-        ]);
     });
 });

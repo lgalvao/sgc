@@ -80,16 +80,22 @@
         Data limite <span aria-hidden="true" class="text-danger">*</span>
       </template>
 
-      <BFormInput
-          id="dataLimite"
-          ref="inputDataLimiteRef"
-          :model-value="modelValue.dataLimite"
-          :state="fieldErrors.dataLimite ? false : null"
-          data-testid="inp-processo-data-limite"
-          required
-          type="date"
-          @update:model-value="(val) => updateField('dataLimite', String(val))"
-      />
+      <BInputGroup>
+        <BFormInput
+            id="dataLimite"
+            ref="inputDataLimiteRef"
+            :model-value="modelValue.dataLimite"
+            :state="fieldErrors.dataLimite ? false : null"
+            data-testid="inp-processo-data-limite"
+            required
+            type="date"
+            @update:model-value="(val) => updateField('dataLimite', String(val))"
+        />
+        <BInputGroupText class="cursor-pointer" @click="abrirCalendario">
+          <i class="bi bi-calendar-event"></i>
+        </BInputGroupText>
+      </BInputGroup>
+
       <BFormInvalidFeedback :state="fieldErrors.dataLimite ? false : null">
         {{ fieldErrors.dataLimite }}
       </BFormInvalidFeedback>
@@ -98,7 +104,15 @@
 </template>
 
 <script lang="ts" setup>
-import {BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect, BFormSelectOption} from "bootstrap-vue-next";
+import {
+  BFormGroup,
+  BFormInput,
+  BFormInvalidFeedback,
+  BFormSelect,
+  BFormSelectOption,
+  BInputGroup,
+  BInputGroupText
+} from "bootstrap-vue-next";
 import {nextTick, ref, watch} from "vue";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import type {Unidade} from "@/types/tipos";
@@ -148,6 +162,17 @@ function updateField<K extends keyof ProcessoFormData>(field: K, value: Processo
     ...props.modelValue,
     [field]: value
   });
+}
+
+function abrirCalendario() {
+  if (inputDataLimiteRef.value?.$el) {
+    const input = inputDataLimiteRef.value.$el as HTMLInputElement;
+    if (typeof input.showPicker === 'function') {
+      input.showPicker();
+    } else {
+      input.focus();
+    }
+  }
 }
 
 function focarPrimeiroErro() {
@@ -205,11 +230,14 @@ defineExpose({inputDescricaoRef, focarPrimeiroErro});
 </script>
 
 <style scoped>
-/* Garante que o ícone do seletor de datas seja exibido e clicável */
-:deep(input[type="date"]::-webkit-calendar-picker-indicator) {
+.cursor-pointer {
   cursor: pointer;
-  display: block;
-  opacity: 1;
+}
+
+/* Esconde o ícone de calendário nativo do navegador para evitar duplicidade */
+:deep(input[type="date"]::-webkit-calendar-picker-indicator) {
+  display: none !important;
+  -webkit-appearance: none;
 }
 
 /* Garante altura mínima para o input para evitar cortes no ícone */

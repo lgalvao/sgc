@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
-import Unidade from '@/views/unidade/UnidadeDetalheView.vue';
+import UnidadeView from '@/views/UnidadeView.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import ErrorAlert from '@/components/comum/ErrorAlert.vue';
 import {useUnidadesStore} from '@/stores/unidades';
@@ -30,7 +30,7 @@ const {mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel} = vi.hois
         mockUnidadeData: {
             codigo: 1,
             sigla: 'TEST',
-            nome: 'Unidade Teste',
+            nome: 'UnidadeView Teste',
             usuarioCodigo: 10,
             tituloTitular: '123456',
             filhas: [
@@ -86,7 +86,7 @@ const TreeTableStub = {
     emits: ['row-click']
 };
 
-describe('Unidade.vue', () => {
+describe('UnidadeView.vue', () => {
     const context = setupComponentTest();
 
     beforeEach(() => {
@@ -104,7 +104,7 @@ describe('Unidade.vue', () => {
 
 
     const createWrapper = (initialStateOverride = {}) => {
-        context.wrapper = mount(Unidade, {
+        context.wrapper = mount(UnidadeView, {
             ...getCommonMountOptions(
                 {
                     unidades: {
@@ -172,7 +172,7 @@ describe('Unidade.vue', () => {
         await wrapper.vm.$nextTick();
         await flushPromises();
 
-        expect(wrapper.text()).toContain('TEST - Unidade Teste');
+        expect(wrapper.text()).toContain('TEST - UnidadeView Teste');
         expect(wrapper.text()).toContain('Titular: Titular Teste');
     });
 

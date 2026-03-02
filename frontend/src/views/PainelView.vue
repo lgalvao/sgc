@@ -50,18 +50,9 @@
             <EmptyState
                 class="border-0 bg-transparent mb-0"
                 data-testid="empty-state-alertas"
-                description="Não há alertas no momento. Atualize para verificar novas notificações."
                 icon="bi-bell-slash"
                 title="Nenhum alerta"
             >
-              <BButton
-                  data-testid="btn-empty-state-alertas-atualizar"
-                  size="sm"
-                  variant="outline-primary"
-                  @click="carregarDados"
-              >
-                Atualizar alertas
-              </BButton>
             </EmptyState>
           </template>
         </BTable>
@@ -83,8 +74,7 @@ import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {useAlertasStore} from "@/stores/alertas";
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
-import type {Alerta} from "@/types/tipos";
-import type {ProcessoResumo} from "@/types/tipos";
+import type {Alerta, ProcessoResumo} from "@/types/tipos";
 
 const perfil = usePerfilStore();
 const processosStore = useProcessosStore();

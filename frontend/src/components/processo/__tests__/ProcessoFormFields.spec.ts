@@ -1,4 +1,4 @@
-import {describe, expect, it} from "vitest";
+import {describe, expect, it, vi} from "vitest";
 import {mount} from "@vue/test-utils";
 import {nextTick} from "vue";
 import ProcessoFormFields from "../ProcessoFormFields.vue";
@@ -40,5 +40,33 @@ describe("ProcessoFormFields.vue", () => {
         await nextTick();
         const container = wrapper.find('[data-testid="container-processo-unidades"]');
         expect(container.element).toBe(document.activeElement);
+    });
+
+    it("foca no campo data limite quando há erro de data limite", async () => {
+        const wrapper = criarWrapper({dataLimite: "Data limite obrigatória"});
+        await nextTick();
+        const inputDataLimite = wrapper.find('[data-testid="inp-processo-data-limite"]');
+        expect(inputDataLimite.element).toBe(document.activeElement);
+    });
+
+    it("renderiza o ícone de calendário", () => {
+        const wrapper = criarWrapper();
+        const icone = wrapper.find('.bi-calendar-event');
+        expect(icone.exists()).toBe(true);
+        expect(icone.element.parentElement?.classList.contains('input-group-text')).toBe(true);
+    });
+
+    it("tenta abrir o seletor de data ao clicar no ícone", async () => {
+        const wrapper = criarWrapper();
+        const input = wrapper.find('[data-testid="inp-processo-data-limite"]').element as HTMLInputElement;
+
+        // Mock showPicker
+        const showPickerSpy = vi.fn();
+        input.showPicker = showPickerSpy;
+
+        const iconeContainer = wrapper.find('.cursor-pointer');
+        await iconeContainer.trigger('click');
+
+        expect(showPickerSpy).toHaveBeenCalled();
     });
 });

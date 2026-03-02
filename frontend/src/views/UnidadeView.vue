@@ -5,8 +5,8 @@
         @dismiss="unidadesStore.clearError()"
     />
 
-    <div v-if="unidadeComResponsavelDinamico">
-      <PageHeader :title="`${unidadeComResponsavelDinamico.sigla} - ${unidadeComResponsavelDinamico.nome}`">
+    <div v-if="unidade">
+      <PageHeader :title="`${unidade.sigla} - ${unidade.nome}`">
         <template #actions>
           <BButton
               v-if="mapaVigente"
@@ -57,9 +57,22 @@
             <BCol class="border-start" md="6">
               <div data-testid="unidade-responsavel-info">
                 <h5 class="mb-1">
-                  Responsável: {{ unidadeComResponsavelDinamico.responsavel ? unidadeComResponsavelDinamico.responsavel.nome : 'Não informado' }}
+                  Responsável: {{ unidade.responsavel ? unidade.responsavel.nome : 'Não informado' }}
                 </h5>
-                <p v-if="unidadeComResponsavelDinamico.responsavel" class="mb-0 text-muted small">Titular ou substituto legal</p>
+                <div v-if="unidade.responsavel" class="d-flex flex-column">
+                  <span v-if="unidade.responsavel.ramal">
+                    Ramal: <a
+                      :aria-label="`Ligar para ${unidade.responsavel.ramal}`"
+                      :href="`tel:${unidade.responsavel.ramal}`"
+                    >{{ unidade.responsavel.ramal }}</a>
+                  </span>
+                  <span v-if="unidade.responsavel.email">
+                    E-mail: <a
+                      :aria-label="`Enviar e-mail para ${unidade.responsavel.email}`"
+                      :href="`mailto:${unidade.responsavel.email}`"
+                    >{{ unidade.responsavel.email }}</a>
+                  </span>
+                </div>
               </div>
             </BCol>
           </BRow>
@@ -74,7 +87,7 @@
     />
 
     <div
-        v-if="unidadeComResponsavelDinamico && unidadeComResponsavelDinamico.filhas && unidadeComResponsavelDinamico.filhas.length > 0"
+        v-if="unidade && unidade.filhas && unidade.filhas.length > 0"
         class="mt-5"
     >
       <TreeTable
@@ -99,7 +112,6 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {useUnidadesStore} from "@/stores/unidades";
-import {useAtribuicaoTemporariaStore} from "@/stores/atribuicoes";
 import {usePerfilStore} from "@/stores/perfil";
 import {useMapasStore} from "@/stores/mapas";
 import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
@@ -109,7 +121,6 @@ const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
 const unidadesStore = useUnidadesStore();
-const atribuicaoStore = useAtribuicaoTemporariaStore();
 const perfilStore = usePerfilStore();
 const mapasStore = useMapasStore();
 
@@ -118,40 +129,15 @@ const titularDetalhes = ref<Usuario | null>(null);
 const unidade = computed(() => unidadesStore.unidade);
 const mapaVigente = computed(() => mapasStore.mapaCompleto);
 
-const unidadeComResponsavelDinamico = computed(() => {
-  if (!unidade.value) return null;
-
-  const atribuicoes = atribuicaoStore.obterAtribuicoesPorUnidade(unidade.value.sigla);
-  const agora = new Date();
-  const atribuicaoAtiva = atribuicoes.find(a => {
-    const inicio = new Date(a.dataInicio);
-    let fim = null;
-    if (a.dataTermino) {
-      fim = new Date(a.dataTermino);
-    } else if (a.dataFim) {
-      fim = new Date(a.dataFim);
-    }
-    return inicio <= agora && (!fim || fim >= agora);
-  });
-
-  return {
-    ...unidade.value,
-    responsavel: atribuicaoAtiva ? atribuicaoAtiva.usuario : (unidade.value.responsavel || null)
-  };
-});
-
 async function carregarDados() {
   try {
-    await Promise.all([
-      unidadesStore.buscarArvoreUnidade(props.codUnidade),
-      atribuicaoStore.buscarAtribuicoes()
-    ]);
+    await unidadesStore.buscarArvoreUnidade(props.codUnidade);
 
     if (unidade.value?.tituloTitular) {
       titularDetalhes.value = await buscarUsuarioPorTitulo(unidade.value.tituloTitular);
     }
   } catch (error) {
-    logger.error("Erro ao buscar titular:", error);
+    logger.error("Erro ao carregar dados da unidade:", error);
   }
 }
 
@@ -181,13 +167,9 @@ watch(() => props.codUnidade, carregarDados);
 const colunasTabela = [{key: "nome", label: "Unidade"}];
 
 const dadosFormatadosSubordinadas = computed(() => {
-  if (
-      !unidadeComResponsavelDinamico.value ||
-      !unidadeComResponsavelDinamico.value.filhas ||
-      unidadeComResponsavelDinamico.value.filhas.length === 0
-  )
+  if (!unidade.value || !unidade.value.filhas || unidade.value.filhas.length === 0)
     return [];
-  return formatarDadosParaArvore(unidadeComResponsavelDinamico.value.filhas);
+  return formatarDadosParaArvore(unidade.value.filhas);
 });
 
 interface UnidadeFormatada {

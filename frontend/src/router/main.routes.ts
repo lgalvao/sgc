@@ -32,13 +32,13 @@ const mainRoutes: RouteRecordRaw[] = [
     {
         path: "/parametros",
         name: "Parametros",
-        component: () => import("@/views/configuracoes/ParametrosView.vue"),
+        component: () => import("@/views/ParametrosView.vue"),
         meta: {title: "Parâmetros"},
     },
     {
         path: "/administradores",
         name: "Administradores",
-        component: () => import("@/views/configuracoes/AdministradoresView.vue"),
+        component: () => import("@/views/AdministradoresView.vue"),
         meta: {title: "Administradores"},
     },
 ];

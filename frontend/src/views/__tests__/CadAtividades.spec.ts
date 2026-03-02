@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
-import CadAtividades from "@/views/processo/AtividadesCadastroView.vue";
+import CadastroView from "@/views/CadastroView.vue";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
@@ -85,7 +85,7 @@ const BFormInputStub = {
     }
 };
 
-describe("CadAtividades.vue", () => {
+describe("CadastroView.vue", () => {
     let subprocessosStore: any;
     let atividadesStore: any;
     let analisesStore: any;
@@ -178,7 +178,7 @@ describe("CadAtividades.vue", () => {
 
         feedbackStore = useFeedbackStore(pinia) as any;
 
-        const wrapper = mount(CadAtividades, {
+        const wrapper = mount(CadastroView, {
             attachTo: document.body, // Important for focus testing
             global: {
                 plugins: [pinia],

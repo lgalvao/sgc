@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
-import VisAtividades from "@/views/processo/AtividadesVisualizacaoView.vue";
+import CadastroVisualizacaoView from "@/views/CadastroVisualizacaoView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useAtividadesStore} from "@/stores/atividades";
@@ -60,7 +60,7 @@ const BModalStub = {
     emits: ['update:modelValue']
 };
 
-describe("VisAtividades.vue Coverage", () => {
+describe("CadastroVisualizacaoView.vue Coverage", () => {
     let pushMock: any;
 
     beforeEach(() => {
@@ -121,7 +121,7 @@ describe("VisAtividades.vue Coverage", () => {
             ...accessOverrides
         } as any);
 
-        return mount(VisAtividades, mountOptions(initialState, propsData));
+        return mount(CadastroVisualizacaoView, mountOptions(initialState, propsData));
     };
 
     it("deve encontrar unidade aninhada recursivamente", async () => {

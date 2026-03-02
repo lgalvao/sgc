@@ -1,13 +1,6 @@
 <template>
   <LayoutPadrao>
     <div v-if="subprocesso">
-      <PageHeader
-          :etapa="`Etapa atual: ${formatSituacaoSubprocesso(subprocesso.situacao)}`"
-          :proxima-acao="proximaAcaoSubprocesso"
-          :subtitle="subprocesso.processoDescricao"
-          :title="`Subprocesso - ${subprocesso.unidade.sigla}`"
-      />
-
       <div data-testid="header-subprocesso">
         <PageHeader
             :subtitle="subprocesso.unidade.nome"
@@ -56,26 +49,35 @@
 
         <BCard class="mb-4" data-testid="header-subprocesso-details" no-body>
           <BCardBody>
-            <p
-                class="text-muted small mb-3"
-                data-testid="txt-header-processo"
-            >
-              Processo: {{ subprocesso.processoDescricao }}
+            <p data-testid="txt-header-processo">
+              <strong>Processo:</strong> {{ subprocesso.processoDescricao }}
             </p>
             <p>
               <span class="fw-bold me-1">Situação:</span>
               <span data-testid="subprocesso-header__txt-situacao">{{ formatSituacaoSubprocesso(subprocesso.situacao) }}</span>
             </p>
             <p><strong>Titular:</strong> {{ subprocesso.titular?.nome || '' }}</p>
-            <p class="ms-3">
-              <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ subprocesso.titular?.ramal || '' }}
-              <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ subprocesso.titular?.email || '' }}
+            <p class="ms-3 mb-2">
+              <span v-if="subprocesso.titular?.ramal" class="me-3">
+                <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
+                <a :href="`tel:${subprocesso.titular.ramal}`">{{ subprocesso.titular.ramal }}</a>
+              </span>
+              <span v-if="subprocesso.titular?.email">
+                <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
+                <a :href="`mailto:${subprocesso.titular.email}`">{{ subprocesso.titular.email }}</a>
+              </span>
             </p>
             <template v-if="subprocesso.responsavel?.nome && subprocesso.responsavel?.nome !== subprocesso.titular?.nome">
-              <p><strong>Responsável:</strong> {{ subprocesso.responsavel?.nome || '' }}</p>
-              <p class="ms-3">
-                <i aria-hidden="true" class="bi bi-telephone-fill me-2"/>{{ subprocesso.responsavel?.ramal || '' }}
-                <i aria-hidden="true" class="bi bi-envelope-fill ms-3 me-2"/>{{ subprocesso.responsavel?.email || '' }}
+              <p class="mt-2"><strong>Responsável:</strong> {{ subprocesso.responsavel?.nome || '' }}</p>
+              <p class="ms-3 mb-0">
+                <span v-if="subprocesso.responsavel?.ramal" class="me-3">
+                  <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
+                  <a :href="`tel:${subprocesso.responsavel.ramal}`">{{ subprocesso.responsavel.ramal }}</a>
+                </span>
+                <span v-if="subprocesso.responsavel?.email">
+                  <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
+                  <a :href="`mailto:${subprocesso.responsavel.email}`">{{ subprocesso.responsavel.email }}</a>
+                </span>
               </p>
             </template>
           </BCardBody>
@@ -116,16 +118,10 @@
             {{ formatDateTimeBR(data.item.dataHora) }}
           </template>
           <template #cell(unidadeOrigem)="data">
-            {{ data.item.unidadeOrigem?.sigla || '-' }}
+            {{ data.item.unidadeOrigemSigla || '-' }}
           </template>
           <template #cell(unidadeDestino)="data">
-            {{ data.item.unidadeDestino?.sigla || '-' }}
-          </template>
-          <template #cell(situacao)="data">
-            <BadgeSituacao
-                :situacao="data.item.subprocesso?.situacao || 'DESCONHECIDO'"
-                :texto="formatarSituacaoMovimentacao(data.item.subprocesso?.situacao)"
-            />
+            {{ data.item.unidadeDestinoSigla || '-' }}
           </template>
         </BTable>
       </div>
@@ -197,10 +193,8 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
 import SubprocessoModal from "@/components/processo/SubprocessoModal.vue";
-import BadgeSituacao from "@/components/comum/BadgeSituacao.vue";
 import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import {useProximaAcao} from "@/composables/useProximaAcao";
 import {useMapasStore} from "@/stores/mapas";
 import {useFeedbackStore} from "@/stores/feedback";
 import {usePerfilStore} from "@/stores/perfil";
@@ -217,9 +211,8 @@ import {
   type SubprocessoDetalhe,
   TipoProcesso
 } from "@/types/tipos";
-import {formatDateTimeBR} from "@/utils";
+import {formatDateTimeBR, logger} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
-import {logger} from "@/utils";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
@@ -240,10 +233,9 @@ const codSubprocesso = ref<number | null>(null);
 const modalLembreteAberto = ref(false);
 
 const camposMovimentacoes = [
-  {key: "dataHora", label: "Data/Hora"},
-  {key: "unidadeOrigem", label: "Unidade Origem"},
-  {key: "unidadeDestino", label: "Unidade Destino"},
-  {key: "situacao", label: "Situação"},
+  {key: "dataHora", label: "Data/hora"},
+  {key: "unidadeOrigem", label: "Origem"},
+  {key: "unidadeDestino", label: "Destino"},
   {key: "descricao", label: "Descrição"}
 ];
 
@@ -252,11 +244,6 @@ const rowAttrMovimentacao = (item: Movimentacao | null, type: string) => {
       ? {'data-testid': `row-movimentacao-${item.codigo}`}
       : {};
 };
-
-function formatarSituacaoMovimentacao(situacao?: string) {
-  if (!situacao) return "Desconhecido";
-  return situacao.replaceAll("_", " ");
-}
 
 const subprocesso = computed<SubprocessoDetalhe | null>(
     () => subprocessosStore.subprocessoDetalhe,
@@ -286,14 +273,6 @@ const dataLimite = computed(() =>
         ? new Date(subprocesso.value.prazoEtapaAtual)
         : new Date(),
 );
-const {obterProximaAcao} = useProximaAcao();
-const proximaAcaoSubprocesso = computed(() => obterProximaAcao({
-  perfil: perfilStore.perfilSelecionado,
-  situacao: formatSituacaoSubprocesso(subprocesso.value?.situacao),
-  podeDisponibilizarCadastro: podeDisponibilizarCadastro.value,
-  podeEditarCadastro: podeEditarCadastro.value,
-  isProcessoFinalizado: isProcessoFinalizado.value,
-}));
 
 onMounted(async () => {
   try {

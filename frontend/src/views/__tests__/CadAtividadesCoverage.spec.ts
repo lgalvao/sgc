@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
-import CadAtividades from '@/views/processo/AtividadesCadastroView.vue';
+import CadastroView from '@/views/CadastroView.vue';
 import {useAtividadesStore} from '@/stores/atividades';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useMapasStore} from '@/stores/mapas';
@@ -25,7 +25,7 @@ vi.mock('vue-router', () => ({
     createMemoryHistory: vi.fn(),
 }));
 
-describe('CadAtividades.vue Coverage', () => {
+describe('CadastroView.vue Coverage', () => {
     const commonStubs = {
         PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
         BButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
@@ -68,7 +68,7 @@ describe('CadAtividades.vue Coverage', () => {
             stubActions: true,
             initialState
         });
-        const wrapper = mount(CadAtividades, {
+        const wrapper = mount(CadastroView, {
             props: {
                 codProcesso: 1,
                 sigla: 'TEST'
@@ -345,7 +345,7 @@ describe('CadAtividades.vue Coverage', () => {
         const subprocessosStore = useSubprocessosStore(pinia);
         (subprocessosStore.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue(null);
 
-        mount(CadAtividades, {
+        mount(CadastroView, {
             props: {codProcesso: 1, sigla: 'TEST'},
             global: {plugins: [pinia], stubs: commonStubs}
         });

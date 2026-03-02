@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import {nextTick} from 'vue';
 import {createTestingPinia} from '@pinia/testing';
-import CadProcesso from '@/views/processo/ProcessoCadastroView.vue';
+import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
 import {useProcessosStore} from '@/stores/processos';
 import {useUnidadesStore} from '@/stores/unidades';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
@@ -46,14 +46,14 @@ const ArvoreUnidadesStub = {
     emits: ['update:modelValue']
 };
 
-describe('CadProcesso.vue', () => {
+describe('ProcessoCadastroView.vue', () => {
     const context = setupComponentTest();
     let processosStore: any;
     let unidadesStore: any;
     let processoService: any;
 
     const createWrapper = (initialState = {}) => {
-        context.wrapper = mount(CadProcesso, {
+        context.wrapper = mount(ProcessoCadastroView, {
             ...getCommonMountOptions(
                 {
                     unidades: {
@@ -527,7 +527,7 @@ describe('CadProcesso.vue', () => {
         const store = useProcessosStore(pinia);
         (store.buscarProcessoDetalhe as any).mockRejectedValue(new Error('Load Error'));
 
-        const wrapper = mount(CadProcesso, {
+        const wrapper = mount(ProcessoCadastroView, {
             ...getCommonMountOptions({}, {
                 BContainer: {template: '<div><slot /></div>'},
                 BAlert: {template: '<div class="alert"><slot /></div>', props: ['modelValue', 'variant']},

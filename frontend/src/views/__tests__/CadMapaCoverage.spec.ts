@@ -1,7 +1,7 @@
 import {describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
-import CadMapa from '@/views/processo/MapaCadastroView.vue';
+import MapaView from '@/views/MapaView.vue';
 import {useMapasStore} from '@/stores/mapas';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 
@@ -19,7 +19,7 @@ vi.mock("vue-router", () => ({
     createMemoryHistory: vi.fn(),
 }));
 
-describe('CadMapa Coverage', () => {
+describe('MapaView Coverage', () => {
     const commonStubs = {
         PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
         BButton: {template: '<button />'},
@@ -46,7 +46,7 @@ describe('CadMapa Coverage', () => {
             }
         });
 
-        const wrapper = mount(CadMapa, {
+        const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
@@ -73,7 +73,7 @@ describe('CadMapa Coverage', () => {
         const store = useSubprocessosStore(pinia);
         (store.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue(null);
 
-        const wrapper = mount(CadMapa, {
+        const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
@@ -98,7 +98,7 @@ describe('CadMapa Coverage', () => {
             }
         });
 
-        const wrapper = mount(CadMapa, {
+        const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
@@ -128,7 +128,7 @@ describe('CadMapa Coverage', () => {
             }
         });
 
-        const wrapper = mount(CadMapa, {
+        const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
@@ -149,7 +149,7 @@ describe('CadMapa Coverage', () => {
 
     it('fecharModalImpacto closes the modal', async () => {
         const pinia = createTestingPinia();
-        const wrapper = mount(CadMapa, {
+        const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
@@ -164,7 +164,7 @@ describe('CadMapa Coverage', () => {
 
     it('handleErrors covers activitiesIds branch', async () => {
         const pinia = createTestingPinia();
-        const wrapper = mount(CadMapa, {
+        const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
@@ -183,7 +183,7 @@ describe('CadMapa Coverage', () => {
 
     it('disponibilizarMapa returns early if codSubprocesso is null', async () => {
         const pinia = createTestingPinia();
-        const wrapper = mount(CadMapa, {
+        const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
@@ -199,7 +199,7 @@ describe('CadMapa Coverage', () => {
 
     it('fecharModalDisponibilizar clears state', async () => {
         const pinia = createTestingPinia();
-        const wrapper = mount(CadMapa, {
+        const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
                 stubs: commonStubs
