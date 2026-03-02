@@ -564,6 +564,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.waitForTimeout(100);
             await capturarTela(page, '05-mapa', '06-mapa-competencia-hover');
 
+            await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
             await page.getByTestId('btn-cad-mapa-disponibilizar').click();
             await page.waitForTimeout(100);
             await capturarTela(page, '05-mapa', '07-modal-disponibilizar-mapa');

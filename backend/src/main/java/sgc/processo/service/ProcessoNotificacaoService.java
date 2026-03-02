@@ -237,18 +237,21 @@ public class ProcessoNotificacaoService {
             String corpoHtml = emailModelosService.criarEmailInicioProcessoConsolidado(
                     unidade.getSigla(), processo.getDescricao(), dataLimite, isParticipante, siglasSubordinadas);
 
-            enviarEmailEParaSubstituto(unidade, responsavel, usuarios, assunto, corpoHtml, unidade.getNome());
+            enviarEmailUnidade(unidade, responsavel, usuarios, assunto, corpoHtml, unidade.getNome());
         } catch (Exception e) {
             log.error("Erro ao enviar e-mail consolidado para {}: {}", unidade.getSigla(), e.getMessage(), e);
         }
     }
 
-    private void enviarEmailEParaSubstituto(Unidade unidade, UnidadeResponsavelDto responsavel,
-                                            Map<String, Usuario> usuarios, String assunto,
-                                            String corpoHtml, String nomeUnidade) {
-        String emailUnidade = String.format("%s@tre-pe.jus.br", unidade.getSigla().toLowerCase());
+    private void enviarEmailUnidade(Unidade unidade, UnidadeResponsavelDto responsavel,
+                                    Map<String, Usuario> usuarios, String assunto,
+                                    String corpoHtml, String nomeUnidade) {
+
+        String sigla = unidade.getSigla();
+
+        String emailUnidade = String.format("%s@tre-pe.jus.br", sigla.toLowerCase());
         emailService.enviarEmailHtml(emailUnidade, assunto, corpoHtml);
-        log.info("E-mail enviado para {}", unidade.getSigla());
+        log.info("E-mail enviado para {}", sigla);
 
         if (responsavel.substitutoTitulo() != null) {
             enviarEmailParaSubstituto(responsavel.substitutoTitulo(), usuarios, assunto, corpoHtml, nomeUnidade);

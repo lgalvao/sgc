@@ -590,7 +590,7 @@ public class SubprocessoService {
                 unidadeSp,
                 sp,
                 detalhes,
-                mapaManutencaoService.mapaCodigo(sp.getMapa().getCodigo()),
+                mapaManutencaoService.mapaCompletoSubprocesso(codSubprocesso),
                 atividades
         );
     }
