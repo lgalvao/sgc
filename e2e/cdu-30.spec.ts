@@ -16,7 +16,7 @@ test.describe.serial('CDU-30 - Manter Administradores', () => {
         await expect(page).toHaveURL(/\/administradores/);
 
         // Cenario 2: Página contém seção de administradores
-        await expect(page.getByRole('heading', {name: /Administradores/i})).toBeVisible();
+        await expect(page.getByRole('heading', {name: 'Administradores', exact: true})).toBeVisible();
 
         // Cenario 3: Lista de administradores é exibida com dados e botão de adição
         const tabela = page.locator('main table');
