@@ -27,16 +27,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(RestExceptionHandler.class)
 @DisplayName("SubprocessoController")
 class SubprocessoControllerTest {
-
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+
     @MockitoBean
     private SubprocessoService subprocessoService;
+
     @MockitoBean
     private SubprocessoTransicaoService transicaoService;
+
     @MockitoBean
     private UnidadeService unidadeService;
+
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
+
     @Autowired
     private MockMvc mockMvc;
 

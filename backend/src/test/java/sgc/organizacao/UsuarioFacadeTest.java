@@ -51,16 +51,6 @@ class UsuarioFacadeTest {
         return unidade;
     }
 
-    private UsuarioPerfil criarAtribuicao(Usuario usuario, Unidade unidade, Perfil perfil) {
-        UsuarioPerfil atribuicao = new UsuarioPerfil();
-        atribuicao.setUsuario(usuario);
-        atribuicao.setUsuarioTitulo(usuario.getTituloEleitoral());
-        atribuicao.setUnidade(unidade);
-        atribuicao.setUnidadeCodigo(unidade.getCodigo());
-        atribuicao.setPerfil(perfil);
-        return atribuicao;
-    }
-
     private void configurarAutenticacao(String titulo) {
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 titulo, null, Collections.emptyList());

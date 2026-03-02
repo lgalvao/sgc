@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
@@ -29,7 +28,6 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 public class ProcessoFacade {
     private final ProcessoConsultaService processoConsultaService;
     private final ProcessoManutencaoService processoManutencaoService;
-    private final UnidadeService unidadeService;
     private final SubprocessoService subprocessoService;
     private final SubprocessoTransicaoService transicaoService;
     private final ProcessoDetalheBuilder processoDetalheBuilder;

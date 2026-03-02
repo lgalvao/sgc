@@ -33,6 +33,7 @@ const {mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel} = vi.hois
             nome: 'UnidadeView Teste',
             usuarioCodigo: 10,
             tituloTitular: '123456',
+            responsavel: ur,
             filhas: [
                 {codigo: 2, sigla: 'SUB1', nome: 'Subordinada 1', filhas: []},
                 {codigo: 3, sigla: 'SUB2', nome: 'Subordinada 2', filhas: []}
@@ -278,7 +279,7 @@ describe('UnidadeView.vue', () => {
 
         // Test dismiss
         vi.spyOn(unidadesStore, 'clearError');
-        await alert.vm.$emit('dismiss');
+        alert.vm.$emit('dismiss');
         expect(unidadesStore.clearError).toHaveBeenCalled();
     });
 
@@ -341,7 +342,7 @@ describe('UnidadeView.vue', () => {
         expect(unidadesStore.unidade.filhas).toHaveLength(0);
 
         // Access computed property explicitly to ensure coverage
-        expect((wrapper.vm as any).dadosFormatadosSubordinadas).toEqual([]);
+        expect((wrapper.vm).dadosFormatadosSubordinadas).toEqual([]);
 
         // Should check that TreeTable is not rendered or data is empty
         const treeTable = wrapper.findComponent(TreeTableStub);

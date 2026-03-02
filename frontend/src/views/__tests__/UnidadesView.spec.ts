@@ -4,6 +4,10 @@ import Unidades from "@/views/UnidadesView.vue";
 import {useUnidadesStore} from "@/stores/unidades";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
+vi.mock("vue-router", () => ({
+    useRouter: () => ({ push: vi.fn() }),
+}));
+
 describe("Unidades.vue", () => {
     const context = setupComponentTest();
 
