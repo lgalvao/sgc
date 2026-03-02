@@ -51,7 +51,7 @@ describe("HistoricoView Coverage", () => {
         expect(store.processosFinalizados).toHaveLength(1);
 
         // Find the row
-        const row = wrapper.find("tbody tr.cursor-pointer");
+        const row = wrapper.find("tbody tr.row-processo-1");
         expect(row.exists()).toBe(true);
         expect(row.text()).toContain("Processo Teste");
 

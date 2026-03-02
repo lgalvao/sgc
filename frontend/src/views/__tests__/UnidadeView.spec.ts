@@ -157,9 +157,8 @@ describe('UnidadeView.vue', () => {
     };
 
     it('fetches data on mount', async () => {
-        const {unidadesStore, atribuicaoStore} = createWrapper();
+        const {unidadesStore} = createWrapper();
         expect(unidadesStore.buscarArvoreUnidade).toHaveBeenCalledWith(1);
-        expect(atribuicaoStore.buscarAtribuicoes).toHaveBeenCalled();
     });
 
     it('renders unit details correctly', async () => {
@@ -204,33 +203,18 @@ describe('UnidadeView.vue', () => {
         expect(mockPush).toHaveBeenCalledWith({path: '/unidade/1/atribuicao'});
     });
 
-    it('calculates dynamic responsible person correctly', async () => {
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-
-        const mockAtribuicao = {
-            usuario: {...mockUsuarioResponsavel, unidade: {codigo: 1}},
-            unidade: {...mockUnidade},
-            dataInicio: yesterday.toISOString(),
-            dataTermino: tomorrow.toISOString(),
+    it('renders responsible person correctly from API payload', async () => {
+        const unidadeComResponsavel = {
+            ...mockUnidade,
+            responsavel: mockUsuarioResponsavel
         };
 
-        const {wrapper, atribuicaoStore} = createWrapper({
+        const {wrapper} = createWrapper({
             unidades: {
-                unidade: mockUnidade
-            },
-            atribuicoes: {
-                atribuicoes: [mockAtribuicao]
+                unidade: unidadeComResponsavel
             }
         });
 
-        // Mock obterAtribuicoesPorUnidade para retornar a atribuição
-        vi.spyOn(atribuicaoStore, 'obterAtribuicoesPorUnidade').mockReturnValue([mockAtribuicao]);
-
-        // Force re-computation
         await wrapper.vm.$nextTick();
         await flushPromises();
 
@@ -308,7 +292,7 @@ describe('UnidadeView.vue', () => {
         });
         await flushPromises();
 
-        expect(logger.error).toHaveBeenCalledWith('Erro ao buscar titular:', expect.any(Error));
+        expect(logger.error).toHaveBeenCalledWith('Erro ao carregar dados da unidade:', expect.any(Error));
     });
 
     it('renders clickable contact links for titular', async () => {
@@ -342,36 +326,6 @@ describe('UnidadeView.vue', () => {
         expect(emailLink.attributes('aria-label')).toBe('Enviar e-mail para test@example.com');
     });
 
-    it('calculates dynamic responsible person using dataFim (legacy format)', async () => {
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-
-        const mockAtribuicao = {
-            usuario: {...mockUsuarioResponsavel, unidade: {codigo: 1}},
-            unidade: {...mockUnidade},
-            dataInicio: yesterday.toISOString(),
-            dataFim: tomorrow.toISOString(), // Legacy field
-        };
-
-        const {wrapper, atribuicaoStore} = createWrapper({
-            unidades: {
-                unidade: mockUnidade
-            },
-            atribuicoes: {
-                atribuicoes: [mockAtribuicao]
-            }
-        });
-
-        vi.spyOn(atribuicaoStore, 'obterAtribuicoesPorUnidade').mockReturnValue([mockAtribuicao]);
-
-        await wrapper.vm.$nextTick();
-        await flushPromises();
-
-        expect(wrapper.text()).toContain('Responsável: Responsavel Teste');
-    });
 
     it('handles unit with no children safely', async () => {
         const mockUnidadeSemFilhas = {

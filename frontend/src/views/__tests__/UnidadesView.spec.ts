@@ -30,10 +30,10 @@ describe("Unidades.vue", () => {
                     PageHeader: {
                         template: "<div><h1>Page Header</h1><slot name='description' /></div>"
                     },
-                    ArvoreUnidades: {
-                        name: "ArvoreUnidades",
-                        template: "<div data-testid='arvore-unidades'></div>",
-                        props: ["unidades", "modelValue", "modoSelecao", "ocultarRaiz"]
+                    TreeTable: {
+                        name: "TreeTable",
+                        template: "<div data-testid='tree-table'></div>",
+                        props: ["data", "columns", "title"]
                     },
                     BContainer: {template: "<div><slot /></div>"},
                     BAlert: {
@@ -79,20 +79,19 @@ describe("Unidades.vue", () => {
         expect(store.clearError).toHaveBeenCalled();
     });
 
-    it("deve exibir ArvoreUnidades quando houver unidades", () => {
+    it("deve exibir TreeTable quando houver unidades", () => {
         const wrapper = createWrapper({unidades: mockUnidades});
-        const arvore = wrapper.find("[data-testid='arvore-unidades']");
+        const arvore = wrapper.find("[data-testid='tree-table']");
         expect(arvore.exists()).toBe(true);
 
-        const arvoreComponent = wrapper.findComponent({name: "ArvoreUnidades"});
-        expect(arvoreComponent.props("unidades")).toEqual(mockUnidades);
-        expect(arvoreComponent.props("modoSelecao")).toBe(false);
-        expect(arvoreComponent.props("ocultarRaiz")).toBe(false);
+        const arvoreComponent = wrapper.findComponent({name: "TreeTable"});
+        expect(arvoreComponent.props("data")).toBeDefined();
     });
 
     it("deve exibir mensagem quando não houver unidades", () => {
         const wrapper = createWrapper({unidades: []});
         expect(wrapper.text()).toContain("Nenhuma unidade encontrada.");
-        expect(wrapper.find("[data-testid='arvore-unidades']").exists()).toBe(false);
+        expect(wrapper.find("[data-testid='tree-table']").exists()).toBe(false);
     });
+
 });

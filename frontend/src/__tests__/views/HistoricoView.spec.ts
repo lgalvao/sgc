@@ -40,12 +40,14 @@ describe("HistoricoView.vue", () => {
             descricao: "Proc B",
             tipo: "MAPEAMENTO",
             dataFinalizacao: "2023-01-02T10:00:00",
+            situacao: "FINALIZADO",
         },
         {
             codigo: 2,
             descricao: "Proc A",
             tipo: "REVISAO",
             dataFinalizacao: "2023-01-01T10:00:00",
+            situacao: "FINALIZADO",
         }
     ];
 
@@ -117,7 +119,7 @@ describe("HistoricoView.vue", () => {
         await flushPromises();
 
         const text = context.wrapper.text();
-        expect(text).toContain("Nenhum processo finalizado");
+        expect(text).toContain("Nenhum processo encontrado");
     });
 
     it("deve navegar para detalhes ao clicar", async () => {
