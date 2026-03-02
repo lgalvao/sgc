@@ -87,35 +87,35 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
 
         // Configurar mocks padrão ANTES de qualquer montagem
         // IMPORTANTE: Retornar cópias para evitar mutação compartilhada entre testes
-        (diagnosticoService.buscarMinhasAvaliacoes as any).mockResolvedValue([
+        (diagnosticoService.buscarMinhasAvaliacoes).mockResolvedValue([
             {competenciaCodigo: 1, importancia: 'N5', dominio: 'N3', observacoes: 'Obs 1'},
             {competenciaCodigo: 2, importancia: '', dominio: '', observacoes: ''}
         ]);
-        (diagnosticoService.salvarAvaliacao as any).mockResolvedValue({});
-        (diagnosticoService.concluirAutoavaliacao as any).mockResolvedValue({});
-        (subprocessoService.obterMapaCompleto as any).mockResolvedValue({
+        (diagnosticoService.salvarAvaliacao).mockResolvedValue({});
+        (diagnosticoService.concluirAutoavaliacao).mockResolvedValue({});
+        (subprocessoService.obterMapaCompleto).mockResolvedValue({
             competencias: [
                 {codigo: 1, descricao: 'Competencia 1'},
                 {codigo: 2, descricao: 'Competencia 2'}
             ]
         });
-        (unidadeService.buscarUnidadePorSigla as any).mockResolvedValue({nome: 'Unidade Teste', sigla: 'TEST'});
+        (unidadeService.buscarUnidadePorSigla).mockResolvedValue({nome: 'Unidade Teste', sigla: 'TEST'});
     });
 
     const mountComponent = async (competencias?: any[], avaliacoes?: any[]) => {
         // Sempre resetar os mocks para garantir isolamento entre testes
         // Usar valores fornecidos ou valores padrão com cópias frescas
-        const compData = competencias !== undefined ? competencias : [
+        const compData = competencias ?? [
             {codigo: 1, descricao: 'Competencia 1'},
             {codigo: 2, descricao: 'Competencia 2'}
         ];
-        const avalData = avaliacoes !== undefined ? avaliacoes : [
+        const avalData = avaliacoes ?? [
             {competenciaCodigo: 1, importancia: 'N5', dominio: 'N3', observacoes: 'Obs 1'},
             {competenciaCodigo: 2, importancia: '', dominio: '', observacoes: ''}
         ];
 
-        (subprocessoService.obterMapaCompleto as any).mockResolvedValue({competencias: compData});
-        (diagnosticoService.buscarMinhasAvaliacoes as any).mockResolvedValue(avalData);
+        (subprocessoService.obterMapaCompleto).mockResolvedValue({competencias: compData});
+        (diagnosticoService.buscarMinhasAvaliacoes).mockResolvedValue(avalData);
 
         ctx.wrapper = mount(AutoavaliacaoDiagnostico, {
             global: {
@@ -266,7 +266,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         const feedbackStore = useFeedbackStore();
         vi.clearAllMocks();
 
-        (diagnosticoService.salvarAvaliacao as any).mockRejectedValueOnce({
+        (diagnosticoService.salvarAvaliacao).mockRejectedValueOnce({
             isAxiosError: true,
             response: {data: {message: 'Erro de validação'}}
         });
@@ -301,7 +301,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         const feedbackStore = useFeedbackStore();
         vi.clearAllMocks();
 
-        (diagnosticoService.concluirAutoavaliacao as any).mockRejectedValueOnce({
+        (diagnosticoService.concluirAutoavaliacao).mockRejectedValueOnce({
             isAxiosError: true,
             response: {data: {message: 'Erro ao finalizar'}}
         });
@@ -332,7 +332,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         const feedbackStore = useFeedbackStore();
 
         vi.clearAllMocks();
-        (diagnosticoService.salvarAvaliacao as any).mockRejectedValueOnce(new Error('Erro de rede'));
+        (diagnosticoService.salvarAvaliacao).mockRejectedValueOnce(new Error('Erro de rede'));
 
         await ctx.wrapper!.vm.salvar(1, 'N4', 'N2');
         await flushPromises();
@@ -367,7 +367,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         const feedbackStore = useFeedbackStore();
         vi.clearAllMocks();
 
-        (diagnosticoService.concluirAutoavaliacao as any).mockRejectedValueOnce(new Error('Erro genérico'));
+        (diagnosticoService.concluirAutoavaliacao).mockRejectedValueOnce(new Error('Erro genérico'));
 
         await ctx.wrapper!.vm.concluirAutoavaliacao();
         await flushPromises();
@@ -388,7 +388,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         const feedbackStore = useFeedbackStore();
         vi.clearAllMocks();
 
-        (diagnosticoService.concluirAutoavaliacao as any).mockRejectedValueOnce({
+        (diagnosticoService.concluirAutoavaliacao).mockRejectedValueOnce({
             isAxiosError: true,
             response: {data: {message: 'Erro da API'}}
         });

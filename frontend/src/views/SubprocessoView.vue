@@ -99,7 +99,7 @@
         <BTable
             :fields="camposMovimentacoes"
             :items="movimentacoes"
-            :tbody-tr-attr="rowAttrMovimentacao"
+            :tbody-tr-props="rowAttrMovimentacao"
             data-testid="tbl-movimentacoes"
             primary-key="codigo"
             responsive
@@ -197,7 +197,6 @@ import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useMapasStore} from "@/stores/mapas";
 import {useFeedbackStore} from "@/stores/feedback";
-import {usePerfilStore} from "@/stores/perfil";
 import {useModalManager} from "@/composables/useModalManager";
 import {useLoadingManager} from "@/composables/useLoadingManager";
 
@@ -238,8 +237,8 @@ const camposMovimentacoes = [
   {key: "descricao", label: "Descrição"}
 ];
 
-const rowAttrMovimentacao = (item: Movimentacao | null, type: string) => {
-  return item && type === 'row'
+const rowAttrMovimentacao = (item: Movimentacao | null) => {
+  return item
       ? {'data-testid': `row-movimentacao-${item.codigo}`}
       : {};
 };

@@ -57,22 +57,21 @@ const internalSortBy = computed({
 });
 
 function handleSelecionarProcesso(processo: any) {
-  // O BTable do bootstrap-vue-next pode emitir o item diretamente ou um objeto com {item, index, event}
   const item = processo?.item || processo;
   emit("selecionarProcesso", item);
 }
 
-function rowClass(item: ProcessoResumo | null, type: string) {
-  return item && type === 'row' ? `row-processo-${item.codigo}` : '';
+function rowClass(item: ProcessoResumo | null) {
+  return item ? `row-processo-${item.codigo}` : '';
 }
 
-function rowAttr(item: ProcessoResumo | null, type: string) {
-  if (item && type === 'row') {
+function rowAttr(item: ProcessoResumo | null) {
+  if (item) {
     return {
-      tabindex: '0',
-      style: {cursor: 'pointer'},
+      tabindex: "0",
+      style: {cursor: "pointer"},
       onKeydown: (e: KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           handleSelecionarProcesso(item);
         }

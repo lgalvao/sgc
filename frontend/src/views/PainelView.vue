@@ -33,7 +33,7 @@
             :fields="camposAlertas"
             :items="alertas"
             :striped="alertas.length > 0"
-            :tbody-tr-attr="rowAttrAlerta"
+            :tbody-tr-props="rowAttrAlerta"
             :tbody-tr-class="rowClassAlerta"
             data-testid="tbl-alertas"
             hover
@@ -192,8 +192,8 @@ const handleSortChangeAlertas = (ctx: any) => {
   }
 };
 
-const rowAttrAlerta = (item: Alerta | null, type: string) => {
-  if (item && type === 'row') {
+const rowAttrAlerta = (item: Alerta | null) => {
+  if (item) {
     return {'data-testid': `row-alerta-${item.codigo}`};
   }
   return {};

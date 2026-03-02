@@ -126,19 +126,19 @@ describe('CadAtribuicao.vue', () => {
         await flushPromises();
 
         // Preencher formulário
-        const select = context.wrapper!.find('[data-testid="select-usuario"]');
+        const select = context.wrapper.find('[data-testid="select-usuario"]');
         await select.setValue('111');
 
-        const dateInput = context.wrapper!.find('[data-testid="input-data-termino"]');
+        const dateInput = context.wrapper.find('[data-testid="input-data-termino"]');
         await dateInput.setValue('2023-12-31');
 
-        const dateInicioInput = context.wrapper!.find('[data-testid="input-data-inicio"]');
+        const dateInicioInput = context.wrapper.find('[data-testid="input-data-inicio"]');
         await dateInicioInput.setValue('2023-01-01');
 
-        const textarea = context.wrapper!.find('[data-testid="textarea-justificativa"]');
+        const textarea = context.wrapper.find('[data-testid="textarea-justificativa"]');
         await textarea.setValue('Justificativa de teste');
 
-        await context.wrapper!.find('form').trigger('submit');
+        await context.wrapper.find('form').trigger('submit');
         await flushPromises();
 
         expect(criarAtribuicaoTemporaria).toHaveBeenCalledWith(1, {
@@ -161,12 +161,12 @@ describe('CadAtribuicao.vue', () => {
         await flushPromises();
 
         // Preencher formulário
-        context.wrapper!.vm.usuarioSelecionado = '111';
-        context.wrapper!.vm.dataInicio = '2023-01-01';
-        context.wrapper!.vm.dataTermino = '2023-12-31';
-        context.wrapper!.vm.justificativa = 'Teste';
+        context.wrapper.vm.usuarioSelecionado = '111';
+        context.wrapper.vm.dataInicio = '2023-01-01';
+        context.wrapper.vm.dataTermino = '2023-12-31';
+        context.wrapper.vm.justificativa = 'Teste';
 
-        await context.wrapper!.find('form').trigger('submit');
+        await context.wrapper.find('form').trigger('submit');
         await flushPromises();
 
         expect(mockFeedbackShow).toHaveBeenCalledWith('Erro', 'Falha ao criar atribuição. Tente novamente.', 'danger');
@@ -184,12 +184,12 @@ describe('CadAtribuicao.vue', () => {
         await flushPromises();
 
         // Sem usuario
-        await context.wrapper!.find('form').trigger('submit');
+        await context.wrapper.find('form').trigger('submit');
         expect(mockFeedbackShow).toHaveBeenCalledWith('Erro', expect.stringContaining('Selecione um usuário'), 'danger');
 
         // Com usuario, sem justificativa
-        context.wrapper!.vm.usuarioSelecionado = '111';
-        await context.wrapper!.find('form').trigger('submit');
+        context.wrapper.vm.usuarioSelecionado = '111';
+        await context.wrapper.find('form').trigger('submit');
         expect(mockFeedbackShow).toHaveBeenCalledWith('Erro', expect.stringContaining('Preencha data de início'), 'danger');
     });
 
@@ -198,6 +198,6 @@ describe('CadAtribuicao.vue', () => {
         context.wrapper = criarWrapper();
         await flushPromises();
 
-        expect(context.wrapper!.vm.erroUsuario).toBe("Falha ao carregar dados da unidade ou usuários.");
+        expect(context.wrapper.vm.erroUsuario).toBe("Falha ao carregar dados da unidade ou usuários.");
     });
 });

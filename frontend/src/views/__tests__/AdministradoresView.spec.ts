@@ -93,8 +93,8 @@ describe("AdministradoresView.vue", () => {
         const notificacoes = useNotificacoesStore();
         await flushPromises();
 
-        const removeBtns = wrapper.findAll('button').filter(b => b.text().includes('Remover'));
-        await removeBtns[0].trigger("click"); // Confirmar remoção
+        const removeBtn = wrapper.findAll('button').find(b => b.text().includes('Remover'));
+        await removeBtn?.trigger("click"); // Confirmar remoção
 
         vi.mocked(administradorService.removerAdministrador).mockResolvedValue({} as any);
 

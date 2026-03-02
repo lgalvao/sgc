@@ -126,7 +126,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         await nextTick();
 
         // Call method directly
-        await (wrapper.vm as any).salvarProcesso();
+        await (wrapper.vm).salvarProcesso();
         await flushPromises();
 
         expect(wrapper.vm.alertState.show).toBe(true);
@@ -143,7 +143,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        await (wrapper.vm as any).abrirModalConfirmacao();
+        await (wrapper.vm).abrirModalConfirmacao();
         expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
 
         // Configure error on create
@@ -170,7 +170,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        await (wrapper.vm as any).abrirModalConfirmacao();
+        await (wrapper.vm).abrirModalConfirmacao();
 
         // Configure success on create, failure on start
         processosStore.criarProcesso.mockResolvedValue({codigo: 777});
