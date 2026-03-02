@@ -12,13 +12,13 @@ public interface MapaRepo extends JpaRepository<Mapa, Long> {
             SELECT um.mapaVigente FROM UnidadeMapa um
             WHERE um.unidadeCodigo = :unidadeCodigo
             """)
-    Optional<Mapa> findMapaVigenteByUnidade(@Param("unidadeCodigo") Long unidadeCodigo);
+    Optional<Mapa> buscarMapaVigentePorUnidade(@Param("unidadeCodigo") Long unidadeCodigo);
 
     @Query("""
             SELECT m FROM Mapa m
             WHERE m.subprocesso.codigo = :subprocessoCodigo
             """)
-    Optional<Mapa> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long subprocessoCodigo);
+    Optional<Mapa> buscarPorSubprocesso(@Param("subprocessoCodigo") Long subprocessoCodigo);
 
     @Query("""
             SELECT DISTINCT m FROM Mapa m
@@ -29,5 +29,5 @@ public interface MapaRepo extends JpaRepository<Mapa, Long> {
             LEFT JOIN FETCH c.atividades ca
             WHERE m.subprocesso.codigo = :subprocessoCodigo
             """)
-    Optional<Mapa> findFullBySubprocessoCodigo(@Param("subprocessoCodigo") Long subprocessoCodigo);
+    Optional<Mapa> buscarCompletoPorSubprocesso(@Param("subprocessoCodigo") Long subprocessoCodigo);
 }

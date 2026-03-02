@@ -42,84 +42,82 @@ public class MapaManutencaoService {
         return atividadeRepo.findAll();
     }
 
-    public Atividade obterAtividadePorCodigo(Long codAtividade) {
+    public Atividade atividadeCodigo(Long codAtividade) {
         return repo.buscar(Atividade.class, codAtividade);
     }
 
-    public List<Atividade> buscarAtividadesPorCodigos(List<Long> codigos) {
+    public List<Atividade> atividadesCodigos(List<Long> codigos) {
         return atividadeRepo.findAllById(codigos);
     }
 
-    public List<Atividade> buscarAtividadesPorMapaCodigo(Long mapaCodigo) {
+    public List<Atividade> atividadesMapaCodigo(Long mapaCodigo) {
         return atividadeRepo.findByMapa_Codigo(mapaCodigo);
     }
 
-    public List<Atividade> buscarAtividadesPorMapaCodigoSemRelacionamentos(Long mapaCodigo) {
+    public List<Atividade> atividadesMapaCodigoSemRels(Long mapaCodigo) {
         return atividadeRepo.findByMapaCodigoSemFetch(mapaCodigo);
     }
 
-    public List<Atividade> buscarAtividadesPorMapaCodigoComConhecimentos(Long mapaCodigo) {
+    public List<Atividade> atividadesMapaCodigoComConhecimentos(Long mapaCodigo) {
         return atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaCodigo);
     }
 
-    public Competencia buscarCompetenciaPorCodigo(Long codCompetencia) {
+    public Competencia competenciaCodigo(Long codCompetencia) {
         return repo.buscar(Competencia.class, codCompetencia);
     }
 
-    public List<Competencia> buscarCompetenciasPorCodMapa(Long codMapa) {
+    public List<Competencia> competenciasCodMapa(Long codMapa) {
         return competenciaRepo.findByMapa_Codigo(codMapa);
     }
 
-    public List<Competencia> buscarCompetenciasPorCodMapaSemRelacionamentos(Long codMapa) {
+    public List<Competencia> competenciasCodMapaSemRels(Long codMapa) {
         return competenciaRepo.findByMapaCodigoSemFetch(codMapa);
     }
 
-    public Map<Long, Set<Long>> buscarIdsAssociacoesCompetenciaAtividade(Long codMapa) {
+    public Map<Long, Set<Long>> codigosAssociacoesCompetenciaAtividade(Long codMapa) {
         List<Object[]> rows = competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(codMapa);
         Map<Long, Set<Long>> result = new HashMap<>();
+
         for (Object[] row : rows) {
             Long compId = (Long) row[0];
             Long ativId = (Long) row[2];
             result.computeIfAbsent(compId, k -> new HashSet<>()).add(ativId);
         }
+
         return result;
     }
 
-    public List<Conhecimento> listarConhecimentosPorAtividade(Long codAtividade) {
+    public List<Conhecimento> conhecimentosCodigoAtividade(Long codAtividade) {
         repo.buscar(Atividade.class, codAtividade);
         return conhecimentoRepo.findByAtividade_Codigo(codAtividade);
     }
 
-    public List<Conhecimento> listarConhecimentosEntidadesPorAtividade(Long codAtividade) {
-        return conhecimentoRepo.findByAtividade_Codigo(codAtividade);
-    }
-
-    public List<Conhecimento> listarConhecimentosPorMapa(Long codMapa) {
+    public List<Conhecimento> conhecimentosCodMapa(Long codMapa) {
         return conhecimentoRepo.findByMapaCodigo(codMapa);
     }
 
-    public List<Competencia> buscarCompetenciasPorCodigos(List<Long> codigos) {
+    public List<Competencia> competenciasCodigos(List<Long> codigos) {
         return competenciaRepo.findAllById(codigos);
     }
 
-    public List<Mapa> listarTodosMapas() {
+    public List<Mapa> mapas() {
         return mapaRepo.findAll();
     }
 
-    public Optional<Mapa> buscarMapaVigentePorUnidade(Long unidadeCodigo) {
-        return mapaRepo.findMapaVigenteByUnidade(unidadeCodigo);
+    public Optional<Mapa> mapaVigenteUnidade(Long unidadeCodigo) {
+        return mapaRepo.buscarMapaVigentePorUnidade(unidadeCodigo);
     }
 
-    public Optional<Mapa> buscarMapaPorSubprocessoCodigo(Long subprocessoCodigo) {
-        return mapaRepo.findBySubprocessoCodigo(subprocessoCodigo);
+    public Optional<Mapa> mapaSubprocesso(Long subprocessoCodigo) {
+        return mapaRepo.buscarPorSubprocesso(subprocessoCodigo);
     }
 
-    public Mapa buscarMapaCompletoPorSubprocesso(Long subprocessoCodigo) {
-        return mapaRepo.findFullBySubprocessoCodigo(subprocessoCodigo)
+    public Mapa mapaCompletoSubprocesso(Long subprocessoCodigo) {
+        return mapaRepo.buscarCompletoPorSubprocesso(subprocessoCodigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", "S:" + subprocessoCodigo));
     }
 
-    public Mapa buscarMapaPorCodigo(Long codigo) {
+    public Mapa mapaCodigo(Long codigo) {
         return repo.buscar(Mapa.class, codigo);
     }
 
@@ -130,6 +128,7 @@ public class MapaManutencaoService {
     @Transactional
     public Atividade criarAtividade(CriarAtividadeRequest request) {
         log.info("Criando atividade no mapa {}: {}", request.mapaCodigo(), request.descricao());
+
         validarDescricaoAtividadeUnica(request.mapaCodigo(), request.descricao());
         Mapa mapa = repo.buscar(Mapa.class, request.mapaCodigo());
         notificarAlteracaoMapa(request.mapaCodigo());
@@ -143,6 +142,7 @@ public class MapaManutencaoService {
     @Transactional
     public void atualizarAtividade(Long codigo, AtualizarAtividadeRequest request) {
         log.info("Atualizando atividade {}: {}", codigo, request.descricao());
+
         Atividade existente = repo.buscar(Atividade.class, codigo);
         if (!existente.getDescricao().equalsIgnoreCase(request.descricao())) {
             validarDescricaoAtividadeUnica(existente.getMapa().getCodigo(), request.descricao());
@@ -154,7 +154,7 @@ public class MapaManutencaoService {
     }
 
     @Transactional
-    public void atualizarDescricoesAtividadeEmLote(Map<Long, String> descricoesPorId) {
+    public void atualizarDescricoesAtividadeEmBloco(Map<Long, String> descricoesPorId) {
         log.info("Atualizando descrições de {} atividades em lote", descricoesPorId.size());
         List<Atividade> atividades = atividadeRepo.findAllById(descricoesPorId.keySet());
         Set<Long> mapasAfetados = new HashSet<>();
@@ -176,14 +176,13 @@ public class MapaManutencaoService {
     public void excluirAtividade(Long codAtividade) {
         log.info("Excluindo atividade {}", codAtividade);
         Atividade atividade = repo.buscar(Atividade.class, codAtividade);
-        excluirAtividadeEConhecimentos(atividade);
+        excluirAtividadeComConhecimentos(atividade);
     }
 
-    private void excluirAtividadeEConhecimentos(Atividade atividade) {
+    private void excluirAtividadeComConhecimentos(Atividade atividade) {
         var mapa = atividade.getMapa();
         notificarAlteracaoMapa(mapa.getCodigo());
 
-        // Remove conhecimentos associados
         List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividade_Codigo(atividade.getCodigo());
         conhecimentoRepo.deleteAll(conhecimentos);
 
@@ -206,14 +205,14 @@ public class MapaManutencaoService {
     }
 
     @Transactional
-    public void salvarTodasCompetencias(List<Competencia> competencias) {
+    public void salvarCompetencias(List<Competencia> competencias) {
         log.info("Salvando lote de {} competências", competencias.size());
         competenciaRepo.saveAll(competencias);
     }
 
     @Transactional
     public void criarCompetenciaComAtividades(Mapa mapa, String descricao, List<Long> codigosAtividades) {
-        log.info("Criando competência no mapa {}: {} ({} atividades)", mapa.getCodigo(), descricao, codigosAtividades.size());
+        log.info("Criando competência {} ({} ativ.)", descricao, codigosAtividades.size());
         Competencia competencia = Competencia.builder()
                 .descricao(descricao)
                 .mapa(mapa)
@@ -225,17 +224,17 @@ public class MapaManutencaoService {
     }
 
     @Transactional
-    public void atualizarCompetencia(Long codCompetencia, String descricao, List<Long> atividadesIds) {
-        log.info("Atualizando competência {}: {} ({} atividades)", codCompetencia, descricao, atividadesIds.size());
-        Competencia competencia = repo.buscar(Competencia.class, codCompetencia);
-        competencia.setDescricao(descricao);
+    public void atualizarCompetencia(Long codigo, String desc, List<Long> atividadesCodigos) {
+        log.info("Atualizando competência {}: {} ({} atividades)", codigo, desc, atividadesCodigos.size());
+        Competencia competencia = repo.buscar(Competencia.class, codigo);
+        competencia.setDescricao(desc);
 
         List<Atividade> atividadesAntigas = atividadeRepo.listarPorCompetencia(competencia);
         atividadesAntigas.forEach(atividade -> atividade.getCompetencias().remove(competencia));
         atividadeRepo.saveAll(atividadesAntigas);
 
         competencia.getAtividades().clear();
-        prepararCompetenciasAtividades(atividadesIds, competencia);
+        prepararCompetenciasAtividades(atividadesCodigos, competencia);
         competenciaRepo.save(competencia);
 
         atividadeRepo.saveAll(competencia.getAtividades());
@@ -269,11 +268,13 @@ public class MapaManutencaoService {
 
     @Transactional
     public void atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
-        log.info("Atualizando conhecimento {} na atividade {}: {}", codConhecimento, codAtividade, request.descricao());
-        var existente = repo.buscar(Conhecimento.class, Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade));
+        String descricao = request.descricao();
 
-        if (!existente.getDescricao().equalsIgnoreCase(request.descricao())) {
-            validarDescricaoConhecimentoUnica(codAtividade, request.descricao());
+        log.info("Atualizando conhecimento {} na atividade {}: {}", codConhecimento, codAtividade, descricao);
+
+        Conhecimento existente = repo.buscar(Conhecimento.class, Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade));
+        if (!existente.getDescricao().equalsIgnoreCase(descricao)) {
+            validarDescricaoConhecimentoUnica(codAtividade, descricao);
         }
 
         var mapa = existente.getAtividade().getMapa();
@@ -286,7 +287,8 @@ public class MapaManutencaoService {
     @Transactional
     public void excluirConhecimento(Long codAtividade, Long codConhecimento) {
         log.info("Excluindo conhecimento {} da atividade {}", codConhecimento, codAtividade);
-        var conhecimento = repo.buscar(Conhecimento.class, Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade));
+
+        Conhecimento conhecimento = repo.buscar(Conhecimento.class, Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade));
         executarExclusaoConhecimento(conhecimento);
     }
 
@@ -296,7 +298,7 @@ public class MapaManutencaoService {
     }
 
     private void executarExclusaoConhecimento(Conhecimento conhecimento) {
-        var mapa = conhecimento.getAtividade().getMapa();
+        Mapa mapa = conhecimento.getAtividade().getMapa();
         notificarAlteracaoMapa(mapa.getCodigo());
         conhecimento.getAtividade().getConhecimentos().remove(conhecimento);
         conhecimentoRepo.delete(conhecimento);
@@ -311,25 +313,21 @@ public class MapaManutencaoService {
         atividades.forEach(atividade -> atividade.getCompetencias().add(competencia));
     }
 
-    private void notificarAlteracaoMapa(Long mapaCodigo) {
-        subprocessoService.atualizarParaEmAndamento(mapaCodigo);
+    private void notificarAlteracaoMapa(Long codMapa) {
+        subprocessoService.atualizarParaEmAndamento(codMapa);
     }
 
-    private void validarDescricaoAtividadeUnica(Long mapaCodigo, String descricao) {
-        boolean existe = atividadeRepo.findByMapaCodigoSemFetch(mapaCodigo).stream()
-                .anyMatch(a -> a.getDescricao().equalsIgnoreCase(descricao));
+    private void validarDescricaoAtividadeUnica(Long codMapa, String desc) {
+        boolean existe = atividadeRepo.findByMapaCodigoSemFetch(codMapa).stream()
+                .anyMatch(a -> a.getDescricao().equalsIgnoreCase(desc));
 
-        if (existe) {
-            throw new ErroValidacao("Já existe uma atividade com esta descrição neste mapa.");
-        }
+        if (existe) throw new ErroValidacao("Já existe uma atividade com esta descrição neste mapa.");
     }
 
     private void validarDescricaoConhecimentoUnica(Long codAtividade, String descricao) {
         boolean existe = conhecimentoRepo.findByAtividade_Codigo(codAtividade).stream()
                 .anyMatch(c -> c.getDescricao().equalsIgnoreCase(descricao));
 
-        if (existe) {
-            throw new ErroValidacao("Já existe um conhecimento com esta descrição nesta atividade.");
-        }
+        if (existe) throw new ErroValidacao("Já existe um conhecimento com esta descrição nesta atividade.");
     }
 }

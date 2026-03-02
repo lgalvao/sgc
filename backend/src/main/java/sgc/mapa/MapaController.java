@@ -33,7 +33,7 @@ public class MapaController {
     @Operation(summary = "Lista todos os mapas")
     @JsonView(MapaViews.Publica.class)
     public List<Mapa> listar() {
-        return mapaManutencaoService.listarTodosMapas();
+        return mapaManutencaoService.mapas();
     }
 
     /**
@@ -44,7 +44,7 @@ public class MapaController {
     @Operation(summary = "Obtém um mapa pelo código")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> obterPorId(@PathVariable Long codigo) {
-        var mapa = mapaManutencaoService.buscarMapaPorCodigo(codigo);
+        var mapa = mapaManutencaoService.mapaCodigo(codigo);
         return ResponseEntity.ok(mapa);
     }
 
@@ -69,7 +69,7 @@ public class MapaController {
     @Operation(summary = "Atualiza um mapa existente")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> atualizar(@PathVariable Long codMapa, @Valid @RequestBody Mapa mapa) {
-        Mapa existente = mapaManutencaoService.buscarMapaPorCodigo(codMapa)
+        Mapa existente = mapaManutencaoService.mapaCodigo(codMapa)
                 .setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado())
                 .setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao())
                 .setDataHoraHomologado(mapa.getDataHoraHomologado());

@@ -7,9 +7,9 @@ import org.mockito.junit.jupiter.*;
 import org.openpdf.text.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
-import sgc.organizacao.service.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.*;
 import sgc.processo.model.*;
 import sgc.relatorio.*;
@@ -103,7 +103,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(c));
+        when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, 1L, out);
@@ -135,7 +135,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
-        when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of());
+        when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of());
 
         OutputStream out = new ByteArrayOutputStream();
         // Filtra pela unidade 1
@@ -164,7 +164,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(c));
+        when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, 1L, out);
@@ -194,7 +194,7 @@ class RelatorioFacadeTest {
 
         when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(mapaManutencaoService.buscarCompetenciasPorCodMapa(10L)).thenReturn(List.of(c));
+        when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioMapas(1L, 1L, out);

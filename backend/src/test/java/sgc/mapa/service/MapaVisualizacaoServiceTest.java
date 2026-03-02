@@ -52,7 +52,7 @@ class MapaVisualizacaoServiceTest {
         comp1.setDescricao("C1");
         comp1.setAtividades(Set.of(ativ1));
 
-        when(mapaRepo.findFullBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapa));
+        when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.of(mapa));
         when(competenciaRepo.findByMapa_Codigo(10L)).thenReturn(List.of(comp1));
 
         MapaVisualizacaoResponse response = service.obterMapaParaVisualizacao(sub);
@@ -85,7 +85,7 @@ class MapaVisualizacaoServiceTest {
         mapa.setAtividades(Set.of(ativ));
         sub.setMapa(mapa);
 
-        when(mapaRepo.findFullBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapa));
+        when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.of(mapa));
         when(competenciaRepo.findByMapa_Codigo(10L)).thenReturn(List.of());
 
         MapaVisualizacaoResponse response = service.obterMapaParaVisualizacao(sub);

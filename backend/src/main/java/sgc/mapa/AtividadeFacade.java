@@ -42,12 +42,12 @@ public class AtividadeFacade {
 
     @Transactional(readOnly = true)
     public Atividade obterAtividadePorId(Long codAtividade) {
-        return mapaManutencaoService.obterAtividadePorCodigo(codAtividade);
+        return mapaManutencaoService.atividadeCodigo(codAtividade);
     }
 
     @Transactional(readOnly = true)
     public List<Conhecimento> listarConhecimentosPorAtividade(Long codAtividade) {
-        return mapaManutencaoService.listarConhecimentosPorAtividade(codAtividade);
+        return mapaManutencaoService.conhecimentosCodigoAtividade(codAtividade);
     }
 
     public AtividadeOperacaoResponse criarAtividade(CriarAtividadeRequest request) {
@@ -60,7 +60,7 @@ public class AtividadeFacade {
     }
 
     public AtividadeOperacaoResponse atualizarAtividade(Long codigo, AtualizarAtividadeRequest request) {
-        Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codigo);
+        Atividade atividade = mapaManutencaoService.atividadeCodigo(codigo);
         Usuario usuario = usuarioService.usuarioAutenticado();
 
         verificarPermissaoEdicao(atividade.getMapa().getCodigo(), usuario);
@@ -70,7 +70,7 @@ public class AtividadeFacade {
     }
 
     public AtividadeOperacaoResponse excluirAtividade(Long codigo) {
-        Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codigo);
+        Atividade atividade = mapaManutencaoService.atividadeCodigo(codigo);
         Long codMapa = atividade.getMapa().getCodigo();
 
         Usuario usuario = usuarioService.usuarioAutenticado();
@@ -81,7 +81,7 @@ public class AtividadeFacade {
     }
 
     public ResultadoOperacaoConhecimento criarConhecimento(Long codAtividade, CriarConhecimentoRequest request) {
-        Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codAtividade);
+        Atividade atividade = mapaManutencaoService.atividadeCodigo(codAtividade);
         Usuario usuario = usuarioService.usuarioAutenticado();
         verificarPermissaoEdicao(atividade.getMapa().getCodigo(), usuario);
 
@@ -92,7 +92,7 @@ public class AtividadeFacade {
     }
 
     public AtividadeOperacaoResponse atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
-        Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codAtividade);
+        Atividade atividade = mapaManutencaoService.atividadeCodigo(codAtividade);
         Usuario usuario = usuarioService.usuarioAutenticado();
         verificarPermissaoEdicao(atividade.getMapa().getCodigo(), usuario);
 
@@ -101,7 +101,7 @@ public class AtividadeFacade {
     }
 
     public AtividadeOperacaoResponse excluirConhecimento(Long codAtividade, Long codConhecimento) {
-        Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codAtividade);
+        Atividade atividade = mapaManutencaoService.atividadeCodigo(codAtividade);
 
         Usuario usuario = usuarioService.usuarioAutenticado();
         verificarPermissaoEdicao(atividade.getMapa().getCodigo(), usuario);
@@ -142,7 +142,7 @@ public class AtividadeFacade {
     }
 
     private Long obterCodigoSubprocessoPorAtividade(Long codigoAtividade) {
-        Atividade atividade = mapaManutencaoService.obterAtividadePorCodigo(codigoAtividade);
+        Atividade atividade = mapaManutencaoService.atividadeCodigo(codigoAtividade);
         Mapa mapa = atividade.getMapa();
 
         return obterCodigoSubprocessoPorMapa(mapa.getCodigo());

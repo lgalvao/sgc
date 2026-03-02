@@ -32,14 +32,14 @@ public class ImpactoMapaService {
 
         checkSituacao(usuario, subprocesso);
 
-        Optional<Mapa> mapaVigenteOpt = mapaRepo.findMapaVigenteByUnidade(subprocesso.getUnidade().getCodigo());
+        Optional<Mapa> mapaVigenteOpt = mapaRepo.buscarMapaVigentePorUnidade(subprocesso.getUnidade().getCodigo());
         if (mapaVigenteOpt.isEmpty()) {
             log.info("Unidade sem mapa vigente, não há impactos a analisar");
             return ImpactoMapaResponse.semImpacto();
         }
 
         Mapa mapaVigente = mapaVigenteOpt.get();
-        Mapa mapaSubprocesso = mapaRepo.findBySubprocessoCodigo(subprocesso.getCodigo())
+        Mapa mapaSubprocesso = mapaRepo.buscarPorSubprocesso(subprocesso.getCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa (por subprocesso)", subprocesso.getCodigo()));
         List<Atividade> atividadesAtuais = obterAtividadesDoMapa(mapaSubprocesso);
         List<Atividade> atividadesVigentes = obterAtividadesDoMapa(mapaVigente);
@@ -90,7 +90,7 @@ public class ImpactoMapaService {
     }
 
     private List<Atividade> obterAtividadesDoMapa(Mapa mapa) {
-        return mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(mapa.getCodigo());
+        return mapaManutencaoService.atividadesMapaCodigoComConhecimentos(mapa.getCodigo());
     }
 
     private List<AtividadeImpactadaDto> detectarInseridas(List<Atividade> atuais, Set<String> descVigentes) {

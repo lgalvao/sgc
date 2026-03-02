@@ -30,7 +30,7 @@ class MapaVisualizacaoServiceCoverageTest {
 
         Unidade u = new Unidade();
         sub.setUnidade(u);
-        when(mapaRepo.findFullBySubprocessoCodigo(1L)).thenReturn(Optional.empty());
+        when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
 
         MapaVisualizacaoResponse res = service.obterMapaParaVisualizacao(sub);
         assertThat(res).isNotNull();

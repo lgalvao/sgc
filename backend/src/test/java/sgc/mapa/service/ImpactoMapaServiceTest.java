@@ -68,7 +68,7 @@ class ImpactoMapaServiceTest {
         unidade.setCodigo(1L);
         subprocesso.setUnidade(unidade);
 
-        when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
+        when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.empty());
 
         ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
@@ -94,18 +94,18 @@ class ImpactoMapaServiceTest {
         Mapa mapaSub = new Mapa();
         mapaSub.setCodigo(200L);
 
-        when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepo.findBySubprocessoCodigo(10L)).thenReturn(Optional.of(mapaSub));
+        when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.buscarPorSubprocesso(10L)).thenReturn(Optional.of(mapaSub));
 
         // Vigente: vazio
-        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L)).thenReturn(Collections.emptyList());
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(100L)).thenReturn(Collections.emptyList());
 
         // Atual: 1 atividade
         Atividade nova = new Atividade();
         nova.setCodigo(1L);
         nova.setDescricao("Nova");
         nova.setConhecimentos(Collections.emptySet());
-        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L)).thenReturn(Collections.singletonList(nova));
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(200L)).thenReturn(Collections.singletonList(nova));
 
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
@@ -131,18 +131,18 @@ class ImpactoMapaServiceTest {
         Mapa mapaSub = new Mapa();
         mapaSub.setCodigo(200L);
 
-        when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepo.findBySubprocessoCodigo(10L)).thenReturn(Optional.of(mapaSub));
+        when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.buscarPorSubprocesso(10L)).thenReturn(Optional.of(mapaSub));
 
         // Vigente: 1 atividade "Antiga"
         Atividade antiga = new Atividade();
         antiga.setCodigo(1L);
         antiga.setDescricao("Antiga");
         antiga.setConhecimentos(Collections.emptySet());
-        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L)).thenReturn(Collections.singletonList(antiga));
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(100L)).thenReturn(Collections.singletonList(antiga));
 
         // Atual: vazio (foi removida)
-        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L)).thenReturn(Collections.emptyList());
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(200L)).thenReturn(Collections.emptyList());
 
         // Competencia ligada à atividade antiga
         Competencia comp = new Competencia();
@@ -176,8 +176,8 @@ class ImpactoMapaServiceTest {
         Mapa mapaSub = new Mapa();
         mapaSub.setCodigo(200L);
 
-        when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepo.findBySubprocessoCodigo(10L)).thenReturn(Optional.of(mapaSub));
+        when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.buscarPorSubprocesso(10L)).thenReturn(Optional.of(mapaSub));
 
         // Vigente: Ativ A com Conhecimento C1
         Atividade ativVigente = new Atividade();
@@ -187,7 +187,7 @@ class ImpactoMapaServiceTest {
         c1.setDescricao("C1");
         ativVigente.setConhecimentos(Set.of(c1));
 
-        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L)).thenReturn(Collections.singletonList(ativVigente));
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(100L)).thenReturn(Collections.singletonList(ativVigente));
 
         // Atual: Ativ A com Conhecimento C2 (alterado)
         Atividade ativAtual = new Atividade();
@@ -197,7 +197,7 @@ class ImpactoMapaServiceTest {
         c2.setDescricao("C2");
         ativAtual.setConhecimentos(Set.of(c2));
 
-        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L)).thenReturn(Collections.singletonList(ativAtual));
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(200L)).thenReturn(Collections.singletonList(ativAtual));
 
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
@@ -228,11 +228,11 @@ class ImpactoMapaServiceTest {
                 .conhecimentos(Set.of())
                 .build();
 
-        when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaAtual));
-        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L))
+        when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.buscarPorSubprocesso(1L)).thenReturn(Optional.of(mapaAtual));
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(100L))
                 .thenReturn(Collections.singletonList(ativVigente));
-        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L))
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(200L))
                 .thenReturn(Collections.singletonList(ativAtual));
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
@@ -266,11 +266,11 @@ class ImpactoMapaServiceTest {
                 .conhecimentos(Set.of(c2, c3))
                 .build();
 
-        when(mapaRepo.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaAtual));
-        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(100L))
+        when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+        when(mapaRepo.buscarPorSubprocesso(1L)).thenReturn(Optional.of(mapaAtual));
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(100L))
                 .thenReturn(Collections.singletonList(ativVigente));
-        when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(200L))
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(200L))
                 .thenReturn(Collections.singletonList(ativAtual));
         when(competenciaRepo.findByMapa_Codigo(100L)).thenReturn(Collections.emptyList());
 
@@ -308,8 +308,8 @@ class ImpactoMapaServiceTest {
             sp.setUnidade(u);
             Usuario usuario = usuarioAdmin();
 
-            when(mapaRepo.findMapaVigenteByUnidade(100L)).thenReturn(Optional.of(new Mapa()));
-            when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.empty());
+            when(mapaRepo.buscarMapaVigentePorUnidade(100L)).thenReturn(Optional.of(new Mapa()));
+            when(mapaRepo.buscarPorSubprocesso(1L)).thenReturn(Optional.empty());
 
             assertThrows(ErroEntidadeNaoEncontrada.class, () -> impactoMapaService.verificarImpactos(sp, usuario));
         }
@@ -330,8 +330,8 @@ class ImpactoMapaServiceTest {
             Mapa mapaSub = new Mapa();
             mapaSub.setCodigo(21L);
 
-            when(mapaRepo.findMapaVigenteByUnidade(100L)).thenReturn(Optional.of(mapaVigente));
-            when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSub));
+            when(mapaRepo.buscarMapaVigentePorUnidade(100L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaRepo.buscarPorSubprocesso(1L)).thenReturn(Optional.of(mapaSub));
 
             Atividade a1 = new Atividade();
             a1.setCodigo(10L);
@@ -341,9 +341,9 @@ class ImpactoMapaServiceTest {
             a2.setCodigo(11L);
             a2.setDescricao("Mesma");
 
-            when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(20L))
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(20L))
                     .thenReturn(List.of(a1, a2));
-            when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(21L))
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(21L))
                     .thenReturn(List.of());
 
             when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(Collections.emptyList());
@@ -369,8 +369,8 @@ class ImpactoMapaServiceTest {
             Mapa mapaSub = new Mapa();
             mapaSub.setCodigo(21L);
 
-            when(mapaRepo.findMapaVigenteByUnidade(100L)).thenReturn(Optional.of(mapaVigente));
-            when(mapaRepo.findBySubprocessoCodigo(1L)).thenReturn(Optional.of(mapaSub));
+            when(mapaRepo.buscarMapaVigentePorUnidade(100L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaRepo.buscarPorSubprocesso(1L)).thenReturn(Optional.of(mapaSub));
 
             Atividade aVigente = new Atividade();
             aVigente.setCodigo(10L);
@@ -382,9 +382,9 @@ class ImpactoMapaServiceTest {
             aAtual.setDescricao("Ativ 1");
             aAtual.setConhecimentos(Set.of());
 
-            when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(20L))
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(20L))
                     .thenReturn(List.of(aVigente));
-            when(mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(21L))
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(21L))
                     .thenReturn(List.of(aAtual));
 
             Competencia comp = new Competencia();

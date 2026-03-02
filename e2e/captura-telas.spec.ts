@@ -588,10 +588,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await capturarTela(page, '06-navegacao', '01-menu-principal');
 
-            // Configurações (se admin)
-            await page.getByTestId('btn-configuracoes').click();
+            // Parâmetros (se admin)
+            await page.getByTestId('btn-parametros').click();
             await page.waitForTimeout(300);
-            await capturarTela(page, '06-navegacao', '02-menu-configuracoes');
+            await capturarTela(page, '06-navegacao', '02-menu-parametros');
             await page.goto('/painel');
 
             // Seção Unidades (para ADMIN)
@@ -885,14 +885,15 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         });
     });
 
-    // SEÇÃO 13 - CONFIGURAÇÕES E ADMINISTRADORES (CDUs 30-31)
+    // SEÇÃO 13 - PARÂMETROS E ADMINISTRADORES (CDUs 30-31)
     test.describe('13 - Configurações', () => {
         test('Captura página de configurações e administradores', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            await page.getByTestId('btn-configuracoes').click();
+            // Página de parâmetros (CDU-31)
+            await page.getByTestId('btn-parametros').click();
             await page.waitForTimeout(500);
-            await capturarTela(page, '13-configuracoes', '01-pagina-configuracoes', {fullPage: true});
+            await capturarTela(page, '13-configuracoes', '01-pagina-parametros', {fullPage: true});
 
             // Seção de configurações do sistema (CDU-31)
             const inputDiasInativacao = page.getByTestId('inp-config-dias-inativacao');
@@ -900,21 +901,18 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 await capturarTela(page, '13-configuracoes', '02-config-sistema');
             }
 
-            // Seção de administradores (CDU-30)
-            const secaoAdmins = page.getByText(/Administradores/i);
-            if (await secaoAdmins.isVisible().catch(() => false)) {
-                await secaoAdmins.click();
-                await page.waitForTimeout(300);
-                await capturarTela(page, '13-configuracoes', '03-lista-administradores', {fullPage: true});
+            // Página de administradores (CDU-30)
+            await page.getByTestId('btn-administradores').click();
+            await page.waitForTimeout(500);
+            await capturarTela(page, '13-configuracoes', '03-lista-administradores', {fullPage: true});
 
-                // Botão de adicionar administrador
-                const btnAdicionar = page.getByRole('button', {name: /Adicionar|Novo/i});
-                if (await btnAdicionar.isVisible().catch(() => false)) {
-                    await btnAdicionar.click();
-                    await page.waitForTimeout(300);
-                    await capturarTela(page, '13-configuracoes', '04-modal-adicionar-administrador');
-                    await page.getByRole('button', {name: /Cancelar/i}).click();
-                }
+            // Botão de adicionar administrador
+            const btnAdicionar = page.getByRole('button', {name: /Adicionar|Novo/i});
+            if (await btnAdicionar.isVisible().catch(() => false)) {
+                await btnAdicionar.click();
+                await page.waitForTimeout(300);
+                await capturarTela(page, '13-configuracoes', '04-modal-adicionar-administrador');
+                await page.getByRole('button', {name: /Cancelar/i}).click();
             }
         });
     });

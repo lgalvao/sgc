@@ -11,9 +11,9 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 test.describe.serial('CDU-30 - Manter Administradores', () => {
 
     test('Cenários CDU-30: ADMIN acessa e visualiza lista de administradores', async ({page, autenticadoComoAdmin}) => {
-        // Cenario 1: Navegação para página de configurações
-        await page.getByTestId('btn-configuracoes').click();
-        await expect(page).toHaveURL(/\/configuracoes/);
+        // Cenario 1: Navegação para página de administradores
+        await page.getByTestId('btn-administradores').click();
+        await expect(page).toHaveURL(/\/administradores/);
 
         // Cenario 2: Página contém seção de administradores
         await expect(page.getByRole('heading', {name: /Administradores/i})).toBeVisible();

@@ -37,7 +37,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve obter atividade por código")
         void deveObterPorCodigo() {
             // Em data.sql, a atividade 17001 está inserida e associada ao mapa 1700
-            Atividade ativ = service.obterAtividadePorCodigo(17001L);
+            Atividade ativ = service.atividadeCodigo(17001L);
             assertThat(ativ).isNotNull();
             assertThat(ativ.getCodigo()).isEqualTo(17001L);
         }
@@ -46,17 +46,17 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve buscar atividades por mapa (com conhecimentos)")
         void deveBuscarPorMapa() {
             // Em data.sql, o mapa 1700 possui a atividade 17001
-            List<Atividade> ativs = service.buscarAtividadesPorMapaCodigo(1700L);
+            List<Atividade> ativs = service.atividadesMapaCodigo(1700L);
             assertThat(ativs).isNotEmpty();
 
-            List<Atividade> comConhecimentos = service.buscarAtividadesPorMapaCodigoComConhecimentos(1700L);
+            List<Atividade> comConhecimentos = service.atividadesMapaCodigoComConhecimentos(1700L);
             assertThat(comConhecimentos).isNotEmpty();
         }
 
         @Test
         @DisplayName("Deve listar todos os mapas")
         void listarTodosMapas() {
-            List<Mapa> mapas = service.listarTodosMapas();
+            List<Mapa> mapas = service.mapas();
             assertThat(mapas).isNotEmpty();
         }
 
@@ -64,7 +64,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve buscar mapa vigente por unidade")
         void buscarMapaVigentePorUnidade() {
             // Em data.sql, a Unidade 8 possui o mapa 1001 como vigente no subprocesso 60000
-            Mapa mapa = service.buscarMapaVigentePorUnidade(8L).orElse(null);
+            Mapa mapa = service.mapaVigenteUnidade(8L).orElse(null);
             assertThat(mapa).isNotNull();
         }
 
@@ -72,7 +72,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve buscar mapa por código de subprocesso")
         void buscarMapaPorSubprocessoCodigo() {
             // Em data.sql, o subprocesso 60000 está associado ao mapa 1001
-            Mapa mapa = service.buscarMapaPorSubprocessoCodigo(60000L).orElse(null);
+            Mapa mapa = service.mapaSubprocesso(60000L).orElse(null);
             assertThat(mapa).isNotNull();
         }
 
@@ -132,7 +132,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
 
             service.atualizarAtividade(atividade.getCodigo(), request);
 
-            Atividade atualizada = service.obterAtividadePorCodigo(atividade.getCodigo());
+            Atividade atualizada = service.atividadeCodigo(atividade.getCodigo());
             assertThat(atualizada.getDescricao()).isEqualTo("Nova Descrição");
         }
 
@@ -146,7 +146,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
             service.excluirAtividade(atividade.getCodigo());
 
             Long codigo = atividade.getCodigo();
-            assertThatThrownBy(() -> service.obterAtividadePorCodigo(codigo))
+            assertThatThrownBy(() -> service.atividadeCodigo(codigo))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
@@ -167,10 +167,10 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
                     a2.getCodigo(), "Nova 2"
             );
 
-            service.atualizarDescricoesAtividadeEmLote(descricoes);
+            service.atualizarDescricoesAtividadeEmBloco(descricoes);
 
-            assertThat(service.obterAtividadePorCodigo(a1.getCodigo()).getDescricao()).isEqualTo("Nova 1");
-            assertThat(service.obterAtividadePorCodigo(a2.getCodigo()).getDescricao()).isEqualTo("Nova 2");
+            assertThat(service.atividadeCodigo(a1.getCodigo()).getDescricao()).isEqualTo("Nova 1");
+            assertThat(service.atividadeCodigo(a2.getCodigo()).getDescricao()).isEqualTo("Nova 2");
         }
     }
 
@@ -182,10 +182,10 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve buscar competências por código e por mapa")
         void leitura() {
             // No data.sql o mapa 1001 possui competências 10001 e 10002
-            List<Competencia> comps = service.buscarCompetenciasPorCodMapa(1001L);
+            List<Competencia> comps = service.competenciasCodMapa(1001L);
             assertThat(comps).isNotEmpty();
 
-            Competencia comp = service.buscarCompetenciaPorCodigo(comps.getFirst().getCodigo());
+            Competencia comp = service.competenciaCodigo(comps.getFirst().getCodigo());
             assertThat(comp).isNotNull();
         }
 
@@ -198,19 +198,19 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
 
             service.criarCompetenciaComAtividades(mapa, "Comp Nova", List.of(a1.getCodigo()));
 
-            List<Competencia> criadas = service.buscarCompetenciasPorCodMapa(mapa.getCodigo());
+            List<Competencia> criadas = service.competenciasCodMapa(mapa.getCodigo());
             assertThat(criadas).hasSize(1);
             Competencia novaComp = criadas.getFirst();
             assertThat(novaComp.getDescricao()).isEqualTo("Comp Nova");
 
             service.atualizarCompetencia(novaComp.getCodigo(), "Comp Atualizada", List.of(a1.getCodigo()));
 
-            Competencia atualizada = service.buscarCompetenciaPorCodigo(novaComp.getCodigo());
+            Competencia atualizada = service.competenciaCodigo(novaComp.getCodigo());
             assertThat(atualizada.getDescricao()).isEqualTo("Comp Atualizada");
 
             service.removerCompetencia(novaComp.getCodigo());
             Long codigo = novaComp.getCodigo();
-            assertThatThrownBy(() -> service.buscarCompetenciaPorCodigo(codigo))
+            assertThatThrownBy(() -> service.competenciaCodigo(codigo))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class);
         }
     }
@@ -242,7 +242,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
             entityManager.flush();
             entityManager.clear();
 
-            List<Conhecimento> conhecs = service.listarConhecimentosPorAtividade(atividade.getCodigo());
+            List<Conhecimento> conhecs = service.conhecimentosCodigoAtividade(atividade.getCodigo());
             assertThat(conhecs).hasSize(1);
             assertThat(conhecs.getFirst().getDescricao()).isEqualTo("Conhec Atualizado");
 
@@ -252,7 +252,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
             entityManager.flush();
             entityManager.clear();
 
-            assertThat(service.listarConhecimentosPorAtividade(atividade.getCodigo())).isEmpty();
+            assertThat(service.conhecimentosCodigoAtividade(atividade.getCodigo())).isEmpty();
         }
     }
 }

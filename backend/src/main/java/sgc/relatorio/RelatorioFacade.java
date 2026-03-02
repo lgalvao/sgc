@@ -76,7 +76,7 @@ public class RelatorioFacade {
                 document.add(new Paragraph("Unidade: %s - %s".formatted(unidade.getSigla(), unidade.getNome())));
                 document.add(new Paragraph(" "));
 
-                List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapa(sp.getMapa().getCodigo());
+                List<Competencia> competencias = mapaManutencaoService.competenciasCodMapa(sp.getMapa().getCodigo());
                 competencias.forEach(c -> {
                     document.add(new Paragraph("Competência: %s".formatted(c.getDescricao())));
                     c.getAtividades().forEach(a -> {

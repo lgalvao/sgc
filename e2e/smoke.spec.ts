@@ -497,8 +497,8 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
 
-            // Configurações (se admin)
-            await page.getByTestId('btn-configuracoes').click();
+            // Parâmetros (se admin)
+            await page.getByTestId('btn-parametros').click();
             await page.waitForTimeout(300);
             await page.goto('/painel');
 
@@ -762,12 +762,13 @@ test.describe('Smoke Test - Sistema SGC', () => {
         });
     });
 
-    // SEÇÃO 13 - CONFIGURAÇÕES E ADMINISTRADORES (CDUs 30-31)
+    // SEÇÃO 13 - PARÂMETROS E ADMINISTRADORES (CDUs 30-31)
     test.describe('13 - Configurações', () => {
         test('Captura página de configurações e administradores', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            await page.getByTestId('btn-configuracoes').click();
+            // Página de parâmetros (CDU-31)
+            await page.getByTestId('btn-parametros').click();
             await page.waitForTimeout(500);
 
             // Seção de configurações do sistema (CDU-31)
@@ -775,19 +776,16 @@ test.describe('Smoke Test - Sistema SGC', () => {
             if (await inputDiasInativacao.isVisible().catch(() => false)) {
             }
 
-            // Seção de administradores (CDU-30)
-            const secaoAdmins = page.getByText(/Administradores/i);
-            if (await secaoAdmins.isVisible().catch(() => false)) {
-                await secaoAdmins.click();
-                await page.waitForTimeout(300);
+            // Página de administradores (CDU-30)
+            await page.getByTestId('btn-administradores').click();
+            await page.waitForTimeout(300);
 
-                // Botão de adicionar administrador
-                const btnAdicionar = page.getByRole('button', {name: /Adicionar|Novo/i});
-                if (await btnAdicionar.isVisible().catch(() => false)) {
-                    await btnAdicionar.click();
-                    await page.waitForTimeout(300);
-                    await page.getByRole('button', {name: /Cancelar/i}).click();
-                }
+            // Botão de adicionar administrador
+            const btnAdicionar = page.getByRole('button', {name: /Adicionar|Novo/i});
+            if (await btnAdicionar.isVisible().catch(() => false)) {
+                await btnAdicionar.click();
+                await page.waitForTimeout(300);
+                await page.getByRole('button', {name: /Cancelar/i}).click();
             }
         });
     });

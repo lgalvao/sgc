@@ -1,22 +1,16 @@
 package sgc.subprocesso.service;
 
-import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.subprocesso.dto.ValidacaoCadastroDto;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import lombok.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +25,7 @@ public class SubprocessoValidacaoService {
             throw new ErroValidacao("Subprocesso não possui mapa associado.");
         }
 
-        List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
+        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
         if (atividades.isEmpty()) {
             throw new ErroValidacao("O mapa de competências deve ter ao menos uma atividade cadastrada.");
         }
@@ -46,7 +40,7 @@ public class SubprocessoValidacaoService {
     }
 
     public void validarAssociacoesMapa(Long mapaId) {
-        List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapa(mapaId);
+        List<Competencia> competencias = mapaManutencaoService.competenciasCodMapa(mapaId);
         List<String> competenciasSemAssociacao = competencias.stream()
                 .filter(c -> c.getAtividades().isEmpty())
                 .map(Competencia::getDescricao)
@@ -56,7 +50,7 @@ public class SubprocessoValidacaoService {
                 "Existem competências que não foram associadas a nenhuma atividade.",
                 Map.of("competenciasNaoAssociadas", competenciasSemAssociacao));
 
-        List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigo(mapaId);
+        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigo(mapaId);
         List<String> atividadesSemAssociacao = atividades.stream()
                 .filter(a -> a.getCompetencias().isEmpty())
                 .map(Atividade::getDescricao)
@@ -69,13 +63,13 @@ public class SubprocessoValidacaoService {
 
     public void validarMapaParaDisponibilizacao(Subprocesso subprocesso) {
         Long codMapa = subprocesso.getMapa().getCodigo();
-        var competencias = mapaManutencaoService.buscarCompetenciasPorCodMapa(codMapa);
+        var competencias = mapaManutencaoService.competenciasCodMapa(codMapa);
 
         if (competencias.stream().anyMatch(c -> c.getAtividades().isEmpty())) {
             throw new ErroValidacao("Todas as competências devem estar associadas a pelo menos uma atividade.");
         }
 
-        var atividadesDoSubprocesso = mapaManutencaoService.buscarAtividadesPorMapaCodigo(codMapa);
+        var atividadesDoSubprocesso = mapaManutencaoService.atividadesMapaCodigo(codMapa);
         var atividadesAssociadas = competencias.stream()
                 .flatMap(c -> c.getAtividades().stream())
                 .map(Atividade::getCodigo)
@@ -110,7 +104,7 @@ public class SubprocessoValidacaoService {
                     .build();
         }
 
-        List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
+        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
         if (atividades.isEmpty()) {
             erros.add(ValidacaoCadastroDto.Erro.builder()
                     .tipo("SEM_ATIVIDADES")

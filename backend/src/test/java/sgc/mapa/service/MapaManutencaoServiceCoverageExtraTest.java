@@ -1,25 +1,18 @@
 package sgc.mapa.service;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroValidacao;
-import sgc.comum.model.ComumRepo;
-import sgc.mapa.dto.CriarAtividadeRequest;
-import sgc.mapa.dto.CriarConhecimentoRequest;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Conhecimento;
+import org.mockito.junit.jupiter.*;
+import sgc.comum.erros.*;
+import sgc.comum.model.*;
+import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,42 +30,35 @@ class MapaManutencaoServiceCoverageExtraTest {
     private MapaManutencaoService mapaService;
 
     @Test
-    void buscarAtividadesPorMapaCodigoSemRelacionamentos_ok() {
+    void atividadesMapaCodigoSemRelacionamentos_ok() {
         when(atividadeRepo.findByMapaCodigoSemFetch(1L)).thenReturn(List.of(new Atividade()));
-        mapaService.buscarAtividadesPorMapaCodigoSemRelacionamentos(1L);
+        mapaService.atividadesMapaCodigoSemRels(1L);
         verify(atividadeRepo).findByMapaCodigoSemFetch(1L);
     }
 
     @Test
-    void buscarCompetenciasPorCodMapaSemRelacionamentos_ok() {
+    void competenciasCodMapaSemRelacionamentos_ok() {
         when(competenciaRepo.findByMapaCodigoSemFetch(1L)).thenReturn(List.of(new Competencia()));
-        mapaService.buscarCompetenciasPorCodMapaSemRelacionamentos(1L);
+        mapaService.competenciasCodMapaSemRels(1L);
         verify(competenciaRepo).findByMapaCodigoSemFetch(1L);
     }
 
     @Test
-    void buscarIdsAssociacoesCompetenciaAtividade_ok() {
+    void codigosAssociacoesCompetenciaAtividade_ok() {
         Object[] row1 = new Object[]{1L, null, 2L};
         Object[] row2 = new Object[]{1L, null, 3L};
         when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(1L)).thenReturn(List.of(row1, row2));
 
-        Map<Long, Set<Long>> result = mapaService.buscarIdsAssociacoesCompetenciaAtividade(1L);
+        Map<Long, Set<Long>> result = mapaService.codigosAssociacoesCompetenciaAtividade(1L);
 
         assertEquals(1, result.size());
         assertEquals(2, result.get(1L).size());
     }
 
     @Test
-    void listarConhecimentosEntidadesPorAtividade_ok() {
-        when(conhecimentoRepo.findByAtividade_Codigo(1L)).thenReturn(List.of(new Conhecimento()));
-        mapaService.listarConhecimentosEntidadesPorAtividade(1L);
-        verify(conhecimentoRepo).findByAtividade_Codigo(1L);
-    }
-
-    @Test
-    void listarConhecimentosPorMapa_ok() {
+    void conhecimentosCodMapa_ok() {
         when(conhecimentoRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Conhecimento()));
-        mapaService.listarConhecimentosPorMapa(1L);
+        mapaService.conhecimentosCodMapa(1L);
         verify(conhecimentoRepo).findByMapaCodigo(1L);
     }
 

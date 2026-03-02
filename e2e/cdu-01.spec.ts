@@ -51,7 +51,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
 
         await expect(page.getByText('ADMIN - ADMIN')).toBeVisible();
 
-        await expect(page.getByTestId('btn-configuracoes')).toBeVisible();
+        await expect(page.getByTestId('btn-parametros')).toBeVisible();
 
         await expect(page.getByTestId('btn-logout')).toBeVisible();
     });

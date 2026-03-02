@@ -83,7 +83,7 @@ public class SubprocessoService {
 
     @Transactional(readOnly = true)
     public Mapa mapaCompletoPorSubprocesso(Long codSubprocesso) {
-        return mapaManutencaoService.buscarMapaCompletoPorSubprocesso(codSubprocesso);
+        return mapaManutencaoService.mapaCompletoSubprocesso(codSubprocesso);
     }
 
     @Transactional(readOnly = true)
@@ -213,7 +213,7 @@ public class SubprocessoService {
     public List<Atividade> obterAtividadesSemConhecimento(@Nullable Mapa mapa) {
         if (mapa == null || mapa.getCodigo() == null) return emptyList();
 
-        List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(mapa.getCodigo());
+        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(mapa.getCodigo());
         return atividades.isEmpty()
                 ? emptyList()
                 : atividades.stream().filter(a -> a.getConhecimentos().isEmpty()).toList();
@@ -366,7 +366,7 @@ public class SubprocessoService {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         Long codMapa = subprocesso.getMapa().getCodigo();
 
-        boolean eraVazio = mapaManutencaoService.buscarCompetenciasPorCodMapa(codMapa).isEmpty();
+        boolean eraVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
         boolean temNovasCompetencias = !request.competencias().isEmpty();
 
         Mapa mapa = mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
@@ -382,7 +382,7 @@ public class SubprocessoService {
         Mapa mapa = subprocesso.getMapa();
         Long codMapa = mapa.getCodigo();
 
-        boolean eraVazio = mapaManutencaoService.buscarCompetenciasPorCodMapa(codMapa).isEmpty();
+        boolean eraVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
 
         mapaManutencaoService.criarCompetenciaComAtividades(mapa, request.descricao(), request.atividadesIds());
 
@@ -390,7 +390,7 @@ public class SubprocessoService {
             atualizarSituacaoMapaVazio(subprocesso, false);
         }
 
-        return mapaManutencaoService.buscarMapaPorCodigo(mapa.getCodigo());
+        return mapaManutencaoService.mapaCodigo(mapa.getCodigo());
     }
 
     public Mapa atualizarCompetencia(Long codSubprocesso, Long codCompetencia, CompetenciaRequest request) {
@@ -398,7 +398,7 @@ public class SubprocessoService {
         mapaManutencaoService.atualizarCompetencia(codCompetencia, request.descricao(), request.atividadesIds());
 
         Mapa mapa = sp.getMapa();
-        return mapaManutencaoService.buscarMapaPorCodigo(mapa.getCodigo());
+        return mapaManutencaoService.mapaCodigo(mapa.getCodigo());
     }
 
     public Mapa removerCompetencia(Long codSubprocesso, Long codCompetencia) {
@@ -407,12 +407,12 @@ public class SubprocessoService {
         Long codMapa = subprocesso.getMapa().getCodigo();
         mapaManutencaoService.removerCompetencia(codCompetencia);
 
-        boolean ficouVazio = mapaManutencaoService.buscarCompetenciasPorCodMapa(codMapa).isEmpty();
+        boolean ficouVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
         if (ficouVazio) {
             atualizarSituacaoMapaVazio(subprocesso, true);
         }
 
-        return mapaManutencaoService.buscarMapaPorCodigo(subprocesso.getMapa().getCodigo());
+        return mapaManutencaoService.mapaCodigo(subprocesso.getMapa().getCodigo());
     }
 
     private void atualizarSituacaoMapaVazio(Subprocesso subprocesso, boolean ficouVazio) {
@@ -477,9 +477,9 @@ public class SubprocessoService {
                 .findFirst()
                 .orElse(null);
 
-        List<Competencia> competencias = mapaManutencaoService.buscarCompetenciasPorCodMapaSemRelacionamentos(codMapa);
-        List<Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoSemRelacionamentos(codMapa);
-        List<Conhecimento> conhecimentos = mapaManutencaoService.listarConhecimentosPorMapa(codMapa);
+        List<Competencia> competencias = mapaManutencaoService.competenciasCodMapaSemRels(codMapa);
+        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoSemRels(codMapa);
+        List<Conhecimento> conhecimentos = mapaManutencaoService.conhecimentosCodMapa(codMapa);
 
         return MapaAjusteDto.of(sp, analise, competencias, atividades, conhecimentos);
     }
@@ -500,7 +500,7 @@ public class SubprocessoService {
         );
 
         if (!atividadeDescricoes.isEmpty()) {
-            mapaManutencaoService.atualizarDescricoesAtividadeEmLote(atividadeDescricoes);
+            mapaManutencaoService.atualizarDescricoesAtividadeEmBloco(atividadeDescricoes);
         }
     }
 
@@ -509,7 +509,7 @@ public class SubprocessoService {
                 .map(CompetenciaAjusteDto::getCodCompetencia)
                 .toList();
 
-        Map<Long, Competencia> mapaCompetencias = mapaManutencaoService.buscarCompetenciasPorCodigos(competenciaIds)
+        Map<Long, Competencia> mapaCompetencias = mapaManutencaoService.competenciasCodigos(competenciaIds)
                 .stream()
                 .collect(Collectors.toMap(Competencia::getCodigo, Function.identity()));
 
@@ -519,7 +519,7 @@ public class SubprocessoService {
                 .distinct()
                 .toList();
 
-        Map<Long, Atividade> mapaAtividades = mapaManutencaoService.buscarAtividadesPorCodigos(todasAtividadesIds)
+        Map<Long, Atividade> mapaAtividades = mapaManutencaoService.atividadesCodigos(todasAtividadesIds)
                 .stream()
                 .collect(Collectors.toMap(Atividade::getCodigo, Function.identity()));
 
@@ -538,7 +538,7 @@ public class SubprocessoService {
                 competenciasParaSalvar.add(competencia);
             }
         }
-        mapaManutencaoService.salvarTodasCompetencias(competenciasParaSalvar);
+        mapaManutencaoService.salvarCompetencias(competenciasParaSalvar);
     }
 
     public SubprocessoDetalheResponse obterDetalhes(Long codigo, Usuario usuarioAutenticado) {
@@ -590,7 +590,7 @@ public class SubprocessoService {
                 unidadeSp,
                 sp,
                 detalhes,
-                mapaManutencaoService.buscarMapaPorCodigo(sp.getMapa().getCodigo()),
+                mapaManutencaoService.mapaCodigo(sp.getMapa().getCodigo()),
                 atividades
         );
     }
@@ -710,7 +710,7 @@ public class SubprocessoService {
         Subprocesso subprocesso = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow();
 
         Long codMapa = subprocesso.getMapa().getCodigo();
-        List<Atividade> todasAtividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(codMapa);
+        List<Atividade> todasAtividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa);
 
         return todasAtividades.stream().map(this::mapAtividadeToDto).toList();
     }

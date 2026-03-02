@@ -1,33 +1,24 @@
 package sgc.subprocesso.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.mapa.service.ImpactoMapaService;
-import sgc.subprocesso.model.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import org.springframework.util.*;
+import sgc.alerta.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.service.HierarquiaService;
-import sgc.organizacao.service.UnidadeService;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.UsuarioFacade;
-import sgc.alerta.AlertaFacade;
-import sgc.alerta.EmailService;
-import sgc.processo.model.TipoProcesso;
-import sgc.processo.model.Processo;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.time.*;
+import java.time.format.*;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -181,7 +172,7 @@ public class SubprocessoTransicaoService {
     private void disponibilizar(Subprocesso sp, SituacaoSubprocesso novaSituacao,
                                 TipoTransicao transicao, Usuario usuario) {
 
-        List<sgc.mapa.model.Atividade> atividades = mapaManutencaoService.buscarAtividadesPorMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
+        List<sgc.mapa.model.Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
         List<sgc.mapa.model.Atividade> atividadesSemConhecimento = atividades.isEmpty() ? List.of() : atividades.stream().filter(a -> a.getConhecimentos().isEmpty()).toList();
         
         validacaoService.validarRequisitosNegocioParaDisponibilizacao(sp, atividadesSemConhecimento);

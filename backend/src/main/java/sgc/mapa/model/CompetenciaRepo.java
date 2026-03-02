@@ -64,7 +64,7 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      * <p><b>Atenção:</b> Acessar {@code competencia.getAtividades()} causará lazy loading
      * (N+1 queries) se fora de transação.
      *
-     * @see sgc.mapa.service.MapaManutencaoService#buscarCompetenciasPorCodMapaSemRelacionamentos(Long)
+     * @see sgc.mapa.service.MapaManutencaoService#competenciasCodMapaSemRels(Long)
      */
     @Query("SELECT c FROM Competencia c WHERE c.mapa.codigo = :mapaCodigo")
     List<Competencia> findByMapaCodigoSemFetch(@Param("mapaCodigo") Long mapaCodigo);
