@@ -71,7 +71,8 @@ function rowAttr(item: ProcessoResumo | null, type: string) {
       tabindex: "0",
       style: {cursor: "pointer"},
       onKeydown: (e: KeyboardEvent) => {
-        if (e.key === "Enter" || e.key === "enter" || e.key === " " || e.key === "space") {
+        const key = e.key.toLowerCase();
+        if (key === "enter" || key === " " || key === "space") {
           e.preventDefault();
           handleSelecionarProcesso(item);
         }
