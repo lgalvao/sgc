@@ -64,7 +64,6 @@ class ValidadorDadosOrgServiceTest {
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u1));
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular));
 
-            // Act & Assert
             assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
         }
 
@@ -76,7 +75,6 @@ class ValidadorDadosOrgServiceTest {
             // unidades inativas não seriam retornadas pelo método simulado.
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of());
 
-            // Act & Assert
             assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
         }
 
@@ -88,7 +86,6 @@ class ValidadorDadosOrgServiceTest {
             // unidades SEM_EQUIPE e RAIZ não seriam retornadas.
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of());
 
-            // Act & Assert
             assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
         }
 
@@ -107,7 +104,6 @@ class ValidadorDadosOrgServiceTest {
             when(usuarioRepo.findAllById(List.of("TITULO_1", "TITULO_2")))
                     .thenReturn(List.of(titularPai, titularFilha));
 
-            // Act & Assert
             assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
         }
 
@@ -120,7 +116,6 @@ class ValidadorDadosOrgServiceTest {
 
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u));
 
-            // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("1 violação");
@@ -137,7 +132,6 @@ class ValidadorDadosOrgServiceTest {
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u1));
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular1, titular2));
 
-            // Act & Assert
             assertThatCode(() -> validador.run(args)).doesNotThrowAnyException();
         }
     }
@@ -156,7 +150,6 @@ class ValidadorDadosOrgServiceTest {
 
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u));
 
-            // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("1 violação");
@@ -171,7 +164,6 @@ class ValidadorDadosOrgServiceTest {
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u));
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of()); // Usuário não existe
 
-            // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("1 violação");
@@ -188,7 +180,6 @@ class ValidadorDadosOrgServiceTest {
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u));
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular));
 
-            // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class);
         }
@@ -203,7 +194,6 @@ class ValidadorDadosOrgServiceTest {
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(intermediaria));
             when(usuarioRepo.findAllById(List.of("TITULO_1"))).thenReturn(List.of(titular));
 
-            // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("1 violação");
@@ -218,7 +208,6 @@ class ValidadorDadosOrgServiceTest {
 
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(semTitular));
 
-            // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("1 violação");
@@ -246,7 +235,6 @@ class ValidadorDadosOrgServiceTest {
 
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(List.of(u));
 
-            // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("1 violação");
@@ -267,7 +255,6 @@ class ValidadorDadosOrgServiceTest {
 
             when(unidadeRepo.findBySituacaoAtivaAndTipoIn(anySet())).thenReturn(unidades);
 
-            // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class)
                     .hasMessageContaining("violações encontradas")
@@ -287,7 +274,6 @@ class ValidadorDadosOrgServiceTest {
             // Responsabilidade presente mas com título em branco
             u.getResponsabilidade().setUsuarioTitulo("   ");
 
-            // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class);
         }
@@ -305,7 +291,6 @@ class ValidadorDadosOrgServiceTest {
             // Responsabilidade nula
             u.setResponsabilidade(null);
 
-            // Act & Assert
             assertThatThrownBy(() -> validador.run(args))
                     .isInstanceOf(ErroConfiguracao.class);
         }

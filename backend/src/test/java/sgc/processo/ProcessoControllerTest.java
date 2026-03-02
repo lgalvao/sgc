@@ -39,11 +39,13 @@ class ProcessoControllerTest {
     protected static final String DESCRICAO_JSON_PATH = "$.descricao";
     protected static final String PROCESSO_ATUALIZADO = "Processo Atualizado";
     private static final String NOVO_PROCESSO = "Novo Processo";
+
     @MockitoBean
     private ProcessoFacade processoFacade;
 
     @Autowired
     private MockMvc mockMvc;
+
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
 
@@ -95,7 +97,6 @@ class ProcessoControllerTest {
 
             when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(processo);
 
-            // Act & Assert
             mockMvc.perform(
                             post(API_PROCESSOS)
                                     .with(csrf())
@@ -120,7 +121,6 @@ class ProcessoControllerTest {
                     new CriarProcessoRequest(
                             "", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(30), List.of(1L));
 
-            // Act & Assert
             mockMvc.perform(
                             post(API_PROCESSOS)
                                     .with(csrf())
@@ -149,7 +149,6 @@ class ProcessoControllerTest {
 
             when(processoFacade.obterPorId(1L)).thenReturn(Optional.of(processo));
 
-            // Act & Assert
             mockMvc.perform(get(API_PROCESSOS_1))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
@@ -174,7 +173,6 @@ class ProcessoControllerTest {
 
             when(processoFacade.obterDetalhes(eq(1L), any(Usuario.class))).thenReturn(dto);
 
-            // Act & Assert
             mockMvc.perform(get("/api/processos/1/detalhes"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
@@ -190,7 +188,6 @@ class ProcessoControllerTest {
 
             doThrow(new ErroAcessoNegado("Acesso negado")).when(processoFacade).obterDetalhes(eq(1L), any(Usuario.class));
 
-            // Act & Assert
             mockMvc.perform(get("/api/processos/1/detalhes")).andExpect(status().isForbidden());
         }
 
@@ -201,7 +198,6 @@ class ProcessoControllerTest {
 
             when(processoFacade.obterPorId(999L)).thenReturn(Optional.empty());
 
-            // Act & Assert
             mockMvc.perform(get(API_PROCESSOS_999))
                     .andExpect(status().isNotFound());
 
@@ -216,26 +212,23 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar 200 OK ao atualizar processo existente")
         void deveRetornarOkAoAtualizarQuandoProcessoExiste() throws Exception {
+            AtualizarProcessoRequest req = new AtualizarProcessoRequest(
+                    1L,
+                    PROCESSO_ATUALIZADO,
+                    TipoProcesso.REVISAO,
+                    LocalDateTime.now().plusDays(45),
+                    List.of(1L));
 
-            var req =
-                    new AtualizarProcessoRequest(
-                            1L,
-                            PROCESSO_ATUALIZADO,
-                            TipoProcesso.REVISAO,
-                            LocalDateTime.now().plusDays(45),
-                            List.of(1L));
-            var processo =
-                    Processo.builder()
-                            .codigo(1L)
-                            .dataCriacao(LocalDateTime.now())
-                            .descricao(PROCESSO_ATUALIZADO)
-                            .situacao(SituacaoProcesso.CRIADO)
-                            .tipo(TipoProcesso.REVISAO)
-                            .build();
+            Processo processo = Processo.builder()
+                    .codigo(1L)
+                    .dataCriacao(LocalDateTime.now())
+                    .descricao(PROCESSO_ATUALIZADO)
+                    .situacao(SituacaoProcesso.CRIADO)
+                    .tipo(TipoProcesso.REVISAO)
+                    .build();
 
             when(processoFacade.atualizar(eq(1L), any(AtualizarProcessoRequest.class))).thenReturn(processo);
 
-            // Act & Assert
             mockMvc.perform(
                             post(API_PROCESSOS + "/1/atualizar")
                                     .with(csrf())
@@ -258,14 +251,12 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar 200 OK ao iniciar mapeamento com sucesso")
         void deveRetornarOkAoIniciarMapeamentoQuandoValido() throws Exception {
-
-            var req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
-            var processo = Processo.builder().codigo(1L).descricao("Processo Teste").build();
+            IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
+            Processo processo = Processo.builder().codigo(1L).descricao("Processo Teste").build();
 
             when(processoFacade.obterEntidadePorId(1L)).thenReturn(processo);
             when(processoFacade.iniciarProcesso(eq(1L), anyList())).thenReturn(List.of());
 
-            // Act & Assert
             mockMvc.perform(
                             post("/api/processos/1/iniciar")
                                     .with(csrf())
@@ -282,12 +273,8 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar 200 OK ao finalizar processo com sucesso")
         void deveRetornarOkAoFinalizarQuandoValido() throws Exception {
-
             doNothing().when(processoFacade).finalizar(1L);
-
-            // Act & Assert
             mockMvc.perform(post("/api/processos/1/finalizar").with(csrf())).andExpect(status().isOk());
-
             verify(processoFacade).finalizar(1L);
         }
     }
@@ -299,11 +286,9 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar lista de processos finalizados")
         void deveRetornarListaDeProcessosFinalizados() throws Exception {
-
             when(processoFacade.listarFinalizados())
                     .thenReturn(List.of(Processo.builder().codigo(1L).build()));
 
-            // Act & Assert
             mockMvc.perform(get("/api/processos/finalizados"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
@@ -319,7 +304,6 @@ class ProcessoControllerTest {
                     .thenReturn(
                             List.of(Subprocesso.builder().codigo(10L).build()));
 
-            // Act & Assert
             mockMvc.perform(get("/api/processos/1/subprocessos"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
@@ -395,7 +379,6 @@ class ProcessoControllerTest {
         @DisplayName("enviarLembrete deve chamar facade")
         void deveEnviarLembrete() throws Exception {
             EnviarLembreteRequest req = new EnviarLembreteRequest(10L);
-
             mockMvc.perform(post("/api/processos/1/enviar-lembrete")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -409,7 +392,6 @@ class ProcessoControllerTest {
     @Nested
     @DisplayName("Cobertura Extra")
     class CoberturaExtra {
-
         // Usar mocks manuais para testes isolados
         private ProcessoController controller;
         private ProcessoFacade processoFacadeMock;
@@ -437,7 +419,6 @@ class ProcessoControllerTest {
         void executarAcaoEmBloco_Sucesso() {
             Long codigo = 1L;
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(10L), AcaoProcesso.ACEITAR, LocalDate.now());
-
             ResponseEntity<Void> response = controller.executarAcaoEmBloco(codigo, req);
 
             verify(processoFacadeMock).executarAcaoEmBloco(codigo, req);

@@ -30,7 +30,7 @@
           :disabled="isEdit"
           :model-value="modelValue.tipo"
           :options="tipoOptions"
-          :state="fieldErrors.tipo ? false : null"
+          :state="isEdit ? null : (fieldErrors.tipo ? false : null)"
           data-testid="sel-processo-tipo"
           required
           @update:model-value="updateField('tipo', $event as any)"
@@ -39,7 +39,7 @@
           <BFormSelectOption :value="null" disabled>-- Selecione o tipo --</BFormSelectOption>
         </template>
       </BFormSelect>
-      <BFormInvalidFeedback :state="fieldErrors.tipo ? false : null">
+      <BFormInvalidFeedback :state="isEdit ? null : (fieldErrors.tipo ? false : null)">
         {{ fieldErrors.tipo }}
       </BFormInvalidFeedback>
     </BFormGroup>
@@ -51,7 +51,7 @@
       <div
           ref="containerUnidadesRef"
           :class="{ 'border-danger': fieldErrors.unidades }"
-          class="border rounded p-3"
+          class="border rounded p-3 container-arvore"
           data-testid="container-processo-unidades"
           tabindex="-1"
       >
@@ -73,12 +73,13 @@
 
     <BFormGroup
         class="mb-3"
-        description="Prazo para conclusão da primeira etapa (Mapeamento/Revisão)."
-        label-for="dataLimite"
-    >
+        description="Prazo para conclusão da primeira etapa"
+        label-for="dataLimite">
+
       <template #label>
         Data limite <span aria-hidden="true" class="text-danger">*</span>
       </template>
+
       <BFormInput
           id="dataLimite"
           ref="inputDataLimiteRef"
@@ -151,6 +152,12 @@ function updateField<K extends keyof ProcessoFormData>(field: K, value: Processo
 
 function focarPrimeiroErro() {
   const primeiroCampo = obterPrimeiroCampoComErro(props.fieldErrors);
+  // Se for edição, ignoramos erros no campo 'tipo' para foco
+  if (props.isEdit && primeiroCampo === "tipo") {
+    // Tenta focar no próximo campo com erro se houver
+    return;
+  }
+
   switch (primeiroCampo) {
     case "descricao":
       inputDescricaoRef.value?.$el?.focus?.();
@@ -179,12 +186,14 @@ watch(
       props.fieldErrors.dataLimite
     ],
     async (erros) => {
-      if (possuiErros({
+      const errosFiltrados = {
         descricao: erros[0],
-        tipo: erros[1],
+        tipo: props.isEdit ? undefined : erros[1], // Ignora erro de tipo na edição
         unidades: erros[2],
         dataLimite: erros[3]
-      })) {
+      };
+
+      if (possuiErros(errosFiltrados)) {
         await nextTick();
         focarPrimeiroErro();
       }
@@ -194,3 +203,28 @@ watch(
 
 defineExpose({inputDescricaoRef, focarPrimeiroErro});
 </script>
+
+<style scoped>
+/* Garante que o ícone do seletor de datas seja exibido e clicável */
+:deep(input[type="date"]::-webkit-calendar-picker-indicator) {
+  cursor: pointer;
+  display: block;
+  opacity: 1;
+}
+
+/* Garante altura mínima para o input para evitar cortes no ícone */
+:deep(input[type="date"]) {
+  min-height: calc(1.5em + 0.75rem + 2px);
+}
+
+/* Ajustes para o container da árvore de unidades no celular */
+.container-arvore {
+  overflow-x: hidden;
+}
+
+@media (max-width: 575.98px) {
+  .container-arvore {
+    padding: 0.75rem !important;
+  }
+}
+</style>

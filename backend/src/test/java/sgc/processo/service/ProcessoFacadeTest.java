@@ -10,9 +10,9 @@ import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
 import sgc.comum.erros.*;
 import sgc.fixture.*;
-import sgc.organizacao.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
@@ -139,7 +139,6 @@ class ProcessoFacadeTest {
             when(processoValidacaoService.checarAcesso(auth, 1L)).thenReturn(false);
             when(processoValidacaoService.checarAcesso(null, 1L)).thenReturn(false);
 
-            // Act & Assert
             assertThat(processoFacade.checarAcesso(auth, 1L)).isFalse();
             assertThat(processoFacade.checarAcesso(null, 1L)).isFalse();
         }
@@ -267,7 +266,6 @@ class ProcessoFacadeTest {
             when(processoManutencaoService.criar(req))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Unidade", 99L));
 
-            // Act & Assert
             assertThatThrownBy(() -> processoFacade.criar(req))
                     .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                     .hasMessageContaining("Unidade")
@@ -331,7 +329,6 @@ class ProcessoFacadeTest {
                     .thenReturn(List.of(ProcessoFixture.processoPadrao()));
             when(processoConsultaService.processosAndamento())
                     .thenReturn(List.of(ProcessoFixture.processoPadrao()));
-            // Act & Assert
             assertThat(processoFacade.listarFinalizados()).hasSize(1);
             assertThat(processoFacade.listarAtivos()).hasSize(1);
         }

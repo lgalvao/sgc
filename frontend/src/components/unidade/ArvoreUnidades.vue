@@ -5,17 +5,16 @@
           aria-label="Selecionar todas as unidades elegíveis"
           class="btn btn-sm btn-outline-primary"
           type="button"
-          @click="selecionarTodas"
-      >
-        <i aria-hidden="true" class="bi bi-check-all me-1"/> Selecionar todas as unidades elegíveis
+          @click="selecionarTodas">
+        <i aria-hidden="true" class="bi bi-check-all me-1"/>
       </button>
+
       <button
           aria-label="Desmarcar todas as unidades"
           class="btn btn-sm btn-outline-secondary"
           type="button"
-          @click="deselecionarTodas"
-      >
-        <i aria-hidden="true" class="bi bi-x-lg me-1"/> Desmarcar todas as unidades
+          @click="deselecionarTodas">
+        <i aria-hidden="true" class="bi bi-x-lg me-1"/>
       </button>
     </div>
 
@@ -41,10 +40,10 @@ import UnidadeTreeNode from "./UnidadeTreeNode.vue";
 
 interface Props {
   unidades: Unidade[];
-  modelValue: number[]; // V-model: Lista de IDs selecionados
+  modelValue: number[]; 
   filtrarPor?: (unidade: Unidade) => boolean;
   ocultarRaiz?: boolean;
-  modoSelecao?: boolean; // Novo prop para ativar/desativar checkboxes (default true)
+  modoSelecao?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {

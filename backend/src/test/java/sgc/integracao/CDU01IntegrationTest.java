@@ -188,7 +188,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
 
             // Não realizamos a autenticação prévia para simular um usuário não autenticado.
 
-            // Act & Assert
             // Sem autenticação prévia (sessão válida), a tentativa de autorizar deve ser
             // rejeitada com 401 (Unauthorized)
             AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
@@ -225,7 +224,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                     .unidadeCodigo(codigoUnidadeInexistente)
                     .build();
 
-            // Act & Assert
             // A unidade inexistente retorna 404 (NOT_FOUND) via ErroEntidadeNaoEncontrada
             mockMvc.perform(post(BASE_URL + "/entrar")
                             .with(csrf())
