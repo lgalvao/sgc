@@ -40,6 +40,9 @@
           @row-click="abrirDetalhesUnidade"/>
 
       <div>
+        <p v-if="isProcessoFinalizado" class="mt-3 text-muted">
+          Processo concluído.
+        </p>
         <BButton
             v-if="podeFinalizar"
             class="mt-3"

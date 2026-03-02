@@ -365,7 +365,7 @@ function scrollParaPrimeiroErro() {
     const primeiraAtividadeComErro = atividadeRefs.get(errosValidacao.value[0].atividadeCodigo);
     if (primeiraAtividadeComErro) {
       primeiraAtividadeComErro.scrollIntoView({
-        behavior: "smooth",
+        behavior: "instant" as ScrollBehavior,
         block: "center",
       });
     }
