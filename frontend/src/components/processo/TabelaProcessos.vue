@@ -90,7 +90,7 @@ defineExpose({fields});
         v-model:sort-by="internalSortBy"
         :fields="fields"
         :items="processos"
-        :tbody-tr-props="rowAttr"
+        :tbody-tr-attrs="rowAttr"
         :tbody-tr-class="rowClass"
         aria-label="Lista de processos cadastrados"
         data-testid="tbl-processos"
