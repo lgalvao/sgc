@@ -221,7 +221,6 @@ const processosStore = useProcessosStore();
 
 const mapaStore = useMapasStore();
 const feedbackStore = useFeedbackStore();
-const perfilStore = usePerfilStore();
 
 // Gerenciamento simplificado de modals e loading com composables
 const modals = useModalManager(['alterarDataLimite', 'reabrir']);
@@ -253,9 +252,7 @@ const {
   podeAlterarDataLimite,
   podeReabrirCadastro,
   podeReabrirRevisao,
-  podeEnviarLembrete,
-  podeDisponibilizarCadastro,
-  podeEditarCadastro
+  podeEnviarLembrete
 } = useAcesso(subprocesso);
 
 const isProcessoFinalizado = computed(() => {

@@ -8,8 +8,6 @@ const meta: Meta<typeof PageHeader> = {
     argTypes: {
         title: {control: 'text'},
         subtitle: {control: 'text'},
-        etapa: {control: 'text'},
-        proximaAcao: {control: 'text'},
     },
 };
 
@@ -27,8 +25,6 @@ export const ComContexto: Story = {
     args: {
         title: 'Mapeamento de Competências',
         subtitle: 'Unidade: Diretoria de Tecnologia',
-        etapa: 'Em Andamento',
-        proximaAcao: 'Aguardando validação do gestor',
     },
 };
 

@@ -125,12 +125,11 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
-import {useProximaAcao} from "@/composables/useProximaAcao";
 import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
 import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
-import {formatSituacaoSubprocesso} from "@/utils/formatters";
+import {formatSituacaoProcesso, formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
 
 function flattenUnidades(unidades: any[]): any[] {
@@ -149,7 +148,6 @@ const router = useRouter();
 const processosStore = useProcessosStore();
 const perfilStore = usePerfilStore();
 const feedbackStore = useFeedbackStore();
-const {obterProximaAcao} = useProximaAcao();
 
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const modalBlocoRef = ref<any>(null);
