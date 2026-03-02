@@ -40,29 +40,6 @@
           @row-click="abrirDetalhesUnidade"/>
 
       <div>
-        <div
-            v-if="podeAceitarBloco || podeHomologarBloco"
-            class="mt-3 d-flex gap-2"
-        >
-          <BButton
-              v-if="podeAceitarBloco"
-              data-testid="btn-acao-bloco-aceitar"
-              variant="outline-primary"
-              @click="abrirModalBloco('aceitar')"
-          >
-            <i aria-hidden="true" class="bi bi-check-circle me-1"/>
-            Aceitar em bloco
-          </BButton>
-          <BButton
-              v-if="podeHomologarBloco"
-              data-testid="btn-acao-bloco-homologar"
-              variant="outline-success"
-              @click="abrirModalBloco('homologar')"
-          >
-            <i aria-hidden="true" class="bi bi-check-all me-1"/>
-            Homologar em bloco
-          </BButton>
-        </div>
         <BButton
             v-if="podeFinalizar"
             class="mt-3"

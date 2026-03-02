@@ -331,7 +331,7 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
-        const store = useSubprocessosStore();
+        const store = useProcessosStore();
         vi.spyOn(feedbackStore, "show");
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
@@ -347,8 +347,8 @@ describe("VisMapa.vue", () => {
         );
         await confirmBtn.trigger("click");
 
-        expect(store.devolverRevisaoCadastro).toHaveBeenCalledWith(10, {
-            observacoes: "Ajustar X",
+        expect(store.devolverValidacao).toHaveBeenCalledWith(10, {
+            justificativa: "Ajustar X",
         });
         expect(feedbackStore.show).not.toHaveBeenCalled();
     });
@@ -562,11 +562,14 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
-        const store = useSubprocessosStore();
-        (store.devolverRevisaoCadastro as any).mockRejectedValue(new Error("Fail"));
+        const store = useProcessosStore();
+        (store.devolverValidacao as any).mockRejectedValue(new Error("Fail"));
         vi.spyOn(feedbackStore, "show");
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
+        await wrapper.vm.$nextTick();
+
+        (wrapper.vm as any).observacaoDevolucao = "Observação de teste";
         await wrapper.vm.$nextTick();
 
         await wrapper.find('[data-testid="btn-devolucao-mapa-confirmar"]').trigger("click");

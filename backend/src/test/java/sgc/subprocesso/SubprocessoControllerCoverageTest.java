@@ -217,7 +217,7 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("importarAtividades - deve chamar servico e retornar 200")
     @WithMockUser
     void importarAtividades() throws Exception {
-        ImportarAtividadesRequest req = new ImportarAtividadesRequest(2L);
+        ImportarAtividadesRequest req = new ImportarAtividadesRequest(2L, null);
 
         mockMvc.perform(post("/api/subprocessos/1/importar-atividades")
                         .with(csrf())
@@ -225,7 +225,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).importarAtividades(1L, 2L);
+        verify(subprocessoService).importarAtividades(1L, 2L, null);
     }
 
     @Test

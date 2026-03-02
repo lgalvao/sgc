@@ -15,6 +15,7 @@
           v-model="novaDataLimite"
           :min="dataLimiteMinima"
           data-testid="input-nova-data-limite"
+          max="2099-12-31"
           type="date"
       />
       <template #description>

@@ -93,7 +93,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("importarAtividades: Deve importar atividades de outro mapa com sucesso")
     void importarAtividades_Sucesso() {
-        subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo());
+        subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo(), null);
 
         Subprocesso destAtualizado = subprocessoRepo.findById(subprocessoDestino.getCodigo()).orElseThrow();
         assertThat(destAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
@@ -107,7 +107,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
     void importarAtividades_NegarAcessoDestino() {
         chefe.setUnidadeAtivaCodigo(999L); // Different unit
 
-        assertThatThrownBy(() -> subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo()))
+        assertThatThrownBy(() -> subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo(), null))
                 .isInstanceOf(ErroAcessoNegado.class)
                 .hasMessageContaining("Usuário não tem permissão para importar atividades");
     }
@@ -116,7 +116,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
     @DisplayName("importarAtividades: Deve negar acesso se usuário não tiver permissão de consulta na origem")
     void importarAtividades_NegarAcessoOrigem() {
         chefe.setPerfilAtivo(Perfil.SERVIDOR);
-        assertThatThrownBy(() -> subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo()))
+        assertThatThrownBy(() -> subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo(), null))
                 .isInstanceOf(ErroAcessoNegado.class)
                 .hasMessageContaining("Usuário não tem permissão para importar atividades");
     }
@@ -127,7 +127,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
         subprocessoDestino.getProcesso().setTipo(TipoProcesso.REVISAO);
         processoRepo.save(subprocessoDestino.getProcesso());
 
-        subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo());
+        subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo(), null);
 
         Subprocesso destAtualizado = subprocessoRepo.findById(subprocessoDestino.getCodigo()).orElseThrow();
         assertThat(destAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -139,7 +139,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
         subprocessoDestino.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.save(subprocessoDestino);
 
-        subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo());
+        subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo(), null);
 
         Subprocesso destAtualizado = subprocessoRepo.findById(subprocessoDestino.getCodigo()).orElseThrow();
         assertThat(destAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
@@ -151,7 +151,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
         subprocessoDestino.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocessoRepo.save(subprocessoDestino);
 
-        assertThatThrownBy(() -> subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo()))
+        assertThatThrownBy(() -> subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo(), null))
                 .isInstanceOf(sgc.comum.erros.ErroValidacao.class)
                 .hasMessageContaining("Situação do subprocesso não permite importação");
     }
@@ -159,7 +159,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("listarAtividadesSubprocesso: Deve listar atividades do subprocesso")
     void listarAtividadesSubprocesso_Sucesso() {
-        subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo());
+        subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo(), null);
         
         List<sgc.mapa.dto.AtividadeDto> atividades = subprocessoService.listarAtividadesSubprocesso(subprocessoDestino.getCodigo());
         
