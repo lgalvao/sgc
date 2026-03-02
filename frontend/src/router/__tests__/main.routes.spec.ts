@@ -1,6 +1,12 @@
-import {describe, expect, it} from "vitest";
+import {describe, expect, it, vi} from "vitest";
 import mainRoutes from "../main.routes";
 
+vi.mock('@/views/LoginView.vue', () => ({ default: { name: 'LoginView' } }));
+vi.mock('@/views/PainelView.vue', () => ({ default: { name: 'PainelView' } }));
+vi.mock('@/views/HistoricoView.vue', () => ({ default: { name: 'HistoricoView' } }));
+vi.mock('@/views/RelatoriosView.vue', () => ({ default: { name: 'RelatoriosView' } }));
+vi.mock('@/views/ParametrosView.vue', () => ({ default: { name: 'ParametrosView' } }));
+vi.mock('@/views/AdministradoresView.vue', () => ({ default: { name: 'AdministradoresView' } }));
 describe("main.routes", () => {
     it("deve exportar um array de rotas", () => {
         expect(Array.isArray(mainRoutes)).toBe(true);
