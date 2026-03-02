@@ -69,4 +69,12 @@ describe("ProcessoFormFields.vue", () => {
 
         expect(showPickerSpy).toHaveBeenCalled();
     });
+
+    it("campo de data deve ter atributos min e max para validação de ano", async () => {
+        const wrapper = criarWrapper();
+        const input = wrapper.find('[data-testid="inp-processo-data-limite"]').element as HTMLInputElement;
+
+        expect(input.getAttribute('min')).toBe('2000-01-01');
+        expect(input.getAttribute('max')).toBe('2099-12-31');
+    });
 });
