@@ -37,6 +37,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocessoOrigem;
     private Usuario chefe;
     private Unidade unidade;
+    private Atividade atividadeOrigem;
 
     @BeforeEach
     void setUp() {
@@ -86,7 +87,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
         mapaRepo.save(mapaOrigem);
         subprocessoOrigem.setMapa(mapaOrigem);
 
-        Atividade atividadeOrigem = Atividade.builder().mapa(mapaOrigem).descricao("Atividade Importada").build();
+        atividadeOrigem = Atividade.builder().mapa(mapaOrigem).descricao("Atividade Importada").build();
         atividadeRepo.save(atividadeOrigem);
     }
 
@@ -100,6 +101,28 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
 
         long countAtividadesDestino = atividadeRepo.findByMapa_Codigo(destAtualizado.getMapa().getCodigo()).size();
         assertThat(countAtividadesDestino).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("importarAtividades: Deve importar somente as atividades selecionadas (codigosAtividades)")
+    void importarAtividades_SeletivaSucesso() {
+        Atividade atividadeExtra = Atividade.builder()
+                .mapa(subprocessoOrigem.getMapa())
+                .descricao("Atividade Nao Selecionada")
+                .build();
+        atividadeRepo.save(atividadeExtra);
+
+        subprocessoService.importarAtividades(
+                subprocessoDestino.getCodigo(),
+                subprocessoOrigem.getCodigo(),
+                List.of(atividadeOrigem.getCodigo())
+        );
+
+        Subprocesso destAtualizado = subprocessoRepo.findById(subprocessoDestino.getCodigo()).orElseThrow();
+        long countAtividadesDestino = atividadeRepo.findByMapa_Codigo(destAtualizado.getMapa().getCodigo()).size();
+        assertThat(countAtividadesDestino).isEqualTo(1);
+        assertThat(atividadeRepo.findByMapa_Codigo(destAtualizado.getMapa().getCodigo()).getFirst().getDescricao())
+                .isEqualTo("Atividade Importada");
     }
 
     @Test

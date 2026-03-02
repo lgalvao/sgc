@@ -9,6 +9,7 @@ import sgc.mapa.model.*;
 
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,6 +83,54 @@ class CopiaMapaServiceCoverageTest {
 
 
         verify(atividadeRepo).saveAll(anyList());
+    }
+
+    @Test
+    @DisplayName("importarAtividadesDeOutroMapa deve importar somente atividades selecionadas (codigosAtividades não nulo)")
+    void deveImportarApenasAtividadesSelecionadas() {
+
+        Long mapaOrigemId = 1L;
+        Long mapaDestinoId = 2L;
+
+        Atividade ativ1 = Atividade.builder().descricao("Selecionada").conhecimentos(new HashSet<>()).build();
+        ativ1.setCodigo(10L);
+        Atividade ativ2 = Atividade.builder().descricao("Nao Selecionada").conhecimentos(new HashSet<>()).build();
+        ativ2.setCodigo(20L);
+
+        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativ1, ativ2));
+        when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of());
+        when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
+
+
+        service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId, List.of(10L));
+
+
+        ArgumentCaptor<List<Atividade>> captor = ArgumentCaptor.forClass(List.class);
+        verify(atividadeRepo).saveAll(captor.capture());
+        assertThat(captor.getValue()).hasSize(1);
+        assertThat(captor.getValue().getFirst().getDescricao()).isEqualTo("Selecionada");
+    }
+
+    @Test
+    @DisplayName("importarAtividadesDeOutroMapa deve ignorar IDs inexistentes sem lançar exceção")
+    void deveIgnorarIdsInexistentesELogarAviso() {
+
+        Long mapaOrigemId = 1L;
+        Long mapaDestinoId = 2L;
+
+        Atividade ativ1 = Atividade.builder().descricao("Existente").conhecimentos(new HashSet<>()).build();
+        ativ1.setCodigo(10L);
+
+        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativ1));
+        when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of());
+        when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
+
+
+        // ID 999 não existe no mapa de origem — deve ser ignorado sem lançar exceção
+        service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId, List.of(999L));
+
+
+        verify(atividadeRepo, never()).saveAll(anyList());
     }
 
     @Test

@@ -659,4 +659,33 @@ describe("VisMapa.vue", () => {
         const modal = wrapper.findAllComponents({name: 'ModalConfirmacao'}).find(c => c.props('titulo') === 'Devolução');
         await modal?.vm.$emit('shown');
     });
+
+    it("botão de confirmar devolução deve estar desabilitado quando observação está vazia", async () => {
+        const {wrapper} = mountComponent({
+            perfil: {perfilSelecionado: "GESTOR"},
+            processos: {
+                processoDetalhe: {
+                    unidades: [
+                        {
+                            sigla: "TEST",
+                            codUnidade: 10,
+                            codSubprocesso: 10,
+                            situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+                        },
+                    ],
+                },
+            },
+        });
+
+        await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
+        await wrapper.vm.$nextTick();
+
+        const confirmBtn = wrapper.find('[data-testid="btn-devolucao-mapa-confirmar"]');
+        expect((confirmBtn.element as HTMLButtonElement).disabled).toBe(true);
+
+        await wrapper.find('[data-testid="inp-devolucao-mapa-obs"]').setValue("Motivo de devolução");
+        await wrapper.vm.$nextTick();
+
+        expect((confirmBtn.element as HTMLButtonElement).disabled).toBe(false);
+    });
 });

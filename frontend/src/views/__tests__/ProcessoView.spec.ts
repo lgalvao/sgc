@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {flushPromises, mount} from "@vue/test-utils";
+import {flushPromises, mount, type DOMWrapper} from "@vue/test-utils";
 import Processo from "@/views/ProcessoDetalheView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useProcessosStore} from "@/stores/processos";
@@ -227,6 +227,28 @@ describe("Processo.vue", () => {
         // Disponibilizar
         const btnDisponibilizar = wrapper.find("button.btn-info");
         expect(btnDisponibilizar.exists()).toBe(true);
+    });
+
+    it("não deve exibir botões de ação em bloco duplicados (apenas um conjunto)", async () => {
+        wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        processosStore = useProcessosStore();
+
+        perfilStore.$patch({perfis: [Perfil.GESTOR, Perfil.ADMIN]});
+        processosStore.$patch({processoDetalhe: mockProcesso});
+
+        await nextTick();
+        await flushPromises();
+
+        const botoesAceitar = wrapper.findAll("button.btn-success").filter(
+            (b: DOMWrapper<Element>) => b.text().includes("Aceitar em bloco")
+        );
+        expect(botoesAceitar.length).toBe(1);
+
+        const botoesHomologar = wrapper.findAll("button.btn-warning").filter(
+            (b: DOMWrapper<Element>) => b.text().includes("Homologar em bloco")
+        );
+        expect(botoesHomologar.length).toBe(1);
     });
 
     it("deve abrir modal de ação em bloco ao clicar no botão", async () => {
