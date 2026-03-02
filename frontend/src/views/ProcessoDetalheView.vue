@@ -106,7 +106,7 @@ import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
 import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
-import {formatSituacaoProcesso, formatSituacaoSubprocesso} from "@/utils/formatters";
+import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
 
 function flattenUnidades(unidades: any[]): any[] {
