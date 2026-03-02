@@ -61,17 +61,17 @@ function handleSelecionarProcesso(processo: any) {
   emit("selecionarProcesso", item);
 }
 
-function rowClass(item: ProcessoResumo | null) {
-  return item ? `row-processo-${item.codigo}` : '';
+function rowClass(item: ProcessoResumo | null, type: string) {
+  return item && type === 'row' ? `row-processo-${item.codigo}` : '';
 }
 
-function rowAttr(item: ProcessoResumo | null) {
-  if (item) {
+function rowAttr(item: ProcessoResumo | null, type: string) {
+  if (item && type === 'row') {
     return {
       tabindex: "0",
       style: {cursor: "pointer"},
       onKeydown: (e: KeyboardEvent) => {
-        if (e.key === "Enter" || e.key === " ") {
+        if (e.key === "Enter" || e.key === "enter" || e.key === " " || e.key === "space") {
           e.preventDefault();
           handleSelecionarProcesso(item);
         }
@@ -90,7 +90,7 @@ defineExpose({fields});
         v-model:sort-by="internalSortBy"
         :fields="fields"
         :items="processos"
-        :tbody-tr-props="rowAttr"
+        :tbody-tr-attrs="rowAttr"
         :tbody-tr-class="rowClass"
         aria-label="Lista de processos cadastrados"
         data-testid="tbl-processos"

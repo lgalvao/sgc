@@ -136,13 +136,13 @@ describe("TabelaProcessos.vue", () => {
         context.wrapper = mount(TabelaProcessos, {
             ...getCommonMountOptions({}, {
                 BTable: {
-                    props: ['items', 'tbodyTrAttr'],
+                    props: ['items', 'tbodyTrAttrs'],
                     template: `
                         <table>
                             <tbody>
                                 <tr v-for="item in items"
                                     :key="item.codigo"
-                                    v-bind="tbodyTrAttr ? tbodyTrAttr(item, 'row') : {}">
+                                    v-bind="tbodyTrAttrs ? tbodyTrAttrs(item, 'row') : {}">
                                     <td>{{ item.descricao }}</td>
                                 </tr>
                             </tbody>
