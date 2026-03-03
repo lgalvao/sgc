@@ -7,22 +7,6 @@ function getFiles() {
     return output.trim().split(/\r?\n/).filter(Boolean);
 }
 
-function walkDir(dir, fileList = []) {
-    const files = fs.readdirSync(dir);
-    for (const file of files) {
-        if (file === '.git' || file === 'node_modules' || file === 'dist' || file === 'build' || file === '.gradle') continue;
-
-        const filePath = path.join(dir, file);
-        const stat = fs.statSync(filePath);
-        if (stat.isDirectory()) {
-            walkDir(filePath, fileList);
-        } else {
-            fileList.push(filePath.replaceAll('\\', '/'));
-        }
-    }
-    return fileList;
-}
-
 function countLines(filePath) {
     if (!fs.existsSync(filePath)) return 0;
     const content = fs.readFileSync(filePath, 'utf-8');

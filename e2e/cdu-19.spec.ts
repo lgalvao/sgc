@@ -26,11 +26,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
     // PREPARAÇÃO - Criar mapa disponibilizado para CHEFE validar
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
-                                                                                page,
-                                                                                autenticadoComoAdmin,
-                                                                                cleanupAutomatico
-                                                                            }) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, cleanupAutomatico}) => {
         await criarProcesso(page, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
@@ -51,10 +47,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({
-                                                                                        page,
-                                                                                        autenticadoComoChefeSecao221
-                                                                                    }) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
@@ -71,7 +64,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Gestores aceitam cadastro', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Preparacao 3: Gestores aceitam cadastro', async ({page}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
@@ -82,7 +75,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await aceitarCadastroMapeamento(page);
     });
 
-    test('Preparacao 4: Admin homologa cadastro e cria competências', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 4: Admin homologa cadastro e cria competências', async ({page}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_221');
         await page.getByTestId('card-subprocesso-atividades-vis').click();
@@ -103,10 +96,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
     // TESTES PRINCIPAIS - CDU-19
 
-    test('Cenários CDU-19: Fluxo completo de validação do mapa pelo CHEFE', async ({
-                                                                                       page,
-                                                                                       autenticadoComoChefeSecao221
-                                                                                   }) => {
+    test('Cenários CDU-19: Fluxo completo de validação do mapa pelo CHEFE', async ({page}) => {
         // Cenario 1: Navegação para visualização do mapa
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

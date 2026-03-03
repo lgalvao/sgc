@@ -41,6 +41,7 @@ const reportFile = 'relatorio-testes.md';
 
 function cleanLog(output) {
     // Remove cores ANSI
+    // eslint-disable-next-line no-control-regex
     let text = output.replace(/\u001b\[.*?m/g, '');
 
     // Filtros de linhas indesejadas

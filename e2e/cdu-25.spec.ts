@@ -46,7 +46,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     const competencia1 = `Competência Val ${timestamp}`;
 
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Preparacao 1: Admin cria e inicia processo', async ({page, cleanupAutomatico}) => {
 
 
         await criarProcesso(page, {
@@ -99,7 +99,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await aceitarCadastroMapeamento(page);
     });
 
-    test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page}) => {
 
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

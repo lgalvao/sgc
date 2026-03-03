@@ -15,7 +15,7 @@ import {navegarParaMapa} from './helpers/helpers-mapas.js';
  */
 test.describe('CDU-18: Visualizar mapa de competências', () => {
 
-    test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({page, autenticadoComoAdmin}) => {
+    test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({page}) => {
         await test.step('1. Login como ADMIN', async () => {
             // Já autenticado via fixture
         });
@@ -61,7 +61,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
         });
     });
 
-    test('Cenário 2: CHEFE visualiza mapa da própria unidade', async ({page, autenticadoComoChefeAssessoria12}) => {
+    test('Cenário 2: CHEFE visualiza mapa da própria unidade', async ({page}) => {
         await test.step('1. Login como CHEFE_ASSESSORIA_12', async () => {
             // Já autenticado via fixture
         });

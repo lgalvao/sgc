@@ -32,7 +32,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     const atividade1 = `Atividade Reabrir ${timestamp}`;
 
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Preparacao 1: Admin cria e inicia processo', async ({page, cleanupAutomatico}) => {
         await criarProcesso(page, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
@@ -53,7 +53,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
+    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
@@ -66,10 +66,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Gestores e ADMIN aceitam e homologam cadastro', async ({
-                                                                                   page,
-                                                                                   autenticadoComoGestorCoord22
-                                                                               }) => {
+    test('Preparacao 3: Gestores e ADMIN aceitam e homologam cadastro', async ({page}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page, 'Aceite intermediário COORD_22');
@@ -87,7 +84,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
 
-    test('Cenários CDU-32: ADMIN reabre cadastro', async ({page, autenticadoComoAdmin}) => {
+    test('Cenários CDU-32: ADMIN reabre cadastro', async ({page}) => {
         // Cenario 1 & 2: Navegação e visualização do botão
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);

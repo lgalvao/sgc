@@ -27,7 +27,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     const competencia1 = `Competência 1 ${timestamp}`;
     const competencia2 = `Competência 2 ${timestamp}`;
 
-    test('Fluxo completo de validação de mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Fluxo completo de validação de mapa', async ({page}) => {
         await test.step('1. ADMIN cria processo e CHEFE disponibiliza', async () => {
             await criarProcesso(page, {
                 descricao: descProcesso,

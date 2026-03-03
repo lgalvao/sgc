@@ -5,54 +5,55 @@ import http from 'node:http';
 import {fileURLToPath} from 'node:url';
 import {SMTPServer} from 'smtp-server';
 
-// Recreate __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const BACKEND_DIR = path.resolve(__dirname, '../backend');
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
 const BACKEND_PORT = 10000;
-const FRONTEND_PORT = 5173;
+const FRONTEND_PORT = 4173;
 const SMTP_PORT = 1025;
 
 let backendProcess;
 let frontendProcess;
 let smtpServer;
 
-// Criar/limpar arquivo de log ao iniciar
 const LOG_FILE = path.resolve(__dirname, 'server.log');
-
-// Local lightweight logger for this lifecycle script.
-// Writes to console and appends to LOG_FILE.
 const lifecycleLogger = {
     info: (msg) => {
         try {
             console.log(msg);
         } catch {
+            // Ignorar erro de log
         }
         try {
             fs.appendFileSync(LOG_FILE, `[INFO] ${msg}\n`);
         } catch {
+            // Ignorar erro de escrita em arquivo
         }
     },
     warn: (msg) => {
         try {
             console.warn(msg);
         } catch {
+            // Ignorar erro de log
         }
         try {
             fs.appendFileSync(LOG_FILE, `[WARN] ${msg}\n`);
         } catch {
+            // Ignorar erro de escrita em arquivo
         }
     },
     error: (msg) => {
         try {
             console.error(msg);
         } catch {
+            // Ignorar erro de log
         }
         try {
             fs.appendFileSync(LOG_FILE, `[ERROR] ${msg}\n`);
         } catch {
+            // Ignorar erro de escrita em arquivo
         }
     }
 };
@@ -60,11 +61,9 @@ const lifecycleLogger = {
 try {
     fs.writeFileSync(LOG_FILE, '');
 } catch (e) {
-    // If LOG_FILE creation fails, fallback to console
     console.error('Não foi possível criar o arquivo de log:', e && e.message ? e.message : e);
 }
 
-// Suprimir o DeprecationWarning DEP0190 - é necessário usar shell: true no Windows para .bat/.cmd
 process.removeAllListeners('warning');
 process.on('warning', (warning) => {
     if (warning.name === 'DeprecationWarning' && warning.code === 'DEP0190') return;
@@ -75,12 +74,13 @@ const LOG_FILTERS = [
     // Warnings do Lombok
     /WARNING:/,
 
-    /^> Task :/,
+    // Mensagens do Gradle
+    /^> Task :/, 
     /logStarted/,
-    /UP-TO-DATE/,
+    /UP-TO-DATE/, 
     /Starting a Gradle Daemon.*Daemons could not be reused/,
     /Reusing configuration cache/,
-    /Starting/,
+    /Starting/, 
 
     // Spring Boot - Inicialização
     /The following.*profile.*is active/,
@@ -93,7 +93,9 @@ const LOG_FILTERS = [
 
     // Vite - Inicialização
     /^> sgc@.*dev$/,
+    /^> sgc@.*preview$/,
     /^> vite$/,
+    /^> vite preview$/,
     /VITE v.* ready in/,
     /➜ {2}Local:/,
     /➜ {2}Network:/,
@@ -124,7 +126,6 @@ function log(prefix, data) {
     lines.forEach(line => {
         const trimmed = line.trim();
         if (trimmed && !shouldFilterLog(line)) {
-            // Use lifecycleLogger to keep console + file in sync
             lifecycleLogger.info(`[${prefix}] ${line}`);
         }
     });
@@ -133,14 +134,11 @@ function log(prefix, data) {
 const isWindows = process.platform === 'win32';
 
 function startBackend() {
-    // Ensure gradlew is executable (Unix only)
     if (!isWindows) {
         fs.chmodSync(path.join(BACKEND_DIR, 'gradlew'), '755');
     }
-
     const gradlewExecutable = isWindows ? 'gradlew.bat' : './gradlew';
     const gradlewPath = path.resolve(BACKEND_DIR, `../${gradlewExecutable}`);
-
     const spawnOptions = {
         cwd: BACKEND_DIR,
         shell: isWindows,
@@ -148,7 +146,6 @@ function startBackend() {
     };
 
     backendProcess = spawn(gradlewPath, ['bootRun', '-PENV=e2e'], spawnOptions);
-
     backendProcess.stdout.on('data', data => log('BACKEND', data));
     backendProcess.stderr.on('data', data => log('BACKEND_ERR', data));
 
@@ -163,14 +160,17 @@ function startBackend() {
 function startFrontend() {
     const npmExecutable = isWindows ? 'npm.cmd' : 'npm';
 
+    lifecycleLogger.info('[FRONTEND] Gerando build de produção...');
+    execSync(`${npmExecutable} run build`, {cwd: FRONTEND_DIR, stdio: 'inherit'});
+    lifecycleLogger.info('[FRONTEND] Build concluído.');
+
     const spawnOptions = {
         cwd: FRONTEND_DIR,
         shell: isWindows,
         stdio: ['ignore', 'pipe', 'pipe']
     };
 
-    frontendProcess = spawn(npmExecutable, ['run', 'dev'], spawnOptions);
-
+    frontendProcess = spawn(npmExecutable, ['run', 'preview'], spawnOptions);
     frontendProcess.stdout.on('data', data => log('FRONTEND', data));
     frontendProcess.stderr.on('data', data => log('FRONTEND_ERR', data));
 
@@ -186,13 +186,11 @@ function startSmtpServer() {
     smtpServer = new SMTPServer({
         authOptional: true,
         onData(stream, session, callback) {
-            let buffer = '';
-            stream.on('data', (chunk) => {
-                buffer += chunk;
+            stream.on('data', () => {
+                // Consumir dados para evitar backpressure
             });
             stream.on('end', () => {
                 // log('SMTP', `E-mail recebido de ${session.envelope.mailFrom.address} para ${session.envelope.rcptTo.map(r => r.address).join(', ')}`);
-                // Se precisar do corpo do e-mail para debug futuro, pode logar 'buffer' aqui
                 callback();
             });
         }

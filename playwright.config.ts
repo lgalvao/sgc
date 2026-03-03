@@ -9,13 +9,13 @@ export default defineConfig({
     expect: {timeout: 5_000},
     reporter: 'list',
     use: {
-        baseURL: 'http://localhost:5173',
+        baseURL: 'http://localhost:4173',
         trace: 'on-first-retry',
         screenshot: 'only-on-failure'
     },
     webServer: {
         command: 'node e2e/lifecycle.js',
-        url: 'http://localhost:5173',
+        url: 'http://localhost:4173',
         reuseExistingServer: true,
         timeout: 100 * 1000,
         stdout: 'pipe',

@@ -10,17 +10,24 @@
     "test:e2e:captura": "playwright test e2e/captura-telas.spec.ts",
     "typecheck": "npm run typecheck --prefix frontend && npm run typecheck:e2e",
     "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
-    "lint": "npm run lint --prefix frontend"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
+    "@eslint/js": "^9.21.0",
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.3.3",
     "@types/smtp-server": "^3.5.12",
     "@vitest/browser-preview": "^4.0.18",
     "chrome-launcher": "^1.2.1",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.2",
+    "eslint-plugin-playwright": "^2.2.0",
+    "globals": "^16.0.0",
     "lighthouse": "^13.0.3",
     "smtp-server": "^3.18.1",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.25.0",
     "vitest": "^4.0.18"
   },
   "dependencies": {

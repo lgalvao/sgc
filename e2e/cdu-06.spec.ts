@@ -5,7 +5,7 @@ import {criarProcesso, verificarDetalhesProcesso, verificarUnidadeParticipante} 
 test.describe('CDU-06 - Detalhar processo', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_12';
 
-    test('Deve exibir detalhes do processo para ADMIN', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Deve exibir detalhes do processo para ADMIN', async ({page, cleanupAutomatico}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 ${timestamp}`;
 

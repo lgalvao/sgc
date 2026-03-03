@@ -2,15 +2,10 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
 import {criarProcesso, extrairProcessoId, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
-import type {Page} from '@playwright/test';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 test.describe('CDU-02 - Visualizar Painel', () => {
     test.describe('Como ADMIN', () => {
-        test('Deve exibir estrutura básica do painel e testar ordenação', async ({page, autenticadoComoAdmin}: {
-            page: Page,
-            autenticadoComoAdmin: void
-        }) => {
+        test('Deve exibir estrutura básica do painel e testar ordenação', async ({page}) => {
             await test.step('Verificar seções principais', async () => {
                 await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();
                 await expect(page.getByTestId('txt-painel-titulo-processos')).toHaveText('Processos');
@@ -37,11 +32,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             });
         });
 
-        test('Deve criar processo e visualizá-lo na tabela', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {
-            page: Page,
-            autenticadoComoAdmin: void,
-            cleanupAutomatico: ReturnType<typeof useProcessoCleanup>
-        }) => {
+        test('Deve criar processo e visualizá-lo na tabela', async ({page, cleanupAutomatico}) => {
             const descricaoProcesso = `Processo E2E - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -66,15 +57,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             });
         });
 
-        test('Processos "Criado" devem aparecer apenas para ADMIN', async ({
-                                                                               page,
-                                                                               autenticadoComoAdmin,
-                                                                               cleanupAutomatico
-                                                                           }: {
-            page: Page,
-            autenticadoComoAdmin: void,
-            cleanupAutomatico: ReturnType<typeof useProcessoCleanup>
-        }) => {
+        test('Processos "Criado" devem aparecer apenas para ADMIN', async ({page, cleanupAutomatico}) => {
             const descricaoProcesso = `Processo Criado - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -103,19 +86,11 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             );
 
             // Verifica que o processo NÃO está visível para GESTOR
-            await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso)).not.toBeVisible();
+            await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso)).toBeHidden();
         });
 
 
-        test('Não deve incluir unidades INTERMEDIARIAS na seleção', async ({
-                                                                               page,
-                                                                               autenticadoComoAdmin,
-                                                                               cleanupAutomatico
-                                                                           }: {
-            page: Page,
-            autenticadoComoAdmin: void,
-            cleanupAutomatico: ReturnType<typeof useProcessoCleanup>
-        }) => {
+        test('Não deve incluir unidades INTERMEDIARIAS na seleção', async ({page, cleanupAutomatico}) => {
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
 
@@ -174,12 +149,9 @@ test.describe('CDU-02 - Visualizar Painel', () => {
     });
 
     test.describe('Como GESTOR', () => {
-        test('Deve validar visualização, alertas e ordenação', async ({page, autenticadoComoGestor}: {
-            page: Page,
-            autenticadoComoGestor: void
-        }) => {
+        test('Deve validar visualização, alertas e ordenação', async ({page}) => {
             await test.step('Verificar restrições de botões e mensagens de tabela vazia', async () => {
-                await expect(page.getByTestId('btn-painel-criar-processo')).not.toBeVisible();
+                await expect(page.getByTestId('btn-painel-criar-processo')).toBeHidden();
                 await expect(page.getByTestId('tbl-processos')).toBeVisible();
                 await expect(page.getByTestId('empty-state-processos')).toBeVisible();
             });

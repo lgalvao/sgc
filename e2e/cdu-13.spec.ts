@@ -24,7 +24,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-13 ${timestamp}`;
 
-    test('Fluxo Completo de Análise de Atividades (CDU-13)', async ({page, autenticadoComoAdmin}) => {
+    test('Fluxo Completo de Análise de Atividades (CDU-13)', async ({page}) => {
 
         await test.step('1. ADMIN cria e inicia processo', async () => {
             await criarProcesso(page, {

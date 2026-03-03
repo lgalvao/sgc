@@ -39,11 +39,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
     // PREPARAÇÃO - Criar mapa vigente (processo de mapeamento completo)
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
-                                                                                page,
-                                                                                autenticadoComoAdmin,
-                                                                                cleanupAutomatico
-                                                                            }) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, cleanupAutomatico}) => {
         await criarProcesso(page, {
             descricao: descProcessoMapeamento,
             tipo: 'MAPEAMENTO',
@@ -63,10 +59,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({
-                                                                                        page,
-                                                                                        autenticadoComoChefeSecao211
-                                                                                    }) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
         await navegarParaAtividades(page);
 
@@ -86,7 +79,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Gestores aceitam cadastro', async ({page, autenticadoComoGestorCoord21}) => {
+    test('Preparacao 3: Gestores aceitam cadastro', async ({page}) => {
         console.log('-> Gestores (COORD e SEC) aceitando cadastro...');
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -98,10 +91,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await aceitarCadastroMapeamento(page);
     });
 
-    test('Preparacao 4: Admin homologa cadastro, cria competências e disponibiliza mapa', async ({
-                                                                                                     page,
-                                                                                                     autenticadoComoAdmin
-                                                                                                 }) => {
+    test('Preparacao 4: Admin homologa cadastro, cria competências e disponibiliza mapa', async ({page}) => {
         // Homologação do cadastro
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -120,7 +110,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 5: Chefe valida mapa', async ({page, autenticadoComoChefeSecao211}) => {
+    test('Preparacao 5: Chefe valida mapa', async ({page}) => {
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
         await navegarParaMapa(page);
 
@@ -131,7 +121,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
     });
 
-    test('Preparacao 6: Gestores aceitam mapa', async ({page, autenticadoComoGestorCoord21}) => {
+    test('Preparacao 6: Gestores aceitam mapa', async ({page}) => {
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
@@ -146,11 +136,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 7: Admin homologa mapa, finaliza e inicia revisão', async ({
-                                                                                    page,
-                                                                                    autenticadoComoAdmin,
-                                                                                    cleanupAutomatico
-                                                                                }) => {
+    test('Preparacao 7: Admin homologa mapa, finaliza e inicia revisão', async ({page, cleanupAutomatico}) => {
         // Homologação e finalização do Mapeamento
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -184,7 +170,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 8: Chefe revisa atividades com alterações', async ({page, autenticadoComoChefeSecao211}) => {
+    test('Preparacao 8: Chefe revisa atividades com alterações', async ({page}) => {
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
         await navegarParaAtividades(page);
 
@@ -206,7 +192,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 9: Gestores e Admin aceitam revisão', async ({page, autenticadoComoGestorCoord21}) => {
+    test('Preparacao 9: Gestores e Admin aceitam revisão', async ({page}) => {
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarRevisao(page);
@@ -228,7 +214,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
     // TESTES PRINCIPAIS - CDU-16
 
-    test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({page, autenticadoComoAdmin}) => {
+    test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({page}) => {
         // Cenario 1: Navegação para tela de edição do mapa
         await test.step('Cenário 1: Navegação para o Mapa', async () => {
             await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);

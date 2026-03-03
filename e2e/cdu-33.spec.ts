@@ -36,7 +36,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
 
     // PREPARAÇÃO 0 - CRIAR MAPA VIGENTE
 
-    test('Preparacao 0: Criar e finalizar Mapeamento', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Preparacao 0: Criar e finalizar Mapeamento', async ({page}) => {
         await criarProcesso(page, {
             descricao: descMapeamento,
             tipo: 'MAPEAMENTO',
@@ -116,11 +116,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     });
 
 
-    test('Preparacao 1: Admin cria e inicia processo de REVISAO', async ({
-                                                                             page,
-                                                                             autenticadoComoAdmin,
-                                                                             cleanupAutomatico
-                                                                         }) => {
+    test('Preparacao 1: Admin cria e inicia processo de REVISAO', async ({page, cleanupAutomatico}) => {
         await criarProcesso(page, {
             descricao: descRevisao,
             tipo: 'REVISAO',
@@ -140,7 +136,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza revisão de cadastro', async ({page, autenticadoComoChefeSecao212}) => {
+    test('Preparacao 2: Chefe disponibiliza revisão de cadastro', async ({page}) => {
         await acessarSubprocessoChefeDireto(page, descRevisao);
         await navegarParaAtividades(page);
 
@@ -153,7 +149,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 3: Gestores e ADMIN aceitam revisão', async ({page, autenticadoComoGestorCoord21}) => {
+    test('Preparacao 3: Gestores e ADMIN aceitam revisão', async ({page}) => {
         await acessarSubprocessoGestor(page, descRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarRevisao(page);
@@ -173,7 +169,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     });
 
 
-    test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({page, cleanupAutomatico}) => {
         if (mappingPid > 0) cleanupAutomatico.registrar(mappingPid);
         if (revisaoPid > 0) cleanupAutomatico.registrar(revisaoPid);
 
